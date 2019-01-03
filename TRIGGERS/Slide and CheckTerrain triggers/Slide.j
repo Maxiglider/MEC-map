@@ -41,7 +41,9 @@ function Slide_$n$_Actions takes nothing returns nothing
             call escaper.setSpeedZ(escaper.getOldDiffZ() + GetGravity())
             call SetUnitFlyHeight(escaper.getHero(), -diffZ + escaper.getSpeedZ(), 0)
             //arrêter de tourner si un clic a été fait juste avant
-            call SetUnitFacing(escaper.getHero(), GetUnitFacing(escaper.getHero()))
+            if (not CAN_TURN_IN_AIR) then
+                call SetUnitFacing(escaper.getHero(), GetUnitFacing(escaper.getHero()))
+            endif
         elseif (not escaper.isAlive()) then //le héros mort touche le sol, on désactive le slide
             call escaper.enableSlide(false)
         endif

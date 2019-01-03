@@ -81,4 +81,7 @@ globals
     constant real COOP_REVIVE_DIST = 60.
     
     constant real SON_LAST_HOPE_INTERVALLE_MIN = 10.
+
+
+    constant boolean CAN_TURN_IN_AIR = false
 endglobals

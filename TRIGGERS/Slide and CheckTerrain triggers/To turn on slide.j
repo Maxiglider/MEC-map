@@ -55,17 +55,13 @@ function Trig_to_turn_to_point_Actions takes nothing returns nothing
 //stop hero
     call StopUnit(slider)
     
-    if (not IsOnGround(slider)) then
-        return
-    endif
-    
 //set angle
     //if (udg_isMirrorModeOn_j[n]) then
     //    set angle = Atan2( sliderY - orderY, sliderX - orderX) * bj_RADTODEG
     //else
       set angle = Atan2(orderY - sliderY, orderX - sliderX) * bj_RADTODEG
     //endif
-    
+
 //drunk mode
     if (udg_isDrunk[n]) then
         if (GetRandomInt(1,2) == 1) then
@@ -74,22 +70,25 @@ function Trig_to_turn_to_point_Actions takes nothing returns nothing
             set angle = angle - udg_drunk[n]
         endif
     endif
-    
+
 //turn hero
-    set canTurn = true
-    if (escaper.getLastTerrainType().kind == "slide") then
-        set canTurn = TerrainTypeSlide(integer(escaper.getLastTerrainType())).getCanTurn()
-    endif
+    if (IsOnGround(slider)) then
+		if (escaper.getLastTerrainType().kind == "slide") then
+			set canTurn = TerrainTypeSlide(integer(escaper.getLastTerrainType())).getCanTurn()
+		endif
+	else
+		set canTurn = CAN_TURN_IN_AIR
+	endif
     if (canTurn) then
         call SetUnitFacing(slider, angle)
         call escaper.setSlideLastAngleOrder(angle)
     endif
-        
+
 //save click
     set lastClickedX[n] = orderX
     set lastClickedY[n] = orderY
     set isLastTargetALocation[n] = true
-    
+
     set nbClicsOnSlide[n] = nbClicsOnSlide[n] + 1
 endfunction
 
@@ -110,14 +109,10 @@ function Trig_to_turn_to_widget_Actions takes nothing returns nothing
     set orderWidget = GetOrderTarget()
     set orderX = GetWidgetX(orderWidget)
     set orderY = GetWidgetY(orderWidget)
-    
+
 //stop hero
     call StopUnit(slider)
-    
-    if (not IsOnGround(slider)) then
-        return
-    endif
-    
+
 //set angle
     //if (udg_isMirrorModeOn_j[n]) then
     //    set angle = Atan2( sliderY - orderY, sliderX - orderX) * bj_RADTODEG
@@ -133,12 +128,15 @@ function Trig_to_turn_to_widget_Actions takes nothing returns nothing
             set angle = angle - udg_drunk[n]
         endif
     endif
-    
+
 //turn hero
-    set canTurn = true
-    if (escaper.getLastTerrainType().kind == "slide") then
-        set canTurn = TerrainTypeSlide(integer(escaper.getLastTerrainType())).getCanTurn()
-    endif
+    if (IsOnGround(slider)) then
+		if (escaper.getLastTerrainType().kind == "slide") then
+			set canTurn = TerrainTypeSlide(integer(escaper.getLastTerrainType())).getCanTurn()
+		endif
+	else
+		set canTurn = CAN_TURN_IN_AIR
+	endif
     if (canTurn) then
         call SetUnitFacing(slider, angle)
         call escaper.setSlideLastAngleOrder(angle)
