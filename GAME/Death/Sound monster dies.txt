@@ -1,0 +1,7 @@
+Sound monster dies
+    Evénements
+        Unité - A unit Meurt
+    Conditions
+        (Owner of (Triggering unit)) Egal à Neutre Hostile
+    Actions
+        Son - Play goodJob <gen>

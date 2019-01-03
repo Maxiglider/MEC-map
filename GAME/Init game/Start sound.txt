@@ -1,0 +1,6 @@
+Start sound
+    Evénements
+        Temps - Elapsed game time is 2.00 seconds
+    Conditions
+    Actions
+        Son - Play start <gen>

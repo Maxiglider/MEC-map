@@ -1,0 +1,10 @@
+//DISABLED TRIGGER
+
+Desactiver Forme de corbeau
+    Evénements
+        Map initialization
+    Conditions
+    Actions
+        Groupe joueur - Pick every player in (All players) and do (Actions)
+            Boucle - Actions
+                Joueur - Désactiver Forme de corbeau for (Picked player)
