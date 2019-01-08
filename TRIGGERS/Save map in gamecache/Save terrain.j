@@ -44,31 +44,6 @@ private function SaveMapDimensionsAndCenterOffset takes nothing returns nothing
 endfunction
 
 
-private function I2HexaString takes integer n returns string
-    if (n < 10) then
-        return I2S(n)
-    endif
-    if (n == 10) then
-        return "A"
-    endif
-    if (n == 11) then
-        return "B"
-    endif
-    if (n == 12) then
-        return "C"
-    endif
-    if (n == 13) then
-        return "D"
-    endif
-    if (n == 14) then
-        return "E"
-    endif
-    if (n == 15) then
-        return "F"
-    endif
-    return "0"
-endfunction
-
 //crée si besoin une nouvelle instance dans le tableau et retourne l'id de cet élément de tableau
 private function GetTerrainId takes real x, real y returns string
     local integer terrainTypeId = GetTerrainType(x, y)
