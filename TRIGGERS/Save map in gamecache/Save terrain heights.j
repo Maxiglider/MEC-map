@@ -49,7 +49,7 @@ private function SaveTerrainRamps_Actions takes nothing returns nothing
                             //il y a une falaise entre les deux ; si c'est walkable malgré tout, c'est qu'il y a une rampe
                             if (walkable) then
                                 set ramp = true
-                            else
+                            elseif (IAbsBJ(currentCliffLevel - otherCliffLevel) == 1) then //il ne peut y avoir de rampe que si la différence de niveau est de 1
                                 //ce n'est pas walkable, mais il y a peut-être une rampe, de largeur 1
                                 //si ce n'est pas walkable non plus en bas de la falaise, c'est qu'il y a une rampe
                                 if (currentCliffLevel > otherCliffLevel) then
@@ -59,7 +59,7 @@ private function SaveTerrainRamps_Actions takes nothing returns nothing
                                 endif
                                 set walkable2 = not IsTerrainPathable(otherX, otherY + DECAL_TEST_PATH, PATHING_TYPE_WALKABILITY) or not IsTerrainPathable(otherX, otherY - DECAL_TEST_PATH, PATHING_TYPE_WALKABILITY)
                                 if (not walkable2) then
-                                    //il y a une rampe sauf si les deux points en bas de la falaise sont à la même hauteur
+                                    //il y a une rampe à condition que les deux points en bas de la falaise soient au même niveau de falaise et pas à la même hauteur
                                     if (currentCliffLevel < otherCliffLevel) then
                                         set loc1 = Location(x, y)
                                         set loc2 = Location(x - LARGEUR_CASE, y)
@@ -67,7 +67,7 @@ private function SaveTerrainRamps_Actions takes nothing returns nothing
                                         set loc1 = Location(otherX, y)
                                         set loc2 = Location(otherX + LARGEUR_CASE, y)
                                     endif
-                                    if (GetLocationZ(loc1) != GetLocationZ(loc2)) then
+                                    if (GetLocationZ(loc1) != GetLocationZ(loc2) and GetTerrainCliffLevelBJ(loc1) == GetTerrainCliffLevelBJ(loc2)) then
                                         set ramp = true
                                     endif
                                     call RemoveLocation(loc1)
@@ -81,11 +81,11 @@ private function SaveTerrainRamps_Actions takes nothing returns nothing
                                 endif
                             endif
                         else
-                            //il n'y a pas de falaise entre les deux ; si ce n'est pas walkable, il y a une rampe de largeur 1 s'il y a une falaise ensuite vers le haut
+                            //il n'y a pas de falaise entre les deux ; si ce n'est pas walkable, il y a une rampe de largeur 1 s'il y a une falaise ensuite vers le haut de différence 1
                             if (not walkable) then
                                 set otherX = x + LARGEUR_CASE*2
                                 set otherCliffLevel2 = GetTerrainCliffLevel(otherX, otherY)
-                                if (currentCliffLevel < otherCliffLevel2) then
+                                if (otherCliffLevel2 - currentCliffLevel == 1) then
                                     //il y a une rampe sauf si les deux points en bas de la falaise sont à la même hauteur
                                     set loc1 = Location(x, y)
                                     set loc2 = Location(x + LARGEUR_CASE, y)
@@ -127,7 +127,7 @@ private function SaveTerrainRamps_Actions takes nothing returns nothing
                             //il y a une falaise entre les deux ; si c'est walkable malgré tout, c'est qu'il y a une rampe
                             if (walkable) then
                                 set ramp = true
-                            else
+                            elseif (IAbsBJ(currentCliffLevel - otherCliffLevel) == 1) then //il ne peut y avoir de rampe que si la différence de niveau est de 1
                                 //ce n'est pas walkable, mais il y a peut-être une rampe, de largeur 1
                                 //si ce n'est pas walkable non plus en bas de la falaise, c'est qu'il y a une rampe
                                 if (currentCliffLevel > otherCliffLevel) then
@@ -137,7 +137,7 @@ private function SaveTerrainRamps_Actions takes nothing returns nothing
                                 endif
                                 set walkable2 = not IsTerrainPathable(otherX, otherY + DECAL_TEST_PATH, PATHING_TYPE_WALKABILITY) or not IsTerrainPathable(otherX, otherY - DECAL_TEST_PATH, PATHING_TYPE_WALKABILITY)
                                 if (not walkable2) then
-                                    //il y a une rampe sauf si les deux points en bas de la falaise sont à la même hauteur
+                                    //il y a une rampe à condition que les deux points en bas de la falaise soient au même niveau de falaise et pas à la même hauteur
                                     if (currentCliffLevel < otherCliffLevel) then
                                         set loc1 = Location(x, y)
                                         set loc2 = Location(x + LARGEUR_CASE, y)
@@ -145,7 +145,7 @@ private function SaveTerrainRamps_Actions takes nothing returns nothing
                                         set loc1 = Location(otherX, y)
                                         set loc2 = Location(otherX - LARGEUR_CASE, y)
                                     endif
-                                    if (GetLocationZ(loc1) != GetLocationZ(loc2)) then
+                                    if (GetLocationZ(loc1) != GetLocationZ(loc2) and GetTerrainCliffLevelBJ(loc1) == GetTerrainCliffLevelBJ(loc2)) then
                                         set ramp = true
                                     endif
                                     call RemoveLocation(loc1)
@@ -159,11 +159,11 @@ private function SaveTerrainRamps_Actions takes nothing returns nothing
                                 endif
                             endif
                         else
-                            //il n'y a pas de falaise entre les deux ; si ce n'est pas walkable, il y a une rampe de largeur 1 s'il y a une falaise ensuite vers le haut
+                            //il n'y a pas de falaise entre les deux ; si ce n'est pas walkable, il y a une rampe de largeur 1 s'il y a une falaise ensuite vers le haut de différence 1
                             if (not walkable) then
                                 set otherX = x - LARGEUR_CASE*2
                                 set otherCliffLevel2 = GetTerrainCliffLevel(otherX, otherY)
-                                if (currentCliffLevel < otherCliffLevel2) then
+                                if (otherCliffLevel2 - currentCliffLevel == 1) then
                                     //il y a une rampe sauf si les deux points en bas de la falaise sont à la même hauteur
                                     set loc1 = Location(x, y)
                                     set loc2 = Location(x - LARGEUR_CASE, y)
@@ -205,7 +205,7 @@ private function SaveTerrainRamps_Actions takes nothing returns nothing
                             //il y a une falaise entre les deux ; si c'est walkable malgré tout, c'est qu'il y a une rampe
                             if (walkable) then
                                 set ramp = true
-                            else
+                            elseif (IAbsBJ(currentCliffLevel - otherCliffLevel) == 1) then //il ne peut y avoir de rampe que si la différence de niveau est de 1
                                 //ce n'est pas walkable, mais il y a peut-être une rampe, de largeur 1
                                 //si ce n'est pas walkable non plus en bas de la falaise, c'est qu'il y a une rampe
                                 if (currentCliffLevel > otherCliffLevel) then
@@ -215,7 +215,7 @@ private function SaveTerrainRamps_Actions takes nothing returns nothing
                                 endif
                                 set walkable2 = not IsTerrainPathable(otherX + DECAL_TEST_PATH, otherY, PATHING_TYPE_WALKABILITY) or not IsTerrainPathable(otherX - DECAL_TEST_PATH, otherY, PATHING_TYPE_WALKABILITY)
                                 if (not walkable2) then
-                                    //il y a une rampe sauf si les deux points en bas de la falaise sont à la même hauteur
+                                    //il y a une rampe à condition que les deux points en bas de la falaise soient au même niveau de falaise et pas à la même hauteur
                                     if (currentCliffLevel < otherCliffLevel) then
                                         set loc1 = Location(x, y)
                                         set loc2 = Location(x, y - LARGEUR_CASE)
@@ -223,7 +223,7 @@ private function SaveTerrainRamps_Actions takes nothing returns nothing
                                         set loc1 = Location(x, otherY)
                                         set loc2 = Location(x, otherY + LARGEUR_CASE)
                                     endif
-                                    if (GetLocationZ(loc1) != GetLocationZ(loc2)) then
+                                    if (GetLocationZ(loc1) != GetLocationZ(loc2) and GetTerrainCliffLevelBJ(loc1) == GetTerrainCliffLevelBJ(loc2)) then
                                         set ramp = true
                                     endif
                                     call RemoveLocation(loc1)
@@ -237,11 +237,11 @@ private function SaveTerrainRamps_Actions takes nothing returns nothing
                                 endif
                             endif
                         else
-                            //il n'y a pas de falaise entre les deux ; si ce n'est pas walkable, il y a une rampe de largeur 1 s'il y a une falaise ensuite vers le haut
+                            //il n'y a pas de falaise entre les deux ; si ce n'est pas walkable, il y a une rampe de largeur 1 s'il y a une falaise ensuite vers le haut de différence 1
                             if (not walkable) then
                                 set otherY = y + LARGEUR_CASE*2
                                 set otherCliffLevel2 = GetTerrainCliffLevel(otherX, otherY)
-                                if (currentCliffLevel < otherCliffLevel2) then
+                                if (otherCliffLevel2 - currentCliffLevel == 1) then
                                     //il y a une rampe sauf si les deux points en bas de la falaise sont à la même hauteur
                                     set loc1 = Location(x, y)
                                     set loc2 = Location(x, y + LARGEUR_CASE)
@@ -283,7 +283,7 @@ private function SaveTerrainRamps_Actions takes nothing returns nothing
                             //il y a une falaise entre les deux ; si c'est walkable malgré tout, c'est qu'il y a une rampe
                             if (walkable) then
                                 set ramp = true
-                            else
+                            elseif (IAbsBJ(currentCliffLevel - otherCliffLevel) == 1) then //il ne peut y avoir de rampe que si la différence de niveau est de 1
                                 //ce n'est pas walkable, mais il y a peut-être une rampe, de largeur 1
                                 //si ce n'est pas walkable non plus en bas de la falaise, c'est qu'il y a une rampe
                                 if (currentCliffLevel > otherCliffLevel) then
@@ -293,7 +293,7 @@ private function SaveTerrainRamps_Actions takes nothing returns nothing
                                 endif
                                 set walkable2 = not IsTerrainPathable(otherX + DECAL_TEST_PATH, otherY, PATHING_TYPE_WALKABILITY) or not IsTerrainPathable(otherX - DECAL_TEST_PATH, otherY, PATHING_TYPE_WALKABILITY)
                                 if (not walkable2) then
-                                    //il y a une rampe sauf si les deux points en bas de la falaise sont à la même hauteur
+                                    //il y a une rampe à condition que les deux points en bas de la falaise soient au même niveau de falaise et pas à la même hauteur
                                     if (currentCliffLevel < otherCliffLevel) then
                                         set loc1 = Location(x, y)
                                         set loc2 = Location(x, y + LARGEUR_CASE)
@@ -301,7 +301,7 @@ private function SaveTerrainRamps_Actions takes nothing returns nothing
                                         set loc1 = Location(x, otherY)
                                         set loc2 = Location(x, otherY - LARGEUR_CASE)
                                     endif
-                                    if (GetLocationZ(loc1) != GetLocationZ(loc2)) then
+                                    if (GetLocationZ(loc1) != GetLocationZ(loc2) and GetTerrainCliffLevelBJ(loc1) == GetTerrainCliffLevelBJ(loc2)) then
                                         set ramp = true
                                     endif
                                     call RemoveLocation(loc1)
@@ -315,11 +315,11 @@ private function SaveTerrainRamps_Actions takes nothing returns nothing
                                 endif
                             endif
                         else
-                            //il n'y a pas de falaise entre les deux ; si ce n'est pas walkable, il y a une rampe de largeur 1 s'il y a une falaise ensuite vers le haut
+                            //il n'y a pas de falaise entre les deux ; si ce n'est pas walkable, il y a une rampe de largeur 1 s'il y a une falaise ensuite vers le haut de différence 1
                             if (not walkable) then
                                 set otherY = y - LARGEUR_CASE*2
                                 set otherCliffLevel2 = GetTerrainCliffLevel(otherX, otherY)
-                                if (currentCliffLevel < otherCliffLevel2) then
+                                if (otherCliffLevel2 - currentCliffLevel == 1) then
                                     //il y a une rampe sauf si les deux points en bas de la falaise sont à la même hauteur
                                     set loc1 = Location(x, y)
                                     set loc2 = Location(x, y - LARGEUR_CASE)
@@ -378,7 +378,7 @@ private function SaveTerrainRamps_Actions takes nothing returns nothing
                 endif   
 
                 if (ramp) then
-                    call CreateUnit(Player(1), 'hpea', x, y, 0)
+                    call CreateUnit(Player(0), 'hpea', x, y, 0)
                     if (rampMiddle) then     
                         set rampStr = "2" 
                     else
