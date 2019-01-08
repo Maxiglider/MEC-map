@@ -66,17 +66,19 @@ function Trig_invisUnit_dies_Actions takes nothing returns nothing
                 return  
             endif
 
-            call escaper.kill()
+            if (not escaper.isCoopInvul()) then //don't kill if the escaper was just revived by a friend
+                call escaper.kill()
 
-            //effet de tuation du héros par le monstre, suivant le type du monstre
-            set effectStr = udg_monsterTypes.monsterUnit2KillEffectStr(killingUnit)
-            if (effectStr != null) then
-                set x = GetUnitX(invisUnit)
-                set y = GetUnitY(invisUnit)
-                set eff = AddSpecialEffect(effectStr, x, y)
-                call TriggerSleepAction(3)
-                call DestroyEffect(eff)
-                set eff = null
+                //effet de tuation du héros par le monstre, suivant le type du monstre
+                set effectStr = udg_monsterTypes.monsterUnit2KillEffectStr(killingUnit)
+                if (effectStr != null) then
+                    set x = GetUnitX(invisUnit)
+                    set y = GetUnitY(invisUnit)
+                    set eff = AddSpecialEffect(effectStr, x, y)
+                    call TriggerSleepAction(3)
+                    call DestroyEffect(eff)
+                    set eff = null
+                endif
             endif
         endif
     endif
