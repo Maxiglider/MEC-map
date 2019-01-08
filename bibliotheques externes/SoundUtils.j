@@ -182,7 +182,7 @@ hook StopSound HookStopSound
 
 private function HookKillSoundWhenDone takes sound soundHandle returns nothing
     if HaveSavedInteger(ht, 0, GetHandleId(soundHandle)) then
-        call BJDebugMsg(SCOPE_PREFIX+"Warning: (KillSoundWhenDone) Destroying a sound in the stack")
+        debug call BJDebugMsg(SCOPE_PREFIX+"Warning: (KillSoundWhenDone) Destroying a sound in the stack")
     endif
 endfunction
 

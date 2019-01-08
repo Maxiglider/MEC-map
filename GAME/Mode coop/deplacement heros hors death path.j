@@ -41,10 +41,10 @@ function DeplacementHeroHorsDeathPath takes unit hero returns nothing
                 if (not angleNonDeathTrouveALInstant) then
                     if (dernierAngleNonDeath == 0) then //pas encore d'angle non death trouvé
                         set premierAngleNonDeath = angle
-                        call BJDebugMsg("premier angle = " + R2S(premierAngleNonDeath))
+                        debug call BJDebugMsg("premier angle = " + R2S(premierAngleNonDeath))
                     else
                         set deuxiemePremierAngleNonDeath = angle
-                        call BJDebugMsg("deuxieme premier angle = " + R2S(deuxiemePremierAngleNonDeath))
+                        debug call BJDebugMsg("deuxieme premier angle = " + R2S(deuxiemePremierAngleNonDeath))
                     endif
                     set angleNonDeathTrouveALInstant = true
                 endif
@@ -52,10 +52,10 @@ function DeplacementHeroHorsDeathPath takes unit hero returns nothing
                 if (angleNonDeathTrouveALInstant) then //dernierAngleNonDeathTrouvé
                     if (dernierAngleNonDeath == 0) then
                         set dernierAngleNonDeath = angle - GRADUATION_ANGLE
-                        call BJDebugMsg("dernier angle = " + R2S(dernierAngleNonDeath))
+                        debug call BJDebugMsg("dernier angle = " + R2S(dernierAngleNonDeath))
                     else
                         set deuxiemeDernierAngleNonDeath = angle - GRADUATION_ANGLE
-                        call BJDebugMsg("deuxieme dernier angle = " + R2S(deuxiemeDernierAngleNonDeath))
+                        debug call BJDebugMsg("deuxieme dernier angle = " + R2S(deuxiemeDernierAngleNonDeath))
                     endif
                     set angleNonDeathTrouveALInstant = false
                 endif
@@ -66,10 +66,10 @@ function DeplacementHeroHorsDeathPath takes unit hero returns nothing
     if (angleNonDeathTrouveALInstant) then
         if (dernierAngleNonDeath == 0) then
             set dernierAngleNonDeath = angle - GRADUATION_ANGLE
-            call BJDebugMsg("dernier angle = " + R2S(dernierAngleNonDeath))
+            debug call BJDebugMsg("dernier angle = " + R2S(dernierAngleNonDeath))
         else
             set deuxiemeDernierAngleNonDeath = angle - GRADUATION_ANGLE
-            call BJDebugMsg("deuxieme dernier angle = " + R2S(deuxiemeDernierAngleNonDeath))
+            debug call BJDebugMsg("deuxieme dernier angle = " + R2S(deuxiemeDernierAngleNonDeath))
         endif
     endif
         
@@ -78,13 +78,13 @@ function DeplacementHeroHorsDeathPath takes unit hero returns nothing
     if (deuxiemePremierAngleNonDeath == 0) then
         //cas aucun angle non death trouvé
         if (dernierAngleNonDeath == 0) then
-            call BJDebugMsg("Pas de terrain non death proche trouvé !")
+            debug call BJDebugMsg("Pas de terrain non death proche trouvé !")
             return
         endif
         set angleIdeal = (dernierAngleNonDeath + premierAngleNonDeath) / 2
     else //cas où l'ensemble des angles non death passe par 0
         if (premierAngleNonDeath != 0 or deuxiemeDernierAngleNonDeath != 355) then //cas où l'on a deux ensembles d'angles distincts
-            call BJDebugMsg("DEUX ENSEMBLES D'ANGLES DISTINCTS")
+            debug call BJDebugMsg("DEUX ENSEMBLES D'ANGLES DISTINCTS")
             if (dernierAngleNonDeath - premierAngleNonDeath > deuxiemeDernierAngleNonDeath - deuxiemePremierAngleNonDeath) then //on choisit l'ensemble d'angles le plus large
                 set angleIdeal = (dernierAngleNonDeath + premierAngleNonDeath) / 2
             else
@@ -94,7 +94,7 @@ function DeplacementHeroHorsDeathPath takes unit hero returns nothing
         set angleIdeal = ((dernierAngleNonDeath + deuxiemePremierAngleNonDeath) / 2) + 180
         endif
     endif
-    call BJDebugMsg("angle idéal = " + R2S(angleIdeal))
+    debug call BJDebugMsg("angle idéal = " + R2S(angleIdeal))
 
     //déplacement du héros
     set xDecal = xHero + VALEUR_DECALAGE * CosBJ(angleIdeal)
