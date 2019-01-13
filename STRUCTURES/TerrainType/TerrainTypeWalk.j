@@ -18,6 +18,7 @@ struct TerrainTypeWalk extends TerrainType
         set tt.walkSpeed = walkSpeed
         set tt.kind = "walk"
         set tt.orderId = 0
+        set tt.cliffClassId = 1
         return tt
 	endmethod
 	

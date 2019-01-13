@@ -532,6 +532,25 @@ function ExecuteCommandMax takes Escaper escaper, string cmd returns boolean
     endif
     
 
+//-setTerrainCliffClass(settcc) <terrainLabel> <cliffClass>
+    if (name == "setTerrainCliffClass" or name == "settcc") then
+        if (nbParam != 2) then
+            return true
+        endif
+        //checkParam 1
+        set b = (udg_terrainTypes.get(param1) != 0)
+        if (not b) then
+            return true
+        endif
+        //checkParam 2
+        if (param2 != "1" and param2 != "2") then
+            call Text_erP(escaper.getPlayer(), "cliff class must be 1 or 2")
+        endif
+        //apply command
+        call udg_terrainTypes.get(param1).setCliffClassId(S2I(param2))
+        call Text_mkP(escaper.getPlayer(), "cliff class changed to " + param2)
+        return true
+    endif
     
     
     return false

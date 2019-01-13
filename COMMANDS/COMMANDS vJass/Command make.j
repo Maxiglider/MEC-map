@@ -1111,7 +1111,10 @@ function ExecuteCommandMake takes Escaper escaper, string cmd returns boolean
         call escaper.makeGetUnitTeleportPeriod()
         call Text_mkP(escaper.getPlayer(), "getting unit teleport period on")
         return true
-    endif//-setUnitTeleportPeriod(setutp) <period>
+    endif
+
+
+//-setUnitTeleportPeriod(setutp) <period>
     if (name == "setUnitTeleportPeriod" or name == "setutp") then
         if (nbParam != 1) then
             return true
@@ -1959,6 +1962,21 @@ function ExecuteCommandMake takes Escaper escaper, string cmd returns boolean
         return true
     endif
     
+
+//-getTerrainCliffClass(gettcc) <terrainLabel>
+    if (name == "getTerrainCliffClass" or name == "gettcc") then
+        if (nbParam != 1) then
+            return true
+        endif
+        //checkParam 1
+        set b = (udg_terrainTypes.get(param1) != 0)
+        if (not b) then
+            return true
+        endif
+        //apply command
+        call Text_mkP(escaper.getPlayer(), "cliff class for that terrain is " + I2S(udg_terrainTypes.get(param1).getCliffClassId()))
+        return true
+    endif    
     
     
         

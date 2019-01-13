@@ -9,13 +9,26 @@ struct TerrainType
     string kind
 	integer terrainTypeId
     integer orderId //numéro du terrain (ordre des tilesets), de 1 à 16
+    integer cliffClassId //cliff class 1 or 2, depending of the main tileset
     
-    method setOrderId takes integer orderId returns nothing
+    method setOrderId takes integer orderId returns TerrainType
         set .orderId = orderId
+        return TerrainType(integer(this))
     endmethod
     
     method getOrderId takes nothing returns integer
         return .orderId
+    endmethod
+
+    method setCliffClassId takes integer cliffClassId returns TerrainType
+        if (cliffClassId == 1 or cliffClassId == 2) then
+            set .cliffClassId = cliffClassId
+        endif
+        return TerrainType(integer(this))
+    endmethod
+    
+    method getCliffClassId takes nothing returns integer
+        return .cliffClassId
     endmethod
 	
 	method setType takes integer terrainTypeId returns nothing
@@ -89,6 +102,8 @@ struct TerrainType
         endif
         endif
         endif
+        //display cliff class
+        set display = display + space + "cliff" + I2S(.cliffClassId)
         call Text_P_timed(p, TERRAIN_DATA_DISPLAY_TIME, display)
     endmethod
     
@@ -97,7 +112,7 @@ struct TerrainType
         local TerrainTypeWalk walk
         local TerrainTypeDeath death
         local string str = .label + CACHE_SEPARATEUR_PARAM + .theAlias + CACHE_SEPARATEUR_PARAM + I2S(.orderId) + CACHE_SEPARATEUR_PARAM
-        set str = str + .kind + CACHE_SEPARATEUR_PARAM + Ascii2String(.terrainTypeId) + CACHE_SEPARATEUR_PARAM
+        set str = str + .kind + CACHE_SEPARATEUR_PARAM + Ascii2String(.terrainTypeId) + CACHE_SEPARATEUR_PARAM + I2S(.cliffClassId) + CACHE_SEPARATEUR_PARAM
         if (.kind == "slide") then
             set slide = TerrainTypeSlide(integer(this))
             set str = str + I2S(R2I(slide.getSlideSpeed() / SLIDE_PERIOD)) + CACHE_SEPARATEUR_PARAM + B2S(slide.getCanTurn())

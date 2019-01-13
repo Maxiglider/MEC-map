@@ -21,6 +21,7 @@ struct TerrainTypeSlide extends TerrainType
 		set tt.slideSpeed = slideSpeed * SLIDE_PERIOD
         set tt.canTurn = canTurn
         set tt.orderId = 0
+        set tt.cliffClassId = 1
         return tt
 	endmethod
     

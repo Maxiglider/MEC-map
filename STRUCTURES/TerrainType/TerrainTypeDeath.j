@@ -30,6 +30,7 @@ struct TerrainTypeDeath extends TerrainType
 		set tt.kind = "death"
         set tt.toleranceDist = toleranceDist
         set tt.orderId = 0
+        set tt.cliffClassId = 1
 		return tt
 	endmethod
 	
