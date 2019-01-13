@@ -151,5 +151,9 @@ function IsOnGround takes unit slider returns boolean
     return GetUnitFlyHeight( slider ) < 1
 endfunction
     
+function IsNearBounds takes real x, real y returns boolean
+    return y >= MAP_MAX_Y - LARGEUR_CASE * 2 or x >= MAP_MAX_X - LARGEUR_CASE * 2 or x <= MAP_MIN_X + LARGEUR_CASE * 2 or y <= MAP_MIN_Y + LARGEUR_CASE * 2
+endfunction
+
 
 endlibrary
