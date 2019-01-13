@@ -10,12 +10,14 @@ struct TerrainTypeArray
     integer numberOfWalk
     integer numberOfDeath
     integer numberOfSlide
+    string mainTileset
     
     static method create takes nothing returns TerrainTypeArray
         local TerrainTypeArray tta = TerrainTypeArray.allocate()
         set tta.numberOfWalk = 0
         set tta.numberOfDeath = 0
         set tta.numberOfSlide = 0
+        set tta.mainTileset = "auto"
         return tta
     endmethod    
     
@@ -244,6 +246,13 @@ struct TerrainTypeArray
     
     method saveInCache takes nothing returns nothing
         local integer i
+
+        //main tileset
+        set stringArrayForCache = StringArrayForCache.create("terrain", "mainTileset", false)
+        call stringArrayForCache.push(.mainTileset)
+        call stringArrayForCache.writeInCache()
+
+        //terrainConfig
         set stringArrayForCache = StringArrayForCache.create("terrain", "terrainConfig", true)
         set i = 0
         loop
@@ -308,6 +317,19 @@ struct TerrainTypeArray
             set i = i + 1
         endloop
         return true
+    endmethod
+
+    method setMainTileset takes string tileset returns boolean
+        local string tilesetChar = tileset2tilesetChar(tileset)
+        if (tilesetChar != "") then
+            set .mainTileset = tilesetChar
+            return true
+        endif
+        return false
+    endmethod
+
+    method getMainTileset takes nothing returns string
+        return .mainTileset
     endmethod
 endstruct
     

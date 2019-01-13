@@ -5,9 +5,9 @@ library Text
 
 
 globals
-    private constant string NORMAL_TEXT_COLORCODE = "|c00ffffff" //blanc
-    private constant string MAKE_TEXT_COLORCODE = "|c00ffff00" //jaune
-    private constant string ERROR_TEXT_COLORCODE = "|c00960000" //sorte de rouge foncé
+    constant string NORMAL_TEXT_COLORCODE = "|c00ffffff" //blanc
+    constant string MAKE_TEXT_COLORCODE = "|c00ffff00" //jaune
+    constant string ERROR_TEXT_COLORCODE = "|c00960000" //sorte de rouge foncé
     
     public boolean enabled = true
     public real posX = 0

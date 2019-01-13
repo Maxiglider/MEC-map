@@ -1976,7 +1976,22 @@ function ExecuteCommandMake takes Escaper escaper, string cmd returns boolean
         //apply command
         call Text_mkP(escaper.getPlayer(), "cliff class for that terrain is " + I2S(udg_terrainTypes.get(param1).getCliffClassId()))
         return true
-    endif    
+    endif   
+
+
+//-getMainTileset
+    if (name == "getMainTileset") then
+        if (not noParam) then
+            return true
+        endif
+        if (udg_terrainTypes.getMainTileset() == "auto") then
+            call Text_mkP(escaper.getPlayer(), "main tileset : auto")
+        else
+            call Text_mkP(escaper.getPlayer(), "main tileset : " + udg_terrainTypes.getMainTileset() + " = " + tileset2tilesetString(udg_terrainTypes.getMainTileset()))
+        endif
+        return true
+    endif   
+
     
     
         

@@ -155,5 +155,94 @@ function IsNearBounds takes real x, real y returns boolean
     return y >= MAP_MAX_Y - LARGEUR_CASE * 2 or x >= MAP_MAX_X - LARGEUR_CASE * 2 or x <= MAP_MIN_X + LARGEUR_CASE * 2 or y <= MAP_MIN_Y + LARGEUR_CASE * 2
 endfunction
 
+function tileset2tilesetChar takes string tileset returns string
+    if (tileset == "auto") then
+        return "auto"
+    elseif (tileset == "A" or tileset == "a" or tileset == "Ashenvale") then
+        return "A"
+    elseif (tileset == "B" or tileset == "b" or tileset == "Barrens") then
+        return "B"
+    elseif (tileset == "C" or tileset == "c" or tileset == "Felwood") then
+        return "C"
+    elseif (tileset == "D" or tileset == "d" or tileset == "Dungeon") then
+        return "D"
+    elseif (tileset == "F" or tileset == "f" or tileset == "Lordaeron Fall") then
+        return "F"
+    elseif (tileset == "G" or tileset == "g" or tileset == "Underground") then
+        return "G"
+    elseif (tileset == "L" or tileset == "l" or tileset == "Lordaeron Summer") then
+        return "L"
+    elseif (tileset == "N" or tileset == "n" or tileset == "Northrend") then
+        return "N"
+    elseif (tileset == "Q" or tileset == "q" or tileset == "Village Fall") then
+        return "Q"
+    elseif (tileset == "V" or tileset == "v" or tileset == "Village") then
+        return "V"
+    elseif (tileset == "W" or tileset == "w" or tileset == "Lordaeron Winter") then
+        return "W"
+    elseif (tileset == "X" or tileset == "x" or tileset == "Dalaran") then
+        return "X"
+    elseif (tileset == "Y" or tileset == "y" or tileset == "Cityscape") then
+        return "Y"
+    elseif (tileset == "Z" or tileset == "z" or tileset == "Sunken Ruins") then
+        return "Z"
+    elseif (tileset == "I" or tileset == "i" or tileset == "Icecrown") then
+        return "I"
+    elseif (tileset == "J" or tileset == "j" or tileset == "Dalaran Ruins") then
+        return "J"
+    elseif (tileset == "O" or tileset == "o" or tileset == "Outland") then
+        return "O"
+    elseif (tileset == "K" or tileset == "k" or tileset == "Black Citadel") then
+        return "K"
+    endif
+
+    return ""
+endfunction
+
+function tileset2tilesetString takes string tileset returns string
+    if (tileset == "auto") then
+        return "auto"
+    elseif (tileset == "A" or tileset == "a" or tileset == "Ashenvale") then
+        return "Ashenvale"
+    elseif (tileset == "B" or tileset == "b" or tileset == "Barrens") then
+        return "Barrens"
+    elseif (tileset == "C" or tileset == "c" or tileset == "Felwood") then
+        return "Felwood"
+    elseif (tileset == "D" or tileset == "d" or tileset == "Dungeon") then
+        return "Dungeon"
+    elseif (tileset == "F" or tileset == "f" or tileset == "Lordaeron Fall") then
+        return "Lordaeron Fall"
+    elseif (tileset == "G" or tileset == "g" or tileset == "Underground") then
+        return "Underground"
+    elseif (tileset == "L" or tileset == "l" or tileset == "Lordaeron Summer") then
+        return "Lordaeron Summer"
+    elseif (tileset == "N" or tileset == "n" or tileset == "Northrend") then
+        return "Northrend"
+    elseif (tileset == "Q" or tileset == "q" or tileset == "Village Fall") then
+        return "Village Fall"
+    elseif (tileset == "V" or tileset == "v" or tileset == "Village") then
+        return "Village"
+    elseif (tileset == "W" or tileset == "w" or tileset == "Lordaeron Winter") then
+        return "Lordaeron Winter"
+    elseif (tileset == "X" or tileset == "x" or tileset == "Dalaran") then
+        return "Dalaran"
+    elseif (tileset == "Y" or tileset == "y" or tileset == "Cityscape") then
+        return "Cityscape"
+    elseif (tileset == "Z" or tileset == "z" or tileset == "Sunken Ruins") then
+        return "Sunken Ruins"
+    elseif (tileset == "I" or tileset == "i" or tileset == "Icecrown") then
+        return "Icecrown"
+    elseif (tileset == "J" or tileset == "j" or tileset == "Dalaran Ruins") then
+        return "Dalaran Ruins"
+    elseif (tileset == "O" or tileset == "o" or tileset == "Outland") then
+        return "Outland"
+    elseif (tileset == "K" or tileset == "k" or tileset == "Black Citadel") then
+        return "Black Citadel"
+    endif
+
+    return ""
+endfunction
+
+
 
 endlibrary

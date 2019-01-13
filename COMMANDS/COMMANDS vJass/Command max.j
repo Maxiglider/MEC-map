@@ -551,8 +551,24 @@ function ExecuteCommandMax takes Escaper escaper, string cmd returns boolean
         call Text_mkP(escaper.getPlayer(), "cliff class changed to " + param2)
         return true
     endif
+
+
+//-setMainTileset <tileset>
+    if (name == "setMainTileset") then
+        if (nbParam > 1) then
+            return true
+        endif
+        if (udg_terrainTypes.setMainTileset(param1)) then
+            call Text_mkP(escaper.getPlayer(), "main tileset changed")
+        else
+            call Text_P(escaper.getPlayer(), "available tilesets : " + MAKE_TEXT_COLORCODE + "auto|r ; " + MAKE_TEXT_COLORCODE + "A|r = Ashenvale ; " + MAKE_TEXT_COLORCODE + "B|r = Barrens ; " + MAKE_TEXT_COLORCODE + "C|r = Felwood ; " + MAKE_TEXT_COLORCODE + "D|r = Dungeon ; " + MAKE_TEXT_COLORCODE + "F|r = Lordaeron Fall ; " + MAKE_TEXT_COLORCODE + "G|r = Underground ; " + MAKE_TEXT_COLORCODE + "L|r = Lordaeron Summer ; " + MAKE_TEXT_COLORCODE + "N|r = Northrend ; " + MAKE_TEXT_COLORCODE + "Q|r = Village Fall ; " + MAKE_TEXT_COLORCODE + "V|r = Village ; " + MAKE_TEXT_COLORCODE + "W|r = Lordaeron Winter ; " + MAKE_TEXT_COLORCODE + "X|r = Dalaran ; " + MAKE_TEXT_COLORCODE + "Y|r = Cityscape ; " + MAKE_TEXT_COLORCODE + "Z|r = Sunken Ruins ; " + MAKE_TEXT_COLORCODE + "I|r = Icecrown ; " + MAKE_TEXT_COLORCODE + "J|r = Dalaran Ruins ; " + MAKE_TEXT_COLORCODE + "O|r = Outland ; " + MAKE_TEXT_COLORCODE + "K|r = Black Citadel")
+        endif
+        return true
+    endif
     
     
+
+
     return false
 endfunction
 
