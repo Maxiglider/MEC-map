@@ -56,10 +56,10 @@ private function SaveTerrainHeights_Actions takes nothing returns nothing
         set x = MAP_MIN_X
         loop
             exitwhen (x > MAP_MAX_X)
-                //set isWater = not IsTerrainPathable(x, y, PATHING_TYPE_FLOATABILITY)
-                if (IsNearBounds(x, y)/* or not isWater*/) then //at MAP_MAX_Y, GetTerrainZ crashes the game
-                    set height = GetSurfaceZ(x, y)
-                else
+                set height = GetSurfaceZ(x, y)
+                if (not IsNearBounds(x, y) and (GetTerrainCliffLevel(x, y) != 2 or height != 0)) then 
+                    //near bounds, GetTerrainZ crashes the game
+                    //if surfaceZ is 0 and cliff level 2, we consider it's a "default tilepoint", with no water, and we avoid the GetTerrainZ call (which is heavy)
                     set height = GetTerrainZ(x, y)
                 endif
                 /*
