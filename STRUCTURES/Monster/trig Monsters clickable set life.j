@@ -13,7 +13,7 @@ endglobals
 function MonstersClickableSetLifeForEach takes nothing returns nothing
     local unit monsterUnit = GetEnumUnit()
     local real currentLife = GetUnitState(monsterUnit, UNIT_STATE_LIFE)
-    local Monster monster = Monster(GetUnitUserData(monsterUnit))
+    local Monster monster = Monster(LoadInteger(htMonsterId2MonsterHandleId, MonsterInterface.MONSTER, GetUnitUserData(monsterUnit)))
     local real previousLife = I2R(monster.getLife())
     local real diffLife = RMaxBJ(currentLife, previousLife) - RMinBJ(currentLife, previousLife)
     if (diffLife < 100) then

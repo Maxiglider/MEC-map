@@ -19,7 +19,7 @@ function MonsterMultiplePatrols_move_Actions takes nothing returns nothing
     if (IsHero(GetTriggerUnit())) then
         return
     endif
-    set monster = Monster(GetUnitUserData(GetTriggerUnit()))
+    set monster = MonsterId2Monster(GetUnitUserData(GetTriggerUnit()))
     if (monster.getType() == MonsterMultiplePatrols.typeid) then
         set MMP = MonsterMultiplePatrols(integer(monster))
         if (MMP.getCurrentTrigger() == GetTriggeringTrigger()) then

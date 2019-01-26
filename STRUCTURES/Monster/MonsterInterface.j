@@ -5,8 +5,8 @@ library MonsterInterface initializer InitHtMonster needs MonsterCreationFunction
 
 globals
     constant integer MAX_NB_MONSTERS = 500 //nombre maximum de monstres pour chacun des trois types et par niveau (no move, simple patrol, multiple patrols)
-    private hashtable htMonsterId2MonsterHandleId
-    private constant integer MONSTER = 1
+    hashtable htMonsterId2MonsterHandleId
+    public constant integer MONSTER = 1
     private constant integer CASTER = 2
     constant integer NO_ID = -1
     private integer monsterNextId = 1
