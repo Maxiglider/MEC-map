@@ -8,6 +8,51 @@ globals
 endglobals
 
 
+/*
+takes a ramp (ramp center + direction of the ramp)
+returns if the ramp middle is raised
+a ramp middle is not raised in some cases, depending of the cliff level around the ramp :
+here is the ramp : (R = ramp tilepoint, N = near ramp tilepoint, T = basic tilepoint)
+TNNNT
+TRRRT
+TNNNT
+the middle R is at cliff level CL
+if one of the N tilepoints is at a cliff level different than CL or CL+1, the ramp middle isn't raised
+*/
+private function isRampMiddleRaised takes real x, real y, boolean isRampDirectionX returns boolean
+    local integer middleRampcliffLevel = GetTerrainCliffLevel(x, y)
+    local integer diffCliffLevel
+    local integer sens = -1
+    local integer diff
+    local real x2
+    local real y2
+    local boolean isRampMiddleRaisedB = true
+
+    //call CreateUnit(Player(0), 'hpea', x, y, 0)
+
+    loop
+        exitwhen sens > 1
+            set diff = -1
+            loop
+                exitwhen diff > 1
+                    if (isRampDirectionX) then
+                        set x2 = x + diff * LARGEUR_CASE
+                        set y2 = y + sens * LARGEUR_CASE
+                    else
+                        set x2 = x + sens * LARGEUR_CASE
+                        set y2 = y + diff * LARGEUR_CASE
+                    endif
+                    set diffCliffLevel = GetTerrainCliffLevel(x2, y2) - middleRampcliffLevel
+                    if (diffCliffLevel < 0 or diffCliffLevel > 1) then
+                        set isRampMiddleRaisedB = false
+                    endif
+                set diff = diff + 1
+            endloop
+        set sens = sens + 2        
+    endloop
+
+    return isRampMiddleRaisedB
+endfunction
 
 
 //save terrain ramps
@@ -19,7 +64,7 @@ private function SaveTerrainRamps_Actions takes nothing returns nothing
     local real otherX
     local real otherY
     local boolean ramp
-    local boolean rampMiddle
+    local boolean isRampMiddleRaisedB
     local string rampStr
     local boolean walkable
     local boolean walkable2
@@ -36,9 +81,9 @@ private function SaveTerrainRamps_Actions takes nothing returns nothing
 
                 if (not IsNearBounds(x, y)) then //à cause de l'utilisation préalable de GetTerrainZ, GetTerrainCliffLevel plante sur les bords de la carte
                     set currentCliffLevel = GetTerrainCliffLevel(x, y)
-                    set rampMiddle = false
+                    set isRampMiddleRaisedB = false
 
-                    if (not ramp) then
+                    if (not isRampMiddleRaisedB) then
                         //droite
                         set otherX = x + LARGEUR_CASE
                         set otherY = y
@@ -80,7 +125,7 @@ private function SaveTerrainRamps_Actions takes nothing returns nothing
                                 //s'il y a une rampe, on détermine si on est au milieu de la rampe
                                 if (ramp) then
                                     if (currentCliffLevel < otherCliffLevel) then
-                                        set rampMiddle = true
+                                        set isRampMiddleRaisedB = isRampMiddleRaised(x, y, true)
                                     endif
                                 endif
                             else
@@ -116,7 +161,7 @@ private function SaveTerrainRamps_Actions takes nothing returns nothing
                         endif          
                     endif  
 
-                    if (not ramp) then
+                    if (not isRampMiddleRaisedB) then
                         //gauche
                         set otherX = x - LARGEUR_CASE
                         set otherY = y
@@ -158,7 +203,7 @@ private function SaveTerrainRamps_Actions takes nothing returns nothing
                                 //s'il y a une rampe, on détermine si on est au milieu de la rampe
                                 if (ramp) then
                                     if (currentCliffLevel < otherCliffLevel) then
-                                        set rampMiddle = true
+                                        set isRampMiddleRaisedB = isRampMiddleRaised(x, y, true)
                                     endif
                                 endif
                             else
@@ -194,7 +239,7 @@ private function SaveTerrainRamps_Actions takes nothing returns nothing
                         endif     
                     endif       
 
-                    if (not ramp) then
+                    if (not isRampMiddleRaisedB) then
                         //haut
                         set otherX = x
                         set otherY = y + LARGEUR_CASE
@@ -236,7 +281,7 @@ private function SaveTerrainRamps_Actions takes nothing returns nothing
                                 //s'il y a une rampe, on détermine si on est au milieu de la rampe
                                 if (ramp) then
                                     if (currentCliffLevel < otherCliffLevel) then
-                                        set rampMiddle = true
+                                        set isRampMiddleRaisedB = isRampMiddleRaised(x, y, false)
                                     endif
                                 endif
                             else
@@ -272,7 +317,7 @@ private function SaveTerrainRamps_Actions takes nothing returns nothing
                         endif      
                     endif      
 
-                    if (not ramp) then
+                    if (not isRampMiddleRaisedB) then
                         //bas
                         set otherX = x
                         set otherY = y - LARGEUR_CASE
@@ -314,7 +359,7 @@ private function SaveTerrainRamps_Actions takes nothing returns nothing
                                 //s'il y a une rampe, on détermine si on est au milieu de la rampe
                                 if (ramp) then
                                     if (currentCliffLevel < otherCliffLevel) then
-                                        set rampMiddle = true
+                                        set isRampMiddleRaisedB = isRampMiddleRaised(x, y, false)
                                     endif
                                 endif
                             else
@@ -380,10 +425,11 @@ private function SaveTerrainRamps_Actions takes nothing returns nothing
                 endif 
 
                 if (ramp) then
-                    //call CreateUnit(Player(0), 'hpea', x, y, 0)
-                    if (rampMiddle) then     
+                    if (isRampMiddleRaisedB) then
+                        //call CreateUnit(Player(0), 'hpea', x, y, 0)
                         set rampStr = "2" 
                     else
+                        //call CreateUnit(Player(1), 'hpea', x, y, 0)
                         set rampStr = "1"
                     endif
                 else
