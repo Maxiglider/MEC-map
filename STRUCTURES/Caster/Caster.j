@@ -48,6 +48,7 @@ struct Caster [300000] //12 escapers * 50 niveaux * 500 monstres
         endif
         call CasterHashtableSetCasterId(this, .id, id)
         set .id = id
+        call MonsterIdHasBeenSetTo(id)
         return this
     endmethod
     

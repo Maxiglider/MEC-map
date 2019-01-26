@@ -104,6 +104,7 @@ struct MonsterTeleport extends Monster
         endif
         call MonsterHashtableSetMonsterId(this, .id, id)
         set .id = id
+        call MonsterIdHasBeenSetTo(id)
         return this
     endmethod
         	
