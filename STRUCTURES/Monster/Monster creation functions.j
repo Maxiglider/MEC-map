@@ -87,7 +87,7 @@ function NewImmobileMonsterForPlayer takes MonsterType mt, player p, real x, rea
     endif
     call SetUnitMoveSpeed(monster, mt.getUnitMoveSpeed())
     if (not MOBS_VARIOUS_COLORS) then
-        call SetUnitColor(monster, ConvertPlayerColor(12))
+        call SetUnitColor(monster, ConvertPlayerColor(24))
     endif
     call UnitRemoveAbility(monster, ATTACK_SKILL)
     call UnitRemoveType(monster, UNIT_TYPE_PEON)
