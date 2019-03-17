@@ -47,7 +47,7 @@ private function SaveWater_Actions takes nothing returns nothing
         set x = MAP_MIN_X
         loop
             exitwhen (x > MAP_MAX_X)
-                set isWater = not IsTerrainPathable(x, y, PATHING_TYPE_FLOATABILITY)
+                set isWater = false //not IsTerrainPathable(x, y, PATHING_TYPE_FLOATABILITY)
                 if (isWater) then
                     call stringArrayForCache.push("1")
                 else
