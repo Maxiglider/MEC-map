@@ -19,7 +19,7 @@ globals
 	constant real HERO_SLIDE_SPEED = 550
 	constant real SLIDE_PERIOD = 0.015
 	constant real CHECK_TERRAIN_PERIOD = 0.05
-    constant real LOW_PERIOD_FOR_WORK = 0.0001
+    constant real LOW_PERIOD_FOR_WORK = 0.005
     
     
     constant integer CRITICAL_LIVES_LIMIT = 2 //s'il y a au plus ce nombre de vies, on affiche les vies en rouge
