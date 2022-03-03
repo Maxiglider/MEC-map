@@ -7,7 +7,7 @@ globals
 //==================================================================================================================   
 
     constant string MapDescriptionRequirement1 = "This map was made with Max Escape Creation"
-    constant string MapDescriptionRequirement2 = "http:/max.slid.free.fr/maxEscapeCreation"
+    constant string MapDescriptionRequirement2 = "https:/mec.maxslid.com"
     
 endglobals
 
