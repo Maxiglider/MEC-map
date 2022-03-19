@@ -17,8 +17,8 @@ globals
     constant integer DEFAULT_MONSTER_SPEED = 400
     
 	constant real HERO_SLIDE_SPEED = 550
-	constant real SLIDE_PERIOD = 0.015
-	constant real CHECK_TERRAIN_PERIOD = 0.05
+	constant real SLIDE_PERIOD = 0.008 //120 FPS
+	constant real CHECK_TERRAIN_PERIOD = 0.02
     constant real LOW_PERIOD_FOR_WORK = 0.005
     
     
