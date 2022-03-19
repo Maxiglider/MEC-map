@@ -80,7 +80,11 @@ function Trig_to_turn_to_point_Actions takes nothing returns nothing
 		set canTurn = CAN_TURN_IN_AIR
 	endif
     if (canTurn) then
-        call SetUnitFacing(slider, angle)
+    	if (escaper.isAbsoluteInstantTurn()) then
+    		call escaper.turnInstantly(angle)
+    	else
+            call SetUnitFacing(slider, angle)
+		endif
         call escaper.setSlideLastAngleOrder(angle)
     endif
 

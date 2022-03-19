@@ -57,6 +57,8 @@ struct Escaper
     
     private real slideLastAngleOrder
     private boolean isHeroSelectedB
+
+    private boolean instantTurnAbsolute
     
     //coop
     private unit powerCircle
@@ -176,6 +178,8 @@ struct Escaper
         set e.discoTrigger = null
         set e.controler = e
         set e.slideLastAngleOrder = -1
+        set e.instantTurnAbsolute = false
+
         //coop
         set e.powerCircle = CreateUnit(e.p, POWER_CIRCLE, 0, 0, 0)
         call SetUnitUserData(e.powerCircle, playerId)
@@ -183,6 +187,7 @@ struct Escaper
         set e.dummyPowerCircle = CreateUnit(ENNEMY_PLAYER, DUMMY_POWER_CIRCLE, 0, 0, 0)
         call SetUnitUserData(e.dummyPowerCircle, playerId)
         call ShowUnit(e.dummyPowerCircle, false)
+
 		return e
 	endmethod    
 	
@@ -564,6 +569,14 @@ struct Escaper
                 endif
             endif
         endif 
+	endmethod
+
+	method isAbsoluteInstantTurn takes nothing returns boolean
+	    return .instantTurnAbsolute
+	endmethod
+
+	method setAbsoluteInstantTurn takes boolean flag returns nothing
+		set .instantTurnAbsolute = flag
 	endmethod
 	
 //godMode methods    
