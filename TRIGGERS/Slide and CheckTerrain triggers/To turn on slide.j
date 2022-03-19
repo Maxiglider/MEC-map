@@ -43,18 +43,27 @@ function Trig_to_turn_to_point_Conditions takes nothing returns boolean
 endfunction
 
 
-function Trig_to_turn_to_point_Actions takes nothing returns nothing
+function HandleTurn takes boolean triggerIsToLocation returns nothing
+
 //init variables
     set slider = GetTriggerUnit()
     set n = GetUnitUserData(slider)
     set sliderX = GetUnitX(slider)
     set sliderY = GetUnitY(slider)
-    set orderX = GetOrderPointX()
-    set orderY = GetOrderPointY()
-    
+
+    if triggerIsToLocation then
+		set orderX = GetOrderPointX()
+		set orderY = GetOrderPointY()
+    else
+    	set orderWidget = GetOrderTarget()
+		set orderX = GetWidgetX(orderWidget)
+		set orderY = GetWidgetY(orderWidget)
+    endif
+
+
 //stop hero
     call StopUnit(slider)
-    
+
 //set angle
     //if (udg_isMirrorModeOn_j[n]) then
     //    set angle = Atan2( sliderY - orderY, sliderX - orderX) * bj_RADTODEG
@@ -79,6 +88,7 @@ function Trig_to_turn_to_point_Actions takes nothing returns nothing
 	else
 		set canTurn = CAN_TURN_IN_AIR
 	endif
+
     if (canTurn) then
     	if (escaper.isAbsoluteInstantTurn()) then
     		call escaper.turnInstantly(angle)
@@ -91,9 +101,14 @@ function Trig_to_turn_to_point_Actions takes nothing returns nothing
 //save click
     set lastClickedX[n] = orderX
     set lastClickedY[n] = orderY
-    set isLastTargetALocation[n] = true
+    set isLastTargetALocation[n] = triggerIsToLocation
 
     set nbClicsOnSlide[n] = nbClicsOnSlide[n] + 1
+endfunction
+
+
+function Trig_to_turn_to_point_Actions takes nothing returns nothing
+	call HandleTurn(true)
 endfunction
 
 
@@ -105,54 +120,7 @@ endfunction
 
 
 function Trig_to_turn_to_widget_Actions takes nothing returns nothing
-//init variables
-    set slider = GetTriggerUnit()
-    set n = GetUnitUserData(slider)
-    set sliderX = GetUnitX(slider)
-    set sliderY = GetUnitY(slider)
-    set orderWidget = GetOrderTarget()
-    set orderX = GetWidgetX(orderWidget)
-    set orderY = GetWidgetY(orderWidget)
-
-//stop hero
-    call StopUnit(slider)
-
-//set angle
-    //if (udg_isMirrorModeOn_j[n]) then
-    //    set angle = Atan2( sliderY - orderY, sliderX - orderX) * bj_RADTODEG
-    //else
-    set angle = Atan2( orderY - sliderY, orderX - sliderX) * bj_RADTODEG
-    //endif
-
-//drunk mode
-    if (udg_isDrunk[n]) then
-        if (GetRandomInt(1,2) == 1) then
-            set angle = angle + udg_drunk[n]
-        else
-            set angle = angle - udg_drunk[n]
-        endif
-    endif
-
-//turn hero
-    if (IsOnGround(slider)) then
-		if (escaper.getLastTerrainType().kind == "slide") then
-			set canTurn = TerrainTypeSlide(integer(escaper.getLastTerrainType())).getCanTurn()
-		endif
-	else
-		set canTurn = CAN_TURN_IN_AIR
-	endif
-    if (canTurn) then
-        call SetUnitFacing(slider, angle)
-        call escaper.setSlideLastAngleOrder(angle)
-    endif
-    
-//save click
-    set lastClickedWidgets[n] = orderWidget
-    set lastClickedX[n] = orderX
-    set lastClickedY[n] = orderY
-    set isLastTargetALocation[n] = false
-    
-    set nbClicsOnSlide[n] = nbClicsOnSlide[n] + 1
+	call HandleTurn(false)
 endfunction
 
 
