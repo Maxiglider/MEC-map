@@ -437,23 +437,6 @@ function ExecuteCommandMax takes Escaper escaper, string cmd returns boolean
     endif
     
     
-//-canSave(-) [<boolean canSave>]   --> allow or not saving the game for all players
-    if (name == "canSave") then
-        if (not(noParam or (nbParam == 1 and IsBoolString(param1)))) then
-            call Text_erP(escaper.getPlayer(), "there must be no param or one param boolean")
-            return true
-        endif
-        if (noParam or S2B(param1)) then
-            call DisableTrigger(gg_trg_Antisave)
-            call Text_P(escaper.getPlayer(), "you can now save")
-        else
-            call EnableTrigger(gg_trg_Antisave)
-            call Text_P(escaper.getPlayer(), "now you can't save")
-        endif
-        return true
-    endif
-    
-    
 //-saveMapInCache(smic)
     if (name == "saveMapInCache" or name == "smic") then
         if (noParam) then

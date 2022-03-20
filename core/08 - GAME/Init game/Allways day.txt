@@ -1,7 +1,0 @@
-Allways day
-    Evénements
-        Map initialization
-    Conditions
-    Actions
-        Partie - Set the time of day to 12.00
-        Partie - Turn the day/night cycle Off
