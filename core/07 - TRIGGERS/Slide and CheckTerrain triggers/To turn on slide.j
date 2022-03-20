@@ -7,6 +7,7 @@ library TurnOnSlide initializer Init_ToTurnOnSlide needs Escaper, Apm
 globals
 //turn variables
     private Escaper escaper
+    private Escaper escaperSecond
     private unit slider
     private integer n
     private real sliderX
@@ -15,6 +16,7 @@ globals
     private real orderX
     private real orderY
     private real angle
+    private real angleSecond
     private boolean canTurn
     
 //drunk variables
@@ -64,6 +66,12 @@ function HandleTurn takes boolean triggerIsToLocation returns nothing
 //stop hero
     call StopUnit(slider)
 
+    if (isSecondaryHero(slider)) then
+    	return //secondary hero is controlled by main hero on slide terrain
+	endif
+
+	set escaperSecond = MainEscaperToSecondaryOne(escaper)
+
 //set angle
     //if (udg_isMirrorModeOn_j[n]) then
     //    set angle = Atan2( sliderY - orderY, sliderX - orderX) * bj_RADTODEG
@@ -89,13 +97,18 @@ function HandleTurn takes boolean triggerIsToLocation returns nothing
 		set canTurn = CAN_TURN_IN_AIR
 	endif
 
+	set angleSecond = ApplyAngleSymmetry(angle, udg_symmetryAngle)
+
     if (canTurn) then
     	if (escaper.isAbsoluteInstantTurn()) then
     		call escaper.turnInstantly(angle)
+    		call escaperSecond.turnInstantly(angleSecond)
     	else
             call SetUnitFacing(slider, angle)
+            call SetUnitFacing(escaperSecond.getHero(), angleSecond)
 		endif
         call escaper.setSlideLastAngleOrder(angle)
+        call escaperSecond.setSlideLastAngleOrder(angleSecond)
     endif
 
 //save click

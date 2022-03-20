@@ -11,7 +11,9 @@ endglobals
 
 
 struct Escaper
+	private integer escaperId
 	private integer playerId
+
 	private player p
     private unit hero
 	private unit invisUnit
@@ -60,13 +62,72 @@ struct Escaper
     private boolean isHeroSelectedB
 
     private boolean instantTurnAbsolute
+
+    private real animSpeedSecondaryHero = 0.8
     
     //coop
     private unit powerCircle
     private unit dummyPowerCircle
     private boolean coopInvul
     
-    
+
+//constructor
+	static method create takes integer escaperId returns Escaper //ne crée pas le héros
+		local Escaper e = Escaper.allocate()
+
+		if (escaperId > 11) then
+			set e.playerId = escaperId - 12
+		else
+			set e.playerId = escaperId
+		endif
+
+		set e.escaperId = escaperId
+		set e.p = Player(e.playerId)
+		set e.walkSpeed = HERO_WALK_SPEED
+		set e.slideSpeed = HERO_SLIDE_SPEED
+		set e.baseColorId = e.playerId
+		set e.slide = CreateSlideTrigger(escaperId)
+        set e.checkTerrain = CreateCheckTerrainTrigger(escaperId)
+        set e.cameraField = DEFAULT_CAMERA_FIELD
+        call SetCameraFieldForPlayer(e.p, CAMERA_FIELD_TARGET_DISTANCE, I2R(e.cameraField), 0)
+        set e.effects = EscaperEffectArray.create()
+        set e.vcRed = 100
+        set e.vcGreen = 100
+        set e.vcBlue = 100
+        set e.vcTransparency = 0
+        set e.lastTerrainType = 0
+        set e.makingLevel = 0
+        set e.make = 0
+        set e.makeLastActions = MakeLastActions.create(e)
+        set e.godMode = false
+        set e.godModeKills = false
+        set e.walkSpeedAbsolute = false
+        set e.slideSpeedAbsolute = false
+        set e.canTeleportB = false
+        set e.hasAutoreviveB = false
+        set e.canCheatB = false
+        set e.isMaximaxouB = false
+        set e.isTrueMaximaxouB = false
+        set e.discoTrigger = null
+        set e.controler = e
+        set e.slideLastAngleOrder = -1
+        set e.instantTurnAbsolute = false
+
+        //coop
+        set e.powerCircle = CreateUnit(e.p, POWER_CIRCLE, 0, 0, 0)
+        call SetUnitUserData(e.powerCircle, escaperId)
+        call ShowUnit(e.powerCircle, false)
+        set e.dummyPowerCircle = CreateUnit(ENNEMY_PLAYER, DUMMY_POWER_CIRCLE, 0, 0, 0)
+        call SetUnitUserData(e.dummyPowerCircle, escaperId)
+        call ShowUnit(e.dummyPowerCircle, false)
+
+		return e
+	endmethod
+
+
+	method getEscaperId takes nothing returns integer
+		return .escaperId
+	endmethod
     
     
 //item method
@@ -102,13 +163,25 @@ struct Escaper
 	
 //creation method
 	method createHero takes real x, real y, real angle returns boolean //retourne false si le héros existe déja
+		local integer heroTypeId = HERO_TYPE_ID
+
 		if (.hero != null) then
 			return false
 		endif
-		set .hero = CreateUnit(.p, HERO_TYPE_ID, x, y, angle)
+
+		if (.escaperId >= NB_PLAYERS_MAX) then
+			set heroTypeId = HERO_SECONDARY_TYPE_ID
+		endif
+
+		set .hero = CreateUnit(.p, heroTypeId, x, y, angle)
+
+		if (.escaperId >= NB_PLAYERS_MAX) then
+			call SetUnitTimeScale(.hero, .animSpeedSecondaryHero)
+		endif
+
         call SetUnitFlyHeight(.hero, 1., 0.)
         call SetUnitFlyHeight(.hero, 0., 0.)
-        call SetUnitUserData(.hero, GetPlayerId(.p))
+        call SetUnitUserData(.hero, .escaperId)
         call ShowUnit(.hero, false)
         call ShowUnit(.hero, true)
         call UnitRemoveAbility(.hero, 'Aloc')
@@ -147,57 +220,6 @@ struct Escaper
 		set y = start.getRandomY()
 		return .createHero(x, y, angle)
 	endmethod
-	
-	static method create takes integer escaperId returns Escaper //ne crée pas le héros
-		local Escaper e = Escaper.allocate()
-
-		if (escaperId > 11) then
-			set e.playerId = escaperId - 12
-		else
-			set e.playerId = escaperId
-		endif
-
-		set e.p = Player(e.playerId)
-		set e.walkSpeed = HERO_WALK_SPEED
-		set e.slideSpeed = HERO_SLIDE_SPEED
-		set e.baseColorId = escaperId
-		set e.slide = CreateSlideTrigger(escaperId)
-        set e.checkTerrain = CreateCheckTerrainTrigger(escaperId)
-        set e.cameraField = DEFAULT_CAMERA_FIELD
-        call SetCameraFieldForPlayer(e.p, CAMERA_FIELD_TARGET_DISTANCE, I2R(e.cameraField), 0)
-        set e.effects = EscaperEffectArray.create()
-        set e.vcRed = 100
-        set e.vcGreen = 100
-        set e.vcBlue = 100
-        set e.vcTransparency = 0
-        set e.lastTerrainType = 0
-        set e.makingLevel = 0
-        set e.make = 0
-        set e.makeLastActions = MakeLastActions.create(e)
-        set e.godMode = false
-        set e.godModeKills = false
-        set e.walkSpeedAbsolute = false
-        set e.slideSpeedAbsolute = false
-        set e.canTeleportB = false
-        set e.hasAutoreviveB = false
-        set e.canCheatB = false
-        set e.isMaximaxouB = false
-        set e.isTrueMaximaxouB = false
-        set e.discoTrigger = null
-        set e.controler = e
-        set e.slideLastAngleOrder = -1
-        set e.instantTurnAbsolute = false
-
-        //coop
-        set e.powerCircle = CreateUnit(e.p, POWER_CIRCLE, 0, 0, 0)
-        call SetUnitUserData(e.powerCircle, escaperId)
-        call ShowUnit(e.powerCircle, false)
-        set e.dummyPowerCircle = CreateUnit(ENNEMY_PLAYER, DUMMY_POWER_CIRCLE, 0, 0, 0)
-        call SetUnitUserData(e.dummyPowerCircle, escaperId)
-        call ShowUnit(e.dummyPowerCircle, false)
-
-		return e
-	endmethod    
 	
 	method removeHero takes nothing returns nothing
 		if (.hero == null) then
@@ -387,6 +409,7 @@ struct Escaper
     
     
     method turnInstantly takes real angle returns nothing
+		local integer heroTypeId = HERO_TYPE_ID
         local TerrainType lastTerrainType = .lastTerrainType
         local real x = GetUnitX(.hero)
 		local real y = GetUnitY(.hero)
@@ -395,7 +418,16 @@ struct Escaper
 		call RemoveUnit(.hero)
 
         //recreate hero
-            set .hero = CreateUnit(.p, HERO_TYPE_ID, x, y, angle)
+			if (.escaperId >= NB_PLAYERS_MAX) then
+				set heroTypeId = HERO_SECONDARY_TYPE_ID
+			endif
+
+			set .hero = CreateUnit(.p, heroTypeId, x, y, angle)
+
+			if (.escaperId >= NB_PLAYERS_MAX) then
+				call SetUnitTimeScale(.hero, .animSpeedSecondaryHero)
+			endif
+
             call SetUnitFlyHeight(.hero, 1., 0.)
             call SetUnitFlyHeight(.hero, 0., 0.)
             call SetUnitUserData(.hero, GetPlayerId(.p))
@@ -718,6 +750,10 @@ struct Escaper
 //autres
 	method getPlayer takes nothing returns player
 		return .p
+	endmethod
+
+	method getControler takes nothing returns integer
+		return .controler
 	endmethod
 	
 	method setCameraField takes integer cameraField returns nothing
@@ -1071,16 +1107,33 @@ struct Escaper
     
 //coop reviving
     method coopReviveHero takes nothing returns nothing
+    	local Escaper mirrorEscaper = GetMirrorEscaper(this)
+    	local unit mirrorHero = mirrorEscaper.getHero()
+
         call .revive(GetUnitX(.hero), GetUnitY(.hero))
         call RunSoundOnUnit(udg_coop_index_son, .hero)
         call SetUnitAnimation(.hero, "channel")
         call .absoluteSlideSpeed(0)
         call .setCoopInvul(true)
+
+        call mirrorEscaper.revive(GetUnitX(mirrorHero), GetUnitY(mirrorHero))
+        call RunSoundOnUnit(udg_coop_index_son, mirrorHero)
+        call SetUnitAnimation(mirrorHero, "channel")
+        call mirrorEscaper.absoluteSlideSpeed(0)
+        call mirrorEscaper.setCoopInvul(true)
+
         call TriggerSleepAction(1.4)
+
         call .stopAbsoluteSlideSpeed()
         call SetUnitAnimation(.hero, "stand")
+
+        call mirrorEscaper.stopAbsoluteSlideSpeed()
+        call SetUnitAnimation(mirrorHero, "stand")
+
         call TriggerSleepAction(0.6)
+
         call .setCoopInvul(false)
+        call mirrorEscaper.setCoopInvul(false)
     endmethod
     
     method isCoopInvul takes nothing returns boolean

@@ -27,7 +27,7 @@ function RandomizeStartPositionsAndHeroSpawnOrder takes nothing returns nothing
     loop
         exitwhen (i >= NB_ESCAPERS)
             loop
-                set n = GetRandomInt(0, = NB_ESCAPERS - 1)
+                set n = GetRandomInt(0, NB_ESCAPERS - 1)
                 exitwhen (not alreadyAdded[n])
             endloop
             set startPositionsRandomized[i] = startPositions[n]
@@ -46,15 +46,28 @@ function RandomizeStartPositionsAndHeroSpawnOrder takes nothing returns nothing
 //randomize hero spawn order
     set i = 0
     loop
-        exitwhen (i >= NB_ESCAPERS)
+        exitwhen (i >= 12)
             loop
-                set n = GetRandomInt(0, NB_ESCAPERS - 1)
+                set n = GetRandomInt(0, 11)
                 exitwhen (not alreadyAdded[n])
             endloop
             set playerIdsRandomized[i] = n
             set alreadyAdded[n] = true
         set i = i + 1
     endloop
+
+	if (udg_doubleHeroesEnabled) then
+		loop
+			exitwhen (i >= NB_ESCAPERS)
+				loop
+					set n = GetRandomInt(12, NB_ESCAPERS - 1)
+					exitwhen (not alreadyAdded[n])
+				endloop
+				set playerIdsRandomized[i] = n
+				set alreadyAdded[n] = true
+			set i = i + 1
+		endloop
+	endif
 endfunction
 
 
@@ -99,6 +112,12 @@ function Init_Heroes takes nothing returns nothing
     local integer x = 0
     local integer y = 0
     local integer n = 0
+    local real spawnPeriod = TIME_BEFORE_HERO_SPAWN
+
+    if (udg_doubleHeroesEnabled) then
+		set spawnPeriod = spawnPeriod / 2
+	endif
+
     loop
         exitwhen (y  >  NB_ROWS - 1)
         loop
@@ -110,10 +129,26 @@ function Init_Heroes takes nothing returns nothing
         set x = 0
         set y = y + 1
     endloop
+
+    if (udg_doubleHeroesEnabled) then
+		set x = 0
+		set y = 0
+		loop
+			exitwhen (y  >  NB_ROWS - 1)
+			loop
+				exitwhen (x > NB_COLUMNS - 1)
+					set startPositions[n] = Location(minX + diffX * x, minY + diffY * y)
+				set n = n + 1
+				set x = x + 1
+			endloop
+			set x = 0
+			set y = y + 1
+		endloop
+    endif
     
     set gg_trg_Heroes = CreateTrigger()
     call TriggerAddAction(gg_trg_Heroes, function Trig_heroes_Actions)
-    call TriggerRegisterTimerEvent(gg_trg_Heroes, TIME_BEFORE_HERO_SPAWN, false)
+    call TriggerRegisterTimerEvent(gg_trg_Heroes, spawnPeriod, false)
 endfunction
 
 

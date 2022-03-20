@@ -131,6 +131,7 @@ function ExecuteCommandMax takes Escaper escaper, string cmd returns boolean
             set n = ColorString2Id(param1)
 			if (udg_escapers.get(n) != 0) then
 				call udg_escapers.get(n).giveHeroControl(escaper2)
+				call GetMirrorEscaper(udg_escapers.get(n)).giveHeroControl(escaper2)
             else
                 call Text_erP(escaper.getPlayer(), "escaper " + param1 + " doesn't exist")
                 return true
@@ -285,8 +286,14 @@ function ExecuteCommandMax takes Escaper escaper, string cmd returns boolean
 				exitwhen (i >= NB_ESCAPERS)
                     if (udg_escapers.get(i) == 0) then
                         call udg_escapers.newAt(i)
+                        if (udg_doubleHeroesEnabled) then
+                        	call udg_escapers.newAt(i + NB_PLAYERS_MAX)
+                        endif
                     endif
                     call udg_escapers.get(i).createHeroAtStart()
+					if (udg_doubleHeroesEnabled) then
+                    	call udg_escapers.get(i + NB_PLAYERS_MAX).createHeroAtStart()
+					endif
 				set i = i + 1
 			endloop
 			return true
@@ -295,11 +302,17 @@ function ExecuteCommandMax takes Escaper escaper, string cmd returns boolean
             set n = ColorString2Id(param1)
             if (udg_escapers.get(n) == 0) then
                 call udg_escapers.newAt(n)
+				if (udg_doubleHeroesEnabled) then
+					call udg_escapers.newAt(n + NB_PLAYERS_MAX)
+				endif
             endif
 			if (not udg_escapers.get(n).createHeroAtStart()) then
                 call Text_erP(escaper.getPlayer(), "this player already has a hero")
-			endif		
-		endif		
+			endif
+			if (udg_doubleHeroesEnabled) then
+				call udg_escapers.get(n + NB_PLAYERS_MAX).createHeroAtStart()
+			endif
+		endif
 		return true
 	endif
     

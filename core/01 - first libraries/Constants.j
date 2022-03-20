@@ -8,7 +8,8 @@ globals
 
 	constant integer INVIS_UNIT_TYPE_ID = 'Einv' 
     constant integer HERO_TYPE_ID = 'E000'
-    
+    constant integer HERO_SECONDARY_TYPE_ID = 'D001'
+
 	constant integer HERO_WALK_SPEED = 522
     
     constant real MAX_MOVE_SPEED = 522
@@ -85,5 +86,6 @@ globals
 
     constant boolean CAN_TURN_IN_AIR = false
 
+	constant integer NB_PLAYERS_MAX = 12
     constant integer NB_ESCAPERS = 24
 endglobals

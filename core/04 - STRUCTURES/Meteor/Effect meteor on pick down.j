@@ -1,7 +1,7 @@
 //TESH.scrollpos=0
 //TESH.alwaysfold=0
 function Trig_Effect_meteor_on_pick_down_Actions takes nothing returns nothing
-    if (not(GetUnitTypeId(GetTriggerUnit()) == HERO_TYPE_ID and (GetItemTypeId(GetManipulatedItem()) == METEOR_NORMAL or GetItemTypeId(GetManipulatedItem()) == METEOR_CHEAT))) then
+    if (not(IsHero(GetTriggerUnit()) and (GetItemTypeId(GetManipulatedItem()) == METEOR_NORMAL or GetItemTypeId(GetManipulatedItem()) == METEOR_CHEAT))) then
         return
     endif
     call Hero2Escaper(GetTriggerUnit()).removeEffectMeteor()
