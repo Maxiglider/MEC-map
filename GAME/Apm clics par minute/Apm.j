@@ -13,7 +13,7 @@ endglobals
 function Init_Apm takes nothing returns nothing
     local integer i = 0
     loop
-        exitwhen (i > 11)
+        exitwhen (i >= NB_ESCAPERS)
             set nbClicsOnSlide[i] = 0
             set timeOnSlide[i] = 0.
         set i = i + 1

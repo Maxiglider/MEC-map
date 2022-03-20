@@ -141,7 +141,7 @@ function Init_ToTurnOnSlide takes nothing returns nothing
     //drunk mode
     set i = 0
     loop
-        exitwhen (i > 11)
+        exitwhen (i >= NB_ESCAPERS)
             set udg_drunk[i] = INITIAL_DRUNK
         set i = i + 1
     endloop

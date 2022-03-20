@@ -25,7 +25,7 @@ function StopEnabledCheckTerrainTriggers takes nothing returns nothing
     local Escaper escaper
     local integer i = 0
     loop
-        exitwhen (i > 11)
+        exitwhen (i >= NB_ESCAPERS)
             set escaper = udg_escapers.get(i)
             if (escaper != 0) then
                 if (escaper.doesCheckTerrain()) then
@@ -44,7 +44,7 @@ function RestartEnabledCheckTerrainTriggers takes nothing returns nothing
     local Escaper escaper
     local integer i = 0
     loop
-        exitwhen (i > 11)
+        exitwhen (i >= NB_ESCAPERS)
             set escaper = udg_escapers.get(i)
             if (escaper != 0) then
                 if (wasCheckTerrainTriggerOn[i]) then

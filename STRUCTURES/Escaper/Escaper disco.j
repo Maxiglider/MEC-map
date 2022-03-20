@@ -18,7 +18,7 @@ function Disco_Actions takes nothing returns nothing
     local integer n = 0
     loop
         exitwhen (udg_escapers.get(n).discoTrigger == GetTriggeringTrigger())
-            if (n > 11) then
+            if (n >= NB_ESCAPERS) then
                 return
             endif
         set n = n + 1

@@ -28,7 +28,7 @@ function Trig_Lose_a_life_and_res_Actions takes nothing returns nothing
         endif
         set i = 0
         loop
-            exitwhen (i > 11)
+            exitwhen (i >= NB_ESCAPERS)
                 if (udg_escapers.get(i) != 0) then
                     call udg_escapers.get(i).reviveAtStart()
                 endif

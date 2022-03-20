@@ -6,7 +6,7 @@ library LevelFunctions
 function IsLevelBeingMade takes Level level returns boolean
     local integer i = 0
     loop
-        exitwhen (i > 11)
+        exitwhen (i >= NB_ESCAPERS)
             if (udg_escapers.get(i) != 0) then
                 if (udg_escapers.get(i).getMakingLevel() == level) then
                     return true

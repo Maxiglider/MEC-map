@@ -22,7 +22,7 @@ function AreAllAliveHeroesAfk takes nothing returns boolean //false if noone is 
     local boolean someoneDead = false
     local integer i = 0
     loop
-        exitwhen (i > 11)
+        exitwhen (i >= NB_ESCAPERS)
             if (udg_escapers.get(i).getHero() != null) then
                 if (IsUnitAliveBJ(udg_escapers.get(i).getHero())) then
                     set someoneAlive = true
@@ -43,7 +43,7 @@ function KillAllHeroesIfAfk takes nothing returns nothing
     local integer i = 0    
     if (AreAllAliveHeroesAfk()) then
         loop
-            exitwhen (i > 11)
+            exitwhen (i >= NB_ESCAPERS)
                 if (IsUnitAliveBJ(udg_escapers.get(i).getHero()) and isAfk[i]) then
                     call udg_escapers.get(i).kill()
                 endif

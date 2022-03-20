@@ -28,7 +28,7 @@ struct Caster [300000] //12 escapers * 50 niveaux * 500 monstres
     
     unit casterUnit
     private trigger trg_unitWithinRange
-    Escaper array escapersInRange [12]
+    Escaper array escapersInRange [NB_ESCAPERS]
     integer nbEscapersInRange
     boolean canShoot
     timer t

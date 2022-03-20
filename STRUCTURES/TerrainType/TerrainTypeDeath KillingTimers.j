@@ -4,12 +4,12 @@ library TerrainTypeDeathKillingTimers needs TerrainTypeDeathFunctions
 
 
 struct KillingTimers
-	private timer array timers [12]
+	private timer array timers [NB_ESCAPERS]
     
 	private method onDestroy takes nothing returns nothing
         local integer i = 0
 		loop
-			exitwhen (i > 11)
+			exitwhen (i >= NB_ESCAPERS)
 				call DestroyTimer(.timers[i])
 				set .timers[i] = null
             set i = i + 1
@@ -21,7 +21,7 @@ struct KillingTimers
         local integer i
         set i = 0
         loop
-            exitwhen (i > 11)
+            exitwhen (i >= NB_ESCAPERS)
                 //if (udg_escapers.get(i) != 0) then //si l'escaper existe
                 //si on laisse le filtre if les escapers apparus après le début (via un -createHero) ne meurent plus avec les terrains
                     set kt.timers[i] = CreateTimer()

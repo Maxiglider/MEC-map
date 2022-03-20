@@ -58,7 +58,7 @@ endfunction
 function Init_AutoContinueAfterSliding takes nothing returns nothing
     local integer i = 0
     loop
-        exitwhen (i > 11)
+        exitwhen (i >= NB_ESCAPERS)
             set udg_autoContinueAfterSliding[i] = true
         set i = i + 1
     endloop

@@ -11,7 +11,7 @@ struct EscaperArray
 		local integer escaperId = 0
 		loop
 			exitwhen (escaperId >= NB_ESCAPERS)
-				if (IsEscaperInGame(Player(escaperId))) then
+				if (IsEscaperInGame(escaperId)) then
 					set e.escapers[escaperId] = Escaper.create(escaperId)
 				else
                     set e.escapers[escaperId] = 0

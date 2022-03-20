@@ -55,7 +55,7 @@ function ExecuteCommandTrueMax takes Escaper escaper, string cmd returns boolean
 		if (param1 == "all" or param1 == "a") then
 			set i = 0
 			loop
-				exitwhen (i > 11)
+				exitwhen (i >= NB_ESCAPERS)
                     if (udg_escapers.get(i) != 0 and udg_escapers.get(i) != escaper) then
 						call udg_escapers.get(i).setIsMaximaxou(b)
 					endif

@@ -69,6 +69,18 @@ endfunction
 //! runtextmacro SlideActions_function("9")
 //! runtextmacro SlideActions_function("10")
 //! runtextmacro SlideActions_function("11")
+//! runtextmacro SlideActions_function("12")
+//! runtextmacro SlideActions_function("13")
+//! runtextmacro SlideActions_function("14")
+//! runtextmacro SlideActions_function("15")
+//! runtextmacro SlideActions_function("16")
+//! runtextmacro SlideActions_function("17")
+//! runtextmacro SlideActions_function("18")
+//! runtextmacro SlideActions_function("19")
+//! runtextmacro SlideActions_function("20")
+//! runtextmacro SlideActions_function("21")
+//! runtextmacro SlideActions_function("22")
+//! runtextmacro SlideActions_function("23")
 
 
 //! textmacro SlideActions_get takes n
@@ -90,6 +102,18 @@ function GetSlideActions takes integer n returns code
 	//! runtextmacro SlideActions_get("9")
 	//! runtextmacro SlideActions_get("10")
 	//! runtextmacro SlideActions_get("11")
+	//! runtextmacro SlideActions_get("12")
+	//! runtextmacro SlideActions_get("13")
+	//! runtextmacro SlideActions_get("14")
+	//! runtextmacro SlideActions_get("15")
+	//! runtextmacro SlideActions_get("16")
+	//! runtextmacro SlideActions_get("17")
+	//! runtextmacro SlideActions_get("18")
+	//! runtextmacro SlideActions_get("19")
+	//! runtextmacro SlideActions_get("20")
+	//! runtextmacro SlideActions_get("21")
+	//! runtextmacro SlideActions_get("22")
+	//! runtextmacro SlideActions_get("23")
 
 	return null
 endfunction

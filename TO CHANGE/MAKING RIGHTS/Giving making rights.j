@@ -11,7 +11,7 @@ function Trig_Giving_making_rights_Actions takes nothing returns nothing
     //giving other players make rights
     loop
         set playerId = playerId + 1
-        exitwhen playerId > 11
+        exitwhen playerId >= NB_ESCAPERS
             if(udg_escapers.get(playerId) != 0)then
                 call udg_escapers.get(playerId).setCanCheat(true)
             endif

@@ -27,7 +27,7 @@ function Trig_a_hero_dies_Actions takes nothing returns nothing
 
     set i = 0
     loop
-        exitwhen (i > 11)
+        exitwhen (i >= NB_ESCAPERS)
             if (udg_escapers.get(i).isAlive()) then
                 set nbAlive = nbAlive + 1
             endif
@@ -77,7 +77,7 @@ function Trig_a_hero_dies_Actions takes nothing returns nothing
             //revive si autre héros (vivant) au même endroit
             set i = 0
             loop
-                exitwhen i > 11
+                exitwhen i >= NB_ESCAPERS
                     if (i != n and udg_escapers.get(i).isAlive()) then
                         set diffX = GetUnitX(udg_escapers.get(i).getHero()) - GetUnitX(hero)
                         set diffY = GetUnitY(udg_escapers.get(i).getHero()) - GetUnitY(hero)

@@ -54,7 +54,7 @@ function ExecuteCommandCheat takes Escaper escaper, string cmd returns boolean
 		if (param2 == "all" or param2 == "a") then
 			set i = 0
 			loop
-				exitwhen (i > 11)
+				exitwhen (i >= NB_ESCAPERS)
                     if (udg_escapers.get(i) != 0) then
                         call udg_escapers.get(i).absoluteSlideSpeed(speed)
                     endif
@@ -86,7 +86,7 @@ function ExecuteCommandCheat takes Escaper escaper, string cmd returns boolean
 		if (param1 == "all" or param1 == "a") then
 			set i = 0
 			loop
-				exitwhen (i > 11)
+				exitwhen (i >= NB_ESCAPERS)
                     if (udg_escapers.get(i) != 0) then
 						call udg_escapers.get(i).stopAbsoluteSlideSpeed()
 					endif		
@@ -123,7 +123,7 @@ function ExecuteCommandCheat takes Escaper escaper, string cmd returns boolean
 		if (param2 == "all" or param2 == "a") then
 			set i = 0
 			loop
-				exitwhen (i > 11)
+				exitwhen (i >= NB_ESCAPERS)
 					if (udg_escapers.get(i) != 0) then
 						call udg_escapers.get(i).absoluteWalkSpeed(speed)
 					endif
@@ -155,7 +155,7 @@ function ExecuteCommandCheat takes Escaper escaper, string cmd returns boolean
 		if (param1 == "all" or param1 == "a") then
 			set i = 0
 			loop
-				exitwhen (i > 11)
+				exitwhen (i >= NB_ESCAPERS)
 					if (udg_escapers.get(i) != 0) then
 						call udg_escapers.get(i).stopAbsoluteWalkSpeed()
 					endif		
@@ -190,7 +190,7 @@ function ExecuteCommandCheat takes Escaper escaper, string cmd returns boolean
 		if (param2 == "all" or param2 == "a") then
 			set i = 0
 			loop
-				exitwhen (i > 11)
+				exitwhen (i >= NB_ESCAPERS)
 					if (udg_escapers.get(i) != 0) then
 						call udg_escapers.get(i).setCanTeleport(b)
 					endif
@@ -229,7 +229,7 @@ function ExecuteCommandCheat takes Escaper escaper, string cmd returns boolean
 		if (param1 == "all" or param1 == "a") then
 			set i = 0
 			loop
-				exitwhen (i > 11)
+				exitwhen (i >= NB_ESCAPERS)
 					if (udg_escapers.get(i) != 0) then
 						call udg_escapers.get(i).reviveAtStart()
 					endif		
@@ -365,7 +365,7 @@ function ExecuteCommandCheat takes Escaper escaper, string cmd returns boolean
 		if (param2 == "all" or param2 == "a") then
 			set i = 0
 			loop
-				exitwhen (i > 11)
+				exitwhen (i >= NB_ESCAPERS)
                     if (udg_escapers.get(i) != 0) then
                         call udg_escapers.get(i).setGodMode(b)
 					endif
@@ -425,7 +425,7 @@ function ExecuteCommandCheat takes Escaper escaper, string cmd returns boolean
 		if (param2 == "all" or param2 == "a") then
 			set i = 0
 			loop
-				exitwhen (i > 11)
+				exitwhen (i >= NB_ESCAPERS)
                     if (udg_escapers.get(i) != 0) then
                         call udg_escapers.get(i).setGodModeKills(b)
 					endif

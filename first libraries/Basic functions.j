@@ -33,11 +33,16 @@ function IsItemBetweenLocs takes item i, real x1, real y1, real x2, real y2 retu
 	return ((minX < x and maxX > x) and (minY < y and maxY > y))
 endfunction
 
-
-function IsEscaperInGame takes player p returns boolean
-	if (p > 11) then
-		set p = p - 12
+function EscaperIdToPlayer takes integer escaperId returns player
+	local player p
+	if (escaperId > 11) then
+		set escaperId = escaperId - 12
 	endif
+	return Player(escaperId)
+endfunction
+
+function IsEscaperInGame takes integer escaperId returns boolean
+	local player p = EscaperIdToPlayer(escaperId)
     return (GetPlayerController(p) == MAP_CONTROL_USER and GetPlayerSlotState(p) == PLAYER_SLOT_STATE_PLAYING)
 endfunction
 

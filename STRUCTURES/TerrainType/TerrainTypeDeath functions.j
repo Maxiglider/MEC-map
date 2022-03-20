@@ -16,7 +16,7 @@ function TerrainKillTimer2Escaper takes timer theTimer returns Escaper
 		exitwhen (terrainTypeDeathId > terrainTypeDeathMaxId)
 			set escaperId = 0
 			loop
-				exitwhen (escaperId > 11)
+				exitwhen (escaperId >= NB_ESCAPERS)
 					if (theTimer == udg_terrainTypes.getDeath(terrainTypeDeathId).getTimer(escaperId)) then
                         return udg_escapers.get(escaperId)
                     endif

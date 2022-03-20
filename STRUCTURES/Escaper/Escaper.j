@@ -245,7 +245,7 @@ struct Escaper
     method getId takes nothing returns integer
         local integer i = 0
         loop
-            exitwhen (i > 11)
+            exitwhen (i >= NB_ESCAPERS)
                 if (this == udg_escapers.get(i)) then
                     return i
                 endif
@@ -391,20 +391,9 @@ struct Escaper
         local real x = GetUnitX(.hero)
 		local real y = GetUnitY(.hero)
         local item meteor = UnitItemInSlot(.hero, 0)
-        //local player array playersSelectingHero
-        //local integer playersSelectingHeroLastId = -1
-        //local integer i = 0
-        //loop
-        //    exitwhen i > 11
-                //if (IsUnitSelected(.hero, Player(i))) then
-         //           set playersSelectingHeroLastId = playersSelectingHeroLastId + 1
-         //           set playersSelectingHero[playersSelectingHeroLastId] = Player(i)
-                //endif
-         //   set i = i + 1
-        //endloop
+
 		call RemoveUnit(.hero)
-        //call .make.destroy()
-        //set .make = 0
+
         //recreate hero
             set .hero = CreateUnit(.p, HERO_TYPE_ID, x, y, angle)
             call SetUnitFlyHeight(.hero, 1., 0.)
@@ -417,12 +406,7 @@ struct Escaper
             if (.controler != this) then
                 call SetUnitOwner(.hero, .controler.getPlayer(), false)
             endif
-            //set i = 0
-            //loop
-            //    exitwhen i > playersSelectingHeroLastId
-            //        call SelectUnitAddForPlayer(.hero, playersSelectingHero[i])
-            //    set i = i + 1
-            //endloop
+
             if (.isHeroSelectedB) then
                 call SelectUnit(.hero, true)
             endif

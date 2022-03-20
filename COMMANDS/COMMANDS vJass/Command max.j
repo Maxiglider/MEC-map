@@ -114,7 +114,7 @@ function ExecuteCommandMax takes Escaper escaper, string cmd returns boolean
 		if (param1 == "all" or param1 == "a") then
 			set i = 0
 			loop
-				exitwhen (i > 11)
+				exitwhen (i >= NB_ESCAPERS)
 					if (udg_escapers.get(i) != 0) then
                         call udg_escapers.get(i).giveHeroControl(escaper2)
 					endif
@@ -150,7 +150,7 @@ function ExecuteCommandMax takes Escaper escaper, string cmd returns boolean
         if (noParam) then
             set i = 0
             loop
-                exitwhen (i > 11)
+                exitwhen (i >= NB_ESCAPERS)
                     if (udg_escapers.get(i) != 0) then
                         call udg_escapers.get(i).resetOwner()
                     endif
@@ -235,7 +235,7 @@ function ExecuteCommandMax takes Escaper escaper, string cmd returns boolean
 		if (param2 == "all" or param2 == "a") then
 			set i=0
 			loop
-				exitwhen (i > 11)
+				exitwhen (i >= NB_ESCAPERS)
 					if (udg_escapers.get(i) != 0) then
 						call udg_escapers.get(i).setHasAutorevive(b)
 					endif
@@ -282,7 +282,7 @@ function ExecuteCommandMax takes Escaper escaper, string cmd returns boolean
 		if (param1 == "all" or param1 == "a") then
 			set i = 0
 			loop
-				exitwhen (i > 11)
+				exitwhen (i >= NB_ESCAPERS)
                     if (udg_escapers.get(i) == 0) then
                         call udg_escapers.newAt(i)
                     endif
@@ -317,9 +317,9 @@ function ExecuteCommandMax takes Escaper escaper, string cmd returns boolean
 		if (param1 == "all" or param1 == "a") then
 			set i = 0
 			loop
-				exitwhen (i > 11)
+				exitwhen (i >= NB_ESCAPERS)
 					if (udg_escapers.get(i) != 0 and udg_escapers.get(i) != escaper) then
-                        if (IsEscaperInGame(Player(i))) then
+                        if (IsEscaperInGame(i)) then
                             call udg_escapers.get(i).removeHero()
                         else
                             call udg_escapers.remove(i)
@@ -332,7 +332,7 @@ function ExecuteCommandMax takes Escaper escaper, string cmd returns boolean
 		if (IsPlayerColorString(param1)) then
             set n = ColorString2Id(param1)
 			if (udg_escapers.get(n) != 0) then
-                if (IsEscaperInGame(Player(n))) then
+                if (IsEscaperInGame(n)) then
                     call udg_escapers.get(n).removeHero()
                 else
                     call udg_escapers.remove(n)
@@ -366,7 +366,7 @@ function ExecuteCommandMax takes Escaper escaper, string cmd returns boolean
 		if (param1 == "all" or param1 == "a") then
 			set i = 0
 			loop
-				exitwhen (i > 11)
+				exitwhen (i >= NB_ESCAPERS)
                     if (udg_escapers.get(i) != 0 and udg_escapers.get(i) != escaper) then
                         if (not udg_escapers.get(i).isMaximaxou()) then
                             call udg_escapers.get(i).setCanCheat(b)

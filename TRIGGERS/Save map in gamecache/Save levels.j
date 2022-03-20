@@ -323,7 +323,7 @@ endfunction
 function StartSaveLevels takes nothing returns nothing
     local integer i = 0
     loop
-        exitwhen (i > 11)
+        exitwhen (i >= NB_ESCAPERS)
             if (udg_escapers.get(i) != 0) then
                 call udg_escapers.get(i).destroyMake()
                 call udg_escapers.get(i).destroyAllSavedActions()

@@ -60,7 +60,7 @@ struct CasterType
         call currentLevel.refreshCastersOfType(this) 
         set i = 0
         loop
-            exitwhen (i > 11)
+            exitwhen (i >= NB_ESCAPERS)
                 set escaper = udg_escapers.get(i)
                 if (escaper != 0) then
                     if (escaper.getMakingLevel() != currentLevel) then

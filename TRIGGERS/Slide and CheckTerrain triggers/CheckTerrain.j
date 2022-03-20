@@ -184,6 +184,18 @@ endfunction
 //! runtextmacro CheckTerrainActions_function("9")
 //! runtextmacro CheckTerrainActions_function("10")
 //! runtextmacro CheckTerrainActions_function("11")
+//! runtextmacro CheckTerrainActions_function("12")
+//! runtextmacro CheckTerrainActions_function("13")
+//! runtextmacro CheckTerrainActions_function("14")
+//! runtextmacro CheckTerrainActions_function("15")
+//! runtextmacro CheckTerrainActions_function("16")
+//! runtextmacro CheckTerrainActions_function("17")
+//! runtextmacro CheckTerrainActions_function("18")
+//! runtextmacro CheckTerrainActions_function("19")
+//! runtextmacro CheckTerrainActions_function("20")
+//! runtextmacro CheckTerrainActions_function("21")
+//! runtextmacro CheckTerrainActions_function("22")
+//! runtextmacro CheckTerrainActions_function("23")
 
 
 //! textmacro CheckTerrainActions_get takes n
@@ -205,6 +217,18 @@ function GetCheckTerrainActions takes integer n returns code
 	//! runtextmacro CheckTerrainActions_get("9")
 	//! runtextmacro CheckTerrainActions_get("10")
 	//! runtextmacro CheckTerrainActions_get("11")
+	//! runtextmacro CheckTerrainActions_get("12")
+	//! runtextmacro CheckTerrainActions_get("13")
+	//! runtextmacro CheckTerrainActions_get("14")
+	//! runtextmacro CheckTerrainActions_get("15")
+	//! runtextmacro CheckTerrainActions_get("16")
+	//! runtextmacro CheckTerrainActions_get("17")
+	//! runtextmacro CheckTerrainActions_get("18")
+	//! runtextmacro CheckTerrainActions_get("19")
+	//! runtextmacro CheckTerrainActions_get("20")
+	//! runtextmacro CheckTerrainActions_get("21")
+	//! runtextmacro CheckTerrainActions_get("22")
+	//! runtextmacro CheckTerrainActions_get("23")
 
 	return null
 endfunction

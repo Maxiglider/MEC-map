@@ -16,7 +16,7 @@ function Trig_Trig_checkpoint_revive_heroes_Actions takes nothing returns nothin
     local Escaper escaper
     local integer i = 0
     loop
-        exitwhen (i > 11)
+        exitwhen (i >= NB_ESCAPERS)
             set escaper = udg_escapers.get(i)
             if (escaper != 0 and escaper != finisher) then
                 if (not escaper.reviveAtStart()) then
@@ -35,7 +35,7 @@ function Trig_Trig_checkpoint_revive_heroes_Actions takes nothing returns nothin
     call TriggerSleepAction(1)
     set i = 0
     loop
-        exitwhen (i > 11)
+        exitwhen (i >= NB_ESCAPERS)
             set escaper = udg_escapers.get(i)
             if (escaper != 0 and escaper != finisher) then
                 call escaper.pause(false)
