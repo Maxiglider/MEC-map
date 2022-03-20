@@ -622,7 +622,7 @@ struct Escaper
 	
 //color methods
 	method setBaseColor takes integer baseColorId returns boolean
-        if (baseColorId < 0 or baseColorId > 12) then
+        if (baseColorId < 0 or baseColorId >= NB_PLAYERS_MAX_REFORGED) then
             return false
         endif
 		set .baseColorId = baseColorId
@@ -633,12 +633,16 @@ struct Escaper
                 call SetUnitColor(.hero, ConvertPlayerColor(baseColorId))
             endif
 		endif
-        call ColorInfo(this, .p)
+
+		if (not .isEscaperSecondary()) then
+        	call ColorInfo(this, .p)
+			call GetMirrorEscaper(this).setBaseColor(baseColorId)
+		endif
         return true
 	endmethod
     
 	method setBaseColorDisco takes integer baseColorId returns boolean
-        if (baseColorId < 0 or baseColorId > 12) then
+        if (baseColorId < 0 or baseColorId >= NB_PLAYERS_MAX_REFORGED) then
             return false
         endif
 		set .baseColorId = baseColorId
@@ -649,6 +653,11 @@ struct Escaper
                 call SetUnitColor(.hero, ConvertPlayerColor(baseColorId))
             endif
 		endif
+
+		if (not .isEscaperSecondary()) then
+			call GetMirrorEscaper(this).setBaseColorDisco(baseColorId)
+		endif
+
         return true
 	endmethod
     
@@ -661,6 +670,11 @@ struct Escaper
             return false
         endif
 		set .vcRed = vcRed
+
+		if (not .isEscaperSecondary()) then
+			call GetMirrorEscaper(this).setVcRed(vcRed)
+		endif
+
         return true
 	endmethod
 	
@@ -669,6 +683,11 @@ struct Escaper
             return false
         endif
 		set .vcGreen = vcGreen
+
+		if (not .isEscaperSecondary()) then
+			call GetMirrorEscaper(this).setVcGreen(vcGreen)
+		endif
+
         return true
 	endmethod
 	
@@ -676,6 +695,11 @@ struct Escaper
         if (vcBlue < 0 or vcBlue > 100) then
             return false
         endif
+
+		if (not .isEscaperSecondary()) then
+			call GetMirrorEscaper(this).setVcBlue(vcBlue)
+		endif
+
 		set .vcBlue = vcBlue
         return true
 	endmethod
@@ -685,6 +709,11 @@ struct Escaper
             return false
         endif
 		set .vcTransparency = vcTransparency
+
+		if (not .isEscaperSecondary()) then
+			call GetMirrorEscaper(this).setVcTransparency(vcTransparency)
+		endif
+
         return true
 	endmethod
 	
@@ -706,7 +735,11 @@ struct Escaper
 	
 	method refreshVertexColor takes nothing returns nothing
 		call SetUnitVertexColorBJ(.hero, .vcRed, .vcGreen, .vcBlue, .vcTransparency)
-		call ColorInfo(this, .p)
+
+		if (not .isEscaperSecondary()) then
+			call ColorInfo(this, .p)
+			call GetMirrorEscaper(this).refreshVertexColor()
+		endif
 	endmethod
 	
 //cheat methods
@@ -1159,6 +1192,10 @@ struct Escaper
             call SetUnitPosition(.dummyPowerCircle, GetUnitX(.hero), GetUnitY(.hero))
         endif
     endmethod
+
+    method isEscaperSecondary takes nothing returns boolean
+    	return .escaperId >= NB_PLAYERS_MAX
+	endmethod
     
     
 endstruct

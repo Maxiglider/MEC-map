@@ -95,55 +95,13 @@ function NoParam takes string str returns boolean
 endfunction
 
 
-function ColorString2Id takes string colorString returns integer
-    if (colorString == "red" or colorString == "rd") then
-        return 0
-    endif
-    if (colorString == "blue" or colorString == "be") then
-        return 1
-    endif
-    if (colorString == "teal" or colorString == "tl") then
-        return 2
-    endif
-    if (colorString == "purple" or colorString == "pe") then
-        return 3
-    endif
-    if (colorString == "yellow" or colorString == "yw") then
-        return 4
-    endif
-    if (colorString == "orange" or colorString == "oe") then
-        return 5
-    endif
-    if (colorString == "green" or colorString == "gn") then
-        return 6
-    endif
-    if (colorString == "pink" or colorString == "pk") then
-        return 7
-    endif
-    if (colorString == "grey" or colorString == "gray" or colorString == "gy") then
-        return 8
-    endif
-    if (colorString == "lightblue" or colorString == "lb") then
-        return 9
-    endif
-    if (colorString == "darkgreen" or colorString == "dg") then
-        return 10
-    endif
-    if (colorString == "brown" or colorString == "bn") then
-        return 11
-    endif
-    if (colorString == "black" or colorString == "bk") then
-        return 12
-    endif
-    return 13
-endfunction
 
 function IsColorString takes string colorString returns boolean
-    return (ColorString2Id(colorString) <= 12)
+    return (ColorString2Id(colorString) >= 0)
 endfunction
 
 function IsPlayerColorString takes string colorString returns boolean
-    return (ColorString2Id(colorString) <= 11)
+    return (ColorString2Id(colorString) >= 0 and ColorString2Id(colorString) <= NB_PLAYERS_MAX)
 endfunction
 
 

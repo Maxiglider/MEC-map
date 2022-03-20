@@ -86,6 +86,7 @@ globals
 
     constant boolean CAN_TURN_IN_AIR = false
 
-	constant integer NB_PLAYERS_MAX = 12
+	constant integer NB_PLAYERS_MAX = 12 //number of players max of MEC
+	constant integer NB_PLAYERS_MAX_REFORGED = 24 //number of players max of Reforged in general
     constant integer NB_ESCAPERS = 24
 endglobals
