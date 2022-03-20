@@ -1,0 +1,6 @@
+Camera
+    Evénements
+        Map initialization
+    Conditions
+    Actions
+        Custom script:   call SetCameraField( CAMERA_FIELD_TARGET_DISTANCE, DEFAULT_CAMERA_FIELD, 0 )

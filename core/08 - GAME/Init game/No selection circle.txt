@@ -1,0 +1,7 @@
+No selection circle
+    Evénements
+        Map initialization
+        Partie - A saved game is loaded
+    Conditions
+    Actions
+        Partie - Activer selection and deselection functionality (Désactiver selection circles)

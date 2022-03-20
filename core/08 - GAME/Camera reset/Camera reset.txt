@@ -1,0 +1,19 @@
+Camera reset
+    Evénements
+        Joueur - Joueur 1 (Rouge) skips a cinematic sequence
+        Joueur - Joueur 2 (Bleu) skips a cinematic sequence
+        Joueur - Joueur 3 (Cyan) skips a cinematic sequence
+        Joueur - Joueur 4 (Pourpre) skips a cinematic sequence
+        Joueur - Joueur 5 (Jaune) skips a cinematic sequence
+        Joueur - Joueur 6 (Orange) skips a cinematic sequence
+        Joueur - Joueur 7 (Vert) skips a cinematic sequence
+        Joueur - Joueur 8 (Rose) skips a cinematic sequence
+        Joueur - Joueur 9 (gris) skips a cinematic sequence
+        Joueur - Joueur 10 (Bleu clair) skips a cinematic sequence
+        Joueur - Joueur 11 (Vert foncé) skips a cinematic sequence
+        Joueur - Joueur 12 (Marron) skips a cinematic sequence
+    Conditions
+    Actions
+        Custom script:   local player TP = GetTriggerPlayer()
+        Custom script:   local integer TPN = GetPlayerId(TP)
+        Custom script:   call udg_escapers.get(TPN).resetCamera()
