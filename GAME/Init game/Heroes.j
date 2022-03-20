@@ -25,9 +25,9 @@ function RandomizeStartPositionsAndHeroSpawnOrder takes nothing returns nothing
 //randomize start positions
     set i = 0
     loop
-        exitwhen (i > 11)
+        exitwhen (i >= NB_ESCAPERS)
             loop
-                set n = GetRandomInt(0, 11)
+                set n = GetRandomInt(0, = NB_ESCAPERS - 1)
                 exitwhen (not alreadyAdded[n])
             endloop
             set startPositionsRandomized[i] = startPositions[n]
@@ -38,7 +38,7 @@ function RandomizeStartPositionsAndHeroSpawnOrder takes nothing returns nothing
 //reinit alreadyAdded to false
     set i = 0
     loop
-        exitwhen (i > 11)
+        exitwhen (i >= NB_ESCAPERS)
             set alreadyAdded[i] = false
         set i = i + 1
     endloop
@@ -46,9 +46,9 @@ function RandomizeStartPositionsAndHeroSpawnOrder takes nothing returns nothing
 //randomize hero spawn order
     set i = 0
     loop
-        exitwhen (i > 11)
+        exitwhen (i >= NB_ESCAPERS)
             loop
-                set n = GetRandomInt(0, 11)
+                set n = GetRandomInt(0, NB_ESCAPERS - 1)
                 exitwhen (not alreadyAdded[n])
             endloop
             set playerIdsRandomized[i] = n
@@ -72,7 +72,7 @@ function Trig_heroes_Actions takes nothing returns nothing
     call ClearSelection()
     set i = 0
     loop
-        exitwhen (i > 11)
+        exitwhen (i >= NB_ESCAPERS)
             set n = playerIdsRandomized[i]
             if (udg_escapers.get(n) != 0) then
                 call udg_escapers.get(n).createHero(GetLocationX(startPositionsRandomized[n]), GetLocationY(startPositionsRandomized[n]), HERO_START_ANGLE)

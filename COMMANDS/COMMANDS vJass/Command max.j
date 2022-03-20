@@ -319,7 +319,7 @@ function ExecuteCommandMax takes Escaper escaper, string cmd returns boolean
 			loop
 				exitwhen (i > 11)
 					if (udg_escapers.get(i) != 0 and udg_escapers.get(i) != escaper) then
-                        if (IsPlayerInGame(Player(i))) then
+                        if (IsEscaperInGame(Player(i))) then
                             call udg_escapers.get(i).removeHero()
                         else
                             call udg_escapers.remove(i)
@@ -332,7 +332,7 @@ function ExecuteCommandMax takes Escaper escaper, string cmd returns boolean
 		if (IsPlayerColorString(param1)) then
             set n = ColorString2Id(param1)
 			if (udg_escapers.get(n) != 0) then
-                if (IsPlayerInGame(Player(n))) then
+                if (IsEscaperInGame(Player(n))) then
                     call udg_escapers.get(n).removeHero()
                 else
                     call udg_escapers.remove(n)

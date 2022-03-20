@@ -4,25 +4,25 @@ library EscaperArray needs Escaper
 
 
 struct EscaperArray
-	private Escaper array escapers [12]
+	private Escaper array escapers [NB_ESCAPERS]
 	
 	static method create takes nothing returns EscaperArray
 		local EscaperArray e = EscaperArray.allocate()
-		local integer playerId = 0
+		local integer escaperId = 0
 		loop
-			exitwhen (playerId > 11)
-				if (IsPlayerInGame(Player(playerId))) then
-					set e.escapers[playerId] = Escaper.create(playerId)
+			exitwhen (escaperId >= NB_ESCAPERS)
+				if (IsEscaperInGame(Player(escaperId))) then
+					set e.escapers[escaperId] = Escaper.create(escaperId)
 				else
-                    set e.escapers[playerId] = 0
+                    set e.escapers[escaperId] = 0
                 endif
-			set playerId = playerId + 1
+			set escaperId = escaperId + 1
 		endloop
 		return e
 	endmethod
     
     method newAt takes integer id returns nothing
-        if (id < 0 or id > 11) then
+        if (id < 0 or id >= NB_ESCAPERS) then
             return
         endif
         if (.escapers[id] != 0) then
@@ -35,7 +35,7 @@ struct EscaperArray
 		local integer n = 0
 		local integer i = 0
 		loop
-			exitwhen (i > 11)
+			exitwhen (i >= NB_ESCAPERS)
 				if (.escapers[i] != 0) then
 					set n = n + 1
 				endif
@@ -60,7 +60,7 @@ struct EscaperArray
     method deleteSpecificActionsForLevel takes Level level returns nothing
         local integer i = 0
         loop
-            exitwhen (i > 11)
+            exitwhen (i >= NB_ESCAPERS)
                 if (.escapers[i] != 0) then
                     call .escapers[i].deleteSpecificActionsForLevel(level)
                 endif
@@ -73,7 +73,7 @@ struct EscaperArray
         local boolean doDestroy
         local integer i = 0
         loop
-            exitwhen (i > 11)
+            exitwhen (i >= NB_ESCAPERS)
                 if (.escapers[i] != 0 and .escapers[i].isMakingCurrentLevel()) then
                     call .escapers[i].destroyMakeIfForSpecificLevel()
                 endif

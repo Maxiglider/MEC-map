@@ -11,6 +11,7 @@ endglobals
 
 
 struct Escaper
+	private integer playerId
 	private player p
     private unit hero
 	private unit invisUnit
@@ -147,14 +148,21 @@ struct Escaper
 		return .createHero(x, y, angle)
 	endmethod
 	
-	static method create takes integer playerId returns Escaper //ne crée pas le héros
+	static method create takes integer escaperId returns Escaper //ne crée pas le héros
 		local Escaper e = Escaper.allocate()
-		set e.p = Player(playerId)
+
+		if (escaperId > 11) then
+			set e.playerId = escaperId - 12
+		else
+			set e.playerId = escaperId
+		endif
+
+		set e.p = Player(e.playerId)
 		set e.walkSpeed = HERO_WALK_SPEED
 		set e.slideSpeed = HERO_SLIDE_SPEED
-		set e.baseColorId = playerId
-		set e.slide = CreateSlideTrigger(playerId)
-        set e.checkTerrain = CreateCheckTerrainTrigger(playerId)
+		set e.baseColorId = escaperId
+		set e.slide = CreateSlideTrigger(escaperId)
+        set e.checkTerrain = CreateCheckTerrainTrigger(escaperId)
         set e.cameraField = DEFAULT_CAMERA_FIELD
         call SetCameraFieldForPlayer(e.p, CAMERA_FIELD_TARGET_DISTANCE, I2R(e.cameraField), 0)
         set e.effects = EscaperEffectArray.create()
@@ -182,10 +190,10 @@ struct Escaper
 
         //coop
         set e.powerCircle = CreateUnit(e.p, POWER_CIRCLE, 0, 0, 0)
-        call SetUnitUserData(e.powerCircle, playerId)
+        call SetUnitUserData(e.powerCircle, escaperId)
         call ShowUnit(e.powerCircle, false)
         set e.dummyPowerCircle = CreateUnit(ENNEMY_PLAYER, DUMMY_POWER_CIRCLE, 0, 0, 0)
-        call SetUnitUserData(e.dummyPowerCircle, playerId)
+        call SetUnitUserData(e.dummyPowerCircle, escaperId)
         call ShowUnit(e.dummyPowerCircle, false)
 
 		return e

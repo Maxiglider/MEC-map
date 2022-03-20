@@ -84,4 +84,6 @@ globals
 
 
     constant boolean CAN_TURN_IN_AIR = false
+
+    constant integer NB_ESCAPERS = 24
 endglobals

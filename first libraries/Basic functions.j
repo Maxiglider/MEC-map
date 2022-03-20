@@ -34,7 +34,10 @@ function IsItemBetweenLocs takes item i, real x1, real y1, real x2, real y2 retu
 endfunction
 
 
-function IsPlayerInGame takes player p returns boolean
+function IsEscaperInGame takes player p returns boolean
+	if (p > 11) then
+		set p = p - 12
+	endif
     return (GetPlayerController(p) == MAP_CONTROL_USER and GetPlayerSlotState(p) == PLAYER_SLOT_STATE_PLAYING)
 endfunction
 
