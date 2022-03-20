@@ -1,6 +1,0 @@
-Antisave
-    Evénements
-        Partie - A saved game is loaded
-    Conditions
-    Actions
-        Déclencheur - Run (This trigger) (ignoring conditions)

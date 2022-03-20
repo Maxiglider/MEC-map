@@ -1,9 +1,0 @@
-Forces ally
-    Evénements
-        Map initialization
-    Conditions
-    Actions
-        For each (Integer A) from 1 to 11, do (Actions)
-            Boucle - Actions
-                Joueur - Make Joueur 12 (Marron) treat (Player((Integer A))) as an Allié avec vision partagée
-                Joueur - Make (Player((Integer A))) treat Joueur 12 (Marron) as an Allié avec vision partagée
