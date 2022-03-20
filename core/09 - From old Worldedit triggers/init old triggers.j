@@ -5,7 +5,6 @@ function InitOldTriggers takes nothing returns nothing
     call InitTrig_Constants(  )
     call InitTrig_Text(  )
     call InitTrig_Init_terrain_limit_variables(  )
-    call InitTrig_Init_colorCodes(  )
     call InitTrig_Basic_functions(  )
     call InitTrig_Functions_on_numbers(  )
     call InitTrig_Ascii(  )

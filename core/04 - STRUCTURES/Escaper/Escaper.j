@@ -199,7 +199,7 @@ struct Escaper
         call TriggerRegisterUnitEvent(gg_trg_InvisUnit_is_getting_damage, .invisUnit, EVENT_UNIT_DAMAGED)
         call .effects.showEffects(.hero)
         set .lastTerrainType = 0
-        call TimerStart(afkModeTimers[GetPlayerId(.p)], timeMinAfk, false, GetAfkModeTimeExpiresCodeFromId(GetPlayerId(.p)))
+        call TimerStart(afkModeTimers[.escaperId], timeMinAfk, false, GetAfkModeTimeExpiresCodeFromId(.escaperId))
         call InitShortcutSkills(GetPlayerId(.p))
         call EnableTrigger(.checkTerrain)
         return true
@@ -357,7 +357,7 @@ struct Escaper
 			set .lastTerrainType = 0
             call ShowUnit(.invisUnit, false)
             call .enableCheckTerrain(false)
-            call StopAfk(GetPlayerId(.p))
+            call StopAfk(.escaperId)
             call DisplayDeathMessagePlayer(.p)
             set .isHeroSelectedB = false
 			return true
@@ -391,7 +391,7 @@ struct Escaper
         if (.vcTransparency != 0) then
             call SetUnitVertexColorBJ(.hero, .vcRed, .vcGreen, .vcBlue, .vcTransparency)
         endif
-        call TimerStart(afkModeTimers[GetPlayerId(.p)], timeMinAfk, false, GetAfkModeTimeExpiresCodeFromId(GetPlayerId(.p)))
+        call TimerStart(afkModeTimers[.escaperId], timeMinAfk, false, GetAfkModeTimeExpiresCodeFromId(.escaperId))
         set .lastZ = 0
         set .oldDiffZ = 0
         set .speedZ = 0

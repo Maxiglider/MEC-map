@@ -1,6 +1,6 @@
 //TESH.scrollpos=0
 //TESH.alwaysfold=0
-library AfkMode initializer Init_AfkMode
+library AfkMode initializer Init_AfkMode needs EscaperFunctions
 
 
 
@@ -58,20 +58,21 @@ function KillAllHeroesAfkInFiveSeconds takes nothing returns nothing
 endfunction
 
 
-function SetAfkMode takes integer playerId returns nothing
-    if (afkModeTextTags[playerId] != null) then
-        call DestroyTextTag(afkModeTextTags[playerId])
+function SetAfkMode takes integer escaperId returns nothing
+	local integer playerId = escaperId2playerId(escaperId)
+    if (afkModeTextTags[escaperId] != null) then
+        call DestroyTextTag(afkModeTextTags[escaperId])
     endif
-    set afkModeTextTags[playerId] = CreateTextTagUnitBJ( udg_colorCode[playerId]+"AFK", udg_escapers.get(playerId).getHero(), Z, SIZE, 100, 100, 100, TRANSPARENCY )
-    set isAfk[playerId] = true
+    set afkModeTextTags[escaperId] = CreateTextTagUnitBJ( udg_colorCode[playerId]+"AFK|r", udg_escapers.get(escaperId).getHero(), Z, SIZE, 100, 100, 100, TRANSPARENCY )
+    set isAfk[escaperId] = true
 endfunction
 
 
-function StopAfk takes integer playerId returns nothing
-    if (isAfk[playerId]) then
-        set isAfk[playerId] = false
-        call DestroyTextTag(afkModeTextTags[playerId])
-        set afkModeTextTags[playerId] = null
+function StopAfk takes integer escaperId returns nothing
+    if (isAfk[escaperId]) then
+        set isAfk[escaperId] = false
+        call DestroyTextTag(afkModeTextTags[escaperId])
+        set afkModeTextTags[escaperId] = null
     endif
 endfunction
 
@@ -97,6 +98,18 @@ endfunction
 //! runtextmacro AfkModeTimerExpires("9")
 //! runtextmacro AfkModeTimerExpires("10")
 //! runtextmacro AfkModeTimerExpires("11")
+//! runtextmacro AfkModeTimerExpires("12")
+//! runtextmacro AfkModeTimerExpires("13")
+//! runtextmacro AfkModeTimerExpires("14")
+//! runtextmacro AfkModeTimerExpires("15")
+//! runtextmacro AfkModeTimerExpires("16")
+//! runtextmacro AfkModeTimerExpires("17")
+//! runtextmacro AfkModeTimerExpires("18")
+//! runtextmacro AfkModeTimerExpires("19")
+//! runtextmacro AfkModeTimerExpires("20")
+//! runtextmacro AfkModeTimerExpires("21")
+//! runtextmacro AfkModeTimerExpires("22")
+//! runtextmacro AfkModeTimerExpires("23")
 
 
 function GetAfkModeTimeExpiresCodeFromId takes integer id returns code
@@ -118,7 +131,19 @@ function GetAfkModeTimeExpiresCodeFromId takes integer id returns code
     //! runtextmacro GetAfkModeTimeExpiresCodeFromId("9")
     //! runtextmacro GetAfkModeTimeExpiresCodeFromId("10")
     //! runtextmacro GetAfkModeTimeExpiresCodeFromId("11")
-    
+    //! runtextmacro GetAfkModeTimeExpiresCodeFromId("12")
+    //! runtextmacro GetAfkModeTimeExpiresCodeFromId("13")
+    //! runtextmacro GetAfkModeTimeExpiresCodeFromId("14")
+    //! runtextmacro GetAfkModeTimeExpiresCodeFromId("15")
+    //! runtextmacro GetAfkModeTimeExpiresCodeFromId("16")
+    //! runtextmacro GetAfkModeTimeExpiresCodeFromId("17")
+    //! runtextmacro GetAfkModeTimeExpiresCodeFromId("18")
+    //! runtextmacro GetAfkModeTimeExpiresCodeFromId("19")
+    //! runtextmacro GetAfkModeTimeExpiresCodeFromId("20")
+    //! runtextmacro GetAfkModeTimeExpiresCodeFromId("21")
+    //! runtextmacro GetAfkModeTimeExpiresCodeFromId("22")
+    //! runtextmacro GetAfkModeTimeExpiresCodeFromId("23")
+
     return null
 endfunction
 
@@ -127,7 +152,7 @@ endfunction
 function Init_AfkMode takes nothing returns nothing
     local integer i = 0
     loop
-        exitwhen i > 11
+        exitwhen i >= NB_ESCAPERS
             set afkModeTimers[i] = CreateTimer()
             set isAfk[i] = false
             set afkModeTextTags[i] = null

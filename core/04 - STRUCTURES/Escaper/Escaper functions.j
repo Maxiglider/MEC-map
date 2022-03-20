@@ -75,5 +75,12 @@ function ForceSelectHeroes takes Escaper e returns nothing
 endfunction
 
 
+function escaperId2playerId takes integer escaperId returns integer
+	if (escaperId >= NB_PLAYERS_MAX) then
+		return escaperId - NB_PLAYERS_MAX
+	else
+		return escaperId
+	endif
+endfunction
 
 endlibrary

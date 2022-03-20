@@ -1,5 +1,6 @@
-//TESH.scrollpos=6
-//TESH.alwaysfold=0
+library ColorCodes initializer InitColorCodes
+
+
 globals
     string array udg_colorCode
     string array udg_baseColorString
@@ -10,7 +11,7 @@ endglobals
 
 
 
-function Trig_init_colorCodes_Actions takes nothing returns nothing
+function InitColorCodes takes nothing returns nothing
 
     set udg_colorCode[ 0 ] = "|cffff0303" //red
     set udg_colorCode[ 1 ] = "|cff0042ff" //blue
@@ -46,9 +47,5 @@ function Trig_init_colorCodes_Actions takes nothing returns nothing
 
 endfunction
 
-//===========================================================================
-function InitTrig_Init_colorCodes takes nothing returns nothing
-    set gg_trg_Init_colorCodes = CreateTrigger(  )
-    call TriggerAddAction( gg_trg_Init_colorCodes, function Trig_init_colorCodes_Actions )
-endfunction
 
+endlibrary
