@@ -752,7 +752,7 @@ struct Escaper
 		return .p
 	endmethod
 
-	method getControler takes nothing returns integer
+	method getControler takes nothing returns Escaper
 		return .controler
 	endmethod
 	

@@ -68,7 +68,7 @@ endfunction
 
 
 function ForceSelectHeroes takes Escaper e returns nothing
-	local player p = udg_escapers.get(e.getControler()).getPlayer()
+	local player p = e.getControler().getPlayer()
 	call ClearSelectionForPlayer(p)
 	call e.selectHero()
 	call GetMirrorEscaper(e).selectHero()
