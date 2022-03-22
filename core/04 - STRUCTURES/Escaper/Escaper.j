@@ -75,7 +75,7 @@ struct Escaper
 	static method create takes integer escaperId returns Escaper //ne crée pas le héros
 		local Escaper e = Escaper.allocate()
 
-		if (escaperId > 11) then
+		if (escaperId >= NB_PLAYERS_MAX) then
 			set e.playerId = escaperId - 12
 		else
 			set e.playerId = escaperId
@@ -94,7 +94,13 @@ struct Escaper
         set e.vcRed = 100
         set e.vcGreen = 100
         set e.vcBlue = 100
-        set e.vcTransparency = 0
+
+		if (escaperId >= NB_PLAYERS_MAX) then
+        	set e.vcTransparency = 50
+        else
+        	set e.vcTransparency = 0
+        endif
+
         set e.lastTerrainType = 0
         set e.makingLevel = 0
         set e.make = 0
@@ -708,11 +714,12 @@ struct Escaper
         if (vcTransparency < 0 or vcTransparency > 100) then
             return false
         endif
-		set .vcTransparency = vcTransparency
 
-		if (not .isEscaperSecondary()) then
-			call GetMirrorEscaper(this).setVcTransparency(vcTransparency)
+		if (.isEscaperSecondary()) then
+			return true //secondary escapers transparency is fixed
 		endif
+
+		set .vcTransparency = vcTransparency
 
         return true
 	endmethod
