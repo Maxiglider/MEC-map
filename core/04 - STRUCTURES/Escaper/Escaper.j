@@ -271,15 +271,7 @@ struct Escaper
     
 //getId method
     method getId takes nothing returns integer
-        local integer i = 0
-        loop
-            exitwhen (i >= NB_ESCAPERS)
-                if (this == udg_escapers.get(i)) then
-                    return i
-                endif
-            set i = i + 1
-        endloop
-        return -1
+        return .escaperId
     endmethod		
 			
 //trigger methods
@@ -498,18 +490,34 @@ struct Escaper
 //effects methods
 	method newEffect takes string efStr, string bodyPart returns nothing
 		call .effects.new(efStr, .hero, bodyPart)
+
+		if (not .isEscaperSecondary()) then
+            call GetMirrorEscaper(this).newEffect(efStr, bodyPart)
+		endif
 	endmethod
 	
 	method destroyLastEffects takes integer numEfToDestroy returns nothing
 		call .effects.destroyLastEffects(numEfToDestroy)
+
+		if (not .isEscaperSecondary()) then
+            call GetMirrorEscaper(this).destroyLastEffects(numEfToDestroy)
+		endif
 	endmethod
 	
 	method hideEffects takes nothing returns nothing
 		call .effects.hideEffects()
+
+		if (not .isEscaperSecondary()) then
+            call GetMirrorEscaper(this).hideEffects()
+		endif
 	endmethod
 	
 	method showEffects takes nothing returns nothing
 		call .effects.showEffects(.hero)
+
+		if (not .isEscaperSecondary()) then
+            call GetMirrorEscaper(this).showEffects()
+		endif
 	endmethod
 	
     
@@ -564,6 +572,10 @@ struct Escaper
 	method absoluteSlideSpeed takes real slideSpeed returns nothing
 		set .slideSpeedAbsolute = true
 		set .slideSpeed = slideSpeed
+
+		if (not .isEscaperSecondary()) then
+            call GetMirrorEscaper(this).absoluteSlideSpeed(slideSpeed)
+		endif
 	endmethod
 	
 	method stopAbsoluteSlideSpeed takes nothing returns nothing
@@ -576,6 +588,10 @@ struct Escaper
                     call .setSlideSpeed(TerrainTypeSlide(integer(currentTerrainType)).getSlideSpeed())
                 endif
             endif
+
+            if (not .isEscaperSecondary()) then
+                call GetMirrorEscaper(this).stopAbsoluteSlideSpeed()
+            endif
         endif        
 	endmethod
 	
@@ -586,6 +602,10 @@ struct Escaper
 	method absoluteWalkSpeed takes real walkSpeed returns nothing
 		set .walkSpeedAbsolute = true
 		call .setWalkSpeed( walkSpeed )
+
+        if (not .isEscaperSecondary()) then
+            call GetMirrorEscaper(this).absoluteWalkSpeed(walkSpeed)
+        endif
 	endmethod
 	
 	method stopAbsoluteWalkSpeed takes nothing returns nothing
@@ -598,6 +618,10 @@ struct Escaper
                     call .setWalkSpeed(TerrainTypeWalk(integer(currentTerrainType)).getWalkSpeed())
                 endif
             endif
+
+            if (not .isEscaperSecondary()) then
+                call GetMirrorEscaper(this).stopAbsoluteWalkSpeed()
+            endif
         endif 
 	endmethod
 
@@ -607,15 +631,27 @@ struct Escaper
 
 	method setAbsoluteInstantTurn takes boolean flag returns nothing
 		set .instantTurnAbsolute = flag
+
+        if (not .isEscaperSecondary()) then
+            call GetMirrorEscaper(this).setAbsoluteInstantTurn(flag)
+        endif
 	endmethod
 	
 //godMode methods    
     method setGodMode takes boolean godMode returns nothing
         set .godMode = godMode
+
+        if (not .isEscaperSecondary()) then
+            call GetMirrorEscaper(this).setGodMode(godMode)
+        endif
     endmethod
     
     method setGodModeKills takes boolean godModeKills returns nothing
         set .godModeKills = godModeKills
+
+        if (not .isEscaperSecondary()) then
+            call GetMirrorEscaper(this).setGodModeKills(godModeKills)
+        endif
     endmethod
 	
 	method isGodModeOn takes nothing returns boolean
@@ -899,16 +935,35 @@ struct Escaper
         endif
         call .make.destroy()
         set .make = 0
+
+		if (not .isEscaperSecondary()) then
+            call GetMirrorEscaper(this).destroyMake()
+		endif
+
         return true
+    endmethod
+
+    method onInitMake takes nothing returns nothing
+		if (not .isEscaperSecondary()) then
+            call GetMirrorEscaper(this).makeDoNothing()
+		endif
+    endmethod
+
+    method makeDoNothing takes nothing returns nothing
+        call .destroyMake()
+        call BJDebugMsg("doNothing sur escaper" + I2S(.escaperId))
+        set .make = MakeDoNothing.create(.hero)
     endmethod
     
     method makeCreateNoMoveMonsters takes MonsterType mt, real facingAngle returns nothing
+        call .onInitMake()
         //mode : noMove
         call .destroyMake()
         set .make = MakeMonsterNoMove.create(.hero, mt, facingAngle)
     endmethod
     
 	method makeCreateSimplePatrolMonsters takes string mode, MonsterType mt returns nothing
+	    call .onInitMake()
         call .destroyMake()
 		//modes : normal, string, auto
 		if (mode == "normal" or mode == "string" or mode == "auto") then
@@ -917,6 +972,7 @@ struct Escaper
 	endmethod	
     
 	method makeCreateMultiplePatrolsMonsters takes string mode, MonsterType mt returns nothing
+	    call .onInitMake()
         call .destroyMake()
         //modes : normal, string
 		if (mode == "normal" or mode == "string") then
@@ -925,6 +981,7 @@ struct Escaper
 	endmethod	
     
 	method makeCreateTeleportMonsters takes string mode, MonsterType mt, real period, real angle returns nothing
+	    call .onInitMake()
         call .destroyMake()
         //modes : normal, string
 		if (mode == "normal" or mode == "string") then
@@ -933,6 +990,7 @@ struct Escaper
 	endmethod	
     
     method makeMmpOrMtNext takes nothing returns boolean
+        call .onInitMake()
         if (.make == 0 or not(.make.getType() == MakeMonsterMultiplePatrols.typeid or .make.getType() == MakeMonsterTeleport.typeid)) then
             return false
         endif
@@ -945,6 +1003,7 @@ struct Escaper
     endmethod
     
     method makeMonsterTeleportWait takes nothing returns boolean
+        call .onInitMake()
         if (.make == 0 or .make.getType() != MakeMonsterTeleport.typeid) then
             return false
         endif
@@ -952,6 +1011,7 @@ struct Escaper
     endmethod
     
     method makeMonsterTeleportHide takes nothing returns boolean
+        call .onInitMake()
         if (.make == 0 or .make.getType() != MakeMonsterTeleport.typeid) then
             return false
         endif
@@ -959,11 +1019,13 @@ struct Escaper
     endmethod
     
     method makeCreateMonsterSpawn takes string label, MonsterType mt, string sens, real frequence returns nothing
+        call .onInitMake()
         call .destroyMake()
         set .make = MakeMonsterSpawn.create(.hero, label, mt, sens, frequence)
     endmethod
 	
 	method makeDeleteMonsters takes string mode returns nothing
+	    call .onInitMake()
 		call .destroyMake()
 		//delete modes : all, noMove, move, simplePatrol, multiplePatrols, oneByOne
 		if (mode != "all" and mode != "noMove" and mode != "move" and mode != "simplePatrol" and mode != "multiplePatrols" and mode != "oneByOne") then
@@ -973,6 +1035,7 @@ struct Escaper
 	endmethod
 	
 	method makeSetUnitTeleportPeriod takes string mode, real period returns nothing
+	    call .onInitMake()
 		call .destroyMake()
 		//modes : oneByOne, twoClics
 		if (mode != "twoClics" and mode != "oneByOne") then
@@ -982,11 +1045,13 @@ struct Escaper
 	endmethod
 	
 	method makeGetUnitTeleportPeriod takes nothing returns nothing
+	    call .onInitMake()
 		call .destroyMake()
 		set .make = MakeGetUnitTeleportPeriod.create(.hero)
 	endmethod
 	
 	method makeSetUnitMonsterType takes string mode, MonsterType mt returns nothing
+	    call .onInitMake()
 		call .destroyMake()
 		//modes : oneByOne, twoClics
 		if (mode != "twoClics" and mode != "oneByOne") then
@@ -996,11 +1061,13 @@ struct Escaper
 	endmethod
     
     method makeCreateMeteor takes nothing returns nothing
+        call .onInitMake()
         call .destroyMake()
         set .make = MakeMeteor.create(.hero)
     endmethod
 	
 	method makeDeleteMeteors takes string mode returns nothing
+	    call .onInitMake()
 		call .destroyMake()
 		//delete modes : oneByOne, twoClics
 		if (mode != "oneByOne" and mode != "twoClics") then
@@ -1010,11 +1077,13 @@ struct Escaper
 	endmethod
     
     method makeCreateCaster takes CasterType casterType, real angle returns nothing
+        call .onInitMake()
         call .destroyMake()
         set .make = MakeCaster.create(.hero, casterType, angle)
     endmethod
 	
 	method makeDeleteCasters takes string mode returns nothing
+	    call .onInitMake()
 		call .destroyMake()
 		//delete modes : oneByOne, twoClics
 		if (mode != "oneByOne" and mode != "twoClics") then
@@ -1024,61 +1093,73 @@ struct Escaper
 	endmethod
 	
 	method makeCreateClearMobs takes real disableDuration returns nothing
+	    call .onInitMake()
 		call .destroyMake()
 		set .make = MakeClearMob.create(.hero, disableDuration)
 	endmethod
 	
 	method makeDeleteClearMobs takes nothing returns nothing
+	    call .onInitMake()
 		call .destroyMake()
 		set .make = MakeDeleteClearMob.create(.hero)
 	endmethod
     
     method makeCreateTerrain takes TerrainType terrainType returns nothing
+        call .onInitMake()
         call .destroyMake()
         set .make = MakeTerrainCreate.create(.hero, terrainType)    
     endmethod
     
     method makeTerrainCopyPaste takes nothing returns nothing
+        call .onInitMake()
         call .destroyMake()
         set .make = MakeTerrainCopyPaste.create(.hero)
     endmethod
     
     method makeTerrainVerticalSymmetry takes nothing returns nothing
+        call .onInitMake()
         call .destroyMake()
         set .make = MakeTerrainVerticalSymmetry.create(.hero)
     endmethod
     
     method makeTerrainHorizontalSymmetry takes nothing returns nothing
+        call .onInitMake()
         call .destroyMake()
         set .make = MakeTerrainHorizontalSymmetry.create(.hero)
     endmethod
     
     method makeTerrainHeight takes real radius, real height returns nothing
+        call .onInitMake()
         call .destroyMake()
         set .make = MakeTerrainHeight.create(.hero, radius, height)
     endmethod
     
     method makeGetTerrainType takes nothing returns nothing
+        call .onInitMake()
         call .destroyMake()
         set .make = MakeGetTerrainType.create(.hero)    
     endmethod
     
     method makeExchangeTerrains takes nothing returns nothing
+        call .onInitMake()
         call .destroyMake()
         set .make = MakeExchangeTerrains.create(.hero)    
     endmethod  
     
     method makeCreateStart takes boolean forNext returns nothing
+        call .onInitMake()
         call .destroyMake()
         set .make = MakeStart.create(.hero, forNext)
     endmethod 
     
     method makeCreateEnd takes nothing returns nothing
+        call .onInitMake()
         call .destroyMake()
         set .make = MakeEnd.create(.hero)
     endmethod
     
     method makeCreateVisibilityModifier takes nothing returns nothing
+        call .onInitMake()
         call .destroyMake()
         set .make = MakeVisibilityModifier.create(.hero)
     endmethod

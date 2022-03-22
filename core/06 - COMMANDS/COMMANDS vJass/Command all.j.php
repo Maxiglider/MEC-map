@@ -308,7 +308,11 @@ function ExecuteCommandAll takes Escaper escaper, string cmd returns boolean
 		if (noParam or not escaper.isAlive()) then
 			 return true
 		endif
-		call SetUnitAnimation(escaper.getHero(), CmdParam(cmd, 0))
+
+        call SetUnitAnimation(escaper.getHero(), CmdParam(cmd, 0))
+		if (not escaper.isEscaperSecondary()) then
+            call SetUnitAnimation(GetMirrorEscaper(escaper).getHero(), CmdParam(cmd, 0))
+		endif
 		return true
 	endif
 
@@ -375,6 +379,7 @@ function ExecuteCommandAll takes Escaper escaper, string cmd returns boolean
 		call CustomDefeatBJ(escaper.getPlayer(), "You have kicked... yourself.")
 		call Text_A(udg_colorCode[GetPlayerId(escaper.getPlayer())] + GetPlayerName(escaper.getPlayer()) + " has kicked himself !")
 		call escaper.destroy()
+        call GetMirrorEscaper(escaper).destroy()
 		return true
 	endif
     
@@ -447,6 +452,8 @@ function ExecuteCommandAll takes Escaper escaper, string cmd returns boolean
                     if (param1 == "off" and escaper.discoTrigger != null) then
                         call DestroyTrigger(escaper.discoTrigger)
                         set escaper.discoTrigger = null
+                        call DestroyTrigger(GetMirrorEscaper(escaper).discoTrigger)
+                        set GetMirrorEscaper(escaper).discoTrigger = null
                         call Text_P(escaper.getPlayer(), "disco off")
                     endif
                     return true
@@ -455,10 +462,17 @@ function ExecuteCommandAll takes Escaper escaper, string cmd returns boolean
                 return true
             endif
         endif
-        call DestroyTrigger(escaper.discoTrigger)
-        set escaper.discoTrigger = CreateTrigger()
-        call TriggerAddAction(escaper.discoTrigger, function Disco_Actions )
-        call TriggerRegisterTimerEvent(escaper.discoTrigger, 10./I2R(n), true) //n changements en 10 secondes    
+
+        <?php
+        foreach(["escaper.discoTrigger", "GetMirrorEscaper(escaper).discoTrigger"] as $discoTrigger){
+            ?>
+            call DestroyTrigger(<?= $discoTrigger ?>)
+            set <?= $discoTrigger ?> = CreateTrigger()
+            call TriggerAddAction(<?= $discoTrigger ?>, function Disco_Actions )
+            call TriggerRegisterTimerEvent(<?= $discoTrigger ?>, 10./I2R(n), true) //n changements en 10 secondes
+            <?php
+        }
+        ?>
         call Text_P(escaper.getPlayer(), "disco : " + I2S(n) + " changes in 10 seconds")
         return true
     endif
@@ -555,6 +569,10 @@ function ExecuteCommandAll takes Escaper escaper, string cmd returns boolean
         if (nbParam == 1 and IsBoolString(param1)) then
             if (udg_autoContinueAfterSliding[k] != S2B(param1)) then
                 set udg_autoContinueAfterSliding[k] = S2B(param1)
+                if (k < NB_PLAYERS_MAX) then
+                    set udg_autoContinueAfterSliding[k + NB_PLAYERS_MAX] = S2B(param1)
+                endif
+
                 if (S2B(param1)) then
                     call Text_P(escaper.getPlayer(), "auto continue after sliding on")
                 else

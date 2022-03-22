@@ -1,6 +1,4 @@
-//TESH.scrollpos=0
-//TESH.alwaysfold=0
-library Make needs MMNoMoveActions, MMSimplePatrolActions, MMMultiplePatrolsActions, MMTeleportActions, MonsterSpawnMakingActions, MonsterDeleteActions, MakeSetUnitMonsterTypeActions, MakeSetUnitTeleportPeriodActions, MakeGetUnitTeleportPeriodActions, TerrainMakingActions, TerrainHeightMakingActions, GettingTerrainTypeInfoActions, MakeExchangeTerrainsActions, StartMakingActions, EndMakingActions, VisibilityModifierMakingActions, TerrainCopyPasteActions, TerrainVerticalSymmetryActions, TerrainHorizontalSymmetryActions, MeteorMakingActions, CasterMakingActions, MeteorDeleteActions, CasterDeleteActions, MClearMobActions, MClearMobDeleteActions
+library Make needs MMNoMoveActions, MMSimplePatrolActions, MMMultiplePatrolsActions, MMTeleportActions, MonsterSpawnMakingActions, MonsterDeleteActions, MakeSetUnitMonsterTypeActions, MakeSetUnitTeleportPeriodActions, MakeGetUnitTeleportPeriodActions, TerrainMakingActions, TerrainHeightMakingActions, GettingTerrainTypeInfoActions, MakeExchangeTerrainsActions, StartMakingActions, EndMakingActions, VisibilityModifierMakingActions, TerrainCopyPasteActions, TerrainVerticalSymmetryActions, TerrainHorizontalSymmetryActions, MeteorMakingActions, CasterMakingActions, MeteorDeleteActions, CasterDeleteActions, MClearMobActions, MClearMobDeleteActions, MakeDoNothingActions
 
 globals
 	constant integer MAKE_LAST_CLIC_UNIT_ID = 'e001' //à remplacer par l'id de l'unité choisie (need couleur variable)
@@ -70,6 +68,8 @@ public function GetActions takes string kind returns code
         return function EndMaking_Actions
     elseif (kind == "visibilityModifierCreate") then
         return function VisibilityModifierMaking_Actions
+    elseif (kind == "doNothing") then
+        return function StopTriggerUnit
     endif
     return null
 endfunction
