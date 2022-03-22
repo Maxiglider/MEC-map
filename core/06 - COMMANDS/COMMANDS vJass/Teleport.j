@@ -1,21 +1,49 @@
-//TESH.scrollpos=0
-//TESH.alwaysfold=0
-function Trig_teleport_Conditions takes nothing returns boolean
-    return (IsHero(GetTriggerUnit()) and Hero2Escaper(GetTriggerUnit()).canTeleport())
+library Teleport needs BasicFunctions
+
+
+globals
+    private trigger array teleTriggers
+    private boolean array onceOnly
+endglobals
+
+
+function Teleport_Actions takes nothing returns nothing
+    local unit hero = GetTriggerUnit()
+    
+    if (not IsIssuedOrder("smart")) then
+        return
+    endif
+    call StopUnit(hero)
+    
+    call SetUnitX(hero, GetOrderPointX())
+    call SetUnitY(hero, GetOrderPointY())
+
+    if (onceOnly[GetUnitUserData(hero)]) then
+        call DestroyTrigger(GetTriggeringTrigger())
+    endif
+
+    set hero = null
 endfunction
 
-function Trig_teleport_Actions takes nothing returns nothing
-    call StopUnit(GetTriggerUnit())
-    call SetUnitX(GetTriggerUnit(), GetOrderPointX())
-    call SetUnitY(GetTriggerUnit(), GetOrderPointY())
+
+
+function ActivateTeleport takes unit hero, boolean onceOnlyB returns nothing
+    local integer escaperId = GetUnitUserData(hero)
+    call DestroyTrigger(teleTriggers[escaperId])
+    set teleTriggers[escaperId] = CreateTrigger()
+    call TriggerAddAction(teleTriggers[escaperId], function Teleport_Actions)
+    call TriggerRegisterUnitEvent(teleTriggers[escaperId], hero, EVENT_UNIT_ISSUED_POINT_ORDER )
+    set onceOnly[escaperId] = onceOnlyB
 endfunction
 
-//===========================================================================
-function InitTrig_Teleport takes nothing returns nothing
-    set gg_trg_Teleport = CreateTrigger()
-    call DisableTrigger(gg_trg_Teleport)
-    call TriggerRegisterAnyUnitEventBJ( gg_trg_Teleport, EVENT_PLAYER_UNIT_ISSUED_POINT_ORDER)
-    call TriggerAddCondition(gg_trg_Teleport, Condition(function Trig_teleport_Conditions))
-    call TriggerAddAction(gg_trg_Teleport, function Trig_teleport_Actions)
+
+
+function DisableTeleport takes unit hero returns nothing
+    local integer escaperId = GetUnitUserData(hero)
+    call DestroyTrigger(teleTriggers[escaperId])
 endfunction
 
+
+
+
+endlibrary

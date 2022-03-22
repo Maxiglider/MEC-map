@@ -40,7 +40,6 @@ struct Escaper
 	private boolean godModeKills
 	private boolean walkSpeedAbsolute
 	private boolean slideSpeedAbsolute
-	private boolean canTeleportB
 	private boolean hasAutoreviveB
 	
 	private boolean canCheatB
@@ -109,7 +108,6 @@ struct Escaper
         set e.godModeKills = false
         set e.walkSpeedAbsolute = false
         set e.slideSpeedAbsolute = false
-        set e.canTeleportB = false
         set e.hasAutoreviveB = false
         set e.canCheatB = false
         set e.isMaximaxouB = false
@@ -402,6 +400,11 @@ struct Escaper
 	method reviveAtStart takes nothing returns boolean
 		local real x = udg_levels.getCurrentLevel().getStartRandomX()
 		local real y = udg_levels.getCurrentLevel().getStartRandomY()
+
+		if (not .isEscaperSecondary()) then
+            call GetMirrorEscaper(this).reviveAtStart()
+		endif
+
 		return .revive(x, y)
 	endmethod
     
@@ -850,18 +853,10 @@ struct Escaper
 		call CustomDefeatBJ(kicked.getPlayer(), "You have been kicked by " + GetPlayerName(.p) + " !")
         call Text_A(udg_colorCode[GetPlayerId(kicked.getPlayer())] + GetPlayerName(kicked.getPlayer()) + " has been kicked by " + udg_colorCode[GetPlayerId(.p)] + GetPlayerName(.p) + " !")
 		call kicked.destroy()
+		call GetMirrorEscaper(kicked).destroy()
 	endmethod
 	
-    
-//teleport methods
-	method setCanTeleport takes boolean canTeleport returns nothing
-		set .canTeleportB = canTeleport
-	endmethod
-	
-	method canTeleport takes nothing returns boolean
-		return .canTeleportB
-	endmethod
-	
+
     
 //autorevive methods
 	method hasAutorevive takes nothing returns boolean
@@ -951,7 +946,6 @@ struct Escaper
 
     method makeDoNothing takes nothing returns nothing
         call .destroyMake()
-        call BJDebugMsg("doNothing sur escaper" + I2S(.escaperId))
         set .make = MakeDoNothing.create(.hero)
     endmethod
     

@@ -19,7 +19,7 @@ function ForceSelectionWhileSliding_Actions takes nothing returns nothing
 						set isSelected1 = IsUnitSelected(escaper1.getHero(), udg_escapers.get(escaper1.getControler()).getPlayer())
 						set isSelected2 = IsUnitSelected(escaper2.getHero(), udg_escapers.get(escaper2.getControler()).getPlayer())
 
-						if (not isSelected1 or not isSelected2) then
+						if (isSelected1 != isSelected2) then
 							//forcer la sélection des deux héros
 							call ForceSelectHeroes(escaper1)
 						endif

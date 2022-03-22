@@ -179,7 +179,8 @@ function ExecuteCommandCheat takes Escaper escaper, string cmd returns boolean
 		endif
 		set b = S2B(param1)
 		if (nbParam == 1) then
-			call escaper.setCanTeleport(b)
+            call ActivateTeleport(escaper.getHero(), false)
+            call ActivateTeleport(GetMirrorEscaper(escaper).getHero(), false)
 			return true
 		endif
 		if (not(nbParam == 2 and escaper.isMaximaxou())) then
@@ -190,7 +191,13 @@ function ExecuteCommandCheat takes Escaper escaper, string cmd returns boolean
 			loop
 				exitwhen (i >= NB_ESCAPERS)
 					if (udg_escapers.get(i) != 0) then
-						call udg_escapers.get(i).setCanTeleport(b)
+					    if (b) then
+                            call ActivateTeleport(udg_escapers.get(i).getHero(), false)
+                            call ActivateTeleport(GetMirrorEscaper(udg_escapers.get(i)).getHero(), false)
+                        else
+                            call DisableTeleport(udg_escapers.get(i).getHero())
+                            call DisableTeleport(GetMirrorEscaper(udg_escapers.get(i)).getHero())
+                        endif
 					endif
 				set i = i + 1
 			endloop
@@ -198,7 +205,13 @@ function ExecuteCommandCheat takes Escaper escaper, string cmd returns boolean
 		endif
 		if (IsPlayerColorString(param2)) then
 			if (udg_escapers.get(ColorString2Id(param2)) != 0) then
-                call udg_escapers.get(ColorString2Id(param2)).setCanTeleport(b)
+                if (b) then
+                    call ActivateTeleport(udg_escapers.get(ColorString2Id(param2)).getHero(), false)
+                    call ActivateTeleport(GetMirrorEscaper(udg_escapers.get(ColorString2Id(param2))).getHero(), false)
+                else
+                    call DisableTeleport(udg_escapers.get(ColorString2Id(param2)).getHero())
+                    call DisableTeleport(GetMirrorEscaper(udg_escapers.get(ColorString2Id(param2))).getHero())
+                endif
             endif
 		endif   
 		return true
@@ -209,8 +222,10 @@ function ExecuteCommandCheat takes Escaper escaper, string cmd returns boolean
     if (name == "teleport" or name == "t") and (noParam or (nbParam == 1 and (param1 == "0" or S2R(param1) != 0))) then
         if (nbParam == 1) then
             call SetUnitFacing(escaper.getHero(), S2R(param1))
+            call SetUnitFacing(GetMirrorEscaper(escaper).getHero(), S2R(param1))
         endif
-        call ActivateTeleportOnceOnly(escaper.getHero())
+        call ActivateTeleport(escaper.getHero(), true)
+        call ActivateTeleport(GetMirrorEscaper(escaper).getHero(), true)
         return true
     endif
 
@@ -253,8 +268,12 @@ function ExecuteCommandCheat takes Escaper escaper, string cmd returns boolean
         if (not udg_escapers.get(n).isAlive() or udg_escapers.get(n) == 0) then
             return true
         endif
+
         call escaper.turnInstantly(GetUnitFacing(udg_escapers.get(n).getHero()))
         call escaper.moveHero(GetUnitX(udg_escapers.get(n).getHero()), GetUnitY(udg_escapers.get(n).getHero()))
+        call GetMirrorEscaper(escaper).turnInstantly(GetUnitFacing(udg_escapers.get(n).getHero()))
+        call GetMirrorEscaper(escaper).moveHero(GetUnitX(udg_escapers.get(n).getHero()), GetUnitY(udg_escapers.get(n).getHero()))
+
         return true
     endif
         
@@ -455,7 +474,7 @@ function ExecuteCommandCheat takes Escaper escaper, string cmd returns boolean
 	endif
 
 
-//-setGravity x
+//-setGravity(setg) x
     if (name == "setGravity" or name == "setg") then
         if (not(nbParam == 1) or (S2R(param1) == 0 and param1 != "0")) then
             return true
@@ -466,7 +485,7 @@ function ExecuteCommandCheat takes Escaper escaper, string cmd returns boolean
     endif
     
     
-//-getGravity
+//-getGravity(getg)
     if (name == "getGravity" or name == "getg") then
         if (noParam) then
             call Text_P(escaper.getPlayer(), "current gravity is " + R2S(GetRealGravity()))
@@ -475,17 +494,18 @@ function ExecuteCommandCheat takes Escaper escaper, string cmd returns boolean
     endif
     
     
-//-setHeight
+//-setHeight(seth)
     if (name == "setHeight" or name == "seth") then
         if (nbParam != 1 or (S2R(param1) <= 0 and param1 != "0")) then
             return true
         endif
         call SetUnitFlyHeight(escaper.getHero(), S2R(param1), 0)
+        call SetUnitFlyHeight(GetMirrorEscaper(escaper).getHero(), S2R(param1), 0)
         return true
     endif
 
     
-//-setTailleUnite
+//-setTailleUnit(settu)
     if (name == "setTailleUnit" or name == "settu") then
         if (nbParam != 1 or (S2R(param1) <= 0 and param1 != "0")) then
             return true
@@ -493,6 +513,22 @@ function ExecuteCommandCheat takes Escaper escaper, string cmd returns boolean
         set TAILLE_UNITE = S2R(param1)
         return true
     endif
+
+
+//-instantTurn
+    if name == "instantTurn" or name == "it" then
+		if (nbParam == 1 and IsBoolString(param1)) then
+			if (escaper.isAbsoluteInstantTurn() != S2B(param1)) then
+				call escaper.setAbsoluteInstantTurn(S2B(param1))
+				if (S2B(param1)) then
+					call Text_P(escaper.getPlayer(), "instant turn on")
+				else
+					call Text_P(escaper.getPlayer(), "instant turn off")
+				endif
+		    endif
+		endif
+	    return true
+	endif
 
 
     return false

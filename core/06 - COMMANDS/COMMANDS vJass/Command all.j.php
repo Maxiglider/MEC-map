@@ -669,22 +669,6 @@ function ExecuteCommandAll takes Escaper escaper, string cmd returns boolean
         endif
         return true
     endif
-
-
-//-instantTurn
-    if name == "instantTurn" or name == "it" then
-		if (nbParam == 1 and IsBoolString(param1)) then
-			if (escaper.isAbsoluteInstantTurn() != S2B(param1)) then
-				call escaper.setAbsoluteInstantTurn(S2B(param1))
-				if (S2B(param1)) then
-					call Text_P(escaper.getPlayer(), "instant turn on")
-				else
-					call Text_P(escaper.getPlayer(), "instant turn off")
-				endif
-		    endif
-		endif
-	    return true
-	endif
         
         
         
