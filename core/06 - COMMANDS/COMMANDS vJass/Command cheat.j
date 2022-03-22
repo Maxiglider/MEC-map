@@ -1,5 +1,3 @@
-//TESH.scrollpos=459
-//TESH.alwaysfold=0
 library CommandCheat needs CommandsFunctions
 
 

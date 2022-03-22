@@ -1,5 +1,3 @@
-//TESH.scrollpos=21
-//TESH.alwaysfold=0
 library CommandAll needs CommandsFunctions, CommandShortcuts, Disco
 
 
@@ -655,7 +653,7 @@ function ExecuteCommandAll takes Escaper escaper, string cmd returns boolean
     endif
 
 
-//let's have fun with instant turning
+//-instantTurn
     if name == "instantTurn" or name == "it" then
 		if (nbParam == 1 and IsBoolString(param1)) then
 			if (escaper.isAbsoluteInstantTurn() != S2B(param1)) then

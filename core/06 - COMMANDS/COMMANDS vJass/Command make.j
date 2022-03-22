@@ -1,5 +1,3 @@
-//TESH.scrollpos=967
-//TESH.alwaysfold=0
 library CommandMake needs CommandsFunctions, ChangeOneTerrain, ChangeAllTerrains, ExchangeTerrains, RandomizeTerrains, Ascii
 
 
