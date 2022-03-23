@@ -98,9 +98,11 @@ function CheckTerrain_$n$_Actions takes nothing returns nothing
                         set an_effect = null
                     else
                         set terrainTypeD = TerrainTypeDeath(integer(currentTerrainType))
+
                         call terrainTypeD.killEscaper(escaper)
                         call escaper.enableSlide(false)
-                        //coop
+                        call terrainTypeD.killEscaper(GetMirrorEscaper(escaper))
+                        call GetMirrorEscaper(escaper).enableSlide(false)
                     endif
                 else
                     if (terrainTypeTolerance.getKind() == "slide") then
