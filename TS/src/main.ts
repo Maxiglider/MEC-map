@@ -7,6 +7,7 @@ import { Init_terrain_limit_variables } from 'core/01_libraries/Init_terrain_lim
 import { Text } from 'core/01_libraries/Text'
 import { ZLibrary } from 'core/02_bibliotheques_externes/ZLibrary'
 import { ViewAllHideAll } from 'core/03_view_all_hide_all/View_all_hide_all'
+import { initOldTriggers } from 'core/09_From_old_Worldedit_triggers/init_old_triggers'
 import { errorHandler } from 'Utils/mapUtils'
 import { addScriptHook, W3TS_HOOK } from 'w3ts/hooks'
 
@@ -34,6 +35,11 @@ const tsMain = () => {
     // 3
     {
         ViewAllHideAll()
+    }
+
+    // 9
+    {
+        initOldTriggers()
     }
 }
 
