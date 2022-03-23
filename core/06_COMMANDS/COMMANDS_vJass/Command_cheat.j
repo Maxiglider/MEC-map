@@ -269,10 +269,10 @@ function ExecuteCommandCheat takes Escaper escaper, string cmd returns boolean
             return true
         endif
 
+        call escaper.revive(GetUnitX(udg_escapers.get(n).getHero()), GetUnitY(udg_escapers.get(n).getHero()))
         call escaper.turnInstantly(GetUnitFacing(udg_escapers.get(n).getHero()))
-        call escaper.moveHero(GetUnitX(udg_escapers.get(n).getHero()), GetUnitY(udg_escapers.get(n).getHero()))
+        call GetMirrorEscaper(escaper).revive(GetUnitX(udg_escapers.get(n).getHero()), GetUnitY(udg_escapers.get(n).getHero()))
         call GetMirrorEscaper(escaper).turnInstantly(GetUnitFacing(udg_escapers.get(n).getHero()))
-        call GetMirrorEscaper(escaper).moveHero(GetUnitX(udg_escapers.get(n).getHero()), GetUnitY(udg_escapers.get(n).getHero()))
 
         return true
     endif

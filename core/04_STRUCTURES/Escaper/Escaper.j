@@ -465,7 +465,7 @@ struct Escaper
     endmethod
 	
 	method reverse takes nothing returns nothing
-		local real angle = GetUnitFacing(.hero) + 180 //à vérifier
+		local real angle = GetUnitFacing(.hero) + 180
 		call .turnInstantly(angle)
         if (.slideLastAngleOrder != -1) then
             set .slideLastAngleOrder = .slideLastAngleOrder + 180
