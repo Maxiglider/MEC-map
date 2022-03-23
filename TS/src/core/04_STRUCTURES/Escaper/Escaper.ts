@@ -1,13 +1,13 @@
-export const structEscaper = () => {
+//TESH.scrollpos=1017
+//TESH.alwaysfold=0
+library Escaper needs EscaperEffectArray, EscaperFunctions, MessageHeroDies
 
-// library Escaper needs EscaperEffectArray, EscaperFunctions, MessageHeroDies
 
 
-
-// globals
-// 	constant boolean SHOW_REVIVE_EFFECTS = false
-//     private unit heroToSelect
-// endglobals
+globals
+	constant boolean SHOW_REVIVE_EFFECTS = false
+    private unit heroToSelect
+endglobals
 
 
 struct Escaper
@@ -246,6 +246,10 @@ struct Escaper
         //coop
         call ShowUnit(.powerCircle, false)
         call ShowUnit(.dummyPowerCircle, false)
+
+		if (not .isEscaperSecondary()) then
+            call GetMirrorEscaper(this).removeHero()
+		endif
 	endmethod
 	
 	private method onDestroy takes nothing returns nothing
@@ -465,7 +469,7 @@ struct Escaper
     endmethod
 	
 	method reverse takes nothing returns nothing
-		local real angle = GetUnitFacing(.hero) + 180 //à vérifier
+		local real angle = GetUnitFacing(.hero) + 180
 		call .turnInstantly(angle)
         if (.slideLastAngleOrder != -1) then
             set .slideLastAngleOrder = .slideLastAngleOrder + 180
@@ -1284,7 +1288,4 @@ endstruct
 
 
 
-// endlibrary
-
-}
-
+endlibrary
