@@ -102,13 +102,22 @@ function HandleTurn takes boolean triggerIsToLocation returns nothing
     if (canTurn) then
     	if (escaper.isAbsoluteInstantTurn()) then
     		call escaper.turnInstantly(angle)
-    		call escaperSecond.turnInstantly(angleSecond)
+
+    		if (escaperSecond.isSliding()) then
+    		    call escaperSecond.turnInstantly(angleSecond)
+    		endif
     	else
             call SetUnitFacing(slider, angle)
-            call SetUnitFacing(escaperSecond.getHero(), angleSecond)
+
+    		if (escaperSecond.isSliding()) then
+                call SetUnitFacing(escaperSecond.getHero(), angleSecond)
+            endif
 		endif
         call escaper.setSlideLastAngleOrder(angle)
-        call escaperSecond.setSlideLastAngleOrder(angleSecond)
+
+        if (escaperSecond.isSliding()) then
+            call escaperSecond.setSlideLastAngleOrder(angleSecond)
+        endif
     endif
 
 //save click

@@ -10,14 +10,14 @@ function ForceSelectionWhileSliding_Actions takes nothing returns nothing
 
 	if (udg_doubleHeroesEnabled) then
 		loop
-			exitwhen (i >= NB_ESCAPERS)
+			exitwhen (i >= NB_PLAYERS_MAX)
 				set escaper1 = udg_escapers.get(i)
 				if (escaper1 != 0) then
 					set escaper2 = GetMirrorEscaper(escaper1)
 
 					if (escaper1.isSliding() or escaper2.isSliding()) then
-						set isSelected1 = IsUnitSelected(escaper1.getHero(), udg_escapers.get(escaper1.getControler()).getPlayer())
-						set isSelected2 = IsUnitSelected(escaper2.getHero(), udg_escapers.get(escaper2.getControler()).getPlayer())
+						set isSelected1 = IsUnitSelected(escaper1.getHero(), escaper1.getControler().getPlayer())
+						set isSelected2 = IsUnitSelected(escaper2.getHero(), escaper2.getControler().getPlayer())
 
 						if (isSelected1 != isSelected2) then
 							//forcer la sélection des deux héros
