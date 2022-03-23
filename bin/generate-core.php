@@ -21,7 +21,7 @@ function getJFilesRecursively($rootDir, $currentdir = ''){
 		if($file != '.' && $file != '..'){
 			if(is_dir($rootDir.$currentdir.$file)){
 				$jFiles = array_merge($jFiles, getJFilesRecursively($rootDir, $currentdir.$file.'/'));
-			}elseif(preg_match('/\.j$/', $rootDir.$currentdir.$file)){
+			}elseif(preg_match('/\.j(\.php)?$/', $rootDir.$currentdir.$file)){
 				$jFiles[] = $currentdir.$file;
 			}
 		}
@@ -33,14 +33,14 @@ function getJFilesRecursively($rootDir, $currentdir = ''){
 $jFiles = getJFilesRecursively(CORE_DIR);
 
 
-$core = '';
+ob_start();
 
 foreach($jFiles as $jFile){
-	$jFileLibelle = preg_replace('/\.j$/', '', $jFile);
+	$jFileLibelle = preg_replace('/\.j(\.php)$/', '', $jFile);
 
-	$core .= "//START FILE \"$jFileLibelle\"\n\n";
-	$core .= file_get_contents(CORE_DIR.$jFile);
-	$core .= "\n\n//END FILE \"$jFileLibelle\"\n\n\n\n";
+	echo "//START FILE \"$jFileLibelle\"\n\n";
+	include CORE_DIR.$jFile;
+	echo "\n\n//END FILE \"$jFileLibelle\"\n\n\n\n";
 }
 
-file_put_contents(CORE_OUTPUT_PATH, $core);
+file_put_contents(CORE_OUTPUT_PATH, ob_get_clean());

@@ -1,5 +1,3 @@
-//TESH.scrollpos=19
-//TESH.alwaysfold=0
 library CommandTrueMax needs CommandsFunctions
 
 

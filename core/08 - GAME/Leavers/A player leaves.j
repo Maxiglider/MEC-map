@@ -4,6 +4,7 @@ function Trig_a_player_leaves_Actions takes nothing returns nothing
     local integer n = GetPlayerId(GetTriggerPlayer())
     call udg_escapers.remove(n)
     call StopAfk(n)
+    call StopAfk(n + NB_PLAYERS_MAX) //the secondary hero
     call DisplayTextToForce(GetPlayersAll(), udg_colorCode[n] + "This is too difficult for " + GetPlayerName(GetTriggerPlayer()) + ", (s)he has left the game." )
     call StartSound(gg_snd_noob)
     //set NbPlayersMinimumThree_nbPlayers = NbPlayersMinimumThree_nbPlayers - 1

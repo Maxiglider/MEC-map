@@ -1,5 +1,3 @@
-//TESH.scrollpos=57
-//TESH.alwaysfold=0
 library CommandRed needs CommandsFunctions
 
 

@@ -11,7 +11,9 @@ endglobals
 
 
 struct Escaper
+	private integer escaperId
 	private integer playerId
+
 	private player p
     private unit hero
 	private unit invisUnit
@@ -38,7 +40,6 @@ struct Escaper
 	private boolean godModeKills
 	private boolean walkSpeedAbsolute
 	private boolean slideSpeedAbsolute
-	private boolean canTeleportB
 	private boolean hasAutoreviveB
 	
 	private boolean canCheatB
@@ -60,13 +61,77 @@ struct Escaper
     private boolean isHeroSelectedB
 
     private boolean instantTurnAbsolute
+
+    private real animSpeedSecondaryHero = 0.8
     
     //coop
     private unit powerCircle
     private unit dummyPowerCircle
     private boolean coopInvul
     
-    
+
+//constructor
+	static method create takes integer escaperId returns Escaper //ne crée pas le héros
+		local Escaper e = Escaper.allocate()
+
+		if (escaperId >= NB_PLAYERS_MAX) then
+			set e.playerId = escaperId - 12
+		else
+			set e.playerId = escaperId
+		endif
+
+		set e.escaperId = escaperId
+		set e.p = Player(e.playerId)
+		set e.walkSpeed = HERO_WALK_SPEED
+		set e.slideSpeed = HERO_SLIDE_SPEED
+		set e.baseColorId = e.playerId
+		set e.slide = CreateSlideTrigger(escaperId)
+        set e.checkTerrain = CreateCheckTerrainTrigger(escaperId)
+        set e.cameraField = DEFAULT_CAMERA_FIELD
+        call SetCameraFieldForPlayer(e.p, CAMERA_FIELD_TARGET_DISTANCE, I2R(e.cameraField), 0)
+        set e.effects = EscaperEffectArray.create()
+        set e.vcRed = 100
+        set e.vcGreen = 100
+        set e.vcBlue = 100
+
+		if (escaperId >= NB_PLAYERS_MAX) then
+        	set e.vcTransparency = 50
+        else
+        	set e.vcTransparency = 0
+        endif
+
+        set e.lastTerrainType = 0
+        set e.makingLevel = 0
+        set e.make = 0
+        set e.makeLastActions = MakeLastActions.create(e)
+        set e.godMode = false
+        set e.godModeKills = false
+        set e.walkSpeedAbsolute = false
+        set e.slideSpeedAbsolute = false
+        set e.hasAutoreviveB = false
+        set e.canCheatB = false
+        set e.isMaximaxouB = false
+        set e.isTrueMaximaxouB = false
+        set e.discoTrigger = null
+        set e.controler = e
+        set e.slideLastAngleOrder = -1
+        set e.instantTurnAbsolute = false
+
+        //coop
+        set e.powerCircle = CreateUnit(e.p, POWER_CIRCLE, 0, 0, 0)
+        call SetUnitUserData(e.powerCircle, escaperId)
+        call ShowUnit(e.powerCircle, false)
+        set e.dummyPowerCircle = CreateUnit(ENNEMY_PLAYER, DUMMY_POWER_CIRCLE, 0, 0, 0)
+        call SetUnitUserData(e.dummyPowerCircle, escaperId)
+        call ShowUnit(e.dummyPowerCircle, false)
+
+		return e
+	endmethod
+
+
+	method getEscaperId takes nothing returns integer
+		return .escaperId
+	endmethod
     
     
 //item method
@@ -102,13 +167,25 @@ struct Escaper
 	
 //creation method
 	method createHero takes real x, real y, real angle returns boolean //retourne false si le héros existe déja
+		local integer heroTypeId = HERO_TYPE_ID
+
 		if (.hero != null) then
 			return false
 		endif
-		set .hero = CreateUnit(.p, HERO_TYPE_ID, x, y, angle)
+
+		if (.escaperId >= NB_PLAYERS_MAX) then
+			set heroTypeId = HERO_SECONDARY_TYPE_ID
+		endif
+
+		set .hero = CreateUnit(.p, heroTypeId, x, y, angle)
+
+		if (.escaperId >= NB_PLAYERS_MAX) then
+			call SetUnitTimeScale(.hero, .animSpeedSecondaryHero)
+		endif
+
         call SetUnitFlyHeight(.hero, 1., 0.)
         call SetUnitFlyHeight(.hero, 0., 0.)
-        call SetUnitUserData(.hero, GetPlayerId(.p))
+        call SetUnitUserData(.hero, .escaperId)
         call ShowUnit(.hero, false)
         call ShowUnit(.hero, true)
         call UnitRemoveAbility(.hero, 'Aloc')
@@ -126,7 +203,7 @@ struct Escaper
         call TriggerRegisterUnitEvent(gg_trg_InvisUnit_is_getting_damage, .invisUnit, EVENT_UNIT_DAMAGED)
         call .effects.showEffects(.hero)
         set .lastTerrainType = 0
-        call TimerStart(afkModeTimers[GetPlayerId(.p)], timeMinAfk, false, GetAfkModeTimeExpiresCodeFromId(GetPlayerId(.p)))
+        call TimerStart(afkModeTimers[.escaperId], timeMinAfk, false, GetAfkModeTimeExpiresCodeFromId(.escaperId))
         call InitShortcutSkills(GetPlayerId(.p))
         call EnableTrigger(.checkTerrain)
         return true
@@ -147,57 +224,6 @@ struct Escaper
 		set y = start.getRandomY()
 		return .createHero(x, y, angle)
 	endmethod
-	
-	static method create takes integer escaperId returns Escaper //ne crée pas le héros
-		local Escaper e = Escaper.allocate()
-
-		if (escaperId > 11) then
-			set e.playerId = escaperId - 12
-		else
-			set e.playerId = escaperId
-		endif
-
-		set e.p = Player(e.playerId)
-		set e.walkSpeed = HERO_WALK_SPEED
-		set e.slideSpeed = HERO_SLIDE_SPEED
-		set e.baseColorId = escaperId
-		set e.slide = CreateSlideTrigger(escaperId)
-        set e.checkTerrain = CreateCheckTerrainTrigger(escaperId)
-        set e.cameraField = DEFAULT_CAMERA_FIELD
-        call SetCameraFieldForPlayer(e.p, CAMERA_FIELD_TARGET_DISTANCE, I2R(e.cameraField), 0)
-        set e.effects = EscaperEffectArray.create()
-        set e.vcRed = 100
-        set e.vcGreen = 100
-        set e.vcBlue = 100
-        set e.vcTransparency = 0
-        set e.lastTerrainType = 0
-        set e.makingLevel = 0
-        set e.make = 0
-        set e.makeLastActions = MakeLastActions.create(e)
-        set e.godMode = false
-        set e.godModeKills = false
-        set e.walkSpeedAbsolute = false
-        set e.slideSpeedAbsolute = false
-        set e.canTeleportB = false
-        set e.hasAutoreviveB = false
-        set e.canCheatB = false
-        set e.isMaximaxouB = false
-        set e.isTrueMaximaxouB = false
-        set e.discoTrigger = null
-        set e.controler = e
-        set e.slideLastAngleOrder = -1
-        set e.instantTurnAbsolute = false
-
-        //coop
-        set e.powerCircle = CreateUnit(e.p, POWER_CIRCLE, 0, 0, 0)
-        call SetUnitUserData(e.powerCircle, escaperId)
-        call ShowUnit(e.powerCircle, false)
-        set e.dummyPowerCircle = CreateUnit(ENNEMY_PLAYER, DUMMY_POWER_CIRCLE, 0, 0, 0)
-        call SetUnitUserData(e.dummyPowerCircle, escaperId)
-        call ShowUnit(e.dummyPowerCircle, false)
-
-		return e
-	endmethod    
 	
 	method removeHero takes nothing returns nothing
 		if (.hero == null) then
@@ -243,15 +269,7 @@ struct Escaper
     
 //getId method
     method getId takes nothing returns integer
-        local integer i = 0
-        loop
-            exitwhen (i >= NB_ESCAPERS)
-                if (this == udg_escapers.get(i)) then
-                    return i
-                endif
-            set i = i + 1
-        endloop
-        return -1
+        return .escaperId
     endmethod		
 			
 //trigger methods
@@ -335,7 +353,7 @@ struct Escaper
 			set .lastTerrainType = 0
             call ShowUnit(.invisUnit, false)
             call .enableCheckTerrain(false)
-            call StopAfk(GetPlayerId(.p))
+            call StopAfk(.escaperId)
             call DisplayDeathMessagePlayer(.p)
             set .isHeroSelectedB = false
 			return true
@@ -369,7 +387,7 @@ struct Escaper
         if (.vcTransparency != 0) then
             call SetUnitVertexColorBJ(.hero, .vcRed, .vcGreen, .vcBlue, .vcTransparency)
         endif
-        call TimerStart(afkModeTimers[GetPlayerId(.p)], timeMinAfk, false, GetAfkModeTimeExpiresCodeFromId(GetPlayerId(.p)))
+        call TimerStart(afkModeTimers[.escaperId], timeMinAfk, false, GetAfkModeTimeExpiresCodeFromId(.escaperId))
         set .lastZ = 0
         set .oldDiffZ = 0
         set .speedZ = 0
@@ -382,11 +400,17 @@ struct Escaper
 	method reviveAtStart takes nothing returns boolean
 		local real x = udg_levels.getCurrentLevel().getStartRandomX()
 		local real y = udg_levels.getCurrentLevel().getStartRandomY()
+
+		if (not .isEscaperSecondary()) then
+            call GetMirrorEscaper(this).reviveAtStart()
+		endif
+
 		return .revive(x, y)
 	endmethod
     
     
     method turnInstantly takes real angle returns nothing
+		local integer heroTypeId = HERO_TYPE_ID
         local TerrainType lastTerrainType = .lastTerrainType
         local real x = GetUnitX(.hero)
 		local real y = GetUnitY(.hero)
@@ -395,7 +419,16 @@ struct Escaper
 		call RemoveUnit(.hero)
 
         //recreate hero
-            set .hero = CreateUnit(.p, HERO_TYPE_ID, x, y, angle)
+			if (.escaperId >= NB_PLAYERS_MAX) then
+				set heroTypeId = HERO_SECONDARY_TYPE_ID
+			endif
+
+			set .hero = CreateUnit(.p, heroTypeId, x, y, angle)
+
+			if (.escaperId >= NB_PLAYERS_MAX) then
+				call SetUnitTimeScale(.hero, .animSpeedSecondaryHero)
+			endif
+
             call SetUnitFlyHeight(.hero, 1., 0.)
             call SetUnitFlyHeight(.hero, 0., 0.)
             call SetUnitUserData(.hero, GetPlayerId(.p))
@@ -460,18 +493,34 @@ struct Escaper
 //effects methods
 	method newEffect takes string efStr, string bodyPart returns nothing
 		call .effects.new(efStr, .hero, bodyPart)
+
+		if (not .isEscaperSecondary()) then
+            call GetMirrorEscaper(this).newEffect(efStr, bodyPart)
+		endif
 	endmethod
 	
 	method destroyLastEffects takes integer numEfToDestroy returns nothing
 		call .effects.destroyLastEffects(numEfToDestroy)
+
+		if (not .isEscaperSecondary()) then
+            call GetMirrorEscaper(this).destroyLastEffects(numEfToDestroy)
+		endif
 	endmethod
 	
 	method hideEffects takes nothing returns nothing
 		call .effects.hideEffects()
+
+		if (not .isEscaperSecondary()) then
+            call GetMirrorEscaper(this).hideEffects()
+		endif
 	endmethod
 	
 	method showEffects takes nothing returns nothing
 		call .effects.showEffects(.hero)
+
+		if (not .isEscaperSecondary()) then
+            call GetMirrorEscaper(this).showEffects()
+		endif
 	endmethod
 	
     
@@ -526,6 +575,10 @@ struct Escaper
 	method absoluteSlideSpeed takes real slideSpeed returns nothing
 		set .slideSpeedAbsolute = true
 		set .slideSpeed = slideSpeed
+
+		if (not .isEscaperSecondary()) then
+            call GetMirrorEscaper(this).absoluteSlideSpeed(slideSpeed)
+		endif
 	endmethod
 	
 	method stopAbsoluteSlideSpeed takes nothing returns nothing
@@ -538,6 +591,10 @@ struct Escaper
                     call .setSlideSpeed(TerrainTypeSlide(integer(currentTerrainType)).getSlideSpeed())
                 endif
             endif
+
+            if (not .isEscaperSecondary()) then
+                call GetMirrorEscaper(this).stopAbsoluteSlideSpeed()
+            endif
         endif        
 	endmethod
 	
@@ -548,6 +605,10 @@ struct Escaper
 	method absoluteWalkSpeed takes real walkSpeed returns nothing
 		set .walkSpeedAbsolute = true
 		call .setWalkSpeed( walkSpeed )
+
+        if (not .isEscaperSecondary()) then
+            call GetMirrorEscaper(this).absoluteWalkSpeed(walkSpeed)
+        endif
 	endmethod
 	
 	method stopAbsoluteWalkSpeed takes nothing returns nothing
@@ -560,6 +621,10 @@ struct Escaper
                     call .setWalkSpeed(TerrainTypeWalk(integer(currentTerrainType)).getWalkSpeed())
                 endif
             endif
+
+            if (not .isEscaperSecondary()) then
+                call GetMirrorEscaper(this).stopAbsoluteWalkSpeed()
+            endif
         endif 
 	endmethod
 
@@ -569,15 +634,27 @@ struct Escaper
 
 	method setAbsoluteInstantTurn takes boolean flag returns nothing
 		set .instantTurnAbsolute = flag
+
+        if (not .isEscaperSecondary()) then
+            call GetMirrorEscaper(this).setAbsoluteInstantTurn(flag)
+        endif
 	endmethod
 	
 //godMode methods    
     method setGodMode takes boolean godMode returns nothing
         set .godMode = godMode
+
+        if (not .isEscaperSecondary()) then
+            call GetMirrorEscaper(this).setGodMode(godMode)
+        endif
     endmethod
     
     method setGodModeKills takes boolean godModeKills returns nothing
         set .godModeKills = godModeKills
+
+        if (not .isEscaperSecondary()) then
+            call GetMirrorEscaper(this).setGodModeKills(godModeKills)
+        endif
     endmethod
 	
 	method isGodModeOn takes nothing returns boolean
@@ -590,7 +667,7 @@ struct Escaper
 	
 //color methods
 	method setBaseColor takes integer baseColorId returns boolean
-        if (baseColorId < 0 or baseColorId > 12) then
+        if (baseColorId < 0 or baseColorId >= NB_PLAYERS_MAX_REFORGED) then
             return false
         endif
 		set .baseColorId = baseColorId
@@ -601,12 +678,16 @@ struct Escaper
                 call SetUnitColor(.hero, ConvertPlayerColor(baseColorId))
             endif
 		endif
-        call ColorInfo(this, .p)
+
+		if (not .isEscaperSecondary()) then
+        	call ColorInfo(this, .p)
+			call GetMirrorEscaper(this).setBaseColor(baseColorId)
+		endif
         return true
 	endmethod
     
 	method setBaseColorDisco takes integer baseColorId returns boolean
-        if (baseColorId < 0 or baseColorId > 12) then
+        if (baseColorId < 0 or baseColorId >= NB_PLAYERS_MAX_REFORGED) then
             return false
         endif
 		set .baseColorId = baseColorId
@@ -617,6 +698,11 @@ struct Escaper
                 call SetUnitColor(.hero, ConvertPlayerColor(baseColorId))
             endif
 		endif
+
+		if (not .isEscaperSecondary()) then
+			call GetMirrorEscaper(this).setBaseColorDisco(baseColorId)
+		endif
+
         return true
 	endmethod
     
@@ -629,6 +715,11 @@ struct Escaper
             return false
         endif
 		set .vcRed = vcRed
+
+		if (not .isEscaperSecondary()) then
+			call GetMirrorEscaper(this).setVcRed(vcRed)
+		endif
+
         return true
 	endmethod
 	
@@ -637,6 +728,11 @@ struct Escaper
             return false
         endif
 		set .vcGreen = vcGreen
+
+		if (not .isEscaperSecondary()) then
+			call GetMirrorEscaper(this).setVcGreen(vcGreen)
+		endif
+
         return true
 	endmethod
 	
@@ -644,6 +740,11 @@ struct Escaper
         if (vcBlue < 0 or vcBlue > 100) then
             return false
         endif
+
+		if (not .isEscaperSecondary()) then
+			call GetMirrorEscaper(this).setVcBlue(vcBlue)
+		endif
+
 		set .vcBlue = vcBlue
         return true
 	endmethod
@@ -652,7 +753,13 @@ struct Escaper
         if (vcTransparency < 0 or vcTransparency > 100) then
             return false
         endif
+
+		if (.isEscaperSecondary()) then
+			return true //secondary escapers transparency is fixed
+		endif
+
 		set .vcTransparency = vcTransparency
+
         return true
 	endmethod
 	
@@ -674,7 +781,11 @@ struct Escaper
 	
 	method refreshVertexColor takes nothing returns nothing
 		call SetUnitVertexColorBJ(.hero, .vcRed, .vcGreen, .vcBlue, .vcTransparency)
-		call ColorInfo(this, .p)
+
+		if (not .isEscaperSecondary()) then
+			call ColorInfo(this, .p)
+			call GetMirrorEscaper(this).refreshVertexColor()
+		endif
 	endmethod
 	
 //cheat methods
@@ -719,6 +830,10 @@ struct Escaper
 	method getPlayer takes nothing returns player
 		return .p
 	endmethod
+
+	method getControler takes nothing returns Escaper
+		return .controler
+	endmethod
 	
 	method setCameraField takes integer cameraField returns nothing
 		set .cameraField = cameraField
@@ -738,18 +853,10 @@ struct Escaper
 		call CustomDefeatBJ(kicked.getPlayer(), "You have been kicked by " + GetPlayerName(.p) + " !")
         call Text_A(udg_colorCode[GetPlayerId(kicked.getPlayer())] + GetPlayerName(kicked.getPlayer()) + " has been kicked by " + udg_colorCode[GetPlayerId(.p)] + GetPlayerName(.p) + " !")
 		call kicked.destroy()
+		call GetMirrorEscaper(kicked).destroy()
 	endmethod
 	
-    
-//teleport methods
-	method setCanTeleport takes boolean canTeleport returns nothing
-		set .canTeleportB = canTeleport
-	endmethod
-	
-	method canTeleport takes nothing returns boolean
-		return .canTeleportB
-	endmethod
-	
+
     
 //autorevive methods
 	method hasAutorevive takes nothing returns boolean
@@ -823,16 +930,34 @@ struct Escaper
         endif
         call .make.destroy()
         set .make = 0
+
+		if (not .isEscaperSecondary()) then
+            call GetMirrorEscaper(this).destroyMake()
+		endif
+
         return true
+    endmethod
+
+    method onInitMake takes nothing returns nothing
+		if (not .isEscaperSecondary()) then
+            call GetMirrorEscaper(this).makeDoNothing()
+		endif
+    endmethod
+
+    method makeDoNothing takes nothing returns nothing
+        call .destroyMake()
+        set .make = MakeDoNothing.create(.hero)
     endmethod
     
     method makeCreateNoMoveMonsters takes MonsterType mt, real facingAngle returns nothing
+        call .onInitMake()
         //mode : noMove
         call .destroyMake()
         set .make = MakeMonsterNoMove.create(.hero, mt, facingAngle)
     endmethod
     
 	method makeCreateSimplePatrolMonsters takes string mode, MonsterType mt returns nothing
+	    call .onInitMake()
         call .destroyMake()
 		//modes : normal, string, auto
 		if (mode == "normal" or mode == "string" or mode == "auto") then
@@ -841,6 +966,7 @@ struct Escaper
 	endmethod	
     
 	method makeCreateMultiplePatrolsMonsters takes string mode, MonsterType mt returns nothing
+	    call .onInitMake()
         call .destroyMake()
         //modes : normal, string
 		if (mode == "normal" or mode == "string") then
@@ -849,6 +975,7 @@ struct Escaper
 	endmethod	
     
 	method makeCreateTeleportMonsters takes string mode, MonsterType mt, real period, real angle returns nothing
+	    call .onInitMake()
         call .destroyMake()
         //modes : normal, string
 		if (mode == "normal" or mode == "string") then
@@ -857,6 +984,7 @@ struct Escaper
 	endmethod	
     
     method makeMmpOrMtNext takes nothing returns boolean
+        call .onInitMake()
         if (.make == 0 or not(.make.getType() == MakeMonsterMultiplePatrols.typeid or .make.getType() == MakeMonsterTeleport.typeid)) then
             return false
         endif
@@ -869,6 +997,7 @@ struct Escaper
     endmethod
     
     method makeMonsterTeleportWait takes nothing returns boolean
+        call .onInitMake()
         if (.make == 0 or .make.getType() != MakeMonsterTeleport.typeid) then
             return false
         endif
@@ -876,6 +1005,7 @@ struct Escaper
     endmethod
     
     method makeMonsterTeleportHide takes nothing returns boolean
+        call .onInitMake()
         if (.make == 0 or .make.getType() != MakeMonsterTeleport.typeid) then
             return false
         endif
@@ -883,11 +1013,13 @@ struct Escaper
     endmethod
     
     method makeCreateMonsterSpawn takes string label, MonsterType mt, string sens, real frequence returns nothing
+        call .onInitMake()
         call .destroyMake()
         set .make = MakeMonsterSpawn.create(.hero, label, mt, sens, frequence)
     endmethod
 	
 	method makeDeleteMonsters takes string mode returns nothing
+	    call .onInitMake()
 		call .destroyMake()
 		//delete modes : all, noMove, move, simplePatrol, multiplePatrols, oneByOne
 		if (mode != "all" and mode != "noMove" and mode != "move" and mode != "simplePatrol" and mode != "multiplePatrols" and mode != "oneByOne") then
@@ -897,6 +1029,7 @@ struct Escaper
 	endmethod
 	
 	method makeSetUnitTeleportPeriod takes string mode, real period returns nothing
+	    call .onInitMake()
 		call .destroyMake()
 		//modes : oneByOne, twoClics
 		if (mode != "twoClics" and mode != "oneByOne") then
@@ -906,11 +1039,13 @@ struct Escaper
 	endmethod
 	
 	method makeGetUnitTeleportPeriod takes nothing returns nothing
+	    call .onInitMake()
 		call .destroyMake()
 		set .make = MakeGetUnitTeleportPeriod.create(.hero)
 	endmethod
 	
 	method makeSetUnitMonsterType takes string mode, MonsterType mt returns nothing
+	    call .onInitMake()
 		call .destroyMake()
 		//modes : oneByOne, twoClics
 		if (mode != "twoClics" and mode != "oneByOne") then
@@ -920,11 +1055,13 @@ struct Escaper
 	endmethod
     
     method makeCreateMeteor takes nothing returns nothing
+        call .onInitMake()
         call .destroyMake()
         set .make = MakeMeteor.create(.hero)
     endmethod
 	
 	method makeDeleteMeteors takes string mode returns nothing
+	    call .onInitMake()
 		call .destroyMake()
 		//delete modes : oneByOne, twoClics
 		if (mode != "oneByOne" and mode != "twoClics") then
@@ -934,11 +1071,13 @@ struct Escaper
 	endmethod
     
     method makeCreateCaster takes CasterType casterType, real angle returns nothing
+        call .onInitMake()
         call .destroyMake()
         set .make = MakeCaster.create(.hero, casterType, angle)
     endmethod
 	
 	method makeDeleteCasters takes string mode returns nothing
+	    call .onInitMake()
 		call .destroyMake()
 		//delete modes : oneByOne, twoClics
 		if (mode != "oneByOne" and mode != "twoClics") then
@@ -948,61 +1087,73 @@ struct Escaper
 	endmethod
 	
 	method makeCreateClearMobs takes real disableDuration returns nothing
+	    call .onInitMake()
 		call .destroyMake()
 		set .make = MakeClearMob.create(.hero, disableDuration)
 	endmethod
 	
 	method makeDeleteClearMobs takes nothing returns nothing
+	    call .onInitMake()
 		call .destroyMake()
 		set .make = MakeDeleteClearMob.create(.hero)
 	endmethod
     
     method makeCreateTerrain takes TerrainType terrainType returns nothing
+        call .onInitMake()
         call .destroyMake()
         set .make = MakeTerrainCreate.create(.hero, terrainType)    
     endmethod
     
     method makeTerrainCopyPaste takes nothing returns nothing
+        call .onInitMake()
         call .destroyMake()
         set .make = MakeTerrainCopyPaste.create(.hero)
     endmethod
     
     method makeTerrainVerticalSymmetry takes nothing returns nothing
+        call .onInitMake()
         call .destroyMake()
         set .make = MakeTerrainVerticalSymmetry.create(.hero)
     endmethod
     
     method makeTerrainHorizontalSymmetry takes nothing returns nothing
+        call .onInitMake()
         call .destroyMake()
         set .make = MakeTerrainHorizontalSymmetry.create(.hero)
     endmethod
     
     method makeTerrainHeight takes real radius, real height returns nothing
+        call .onInitMake()
         call .destroyMake()
         set .make = MakeTerrainHeight.create(.hero, radius, height)
     endmethod
     
     method makeGetTerrainType takes nothing returns nothing
+        call .onInitMake()
         call .destroyMake()
         set .make = MakeGetTerrainType.create(.hero)    
     endmethod
     
     method makeExchangeTerrains takes nothing returns nothing
+        call .onInitMake()
         call .destroyMake()
         set .make = MakeExchangeTerrains.create(.hero)    
     endmethod  
     
     method makeCreateStart takes boolean forNext returns nothing
+        call .onInitMake()
         call .destroyMake()
         set .make = MakeStart.create(.hero, forNext)
     endmethod 
     
     method makeCreateEnd takes nothing returns nothing
+        call .onInitMake()
         call .destroyMake()
         set .make = MakeEnd.create(.hero)
     endmethod
     
     method makeCreateVisibilityModifier takes nothing returns nothing
+        call .onInitMake()
         call .destroyMake()
         set .make = MakeVisibilityModifier.create(.hero)
     endmethod
@@ -1071,16 +1222,33 @@ struct Escaper
     
 //coop reviving
     method coopReviveHero takes nothing returns nothing
+    	local Escaper mirrorEscaper = GetMirrorEscaper(this)
+    	local unit mirrorHero = mirrorEscaper.getHero()
+
         call .revive(GetUnitX(.hero), GetUnitY(.hero))
         call RunSoundOnUnit(udg_coop_index_son, .hero)
         call SetUnitAnimation(.hero, "channel")
         call .absoluteSlideSpeed(0)
         call .setCoopInvul(true)
+
+        call mirrorEscaper.revive(GetUnitX(mirrorHero), GetUnitY(mirrorHero))
+        call RunSoundOnUnit(udg_coop_index_son, mirrorHero)
+        call SetUnitAnimation(mirrorHero, "channel")
+        call mirrorEscaper.absoluteSlideSpeed(0)
+        call mirrorEscaper.setCoopInvul(true)
+
         call TriggerSleepAction(1.4)
+
         call .stopAbsoluteSlideSpeed()
         call SetUnitAnimation(.hero, "stand")
+
+        call mirrorEscaper.stopAbsoluteSlideSpeed()
+        call SetUnitAnimation(mirrorHero, "stand")
+
         call TriggerSleepAction(0.6)
+
         call .setCoopInvul(false)
+        call mirrorEscaper.setCoopInvul(false)
     endmethod
     
     method isCoopInvul takes nothing returns boolean
@@ -1106,6 +1274,10 @@ struct Escaper
             call SetUnitPosition(.dummyPowerCircle, GetUnitX(.hero), GetUnitY(.hero))
         endif
     endmethod
+
+    method isEscaperSecondary takes nothing returns boolean
+    	return .escaperId >= NB_PLAYERS_MAX
+	endmethod
     
     
 endstruct

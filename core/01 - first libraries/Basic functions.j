@@ -93,19 +93,6 @@ function StopUnit takes unit U returns nothing
     call PauseUnit(U, false)
 endfunction
 
-
-function IsHero takes unit U returns boolean
-    local integer i = 0
-    loop
-        exitwhen (i > 11)
-            if (udg_escapers.get(i).getHero() == U) then
-                return true
-            endif
-        set i = i + 1
-    endloop
-    return false
-endfunction
-
 function ClearTextForPlayer takes player p returns nothing
     if (GetLocalPlayer() == p) then
         call ClearTextMessages()
@@ -250,6 +237,12 @@ function tileset2tilesetString takes string tileset returns string
 
     return ""
 endfunction
+
+
+function ApplyAngleSymmetry takes real previousAngle, real symmetryAngle returns real
+	return -(previousAngle - symmetryAngle) + symmetryAngle
+endfunction
+
 
 
 

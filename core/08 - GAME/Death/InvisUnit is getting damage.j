@@ -37,7 +37,7 @@ function Trig_invisUnit_dies_Actions takes nothing returns nothing
     
     
     if (RAbsBJ(hauteurHero - hauteurKillingUnit) < TAILLE_UNITE) then
-        if (GetUnitTypeId(killingUnit) == 'dcir') then //on vient de toucher un héros mort, on va le ressusciter
+        if (GetUnitTypeId(killingUnit) == DUMMY_POWER_CIRCLE) then //on vient de toucher un héros mort, on va le ressusciter
             call udg_escapers.get(GetUnitUserData(killingUnit)).coopReviveHero()
             set invisUnit = null
             set killingUnit = null 
