@@ -244,6 +244,9 @@ function ApplyAngleSymmetry takes real previousAngle, real symmetryAngle returns
 endfunction
 
 
+function msg takes string text returns nothing
+    call BJDebugMsg(text)
+endfunction
 
 
 endlibrary
