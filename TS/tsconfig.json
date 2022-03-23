@@ -4,8 +4,11 @@
     "allowJs": true,
     "target": "es6",
     "lib": [
-      "es6"
+      "es6",
+      "es2020"
     ],
+    "noImplicitAny": true,
+    "strict": true,
     "moduleResolution": "classic",
     "paths": {
       "*": [
@@ -41,7 +44,8 @@
       "war3-types/core/commonai",
       "war3-types/core/polyfill",
       "war3-types/special/w3ts"
-    ]
+    ],
+    "skipLibCheck": true
   },
   "include": [
     "src"
