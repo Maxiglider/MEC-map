@@ -246,6 +246,10 @@ struct Escaper
         //coop
         call ShowUnit(.powerCircle, false)
         call ShowUnit(.dummyPowerCircle, false)
+
+		if (not .isEscaperSecondary()) then
+            call GetMirrorEscaper(this).removeHero()
+		endif
 	endmethod
 	
 	private method onDestroy takes nothing returns nothing
