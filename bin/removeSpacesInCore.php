@@ -15,6 +15,11 @@ function renameFilesAndFolders($rootDir, $currentdir = ''){
                 rename($rootDir.$currentdir.$file, $rootDir.$currentdir.$newFile);
                 $file = $newFile;
             }
+            if(str_contains($file, '_-_')){
+                $newFile = str_replace('_-_', '_', $file);
+                rename($rootDir.$currentdir.$file, $rootDir.$currentdir.$newFile);
+                $file = $newFile;
+            }
 
             if(is_dir($rootDir.$currentdir.$file)){
                 renameFilesAndFolders($rootDir, $currentdir.$file.'/');
