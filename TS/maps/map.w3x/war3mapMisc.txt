@@ -1,0 +1,5 @@
+[Misc]
+DissipateTime=100000.0
+MaxUnitSpeed=522.0
+MinUnitSpeed=1.0
+

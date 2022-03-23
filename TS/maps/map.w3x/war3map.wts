@@ -1,55 +1,1081 @@
-﻿STRING 1
+﻿STRING 4
 {
-TypeScript Template
-}
-
-STRING 2
-{
-Any
-}
-
-STRING 3
-{
-Nondescript
-}
-
-STRING 4
-{
-TriggerHappy
+Joueur 1
 }
 
 STRING 5
 {
-Player 1
+Joueur 2
 }
 
 STRING 6
 {
-Player 2
+Joueur 3
 }
 
 STRING 7
 {
-Player 3
+Joueur 4
 }
 
 STRING 8
 {
-Force 1
+Joueur 5
 }
 
 STRING 9
 {
-Force 2
+Joueur 6
 }
 
 STRING 10
 {
-Player 4
+Joueur 7
 }
 
 STRING 11
 {
-Player 12
+Joueur 8
+}
+
+STRING 12
+{
+Joueur 9
+}
+
+STRING 13
+{
+Joueur 10
+}
+
+STRING 14
+{
+Joueur 11
+}
+
+STRING 15
+{
+Joueur 12
+}
+
+STRING 18
+{
+MaxEscapeCreation -devMax
+}
+
+STRING 19
+{
+Tous
+}
+
+STRING 20
+{
+Sans description
+}
+
+STRING 21
+{
+Maximaxou
+}
+
+STRING 22
+// Units: Einv (InvisUnit), Name (Name)
+{
+InvisUnit
+}
+
+STRING 23
+// Units: E000 (Slider), Name (Name)
+{
+Slider
+}
+
+STRING 24
+// Units: E000 (Slider), Propernames (Proper Names)
+{
+A smart slider
+}
+
+STRING 25
+// Items: MND1 (A little meteor), Name (Name)
+{
+A little meteor
+}
+
+STRING 27
+// Items: MND1 (A little meteor), Description (Description)
+{
+To cast a little meteor.
+}
+
+STRING 28
+// Items: MCD1 (Unlimited meteors), Name (Name)
+{
+Unlimited meteors
+}
+
+STRING 30
+// Items: MCD1 (Unlimited meteors), Description (Description)
+{
+To cast little meteors.
+}
+
+STRING 31
+// Abilities: A002 (Petite météore), Name (Name)
+{
+Petite météore
+}
+
+STRING 32
+// Abilities: A002 (Petite météore), Tip (Tooltip - Normal)
+{
+|cffffcc00M|eteor
+}
+
+STRING 33
+// Abilities: A002 (Petite météore), Ubertip (Tooltip - Normal - Extended)
+{
+A meteor hits a naga, killing it.
+}
+
+STRING 34
+// Abilities: A002 (Petite météore), Hotkey (Hotkey - Normal)
+{
+M
+}
+
+STRING 35
+// Abilities: A004 (Petite météore portée infinie), Name (Name)
+{
+Petite météore portée infinie
+}
+
+STRING 36
+// Abilities: A004 (Petite météore portée infinie), Tip (Tooltip - Normal)
+{
+|cffffcc00M|eteor
+}
+
+STRING 37
+// Abilities: A004 (Petite météore portée infinie), Ubertip (Tooltip - Normal - Extended)
+{
+A meteor hits a naga, killing it. Infinite range !
+}
+
+STRING 38
+// Abilities: A004 (Petite météore portée infinie), Hotkey (Hotkey - Normal)
+{
+M
+}
+
+STRING 39
+// Abilities: A004 (Petite météore portée infinie), Researchhotkey (Hotkey - Learn)
+{
+M
+}
+
+STRING 40
+// Abilities: SCAu (Shortcut A), Name (Name)
+{
+Shortcut A
+}
+
+STRING 41
+// Abilities: SCAu (Shortcut A), Tip (Tooltip - Normal)
+{
+Shortcut |cffffcc00A|r
+}
+
+STRING 42
+// Abilities: SCAu (Shortcut A), Ubertip (Tooltip - Normal - Extended)
+{
+Type "-assign A command" to assign a command to key A. Replace "command" by the command you want, without typing "-". You can write "-as" instead of "-assign".
+}
+
+STRING 43
+// Abilities: SCZu (Shortcut Z), Name (Name)
+{
+Shortcut Z
+}
+
+STRING 44
+// Abilities: SCZu (Shortcut Z), Tip (Tooltip - Normal)
+{
+Shortcut |cffffcc00Z|r
+}
+
+STRING 45
+// Abilities: SCZu (Shortcut Z), Ubertip (Tooltip - Normal - Extended)
+{
+Type "-assign Z command" to assign a command to key Z. Replace "command" by the command you want, without typing "-". You can write "-as" instead of "-assign".
+}
+
+STRING 46
+// Abilities: SCEu (Shortcut E), Name (Name)
+{
+Shortcut E
+}
+
+STRING 47
+// Abilities: SCEu (Shortcut E), Tip (Tooltip - Normal)
+{
+Shortcut |cffffcc00E|r
+}
+
+STRING 48
+// Abilities: SCEu (Shortcut E), Ubertip (Tooltip - Normal - Extended)
+{
+Type "-assign E command" to assign a command to key E. Replace "command" by the command you want, without typing "-". You can write "-as" instead of "-assign".
+}
+
+STRING 49
+// Abilities: SCRu (Shortcut R), Name (Name)
+{
+Shortcut R
+}
+
+STRING 50
+// Abilities: SCRu (Shortcut R), Tip (Tooltip - Normal)
+{
+Shortcut |cffffcc00R|r
+}
+
+STRING 51
+// Abilities: SCRu (Shortcut R), Ubertip (Tooltip - Normal - Extended)
+{
+Type "-assign R command" to assign a command to key R. Replace "command" by the command you want, without typing "-". You can write "-as" instead of "-assign".
+}
+
+STRING 52
+// Abilities: SCQu (Shortcut Q), Name (Name)
+{
+Shortcut Q
+}
+
+STRING 53
+// Abilities: SCQu (Shortcut Q), Tip (Tooltip - Normal)
+{
+Shortcut |cffffcc00Q|r
+}
+
+STRING 54
+// Abilities: SCQu (Shortcut Q), Ubertip (Tooltip - Normal - Extended)
+{
+Type "-assign Q command" to assign a command to key Q. Replace "command" by the command you want, without typing "-". You can write "-as" instead of "-assign".
+}
+
+STRING 55
+// Abilities: SCSu (Shortcut S), Name (Name)
+{
+Shortcut S
+}
+
+STRING 56
+// Abilities: SCSu (Shortcut S), Tip (Tooltip - Normal)
+{
+Shortcut |cffffcc00S|r
+}
+
+STRING 57
+// Abilities: SCSu (Shortcut S), Ubertip (Tooltip - Normal - Extended)
+{
+Type "-assign S command" to assign a command to key S. Replace "command" by the command you want, without typing "-". You can write "-as" instead of "-assign".
+}
+
+STRING 58
+// Abilities: SCDu (Shortcut D), Name (Name)
+{
+Shortcut D
+}
+
+STRING 59
+// Abilities: SCDu (Shortcut D), Tip (Tooltip - Normal)
+{
+Shortcut |cffffcc00D|r
+}
+
+STRING 60
+// Abilities: SCDu (Shortcut D), Ubertip (Tooltip - Normal - Extended)
+{
+Type "-assign D command" to assign a command to key D. Replace "command" by the command you want, without typing "-". You can write "-as" instead of "-assign".
+}
+
+STRING 61
+// Abilities: SCFu (Shortcut F), Name (Name)
+{
+Shortcut F
+}
+
+STRING 62
+// Abilities: SCFu (Shortcut F), Tip (Tooltip - Normal)
+{
+Shortcut |cffffcc00F|r
+}
+
+STRING 63
+// Abilities: SCFu (Shortcut F), Ubertip (Tooltip - Normal - Extended)
+{
+Type "-assign F command" to assign a command to key F. Replace "command" by the command you want, without typing "-". You can write "-as" instead of "-assign".
+}
+
+STRING 64
+// Abilities: SCAo (Shortcut A used), Tip (Tooltip - Normal)
+{
+|cffffcc00A
+}
+
+STRING 65
+// Abilities: SCAo (Shortcut A used), Ubertip (Tooltip - Normal - Extended)
+{
+Press key A to use this shortcut. To remove this shortcut, type "-unassign A" or "-uas A".
+}
+
+STRING 66
+// Abilities: SCAo (Shortcut A used), Name (Name)
+{
+Shortcut A used
+}
+
+STRING 67
+// Abilities: SCAo (Shortcut A used), Hotkey (Hotkey - Normal)
+{
+A
+}
+
+STRING 68
+// Abilities: SCDo (Shortcut D used), Tip (Tooltip - Normal)
+{
+|cffffcc00D
+}
+
+STRING 69
+// Abilities: SCDo (Shortcut D used), Ubertip (Tooltip - Normal - Extended)
+{
+Press key D to use this shortcut. To remove this shortcut, type "-unassign D" or "-uas D".
+}
+
+STRING 70
+// Abilities: SCDo (Shortcut D used), Name (Name)
+{
+Shortcut D used
+}
+
+STRING 71
+// Abilities: SCDo (Shortcut D used), Hotkey (Hotkey - Normal)
+{
+D
+}
+
+STRING 72
+// Abilities: SCEo (Shortcut E used), Tip (Tooltip - Normal)
+{
+|cffffcc00E
+}
+
+STRING 73
+// Abilities: SCEo (Shortcut E used), Ubertip (Tooltip - Normal - Extended)
+{
+Press key E to use this shortcut. To remove this shortcut, type "-unassign E" or "-uas E".
+}
+
+STRING 74
+// Abilities: SCEo (Shortcut E used), Name (Name)
+{
+Shortcut E used
+}
+
+STRING 75
+// Abilities: SCEo (Shortcut E used), Hotkey (Hotkey - Normal)
+{
+E
+}
+
+STRING 76
+// Abilities: SCFo (Shortcut F used), Tip (Tooltip - Normal)
+{
+|cffffcc00F
+}
+
+STRING 77
+// Abilities: SCFo (Shortcut F used), Ubertip (Tooltip - Normal - Extended)
+{
+Press key F to use this shortcut. To remove this shortcut, type "-unassign F" or "-uas F".
+}
+
+STRING 78
+// Abilities: SCFo (Shortcut F used), Name (Name)
+{
+Shortcut F used
+}
+
+STRING 79
+// Abilities: SCFo (Shortcut F used), Hotkey (Hotkey - Normal)
+{
+F
+}
+
+STRING 80
+// Abilities: SCQo (Shortcut Q used), Tip (Tooltip - Normal)
+{
+|cffffcc00Q
+}
+
+STRING 81
+// Abilities: SCQo (Shortcut Q used), Ubertip (Tooltip - Normal - Extended)
+{
+Press key Q to use this shortcut. To remove this shortcut, type "-unassign Q" or "-uas Q".
+}
+
+STRING 82
+// Abilities: SCQo (Shortcut Q used), Name (Name)
+{
+Shortcut Q used
+}
+
+STRING 83
+// Abilities: SCQo (Shortcut Q used), Hotkey (Hotkey - Normal)
+{
+Q
+}
+
+STRING 84
+// Abilities: SCRo (Shortcut R used), Tip (Tooltip - Normal)
+{
+|cffffcc00R
+}
+
+STRING 85
+// Abilities: SCRo (Shortcut R used), Ubertip (Tooltip - Normal - Extended)
+{
+Press key R to use this shortcut. To remove this shortcut, type "-unassign R" or "-uas R".
+}
+
+STRING 86
+// Abilities: SCRo (Shortcut R used), Name (Name)
+{
+Shortcut R used
+}
+
+STRING 87
+// Abilities: SCRo (Shortcut R used), Hotkey (Hotkey - Normal)
+{
+R
+}
+
+STRING 88
+// Abilities: SCSo (Shortcut S used), Tip (Tooltip - Normal)
+{
+|cffffcc00S
+}
+
+STRING 89
+// Abilities: SCSo (Shortcut S used), Ubertip (Tooltip - Normal - Extended)
+{
+Press key S to use this shortcut. To remove this shortcut, type "-unassign S" or "-uas S".
+}
+
+STRING 90
+// Abilities: SCSo (Shortcut S used), Name (Name)
+{
+Shortcut S used
+}
+
+STRING 91
+// Abilities: SCSo (Shortcut S used), Hotkey (Hotkey - Normal)
+{
+S
+}
+
+STRING 92
+// Abilities: SCZo (Shortcut Z used), Tip (Tooltip - Normal)
+{
+|cffffcc00Z
+}
+
+STRING 93
+// Abilities: SCZo (Shortcut Z used), Ubertip (Tooltip - Normal - Extended)
+{
+Press key Z to use this shortcut. To remove this shortcut, type "-unassign Z" or "-uas Z".
+}
+
+STRING 94
+// Abilities: SCZo (Shortcut Z used), Name (Name)
+{
+Shortcut Z used
+}
+
+STRING 95
+// Abilities: SCZo (Shortcut Z used), Hotkey (Hotkey - Normal)
+{
+Z
+}
+
+STRING 96
+// Abilities: I010 (Immolation 010), Name (Name)
+{
+Immolation 010
+}
+
+STRING 97
+// Abilities: I020 (Immolation 020), Name (Name)
+{
+Immolation 020
+}
+
+STRING 98
+// Abilities: I030 (Immolation 030), Name (Name)
+{
+Immolation 030
+}
+
+STRING 99
+// Abilities: I040 (Immolation 040), Name (Name)
+{
+Immolation 040
+}
+
+STRING 100
+// Abilities: I050 (Immolation 050), Name (Name)
+{
+Immolation 050
+}
+
+STRING 101
+// Abilities: I060 (Immolation 060), Name (Name)
+{
+Immolation 060
+}
+
+STRING 102
+// Abilities: I070 (Immolation 070), Name (Name)
+{
+Immolation 070
+}
+
+STRING 103
+// Abilities: I080 (Immolation 080), Name (Name)
+{
+Immolation 080
+}
+
+STRING 104
+// Abilities: I090 (Immolation 090), Name (Name)
+{
+Immolation 090
+}
+
+STRING 105
+// Abilities: I100 (Immolation 100), Name (Name)
+{
+Immolation 100
+}
+
+STRING 106
+// Abilities: I110 (Immolation 110), Name (Name)
+{
+Immolation 110
+}
+
+STRING 107
+// Abilities: I120 (Immolation 120), Name (Name)
+{
+Immolation 120
+}
+
+STRING 108
+// Abilities: I130 (Immolation 130), Name (Name)
+{
+Immolation 130
+}
+
+STRING 109
+// Abilities: I140 (Immolation 140), Name (Name)
+{
+Immolation 140
+}
+
+STRING 110
+// Abilities: I150 (Immolation 150), Name (Name)
+{
+Immolation 150
+}
+
+STRING 111
+// Abilities: I160 (Immolation 160), Name (Name)
+{
+Immolation 160
+}
+
+STRING 112
+// Abilities: I170 (Immolation 170), Name (Name)
+{
+Immolation 170
+}
+
+STRING 113
+// Abilities: I180 (Immolation 180), Name (Name)
+{
+Immolation 180
+}
+
+STRING 114
+// Abilities: I190 (Immolation 190), Name (Name)
+{
+Immolation 190
+}
+
+STRING 115
+// Abilities: I200 (Immolation 200), Name (Name)
+{
+Immolation 200
+}
+
+STRING 116
+// Abilities: I210 (Immolation 210), Name (Name)
+{
+Immolation 210
+}
+
+STRING 117
+// Abilities: I220 (Immolation 220), Name (Name)
+{
+Immolation 220
+}
+
+STRING 118
+// Abilities: I230 (Immolation 230), Name (Name)
+{
+Immolation 230
+}
+
+STRING 119
+// Abilities: I240 (Immolation 240), Name (Name)
+{
+Immolation 240
+}
+
+STRING 120
+// Abilities: I250 (Immolation 250), Name (Name)
+{
+Immolation 250
+}
+
+STRING 121
+// Abilities: I260 (Immolation 260), Name (Name)
+{
+Immolation 260
+}
+
+STRING 122
+// Abilities: I270 (Immolation 270), Name (Name)
+{
+Immolation 270
+}
+
+STRING 123
+// Abilities: I290 (Immolation 290), Name (Name)
+{
+Immolation 290
+}
+
+STRING 124
+// Abilities: I300 (Immolation 300), Name (Name)
+{
+Immolation 300
+}
+
+STRING 125
+// Abilities: I310 (Immolation 310), Name (Name)
+{
+Immolation 310
+}
+
+STRING 126
+// Abilities: I320 (Immolation 320), Name (Name)
+{
+Immolation 320
+}
+
+STRING 127
+// Abilities: I330 (Immolation 330), Name (Name)
+{
+Immolation 330
+}
+
+STRING 128
+// Abilities: I340 (Immolation 340), Name (Name)
+{
+Immolation 340
+}
+
+STRING 129
+// Abilities: I360 (Immolation 360), Name (Name)
+{
+Immolation 360
+}
+
+STRING 130
+// Abilities: I370 (Immolation 370), Name (Name)
+{
+Immolation 370
+}
+
+STRING 131
+// Abilities: I380 (Immolation 380), Name (Name)
+{
+Immolation 380
+}
+
+STRING 132
+// Abilities: I390 (Immolation 390), Name (Name)
+{
+Immolation 390
+}
+
+STRING 133
+// Abilities: I400 (Immolation 400), Name (Name)
+{
+Immolation 400
+}
+
+STRING 134
+// Abilities: I005 (Immolation 005), Name (Name)
+{
+Immolation 005
+}
+
+STRING 135
+// Abilities: I015 (Immolation 015), Name (Name)
+{
+Immolation 015
+}
+
+STRING 136
+// Abilities: I025 (Immolation 025), Name (Name)
+{
+Immolation 025
+}
+
+STRING 137
+// Abilities: I035 (Immolation 035), Name (Name)
+{
+Immolation 035
+}
+
+STRING 138
+// Abilities: I045 (Immolation 045), Name (Name)
+{
+Immolation 045
+}
+
+STRING 139
+// Abilities: I055 (Immolation 055), Name (Name)
+{
+Immolation 055
+}
+
+STRING 140
+// Abilities: I065 (Immolation 065), Name (Name)
+{
+Immolation 065
+}
+
+STRING 141
+// Abilities: I075 (Immolation 075), Name (Name)
+{
+Immolation 075
+}
+
+STRING 142
+// Abilities: I085 (Immolation 085), Name (Name)
+{
+Immolation 085
+}
+
+STRING 143
+// Abilities: I095 (Immolation 095), Name (Name)
+{
+Immolation 095
+}
+
+STRING 144
+// Abilities: I105 (Immolation 105), Name (Name)
+{
+Immolation 105
+}
+
+STRING 145
+// Abilities: I115 (Immolation 115), Name (Name)
+{
+Immolation 115
+}
+
+STRING 146
+// Abilities: I125 (Immolation 125), Name (Name)
+{
+Immolation 125
+}
+
+STRING 147
+// Abilities: I135 (Immolation 135), Name (Name)
+{
+Immolation 135
+}
+
+STRING 148
+// Abilities: I145 (Immolation 145), Name (Name)
+{
+Immolation 145
+}
+
+STRING 149
+// Abilities: I155 (Immolation 155), Name (Name)
+{
+Immolation 155
+}
+
+STRING 150
+// Abilities: I165 (Immolation 165), Name (Name)
+{
+Immolation 165
+}
+
+STRING 151
+// Abilities: I175 (Immolation 175), Name (Name)
+{
+Immolation 175
+}
+
+STRING 152
+// Abilities: I185 (Immolation 185), Name (Name)
+{
+Immolation 185
+}
+
+STRING 153
+// Abilities: I195 (Immolation 195), Name (Name)
+{
+Immolation 195
+}
+
+STRING 154
+// Abilities: I205 (Immolation 205), Name (Name)
+{
+Immolation 205
+}
+
+STRING 155
+// Abilities: I215 (Immolation 215), Name (Name)
+{
+Immolation 215
+}
+
+STRING 156
+// Abilities: I225 (Immolation 225), Name (Name)
+{
+Immolation 225
+}
+
+STRING 157
+// Abilities: I235 (Immolation 235), Name (Name)
+{
+Immolation 235
+}
+
+STRING 158
+// Abilities: I245 (Immolation 245), Name (Name)
+{
+Immolation 245
+}
+
+STRING 159
+// Abilities: I255 (Immolation 255), Name (Name)
+{
+Immolation 255
+}
+
+STRING 160
+// Abilities: I265 (Immolation 265), Name (Name)
+{
+Immolation 265
+}
+
+STRING 161
+// Abilities: I275 (Immolation 275), Name (Name)
+{
+Immolation 275
+}
+
+STRING 162
+// Abilities: I280 (Immolation 280), Name (Name)
+{
+Immolation 280
+}
+
+STRING 163
+// Abilities: I285 (Immolation 285), Name (Name)
+{
+Immolation 285
+}
+
+STRING 164
+// Abilities: I295 (Immolation 295), Name (Name)
+{
+Immolation 295
+}
+
+STRING 165
+// Abilities: I305 (Immolation 305), Name (Name)
+{
+Immolation 305
+}
+
+STRING 166
+// Abilities: I315 (Immolation 315), Name (Name)
+{
+Immolation 315
+}
+
+STRING 167
+// Abilities: I325 (Immolation 325), Name (Name)
+{
+Immolation 325
+}
+
+STRING 168
+// Abilities: I335 (Immolation 335), Name (Name)
+{
+Immolation 335
+}
+
+STRING 169
+// Abilities: I345 (Immolation 345), Name (Name)
+{
+Immolation 345
+}
+
+STRING 170
+// Abilities: I355 (Immolation 355), Name (Name)
+{
+Immolation 355
+}
+
+STRING 171
+// Abilities: I365 (Immolation 365), Name (Name)
+{
+Immolation 365
+}
+
+STRING 172
+// Abilities: I375 (Immolation 375), Name (Name)
+{
+Immolation 375
+}
+
+STRING 173
+// Abilities: I385 (Immolation 385), Name (Name)
+{
+Immolation 385
+}
+
+STRING 174
+// Abilities: I395 (Immolation 395), Name (Name)
+{
+Immolation 395
+}
+
+STRING 175
+// Abilities: I350 (Immolation 350), Name (Name)
+{
+Immolation 350
+}
+
+STRING 176
+// Abilities: A0AV (Annuler champ de vision), Name (Name)
+{
+Annuler champ de vision
+}
+
+STRING 177
+{
+Map information (|Cfffed312F9|R)
+}
+
+STRING 178
+{
+Commands
+}
+
+STRING 179
+{
+Miscellaneous
+}
+
+STRING 180
+{
+|cffff0303by Maximaxou
+}
+
+STRING 181
+{
+Map information (|Cfffed312F9|R)
+}
+
+STRING 182
+{
+Map information
+}
+
+STRING 187
+{
+Sliders
+}
+
+STRING 188
+// Items: MND1 (A little meteor), Ubertip (Tooltip - Extended)
+{
+Allow you to cast a little meteor on some monsters.
+}
+
+STRING 189
+// Items: MCD1 (Unlimited meteors), Ubertip (Tooltip - Extended)
+{
+Allow you to cast meteors on some monsters. Unlimited range.
+}
+
+STRING 192
+// Units: e001 (Esprit de vengeance), Name (Name)
+{
+Esprit de vengeance
+}
+
+STRING 193
+// Units: dcir (Dummy cercle de puissance), Name (Name)
+{
+Dummy cercle de puissance
+}
+
+STRING 194
+// Destructibles: B000 (GetZ), Name (Name)
+{
+GetZ
+}
+
+STRING 195
+// Units: cais (Caisse), Name (Name)
+{
+Caisse
+}
+
+STRING 198
+// Units: D001 (Slider mirror), Propernames (Proper Names)
+{
+A smart slider
+}
+
+STRING 199
+// Units: D001 (Slider mirror), Name (Name)
+{
+Slider mirror
 }
 
