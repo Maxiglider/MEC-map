@@ -1,22 +1,74 @@
-library Make needs MMNoMoveActions, MMSimplePatrolActions, MMMultiplePatrolsActions, MMTeleportActions, MonsterSpawnMakingActions, MonsterDeleteActions, MakeSetUnitMonsterTypeActions, MakeSetUnitTeleportPeriodActions, MakeGetUnitTeleportPeriodActions, TerrainMakingActions, TerrainHeightMakingActions, GettingTerrainTypeInfoActions, MakeExchangeTerrainsActions, StartMakingActions, EndMakingActions, VisibilityModifierMakingActions, TerrainCopyPasteActions, TerrainVerticalSymmetryActions, TerrainHorizontalSymmetryActions, MeteorMakingActions, CasterMakingActions, MeteorDeleteActions, CasterDeleteActions, MClearMobActions, MClearMobDeleteActions, MakeDoNothingActions
-
-globals
-	constant integer MAKE_LAST_CLIC_UNIT_ID = 'e001' //à remplacer par l'id de l'unité choisie (need couleur variable)
-	constant string MAKE_CANT_CANCEL_MORE = "Nothing else to cancel !"
-	constant string MAKE_CANT_REDO_MORE = "Nothing else to redo !"
-endglobals
+import {EscaperFunctions} from 'core/04_STRUCTURES/Escaper/Escaper_functions'
+const {Hero2Escaper} = EscaperFunctions
+import {BasicFunctions} from 'core/01_libraries/Basic_functions'
+const {IsIssuedOrder, StopUnit} = BasicFunctions
 
 
-interface Make
-    player makerOwner
-    string kind //monsterMaking, monsterDeleting...
-    trigger t
-    unit maker
-    method cancelLastAction takes nothing returns boolean
-    method redoLastAction takes nothing returns boolean
-endinterface
+
+export const MakeConsts: {
+    MAKE_LAST_CLIC_UNIT_ID: number,
+    MAKE_CANT_CANCEL_MORE: string,
+    MAKE_CANT_REDO_MORE: string
+} = {
+    MAKE_LAST_CLIC_UNIT_ID: FourCC('e001'), //à remplacer par l'id de l'unité choisie (need couleur variable)
+    MAKE_CANT_CANCEL_MORE: "Nothing else to cancel !",
+    MAKE_CANT_REDO_MORE: "Nothing else to redo !"
+}
 
 
+
+export abstract class Make{
+    makerOwner: player
+    kind: string  //monsterMaking, monsterDeleting...
+    t: trigger | null
+    maker: unit
+    escaper: Escaper
+
+    constructor(maker: unit, kind: string){
+        this.maker = maker
+        this.makerOwner = GetOwningPlayer(maker)
+        this.kind = kind
+        this.escaper = Hero2Escaper(maker)
+
+        this.t = null;
+        this.enableTrigger()
+    }
+
+    destroy(){
+        if(this.t) {
+            DestroyTrigger(this.t);
+        }
+    }
+
+    doActions(){
+        if (!IsIssuedOrder("smart")) {
+            return false
+        }
+
+        StopUnit(this.maker)
+        return true
+    }
+
+    enableTrigger(){
+        if(this.t) DestroyTrigger(this.t)
+        this.t = CreateTrigger()
+        TriggerAddAction(this.t, this.doActions);
+        TriggerRegisterUnitEvent(this.t, this.maker, EVENT_UNIT_ISSUED_POINT_ORDER)
+    }
+
+    cancelLastAction() {
+        return false
+    }
+
+    redoLastAction() {
+        return false
+    }
+}
+
+
+
+
+/* todomax make that not needed
 public function GetActions takes string kind returns code
     if (kind == "monsterCreateNoMove") then
         return function MonsterMakingNoMove_Actions
@@ -73,9 +125,8 @@ public function GetActions takes string kind returns code
     endif
     return null
 endfunction
+*/
 
 
-
-endlibrary
 
 
