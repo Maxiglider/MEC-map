@@ -1,4 +1,4 @@
-export const Ascii = () => {
+const initAscii = () => {
     const TABLE_ASCII =
         ' !"#$%&\'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~'
     const DEBUT_TABLE_ASCII = 32
@@ -89,4 +89,13 @@ export const Ascii = () => {
         //Le code n'a pas été reconnue.
         return ''
     }
+
+    return {
+        CaractereVersAscii,
+        AsciiVersCaractere,
+        String2Ascii,
+        Ascii2String,
+    }
 }
+
+export const Ascii = initAscii()

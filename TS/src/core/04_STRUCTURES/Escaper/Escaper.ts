@@ -1,1291 +1,1419 @@
-//TESH.scrollpos=1017
-//TESH.alwaysfold=0
-library Escaper needs EscaperEffectArray, EscaperFunctions, MessageHeroDies
+import {
+    DEFAULT_CAMERA_FIELD,
+    DUMMY_POWER_CIRCLE,
+    ENNEMY_PLAYER,
+    HERO_SECONDARY_TYPE_ID,
+    HERO_SLIDE_SPEED,
+    HERO_TYPE_ID,
+    HERO_WALK_SPEED,
+    INVIS_UNIT_TYPE_ID,
+    NB_PLAYERS_MAX,
+    NB_PLAYERS_MAX_REFORGED,
+    NEUTRAL_PLAYER,
+    POWER_CIRCLE,
+    SLIDE_PERIOD,
+    TERRAIN_KILL_EFFECT_BODY_PART,
+} from 'core/01_libraries/Constants'
+import { EscaperEffectArray } from './EscaperEffectArray'
 
+export type IEscaper = ReturnType<typeof Escaper>
 
+export const Escaper = (escaperId: number) => {
+    const SHOW_REVIVE_EFFECTS = false
+    const heroToSelect: unit
 
-globals
-	constant boolean SHOW_REVIVE_EFFECTS = false
-    private unit heroToSelect
-endglobals
+    let playerId = escaperId >= NB_PLAYERS_MAX ? escaperId - 12 : escaperId
 
+    let p = Player(playerId)
+    let hero: unit
+    let invisUnit: unit
+    let walkSpeed = HERO_WALK_SPEED
+    let slideSpeed = HERO_SLIDE_SPEED
+    let baseColorId = playerId
+    let cameraField = DEFAULT_CAMERA_FIELD
+    SetCameraFieldForPlayer(p, CAMERA_FIELD_TARGET_DISTANCE, I2R(cameraField), 0)
 
-struct Escaper
-	private integer escaperId
-	private integer playerId
+    let lastTerrainType: TerrainType = 0
+    let controler: IEscaper
 
-	private player p
-    private unit hero
-	private unit invisUnit
-    private real walkSpeed
-    private real slideSpeed
-    private integer baseColorId
-	private integer cameraField
-	private TerrainType lastTerrainType
-    private Escaper controler
-	
-	private trigger slide
-	private trigger checkTerrain
-	
-    private real vcRed
-    private real vcGreen
-    private real vcBlue
-    private real vcTransparency
-    trigger discoTrigger
-    private EscaperEffectArray effects
-	private effect terrainKillEffect
-    private effect meteorEffect
-	
-	private boolean godMode
-	private boolean godModeKills
-	private boolean walkSpeedAbsolute
-	private boolean slideSpeedAbsolute
-	private boolean hasAutoreviveB
-	
-	private boolean canCheatB
-	private boolean isMaximaxouB
-	private boolean isTrueMaximaxouB
-    
-    private Make make
-    private MakeLastActions makeLastActions
-    private Level makingLevel
-	
-	Level currentLevelTouchTerrainDeath //pour le terrain qui tue, vérifie s'il faut bien tuer l'escaper
-	private item itemInInventory //créer le déclo pour save ça
-    
-    private real lastZ
-    private real oldDiffZ
-    private real speedZ
-    
-    private real slideLastAngleOrder
-    private boolean isHeroSelectedB
+    let slide = CreateSlideTrigger(escaperId)
+    let checkTerrain = CreateCheckTerrainTrigger(escaperId)
 
-    private boolean instantTurnAbsolute
+    let vcRed = 100
+    let vcGreen = 100
+    let vcBlue = 100
+    let vcTransparency = escaperId >= NB_PLAYERS_MAX ? 50 : 0
+    let discoTrigger: trigger | null = null
+    let effects = EscaperEffectArray()
+    let terrainKillEffect: effect
+    let meteorEffect: effect
 
-    private real animSpeedSecondaryHero = 0.8
-    
+    let godMode = false
+    let godModeKills = false
+    let walkSpeedAbsolute = false
+    let slideSpeedAbsolute = false
+    let hasAutoreviveB = false
+
+    let canCheatB = false
+    let isMaximaxouB = false
+    let isTrueMaximaxouB = false
+
+    let make: Make = 0
+    let makeLastActions: MakeLastActions = MakeLastActions() // TODO; used to be; MakeLastActions.create(e)
+    let makingLevel: Level = 0
+
+    let currentLevelTouchTerrainDeath: Level //pour le terrain qui tue, vérifie s'il faut bien tuer l'escaper
+    let itemInInventory: item //créer le déclo pour save ça
+
+    let lastZ: number
+    let oldDiffZ: number
+    let speedZ: number
+
+    let slideLastAngleOrder = -1
+    let isHeroSelectedB: boolean
+
+    let instantTurnAbsolute = false
+
+    let animSpeedSecondaryHero = 0.8
+
     //coop
-    private unit powerCircle
-    private unit dummyPowerCircle
-    private boolean coopInvul
-    
+    let powerCircle = CreateUnit(p, POWER_CIRCLE, 0, 0, 0)
+    SetUnitUserData(powerCircle, escaperId)
+    ShowUnit(powerCircle, false)
 
-//constructor
-	static method create takes integer escaperId returns Escaper //ne crée pas le héros
-		local Escaper e = Escaper.allocate()
+    let dummyPowerCircle = CreateUnit(ENNEMY_PLAYER, DUMMY_POWER_CIRCLE, 0, 0, 0)
+    SetUnitUserData(dummyPowerCircle, escaperId)
+    ShowUnit(dummyPowerCircle, false)
 
-		if (escaperId >= NB_PLAYERS_MAX) then
-			set e.playerId = escaperId - 12
-		else
-			set e.playerId = escaperId
-		endif
+    let coopInvul: boolean
 
-		set e.escaperId = escaperId
-		set e.p = Player(e.playerId)
-		set e.walkSpeed = HERO_WALK_SPEED
-		set e.slideSpeed = HERO_SLIDE_SPEED
-		set e.baseColorId = e.playerId
-		set e.slide = CreateSlideTrigger(escaperId)
-        set e.checkTerrain = CreateCheckTerrainTrigger(escaperId)
-        set e.cameraField = DEFAULT_CAMERA_FIELD
-        call SetCameraFieldForPlayer(e.p, CAMERA_FIELD_TARGET_DISTANCE, I2R(e.cameraField), 0)
-        set e.effects = EscaperEffectArray.create()
-        set e.vcRed = 100
-        set e.vcGreen = 100
-        set e.vcBlue = 100
+    // let controler:Escaper ; TODO; REMOVE THIS; CONTROLLER IS JUST A SELF REFERENCE SO this. (in theory or just w/e function directly)
 
-		if (escaperId >= NB_PLAYERS_MAX) then
-        	set e.vcTransparency = 50
-        else
-        	set e.vcTransparency = 0
-        endif
+    const getEscaperId = () => {
+        return escaperId
+    }
 
-        set e.lastTerrainType = 0
-        set e.makingLevel = 0
-        set e.make = 0
-        set e.makeLastActions = MakeLastActions.create(e)
-        set e.godMode = false
-        set e.godModeKills = false
-        set e.walkSpeedAbsolute = false
-        set e.slideSpeedAbsolute = false
-        set e.hasAutoreviveB = false
-        set e.canCheatB = false
-        set e.isMaximaxouB = false
-        set e.isTrueMaximaxouB = false
-        set e.discoTrigger = null
-        set e.controler = e
-        set e.slideLastAngleOrder = -1
-        set e.instantTurnAbsolute = false
-
-        //coop
-        set e.powerCircle = CreateUnit(e.p, POWER_CIRCLE, 0, 0, 0)
-        call SetUnitUserData(e.powerCircle, escaperId)
-        call ShowUnit(e.powerCircle, false)
-        set e.dummyPowerCircle = CreateUnit(ENNEMY_PLAYER, DUMMY_POWER_CIRCLE, 0, 0, 0)
-        call SetUnitUserData(e.dummyPowerCircle, escaperId)
-        call ShowUnit(e.dummyPowerCircle, false)
-
-		return e
-	endmethod
-
-
-	method getEscaperId takes nothing returns integer
-		return .escaperId
-	endmethod
-    
-    
-//item method
-    method resetItem takes nothing returns boolean //renvoie true si le héros portait un item
-        if (UnitHasItemOfTypeBJ(.hero, METEOR_NORMAL)) then
-            call SetItemDroppable(UnitItemInSlot(.hero, 0), true)
-            call Meteor(GetItemUserData(UnitItemInSlot(.hero, 0))).replace()
-            call DestroyEffect(.meteorEffect)
-            set .meteorEffect = null
+    //item method
+    const resetItem = (): boolean => {
+        //renvoie true si le héros portait un item
+        if (UnitHasItemOfTypeBJ(hero, METEOR_NORMAL)) {
+            SetItemDroppable(UnitItemInSlot(hero, 0), true)
+            Meteor(GetItemUserData(UnitItemInSlot(hero, 0))).replace()
+            DestroyEffect(meteorEffect)
+            meteorEffect = null
             return true
-        endif
+        }
         return false
-    endmethod
-    
-    method addEffectMeteor takes nothing returns nothing
-        if(.meteorEffect == null)then
-            set .meteorEffect = AddSpecialEffectTarget("Abilities\\Weapons\\DemonHunterMissile\\DemonHunterMissile.mdl", .hero, "hand right")
-        endif
-    endmethod
-    
-    method removeEffectMeteor takes nothing returns nothing
-        if(.meteorEffect != null)then
-            call DestroyEffect(.meteorEffect)
-            set .meteorEffect = null
-        endif
-    endmethod
-    
-//select method
-    method selectHero takes nothing returns nothing
-        call SelectUnitAddForPlayer(.hero, .controler.getPlayer())
-        call .setIsHeroSelectedForPlayer(.controler.getPlayer(), true)
-    endmethod
-	
-//creation method
-	method createHero takes real x, real y, real angle returns boolean //retourne false si le héros existe déja
-		local integer heroTypeId = HERO_TYPE_ID
+    }
 
-		if (.hero != null) then
-			return false
-		endif
+    const addEffectMeteor = () => {
+        if (meteorEffect == null) {
+            meteorEffect = AddSpecialEffectTarget(
+                'Abilities\\Weapons\\DemonHunterMissile\\DemonHunterMissile.mdl',
+                hero,
+                'hand right'
+            )
+        }
+    }
 
-		if (.escaperId >= NB_PLAYERS_MAX) then
-			set heroTypeId = HERO_SECONDARY_TYPE_ID
-		endif
+    const removeEffectMeteor = () => {
+        if (meteorEffect != null) {
+            DestroyEffect(meteorEffect)
+            meteorEffect = null
+        }
+    }
 
-		set .hero = CreateUnit(.p, heroTypeId, x, y, angle)
+    //select method
+    const selectHero = () => {
+        SelectUnitAddForPlayer(hero, controler.getPlayer())
+        setIsHeroSelectedForPlayer(controler.getPlayer(), true)
+    }
 
-		if (.escaperId >= NB_PLAYERS_MAX) then
-			call SetUnitTimeScale(.hero, .animSpeedSecondaryHero)
-		endif
+    //creation method
+    const createHero = (x: number, y: number, angle: number): boolean => {
+        //retourne false si le héros existe déja
+        let heroTypeId = HERO_TYPE_ID
 
-        call SetUnitFlyHeight(.hero, 1., 0.)
-        call SetUnitFlyHeight(.hero, 0., 0.)
-        call SetUnitUserData(.hero, .escaperId)
-        call ShowUnit(.hero, false)
-        call ShowUnit(.hero, true)
-        call UnitRemoveAbility(.hero, 'Aloc')
-		call SetUnitMoveSpeed(.hero, .walkSpeed) //voir pour le nom de la fonction
-        call .selectHero()
-        if (.baseColorId == 0) then
-            call SetUnitColor(.hero, PLAYER_COLOR_RED)
-        else
-            call SetUnitColor(.hero, ConvertPlayerColor(.baseColorId))
-        endif
-        call SetUnitVertexColorBJ(.hero, .vcRed, .vcGreen, .vcBlue, .vcTransparency)
-        call SpecialIllidan(.hero)
-		set .invisUnit = CreateUnit(NEUTRAL_PLAYER, INVIS_UNIT_TYPE_ID, x, y, angle)
-        call SetUnitUserData(.invisUnit, GetPlayerId(.p)) 
-        call TriggerRegisterUnitEvent(gg_trg_InvisUnit_is_getting_damage, .invisUnit, EVENT_UNIT_DAMAGED)
-        call .effects.showEffects(.hero)
-        set .lastTerrainType = 0
-        call TimerStart(afkModeTimers[.escaperId], timeMinAfk, false, GetAfkModeTimeExpiresCodeFromId(.escaperId))
-        call InitShortcutSkills(GetPlayerId(.p))
-        call EnableTrigger(.checkTerrain)
-        return true
-	endmethod
-	
-	method createHeroAtStart takes nothing returns boolean
-		local real x
-		local real y
-		local Start start = udg_levels.getCurrentLevel().getStart()
-        local real angle
-		if (start == 0) then //si le départ du niveau en cours n'existe pas
-			set start = DEPART_PAR_DEFAUT
-            set angle = HERO_START_ANGLE
-        else
-            set angle = GetRandomDirectionDeg()
-		endif
-		set x = start.getRandomX()
-		set y = start.getRandomY()
-		return .createHero(x, y, angle)
-	endmethod
-	
-	method removeHero takes nothing returns nothing
-		if (.hero == null) then
-			return
-		endif
-		call .resetItem()
-        if (IsUnitAliveBJ(.hero)) then
-            call KillUnit(.hero)
-        endif
-		call RemoveUnit(.hero)
-		set .hero = null
-		call RemoveUnit(.invisUnit)
-		set .invisUnit = null
-		set .lastTerrainType = 0
-        call .make.destroy()
-        set .make = 0
-        call .effects.hideEffects()
-        call DisableTrigger(.checkTerrain)
-        call DisableTrigger(.slide)
-        //coop
-        call ShowUnit(.powerCircle, false)
-        call ShowUnit(.dummyPowerCircle, false)
-
-		if (not .isEscaperSecondary()) then
-            call GetMirrorEscaper(this).removeHero()
-		endif
-	endmethod
-	
-	private method onDestroy takes nothing returns nothing
-		call .removeHero()
-		call DestroyEffect(.terrainKillEffect)
-		set .terrainKillEffect = null
-		call .effects.destroy()
-		call DestroyTrigger(.slide)
-		set .slide = null
-		call DestroyTrigger(.checkTerrain)
-		set .checkTerrain = null
-        call DestroyTrigger(.discoTrigger)
-        set .discoTrigger = null
-        call udg_escapers.nullify(GetPlayerId(.p))
-        //coop
-        call RemoveUnit(.powerCircle)
-        set .powerCircle = null
-        call RemoveUnit(.dummyPowerCircle)
-        set .dummyPowerCircle = null
-	endmethod
-    
-//getId method
-    method getId takes nothing returns integer
-        return .escaperId
-    endmethod		
-			
-//trigger methods
-	method enableSlide takes boolean doEnable returns boolean
-        local location heroPos
-		if (IsTriggerEnabled(.slide) == doEnable) then
-			return false
-		endif
-		if (doEnable) then
-			call EnableTrigger(.slide)
-			call StopUnit(.hero)
-            set heroPos = GetUnitLoc(.hero)
-            call .setLastZ(GetLocationZ(heroPos) + GetUnitFlyHeight(.hero))
-            call RemoveLocation(heroPos)
-            set heroPos = null
-		else
-			call DisableTrigger(.slide)
-            set .slideLastAngleOrder = -1
-		endif
-		return true
-	endmethod
-    
-    method setSlideLastAngleOrder takes real angle returns nothing
-        set .slideLastAngleOrder = angle
-    endmethod
-    
-    method getSlideLastAngleOrder takes nothing returns real
-        return .slideLastAngleOrder
-	endmethod
-    
-	method enableCheckTerrain takes boolean doEnable returns boolean
-		if (IsTriggerEnabled(.checkTerrain) == doEnable) then
-			return false
-		endif
-		if (doEnable) then
-			call EnableTrigger(.checkTerrain)
-		else
-			call DisableTrigger(.checkTerrain)
-		endif
-		return true
-	endmethod
-    
-    method isSliding takes nothing returns boolean
-        return IsTriggerEnabled(.slide)
-    endmethod
-    
-    method doesCheckTerrain takes nothing returns boolean
-        return IsTriggerEnabled(.checkTerrain)
-    endmethod
-	
-	
-//move methods
-	method moveHero takes real x, real y returns nothing
-		call SetUnitX(.hero, x)
-		call SetUnitY(.hero, y)
-	endmethod
-	
-	method moveInvisUnit takes real x, real y returns nothing
-		call SetUnitX(.invisUnit, x)
-		call SetUnitY(.invisUnit, y)
-	endmethod	
-	
-	
-//hero methods
-	method getHero takes nothing returns unit
-		return .hero
-	endmethod
-	
-	method isAlive takes nothing returns boolean
-		return IsUnitAliveBJ(.hero)
-	endmethod
-	
-	method isPaused takes nothing returns boolean
-		return IsUnitPaused(.hero)
-	endmethod
-	
-	method kill takes nothing returns boolean
-		if (.isAlive()) then
-			call .resetItem()
-			call KillUnit(.hero)
-			set .lastTerrainType = 0
-            call ShowUnit(.invisUnit, false)
-            call .enableCheckTerrain(false)
-            call StopAfk(.escaperId)
-            call DisplayDeathMessagePlayer(.p)
-            set .isHeroSelectedB = false
-			return true
-		endif
-		return false
-	endmethod
-	
-	method pause takes boolean doPause returns boolean
-		if (.isPaused() == doPause) then
+        if (hero != null) {
             return false
-		endif
-        call PauseUnit(.hero, doPause)
+        }
+
+        if (escaperId >= NB_PLAYERS_MAX) {
+            heroTypeId = HERO_SECONDARY_TYPE_ID
+        }
+
+        hero = CreateUnit(p, heroTypeId, x, y, angle)
+
+        if (escaperId >= NB_PLAYERS_MAX) {
+            SetUnitTimeScale(hero, animSpeedSecondaryHero)
+        }
+
+        SetUnitFlyHeight(hero, 1, 0)
+        SetUnitFlyHeight(hero, 0, 0)
+        SetUnitUserData(hero, escaperId)
+        ShowUnit(hero, false)
+        ShowUnit(hero, true)
+        UnitRemoveAbility(hero, FourCC('Aloc'))
+        SetUnitMoveSpeed(hero, walkSpeed) //voir pour le nom de la fonction
+        selectHero()
+
+        if (baseColorId == 0) {
+            SetUnitColor(hero, PLAYER_COLOR_RED)
+        } else {
+            SetUnitColor(hero, ConvertPlayerColor(baseColorId))
+        }
+
+        SetUnitVertexColorBJ(hero, vcRed, vcGreen, vcBlue, vcTransparency)
+        SpecialIllidan(hero)
+        invisUnit = CreateUnit(NEUTRAL_PLAYER, INVIS_UNIT_TYPE_ID, x, y, angle)
+        SetUnitUserData(invisUnit, GetPlayerId(p))
+        TriggerRegisterUnitEvent(gg_trg_InvisUnit_is_getting_damage, invisUnit, EVENT_UNIT_DAMAGED)
+        effects.showEffects(hero)
+        lastTerrainType = 0
+        TimerStart(afkModeTimers[escaperId], timeMinAfk, false, GetAfkModeTimeExpiresCodeFromId(escaperId))
+        InitShortcutSkills(GetPlayerId(p))
+        EnableTrigger(checkTerrain)
         return true
-	endmethod
-	
-	method specialIllidan takes nothing returns nothing
-		call SetUnitAnimation(.hero, "Morph Alternate")
-	endmethod
-	
-	method revive takes real x, real y returns boolean
-		if (.isAlive()) then
-			return false
-		endif
-		call ReviveHero(.hero, x, y, SHOW_REVIVE_EFFECTS)
-		call SetUnitX(.invisUnit, x)
-		call SetUnitY(.invisUnit, y)
-		call ShowUnit(.invisUnit, true)
-		call .enableCheckTerrain(true)
-		call .specialIllidan()
-		call .selectHero()
-        if (.vcTransparency != 0) then
-            call SetUnitVertexColorBJ(.hero, .vcRed, .vcGreen, .vcBlue, .vcTransparency)
-        endif
-        call TimerStart(afkModeTimers[.escaperId], timeMinAfk, false, GetAfkModeTimeExpiresCodeFromId(.escaperId))
-        set .lastZ = 0
-        set .oldDiffZ = 0
-        set .speedZ = 0
+    }
+
+    const createHeroAtStart = (): boolean => {
+        let x: number
+        let y: number
+        let start: Start = udg_levels.getCurrentLevel().getStart()
+        let angle: real
+
+        if (start == 0) {
+            //si le départ du niveau en cours n'existe pas
+            start = DEPART_PAR_DEFAUT
+            angle = HERO_START_ANGLE
+        } else {
+            angle = GetRandomDirectionDeg()
+        }
+
+        x = start.getRandomX()
+        y = start.getRandomY()
+        return createHero(x, y, angle)
+    }
+
+    const removeHero = () => {
+        if (hero == null) {
+            return
+        }
+
+        resetItem()
+
+        if (IsUnitAliveBJ(hero)) {
+            KillUnit(hero)
+        }
+
+        RemoveUnit(hero)
+        hero = null
+        RemoveUnit(invisUnit)
+        invisUnit = null
+        lastTerrainType = 0
+        make.destroy()
+        make = 0
+        effects.hideEffects()
+        DisableTrigger(checkTerrain)
+        DisableTrigger(slide)
+
         //coop
-        call ShowUnit(.powerCircle, false)
-        call ShowUnit(.dummyPowerCircle, false)
+        ShowUnit(powerCircle, false)
+        ShowUnit(dummyPowerCircle, false)
+
+        if (!isEscaperSecondary()) {
+            GetMirrorEscaper(this).removeHero()
+        }
+    }
+
+    const destroy = () => {
+        removeHero()
+        DestroyEffect(terrainKillEffect)
+        terrainKillEffect = null
+        effects.destroy()
+        DestroyTrigger(slide)
+        slide = null
+        DestroyTrigger(checkTerrain)
+        checkTerrain = null
+        DestroyTrigger(discoTrigger)
+        discoTrigger = null
+        udg_escapers.nullify(GetPlayerId(p))
+        //coop
+        RemoveUnit(powerCircle)
+        powerCircle = null
+        RemoveUnit(dummyPowerCircle)
+        dummyPowerCircle = null
+    }
+
+    //getId method
+    const getId = (): number => {
+        return escaperId
+    }
+
+    //trigger methods
+    const enableSlide = (doEnable: boolean): boolean => {
+        let heroPos: location
+
+        if (IsTriggerEnabled(slide) == doEnable) {
+            return false
+        }
+
+        if (doEnable) {
+            EnableTrigger(slide)
+            StopUnit(hero)
+            heroPos = GetUnitLoc(hero)
+            setLastZ(GetLocationZ(heroPos) + GetUnitFlyHeight(hero))
+            RemoveLocation(heroPos)
+            heroPos = null
+        } else {
+            DisableTrigger(slide)
+            slideLastAngleOrder = -1
+        }
+
         return true
-	endmethod
-	
-	method reviveAtStart takes nothing returns boolean
-		local real x = udg_levels.getCurrentLevel().getStartRandomX()
-		local real y = udg_levels.getCurrentLevel().getStartRandomY()
+    }
 
-		if (not .isEscaperSecondary()) then
-            call GetMirrorEscaper(this).reviveAtStart()
-		endif
+    const setSlideLastAngleOrder = (angle: number) => {
+        slideLastAngleOrder = angle
+    }
 
-		return .revive(x, y)
-	endmethod
-    
-    
-    method turnInstantly takes real angle returns nothing
-		local integer heroTypeId = HERO_TYPE_ID
-        local TerrainType lastTerrainType = .lastTerrainType
-        local real x = GetUnitX(.hero)
-		local real y = GetUnitY(.hero)
-        local item meteor = UnitItemInSlot(.hero, 0)
+    const getSlideLastAngleOrder = (): number => {
+        return slideLastAngleOrder
+    }
 
-		call RemoveUnit(.hero)
+    const enableCheckTerrain = (doEnable: boolean): boolean => {
+        if (IsTriggerEnabled(checkTerrain) == doEnable) {
+            return false
+        }
+        if (doEnable) {
+            EnableTrigger(checkTerrain)
+        } else {
+            DisableTrigger(checkTerrain)
+        }
+        return true
+    }
+
+    const isSliding = (): boolean => {
+        return IsTriggerEnabled(slide)
+    }
+
+    const doesCheckTerrain = (): boolean => {
+        return IsTriggerEnabled(checkTerrain)
+    }
+
+    //move methods
+    const moveHero = (x: real, y: real) => {
+        SetUnitX(hero, x)
+        SetUnitY(hero, y)
+    }
+
+    const moveInvisUnit = (x: real, y: real) => {
+        SetUnitX(invisUnit, x)
+        SetUnitY(invisUnit, y)
+    }
+
+    //hero methods
+    const getHero = (): unit => {
+        return hero
+    }
+
+    const isAlive = (): boolean => {
+        return IsUnitAliveBJ(hero)
+    }
+
+    const isPaused = (): boolean => {
+        return IsUnitPaused(hero)
+    }
+
+    const kill = (): boolean => {
+        if (isAlive()) {
+            resetItem()
+            KillUnit(hero).lastTerrainType = 0
+            ShowUnit(invisUnit, false)
+            enableCheckTerrain(false)
+            StopAfk(escaperId)
+            DisplayDeathMessagePlayer(p)
+            isHeroSelectedB = false
+            return true
+        }
+        return false
+    }
+
+    const pause = (doPause: boolean) => {
+        if (isPaused() == doPause) {
+            return false
+        }
+        PauseUnit(hero, doPause)
+        return true
+    }
+
+    const specialIllidan = () => {
+        SetUnitAnimation(hero, 'Morph Alternate')
+    }
+
+    const revive = (x: real, y: real): boolean => {
+        if (isAlive()) {
+            return false
+        }
+        ReviveHero(hero, x, y, SHOW_REVIVE_EFFECTS)
+        SetUnitX(invisUnit, x)
+        SetUnitY(invisUnit, y)
+        ShowUnit(invisUnit, true).enableCheckTerrain(true).specialIllidan().selectHero()
+        if (vcTransparency != 0) {
+            SetUnitVertexColorBJ(hero, vcRed, vcGreen, vcBlue, vcTransparency)
+        }
+        TimerStart(afkModeTimers[escaperId], timeMinAfk, false, GetAfkModeTimeExpiresCodeFromId(escaperId))
+        lastZ = 0
+        oldDiffZ = 0
+        speedZ = 0
+        //coop
+        ShowUnit(powerCircle, false)
+        ShowUnit(dummyPowerCircle, false)
+        return true
+    }
+
+    const reviveAtStart = (): boolean => {
+        let x: real = udg_levels.getCurrentLevel().getStartRandomX()
+        let y: real = udg_levels.getCurrentLevel().getStartRandomY()
+
+        if (!isEscaperSecondary()) {
+            GetMirrorEscaper(this).reviveAtStart()
+        }
+
+        return revive(x, y)
+    }
+
+    const turnInstantly = (angle: real) => {
+        let heroTypeId = HERO_TYPE_ID
+        let lastTerrainType: TerrainType = lastTerrainType
+        let x = GetUnitX(hero)
+        let y = GetUnitY(hero)
+        let meteor = UnitItemInSlot(hero, 0)
+
+        RemoveUnit(hero)
 
         //recreate hero
-			if (.escaperId >= NB_PLAYERS_MAX) then
-				set heroTypeId = HERO_SECONDARY_TYPE_ID
-			endif
+        if (escaperId >= NB_PLAYERS_MAX) {
+            heroTypeId = HERO_SECONDARY_TYPE_ID
+        }
 
-			set .hero = CreateUnit(.p, heroTypeId, x, y, angle)
+        hero = CreateUnit(p, heroTypeId, x, y, angle)
 
-			if (.escaperId >= NB_PLAYERS_MAX) then
-				call SetUnitTimeScale(.hero, .animSpeedSecondaryHero)
-			endif
+        if (escaperId >= NB_PLAYERS_MAX) {
+            SetUnitTimeScale(hero, animSpeedSecondaryHero)
+        }
 
-            call SetUnitFlyHeight(.hero, 1., 0.)
-            call SetUnitFlyHeight(.hero, 0., 0.)
-            call SetUnitUserData(.hero, GetPlayerId(.p))
-            call ShowUnit(.hero, false)
-            call ShowUnit(.hero, true)
-            call UnitRemoveAbility(.hero, 'Aloc')
-            call SetUnitMoveSpeed(.hero, .walkSpeed) //voir pour le nom de la fonction
-            if (.controler != this) then
-                call SetUnitOwner(.hero, .controler.getPlayer(), false)
-            endif
+        SetUnitFlyHeight(hero, 1, 0)
+        SetUnitFlyHeight(hero, 0, 0)
+        SetUnitUserData(hero, GetPlayerId(p))
+        ShowUnit(hero, false)
+        ShowUnit(hero, true)
+        UnitRemoveAbility(hero, 'Aloc')
+        SetUnitMoveSpeed(hero, walkSpeed) //voir pour le nom de la fonction
+        if (controler != this) {
+            SetUnitOwner(hero, controler.getPlayer(), false)
+        }
 
-            if (.isHeroSelectedB) then
-                call SelectUnit(.hero, true)
-            endif
-            if (.baseColorId == 0) then
-                call SetUnitColor(.hero, PLAYER_COLOR_RED)
-            else
-                call SetUnitColor(.hero, ConvertPlayerColor(.baseColorId))
-            endif
-            call SetUnitVertexColorBJ(.hero, .vcRed, .vcGreen, .vcBlue, .vcTransparency)
-            call .effects.showEffects(.hero)
-            if (.make != 0) then
-                set .make.maker = .hero
-                call TriggerRegisterUnitEvent(.make.t, .hero, EVENT_UNIT_ISSUED_POINT_ORDER)
-            endif
+        if (isHeroSelectedB) {
+            SelectUnit(hero, true)
+        }
+        if (baseColorId == 0) {
+            SetUnitColor(hero, PLAYER_COLOR_RED)
+        } else {
+            SetUnitColor(hero, ConvertPlayerColor(baseColorId))
+        }
+        SetUnitVertexColorBJ(hero, vcRed, vcGreen, vcBlue, vcTransparency)
+        effects.showEffects(hero)
+        if (make != 0) {
+            make.maker = hero
+            TriggerRegisterUnitEvent(make.t, hero, EVENT_UNIT_ISSUED_POINT_ORDER)
+        }
         ///////////////////////
-        set .lastTerrainType = lastTerrainType
-        call SetUnitAnimation(.getHero(), "stand")
-        if (meteor != null) then
-            call UnitAddItem(.hero, meteor)
-        endif
-        call InitShortcutSkills(GetPlayerId(.p))
-        set meteor = null
-    endmethod
-	
-	method reverse takes nothing returns nothing
-		local real angle = GetUnitFacing(.hero) + 180
-		call .turnInstantly(angle)
-        if (.slideLastAngleOrder != -1) then
-            set .slideLastAngleOrder = .slideLastAngleOrder + 180
-            call SetUnitFacing(.hero, .slideLastAngleOrder)
-        endif
-	endmethod
-    
-    method giveHeroControl takes Escaper escaper returns nothing
-        call SetUnitOwner(.hero, escaper.getPlayer(), false)
-        set .controler = escaper
-    endmethod
-    
-    method resetOwner takes nothing returns nothing
-        call SetUnitOwner(.hero, .getPlayer(), false)
-        set .controler = this
-    endmethod
-    
-    method setIsHeroSelectedForPlayer takes player p, boolean heroSelected returns nothing
-        if (GetLocalPlayer() == p) then
-            set .isHeroSelectedB = heroSelected
-        endif
-    endmethod
-	
-    
-//effects methods
-	method newEffect takes string efStr, string bodyPart returns nothing
-		call .effects.new(efStr, .hero, bodyPart)
+        lastTerrainType = lastTerrainType
+        SetUnitAnimation(getHero(), 'stand')
+        if (meteor != null) {
+            UnitAddItem(hero, meteor)
+        }
+        InitShortcutSkills(GetPlayerId(p))
+        meteor = null
+    }
 
-		if (not .isEscaperSecondary()) then
-            call GetMirrorEscaper(this).newEffect(efStr, bodyPart)
-		endif
-	endmethod
-	
-	method destroyLastEffects takes integer numEfToDestroy returns nothing
-		call .effects.destroyLastEffects(numEfToDestroy)
+    const reverse = () => {
+        let angle: number = GetUnitFacing(hero) + (180).turnInstantly(angle)
+        if (slideLastAngleOrder != -1) {
+            slideLastAngleOrder = slideLastAngleOrder + 180
+            SetUnitFacing(hero, slideLastAngleOrder)
+        }
+    }
 
-		if (not .isEscaperSecondary()) then
-            call GetMirrorEscaper(this).destroyLastEffects(numEfToDestroy)
-		endif
-	endmethod
-	
-	method hideEffects takes nothing returns nothing
-		call .effects.hideEffects()
+    // TODO; Should be IEscaper but gives circular error
+    const giveHeroControl = (escaper: any) => {
+        SetUnitOwner(hero, escaper.getPlayer(), false)
+        controler = escaper
+    }
 
-		if (not .isEscaperSecondary()) then
-            call GetMirrorEscaper(this).hideEffects()
-		endif
-	endmethod
-	
-	method showEffects takes nothing returns nothing
-		call .effects.showEffects(.hero)
+    const resetOwner = () => {
+        SetUnitOwner(hero, getPlayer(), false)
+        controler = this
+    }
 
-		if (not .isEscaperSecondary()) then
-            call GetMirrorEscaper(this).showEffects()
-		endif
-	endmethod
-	
-    
-//terrainKill methods
-	method destroyTerrainKillEffect takes nothing returns nothing
-		call DestroyEffect(.terrainKillEffect)
-		set .terrainKillEffect = null
-	endmethod
-	
-	method createTerrainKillEffect takes string killEffectStr returns nothing
-		if (.terrainKillEffect != null) then
-			call .destroyTerrainKillEffect()
-		endif
-		set .terrainKillEffect = AddSpecialEffectTarget( killEffectStr, .hero, TERRAIN_KILL_EFFECT_BODY_PART )
-	endmethod
-	
-//lastTerrainType methods
-	method getLastTerrainType takes nothing returns TerrainType
-		return .lastTerrainType
-	endmethod
-	
-    method setLastTerrainType takes TerrainType terrainType returns nothing
-		set .lastTerrainType = terrainType
-	endmethod
-	
-//speed methods
-	method setSlideSpeed takes real slideSpeed returns nothing
-		set .slideSpeed = slideSpeed
-	endmethod
-	
-	method setWalkSpeed takes real walkSpeed returns nothing
-		set .walkSpeed = walkSpeed
-		call SetUnitMoveSpeed(.hero, walkSpeed)
-	endmethod
-	
-	method getSlideSpeed takes nothing returns real
-		return .slideSpeed
-	endmethod
-    
-    method getRealSlideSpeed takes nothing returns real
-        return .slideSpeed / SLIDE_PERIOD
-    endmethod
-	
-	method getWalkSpeed takes nothing returns real
-		return .walkSpeed
-	endmethod
-	
-	method isAbsoluteSlideSpeed takes nothing returns boolean
-		return .slideSpeedAbsolute
-	endmethod
-	
-	method absoluteSlideSpeed takes real slideSpeed returns nothing
-		set .slideSpeedAbsolute = true
-		set .slideSpeed = slideSpeed
+    const setIsHeroSelectedForPlayer = (p: player, heroSelected: boolean) => {
+        if (GetLocalPlayer() == p) {
+            isHeroSelectedB = heroSelected
+        }
+    }
 
-		if (not .isEscaperSecondary()) then
-            call GetMirrorEscaper(this).absoluteSlideSpeed(slideSpeed)
-		endif
-	endmethod
-	
-	method stopAbsoluteSlideSpeed takes nothing returns nothing
-        local TerrainType currentTerrainType
-		if (.slideSpeedAbsolute) then
-            set .slideSpeedAbsolute = false
-            if (.isAlive()) then
-                set currentTerrainType= udg_terrainTypes.getTerrainType(GetUnitX(.hero), GetUnitY(.hero))
-                if (currentTerrainType.getKind() == "slide") then
-                    call .setSlideSpeed(TerrainTypeSlide(integer(currentTerrainType)).getSlideSpeed())
-                endif
-            endif
+    //effects methods
+    const newEffect = (efStr: string, bodyPart: string) => {
+        effects.new(efStr, hero, bodyPart)
 
-            if (not .isEscaperSecondary()) then
-                call GetMirrorEscaper(this).stopAbsoluteSlideSpeed()
-            endif
-        endif        
-	endmethod
-	
-	method isAbsoluteWalkSpeed takes nothing returns boolean
-		return .walkSpeedAbsolute
-	endmethod
-	
-	method absoluteWalkSpeed takes real walkSpeed returns nothing
-		set .walkSpeedAbsolute = true
-		call .setWalkSpeed( walkSpeed )
+        if (!isEscaperSecondary()) {
+            GetMirrorEscaper(this).newEffect(efStr, bodyPart)
+        }
+    }
 
-        if (not .isEscaperSecondary()) then
-            call GetMirrorEscaper(this).absoluteWalkSpeed(walkSpeed)
-        endif
-	endmethod
-	
-	method stopAbsoluteWalkSpeed takes nothing returns nothing
-        local TerrainType currentTerrainType
-		if (.walkSpeedAbsolute) then
-            set .walkSpeedAbsolute = false
-            if (.isAlive()) then
-                set currentTerrainType= udg_terrainTypes.getTerrainType(GetUnitX(.hero), GetUnitY(.hero))
-                if (currentTerrainType.getKind() == "walk") then
-                    call .setWalkSpeed(TerrainTypeWalk(integer(currentTerrainType)).getWalkSpeed())
-                endif
-            endif
+    const destroyLastEffects = (numEfToDestroy: number) => {
+        effects.destroyLastEffects(numEfToDestroy)
 
-            if (not .isEscaperSecondary()) then
-                call GetMirrorEscaper(this).stopAbsoluteWalkSpeed()
-            endif
-        endif 
-	endmethod
+        if (!isEscaperSecondary()) {
+            GetMirrorEscaper(this).destroyLastEffects(numEfToDestroy)
+        }
+    }
 
-	method isAbsoluteInstantTurn takes nothing returns boolean
-	    return .instantTurnAbsolute
-	endmethod
+    const hideEffects = () => {
+        effects.hideEffects()
 
-	method setAbsoluteInstantTurn takes boolean flag returns nothing
-		set .instantTurnAbsolute = flag
+        if (!isEscaperSecondary()) {
+            GetMirrorEscaper(this).hideEffects()
+        }
+    }
 
-        if (not .isEscaperSecondary()) then
-            call GetMirrorEscaper(this).setAbsoluteInstantTurn(flag)
-        endif
-	endmethod
-	
-//godMode methods    
-    method setGodMode takes boolean godMode returns nothing
-        set .godMode = godMode
+    const showEffects = () => {
+        effects.showEffects(hero)
 
-        if (not .isEscaperSecondary()) then
-            call GetMirrorEscaper(this).setGodMode(godMode)
-        endif
-    endmethod
-    
-    method setGodModeKills takes boolean godModeKills returns nothing
-        set .godModeKills = godModeKills
+        if (!isEscaperSecondary()) {
+            GetMirrorEscaper(this).showEffects()
+        }
+    }
 
-        if (not .isEscaperSecondary()) then
-            call GetMirrorEscaper(this).setGodModeKills(godModeKills)
-        endif
-    endmethod
-	
-	method isGodModeOn takes nothing returns boolean
-		return .godMode
-	endmethod
+    //terrainKill methods
+    const destroyTerrainKillEffect = () => {
+        DestroyEffect(terrainKillEffect).terrainKillEffect = null
+    }
 
-	method doesGodModeKills takes nothing returns boolean
-		return .godModeKills
-	endmethod
-	
-//color methods
-	method setBaseColor takes integer baseColorId returns boolean
-        if (baseColorId < 0 or baseColorId >= NB_PLAYERS_MAX_REFORGED) then
+    const createTerrainKillEffect = (killEffectStr: string) => {
+        if (terrainKillEffect != null) {
+            destroyTerrainKillEffect()
+        }
+        terrainKillEffect = AddSpecialEffectTarget(killEffectStr, hero, TERRAIN_KILL_EFFECT_BODY_PART)
+    }
+
+    //lastTerrainType methods
+    const getLastTerrainType = (): TerrainType => {
+        return lastTerrainType
+    }
+
+    const setLastTerrainType = (terrainType: TerrainType) => {
+        lastTerrainType = terrainType
+    }
+
+    //speed methods
+    const setSlideSpeed = (ss: number) => {
+        slideSpeed = ss
+    }
+
+    const setWalkSpeed = (ws: number) => {
+        walkSpeed = ws
+        SetUnitMoveSpeed(hero, ws)
+    }
+
+    const getSlideSpeed = (): number => {
+        return slideSpeed
+    }
+
+    const getRealSlideSpeed = (): number => {
+        return slideSpeed / SLIDE_PERIOD
+    }
+
+    const getWalkSpeed = (): number => {
+        return walkSpeed
+    }
+
+    const isAbsoluteSlideSpeed = (): boolean => {
+        return slideSpeedAbsolute
+    }
+
+    const absoluteSlideSpeed = (slideSpeed: number) => {
+        slideSpeedAbsolute = true
+        slideSpeed = slideSpeed // TODO; Refactor to ss otherwise its a self ref
+
+        if (!isEscaperSecondary()) {
+            GetMirrorEscaper(this).absoluteSlideSpeed(slideSpeed)
+        }
+    }
+
+    const stopAbsoluteSlideSpeed = () => {
+        let currentTerrainType: TerrainType
+
+        if (slideSpeedAbsolute) {
+            slideSpeedAbsolute = false
+            if (isAlive()) {
+                currentTerrainType = udg_terrainTypes.getTerrainType(GetUnitX(hero), GetUnitY(hero))
+                if (currentTerrainType.getKind() == 'slide') {
+                    setSlideSpeed(TerrainTypeSlide(integer(currentTerrainType)).getSlideSpeed())
+                }
+            }
+
+            if (!isEscaperSecondary()) {
+                GetMirrorEscaper(this).stopAbsoluteSlideSpeed()
+            }
+        }
+    }
+
+    const isAbsoluteWalkSpeed = (): boolean => {
+        return walkSpeedAbsolute
+    }
+
+    const absoluteWalkSpeed = (walkSpeed: number) => {
+        walkSpeedAbsolute = true
+        setWalkSpeed(walkSpeed)
+
+        if (!isEscaperSecondary()) {
+            GetMirrorEscaper(this).absoluteWalkSpeed(walkSpeed)
+        }
+    }
+
+    const stopAbsoluteWalkSpeed = () => {
+        let currentTerrainType: TerrainType
+        if (walkSpeedAbsolute) {
+            walkSpeedAbsolute = false
+            if (isAlive()) {
+                currentTerrainType = udg_terrainTypes.getTerrainType(GetUnitX(hero), GetUnitY(hero))
+                if (currentTerrainType.getKind() == 'walk') {
+                    setWalkSpeed(TerrainTypeWalk(integer(currentTerrainType)).getWalkSpeed())
+                }
+            }
+
+            if (!isEscaperSecondary()) {
+                GetMirrorEscaper(this).stopAbsoluteWalkSpeed()
+            }
+        }
+    }
+
+    const isAbsoluteInstantTurn = (): boolean => {
+        return instantTurnAbsolute
+    }
+
+    const setAbsoluteInstantTurn = (flag: boolean) => {
+        instantTurnAbsolute = flag
+
+        if (!isEscaperSecondary()) {
+            GetMirrorEscaper(this).setAbsoluteInstantTurn(flag)
+        }
+    }
+
+    //godMode methods
+    const setGodMode = (godMode: boolean) => {
+        godMode = godMode // TODO; SELF REF
+
+        if (!isEscaperSecondary()) {
+            GetMirrorEscaper(this).setGodMode(godMode)
+        }
+    }
+
+    const setGodModeKills = (godModeKills: boolean) => {
+        godModeKills = godModeKills // TODO; SELF REF
+
+        if (!isEscaperSecondary()) {
+            GetMirrorEscaper(this).setGodModeKills(godModeKills)
+        }
+    }
+
+    const isGodModeOn = (): boolean => {
+        return godMode
+    }
+
+    const doesGodModeKills = (): boolean => {
+        return godModeKills
+    }
+
+    //color methods
+    const setBaseColor = (baseColorId: number): boolean => {
+        if (baseColorId < 0 || baseColorId >= NB_PLAYERS_MAX_REFORGED) {
             return false
-        endif
-		set .baseColorId = baseColorId
-		if (.hero != null) then
-            if (baseColorId == 0) then
-                call SetUnitColor(.hero, PLAYER_COLOR_RED)
-            else
-                call SetUnitColor(.hero, ConvertPlayerColor(baseColorId))
-            endif
-		endif
+        }
+        baseColorId = baseColorId // TODO; SELF REF
+        if (hero != null) {
+            if (baseColorId == 0) {
+                SetUnitColor(hero, PLAYER_COLOR_RED)
+            } else {
+                SetUnitColor(hero, ConvertPlayerColor(baseColorId))
+            }
+        }
 
-		if (not .isEscaperSecondary()) then
-        	call ColorInfo(this, .p)
-			call GetMirrorEscaper(this).setBaseColor(baseColorId)
-		endif
+        if (!isEscaperSecondary()) {
+            ColorInfo(this, p)
+            GetMirrorEscaper(this).setBaseColor(baseColorId)
+        }
         return true
-	endmethod
-    
-	method setBaseColorDisco takes integer baseColorId returns boolean
-        if (baseColorId < 0 or baseColorId >= NB_PLAYERS_MAX_REFORGED) then
-            return false
-        endif
-		set .baseColorId = baseColorId
-		if (.hero != null) then
-            if (baseColorId == 0) then
-                call SetUnitColor(.hero, PLAYER_COLOR_RED)
-            else
-                call SetUnitColor(.hero, ConvertPlayerColor(baseColorId))
-            endif
-		endif
+    }
 
-		if (not .isEscaperSecondary()) then
-			call GetMirrorEscaper(this).setBaseColorDisco(baseColorId)
-		endif
+    const setBaseColorDisco = (baseColorId: number): boolean => {
+        if (baseColorId < 0 || baseColorId >= NB_PLAYERS_MAX_REFORGED) {
+            return false
+        }
+        baseColorId = baseColorId // TODO; SELF REF
+        if (hero != null) {
+            if (baseColorId == 0) {
+                SetUnitColor(hero, PLAYER_COLOR_RED)
+            } else {
+                SetUnitColor(hero, ConvertPlayerColor(baseColorId))
+            }
+        }
+
+        if (!isEscaperSecondary()) {
+            GetMirrorEscaper(this).setBaseColorDisco(baseColorId)
+        }
 
         return true
-	endmethod
-    
-    method getBaseColor takes nothing returns integer
-        return .baseColorId
-    endmethod
-	
-	method setVcRed takes real vcRed returns boolean
-        if (vcRed < 0 or vcRed > 100) then
-            return false
-        endif
-		set .vcRed = vcRed
+    }
 
-		if (not .isEscaperSecondary()) then
-			call GetMirrorEscaper(this).setVcRed(vcRed)
-		endif
+    const getBaseColor = (): number => {
+        return baseColorId
+    }
+
+    const setVcRed = (vcRed: number): boolean => {
+        if (vcRed < 0 || vcRed > 100) {
+            return false
+        }
+        vcRed = vcRed // TODO; SELF REF
+
+        if (!isEscaperSecondary()) {
+            GetMirrorEscaper(this).setVcRed(vcRed)
+        }
 
         return true
-	endmethod
-	
-	method setVcGreen takes real vcGreen returns boolean
-        if (vcGreen < 0 or vcGreen > 100) then
-            return false
-        endif
-		set .vcGreen = vcGreen
+    }
 
-		if (not .isEscaperSecondary()) then
-			call GetMirrorEscaper(this).setVcGreen(vcGreen)
-		endif
+    const setVcGreen = (vcGreen: number): boolean => {
+        if (vcGreen < 0 || vcGreen > 100) {
+            return false
+        }
+        vcGreen = vcGreen // TODO; SELF REF
+
+        if (!isEscaperSecondary()) {
+            GetMirrorEscaper(this).setVcGreen(vcGreen)
+        }
 
         return true
-	endmethod
-	
-	method setVcBlue takes real vcBlue returns boolean
-        if (vcBlue < 0 or vcBlue > 100) then
+    }
+
+    const setVcBlue = (vcBlue: number): boolean => {
+        if (vcBlue < 0 || vcBlue > 100) {
             return false
-        endif
+        }
 
-		if (not .isEscaperSecondary()) then
-			call GetMirrorEscaper(this).setVcBlue(vcBlue)
-		endif
+        if (!isEscaperSecondary()) {
+            GetMirrorEscaper(this).setVcBlue(vcBlue)
+        }
 
-		set .vcBlue = vcBlue
+        vcBlue = vcBlue // TODO; SELF REF
         return true
-	endmethod
-	
-	method setVcTransparency takes real vcTransparency returns boolean
-        if (vcTransparency < 0 or vcTransparency > 100) then
+    }
+
+    const setVcTransparency = (vcTransparency: number): boolean => {
+        if (vcTransparency < 0 || vcTransparency > 100) {
             return false
-        endif
+        }
 
-		if (.isEscaperSecondary()) then
-			return true //secondary escapers transparency is fixed
-		endif
+        if (isEscaperSecondary()) {
+            return true //secondary escapers transparency is fixed
+        }
 
-		set .vcTransparency = vcTransparency
+        vcTransparency = vcTransparency // TODO; self ref
 
         return true
-	endmethod
-	
-	method getVcRed takes nothing returns real
-		return .vcRed
-	endmethod
-	
-	method getVcGreen takes nothing returns real
-		return .vcGreen
-	endmethod
-	
-	method getVcBlue takes nothing returns real
-		return .vcBlue
-	endmethod
-	
-	method getVcTransparency takes nothing returns real
-		return .vcTransparency
-	endmethod
-	
-	method refreshVertexColor takes nothing returns nothing
-		call SetUnitVertexColorBJ(.hero, .vcRed, .vcGreen, .vcBlue, .vcTransparency)
+    }
 
-		if (not .isEscaperSecondary()) then
-			call ColorInfo(this, .p)
-			call GetMirrorEscaper(this).refreshVertexColor()
-		endif
-	endmethod
-	
-//cheat methods
-	method setCanCheat takes boolean canCheat returns nothing
-        if (not canCheat) then
-            set .isMaximaxouB = false
-            set .isTrueMaximaxouB = false
-        endif
-		set .canCheatB = canCheat
-	endmethod
-	
-	method setIsMaximaxou takes boolean isMaximaxou returns nothing
-		if (isMaximaxou) then
-			call .setCanCheat(true)
-        else
-            set .isTrueMaximaxouB = false
-		endif
-		set .isMaximaxouB = isMaximaxou
-	endmethod
-	
-	method setIsTrueMaximaxou takes boolean isTrueMaximaxou returns nothing
-		if (isTrueMaximaxou) then
-			call .setIsMaximaxou(true)
-		endif
-		set .isTrueMaximaxouB = isTrueMaximaxou
-	endmethod
-	
-	method canCheat takes nothing returns boolean
-		return .canCheatB
-	endmethod
-	
-	method isMaximaxou takes nothing returns boolean
-		return .isMaximaxouB
-	endmethod
-	
-	method isTrueMaximaxou takes nothing returns boolean
-		return .isTrueMaximaxouB
-	endmethod
-	
-    
-//autres
-	method getPlayer takes nothing returns player
-		return .p
-	endmethod
+    const getVcRed = (): number => {
+        return vcRed
+    }
 
-	method getControler takes nothing returns Escaper
-		return .controler
-	endmethod
-	
-	method setCameraField takes integer cameraField returns nothing
-		set .cameraField = cameraField
-		call SetCameraFieldForPlayer(.p, CAMERA_FIELD_TARGET_DISTANCE, I2R(cameraField), 0)
-	endmethod
-    
-    method getCameraField takes nothing returns integer
-        return .cameraField
-    endmethod
-    
-    method resetCamera takes nothing returns nothing
-        call ResetToGameCameraForPlayer(.p, 0)
-        call SetCameraFieldForPlayer(.p, CAMERA_FIELD_TARGET_DISTANCE, .cameraField, 0 )
-    endmethod
+    const getVcGreen = (): number => {
+        return vcGreen
+    }
 
-	method kick takes Escaper kicked returns nothing
-		call CustomDefeatBJ(kicked.getPlayer(), "You have been kicked by " + GetPlayerName(.p) + " !")
-        call Text_A(udg_colorCode[GetPlayerId(kicked.getPlayer())] + GetPlayerName(kicked.getPlayer()) + " has been kicked by " + udg_colorCode[GetPlayerId(.p)] + GetPlayerName(.p) + " !")
-		call kicked.destroy()
-		call GetMirrorEscaper(kicked).destroy()
-	endmethod
-	
+    const getVcBlue = (): number => {
+        return vcBlue
+    }
 
-    
-//autorevive methods
-	method hasAutorevive takes nothing returns boolean
-		return .hasAutoreviveB
-	endmethod
-	
-	method setHasAutorevive takes boolean hasAutorevive returns nothing
-		set .hasAutoreviveB = hasAutorevive
-	endmethod
-    
-    
-//make methods
-    method getMake takes nothing returns Make
-        return .make
-    endmethod
-    
-    method destroyMakeIfForSpecificLevel takes nothing returns nothing
-        local boolean doDestroy
-        if (.make != 0) then
-            set doDestroy = (.make.getType() == MakeMonsterNoMove.typeid)
-            set doDestroy = doDestroy or (.make.getType() == MakeMonsterSimplePatrol.typeid)
-            set doDestroy = doDestroy or (.make.getType() == MakeMonsterMultiplePatrols.typeid)
-            set doDestroy = doDestroy or (.make.getType() == MakeMonsterTeleport.typeid)
-            set doDestroy = doDestroy or (.make.getType() == MakeDeleteMonsters.typeid)
-            set doDestroy = doDestroy or (.make.getType() == MakeMeteor.typeid)
-            set doDestroy = doDestroy or (.make.getType() == MakeCaster.typeid)
-            set doDestroy = doDestroy or (.make.getType() == MakeDeleteMeteors.typeid)
-            set doDestroy = doDestroy or (.make.getType() == MakeStart.typeid)
-            set doDestroy = doDestroy or (.make.getType() == MakeEnd.typeid)
-            set doDestroy = doDestroy or (.make.getType() == MakeVisibilityModifier.typeid)
-            if (doDestroy) then
-                call .destroyMake()
-            endif
-        endif
-    endmethod
-    
-    method setMakingLevel takes Level level returns boolean
-        local Level oldMakingLevel
-        if (.makingLevel == level) then
+    const getVcTransparency = (): number => {
+        return vcTransparency
+    }
+
+    const refreshVertexColor = () => {
+        SetUnitVertexColorBJ(hero, vcRed, vcGreen, vcBlue, vcTransparency)
+
+        if (!isEscaperSecondary()) {
+            ColorInfo(this, p)
+            GetMirrorEscaper(this).refreshVertexColor()
+        }
+    }
+
+    //cheat methods
+    const setCanCheat = (canCheat: boolean) => {
+        if (!canCheat) {
+            isMaximaxouB = false
+            isTrueMaximaxouB = false
+        }
+        canCheatB = canCheat // TODO; self ref
+    }
+
+    const setIsMaximaxou = (isMaximaxou: boolean) => {
+        if (isMaximaxou) {
+            setCanCheat(true)
+        } else {
+            isTrueMaximaxouB = false
+        }
+        isMaximaxouB = isMaximaxou // TODO; self ref
+    }
+
+    const setIsTrueMaximaxou = (isTrueMaximaxou: boolean) => {
+        if (isTrueMaximaxou) {
+            setIsMaximaxou(true)
+        }
+        isTrueMaximaxouB = isTrueMaximaxou
+    }
+
+    const canCheat = (): boolean => {
+        return canCheatB
+    }
+
+    const isMaximaxou = (): boolean => {
+        return isMaximaxouB
+    }
+
+    const isTrueMaximaxou = (): boolean => {
+        return isTrueMaximaxouB
+    }
+
+    //autres
+    const getPlayer = (): player => {
+        return p
+    }
+
+    // TODO; IEscaper is circular dep
+    const getControler = (): any => {
+        return controler
+    }
+
+    const setCameraField = (cameraField: number) => {
+        cameraField = cameraField //TODO; self ref
+        SetCameraFieldForPlayer(p, CAMERA_FIELD_TARGET_DISTANCE, I2R(cameraField), 0)
+    }
+
+    const getCameraField = (): number => {
+        return cameraField
+    }
+
+    const resetCamera = () => {
+        ResetToGameCameraForPlayer(p, 0)
+        SetCameraFieldForPlayer(p, CAMERA_FIELD_TARGET_DISTANCE, cameraField, 0)
+    }
+
+    // TODO; Should be IEscaper but gives circular error
+    const kick = (kicked: any) => {
+        //TODO; COULD BE CIRCULAR REF
+        CustomDefeatBJ(kicked.getPlayer(), 'You have been kicked by ' + GetPlayerName(p) + ' !')
+        Text_A(
+            udg_colorCode[GetPlayerId(kicked.getPlayer())] +
+                GetPlayerName(kicked.getPlayer()) +
+                ' has been kicked by ' +
+                udg_colorCode[GetPlayerId(p)] +
+                GetPlayerName(p) +
+                ' !'
+        )
+        kicked.destroy()
+        GetMirrorEscaper(kicked).destroy()
+    }
+
+    //autorevive methods
+    const hasAutorevive = (): boolean => {
+        return hasAutoreviveB
+    }
+
+    const setHasAutorevive = (hasAutorevive: boolean) => {
+        hasAutoreviveB = hasAutorevive
+    }
+
+    //make methods
+    const getMake = (): Make => {
+        return make
+    }
+
+    const destroyMakeIfForSpecificLevel = () => {
+        let doDestroy: boolean
+
+        if (make != 0) {
+            doDestroy = make.getType() == MakeMonsterNoMove.typeid
+            doDestroy = doDestroy || make.getType() == MakeMonsterSimplePatrol.typeid
+            doDestroy = doDestroy || make.getType() == MakeMonsterMultiplePatrols.typeid
+            doDestroy = doDestroy || make.getType() == MakeMonsterTeleport.typeid
+            doDestroy = doDestroy || make.getType() == MakeDeleteMonsters.typeid
+            doDestroy = doDestroy || make.getType() == MakeMeteor.typeid
+            doDestroy = doDestroy || make.getType() == MakeCaster.typeid
+            doDestroy = doDestroy || make.getType() == MakeDeleteMeteors.typeid
+            doDestroy = doDestroy || make.getType() == MakeStart.typeid
+            doDestroy = doDestroy || make.getType() == MakeEnd.typeid
+            doDestroy = doDestroy || make.getType() == MakeVisibilityModifier.typeid
+
+            if (doDestroy) {
+                destroyMake()
+            }
+        }
+    }
+
+    const setMakingLevel = (level: Level): boolean => {
+        let oldMakingLevel: Level
+        if (makingLevel == level) {
             return false
-        endif
-        set oldMakingLevel = .makingLevel
-        set .makingLevel = level
-        call .destroyMakeIfForSpecificLevel()
-        if (not IsLevelBeingMade(oldMakingLevel)) then
-            call oldMakingLevel.activate(false)
-            if (udg_levels.getCurrentLevel().getId() < oldMakingLevel.getId()) then
-                call oldMakingLevel.activateVisibilities(false)
-            endif
-        endif
-        set Level_earningLivesActivated = false
-        call level.activate(true)
-        set Level_earningLivesActivated = true
+        }
+        oldMakingLevel = makingLevel
+        makingLevel = level
+        destroyMakeIfForSpecificLevel()
+        if (!IsLevelBeingMade(oldMakingLevel)) {
+            oldMakingLevel.activate(false)
+            if (udg_levels.getCurrentLevel().getId() < oldMakingLevel.getId()) {
+                oldMakingLevel.activateVisibilities(false)
+            }
+        }
+        Level_earningLivesActivated = false
+        level.activate(true)
+        Level_earningLivesActivated = true
         return true
-    endmethod
-    
-    method getMakingLevel takes nothing returns Level
-        if (.makingLevel == 0) then
+    }
+
+    const getMakingLevel = (): Level => {
+        if (makingLevel == 0) {
             return udg_levels.getCurrentLevel()
-        endif
-        return .makingLevel
-    endmethod
-    
-    method isMakingCurrentLevel takes nothing returns boolean
-        return (.makingLevel == 0)
-    endmethod
-    
-    method destroyMake takes nothing returns boolean
-        if (.make == 0) then
-            return false
-        endif
-        call .make.destroy()
-        set .make = 0
+        }
+        return makingLevel
+    }
 
-		if (not .isEscaperSecondary()) then
-            call GetMirrorEscaper(this).destroyMake()
-		endif
+    const isMakingCurrentLevel = (): boolean => {
+        return makingLevel == 0
+    }
+
+    const destroyMake = (): boolean => {
+        if (make == 0) {
+            return false
+        }
+        make.destroy()
+        make = 0
+
+        if (!isEscaperSecondary()) {
+            GetMirrorEscaper(this).destroyMake()
+        }
 
         return true
-    endmethod
+    }
 
-    method onInitMake takes nothing returns nothing
-		if (not .isEscaperSecondary()) then
-            call GetMirrorEscaper(this).makeDoNothing()
-		endif
-    endmethod
+    const onInitMake = () => {
+        if (!isEscaperSecondary()) {
+            GetMirrorEscaper(this).makeDoNothing()
+        }
+    }
 
-    method makeDoNothing takes nothing returns nothing
-        call .destroyMake()
-        set .make = MakeDoNothing.create(.hero)
-    endmethod
-    
-    method makeCreateNoMoveMonsters takes MonsterType mt, real facingAngle returns nothing
-        call .onInitMake()
+    const makeDoNothing = () => {
+        destroyMake()
+        make = MakeDoNothing.create(hero)
+    }
+
+    const makeCreateNoMoveMonsters = (mt: MonsterType, facingAngle: number) => {
+        onInitMake()
         //mode : noMove
-        call .destroyMake()
-        set .make = MakeMonsterNoMove.create(.hero, mt, facingAngle)
-    endmethod
-    
-	method makeCreateSimplePatrolMonsters takes string mode, MonsterType mt returns nothing
-	    call .onInitMake()
-        call .destroyMake()
-		//modes : normal, string, auto
-		if (mode == "normal" or mode == "string" or mode == "auto") then
-			set .make = MakeMonsterSimplePatrol.create(.hero, mode, mt)
-		endif
-	endmethod	
-    
-	method makeCreateMultiplePatrolsMonsters takes string mode, MonsterType mt returns nothing
-	    call .onInitMake()
-        call .destroyMake()
+        destroyMake()
+        make = MakeMonsterNoMove.create(hero, mt, facingAngle)
+    }
+
+    const makeCreateSimplePatrolMonsters = (mode: string, mt: MonsterType) => {
+        onInitMake()
+        destroyMake()
+        //modes : normal, string, auto
+        if (mode == 'normal' || mode == 'string' || mode == 'auto') {
+            make = MakeMonsterSimplePatrol.create(hero, mode, mt)
+        }
+    }
+
+    const makeCreateMultiplePatrolsMonsters = (mode: string, mt: MonsterType) => {
+        onInitMake()
+        destroyMake()
         //modes : normal, string
-		if (mode == "normal" or mode == "string") then
-			set .make = MakeMonsterMultiplePatrols.create(.hero, mode, mt)
-		endif
-	endmethod	
-    
-	method makeCreateTeleportMonsters takes string mode, MonsterType mt, real period, real angle returns nothing
-	    call .onInitMake()
-        call .destroyMake()
+        if (mode == 'normal' || mode == 'string') {
+            make = MakeMonsterMultiplePatrols.create(hero, mode, mt)
+        }
+    }
+
+    const makeCreateTeleportMonsters = (mode: string, mt: MonsterType, period: number, angle: number) => {
+        onInitMake()
+        destroyMake()
         //modes : normal, string
-		if (mode == "normal" or mode == "string") then
-			set .make = MakeMonsterTeleport.create(.hero, mode, mt, period, angle)
-		endif
-	endmethod	
-    
-    method makeMmpOrMtNext takes nothing returns boolean
-        call .onInitMake()
-        if (.make == 0 or not(.make.getType() == MakeMonsterMultiplePatrols.typeid or .make.getType() == MakeMonsterTeleport.typeid)) then
+        if (mode == 'normal' || mode == 'string') {
+            make = MakeMonsterTeleport.create(hero, mode, mt, period, angle)
+        }
+    }
+
+    const makeMmpOrMtNext = (): boolean => {
+        onInitMake()
+        if (
+            make == 0 ||
+            !(make.getType() == MakeMonsterMultiplePatrols.typeid || make.getType() == MakeMonsterTeleport.typeid)
+        ) {
             return false
-        endif
-        if (.make.getType() == MakeMonsterMultiplePatrols.typeid) then
-            call MakeMonsterMultiplePatrols(integer(.make)).nextMonster()
-        else
-            call MakeMonsterTeleport(integer(.make)).nextMonster()
-        endif
+        }
+        if (make.getType() == MakeMonsterMultiplePatrols.typeid) {
+            MakeMonsterMultiplePatrols(integer(make)).nextMonster()
+        } else {
+            MakeMonsterTeleport(integer(make)).nextMonster()
+        }
         return true
-    endmethod
-    
-    method makeMonsterTeleportWait takes nothing returns boolean
-        call .onInitMake()
-        if (.make == 0 or .make.getType() != MakeMonsterTeleport.typeid) then
+    }
+
+    const makeMonsterTeleportWait = (): boolean => {
+        onInitMake()
+        if (make == 0 || make.getType() != MakeMonsterTeleport.typeid) {
             return false
-        endif
-        return MakeMonsterTeleport(integer(.make)).addWaitPeriod()
-    endmethod
-    
-    method makeMonsterTeleportHide takes nothing returns boolean
-        call .onInitMake()
-        if (.make == 0 or .make.getType() != MakeMonsterTeleport.typeid) then
+        }
+        return MakeMonsterTeleport(integer(make)).addWaitPeriod()
+    }
+
+    const makeMonsterTeleportHide = (): boolean => {
+        onInitMake()
+        if (make == 0 || make.getType() != MakeMonsterTeleport.typeid) {
             return false
-        endif
-        return MakeMonsterTeleport(integer(.make)).addHidePeriod()
-    endmethod
-    
-    method makeCreateMonsterSpawn takes string label, MonsterType mt, string sens, real frequence returns nothing
-        call .onInitMake()
-        call .destroyMake()
-        set .make = MakeMonsterSpawn.create(.hero, label, mt, sens, frequence)
-    endmethod
-	
-	method makeDeleteMonsters takes string mode returns nothing
-	    call .onInitMake()
-		call .destroyMake()
-		//delete modes : all, noMove, move, simplePatrol, multiplePatrols, oneByOne
-		if (mode != "all" and mode != "noMove" and mode != "move" and mode != "simplePatrol" and mode != "multiplePatrols" and mode != "oneByOne") then
-			return
-		endif
-		set .make = MakeDeleteMonsters.create(.hero, mode)
-	endmethod
-	
-	method makeSetUnitTeleportPeriod takes string mode, real period returns nothing
-	    call .onInitMake()
-		call .destroyMake()
-		//modes : oneByOne, twoClics
-		if (mode != "twoClics" and mode != "oneByOne") then
-			return
-		endif
-		set .make = MakeSetUnitTeleportPeriod.create(.hero, mode, period)
-	endmethod
-	
-	method makeGetUnitTeleportPeriod takes nothing returns nothing
-	    call .onInitMake()
-		call .destroyMake()
-		set .make = MakeGetUnitTeleportPeriod.create(.hero)
-	endmethod
-	
-	method makeSetUnitMonsterType takes string mode, MonsterType mt returns nothing
-	    call .onInitMake()
-		call .destroyMake()
-		//modes : oneByOne, twoClics
-		if (mode != "twoClics" and mode != "oneByOne") then
-			return
-		endif
-		set .make = MakeSetUnitMonsterType.create(.hero, mode, mt)
-	endmethod
-    
-    method makeCreateMeteor takes nothing returns nothing
-        call .onInitMake()
-        call .destroyMake()
-        set .make = MakeMeteor.create(.hero)
-    endmethod
-	
-	method makeDeleteMeteors takes string mode returns nothing
-	    call .onInitMake()
-		call .destroyMake()
-		//delete modes : oneByOne, twoClics
-		if (mode != "oneByOne" and mode != "twoClics") then
-			return
-		endif
-		set .make = MakeDeleteMeteors.create(.hero, mode)
-	endmethod
-    
-    method makeCreateCaster takes CasterType casterType, real angle returns nothing
-        call .onInitMake()
-        call .destroyMake()
-        set .make = MakeCaster.create(.hero, casterType, angle)
-    endmethod
-	
-	method makeDeleteCasters takes string mode returns nothing
-	    call .onInitMake()
-		call .destroyMake()
-		//delete modes : oneByOne, twoClics
-		if (mode != "oneByOne" and mode != "twoClics") then
-			return
-		endif
-		set .make = MakeDeleteCasters.create(.hero, mode)
-	endmethod
-	
-	method makeCreateClearMobs takes real disableDuration returns nothing
-	    call .onInitMake()
-		call .destroyMake()
-		set .make = MakeClearMob.create(.hero, disableDuration)
-	endmethod
-	
-	method makeDeleteClearMobs takes nothing returns nothing
-	    call .onInitMake()
-		call .destroyMake()
-		set .make = MakeDeleteClearMob.create(.hero)
-	endmethod
-    
-    method makeCreateTerrain takes TerrainType terrainType returns nothing
-        call .onInitMake()
-        call .destroyMake()
-        set .make = MakeTerrainCreate.create(.hero, terrainType)    
-    endmethod
-    
-    method makeTerrainCopyPaste takes nothing returns nothing
-        call .onInitMake()
-        call .destroyMake()
-        set .make = MakeTerrainCopyPaste.create(.hero)
-    endmethod
-    
-    method makeTerrainVerticalSymmetry takes nothing returns nothing
-        call .onInitMake()
-        call .destroyMake()
-        set .make = MakeTerrainVerticalSymmetry.create(.hero)
-    endmethod
-    
-    method makeTerrainHorizontalSymmetry takes nothing returns nothing
-        call .onInitMake()
-        call .destroyMake()
-        set .make = MakeTerrainHorizontalSymmetry.create(.hero)
-    endmethod
-    
-    method makeTerrainHeight takes real radius, real height returns nothing
-        call .onInitMake()
-        call .destroyMake()
-        set .make = MakeTerrainHeight.create(.hero, radius, height)
-    endmethod
-    
-    method makeGetTerrainType takes nothing returns nothing
-        call .onInitMake()
-        call .destroyMake()
-        set .make = MakeGetTerrainType.create(.hero)    
-    endmethod
-    
-    method makeExchangeTerrains takes nothing returns nothing
-        call .onInitMake()
-        call .destroyMake()
-        set .make = MakeExchangeTerrains.create(.hero)    
-    endmethod  
-    
-    method makeCreateStart takes boolean forNext returns nothing
-        call .onInitMake()
-        call .destroyMake()
-        set .make = MakeStart.create(.hero, forNext)
-    endmethod 
-    
-    method makeCreateEnd takes nothing returns nothing
-        call .onInitMake()
-        call .destroyMake()
-        set .make = MakeEnd.create(.hero)
-    endmethod
-    
-    method makeCreateVisibilityModifier takes nothing returns nothing
-        call .onInitMake()
-        call .destroyMake()
-        set .make = MakeVisibilityModifier.create(.hero)
-    endmethod
-    
-    method cancelLastAction takes nothing returns boolean
-        if (.make != 0) then
-            if (.make.cancelLastAction()) then
+        }
+        return MakeMonsterTeleport(integer(make)).addHidePeriod()
+    }
+
+    const makeCreateMonsterSpawn = (label: string, mt: MonsterType, sens: string, frequence: number) => {
+        onInitMake()
+        destroyMake()
+        make = MakeMonsterSpawn.create(hero, label, mt, sens, frequence)
+    }
+
+    const makeDeleteMonsters = (mode: string) => {
+        onInitMake()
+        destroyMake()
+
+        //delete modes : all, noMove, move, simplePatrol, multiplePatrols, oneByOne
+        if (
+            mode != 'all' &&
+            mode != 'noMove' &&
+            mode != 'move' &&
+            mode != 'simplePatrol' &&
+            mode != 'multiplePatrols' &&
+            mode != 'oneByOne'
+        ) {
+            return
+        }
+
+        make = MakeDeleteMonsters.create(hero, mode)
+    }
+
+    const makeSetUnitTeleportPeriod = (mode: string, period: number) => {
+        onInitMake()
+        destroyMake()
+
+        //modes : oneByOne, twoClics
+        if (mode != 'twoClics' && mode != 'oneByOne') {
+            return
+        }
+
+        make = MakeSetUnitTeleportPeriod.create(hero, mode, period)
+    }
+
+    const makeGetUnitTeleportPeriod = () => {
+        onInitMake()
+        destroyMake()
+        make = MakeGetUnitTeleportPeriod.create(hero)
+    }
+
+    const makeSetUnitMonsterType = (mode: string, mt: MonsterType) => {
+        onInitMake()
+        destroyMake()
+
+        //modes : oneByOne, twoClics
+        if (mode != 'twoClics' && mode != 'oneByOne') {
+            return
+        }
+
+        make = MakeSetUnitMonsterType.create(hero, mode, mt)
+    }
+
+    const makeCreateMeteor = () => {
+        onInitMake()
+        destroyMake()
+        make = MakeMeteor.create(hero)
+    }
+
+    const makeDeleteMeteors = (mode: string) => {
+        onInitMake()
+        destroyMake()
+
+        //delete modes : oneByOne, twoClics
+        if (mode != 'oneByOne' && mode != 'twoClics') {
+            return
+        }
+
+        make = MakeDeleteMeteors.create(hero, mode)
+    }
+
+    const makeCreateCaster = (casterType: ICasterType, angle: number) => {
+        onInitMake()
+        destroyMake()
+        make = MakeCaster.create(hero, casterType, angle)
+    }
+
+    const makeDeleteCasters = (mode: string) => {
+        onInitMake()
+        destroyMake()
+
+        //delete modes : oneByOne, twoClics
+        if (mode != 'oneByOne' && mode != 'twoClics') {
+            return
+        }
+
+        make = MakeDeleteCasters.create(hero, mode)
+    }
+
+    const makeCreateClearMobs = (disableDuration: number) => {
+        onInitMake()
+        destroyMake()
+        make = MakeClearMob.create(hero, disableDuration)
+    }
+
+    const makeDeleteClearMobs = () => {
+        onInitMake()
+        destroyMake()
+        make = MakeDeleteClearMob.create(hero)
+    }
+
+    const makeCreateTerrain = (terrainType: TerrainType) => {
+        onInitMake()
+        destroyMake()
+        make = MakeTerrainCreate.create(hero, terrainType)
+    }
+
+    const makeTerrainCopyPaste = () => {
+        onInitMake()
+        destroyMake()
+        make = MakeTerrainCopyPaste.create(hero)
+    }
+
+    const makeTerrainVerticalSymmetry = () => {
+        onInitMake()
+        destroyMake()
+        make = MakeTerrainVerticalSymmetry.create(hero)
+    }
+
+    const makeTerrainHorizontalSymmetry = () => {
+        onInitMake()
+        destroyMake()
+        make = MakeTerrainHorizontalSymmetry.create(hero)
+    }
+
+    const makeTerrainHeight = (radius: number, height: number) => {
+        onInitMake()
+        destroyMake()
+        make = MakeTerrainHeight.create(hero, radius, height)
+    }
+
+    const makeGetTerrainType = () => {
+        onInitMake()
+        destroyMake()
+        make = MakeGetTerrainType.create(hero)
+    }
+
+    const makeExchangeTerrains = () => {
+        onInitMake()
+        destroyMake()
+        make = MakeExchangeTerrains.create(hero)
+    }
+
+    const makeCreateStart = (forNext: boolean) => {
+        onInitMake()
+        destroyMake()
+        make = MakeStart.create(hero, forNext)
+    }
+
+    const makeCreateEnd = () => {
+        onInitMake()
+        destroyMake()
+        make = MakeEnd.create(hero)
+    }
+
+    const makeCreateVisibilityModifier = () => {
+        onInitMake()
+        destroyMake()
+        make = MakeVisibilityModifier.create(hero)
+    }
+
+    const cancelLastAction = (): boolean => {
+        if (make != 0) {
+            if (make.cancelLastAction()) {
                 return true
-            endif
-        endif
-        return .makeLastActions.cancelLastAction()
-    endmethod
-    
-    method redoLastAction takes nothing returns boolean
-        if (.makeLastActions.redoLastAction()) then
+            }
+        }
+        return makeLastActions.cancelLastAction()
+    }
+
+    const redoLastAction = (): boolean => {
+        if (makeLastActions.redoLastAction()) {
             return true
-        endif
-        if (.make != 0) then
-            return .make.redoLastAction()
-        endif
+        }
+        if (make != 0) {
+            return make.redoLastAction()
+        }
         return false
-    endmethod
-    
-    method deleteSpecificActionsForLevel takes Level level returns nothing
-        call .makeLastActions.deleteSpecificActionsForLevel(level)
-    endmethod
-    
-    method newAction takes MakeAction action returns MakeAction
-        return .makeLastActions.newAction(action)
-    endmethod
-    
-    method destroyAllSavedActions takes nothing returns nothing
-        call .makeLastActions.destroyAllActions()
-    endmethod
-    
-    method destroyCancelledActions takes nothing returns nothing
-        call .makeLastActions.destroyCancelledActions()
-    endmethod
-    
-    
-//for gravity gestion    
-    method getLastZ takes nothing returns real
-        return .lastZ
-    endmethod
-    
-    method setLastZ takes real lastZ returns nothing
-        set .lastZ = lastZ
-    endmethod  
-    
-    method getOldDiffZ takes nothing returns real
-        return .oldDiffZ
-    endmethod
-    
-    method setOldDiffZ takes real oldDiffZ returns nothing
-        set .oldDiffZ = oldDiffZ
-    endmethod
-    
-    method getSpeedZ takes nothing returns real
-        return .speedZ
-    endmethod
-    
-    method setSpeedZ takes real speedZ returns nothing
-        set .speedZ = speedZ
-    endmethod
-    
-    
-//coop reviving
-    method coopReviveHero takes nothing returns nothing
-    	local Escaper mirrorEscaper = GetMirrorEscaper(this)
-    	local unit mirrorHero = mirrorEscaper.getHero()
+    }
 
-        call .revive(GetUnitX(.hero), GetUnitY(.hero))
-        call RunSoundOnUnit(udg_coop_index_son, .hero)
-        call SetUnitAnimation(.hero, "channel")
-        call .absoluteSlideSpeed(0)
-        call .setCoopInvul(true)
+    const deleteSpecificActionsForLevel = (level: Level) => {
+        makeLastActions.deleteSpecificActionsForLevel(level)
+    }
 
-        call mirrorEscaper.revive(GetUnitX(mirrorHero), GetUnitY(mirrorHero))
-        call RunSoundOnUnit(udg_coop_index_son, mirrorHero)
-        call SetUnitAnimation(mirrorHero, "channel")
-        call mirrorEscaper.absoluteSlideSpeed(0)
-        call mirrorEscaper.setCoopInvul(true)
+    const newAction = (action: MakeAction): MakeAction => {
+        return makeLastActions.newAction(action)
+    }
 
-        call TriggerSleepAction(1.4)
+    const destroyAllSavedActions = () => {
+        makeLastActions.destroyAllActions()
+    }
 
-        call .stopAbsoluteSlideSpeed()
-        call SetUnitAnimation(.hero, "stand")
+    const destroyCancelledActions = () => {
+        makeLastActions.destroyCancelledActions()
+    }
 
-        call mirrorEscaper.stopAbsoluteSlideSpeed()
-        call SetUnitAnimation(mirrorHero, "stand")
+    //for gravity gestion
+    const getLastZ = (): number => {
+        return lastZ
+    }
 
-        call TriggerSleepAction(0.6)
+    const setLastZ = (lastZ: number) => {
+        lastZ = lastZ
+    }
 
-        call .setCoopInvul(false)
-        call mirrorEscaper.setCoopInvul(false)
-    endmethod
-    
-    method isCoopInvul takes nothing returns boolean
-        return .coopInvul
-    endmethod
-    
-    method setCoopInvul takes boolean invul returns nothing
-        set .coopInvul = invul
-    endmethod
-    
-    method enableTrigCoopRevive takes nothing returns nothing
-        call ShowUnit(.powerCircle, true)
-        call SetUnitPathing(.powerCircle, false)
-        call SetUnitPosition(.powerCircle, GetUnitX(.hero), GetUnitY(.hero))
-        call ShowUnit(.dummyPowerCircle, true)
-        call SetUnitPathing(.dummyPowerCircle, false)
-        call SetUnitPosition(.dummyPowerCircle, GetUnitX(.hero), GetUnitY(.hero))
-    endmethod
-    
-    method refreshCerclePosition takes nothing returns nothing
-        if (not IsUnitHidden(.powerCircle)) then
-            call SetUnitPosition(.powerCircle, GetUnitX(.hero), GetUnitY(.hero))
-            call SetUnitPosition(.dummyPowerCircle, GetUnitX(.hero), GetUnitY(.hero))
-        endif
-    endmethod
+    const getOldDiffZ = (): number => {
+        return oldDiffZ
+    }
 
-    method isEscaperSecondary takes nothing returns boolean
-    	return .escaperId >= NB_PLAYERS_MAX
-	endmethod
-    
-    
-endstruct
+    const setOldDiffZ = (oldDiffZ: number) => {
+        oldDiffZ = oldDiffZ
+    }
 
+    const getSpeedZ = (): number => {
+        return speedZ
+    }
 
+    const setSpeedZ = (speedX: number) => {
+        speedZ = speedZ
+    }
 
-endlibrary
+    //coop reviving
+    const coopReviveHero = () => {
+        let mirrorEscaper: Escaper = GetMirrorEscaper(this)
+        let mirrorHero: unit = mirrorEscaper.getHero()
+
+        revive(GetUnitX(hero), GetUnitY(hero))
+        RunSoundOnUnit(udg_coop_index_son, hero)
+        SetUnitAnimation(hero, 'channel')
+        absoluteSlideSpeed(0)
+        setCoopInvul(true)
+
+        mirrorEscaper.revive(GetUnitX(mirrorHero), GetUnitY(mirrorHero))
+        RunSoundOnUnit(udg_coop_index_son, mirrorHero)
+        SetUnitAnimation(mirrorHero, 'channel')
+        mirrorEscaper.absoluteSlideSpeed(0)
+        mirrorEscaper.setCoopInvul(true)
+
+        TriggerSleepAction(1.4)
+
+        stopAbsoluteSlideSpeed()
+        SetUnitAnimation(hero, 'stand')
+
+        mirrorEscaper.stopAbsoluteSlideSpeed()
+        SetUnitAnimation(mirrorHero, 'stand')
+
+        TriggerSleepAction(0.6)
+
+        setCoopInvul(false)
+        mirrorEscaper.setCoopInvul(false)
+    }
+
+    const isCoopInvul = (): boolean => {
+        return coopInvul
+    }
+
+    const setCoopInvul = (invul: boolean) => {
+        coopInvul = invul
+    }
+
+    const enableTrigCoopRevive = () => {
+        ShowUnit(powerCircle, true)
+        SetUnitPathing(powerCircle, false)
+        SetUnitPosition(powerCircle, GetUnitX(hero), GetUnitY(hero))
+        ShowUnit(dummyPowerCircle, true)
+        SetUnitPathing(dummyPowerCircle, false)
+        SetUnitPosition(dummyPowerCircle, GetUnitX(hero), GetUnitY(hero))
+    }
+
+    const refreshCerclePosition = () => {
+        if (!IsUnitHidden(powerCircle)) {
+            SetUnitPosition(powerCircle, GetUnitX(hero), GetUnitY(hero))
+            SetUnitPosition(dummyPowerCircle, GetUnitX(hero), GetUnitY(hero))
+        }
+    }
+
+    const isEscaperSecondary = (): boolean => {
+        return escaperId >= NB_PLAYERS_MAX
+    }
+
+    return {
+        discoTrigger,
+        getEscaperId,
+        resetItem,
+        addEffectMeteor,
+        removeEffectMeteor,
+        selectHero,
+        createHero,
+        createHeroAtStart,
+        removeHero,
+        destroy,
+        getId,
+        enableSlide,
+        setSlideLastAngleOrder,
+        getSlideLastAngleOrder,
+        enableCheckTerrain,
+        isSliding,
+        doesCheckTerrain,
+        moveHero,
+        moveInvisUnit,
+        getHero,
+        isAlive,
+        isPaused,
+        kill,
+        pause,
+        specialIllidan,
+        revive,
+        reviveAtStart,
+        turnInstantly,
+        reverse,
+        giveHeroControl,
+        resetOwner,
+        setIsHeroSelectedForPlayer,
+        newEffect,
+        destroyLastEffects,
+        hideEffects,
+        showEffects,
+        destroyTerrainKillEffect,
+        createTerrainKillEffect,
+        getLastTerrainType,
+        setLastTerrainType,
+        setSlideSpeed,
+        setWalkSpeed,
+        getSlideSpeed,
+        getRealSlideSpeed,
+        getWalkSpeed,
+        isAbsoluteSlideSpeed,
+        absoluteSlideSpeed,
+        stopAbsoluteSlideSpeed,
+        isAbsoluteWalkSpeed,
+        absoluteWalkSpeed,
+        stopAbsoluteWalkSpeed,
+        isAbsoluteInstantTurn,
+        setAbsoluteInstantTurn,
+        setGodMode,
+        setGodModeKills,
+        isGodModeOn,
+        doesGodModeKills,
+        setBaseColor,
+        setBaseColorDisco,
+        getBaseColor,
+        setVcRed,
+        setVcGreen,
+        setVcBlue,
+        setVcTransparency,
+        getVcRed,
+        getVcGreen,
+        getVcBlue,
+        getVcTransparency,
+        refreshVertexColor,
+        setCanCheat,
+        setIsMaximaxou,
+        setIsTrueMaximaxou,
+        canCheat,
+        isMaximaxou,
+        isTrueMaximaxou,
+        getPlayer,
+        getControler,
+        setCameraField,
+        getCameraField,
+        resetCamera,
+        kick,
+        hasAutorevive,
+        setHasAutorevive,
+        getMake,
+        destroyMakeIfForSpecificLevel,
+        setMakingLevel,
+        getMakingLevel,
+        isMakingCurrentLevel,
+        destroyMake,
+        onInitMake,
+        makeDoNothing,
+        makeCreateNoMoveMonsters,
+        makeCreateSimplePatrolMonsters,
+        makeCreateMultiplePatrolsMonsters,
+        makeCreateTeleportMonsters,
+        makeMmpOrMtNext,
+        makeMonsterTeleportWait,
+        makeMonsterTeleportHide,
+        makeCreateMonsterSpawn,
+        makeDeleteMonsters,
+        makeSetUnitTeleportPeriod,
+        makeGetUnitTeleportPeriod,
+        makeSetUnitMonsterType,
+        makeCreateMeteor,
+        makeDeleteMeteors,
+        makeCreateCaster,
+        makeDeleteCasters,
+        makeCreateClearMobs,
+        makeDeleteClearMobs,
+        makeCreateTerrain,
+        makeTerrainCopyPaste,
+        makeTerrainVerticalSymmetry,
+        makeTerrainHorizontalSymmetry,
+        makeTerrainHeight,
+        makeGetTerrainType,
+        makeExchangeTerrains,
+        makeCreateStart,
+        makeCreateEnd,
+        makeCreateVisibilityModifier,
+        cancelLastAction,
+        redoLastAction,
+        deleteSpecificActionsForLevel,
+        newAction,
+        destroyAllSavedActions,
+        destroyCancelledActions,
+        getLastZ,
+        setLastZ,
+        getOldDiffZ,
+        setOldDiffZ,
+        getSpeedZ,
+        setSpeedZ,
+        coopReviveHero,
+        isCoopInvul,
+        setCoopInvul,
+        enableTrigCoopRevive,
+        refreshCerclePosition,
+        isEscaperSecondary,
+    }
+}

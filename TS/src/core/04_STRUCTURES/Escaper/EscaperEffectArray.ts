@@ -1,5 +1,7 @@
 import { EscaperEffect, IEscaperEffect } from './EscaperEffect'
 
+export type IEscaperEffectArray = ReturnType<typeof EscaperEffectArray>
+
 export const EscaperEffectArray = () => {
     const efs: IEscaperEffect[] = []
     let lastInstance: number = -1
