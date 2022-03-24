@@ -1,3 +1,4 @@
+import { BasicFunctions } from 'core/01_libraries/Basic_functions'
 import {
     DEFAULT_CAMERA_FIELD,
     DUMMY_POWER_CIRCLE,
@@ -20,7 +21,7 @@ export type IEscaper = ReturnType<typeof Escaper>
 
 export const Escaper = (escaperId: number) => {
     const SHOW_REVIVE_EFFECTS = false
-    const heroToSelect: unit
+    let heroToSelect: unit
 
     let playerId = escaperId >= NB_PLAYERS_MAX ? escaperId - 12 : escaperId
 
@@ -164,7 +165,7 @@ export const Escaper = (escaperId: number) => {
         }
 
         SetUnitVertexColorBJ(hero, vcRed, vcGreen, vcBlue, vcTransparency)
-        SpecialIllidan(hero)
+        BasicFunctions.SpecialIllidan(hero)
         invisUnit = CreateUnit(NEUTRAL_PLAYER, INVIS_UNIT_TYPE_ID, x, y, angle)
         SetUnitUserData(invisUnit, GetPlayerId(p))
         TriggerRegisterUnitEvent(gg_trg_InvisUnit_is_getting_damage, invisUnit, EVENT_UNIT_DAMAGED)
@@ -180,7 +181,7 @@ export const Escaper = (escaperId: number) => {
         let x: number
         let y: number
         let start: Start = udg_levels.getCurrentLevel().getStart()
-        let angle: real
+        let angle: number
 
         if (start == 0) {
             //si le départ du niveau en cours n'existe pas
@@ -355,13 +356,19 @@ export const Escaper = (escaperId: number) => {
         if (isAlive()) {
             return false
         }
+
         ReviveHero(hero, x, y, SHOW_REVIVE_EFFECTS)
         SetUnitX(invisUnit, x)
         SetUnitY(invisUnit, y)
-        ShowUnit(invisUnit, true).enableCheckTerrain(true).specialIllidan().selectHero()
+        ShowUnit(invisUnit, true)
+        enableCheckTerrain(true)
+        specialIllidan()
+        selectHero()
+
         if (vcTransparency != 0) {
             SetUnitVertexColorBJ(hero, vcRed, vcGreen, vcBlue, vcTransparency)
         }
+
         TimerStart(afkModeTimers[escaperId], timeMinAfk, false, GetAfkModeTimeExpiresCodeFromId(escaperId))
         lastZ = 0
         oldDiffZ = 0
