@@ -1,3 +1,6 @@
+import { initGameTime } from 'core/04_STRUCTURES/Lives_and_game_time/Time_of_game_trigger'
+import { InitTrig_Camera_reset } from 'core/08_GAME/Camera_reset/Camera_reset'
+
 export const initOldTriggers = () => {
     // InitTrig_Version()
     // InitTrig_Constants()
@@ -47,7 +50,7 @@ export const initOldTriggers = () => {
     // InitTrig_TerrainTypeDeath()
     // InitTrig_TerrainTypeSlide()
     // InitTrig_TerrainTypeArray()
-    // InitTrig_Time_of_game_trigger()
+    initGameTime()
     // InitTrig_Lives_and_game_time()
     // InitTrig_Meteor()
     // InitTrig_MeteorArray()
@@ -198,7 +201,7 @@ export const initOldTriggers = () => {
     // InitTrig_deplacement_heros_hors_death_path()
     // InitTrig_Command_shortcuts_functions()
     // InitTrig_Using_shortcut()
-    // InitTrig_Camera_reset()
+    InitTrig_Camera_reset()
     // InitTrig_Apm()
     // InitTrig_Afk_mode()
     // InitTrig_Afk_mode_ordre_recu()
