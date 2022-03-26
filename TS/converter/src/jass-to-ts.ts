@@ -18,6 +18,9 @@ const reservedKeywords = [
     'AAAAAAAAAA',
     '@@BELOWTEXTMACRO',
     '@@ENDTEXTMACRO',
+    '@@STARTSTRCTPROPERTIES',
+    '@@ENDSTRCTPROPERTIES',
+    'AAAAAAAATHIS',
 ]
 
 const parseFile = async (inFile: string) => {
@@ -52,6 +55,10 @@ const parseFile = async (inFile: string) => {
         content = content.replace(new RegExp('([^\\/d]|^)library'), '//library')
         content = content.replace(new RegExp('([^\\/]|^)endlibrary'), '//endlibrary')
 
+        content = content.replace(new RegExp('(^.*?)private', 'gmi'), '// TODO; Used to be private\n$1')
+        content = content.replace(new RegExp('(^.*?)public', 'gmi'), '// TODO; Used to be public\n$1')
+        content = content.replace(new RegExp('(^.*?)static', 'gmi'), '// TODO; Used to be static\n$1')
+
         // Comment out all method calls inside elseif statements while preserving the elseif statement in the comment above
         content = content.replace(
             new RegExp('^\\s*elseif(.*?[a-z0-9\\]\\)]+\\.[a-z0-9\\]\\)]+.*?)then', 'gmi'),
@@ -79,13 +86,28 @@ const parseFile = async (inFile: string) => {
         // Comment out integer calls
         content = content.replace(new RegExp('(.*?( |\\()integer\\()', 'gmi'), `${dumbComment}$1`)
 
-        content = content.replace(new RegExp('^\\s*private', 'gmi'), '')
-
         // Remove memory allocation
         content = content.replace(new RegExp(' \\[[0-9]+\\]', 'gmi'), '')
 
         // Rename all textmacros
         content = content.replace(new RegExp('\\$([a-z]+)\\$', 'gmi'), 'AAAAAAAAAA$1AAAAAAAAAA')
+
+        // Comment out all properties of a struct
+        content = content.replace(
+            new RegExp('(struct.*?\\n)([\\s\\S]*?)(method)', 'gmi'),
+            '$1/*@@STARTSTRCTPROPERTIES\n$2\n@@ENDSTRCTPROPERTIES*/\n$3'
+        )
+
+        // Structs - Rename methods to functions
+        content = content.replace(new RegExp('(\\s)method ', 'gmi'), '$1function ')
+        content = content.replace(new RegExp('(\\s)endmethod', 'gmi'), '$1endfunction')
+
+        // Structs - Comments out struct keywords
+        content = content.replace(new RegExp('([^\\/d]|^)struct', 'gmi'), '//struct')
+        content = content.replace(new RegExp('([^\\/]|^)endstruct', 'gmi'), '\n//endstruct')
+
+        // Structs - Change property calls
+        content = content.replace(new RegExp('( |\\(|\\[)\\.', 'gmi'), '$1AAAAAAAATHIS')
     }
 
     const tryConvert = async () => {
@@ -164,6 +186,16 @@ const parseFile = async (inFile: string) => {
         // Restore all textmacros
         content = content.replace(new RegExp('\\/\\/@@BELOWTEXTMACRO\n\\/\\*', 'gmi'), '')
         content = content.replace(new RegExp('@@ENDTEXTMACRO\\*\\/', 'gmi'), '')
+
+        // Restore all struct properties
+        content = content.replace(new RegExp('\\/\\*@@STARTSTRCTPROPERTIES', 'gmi'), '')
+        content = content.replace(new RegExp('@@ENDSTRCTPROPERTIES\\*\\/', 'gmi'), '')
+
+        // Restore property calls
+        content = content.replace(new RegExp('AAAAAAAATHIS', 'gmi'), 'this.')
+
+        // Remove set
+        content = content.replace(new RegExp('set ', 'gmi'), '')
     }
 
     // content = content.replace(new RegExp('then\\s*$', 'gmi'), '{')
