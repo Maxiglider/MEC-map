@@ -65,7 +65,7 @@ const parseFile = async (inFile: string) => {
         // Comment out all method calls
         content = content.replace(
             new RegExp('^\\s*(call|set|local|return)(.*?[a-z0-9\\]\\)]+\\.[a-z0-9\\]\\)]+.*?)', 'gmi'),
-            `${dumbComment}$2`
+            `${dumbComment}$1$2`
         )
 
         // Comment out integer calls
