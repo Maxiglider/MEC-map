@@ -1,0 +1,59 @@
+
+
+const initMakeSetUnitTeleportPeriodActions = () => { // needs BasicFunctions, Escaper
+
+
+const SetUnitTeleportPeriod_Actions = (): void => {
+
+	//modes : oneByOne, twoClics
+
+	let escaper = Hero2Escaper(GetTriggerUnit());
+	local Make mkGeneral = escaper.getMake()
+		local MakeSetUnitTeleportPeriod mk = MakeSetUnitTeleportPeriod(integer(mkGeneral))
+	let monster: MonsterTeleport;
+	let nbMonstersFixed = 0;
+	let x = GetOrderPointX();
+	let y = GetOrderPointY();
+	let i: number;
+
+	if ((!IsIssuedOrder("smart"))) {
+		return;
+	}
+ StopUnit(mk.maker)
+	if ( (mk.getMode() == "oneByOne") ) {
+		monster = escaper.getMakingLevel().monstersTeleport.getMonsterNear(x, y)
+		if ( (monster != 0 and monster.u != null) ) {
+ monster.setPeriod(mk.getPeriod())
+			nbMonstersFixed = 1;
+		}
+	} else {
+		//mode twoClics
+		if ( (not mk.isLastLocSavedUsed()) ) {
+ mk.saveLoc(x, y)
+			return;
+		}
+
+		i = 0;
+		while (true) {
+			if (i > escaper.getMakingLevel().monstersTeleport.getLastInstanceId()) break;
+			monster = escaper.getMakingLevel().monstersTeleport.get(i)
+			if ( (monster != 0 and monster.u != null and IsUnitBetweenLocs(monster.u, mk.lastX, mk.lastY, x, y)) ) {
+ monster.setPeriod(mk.getPeriod())
+				nbMonstersFixed = nbMonstersFixed + 1;
+			}
+			i = i + 1;
+		}
+	}
+
+	if ((nbMonstersFixed <= 1)) {
+ Text_mkP(mk.makerOwner, I2S(nbMonstersFixed) + " monster fixed.")
+	} else {
+ Text_mkP(mk.makerOwner, I2S(nbMonstersFixed) + " monsters fixed.")
+	}
+ mk.unsaveLocDefinitely()
+};
+
+
+
+}
+

@@ -1,0 +1,34 @@
+
+
+const initMMTeleportActions = () => { // needs BasicFunctions, Escaper
+
+
+const MonsterMakingTeleport_Actions = (): void => {
+	let escaper = Hero2Escaper(GetTriggerUnit());
+	local Make mkGeneral = escaper.getMake()
+		local MakeMonsterTeleport mk = MakeMonsterTeleport(integer(mkGeneral))
+	let x = GetOrderPointX();
+	let y = GetOrderPointY();
+
+	if ((!IsIssuedOrder("smart"))) {
+		return;
+	}
+ StopUnit(mk.maker)
+	if ( (mk.getLocPointeur() >= 0) ) {
+		if ( (not mk.getMonster().addNewLoc(x, y)) ) {
+ Text_erP(mk.makerOwner, "Number limit of actions reached for this monster ! ( " + I2S(MonsterTeleport.NB_MAX_LOC) + " )")
+		} else {
+ mk.saveLoc(x, y)
+		}
+	} else {
+ MonsterTeleport.destroyLocs()
+ MonsterTeleport.storeNewLoc(x, y)
+ mk.saveLoc(x, y)
+ mk.setMonster(escaper.getMakingLevel().monstersTeleport.new(mk.getMonsterType(), mk.getPeriod(), mk.getAngle(), mk.getMode(), true))
+	}
+};
+
+
+
+}
+
