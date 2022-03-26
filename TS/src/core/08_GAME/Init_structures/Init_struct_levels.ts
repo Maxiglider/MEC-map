@@ -1,11 +1,11 @@
 
 
-let udg_levels = 0;
+export let udg_levels: LevelArray;
 
 //===========================================================================
-const InitTrig_Init_struct_levels = (): void => {
-	if ((udg_levels === 0)) {
-		udg_levels = LevelArray.create()
+export const InitTrig_Init_struct_levels = (): void => {
+	if (!udg_levels) {
+		udg_levels = new LevelArray()
 	}
 };
 

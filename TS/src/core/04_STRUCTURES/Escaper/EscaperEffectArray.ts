@@ -6,7 +6,7 @@ export const EscaperEffectArray = () => {
     const efs: IEscaperEffect[] = []
     let lastInstance: number = -1
 
-    const add = (efStr: string, u: unit, bodyPart: string) => {
+    const new = (efStr: string, u: unit, bodyPart: string) => {
         let i: number
 
         if (lastInstance >= 19) {
@@ -76,7 +76,7 @@ export const EscaperEffectArray = () => {
     }
 
     return {
-        add,
+        new,
         count,
         destroy,
         destroyLastEffects,
