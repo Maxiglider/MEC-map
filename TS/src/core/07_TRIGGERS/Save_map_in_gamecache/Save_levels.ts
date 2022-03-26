@@ -1,5 +1,6 @@
 import { NB_ESCAPERS } from "core/01_libraries/Constants";
 import { Text } from "core/01_libraries/Text";
+import { SaveMapInCache } from './SAVE_MAP_in_cache';
 import { StringArrayForCache } from "./struct_StringArrayForCache";
 
 
@@ -59,9 +60,9 @@ const StartSaveCasters = (): void => {
 		TriggerExecute(trg_startSaveNextLevel)
 	} else {
 		StringArrayForCache.stringArrayForCache = new StringArrayForCache("level" + I2S(levelId), "casters", true)
-		TriggerClearActions(trigSaveMapInCache)
-		TriggerAddAction(trigSaveMapInCache, SaveCasters_Actions)
-		EnableTrigger(trigSaveMapInCache)
+		TriggerClearActions(SaveMapInCache.trigSaveMapInCache)
+		TriggerAddAction(SaveMapInCache.trigSaveMapInCache, SaveCasters_Actions)
+		EnableTrigger(SaveMapInCache.trigSaveMapInCache)
 		casterId = 0;
 	}
 };
@@ -94,9 +95,9 @@ const StartSaveMonsterSpawns = (): void => {
 		StartSaveCasters()
 	} else {
 		StringArrayForCache.stringArrayForCache = new StringArrayForCache("level" + I2S(levelId), "monsterSpawns", true)
-		TriggerClearActions(trigSaveMapInCache)
-		TriggerAddAction(trigSaveMapInCache, SaveMonsterSpawns_Actions)
-		EnableTrigger(trigSaveMapInCache)
+		TriggerClearActions(SaveMapInCache.trigSaveMapInCache)
+		TriggerAddAction(SaveMapInCache.trigSaveMapInCache, SaveMonsterSpawns_Actions)
+		EnableTrigger(SaveMapInCache.trigSaveMapInCache)
 		monsterSpawnId = 0;
 	}
 };
@@ -128,9 +129,9 @@ const StartSaveMeteors = (): void => {
 		StartSaveMonsterSpawns()
 	} else {
 		StringArrayForCache.stringArrayForCache = new StringArrayForCache("level" + I2S(levelId), "meteors", true)
-		TriggerClearActions(trigSaveMapInCache)
-		TriggerAddAction(trigSaveMapInCache, SaveMeteors_Actions)
-		EnableTrigger(trigSaveMapInCache)
+		TriggerClearActions(SaveMapInCache.trigSaveMapInCache)
+		TriggerAddAction(SaveMapInCache.trigSaveMapInCache, SaveMeteors_Actions)
+		EnableTrigger(SaveMapInCache.trigSaveMapInCache)
 		meteorId = 0;
 	}
 };
@@ -162,9 +163,9 @@ const StartSaveMonstersTeleport = (): void => {
 		StartSaveMeteors()
 	} else {
 		StringArrayForCache.stringArrayForCache = new StringArrayForCache("level" + I2S(levelId), "monstersTeleport", true)
-		TriggerClearActions(trigSaveMapInCache)
-		TriggerAddAction(trigSaveMapInCache, SaveMonstersTeleport_Actions)
-		EnableTrigger(trigSaveMapInCache)
+		TriggerClearActions(SaveMapInCache.trigSaveMapInCache)
+		TriggerAddAction(SaveMapInCache.trigSaveMapInCache, SaveMonstersTeleport_Actions)
+		EnableTrigger(SaveMapInCache.trigSaveMapInCache)
 		monsterTeleportId = 0;
 	}
 };
@@ -196,9 +197,9 @@ const StartSaveMonstersMultiplePatrols = (): void => {
 		StartSaveMonstersTeleport()
 	} else {
 		StringArrayForCache.stringArrayForCache = new StringArrayForCache("level" + I2S(levelId), "monstersMultiplePatrols", true)
-		TriggerClearActions(trigSaveMapInCache)
-		TriggerAddAction(trigSaveMapInCache, SaveMonstersMultiplePatrols_Actions)
-		EnableTrigger(trigSaveMapInCache)
+		TriggerClearActions(SaveMapInCache.trigSaveMapInCache)
+		TriggerAddAction(SaveMapInCache.trigSaveMapInCache, SaveMonstersMultiplePatrols_Actions)
+		EnableTrigger(SaveMapInCache.trigSaveMapInCache)
 		monsterMultiplePatrolsId = 0;
 	}
 };
@@ -230,9 +231,9 @@ const StartSaveMonstersSimplePatrol = (): void => {
 		StartSaveMonstersMultiplePatrols()
 	} else {
 		StringArrayForCache.stringArrayForCache = new StringArrayForCache("level" + I2S(levelId), "monstersSimplePatrol", true)
-		TriggerClearActions(trigSaveMapInCache)
-		TriggerAddAction(trigSaveMapInCache, SaveMonstersSimplePatrol_Actions)
-		EnableTrigger(trigSaveMapInCache)
+		TriggerClearActions(SaveMapInCache.trigSaveMapInCache)
+		TriggerAddAction(SaveMapInCache.trigSaveMapInCache, SaveMonstersSimplePatrol_Actions)
+		EnableTrigger(SaveMapInCache.trigSaveMapInCache)
 		monsterSimplePatrolId = 0;
 	}
 };
@@ -264,9 +265,9 @@ const StartSaveMonstersNoMove = (): void => {
 		StartSaveMonstersSimplePatrol()
 	} else {
 		StringArrayForCache.stringArrayForCache = new StringArrayForCache("level" + I2S(levelId), "monstersNoMove", true)
-		TriggerClearActions(trigSaveMapInCache)
-		TriggerAddAction(trigSaveMapInCache, SaveMonstersNoMove_Actions)
-		EnableTrigger(trigSaveMapInCache)
+		TriggerClearActions(SaveMapInCache.trigSaveMapInCache)
+		TriggerAddAction(SaveMapInCache.trigSaveMapInCache, SaveMonstersNoMove_Actions)
+		EnableTrigger(SaveMapInCache.trigSaveMapInCache)
 		monsterNoMoveId = 0;
 	}
 };
@@ -298,9 +299,9 @@ const StartSaveVisibilities = (): void => {
 		StartSaveMonstersNoMove()
 	} else {
 		StringArrayForCache.stringArrayForCache = new StringArrayForCache("level" + I2S(levelId), "visibilities", true)
-		TriggerClearActions(trigSaveMapInCache)
-		TriggerAddAction(trigSaveMapInCache, SaveVisibilities_Actions)
-		EnableTrigger(trigSaveMapInCache)
+		TriggerClearActions(SaveMapInCache.trigSaveMapInCache)
+		TriggerAddAction(SaveMapInCache.trigSaveMapInCache, SaveVisibilities_Actions)
+		EnableTrigger(SaveMapInCache.trigSaveMapInCache)
 		visibilityId = 0;
 	}
 };

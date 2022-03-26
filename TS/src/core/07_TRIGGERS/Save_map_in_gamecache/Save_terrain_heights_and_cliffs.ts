@@ -1,7 +1,10 @@
 import { BasicFunctions } from 'core/01_libraries/Basic_functions'
 import { Constants, LARGEUR_CASE } from 'core/01_libraries/Constants'
+import { FunctionsOnNumbers } from 'core/01_libraries/Functions_on_numbers'
 import { Text } from 'core/01_libraries/Text'
 import { ZLibrary } from 'core/02_bibliotheques_externes/ZLibrary'
+import { SaveMapInCache } from './SAVE_MAP_in_cache'
+import { SaveTerrainRamps } from './Save_terrain_ramps'
 import { StringArrayForCache } from './struct_StringArrayForCache'
 
 const initSaveTerrainHeights = () => {
@@ -21,7 +24,7 @@ const initSaveTerrainHeights = () => {
                 } else {
                     cliffLevel = GetTerrainCliffLevel(x, y)
                 }
-                StringArrayForCache.stringArrayForCache.push(I2HexaString(cliffLevel))
+                StringArrayForCache.stringArrayForCache.push(FunctionsOnNumbers.I2HexaString(cliffLevel))
                 x = x + LARGEUR_CASE
             }
             y = y + LARGEUR_CASE
@@ -29,16 +32,16 @@ const initSaveTerrainHeights = () => {
             DisableTrigger(GetTriggeringTrigger())
             StringArrayForCache.stringArrayForCache.writeInCache()
             Text.A('terrain cliffs saved')
-            StartSaveTerrainRamps()
+            SaveTerrainRamps.StartSaveTerrainRamps()
         }
     }
 
     const StartSaveTerrainCliffs = (): void => {
         y = Constants.MAP_MIN_Y
         StringArrayForCache.stringArrayForCache = new StringArrayForCache('terrain', 'terrainCliffs', false)
-        TriggerClearActions(trigSaveMapInCache)
-        TriggerAddAction(trigSaveMapInCache, SaveTerrainCliffs_Actions)
-        EnableTrigger(trigSaveMapInCache)
+        TriggerClearActions(SaveMapInCache.trigSaveMapInCache)
+        TriggerAddAction(SaveMapInCache.trigSaveMapInCache, SaveTerrainCliffs_Actions)
+        EnableTrigger(SaveMapInCache.trigSaveMapInCache)
     }
 
     //save terrain heights
@@ -80,9 +83,9 @@ const initSaveTerrainHeights = () => {
     const StartSaveTerrainHeights = (): void => {
         y = Constants.MAP_MIN_Y
         StringArrayForCache.stringArrayForCache = new StringArrayForCache('terrain', 'terrainHeights', true)
-        TriggerClearActions(trigSaveMapInCache)
-        TriggerAddAction(trigSaveMapInCache, SaveTerrainHeights_Actions)
-        EnableTrigger(trigSaveMapInCache)
+        TriggerClearActions(SaveMapInCache.trigSaveMapInCache)
+        TriggerAddAction(SaveMapInCache.trigSaveMapInCache, SaveTerrainHeights_Actions)
+        EnableTrigger(SaveMapInCache.trigSaveMapInCache)
     }
 
     return { StartSaveTerrainHeights }

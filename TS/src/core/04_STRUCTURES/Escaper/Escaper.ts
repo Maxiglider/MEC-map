@@ -15,14 +15,12 @@ import {
     SLIDE_PERIOD,
     TERRAIN_KILL_EFFECT_BODY_PART,
 } from 'core/01_libraries/Constants'
-import {EscaperEffectArray, IEscaperEffectArray} from './EscaperEffectArray'
-import {udg_levels} from "../../08_GAME/Init_structures/Init_struct_levels";
-
+import { udg_levels } from '../../08_GAME/Init_structures/Init_struct_levels'
+import { EscaperEffectArray, IEscaperEffectArray } from './EscaperEffectArray'
 
 const SHOW_REVIVE_EFFECTS = false
 
-
-class Escaper {
+export class Escaper {
     private escaperId: number
     private playerId: number
 
@@ -81,9 +79,7 @@ class Escaper {
     private powerCircle: unit
     private dummyPowerCircle: unit
     private coopInvul: boolean
-    
-    
-    
+
     constructor(escaperId: number) {
         this.playerId = escaperId >= NB_PLAYERS_MAX ? escaperId - 12 : escaperId
 
@@ -98,7 +94,7 @@ class Escaper {
 
         this.cameraField = DEFAULT_CAMERA_FIELD
         SetCameraFieldForPlayer(this.p, CAMERA_FIELD_TARGET_DISTANCE, this.cameraField, 0)
-        
+
         this.effects = EscaperEffectArray()
         this.vcRed = 100
         this.vcGreen = 100
@@ -116,17 +112,17 @@ class Escaper {
         this.canCheatB = false
         this.isMaximaxouB = false
         this.isTrueMaximaxouB = false
-        
+
         this.controler = this
         this.slideLastAngleOrder = -1
         this.isHeroSelectedB = false
         this.instantTurnAbsolute = false
-        
+
         this.animSpeedSecondaryHero = 0.8
 
         //coop
         this.coopInvul = false
-        
+
         this.powerCircle = CreateUnit(this.p, POWER_CIRCLE, 0, 0, 0)
         SetUnitUserData(this.powerCircle, escaperId)
         ShowUnit(this.powerCircle, false)
@@ -135,7 +131,6 @@ class Escaper {
         SetUnitUserData(this.dummyPowerCircle, escaperId)
         ShowUnit(this.dummyPowerCircle, false)
     }
-
 
     getEscaperId() {
         return this.escaperId
@@ -153,7 +148,7 @@ class Escaper {
         return false
     }
 
-    addEffectMeteor(){
+    addEffectMeteor() {
         if (!this.meteorEffect && this.hero) {
             this.meteorEffect = AddSpecialEffectTarget(
                 'Abilities\\Weapons\\DemonHunterMissile\\DemonHunterMissile.mdl',
@@ -163,7 +158,7 @@ class Escaper {
         }
     }
 
-    removeEffectMeteor(){
+    removeEffectMeteor() {
         if (this.meteorEffect) {
             DestroyEffect(this.meteorEffect)
             delete this.meteorEffect
@@ -171,7 +166,7 @@ class Escaper {
     }
 
     //select method
-    selectHero(){
+    selectHero() {
         SelectUnitAddForPlayer(this.hero, this.controler.getPlayer())
         setIsHeroSelectedForPlayer(this.controler.getPlayer(), true)
     }
@@ -223,7 +218,7 @@ class Escaper {
         return true
     }
 
-    createHeroAtStart(){
+    createHeroAtStart() {
         let x: number
         let y: number
         let start: Start = udg_levels.getCurrentLevel().getStart()
@@ -242,7 +237,7 @@ class Escaper {
         return this.createHero(x, y, angle)
     }
 
-    removeHero(){
+    removeHero() {
         if (!this.hero) {
             return
         }
@@ -256,7 +251,7 @@ class Escaper {
         RemoveUnit(this.hero)
         delete this.hero
 
-        if(this.invisUnit) {
+        if (this.invisUnit) {
             RemoveUnit(this.invisUnit)
             delete this.invisUnit
         }
@@ -278,10 +273,10 @@ class Escaper {
         }
     }
 
-    destroy(){
+    destroy() {
         this.removeHero()
 
-        if(this.terrainKillEffect) {
+        if (this.terrainKillEffect) {
             DestroyEffect(this.terrainKillEffect)
             delete this.terrainKillEffect
         }
@@ -316,7 +311,7 @@ class Escaper {
         if (doEnable) {
             EnableTrigger(this.slide)
 
-            if(this.hero) {
+            if (this.hero) {
                 StopUnit(this.hero)
                 heroPos = GetUnitLoc(this.hero)
                 setLastZ(GetLocationZ(heroPos) + GetUnitFlyHeight(this.hero))
@@ -330,7 +325,7 @@ class Escaper {
         return true
     }
 
-    setSlideLastAngleOrder(angle: number){
+    setSlideLastAngleOrder(angle: number) {
         this.slideLastAngleOrder = angle
     }
 
@@ -350,7 +345,7 @@ class Escaper {
         return true
     }
 
-    isSliding(){
+    isSliding() {
         return IsTriggerEnabled(this.slide)
     }
 
@@ -359,22 +354,22 @@ class Escaper {
     }
 
     //move methods
-    moveHero(x: number, y: number){
-        if(this.hero) {
+    moveHero(x: number, y: number) {
+        if (this.hero) {
             SetUnitX(this.hero, x)
             SetUnitY(this.hero, y)
         }
     }
 
-    moveInvisUnit(x: number, y: number){
-        if(this.invisUnit) {
+    moveInvisUnit(x: number, y: number) {
+        if (this.invisUnit) {
             SetUnitX(this.invisUnit, x)
             SetUnitY(this.invisUnit, y)
         }
     }
 
     //hero methods
-    getHero(){
+    getHero() {
         return this.hero
     }
 
@@ -401,7 +396,7 @@ class Escaper {
         return false
     }
 
-    pause(doPause: boolean){
+    pause(doPause: boolean) {
         if (this.isPaused() == doPause) {
             return false
         }
@@ -409,7 +404,7 @@ class Escaper {
         return true
     }
 
-    specialIllidan(){
+    specialIllidan() {
         this.hero && SetUnitAnimation(this.hero, 'Morph Alternate')
     }
 
@@ -453,8 +448,8 @@ class Escaper {
         return this.revive(x, y)
     }
 
-    turnInstantly(angle: number){
-        if(!this.hero) return
+    turnInstantly(angle: number) {
+        if (!this.hero) return
 
         let heroTypeId = HERO_TYPE_ID
         let lastTerrainType = this.lastTerrainType
@@ -509,8 +504,8 @@ class Escaper {
         InitShortcutSkills(GetPlayerId(this.p))
     }
 
-    reverse(){
-        if(!this.hero) return
+    reverse() {
+        if (!this.hero) return
 
         const angle: number = GetUnitFacing(this.hero) + 180
         this.turnInstantly(angle)
@@ -520,23 +515,23 @@ class Escaper {
         }
     }
 
-    giveHeroControl(escaper: Escaper){
+    giveHeroControl(escaper: Escaper) {
         this.hero && SetUnitOwner(this.hero, escaper.getPlayer(), false)
         this.controler = escaper
     }
 
-    resetOwner(){
+    resetOwner() {
         this.giveHeroControl(this)
     }
 
-    setIsHeroSelectedForPlayer(p: player, heroSelected: boolean){
+    setIsHeroSelectedForPlayer(p: player, heroSelected: boolean) {
         if (GetLocalPlayer() == p) {
             this.isHeroSelectedB = heroSelected
         }
     }
 
     //effects methods
-    newEffect(efStr: string, bodyPart: string){
+    newEffect(efStr: string, bodyPart: string) {
         this.effects.new(efStr, this.hero, bodyPart)
 
         if (!this.isEscaperSecondary()) {
@@ -544,7 +539,7 @@ class Escaper {
         }
     }
 
-    destroyLastEffects(numEfToDestroy: number){
+    destroyLastEffects(numEfToDestroy: number) {
         this.effects.destroyLastEffects(numEfToDestroy)
 
         if (!isEscaperSecondary()) {
@@ -552,7 +547,7 @@ class Escaper {
         }
     }
 
-    hideEffects(){
+    hideEffects() {
         this.effects.hideEffects()
 
         if (!isEscaperSecondary()) {
@@ -560,7 +555,7 @@ class Escaper {
         }
     }
 
-    showEffects(){
+    showEffects() {
         this.hero && this.effects.showEffects(this.hero)
 
         if (!isEscaperSecondary()) {
@@ -569,30 +564,31 @@ class Escaper {
     }
 
     //terrainKill methods
-    destroyTerrainKillEffect(){
+    destroyTerrainKillEffect() {
         this.terrainKillEffect && DestroyEffect(this.terrainKillEffect)
     }
 
-    createTerrainKillEffect(killEffectStr: string){
+    createTerrainKillEffect(killEffectStr: string) {
         this.destroyTerrainKillEffect()
-        this.hero && (this.terrainKillEffect = AddSpecialEffectTarget(killEffectStr, this.hero, TERRAIN_KILL_EFFECT_BODY_PART))
+        this.hero &&
+            (this.terrainKillEffect = AddSpecialEffectTarget(killEffectStr, this.hero, TERRAIN_KILL_EFFECT_BODY_PART))
     }
 
     //lastTerrainType methods
-    getLastTerrainType(){
+    getLastTerrainType() {
         return this.lastTerrainType
     }
 
-    setLastTerrainType(terrainType: TerrainType){
+    setLastTerrainType(terrainType: TerrainType) {
         this.lastTerrainType = terrainType
     }
 
     //speed methods
-    setSlideSpeed(ss: number){
+    setSlideSpeed(ss: number) {
         this.slideSpeed = ss
     }
 
-    setWalkSpeed(ws: number){
+    setWalkSpeed(ws: number) {
         this.walkSpeed = ws
         this.hero && SetUnitMoveSpeed(this.hero, ws)
     }
@@ -605,7 +601,7 @@ class Escaper {
         return this.slideSpeed / SLIDE_PERIOD
     }
 
-    getWalkSpeed(){
+    getWalkSpeed() {
         return this.walkSpeed
     }
 
@@ -613,7 +609,7 @@ class Escaper {
         return this.slideSpeedAbsolute
     }
 
-    absoluteSlideSpeed(slideSpeed: number){
+    absoluteSlideSpeed(slideSpeed: number) {
         this.slideSpeedAbsolute = true
         this.slideSpeed = slideSpeed
 
@@ -622,7 +618,7 @@ class Escaper {
         }
     }
 
-    stopAbsoluteSlideSpeed(){
+    stopAbsoluteSlideSpeed() {
         const currentTerrainType: TerrainType
 
         if (this.slideSpeedAbsolute) {
@@ -644,7 +640,7 @@ class Escaper {
         return this.walkSpeedAbsolute
     }
 
-    absoluteWalkSpeed(walkSpeed: number){
+    absoluteWalkSpeed(walkSpeed: number) {
         this.walkSpeedAbsolute = true
         this.setWalkSpeed(walkSpeed)
 
@@ -653,7 +649,7 @@ class Escaper {
         }
     }
 
-    stopAbsoluteWalkSpeed(){
+    stopAbsoluteWalkSpeed() {
         let currentTerrainType: TerrainType
         if (this.walkSpeedAbsolute) {
             this.walkSpeedAbsolute = false
@@ -674,7 +670,7 @@ class Escaper {
         return this.instantTurnAbsolute
     }
 
-    setAbsoluteInstantTurn(flag: boolean){
+    setAbsoluteInstantTurn(flag: boolean) {
         this.instantTurnAbsolute = flag
 
         if (!isEscaperSecondary()) {
@@ -683,7 +679,7 @@ class Escaper {
     }
 
     //godMode methods
-    setGodMode(godMode: boolean){
+    setGodMode(godMode: boolean) {
         this.godMode = godMode
 
         if (!isEscaperSecondary()) {
@@ -691,7 +687,7 @@ class Escaper {
         }
     }
 
-    setGodModeKills(godModeKills: boolean){
+    setGodModeKills(godModeKills: boolean) {
         this.godModeKills = godModeKills
 
         if (!isEscaperSecondary()) {
@@ -821,7 +817,7 @@ class Escaper {
         return this.vcTransparency
     }
 
-    refreshVertexColor(){
+    refreshVertexColor() {
         SetUnitVertexColorBJ(this.hero, this.vcRed, this.vcGreen, this.vcBlue, this.vcTransparency)
 
         if (!isEscaperSecondary()) {
@@ -831,7 +827,7 @@ class Escaper {
     }
 
     //cheat methods
-    setCanCheat(canCheat: boolean){
+    setCanCheat(canCheat: boolean) {
         if (!canCheat) {
             this.isMaximaxouB = false
             this.isTrueMaximaxouB = false
@@ -839,7 +835,7 @@ class Escaper {
         this.canCheatB = canCheat
     }
 
-    setIsMaximaxou(isMaximaxou: boolean){
+    setIsMaximaxou(isMaximaxou: boolean) {
         if (isMaximaxou) {
             this.setCanCheat(true)
         } else {
@@ -848,7 +844,7 @@ class Escaper {
         this.isMaximaxouB = isMaximaxou
     }
 
-    setIsTrueMaximaxou(isTrueMaximaxou: boolean){
+    setIsTrueMaximaxou(isTrueMaximaxou: boolean) {
         if (isTrueMaximaxou) {
             this.setIsMaximaxou(true)
         }
@@ -872,11 +868,11 @@ class Escaper {
         return this.p
     }
 
-    getControler(){
+    getControler() {
         return this.controler
     }
 
-    setCameraField(cameraField: number){
+    setCameraField(cameraField: number) {
         this.cameraField = cameraField
         SetCameraFieldForPlayer(this.p, CAMERA_FIELD_TARGET_DISTANCE, I2R(cameraField), 0)
     }
@@ -885,12 +881,12 @@ class Escaper {
         return this.cameraField
     }
 
-    resetCamera(){
+    resetCamera() {
         ResetToGameCameraForPlayer(this.p, 0)
         SetCameraFieldForPlayer(this.p, CAMERA_FIELD_TARGET_DISTANCE, this.cameraField, 0)
     }
 
-    kick(kicked: Escaper){
+    kick(kicked: Escaper) {
         CustomDefeatBJ(kicked.getPlayer(), 'You have been kicked by ' + GetPlayerName(this.p) + ' !')
         Text.A(
             udg_colorCode[GetPlayerId(kicked.getPlayer())] +
@@ -909,16 +905,16 @@ class Escaper {
         return this.hasAutoreviveB
     }
 
-    setHasAutorevive(hasAutorevive: boolean){
+    setHasAutorevive(hasAutorevive: boolean) {
         this.hasAutoreviveB = hasAutorevive
     }
 
     //make methods
-    getMake(){
+    getMake() {
         return this.make
     }
 
-    destroyMakeIfForSpecificLevel(){
+    destroyMakeIfForSpecificLevel() {
         let doDestroy: boolean
 
         if (this.make != 0) {
@@ -985,25 +981,25 @@ class Escaper {
         return true
     }
 
-    onInitMake(){
+    onInitMake() {
         if (!isEscaperSecondary()) {
             GetMirrorEscaper(this).makeDoNothing()
         }
     }
 
-    makeDoNothing(){
+    makeDoNothing() {
         this.destroyMake()
         this.make = MakeDoNothing.create(this.hero)
     }
 
-    makeCreateNoMoveMonsters(mt: MonsterType, facingAngle: number){
+    makeCreateNoMoveMonsters(mt: MonsterType, facingAngle: number) {
         this.onInitMake()
         //mode : noMove
         this.destroyMake()
         this.make = MakeMonsterNoMove.create(this.hero, mt, facingAngle)
     }
 
-    makeCreateSimplePatrolMonsters(mode: string, mt: MonsterType){
+    makeCreateSimplePatrolMonsters(mode: string, mt: MonsterType) {
         this.onInitMake()
         this.destroyMake()
         //modes : normal, string, auto
@@ -1012,7 +1008,7 @@ class Escaper {
         }
     }
 
-    makeCreateMultiplePatrolsMonsters(mode: string, mt: MonsterType){
+    makeCreateMultiplePatrolsMonsters(mode: string, mt: MonsterType) {
         this.onInitMake()
         this.destroyMake()
         //modes : normal, string
@@ -1021,7 +1017,7 @@ class Escaper {
         }
     }
 
-    makeCreateTeleportMonsters(mode: string, mt: MonsterType, period: number, angle: number){
+    makeCreateTeleportMonsters(mode: string, mt: MonsterType, period: number, angle: number) {
         this.onInitMake()
         this.destroyMake()
         //modes : normal, string
@@ -1034,7 +1030,10 @@ class Escaper {
         this.onInitMake()
         if (
             this.make == 0 ||
-            !(this.make.getType() == MakeMonsterMultiplePatrols.typeid || this.make.getType() == MakeMonsterTeleport.typeid)
+            !(
+                this.make.getType() == MakeMonsterMultiplePatrols.typeid ||
+                this.make.getType() == MakeMonsterTeleport.typeid
+            )
         ) {
             return false
         }
@@ -1062,13 +1061,13 @@ class Escaper {
         return MakeMonsterTeleport.get(this.make).addHidePeriod()
     }
 
-    makeCreateMonsterSpawn(label: string, mt: MonsterType, sens: string, frequence: number){
+    makeCreateMonsterSpawn(label: string, mt: MonsterType, sens: string, frequence: number) {
         this.onInitMake()
         this.destroyMake()
         this.make = MakeMonsterSpawn.create(this.hero, label, mt, sens, frequence)
     }
 
-    makeDeleteMonsters(mode: string){
+    makeDeleteMonsters(mode: string) {
         this.onInitMake()
         this.destroyMake()
 
@@ -1087,7 +1086,7 @@ class Escaper {
         this.make = MakeDeleteMonsters.create(this.hero, mode)
     }
 
-    makeSetUnitTeleportPeriod(mode: string, period: number){
+    makeSetUnitTeleportPeriod(mode: string, period: number) {
         this.onInitMake()
         this.destroyMake()
 
@@ -1099,13 +1098,13 @@ class Escaper {
         this.make = MakeSetUnitTeleportPeriod.create(this.hero, mode, period)
     }
 
-    makeGetUnitTeleportPeriod(){
+    makeGetUnitTeleportPeriod() {
         this.onInitMake()
         this.destroyMake()
         this.make = MakeGetUnitTeleportPeriod.create(this.hero)
     }
 
-    makeSetUnitMonsterType(mode: string, mt: MonsterType){
+    makeSetUnitMonsterType(mode: string, mt: MonsterType) {
         this.onInitMake()
         this.destroyMake()
 
@@ -1117,13 +1116,13 @@ class Escaper {
         this.make = MakeSetUnitMonsterType.create(this.hero, mode, mt)
     }
 
-    makeCreateMeteor(){
+    makeCreateMeteor() {
         this.onInitMake()
         this.destroyMake()
         this.make = MakeMeteor.create(this.hero)
     }
 
-    makeDeleteMeteors(mode: string){
+    makeDeleteMeteors(mode: string) {
         this.onInitMake()
         this.destroyMake()
 
@@ -1135,13 +1134,13 @@ class Escaper {
         this.make = MakeDeleteMeteors.create(this.hero, mode)
     }
 
-    makeCreateCaster(casterType: ICasterType, angle: number){
+    makeCreateCaster(casterType: ICasterType, angle: number) {
         this.onInitMake()
         this.destroyMake()
         this.make = MakeCaster.create(this.hero, casterType, angle)
     }
 
-    makeDeleteCasters(mode: string){
+    makeDeleteCasters(mode: string) {
         this.onInitMake()
         this.destroyMake()
 
@@ -1153,73 +1152,73 @@ class Escaper {
         this.make = MakeDeleteCasters.create(this.hero, mode)
     }
 
-    makeCreateClearMobs(disableDuration: number){
+    makeCreateClearMobs(disableDuration: number) {
         this.onInitMake()
         this.destroyMake()
         this.make = MakeClearMob.create(this.hero, disableDuration)
     }
 
-    makeDeleteClearMobs(){
+    makeDeleteClearMobs() {
         this.onInitMake()
         this.destroyMake()
         this.make = MakeDeleteClearMob.create(this.hero)
     }
 
-    makeCreateTerrain(terrainType: TerrainType){
+    makeCreateTerrain(terrainType: TerrainType) {
         this.onInitMake()
         this.destroyMake()
         this.make = MakeTerrainCreate.create(this.hero, terrainType)
     }
 
-    makeTerrainCopyPaste(){
+    makeTerrainCopyPaste() {
         this.onInitMake()
         this.destroyMake()
         this.make = MakeTerrainCopyPaste.create(this.hero)
     }
 
-    makeTerrainVerticalSymmetry(){
+    makeTerrainVerticalSymmetry() {
         this.onInitMake()
         this.destroyMake()
         this.make = MakeTerrainVerticalSymmetry.create(this.hero)
     }
 
-    makeTerrainHorizontalSymmetry(){
+    makeTerrainHorizontalSymmetry() {
         this.onInitMake()
         this.destroyMake()
         this.make = MakeTerrainHorizontalSymmetry.create(this.hero)
     }
 
-    makeTerrainHeight(radius: number, height: number){
+    makeTerrainHeight(radius: number, height: number) {
         this.onInitMake()
         this.destroyMake()
         this.make = MakeTerrainHeight.create(this.hero, radius, height)
     }
 
-    makeGetTerrainType(){
+    makeGetTerrainType() {
         this.onInitMake()
         this.destroyMake()
         this.make = MakeGetTerrainType.create(this.hero)
     }
 
-    makeExchangeTerrains(){
+    makeExchangeTerrains() {
         this.onInitMake()
         this.destroyMake()
         this.make = MakeExchangeTerrains.create(this.hero)
     }
 
-    makeCreateStart(forNext: boolean){
+    makeCreateStart(forNext: boolean) {
         this.onInitMake()
         this.destroyMake()
         this.make = MakeStart.create(this.hero, forNext)
     }
 
-    makeCreateEnd(){
+    makeCreateEnd() {
         this.onInitMake()
         this.destroyMake()
         this.make = MakeEnd.create(this.hero)
     }
 
-    makeCreateVisibilityModifier(){
+    makeCreateVisibilityModifier() {
         this.onInitMake()
         this.destroyMake()
         this.make = MakeVisibilityModifier.create(this.hero)
@@ -1244,7 +1243,7 @@ class Escaper {
         return false
     }
 
-    deleteSpecificActionsForLevel(level: Level){
+    deleteSpecificActionsForLevel(level: Level) {
         this.makeLastActions.deleteSpecificActionsForLevel(level)
     }
 
@@ -1252,11 +1251,11 @@ class Escaper {
         return this.makeLastActions.newAction(action)
     }
 
-    destroyAllSavedActions(){
+    destroyAllSavedActions() {
         this.makeLastActions.destroyAllActions()
     }
 
-    destroyCancelledActions(){
+    destroyCancelledActions() {
         this.makeLastActions.destroyCancelledActions()
     }
 
@@ -1265,7 +1264,7 @@ class Escaper {
         return this.lastZ
     }
 
-    setLastZ(lastZ: number){
+    setLastZ(lastZ: number) {
         this.lastZ = lastZ
     }
 
@@ -1273,7 +1272,7 @@ class Escaper {
         return this.oldDiffZ
     }
 
-    setOldDiffZ(oldDiffZ: number){
+    setOldDiffZ(oldDiffZ: number) {
         this.oldDiffZ = oldDiffZ
     }
 
@@ -1281,16 +1280,16 @@ class Escaper {
         return this.speedZ
     }
 
-    setSpeedZ(speedX: number){
+    setSpeedZ(speedX: number) {
         this.speedZ = speedZ
     }
 
     //coop reviving
-    coopReviveHero(){
+    coopReviveHero() {
         const mirrorEscaper: Escaper = GetMirrorEscaper(this)
         const mirrorHero = mirrorEscaper?.getHero()
 
-        if(this.hero) {
+        if (this.hero) {
             this.revive(GetUnitX(this.hero), GetUnitY(this.hero))
             RunSoundOnUnit(udg_coop_index_son, this.hero)
             SetUnitAnimation(this.hero, 'channel')
@@ -1298,7 +1297,7 @@ class Escaper {
             this.setCoopInvul(true)
         }
 
-        if(mirrorHero) {
+        if (mirrorHero) {
             mirrorEscaper.revive(GetUnitX(mirrorHero), GetUnitY(mirrorHero))
             RunSoundOnUnit(udg_coop_index_son, mirrorHero)
             SetUnitAnimation(mirrorHero, 'channel')
@@ -1324,12 +1323,12 @@ class Escaper {
         return this.coopInvul
     }
 
-    setCoopInvul(invul: boolean){
+    setCoopInvul(invul: boolean) {
         this.coopInvul = invul
     }
 
-    enableTrigCoopRevive(){
-        if(this.hero) {
+    enableTrigCoopRevive() {
+        if (this.hero) {
             ShowUnit(this.powerCircle, true)
             SetUnitPathing(this.powerCircle, false)
             SetUnitPosition(this.powerCircle, GetUnitX(this.hero), GetUnitY(this.hero))
@@ -1339,7 +1338,7 @@ class Escaper {
         }
     }
 
-    refreshCerclePosition(){
+    refreshCerclePosition() {
         if (!IsUnitHidden(this.powerCircle) && this.hero) {
             SetUnitPosition(this.powerCircle, GetUnitX(this.hero), GetUnitY(this.hero))
             SetUnitPosition(this.dummyPowerCircle, GetUnitX(this.hero), GetUnitY(this.hero))

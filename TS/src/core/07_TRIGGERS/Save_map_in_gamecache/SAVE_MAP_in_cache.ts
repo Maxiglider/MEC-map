@@ -1,12 +1,14 @@
 import { LOW_PERIOD_FOR_WORK } from 'core/01_libraries/Constants'
 import { Text } from 'core/01_libraries/Text'
+import { SaveTerrain } from './Save_terrain'
+import { SaveTerrainConfigInCache } from './Save_terrain_config'
 
 const initSaveMapInCache = () => {
     const saveMap_cache = InitGameCache('epicSlide')
     const trigSaveMapInCache = CreateTrigger()
 
-    DisableTrigger(trigSaveMapInCache)
-    TriggerRegisterTimerEvent(trigSaveMapInCache, LOW_PERIOD_FOR_WORK, true)
+    DisableTrigger(SaveMapInCache.trigSaveMapInCache)
+    TriggerRegisterTimerEvent(SaveMapInCache.trigSaveMapInCache, LOW_PERIOD_FOR_WORK, true)
 
     const StartSaveMapInCache = (): void => {
         let i: number
@@ -20,11 +22,11 @@ const initSaveMapInCache = () => {
             FlushStoredMission(saveMap_cache, 'level' + I2S(i))
             i = i + 1
         }
-        SaveTerrainConfig()
-        StartSaveTerrain()
+        SaveTerrainConfigInCache.SaveTerrainConfig()
+        SaveTerrain.StartSaveTerrain()
     }
 
-    return { saveMap_cache, StartSaveMapInCache }
+    return { saveMap_cache, trigSaveMapInCache, StartSaveMapInCache }
 }
 
 export const SaveMapInCache = initSaveMapInCache()

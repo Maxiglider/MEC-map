@@ -1,3 +1,5 @@
+import { Constants, LARGEUR_CASE } from 'core/01_libraries/Constants'
+
 const initChangeAllTerrains = () => {
     // needs AllTerrainFunctions, TerrainModifyingTrig
 
@@ -21,9 +23,9 @@ const initChangeAllTerrains = () => {
         //local integer i = 1
         //loop
         //exitwhen (i > TERRAIN_MODIFYING_NB_LINES_TO_DO)
-        x = MAP_MIN_X
+        x = Constants.MAP_MIN_X
         while (true) {
-            if (x > MAP_MAX_X) break
+            if (x > Constants.MAP_MAX_X) break
             terrainTypeId = GetTerrainType(x, y)
             done = false
             j = 0
@@ -38,7 +40,7 @@ const initChangeAllTerrains = () => {
             x = x + LARGEUR_CASE
         }
         y = y + LARGEUR_CASE
-        if (y > MAP_MAX_Y) {
+        if (y > Constants.MAP_MAX_Y) {
             DisableTrigger(GetTriggeringTrigger())
             RestartEnabledCheckTerrainTriggers()
             terrainModifyWorking = false
@@ -50,7 +52,7 @@ const initChangeAllTerrains = () => {
 
     // TODO; Used to be private
     const StartTerrainModifying = (): void => {
-        y = MAP_MIN_Y
+        y = Constants.MAP_MIN_Y
         StopEnabledCheckTerrainTriggers()
         TriggerClearActions(gg_trg_Terrain_modifying_trig)
         TriggerAddAction(gg_trg_Terrain_modifying_trig, ChangeAllTerrains_Actions)

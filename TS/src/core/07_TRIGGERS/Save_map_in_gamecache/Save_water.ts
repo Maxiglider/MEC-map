@@ -1,6 +1,7 @@
 import { Constants, LARGEUR_CASE } from 'core/01_libraries/Constants'
 import { Text } from 'core/01_libraries/Text'
 import { ZLibrary } from 'core/02_bibliotheques_externes/ZLibrary'
+import { SaveMapInCache } from './SAVE_MAP_in_cache'
 import { SaveMonsterTypes } from './Save_monster_types'
 import { StringArrayForCache } from './struct_StringArrayForCache'
 
@@ -29,9 +30,9 @@ const initSaveWater = () => {
     const StartSaveWaterHeights = (): void => {
         y = Constants.MAP_MIN_Y
         StringArrayForCache.stringArrayForCache = new StringArrayForCache('terrain', 'waterHeights', true)
-        TriggerClearActions(trigSaveMapInCache)
-        TriggerAddAction(trigSaveMapInCache, SaveWaterHeights_Actions)
-        EnableTrigger(trigSaveMapInCache)
+        TriggerClearActions(SaveMapInCache.trigSaveMapInCache)
+        TriggerAddAction(SaveMapInCache.trigSaveMapInCache, SaveWaterHeights_Actions)
+        EnableTrigger(SaveMapInCache.trigSaveMapInCache)
     }
 
     //save water presence
@@ -67,9 +68,9 @@ endfunction
         /*
 	    y = MAP_MIN_Y
 	StringArrayForCache.stringArrayForCache = new StringArrayForCache("terrain", "waterPresence", false)
- TriggerClearActions(trigSaveMapInCache)
- TriggerAddAction(trigSaveMapInCache, function SaveWater_Actions)
- EnableTrigger(trigSaveMapInCache)
+ TriggerClearActions(SaveMapInCache.trigSaveMapInCache)
+ TriggerAddAction(SaveMapInCache.trigSaveMapInCache, function SaveWater_Actions)
+ EnableTrigger(SaveMapInCache.trigSaveMapInCache)
 	    */
     }
 

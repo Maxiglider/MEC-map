@@ -1,34 +1,34 @@
+import { Constants, LARGEUR_CASE } from 'core/01_libraries/Constants'
+import { FunctionsOnNumbers } from 'core/01_libraries/Functions_on_numbers'
+import { Text } from 'core/01_libraries/Text'
+import { Ascii } from '../../01_libraries/Ascii'
+import { SaveMapInCache } from './SAVE_MAP_in_cache'
+import { SaveTerrainHeights } from './Save_terrain_heights_and_cliffs'
 import { StringArrayForCache } from './struct_StringArrayForCache'
-const initSaveTerrain = () => {
-    // needs Text, SaveTerrainHeights
 
-    // TODO; Used to be private
+const initSaveTerrain = () => {
     let y: number
-    // TODO; Used to be private
     let terrainTypeIds: Array<number> = []
-    // TODO; Used to be private
     let nbTerrainTypesUsed: number
 
-    // TODO; Used to be private
     const SaveTerrainsUsed = (): void => {
         let i: number
         StringArrayForCache.stringArrayForCache = new StringArrayForCache('terrain', 'terrainsUsed', false)
         i = 0
         while (true) {
             if (i >= nbTerrainTypesUsed) break
-            StringArrayForCache.stringArrayForCache.push(Ascii2String(terrainTypeIds[i]))
+            StringArrayForCache.stringArrayForCache.push(Ascii.Ascii2String(terrainTypeIds[i]))
             i = i + 1
         }
         StringArrayForCache.stringArrayForCache.writeInCache()
         Text.A('terrains used saved')
     }
 
-    // TODO; Used to be private
-    const SaveMapDimensionsAndCenterOff = (): void => {
-        let largeurMap = R2I((MAP_MAX_X - MAP_MIN_X) / LARGEUR_CASE)
-        let hauteurMap = R2I((MAP_MAX_Y - MAP_MIN_Y) / LARGEUR_CASE)
-        let offsetX = R2I(MAP_MIN_X)
-        let offsetY = R2I(MAP_MIN_Y)
+    const SaveMapDimensionsAndCenterOffset = (): void => {
+        let largeurMap = R2I((Constants.MAP_MAX_X - Constants.MAP_MIN_X) / LARGEUR_CASE)
+        let hauteurMap = R2I((Constants.MAP_MAX_Y - Constants.MAP_MIN_Y) / LARGEUR_CASE)
+        let offsetX = R2I(Constants.MAP_MIN_X)
+        let offsetY = R2I(Constants.MAP_MIN_Y)
         StringArrayForCache.stringArrayForCache = new StringArrayForCache('terrain', 'largeur', false)
         StringArrayForCache.stringArrayForCache.push(I2S(largeurMap))
         StringArrayForCache.stringArrayForCache.writeInCache()
@@ -45,14 +45,14 @@ const initSaveTerrain = () => {
     }
 
     //crée si besoin une nouvelle instance dans le tableau et retourne l'id de cet élément de tableau
-    // TODO; Used to be private
+
     const GetTerrainId = (x: number, y: number): string => {
         let terrainTypeId = GetTerrainType(x, y)
         let i = 0
         while (true) {
             if (i >= nbTerrainTypesUsed) break
             if (terrainTypeId === terrainTypeIds[i]) {
-                return I2HexaString(i)
+                return FunctionsOnNumbers.I2HexaString(i)
             }
             i = i + 1
         }
@@ -60,7 +60,7 @@ const initSaveTerrain = () => {
             terrainTypeIds[nbTerrainTypesUsed] = terrainTypeId
             nbTerrainTypesUsed = nbTerrainTypesUsed + 1
         }
-        return I2HexaString(nbTerrainTypesUsed - 1)
+        return FunctionsOnNumbers.I2HexaString(nbTerrainTypesUsed - 1)
     }
 
     const GererOrdreTerrains = (): void => {
@@ -140,13 +140,12 @@ const initSaveTerrain = () => {
         }
     }
 
-    // TODO; Used to be private
     const SaveTerrain_Actions = (): void => {
         let x: number
-        if (y <= MAP_MAX_Y) {
-            x = MAP_MIN_X
+        if (y <= Constants.MAP_MAX_Y) {
+            x = Constants.MAP_MIN_X
             while (true) {
-                if (x > MAP_MAX_X) break
+                if (x > Constants.MAP_MAX_X) break
                 StringArrayForCache.stringArrayForCache.push(GetTerrainId(x, y))
                 x = x + LARGEUR_CASE
             }
@@ -157,16 +156,20 @@ const initSaveTerrain = () => {
             Text.A('terrain saved')
             SaveTerrainsUsed()
             SaveMapDimensionsAndCenterOffset()
-            StartSaveTerrainHeights()
+            SaveTerrainHeights.StartSaveTerrainHeights()
         }
     }
 
     const StartSaveTerrain = (): void => {
-        y = MAP_MIN_Y
+        y = Constants.MAP_MIN_Y
         GererOrdreTerrains()
         StringArrayForCache.stringArrayForCache = new StringArrayForCache('terrain', 'terrainTypes', false)
-        TriggerClearActions(trigSaveMapInCache)
-        TriggerAddAction(trigSaveMapInCache, SaveTerrain_Actions)
-        EnableTrigger(trigSaveMapInCache)
+        TriggerClearActions(SaveMapInCache.trigSaveMapInCache)
+        TriggerAddAction(SaveMapInCache.trigSaveMapInCache, SaveTerrain_Actions)
+        EnableTrigger(SaveMapInCache.trigSaveMapInCache)
     }
+
+    return { GererOrdreTerrains, StartSaveTerrain }
 }
+
+export const SaveTerrain = initSaveTerrain()
