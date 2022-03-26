@@ -52,8 +52,12 @@ const parseFile = async (inFile: string) => {
         content = content.replace(new RegExp('\\/\\/TESH.*', 'gmi'), '')
 
         // Comment out library keywords
-        content = content.replace(new RegExp('([^\\/d]|^)library'), '//library')
-        content = content.replace(new RegExp('([^\\/]|^)endlibrary'), '//endlibrary')
+        content = content.replace(new RegExp('(^([a-z]* )*library)', 'gmi'), '//$1')
+        content = content.replace(new RegExp('(^([a-z]* )*endlibrary)', 'gmi'), '//$1')
+
+        // Structs - Comments out struct keywords
+        content = content.replace(new RegExp('(^([a-z]* )*struct)', 'gmi'), '//$1')
+        content = content.replace(new RegExp('(^([a-z]* )*endstruct)', 'gmi'), '\n//$1')
 
         content = content.replace(new RegExp('(^.*?)private', 'gmi'), '// TODO; Used to be private\n$1')
         content = content.replace(new RegExp('(^.*?)public', 'gmi'), '// TODO; Used to be public\n$1')
@@ -101,10 +105,6 @@ const parseFile = async (inFile: string) => {
         // Structs - Rename methods to functions
         content = content.replace(new RegExp('(\\s)method ', 'gmi'), '$1function ')
         content = content.replace(new RegExp('(\\s)endmethod', 'gmi'), '$1endfunction')
-
-        // Structs - Comments out struct keywords
-        content = content.replace(new RegExp('([^\\/d]|^)struct', 'gmi'), '//struct')
-        content = content.replace(new RegExp('([^\\/]|^)endstruct', 'gmi'), '\n//endstruct')
 
         // Structs - Change property calls
         content = content.replace(new RegExp('( |\\(|\\[)\\.', 'gmi'), '$1AAAAAAAATHIS')
