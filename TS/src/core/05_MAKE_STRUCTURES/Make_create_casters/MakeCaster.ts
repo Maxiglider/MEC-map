@@ -7,7 +7,7 @@ class MakeCaster extends Make {
 
 
     constructor(maker: unit, casterType: CasterType, angle: number) {
-        super(maker, "casterCreate");
+        super(maker, "casterCreate")
 
         this.casterType = casterType
         this.angle = angle
@@ -22,14 +22,9 @@ class MakeCaster extends Make {
     }
 
     doActions(){
-        if(super.doActions()){
-            let x = GetOrderPointX()
-            let y = GetOrderPointY()
-
-            const caster = this.escaper.getMakingLevel().casters.new(this.getCasterType(), x, y, this.getAngle(), true)
+        if(super.doBaseActions()){
+            const caster = this.escaper.getMakingLevel().casters.new(this.getCasterType(), this.orderX, this.orderY, this.getAngle(), true)
             this.escaper.newAction(new MakeCasterAction(this.escaper.getMakingLevel(), caster))
         }
-
-        return true
     }
 }

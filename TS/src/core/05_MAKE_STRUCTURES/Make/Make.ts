@@ -23,6 +23,8 @@ export abstract class Make{
     t: trigger | null
     maker: unit
     escaper: Escaper
+    orderX: number = 0
+    orderY: number = 0
 
     constructor(maker: unit, kind: string){
         this.maker = maker
@@ -40,14 +42,19 @@ export abstract class Make{
         }
     }
 
-    doActions(){
+    doBaseActions(){
         if (!IsIssuedOrder("smart")) {
             return false
         }
 
+        this.orderX = GetOrderPointX()
+        this.orderY = GetOrderPointY()
+
         StopUnit(this.maker)
         return true
     }
+
+    abstract doActions(): void
 
     enableTrigger(){
         if(this.t) DestroyTrigger(this.t)
