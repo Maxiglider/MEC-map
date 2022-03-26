@@ -69,7 +69,7 @@ const parseFile = async (inFile: string) => {
         )
 
         // Comment out integer calls
-        content = content.replace(new RegExp('(.*?integer\\()', 'gmi'), `${dumbComment}$1`)
+        content = content.replace(new RegExp('(.*?( |\\()integer\\()', 'gmi'), `${dumbComment}$1`)
 
         content = content.replace(new RegExp('^\\s*private', 'gmi'), '')
     }
