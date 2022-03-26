@@ -70,7 +70,7 @@ const PlaySoundHeroDies = (fallenPlayer: player): void => {
 // TODO; Used to be private
 const DisplayDeathMessagePlayer_$n$ = (): void => {
 	PlaySoundHeroDies(Player($n$))
-	Text_A_timed(MESSAGE_DURATION, udg_colorCode[$n$] + GetPlayerName(Player($n$)) + "|r has fallen.")
+	Text.A(_timed(MESSAGE_DURATION, udg_colorCode[$n$] + GetPlayerName(Player($n$)) + "|r has fallen.")
 	DestroyTimer(GetExpiredTimer())
 };
 //! endtextmacro

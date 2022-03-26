@@ -47,7 +47,7 @@ const cancel = (): boolean => {
 	this.visibilityModifierSave = this.visibilityModifierPointeur.copy()
  this.visibilityModifierPointeur.destroy()
 	this.isActionMadeB = false;
- Text_mkP(this.owner.getPlayer(), "visibility creation cancelled")
+ Text.mkP(this.owner.getPlayer(), "visibility creation cancelled")
 	return true;
 };
 
@@ -57,13 +57,13 @@ const redo = (): boolean => {
 	}
 	this.visibilityModifierPointeur = this.level.newVisibilityModifierFromExisting(this.visibilityModifierSave)
 	if ((this.visibilityModifierPointeur === 0)) {
- Text_erP(this.owner.getPlayer(), "can't recreate visibility, full for this level")
+ Text.erP(this.owner.getPlayer(), "can't recreate visibility, full for this level")
 	} else {
  this.visibilityModifierPointeur.activate(true)
 	}
 	this.visibilityModifierSave = 0;
 	this.isActionMadeB = true;
- Text_mkP(this.owner.getPlayer(), "visibility creation redone")
+ Text.mkP(this.owner.getPlayer(), "visibility creation redone")
 	return true;
 };
 

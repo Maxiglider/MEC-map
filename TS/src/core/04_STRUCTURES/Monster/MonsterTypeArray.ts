@@ -82,7 +82,7 @@ const displayForPlayer = (p: player): void => {
 		i = i + 1;
 	}
 	if ((this.numberOfMonsterTypes === 0)) {
-		Text_erP(p, "no monster type saved")
+		Text.erP(p, "no monster type saved")
 	}
 };
 

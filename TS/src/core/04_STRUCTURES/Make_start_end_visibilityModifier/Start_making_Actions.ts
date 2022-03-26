@@ -21,20 +21,20 @@ const StartMaking_Actions = (): void => {
 		if ( (mk.forNext()) ) {
 			if ( (udg_levels.get(level.getId() + 1) == 0) ) {
 				if ( (not udg_levels.new()) ) {
- Text_erP(escaper.getPlayer(), "nombre maximum de niveaux atteint")
+ Text.erP(escaper.getPlayer(), "nombre maximum de niveaux atteint")
  escaper.destroyMake()
 					return;
 				}
 			}
 			level = udg_levels.get(level.getId() + 1)
 			if ((level === 0)) {
- Text_erP(escaper.getPlayer(), "erreur d'origine inconnue")
+ Text.erP(escaper.getPlayer(), "erreur d'origine inconnue")
  escaper.destroyMake()
 				return;
 			}
 		}
  level.newStart(mk.lastX, mk.lastY, x, y)
- Text_mkP(mk.makerOwner, "start made for level " + I2S(level.getId()))
+ Text.mkP(mk.makerOwner, "start made for level " + I2S(level.getId()))
  escaper.destroyMake()
 	} else {
  mk.saveLoc(x, y)

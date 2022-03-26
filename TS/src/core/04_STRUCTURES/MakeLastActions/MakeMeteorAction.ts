@@ -43,7 +43,7 @@ const cancel = (): boolean => {
 	}
  this.meteor.removeMeteor()
 	this.isActionMadeB = false;
- Text_mkP(this.owner.getPlayer(), "meteor creation cancelled")
+ Text.mkP(this.owner.getPlayer(), "meteor creation cancelled")
 	return true;
 };
 
@@ -53,7 +53,7 @@ const redo = (): boolean => {
 	}
  this.meteor.createMeteor()
 	this.isActionMadeB = true;
- Text_mkP(this.owner.getPlayer(), "meteor creation redone")
+ Text.mkP(this.owner.getPlayer(), "meteor creation redone")
 	return true;
 };
 

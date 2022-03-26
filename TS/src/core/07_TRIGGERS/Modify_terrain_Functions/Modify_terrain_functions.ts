@@ -1,61 +1,56 @@
+import { LARGEUR_CASE, NB_MAX_TILES_MODIFIED } from 'core/01_libraries/Constants'
+import { TerrainFunctions } from './Terrain_functions'
 
+const initModifyTerrainFunctions = () => {
+    const GetNbCaseBetween = (minX: number, minY: number, maxX: number, maxY: number): number => {
+        return R2I((maxX - minX) / LARGEUR_CASE) * R2I((maxY - minY) / LARGEUR_CASE)
+    }
 
-const initModifyTerrainFunctions = () => { // needs TerrainFunctions
+    const ChangeTerrainType = (x: number, y: number, terrainTypeId: number): void => {
+        SetTerrainType(x, y, terrainTypeId, -1, 1, 0)
+    }
 
+    const ChangeTerrainBetween = (terrainType: number, x1: number, y1: number, x2: number, y2: number): boolean => {
+        let minX = RMinBJ(x1, x2)
+        let minY = RMinBJ(y1, y2)
+        let maxX = RMaxBJ(x1, x2)
+        let maxY = RMaxBJ(y1, y2)
 
+        let r: number
+        let x: number
+        let y: number
 
+        //call Text.A( "nbCases == " + I2S( GetNbCaseBetween( minX, minY, maxX, maxY ) ) )
+        //call Text.A( "changing terrain to : " + TerrainTypeId2TerrainTypeAsciiString( terrainType ) )
 
-const GetNbCaseBetween = (minX: number, minY: number, maxX: number, maxY: number): number => {
-	return (R2I((maxX - minX) / LARGEUR_CASE) * R2I((maxY - minY) / LARGEUR_CASE));
-};
+        if (GetNbCaseBetween(minX, minY, maxX, maxY) > NB_MAX_TILES_MODIFIED) {
+            return false
+        }
 
+        if (!TerrainFunctions.CanUseTerrain(terrainType)) {
+            return false
+        }
 
-const ChangeTerrainType = (x: number, y: number, terrainTypeId: number): void => {
-	SetTerrainType(x, y, terrainTypeId, -1, 1, 0)
-};
+        x = minX
+        y = minY
 
+        while (true) {
+            if (y > maxY) break
+            while (true) {
+                if (x > maxX) break
+                ChangeTerrainType(x, y, terrainType)
+                x = x + LARGEUR_CASE
+            }
+            x = minX
+            y = y + LARGEUR_CASE
+        }
 
-const ChangeTerrainBetween = (terrainType: number, x1: number, y1: number, x2: number, y2: number): boolean => {
-	let minX = RMinBJ(x1, x2);
-	let minY = RMinBJ(y1, y2);
-	let maxX = RMaxBJ(x1, x2);
-	let maxY = RMaxBJ(y1, y2);
+        //call Text.A( "terrain changed to : " + TerrainTypeId2TerrainTypeAsciiString( GetTerrainType( minX, minY ) ) )
 
-	let r: number;
-	let x: number;
-	let y: number;
+        return true
+    }
 
-	//call Text.A( "nbCases == " + I2S( GetNbCaseBetween( minX, minY, maxX, maxY ) ) )
-	//call Text.A( "changing terrain to : " + TerrainTypeId2TerrainTypeAsciiString( terrainType ) )
-
-	if ((GetNbCaseBetween(minX, minY, maxX, maxY) > NB_MAX_TILES_MODIFIED)) {
-		return false;
-	}
-	if ((!CanUseTerrain(terrainType))) {
-		return false;
-	}
-
-	x = minX;
-	y = minY;
-
-	while (true) {
-		if ((y > maxY)) break;
-		while (true) {
-			if ((x > maxX)) break;
-			ChangeTerrainType(x, y, terrainType)
-			x = x + LARGEUR_CASE;
-		}
-		x = minX;
-		y = y + LARGEUR_CASE;
-	}
-
-	//call Text.A( "terrain changed to : " + TerrainTypeId2TerrainTypeAsciiString( GetTerrainType( minX, minY ) ) )
-
-	return true;
-};
-
-
-
-
-
+    return { GetNbCaseBetween, ChangeTerrainType, ChangeTerrainBetween }
 }
+
+export const Modify_terrain_functions = initModifyTerrainFunctions()

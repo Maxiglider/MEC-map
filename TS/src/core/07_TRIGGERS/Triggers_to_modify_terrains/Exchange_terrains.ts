@@ -61,7 +61,7 @@ const ExchangeTerrains = (terrainTypeLabelA: string, terrainTypeLabelB: string):
 		return false;
 	}
 	if ((terrainModifyWorking)) {
-		Text_erA("can't execute two commands of this type simultaneously !")
+		Text.erA("can't execute two commands of this type simultaneously !")
 		return false;
 	}
 	terrainA = terrainTypeA.getTerrainTypeId()

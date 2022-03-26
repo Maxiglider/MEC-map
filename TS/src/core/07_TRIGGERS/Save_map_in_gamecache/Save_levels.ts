@@ -1,3 +1,5 @@
+import { NB_ESCAPERS } from "core/01_libraries/Constants";
+import { Text } from "core/01_libraries/Text";
 
 
 const initSaveLevels = () => { // initializer InitStartSaveNextLevel needs Text
@@ -308,9 +310,9 @@ const StartSaveVisibilities = (): void => {
 
 // TODO; Used to be private
 const EndSaveLevel = (): void => {
-	Text_A("all levels saved")
+	Text.A("all levels saved")
 	SaveGameCache(saveMap_cache)
-	Text_A("SAVING MAP FINISHED")
+	Text.A("SAVING MAP FINISHED")
 };
 
 // TODO; Used to be private

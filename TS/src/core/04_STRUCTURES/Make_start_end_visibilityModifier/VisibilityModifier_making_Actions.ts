@@ -19,11 +19,11 @@ const VisibilityModifierMaking_Actions = (): void => {
 	if ( (mk.isLastLocSavedUsed()) ) {
 		newVisibilityModifier = escaper.getMakingLevel().newVisibilityModifier(mk.lastX, mk.lastY, x, y)
 		if ((newVisibilityModifier === 0)) {
- Text_erP(mk.makerOwner, "can't create visibility, full for this level")
+ Text.erP(mk.makerOwner, "can't create visibility, full for this level")
 		} else {
  newVisibilityModifier.activate(true)
  escaper.newAction(MakeVisibilityModifierAction.create(escaper.getMakingLevel(), newVisibilityModifier))
- Text_mkP(mk.makerOwner, "visibility rectangle made for level " + I2S(escaper.getMakingLevel().getId()))
+ Text.mkP(mk.makerOwner, "visibility rectangle made for level " + I2S(escaper.getMakingLevel().getId()))
 		}
  mk.unsaveLocDefinitely()
 	} else {

@@ -1,3 +1,5 @@
+import { FunctionsOnNumbers } from "core/01_libraries/Functions_on_numbers";
+
 const initCommandMake = () => { // needs CommandsFunctions, ChangeOneTerrain, ChangeAllTerrains, ExchangeTerrains, RandomizeTerrains, Ascii
 
 
@@ -44,8 +46,8 @@ const ExecuteCommandMake = (escaper: Escaper, cmd: string): boolean => {
 			return true;
 		}
 		if ((nbParam === 3)) {
-			if ((!IsPositiveInteger(param3) || S2R(param3) > 522)) {
- Text_erP(escaper.getPlayer(), "wrong speed value, should be a real between 0 and 522")
+			if ((!FunctionsOnNumbers.IsPositiveInteger(param3) || S2R(param3) > 522)) {
+ Text.erP(escaper.getPlayer(), "wrong speed value, should be a real between 0 and 522")
 				return true;
 			}
 			speed = S2R(param3);
@@ -53,13 +55,13 @@ const ExecuteCommandMake = (escaper: Escaper, cmd: string): boolean => {
 			speed = HERO_WALK_SPEED;
 		}
 		if ((StringContainsChar(param1, CACHE_SEPARATEUR_ITEM) || StringContainsChar(param1, CACHE_SEPARATEUR_PARAM) || StringContainsChar(param1, "\""))) {
- Text_erP(escaper.getPlayer(), "characters \", " + CACHE_SEPARATEUR_ITEM + " and " + CACHE_SEPARATEUR_PARAM + " not allowed")
+ Text.erP(escaper.getPlayer(), "characters \", " + CACHE_SEPARATEUR_ITEM + " and " + CACHE_SEPARATEUR_PARAM + " not allowed")
 			return true;
 		}
 		if ( (udg_terrainTypes.newWalk(param1, TerrainTypeString2TerrainTypeId(param2), speed) == 0) ) {
- Text_erP(escaper.getPlayer(), "impossible to add this new terrain type")
+ Text.erP(escaper.getPlayer(), "impossible to add this new terrain type")
 		} else {
- Text_mkP(escaper.getPlayer(), "new terrain type \"" + param1 + "\" added")
+ Text.mkP(escaper.getPlayer(), "new terrain type \"" + param1 + "\" added")
 		}
 		return true;
 	}
@@ -73,7 +75,7 @@ const ExecuteCommandMake = (escaper: Escaper, cmd: string): boolean => {
 		if ((nbParam >= 3)) {
 			str = param3;
 			if ((StringContainsChar(param3, CACHE_SEPARATEUR_ITEM) || StringContainsChar(param3, CACHE_SEPARATEUR_PARAM) || StringContainsChar(param3, "\""))) {
- Text_erP(escaper.getPlayer(), "characters \", " + CACHE_SEPARATEUR_ITEM + " and " + CACHE_SEPARATEUR_PARAM + " not allowed")
+ Text.erP(escaper.getPlayer(), "characters \", " + CACHE_SEPARATEUR_ITEM + " and " + CACHE_SEPARATEUR_PARAM + " not allowed")
 				return true;
 			}
 		} else {
@@ -88,13 +90,13 @@ const ExecuteCommandMake = (escaper: Escaper, cmd: string): boolean => {
 			x = TERRAIN_DEATH_TIME_TO_KILL;
 		}
 		if ((StringContainsChar(param1, CACHE_SEPARATEUR_ITEM) || StringContainsChar(param1, CACHE_SEPARATEUR_PARAM) || StringContainsChar(param1, "\""))) {
- Text_erP(escaper.getPlayer(), "characters \", " + CACHE_SEPARATEUR_ITEM + " and " + CACHE_SEPARATEUR_PARAM + " not allowed")
+ Text.erP(escaper.getPlayer(), "characters \", " + CACHE_SEPARATEUR_ITEM + " and " + CACHE_SEPARATEUR_PARAM + " not allowed")
 			return true;
 		}
 		if ( (udg_terrainTypes.newDeath(param1, TerrainTypeString2TerrainTypeId(param2), str, x, 0) == 0) ) {
- Text_erP(escaper.getPlayer(), "impossible to add this new terrain type")
+ Text.erP(escaper.getPlayer(), "impossible to add this new terrain type")
 		} else {
- Text_mkP(escaper.getPlayer(), "new terrain type \"" + param1 + "\" added")
+ Text.mkP(escaper.getPlayer(), "new terrain type \"" + param1 + "\" added")
 		}
 		return true;
 	}
@@ -107,7 +109,7 @@ const ExecuteCommandMake = (escaper: Escaper, cmd: string): boolean => {
 		}
 		if ((nbParam >= 3)) {
 			if ((!IsInteger(param3))) {
- Text_erP(escaper.getPlayer(), "the slide speed must be an integer")
+ Text.erP(escaper.getPlayer(), "the slide speed must be an integer")
 				return true;
 			}
 			speed = S2R(param3);
@@ -116,7 +118,7 @@ const ExecuteCommandMake = (escaper: Escaper, cmd: string): boolean => {
 		}
 		if ((nbParam === 4)) {
 			if ((!IsBoolString(param4))) {
- Text_erP(escaper.getPlayer(), "the property \"canTurn\" must be a boolean (true or false)")
+ Text.erP(escaper.getPlayer(), "the property \"canTurn\" must be a boolean (true or false)")
 				return true;
 			}
 			b = S2B(param4);
@@ -124,13 +126,13 @@ const ExecuteCommandMake = (escaper: Escaper, cmd: string): boolean => {
 			b = true;
 		}
 		if ((StringContainsChar(param1, CACHE_SEPARATEUR_ITEM) || StringContainsChar(param1, CACHE_SEPARATEUR_PARAM) || StringContainsChar(param1, "\""))) {
- Text_erP(escaper.getPlayer(), "characters \", " + CACHE_SEPARATEUR_ITEM + " and " + CACHE_SEPARATEUR_PARAM + " not allowed")
+ Text.erP(escaper.getPlayer(), "characters \", " + CACHE_SEPARATEUR_ITEM + " and " + CACHE_SEPARATEUR_PARAM + " not allowed")
 			return true;
 		}
 		if ( (udg_terrainTypes.newSlide(param1, TerrainTypeString2TerrainTypeId(param2), speed, b) == 0) ) {
- Text_erP(escaper.getPlayer(), "impossible to add this new terrain type")
+ Text.erP(escaper.getPlayer(), "impossible to add this new terrain type")
 		} else {
- Text_mkP(escaper.getPlayer(), "new terrain type \"" + param1 + "\" added")
+ Text.mkP(escaper.getPlayer(), "new terrain type \"" + param1 + "\" added")
 		}
 		return true;
 	}
@@ -147,13 +149,13 @@ const ExecuteCommandMake = (escaper: Escaper, cmd: string): boolean => {
 		}
 		if ((b)) {
 			if ((StringContainsChar(param2, CACHE_SEPARATEUR_ITEM) || StringContainsChar(param2, CACHE_SEPARATEUR_PARAM) || StringContainsChar(param2, "\""))) {
- Text_erP(escaper.getPlayer(), "characters \", " + CACHE_SEPARATEUR_ITEM + " and " + CACHE_SEPARATEUR_PARAM + " not allowed")
+ Text.erP(escaper.getPlayer(), "characters \", " + CACHE_SEPARATEUR_ITEM + " and " + CACHE_SEPARATEUR_PARAM + " not allowed")
 				return true;
 			}
  udg_terrainTypes.get(param1).setLabel(param2)
- Text_mkP(escaper.getPlayer(), "label changed to \"" + param2 + "\"")
+ Text.mkP(escaper.getPlayer(), "label changed to \"" + param2 + "\"")
 		} else {
- Text_erP(escaper.getPlayer(), "impossible to change label")
+ Text.erP(escaper.getPlayer(), "impossible to change label")
 		}
 		return true;
 	}
@@ -170,13 +172,13 @@ const ExecuteCommandMake = (escaper: Escaper, cmd: string): boolean => {
 		}
 		if ((b)) {
 			if ((StringContainsChar(param2, CACHE_SEPARATEUR_ITEM) || StringContainsChar(param2, CACHE_SEPARATEUR_PARAM) || StringContainsChar(param2, "\""))) {
- Text_erP(escaper.getPlayer(), "characters \", " + CACHE_SEPARATEUR_ITEM + " and " + CACHE_SEPARATEUR_PARAM + " not allowed")
+ Text.erP(escaper.getPlayer(), "characters \", " + CACHE_SEPARATEUR_ITEM + " and " + CACHE_SEPARATEUR_PARAM + " not allowed")
 				return true;
 			}
  udg_terrainTypes.get(param1).setAlias(param2)
- Text_mkP(escaper.getPlayer(), "alias changed to \"" + param2 + "\"")
+ Text.mkP(escaper.getPlayer(), "alias changed to \"" + param2 + "\"")
 		} else {
- Text_erP(escaper.getPlayer(), "impossible to change alias")
+ Text.erP(escaper.getPlayer(), "impossible to change alias")
 		}
 		return true;
 	}
@@ -189,19 +191,19 @@ const ExecuteCommandMake = (escaper: Escaper, cmd: string): boolean => {
 		}
 		terrainType = udg_terrainTypes.get(param1)
 		if ((terrainType === 0)) {
- Text_erP(escaper.getPlayer(), "unknown terrain")
+ Text.erP(escaper.getPlayer(), "unknown terrain")
 			return true;
 		}
 		if ( (terrainType.getKind() != "walk") ) {
- Text_erP(escaper.getPlayer(), "the terrain must be of walk type")
+ Text.erP(escaper.getPlayer(), "the terrain must be of walk type")
 			return true;
 		}
 		if ((!IsPositiveInteger(param2) || S2R(param2) > 522)) {
- Text_erP(escaper.getPlayer(), "wrong speed value, should be a real between 0 and 522")
+ Text.erP(escaper.getPlayer(), "wrong speed value, should be a real between 0 and 522")
 			return true;
 		}
  TerrainTypeWalk(integer(terrainType)).setWalkSpeed(S2R(param2))
- Text_mkP(escaper.getPlayer(), "terrain walk speed changed")
+ Text.mkP(escaper.getPlayer(), "terrain walk speed changed")
 		return true;
 	}
 
@@ -213,19 +215,19 @@ const ExecuteCommandMake = (escaper: Escaper, cmd: string): boolean => {
 		}
 		terrainType = udg_terrainTypes.get(param1)
 		if ((terrainType === 0)) {
- Text_erP(escaper.getPlayer(), "unknown terrain")
+ Text.erP(escaper.getPlayer(), "unknown terrain")
 			return true;
 		}
 		if ( (terrainType.getKind() != "death") ) {
- Text_erP(escaper.getPlayer(), "the terrain must be of death type")
+ Text.erP(escaper.getPlayer(), "the terrain must be of death type")
 			return true;
 		}
 		if ((StringContainsChar(param2, CACHE_SEPARATEUR_ITEM) || StringContainsChar(param2, CACHE_SEPARATEUR_PARAM) || StringContainsChar(param2, "\""))) {
- Text_erP(escaper.getPlayer(), "characters \", " + CACHE_SEPARATEUR_ITEM + " and " + CACHE_SEPARATEUR_PARAM + " not allowed")
+ Text.erP(escaper.getPlayer(), "characters \", " + CACHE_SEPARATEUR_ITEM + " and " + CACHE_SEPARATEUR_PARAM + " not allowed")
 			return true;
 		}
  TerrainTypeDeath(integer(terrainType)).setKillingEffectStr(param2)
- Text_mkP(escaper.getPlayer(), "terrain kill effect changed")
+ Text.mkP(escaper.getPlayer(), "terrain kill effect changed")
 		return true;
 	}
 
@@ -237,19 +239,19 @@ const ExecuteCommandMake = (escaper: Escaper, cmd: string): boolean => {
 		}
 		terrainType = udg_terrainTypes.get(param1)
 		if ((terrainType === 0)) {
- Text_erP(escaper.getPlayer(), "unknown terrain")
+ Text.erP(escaper.getPlayer(), "unknown terrain")
 			return true;
 		}
 		if ( (terrainType.getKind() != "death") ) {
- Text_erP(escaper.getPlayer(), "the terrain must be of death type")
+ Text.erP(escaper.getPlayer(), "the terrain must be of death type")
 			return true;
 		}
 		if ((param2 !== "0" && S2R(param2) === 0)) {
- Text_erP(escaper.getPlayer(), "wrong delay value")
+ Text.erP(escaper.getPlayer(), "wrong delay value")
 			return true;
 		}
  TerrainTypeDeath(integer(terrainType)).setTimeToKill(S2R(param2))
- Text_mkP(escaper.getPlayer(), "terrain kill delay changed")
+ Text.mkP(escaper.getPlayer(), "terrain kill delay changed")
 		return true;
 	}
 
@@ -261,21 +263,21 @@ const ExecuteCommandMake = (escaper: Escaper, cmd: string): boolean => {
 		}
 		terrainType = udg_terrainTypes.get(param1)
 		if ((terrainType === 0)) {
- Text_erP(escaper.getPlayer(), "unknown terrain")
+ Text.erP(escaper.getPlayer(), "unknown terrain")
 			return true;
 		}
 		if ( (terrainType.getKind() != "death") ) {
- Text_erP(escaper.getPlayer(), "the terrain must be of death type")
+ Text.erP(escaper.getPlayer(), "the terrain must be of death type")
 			return true;
 		}
 		if ((param2 !== "0" && S2R(param2) === 0)) {
- Text_erP(escaper.getPlayer(), "wrong tolerance value")
+ Text.erP(escaper.getPlayer(), "wrong tolerance value")
 			return true;
 		}
 		if ( (TerrainTypeDeath(integer(terrainType)).setToleranceDist(S2R(param2))) ) {
- Text_mkP(escaper.getPlayer(), "tolerance distance changed")
+ Text.mkP(escaper.getPlayer(), "tolerance distance changed")
 		} else {
- Text_erP(escaper.getPlayer(), "tolerance must be between 0 and " + R2S(DEATH_TERRAIN_MAX_TOLERANCE))
+ Text.erP(escaper.getPlayer(), "tolerance must be between 0 and " + R2S(DEATH_TERRAIN_MAX_TOLERANCE))
 		}
 		return true;
 	}
@@ -288,19 +290,19 @@ const ExecuteCommandMake = (escaper: Escaper, cmd: string): boolean => {
 		}
 		terrainType = udg_terrainTypes.get(param1)
 		if ((terrainType === 0)) {
- Text_erP(escaper.getPlayer(), "unknown terrain")
+ Text.erP(escaper.getPlayer(), "unknown terrain")
 			return true;
 		}
 		if ( (terrainType.getKind() != "slide") ) {
- Text_erP(escaper.getPlayer(), "the terrain must be of slide type")
+ Text.erP(escaper.getPlayer(), "the terrain must be of slide type")
 			return true;
 		}
 		if ((!IsInteger(param2))) {
- Text_erP(escaper.getPlayer(), "wrong speed value")
+ Text.erP(escaper.getPlayer(), "wrong speed value")
 			return true;
 		}
  TerrainTypeSlide(integer(terrainType)).setSlideSpeed(S2R(param2))
- Text_mkP(escaper.getPlayer(), "terrain slide speed changed")
+ Text.mkP(escaper.getPlayer(), "terrain slide speed changed")
 		return true;
 	}
 
@@ -312,28 +314,28 @@ const ExecuteCommandMake = (escaper: Escaper, cmd: string): boolean => {
 		}
 		terrainType = udg_terrainTypes.get(param1)
 		if ((terrainType === 0)) {
- Text_erP(escaper.getPlayer(), "unknown terrain")
+ Text.erP(escaper.getPlayer(), "unknown terrain")
 			return true;
 		}
 		if ( (terrainType.getKind() != "slide") ) {
- Text_erP(escaper.getPlayer(), "the terrain must be of slide type")
+ Text.erP(escaper.getPlayer(), "the terrain must be of slide type")
 			return true;
 		}
 		if ((!IsBoolString(param2))) {
- Text_erP(escaper.getPlayer(), "the property \"canTurn\" must be a boolean (true or false)")
+ Text.erP(escaper.getPlayer(), "the property \"canTurn\" must be a boolean (true or false)")
 			return true;
 		}
 		if ( (TerrainTypeSlide(integer(terrainType)).setCanTurn(S2B(param2))) ) {
 			if ((S2B(param2))) {
- Text_mkP(escaper.getPlayer(), "the heroes can now turn on this slide terrain")
+ Text.mkP(escaper.getPlayer(), "the heroes can now turn on this slide terrain")
 			} else {
- Text_mkP(escaper.getPlayer(), "the heroes can't turn on this slide terrain anymore")
+ Text.mkP(escaper.getPlayer(), "the heroes can't turn on this slide terrain anymore")
 			}
 		} else {
 			if ((S2B(param2))) {
- Text_erP(escaper.getPlayer(), "the heroes can already turn on this slide terrain")
+ Text.erP(escaper.getPlayer(), "the heroes can already turn on this slide terrain")
 			} else {
- Text_erP(escaper.getPlayer(), "the heroes already can't turn on this slide terrain")
+ Text.erP(escaper.getPlayer(), "the heroes already can't turn on this slide terrain")
 			}
 		}
 		return true;
@@ -348,9 +350,9 @@ const ExecuteCommandMake = (escaper: Escaper, cmd: string): boolean => {
  DisplayLineToPlayer(escaper.getPlayer())
 		str = ChangeOneTerrain(param1, param2);
 		if ((str !== null)) {
- Text_mkP(escaper.getPlayer(), "changed to " + udg_colorCode[RED] + str)
+ Text.mkP(escaper.getPlayer(), "changed to " + udg_colorCode[RED] + str)
 		} else {
- Text_erP(escaper.getPlayer(), "couldn't change terrain")
+ Text.erP(escaper.getPlayer(), "couldn't change terrain")
 		}
 		return true;
 	}
@@ -374,7 +376,7 @@ const ExecuteCommandMake = (escaper: Escaper, cmd: string): boolean => {
 			}
 		}
 		if ((!ChangeAllTerrains(str))) {
- Text_erP(escaper.getPlayer(), "couldn't change terrains")
+ Text.erP(escaper.getPlayer(), "couldn't change terrains")
 		}
 		return true;
 	}
@@ -384,7 +386,7 @@ const ExecuteCommandMake = (escaper: Escaper, cmd: string): boolean => {
 	if ((name === "changeAllTerrainsAtRevive" || name === "chatar")) {
 		if ((nbParam === 1 && IsBoolString(param1) && S2B(param1) !== udg_changeAllTerrainsAtRevive)) {
 			udg_changeAllTerrainsAtRevive = S2B(param1);
- Text_mkP(escaper.getPlayer(), "change all terrains at revive " + StringCase(param1, true))
+ Text.mkP(escaper.getPlayer(), "change all terrains at revive " + StringCase(param1, true))
 		}
 		return true;
 	}
@@ -394,16 +396,16 @@ const ExecuteCommandMake = (escaper: Escaper, cmd: string): boolean => {
 	if ((name === "exchangeTerrains" || name === "excht")) {
 		if ((noParam)) {
  escaper.makeExchangeTerrains()
- Text_mkP(escaper.getPlayer(), "exchange terrains on")
+ Text.mkP(escaper.getPlayer(), "exchange terrains on")
 			return true;
 		}
 		if ((!(nbParam === 2))) {
 			return true;
 		}
 		if ((ExchangeTerrains(param1, param2))) {
- Text_mkP(escaper.getPlayer(), "terrains exchanged")
+ Text.mkP(escaper.getPlayer(), "terrains exchanged")
 		} else {
- Text_erP(escaper.getPlayer(), "couldn't exchange terrains")
+ Text.erP(escaper.getPlayer(), "couldn't exchange terrains")
 		}
 		return true;
 	}
@@ -424,10 +426,10 @@ const ExecuteCommandMake = (escaper: Escaper, cmd: string): boolean => {
 			return true;
 		}
 		if ( (udg_terrainTypes.get(param1) == 0) ) {
- Text_erP(escaper.getPlayer(), "terrain \"" + param1 + "\" doesn't exist")
+ Text.erP(escaper.getPlayer(), "terrain \"" + param1 + "\" doesn't exist")
 		} else {
  escaper.makeCreateTerrain(udg_terrainTypes.get(param1))
- Text_mkP(escaper.getPlayer(), "creating terrain on")
+ Text.mkP(escaper.getPlayer(), "creating terrain on")
 		}
 		return true;
 	}
@@ -437,7 +439,7 @@ const ExecuteCommandMake = (escaper: Escaper, cmd: string): boolean => {
 	if ((name === "copyPasteTerrain" || name === "cpt")) {
 		if ((noParam)) {
  escaper.makeTerrainCopyPaste()
- Text_mkP(escaper.getPlayer(), "copy/paste terrain on")
+ Text.mkP(escaper.getPlayer(), "copy/paste terrain on")
 		}
 		return true;
 	}
@@ -447,7 +449,7 @@ const ExecuteCommandMake = (escaper: Escaper, cmd: string): boolean => {
 	if ((name === "verticalSymmetryTerrain" || name === "vst")) {
 		if ((noParam)) {
  escaper.makeTerrainVerticalSymmetry()
- Text_mkP(escaper.getPlayer(), "vertical symmetry terrain on")
+ Text.mkP(escaper.getPlayer(), "vertical symmetry terrain on")
 		}
 		return true;
 	}
@@ -457,7 +459,7 @@ const ExecuteCommandMake = (escaper: Escaper, cmd: string): boolean => {
 	if ((name === "horizontalSymmetryTerrain" || name === "hst")) {
 		if ((noParam)) {
  escaper.makeTerrainHorizontalSymmetry()
- Text_mkP(escaper.getPlayer(), "horizontal symmetry terrain on")
+ Text.mkP(escaper.getPlayer(), "horizontal symmetry terrain on")
 		}
 		return true;
 	}
@@ -471,11 +473,11 @@ const ExecuteCommandMake = (escaper: Escaper, cmd: string): boolean => {
 		if ((nbParam === 2)) {
 			y = S2R(param2);
 			if ((y === 0 && param2 !== "0")) {
- Text_erP(escaper.getPlayer(), "param2 (height) must be a real")
+ Text.erP(escaper.getPlayer(), "param2 (height) must be a real")
 				return true;
 			}
 			if ((y === 0)) {
- Text_erP(escaper.getPlayer(), "param2 (height) can't be 0")
+ Text.erP(escaper.getPlayer(), "param2 (height) can't be 0")
 				return true;
 			}
 		} else {
@@ -484,18 +486,18 @@ const ExecuteCommandMake = (escaper: Escaper, cmd: string): boolean => {
 		if ((nbParam >= 1)) {
 			x = S2R(param1);
 			if ((x === 0 && param1 !== "0")) {
- Text_erP(escaper.getPlayer(), "param1 (radius) must be a real")
+ Text.erP(escaper.getPlayer(), "param1 (radius) must be a real")
 				return true;
 			}
 			if ((x <= 0)) {
- Text_erP(escaper.getPlayer(), "param1 (radius) must be higher than 0")
+ Text.erP(escaper.getPlayer(), "param1 (radius) must be higher than 0")
 				return true;
 			}
 		} else {
 			x = 100;
 		}
  escaper.makeTerrainHeight(x, y)
- Text_mkP(escaper.getPlayer(), "terrain height making")
+ Text.mkP(escaper.getPlayer(), "terrain height making")
 		return true;
 	}
 
@@ -509,7 +511,7 @@ const ExecuteCommandMake = (escaper: Escaper, cmd: string): boolean => {
 			if ( (udg_terrainTypes.isLabelAlreadyUsed(param1)) ) {
  udg_terrainTypes.get(param1).displayForPlayer(escaper.getPlayer())
 			} else {
- Text_erP(escaper.getPlayer(), "unknown terrain")
+ Text.erP(escaper.getPlayer(), "unknown terrain")
 			}
 		} else {
  udg_terrainTypes.displayForPlayer(escaper.getPlayer())
@@ -525,26 +527,26 @@ const ExecuteCommandMake = (escaper: Escaper, cmd: string): boolean => {
 		}
 		//checkParam1
 		if ( (udg_monsterTypes.isLabelAlreadyUsed(param1)) ) {
- Text_erP(escaper.getPlayer(), "label \"" + param1 + "\" already used")
+ Text.erP(escaper.getPlayer(), "label \"" + param1 + "\" already used")
 			return true;
 		}
 		//checkParam2
 		if ((!(StringLength(param2) === 6 && SubStringBJ(param2, 1, 1) === "'" && SubStringBJ(param2, 6, 6) === "'"))) {
- Text_erP(escaper.getPlayer(), "wrong unit type id (exemple : 'hfoo')")
+ Text.erP(escaper.getPlayer(), "wrong unit type id (exemple : 'hfoo')")
 			return true;
 		}
 		//checkParam3
 		if ((nbParam >= 3)) {
 			x = S2R(param3);
 			if ((!((x / 5) === I2R(R2I(x / 5))) || x < 0 || x > 400)) {
- Text_erP(escaper.getPlayer(), "wrong immolation radius ; should be an integer divisible by 5 and between 0 and 400")
+ Text.erP(escaper.getPlayer(), "wrong immolation radius ; should be an integer divisible by 5 and between 0 and 400")
 				return true;
 			}
 			//checkParam4
 			if ((nbParam >= 4)) {
 				str = CmdParam(cmd, 4);
-				if ((!(IsPositiveInteger(str)) || S2I(str) > MAX_MOVE_SPEED)) {
- Text_erP(escaper.getPlayer(), "wrong speed value ; should be a positive integer between 0 and 522")
+				if ((!(FunctionsOnNumbers.IsPositiveInteger(str)) || S2I(str) > MAX_MOVE_SPEED)) {
+ Text.erP(escaper.getPlayer(), "wrong speed value ; should be a positive integer between 0 and 522")
 					return true;
 				}
 				speed = S2R(str);
@@ -552,7 +554,7 @@ const ExecuteCommandMake = (escaper: Escaper, cmd: string): boolean => {
 				if ((nbParam >= 5)) {
 					str = CmdParam(cmd, 5);
 					if ((S2R(str) <= 0 && str !== "default" && str !== "d")) {
- Text_erP(escaper.getPlayer(), "wrong scale value ; should be a real upper than 0 or \"default\" or \"d\"")
+ Text.erP(escaper.getPlayer(), "wrong scale value ; should be a real upper than 0 or \"default\" or \"d\"")
 						return true;
 					}
 					if ((str === "default" || str === "d")) {
@@ -564,7 +566,7 @@ const ExecuteCommandMake = (escaper: Escaper, cmd: string): boolean => {
 					if ((nbParam === 6)) {
 						str = CmdParam(cmd, 6);
 						if ((!IsBoolString(str))) {
- Text_erP(escaper.getPlayer(), "wrong \"is clickable\" value ; should be 'true', 'false', '0' or '1'")
+ Text.erP(escaper.getPlayer(), "wrong \"is clickable\" value ; should be 'true', 'false', '0' or '1'")
 							return true;
 						}
 						b = S2B(str);
@@ -587,13 +589,13 @@ const ExecuteCommandMake = (escaper: Escaper, cmd: string): boolean => {
 			b = false;
 		}
 		if ((StringContainsChar(param1, CACHE_SEPARATEUR_ITEM) || StringContainsChar(param1, CACHE_SEPARATEUR_PARAM) || StringContainsChar(param1, "\""))) {
- Text_erP(escaper.getPlayer(), "characters \", " + CACHE_SEPARATEUR_ITEM + " and " + CACHE_SEPARATEUR_PARAM + " not allowed")
+ Text.erP(escaper.getPlayer(), "characters \", " + CACHE_SEPARATEUR_ITEM + " and " + CACHE_SEPARATEUR_PARAM + " not allowed")
 			return true;
 		}
 		if ( (udg_monsterTypes.new(param1, String2Ascii(SubStringBJ(param2, 2, 5)), x, S2R(param3), speed, b) == 0) ) {
- Text_erP(escaper.getPlayer(), "couldn't create the monster type")
+ Text.erP(escaper.getPlayer(), "couldn't create the monster type")
 		} else {
- Text_mkP(escaper.getPlayer(), "monster type \"" + param1 + "\" created")
+ Text.mkP(escaper.getPlayer(), "monster type \"" + param1 + "\" created")
 		}
 		return true;
 	}
@@ -610,13 +612,13 @@ const ExecuteCommandMake = (escaper: Escaper, cmd: string): boolean => {
 		}
 		if ((b)) {
 			if ((StringContainsChar(param2, CACHE_SEPARATEUR_ITEM) || StringContainsChar(param2, CACHE_SEPARATEUR_PARAM) || StringContainsChar(param2, "\""))) {
- Text_erP(escaper.getPlayer(), "characters \", " + CACHE_SEPARATEUR_ITEM + " and " + CACHE_SEPARATEUR_PARAM + " not allowed")
+ Text.erP(escaper.getPlayer(), "characters \", " + CACHE_SEPARATEUR_ITEM + " and " + CACHE_SEPARATEUR_PARAM + " not allowed")
 				return true;
 			}
  udg_monsterTypes.get(param1).setLabel(param2)
- Text_mkP(escaper.getPlayer(), "label changed to \"" + param2 + "\"")
+ Text.mkP(escaper.getPlayer(), "label changed to \"" + param2 + "\"")
 		} else {
- Text_erP(escaper.getPlayer(), "impossible to change label")
+ Text.erP(escaper.getPlayer(), "impossible to change label")
 		}
 		return true;
 	}
@@ -633,13 +635,13 @@ const ExecuteCommandMake = (escaper: Escaper, cmd: string): boolean => {
 		}
 		if ((b)) {
 			if ((StringContainsChar(param2, CACHE_SEPARATEUR_ITEM) || StringContainsChar(param2, CACHE_SEPARATEUR_PARAM) || StringContainsChar(param2, "\""))) {
- Text_erP(escaper.getPlayer(), "characters \", " + CACHE_SEPARATEUR_ITEM + " and " + CACHE_SEPARATEUR_PARAM + " not allowed")
+ Text.erP(escaper.getPlayer(), "characters \", " + CACHE_SEPARATEUR_ITEM + " and " + CACHE_SEPARATEUR_PARAM + " not allowed")
 				return true;
 			}
  udg_monsterTypes.get(param1).setAlias(param2)
- Text_mkP(escaper.getPlayer(), "alias changed to \"" + param2 + "\"")
+ Text.mkP(escaper.getPlayer(), "alias changed to \"" + param2 + "\"")
 		} else {
- Text_erP(escaper.getPlayer(), "impossible to change alias")
+ Text.erP(escaper.getPlayer(), "impossible to change alias")
 		}
 		return true;
 	}
@@ -652,18 +654,18 @@ const ExecuteCommandMake = (escaper: Escaper, cmd: string): boolean => {
 		}
 		//checkParam1
 		if ( (not udg_monsterTypes.isLabelAlreadyUsed(param1)) ) {
- Text_erP(escaper.getPlayer(), "unknown monster type")
+ Text.erP(escaper.getPlayer(), "unknown monster type")
 			return true;
 		}
 		//checkParam2
 		if ((!(StringLength(param2) === 6 && SubStringBJ(param2, 1, 1) === "'" && SubStringBJ(param2, 6, 6) === "'"))) {
- Text_erP(escaper.getPlayer(), "wrong unit type id (exemple : 'hfoo')")
+ Text.erP(escaper.getPlayer(), "wrong unit type id (exemple : 'hfoo')")
 			return true;
 		}
 		if ( (udg_monsterTypes.get(param1).setUnitTypeId(String2Ascii(SubStringBJ(param2, 2, 5)))) ) {
- Text_mkP(escaper.getPlayer(), "unit type changed")
+ Text.mkP(escaper.getPlayer(), "unit type changed")
 		} else {
- Text_erP(escaper.getPlayer(), "this unit type doesn't exist")
+ Text.erP(escaper.getPlayer(), "this unit type doesn't exist")
 		}
 		return true;
 	}
@@ -676,19 +678,19 @@ const ExecuteCommandMake = (escaper: Escaper, cmd: string): boolean => {
 		}
 		//checkParam1
 		if ( (not udg_monsterTypes.isLabelAlreadyUsed(param1)) ) {
- Text_erP(escaper.getPlayer(), "unknown monster type")
+ Text.erP(escaper.getPlayer(), "unknown monster type")
 			return true;
 		}
 		//checkParam2
 		x = S2R(param2);
 		if ((!((x / 5) === I2R(R2I(x / 5))) || x < 0 || x > 400)) {
- Text_erP(escaper.getPlayer(), "wrong immolation radius ; should be an integer divisible by 5 and between 0 and 400")
+ Text.erP(escaper.getPlayer(), "wrong immolation radius ; should be an integer divisible by 5 and between 0 and 400")
 			return true;
 		}
 		if ( (udg_monsterTypes.get(param1).setImmolation(x)) ) {
- Text_mkP(escaper.getPlayer(), "immolation changed")
+ Text.mkP(escaper.getPlayer(), "immolation changed")
 		} else {
- Text_erP(escaper.getPlayer(), "couldn't change immolation")
+ Text.erP(escaper.getPlayer(), "couldn't change immolation")
 		}
 		return true;
 	}
@@ -701,18 +703,18 @@ const ExecuteCommandMake = (escaper: Escaper, cmd: string): boolean => {
 		}
 		//checkParam1
 		if ( (not udg_monsterTypes.isLabelAlreadyUsed(param1)) ) {
- Text_erP(escaper.getPlayer(), "unknown monster type")
+ Text.erP(escaper.getPlayer(), "unknown monster type")
 			return true;
 		}
 		//checkParam2
-		if ((!(IsPositiveInteger(param2)) || S2I(param2) > MAX_MOVE_SPEED)) {
- Text_erP(escaper.getPlayer(), "wrong speed value ; should be a positive integer between 0 and 522")
+		if ((!(FunctionsOnNumbers.IsPositiveInteger(param2)) || S2I(param2) > MAX_MOVE_SPEED)) {
+ Text.erP(escaper.getPlayer(), "wrong speed value ; should be a positive integer between 0 and 522")
 			return true;
 		}
 		if ( (udg_monsterTypes.get(param1).setUnitMoveSpeed(S2R(param2))) ) {
- Text_mkP(escaper.getPlayer(), "move speed changed")
+ Text.mkP(escaper.getPlayer(), "move speed changed")
 		} else {
- Text_erP(escaper.getPlayer(), "couldn't change move speed")
+ Text.erP(escaper.getPlayer(), "couldn't change move speed")
 		}
 		return true;
 	}
@@ -725,12 +727,12 @@ const ExecuteCommandMake = (escaper: Escaper, cmd: string): boolean => {
 		}
 		//checkParam1
 		if ( (not udg_monsterTypes.isLabelAlreadyUsed(param1)) ) {
- Text_erP(escaper.getPlayer(), "unknown monster type")
+ Text.erP(escaper.getPlayer(), "unknown monster type")
 			return true;
 		}
 		//checkParam2
 		if ((S2R(param2) <= 0 && param2 !== "default" && param2 !== "d")) {
- Text_erP(escaper.getPlayer(), "wrong scale value ; should be a real upper than 0 or \"default\" or \"d\"")
+ Text.erP(escaper.getPlayer(), "wrong scale value ; should be a real upper than 0 or \"default\" or \"d\"")
 			return true;
 		}
 		if ((param2 === "default" || param2 === "d")) {
@@ -739,9 +741,9 @@ const ExecuteCommandMake = (escaper: Escaper, cmd: string): boolean => {
 			x = S2R(param2);
 		}
 		if ( (udg_monsterTypes.get(param1).setScale(x)) ) {
- Text_mkP(escaper.getPlayer(), "scale changed")
+ Text.mkP(escaper.getPlayer(), "scale changed")
 		} else {
- Text_erP(escaper.getPlayer(), "couldn't change scale, probably because the old value is the same")
+ Text.erP(escaper.getPlayer(), "couldn't change scale, probably because the old value is the same")
 		}
 		return true;
 	}
@@ -754,25 +756,25 @@ const ExecuteCommandMake = (escaper: Escaper, cmd: string): boolean => {
 		}
 		//checkParam1
 		if ( (not udg_monsterTypes.isLabelAlreadyUsed(param1)) ) {
- Text_erP(escaper.getPlayer(), "unknown monster type")
+ Text.erP(escaper.getPlayer(), "unknown monster type")
 			return true;
 		}
 		//checkParam2
 		if ((!IsBoolString(param2))) {
- Text_erP(escaper.getPlayer(), "wrong \"is clickable\" value ; should be 'true', 'false', '0' or '1'")
+ Text.erP(escaper.getPlayer(), "wrong \"is clickable\" value ; should be 'true', 'false', '0' or '1'")
 			return true;
 		}
 		if ( (udg_monsterTypes.get(param1).setIsClickable(S2B(param2))) ) {
 			if ((S2B(param2))) {
- Text_mkP(escaper.getPlayer(), "this monster type is now clickable")
+ Text.mkP(escaper.getPlayer(), "this monster type is now clickable")
 			} else {
- Text_mkP(escaper.getPlayer(), "this monster type is now unclickable")
+ Text.mkP(escaper.getPlayer(), "this monster type is now unclickable")
 			}
 		} else {
 			if ((S2B(param2))) {
- Text_erP(escaper.getPlayer(), "this monster type is already clickable")
+ Text.erP(escaper.getPlayer(), "this monster type is already clickable")
 			} else {
- Text_erP(escaper.getPlayer(), "this monster type is already unclickable")
+ Text.erP(escaper.getPlayer(), "this monster type is already unclickable")
 			}
 		}
 		return true;
@@ -786,15 +788,15 @@ const ExecuteCommandMake = (escaper: Escaper, cmd: string): boolean => {
 		}
 		//checkParam1
 		if ( (not udg_monsterTypes.isLabelAlreadyUsed(param1)) ) {
- Text_erP(escaper.getPlayer(), "unknown monster type")
+ Text.erP(escaper.getPlayer(), "unknown monster type")
 			return true;
 		}
 		if ((StringContainsChar(param2, CACHE_SEPARATEUR_ITEM) || StringContainsChar(param2, CACHE_SEPARATEUR_PARAM) || StringContainsChar(param2, "\""))) {
- Text_erP(escaper.getPlayer(), "characters \", " + CACHE_SEPARATEUR_ITEM + " and " + CACHE_SEPARATEUR_PARAM + " not allowed")
+ Text.erP(escaper.getPlayer(), "characters \", " + CACHE_SEPARATEUR_ITEM + " and " + CACHE_SEPARATEUR_PARAM + " not allowed")
 			return true;
 		}
  udg_monsterTypes.get(param1).setKillingEffectStr(param2)
- Text_mkP(escaper.getPlayer(), "kill effect changed for this monster type")
+ Text.mkP(escaper.getPlayer(), "kill effect changed for this monster type")
 		return true;
 	}
 
@@ -806,16 +808,16 @@ const ExecuteCommandMake = (escaper: Escaper, cmd: string): boolean => {
 		}
 		//checkParam1
 		if ( (not udg_monsterTypes.isLabelAlreadyUsed(param1)) ) {
- Text_erP(escaper.getPlayer(), "unknown monster type")
+ Text.erP(escaper.getPlayer(), "unknown monster type")
 			return true;
 		}
 		//checkParam2
-		if ((!(IsPositiveInteger(param2) && S2I(param2) > 0 && S2I(param2) < 10))) {
- Text_erP(escaper.getPlayer(), "param2 must be an integer between 1 and 9")
+		if ((!(FunctionsOnNumbers.IsPositiveInteger(param2) && S2I(param2) > 0 && S2I(param2) < 10))) {
+ Text.erP(escaper.getPlayer(), "param2 must be an integer between 1 and 9")
 			return true;
 		}
  udg_monsterTypes.get(param1).setNbMeteorsToKill(S2I(param2))
- Text_mkP(escaper.getPlayer(), "number of meteors to kill changed for this monster type")
+ Text.mkP(escaper.getPlayer(), "number of meteors to kill changed for this monster type")
 		return true;
 	}
 
@@ -827,7 +829,7 @@ const ExecuteCommandMake = (escaper: Escaper, cmd: string): boolean => {
 		}
 		//checkParam1
 		if ( (not udg_monsterTypes.isLabelAlreadyUsed(param1)) ) {
- Text_erP(escaper.getPlayer(), "unknown monster type")
+ Text.erP(escaper.getPlayer(), "unknown monster type")
 			return true;
 		}
 		//checkParam2
@@ -836,13 +838,13 @@ const ExecuteCommandMake = (escaper: Escaper, cmd: string): boolean => {
 		} else if ((S2R(param2) > 0 || param2 === "0")) {
 			x = S2R(param2);
 		} else {
- Text_erP(escaper.getPlayer(), "wrong height ; should be a positive real or \"default\" or \"d\"")
+ Text.erP(escaper.getPlayer(), "wrong height ; should be a positive real or \"default\" or \"d\"")
 			return true;
 		}
 		if ( (udg_monsterTypes.get(param1).setHeight(x)) ) {
- Text_mkP(escaper.getPlayer(), "height changed for this monster type")
+ Text.mkP(escaper.getPlayer(), "height changed for this monster type")
 		} else {
- Text_erP(escaper.getPlayer(), "the height is already to this value")
+ Text.erP(escaper.getPlayer(), "the height is already to this value")
 		}
 		return true;
 	}
@@ -855,13 +857,13 @@ const ExecuteCommandMake = (escaper: Escaper, cmd: string): boolean => {
 		}
 		//checkParam1
 		if ( (not udg_monsterTypes.isLabelAlreadyUsed(param1)) ) {
- Text_erP(escaper.getPlayer(), "unknown monster type")
+ Text.erP(escaper.getPlayer(), "unknown monster type")
 			return true;
 		}
 		//checkParam2
 		if ((nbParam === 2)) {
 			if ((S2R(param2) === 0 && param2 !== "0")) {
- Text_erP(escaper.getPlayer(), "wrong angle value ; should be a real (-1 for random angle)")
+ Text.erP(escaper.getPlayer(), "wrong angle value ; should be a real (-1 for random angle)")
 				return true;
 			}
 			x = S2R(param2);
@@ -869,7 +871,7 @@ const ExecuteCommandMake = (escaper: Escaper, cmd: string): boolean => {
 			x = -1;
 		}
  escaper.makeCreateNoMoveMonsters(udg_monsterTypes.get(param1), x)
- Text_mkP(escaper.getPlayer(), "monster making on")
+ Text.mkP(escaper.getPlayer(), "monster making on")
 		return true;
 	}
 
@@ -880,11 +882,11 @@ const ExecuteCommandMake = (escaper: Escaper, cmd: string): boolean => {
 		}
 		//checkParam1
 		if ( (not udg_monsterTypes.isLabelAlreadyUsed(param1)) ) {
- Text_erP(escaper.getPlayer(), "unknown monster type")
+ Text.erP(escaper.getPlayer(), "unknown monster type")
 			return true;
 		}
  escaper.makeCreateSimplePatrolMonsters("normal", udg_monsterTypes.get(param1))
- Text_mkP(escaper.getPlayer(), "monster making on")
+ Text.mkP(escaper.getPlayer(), "monster making on")
 		return true;
 	}
 
@@ -895,11 +897,11 @@ const ExecuteCommandMake = (escaper: Escaper, cmd: string): boolean => {
 		}
 		//checkParam1
 		if ( (not udg_monsterTypes.isLabelAlreadyUsed(param1)) ) {
- Text_erP(escaper.getPlayer(), "unknown monster type")
+ Text.erP(escaper.getPlayer(), "unknown monster type")
 			return true;
 		}
  escaper.makeCreateSimplePatrolMonsters("string", udg_monsterTypes.get(param1))
- Text_mkP(escaper.getPlayer(), "monster making on")
+ Text.mkP(escaper.getPlayer(), "monster making on")
 		return true;
 	}
 
@@ -910,11 +912,11 @@ const ExecuteCommandMake = (escaper: Escaper, cmd: string): boolean => {
 		}
 		//checkParam1
 		if ( (not udg_monsterTypes.isLabelAlreadyUsed(param1)) ) {
- Text_erP(escaper.getPlayer(), "unknown monster type")
+ Text.erP(escaper.getPlayer(), "unknown monster type")
 			return true;
 		}
  escaper.makeCreateSimplePatrolMonsters("auto", udg_monsterTypes.get(param1))
- Text_mkP(escaper.getPlayer(), "monster making on")
+ Text.mkP(escaper.getPlayer(), "monster making on")
 		return true;
 	}
 
@@ -928,11 +930,11 @@ const ExecuteCommandMake = (escaper: Escaper, cmd: string): boolean => {
 			MakeSimplePatrolAuto_ChangeDistOnTerrainDefault()
 		} else {
 			if ((!MakeSimplePatrolAuto_ChangeDistOnTerrain(S2R(param1)))) {
- Text_erP(escaper.getPlayer(), "distance specified out of bounds")
+ Text.erP(escaper.getPlayer(), "distance specified out of bounds")
 				return true;
 			}
 		}
- Text_mkP(escaper.getPlayer(), "distance on terrain changed")
+ Text.mkP(escaper.getPlayer(), "distance on terrain changed")
 		return true;
 	}
 
@@ -944,11 +946,11 @@ const ExecuteCommandMake = (escaper: Escaper, cmd: string): boolean => {
 		}
 		//checkParam1
 		if ( (not udg_monsterTypes.isLabelAlreadyUsed(param1)) ) {
- Text_erP(escaper.getPlayer(), "unknown monster type")
+ Text.erP(escaper.getPlayer(), "unknown monster type")
 			return true;
 		}
  escaper.makeCreateMultiplePatrolsMonsters("normal", udg_monsterTypes.get(param1))
- Text_mkP(escaper.getPlayer(), "monster making on")
+ Text.mkP(escaper.getPlayer(), "monster making on")
 		return true;
 	}
 
@@ -959,11 +961,11 @@ const ExecuteCommandMake = (escaper: Escaper, cmd: string): boolean => {
 		}
 		//checkParam1
 		if ( (not udg_monsterTypes.isLabelAlreadyUsed(param1)) ) {
- Text_erP(escaper.getPlayer(), "unknown monster type")
+ Text.erP(escaper.getPlayer(), "unknown monster type")
 			return true;
 		}
  escaper.makeCreateMultiplePatrolsMonsters("string", udg_monsterTypes.get(param1))
- Text_mkP(escaper.getPlayer(), "monster making on")
+ Text.mkP(escaper.getPlayer(), "monster making on")
 		return true;
 	}
 
@@ -975,22 +977,22 @@ const ExecuteCommandMake = (escaper: Escaper, cmd: string): boolean => {
 		}
 		//checkParam1
 		if ( (not udg_monsterTypes.isLabelAlreadyUsed(param1)) ) {
- Text_erP(escaper.getPlayer(), "unknown monster type")
+ Text.erP(escaper.getPlayer(), "unknown monster type")
 			return true;
 		}
 		//checkParam2
 		x = S2R(param2);
 		if ((x < MONSTER_TELEPORT_PERIOD_MIN || x > MONSTER_TELEPORT_PERIOD_MAX)) {
- Text_erP(escaper.getPlayer(), "the period must be between " + R2S(MONSTER_TELEPORT_PERIOD_MIN) + " and " + R2S(MONSTER_TELEPORT_PERIOD_MAX))
+ Text.erP(escaper.getPlayer(), "the period must be between " + R2S(MONSTER_TELEPORT_PERIOD_MIN) + " and " + R2S(MONSTER_TELEPORT_PERIOD_MAX))
 			return true;
 		}
 		//checkParam3
 		if ((S2R(param3) === 0 && param3 !== "0")) {
- Text_erP(escaper.getPlayer(), "wrong angle value ; should be a real (-1 for random angle)")
+ Text.erP(escaper.getPlayer(), "wrong angle value ; should be a real (-1 for random angle)")
 			return true;
 		}
  escaper.makeCreateTeleportMonsters("normal", udg_monsterTypes.get(param1), x, S2R(param3))
- Text_mkP(escaper.getPlayer(), "monster making on")
+ Text.mkP(escaper.getPlayer(), "monster making on")
 		return true;
 	}
 
@@ -1002,22 +1004,22 @@ const ExecuteCommandMake = (escaper: Escaper, cmd: string): boolean => {
 		}
 		//checkParam1
 		if ( (not udg_monsterTypes.isLabelAlreadyUsed(param1)) ) {
- Text_erP(escaper.getPlayer(), "unknown monster type")
+ Text.erP(escaper.getPlayer(), "unknown monster type")
 			return true;
 		}
 		//checkParam2
 		x = S2R(param2);
 		if ((x < MONSTER_TELEPORT_PERIOD_MIN || x > MONSTER_TELEPORT_PERIOD_MAX)) {
- Text_erP(escaper.getPlayer(), "the period must be between " + R2S(MONSTER_TELEPORT_PERIOD_MIN) + " and " + R2S(MONSTER_TELEPORT_PERIOD_MAX))
+ Text.erP(escaper.getPlayer(), "the period must be between " + R2S(MONSTER_TELEPORT_PERIOD_MIN) + " and " + R2S(MONSTER_TELEPORT_PERIOD_MAX))
 			return true;
 		}
 		//checkParam3
 		if ((S2R(param3) === 0 && param3 !== "0")) {
- Text_erP(escaper.getPlayer(), "wrong angle value ; should be a real (-1 for random angle)")
+ Text.erP(escaper.getPlayer(), "wrong angle value ; should be a real (-1 for random angle)")
 			return true;
 		}
  escaper.makeCreateTeleportMonsters("string", udg_monsterTypes.get(param1), x, S2R(param3))
- Text_mkP(escaper.getPlayer(), "monster making on")
+ Text.mkP(escaper.getPlayer(), "monster making on")
 		return true;
 	}
 
@@ -1028,9 +1030,9 @@ const ExecuteCommandMake = (escaper: Escaper, cmd: string): boolean => {
 			return true;
 		}
 		if ( (escaper.makeMmpOrMtNext()) ) {
- Text_mkP(escaper.getPlayer(), "next")
+ Text.mkP(escaper.getPlayer(), "next")
 		} else {
- Text_erP(escaper.getPlayer(), "you're not making multipatrol or teleport monsters")
+ Text.erP(escaper.getPlayer(), "you're not making multipatrol or teleport monsters")
 		}
 		return true;
 	}
@@ -1042,9 +1044,9 @@ const ExecuteCommandMake = (escaper: Escaper, cmd: string): boolean => {
 			return true;
 		}
 		if ( (escaper.makeMonsterTeleportWait()) ) {
- Text_mkP(escaper.getPlayer(), "wait period added")
+ Text.mkP(escaper.getPlayer(), "wait period added")
 		} else {
- Text_erP(escaper.getPlayer(), "impossible to add a wait period")
+ Text.erP(escaper.getPlayer(), "impossible to add a wait period")
 		}
 		return true;
 	}
@@ -1056,9 +1058,9 @@ const ExecuteCommandMake = (escaper: Escaper, cmd: string): boolean => {
 			return true;
 		}
 		if ( (escaper.makeMonsterTeleportHide()) ) {
- Text_mkP(escaper.getPlayer(), "hide period added")
+ Text.mkP(escaper.getPlayer(), "hide period added")
 		} else {
- Text_erP(escaper.getPlayer(), "impossible to add a hide period")
+ Text.erP(escaper.getPlayer(), "impossible to add a hide period")
 		}
 		return true;
 	}
@@ -1072,12 +1074,12 @@ const ExecuteCommandMake = (escaper: Escaper, cmd: string): boolean => {
 		//checkParam1
 		x = S2R(param1);
 		if ((x < MONSTER_TELEPORT_PERIOD_MIN || x > MONSTER_TELEPORT_PERIOD_MAX)) {
- Text_erP(escaper.getPlayer(), "the period must be between " + R2S(MONSTER_TELEPORT_PERIOD_MIN) + " and " + R2S(MONSTER_TELEPORT_PERIOD_MAX))
+ Text.erP(escaper.getPlayer(), "the period must be between " + R2S(MONSTER_TELEPORT_PERIOD_MIN) + " and " + R2S(MONSTER_TELEPORT_PERIOD_MAX))
 			return true;
 		}
 		//apply command
  escaper.makeSetUnitTeleportPeriod("oneByOne", x)
- Text_mkP(escaper.getPlayer(), "setting unit teleport period on")
+ Text.mkP(escaper.getPlayer(), "setting unit teleport period on")
 		return true;
 	}
 
@@ -1090,12 +1092,12 @@ const ExecuteCommandMake = (escaper: Escaper, cmd: string): boolean => {
 		//checkParam1
 		x = S2R(param1);
 		if ((x < MONSTER_TELEPORT_PERIOD_MIN || x > MONSTER_TELEPORT_PERIOD_MAX)) {
- Text_erP(escaper.getPlayer(), "the period must be between " + R2S(MONSTER_TELEPORT_PERIOD_MIN) + " and " + R2S(MONSTER_TELEPORT_PERIOD_MAX))
+ Text.erP(escaper.getPlayer(), "the period must be between " + R2S(MONSTER_TELEPORT_PERIOD_MIN) + " and " + R2S(MONSTER_TELEPORT_PERIOD_MAX))
 			return true;
 		}
 		//apply command
  escaper.makeSetUnitTeleportPeriod("twoClics", x)
- Text_mkP(escaper.getPlayer(), "setting unit teleport period on")
+ Text.mkP(escaper.getPlayer(), "setting unit teleport period on")
 		return true;
 	}
 
@@ -1107,7 +1109,7 @@ const ExecuteCommandMake = (escaper: Escaper, cmd: string): boolean => {
 		}
 		//apply command
  escaper.makeGetUnitTeleportPeriod()
- Text_mkP(escaper.getPlayer(), "getting unit teleport period on")
+ Text.mkP(escaper.getPlayer(), "getting unit teleport period on")
 		return true;
 	}
 
@@ -1120,12 +1122,12 @@ const ExecuteCommandMake = (escaper: Escaper, cmd: string): boolean => {
 		//checkParam1
 		x = S2R(param1);
 		if ((x < MONSTER_TELEPORT_PERIOD_MIN || x > MONSTER_TELEPORT_PERIOD_MAX)) {
- Text_erP(escaper.getPlayer(), "the period must be between " + R2S(MONSTER_TELEPORT_PERIOD_MIN) + " and " + R2S(MONSTER_TELEPORT_PERIOD_MAX))
+ Text.erP(escaper.getPlayer(), "the period must be between " + R2S(MONSTER_TELEPORT_PERIOD_MIN) + " and " + R2S(MONSTER_TELEPORT_PERIOD_MAX))
 			return true;
 		}
 		//apply command
  escaper.makeSetUnitTeleportPeriod("oneByOne", x)
- Text_mkP(escaper.getPlayer(), "setting unit teleport period on")
+ Text.mkP(escaper.getPlayer(), "setting unit teleport period on")
 		return true;
 	}
 
@@ -1137,12 +1139,12 @@ const ExecuteCommandMake = (escaper: Escaper, cmd: string): boolean => {
 		}
 		//checkParam1
 		if ( (not udg_monsterTypes.isLabelAlreadyUsed(param1)) ) {
- Text_erP(escaper.getPlayer(), "unknown monster type")
+ Text.erP(escaper.getPlayer(), "unknown monster type")
 			return true;
 		}
 		//apply command
  escaper.makeSetUnitMonsterType("oneByOne", udg_monsterTypes.get(param1))
- Text_mkP(escaper.getPlayer(), "setting unit monster type on")
+ Text.mkP(escaper.getPlayer(), "setting unit monster type on")
 		return true;
 	}
 
@@ -1154,12 +1156,12 @@ const ExecuteCommandMake = (escaper: Escaper, cmd: string): boolean => {
 		}
 		//checkParam1
 		if ( (not udg_monsterTypes.isLabelAlreadyUsed(param1)) ) {
- Text_erP(escaper.getPlayer(), "unknown monster type")
+ Text.erP(escaper.getPlayer(), "unknown monster type")
 			return true;
 		}
 		//apply command
  escaper.makeSetUnitMonsterType("twoClics", udg_monsterTypes.get(param1))
- Text_mkP(escaper.getPlayer(), "setting unit monster type on")
+ Text.mkP(escaper.getPlayer(), "setting unit monster type on")
 		return true;
 	}
 
@@ -1173,7 +1175,7 @@ const ExecuteCommandMake = (escaper: Escaper, cmd: string): boolean => {
 			if ( (udg_monsterTypes.isLabelAlreadyUsed(param1)) ) {
  udg_monsterTypes.get(param1).displayTotalForPlayer(escaper.getPlayer())
 			} else {
- Text_erP(escaper.getPlayer(), "unknown monster type")
+ Text.erP(escaper.getPlayer(), "unknown monster type")
 			}
 		} else {
  udg_monsterTypes.displayForPlayer(escaper.getPlayer())
@@ -1214,7 +1216,7 @@ const ExecuteCommandMake = (escaper: Escaper, cmd: string): boolean => {
 			str = "all";
 		}
  escaper.makeDeleteMonsters(str)
- Text_mkP(escaper.getPlayer(), "monsters deleting on")
+ Text.mkP(escaper.getPlayer(), "monsters deleting on")
 		return true;
 	}
 
@@ -1223,7 +1225,7 @@ const ExecuteCommandMake = (escaper: Escaper, cmd: string): boolean => {
 	if ((name === "deleteMonster" || name === "delm")) {
 		if ((noParam)) {
  escaper.makeDeleteMonsters("oneByOne")
- Text_mkP(escaper.getPlayer(), "monster deleting on")
+ Text.mkP(escaper.getPlayer(), "monster deleting on")
 		}
 		return true;
 	}
@@ -1232,15 +1234,15 @@ const ExecuteCommandMake = (escaper: Escaper, cmd: string): boolean => {
 	//-createMonsterSpawn(crmsp) <monsterSpawnLabel> <monsterLabel> <direction> [<frequency>]   --> default frequency is 2, minimum is 0.1, maximum is 30
 	if ((name === "createMonsterSpawn" || name === "crmsp")) {
 		if ((!(nbParam >= 3 && nbParam <= 4))) {
- Text_erP(escaper.getPlayer(), "uncorrect number of parameters")
+ Text.erP(escaper.getPlayer(), "uncorrect number of parameters")
 			return true;
 		}
 		if ((escaper.getMakingLevel().monsterSpawns.getFromLabel(param1) != 0)) {
- Text_erP(escaper.getPlayer(), "a monster spawn with label \"" + param1 + "\" already exists for this level")
+ Text.erP(escaper.getPlayer(), "a monster spawn with label \"" + param1 + "\" already exists for this level")
 			return true;
 		}
 		if ((udg_monsterTypes.get(param2) == 0)) {
- Text_erP(escaper.getPlayer(), "unknown monster type \"" + param2 + "\"")
+ Text.erP(escaper.getPlayer(), "unknown monster type \"" + param2 + "\"")
 			return true;
 		}
 		if ((param3 === "leftToRight" || param3 === "ltr")) {
@@ -1252,20 +1254,20 @@ const ExecuteCommandMake = (escaper: Escaper, cmd: string): boolean => {
 		} else if ((param3 === "downToUp" || param3 === "dtu")) {
 			str = "downToUp";
 		} else {
- Text_erP(escaper.getPlayer(), "param 3 should be direction : leftToRight, upToDown, rightToLeft or downToUp")
+ Text.erP(escaper.getPlayer(), "param 3 should be direction : leftToRight, upToDown, rightToLeft or downToUp")
 			return true;
 		}
 		if ((nbParam === 4)) {
 			x = S2R(param4);
 			if ((x < 0.1 or x > 30)) {
- Text_erP(escaper.getPlayer(), "frequency must be a real between 0.1 and 30")
+ Text.erP(escaper.getPlayer(), "frequency must be a real between 0.1 and 30")
 				return true;
 			}
 		} else {
 			x = 2;
 		}
  escaper.makeCreateMonsterSpawn(param1, udg_monsterTypes.get(param2), str, x)
- Text_mkP(escaper.getPlayer(), "monster spawn making on")
+ Text.mkP(escaper.getPlayer(), "monster spawn making on")
 		return true;
 	}
 
@@ -1276,9 +1278,9 @@ const ExecuteCommandMake = (escaper: Escaper, cmd: string): boolean => {
 			return true;
 		}
 		if ((escaper.getMakingLevel().monsterSpawns.changeLabel(param1, param2))) {
- Text_mkP(escaper.getPlayer(), "label changed")
+ Text.mkP(escaper.getPlayer(), "label changed")
 		} else {
- Text_erP(escaper.getPlayer(), "couldn't change label")
+ Text.erP(escaper.getPlayer(), "couldn't change label")
 		}
 		return true;
 	}
@@ -1290,15 +1292,15 @@ const ExecuteCommandMake = (escaper: Escaper, cmd: string): boolean => {
 			return true;
 		}
 		if ((escaper.getMakingLevel().monsterSpawns.getFromLabel(param1) == 0)) {
- Text_erP(escaper.getPlayer(), "unknown monster spawn \"" + param1 + "\" in this level")
+ Text.erP(escaper.getPlayer(), "unknown monster spawn \"" + param1 + "\" in this level")
 			return true;
 		}
 		if ((udg_monsterTypes.get(param2) == 0)) {
- Text_erP(escaper.getPlayer(), "unknown monster type \"" + param2 + "\"")
+ Text.erP(escaper.getPlayer(), "unknown monster type \"" + param2 + "\"")
 			return true;
 		}
  escaper.getMakingLevel().monsterSpawns.getFromLabel(param1).setMonsterType(udg_monsterTypes.get(param2))
- Text_mkP(escaper.getPlayer(), "monster type changed")
+ Text.mkP(escaper.getPlayer(), "monster type changed")
 		return true;
 	}
 
@@ -1309,7 +1311,7 @@ const ExecuteCommandMake = (escaper: Escaper, cmd: string): boolean => {
 			return true;
 		}
 		if ((escaper.getMakingLevel().monsterSpawns.getFromLabel(param1) == 0)) {
- Text_erP(escaper.getPlayer(), "unknown monster spawn \"" + param1 + "\" in this level")
+ Text.erP(escaper.getPlayer(), "unknown monster spawn \"" + param1 + "\" in this level")
 			return true;
 		}
 		if ((param2 === "leftToRight" || param2 === "ltr")) {
@@ -1321,11 +1323,11 @@ const ExecuteCommandMake = (escaper: Escaper, cmd: string): boolean => {
 		} else if ((param2 === "downToUp" || param2 === "dtu")) {
 			str = "downToUp";
 		} else {
- Text_erP(escaper.getPlayer(), "direction should be leftToRight, upToDown, rightToLeft or downToUp")
+ Text.erP(escaper.getPlayer(), "direction should be leftToRight, upToDown, rightToLeft or downToUp")
 			return true;
 		}
  escaper.getMakingLevel().monsterSpawns.getFromLabel(param1).setSens(str)
- Text_mkP(escaper.getPlayer(), "direction changed")
+ Text.mkP(escaper.getPlayer(), "direction changed")
 		return true;
 	}
 
@@ -1336,16 +1338,16 @@ const ExecuteCommandMake = (escaper: Escaper, cmd: string): boolean => {
 			return true;
 		}
 		if ((escaper.getMakingLevel().monsterSpawns.getFromLabel(param1) == 0)) {
- Text_erP(escaper.getPlayer(), "unknown monster spawn \"" + param1 + "\" in this level")
+ Text.erP(escaper.getPlayer(), "unknown monster spawn \"" + param1 + "\" in this level")
 			return true;
 		}
 		x = S2R(param2);
 		if ((x < 0.1 or x > 30)) {
- Text_erP(escaper.getPlayer(), "frequency must be a real between 0.1 and 30")
+ Text.erP(escaper.getPlayer(), "frequency must be a real between 0.1 and 30")
 			return true;
 		}
  escaper.getMakingLevel().monsterSpawns.getFromLabel(param1).setFrequence(x)
- Text_mkP(escaper.getPlayer(), "frequency changed")
+ Text.mkP(escaper.getPlayer(), "frequency changed")
 		return true;
 	}
 
@@ -1366,9 +1368,9 @@ const ExecuteCommandMake = (escaper: Escaper, cmd: string): boolean => {
 			return true;
 		}
 		if ((escaper.getMakingLevel().monsterSpawns.clearMonsterSpawn(param1))) {
- Text_mkP(escaper.getPlayer(), "monster spawn deleted")
+ Text.mkP(escaper.getPlayer(), "monster spawn deleted")
 		} else {
- Text_erP(escaper.getPlayer(), "unknown monster spawn for this level")
+ Text.erP(escaper.getPlayer(), "unknown monster spawn for this level")
 		}
 		return true;
 	}
@@ -1378,7 +1380,7 @@ const ExecuteCommandMake = (escaper: Escaper, cmd: string): boolean => {
 	if ((name === "createKey" || name === "crk")) {
 		if ((noParam)) {
  escaper.makeCreateMeteor()
- Text_mkP(escaper.getPlayer(), "meteor making on")
+ Text.mkP(escaper.getPlayer(), "meteor making on")
 		}
 		return true;
 	}
@@ -1388,7 +1390,7 @@ const ExecuteCommandMake = (escaper: Escaper, cmd: string): boolean => {
 	if ((name === "deleteKeysBetweenPoints" || name === "delkbp")) {
 		if ((noParam)) {
  escaper.makeDeleteMeteors("twoClics")
- Text_mkP(escaper.getPlayer(), "meteors deleting on")
+ Text.mkP(escaper.getPlayer(), "meteors deleting on")
 		}
 		return true;
 	}
@@ -1398,7 +1400,7 @@ const ExecuteCommandMake = (escaper: Escaper, cmd: string): boolean => {
 	if ((name === "deleteKey" || name === "delk")) {
 		if ((noParam)) {
  escaper.makeDeleteMeteors("oneByOne")
- Text_mkP(escaper.getPlayer(), "meteors deleting on")
+ Text.mkP(escaper.getPlayer(), "meteors deleting on")
 		}
 		return true;
 	}
@@ -1412,7 +1414,7 @@ const ExecuteCommandMake = (escaper: Escaper, cmd: string): boolean => {
 		//checkParam1
 		if ((nbParam === 1)) {
 			if ((!(param1 === "next" || param1 === "n"))) {
- Text_erP(escaper.getPlayer(), "param1 should be \"next\" or \"n\"")
+ Text.erP(escaper.getPlayer(), "param1 should be \"next\" or \"n\"")
 				return true;
 			}
 			b = true;
@@ -1420,7 +1422,7 @@ const ExecuteCommandMake = (escaper: Escaper, cmd: string): boolean => {
 			b = false;
 		}
  escaper.makeCreateStart(b) //b signifie si le "Start" est créé pour le niveau suivant (sinon pour le niveau en cours de mapping pour l'escaper)
- Text_mkP(escaper.getPlayer(), "start making on")
+ Text.mkP(escaper.getPlayer(), "start making on")
 		return true;
 	}
 
@@ -1431,7 +1433,7 @@ const ExecuteCommandMake = (escaper: Escaper, cmd: string): boolean => {
 			return true;
 		}
  escaper.makeCreateEnd()
- Text_mkP(escaper.getPlayer(), "end making on")
+ Text.mkP(escaper.getPlayer(), "end making on")
 		return true;
 	}
 
@@ -1446,7 +1448,7 @@ const ExecuteCommandMake = (escaper: Escaper, cmd: string): boolean => {
 		} else {
 			str = "";
 		}
- Text_P(escaper.getPlayer(), "the level you are making is number " + I2S(escaper.getMakingLevel().getId()) + str)
+ Text.P(escaper.getPlayer(), "the level you are making is number " + I2S(escaper.getMakingLevel().getId()) + str)
 		return true;
 	}
 
@@ -1456,35 +1458,35 @@ const ExecuteCommandMake = (escaper: Escaper, cmd: string): boolean => {
 		if ((!(nbParam === 1))) {
 			return true;
 		}
-		if ((IsPositiveInteger(param1))) {
+		if ((FunctionsOnNumbers.IsPositiveInteger(param1))) {
 			n = S2I(param1);
 			if ( (udg_levels.getLastLevelId() < n) ) {
 				if ( (n - udg_levels.getLastLevelId() == 1) ) {
 					if ( (udg_levels.new()) ) {
- Text_mkP(escaper.getPlayer(), "level number " + I2S(n) + " created")
+ Text.mkP(escaper.getPlayer(), "level number " + I2S(n) + " created")
 					} else {
- Text_erP(escaper.getPlayer(), "nombre maximum de niveaux atteint")
+ Text.erP(escaper.getPlayer(), "nombre maximum de niveaux atteint")
 						return true;
 					}
 				} else {
- Text_erP(escaper.getPlayer(), "this level doesn't exist")
+ Text.erP(escaper.getPlayer(), "this level doesn't exist")
 					return true;
 				}
 			}
 			if ( (escaper.setMakingLevel(udg_levels.get(n))) ) {
- Text_mkP(escaper.getPlayer(), "you are now making level " + I2S(n))
+ Text.mkP(escaper.getPlayer(), "you are now making level " + I2S(n))
 			} else {
- Text_erP(escaper.getPlayer(), "you are already making this level")
+ Text.erP(escaper.getPlayer(), "you are already making this level")
 			}
 		} else {
 			if ((param1 === "current" || param1 === "c")) {
 				if ( (escaper.setMakingLevel(0)) ) {
- Text_mkP(escaper.getPlayer(), "you are now making current level (which is at the moment number " + I2S(udg_levels.getCurrentLevel().getId()) + ")")
+ Text.mkP(escaper.getPlayer(), "you are now making current level (which is at the moment number " + I2S(udg_levels.getCurrentLevel().getId()) + ")")
 				} else {
- Text_erP(escaper.getPlayer(), "you are already making current level")
+ Text.erP(escaper.getPlayer(), "you are already making current level")
 				}
 			} else {
- Text_erP(escaper.getPlayer(), "param1 should be a level id or \"current\"")
+ Text.erP(escaper.getPlayer(), "param1 should be a level id or \"current\"")
 			}
 		}
 		return true;
@@ -1495,9 +1497,9 @@ const ExecuteCommandMake = (escaper: Escaper, cmd: string): boolean => {
 	if ((name === "newLevel" || name === "newl")) {
 		if ((noParam)) {
 			if ( (udg_levels.new()) ) {
- Text_mkP(escaper.getPlayer(), "level number " + I2S(udg_levels.getLastLevelId()) + " created")
+ Text.mkP(escaper.getPlayer(), "level number " + I2S(udg_levels.getLastLevelId()) + " created")
 			} else {
- Text_erP(escaper.getPlayer(), "nombre maximum de niveaux atteint")
+ Text.erP(escaper.getPlayer(), "nombre maximum de niveaux atteint")
 			}
 		}
 		return true;
@@ -1510,19 +1512,19 @@ const ExecuteCommandMake = (escaper: Escaper, cmd: string): boolean => {
 			return true;
 		}
 		//check param1
-		if ((!IsPositiveInteger(param1))) {
- Text_erP(escaper.getPlayer(), "the number of lives must be a positive integer")
+		if ((!FunctionsOnNumbers.IsPositiveInteger(param1))) {
+ Text.erP(escaper.getPlayer(), "the number of lives must be a positive integer")
 			return true;
 		}
 		//check param2
 		if ((nbParam === 2)) {
-			if ((!(IsPositiveInteger(param2)))) {
- Text_erP(escaper.getPlayer(), "the level number must be a positive integer")
+			if ((!(FunctionsOnNumbers.IsPositiveInteger(param2)))) {
+ Text.erP(escaper.getPlayer(), "the level number must be a positive integer")
 				return true;
 			}
 			level = udg_levels.get(S2I(param2))
 			if ((level === 0)) {
- Text_erP(escaper.getPlayer(), "level number " + param2 + " doesn't exist")
+ Text.erP(escaper.getPlayer(), "level number " + param2 + " doesn't exist")
 				return true;
 			}
 		} else {
@@ -1530,9 +1532,9 @@ const ExecuteCommandMake = (escaper: Escaper, cmd: string): boolean => {
 		}
  level.setNbLivesEarned(S2I(param1))
 		if ( (level.getId() > 0) ) {
- Text_mkP(escaper.getPlayer(), "the number of lives earned at level " + I2S(level.getId()) + " is now " + param1)
+ Text.mkP(escaper.getPlayer(), "the number of lives earned at level " + I2S(level.getId()) + " is now " + param1)
 		} else {
- Text_mkP(escaper.getPlayer(), "the number of lives at the beginning of the game is now " + param1)
+ Text.mkP(escaper.getPlayer(), "the number of lives at the beginning of the game is now " + param1)
 		}
 		return true;
 	}
@@ -1542,7 +1544,7 @@ const ExecuteCommandMake = (escaper: Escaper, cmd: string): boolean => {
 	if ((name === "createVisibility" || name === "crv")) {
 		if ((noParam)) {
  escaper.makeCreateVisibilityModifier()
- Text_mkP(escaper.getPlayer(), "visibility making on")
+ Text.mkP(escaper.getPlayer(), "visibility making on")
 		}
 		return true;
 	}
@@ -1555,20 +1557,20 @@ const ExecuteCommandMake = (escaper: Escaper, cmd: string): boolean => {
 		}
 		//check param1
 		if ((nbParam === 1)) {
-			if ((!(IsPositiveInteger(param1)))) {
- Text_erP(escaper.getPlayer(), "the level number must be a positive integer")
+			if ((!(FunctionsOnNumbers.IsPositiveInteger(param1)))) {
+ Text.erP(escaper.getPlayer(), "the level number must be a positive integer")
 				return true;
 			}
 			level = udg_levels.get(S2I(param2))
 			if ((level === 0)) {
- Text_erP(escaper.getPlayer(), "level number " + param1 + " doesn't exist")
+ Text.erP(escaper.getPlayer(), "level number " + param1 + " doesn't exist")
 				return true;
 			}
 		} else {
 			level = escaper.getMakingLevel()
 		}
  level.removeVisibilities()
- Text_mkP(escaper.getPlayer(), "visibilities removed for level " + I2S(level.getId()))
+ Text.mkP(escaper.getPlayer(), "visibilities removed for level " + I2S(level.getId()))
 		return true;
 	}
 
@@ -1576,7 +1578,7 @@ const ExecuteCommandMake = (escaper: Escaper, cmd: string): boolean => {
 	//-setStartMessage(setsm) [<message>]   --> sets the start message of the current level (spaces allowed)
 	if ((name === "setStartMessage" || name === "setsm")) {
  escaper.getMakingLevel().setStartMessage(CmdParam(cmd, 0))
- Text_mkP(escaper.getPlayer(), "start message for level " + I2S(escaper.getMakingLevel().getId()) + " changed")
+ Text.mkP(escaper.getPlayer(), "start message for level " + I2S(escaper.getMakingLevel().getId()) + " changed")
 		return true;
 	}
 
@@ -1585,9 +1587,9 @@ const ExecuteCommandMake = (escaper: Escaper, cmd: string): boolean => {
 	if ((name === "getStartMessage" || name === "getsm")) {
 		str = escaper.getMakingLevel().getStartMessage()
 		if ((str === "" || str === null)) {
- Text_mkP(escaper.getPlayer(), "start message for level " + I2S(escaper.getMakingLevel().getId()) + " is not defined")
+ Text.mkP(escaper.getPlayer(), "start message for level " + I2S(escaper.getMakingLevel().getId()) + " is not defined")
 		} else {
- Text_mkP(escaper.getPlayer(), "start message for level " + I2S(escaper.getMakingLevel().getId()) + " is \"" + str + "\"")
+ Text.mkP(escaper.getPlayer(), "start message for level " + I2S(escaper.getMakingLevel().getId()) + " is \"" + str + "\"")
 		}
 		return true;
 	}
@@ -1597,7 +1599,7 @@ const ExecuteCommandMake = (escaper: Escaper, cmd: string): boolean => {
 	if ((name === "cancel" || name === "z")) {
 		if ((noParam)) {
 			if ( (not escaper.cancelLastAction()) ) {
- Text_erP(escaper.getPlayer(), "nothing to cancel")
+ Text.erP(escaper.getPlayer(), "nothing to cancel")
 			}
 		}
 		return true;
@@ -1608,7 +1610,7 @@ const ExecuteCommandMake = (escaper: Escaper, cmd: string): boolean => {
 	if ((name === "redo" || name === "y")) {
 		if ((noParam)) {
 			if ( (not escaper.redoLastAction()) ) {
- Text_erP(escaper.getPlayer(), "nothing to redo")
+ Text.erP(escaper.getPlayer(), "nothing to redo")
 			}
 		}
 		return true;
@@ -1620,9 +1622,9 @@ const ExecuteCommandMake = (escaper: Escaper, cmd: string): boolean => {
 		if ((noParam)) {
 			n = udg_levels.count()
 			if ((n > 1)) {
- Text_P(escaper.getPlayer(), "there are currently " + I2S(n) + " levels in the map")
+ Text.P(escaper.getPlayer(), "there are currently " + I2S(n) + " levels in the map")
 			} else {
- Text_P(escaper.getPlayer(), "there is currently " + I2S(n) + " level in the map")
+ Text.P(escaper.getPlayer(), "there is currently " + I2S(n) + " level in the map")
 			}
 		}
 		return true;
@@ -1636,37 +1638,37 @@ const ExecuteCommandMake = (escaper: Escaper, cmd: string): boolean => {
 		}
 		//checkParam1
 		if ( (udg_casterTypes.isLabelAlreadyUsed(param1)) ) {
- Text_erP(escaper.getPlayer(), "label \"" + param1 + "\" already used")
+ Text.erP(escaper.getPlayer(), "label \"" + param1 + "\" already used")
 			return true;
 		}
 		//checkParam2
 		if ( (not udg_monsterTypes.isLabelAlreadyUsed(param2)) ) {
- Text_erP(escaper.getPlayer(), "unknown monster type \"" + param2 + "\"")
+ Text.erP(escaper.getPlayer(), "unknown monster type \"" + param2 + "\"")
 			return true;
 		}
 		//checkParam3
 		if ( (not udg_monsterTypes.isLabelAlreadyUsed(param3)) ) {
- Text_erP(escaper.getPlayer(), "unknown monster type \"" + param3 + "\"")
+ Text.erP(escaper.getPlayer(), "unknown monster type \"" + param3 + "\"")
 			return true;
 		}
 		//checkParam4 range
 		if ((nbParam >= 4)) {
 			if ((S2R(param4) <= 0)) {
- Text_erP(escaper.getPlayer(), "the range must be a real higher than 0")
+ Text.erP(escaper.getPlayer(), "the range must be a real higher than 0")
 				return true;
 			}
 			x = S2R(param4);
 			//checkParam5 projectile speed
 			if ((nbParam >= 5)) {
 				if ((S2R(CmdParam(cmd, 5)) < MIN_CASTER_PROJECTILE_SPEED)) {
- Text_erP(escaper.getPlayer(), "the projectile speed must be a real higher or equals to " + R2S(MIN_CASTER_PROJECTILE_SPEED))
+ Text.erP(escaper.getPlayer(), "the projectile speed must be a real higher or equals to " + R2S(MIN_CASTER_PROJECTILE_SPEED))
 					return true;
 				}
 				speed = S2R(CmdParam(cmd, 5));
 				//checkParam6 load time
 				if ((nbParam === 6)) {
 					if ((S2R(CmdParam(cmd, 6)) < MIN_CASTER_LOAD_TIME)) {
- Text_erP(escaper.getPlayer(), "the load time must be a real higher or equals to " + R2S(MIN_CASTER_LOAD_TIME))
+ Text.erP(escaper.getPlayer(), "the load time must be a real higher or equals to " + R2S(MIN_CASTER_LOAD_TIME))
 						return true;
 					}
 					y = S2R(CmdParam(cmd, 6));
@@ -1684,11 +1686,11 @@ const ExecuteCommandMake = (escaper: Escaper, cmd: string): boolean => {
 		}
 		//apply command
 		if ((StringContainsChar(param1, CACHE_SEPARATEUR_ITEM) || StringContainsChar(param1, CACHE_SEPARATEUR_PARAM) || StringContainsChar(param1, "\""))) {
- Text_erP(escaper.getPlayer(), "characters \", " + CACHE_SEPARATEUR_ITEM + " and " + CACHE_SEPARATEUR_PARAM + " not allowed")
+ Text.erP(escaper.getPlayer(), "characters \", " + CACHE_SEPARATEUR_ITEM + " and " + CACHE_SEPARATEUR_PARAM + " not allowed")
 			return true;
 		}
  udg_casterTypes.new(param1, udg_monsterTypes.get(param2), udg_monsterTypes.get(param3), x, speed, y, DEFAULT_CASTER_ANIMATION)
- Text_mkP(escaper.getPlayer(), "new caster type \"" + param1 + "\" created")
+ Text.mkP(escaper.getPlayer(), "new caster type \"" + param1 + "\" created")
 		return true;
 	}
 
@@ -1704,13 +1706,13 @@ const ExecuteCommandMake = (escaper: Escaper, cmd: string): boolean => {
 		}
 		if ((b)) {
 			if ((StringContainsChar(param2, CACHE_SEPARATEUR_ITEM) || StringContainsChar(param2, CACHE_SEPARATEUR_PARAM) || StringContainsChar(param2, "\""))) {
- Text_erP(escaper.getPlayer(), "characters \", " + CACHE_SEPARATEUR_ITEM + " and " + CACHE_SEPARATEUR_PARAM + " not allowed")
+ Text.erP(escaper.getPlayer(), "characters \", " + CACHE_SEPARATEUR_ITEM + " and " + CACHE_SEPARATEUR_PARAM + " not allowed")
 				return true;
 			}
  udg_casterTypes.get(param1).setLabel(param2)
- Text_mkP(escaper.getPlayer(), "label changed to \"" + param2 + "\"")
+ Text.mkP(escaper.getPlayer(), "label changed to \"" + param2 + "\"")
 		} else {
- Text_erP(escaper.getPlayer(), "impossible to change label")
+ Text.erP(escaper.getPlayer(), "impossible to change label")
 		}
 		return true;
 	}
@@ -1727,13 +1729,13 @@ const ExecuteCommandMake = (escaper: Escaper, cmd: string): boolean => {
 		}
 		if ((b)) {
 			if ((StringContainsChar(param2, CACHE_SEPARATEUR_ITEM) || StringContainsChar(param2, CACHE_SEPARATEUR_PARAM) || StringContainsChar(param2, "\""))) {
- Text_erP(escaper.getPlayer(), "characters \", " + CACHE_SEPARATEUR_ITEM + " and " + CACHE_SEPARATEUR_PARAM + " not allowed")
+ Text.erP(escaper.getPlayer(), "characters \", " + CACHE_SEPARATEUR_ITEM + " and " + CACHE_SEPARATEUR_PARAM + " not allowed")
 				return true;
 			}
  udg_casterTypes.get(param1).setAlias(param2)
- Text_mkP(escaper.getPlayer(), "alias changed to \"" + param2 + "\"")
+ Text.mkP(escaper.getPlayer(), "alias changed to \"" + param2 + "\"")
 		} else {
- Text_erP(escaper.getPlayer(), "impossible to change alias")
+ Text.erP(escaper.getPlayer(), "impossible to change alias")
 		}
 		return true;
 	}
@@ -1746,17 +1748,17 @@ const ExecuteCommandMake = (escaper: Escaper, cmd: string): boolean => {
 		}
 		//checkParam 1
 		if ( (not udg_casterTypes.isLabelAlreadyUsed(param1)) ) {
- Text_erP(escaper.getPlayer(), "unknown caster type \"" + param1 + "\"")
+ Text.erP(escaper.getPlayer(), "unknown caster type \"" + param1 + "\"")
 			return true;
 		}
 		//checkParam 2
 		if ( (not udg_monsterTypes.isLabelAlreadyUsed(param2)) ) {
- Text_erP(escaper.getPlayer(), "unknown monster type \"" + param2 + "\"")
+ Text.erP(escaper.getPlayer(), "unknown monster type \"" + param2 + "\"")
 			return true;
 		}
 		//apply command
  udg_casterTypes.get(param1).setCasterMonsterType(udg_monsterTypes.get(param2))
- Text_mkP(escaper.getPlayer(), "caster monster type changed")
+ Text.mkP(escaper.getPlayer(), "caster monster type changed")
 		return true;
 	}
 
@@ -1768,17 +1770,17 @@ const ExecuteCommandMake = (escaper: Escaper, cmd: string): boolean => {
 		}
 		//checkParam 1
 		if ( (not udg_casterTypes.isLabelAlreadyUsed(param1)) ) {
- Text_erP(escaper.getPlayer(), "unknown caster type \"" + param1 + "\"")
+ Text.erP(escaper.getPlayer(), "unknown caster type \"" + param1 + "\"")
 			return true;
 		}
 		//checkParam 2
 		if ( (not udg_monsterTypes.isLabelAlreadyUsed(param2)) ) {
- Text_erP(escaper.getPlayer(), "unknown monster type \"" + param2 + "\"")
+ Text.erP(escaper.getPlayer(), "unknown monster type \"" + param2 + "\"")
 			return true;
 		}
 		//apply command
  udg_casterTypes.get(param1).setProjectileMonsterType(udg_monsterTypes.get(param2))
- Text_mkP(escaper.getPlayer(), "projectile monster type changed")
+ Text.mkP(escaper.getPlayer(), "projectile monster type changed")
 		return true;
 	}
 
@@ -1790,17 +1792,17 @@ const ExecuteCommandMake = (escaper: Escaper, cmd: string): boolean => {
 		}
 		//checkParam 1
 		if ( (not udg_casterTypes.isLabelAlreadyUsed(param1)) ) {
- Text_erP(escaper.getPlayer(), "unknown caster type \"" + param1 + "\"")
+ Text.erP(escaper.getPlayer(), "unknown caster type \"" + param1 + "\"")
 			return true;
 		}
 		//checkParam 2
 		if ((S2R(param2) <= 0)) {
- Text_erP(escaper.getPlayer(), "the range must be a real higher than 0")
+ Text.erP(escaper.getPlayer(), "the range must be a real higher than 0")
 			return true;
 		}
 		//apply command
  udg_casterTypes.get(param1).setRange(S2R(param2))
- Text_mkP(escaper.getPlayer(), "range changed")
+ Text.mkP(escaper.getPlayer(), "range changed")
 		return true;
 	}
 
@@ -1812,17 +1814,17 @@ const ExecuteCommandMake = (escaper: Escaper, cmd: string): boolean => {
 		}
 		//checkParam 1
 		if ( (not udg_casterTypes.isLabelAlreadyUsed(param1)) ) {
- Text_erP(escaper.getPlayer(), "unknown caster type \"" + param1 + "\"")
+ Text.erP(escaper.getPlayer(), "unknown caster type \"" + param1 + "\"")
 			return true;
 		}
 		//checkParam 2
 		if ((S2R(param2) < MIN_CASTER_PROJECTILE_SPEED)) {
- Text_erP(escaper.getPlayer(), "the projectile speed must be a real higher or equals to " + R2S(MIN_CASTER_PROJECTILE_SPEED))
+ Text.erP(escaper.getPlayer(), "the projectile speed must be a real higher or equals to " + R2S(MIN_CASTER_PROJECTILE_SPEED))
 			return true;
 		}
 		//apply command
  udg_casterTypes.get(param1).setProjectileSpeed(S2R(param2))
- Text_mkP(escaper.getPlayer(), "projectile speed changed")
+ Text.mkP(escaper.getPlayer(), "projectile speed changed")
 		return true;
 	}
 
@@ -1834,17 +1836,17 @@ const ExecuteCommandMake = (escaper: Escaper, cmd: string): boolean => {
 		}
 		//checkParam 1
 		if ( (not udg_casterTypes.isLabelAlreadyUsed(param1)) ) {
- Text_erP(escaper.getPlayer(), "unknown caster type \"" + param1 + "\"")
+ Text.erP(escaper.getPlayer(), "unknown caster type \"" + param1 + "\"")
 			return true;
 		}
 		//checkParam 2
 		if ((S2R(param2) < MIN_CASTER_LOAD_TIME)) {
- Text_erP(escaper.getPlayer(), "the load time must be a real higher or equals to " + R2S(MIN_CASTER_LOAD_TIME))
+ Text.erP(escaper.getPlayer(), "the load time must be a real higher or equals to " + R2S(MIN_CASTER_LOAD_TIME))
 			return true;
 		}
 		//apply command
  udg_casterTypes.get(param1).setLoadTime(S2R(param2))
- Text_mkP(escaper.getPlayer(), "load time changed")
+ Text.mkP(escaper.getPlayer(), "load time changed")
 		return true;
 	}
 
@@ -1856,7 +1858,7 @@ const ExecuteCommandMake = (escaper: Escaper, cmd: string): boolean => {
 		}
 		//checkParam 1
 		if ( (not udg_casterTypes.isLabelAlreadyUsed(param1)) ) {
- Text_erP(escaper.getPlayer(), "unknown caster type \"" + param1 + "\"")
+ Text.erP(escaper.getPlayer(), "unknown caster type \"" + param1 + "\"")
 			return true;
 		}
 		//checkParam 2
@@ -1864,7 +1866,7 @@ const ExecuteCommandMake = (escaper: Escaper, cmd: string): boolean => {
 		str = SubStringBJ(cmd, n, StringLength(cmd));
 		//apply command
  udg_casterTypes.get(param1).setAnimation(str)
- Text_mkP(escaper.getPlayer(), "caster animation changed")
+ Text.mkP(escaper.getPlayer(), "caster animation changed")
 		return true;
 	}
 
@@ -1876,13 +1878,13 @@ const ExecuteCommandMake = (escaper: Escaper, cmd: string): boolean => {
 		}
 		//checkParam 1
 		if ( (not udg_casterTypes.isLabelAlreadyUsed(param1)) ) {
- Text_erP(escaper.getPlayer(), "unknown caster type \"" + param1 + "\"")
+ Text.erP(escaper.getPlayer(), "unknown caster type \"" + param1 + "\"")
 			return true;
 		}
 		//checkParam2
 		if ((nbParam === 2)) {
 			if ((S2R(param2) === 0 && param2 !== "0")) {
- Text_erP(escaper.getPlayer(), "wrong angle value ; should be a real (-1 for random angle)")
+ Text.erP(escaper.getPlayer(), "wrong angle value ; should be a real (-1 for random angle)")
 				return true;
 			}
 			x = S2R(param2);
@@ -1891,7 +1893,7 @@ const ExecuteCommandMake = (escaper: Escaper, cmd: string): boolean => {
 		}
 		//apply command
  escaper.makeCreateCaster(udg_casterTypes.get(param1), x)
- Text_mkP(escaper.getPlayer(), "casters making on")
+ Text.mkP(escaper.getPlayer(), "casters making on")
 		return true;
 	}
 
@@ -1900,7 +1902,7 @@ const ExecuteCommandMake = (escaper: Escaper, cmd: string): boolean => {
 	if ((name === "deleteCastersBetweenPoints" || name === "delcbp")) {
 		if ((noParam)) {
  escaper.makeDeleteCasters("twoClics")
- Text_mkP(escaper.getPlayer(), "casters deleting on")
+ Text.mkP(escaper.getPlayer(), "casters deleting on")
 		}
 		return true;
 	}
@@ -1910,7 +1912,7 @@ const ExecuteCommandMake = (escaper: Escaper, cmd: string): boolean => {
 	if ((name === "deleteCaster" || name === "delc")) {
 		if ((noParam)) {
  escaper.makeDeleteCasters("oneByOne")
- Text_mkP(escaper.getPlayer(), "casters deleting on")
+ Text.mkP(escaper.getPlayer(), "casters deleting on")
 		}
 		return true;
 	}
@@ -1925,7 +1927,7 @@ const ExecuteCommandMake = (escaper: Escaper, cmd: string): boolean => {
 			if ( (udg_casterTypes.isLabelAlreadyUsed(param1)) ) {
  udg_casterTypes.get(param1).displayForPlayer(escaper.getPlayer())
 			} else {
- Text_erP(escaper.getPlayer(), "unknown caster type")
+ Text.erP(escaper.getPlayer(), "unknown caster type")
 			}
 		} else {
  udg_casterTypes.displayForPlayer(escaper.getPlayer())
@@ -1941,11 +1943,11 @@ const ExecuteCommandMake = (escaper: Escaper, cmd: string): boolean => {
 		}
 		x = S2R(param1);
 		if ((x !== 0 && (x > CLEAR_MOB_MAX_DURATION || x < ClearMob_FRONT_MONTANT_DURATION))) {
- Text_erP(escaper.getPlayer(), "the disable duration must be a real between " + R2S(ClearMob_FRONT_MONTANT_DURATION) + " and " + R2S(CLEAR_MOB_MAX_DURATION))
+ Text.erP(escaper.getPlayer(), "the disable duration must be a real between " + R2S(ClearMob_FRONT_MONTANT_DURATION) + " and " + R2S(CLEAR_MOB_MAX_DURATION))
 			return true;
 		}
  escaper.makeCreateClearMobs(x)
- Text_mkP(escaper.getPlayer(), "clear mob making on")
+ Text.mkP(escaper.getPlayer(), "clear mob making on")
 		return true;
 	}
 
@@ -1956,7 +1958,7 @@ const ExecuteCommandMake = (escaper: Escaper, cmd: string): boolean => {
 			return true;
 		}
  escaper.makeDeleteClearMobs()
- Text_mkP(escaper.getPlayer(), "clear mobs deleting on")
+ Text.mkP(escaper.getPlayer(), "clear mobs deleting on")
 		return true;
 	}
 
@@ -1972,7 +1974,7 @@ const ExecuteCommandMake = (escaper: Escaper, cmd: string): boolean => {
 			return true;
 		}
 		//apply command
- Text_mkP(escaper.getPlayer(), "cliff class for that terrain is " + I2S(udg_terrainTypes.get(param1).getCliffClassId()))
+ Text.mkP(escaper.getPlayer(), "cliff class for that terrain is " + I2S(udg_terrainTypes.get(param1).getCliffClassId()))
 		return true;
 	}
 
@@ -1983,9 +1985,9 @@ const ExecuteCommandMake = (escaper: Escaper, cmd: string): boolean => {
 			return true;
 		}
 		if ( (udg_terrainTypes.getMainTileset() == "auto") ) {
- Text_mkP(escaper.getPlayer(), "main tile: auto")
+ Text.mkP(escaper.getPlayer(), "main tile: auto")
 		} else {
- Text_mkP(escaper.getPlayer(), "main tile: " + udg_terrainTypes.getMainTileset() + " = " + tileset2tilesetString(udg_terrainTypes.getMainTileset()))
+ Text.mkP(escaper.getPlayer(), "main tile: " + udg_terrainTypes.getMainTileset() + " = " + tileset2tilesetString(udg_terrainTypes.getMainTileset()))
 		}
 		return true;
 	}

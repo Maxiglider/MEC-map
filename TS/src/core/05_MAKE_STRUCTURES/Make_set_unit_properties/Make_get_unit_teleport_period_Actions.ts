@@ -19,7 +19,7 @@ const GetUnitTeleportPeriod_Actions = (): void => {
  StopUnit(mk.maker)
 	monster = escaper.getMakingLevel().monstersTeleport.getMonsterNear(x, y)
 	if ( (monster != 0 and monster.u != null) ) {
- Text_mkP(mk.makerOwner, "period : " + R2S(monster.getPeriod()) + " s")
+ Text.mkP(mk.makerOwner, "period : " + R2S(monster.getPeriod()) + " s")
 	}
 };
 

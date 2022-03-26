@@ -18,10 +18,10 @@ const TerrainMaking_Actions = (): void => {
 	if ( (mk.isLastLocSavedUsed()) ) {
 		action = MakeTerrainCreateAction.create(mk.getTerrainType(), mk.lastX, mk.lastY, x, y)
 		if ((action === -1)) {
- Text_erP(escaper.getPlayer(), "this terrain type doesn't exist anymore")
+ Text.erP(escaper.getPlayer(), "this terrain type doesn't exist anymore")
 		} else {
 			if ((action === 0)) {
- Text_erP(escaper.getPlayer(), "too big zone")
+ Text.erP(escaper.getPlayer(), "too big zone")
 			} else {
  escaper.newAction(action)
  mk.unsaveLocDefinitely()

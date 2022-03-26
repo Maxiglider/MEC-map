@@ -16,7 +16,7 @@ const MonsterMakingTeleport_Actions = (): void => {
  StopUnit(mk.maker)
 	if ( (mk.getLocPointeur() >= 0) ) {
 		if ( (not mk.getMonster().addNewLoc(x, y)) ) {
- Text_erP(mk.makerOwner, "Number limit of actions reached for this monster ! ( " + I2S(MonsterTeleport.NB_MAX_LOC) + " )")
+ Text.erP(mk.makerOwner, "Number limit of actions reached for this monster ! ( " + I2S(MonsterTeleport.NB_MAX_LOC) + " )")
 		} else {
  mk.saveLoc(x, y)
 		}

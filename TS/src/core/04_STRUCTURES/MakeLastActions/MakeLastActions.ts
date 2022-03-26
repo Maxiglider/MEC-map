@@ -77,11 +77,11 @@ const cancelLastAction = (): boolean => {
 		return false;
 	}
 	if ((this.lastActions[this.lastActionEffective] === 0)) {
- Text_erP(this.owner.getPlayer(), "action obsolète")
+ Text.erP(this.owner.getPlayer(), "action obsolète")
 	} else {
 		//annulation de l'action
 		if ( (not this.lastActions[this.lastActionEffective].cancel()) ) {
- Text_erA("error : action already cancelled for player " + I2S(GetPlayerId(this.owner.getPlayer())))
+ Text.erA("error : action already cancelled for player " + I2S(GetPlayerId(this.owner.getPlayer())))
 		}
 	}
 	this.lastActionEffective = this.lastActionEffective - 1;
@@ -94,11 +94,11 @@ const redoLastAction = (): boolean => {
 	}
 	this.lastActionEffective = this.lastActionEffective + 1;
 	if ((this.lastActions[this.lastActionEffective] === 0)) {
- Text_erP(this.owner.getPlayer(), "action obsolète")
+ Text.erP(this.owner.getPlayer(), "action obsolète")
 	} else {
 		//réexécution de l'action
 		if ( (not this.lastActions[this.lastActionEffective].redo()) ) {
- Text_erA("error : action already redone for player " + I2S(GetPlayerId(this.owner.getPlayer())))
+ Text.erA("error : action already redone for player " + I2S(GetPlayerId(this.owner.getPlayer())))
 		}
 	}
 	return true;

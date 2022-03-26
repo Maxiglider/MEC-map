@@ -1,3 +1,5 @@
+import { FunctionsOnNumbers } from "core/01_libraries/Functions_on_numbers";
+
 const initCommandMax = () => { // needs CommandsFunctions, ReinitTerrains, ReinitTerrainsPositions, SaveMapInCache
 
 
@@ -70,7 +72,7 @@ const ExecuteCommandMax = (escaper: Escaper, cmd: string): boolean => {
 			LoadTerrainWithoutName()
 		} else {
 			if ((!LoadTerrainWithName(CmdParam(cmd, 0)))) {
- Text_erP(escaper.getPlayer(), "this terrain save doesn't exist")
+ Text.erP(escaper.getPlayer(), "this terrain save doesn't exist")
 			}
 		}
 		return true;
@@ -83,9 +85,9 @@ const ExecuteCommandMax = (escaper: Escaper, cmd: string): boolean => {
 			return true;
 		}
 		if ((DeleteTerrainSaveWithName(CmdParam(cmd, 0)))) {
- Text_mkP(escaper.getPlayer(), "terrain save deleted")
+ Text.mkP(escaper.getPlayer(), "terrain save deleted")
 		} else {
- Text_erP(escaper.getPlayer(), "this terrain save doesn't exist")
+ Text.erP(escaper.getPlayer(), "this terrain save doesn't exist")
 		}
 		return true;
 	}
@@ -98,12 +100,12 @@ const ExecuteCommandMax = (escaper: Escaper, cmd: string): boolean => {
 		}
 		if ((nbParam === 2)) {
 			if ((!IsPlayerColorString(param2))) {
- Text_erP(escaper.getPlayer(), "param2 should be a player color")
+ Text.erP(escaper.getPlayer(), "param2 should be a player color")
 				return true;
 			}
 			escaper2 = udg_escapers.get(ColorString2Id(param2))
 			if ((escaper2 === 0)) {
- Text_erP(escaper.getPlayer(), "escaper " + param2 + " doesn't exist")
+ Text.erP(escaper.getPlayer(), "escaper " + param2 + " doesn't exist")
 				return true;
 			}
 		} else {
@@ -119,9 +121,9 @@ const ExecuteCommandMax = (escaper: Escaper, cmd: string): boolean => {
 				i = i + 1;
 			}
 			if ((escaper === escaper2)) {
- Text_P(escaper.getPlayer(), "all heroes are now yours")
+ Text.P(escaper.getPlayer(), "all heroes are now yours")
 			} else {
- Text_P(escaper.getPlayer(), "all heroes are now to player " + param2)
+ Text.P(escaper.getPlayer(), "all heroes are now to player " + param2)
 			}
 			return true;
 		}
@@ -131,13 +133,13 @@ const ExecuteCommandMax = (escaper: Escaper, cmd: string): boolean => {
  udg_escapers.get(n).giveHeroControl(escaper2)
  GetMirrorEscaper(udg_escapers.get(n)).giveHeroControl(escaper2)
 			} else {
- Text_erP(escaper.getPlayer(), "escaper " + param1 + " doesn't exist")
+ Text.erP(escaper.getPlayer(), "escaper " + param1 + " doesn't exist")
 				return true;
 			}
 			if ((escaper === escaper2)) {
- Text_P(escaper.getPlayer(), "hero of player " + param1 + " is now yours")
+ Text.P(escaper.getPlayer(), "hero of player " + param1 + " is now yours")
 			} else {
- Text_P(escaper.getPlayer(), "hero of player " + param1 + " is now to player " + param2)
+ Text.P(escaper.getPlayer(), "hero of player " + param1 + " is now to player " + param2)
 			}
 		}
 		return true;
@@ -155,7 +157,7 @@ const ExecuteCommandMax = (escaper: Escaper, cmd: string): boolean => {
 				}
 				i = i + 1;
 			}
- Text_P(escaper.getPlayer(), "all heroes are now to their owners")
+ Text.P(escaper.getPlayer(), "all heroes are now to their owners")
 		}
 		return true;
 	}
@@ -163,7 +165,7 @@ const ExecuteCommandMax = (escaper: Escaper, cmd: string): boolean => {
 
 	//-setlives(setl) <nbLives>
 	if ((name === "setlives" || name === "setl")) {
-		if ((!(nbParam === 1 && IsPositiveInteger(param1)))) {
+		if ((!(nbParam === 1 && FunctionsOnNumbers.IsPositiveInteger(param1)))) {
 			return true;
 		}
  udg_lives.setNb(S2I(param1))
@@ -177,15 +179,15 @@ const ExecuteCommandMax = (escaper: Escaper, cmd: string): boolean => {
 			return true;
 		}
 		if ((!IsBoolString(param1))) {
- Text_erP(escaper.getPlayer(), "param1 should be a boolean or a real")
+ Text.erP(escaper.getPlayer(), "param1 should be a boolean or a real")
 			return true;
 		}
 		if ((S2B(param1))) {
 			EnableTrigger(gg_trg_Teleport)
- Text_P(escaper.getPlayer(), "teleport on")
+ Text.P(escaper.getPlayer(), "teleport on")
 		} else {
 			DisableTrigger(gg_trg_Teleport)
- Text_P(escaper.getPlayer(), "teleport off")
+ Text.P(escaper.getPlayer(), "teleport off")
 		}
 		return true;
 	}
@@ -198,9 +200,9 @@ const ExecuteCommandMax = (escaper: Escaper, cmd: string): boolean => {
 		}
 		udg_areRedRightsOn = S2B(param1);
 		if ((S2B(param1))) {
- Text_P(escaper.getPlayer(), "red rights on")
+ Text.P(escaper.getPlayer(), "red rights on")
 		} else {
- Text_P(escaper.getPlayer(), "red rights off")
+ Text.P(escaper.getPlayer(), "red rights off")
 		}
 		return true;
 	}
@@ -210,25 +212,25 @@ const ExecuteCommandMax = (escaper: Escaper, cmd: string): boolean => {
 	if ((name === "autorevive" || name === "ar")) {
 		if ((noParam)) {
  escaper.setHasAutorevive(true)
- Text_P(escaper.getPlayer(), "you have now autorevive to on")
+ Text.P(escaper.getPlayer(), "you have now autorevive to on")
 			return true;
 		}
 		if ((!IsBoolString(param1))) {
- Text_erP(escaper.getPlayer(), "param1 should be a boolean")
+ Text.erP(escaper.getPlayer(), "param1 should be a boolean")
 			return true;
 		}
 		b = S2B(param1);
 		if ((nbParam === 1)) {
  escaper.setHasAutorevive(b)
 			if ((b)) {
- Text_P(escaper.getPlayer(), "you have now autorevive to on")
+ Text.P(escaper.getPlayer(), "you have now autorevive to on")
 			} else {
- Text_P(escaper.getPlayer(), "you have now autorevive to off")
+ Text.P(escaper.getPlayer(), "you have now autorevive to off")
 			}
 			return true;
 		}
 		if ((!(nbParam === 2))) {
- Text_erP(escaper.getPlayer(), "no more than 2 params allowed for this command")
+ Text.erP(escaper.getPlayer(), "no more than 2 params allowed for this command")
 			return true;
 		}
 		if ((param2 === "all" || param2 === "a")) {
@@ -241,9 +243,9 @@ const ExecuteCommandMax = (escaper: Escaper, cmd: string): boolean => {
 				i = i + 1;
 			}
 			if ((b)) {
- Text_P(escaper.getPlayer(), "autorevive to on for all")
+ Text.P(escaper.getPlayer(), "autorevive to on for all")
 			} else {
- Text_P(escaper.getPlayer(), "autorevive to off for all")
+ Text.P(escaper.getPlayer(), "autorevive to off for all")
 			}
 			return true;
 		}
@@ -252,15 +254,15 @@ const ExecuteCommandMax = (escaper: Escaper, cmd: string): boolean => {
 			if ( (udg_escapers.get(n) != 0) ) {
  udg_escapers.get(n).setHasAutorevive(b)
 				if ((b)) {
- Text_P(escaper.getPlayer(), "autorevive to on for player " + param2)
+ Text.P(escaper.getPlayer(), "autorevive to on for player " + param2)
 				} else {
- Text_P(escaper.getPlayer(), "autorevive to off for player " + param2)
+ Text.P(escaper.getPlayer(), "autorevive to off for player " + param2)
 				}
 			} else {
- Text_erP(escaper.getPlayer(), "escaper " + param2 + " doesn't exist")
+ Text.erP(escaper.getPlayer(), "escaper " + param2 + " doesn't exist")
 			}
 		} else {
- Text_erP(escaper.getPlayer(), "param2 should be a player color or \"all\"")
+ Text.erP(escaper.getPlayer(), "param2 should be a player color or \"all\"")
 		}
 		return true;
 	}
@@ -270,12 +272,12 @@ const ExecuteCommandMax = (escaper: Escaper, cmd: string): boolean => {
 	if ((name === "createHero" || name === "crh")) {
 		if ((noParam)) {
 			if ( (not escaper.createHeroAtStart()) ) {
- Text_erP(escaper.getPlayer(), "You already have a hero !")
+ Text.erP(escaper.getPlayer(), "You already have a hero !")
 			}
 			return true;
 		}
 		if ((!(nbParam === 1))) {
- Text_erP(escaper.getPlayer(), "no more than one param allowed for this command")
+ Text.erP(escaper.getPlayer(), "no more than one param allowed for this command")
 			return true;
 		}
 		if ((param1 === "all" || param1 === "a")) {
@@ -305,7 +307,7 @@ const ExecuteCommandMax = (escaper: Escaper, cmd: string): boolean => {
 				}
 			}
 			if ( (not udg_escapers.get(n).createHeroAtStart()) ) {
- Text_erP(escaper.getPlayer(), "this player already has a hero")
+ Text.erP(escaper.getPlayer(), "this player already has a hero")
 			}
 			if ((udg_doubleHeroesEnabled)) {
  udg_escapers.get(n + NB_PLAYERS_MAX).createHeroAtStart()
@@ -322,7 +324,7 @@ const ExecuteCommandMax = (escaper: Escaper, cmd: string): boolean => {
 			return true;
 		}
 		if ((!(nbParam === 1))) {
- Text_erP(escaper.getPlayer(), "no more than one param allowed for this command")
+ Text.erP(escaper.getPlayer(), "no more than one param allowed for this command")
 			return true;
 		}
 		if ((param1 === "all" || param1 === "a")) {
@@ -349,10 +351,10 @@ const ExecuteCommandMax = (escaper: Escaper, cmd: string): boolean => {
  udg_escapers.remove(n)
 				}
 			} else {
- Text_erP(escaper.getPlayer(), "escaper " + param1 + " doesn't exist")
+ Text.erP(escaper.getPlayer(), "escaper " + param1 + " doesn't exist")
 			}
 		} else {
- Text_erP(escaper.getPlayer(), "param1 should be a player color or \"all\"")
+ Text.erP(escaper.getPlayer(), "param1 should be a player color or \"all\"")
 		}
 		return true;
 	}
@@ -361,14 +363,14 @@ const ExecuteCommandMax = (escaper: Escaper, cmd: string): boolean => {
 	//-canCheat(cc) <Pcolor>|all(a) [<boolean status>]
 	if ((name === "canCheat" || name === "cc")) {
 		if ((!(nbParam === 1 || nbParam === 2))) {
- Text_erP(escaper.getPlayer(), "one or two params for this command")
+ Text.erP(escaper.getPlayer(), "one or two params for this command")
 			return true;
 		}
 		if ((nbParam === 2)) {
 			if ((IsBoolString(param2))) {
 				b = S2B(param2);
 			} else {
- Text_erP(escaper.getPlayer(), "param2 must be a boolean")
+ Text.erP(escaper.getPlayer(), "param2 must be a boolean")
 				return true;
 			}
 		} else {
@@ -386,9 +388,9 @@ const ExecuteCommandMax = (escaper: Escaper, cmd: string): boolean => {
 				i = i + 1;
 			}
 			if ((b)) {
- Text_P(escaper.getPlayer(), "all players can now cheat and make")
+ Text.P(escaper.getPlayer(), "all players can now cheat and make")
 			} else {
- Text_P(escaper.getPlayer(), "all players who haven't Maximaxou rights can't cheat or make anymore")
+ Text.P(escaper.getPlayer(), "all players who haven't Maximaxou rights can't cheat or make anymore")
 			}
 			return true;
 		}
@@ -399,21 +401,21 @@ const ExecuteCommandMax = (escaper: Escaper, cmd: string): boolean => {
 					if ( (not udg_escapers.get(n).isMaximaxou()) ) {
  udg_escapers.get(n).setCanCheat(b)
 						if ((b)) {
- Text_P(escaper.getPlayer(), "player " + param1 + " can now cheat and make")
+ Text.P(escaper.getPlayer(), "player " + param1 + " can now cheat and make")
 						} else {
- Text_P(escaper.getPlayer(), "player " + param1 + " no longer can cheat and make")
+ Text.P(escaper.getPlayer(), "player " + param1 + " no longer can cheat and make")
 						}
 					} else {
- Text_erP(escaper.getPlayer(), "you can't change rights of player " + param1 + ", he has Maximaxou rights like you")
+ Text.erP(escaper.getPlayer(), "you can't change rights of player " + param1 + ", he has Maximaxou rights like you")
 					}
 				} else {
- Text_erP(escaper.getPlayer(), "you can't change your own rights")
+ Text.erP(escaper.getPlayer(), "you can't change your own rights")
 				}
 			} else {
- Text_erP(escaper.getPlayer(), "escaper " + param1 + " doesn't exist")
+ Text.erP(escaper.getPlayer(), "escaper " + param1 + " doesn't exist")
 			}
 		} else {
- Text_erP(escaper.getPlayer(), "param1 must be a player color or \"all\"")
+ Text.erP(escaper.getPlayer(), "param1 must be a player color or \"all\"")
 		}
 		return true;
 	}
@@ -422,11 +424,11 @@ const ExecuteCommandMax = (escaper: Escaper, cmd: string): boolean => {
 	//-setAfkTime(setafkt) <time>
 	if ((name === "setAfkTime" || name === "setafkt")) {
 		if ((nbParam !== 1 || S2I(param1) <= 0)) {
- Text_erP(escaper.getPlayer(), "there must be one param which is an integer higher than 0")
+ Text.erP(escaper.getPlayer(), "there must be one param which is an integer higher than 0")
 			return true;
 		}
 		timeMinAfk = S2R(param1);
- Text_P(escaper.getPlayer(), "afk time to " + param1)
+ Text.P(escaper.getPlayer(), "afk time to " + param1)
 		return true;
 	}
 
@@ -434,15 +436,15 @@ const ExecuteCommandMax = (escaper: Escaper, cmd: string): boolean => {
 	//-setAutoreviveDelay(setard) <time>   --> maximum 15 seconds
 	if ((name === "setAutoreviveDelay" || name === "setard")) {
 		if ((!(nbParam === 1 && (S2R(param1) > 0 || param1 === "0") && S2R(param1) <= 15))) {
- Text_erP(escaper.getPlayer(), "there must be one param positive real (maximum 15)")
+ Text.erP(escaper.getPlayer(), "there must be one param positive real (maximum 15)")
 			return true;
 		}
 		x = S2R(param1);
 		udg_autoreviveDelay = x;
 		if ((x > 1)) {
- Text_P(escaper.getPlayer(), "autorevive delay to " + R2S(x) + " seconds")
+ Text.P(escaper.getPlayer(), "autorevive delay to " + R2S(x) + " seconds")
 		} else {
- Text_P(escaper.getPlayer(), "autorevive delay to " + R2S(x) + " second")
+ Text.P(escaper.getPlayer(), "autorevive delay to " + R2S(x) + " second")
 		}
 		return true;
 	}
@@ -463,9 +465,9 @@ const ExecuteCommandMax = (escaper: Escaper, cmd: string): boolean => {
 			return true;
 		}
 		if ( (udg_terrainTypes.remove(param1)) ) {
- Text_mkP(escaper.getPlayer(), "terrain removed")
+ Text.mkP(escaper.getPlayer(), "terrain removed")
 		} else {
- Text_erP(escaper.getPlayer(), "unknown terrain")
+ Text.erP(escaper.getPlayer(), "unknown terrain")
 		}
 		return true;
 	}
@@ -477,9 +479,9 @@ const ExecuteCommandMax = (escaper: Escaper, cmd: string): boolean => {
 			return true;
 		}
 		if ( (udg_monsterTypes.remove(param1)) ) {
- Text_mkP(escaper.getPlayer(), "monster type removed")
+ Text.mkP(escaper.getPlayer(), "monster type removed")
 		} else {
- Text_erP(escaper.getPlayer(), "unknown monster type")
+ Text.erP(escaper.getPlayer(), "unknown monster type")
 		}
 		return true;
 	}
@@ -489,9 +491,9 @@ const ExecuteCommandMax = (escaper: Escaper, cmd: string): boolean => {
 	if ((name === "removeLastLevel" || name === "remll")) {
 		if ((noParam)) {
 			if ( (udg_levels.destroyLastLevel()) ) {
- Text_mkP(escaper.getPlayer(), "level number " + I2S(udg_levels.getLastLevelId()+1) + " destroyed")
+ Text.mkP(escaper.getPlayer(), "level number " + I2S(udg_levels.getLastLevelId()+1) + " destroyed")
 			} else {
- Text_erP(escaper.getPlayer(), "impossible to destroy the first level")
+ Text.erP(escaper.getPlayer(), "impossible to destroy the first level")
 			}
 		}
 		return true;
@@ -505,12 +507,12 @@ const ExecuteCommandMax = (escaper: Escaper, cmd: string): boolean => {
 		}
 		//checkParam 1
 		if ( (not udg_casterTypes.isLabelAlreadyUsed(param1)) ) {
- Text_erP(escaper.getPlayer(), "unknown caster type \"" + param1 + "\"")
+ Text.erP(escaper.getPlayer(), "unknown caster type \"" + param1 + "\"")
 			return true;
 		}
 		//apply command
  udg_casterTypes.remove(param1)
- Text_mkP(escaper.getPlayer(), "caster type removed")
+ Text.mkP(escaper.getPlayer(), "caster type removed")
 		return true;
 	}
 
@@ -518,9 +520,9 @@ const ExecuteCommandMax = (escaper: Escaper, cmd: string): boolean => {
 	//-setTerrainsOrder(setto) <terrainLabels>
 	if ((name === "setTerrainsOrder" || name === "setto")) {
 		if ( (udg_terrainTypes.setOrder(cmd)) ) {
- Text_mkP(escaper.getPlayer(), "terrains order set")
+ Text.mkP(escaper.getPlayer(), "terrains order set")
 		} else {
- Text_erP(escaper.getPlayer(), "couldn't terrains order. Usage : put all the terrain types as parameters, once each")
+ Text.erP(escaper.getPlayer(), "couldn't terrains order. Usage : put all the terrain types as parameters, once each")
 		}
 		return true;
 	}
@@ -538,11 +540,11 @@ const ExecuteCommandMax = (escaper: Escaper, cmd: string): boolean => {
 		}
 		//checkParam 2
 		if ((param2 !== "1" && param2 !== "2")) {
- Text_erP(escaper.getPlayer(), "cliff class must be 1 or 2")
+ Text.erP(escaper.getPlayer(), "cliff class must be 1 or 2")
 		}
 		//apply command
  udg_terrainTypes.get(param1).setCliffClassId(S2I(param2))
- Text_mkP(escaper.getPlayer(), "cliff class changed to " + param2)
+ Text.mkP(escaper.getPlayer(), "cliff class changed to " + param2)
 		return true;
 	}
 
@@ -553,9 +555,9 @@ const ExecuteCommandMax = (escaper: Escaper, cmd: string): boolean => {
 			return true;
 		}
 		if ( (udg_terrainTypes.setMainTileset(param1)) ) {
- Text_mkP(escaper.getPlayer(), "main tilechanged")
+ Text.mkP(escaper.getPlayer(), "main tilechanged")
 		} else {
- Text_P(escaper.getPlayer(), "available tilesets : " + MAKE_TEXT_COLORCODE + "auto|r ; " + MAKE_TEXT_COLORCODE + "A|r = Ashenvale ; " + MAKE_TEXT_COLORCODE + "B|r = Barrens ; " + MAKE_TEXT_COLORCODE + "C|r = Felwood ; " + MAKE_TEXT_COLORCODE + "D|r = Dungeon ; " + MAKE_TEXT_COLORCODE + "F|r = Lordaeron Fall ; " + MAKE_TEXT_COLORCODE + "G|r = Underground ; " + MAKE_TEXT_COLORCODE + "L|r = Lordaeron Summer ; " + MAKE_TEXT_COLORCODE + "N|r = Northrend ; " + MAKE_TEXT_COLORCODE + "Q|r = Village Fall ; " + MAKE_TEXT_COLORCODE + "V|r = Village ; " + MAKE_TEXT_COLORCODE + "W|r = Lordaeron Winter ; " + MAKE_TEXT_COLORCODE + "X|r = Dalaran ; " + MAKE_TEXT_COLORCODE + "Y|r = Cityscape ; " + MAKE_TEXT_COLORCODE + "Z|r = Sunken Ruins ; " + MAKE_TEXT_COLORCODE + "I|r = Icecrown ; " + MAKE_TEXT_COLORCODE + "J|r = Dalaran Ruins ; " + MAKE_TEXT_COLORCODE + "O|r = Outland ; " + MAKE_TEXT_COLORCODE + "K|r = Black Citadel")
+ Text.P(escaper.getPlayer(), "available tilesets : " + MAKE_TEXT_COLORCODE + "auto|r ; " + MAKE_TEXT_COLORCODE + "A|r = Ashenvale ; " + MAKE_TEXT_COLORCODE + "B|r = Barrens ; " + MAKE_TEXT_COLORCODE + "C|r = Felwood ; " + MAKE_TEXT_COLORCODE + "D|r = Dungeon ; " + MAKE_TEXT_COLORCODE + "F|r = Lordaeron Fall ; " + MAKE_TEXT_COLORCODE + "G|r = Underground ; " + MAKE_TEXT_COLORCODE + "L|r = Lordaeron Summer ; " + MAKE_TEXT_COLORCODE + "N|r = Northrend ; " + MAKE_TEXT_COLORCODE + "Q|r = Village Fall ; " + MAKE_TEXT_COLORCODE + "V|r = Village ; " + MAKE_TEXT_COLORCODE + "W|r = Lordaeron Winter ; " + MAKE_TEXT_COLORCODE + "X|r = Dalaran ; " + MAKE_TEXT_COLORCODE + "Y|r = Cityscape ; " + MAKE_TEXT_COLORCODE + "Z|r = Sunken Ruins ; " + MAKE_TEXT_COLORCODE + "I|r = Icecrown ; " + MAKE_TEXT_COLORCODE + "J|r = Dalaran Ruins ; " + MAKE_TEXT_COLORCODE + "O|r = Outland ; " + MAKE_TEXT_COLORCODE + "K|r = Black Citadel")
 		}
 		return true;
 	}

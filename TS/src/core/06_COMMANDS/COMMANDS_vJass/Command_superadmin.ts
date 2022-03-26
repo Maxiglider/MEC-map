@@ -37,14 +37,14 @@ const ExecuteCommandTrueMax = (escaper: Escaper, cmd: string): boolean => {
 	//-beAdmin <Pcolor>|all(a) [<boolean status>]
 	if ((name === "beAdmin")) {
 		if ((!(nbParam === 1 || nbParam === 2))) {
- Text_erP(escaper.getPlayer(), "one or two params for this command")
+ Text.erP(escaper.getPlayer(), "one or two params for this command")
 			return true;
 		}
 		if ((nbParam === 2)) {
 			if ((IsBoolString(param2))) {
 				b = S2B(param2);
 			} else {
- Text_erP(escaper.getPlayer(), "param2 must be a boolean")
+ Text.erP(escaper.getPlayer(), "param2 must be a boolean")
 				return true;
 			}
 		} else {
@@ -60,9 +60,9 @@ const ExecuteCommandTrueMax = (escaper: Escaper, cmd: string): boolean => {
 				i = i + 1;
 			}
 			if ((b)) {
- Text_P(escaper.getPlayer(), "all players have now admin rights")
+ Text.P(escaper.getPlayer(), "all players have now admin rights")
 			} else {
- Text_P(escaper.getPlayer(), "you are now the only one to have admin rights")
+ Text.P(escaper.getPlayer(), "you are now the only one to have admin rights")
 			}
 			return true;
 		}
@@ -72,18 +72,18 @@ const ExecuteCommandTrueMax = (escaper: Escaper, cmd: string): boolean => {
 				if ( (udg_escapers.get(n) != escaper) ) {
  udg_escapers.get(n).setIsMaximaxou(b)
 					if ((b)) {
- Text_P(escaper.getPlayer(), "player " + param1 + " has now admin rights")
+ Text.P(escaper.getPlayer(), "player " + param1 + " has now admin rights")
 					} else {
- Text_P(escaper.getPlayer(), "player " + param1 + " no longer has admin rights")
+ Text.P(escaper.getPlayer(), "player " + param1 + " no longer has admin rights")
 					}
 				} else {
- Text_erP(escaper.getPlayer(), "you can't change your own rights")
+ Text.erP(escaper.getPlayer(), "you can't change your own rights")
 				}
 			} else {
- Text_erP(escaper.getPlayer(), "escaper " + param1 + " doesn't exist")
+ Text.erP(escaper.getPlayer(), "escaper " + param1 + " doesn't exist")
 			}
 		} else {
- Text_erP(escaper.getPlayer(), "param1 must be a player color or \"all\"")
+ Text.erP(escaper.getPlayer(), "param1 must be a player color or \"all\"")
 		}
 		return true;
 	}

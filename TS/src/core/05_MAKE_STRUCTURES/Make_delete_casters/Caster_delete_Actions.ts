@@ -53,9 +53,9 @@ const CasterDelete_Actions = (): void => {
 	}
 
 	if ((nbCastersRemoved <= 1)) {
- Text_mkP(mk.makerOwner, I2S(nbCastersRemoved) + " caster removed.")
+ Text.mkP(mk.makerOwner, I2S(nbCastersRemoved) + " caster removed.")
 	} else {
- Text_mkP(mk.makerOwner, I2S(nbCastersRemoved) + " casters removed.")
+ Text.mkP(mk.makerOwner, I2S(nbCastersRemoved) + " casters removed.")
 	}
 
 	if ((nbCastersRemoved > 0)) {

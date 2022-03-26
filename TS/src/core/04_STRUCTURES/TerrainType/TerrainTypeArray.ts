@@ -248,7 +248,7 @@ const displayForPlayer = (p: player): void => {
 		i = i + 1;
 	}
 	if ((this.numberOfSlide + this.numberOfWalk + this.numberOfDeath === 0)) {
-		Text_erP(p, "no terrain saved")
+		Text.erP(p, "no terrain saved")
 	}
 };
 

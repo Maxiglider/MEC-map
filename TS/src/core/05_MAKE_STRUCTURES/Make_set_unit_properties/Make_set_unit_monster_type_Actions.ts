@@ -93,9 +93,9 @@ const SetUnitMonsterType_Actions = (): void => {
 	}
 
 	if ((nbMonstersFixed <= 1)) {
- Text_mkP(mk.makerOwner, I2S(nbMonstersFixed) + " monster fixed.")
+ Text.mkP(mk.makerOwner, I2S(nbMonstersFixed) + " monster fixed.")
 	} else {
- Text_mkP(mk.makerOwner, I2S(nbMonstersFixed) + " monsters fixed.")
+ Text.mkP(mk.makerOwner, I2S(nbMonstersFixed) + " monsters fixed.")
 	}
  mk.unsaveLocDefinitely()
 };

@@ -108,7 +108,7 @@ const displayForPlayer = (p: player): void => {
 	}
 	//display cliff class
 	display = display + space + "cliff" + I2S(this.cliffClassId);
-	Text_P_timed(p, TERRAIN_DATA_DISPLAY_TIME, display)
+	Text.P_timed(p, TERRAIN_DATA_DISPLAY_TIME, display)
 };
 
 const toString = (): string => {

@@ -53,7 +53,7 @@ const ClearMobMaking_Actions = (): void => {
 
 	//application du clic
 	if ((monsterOrCasterId === 0)) {
- Text_erP(mk.makerOwner, "no monster clicked for your making level")
+ Text.erP(mk.makerOwner, "no monster clicked for your making level")
 	} else {
  mk.clickMade(monsterOrCasterId)
 	}

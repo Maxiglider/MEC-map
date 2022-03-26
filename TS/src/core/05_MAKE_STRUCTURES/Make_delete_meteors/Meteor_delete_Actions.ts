@@ -58,9 +58,9 @@ const MeteorDelete_Actions = (): void => {
 	}
 
 	if ((nbMeteorsRemoved <= 1)) {
- Text_mkP(mk.makerOwner, I2S(nbMeteorsRemoved) + " meteor removed.")
+ Text.mkP(mk.makerOwner, I2S(nbMeteorsRemoved) + " meteor removed.")
 	} else {
- Text_mkP(mk.makerOwner, I2S(nbMeteorsRemoved) + " meteors removed.")
+ Text.mkP(mk.makerOwner, I2S(nbMeteorsRemoved) + " meteors removed.")
 	}
 
 	if ((nbMeteorsRemoved > 0)) {

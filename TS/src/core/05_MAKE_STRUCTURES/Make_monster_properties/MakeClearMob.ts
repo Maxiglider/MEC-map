@@ -50,25 +50,25 @@ const clickMade = (monsterOrCasterId: number): void => {
 	let escaper = Hero2Escaper(this.maker);
 	if ((this.pointeurClickedMob === -1)) {
 		if ((ClearTriggerMobId2ClearMob(monsterOrCasterId) !== 0)) {
-			Text_erP(this.makerOwner, "this monster is already a trigger mob of a clear mob")
+			Text.erP(this.makerOwner, "this monster is already a trigger mob of a clear mob")
 			return;
 		} else {
 			this.clearMob = escaper.getMakingLevel().clearMobs.new(monsterOrCasterId, this.disableDuration, true)
-			Text_mkP(this.makerOwner, "trigger mob added for a new clear mob")
+			Text.mkP(this.makerOwner, "trigger mob added for a new clear mob")
 		}
 	} else {
 		//vérification que le clear mob existe toujours
 		if ( (this.clearMob.getTriggerMob() == 0) ) {
-			Text_erP(this.makerOwner, "the clear mob you are working on has been removed")
+			Text.erP(this.makerOwner, "the clear mob you are working on has been removed")
  escaper.destroyMake()
 			return;
 		}
 		if ( (this.clearMob.getBlockMobs().containsMob(monsterOrCasterId)) ) {
-			Text_erP(this.makerOwner, "this monster is already a block mob of this clear mob")
+			Text.erP(this.makerOwner, "this monster is already a block mob of this clear mob")
 			return;
 		} else {
  this.clearMob.addBlockMob(monsterOrCasterId)
-			Text_mkP(this.makerOwner, "block mob added")
+			Text.mkP(this.makerOwner, "block mob added")
 		}
 	}
 	this.pointeurClickedMob = this.pointeurClickedMob + 1;
@@ -78,13 +78,13 @@ const clickMade = (monsterOrCasterId: number): void => {
 const cancelLastAction = (): boolean => {
 	if ((this.pointeurClickedMob > 0)) {
 		if ( (this.clearMob.removeLastBlockMob()) ) {
-			Text_mkP(this.makerOwner, "last block mob removed")
+			Text.mkP(this.makerOwner, "last block mob removed")
 		} else {
-			Text_erP(this.makerOwner, "error, couldn't remove the last block mob")
+			Text.erP(this.makerOwner, "error, couldn't remove the last block mob")
 		}
 	} else if ((this.pointeurClickedMob === 0)) {
  this.clearMob.destroy()
-		Text_mkP(this.makerOwner, "clear mob removed")
+		Text.mkP(this.makerOwner, "clear mob removed")
 	} else {
 		return false;
 	}
@@ -100,13 +100,13 @@ const redoLastAction = (): boolean => {
 	this.pointeurClickedMob = this.pointeurClickedMob + 1;
 	if ((this.pointeurClickedMob > 0)) {
 		if ( (this.clearMob.addBlockMob(this.clickedMobs[this.pointeurClickedMob])) ) {
-			Text_mkP(this.makerOwner, "block mob added")
+			Text.mkP(this.makerOwner, "block mob added")
 		} else {
-			Text_erP(this.makerOwner, "error, couldn't add the block mob")
+			Text.erP(this.makerOwner, "error, couldn't add the block mob")
 		}
 	} else {
 		this.clearMob = escaper.getMakingLevel().clearMobs.new(this.clickedMobs[this.pointeurClickedMob], this.disableDuration, true)
-		Text_mkP(this.makerOwner, "trigger mob added for a new clear mob")
+		Text.mkP(this.makerOwner, "trigger mob added for a new clear mob")
 	}
 	return true;
 };

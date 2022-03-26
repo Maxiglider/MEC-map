@@ -54,7 +54,7 @@ const MonsterMakingSimplePatrol_Actions = (): void => {
 	if ( (mk.getMode() == "normal") ) {
 		if ( (mk.isLastLocSavedUsed()) ) {
 			if ( (GetLocDist(mk.lastX, mk.lastY, x, y) <= PATROL_DISTANCE_MIN) ) {
- Text_erP(mk.makerOwner, "Too close to the start location !")
+ Text.erP(mk.makerOwner, "Too close to the start location !")
 				return;
 			} else {
 				monster = escaper.getMakingLevel().monstersSimplePatrol.new(mk.getMonsterType(), mk.lastX, mk.lastY, x, y, true)
@@ -68,7 +68,7 @@ const MonsterMakingSimplePatrol_Actions = (): void => {
 	if ( (mk.getMode() == "string") ) {
 		if ( (mk.isLastLocSavedUsed()) ) {
 			if ( (GetLocDist(mk.lastX, mk.lastY, x, y) <= PATROL_DISTANCE_MIN) ) {
- Text_erP(mk.makerOwner, "Too close to the start location !")
+ Text.erP(mk.makerOwner, "Too close to the start location !")
 				return;
 			} else {
 				monster = escaper.getMakingLevel().monstersSimplePatrol.new(mk.getMonsterType(), mk.lastX, mk.lastY, x, y, true)
@@ -80,7 +80,7 @@ const MonsterMakingSimplePatrol_Actions = (): void => {
 	}
 	if ( (mk.getMode() == "auto") ) {
 		if ((IsTerrainTypeOfKind(GetTerrainType(x, y), "death"))) {
- Text_erP(mk.makerOwner, "You clicked on a death terrain !")
+ Text.erP(mk.makerOwner, "You clicked on a death terrain !")
 			return;
 		}
 
@@ -128,7 +128,7 @@ const MonsterMakingSimplePatrol_Actions = (): void => {
 
 		//first location not found
 		if ((!found)) {
- Text_erP(mk.makerOwner, "Death terrain too far !")
+ Text.erP(mk.makerOwner, "Death terrain too far !")
 			return;
 		}
 
@@ -163,7 +163,7 @@ const MonsterMakingSimplePatrol_Actions = (): void => {
 
 		//second location not found
 		if ((!found)) {
- Text_erP(mk.makerOwner, "Death terrain too far for the second location !")
+ Text.erP(mk.makerOwner, "Death terrain too far for the second location !")
 			return;
 		}
 

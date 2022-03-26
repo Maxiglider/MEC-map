@@ -13,7 +13,7 @@ const Trig_using_shortcut_Actions = (): void => {
 	//!//@@BELOWTEXTMACRO
 	/* textmacro UsingShortcut takes shortcut
 	    if (GetSpellAbilityId() == 'SC$shortcut$o') then
- Text_P(p, udg_colorCode[GetPlayerId(p)] + GetPlayerName(p) + ":|r " + $shortcut$_shortcutCommand[GetPlayerId(p)])
+ Text.P(p, udg_colorCode[GetPlayerId(p)] + GetPlayerName(p) + ":|r " + $shortcut$_shortcutCommand[GetPlayerId(p)])
  ExecuteCommand(escaper, $shortcut$_shortcutCommand[GetPlayerId(p)])
 	        return
 	    endif

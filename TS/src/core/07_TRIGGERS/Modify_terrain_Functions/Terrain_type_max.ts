@@ -1,386 +1,373 @@
+const initTerrainTypeMax = () => {
+    const terrainMap: { [x: number]: string } = {
+        1: 'Ldrt',
+        2: 'Ldro',
+        3: 'Ldrg',
+        4: 'Lrok',
+        5: 'Lgrs',
+        6: 'Lgrd',
+        7: 'Fdrt',
+        8: 'Fdro',
+        9: 'Fdrg',
+        10: 'Frok',
+        11: 'Fgrs',
+        12: 'Fgrd',
+        13: 'Wdrt',
+        14: 'Wdro',
+        15: 'Wsng',
+        16: 'Wrok',
+        17: 'Wgrs',
+        18: 'Wsnw',
+        19: 'Bdrt',
+        20: 'Bdrh',
+        21: 'Bdrr',
+        22: 'Bdrg',
+        23: 'Bdsr',
+        24: 'Bdsd',
+        25: 'Bflr',
+        26: 'Bgrr',
+        27: 'Adrt',
+        28: 'Adrd',
+        29: 'Agrs',
+        30: 'Arck',
+        31: 'Agrd',
+        32: 'Avin',
+        33: 'Adrg',
+        34: 'Alvd',
+        35: 'Cdrt',
+        36: 'Cdrd',
+        37: 'Cpos',
+        38: 'Crck',
+        39: 'Cvin',
+        40: 'Cgrs',
+        41: 'Clvg',
+        42: 'Ndrt',
+        43: 'Ndrd',
+        44: 'Nrck',
+        45: 'Ngrs',
+        46: 'Nice',
+        47: 'Nsnw',
+        48: 'Nsnr',
+        49: 'Ydrt',
+        50: 'Ydtr',
+        51: 'Yblm',
+        52: 'Ybtl',
+        53: 'Ysqd',
+        54: 'Yrtl',
+        55: 'Ygsb',
+        56: 'Yhdg',
+        57: 'Ywmb',
+        58: 'Vdrt',
+        59: 'Vdrr',
+        60: 'Vcrp',
+        61: 'Vcbp',
+        62: 'Vstp',
+        63: 'Vgrs',
+        64: 'Vrck',
+        65: 'Vgrt',
+        66: 'Qdrt',
+        67: 'Qdrr',
+        68: 'Qcrp',
+        69: 'Qcbp',
+        70: 'Qstp',
+        71: 'Qgrs',
+        72: 'Qrck',
+        73: 'Qgrt',
+        74: 'Xdrt',
+        75: 'Xdtr',
+        76: 'Xblm',
+        77: 'Xbtl',
+        78: 'Xsqd',
+        79: 'Xrtl',
+        80: 'Xgsb',
+        81: 'Xhdg',
+        82: 'Xwmb',
+        83: 'Ddrt',
+        84: 'Dbrk',
+        85: 'Drds',
+        86: 'Dlvc',
+        87: 'Dlav',
+        88: 'Ddkr',
+        89: 'Dgrs',
+        90: 'Dsqd',
+        91: 'Gdrt',
+        92: 'Gbrk',
+        93: 'Grds',
+        94: 'Glvc',
+        95: 'Glav',
+        96: 'Gdkr',
+        97: 'Ggrs',
+        98: 'Gsqd',
+        99: 'Zdrt',
+        100: 'Zdtr',
+        101: 'Zdrg',
+        102: 'Zbks',
+        103: 'Zsan',
+        104: 'Zbkl',
+        105: 'Ztil',
+        106: 'Zgrs',
+        107: 'Zvin',
+        108: 'Idrt',
+        109: 'Idtr',
+        110: 'Idki',
+        111: 'Ibkb',
+        112: 'Irbk',
+        113: 'Itbk',
+        114: 'Iice',
+        115: 'Ibsq',
+        116: 'Isnw',
+        117: 'Odrt',
+        118: 'Odtr',
+        119: 'Osmb',
+        120: 'Ofst',
+        121: 'Olgb',
+        122: 'Orok',
+        123: 'Ofsl',
+        124: 'Oaby',
+        125: 'Kdrt',
+        126: 'Kfsl',
+        127: 'Kdts',
+        128: 'Kfst',
+        129: 'Ksmb',
+        130: 'Klgb',
+        131: 'Ksqt',
+        132: 'Kdkt',
+        133: 'Jdrt',
+        134: 'Jdtr',
+        135: 'Jblm',
+        136: 'Jbtl',
+        137: 'Jsqd',
+        138: 'Jrtl',
+        139: 'Jgsb',
+        140: 'Jhdg',
+        141: 'Jwmb',
+        142: 'cAc2',
+        143: 'cAc1',
+        144: 'cBc2',
+        145: 'cBc1',
+        146: 'cKc1',
+        147: 'cKc2',
+        148: 'cYc2',
+        149: 'cYc1',
+        150: 'cXc2',
+        151: 'cXc1',
+        152: 'cJc2',
+        153: 'cJc1',
+        154: 'cDc2',
+        155: 'cDc1',
+        156: 'cCc2',
+        157: 'cCc1',
+        158: 'cIc2',
+        159: 'cIc1',
+        160: 'cFc2',
+        161: 'cFc1',
+        162: 'cLc2',
+        163: 'cLc1',
+        164: 'cWc2',
+        165: 'cWc1',
+        166: 'cNc2',
+        167: 'cNc1',
+        168: 'cOc1',
+        169: 'cOc2',
+        170: 'cZc2',
+        171: 'cZc1',
+        172: 'cGc2',
+        173: 'cGc1',
+        174: 'cVc2',
+        175: 'cVc1',
+        176: 'cQc2',
+        177: 'cQc1',
+    }
 
+    const reversedTerrainMap: { [x: string]: number } = {
+        Ldrt: 1,
+        Ldro: 2,
+        Ldrg: 3,
+        Lrok: 4,
+        Lgrs: 5,
+        Lgrd: 6,
+        Fdrt: 7,
+        Fdro: 8,
+        Fdrg: 9,
+        Frok: 10,
+        Fgrs: 11,
+        Fgrd: 12,
+        Wdrt: 13,
+        Wdro: 14,
+        Wsng: 15,
+        Wrok: 16,
+        Wgrs: 17,
+        Wsnw: 18,
+        Bdrt: 19,
+        Bdrh: 20,
+        Bdrr: 21,
+        Bdrg: 22,
+        Bdsr: 23,
+        Bdsd: 24,
+        Bflr: 25,
+        Bgrr: 26,
+        Adrt: 27,
+        Adrd: 28,
+        Agrs: 29,
+        Arck: 30,
+        Agrd: 31,
+        Avin: 32,
+        Adrg: 33,
+        Alvd: 34,
+        Cdrt: 35,
+        Cdrd: 36,
+        Cpos: 37,
+        Crck: 38,
+        Cvin: 39,
+        Cgrs: 40,
+        Clvg: 41,
+        Ndrt: 42,
+        Ndrd: 43,
+        Nrck: 44,
+        Ngrs: 45,
+        Nice: 46,
+        Nsnw: 47,
+        Nsnr: 48,
+        Ydrt: 49,
+        Ydtr: 50,
+        Yblm: 51,
+        Ybtl: 52,
+        Ysqd: 53,
+        Yrtl: 54,
+        Ygsb: 55,
+        Yhdg: 56,
+        Ywmb: 57,
+        Vdrt: 58,
+        Vdrr: 59,
+        Vcrp: 60,
+        Vcbp: 61,
+        Vstp: 62,
+        Vgrs: 63,
+        Vrck: 64,
+        Vgrt: 65,
+        Qdrt: 66,
+        Qdrr: 67,
+        Qcrp: 68,
+        Qcbp: 69,
+        Qstp: 70,
+        Qgrs: 71,
+        Qrck: 72,
+        Qgrt: 73,
+        Xdrt: 74,
+        Xdtr: 75,
+        Xblm: 76,
+        Xbtl: 77,
+        Xsqd: 78,
+        Xrtl: 79,
+        Xgsb: 80,
+        Xhdg: 81,
+        Xwmb: 82,
+        Ddrt: 83,
+        Dbrk: 84,
+        Drds: 85,
+        Dlvc: 86,
+        Dlav: 87,
+        Ddkr: 88,
+        Dgrs: 89,
+        Dsqd: 90,
+        Gdrt: 91,
+        Gbrk: 92,
+        Grds: 93,
+        Glvc: 94,
+        Glav: 95,
+        Gdkr: 96,
+        Ggrs: 97,
+        Gsqd: 98,
+        Zdrt: 99,
+        Zdtr: 100,
+        Zdrg: 101,
+        Zbks: 102,
+        Zsan: 103,
+        Zbkl: 104,
+        Ztil: 105,
+        Zgrs: 106,
+        Zvin: 107,
+        Idrt: 108,
+        Idtr: 109,
+        Idki: 110,
+        Ibkb: 111,
+        Irbk: 112,
+        Itbk: 113,
+        Iice: 114,
+        Ibsq: 115,
+        Isnw: 116,
+        Odrt: 117,
+        Odtr: 118,
+        Osmb: 119,
+        Ofst: 120,
+        Olgb: 121,
+        Orok: 122,
+        Ofsl: 123,
+        Oaby: 124,
+        Kdrt: 125,
+        Kfsl: 126,
+        Kdts: 127,
+        Kfst: 128,
+        Ksmb: 129,
+        Klgb: 130,
+        Ksqt: 131,
+        Kdkt: 132,
+        Jdrt: 133,
+        Jdtr: 134,
+        Jblm: 135,
+        Jbtl: 136,
+        Jsqd: 137,
+        Jrtl: 138,
+        Jgsb: 139,
+        Jhdg: 140,
+        Jwmb: 141,
+        cAc2: 142,
+        cAc1: 143,
+        cBc2: 144,
+        cBc1: 145,
+        cKc1: 146,
+        cKc2: 147,
+        cYc2: 148,
+        cYc1: 149,
+        cXc2: 150,
+        cXc1: 151,
+        cJc2: 152,
+        cJc1: 153,
+        cDc2: 154,
+        cDc1: 155,
+        cCc2: 156,
+        cCc1: 157,
+        cIc2: 158,
+        cIc1: 159,
+        cFc2: 160,
+        cFc1: 161,
+        cLc2: 162,
+        cLc1: 163,
+        cWc2: 164,
+        cWc1: 165,
+        cNc2: 166,
+        cNc1: 167,
+        cOc1: 168,
+        cOc2: 169,
+        cZc2: 170,
+        cZc1: 171,
+        cGc2: 172,
+        cGc1: 173,
+        cVc2: 174,
+        cVc1: 175,
+        cQc2: 176,
+        cQc1: 177,
+    }
 
-const initTerrainTypeMax = () => { //
+    const TerrainTypeMaxId2TerrainTypeId = (maxId: number): number => {
+        return terrainMap[maxId] ? FourCC(terrainMap[maxId]) : 0
+    }
 
+    const TerrainTypeId2TerrainTypeMaxId = (terrainTypeId: number): number => {
+        return reversedTerrainMap[terrainTypeId] || 0
+    }
 
-const TerrainTypeMaxId2TerrainTypeId = (maxId: number): number => {
-	//! textmacro TerrainTypeMaxId2TerrainTypeId takes maxId, terrainType
-	if ((maxId === $maxId$)) {
-		return $terrainType$;
-	}
-	//! endtextmacro
-
-	//! runtextmacro TerrainTypeMaxId2TerrainTypeId( "1", "'Ldrt'" )
-	//! runtextmacro TerrainTypeMaxId2TerrainTypeId( "2", "'Ldro'" )
-	//! runtextmacro TerrainTypeMaxId2TerrainTypeId( "3", "'Ldrg'" )
-	//! runtextmacro TerrainTypeMaxId2TerrainTypeId( "4", "'Lrok'" )
-	//! runtextmacro TerrainTypeMaxId2TerrainTypeId( "5", "'Lgrs'" )
-	//! runtextmacro TerrainTypeMaxId2TerrainTypeId( "6", "'Lgrd'" )
-	//! runtextmacro TerrainTypeMaxId2TerrainTypeId( "7", "'Fdrt'" )
-	//! runtextmacro TerrainTypeMaxId2TerrainTypeId( "8", "'Fdro'" )
-	//! runtextmacro TerrainTypeMaxId2TerrainTypeId( "9", "'Fdrg'" )
-	//! runtextmacro TerrainTypeMaxId2TerrainTypeId( "10", "'Frok'" )
-	//! runtextmacro TerrainTypeMaxId2TerrainTypeId( "11", "'Fgrs'" )
-	//! runtextmacro TerrainTypeMaxId2TerrainTypeId( "12", "'Fgrd'" )
-	//! runtextmacro TerrainTypeMaxId2TerrainTypeId( "13", "'Wdrt'" )
-	//! runtextmacro TerrainTypeMaxId2TerrainTypeId( "14", "'Wdro'" )
-	//! runtextmacro TerrainTypeMaxId2TerrainTypeId( "15", "'Wsng'" )
-	//! runtextmacro TerrainTypeMaxId2TerrainTypeId( "16", "'Wrok'" )
-	//! runtextmacro TerrainTypeMaxId2TerrainTypeId( "17", "'Wgrs'" )
-	//! runtextmacro TerrainTypeMaxId2TerrainTypeId( "18", "'Wsnw'" )
-	//! runtextmacro TerrainTypeMaxId2TerrainTypeId( "19", "'Bdrt'" )
-	//! runtextmacro TerrainTypeMaxId2TerrainTypeId( "20", "'Bdrh'" )
-	//! runtextmacro TerrainTypeMaxId2TerrainTypeId( "21", "'Bdrr'" )
-	//! runtextmacro TerrainTypeMaxId2TerrainTypeId( "22", "'Bdrg'" )
-	//! runtextmacro TerrainTypeMaxId2TerrainTypeId( "23", "'Bdsr'" )
-	//! runtextmacro TerrainTypeMaxId2TerrainTypeId( "24", "'Bdsd'" )
-	//! runtextmacro TerrainTypeMaxId2TerrainTypeId( "25", "'Bflr'" )
-	//! runtextmacro TerrainTypeMaxId2TerrainTypeId( "26", "'Bgrr'" )
-	//! runtextmacro TerrainTypeMaxId2TerrainTypeId( "27", "'Adrt'" )
-	//! runtextmacro TerrainTypeMaxId2TerrainTypeId( "28", "'Adrd'" )
-	//! runtextmacro TerrainTypeMaxId2TerrainTypeId( "29", "'Agrs'" )
-	//! runtextmacro TerrainTypeMaxId2TerrainTypeId( "30", "'Arck'" )
-	//! runtextmacro TerrainTypeMaxId2TerrainTypeId( "31", "'Agrd'" )
-	//! runtextmacro TerrainTypeMaxId2TerrainTypeId( "32", "'Avin'" )
-	//! runtextmacro TerrainTypeMaxId2TerrainTypeId( "33", "'Adrg'" )
-	//! runtextmacro TerrainTypeMaxId2TerrainTypeId( "34", "'Alvd'" )
-	//! runtextmacro TerrainTypeMaxId2TerrainTypeId( "35", "'Cdrt'" )
-	//! runtextmacro TerrainTypeMaxId2TerrainTypeId( "36", "'Cdrd'" )
-	//! runtextmacro TerrainTypeMaxId2TerrainTypeId( "37", "'Cpos'" )
-	//! runtextmacro TerrainTypeMaxId2TerrainTypeId( "38", "'Crck'" )
-	//! runtextmacro TerrainTypeMaxId2TerrainTypeId( "39", "'Cvin'" )
-	//! runtextmacro TerrainTypeMaxId2TerrainTypeId( "40", "'Cgrs'" )
-	//! runtextmacro TerrainTypeMaxId2TerrainTypeId( "41", "'Clvg'" )
-	//! runtextmacro TerrainTypeMaxId2TerrainTypeId( "42", "'Ndrt'" )
-	//! runtextmacro TerrainTypeMaxId2TerrainTypeId( "43", "'Ndrd'" )
-	//! runtextmacro TerrainTypeMaxId2TerrainTypeId( "44", "'Nrck'" )
-	//! runtextmacro TerrainTypeMaxId2TerrainTypeId( "45", "'Ngrs'" )
-	//! runtextmacro TerrainTypeMaxId2TerrainTypeId( "46", "'Nice'" )
-	//! runtextmacro TerrainTypeMaxId2TerrainTypeId( "47", "'Nsnw'" )
-	//! runtextmacro TerrainTypeMaxId2TerrainTypeId( "48", "'Nsnr'" )
-	//! runtextmacro TerrainTypeMaxId2TerrainTypeId( "49", "'Ydrt'" )
-	//! runtextmacro TerrainTypeMaxId2TerrainTypeId( "50", "'Ydtr'" )
-	//! runtextmacro TerrainTypeMaxId2TerrainTypeId( "51", "'Yblm'" )
-	//! runtextmacro TerrainTypeMaxId2TerrainTypeId( "52", "'Ybtl'" )
-	//! runtextmacro TerrainTypeMaxId2TerrainTypeId( "53", "'Ysqd'" )
-	//! runtextmacro TerrainTypeMaxId2TerrainTypeId( "54", "'Yrtl'" )
-	//! runtextmacro TerrainTypeMaxId2TerrainTypeId( "55", "'Ygsb'" )
-	//! runtextmacro TerrainTypeMaxId2TerrainTypeId( "56", "'Yhdg'" )
-	//! runtextmacro TerrainTypeMaxId2TerrainTypeId( "57", "'Ywmb'" )
-	//! runtextmacro TerrainTypeMaxId2TerrainTypeId( "58", "'Vdrt'" )
-	//! runtextmacro TerrainTypeMaxId2TerrainTypeId( "59", "'Vdrr'" )
-	//! runtextmacro TerrainTypeMaxId2TerrainTypeId( "60", "'Vcrp'" )
-	//! runtextmacro TerrainTypeMaxId2TerrainTypeId( "61", "'Vcbp'" )
-	//! runtextmacro TerrainTypeMaxId2TerrainTypeId( "62", "'Vstp'" )
-	//! runtextmacro TerrainTypeMaxId2TerrainTypeId( "63", "'Vgrs'" )
-	//! runtextmacro TerrainTypeMaxId2TerrainTypeId( "64", "'Vrck'" )
-	//! runtextmacro TerrainTypeMaxId2TerrainTypeId( "65", "'Vgrt'" )
-	//! runtextmacro TerrainTypeMaxId2TerrainTypeId( "66", "'Qdrt'" )
-	//! runtextmacro TerrainTypeMaxId2TerrainTypeId( "67", "'Qdrr'" )
-	//! runtextmacro TerrainTypeMaxId2TerrainTypeId( "68", "'Qcrp'" )
-	//! runtextmacro TerrainTypeMaxId2TerrainTypeId( "69", "'Qcbp'" )
-	//! runtextmacro TerrainTypeMaxId2TerrainTypeId( "70", "'Qstp'" )
-	//! runtextmacro TerrainTypeMaxId2TerrainTypeId( "71", "'Qgrs'" )
-	//! runtextmacro TerrainTypeMaxId2TerrainTypeId( "72", "'Qrck'" )
-	//! runtextmacro TerrainTypeMaxId2TerrainTypeId( "73", "'Qgrt'" )
-	//! runtextmacro TerrainTypeMaxId2TerrainTypeId( "74", "'Xdrt'" )
-	//! runtextmacro TerrainTypeMaxId2TerrainTypeId( "75", "'Xdtr'" )
-	//! runtextmacro TerrainTypeMaxId2TerrainTypeId( "76", "'Xblm'" )
-	//! runtextmacro TerrainTypeMaxId2TerrainTypeId( "77", "'Xbtl'" )
-	//! runtextmacro TerrainTypeMaxId2TerrainTypeId( "78", "'Xsqd'" )
-	//! runtextmacro TerrainTypeMaxId2TerrainTypeId( "79", "'Xrtl'" )
-	//! runtextmacro TerrainTypeMaxId2TerrainTypeId( "80", "'Xgsb'" )
-	//! runtextmacro TerrainTypeMaxId2TerrainTypeId( "81", "'Xhdg'" )
-	//! runtextmacro TerrainTypeMaxId2TerrainTypeId( "82", "'Xwmb'" )
-	//! runtextmacro TerrainTypeMaxId2TerrainTypeId( "83", "'Ddrt'" )
-	//! runtextmacro TerrainTypeMaxId2TerrainTypeId( "84", "'Dbrk'" )
-	//! runtextmacro TerrainTypeMaxId2TerrainTypeId( "85", "'Drds'" )
-	//! runtextmacro TerrainTypeMaxId2TerrainTypeId( "86", "'Dlvc'" )
-	//! runtextmacro TerrainTypeMaxId2TerrainTypeId( "87", "'Dlav'" )
-	//! runtextmacro TerrainTypeMaxId2TerrainTypeId( "88", "'Ddkr'" )
-	//! runtextmacro TerrainTypeMaxId2TerrainTypeId( "89", "'Dgrs'" )
-	//! runtextmacro TerrainTypeMaxId2TerrainTypeId( "90", "'Dsqd'" )
-	//! runtextmacro TerrainTypeMaxId2TerrainTypeId( "91", "'Gdrt'" )
-	//! runtextmacro TerrainTypeMaxId2TerrainTypeId( "92", "'Gbrk'" )
-	//! runtextmacro TerrainTypeMaxId2TerrainTypeId( "93", "'Grds'" )
-	//! runtextmacro TerrainTypeMaxId2TerrainTypeId( "94", "'Glvc'" )
-	//! runtextmacro TerrainTypeMaxId2TerrainTypeId( "95", "'Glav'" )
-	//! runtextmacro TerrainTypeMaxId2TerrainTypeId( "96", "'Gdkr'" )
-	//! runtextmacro TerrainTypeMaxId2TerrainTypeId( "97", "'Ggrs'" )
-	//! runtextmacro TerrainTypeMaxId2TerrainTypeId( "98", "'Gsqd'" )
-	//! runtextmacro TerrainTypeMaxId2TerrainTypeId( "99", "'Zdrt'" )
-	//! runtextmacro TerrainTypeMaxId2TerrainTypeId( "100", "'Zdtr'" )
-	//! runtextmacro TerrainTypeMaxId2TerrainTypeId( "101", "'Zdrg'" )
-	//! runtextmacro TerrainTypeMaxId2TerrainTypeId( "102", "'Zbks'" )
-	//! runtextmacro TerrainTypeMaxId2TerrainTypeId( "103", "'Zsan'" )
-	//! runtextmacro TerrainTypeMaxId2TerrainTypeId( "104", "'Zbkl'" )
-	//! runtextmacro TerrainTypeMaxId2TerrainTypeId( "105", "'Ztil'" )
-	//! runtextmacro TerrainTypeMaxId2TerrainTypeId( "106", "'Zgrs'" )
-	//! runtextmacro TerrainTypeMaxId2TerrainTypeId( "107", "'Zvin'" )
-	//! runtextmacro TerrainTypeMaxId2TerrainTypeId( "108", "'Idrt'" )
-	//! runtextmacro TerrainTypeMaxId2TerrainTypeId( "109", "'Idtr'" )
-	//! runtextmacro TerrainTypeMaxId2TerrainTypeId( "110", "'Idki'" )
-	//! runtextmacro TerrainTypeMaxId2TerrainTypeId( "111", "'Ibkb'" )
-	//! runtextmacro TerrainTypeMaxId2TerrainTypeId( "112", "'Irbk'" )
-	//! runtextmacro TerrainTypeMaxId2TerrainTypeId( "113", "'Itbk'" )
-	//! runtextmacro TerrainTypeMaxId2TerrainTypeId( "114", "'Iice'" )
-	//! runtextmacro TerrainTypeMaxId2TerrainTypeId( "115", "'Ibsq'" )
-	//! runtextmacro TerrainTypeMaxId2TerrainTypeId( "116", "'Isnw'" )
-	//! runtextmacro TerrainTypeMaxId2TerrainTypeId( "117", "'Odrt'" )
-	//! runtextmacro TerrainTypeMaxId2TerrainTypeId( "118", "'Odtr'" )
-	//! runtextmacro TerrainTypeMaxId2TerrainTypeId( "119", "'Osmb'" )
-	//! runtextmacro TerrainTypeMaxId2TerrainTypeId( "120", "'Ofst'" )
-	//! runtextmacro TerrainTypeMaxId2TerrainTypeId( "121", "'Olgb'" )
-	//! runtextmacro TerrainTypeMaxId2TerrainTypeId( "122", "'Orok'" )
-	//! runtextmacro TerrainTypeMaxId2TerrainTypeId( "123", "'Ofsl'" )
-	//! runtextmacro TerrainTypeMaxId2TerrainTypeId( "124", "'Oaby'" )
-	//! runtextmacro TerrainTypeMaxId2TerrainTypeId( "125", "'Kdrt'" )
-	//! runtextmacro TerrainTypeMaxId2TerrainTypeId( "126", "'Kfsl'" )
-	//! runtextmacro TerrainTypeMaxId2TerrainTypeId( "127", "'Kdts'" )
-	//! runtextmacro TerrainTypeMaxId2TerrainTypeId( "128", "'Kfst'" )
-	//! runtextmacro TerrainTypeMaxId2TerrainTypeId( "129", "'Ksmb'" )
-	//! runtextmacro TerrainTypeMaxId2TerrainTypeId( "130", "'Klgb'" )
-	//! runtextmacro TerrainTypeMaxId2TerrainTypeId( "131", "'Ksqt'" )
-	//! runtextmacro TerrainTypeMaxId2TerrainTypeId( "132", "'Kdkt'" )
-	//! runtextmacro TerrainTypeMaxId2TerrainTypeId( "133", "'Jdrt'" )
-	//! runtextmacro TerrainTypeMaxId2TerrainTypeId( "134", "'Jdtr'" )
-	//! runtextmacro TerrainTypeMaxId2TerrainTypeId( "135", "'Jblm'" )
-	//! runtextmacro TerrainTypeMaxId2TerrainTypeId( "136", "'Jbtl'" )
-	//! runtextmacro TerrainTypeMaxId2TerrainTypeId( "137", "'Jsqd'" )
-	//! runtextmacro TerrainTypeMaxId2TerrainTypeId( "138", "'Jrtl'" )
-	//! runtextmacro TerrainTypeMaxId2TerrainTypeId( "139", "'Jgsb'" )
-	//! runtextmacro TerrainTypeMaxId2TerrainTypeId( "140", "'Jhdg'" )
-	//! runtextmacro TerrainTypeMaxId2TerrainTypeId( "141", "'Jwmb'" )
-	//! runtextmacro TerrainTypeMaxId2TerrainTypeId( "142", "'cAc2'" )
-	//! runtextmacro TerrainTypeMaxId2TerrainTypeId( "143", "'cAc1'" )
-	//! runtextmacro TerrainTypeMaxId2TerrainTypeId( "144", "'cBc2'" )
-	//! runtextmacro TerrainTypeMaxId2TerrainTypeId( "145", "'cBc1'" )
-	//! runtextmacro TerrainTypeMaxId2TerrainTypeId( "146", "'cKc1'" )
-	//! runtextmacro TerrainTypeMaxId2TerrainTypeId( "147", "'cKc2'" )
-	//! runtextmacro TerrainTypeMaxId2TerrainTypeId( "148", "'cYc2'" )
-	//! runtextmacro TerrainTypeMaxId2TerrainTypeId( "149", "'cYc1'" )
-	//! runtextmacro TerrainTypeMaxId2TerrainTypeId( "150", "'cXc2'" )
-	//! runtextmacro TerrainTypeMaxId2TerrainTypeId( "151", "'cXc1'" )
-	//! runtextmacro TerrainTypeMaxId2TerrainTypeId( "152", "'cJc2'" )
-	//! runtextmacro TerrainTypeMaxId2TerrainTypeId( "153", "'cJc1'" )
-	//! runtextmacro TerrainTypeMaxId2TerrainTypeId( "154", "'cDc2'" )
-	//! runtextmacro TerrainTypeMaxId2TerrainTypeId( "155", "'cDc1'" )
-	//! runtextmacro TerrainTypeMaxId2TerrainTypeId( "156", "'cCc2'" )
-	//! runtextmacro TerrainTypeMaxId2TerrainTypeId( "157", "'cCc1'" )
-	//! runtextmacro TerrainTypeMaxId2TerrainTypeId( "158", "'cIc2'" )
-	//! runtextmacro TerrainTypeMaxId2TerrainTypeId( "159", "'cIc1'" )
-	//! runtextmacro TerrainTypeMaxId2TerrainTypeId( "160", "'cFc2'" )
-	//! runtextmacro TerrainTypeMaxId2TerrainTypeId( "161", "'cFc1'" )
-	//! runtextmacro TerrainTypeMaxId2TerrainTypeId( "162", "'cLc2'" )
-	//! runtextmacro TerrainTypeMaxId2TerrainTypeId( "163", "'cLc1'" )
-	//! runtextmacro TerrainTypeMaxId2TerrainTypeId( "164", "'cWc2'" )
-	//! runtextmacro TerrainTypeMaxId2TerrainTypeId( "165", "'cWc1'" )
-	//! runtextmacro TerrainTypeMaxId2TerrainTypeId( "166", "'cNc2'" )
-	//! runtextmacro TerrainTypeMaxId2TerrainTypeId( "167", "'cNc1'" )
-	//! runtextmacro TerrainTypeMaxId2TerrainTypeId( "168", "'cOc1'" )
-	//! runtextmacro TerrainTypeMaxId2TerrainTypeId( "169", "'cOc2'" )
-	//! runtextmacro TerrainTypeMaxId2TerrainTypeId( "170", "'cZc2'" )
-	//! runtextmacro TerrainTypeMaxId2TerrainTypeId( "171", "'cZc1'" )
-	//! runtextmacro TerrainTypeMaxId2TerrainTypeId( "172", "'cGc2'" )
-	//! runtextmacro TerrainTypeMaxId2TerrainTypeId( "173", "'cGc1'" )
-	//! runtextmacro TerrainTypeMaxId2TerrainTypeId( "174", "'cVc2'" )
-	//! runtextmacro TerrainTypeMaxId2TerrainTypeId( "175", "'cVc1'" )
-	//! runtextmacro TerrainTypeMaxId2TerrainTypeId( "176", "'cQc2'" )
-	//! runtextmacro TerrainTypeMaxId2TerrainTypeId( "177", "'cQc1'" )
-
-	return 0;
-
-};
-
-
-const TerrainTypeId2TerrainTypeMaxId = (terrainTypeId: number): number => {
-	//! textmacro TerrainTypeId2TerrainTypeMaxId takes maxId, terrainType
-	if ((terrainTypeId === $terrainType$)) {
-		return $maxId$;
-	}
-	//! endtextmacro
-
-	//! runtextmacro TerrainTypeId2TerrainTypeMaxId( "1", "'Ldrt'" )
-	//! runtextmacro TerrainTypeId2TerrainTypeMaxId( "2", "'Ldro'" )
-	//! runtextmacro TerrainTypeId2TerrainTypeMaxId( "3", "'Ldrg'" )
-	//! runtextmacro TerrainTypeId2TerrainTypeMaxId( "4", "'Lrok'" )
-	//! runtextmacro TerrainTypeId2TerrainTypeMaxId( "5", "'Lgrs'" )
-	//! runtextmacro TerrainTypeId2TerrainTypeMaxId( "6", "'Lgrd'" )
-	//! runtextmacro TerrainTypeId2TerrainTypeMaxId( "7", "'Fdrt'" )
-	//! runtextmacro TerrainTypeId2TerrainTypeMaxId( "8", "'Fdro'" )
-	//! runtextmacro TerrainTypeId2TerrainTypeMaxId( "9", "'Fdrg'" )
-	//! runtextmacro TerrainTypeId2TerrainTypeMaxId( "10", "'Frok'" )
-	//! runtextmacro TerrainTypeId2TerrainTypeMaxId( "11", "'Fgrs'" )
-	//! runtextmacro TerrainTypeId2TerrainTypeMaxId( "12", "'Fgrd'" )
-	//! runtextmacro TerrainTypeId2TerrainTypeMaxId( "13", "'Wdrt'" )
-	//! runtextmacro TerrainTypeId2TerrainTypeMaxId( "14", "'Wdro'" )
-	//! runtextmacro TerrainTypeId2TerrainTypeMaxId( "15", "'Wsng'" )
-	//! runtextmacro TerrainTypeId2TerrainTypeMaxId( "16", "'Wrok'" )
-	//! runtextmacro TerrainTypeId2TerrainTypeMaxId( "17", "'Wgrs'" )
-	//! runtextmacro TerrainTypeId2TerrainTypeMaxId( "18", "'Wsnw'" )
-	//! runtextmacro TerrainTypeId2TerrainTypeMaxId( "19", "'Bdrt'" )
-	//! runtextmacro TerrainTypeId2TerrainTypeMaxId( "20", "'Bdrh'" )
-	//! runtextmacro TerrainTypeId2TerrainTypeMaxId( "21", "'Bdrr'" )
-	//! runtextmacro TerrainTypeId2TerrainTypeMaxId( "22", "'Bdrg'" )
-	//! runtextmacro TerrainTypeId2TerrainTypeMaxId( "23", "'Bdsr'" )
-	//! runtextmacro TerrainTypeId2TerrainTypeMaxId( "24", "'Bdsd'" )
-	//! runtextmacro TerrainTypeId2TerrainTypeMaxId( "25", "'Bflr'" )
-	//! runtextmacro TerrainTypeId2TerrainTypeMaxId( "26", "'Bgrr'" )
-	//! runtextmacro TerrainTypeId2TerrainTypeMaxId( "27", "'Adrt'" )
-	//! runtextmacro TerrainTypeId2TerrainTypeMaxId( "28", "'Adrd'" )
-	//! runtextmacro TerrainTypeId2TerrainTypeMaxId( "29", "'Agrs'" )
-	//! runtextmacro TerrainTypeId2TerrainTypeMaxId( "30", "'Arck'" )
-	//! runtextmacro TerrainTypeId2TerrainTypeMaxId( "31", "'Agrd'" )
-	//! runtextmacro TerrainTypeId2TerrainTypeMaxId( "32", "'Avin'" )
-	//! runtextmacro TerrainTypeId2TerrainTypeMaxId( "33", "'Adrg'" )
-	//! runtextmacro TerrainTypeId2TerrainTypeMaxId( "34", "'Alvd'" )
-	//! runtextmacro TerrainTypeId2TerrainTypeMaxId( "35", "'Cdrt'" )
-	//! runtextmacro TerrainTypeId2TerrainTypeMaxId( "36", "'Cdrd'" )
-	//! runtextmacro TerrainTypeId2TerrainTypeMaxId( "37", "'Cpos'" )
-	//! runtextmacro TerrainTypeId2TerrainTypeMaxId( "38", "'Crck'" )
-	//! runtextmacro TerrainTypeId2TerrainTypeMaxId( "39", "'Cvin'" )
-	//! runtextmacro TerrainTypeId2TerrainTypeMaxId( "40", "'Cgrs'" )
-	//! runtextmacro TerrainTypeId2TerrainTypeMaxId( "41", "'Clvg'" )
-	//! runtextmacro TerrainTypeId2TerrainTypeMaxId( "42", "'Ndrt'" )
-	//! runtextmacro TerrainTypeId2TerrainTypeMaxId( "43", "'Ndrd'" )
-	//! runtextmacro TerrainTypeId2TerrainTypeMaxId( "44", "'Nrck'" )
-	//! runtextmacro TerrainTypeId2TerrainTypeMaxId( "45", "'Ngrs'" )
-	//! runtextmacro TerrainTypeId2TerrainTypeMaxId( "46", "'Nice'" )
-	//! runtextmacro TerrainTypeId2TerrainTypeMaxId( "47", "'Nsnw'" )
-	//! runtextmacro TerrainTypeId2TerrainTypeMaxId( "48", "'Nsnr'" )
-	//! runtextmacro TerrainTypeId2TerrainTypeMaxId( "49", "'Ydrt'" )
-	//! runtextmacro TerrainTypeId2TerrainTypeMaxId( "50", "'Ydtr'" )
-	//! runtextmacro TerrainTypeId2TerrainTypeMaxId( "51", "'Yblm'" )
-	//! runtextmacro TerrainTypeId2TerrainTypeMaxId( "52", "'Ybtl'" )
-	//! runtextmacro TerrainTypeId2TerrainTypeMaxId( "53", "'Ysqd'" )
-	//! runtextmacro TerrainTypeId2TerrainTypeMaxId( "54", "'Yrtl'" )
-	//! runtextmacro TerrainTypeId2TerrainTypeMaxId( "55", "'Ygsb'" )
-	//! runtextmacro TerrainTypeId2TerrainTypeMaxId( "56", "'Yhdg'" )
-	//! runtextmacro TerrainTypeId2TerrainTypeMaxId( "57", "'Ywmb'" )
-	//! runtextmacro TerrainTypeId2TerrainTypeMaxId( "58", "'Vdrt'" )
-	//! runtextmacro TerrainTypeId2TerrainTypeMaxId( "59", "'Vdrr'" )
-	//! runtextmacro TerrainTypeId2TerrainTypeMaxId( "60", "'Vcrp'" )
-	//! runtextmacro TerrainTypeId2TerrainTypeMaxId( "61", "'Vcbp'" )
-	//! runtextmacro TerrainTypeId2TerrainTypeMaxId( "62", "'Vstp'" )
-	//! runtextmacro TerrainTypeId2TerrainTypeMaxId( "63", "'Vgrs'" )
-	//! runtextmacro TerrainTypeId2TerrainTypeMaxId( "64", "'Vrck'" )
-	//! runtextmacro TerrainTypeId2TerrainTypeMaxId( "65", "'Vgrt'" )
-	//! runtextmacro TerrainTypeId2TerrainTypeMaxId( "66", "'Qdrt'" )
-	//! runtextmacro TerrainTypeId2TerrainTypeMaxId( "67", "'Qdrr'" )
-	//! runtextmacro TerrainTypeId2TerrainTypeMaxId( "68", "'Qcrp'" )
-	//! runtextmacro TerrainTypeId2TerrainTypeMaxId( "69", "'Qcbp'" )
-	//! runtextmacro TerrainTypeId2TerrainTypeMaxId( "70", "'Qstp'" )
-	//! runtextmacro TerrainTypeId2TerrainTypeMaxId( "71", "'Qgrs'" )
-	//! runtextmacro TerrainTypeId2TerrainTypeMaxId( "72", "'Qrck'" )
-	//! runtextmacro TerrainTypeId2TerrainTypeMaxId( "73", "'Qgrt'" )
-	//! runtextmacro TerrainTypeId2TerrainTypeMaxId( "74", "'Xdrt'" )
-	//! runtextmacro TerrainTypeId2TerrainTypeMaxId( "75", "'Xdtr'" )
-	//! runtextmacro TerrainTypeId2TerrainTypeMaxId( "76", "'Xblm'" )
-	//! runtextmacro TerrainTypeId2TerrainTypeMaxId( "77", "'Xbtl'" )
-	//! runtextmacro TerrainTypeId2TerrainTypeMaxId( "78", "'Xsqd'" )
-	//! runtextmacro TerrainTypeId2TerrainTypeMaxId( "79", "'Xrtl'" )
-	//! runtextmacro TerrainTypeId2TerrainTypeMaxId( "80", "'Xgsb'" )
-	//! runtextmacro TerrainTypeId2TerrainTypeMaxId( "81", "'Xhdg'" )
-	//! runtextmacro TerrainTypeId2TerrainTypeMaxId( "82", "'Xwmb'" )
-	//! runtextmacro TerrainTypeId2TerrainTypeMaxId( "83", "'Ddrt'" )
-	//! runtextmacro TerrainTypeId2TerrainTypeMaxId( "84", "'Dbrk'" )
-	//! runtextmacro TerrainTypeId2TerrainTypeMaxId( "85", "'Drds'" )
-	//! runtextmacro TerrainTypeId2TerrainTypeMaxId( "86", "'Dlvc'" )
-	//! runtextmacro TerrainTypeId2TerrainTypeMaxId( "87", "'Dlav'" )
-	//! runtextmacro TerrainTypeId2TerrainTypeMaxId( "88", "'Ddkr'" )
-	//! runtextmacro TerrainTypeId2TerrainTypeMaxId( "89", "'Dgrs'" )
-	//! runtextmacro TerrainTypeId2TerrainTypeMaxId( "90", "'Dsqd'" )
-	//! runtextmacro TerrainTypeId2TerrainTypeMaxId( "91", "'Gdrt'" )
-	//! runtextmacro TerrainTypeId2TerrainTypeMaxId( "92", "'Gbrk'" )
-	//! runtextmacro TerrainTypeId2TerrainTypeMaxId( "93", "'Grds'" )
-	//! runtextmacro TerrainTypeId2TerrainTypeMaxId( "94", "'Glvc'" )
-	//! runtextmacro TerrainTypeId2TerrainTypeMaxId( "95", "'Glav'" )
-	//! runtextmacro TerrainTypeId2TerrainTypeMaxId( "96", "'Gdkr'" )
-	//! runtextmacro TerrainTypeId2TerrainTypeMaxId( "97", "'Ggrs'" )
-	//! runtextmacro TerrainTypeId2TerrainTypeMaxId( "98", "'Gsqd'" )
-	//! runtextmacro TerrainTypeId2TerrainTypeMaxId( "99", "'Zdrt'" )
-	//! runtextmacro TerrainTypeId2TerrainTypeMaxId( "100", "'Zdtr'" )
-	//! runtextmacro TerrainTypeId2TerrainTypeMaxId( "101", "'Zdrg'" )
-	//! runtextmacro TerrainTypeId2TerrainTypeMaxId( "102", "'Zbks'" )
-	//! runtextmacro TerrainTypeId2TerrainTypeMaxId( "103", "'Zsan'" )
-	//! runtextmacro TerrainTypeId2TerrainTypeMaxId( "104", "'Zbkl'" )
-	//! runtextmacro TerrainTypeId2TerrainTypeMaxId( "105", "'Ztil'" )
-	//! runtextmacro TerrainTypeId2TerrainTypeMaxId( "106", "'Zgrs'" )
-	//! runtextmacro TerrainTypeId2TerrainTypeMaxId( "107", "'Zvin'" )
-	//! runtextmacro TerrainTypeId2TerrainTypeMaxId( "108", "'Idrt'" )
-	//! runtextmacro TerrainTypeId2TerrainTypeMaxId( "109", "'Idtr'" )
-	//! runtextmacro TerrainTypeId2TerrainTypeMaxId( "110", "'Idki'" )
-	//! runtextmacro TerrainTypeId2TerrainTypeMaxId( "111", "'Ibkb'" )
-	//! runtextmacro TerrainTypeId2TerrainTypeMaxId( "112", "'Irbk'" )
-	//! runtextmacro TerrainTypeId2TerrainTypeMaxId( "113", "'Itbk'" )
-	//! runtextmacro TerrainTypeId2TerrainTypeMaxId( "114", "'Iice'" )
-	//! runtextmacro TerrainTypeId2TerrainTypeMaxId( "115", "'Ibsq'" )
-	//! runtextmacro TerrainTypeId2TerrainTypeMaxId( "116", "'Isnw'" )
-	//! runtextmacro TerrainTypeId2TerrainTypeMaxId( "117", "'Odrt'" )
-	//! runtextmacro TerrainTypeId2TerrainTypeMaxId( "118", "'Odtr'" )
-	//! runtextmacro TerrainTypeId2TerrainTypeMaxId( "119", "'Osmb'" )
-	//! runtextmacro TerrainTypeId2TerrainTypeMaxId( "120", "'Ofst'" )
-	//! runtextmacro TerrainTypeId2TerrainTypeMaxId( "121", "'Olgb'" )
-	//! runtextmacro TerrainTypeId2TerrainTypeMaxId( "122", "'Orok'" )
-	//! runtextmacro TerrainTypeId2TerrainTypeMaxId( "123", "'Ofsl'" )
-	//! runtextmacro TerrainTypeId2TerrainTypeMaxId( "124", "'Oaby'" )
-	//! runtextmacro TerrainTypeId2TerrainTypeMaxId( "125", "'Kdrt'" )
-	//! runtextmacro TerrainTypeId2TerrainTypeMaxId( "126", "'Kfsl'" )
-	//! runtextmacro TerrainTypeId2TerrainTypeMaxId( "127", "'Kdts'" )
-	//! runtextmacro TerrainTypeId2TerrainTypeMaxId( "128", "'Kfst'" )
-	//! runtextmacro TerrainTypeId2TerrainTypeMaxId( "129", "'Ksmb'" )
-	//! runtextmacro TerrainTypeId2TerrainTypeMaxId( "130", "'Klgb'" )
-	//! runtextmacro TerrainTypeId2TerrainTypeMaxId( "131", "'Ksqt'" )
-	//! runtextmacro TerrainTypeId2TerrainTypeMaxId( "132", "'Kdkt'" )
-	//! runtextmacro TerrainTypeId2TerrainTypeMaxId( "133", "'Jdrt'" )
-	//! runtextmacro TerrainTypeId2TerrainTypeMaxId( "134", "'Jdtr'" )
-	//! runtextmacro TerrainTypeId2TerrainTypeMaxId( "135", "'Jblm'" )
-	//! runtextmacro TerrainTypeId2TerrainTypeMaxId( "136", "'Jbtl'" )
-	//! runtextmacro TerrainTypeId2TerrainTypeMaxId( "137", "'Jsqd'" )
-	//! runtextmacro TerrainTypeId2TerrainTypeMaxId( "138", "'Jrtl'" )
-	//! runtextmacro TerrainTypeId2TerrainTypeMaxId( "139", "'Jgsb'" )
-	//! runtextmacro TerrainTypeId2TerrainTypeMaxId( "140", "'Jhdg'" )
-	//! runtextmacro TerrainTypeId2TerrainTypeMaxId( "141", "'Jwmb'" )
-	//! runtextmacro TerrainTypeId2TerrainTypeMaxId( "142", "'cAc2'" )
-	//! runtextmacro TerrainTypeId2TerrainTypeMaxId( "143", "'cAc1'" )
-	//! runtextmacro TerrainTypeId2TerrainTypeMaxId( "144", "'cBc2'" )
-	//! runtextmacro TerrainTypeId2TerrainTypeMaxId( "145", "'cBc1'" )
-	//! runtextmacro TerrainTypeId2TerrainTypeMaxId( "146", "'cKc1'" )
-	//! runtextmacro TerrainTypeId2TerrainTypeMaxId( "147", "'cKc2'" )
-	//! runtextmacro TerrainTypeId2TerrainTypeMaxId( "148", "'cYc2'" )
-	//! runtextmacro TerrainTypeId2TerrainTypeMaxId( "149", "'cYc1'" )
-	//! runtextmacro TerrainTypeId2TerrainTypeMaxId( "150", "'cXc2'" )
-	//! runtextmacro TerrainTypeId2TerrainTypeMaxId( "151", "'cXc1'" )
-	//! runtextmacro TerrainTypeId2TerrainTypeMaxId( "152", "'cJc2'" )
-	//! runtextmacro TerrainTypeId2TerrainTypeMaxId( "153", "'cJc1'" )
-	//! runtextmacro TerrainTypeId2TerrainTypeMaxId( "154", "'cDc2'" )
-	//! runtextmacro TerrainTypeId2TerrainTypeMaxId( "155", "'cDc1'" )
-	//! runtextmacro TerrainTypeId2TerrainTypeMaxId( "156", "'cCc2'" )
-	//! runtextmacro TerrainTypeId2TerrainTypeMaxId( "157", "'cCc1'" )
-	//! runtextmacro TerrainTypeId2TerrainTypeMaxId( "158", "'cIc2'" )
-	//! runtextmacro TerrainTypeId2TerrainTypeMaxId( "159", "'cIc1'" )
-	//! runtextmacro TerrainTypeId2TerrainTypeMaxId( "160", "'cFc2'" )
-	//! runtextmacro TerrainTypeId2TerrainTypeMaxId( "161", "'cFc1'" )
-	//! runtextmacro TerrainTypeId2TerrainTypeMaxId( "162", "'cLc2'" )
-	//! runtextmacro TerrainTypeId2TerrainTypeMaxId( "163", "'cLc1'" )
-	//! runtextmacro TerrainTypeId2TerrainTypeMaxId( "164", "'cWc2'" )
-	//! runtextmacro TerrainTypeId2TerrainTypeMaxId( "165", "'cWc1'" )
-	//! runtextmacro TerrainTypeId2TerrainTypeMaxId( "166", "'cNc2'" )
-	//! runtextmacro TerrainTypeId2TerrainTypeMaxId( "167", "'cNc1'" )
-	//! runtextmacro TerrainTypeId2TerrainTypeMaxId( "168", "'cOc1'" )
-	//! runtextmacro TerrainTypeId2TerrainTypeMaxId( "169", "'cOc2'" )
-	//! runtextmacro TerrainTypeId2TerrainTypeMaxId( "170", "'cZc2'" )
-	//! runtextmacro TerrainTypeId2TerrainTypeMaxId( "171", "'cZc1'" )
-	//! runtextmacro TerrainTypeId2TerrainTypeMaxId( "172", "'cGc2'" )
-	//! runtextmacro TerrainTypeId2TerrainTypeMaxId( "173", "'cGc1'" )
-	//! runtextmacro TerrainTypeId2TerrainTypeMaxId( "174", "'cVc2'" )
-	//! runtextmacro TerrainTypeId2TerrainTypeMaxId( "175", "'cVc1'" )
-	//! runtextmacro TerrainTypeId2TerrainTypeMaxId( "176", "'cQc2'" )
-	//! runtextmacro TerrainTypeId2TerrainTypeMaxId( "177", "'cQc1'" )
-
-	return 0;
-};
-
-
-
+    return { TerrainTypeMaxId2TerrainTypeId, TerrainTypeId2TerrainTypeMaxId }
 }
+
+export const TerrainTypeMax = initTerrainTypeMax()

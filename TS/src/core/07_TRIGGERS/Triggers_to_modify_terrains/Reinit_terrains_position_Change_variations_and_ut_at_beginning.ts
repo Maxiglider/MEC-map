@@ -83,7 +83,7 @@ const ReinitTerrainsPosition_Actions = (): void => {
 	}
 	y = y + LARGEUR_CASE;
 	if ((y > MAP_MAX_Y)) {
-		Text_mkA("Terrains position reinitialized !")
+		Text.mkA("Terrains position reinitialized !")
 		DisableTrigger(GetTriggeringTrigger())
 		terrainModifyWorking = false;
 		RestartEnabledCheckTerrainTriggers()
@@ -112,7 +112,7 @@ const StartTerrainModifying = (): void => {
 
 const ReinitTerrainsPosition = (): void => {
 	if ((terrainModifyWorking)) {
-		Text_erA("can't execute two commands of this type simultaneously !")
+		Text.erA("can't execute two commands of this type simultaneously !")
 		return;
 	}
 	StartTerrainModifying()

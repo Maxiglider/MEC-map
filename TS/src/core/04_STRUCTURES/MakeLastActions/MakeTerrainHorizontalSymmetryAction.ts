@@ -90,7 +90,7 @@ const cancel = (): boolean => {
 	}
 	this.applySymmetry()
 	this.isActionMadeB = false;
- Text_mkP(this.owner.getPlayer(), "terrain vertical symmetry cancelled")
+ Text.mkP(this.owner.getPlayer(), "terrain vertical symmetry cancelled")
 	return true;
 };
 
@@ -100,7 +100,7 @@ const redo = (): boolean => {
 	}
 	this.applySymmetry()
 	this.isActionMadeB = true;
- Text_mkP(this.owner.getPlayer(), "terrain vertical symmetry redone")
+ Text.mkP(this.owner.getPlayer(), "terrain vertical symmetry redone")
 	return true;
 };
 

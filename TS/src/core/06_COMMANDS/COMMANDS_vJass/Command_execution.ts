@@ -8,27 +8,27 @@ const initCommandExecution = () => { // initializer Init_Command_execution needs
 const ExecuteCommandSingle = (escaper: Escaper, cmd: string): void => {
 	if ((!ExecuteCommandAll(escaper, cmd))) {
 		if ( (not((escaper.getPlayer() == Player(0) and udg_areRedRightsOn) or escaper.canCheat())) ) {
- Text_erP(escaper.getPlayer(), "unknown command or not enough rights")
+ Text.erP(escaper.getPlayer(), "unknown command or not enough rights")
 			return;
 		}
 		if ((!ExecuteCommandRed(escaper, cmd))) {
 			if ( (not escaper.canCheat()) ) {
- Text_erP(escaper.getPlayer(), "unknown command or not enough rights")
+ Text.erP(escaper.getPlayer(), "unknown command or not enough rights")
 				return;
 			}
 			if ((!ExecuteCommandCheat(escaper, cmd))) {
 				if ((!ExecuteCommandMake(escaper, cmd))) {
 					if ( (not escaper.isMaximaxou()) ) {
- Text_erP(escaper.getPlayer(), "unknown command or not enough rights")
+ Text.erP(escaper.getPlayer(), "unknown command or not enough rights")
 						return;
 					}
 					if ((!ExecuteCommandMax(escaper, cmd))) {
 						if ( (not escaper.isTrueMaximaxou()) ) {
- Text_erP(escaper.getPlayer(), "unknown command or not enough rights")
+ Text.erP(escaper.getPlayer(), "unknown command or not enough rights")
 							return;
 						}
 						if ((!ExecuteCommandTrueMax(escaper, cmd))) {
- Text_erP(escaper.getPlayer(), "unknown command")
+ Text.erP(escaper.getPlayer(), "unknown command")
 						}
 					}
 				}

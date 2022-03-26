@@ -43,7 +43,7 @@ const cancel = (): boolean => {
 	}
  this.monster.removeUnit()
 	this.isActionMadeB = false;
- Text_mkP(this.owner.getPlayer(), "monster creation cancelled")
+ Text.mkP(this.owner.getPlayer(), "monster creation cancelled")
 	return true;
 };
 
@@ -53,7 +53,7 @@ const redo = (): boolean => {
 	}
  this.monster.createUnit()
 	this.isActionMadeB = true;
- Text_mkP(this.owner.getPlayer(), "monster creation redone")
+ Text.mkP(this.owner.getPlayer(), "monster creation redone")
 	return true;
 };
 

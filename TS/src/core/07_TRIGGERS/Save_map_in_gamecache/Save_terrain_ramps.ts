@@ -447,7 +447,7 @@ const SaveTerrainRamps_Actions = (): void => {
 	} else {
 		DisableTrigger(GetTriggeringTrigger())
  stringArrayForCache.writeInCache()
-		Text_A("terrain ramps saved")
+		Text.A("terrain ramps saved")
 		StartSaveWater()
 	}
 };

@@ -168,7 +168,7 @@ const displayForPlayer = (p: player): void => {
 	let display = udg_colorCode[TEAL] + this.label + " " + this.theAlias + " : ";
 	display = display + this.casterMonsterType.label + space + this.projectileMonsterType.label + space + "range: " + R2S(this.range) + space
 	display = display + "projectileSpeed: " + R2S(this.projectileSpeed) + space + "loadTime: " + R2S(this.loadTime) + space + this.animation;
-	Text_P_timed(p, TERRAIN_DATA_DISPLAY_TIME, display)
+	Text.P_timed(p, TERRAIN_DATA_DISPLAY_TIME, display)
 };
 
 const toString = (): string => {

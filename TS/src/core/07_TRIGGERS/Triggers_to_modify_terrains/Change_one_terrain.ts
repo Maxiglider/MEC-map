@@ -50,7 +50,7 @@ const StartTerrainModifying = (): void => {
 const ChangeOneTerrain = (terrainTypeLabel: string, newTerrainType: string): string => {
 	let terrainType: TerrainType;
 	if ((terrainModifyWorking)) {
-		Text_erA("can't execute two commands of this type simultaneously !")
+		Text.erA("can't execute two commands of this type simultaneously !")
 		return null;
 	}
 	terrainType = udg_terrainTypes.get(terrainTypeLabel)

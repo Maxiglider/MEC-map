@@ -134,9 +134,9 @@ const MonsterDelete_Actions = (): void => {
 	}
 
 	if ((nbMonstersRemoved <= 1)) {
- Text_mkP(mk.makerOwner, I2S(nbMonstersRemoved) + " monster removed.")
+ Text.mkP(mk.makerOwner, I2S(nbMonstersRemoved) + " monster removed.")
 	} else {
- Text_mkP(mk.makerOwner, I2S(nbMonstersRemoved) + " monsters removed.")
+ Text.mkP(mk.makerOwner, I2S(nbMonstersRemoved) + " monsters removed.")
 	}
 
 	if ((nbMonstersRemoved > 0)) {

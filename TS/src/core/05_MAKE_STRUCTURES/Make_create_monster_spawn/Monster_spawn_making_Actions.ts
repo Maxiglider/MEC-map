@@ -19,10 +19,10 @@ const MonsterSpawnMaking_Actions = (): void => {
 	if ( (mk.isLastLocSavedUsed()) ) {
 		level = escaper.getMakingLevel()
 		if ((level.monsterSpawns.new(mk.label, mk.mt, mk.sens, mk.frequence, mk.lastX, mk.lastY, x, y, true) != 0)) {
- Text_mkP(mk.makerOwner, "monster spawn \"" + mk.label + "\" created")
+ Text.mkP(mk.makerOwner, "monster spawn \"" + mk.label + "\" created")
  escaper.destroyMake()
 		} else {
- Text_erP(mk.makerOwner, "impossible to create monster spawn \"" + mk.label + "\", label propably already in use")
+ Text.erP(mk.makerOwner, "impossible to create monster spawn \"" + mk.label + "\", label propably already in use")
 		}
 	} else {
  mk.saveLoc(x, y)

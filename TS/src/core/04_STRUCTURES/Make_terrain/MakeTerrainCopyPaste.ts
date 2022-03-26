@@ -134,7 +134,7 @@ const saveLoc = (x: number, y: number): void => {
 	} else {
 		if ((!this.isPoint2Used)) {
 			if ((GetNbCaseBetween(this.x1, this.y1, x, y) > NB_MAX_TILES_MODIFIED)) {
-				Text_erP(this.makerOwner, "Too big zone !")
+				Text.erP(this.makerOwner, "Too big zone !")
 				return;
 			}
 			this.unitLastClic2 = this.createUnitClic(this.unitLastClic2, x, y);
@@ -156,7 +156,7 @@ const saveLoc = (x: number, y: number): void => {
 					this.unsaveLocsDefinitely()
  Hero2Escaper(this.maker).newAction(action)
 				} else {
-					Text_erP(this.makerOwner, "paste zone out of bounds")
+					Text.erP(this.makerOwner, "paste zone out of bounds")
 				}
 			}
 		}

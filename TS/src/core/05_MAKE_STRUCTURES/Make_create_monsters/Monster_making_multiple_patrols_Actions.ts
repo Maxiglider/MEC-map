@@ -19,13 +19,13 @@ const MonsterMakingMultiplePatrols_Actions = (): void => {
 		erreur = mk.getMonster().addNewLoc(x, y)
 		if ((erreur > 0)) {
 			if ((erreur === 3)) {
- Text_erP(mk.makerOwner, "Number limit of patrol locations reached for this monster ! ( " + I2S(MonsterMultiplePatrols.NB_MAX_LOC) + " )")
+ Text.erP(mk.makerOwner, "Number limit of patrol locations reached for this monster ! ( " + I2S(MonsterMultiplePatrols.NB_MAX_LOC) + " )")
 			}
 			if ((erreur === 2)) {
- Text_erP(mk.makerOwner, "Too close to the last location !")
+ Text.erP(mk.makerOwner, "Too close to the last location !")
 			}
 			if ((erreur === 1)) {
- Text_erP(mk.makerOwner, "Too close to the first location !")
+ Text.erP(mk.makerOwner, "Too close to the first location !")
 			}
 		} else {
  mk.saveLoc(x, y)

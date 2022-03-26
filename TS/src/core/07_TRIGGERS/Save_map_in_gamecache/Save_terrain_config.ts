@@ -1,17 +1,12 @@
+import { Text } from 'core/01_libraries/Text'
 
+const initSaveTerrainConfigInCache = () => {
+    const SaveTerrainConfig = (): void => {
+        udg_terrainTypes.saveInCache()
+        Text.A('terrain configuration saved')
+    }
 
-const initSaveTerrainConfigInCache = () => { // needs Text
-
-
-
-
-const SaveTerrainConfig = (): void => {
- udg_terrainTypes.saveInCache()
-	Text_A("terrain configuration saved")
-};
-
-
-
-
-
+    return { SaveTerrainConfig }
 }
+
+export const SaveTerrainConfigInCache = initSaveTerrainConfigInCache()

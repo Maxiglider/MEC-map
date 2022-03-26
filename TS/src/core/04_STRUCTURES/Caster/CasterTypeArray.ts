@@ -82,7 +82,7 @@ const displayForPlayer = (p: player): void => {
 		i = i + 1;
 	}
 	if ((this.numberOfCasterTypes === 0)) {
-		Text_erP(p, "no caster type saved")
+		Text.erP(p, "no caster type saved")
 	}
 };
 

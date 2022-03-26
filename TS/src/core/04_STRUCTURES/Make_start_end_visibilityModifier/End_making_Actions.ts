@@ -17,7 +17,7 @@ const EndMaking_Actions = (): void => {
  StopUnit(mk.maker)
 	if ( (mk.isLastLocSavedUsed()) ) {
  escaper.getMakingLevel().newEnd(mk.lastX, mk.lastY, x, y)
- Text_mkP(mk.makerOwner, "end made for level " + I2S(escaper.getMakingLevel().getId()))
+ Text.mkP(mk.makerOwner, "end made for level " + I2S(escaper.getMakingLevel().getId()))
  escaper.destroyMake()
 	} else {
  mk.saveLoc(x, y)

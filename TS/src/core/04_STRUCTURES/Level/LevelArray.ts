@@ -98,7 +98,7 @@ const goToNextLevel = (finisher: Escaper): boolean => {
 	yCam = this.levels[this.currentLevel].getStart().getCenterY()
 	if ((finisher !== 0)) {
  MoveCamExceptForPlayer(finisher.getPlayer(), xCam, yCam)
- Text_A(udg_colorCode[GetPlayerId(finisher.getPlayer())] + "Good job " + GetPlayerName(finisher.getPlayer()) + " !")
+ Text.A(udg_colorCode[GetPlayerId(finisher.getPlayer())] + "Good job " + GetPlayerName(finisher.getPlayer()) + " !")
 	} else {
 		SetCameraPosition(xCam, yCam)
 	}

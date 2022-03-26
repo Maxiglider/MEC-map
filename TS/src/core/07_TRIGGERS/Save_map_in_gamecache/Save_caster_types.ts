@@ -1,15 +1,13 @@
+import { Text } from 'core/01_libraries/Text'
 
+const initSaveCasterTypes = () => {
+    const StartSaveCasterTypes = (): void => {
+        udg_casterTypes.saveInCache()
+        Text.A('caster types saved')
+        StartSaveLevels()
+    }
 
-const initSaveCasterTypes = () => { // needs Text, SaveLevels
-
-
-
-const StartSaveCasterTypes = (): void => {
- udg_casterTypes.saveInCache()
-	Text_A("caster types saved")
-	StartSaveLevels()
-};
-
-
-
+    return { StartSaveCasterTypes }
 }
+
+export const SaveCasterTypes = initSaveCasterTypes()

@@ -1,3 +1,5 @@
+import { FunctionsOnNumbers } from "core/01_libraries/Functions_on_numbers";
+
 const initCommandCheat = () => { // needs CommandsFunctions
 
 
@@ -43,7 +45,7 @@ const ExecuteCommandCheat = (escaper: Escaper, cmd: string): boolean => {
 		speed = S2R(param1) * SLIDE_PERIOD;
 		if ((nbParam === 1)) {
  escaper.absoluteSlideSpeed(speed)
- Text_P(escaper.getPlayer(), "your slide speed is to " + param1)
+ Text.P(escaper.getPlayer(), "your slide speed is to " + param1)
 			return true;
 		}
 		if ( (not(nbParam == 2 and escaper.isMaximaxou())) ) {
@@ -58,13 +60,13 @@ const ExecuteCommandCheat = (escaper: Escaper, cmd: string): boolean => {
 				}
 				i = i + 1;
 			}
- Text_P(escaper.getPlayer(), "slide speed for all is to " + param1)
+ Text.P(escaper.getPlayer(), "slide speed for all is to " + param1)
 			return true;
 		}
 		if ((IsPlayerColorString(param2))) {
 			if ( (udg_escapers.get(ColorString2Id(param2)) != 0) ) {
  udg_escapers.get(ColorString2Id(param2)).absoluteSlideSpeed(speed)
- Text_P(escaper.getPlayer(), "slide speed for player " + param2 + " is to " + param1)
+ Text.P(escaper.getPlayer(), "slide speed for player " + param2 + " is to " + param1)
 			}
 		}
 		return true;
@@ -75,7 +77,7 @@ const ExecuteCommandCheat = (escaper: Escaper, cmd: string): boolean => {
 	if ((name === "normalSlideSpeed" || name === "nss")) {
 		if ((noParam)) {
  escaper.stopAbsoluteSlideSpeed()
- Text_P(escaper.getPlayer(), "your slide speed depends now on terrains")
+ Text.P(escaper.getPlayer(), "your slide speed depends now on terrains")
 			return true;
 		}
 		if ( (not(nbParam == 1 and escaper.isMaximaxou())) ) {
@@ -90,13 +92,13 @@ const ExecuteCommandCheat = (escaper: Escaper, cmd: string): boolean => {
 				}
 				i = i + 1;
 			}
- Text_P(escaper.getPlayer(), "slide speed for all depends now on terrains")
+ Text.P(escaper.getPlayer(), "slide speed for all depends now on terrains")
 			return true;
 		}
 		if ((IsPlayerColorString(param1))) {
 			if ( (udg_escapers.get(ColorString2Id(param1)) != 0) ) {
  udg_escapers.get(ColorString2Id(param1)).stopAbsoluteSlideSpeed()
- Text_P(escaper.getPlayer(), "slide speed for player " + param1 + " depends now on terrains")
+ Text.P(escaper.getPlayer(), "slide speed for player " + param1 + " depends now on terrains")
 			}
 		}
 		return true;
@@ -112,7 +114,7 @@ const ExecuteCommandCheat = (escaper: Escaper, cmd: string): boolean => {
 		speed = S2R(param1);
 		if ((nbParam === 1)) {
  escaper.absoluteWalkSpeed(speed)
- Text_P(escaper.getPlayer(), "walk speed to " + param1)
+ Text.P(escaper.getPlayer(), "walk speed to " + param1)
 			return true;
 		}
 		if ( (not(nbParam == 2 and escaper.isMaximaxou())) ) {
@@ -127,13 +129,13 @@ const ExecuteCommandCheat = (escaper: Escaper, cmd: string): boolean => {
 				}
 				i = i + 1;
 			}
- Text_P(escaper.getPlayer(), "walk speed for all to " + param1)
+ Text.P(escaper.getPlayer(), "walk speed for all to " + param1)
 			return true;
 		}
 		if ((IsPlayerColorString(param2))) {
 			if ( (udg_escapers.get(ColorString2Id(param2)) != 0) ) {
  udg_escapers.get(ColorString2Id(param2)).absoluteWalkSpeed(speed)
- Text_P(escaper.getPlayer(), "walk speed for player " + param2 + " to " + param1)
+ Text.P(escaper.getPlayer(), "walk speed for player " + param2 + " to " + param1)
 			}
 		}
 		return true;
@@ -144,7 +146,7 @@ const ExecuteCommandCheat = (escaper: Escaper, cmd: string): boolean => {
 	if ((name === "normalWalkSpeed" || name === "nws")) {
 		if ((noParam)) {
  escaper.stopAbsoluteWalkSpeed()
- Text_P(escaper.getPlayer(), "walk speed depends now on terrains")
+ Text.P(escaper.getPlayer(), "walk speed depends now on terrains")
 			return true;
 		}
 		if ( (not(nbParam == 1 and escaper.isMaximaxou())) ) {
@@ -159,13 +161,13 @@ const ExecuteCommandCheat = (escaper: Escaper, cmd: string): boolean => {
 				}
 				i = i + 1;
 			}
- Text_P(escaper.getPlayer(), "walk speed for all depends now on terrains")
+ Text.P(escaper.getPlayer(), "walk speed for all depends now on terrains")
 			return true;
 		}
 		if ((IsPlayerColorString(param1))) {
 			if ( (udg_escapers.get(ColorString2Id(param1)) != 0) ) {
  udg_escapers.get(ColorString2Id(param1)).stopAbsoluteWalkSpeed()
- Text_P(escaper.getPlayer(), "walk speed for player " + param1 + " depends now on terrains")
+ Text.P(escaper.getPlayer(), "walk speed for player " + param1 + " depends now on terrains")
 			}
 		}
 		return true;
@@ -282,9 +284,9 @@ const ExecuteCommandCheat = (escaper: Escaper, cmd: string): boolean => {
 		if ((noParam)) {
 			if ( (UnitItemInSlot(escaper.getHero(), 0) == null) ) {
  HeroAddCheatMeteor(escaper.getHero())
- Text_P(escaper.getPlayer(), "you get infinite meteors")
+ Text.P(escaper.getPlayer(), "you get infinite meteors")
 			} else {
- Text_erP(escaper.getPlayer(), "inventory full")
+ Text.erP(escaper.getPlayer(), "inventory full")
 			}
 		}
 		return true;
@@ -296,9 +298,9 @@ const ExecuteCommandCheat = (escaper: Escaper, cmd: string): boolean => {
 		if ((noParam)) {
 			if ( (GetItemTypeId(UnitItemInSlot(escaper.getHero(), 0)) == METEOR_CHEAT) ) {
  RemoveItem(UnitItemInSlot(escaper.getHero(), 0))
- Text_P(escaper.getPlayer(), "infinite meteors removed")
+ Text.P(escaper.getPlayer(), "infinite meteors removed")
 			} else {
- Text_erP(escaper.getPlayer(), "no infinite meteors to remove")
+ Text.erP(escaper.getPlayer(), "no infinite meteors to remove")
 			}
 		}
 		return true;
@@ -319,17 +321,17 @@ const ExecuteCommandCheat = (escaper: Escaper, cmd: string): boolean => {
 		if ((!(nbParam === 1))) {
 			return true;
 		}
-		if ((!IsPositiveInteger(param1))) {
- Text_erP(escaper.getPlayer(), "level number should be a positive integer")
+		if ((!FunctionsOnNumbers.IsPositiveInteger(param1))) {
+ Text.erP(escaper.getPlayer(), "level number should be a positive integer")
 			return true;
 		}
 		n = S2I(param1);
 		if ( (udg_levels.getCurrentLevel().getId() == n) ) {
- Text_erP(escaper.getPlayer(), "you already are in this level")
+ Text.erP(escaper.getPlayer(), "you already are in this level")
 			return true;
 		}
 		if ( (not udg_levels.goToLevel(0, n)) ) {
- Text_erP(escaper.getPlayer(), "this levels doesn't exist (level max : " + I2S(udg_levels.getLastLevelId()) + ")")
+ Text.erP(escaper.getPlayer(), "this levels doesn't exist (level max : " + I2S(udg_levels.getLastLevelId()) + ")")
 		}
 		return true;
 	}
@@ -356,26 +358,26 @@ const ExecuteCommandCheat = (escaper: Escaper, cmd: string): boolean => {
 	//-setGodMode(setgm) <boolean status>   --> activate or desactivate god mode for your hero
 	if ((name === "setGodMode" || name === "setgm")) {
 		if ((!(nbParam === 1 || nbParam === 2))) {
- Text_erP(escaper.getPlayer(), "one or two params for this command")
+ Text.erP(escaper.getPlayer(), "one or two params for this command")
 			return true;
 		}
 		if ((IsBoolString(param1))) {
 			b = S2B(param1);
 		} else {
- Text_erP(escaper.getPlayer(), "param1 must be a boolean")
+ Text.erP(escaper.getPlayer(), "param1 must be a boolean")
 			return true;
 		}
 		if ((nbParam === 1)) {
  escaper.setGodMode(b)
 			if ((b)) {
- Text_P(escaper.getPlayer(), "you are now invulnerable")
+ Text.P(escaper.getPlayer(), "you are now invulnerable")
 			} else {
- Text_P(escaper.getPlayer(), "you are now vulnerable")
+ Text.P(escaper.getPlayer(), "you are now vulnerable")
 			}
 			return true;
 		}
 		if ( (not escaper.isMaximaxou()) ) {
- Text_erP(escaper.getPlayer(), "your rights are too weak")
+ Text.erP(escaper.getPlayer(), "your rights are too weak")
 			return true;
 		}
 		if ((param2 === "all" || param2 === "a")) {
@@ -388,9 +390,9 @@ const ExecuteCommandCheat = (escaper: Escaper, cmd: string): boolean => {
 				i = i + 1;
 			}
 			if ((b)) {
- Text_P(escaper.getPlayer(), "all sliders are now invulnerable")
+ Text.P(escaper.getPlayer(), "all sliders are now invulnerable")
 			} else {
- Text_P(escaper.getPlayer(), "all sliders are now vulnerable")
+ Text.P(escaper.getPlayer(), "all sliders are now vulnerable")
 			}
 			return true;
 		}
@@ -399,15 +401,15 @@ const ExecuteCommandCheat = (escaper: Escaper, cmd: string): boolean => {
 			if ( (udg_escapers.get(n) != 0) ) {
  udg_escapers.get(n).setGodMode(b)
 				if ((b)) {
- Text_P(escaper.getPlayer(), "slider " + param2 + " is now invulnerable")
+ Text.P(escaper.getPlayer(), "slider " + param2 + " is now invulnerable")
 				} else {
- Text_P(escaper.getPlayer(), "slider " + param2 + " is now vulnerable")
+ Text.P(escaper.getPlayer(), "slider " + param2 + " is now vulnerable")
 				}
 			} else {
- Text_erP(escaper.getPlayer(), "escaper " + param2 + " doesn't exist")
+ Text.erP(escaper.getPlayer(), "escaper " + param2 + " doesn't exist")
 			}
 		} else {
- Text_erP(escaper.getPlayer(), "param2 must be a player color or \"all\"")
+ Text.erP(escaper.getPlayer(), "param2 must be a player color or \"all\"")
 		}
 		return true;
 	}
@@ -416,26 +418,26 @@ const ExecuteCommandCheat = (escaper: Escaper, cmd: string): boolean => {
 	//-setGodModeKills(setgmk) <boolean status>   --> if activated, monsters will be killed by your hero
 	if ((name === "setGodModeKills" || name === "setgmk")) {
 		if ((!(nbParam === 1 || nbParam === 2))) {
- Text_erP(escaper.getPlayer(), "one or two params for this command")
+ Text.erP(escaper.getPlayer(), "one or two params for this command")
 			return true;
 		}
 		if ((IsBoolString(param1))) {
 			b = S2B(param1);
 		} else {
- Text_erP(escaper.getPlayer(), "param1 must be a boolean")
+ Text.erP(escaper.getPlayer(), "param1 must be a boolean")
 			return true;
 		}
 		if ((nbParam === 1)) {
  escaper.setGodModeKills(b)
 			if ((b)) {
- Text_P(escaper.getPlayer(), "your god mode now kills monsters (if activated)")
+ Text.P(escaper.getPlayer(), "your god mode now kills monsters (if activated)")
 			} else {
- Text_P(escaper.getPlayer(), "you god mode doesn't kill monsters anymore")
+ Text.P(escaper.getPlayer(), "you god mode doesn't kill monsters anymore")
 			}
 			return true;
 		}
 		if ( (not escaper.isMaximaxou()) ) {
- Text_erP(escaper.getPlayer(), "your rights are too weak")
+ Text.erP(escaper.getPlayer(), "your rights are too weak")
 			return true;
 		}
 		if ((param2 === "all" || param2 === "a")) {
@@ -448,9 +450,9 @@ const ExecuteCommandCheat = (escaper: Escaper, cmd: string): boolean => {
 				i = i + 1;
 			}
 			if ((b)) {
- Text_P(escaper.getPlayer(), "god mode of all sliders now kills monsters (if activated)")
+ Text.P(escaper.getPlayer(), "god mode of all sliders now kills monsters (if activated)")
 			} else {
- Text_P(escaper.getPlayer(), "god mode of all sliders doesn't kill monsters anymore")
+ Text.P(escaper.getPlayer(), "god mode of all sliders doesn't kill monsters anymore")
 			}
 			return true;
 		}
@@ -459,15 +461,15 @@ const ExecuteCommandCheat = (escaper: Escaper, cmd: string): boolean => {
 			if ( (udg_escapers.get(n) != 0) ) {
  udg_escapers.get(n).setGodModeKills(b)
 				if ((b)) {
- Text_P(escaper.getPlayer(), "god mode of slider " + param2 + " now kills monsters (if activated)")
+ Text.P(escaper.getPlayer(), "god mode of slider " + param2 + " now kills monsters (if activated)")
 				} else {
- Text_P(escaper.getPlayer(), "god mode of slider " + param2 + " doesn't kill monsters anymore")
+ Text.P(escaper.getPlayer(), "god mode of slider " + param2 + " doesn't kill monsters anymore")
 				}
 			} else {
- Text_erP(escaper.getPlayer(), "escaper " + param2 + " doesn't exist")
+ Text.erP(escaper.getPlayer(), "escaper " + param2 + " doesn't exist")
 			}
 		} else {
- Text_erP(escaper.getPlayer(), "param2 must be a player color or \"all\"")
+ Text.erP(escaper.getPlayer(), "param2 must be a player color or \"all\"")
 		}
 		return true;
 	}
@@ -479,7 +481,7 @@ const ExecuteCommandCheat = (escaper: Escaper, cmd: string): boolean => {
 			return true;
 		}
 		SetGravity(S2R(param1))
- Text_P(escaper.getPlayer(), "gravity changed")
+ Text.P(escaper.getPlayer(), "gravity changed")
 		return true;
 	}
 
@@ -487,7 +489,7 @@ const ExecuteCommandCheat = (escaper: Escaper, cmd: string): boolean => {
 	//-getGravity(getg)
 	if ((name === "getGravity" || name === "getg")) {
 		if ((noParam)) {
- Text_P(escaper.getPlayer(), "current gravity is " + R2S(GetRealGravity()))
+ Text.P(escaper.getPlayer(), "current gravity is " + R2S(GetRealGravity()))
 		}
 		return true;
 	}
@@ -520,9 +522,9 @@ const ExecuteCommandCheat = (escaper: Escaper, cmd: string): boolean => {
 			if ( (escaper.isAbsoluteInstantTurn() != S2B(param1)) ) {
  escaper.setAbsoluteInstantTurn(S2B(param1))
 				if ((S2B(param1))) {
- Text_P(escaper.getPlayer(), "instant turn on")
+ Text.P(escaper.getPlayer(), "instant turn on")
 				} else {
- Text_P(escaper.getPlayer(), "instant turn off")
+ Text.P(escaper.getPlayer(), "instant turn off")
 				}
 			}
 		}

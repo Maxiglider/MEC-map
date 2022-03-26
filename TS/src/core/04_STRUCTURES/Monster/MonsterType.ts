@@ -241,7 +241,7 @@ const displayForPlayer = (p: player): void => {
 	if ((this.isClickableB)) {
 		display = display + space + "clickable" + space + I2S(this.maxLife / 10000);
 	}
-	Text_P_timed(p, TERRAIN_DATA_DISPLAY_TIME, display)
+	Text.P_timed(p, TERRAIN_DATA_DISPLAY_TIME, display)
 };
 
 const displayTotalForPlayer = (p: player): void => {
@@ -264,7 +264,7 @@ const displayTotalForPlayer = (p: player): void => {
 	if ((this.isClickableB)) {
 		display = display + space + "clickable" + space + I2S(this.maxLife / 10000);
 	}
-	Text_P_timed(p, TERRAIN_DATA_DISPLAY_TIME, display)
+	Text.P_timed(p, TERRAIN_DATA_DISPLAY_TIME, display)
 };
 
 const toString = (): string => {

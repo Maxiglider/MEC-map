@@ -1,10 +1,4 @@
-
-
-const initAllTerrainFunctions = () => { // needs TerrainTypeNamesAndData, TerrainTypeFromString, ModifyTerrainFunctions
-
-
 //terrain functions
-
 //function IsTerrainAlreadyUsed takes integer terrainType returns boolean
 //function IsTerrainsLimitNumberReached takes nothing returns boolean
 //function AddNewTerrain takes integer newTerrain returns boolean
@@ -15,9 +9,7 @@ const initAllTerrainFunctions = () => { // needs TerrainTypeNamesAndData, Terrai
 //function GetTerrainData takes integer terrain returns string
 //function DisplayTerrainInfoToPlayer takes player p, real x, real y returns nothing
 
-
 //conversion
-
 //function TerrainTypeId2TerrainTypeAsciiString takes integer terrainType returns string
 //function TerrainTypeAsciiString2TerrainTypeId takes string terrainTypeAsciiString returns integer
 //function TerrainTypeMaxId2TerrainTypeId takes integer maxId returns integer
@@ -26,8 +18,3 @@ const initAllTerrainFunctions = () => { // needs TerrainTypeNamesAndData, Terrai
 //function TerrainTypeMaxId2GrassId takes integer maxId returns integer
 //function TerrainTypeGrassId2TerrainTypeId takes integer grassId returns integer
 //function TerrainTypeString2Terrain takes string str returns integer
-
-
-
-
-}

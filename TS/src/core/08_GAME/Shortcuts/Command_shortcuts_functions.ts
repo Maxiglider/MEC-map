@@ -153,14 +153,14 @@ const GetStringAssignedFromCommand = (command: string): string => {
 
 
 const DisplayShortcuts = (playerId: number): void => {
-	Text_P(Player(playerId), " ")
-	Text_P(Player(playerId), udg_colorCode[playerId] + "Your shortcuts:")
+	Text.P(Player(playerId), " ")
+	Text.P(Player(playerId), udg_colorCode[playerId] + "Your shortcuts:")
 	//!//@@BELOWTEXTMACRO
 	/* textmacro ShowShortcut takes shortcut
 	    if ($shortcut$_shortcutCommand[playerId] == null) then
- Text_P(Player(playerId), udg_colorCode[playerId] + "$shortcut$: |r" + udg_colorCode[GREY] + "none")
+ Text.P(Player(playerId), udg_colorCode[playerId] + "$shortcut$: |r" + udg_colorCode[GREY] + "none")
 	    else
- Text_P(Player(playerId), udg_colorCode[playerId] + "$shortcut$: |r" + $shortcut$_shortcutCommand[playerId])
+ Text.P(Player(playerId), udg_colorCode[playerId] + "$shortcut$: |r" + $shortcut$_shortcutCommand[playerId])
 	    endif
 	    //! endtextmacro
 

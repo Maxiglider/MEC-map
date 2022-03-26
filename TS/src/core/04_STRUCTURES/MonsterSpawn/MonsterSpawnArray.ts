@@ -179,7 +179,7 @@ const displayForPlayer = (p: player): void => {
 		i = i + 1;
 	}
 	if ((nbMs === 0)) {
-		Text_erP(p, "no monster spawn for this level")
+		Text.erP(p, "no monster spawn for this level")
 	}
 };
 
