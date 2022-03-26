@@ -1,0 +1,16 @@
+{
+    "compilerOptions": {
+        "outDir": "./dist",
+        "module": "commonjs",
+        "target": "es2015",
+        "noImplicitAny": true,
+        "noEmitOnError": true,
+        "declaration": true,
+        "strict": true,
+        "esModuleInterop": true,
+        "emitDecoratorMetadata": true,
+        "experimentalDecorators": true,
+        "jsx": "react"
+    },
+    "include": ["src"]
+}
