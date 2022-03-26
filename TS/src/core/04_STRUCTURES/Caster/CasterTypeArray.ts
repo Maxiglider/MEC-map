@@ -1,3 +1,4 @@
+import { StringArrayForCache } from "core/07_TRIGGERS/Save_map_in_gamecache/struct_StringArrayForCache"
 
 
 const initCasterTypeArray = () => { // needs CasterType
@@ -88,14 +89,14 @@ const displayForPlayer = (p: player): void => {
 
 const saveInCache = (): void => {
 	let i: number;
-	stringArrayForCache = StringArrayForCache.create("casterTypes", "casterTypes", true)
+	StringArrayForCache.stringArrayForCache = new StringArrayForCache("casterTypes", "casterTypes", true)
 	i = 0;
 	while (true) {
 		if ((i >= this.numberOfCasterTypes)) break;
- stringArrayForCache.push(this.casterTypes[i].toString())
+		StringArrayForCache.stringArrayForCache.push(this.casterTypes[i].toString())
 		i = i + 1;
 	}
- stringArrayForCache.writeInCache()
+	StringArrayForCache.stringArrayForCache.writeInCache()
 };
 
 //endstruct

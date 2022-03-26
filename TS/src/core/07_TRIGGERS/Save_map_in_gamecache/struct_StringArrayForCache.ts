@@ -1,22 +1,34 @@
 import { Text } from 'core/01_libraries/Text'
+import { SaveMapInCache } from './SAVE_MAP_in_cache'
 
 const CACHE_SEPARATEUR_ITEM = '('
 const CACHE_SEPARATEUR_PARAM = ','
 
-// TODO; Used to be private
 const MAX_STRING_LENGTH = 200
-let stringArrayForCache = 0
 
-const StringArrayForCache = (category: string, variableName: string, avecSeparateur: boolean) => {
-    const stringArray: string[] = []
-    const lastStringId = -1
+export class StringArrayForCache {
+    private stringArray: string[] = []
+    private lastStringId = -1
+    private category: string
+    private variableName: string
+    private avecSeparateur: boolean
 
-    const nextString = () => {
+    public static stringArrayForCache: StringArrayForCache
+
+    constructor(category: string, variableName: string, avecSeparateur: boolean) {
+        ;(StringArrayForCache.stringArrayForCache as any) = null
+
+        this.category = category
+        this.variableName = variableName
+        this.avecSeparateur = avecSeparateur
+    }
+
+    private nextString = () => {
         this.lastStringId = this.lastStringId + 1
         this.stringArray[this.lastStringId] = ''
     }
 
-    const push = (str: string) => {
+    push = (str: string) => {
         let length: number
         let nbCharsDispoForCurrentString: number
         if (this.lastStringId === -1) {
@@ -47,26 +59,29 @@ const StringArrayForCache = (category: string, variableName: string, avecSeparat
         }
     }
 
-    const writeInCache = () => {
+    writeInCache = () => {
         let i: number
         if (this.lastStringId > 0) {
             i = 0
             while (true) {
                 if (i > this.lastStringId) break
-                StoreString(saveMap_cache, this.category, this.variableName + I2S(i), this.stringArray[i])
-                //call Text.A(I2S(i) + " : " + this.stringArray[i])
-                //call Text.A("longueur chaîne : " + I2S(StringLength(this.stringArray[i])))
+                StoreString(
+                    SaveMapInCache.saveMap_cache,
+                    this.category,
+                    this.variableName + I2S(i),
+                    this.stringArray[i]
+                )
+                //call Text.A(I2S(i) + " : " + stringArray[i])
+                //call Text.A("longueur chaîne : " + I2S(StringLength(stringArray[i])))
                 i = i + 1
             }
         } else {
             if (this.lastStringId === 0) {
-                StoreString(saveMap_cache, this.category, this.variableName, this.stringArray[0])
+                StoreString(SaveMapInCache.saveMap_cache, this.category, this.variableName, this.stringArray[0])
                 Text.A(this.stringArray[0])
                 Text.A('longueur chaîne : ' + I2S(StringLength(this.stringArray[0])))
             }
         }
         Text.A(this.category + ', ' + this.variableName + ' : finish write in cache')
     }
-
-    return { push, writeInCache }
 }

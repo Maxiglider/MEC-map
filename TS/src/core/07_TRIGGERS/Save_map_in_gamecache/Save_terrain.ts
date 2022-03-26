@@ -1,3 +1,4 @@
+import { StringArrayForCache } from './struct_StringArrayForCache'
 const initSaveTerrain = () => {
     // needs Text, SaveTerrainHeights
 
@@ -11,14 +12,14 @@ const initSaveTerrain = () => {
     // TODO; Used to be private
     const SaveTerrainsUsed = (): void => {
         let i: number
-        stringArrayForCache = StringArrayForCache.create('terrain', 'terrainsUsed', false)
+        StringArrayForCache.stringArrayForCache = new StringArrayForCache('terrain', 'terrainsUsed', false)
         i = 0
         while (true) {
             if (i >= nbTerrainTypesUsed) break
-            stringArrayForCache.push(Ascii2String(terrainTypeIds[i]))
+            StringArrayForCache.stringArrayForCache.push(Ascii2String(terrainTypeIds[i]))
             i = i + 1
         }
-        stringArrayForCache.writeInCache()
+        StringArrayForCache.stringArrayForCache.writeInCache()
         Text.A('terrains used saved')
     }
 
@@ -28,18 +29,18 @@ const initSaveTerrain = () => {
         let hauteurMap = R2I((MAP_MAX_Y - MAP_MIN_Y) / LARGEUR_CASE)
         let offsetX = R2I(MAP_MIN_X)
         let offsetY = R2I(MAP_MIN_Y)
-        stringArrayForCache = StringArrayForCache.create('terrain', 'largeur', false)
-        stringArrayForCache.push(I2S(largeurMap))
-        stringArrayForCache.writeInCache()
-        stringArrayForCache = StringArrayForCache.create('terrain', 'hauteur', false)
-        stringArrayForCache.push(I2S(hauteurMap))
-        stringArrayForCache.writeInCache()
-        stringArrayForCache = StringArrayForCache.create('terrain', 'centerOffsetX', false)
-        stringArrayForCache.push(I2S(offsetX))
-        stringArrayForCache.writeInCache()
-        stringArrayForCache = StringArrayForCache.create('terrain', 'centerOffsetY', false)
-        stringArrayForCache.push(I2S(offsetY))
-        stringArrayForCache.writeInCache()
+        StringArrayForCache.stringArrayForCache = new StringArrayForCache('terrain', 'largeur', false)
+        StringArrayForCache.stringArrayForCache.push(I2S(largeurMap))
+        StringArrayForCache.stringArrayForCache.writeInCache()
+        StringArrayForCache.stringArrayForCache = new StringArrayForCache('terrain', 'hauteur', false)
+        StringArrayForCache.stringArrayForCache.push(I2S(hauteurMap))
+        StringArrayForCache.stringArrayForCache.writeInCache()
+        StringArrayForCache.stringArrayForCache = new StringArrayForCache('terrain', 'centerOffsetX', false)
+        StringArrayForCache.stringArrayForCache.push(I2S(offsetX))
+        StringArrayForCache.stringArrayForCache.writeInCache()
+        StringArrayForCache.stringArrayForCache = new StringArrayForCache('terrain', 'centerOffsetY', false)
+        StringArrayForCache.stringArrayForCache.push(I2S(offsetY))
+        StringArrayForCache.stringArrayForCache.writeInCache()
         Text.A('map dimensions and center offsaved')
     }
 
@@ -146,13 +147,13 @@ const initSaveTerrain = () => {
             x = MAP_MIN_X
             while (true) {
                 if (x > MAP_MAX_X) break
-                stringArrayForCache.push(GetTerrainId(x, y))
+                StringArrayForCache.stringArrayForCache.push(GetTerrainId(x, y))
                 x = x + LARGEUR_CASE
             }
             y = y + LARGEUR_CASE
         } else {
             DisableTrigger(GetTriggeringTrigger())
-            stringArrayForCache.writeInCache()
+            StringArrayForCache.stringArrayForCache.writeInCache()
             Text.A('terrain saved')
             SaveTerrainsUsed()
             SaveMapDimensionsAndCenterOffset()
@@ -163,7 +164,7 @@ const initSaveTerrain = () => {
     const StartSaveTerrain = (): void => {
         y = MAP_MIN_Y
         GererOrdreTerrains()
-        stringArrayForCache = StringArrayForCache.create('terrain', 'terrainTypes', false)
+        StringArrayForCache.stringArrayForCache = new StringArrayForCache('terrain', 'terrainTypes', false)
         TriggerClearActions(trigSaveMapInCache)
         TriggerAddAction(trigSaveMapInCache, SaveTerrain_Actions)
         EnableTrigger(trigSaveMapInCache)

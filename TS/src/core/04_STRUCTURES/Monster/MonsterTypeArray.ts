@@ -1,3 +1,4 @@
+import { StringArrayForCache } from 'core/07_TRIGGERS/Save_map_in_gamecache/struct_StringArrayForCache';
 
 
 const initMonsterTypeArray = () => { // needs MonsterType
@@ -108,14 +109,14 @@ const monsterUnit2MonsterType = (monsterUnit: unit): MonsterType => {
 
 const saveInCache = (): void => {
 	let i: number;
-	stringArrayForCache = StringArrayForCache.create("monsterTypes", "monsterTypes", true)
+	StringArrayForCache.stringArrayForCache = new StringArrayForCache("monsterTypes", "monsterTypes", true)
 	i = 0;
 	while (true) {
 		if ((i >= this.numberOfMonsterTypes)) break;
- stringArrayForCache.push(this.monsterTypes[i].toString())
+		StringArrayForCache.stringArrayForCache.push(this.monsterTypes[i].toString())
 		i = i + 1;
 	}
- stringArrayForCache.writeInCache()
+	StringArrayForCache.stringArrayForCache.writeInCache()
 };
 
 //endstruct

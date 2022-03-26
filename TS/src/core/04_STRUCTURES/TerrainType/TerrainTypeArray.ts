@@ -1,3 +1,4 @@
+import { StringArrayForCache } from 'core/07_TRIGGERS/Save_map_in_gamecache/struct_StringArrayForCache';
 
 
 const initTerrainTypeArray = () => { // needs TerrainTypeWalk, TerrainTypeDeath, TerrainTypeSlide, CommandsFunctions
@@ -256,31 +257,31 @@ const saveInCache = (): void => {
 	let i: number;
 
 	//main tileset
-	stringArrayForCache = StringArrayForCache.create("terrain", "mainTileset", false)
- stringArrayForCache.push(this.mainTileset)
- stringArrayForCache.writeInCache()
+	StringArrayForCache.stringArrayForCache = new StringArrayForCache("terrain", "mainTileset", false)
+	StringArrayForCache.stringArrayForCache.push(this.mainTileset)
+	StringArrayForCache.stringArrayForCache.writeInCache()
 
 	//terrainConfig
-	stringArrayForCache = StringArrayForCache.create("terrain", "terrainConfig", true)
+	StringArrayForCache.stringArrayForCache = new StringArrayForCache("terrain", "terrainConfig", true)
 	i = 0;
 	while (true) {
 		if ((i >= this.numberOfSlide)) break;
- stringArrayForCache.push(this.ttSlide[i].toString())
+		StringArrayForCache.stringArrayForCache.push(this.ttSlide[i].toString())
 		i = i + 1;
 	}
 	i = 0;
 	while (true) {
 		if ((i >= this.numberOfWalk)) break;
- stringArrayForCache.push(this.ttWalk[i].toString())
+		StringArrayForCache.stringArrayForCache.push(this.ttWalk[i].toString())
 		i = i + 1;
 	}
 	i = 0;
 	while (true) {
 		if ((i >= this.numberOfDeath)) break;
- stringArrayForCache.push(this.ttDeath[i].toString())
+		StringArrayForCache.stringArrayForCache.push(this.ttDeath[i].toString())
 		i = i + 1;
 	}
- stringArrayForCache.writeInCache()
+	StringArrayForCache.stringArrayForCache.writeInCache()
 };
 
 const count = (): number => {

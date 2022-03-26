@@ -2,8 +2,11 @@ import { LOW_PERIOD_FOR_WORK } from 'core/01_libraries/Constants'
 import { Text } from 'core/01_libraries/Text'
 
 const initSaveMapInCache = () => {
-    let saveMap_cache: gamecache
-    let trigSaveMapInCache: trigger
+    const saveMap_cache = InitGameCache('epicSlide')
+    const trigSaveMapInCache = CreateTrigger()
+
+    DisableTrigger(trigSaveMapInCache)
+    TriggerRegisterTimerEvent(trigSaveMapInCache, LOW_PERIOD_FOR_WORK, true)
 
     const StartSaveMapInCache = (): void => {
         let i: number
@@ -21,17 +24,7 @@ const initSaveMapInCache = () => {
         StartSaveTerrain()
     }
 
-    //===========================================================================
-    const Init_SaveMapInCache = (): void => {
-        saveMap_cache = InitGameCache('epicSlide')
-        trigSaveMapInCache = CreateTrigger()
-        DisableTrigger(trigSaveMapInCache)
-        TriggerRegisterTimerEvent(trigSaveMapInCache, LOW_PERIOD_FOR_WORK, true)
-    }
-
-    Init_SaveMapInCache()
-
-    return { StartSaveMapInCache }
+    return { saveMap_cache, StartSaveMapInCache }
 }
 
 export const SaveMapInCache = initSaveMapInCache()
