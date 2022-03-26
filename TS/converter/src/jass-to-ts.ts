@@ -10,7 +10,15 @@ const revertJ = true
 // Dumb comment filler, make sure this nowhere in the original code
 const dumbComment = '// @@!!@@!!'
 
-const reservedKeywords = [dumbComment, '@@BELOWIF', '@@BELOWELSEIF', '@@BELOWEXITWHEN']
+const reservedKeywords = [
+    dumbComment,
+    '@@BELOWIF',
+    '@@BELOWELSEIF',
+    '@@BELOWEXITWHEN',
+    'AAAAAAAAAA',
+    '@@BELOWTEXTMACRO',
+    '@@ENDTEXTMACRO',
+]
 
 const parseFile = async (inFile: string) => {
     const outFile = inFile.replace('.j', '.ts')
@@ -72,25 +80,50 @@ const parseFile = async (inFile: string) => {
         content = content.replace(new RegExp('(.*?( |\\()integer\\()', 'gmi'), `${dumbComment}$1`)
 
         content = content.replace(new RegExp('^\\s*private', 'gmi'), '')
+
+        // Remove memory allocation
+        content = content.replace(new RegExp(' \\[[0-9]+\\]', 'gmi'), '')
+
+        // Rename all textmacros
+        content = content.replace(new RegExp('\\$([a-z]+)\\$', 'gmi'), 'AAAAAAAAAA$1AAAAAAAAAA')
     }
 
-    writeFileSync(inFile, content)
+    const tryConvert = async () => {
+        writeFileSync(inFile, content)
 
-    const out = await simpleExec({
-        cmd: `${process.cwd()}/node_modules/.bin/jass-to-ts ${inFile} > ${outFile}`,
-        verbose: true,
-    })
+        const out = await simpleExec({
+            cmd: `${process.cwd()}/node_modules/.bin/jass-to-ts ${inFile} > ${outFile}`,
+            verbose: true,
+        })
 
-    if (readFileSync(outFile).toString().length < 10) {
-        console.log('Error: jass-to-ts failed, reverting changes')
-        console.log(out)
-        unlinkSync(outFile)
+        if (readFileSync(outFile).toString().length < 10) {
+            console.log('Error: jass-to-ts failed, reverting changes')
+            console.log(out)
+            unlinkSync(outFile)
 
-        if (revertJ) {
-            writeFileSync(inFile, initialContent)
+            if (revertJ) {
+                writeFileSync(inFile, initialContent)
+            }
+
+            return false
         }
 
-        return false
+        return true
+    }
+
+    if (!(await tryConvert())) {
+        // Second run, more drastic changes
+        console.log('Attempting more drastic second run')
+
+        // Comment out all textmacros
+        content = content.replace(
+            new RegExp('(\\stextmacro[\\s\\S]*?endtextmacro)', 'gmi'),
+            '//@@BELOWTEXTMACRO\n/*$1@@ENDTEXTMACRO*/'
+        )
+
+        if (!(await tryConvert())) {
+            return false
+        }
     }
 
     if (revertJ) {
@@ -122,8 +155,15 @@ const parseFile = async (inFile: string) => {
         // Restore the if statements using the comment above
         content = content.replace(new RegExp('\\/\\/ @@BELOWIF (.*)\\n.*?if \\(true\\)', 'gmi'), 'if ($1)')
 
-        // // Restore the exitwhen statements using the comment above
+        // Restore the exitwhen statements using the comment above
         content = content.replace(new RegExp('\\/\\/ @@BELOWEXITWHEN (.*)\\n.*?if \\(true\\)', 'gmi'), 'if ($1)')
+
+        // Restore the textmacros
+        content = content.replace(new RegExp('AAAAAAAAAA', 'gmi'), '$')
+
+        // Restore all textmacros
+        content = content.replace(new RegExp('\\/\\/@@BELOWTEXTMACRO\n\\/\\*', 'gmi'), '')
+        content = content.replace(new RegExp('@@ENDTEXTMACRO\\*\\/', 'gmi'), '')
     }
 
     // content = content.replace(new RegExp('then\\s*$', 'gmi'), '{')
