@@ -1,104 +1,135 @@
+import {Make, MakeConsts} from "../Make/Make"
+import {BasicFunctions} from "../../01_libraries/Basic_functions";
+import {Text} from "../../01_libraries/Text";
 
 
-const initMakeDeleteCasters = () => { // needs Make
+const {MAKE_LAST_CLIC_UNIT_ID} = MakeConsts
+const {IsUnitBetweenLocs} = BasicFunctions
 
 
 
-//struct MakeDeleteCasters extends Make
+export class MakeDeleteCasters extends Make{
 
-    real lastX
-    real lastY
-// TODO; Used to be private
-     boolean lastLocIsSaved
-// TODO; Used to be private
-	 boolean lastLocSavedIsUsed
-// TODO; Used to be private
-     unit unitLastClic
-// TODO; Used to be private
-     string mode
+     lastX: number = 0
+     lastY: number = 0
+
+     private lastLocIsSaved: boolean
+	 private lastLocSavedIsUsed: boolean
+     private unitLastClic?: unit
+     private mode: string
 	
+
+
+	constructor(maker: unit, mode: string) {
+		//modes : oneByOne, twoClics
+		if (mode !== "oneByOne" && mode !== "twoClics") {
+			throw "MakeDeleteCasters : wrong mode \"" + mode + '"'
+		}
+
+		super(maker, "monsterSpawnCreate")
+
+		this.mode = mode
+		this.lastLocIsSaved = false
+		this.lastLocSavedIsUsed = false
+	}
+
+	isLastLocSavedUsed() {
+		return this.lastLocSavedIsUsed
+	}
+
+	saveLoc(x: number, y: number){
+		this.lastX = x
+		this.lastY = y
+		this.lastLocIsSaved = true
+		this.lastLocSavedIsUsed = true
+
+		if (!this.unitLastClic) {
+			this.unitLastClic = CreateUnit(this.makerOwner, MAKE_LAST_CLIC_UNIT_ID, x, y, GetRandomDirectionDeg())
+		} else {
+			SetUnitX(this.unitLastClic, x)
+			SetUnitY(this.unitLastClic, y)
+		}
+
+		this.escaper.destroyCancelledActions()
+	}
+
+	unsaveLoc(){
+		if (!this.lastLocSavedIsUsed) {
+			return false
+		}
+
+		this.unitLastClic && RemoveUnit(this.unitLastClic)
+		this.lastLocSavedIsUsed = false
+		
+		return true
+	}
 	
-
-
-const isLastLocSavedUsed = (): boolean => {
-	return this.lastLocSavedIsUsed;
-};
-
-// TODO; Used to be static
-const create = (maker: unit, mode: string): MakeDeleteCasters => {
-	//modes : oneByOne, twoClics
-	let m: MakeDeleteCasters;
-	if ((maker === null || (mode !== "oneByOne" && mode !== "twoClics"))) {
-		return 0;
+	unsaveLocDefinitely() {
+		this.unsaveLoc()
+		this.lastLocIsSaved = false
 	}
-	m = MakeDeleteCasters.allocate()
-	m.maker = maker
-	m.makerOwner = GetOwningPlayer(maker)
-	m.kind = "deleteCasters"
-	m.mode = mode
-	m.lastLocIsSaved = false
-	m.lastLocSavedIsUsed = false
-	m.t = CreateTrigger()
- TriggerAddAction(m.t, Make_GetActions(m.kind))
- TriggerRegisterUnitEvent(m.t, m.maker, EVENT_UNIT_ISSUED_POINT_ORDER)
-	return m;
-};
-
-const onDestroy = (): void => {
-	DestroyTrigger(this.t)
-	this.t = null;
-	this.maker = null;
-	RemoveUnit(this.unitLastClic)
-	this.unitLastClic = null;
-};
-
-const saveLoc = (x: number, y: number): void => {
-	this.lastX = x;
-	this.lastY = y;
-	this.lastLocIsSaved = true;
-	this.lastLocSavedIsUsed = true;
-	if ((this.unitLastClic === null)) {
-		this.unitLastClic = CreateUnit(this.makerOwner, MAKE_LAST_CLIC_UNIT_ID, x, y, GetRandomDirectionDeg());
-	} else {
-		SetUnitX(this.unitLastClic, x)
-		SetUnitY(this.unitLastClic, y)
+	
+	cancelLastAction() {
+		return this.unsaveLoc()
 	}
- Hero2Escaper(this.maker).destroyCancelledActions()
-};
-
-const unsaveLoc = (): boolean => {
-	if ((!this.lastLocSavedIsUsed)) {
-		return false;
+	
+	redoLastAction(){
+		if (this.lastLocIsSaved && !this.lastLocSavedIsUsed) {
+			this.saveLoc(this.lastX, this.lastY)
+			return true
+		}
+		return false
 	}
-	RemoveUnit(this.unitLastClic)
-	this.unitLastClic = null;
-	this.lastLocSavedIsUsed = false;
-	return true;
-};
-
-const unsaveLocDefinitely = (): void => {
-	this.unsaveLoc()
-	this.lastLocIsSaved = false;
-};
-
-const cancelLastAction = (): boolean => {
-	return this.unsaveLoc();
-};
-
-const redoLastAction = (): boolean => {
-	if ((this.lastLocIsSaved && !this.lastLocSavedIsUsed)) {
-		this.saveLoc(this.lastX, this.lastY)
-		return true;
+	
+	getMode(){
+		return this.mode
 	}
-	return false;
-};
 
-const getMode = (): string => {
-	return this.mode;
-};
+	doActions() {
+		if (super.doBaseActions()) {
+			
+			//modes : oneByOne, twoClics
+			let caster: Caster;
+			let suppressedCasters: Caster[] = []
+			let nbCastersRemoved = 0;
+			let i: number;
 
-//endstruct
+			if (this.getMode() == "oneByOne") {
+				caster = this.escaper.getMakingLevel().casters.getCasterNear(this.orderX, this.orderY)
+				if ( caster && caster.casterUnit ) {
+					caster.disable()
+					suppressedCasters.push(caster)
+					nbCastersRemoved = 1;
+				}
+			} else {
+				//mode twoClics
+				if (!this.isLastLocSavedUsed()) {
+					this.saveLoc(this.orderX, this.orderY)
+					return;
+				}
 
+				const lastInstanceId = this.escaper.getMakingLevel().casters.getLastInstanceId()
 
+				for(let i = 0; i <= lastInstanceId; i++){
+					caster = this.escaper.getMakingLevel().casters.get(i)
+					if (caster && caster.casterUnit && IsUnitBetweenLocs(caster.casterUnit, this.lastX, this.lastY, this.orderX, this.orderY)) {
+						caster.disable()
+						suppressedCasters.push(caster)
+						nbCastersRemoved = nbCastersRemoved + 1;
+					}
+				}
+			}
 
+			if (nbCastersRemoved <= 1) {
+				Text.mkP(this.makerOwner, I2S(nbCastersRemoved) + " caster removed.")
+			} else {
+				Text.mkP(this.makerOwner, I2S(nbCastersRemoved) + " casters removed.")
+			}
+
+			if ((nbCastersRemoved > 0)) {
+				this.escaper.newAction(new MakeDeleteCastersAction(this.escaper.getMakingLevel(), suppressedCasters))
+			}
+			this.unsaveLocDefinitely()
+		}
+	}
 }

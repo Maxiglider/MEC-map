@@ -1,10 +1,10 @@
-import {Make} from 'core/05_MAKE_STRUCTURES/Make/Make'
-import {MakeConsts} from "core/05_MAKE_STRUCTURES/Make/Make";
-const {MAKE_LAST_CLIC_UNIT_ID} = MakeConsts
-import {EscaperFunctions} from "../../04_STRUCTURES/Escaper/Escaper_functions";
-const {Hero2Escaper} = EscaperFunctions
+import {Make, MakeConsts} from 'core/05_MAKE_STRUCTURES/Make/Make'
+import {Text} from "../../01_libraries/Text";
 
-class MakeMonsterSpawn extends Make {
+const {MAKE_LAST_CLIC_UNIT_ID} = MakeConsts
+
+
+export class MakeMonsterSpawn extends Make {
 	lastX: number = 0
 	lastY: number = 0
 	private unitLastClic?: unit
@@ -75,5 +75,21 @@ class MakeMonsterSpawn extends Make {
 			return true
 		}
 		return false
+	}
+	
+	doActions() {
+		if (super.doBaseActions()) {
+			if (this.isLastLocSavedUsed()) {
+				const level = this.escaper.getMakingLevel()
+				if (level.monsterSpawns.new(this.label, this.mt, this.sens, this.frequence, this.lastX, this.lastY, this.orderX, this.orderY, true)) {
+					Text.mkP(this.makerOwner, "monster spawn \"" + this.label + "\" created")
+					this.escaper.destroyMake()
+				} else {
+					Text.erP(this.makerOwner, "impossible to create monster spawn \"" + this.label + "\", label propably already in use")
+				}
+			}else {
+				this.saveLoc(this.orderX, this.orderY)
+			}
+		}
 	}
 }
