@@ -1,3 +1,4 @@
+import { IMMOLATION_SKILLS } from "./Immolation_skills"
 
 
 const initMonsterType = () => { // initializer Init_MonsterType needs ImmolationSkills

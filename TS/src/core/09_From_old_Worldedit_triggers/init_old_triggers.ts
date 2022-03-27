@@ -1,4 +1,9 @@
 import { initGameTime } from 'core/04_STRUCTURES/Lives_and_game_time/Time_of_game_trigger'
+import { InitTrig_Effect_meteor_on_pick_down } from 'core/04_STRUCTURES/Meteor/Effect_meteor_on_pick_down'
+import { InitTrig_Effect_meteor_on_pick_up } from 'core/04_STRUCTURES/Meteor/Effect_meteor_on_pick_up'
+import { InitTrig_Meteor_being_used } from 'core/04_STRUCTURES/Meteor/Meteor_being_used'
+import { InitTrig_Right_click_on_widget } from 'core/04_STRUCTURES/Meteor/Right_click_on_widget'
+import { InitTrig_Stop_using_normal_meteor } from 'core/04_STRUCTURES/Meteor/Stop_using_normal_meteor'
 import { InitTrig_Autorevive } from 'core/06_COMMANDS/COMMANDS_vJass/Autorevive'
 import { InitTrig_Afk_mode_ordre_recu } from 'core/08_GAME/Afk_mode/Afk_mode_ordre_recu'
 import { InitTrig_Camera_reset } from 'core/08_GAME/Camera_reset/Camera_reset'
@@ -72,11 +77,11 @@ export const initOldTriggers = () => {
     // InitTrig_Meteor()
     // InitTrig_MeteorArray()
     // InitTrig_Meteor_functions()
-    // InitTrig_Right_click_on_widget()
-    // InitTrig_Meteor_being_used()
-    // InitTrig_Stop_using_normal_meteor()
-    // InitTrig_Effect_meteor_on_pick_up()
-    // InitTrig_Effect_meteor_on_pick_down()
+    InitTrig_Right_click_on_widget()
+    InitTrig_Meteor_being_used()
+    InitTrig_Stop_using_normal_meteor()
+    InitTrig_Effect_meteor_on_pick_up()
+    InitTrig_Effect_meteor_on_pick_down()
     // InitTrig_VisibilityModifier()
     // InitTrig_VisibilityModifierArray()
     // InitTrig_StartAndEnd()

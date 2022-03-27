@@ -1,17 +1,18 @@
-const Trig_right_click_on_widget_Conditions = (): boolean => {
-    return EscaperFunctions.IsHero(GetTriggerUnit()) && BasicFunctions.IsIssuedOrder('smart')
-}
+import { BasicFunctions } from 'core/01_libraries/Basic_functions'
+import { createEvent } from 'Utils/mapUtils'
+import { EscaperFunctions } from '../Escaper/Escaper_functions'
+import { MeteorFunctions } from './Meteor_functions'
 
-const Trig_right_click_on_widget_Actions = (): void => {
-    if (GetOrderTargetUnit() !== null) {
-        ExecuteRightClicOnUnit(GetTriggerUnit(), GetOrderTargetUnit())
-    }
-}
-
-//===========================================================================
-const InitTrig_Right_click_on_widget = (): void => {
-    gg_trg_Right_click_on_widget = CreateTrigger()
-    TriggerRegisterAnyUnitEventBJ(gg_trg_Right_click_on_widget, EVENT_PLAYER_UNIT_ISSUED_TARGET_ORDER)
-    TriggerAddAction(gg_trg_Right_click_on_widget, Trig_right_click_on_widget_Actions)
-    TriggerAddCondition(gg_trg_Right_click_on_widget, Condition(Trig_right_click_on_widget_Conditions))
+export const InitTrig_Right_click_on_widget = () => {
+    createEvent({
+        events: [t => TriggerRegisterAnyUnitEventBJ(t, EVENT_PLAYER_UNIT_ISSUED_TARGET_ORDER)],
+        conditions: [() => EscaperFunctions.IsHero(GetTriggerUnit()) && BasicFunctions.IsIssuedOrder('smart')],
+        actions: [
+            () => {
+                if (GetOrderTargetUnit() !== null) {
+                    MeteorFunctions.ExecuteRightClicOnUnit(GetTriggerUnit(), GetOrderTargetUnit())
+                }
+            },
+        ],
+    })
 }

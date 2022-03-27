@@ -1,95 +1,82 @@
-
-
-const initImmolationSkills = () => { // initializer Init_ImmolationSkills
-
-
-let IMMOLATION_SKILLS: Array<number> = [];
-
-
-const Init_ImmolationSkills = (): void => {
-	IMMOLATION_SKILLS[ 1 ] = FourCC("I005");
-	IMMOLATION_SKILLS[ 2 ] = FourCC("I010");
-	IMMOLATION_SKILLS[ 3 ] = FourCC("I015");
-	IMMOLATION_SKILLS[ 4 ] = FourCC("I020");
-	IMMOLATION_SKILLS[ 5 ] = FourCC("I025");
-	IMMOLATION_SKILLS[ 6 ] = FourCC("I030");
-	IMMOLATION_SKILLS[ 7 ] = FourCC("I035");
-	IMMOLATION_SKILLS[ 8 ] = FourCC("I040");
-	IMMOLATION_SKILLS[ 9 ] = FourCC("I045");
-	IMMOLATION_SKILLS[ 10 ] = FourCC("I050");
-	IMMOLATION_SKILLS[ 11 ] = FourCC("I055");
-	IMMOLATION_SKILLS[ 12 ] = FourCC("I060");
-	IMMOLATION_SKILLS[ 13 ] = FourCC("I065");
-	IMMOLATION_SKILLS[ 14 ] = FourCC("I070");
-	IMMOLATION_SKILLS[ 15 ] = FourCC("I075");
-	IMMOLATION_SKILLS[ 16 ] = FourCC("I080");
-	IMMOLATION_SKILLS[ 17 ] = FourCC("I085");
-	IMMOLATION_SKILLS[ 18 ] = FourCC("I090");
-	IMMOLATION_SKILLS[ 19 ] = FourCC("I095");
-	IMMOLATION_SKILLS[ 20 ] = FourCC("I100");
-	IMMOLATION_SKILLS[ 21 ] = FourCC("I105");
-	IMMOLATION_SKILLS[ 22 ] = FourCC("I110");
-	IMMOLATION_SKILLS[ 23 ] = FourCC("I115");
-	IMMOLATION_SKILLS[ 24 ] = FourCC("I120");
-	IMMOLATION_SKILLS[ 25 ] = FourCC("I125");
-	IMMOLATION_SKILLS[ 26 ] = FourCC("I130");
-	IMMOLATION_SKILLS[ 27 ] = FourCC("I135");
-	IMMOLATION_SKILLS[ 28 ] = FourCC("I140");
-	IMMOLATION_SKILLS[ 29 ] = FourCC("I145");
-	IMMOLATION_SKILLS[ 30 ] = FourCC("I150");
-	IMMOLATION_SKILLS[ 31 ] = FourCC("I155");
-	IMMOLATION_SKILLS[ 32 ] = FourCC("I160");
-	IMMOLATION_SKILLS[ 33 ] = FourCC("I165");
-	IMMOLATION_SKILLS[ 34 ] = FourCC("I170");
-	IMMOLATION_SKILLS[ 35 ] = FourCC("I175");
-	IMMOLATION_SKILLS[ 36 ] = FourCC("I180");
-	IMMOLATION_SKILLS[ 37 ] = FourCC("I185");
-	IMMOLATION_SKILLS[ 38 ] = FourCC("I190");
-	IMMOLATION_SKILLS[ 39 ] = FourCC("I195");
-	IMMOLATION_SKILLS[ 40 ] = FourCC("I200");
-	IMMOLATION_SKILLS[ 41 ] = FourCC("I205");
-	IMMOLATION_SKILLS[ 42 ] = FourCC("I210");
-	IMMOLATION_SKILLS[ 43 ] = FourCC("I215");
-	IMMOLATION_SKILLS[ 44 ] = FourCC("I220");
-	IMMOLATION_SKILLS[ 45 ] = FourCC("I225");
-	IMMOLATION_SKILLS[ 46 ] = FourCC("I230");
-	IMMOLATION_SKILLS[ 47 ] = FourCC("I235");
-	IMMOLATION_SKILLS[ 48 ] = FourCC("I240");
-	IMMOLATION_SKILLS[ 49 ] = FourCC("I245");
-	IMMOLATION_SKILLS[ 50 ] = FourCC("I250");
-	IMMOLATION_SKILLS[ 51 ] = FourCC("I255");
-	IMMOLATION_SKILLS[ 52 ] = FourCC("I260");
-	IMMOLATION_SKILLS[ 53 ] = FourCC("I265");
-	IMMOLATION_SKILLS[ 54 ] = FourCC("I270");
-	IMMOLATION_SKILLS[ 55 ] = FourCC("I275");
-	IMMOLATION_SKILLS[ 56 ] = FourCC("I280");
-	IMMOLATION_SKILLS[ 57 ] = FourCC("I285");
-	IMMOLATION_SKILLS[ 58 ] = FourCC("I290");
-	IMMOLATION_SKILLS[ 59 ] = FourCC("I295");
-	IMMOLATION_SKILLS[ 60 ] = FourCC("I300");
-	IMMOLATION_SKILLS[ 61 ] = FourCC("I305");
-	IMMOLATION_SKILLS[ 62 ] = FourCC("I310");
-	IMMOLATION_SKILLS[ 63 ] = FourCC("I315");
-	IMMOLATION_SKILLS[ 64 ] = FourCC("I320");
-	IMMOLATION_SKILLS[ 65 ] = FourCC("I325");
-	IMMOLATION_SKILLS[ 66 ] = FourCC("I330");
-	IMMOLATION_SKILLS[ 67 ] = FourCC("I335");
-	IMMOLATION_SKILLS[ 68 ] = FourCC("I340");
-	IMMOLATION_SKILLS[ 69 ] = FourCC("I345");
-	IMMOLATION_SKILLS[ 70 ] = FourCC("I350");
-	IMMOLATION_SKILLS[ 71 ] = FourCC("I355");
-	IMMOLATION_SKILLS[ 72 ] = FourCC("I360");
-	IMMOLATION_SKILLS[ 73 ] = FourCC("I365");
-	IMMOLATION_SKILLS[ 74 ] = FourCC("I370");
-	IMMOLATION_SKILLS[ 75 ] = FourCC("I375");
-	IMMOLATION_SKILLS[ 76 ] = FourCC("I380");
-	IMMOLATION_SKILLS[ 77 ] = FourCC("I385");
-	IMMOLATION_SKILLS[ 78 ] = FourCC("I390");
-	IMMOLATION_SKILLS[ 79 ] = FourCC("I395");
-	IMMOLATION_SKILLS[ 80 ] = FourCC("I400");
-};
-
-
-
-
-}
+export const IMMOLATION_SKILLS = [
+    FourCC('I005'),
+    FourCC('I010'),
+    FourCC('I015'),
+    FourCC('I020'),
+    FourCC('I025'),
+    FourCC('I030'),
+    FourCC('I035'),
+    FourCC('I040'),
+    FourCC('I045'),
+    FourCC('I050'),
+    FourCC('I055'),
+    FourCC('I060'),
+    FourCC('I065'),
+    FourCC('I070'),
+    FourCC('I075'),
+    FourCC('I080'),
+    FourCC('I085'),
+    FourCC('I090'),
+    FourCC('I095'),
+    FourCC('I100'),
+    FourCC('I105'),
+    FourCC('I110'),
+    FourCC('I115'),
+    FourCC('I120'),
+    FourCC('I125'),
+    FourCC('I130'),
+    FourCC('I135'),
+    FourCC('I140'),
+    FourCC('I145'),
+    FourCC('I150'),
+    FourCC('I155'),
+    FourCC('I160'),
+    FourCC('I165'),
+    FourCC('I170'),
+    FourCC('I175'),
+    FourCC('I180'),
+    FourCC('I185'),
+    FourCC('I190'),
+    FourCC('I195'),
+    FourCC('I200'),
+    FourCC('I205'),
+    FourCC('I210'),
+    FourCC('I215'),
+    FourCC('I220'),
+    FourCC('I225'),
+    FourCC('I230'),
+    FourCC('I235'),
+    FourCC('I240'),
+    FourCC('I245'),
+    FourCC('I250'),
+    FourCC('I255'),
+    FourCC('I260'),
+    FourCC('I265'),
+    FourCC('I270'),
+    FourCC('I275'),
+    FourCC('I280'),
+    FourCC('I285'),
+    FourCC('I290'),
+    FourCC('I295'),
+    FourCC('I300'),
+    FourCC('I305'),
+    FourCC('I310'),
+    FourCC('I315'),
+    FourCC('I320'),
+    FourCC('I325'),
+    FourCC('I330'),
+    FourCC('I335'),
+    FourCC('I340'),
+    FourCC('I345'),
+    FourCC('I350'),
+    FourCC('I355'),
+    FourCC('I360'),
+    FourCC('I365'),
+    FourCC('I370'),
+    FourCC('I375'),
+    FourCC('I380'),
+    FourCC('I385'),
+    FourCC('I390'),
+    FourCC('I395'),
+    FourCC('I400'),
+]

@@ -1,15 +1,11 @@
-const Trig_Effect_meteor_on_pick_up_Conditions = (): boolean => {
-    return GetItemTypeId(UnitItemInSlotBJ(GetTriggerUnit(), 1)) === METEOR_NORMAL
-}
+import { createEvent } from 'Utils/mapUtils'
+import { EscaperFunctions } from '../Escaper/Escaper_functions'
+import { METEOR_NORMAL } from './Meteor'
 
-const Trig_Effect_meteor_on_pick_up_Actions = (): void => {
-    EscaperFunctions.Hero2Escaper(GetTriggerUnit()).addEffectMeteor()
-}
-
-//===========================================================================
-const InitTrig_Effect_meteor_on_pick_up = (): void => {
-    gg_trg_Effect_meteor_on_pick_up = CreateTrigger()
-    TriggerRegisterAnyUnitEventBJ(gg_trg_Effect_meteor_on_pick_up, EVENT_PLAYER_UNIT_PICKUP_ITEM)
-    TriggerAddCondition(gg_trg_Effect_meteor_on_pick_up, Condition(Trig_Effect_meteor_on_pick_up_Conditions))
-    TriggerAddAction(gg_trg_Effect_meteor_on_pick_up, Trig_Effect_meteor_on_pick_up_Actions)
+export const InitTrig_Effect_meteor_on_pick_up = () => {
+    createEvent({
+        events: [t => TriggerRegisterAnyUnitEventBJ(t, EVENT_PLAYER_UNIT_PICKUP_ITEM)],
+        conditions: [() => GetItemTypeId(UnitItemInSlotBJ(GetTriggerUnit(), 1)) === METEOR_NORMAL],
+        actions: [() => EscaperFunctions.Hero2Escaper(GetTriggerUnit()).addEffectMeteor()],
+    })
 }
