@@ -1,5 +1,14 @@
 import { initGameTime } from 'core/04_STRUCTURES/Lives_and_game_time/Time_of_game_trigger'
+import { InitTrig_Afk_mode_ordre_recu } from 'core/08_GAME/Afk_mode/Afk_mode_ordre_recu'
 import { InitTrig_Camera_reset } from 'core/08_GAME/Camera_reset/Camera_reset'
+import { InitTrig_A_hero_dies_check_if_all_dead_and_sounds } from 'core/08_GAME/Death/A_hero_dies_check_if_all_dead_and_sounds'
+import { InitTrig_Sound_monster_dies } from 'core/08_GAME/Death/Sound_monster_dies'
+import { InitTrig_Start_sound } from 'core/08_GAME/Init_game/Start_sound'
+import { InitTrig_Init_lives } from 'core/08_GAME/Init_structures/Init_lives'
+import { InitTrig_A_player_leaves } from 'core/08_GAME/Leavers/A_player_leaves'
+import { InitTrig_creation_dialogue } from 'core/08_GAME/Mode_coop/creation_dialogue'
+import { InitTrig_Select_hero } from 'core/08_GAME/Select_and_unselect_heroes/Select_hero'
+import { InitTrig_Unselect_hero } from 'core/08_GAME/Select_and_unselect_heroes/Unselect_hero'
 
 export const initOldTriggers = () => {
     // InitTrig_Version()
@@ -184,7 +193,7 @@ export const initOldTriggers = () => {
     // InitTrig_Save_caster_types()
     // InitTrig_Save_levels()
     // InitTrig_SAVE_MAP_in_cache()
-    // InitTrig_Init_lives()
+    InitTrig_Init_lives()
     // InitTrig_Init_escapers()
     // InitTrig_Init_struct_levels()
     // InitTrig_Forces_ally()
@@ -192,10 +201,10 @@ export const initOldTriggers = () => {
     // InitTrig_No_selection_circle()
     // InitTrig_Allways_day()
     // InitTrig_Message_heroDies()
-    // InitTrig_Start_sound()
+    InitTrig_Start_sound()
     // InitTrig_Heroes()
     // InitTrig_coop_init_sounds()
-    // InitTrig_creation_dialogue()
+    InitTrig_creation_dialogue()
     // InitTrig_apparition_dialogue_et_fermeture_automatique()
     // InitTrig_appui_sur_bouton_dialogue()
     // InitTrig_deplacement_heros_hors_death_path()
@@ -204,12 +213,12 @@ export const initOldTriggers = () => {
     InitTrig_Camera_reset()
     // InitTrig_Apm()
     // InitTrig_Afk_mode()
-    // InitTrig_Afk_mode_ordre_recu()
-    // InitTrig_A_player_leaves()
+    InitTrig_Afk_mode_ordre_recu()
+    InitTrig_A_player_leaves()
     // InitTrig_InvisUnit_is_getting_damage()
-    // InitTrig_A_hero_dies_check_if_all_dead_and_sounds()
+    InitTrig_A_hero_dies_check_if_all_dead_and_sounds()
     // InitTrig_Lose_a_life_and_res()
-    // InitTrig_Sound_monster_dies()
-    // InitTrig_Select_hero()
-    // InitTrig_Unselect_hero()
+    InitTrig_Sound_monster_dies()
+    InitTrig_Select_hero()
+    InitTrig_Unselect_hero()
 }

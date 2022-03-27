@@ -1,8 +1,11 @@
 import { NB_LIVES_AT_BEGINNING } from 'core/01_libraries/Constants'
 import { ColorCodes } from 'core/01_libraries/Init_colorCodes'
 import { Text } from 'core/01_libraries/Text'
+import { udg_levels } from 'core/08_GAME/Init_structures/Init_struct_levels'
 
 const LIVES_PLAYER = Player(6) //GREEN
+
+export type ILives = ReturnType<typeof Lives>
 
 export const Lives = () => {
     let nb: number

@@ -1,18 +1,12 @@
+import { Lives } from 'core/04_STRUCTURES/Lives_and_game_time/Lives_and_game_time'
+import { createEvent } from 'Utils/mapUtils'
+import { ILives } from '../../04_STRUCTURES/Lives_and_game_time/Lives_and_game_time'
 
+let udg_lives: ILives | 0 = 0
 
-let udg_lives = 0;
-
-
-const Trig_init_lives_Actions = (): void => {
-	udg_lives = Lives.create()
-};
-
-
-
-//===========================================================================
-const InitTrig_Init_lives = (): void => {
-	gg_trg_Init_lives = CreateTrigger();
-	TriggerAddAction(gg_trg_Init_lives, Trig_init_lives_Actions)
- TriggerRegisterTimerEvent(gg_trg_Init_lives, 0.0001, false)
-};
-
+export const InitTrig_Init_lives = () => {
+    createEvent({
+        events: [t => TriggerRegisterTimerEvent(t, 0.0001, false)],
+        actions: [() => (udg_lives = Lives())],
+    })
+}
