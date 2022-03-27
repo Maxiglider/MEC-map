@@ -20,12 +20,12 @@ const MonsterDelete_Actions = (): void => {
 	let y = GetOrderPointY();
 	let i: number;
 
-	if ((!IsIssuedOrder("smart"))) {
+	if ((!BasicFunctions.IsIssuedOrder("smart"))) {
 		FlushParentHashtable(suppressionHashTable)
 		suppressionHashTable = null;
 		return;
 	}
- StopUnit(mk.maker)
+ BasicFunctions.StopUnit(mk.maker)
 	if ( (mk.getMode() == "oneByOne") ) {
 		Mnm = escaper.getMakingLevel().monstersNoMove.getMonsterNear(x, y)
 		if ( (Mnm != 0 and Mnm.u != null) ) {
@@ -71,7 +71,7 @@ const MonsterDelete_Actions = (): void => {
 				if (i > escaper.getMakingLevel().monstersNoMove.getLastInstanceId()) break;
 				Mnm = escaper.getMakingLevel().monstersNoMove.get(i)
 				if ((Mnm !== 0)) {
-					if ( (Mnm.u != null and IsUnitBetweenLocs(Mnm.u, mk.lastX, mk.lastY, x, y)) ) {
+					if ( (Mnm.u != null and BasicFunctions.IsUnitBetweenLocs(Mnm.u, mk.lastX, mk.lastY, x, y)) ) {
  Mnm.removeUnit()
  SaveInteger(suppressionHashTable, 0, nbMonstersRemoved, integer(Mnm))
 						nbMonstersRemoved = nbMonstersRemoved + 1;
@@ -88,7 +88,7 @@ const MonsterDelete_Actions = (): void => {
 				if (i > escaper.getMakingLevel().monstersSimplePatrol.getLastInstanceId()) break;
 				Msp = escaper.getMakingLevel().monstersSimplePatrol.get(i)
 				if ((Msp !== 0)) {
-					if ( (Msp.u != null and IsUnitBetweenLocs(Msp.u, mk.lastX, mk.lastY, x, y)) ) {
+					if ( (Msp.u != null and BasicFunctions.IsUnitBetweenLocs(Msp.u, mk.lastX, mk.lastY, x, y)) ) {
  Msp.removeUnit()
  SaveInteger(suppressionHashTable, 0, nbMonstersRemoved, integer(Msp))
 						nbMonstersRemoved = nbMonstersRemoved + 1;
@@ -105,7 +105,7 @@ const MonsterDelete_Actions = (): void => {
 				if (i > escaper.getMakingLevel().monstersMultiplePatrols.getLastInstanceId()) break;
 				Mmp = escaper.getMakingLevel().monstersMultiplePatrols.get(i)
 				if ((Mmp !== 0)) {
-					if ( (Mmp.u != null and IsUnitBetweenLocs(Mmp.u, mk.lastX, mk.lastY ,x, y)) ) {
+					if ( (Mmp.u != null and BasicFunctions.IsUnitBetweenLocs(Mmp.u, mk.lastX, mk.lastY ,x, y)) ) {
  Mmp.removeUnit()
  SaveInteger(suppressionHashTable, 0, nbMonstersRemoved, integer(Mmp))
 						nbMonstersRemoved = nbMonstersRemoved + 1;
@@ -122,7 +122,7 @@ const MonsterDelete_Actions = (): void => {
 				if (i > escaper.getMakingLevel().monstersTeleport.getLastInstanceId()) break;
 				Mt = escaper.getMakingLevel().monstersTeleport.get(i)
 				if ((Mt !== 0)) {
-					if ( (Mt.u != null and IsUnitBetweenLocs(Mt.u, mk.lastX, mk.lastY ,x, y)) ) {
+					if ( (Mt.u != null and BasicFunctions.IsUnitBetweenLocs(Mt.u, mk.lastX, mk.lastY ,x, y)) ) {
  Mt.removeUnit()
  SaveInteger(suppressionHashTable, 0, nbMonstersRemoved, integer(Mt))
 						nbMonstersRemoved = nbMonstersRemoved + 1;

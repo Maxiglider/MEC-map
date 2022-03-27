@@ -11,10 +11,10 @@ const TerrainHorizontalSymmetry_Actions = (): void => {
 	let x = GetOrderPointX();
 	let y = GetOrderPointY();
 
-	if ((!IsIssuedOrder("smart"))) {
+	if ((!BasicFunctions.IsIssuedOrder("smart"))) {
 		return;
 	}
- StopUnit(mk.maker)	
+ BasicFunctions.StopUnit(mk.maker)	
 	if ( (mk.isLastLocSavedUsed()) ) {
 		action = MakeTerrainHorizontalSymmetryAction.create(mk.lastX, mk.lastY, x, y)
 		if ((action === 0)) {

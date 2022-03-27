@@ -322,7 +322,7 @@ const initCommandMax = () => {
                 while (true) {
                     if (i >= NB_ESCAPERS) break
                     if (udg_escapers.get(i) != 0 && udg_escapers.get(i) != escaper) {
-                        if (IsEscaperInGame(i)) {
+                        if (BasicFunctions.IsEscaperInGame(i)) {
                             udg_escapers.get(i).removeHero()
                         } else {
                             udg_escapers.remove(i)
@@ -335,7 +335,7 @@ const initCommandMax = () => {
             if (IsPlayerColorString(param1)) {
                 n = ColorCodes.ColorString2Id(param1)
                 if (udg_escapers.get(n) != 0) {
-                    if (IsEscaperInGame(n)) {
+                    if (BasicFunctions.IsEscaperInGame(n)) {
                         udg_escapers.get(n).removeHero()
                     } else {
                         udg_escapers.remove(n)

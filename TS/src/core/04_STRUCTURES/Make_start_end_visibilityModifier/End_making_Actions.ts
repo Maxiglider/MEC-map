@@ -11,10 +11,10 @@ const EndMaking_Actions = (): void => {
 	let x = GetOrderPointX();
 	let y = GetOrderPointY();
 
-	if ((!IsIssuedOrder("smart"))) {
+	if ((!BasicFunctions.IsIssuedOrder("smart"))) {
 		return;
 	}
- StopUnit(mk.maker)
+ BasicFunctions.StopUnit(mk.maker)
 	if ( (mk.isLastLocSavedUsed()) ) {
  escaper.getMakingLevel().newEnd(mk.lastX, mk.lastY, x, y)
  Text.mkP(mk.makerOwner, "end made for level " + I2S(escaper.getMakingLevel().getId()))

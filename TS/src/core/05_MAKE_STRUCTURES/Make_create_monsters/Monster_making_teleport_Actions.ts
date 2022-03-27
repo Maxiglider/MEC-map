@@ -10,10 +10,10 @@ const MonsterMakingTeleport_Actions = (): void => {
 	let x = GetOrderPointX();
 	let y = GetOrderPointY();
 
-	if ((!IsIssuedOrder("smart"))) {
+	if ((!BasicFunctions.IsIssuedOrder("smart"))) {
 		return;
 	}
- StopUnit(mk.maker)
+ BasicFunctions.StopUnit(mk.maker)
 	if ( (mk.getLocPointeur() >= 0) ) {
 		if ( (not mk.getMonster().addNewLoc(x, y)) ) {
  Text.erP(mk.makerOwner, "Number limit of actions reached for this monster ! ( " + I2S(MonsterTeleport.NB_MAX_LOC) + " )")

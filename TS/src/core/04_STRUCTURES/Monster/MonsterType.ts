@@ -271,7 +271,7 @@ const toString = (): string => {
 	let str = this.label + CACHE_SEPARATEUR_PARAM + this.theAlias + CACHE_SEPARATEUR_PARAM;
 	str = str + Ascii2String(this.unitTypeId) + CACHE_SEPARATEUR_PARAM + R2S(this.scale) + CACHE_SEPARATEUR_PARAM;
 	str = str + this.getImmolationRadiusStr() + CACHE_SEPARATEUR_PARAM + R2S(this.speed) + CACHE_SEPARATEUR_PARAM;
-	str = str + B2S(this.isClickableB) + CACHE_SEPARATEUR_PARAM + this.killingEffectStr + CACHE_SEPARATEUR_PARAM;
+	str = str + BasicFunctions.B2S(this.isClickableB) + CACHE_SEPARATEUR_PARAM + this.killingEffectStr + CACHE_SEPARATEUR_PARAM;
 	str = str + I2S(this.maxLife / 10000) + CACHE_SEPARATEUR_PARAM + R2S(this.height);
 	return str;
 };

@@ -56,8 +56,8 @@ const initSaveTerrainHeights = () => {
             while (true) {
                 if (x > Constants.MAP_MAX_X) break
                 height = ZLibrary.GetSurfaceZ(x, y)
-                //if (not IsNearBounds(x, y) and (GetTerrainCliffLevel(x, y) != 2 or height != 0)) then //if surfaceZ is 0 and cliff level 2, we consider it's a "default tilepoint", with no water, and we avoid the GetTerrainZ call (which is heavy)
-                /*if (not IsNearBounds(x, y) and not IsTerrainPathable(x, y, PATHING_TYPE_FLOATABILITY)) then
+                //if (not BasicFunctions.IsNearBounds(x, y) and (GetTerrainCliffLevel(x, y) != 2 or height != 0)) then //if surfaceZ is 0 and cliff level 2, we consider it's a "default tilepoint", with no water, and we avoid the GetTerrainZ call (which is heavy)
+                /*if (not BasicFunctions.IsNearBounds(x, y) and not IsTerrainPathable(x, y, PATHING_TYPE_FLOATABILITY)) then
 			                    //near bounds, GetTerrainZ crashes the game
 			                    //warning, PATHING_TYPE_FLOATABILITY doesn't find water everywhere there is (little spaces of water won't be detected), but I see no other solution
 			                    height = ZLibrary.GetTerrainZ(x, y)

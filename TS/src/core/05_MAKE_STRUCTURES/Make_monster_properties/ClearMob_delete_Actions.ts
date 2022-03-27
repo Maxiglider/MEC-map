@@ -18,10 +18,10 @@ const ClearMobDelete_Actions = (): void => {
 	let caster: Caster;
 	let monsterOrCasterId: number;
 
-	if ((!IsIssuedOrder("smart"))) {
+	if ((!BasicFunctions.IsIssuedOrder("smart"))) {
 		return;
 	}
- StopUnit(mk.maker)
+ BasicFunctions.StopUnit(mk.maker)
 
 	//recherche du monsterOrCaster cliqué
 	Mnm = escaper.getMakingLevel().monstersNoMove.getMonsterNear(x, y)

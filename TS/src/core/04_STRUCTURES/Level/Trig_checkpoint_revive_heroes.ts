@@ -21,7 +21,7 @@ const Trig_Trig_checkpoint_revive_heroes_Actions = (): void => {
 		if ((escaper !== 0 && escaper !== finisher)) {
 			if ( (not escaper.reviveAtStart()) ) {
  escaper.moveHero(l.getStartRandomX(), l.getStartRandomY())
- StopUnit(escaper.getHero())
+ BasicFunctions.StopUnit(escaper.getHero())
  escaper.pause(true)
  escaper.setLastZ(0)
  escaper.setOldDiffZ(0)

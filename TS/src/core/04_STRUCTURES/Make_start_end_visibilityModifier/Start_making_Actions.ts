@@ -12,10 +12,10 @@ const StartMaking_Actions = (): void => {
 	let y = GetOrderPointY();
 	let level: Level;
 
-	if ((!IsIssuedOrder("smart"))) {
+	if ((!BasicFunctions.IsIssuedOrder("smart"))) {
 		return;
 	}
- StopUnit(mk.maker)
+ BasicFunctions.StopUnit(mk.maker)
 	if ( (mk.isLastLocSavedUsed()) ) {
 		level = escaper.getMakingLevel()
 		if ( (mk.forNext()) ) {

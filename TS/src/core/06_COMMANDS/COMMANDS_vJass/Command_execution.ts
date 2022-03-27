@@ -4,8 +4,11 @@ import { udg_escapers } from 'core/08_GAME/Init_structures/Init_escapers'
 import { Globals } from 'core/09_From_old_Worldedit_triggers/globals_variables_and_triggers'
 import { createEvent, forRange } from 'Utils/mapUtils'
 import { CommandMax } from './Command_admin'
+import { CommandCheat } from './Command_cheat'
 import { CommandRed } from './Command_first_player'
 import { CommandsFunctions } from './Command_functions'
+import { CommandMake } from './Command_make'
+import { CommandTrueMax } from './Command_superadmin'
 
 const initCommandExecution = () => {
     const ExecuteCommandSingle = (escaper: Escaper, cmd: string): void => {
@@ -19,8 +22,8 @@ const initCommandExecution = () => {
                     Text.erP(escaper.getPlayer(), 'unknown command or not enough rights')
                     return
                 }
-                if (!ExecuteCommandCheat(escaper, cmd)) {
-                    if (!ExecuteCommandMake(escaper, cmd)) {
+                if (!CommandCheat.ExecuteCommandCheat(escaper, cmd)) {
+                    if (!CommandMake.ExecuteCommandMake(escaper, cmd)) {
                         if (!escaper.isMaximaxou()) {
                             Text.erP(escaper.getPlayer(), 'unknown command or not enough rights')
                             return
@@ -30,7 +33,7 @@ const initCommandExecution = () => {
                                 Text.erP(escaper.getPlayer(), 'unknown command or not enough rights')
                                 return
                             }
-                            if (!ExecuteCommandTrueMax(escaper, cmd)) {
+                            if (!CommandTrueMax.ExecuteCommandTrueMax(escaper, cmd)) {
                                 Text.erP(escaper.getPlayer(), 'unknown command')
                             }
                         }

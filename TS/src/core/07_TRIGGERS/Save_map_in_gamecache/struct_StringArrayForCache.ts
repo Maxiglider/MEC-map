@@ -1,7 +1,7 @@
 import { Text } from 'core/01_libraries/Text'
 import { SaveMapInCache } from './SAVE_MAP_in_cache'
 
-const CACHE_SEPARATEUR_ITEM = '('
+export const CACHE_SEPARATEUR_ITEM = '('
 export const CACHE_SEPARATEUR_PARAM = ','
 
 const MAX_STRING_LENGTH = 200

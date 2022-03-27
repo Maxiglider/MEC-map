@@ -47,13 +47,13 @@ const MonsterMakingSimplePatrol_Actions = (): void => {
 	let angle: number;
 	let found: boolean;
 
-	if ((!IsIssuedOrder("smart"))) {
+	if ((!BasicFunctions.IsIssuedOrder("smart"))) {
 		return;
 	}
- StopUnit(mk.maker)
+ BasicFunctions.StopUnit(mk.maker)
 	if ( (mk.getMode() == "normal") ) {
 		if ( (mk.isLastLocSavedUsed()) ) {
-			if ( (GetLocDist(mk.lastX, mk.lastY, x, y) <= PATROL_DISTANCE_MIN) ) {
+			if ( (BasicFunctions.GetLocDist(mk.lastX, mk.lastY, x, y) <= PATROL_DISTANCE_MIN) ) {
  Text.erP(mk.makerOwner, "Too close to the start location !")
 				return;
 			} else {
@@ -67,7 +67,7 @@ const MonsterMakingSimplePatrol_Actions = (): void => {
 	}
 	if ( (mk.getMode() == "string") ) {
 		if ( (mk.isLastLocSavedUsed()) ) {
-			if ( (GetLocDist(mk.lastX, mk.lastY, x, y) <= PATROL_DISTANCE_MIN) ) {
+			if ( (BasicFunctions.GetLocDist(mk.lastX, mk.lastY, x, y) <= PATROL_DISTANCE_MIN) ) {
  Text.erP(mk.makerOwner, "Too close to the start location !")
 				return;
 			} else {

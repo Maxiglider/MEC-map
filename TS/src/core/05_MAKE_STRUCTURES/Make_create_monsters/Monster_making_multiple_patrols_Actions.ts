@@ -11,10 +11,10 @@ const MonsterMakingMultiplePatrols_Actions = (): void => {
 	let y = GetOrderPointY();
 	let erreur: number;
 
-	if ((!IsIssuedOrder("smart"))) {
+	if ((!BasicFunctions.IsIssuedOrder("smart"))) {
 		return;
 	}
- StopUnit(mk.maker)
+ BasicFunctions.StopUnit(mk.maker)
 	if ( (mk.getLocPointeur() >= 0) ) {
 		erreur = mk.getMonster().addNewLoc(x, y)
 		if ((erreur > 0)) {

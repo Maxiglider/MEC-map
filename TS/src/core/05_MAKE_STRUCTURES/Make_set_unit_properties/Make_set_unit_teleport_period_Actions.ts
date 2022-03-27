@@ -16,10 +16,10 @@ const SetUnitTeleportPeriod_Actions = (): void => {
 	let y = GetOrderPointY();
 	let i: number;
 
-	if ((!IsIssuedOrder("smart"))) {
+	if ((!BasicFunctions.IsIssuedOrder("smart"))) {
 		return;
 	}
- StopUnit(mk.maker)
+ BasicFunctions.StopUnit(mk.maker)
 	if ( (mk.getMode() == "oneByOne") ) {
 		monster = escaper.getMakingLevel().monstersTeleport.getMonsterNear(x, y)
 		if ( (monster != 0 and monster.u != null) ) {
@@ -37,7 +37,7 @@ const SetUnitTeleportPeriod_Actions = (): void => {
 		while (true) {
 			if (i > escaper.getMakingLevel().monstersTeleport.getLastInstanceId()) break;
 			monster = escaper.getMakingLevel().monstersTeleport.get(i)
-			if ( (monster != 0 and monster.u != null and IsUnitBetweenLocs(monster.u, mk.lastX, mk.lastY, x, y)) ) {
+			if ( (monster != 0 and monster.u != null and BasicFunctions.IsUnitBetweenLocs(monster.u, mk.lastX, mk.lastY, x, y)) ) {
  monster.setPeriod(mk.getPeriod())
 				nbMonstersFixed = nbMonstersFixed + 1;
 			}

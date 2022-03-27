@@ -227,7 +227,7 @@ const CasterTryToShoot = (): void => {
 				}
 
 				//trouver temps idéal
-				if ( (IsOnGround(escaper.getHero())) ) {
+				if ( (BasicFunctions.IsOnGround(escaper.getHero())) ) {
 					tempsIdeal = TrouverTempsIdeal(tempsMax);
 				} else {
 					tempsIdeal = -1;

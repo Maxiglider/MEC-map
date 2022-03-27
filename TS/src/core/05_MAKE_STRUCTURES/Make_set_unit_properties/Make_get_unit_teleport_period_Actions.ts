@@ -13,10 +13,10 @@ const GetUnitTeleportPeriod_Actions = (): void => {
 	let y = GetOrderPointY();
 	let i: number;
 
-	if ((!IsIssuedOrder("smart"))) {
+	if ((!BasicFunctions.IsIssuedOrder("smart"))) {
 		return;
 	}
- StopUnit(mk.maker)
+ BasicFunctions.StopUnit(mk.maker)
 	monster = escaper.getMakingLevel().monstersTeleport.getMonsterNear(x, y)
 	if ( (monster != 0 and monster.u != null) ) {
  Text.mkP(mk.makerOwner, "period : " + R2S(monster.getPeriod()) + " s")

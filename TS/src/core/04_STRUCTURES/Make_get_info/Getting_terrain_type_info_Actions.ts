@@ -10,10 +10,10 @@ const initGettingTerrainTypeInfoActions = () => {
         const x = GetOrderPointX()
         const y = GetOrderPointY()
 
-        if (!IsIssuedOrder('smart')) {
+        if (!BasicFunctions.IsIssuedOrder('smart')) {
             return
         }
-        StopUnit(mk.maker)
+        BasicFunctions.StopUnit(mk.maker)
         Text.P(mk.makerOwner, GetTerrainData(GetTerrainType(x, y)))
     }
 }

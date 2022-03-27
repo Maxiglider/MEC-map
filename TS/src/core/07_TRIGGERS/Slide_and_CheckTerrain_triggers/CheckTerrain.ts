@@ -34,7 +34,7 @@ local TerrainType currentTerrainType = udg_terrainTypes.getTerrainType(x, y)
     local TerrainTypeDeath terrainTypeD
     local TerrainTypeWalk terrainTypeW
  escaper.moveInvisUnit(x, y)
-// @@BELOWIF  (IsOnGround(escaper.getHero())) 
+// @@BELOWIF  (BasicFunctions.IsOnGround(escaper.getHero())) 
 if true then
 // @@BELOWIF  (lastTerrainType == currentTerrainType and currentTerrainType.getKind() != "death") 
 if true then

@@ -6,6 +6,7 @@ import { Text } from 'core/01_libraries/Text'
 import { ViewAllHideAll } from 'core/03_view_all_hide_all/View_all_hide_all'
 import { Escaper } from 'core/04_STRUCTURES/Escaper/Escaper'
 import { EscaperFunctions } from 'core/04_STRUCTURES/Escaper/Escaper_functions'
+import { Gravity } from 'core/07_TRIGGERS/Slide_and_CheckTerrain_triggers/Gravity'
 import { udg_escapers } from 'core/08_GAME/Init_structures/Init_escapers'
 import { MeteorFunctions } from '../../04_STRUCTURES/Meteor/Meteor_functions'
 import { CommandsFunctions } from './Command_functions'
@@ -490,7 +491,7 @@ const initCommandCheat = () => {
             if (!(nbParam === 1) || (S2R(param1) === 0 && param1 !== '0')) {
                 return true
             }
-            SetGravity(S2R(param1))
+            Gravity.SetGravity(S2R(param1))
             Text.P(escaper.getPlayer(), 'gravity changed')
             return true
         }
@@ -498,7 +499,7 @@ const initCommandCheat = () => {
         //-getGravity(getg)
         if (name === 'getGravity' || name === 'getg') {
             if (noParam) {
-                Text.P(escaper.getPlayer(), 'current gravity is ' + R2S(GetRealGravity()))
+                Text.P(escaper.getPlayer(), 'current gravity is ' + R2S(Gravity.GetRealGravity()))
             }
             return true
         }

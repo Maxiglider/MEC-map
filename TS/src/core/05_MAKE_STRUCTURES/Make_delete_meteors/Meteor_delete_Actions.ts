@@ -17,12 +17,12 @@ const MeteorDelete_Actions = (): void => {
 	let y = GetOrderPointY();
 	let i: number;
 
-	if ((!IsIssuedOrder("smart"))) {
+	if ((!BasicFunctions.IsIssuedOrder("smart"))) {
 		FlushParentHashtable(suppressionHashTable)
 		suppressionHashTable = null;
 		return;
 	}
- StopUnit(mk.maker)
+ BasicFunctions.StopUnit(mk.maker)
 	if ( (mk.getMode() == "oneByOne") ) {
 		if ((GetItemTypeId(GetOrderTargetItem()) !== METEOR_NORMAL)) {
 			FlushParentHashtable(suppressionHashTable)
@@ -48,7 +48,7 @@ const MeteorDelete_Actions = (): void => {
 		while (true) {
 			if (i > escaper.getMakingLevel().meteors.getLastInstanceId()) break;
 			meteor = escaper.getMakingLevel().meteors.get(i)
-			if ( (meteor != 0 and meteor.getItem() != null and IsItemBetweenLocs(meteor.getItem(), mk.lastX, mk.lastY, x, y)) ) {
+			if ( (meteor != 0 and meteor.getItem() != null and BasicFunctions.IsItemBetweenLocs(meteor.getItem(), mk.lastX, mk.lastY, x, y)) ) {
  meteor.removeMeteor()
  SaveInteger(suppressionHashTable, 0, nbMeteorsRemoved, integer(meteor))
 				nbMeteorsRemoved = nbMeteorsRemoved + 1;

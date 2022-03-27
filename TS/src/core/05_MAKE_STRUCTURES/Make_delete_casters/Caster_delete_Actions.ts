@@ -17,12 +17,12 @@ const CasterDelete_Actions = (): void => {
 	let y = GetOrderPointY();
 	let i: number;
 
-	if ((!IsIssuedOrder("smart"))) {
+	if ((!BasicFunctions.IsIssuedOrder("smart"))) {
 		FlushParentHashtable(suppressionHashTable)
 		suppressionHashTable = null;
 		return;
 	}
- StopUnit(mk.maker)
+ BasicFunctions.StopUnit(mk.maker)
 	if ( (mk.getMode() == "oneByOne") ) {
 		caster = escaper.getMakingLevel().casters.getCasterNear(x, y)
 		if ( (caster != 0 and caster.casterUnit != null) ) {
@@ -43,7 +43,7 @@ const CasterDelete_Actions = (): void => {
 		while (true) {
 			if (i > escaper.getMakingLevel().casters.getLastInstanceId()) break;
 			caster = escaper.getMakingLevel().casters.get(i)
-			if ( (caster != 0 and caster.casterUnit != null and IsUnitBetweenLocs(caster.casterUnit, mk.lastX, mk.lastY, x, y)) ) {
+			if ( (caster != 0 and caster.casterUnit != null and BasicFunctions.IsUnitBetweenLocs(caster.casterUnit, mk.lastX, mk.lastY, x, y)) ) {
  caster.disable()
  SaveInteger(suppressionHashTable, 0, nbCastersRemoved, integer(caster))
 				nbCastersRemoved = nbCastersRemoved + 1;

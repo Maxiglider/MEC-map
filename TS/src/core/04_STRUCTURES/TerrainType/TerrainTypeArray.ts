@@ -329,7 +329,7 @@ const setOrder = (cmd: string): boolean => {
 };
 
 const setMainTile= (tileset: string): boolean => {
-	let tilesetChar = tileset2tilesetChar(tileset);
+	let tilesetChar = BasicFunctions.tileset2tilesetChar(tileset);
 	if ((tilesetChar !== "")) {
 		this.mainTile= tilesetChar;
 		return true;

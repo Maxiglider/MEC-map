@@ -35,7 +35,7 @@ const initTurnOnSlide = () => {
 
     const Trig_to_turn_to_point_Conditions = (): boolean => {
         escaper = EscaperFunctions.Hero2Escaper(GetTriggerUnit())
-        return EscaperFunctions.IsHero(GetTriggerUnit()) && escaper.isSliding() && !IsLastOrderPause()
+        return EscaperFunctions.IsHero(GetTriggerUnit()) && escaper.isSliding() && !BasicFunctions.IsLastOrderPause()
     }
 
     const HandleTurn = (triggerIsToLocation: boolean): void => {

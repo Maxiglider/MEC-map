@@ -1,65 +1,61 @@
-import {EscaperFunctions} from 'core/04_STRUCTURES/Escaper/Escaper_functions'
-const {Hero2Escaper} = EscaperFunctions
-import {BasicFunctions} from 'core/01_libraries/Basic_functions'
-const {IsIssuedOrder, StopUnit} = BasicFunctions
-
-
+import { BasicFunctions } from 'core/01_libraries/Basic_functions'
+import { EscaperFunctions } from 'core/04_STRUCTURES/Escaper/Escaper_functions'
+const { Hero2Escaper } = EscaperFunctions
+const { IsIssuedOrder, StopUnit } = BasicFunctions
 
 export const MakeConsts: {
-    MAKE_LAST_CLIC_UNIT_ID: number,
-    MAKE_CANT_CANCEL_MORE: string,
+    MAKE_LAST_CLIC_UNIT_ID: number
+    MAKE_CANT_CANCEL_MORE: string
     MAKE_CANT_REDO_MORE: string
 } = {
     MAKE_LAST_CLIC_UNIT_ID: FourCC('e001'), //à remplacer par l'id de l'unité choisie (need couleur variable)
-    MAKE_CANT_CANCEL_MORE: "Nothing else to cancel !",
-    MAKE_CANT_REDO_MORE: "Nothing else to redo !"
+    MAKE_CANT_CANCEL_MORE: 'Nothing else to cancel !',
+    MAKE_CANT_REDO_MORE: 'Nothing else to redo !',
 }
 
-
-
-export abstract class Make{
+export abstract class Make {
     makerOwner: player
-    kind: string  //monsterMaking, monsterDeleting...
+    kind: string //monsterMaking, monsterDeleting...
     t: trigger | null
     maker: unit
     escaper: Escaper
     orderX: number = 0
     orderY: number = 0
 
-    constructor(maker: unit, kind: string){
+    constructor(maker: unit, kind: string) {
         this.maker = maker
         this.makerOwner = GetOwningPlayer(maker)
         this.kind = kind
         this.escaper = Hero2Escaper(maker)
 
-        this.t = null;
+        this.t = null
         this.enableTrigger()
     }
 
-    destroy(){
-        if(this.t) {
-            DestroyTrigger(this.t);
+    destroy() {
+        if (this.t) {
+            DestroyTrigger(this.t)
         }
     }
 
-    doBaseActions(){
-        if (!IsIssuedOrder("smart")) {
+    doBaseActions() {
+        if (!BasicFunctions.IsIssuedOrder('smart')) {
             return false
         }
 
         this.orderX = GetOrderPointX()
         this.orderY = GetOrderPointY()
 
-        StopUnit(this.maker)
+        BasicFunctions.StopUnit(this.maker)
         return true
     }
 
     abstract doActions(): void
 
-    enableTrigger(){
-        if(this.t) DestroyTrigger(this.t)
+    enableTrigger() {
+        if (this.t) DestroyTrigger(this.t)
         this.t = CreateTrigger()
-        TriggerAddAction(this.t, this.doActions);
+        TriggerAddAction(this.t, this.doActions)
         TriggerRegisterUnitEvent(this.t, this.maker, EVENT_UNIT_ISSUED_POINT_ORDER)
     }
 
@@ -71,9 +67,6 @@ export abstract class Make{
         return false
     }
 }
-
-
-
 
 /* todomax make that not needed
 public function GetActions takes string kind returns code
@@ -133,7 +126,3 @@ public function GetActions takes string kind returns code
     return null
 endfunction
 */
-
-
-
-

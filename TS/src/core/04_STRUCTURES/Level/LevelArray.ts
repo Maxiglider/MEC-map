@@ -74,7 +74,7 @@ const goToLevel = (finisher: Escaper, levelId: number): boolean => {
 	xCam = this.levels[levelId].getStart().getCenterX()
 	yCam = this.levels[levelId].getStart().getCenterY()
 	if ((finisher !== 0)) {
- MoveCamExceptForPlayer(finisher.getPlayer(), xCam, yCam)
+ BasicFunctions.MoveCamExceptForPlayer(finisher.getPlayer(), xCam, yCam)
 	} else {
 		SetCameraPosition(xCam, yCam)
 	}
@@ -97,7 +97,7 @@ const goToNextLevel = (finisher: Escaper): boolean => {
 	xCam = this.levels[this.currentLevel].getStart().getCenterX()
 	yCam = this.levels[this.currentLevel].getStart().getCenterY()
 	if ((finisher !== 0)) {
- MoveCamExceptForPlayer(finisher.getPlayer(), xCam, yCam)
+ BasicFunctions.MoveCamExceptForPlayer(finisher.getPlayer(), xCam, yCam)
  Text.A(udg_colorCode[GetPlayerId(finisher.getPlayer())] + "Good job " + GetPlayerName(finisher.getPlayer()) + " !")
 	} else {
 		SetCameraPosition(xCam, yCam)

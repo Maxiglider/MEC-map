@@ -12,10 +12,10 @@ const MonsterMakingNoMove_Actions = (): void => {
 	let x = GetOrderPointX();
 	let y = GetOrderPointY();
 
-	if ((!IsIssuedOrder("smart"))) {
+	if ((!BasicFunctions.IsIssuedOrder("smart"))) {
 		return;
 	}
- StopUnit(mk.maker)
+ BasicFunctions.StopUnit(mk.maker)
 	monster = escaper.getMakingLevel().monstersNoMove.new(mk.getMonsterType(), x, y, mk.getFacingAngle(), true)
  escaper.newAction(MakeMonsterAction.create(escaper.getMakingLevel(), monster))
 };

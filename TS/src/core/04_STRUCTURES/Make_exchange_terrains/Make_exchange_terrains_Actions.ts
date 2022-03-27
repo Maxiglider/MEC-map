@@ -12,10 +12,10 @@ const MakeExchangeTerrains_Actions = (): void => {
 	let terrainTypeA: TerrainType;
 	let terrainTypeB: TerrainType;
 
-	if ((!IsIssuedOrder("smart"))) {
+	if ((!BasicFunctions.IsIssuedOrder("smart"))) {
 		return;
 	}
- StopUnit(mk.maker)	
+ BasicFunctions.StopUnit(mk.maker)	
 	if ( (mk.isLastLocSavedUsed()) ) {
 		terrainTypeA = udg_terrainTypes.getTerrainType(mk.lastX, mk.lastY)
 		terrainTypeB = udg_terrainTypes.getTerrainType(x, y)

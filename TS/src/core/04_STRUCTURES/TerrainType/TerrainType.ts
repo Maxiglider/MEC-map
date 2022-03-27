@@ -119,7 +119,7 @@ const toString = (): string => {
 	str = str + this.kind + CACHE_SEPARATEUR_PARAM + Ascii2String(this.terrainTypeId) + CACHE_SEPARATEUR_PARAM + I2S(this.cliffClassId) + CACHE_SEPARATEUR_PARAM;
 	if ((this.kind === "slide")) {
 		            slide = TerrainTypeSlide(integer(this))
-		str = str + I2S(R2I(slide.getSlideSpeed() / SLIDE_PERIOD)) + CACHE_SEPARATEUR_PARAM + B2S(slide.getCanTurn())
+		str = str + I2S(R2I(slide.getSlideSpeed() / SLIDE_PERIOD)) + CACHE_SEPARATEUR_PARAM + BasicFunctions.B2S(slide.getCanTurn())
 	} else {
 		if ((this.kind === "walk")) {
 			            walk = TerrainTypeWalk(integer(this))

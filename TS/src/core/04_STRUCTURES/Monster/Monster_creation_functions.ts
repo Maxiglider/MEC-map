@@ -106,7 +106,7 @@ const initMonsterCreationFunctions = () => {
         if (mt.isClickable()) {
             p = ENNEMY_PLAYER
         } else {
-            p = GetCurrentMonsterPlayer()
+            p = BasicFunctions.GetCurrentMonsterPlayer()
         }
         return NewImmobileMonsterForPlayer(mt, p, x, y, angle)
     }

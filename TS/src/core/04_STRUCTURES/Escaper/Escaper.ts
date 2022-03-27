@@ -13,7 +13,7 @@ import {
     NEUTRAL_PLAYER,
     POWER_CIRCLE,
     SLIDE_PERIOD,
-    TERRAIN_KILL_EFFECT_BODY_PART,
+    TERRAIN_KILL_EFFECT_BODY_PART
 } from 'core/01_libraries/Constants'
 import { udg_levels } from '../../08_GAME/Init_structures/Init_struct_levels'
 import { EscaperEffectArray, IEscaperEffectArray } from './EscaperEffectArray'
@@ -312,7 +312,7 @@ export class Escaper {
             EnableTrigger(this.slide)
 
             if (this.hero) {
-                StopUnit(this.hero)
+                BasicFunctions.StopUnit(this.hero)
                 heroPos = GetUnitLoc(this.hero)
                 setLastZ(GetLocationZ(heroPos) + GetUnitFlyHeight(this.hero))
                 RemoveLocation(heroPos)
@@ -404,7 +404,7 @@ export class Escaper {
         return true
     }
 
-    specialIllidan() {
+    BasicFunctions.SpecialIllidan() {
         this.hero && SetUnitAnimation(this.hero, 'Morph Alternate')
     }
 
@@ -418,7 +418,7 @@ export class Escaper {
         SetUnitY(this.invisUnit, y)
         ShowUnit(this.invisUnit, true)
         this.enableCheckTerrain(true)
-        this.specialIllidan()
+        this.BasicFunctions.SpecialIllidan()
         this.selectHero()
 
         if (this.vcTransparency != 0) {

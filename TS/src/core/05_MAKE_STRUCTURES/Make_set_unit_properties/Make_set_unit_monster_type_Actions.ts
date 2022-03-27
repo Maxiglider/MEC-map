@@ -16,10 +16,10 @@ const SetUnitMonsterType_Actions = (): void => {
 	let y = GetOrderPointY();
 	let i: number;
 
-	if ((!IsIssuedOrder("smart"))) {
+	if ((!BasicFunctions.IsIssuedOrder("smart"))) {
 		return;
 	}
- StopUnit(mk.maker)
+ BasicFunctions.StopUnit(mk.maker)
 	if ( (mk.getMode() == "oneByOne") ) {
 		monster = escaper.getMakingLevel().monstersNoMove.getMonsterNear(x, y)
 		if ( (monster == 0 or monster.u == null) ) {
@@ -47,7 +47,7 @@ const SetUnitMonsterType_Actions = (): void => {
 		while (true) {
 			if (i > escaper.getMakingLevel().monstersNoMove.getLastInstanceId()) break;
 			monster = escaper.getMakingLevel().monstersNoMove.get(i)
-			if ( (monster != 0 and monster.u != null and IsUnitBetweenLocs(monster.u, mk.lastX, mk.lastY, x, y)) ) {
+			if ( (monster != 0 and monster.u != null and BasicFunctions.IsUnitBetweenLocs(monster.u, mk.lastX, mk.lastY, x, y)) ) {
 				if ( (monster.setMonsterType(mk.getMonsterType())) ) {
 					nbMonstersFixed = nbMonstersFixed + 1;
 				}
@@ -59,7 +59,7 @@ const SetUnitMonsterType_Actions = (): void => {
 		while (true) {
 			if (i > escaper.getMakingLevel().monstersSimplePatrol.getLastInstanceId()) break;
 			monster = escaper.getMakingLevel().monstersSimplePatrol.get(i)
-			if ( (monster != 0 and monster.u != null and IsUnitBetweenLocs(monster.u, mk.lastX, mk.lastY, x, y)) ) {
+			if ( (monster != 0 and monster.u != null and BasicFunctions.IsUnitBetweenLocs(monster.u, mk.lastX, mk.lastY, x, y)) ) {
 				if ( (monster.setMonsterType(mk.getMonsterType())) ) {
 					nbMonstersFixed = nbMonstersFixed + 1;
 				}
@@ -71,7 +71,7 @@ const SetUnitMonsterType_Actions = (): void => {
 		while (true) {
 			if (i > escaper.getMakingLevel().monstersMultiplePatrols.getLastInstanceId()) break;
 			monster = escaper.getMakingLevel().monstersMultiplePatrols.get(i)
-			if ( (monster != 0 and monster.u != null and IsUnitBetweenLocs(monster.u, mk.lastX, mk.lastY, x, y)) ) {
+			if ( (monster != 0 and monster.u != null and BasicFunctions.IsUnitBetweenLocs(monster.u, mk.lastX, mk.lastY, x, y)) ) {
 				if ( (monster.setMonsterType(mk.getMonsterType())) ) {
 					nbMonstersFixed = nbMonstersFixed + 1;
 				}
@@ -83,7 +83,7 @@ const SetUnitMonsterType_Actions = (): void => {
 		while (true) {
 			if (i > escaper.getMakingLevel().monstersTeleport.getLastInstanceId()) break;
 			monster = escaper.getMakingLevel().monstersTeleport.get(i)
-			if ( (monster != 0 and monster.u != null and IsUnitBetweenLocs(monster.u, mk.lastX, mk.lastY, x, y)) ) {
+			if ( (monster != 0 and monster.u != null and BasicFunctions.IsUnitBetweenLocs(monster.u, mk.lastX, mk.lastY, x, y)) ) {
 				if ( (monster.setMonsterType(mk.getMonsterType())) ) {
 					nbMonstersFixed = nbMonstersFixed + 1;
 				}
