@@ -1,4 +1,5 @@
 import { initGameTime } from 'core/04_STRUCTURES/Lives_and_game_time/Time_of_game_trigger'
+import { InitTrig_Autorevive } from 'core/06_COMMANDS/COMMANDS_vJass/Autorevive'
 import { InitTrig_Afk_mode_ordre_recu } from 'core/08_GAME/Afk_mode/Afk_mode_ordre_recu'
 import { InitTrig_Camera_reset } from 'core/08_GAME/Camera_reset/Camera_reset'
 import { InitTrig_A_hero_dies_check_if_all_dead_and_sounds } from 'core/08_GAME/Death/A_hero_dies_check_if_all_dead_and_sounds'
@@ -153,7 +154,7 @@ export const initOldTriggers = () => {
     // InitTrig_Command_functions()
     // InitTrig_Teleport_once_only()
     // InitTrig_Teleport()
-    // InitTrig_Autorevive()
+    InitTrig_Autorevive()
     // InitTrig_Command_all()
     // InitTrig_Command_red()
     // InitTrig_Command_cheat()

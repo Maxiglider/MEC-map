@@ -106,8 +106,8 @@ if true then
                         terrainTypeD = TerrainTypeDeath(integer(currentTerrainType))
  terrainTypeD.killEscaper(escaper)
  escaper.enableSlide(false)
- terrainTypeD.killEscaper(GetMirrorEscaper(escaper))
- GetMirrorEscaper(escaper).enableSlide(false)
+ terrainTypeD.killEscaper(EscaperFunctions.GetMirrorEscaper(escaper))
+ EscaperFunctions.GetMirrorEscaper(escaper).enableSlide(false)
                     endif
                 else
 // @@BELOWIF  (terrainTypeTolerance.getKind() == "slide") 

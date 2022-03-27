@@ -269,7 +269,7 @@ export class Escaper {
         ShowUnit(this.dummyPowerCircle, false)
 
         if (!this.isEscaperSecondary()) {
-            GetMirrorEscaper(this).removeHero()
+            EscaperFunctions.GetMirrorEscaper(this).removeHero()
         }
     }
 
@@ -442,7 +442,7 @@ export class Escaper {
         const y: number = udg_levels.getCurrentLevel().getStartRandomY()
 
         if (!this.isEscaperSecondary()) {
-            GetMirrorEscaper(this).reviveAtStart()
+            EscaperFunctions.GetMirrorEscaper(this).reviveAtStart()
         }
 
         return this.revive(x, y)
@@ -535,7 +535,7 @@ export class Escaper {
         this.effects.new(efStr, this.hero, bodyPart)
 
         if (!this.isEscaperSecondary()) {
-            GetMirrorEscaper(this).newEffect(efStr, bodyPart)
+            EscaperFunctions.GetMirrorEscaper(this).newEffect(efStr, bodyPart)
         }
     }
 
@@ -543,7 +543,7 @@ export class Escaper {
         this.effects.destroyLastEffects(numEfToDestroy)
 
         if (!isEscaperSecondary()) {
-            GetMirrorEscaper(this).destroyLastEffects(numEfToDestroy)
+            EscaperFunctions.GetMirrorEscaper(this).destroyLastEffects(numEfToDestroy)
         }
     }
 
@@ -551,7 +551,7 @@ export class Escaper {
         this.effects.hideEffects()
 
         if (!isEscaperSecondary()) {
-            GetMirrorEscaper(this).hideEffects()
+            EscaperFunctions.GetMirrorEscaper(this).hideEffects()
         }
     }
 
@@ -559,7 +559,7 @@ export class Escaper {
         this.hero && this.effects.showEffects(this.hero)
 
         if (!isEscaperSecondary()) {
-            GetMirrorEscaper(this).showEffects()
+            EscaperFunctions.GetMirrorEscaper(this).showEffects()
         }
     }
 
@@ -614,7 +614,7 @@ export class Escaper {
         this.slideSpeed = slideSpeed
 
         if (!this.isEscaperSecondary()) {
-            GetMirrorEscaper(this).absoluteSlideSpeed(slideSpeed)
+            EscaperFunctions.GetMirrorEscaper(this).absoluteSlideSpeed(slideSpeed)
         }
     }
 
@@ -631,7 +631,7 @@ export class Escaper {
             }
 
             if (!isEscaperSecondary()) {
-                GetMirrorEscaper(this).stopAbsoluteSlideSpeed()
+                EscaperFunctions.GetMirrorEscaper(this).stopAbsoluteSlideSpeed()
             }
         }
     }
@@ -645,7 +645,7 @@ export class Escaper {
         this.setWalkSpeed(walkSpeed)
 
         if (!isEscaperSecondary()) {
-            GetMirrorEscaper(this).absoluteWalkSpeed(walkSpeed)
+            EscaperFunctions.GetMirrorEscaper(this).absoluteWalkSpeed(walkSpeed)
         }
     }
 
@@ -661,7 +661,7 @@ export class Escaper {
             }
 
             if (!isEscaperSecondary()) {
-                GetMirrorEscaper(this).stopAbsoluteWalkSpeed()
+                EscaperFunctions.GetMirrorEscaper(this).stopAbsoluteWalkSpeed()
             }
         }
     }
@@ -674,7 +674,7 @@ export class Escaper {
         this.instantTurnAbsolute = flag
 
         if (!isEscaperSecondary()) {
-            GetMirrorEscaper(this).setAbsoluteInstantTurn(flag)
+            EscaperFunctions.GetMirrorEscaper(this).setAbsoluteInstantTurn(flag)
         }
     }
 
@@ -683,7 +683,7 @@ export class Escaper {
         this.godMode = godMode
 
         if (!isEscaperSecondary()) {
-            GetMirrorEscaper(this).setGodMode(godMode)
+            EscaperFunctions.GetMirrorEscaper(this).setGodMode(godMode)
         }
     }
 
@@ -691,7 +691,7 @@ export class Escaper {
         this.godModeKills = godModeKills
 
         if (!isEscaperSecondary()) {
-            GetMirrorEscaper(this).setGodModeKills(godModeKills)
+            EscaperFunctions.GetMirrorEscaper(this).setGodModeKills(godModeKills)
         }
     }
 
@@ -719,7 +719,7 @@ export class Escaper {
 
         if (!isEscaperSecondary()) {
             ColorInfo(this, this.p)
-            GetMirrorEscaper(this).setBaseColor(baseColorId)
+            EscaperFunctions.GetMirrorEscaper(this).setBaseColor(baseColorId)
         }
         return true
     }
@@ -738,7 +738,7 @@ export class Escaper {
         }
 
         if (!isEscaperSecondary()) {
-            GetMirrorEscaper(this).setBaseColorDisco(baseColorId)
+            EscaperFunctions.GetMirrorEscaper(this).setBaseColorDisco(baseColorId)
         }
 
         return true
@@ -755,7 +755,7 @@ export class Escaper {
         this.vcRed = vcRed
 
         if (!isEscaperSecondary()) {
-            GetMirrorEscaper(this).setVcRed(vcRed)
+            EscaperFunctions.GetMirrorEscaper(this).setVcRed(vcRed)
         }
 
         return true
@@ -768,7 +768,7 @@ export class Escaper {
         this.vcGreen = vcGreen
 
         if (!isEscaperSecondary()) {
-            GetMirrorEscaper(this).setVcGreen(vcGreen)
+            EscaperFunctions.GetMirrorEscaper(this).setVcGreen(vcGreen)
         }
 
         return true
@@ -780,7 +780,7 @@ export class Escaper {
         }
 
         if (!isEscaperSecondary()) {
-            GetMirrorEscaper(this).setVcBlue(vcBlue)
+            EscaperFunctions.GetMirrorEscaper(this).setVcBlue(vcBlue)
         }
 
         this.vcBlue = vcBlue
@@ -822,7 +822,7 @@ export class Escaper {
 
         if (!isEscaperSecondary()) {
             ColorInfo(this, this.p)
-            GetMirrorEscaper(this).refreshVertexColor()
+            EscaperFunctions.GetMirrorEscaper(this).refreshVertexColor()
         }
     }
 
@@ -897,7 +897,7 @@ export class Escaper {
                 ' !'
         )
         kicked.destroy()
-        GetMirrorEscaper(kicked).destroy()
+        EscaperFunctions.GetMirrorEscaper(kicked).destroy()
     }
 
     //autorevive methods
@@ -975,7 +975,7 @@ export class Escaper {
         delete this.make
 
         if (!isEscaperSecondary()) {
-            GetMirrorEscaper(this).destroyMake()
+            EscaperFunctions.GetMirrorEscaper(this).destroyMake()
         }
 
         return true
@@ -983,7 +983,7 @@ export class Escaper {
 
     onInitMake() {
         if (!isEscaperSecondary()) {
-            GetMirrorEscaper(this).makeDoNothing()
+            EscaperFunctions.GetMirrorEscaper(this).makeDoNothing()
         }
     }
 
@@ -1286,7 +1286,7 @@ export class Escaper {
 
     //coop reviving
     coopReviveHero() {
-        const mirrorEscaper: Escaper = GetMirrorEscaper(this)
+        const mirrorEscaper: Escaper = EscaperFunctions.GetMirrorEscaper(this)
         const mirrorHero = mirrorEscaper?.getHero()
 
         if (this.hero) {

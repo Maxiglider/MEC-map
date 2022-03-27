@@ -14,7 +14,7 @@ const Trig_using_shortcut_Actions = (): void => {
 	/* textmacro UsingShortcut takes shortcut
 	    if (GetSpellAbilityId() == 'SC$shortcut$o') then
  Text.P(p, udg_colorCode[GetPlayerId(p)] + GetPlayerName(p) + ":|r " + $shortcut$_shortcutCommand[GetPlayerId(p)])
- ExecuteCommand(escaper, $shortcut$_shortcutCommand[GetPlayerId(p)])
+ CommandExecution.ExecuteCommand(escaper, $shortcut$_shortcutCommand[GetPlayerId(p)])
 	        return
 	    endif
 	    //! endtextmacro

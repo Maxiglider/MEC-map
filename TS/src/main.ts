@@ -6,7 +6,6 @@ import { ColorCodes } from 'core/01_libraries/Init_colorCodes'
 import { Init_terrain_limit_variables } from 'core/01_libraries/Init_terrain_limit_variables'
 import { Text } from 'core/01_libraries/Text'
 import { ZLibrary } from 'core/02_bibliotheques_externes/ZLibrary'
-import { ViewAllHideAll } from 'core/03_view_all_hide_all/View_all_hide_all'
 import { Init_AfkMode } from 'core/08_GAME/Afk_mode/Afk_mode'
 import { Apm } from 'core/08_GAME/Apm_clics_par_minute/Apm'
 import { initOldTriggers } from 'core/09_From_old_Worldedit_triggers/init_old_triggers'
@@ -32,11 +31,6 @@ const tsMain = () => {
 
     // 2
     {
-    }
-
-    // 3
-    {
-        ViewAllHideAll()
     }
 
     // 8

@@ -1,3 +1,5 @@
+import { CommandsFunctions } from "./Command_functions";
+
 const initCommandTrueMax = () => { // needs CommandsFunctions
 
 
@@ -41,8 +43,8 @@ const ExecuteCommandTrueMax = (escaper: Escaper, cmd: string): boolean => {
 			return true;
 		}
 		if ((nbParam === 2)) {
-			if ((IsBoolString(param2))) {
-				b = S2B(param2);
+			if ((BasicFunctions.IsBoolString(param2))) {
+				b = BasicFunctions.S2B(param2);
 			} else {
  Text.erP(escaper.getPlayer(), "param2 must be a boolean")
 				return true;
@@ -66,8 +68,8 @@ const ExecuteCommandTrueMax = (escaper: Escaper, cmd: string): boolean => {
 			}
 			return true;
 		}
-		if ((IsPlayerColorString(param1))) {
-			n = ColorString2Id(param1);
+		if ((CommandsFunctions.IsPlayerColorString(param1))) {
+			n = ColorCodes.ColorString2Id(param1);
 			if ( (udg_escapers.get(n) != 0) ) {
 				if ( (udg_escapers.get(n) != escaper) ) {
  udg_escapers.get(n).setIsMaximaxou(b)

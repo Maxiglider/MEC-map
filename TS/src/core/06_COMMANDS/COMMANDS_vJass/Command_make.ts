@@ -1,3 +1,4 @@
+import { BasicFunctions } from "core/01_libraries/Basic_functions";
 import { FunctionsOnNumbers } from "core/01_libraries/Functions_on_numbers";
 
 const initCommandMake = () => { // needs CommandsFunctions, ChangeOneTerrain, ChangeAllTerrains, ExchangeTerrains, RandomizeTerrains, Ascii
@@ -117,11 +118,11 @@ const ExecuteCommandMake = (escaper: Escaper, cmd: string): boolean => {
 			speed = HERO_SLIDE_SPEED;
 		}
 		if ((nbParam === 4)) {
-			if ((!IsBoolString(param4))) {
+			if ((!BasicFunctions.IsBoolString(param4))) {
  Text.erP(escaper.getPlayer(), "the property \"canTurn\" must be a boolean (true or false)")
 				return true;
 			}
-			b = S2B(param4);
+			b = BasicFunctions.S2B(param4);
 		} else {
 			b = true;
 		}
@@ -321,18 +322,18 @@ const ExecuteCommandMake = (escaper: Escaper, cmd: string): boolean => {
  Text.erP(escaper.getPlayer(), "the terrain must be of slide type")
 			return true;
 		}
-		if ((!IsBoolString(param2))) {
+		if ((!BasicFunctions.IsBoolString(param2))) {
  Text.erP(escaper.getPlayer(), "the property \"canTurn\" must be a boolean (true or false)")
 			return true;
 		}
-		if ( (TerrainTypeSlide(integer(terrainType)).setCanTurn(S2B(param2))) ) {
-			if ((S2B(param2))) {
+		if ( (TerrainTypeSlide(integer(terrainType)).setCanTurn(BasicFunctions.S2B(param2))) ) {
+			if ((BasicFunctions.S2B(param2))) {
  Text.mkP(escaper.getPlayer(), "the heroes can now turn on this slide terrain")
 			} else {
  Text.mkP(escaper.getPlayer(), "the heroes can't turn on this slide terrain anymore")
 			}
 		} else {
-			if ((S2B(param2))) {
+			if ((BasicFunctions.S2B(param2))) {
  Text.erP(escaper.getPlayer(), "the heroes can already turn on this slide terrain")
 			} else {
  Text.erP(escaper.getPlayer(), "the heroes already can't turn on this slide terrain")
@@ -384,8 +385,8 @@ const ExecuteCommandMake = (escaper: Escaper, cmd: string): boolean => {
 
 	//-changeAllTerrainsAtRevive(chatar) <boolean change>
 	if ((name === "changeAllTerrainsAtRevive" || name === "chatar")) {
-		if ((nbParam === 1 && IsBoolString(param1) && S2B(param1) !== udg_changeAllTerrainsAtRevive)) {
-			udg_changeAllTerrainsAtRevive = S2B(param1);
+		if ((nbParam === 1 && BasicFunctions.IsBoolString(param1) && BasicFunctions.S2B(param1) !== udg_changeAllTerrainsAtRevive)) {
+			udg_changeAllTerrainsAtRevive = BasicFunctions.S2B(param1);
  Text.mkP(escaper.getPlayer(), "change all terrains at revive " + StringCase(param1, true))
 		}
 		return true;
@@ -565,11 +566,11 @@ const ExecuteCommandMake = (escaper: Escaper, cmd: string): boolean => {
 					//checkParam6
 					if ((nbParam === 6)) {
 						str = CmdParam(cmd, 6);
-						if ((!IsBoolString(str))) {
+						if ((!BasicFunctions.IsBoolString(str))) {
  Text.erP(escaper.getPlayer(), "wrong \"is clickable\" value ; should be 'true', 'false', '0' or '1'")
 							return true;
 						}
-						b = S2B(str);
+						b = BasicFunctions.S2B(str);
 					} else {
 						b = false;
 					}
@@ -760,18 +761,18 @@ const ExecuteCommandMake = (escaper: Escaper, cmd: string): boolean => {
 			return true;
 		}
 		//checkParam2
-		if ((!IsBoolString(param2))) {
+		if ((!BasicFunctions.IsBoolString(param2))) {
  Text.erP(escaper.getPlayer(), "wrong \"is clickable\" value ; should be 'true', 'false', '0' or '1'")
 			return true;
 		}
-		if ( (udg_monsterTypes.get(param1).setIsClickable(S2B(param2))) ) {
-			if ((S2B(param2))) {
+		if ( (udg_monsterTypes.get(param1).setIsClickable(BasicFunctions.S2B(param2))) ) {
+			if ((BasicFunctions.S2B(param2))) {
  Text.mkP(escaper.getPlayer(), "this monster type is now clickable")
 			} else {
  Text.mkP(escaper.getPlayer(), "this monster type is now unclickable")
 			}
 		} else {
-			if ((S2B(param2))) {
+			if ((BasicFunctions.S2B(param2))) {
  Text.erP(escaper.getPlayer(), "this monster type is already clickable")
 			} else {
  Text.erP(escaper.getPlayer(), "this monster type is already unclickable")

@@ -236,7 +236,7 @@ const temporarilyEnable = (disablingTimer: timer): void => {
 const setBaseColor = (colorString: string): void => {
 	let baseColorId: number;
 	if ((IsColorString(colorString))) {
-		baseColorId = ColorString2Id(colorString);
+		baseColorId = ColorCodes.ColorString2Id(colorString);
 		if ((baseColorId < 0 || baseColorId > 12)) {
 			return;
 		}
