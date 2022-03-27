@@ -1,9 +1,8 @@
 import { Text } from 'core/01_libraries/Text'
-
+import { gg_trg____Trig_checkpoint_revive_heroes } from './Trig_checkpoint_revive_heroes'
 
 //Avec le jass : //todomax handle infinite number of monsters and levels
 //nombre maximum de niveaux : 200. Nombre maximum de monstres de chaque type par niveau : 1000.
-
 
 export class Level {
     public static earningLivesActivated = true
@@ -37,7 +36,7 @@ export class Level {
         this.clearMobs = new ClearMobArray()
         this.livesEarnedAtBeginning = 1
         this.isActivatedB = false
-        this.startMessage = ""
+        this.startMessage = ''
         this.start = 0
         this.end = 0
     }
@@ -63,8 +62,7 @@ export class Level {
             this.clearMobs.initializeClearMobs()
             if (Level.earningLivesActivated && getId() > 0) {
                 udg_lives.add(this.livesEarnedAtBeginning)
-            } else
-                this.monstersNoMove.removeMonsters()
+            } else this.monstersNoMove.removeMonsters()
             this.monstersSimplePatrol.removeMonsters()
             this.monstersMultiplePatrols.removeMonsters()
             this.monstersTeleport.removeMonsters()
@@ -115,13 +113,13 @@ export class Level {
     getNbMonsters(mode: string) {
         //modes : all, moving, not moving
         let nb = 0
-        if (mode == "all" || mode == "not moving") {
+        if (mode == 'all' || mode == 'not moving') {
             nb += this.monstersNoMove.count() + this.casters.count()
         }
-        if (mode == "all" || mode == "moving") {
+        if (mode == 'all' || mode == 'moving') {
             nb += this.monstersSimplePatrol.count() + this.monstersMultiplePatrols.count()
         }
-        if (mode == "all") {
+        if (mode == 'all') {
             nb += this.monstersTeleport.count()
         }
         return nb
@@ -215,4 +213,3 @@ export class Level {
         return this.startMessage
     }
 }
-

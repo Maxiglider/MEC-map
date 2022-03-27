@@ -1,3 +1,4 @@
+import { LevelFunctions } from './Level_functions';
 
 
 const initLevelArray = () => { // needs Level
@@ -45,7 +46,7 @@ const goToLevel = (finisher: Escaper, levelId: number): boolean => {
 	}
 	this.currentLevel = levelId;
 	if ((previousLevelId !== NB_MAX_LEVELS)) {
-		if ((!IsLevelBeingMade(this.levels[previousLevelId]))) {
+		if ((!LevelFunctions.IsLevelBeingMade(this.levels[previousLevelId]))) {
  udg_escapers.destroyMakesIfForSpecificLevel_currentLevel()
  this.levels[previousLevelId].activate(false)
 		}
@@ -88,7 +89,7 @@ const goToNextLevel = (finisher: Escaper): boolean => {
 		return false;
 	}
 	this.currentLevel = this.currentLevel + 1;
-	if ((!IsLevelBeingMade(this.levels[this.currentLevel - 1]))) {
+	if ((!LevelFunctions.IsLevelBeingMade(this.levels[this.currentLevel - 1]))) {
  udg_escapers.destroyMakesIfForSpecificLevel_currentLevel()
  this.levels[this.currentLevel - 1].activate(false)
 	}

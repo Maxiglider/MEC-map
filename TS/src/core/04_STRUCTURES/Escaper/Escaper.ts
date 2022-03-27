@@ -20,6 +20,7 @@ import { gg_trg_InvisUnit_is_getting_damage } from 'core/08_GAME/Death/InvisUnit
 import { CheckTerrainTrigger } from '../../07_TRIGGERS/Slide_and_CheckTerrain_triggers/CheckTerrain'
 import { MessageHeroDies } from '../../08_GAME/Init_game/Message_heroDies'
 import { udg_levels } from '../../08_GAME/Init_structures/Init_struct_levels'
+import { LevelFunctions } from '../Level/Level_functions'
 import { EscaperEffectArray, IEscaperEffectArray } from './EscaperEffectArray'
 import { EscaperFunctions } from './Escaper_functions'
 
@@ -959,7 +960,7 @@ export class Escaper {
         oldMakingLevel = this.makingLevel
         this.makingLevel = level
         this.destroyMakeIfForSpecificLevel()
-        if (!IsLevelBeingMade(oldMakingLevel)) {
+        if (!LevelFunctions.IsLevelBeingMade(oldMakingLevel)) {
             oldMakingLevel.activate(false)
             if (udg_levels.getCurrentLevel().getId() < oldMakingLevel.getId()) {
                 oldMakingLevel.activateVisibilities(false)

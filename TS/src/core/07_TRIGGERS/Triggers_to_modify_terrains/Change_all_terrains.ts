@@ -1,7 +1,6 @@
 import { Constants, LARGEUR_CASE } from 'core/01_libraries/Constants'
 
 const initChangeAllTerrains = () => {
-  
     // TODO; Used to be private
     let oldTerrainTypes: Array<number> = []
     // TODO; Used to be private
@@ -217,7 +216,7 @@ const initChangeAllTerrains = () => {
         return true
     }
 
-    return {ChangeAllTerrains}
+    return { ChangeAllTerrains }
 }
 
 export const ChangeAllTerrains = initChangeAllTerrains()
