@@ -5,7 +5,7 @@ const initTerrainMakingActions = () => { // needs Escaper
 
 const TerrainMaking_Actions = (): void => {
 	let action: MakeAction;
-	let escaper = Hero2Escaper(GetTriggerUnit());
+	let escaper = EscaperFunctions.Hero2Escaper(GetTriggerUnit());
 	local Make mkGeneral = escaper.getMake()
 		local MakeTerrainCreate mk = MakeTerrainCreate(integer(mkGeneral))
 	let x = GetOrderPointX();

@@ -33,7 +33,7 @@ const MakeSimplePatrolAuto_ChangeDistOnTerrainDefault = (): void => {
 
 const MonsterMakingSimplePatrol_Actions = (): void => {
 	let monster: Monster;
-	let escaper = Hero2Escaper(GetTriggerUnit());
+	let escaper = EscaperFunctions.Hero2Escaper(GetTriggerUnit());
 	local Make mkGeneral = escaper.getMake()
 		local MakeMonsterSimplePatrol mk = MakeMonsterSimplePatrol(integer(mkGeneral))
 	let x = GetOrderPointX();

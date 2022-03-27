@@ -5,7 +5,7 @@ const initTerrainVerticalSymmetryActions = () => { // needs Escaper
 
 const TerrainVerticalSymmetry_Actions = (): void => {
 	let action: MakeAction;
-	let escaper = Hero2Escaper(GetTriggerUnit());
+	let escaper = EscaperFunctions.Hero2Escaper(GetTriggerUnit());
 	local Make mkGeneral = escaper.getMake()
 		local MakeTerrainVerticalSymmetry mk = MakeTerrainVerticalSymmetry(integer(mkGeneral))
 	let x = GetOrderPointX();

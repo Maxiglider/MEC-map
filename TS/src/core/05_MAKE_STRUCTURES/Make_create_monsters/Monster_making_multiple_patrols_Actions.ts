@@ -4,7 +4,7 @@ const initMMMultiplePatrolsActions = () => { // needs BasicFunctions, Escaper
 
 
 const MonsterMakingMultiplePatrols_Actions = (): void => {
-	let escaper = Hero2Escaper(GetTriggerUnit());
+	let escaper = EscaperFunctions.Hero2Escaper(GetTriggerUnit());
 	local Make mkGeneral = escaper.getMake()
 		local MakeMonsterMultiplePatrols mk = MakeMonsterMultiplePatrols(integer(mkGeneral))
 	let x = GetOrderPointX();

@@ -1,17 +1,17 @@
 import { BasicFunctions } from 'core/01_libraries/Basic_functions'
 import { NB_ESCAPERS } from 'core/01_libraries/Constants'
-import { Escaper, IEscaper } from './Escaper'
+import { Escaper } from './Escaper'
 
 export type IEscaperArray = ReturnType<typeof EscaperArray>
 
 export const EscaperArray = () => {
-    const escapers: (IEscaper | null)[] = []
+    const escapers: (Escaper | null)[] = []
 
     let escaperId = 0
 
     while (!(escaperId >= NB_ESCAPERS)) {
         if (BasicFunctions.IsEscaperInGame(escaperId)) {
-            escapers[escaperId] = Escaper(escaperId)
+            escapers[escaperId] = new Escaper(escaperId)
         } else {
             escapers[escaperId] = null
         }
@@ -25,7 +25,7 @@ export const EscaperArray = () => {
         if (escapers[id] != null) {
             return
         }
-        escapers[id] = Escaper(id)
+        escapers[id] = new Escaper(id)
     }
 
     const count = () => {

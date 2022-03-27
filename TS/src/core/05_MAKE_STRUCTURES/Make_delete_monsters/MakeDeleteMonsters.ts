@@ -63,7 +63,7 @@ const saveLoc = (x: number, y: number): void => {
 		SetUnitX(this.unitLastClic, x)
 		SetUnitY(this.unitLastClic, y)
 	}
- Hero2Escaper(this.maker).destroyCancelledActions()
+ EscaperFunctions.Hero2Escaper(this.maker).destroyCancelledActions()
 };
 
 const unsaveLoc = (): boolean => {

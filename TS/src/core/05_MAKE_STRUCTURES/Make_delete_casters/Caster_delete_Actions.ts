@@ -7,7 +7,7 @@ const CasterDelete_Actions = (): void => {
 
 	//modes : oneByOne, twoClics
 
-	let escaper = Hero2Escaper(GetTriggerUnit());
+	let escaper = EscaperFunctions.Hero2Escaper(GetTriggerUnit());
 	local Make mkGeneral = escaper.getMake()
 		local MakeDeleteCasters mk = MakeDeleteCasters(integer(mkGeneral))
 	let caster: Caster;

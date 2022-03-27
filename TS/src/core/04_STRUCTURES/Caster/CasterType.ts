@@ -1,3 +1,4 @@
+import { ColorCodes } from "core/01_libraries/Init_colorCodes";
 
 
 const initCasterType = () => { // needs Text
@@ -165,7 +166,7 @@ const setAnimation = (animation: string): void => {
 
 const displayForPlayer = (p: player): void => {
 	let space = "   ";
-	let display = udg_colorCode[TEAL] + this.label + " " + this.theAlias + " : ";
+	let display = ColorCodes.udg_colorCode[TEAL] + this.label + " " + this.theAlias + " : ";
 	display = display + this.casterMonsterType.label + space + this.projectileMonsterType.label + space + "range: " + R2S(this.range) + space
 	display = display + "projectileSpeed: " + R2S(this.projectileSpeed) + space + "loadTime: " + R2S(this.loadTime) + space + this.animation;
 	Text.P_timed(p, TERRAIN_DATA_DISPLAY_TIME, display)

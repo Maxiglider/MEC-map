@@ -6,7 +6,7 @@ const initVisibilityModifierMakingActions = () => { // needs Escaper
 
 const VisibilityModifierMaking_Actions = (): void => {
 	let newVisibilityModifier: VisibilityModifier;
-	let escaper = Hero2Escaper(GetTriggerUnit());
+	let escaper = EscaperFunctions.Hero2Escaper(GetTriggerUnit());
 	local Make mkGeneral = escaper.getMake()
 		local MakeVisibilityModifier mk = MakeVisibilityModifier(integer(mkGeneral))
 	let x = GetOrderPointX();

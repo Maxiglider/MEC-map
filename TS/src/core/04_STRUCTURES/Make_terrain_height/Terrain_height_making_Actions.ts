@@ -5,7 +5,7 @@ const initTerrainHeightMakingActions = () => { // needs BasicFunctions, Escaper
 
 
 const TerrainHeightMaking_Actions = (): void => {
-	let escaper = Hero2Escaper(GetTriggerUnit());
+	let escaper = EscaperFunctions.Hero2Escaper(GetTriggerUnit());
 	local Make mkGeneral = escaper.getMake()
 		local MakeTerrainHeight mk = MakeTerrainHeight(integer(mkGeneral))
 	let x = GetOrderPointX();

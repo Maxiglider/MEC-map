@@ -1,7 +1,5 @@
-const initnoSelectionCircle = () => { // initializer NoSelectionCircle
+// TODO; Unused?
 
-const NoSelectionCircle = (): void => {
-	EnableSelect(true, false)
-};
-
+const initNoSelectionCircle = () => {
+    EnableSelect(true, false)
 }

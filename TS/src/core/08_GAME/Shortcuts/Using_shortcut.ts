@@ -1,41 +1,42 @@
+import { ColorCodes } from 'core/01_libraries/Init_colorCodes'
+import { Text } from 'core/01_libraries/Text'
+import { EscaperFunctions } from 'core/04_STRUCTURES/Escaper/Escaper_functions'
+import { CommandExecution } from 'core/06_COMMANDS/COMMANDS_vJass/Command_execution'
+import { literalArray } from 'Utils/ArrayUtils'
+import { createEvent } from 'Utils/mapUtils'
+import { CommandShortcuts } from './Command_shortcuts_functions'
 
+export const shortcuts = literalArray(['A', 'Z', 'E', 'R', 'Q', 'S', 'D', 'F'])
 
-const Trig_using_shortcut_Conditions = (): boolean => {
-	return IsHero(GetTriggerUnit());
-};
+export const InitTrig_Using_shortcut = () => {
+    createEvent({
+        events: [t => TriggerRegisterAnyUnitEventBJ(t, EVENT_PLAYER_UNIT_SPELL_CAST)],
+        conditions: [() => EscaperFunctions.IsHero(GetTriggerUnit())],
+        actions: [
+            () => {
+                const escaper = EscaperFunctions.Hero2Escaper(GetTriggerUnit())
+                const p = escaper.getPlayer()
 
+                shortcuts.forEach(sc => {
+                    if (GetSpellAbilityId() === FourCC(`SC${sc}o`)) {
+                        Text.P(
+                            p,
+                            ColorCodes.udg_colorCode[GetPlayerId(p)] +
+                                GetPlayerName(p) +
+                                ':|r ' +
+                                CommandShortcuts.shortcutCommands[sc][GetPlayerId(p)]
+                        )
 
+                        const targetCmd = CommandShortcuts.shortcutCommands[sc][GetPlayerId(p)]
 
-const Trig_using_shortcut_Actions = (): void => {
-	let escaper = Hero2Escaper(GetTriggerUnit());
-	local player p = escaper.getPlayer()
+                        if (!targetCmd) {
+                            return
+                        }
 
-	//!//@@BELOWTEXTMACRO
-	/* textmacro UsingShortcut takes shortcut
-	    if (GetSpellAbilityId() == 'SC$shortcut$o') then
- Text.P(p, udg_colorCode[GetPlayerId(p)] + GetPlayerName(p) + ":|r " + $shortcut$_shortcutCommand[GetPlayerId(p)])
- CommandExecution.ExecuteCommand(escaper, $shortcut$_shortcutCommand[GetPlayerId(p)])
-	        return
-	    endif
-	    //! endtextmacro
-
-
-	//! runtextmacro UsingShortcut("A")
-	//! runtextmacro UsingShortcut("Z")
-	//! runtextmacro UsingShortcut("E")
-	//! runtextmacro UsingShortcut("R")
-	//! runtextmacro UsingShortcut("Q")
-	//! runtextmacro UsingShortcut("S")
-	//! runtextmacro UsingShortcut("D")
-	//! runtextmacro UsingShortcut("F")
-};
-
-
-//===========================================================================
-const InitTrig_Using_shortcut = (): void => {
-	gg_trg_Using_shortcut = CreateTrigger();
-	TriggerRegisterAnyUnitEventBJ(gg_trg_Using_shortcut, EVENT_PLAYER_UNIT_SPELL_CAST)
-	TriggerAddCondition(gg_trg_Using_shortcut, Condition(Trig_using_shortcut_Conditions))
-	TriggerAddAction(gg_trg_Using_shortcut, Trig_using_shortcut_Actions)
-};
-
+                        CommandExecution.ExecuteCommand(escaper, targetCmd)
+                    }
+                })
+            },
+        ],
+    })
+}

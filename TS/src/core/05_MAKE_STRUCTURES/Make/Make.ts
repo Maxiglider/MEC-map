@@ -26,7 +26,7 @@ export abstract class Make {
         this.maker = maker
         this.makerOwner = GetOwningPlayer(maker)
         this.kind = kind
-        this.escaper = Hero2Escaper(maker)
+        this.escaper = EscaperFunctions.Hero2Escaper(maker)
 
         this.t = null
         this.enableTrigger()

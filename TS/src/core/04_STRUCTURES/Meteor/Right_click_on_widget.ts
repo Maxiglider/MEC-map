@@ -1,5 +1,5 @@
 const Trig_right_click_on_widget_Conditions = (): boolean => {
-    return IsHero(GetTriggerUnit()) && BasicFunctions.IsIssuedOrder('smart')
+    return EscaperFunctions.IsHero(GetTriggerUnit()) && BasicFunctions.IsIssuedOrder('smart')
 }
 
 const Trig_right_click_on_widget_Actions = (): void => {

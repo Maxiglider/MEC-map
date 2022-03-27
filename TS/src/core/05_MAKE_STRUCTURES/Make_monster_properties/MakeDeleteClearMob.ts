@@ -27,7 +27,7 @@ const initMakeDeleteClearMob = () => {
     }
 
     const clickMade = (monsterOrCasterId: number): void => {
-        let escaper = Hero2Escaper(this.maker)
+        let escaper = EscaperFunctions.Hero2Escaper(this.maker)
         let clearMob = ClearTriggerMobId2ClearMob(monsterOrCasterId)
         if (clearMob !== 0) {
             clearMob.destroy()

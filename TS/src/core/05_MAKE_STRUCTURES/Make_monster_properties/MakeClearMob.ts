@@ -47,7 +47,7 @@ const onDestroy = (): void => {
 };
 
 const clickMade = (monsterOrCasterId: number): void => {
-	let escaper = Hero2Escaper(this.maker);
+	let escaper = EscaperFunctions.Hero2Escaper(this.maker);
 	if ((this.pointeurClickedMob === -1)) {
 		if ((ClearTriggerMobId2ClearMob(monsterOrCasterId) !== 0)) {
 			Text.erP(this.makerOwner, "this monster is already a trigger mob of a clear mob")
@@ -93,7 +93,7 @@ const cancelLastAction = (): boolean => {
 };
 
 const redoLastAction = (): boolean => {
-	let escaper = Hero2Escaper(this.maker);
+	let escaper = EscaperFunctions.Hero2Escaper(this.maker);
 	if ((this.pointeurClickedMob === this.lastClickedMobInd)) {
 		return false;
 	}

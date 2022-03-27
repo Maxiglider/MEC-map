@@ -154,14 +154,14 @@ const saveLoc = (x: number, y: number): void => {
 				action = MakeTerrainCopyPasteAction.create(this.x1, this.y1, this.x2, this.y2, this.x3, this.y3, x, y)
 				if ((action !== 0)) {
 					this.unsaveLocsDefinitely()
- Hero2Escaper(this.maker).newAction(action)
+ EscaperFunctions.Hero2Escaper(this.maker).newAction(action)
 				} else {
 					Text.erP(this.makerOwner, "paste zone out of bounds")
 				}
 			}
 		}
 	}
- Hero2Escaper(this.maker).destroyCancelledActions()
+ EscaperFunctions.Hero2Escaper(this.maker).destroyCancelledActions()
 };
 
 const cancelLastAction = (): boolean => {

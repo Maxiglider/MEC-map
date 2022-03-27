@@ -4,7 +4,7 @@ const initGettingTerrainTypeInfoActions = () => {
     // needs Escaper
 
     const GettingTerrainTypeInfo_Actions = (): void => {
-        const escaper = Hero2Escaper(GetTriggerUnit())
+        const escaper = EscaperFunctions.Hero2Escaper(GetTriggerUnit())
         const mkGeneral: Make = escaper.getMake()
         const mk: MakeGetTerrainType = MakeGetTerrainType(integer(mkGeneral))
         const x = GetOrderPointX()

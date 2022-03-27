@@ -1,11 +1,15 @@
-const Trig_Allways_day_Actions = (): void => {
-	SetTimeOfDay(12)
-	UseTimeOfDayBJ(false)
-};
+import { createEvent } from 'Utils/mapUtils'
 
-//===========================================================================
-const InitTrig_Allways_day = (): void => {
-	gg_trg_Allways_day = CreateTrigger();
-	TriggerAddAction(gg_trg_Allways_day, Trig_Allways_day_Actions)
-};
+// TODO; Trigger has no events and no external calls..?
 
+export const InitTrig_Allways_day = () => {
+    createEvent({
+        events: [],
+        actions: [
+            () => {
+                SetTimeOfDay(12)
+                UseTimeOfDayBJ(false)
+            },
+        ],
+    })
+}

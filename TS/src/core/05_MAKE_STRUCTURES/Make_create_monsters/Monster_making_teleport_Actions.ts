@@ -4,7 +4,7 @@ const initMMTeleportActions = () => { // needs BasicFunctions, Escaper
 
 
 const MonsterMakingTeleport_Actions = (): void => {
-	let escaper = Hero2Escaper(GetTriggerUnit());
+	let escaper = EscaperFunctions.Hero2Escaper(GetTriggerUnit());
 	local Make mkGeneral = escaper.getMake()
 		local MakeMonsterTeleport mk = MakeMonsterTeleport(integer(mkGeneral))
 	let x = GetOrderPointX();

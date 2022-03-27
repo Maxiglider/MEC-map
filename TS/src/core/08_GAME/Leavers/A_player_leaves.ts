@@ -1,5 +1,7 @@
+import { NB_PLAYERS_MAX } from 'core/01_libraries/Constants'
 import { ColorCodes } from 'core/01_libraries/Init_colorCodes'
 import { createEvent, forRange } from 'Utils/mapUtils'
+import { AfkMode } from '../Afk_mode/Afk_mode'
 import { udg_escapers } from '../Init_structures/Init_escapers'
 
 export const InitTrig_A_player_leaves = () => {
@@ -9,8 +11,8 @@ export const InitTrig_A_player_leaves = () => {
             () => {
                 let n = GetPlayerId(GetTriggerPlayer())
                 udg_escapers.remove(n)
-                StopAfk(n)
-                StopAfk(n + NB_PLAYERS_MAX)
+                AfkMode.StopAfk(n)
+                AfkMode.StopAfk(n + NB_PLAYERS_MAX)
                 DisplayTextToForce(
                     GetPlayersAll(),
                     ColorCodes.udg_colorCode[n] +

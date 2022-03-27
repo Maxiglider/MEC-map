@@ -367,7 +367,7 @@ const initCommandMake = () => {
                 Text.erP(escaper.getPlayer(), 'the terrain must be of slide type')
                 return true
             }
-            if (!IsInteger(param2)) {
+            if (!FunctionsOnNumbers.IsInteger(param2)) {
                 Text.erP(escaper.getPlayer(), 'wrong speed value')
                 return true
             }
@@ -415,7 +415,7 @@ const initCommandMake = () => {
             if (!(nbParam === 2)) {
                 return true
             }
-            DisplayLineToPlayer(escaper.getPlayer())
+            Text.DisplayLineToPlayer(escaper.getPlayer())
             str = ChangeOneTerrain(param1, param2)
             if (str !== null) {
                 Text.mkP(escaper.getPlayer(), 'changed to ' + udg_colorCode[RED] + str)

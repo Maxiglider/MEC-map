@@ -7,7 +7,7 @@ const SetUnitMonsterType_Actions = (): void => {
 
 	//modes : oneByOne, twoClics
 
-	let escaper = Hero2Escaper(GetTriggerUnit());
+	let escaper = EscaperFunctions.Hero2Escaper(GetTriggerUnit());
 	local Make mkGeneral = escaper.getMake()
 		local MakeSetUnitMonsterType mk = MakeSetUnitMonsterType(integer(mkGeneral))
 	let monster: Monster;

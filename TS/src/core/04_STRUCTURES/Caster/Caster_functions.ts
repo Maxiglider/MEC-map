@@ -275,7 +275,7 @@ const CasterTryToShoot = (): void => {
 
 
 const CasterUnitWithinRange_Actions = (): void => {
-	let escaperInRange = Hero2Escaper(GetTriggerUnit());
+	let escaperInRange = EscaperFunctions.Hero2Escaper(GetTriggerUnit());
 	if ((escaperInRange === 0)) {
 		return;
 	}

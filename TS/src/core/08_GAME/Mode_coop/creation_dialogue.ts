@@ -1,11 +1,8 @@
 import { createEvent } from 'Utils/mapUtils'
 
 let dialChoixModeCoop: dialog
-let btnChoixCoop: button
-let btnChoixSolo: button
 let dialBoutonAppuye: boolean
 const DIAL_TIME_TO_ANSWER = 10
-let udg_joueurDialogue: player
 let dialTimerTempLimite: timer
 let udg_coopModeActive = true
 
@@ -17,10 +14,59 @@ export const InitTrig_creation_dialogue = () => {
                 dialChoixModeCoop = DialogCreate()
                 dialTimerTempLimite = CreateTimer()
                 DialogSetMessageBJ(dialChoixModeCoop, 'Choose a game mode for everybody')
-                btnChoixCoop = DialogAddButton(dialChoixModeCoop, 'Coop (you can revive allies)', 0)
-                btnChoixSolo = DialogAddButton(dialChoixModeCoop, 'Solo', 0)
-                TriggerRegisterDialogEventBJ(gg_trg_appui_sur_bouton_dialogue, dialChoixModeCoop)
+                const btnChoixCoop = DialogAddButton(dialChoixModeCoop, 'Coop (you can revive allies)', 0)
+                DialogAddButton(dialChoixModeCoop, 'Solo', 0)
+
+                createEvent({
+                    events: [t => TriggerRegisterDialogEventBJ(t, dialChoixModeCoop)],
+                    actions: [
+                        () => {
+                            udg_coopModeActive = GetClickedButton() === btnChoixCoop
+                            dialBoutonAppuye = true
+                            if (udg_coopModeActive) {
+                                DisplayTextToForce(GetPlayersAll(), 'coop mode chosen by first player')
+                            } else {
+                                DisplayTextToForce(GetPlayersAll(), 'solo mode chosen by first player')
+                            }
+                        },
+                    ],
+                })
             },
         ],
     })
 }
+
+export const gg_trg_apparition_dialogue_et_fermeture_automatique = createEvent({
+    events: [t => TriggerRegisterTimerEventSingle(t, 1)],
+    actions: [
+        () => {
+            //détermination du premier joueur
+            let i = 0
+            while (true) {
+                if (
+                    (GetPlayerController(Player(i)) === MAP_CONTROL_USER &&
+                        GetPlayerSlotState(Player(i)) === PLAYER_SLOT_STATE_PLAYING) ||
+                    i > 11
+                )
+                    break
+                i = i + 1
+            }
+            if (i > 11) {
+                return
+            }
+            const udg_joueurDialogue = Player(i)
+            DialogDisplay(udg_joueurDialogue, dialChoixModeCoop, true)
+            let dialBoutonAppuye = false
+            TimerStart(dialTimerTempLimite, DIAL_TIME_TO_ANSWER, false, () => {
+                if (!dialBoutonAppuye) {
+                    DialogDisplay(udg_joueurDialogue, dialChoixModeCoop, false)
+                    if (udg_coopModeActive) {
+                        DisplayTextToForce(GetPlayersAll(), 'coop mode automatically chosen')
+                    } else {
+                        DisplayTextToForce(GetPlayersAll(), 'solo mode automatically chosen')
+                    }
+                }
+            })
+        },
+    ],
+})

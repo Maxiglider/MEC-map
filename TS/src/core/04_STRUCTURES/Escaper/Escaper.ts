@@ -13,10 +13,14 @@ import {
     NEUTRAL_PLAYER,
     POWER_CIRCLE,
     SLIDE_PERIOD,
-    TERRAIN_KILL_EFFECT_BODY_PART
+    TERRAIN_KILL_EFFECT_BODY_PART,
 } from 'core/01_libraries/Constants'
+import { AfkMode } from 'core/08_GAME/Afk_mode/Afk_mode'
+import { gg_trg_InvisUnit_is_getting_damage } from 'core/08_GAME/Death/InvisUnit_is_getting_damage'
+import { MessageHeroDies } from '../../08_GAME/Init_game/Message_heroDies'
 import { udg_levels } from '../../08_GAME/Init_structures/Init_struct_levels'
 import { EscaperEffectArray, IEscaperEffectArray } from './EscaperEffectArray'
+import { EscaperFunctions } from './Escaper_functions'
 
 const SHOW_REVIVE_EFFECTS = false
 
@@ -206,13 +210,18 @@ export class Escaper {
         }
 
         SetUnitVertexColorBJ(this.hero, this.vcRed, this.vcGreen, this.vcBlue, this.vcTransparency)
-        BasicFunctions.SpecialIllidan(this.hero)
+        this.SpecialIllidan()
         this.invisUnit = CreateUnit(NEUTRAL_PLAYER, INVIS_UNIT_TYPE_ID, x, y, angle)
         SetUnitUserData(this.invisUnit, GetPlayerId(this.p))
         TriggerRegisterUnitEvent(gg_trg_InvisUnit_is_getting_damage, this.invisUnit, EVENT_UNIT_DAMAGED)
         this.effects.showEffects(this.hero)
         this.lastTerrainType = 0
-        TimerStart(afkModeTimers[this.escaperId], timeMinAfk, false, GetAfkModeTimeExpiresCodeFromId(this.escaperId))
+        TimerStart(
+            afkModeTimers[this.escaperId],
+            timeMinAfk,
+            false,
+            AfkMode.GetAfkModeTimeExpiresCodeFromId(this.escaperId)
+        )
         InitShortcutSkills(GetPlayerId(this.p))
         EnableTrigger(this.checkTerrain)
         return true
@@ -388,8 +397,8 @@ export class Escaper {
             delete this.lastTerrainType
             this.invisUnit && ShowUnit(this.invisUnit, false)
             this.enableCheckTerrain(false)
-            StopAfk(this.escaperId)
-            DisplayDeathMessagePlayer(this.p)
+            AfkMode.StopAfk(this.escaperId)
+            MessageHeroDies.DisplayDeathMessagePlayer(this.p)
             this.isHeroSelectedB = false
             return true
         }
@@ -404,7 +413,7 @@ export class Escaper {
         return true
     }
 
-    BasicFunctions.SpecialIllidan() {
+    SpecialIllidan() {
         this.hero && SetUnitAnimation(this.hero, 'Morph Alternate')
     }
 
@@ -418,14 +427,19 @@ export class Escaper {
         SetUnitY(this.invisUnit, y)
         ShowUnit(this.invisUnit, true)
         this.enableCheckTerrain(true)
-        this.BasicFunctions.SpecialIllidan()
+        this.SpecialIllidan()
         this.selectHero()
 
         if (this.vcTransparency != 0) {
             SetUnitVertexColorBJ(this.hero, this.vcRed, this.vcGreen, this.vcBlue, this.vcTransparency)
         }
 
-        TimerStart(afkModeTimers[this.escaperId], timeMinAfk, false, GetAfkModeTimeExpiresCodeFromId(this.escaperId))
+        TimerStart(
+            afkModeTimers[this.escaperId],
+            timeMinAfk,
+            false,
+            AfkMode.GetAfkModeTimeExpiresCodeFromId(this.escaperId)
+        )
         this.lastZ = 0
         this.oldDiffZ = 0
         this.speedZ = 0
@@ -542,7 +556,7 @@ export class Escaper {
     destroyLastEffects(numEfToDestroy: number) {
         this.effects.destroyLastEffects(numEfToDestroy)
 
-        if (!isEscaperSecondary()) {
+        if (!this.isEscaperSecondary()) {
             EscaperFunctions.GetMirrorEscaper(this).destroyLastEffects(numEfToDestroy)
         }
     }
@@ -550,7 +564,7 @@ export class Escaper {
     hideEffects() {
         this.effects.hideEffects()
 
-        if (!isEscaperSecondary()) {
+        if (!this.isEscaperSecondary()) {
             EscaperFunctions.GetMirrorEscaper(this).hideEffects()
         }
     }
@@ -558,7 +572,7 @@ export class Escaper {
     showEffects() {
         this.hero && this.effects.showEffects(this.hero)
 
-        if (!isEscaperSecondary()) {
+        if (!this.isEscaperSecondary()) {
             EscaperFunctions.GetMirrorEscaper(this).showEffects()
         }
     }
@@ -630,7 +644,7 @@ export class Escaper {
                 }
             }
 
-            if (!isEscaperSecondary()) {
+            if (!this.isEscaperSecondary()) {
                 EscaperFunctions.GetMirrorEscaper(this).stopAbsoluteSlideSpeed()
             }
         }
@@ -644,7 +658,7 @@ export class Escaper {
         this.walkSpeedAbsolute = true
         this.setWalkSpeed(walkSpeed)
 
-        if (!isEscaperSecondary()) {
+        if (!this.isEscaperSecondary()) {
             EscaperFunctions.GetMirrorEscaper(this).absoluteWalkSpeed(walkSpeed)
         }
     }
@@ -660,7 +674,7 @@ export class Escaper {
                 }
             }
 
-            if (!isEscaperSecondary()) {
+            if (!this.isEscaperSecondary()) {
                 EscaperFunctions.GetMirrorEscaper(this).stopAbsoluteWalkSpeed()
             }
         }
@@ -673,7 +687,7 @@ export class Escaper {
     setAbsoluteInstantTurn(flag: boolean) {
         this.instantTurnAbsolute = flag
 
-        if (!isEscaperSecondary()) {
+        if (!this.isEscaperSecondary()) {
             EscaperFunctions.GetMirrorEscaper(this).setAbsoluteInstantTurn(flag)
         }
     }
@@ -682,7 +696,7 @@ export class Escaper {
     setGodMode(godMode: boolean) {
         this.godMode = godMode
 
-        if (!isEscaperSecondary()) {
+        if (!this.isEscaperSecondary()) {
             EscaperFunctions.GetMirrorEscaper(this).setGodMode(godMode)
         }
     }
@@ -690,7 +704,7 @@ export class Escaper {
     setGodModeKills(godModeKills: boolean) {
         this.godModeKills = godModeKills
 
-        if (!isEscaperSecondary()) {
+        if (!this.isEscaperSecondary()) {
             EscaperFunctions.GetMirrorEscaper(this).setGodModeKills(godModeKills)
         }
     }
@@ -717,8 +731,8 @@ export class Escaper {
             }
         }
 
-        if (!isEscaperSecondary()) {
-            ColorInfo(this, this.p)
+        if (!this.isEscaperSecondary()) {
+            EscaperFunctions.ColorInfo(this, this.p)
             EscaperFunctions.GetMirrorEscaper(this).setBaseColor(baseColorId)
         }
         return true
@@ -737,7 +751,7 @@ export class Escaper {
             }
         }
 
-        if (!isEscaperSecondary()) {
+        if (!this.isEscaperSecondary()) {
             EscaperFunctions.GetMirrorEscaper(this).setBaseColorDisco(baseColorId)
         }
 
@@ -754,7 +768,7 @@ export class Escaper {
         }
         this.vcRed = vcRed
 
-        if (!isEscaperSecondary()) {
+        if (!this.isEscaperSecondary()) {
             EscaperFunctions.GetMirrorEscaper(this).setVcRed(vcRed)
         }
 
@@ -767,7 +781,7 @@ export class Escaper {
         }
         this.vcGreen = vcGreen
 
-        if (!isEscaperSecondary()) {
+        if (!this.isEscaperSecondary()) {
             EscaperFunctions.GetMirrorEscaper(this).setVcGreen(vcGreen)
         }
 
@@ -779,7 +793,7 @@ export class Escaper {
             return false
         }
 
-        if (!isEscaperSecondary()) {
+        if (!this.isEscaperSecondary()) {
             EscaperFunctions.GetMirrorEscaper(this).setVcBlue(vcBlue)
         }
 
@@ -792,7 +806,7 @@ export class Escaper {
             return false
         }
 
-        if (isEscaperSecondary()) {
+        if (this.isEscaperSecondary()) {
             return true //secondary escapers transparency is fixed
         }
 
@@ -820,8 +834,8 @@ export class Escaper {
     refreshVertexColor() {
         SetUnitVertexColorBJ(this.hero, this.vcRed, this.vcGreen, this.vcBlue, this.vcTransparency)
 
-        if (!isEscaperSecondary()) {
-            ColorInfo(this, this.p)
+        if (!this.isEscaperSecondary()) {
+            EscaperFunctions.ColorInfo(this, this.p)
             EscaperFunctions.GetMirrorEscaper(this).refreshVertexColor()
         }
     }
@@ -974,7 +988,7 @@ export class Escaper {
         this.make.destroy()
         delete this.make
 
-        if (!isEscaperSecondary()) {
+        if (!this.isEscaperSecondary()) {
             EscaperFunctions.GetMirrorEscaper(this).destroyMake()
         }
 
@@ -982,7 +996,7 @@ export class Escaper {
     }
 
     onInitMake() {
-        if (!isEscaperSecondary()) {
+        if (!this.isEscaperSecondary()) {
             EscaperFunctions.GetMirrorEscaper(this).makeDoNothing()
         }
     }

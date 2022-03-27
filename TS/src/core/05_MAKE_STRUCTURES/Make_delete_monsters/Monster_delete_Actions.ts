@@ -7,7 +7,7 @@ const MonsterDelete_Actions = (): void => {
 
 	//modes : oneByOne, all, noMove, move, simplePatrol, multiplePatrols
 
-	let escaper = Hero2Escaper(GetTriggerUnit());
+	let escaper = EscaperFunctions.Hero2Escaper(GetTriggerUnit());
 	local Make mkGeneral = escaper.getMake()
 		local MakeDeleteMonsters mk = MakeDeleteMonsters(integer(mkGeneral))
 	let Mnm: MonsterNoMove;

@@ -1,8 +1,10 @@
 import { COOP_REVIVE_DIST, NB_ESCAPERS } from 'core/01_libraries/Constants'
 import { EscaperFunctions } from 'core/04_STRUCTURES/Escaper/Escaper_functions'
 import { createEvent } from 'Utils/mapUtils'
+import { AfkMode } from '../Afk_mode/Afk_mode'
 import { udg_escapers } from '../Init_structures/Init_escapers'
 import { DeplacementHeroHorsDeathPath } from '../Mode_coop/deplacement_heros_hors_death_path'
+import { gg_trg_Lose_a_life_and_res } from './Lose_a_life_and_res'
 
 let udg_nbKilled = 0
 
@@ -52,7 +54,7 @@ export const InitTrig_A_hero_dies_check_if_all_dead_and_sounds = () => {
                     PauseTimer(afkModeTimers[n])
                 }
 
-                if (AreAllAliveHeroesAfk()) {
+                if (AfkMode.AreAllAliveHeroesAfk()) {
                     KillAllHeroesAfkInFiveSeconds()
                 }
 

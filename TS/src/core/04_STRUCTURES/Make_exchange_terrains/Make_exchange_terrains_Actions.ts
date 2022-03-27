@@ -4,7 +4,7 @@ const initMakeExchangeTerrainsActions = () => { // needs Escaper, ExchangeTerrai
 
 
 const MakeExchangeTerrains_Actions = (): void => {
-	let escaper = Hero2Escaper(GetTriggerUnit());
+	let escaper = EscaperFunctions.Hero2Escaper(GetTriggerUnit());
 	local Make mkGeneral = escaper.getMake()
 		local MakeExchangeTerrains mk = MakeExchangeTerrains(integer(mkGeneral))
 	let x = GetOrderPointX();

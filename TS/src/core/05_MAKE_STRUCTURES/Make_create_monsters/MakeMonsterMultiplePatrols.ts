@@ -62,7 +62,7 @@ const create = (maker: unit, mode: string, mt: MonsterType): MakeMonsterMultiple
 const onDestroy = (): void => {
 	let escaper: Escaper;
 	if ( (this.monster != 0 and this.monster.u != null) ) {
-		escaper = Hero2Escaper(this.maker);
+		escaper = EscaperFunctions.Hero2Escaper(this.maker);
  escaper.newAction(MakeMonsterAction.create(escaper.getMakingLevel(), this.monster))
 	} else {
  this.monster.destroy()
@@ -81,7 +81,7 @@ const nextMonster = (): void => {
 	RemoveUnit(this.unitLastClic)
 	this.unitLastClic = null;
 	if ( (this.monster != 0 and this.monster.u != null) ) {
-		escaper = Hero2Escaper(this.maker);
+		escaper = EscaperFunctions.Hero2Escaper(this.maker);
  escaper.newAction(MakeMonsterAction.create(escaper.getMakingLevel(), this.monster))
 	} else {
  this.monster.destroy()
@@ -112,7 +112,7 @@ const saveLoc = (x: number, y: number): void => {
 	this.lastY[ this.locPointeur ] = y;
 	this.lastLocId = this.locPointeur;
 	this.setUnitLastClicPosition(x, y)
- Hero2Escaper(this.maker).destroyCancelledActions()
+ EscaperFunctions.Hero2Escaper(this.maker).destroyCancelledActions()
 };
 
 const unsaveLoc = (): boolean => {

@@ -1,10 +1,11 @@
-const Trig_Camera_Actions = (): void => {
-	SetCameraField(CAMERA_FIELD_TARGET_DISTANCE, DEFAULT_CAMERA_FIELD, 0)
-};
+import { DEFAULT_CAMERA_FIELD } from 'core/01_libraries/Constants'
+import { createEvent } from 'Utils/mapUtils'
 
-//===========================================================================
-const InitTrig_Camera = (): void => {
-	gg_trg_Camera = CreateTrigger();
-	TriggerAddAction(gg_trg_Camera, Trig_Camera_Actions)
-};
+// TODO; Trigger has no events and no external calls..?
 
+export const InitTrig_Camera = () => {
+    createEvent({
+        events: [],
+        actions: [() => SetCameraField(CAMERA_FIELD_TARGET_DISTANCE, DEFAULT_CAMERA_FIELD, 0)],
+    })
+}
