@@ -67,7 +67,7 @@ const initAutoContinueAfterSliding = () => {
 
     Init_AutoContinueAfterSliding()
 
-    return { AutoContinueAfterSliding, ClearLastClickSave }
+    return { udg_autoContinueAfterSliding, AutoContinueAfterSliding, ClearLastClickSave }
 }
 
 export const AutoContinueAfterSliding = initAutoContinueAfterSliding()

@@ -155,6 +155,8 @@ const initTurnOnSlide = () => {
     }
 
     Init_ToTurnOnSlide()
+
+    return { udg_isDrunk, udg_drunk, udg_drunkLevel, udg_drunkEffect, DRUNK_EFFECTS }
 }
 
 export const TurnOnSlide = initTurnOnSlide()

@@ -4,6 +4,7 @@ import { udg_escapers } from 'core/08_GAME/Init_structures/Init_escapers'
 import { Globals } from 'core/09_From_old_Worldedit_triggers/globals_variables_and_triggers'
 import { createEvent, forRange } from 'Utils/mapUtils'
 import { CommandMax } from './Command_admin'
+import { CommandAll } from './Command_all'
 import { CommandCheat } from './Command_cheat'
 import { CommandRed } from './Command_first_player'
 import { CommandsFunctions } from './Command_functions'
@@ -12,7 +13,7 @@ import { CommandTrueMax } from './Command_superadmin'
 
 export const initCommandExecution = () => {
     const ExecuteCommandSingle = (escaper: Escaper, cmd: string) => {
-        if (!ExecuteCommandAll(escaper, cmd)) {
+        if (!CommandAll.ExecuteCommandAll(escaper, cmd)) {
             if (!((escaper.getPlayer() == Player(0) && Globals.udg_areRedRightsOn) || escaper.canCheat())) {
                 Text.erP(escaper.getPlayer(), 'unknown command or not enough rights')
                 return
