@@ -42,11 +42,11 @@ const SaveTerrain_Actions = (): void => {
 
 // TODO; Used to be private
 const StartSaveTerrain = (): void => {
-	TriggerClearActions(gg_trg_Terrain_modifying_trig)
-	TriggerAddAction(gg_trg_Terrain_modifying_trig, SaveTerrain_Actions)
+	TriggerClearActions(TerrainModifyingTrig.gg_trg_Terrain_modifying_trig)
+	TriggerAddAction(TerrainModifyingTrig.gg_trg_Terrain_modifying_trig, SaveTerrain_Actions)
 	terrainSave_id = 0;
 	y = MAP_MIN_Y;
-	EnableTrigger(gg_trg_Terrain_modifying_trig)
+	EnableTrigger(TerrainModifyingTrig.gg_trg_Terrain_modifying_trig)
 	terrainModifyWorking = true;
 	DestroyTrigger(GetTriggeringTrigger())
 };
@@ -86,7 +86,7 @@ const ReinitTerrainsPosition_Actions = (): void => {
 		Text.mkA("Terrains position reinitialized !")
 		DisableTrigger(GetTriggeringTrigger())
 		terrainModifyWorking = false;
-		RestartEnabledCheckTerrainTriggers()
+		TerrainModifyingTrig.RestartEnabledCheckTerrainTriggers()
 		return;
 	}
 	//i = i + 1
@@ -97,13 +97,13 @@ const ReinitTerrainsPosition_Actions = (): void => {
 
 // TODO; Used to be private
 const StartTerrainModifying = (): void => {
-	TriggerClearActions(gg_trg_Terrain_modifying_trig)
-	TriggerAddAction(gg_trg_Terrain_modifying_trig, ReinitTerrainsPosition_Actions)
+	TriggerClearActions(TerrainModifyingTrig.gg_trg_Terrain_modifying_trig)
+	TriggerAddAction(TerrainModifyingTrig.gg_trg_Terrain_modifying_trig, ReinitTerrainsPosition_Actions)
 	terrainSave_id = 0;
 	y = MAP_MIN_Y;
-	EnableTrigger(gg_trg_Terrain_modifying_trig)
+	EnableTrigger(TerrainModifyingTrig.gg_trg_Terrain_modifying_trig)
 	terrainModifyWorking = true;
-	StopEnabledCheckTerrainTriggers()
+	TerrainModifyingTrig.StopEnabledCheckTerrainTriggers()
 };
 
 

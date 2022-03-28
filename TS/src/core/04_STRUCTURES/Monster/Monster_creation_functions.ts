@@ -1,26 +1,17 @@
-const initMonsterCreationFunctions = () => {
-    // needs BasicFunctions, MonsterTypeArray
+import { BasicFunctions } from 'core/01_libraries/Basic_functions'
+import { ENNEMY_PLAYER, MOBS_VARIOUS_COLORS } from 'core/01_libraries/Constants'
 
-    // TODO; Used to be private
+const initMonsterCreationFunctions = () => {
     let monster: unit
-    // TODO; Used to be private
     let ATTACK_SKILL = FourCC('Aatk')
-    // TODO; Used to be private
     const ABILITY_1_LIFE = FourCC('ABV1')
-    // TODO; Used to be private
     const ABILITY_10_LIFE = FourCC('ABV2')
-    // TODO; Used to be private
     const ABILITY_100_LIFE = FourCC('ABV3')
-    // TODO; Used to be private
     const ABILITY_1000_LIFE = FourCC('ABV4')
-    // TODO; Used to be private
     const ABILITY_10000_LIFE = FourCC('ABV5')
-    // TODO; Used to be private
     const ABILITY_ANNULER_VISION = FourCC('A0AV')
-    // TODO; Used to be private
     const ABILITY_FORME_CORBEAU = FourCC('Amrf')
 
-    // TODO; Used to be private
     const UnitAddRemoveLifeAbility = (u: unit, lifeAbility: number): void => {
         UnitAddAbility(u, lifeAbility)
         SetUnitAbilityLevel(u, lifeAbility, 2)
@@ -117,4 +108,8 @@ const initMonsterCreationFunctions = () => {
         IssuePointOrder(monster, 'patrol', x2, y2)
         return monster
     }
+
+    return { UnitAddMaxLife, SetUnitMaxLife, NewImmobileMonster, NewImmobileMonsterForPlayer, NewPatrolMonster }
 }
+
+export const MonsterCreationFunctions = initMonsterCreationFunctions()

@@ -16,13 +16,14 @@ import {
     CACHE_SEPARATEUR_ITEM,
     CACHE_SEPARATEUR_PARAM,
 } from '../../07_TRIGGERS/Save_map_in_gamecache/struct_StringArrayForCache'
+import { ChangeOneTerrain } from '../../07_TRIGGERS/Triggers_to_modify_terrains/Change_one_terrain'
 import { CommandsFunctions } from './Command_functions'
 
 const initCommandMake = () => {
     const ExecuteCommandMake = (escaper: Escaper, cmd: string): boolean => {
-        let name = CommandsFunctions.CmdName(cmd)
-        let noParam = CommandsFunctions.NoParam(cmd)
-        let nbParam = CommandsFunctions.NbParam(cmd)
+        let name = CommandsFunctions.CommandsFunctions.CmdName(cmd)
+        let noParam = CommandsFunctions.CommandsFunctions.NoParam(cmd)
+        let nbParam = CommandsFunctions.CommandsFunctions.NbParam(cmd)
 
         let n: number
         let i: number
@@ -40,10 +41,10 @@ const initCommandMake = () => {
 
         let param: string
 
-        let param1 = CommandsFunctions.CmdParam(cmd, 1)
-        let param2 = CommandsFunctions.CmdParam(cmd, 2)
-        let param3 = CommandsFunctions.CmdParam(cmd, 3)
-        let param4 = CommandsFunctions.CmdParam(cmd, 4)
+        let param1 = CommandsFunctions.CommandsFunctions.CmdParam(cmd, 1)
+        let param2 = CommandsFunctions.CommandsFunctions.CmdParam(cmd, 2)
+        let param3 = CommandsFunctions.CommandsFunctions.CmdParam(cmd, 3)
+        let param4 = CommandsFunctions.CommandsFunctions.CmdParam(cmd, 4)
 
         let speed: number
         let terrainType: TerrainType
@@ -416,7 +417,7 @@ const initCommandMake = () => {
                 return true
             }
             Text.DisplayLineToPlayer(escaper.getPlayer())
-            str = ChangeOneTerrain(param1, param2)
+            str = ChangeOneTerrain.ChangeOneTerrain(param1, param2)
             if (str !== null) {
                 Text.mkP(escaper.getPlayer(), 'changed to ' + udg_colorCode[RED] + str)
             } else {
@@ -610,7 +611,7 @@ const initCommandMake = () => {
                 }
                 //checkParam4
                 if (nbParam >= 4) {
-                    str = CmdParam(cmd, 4)
+                    str = CommandsFunctions.CmdParam(cmd, 4)
                     if (!FunctionsOnNumbers.IsPositiveInteger(str) || S2I(str) > MAX_MOVE_SPEED) {
                         Text.erP(
                             escaper.getPlayer(),
@@ -621,7 +622,7 @@ const initCommandMake = () => {
                     speed = S2R(str)
                     //checkParam5
                     if (nbParam >= 5) {
-                        str = CmdParam(cmd, 5)
+                        str = CommandsFunctions.CmdParam(cmd, 5)
                         if (S2R(str) <= 0 && str !== 'default' && str !== 'd') {
                             Text.erP(
                                 escaper.getPlayer(),
@@ -636,7 +637,7 @@ const initCommandMake = () => {
                         }
                         //checkParam6
                         if (nbParam === 6) {
-                            str = CmdParam(cmd, 6)
+                            str = CommandsFunctions.CmdParam(cmd, 6)
                             if (!BasicFunctions.IsBoolString(str)) {
                                 Text.erP(
                                     escaper.getPlayer(),
@@ -1689,7 +1690,7 @@ const initCommandMake = () => {
 
         //-setStartMessage(setsm) [<message>]   --> sets the start message of the current level (spaces allowed)
         if (name === 'setStartMessage' || name === 'setsm') {
-            escaper.getMakingLevel().setStartMessage(CmdParam(cmd, 0))
+            escaper.getMakingLevel().setStartMessage(CommandsFunctions.CmdParam(cmd, 0))
             Text.mkP(
                 escaper.getPlayer(),
                 'start message for level ' + I2S(escaper.getMakingLevel().getId()) + ' changed'
@@ -1776,7 +1777,7 @@ const initCommandMake = () => {
                 x = S2R(param4)
                 //checkParam5 projectile speed
                 if (nbParam >= 5) {
-                    if (S2R(CmdParam(cmd, 5)) < MIN_CASTER_PROJECTILE_SPEED) {
+                    if (S2R(CommandsFunctions.CmdParam(cmd, 5)) < MIN_CASTER_PROJECTILE_SPEED) {
                         Text.erP(
                             escaper.getPlayer(),
                             'the projectile speed must be a real higher or equals to ' +
@@ -1784,17 +1785,17 @@ const initCommandMake = () => {
                         )
                         return true
                     }
-                    speed = S2R(CmdParam(cmd, 5))
+                    speed = S2R(CommandsFunctions.CmdParam(cmd, 5))
                     //checkParam6 load time
                     if (nbParam === 6) {
-                        if (S2R(CmdParam(cmd, 6)) < MIN_CASTER_LOAD_TIME) {
+                        if (S2R(CommandsFunctions.CmdParam(cmd, 6)) < MIN_CASTER_LOAD_TIME) {
                             Text.erP(
                                 escaper.getPlayer(),
                                 'the load time must be a real higher or equals to ' + R2S(MIN_CASTER_LOAD_TIME)
                             )
                             return true
                         }
-                        y = S2R(CmdParam(cmd, 6))
+                        y = S2R(CommandsFunctions.CmdParam(cmd, 6))
                     } else {
                         y = DEFAULT_CASTER_LOAD_TIME
                     }

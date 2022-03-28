@@ -21,6 +21,7 @@ import { CheckTerrainTrigger } from '../../07_TRIGGERS/Slide_and_CheckTerrain_tr
 import { MessageHeroDies } from '../../08_GAME/Init_game/Message_heroDies'
 import { udg_levels } from '../../08_GAME/Init_structures/Init_struct_levels'
 import { LevelFunctions } from '../Level/Level_functions'
+import { DEPART_PAR_DEFAUT } from '../Level/StartAndEnd'
 import { EscaperEffectArray, IEscaperEffectArray } from './EscaperEffectArray'
 import { EscaperFunctions } from './Escaper_functions'
 

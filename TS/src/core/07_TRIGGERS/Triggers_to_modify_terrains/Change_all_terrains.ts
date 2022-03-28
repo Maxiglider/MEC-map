@@ -1,73 +1,69 @@
-import { Constants, LARGEUR_CASE } from 'core/01_libraries/Constants'
+import { Constants, LARGEUR_CASE, NB_MAX_OF_TERRAINS } from 'core/01_libraries/Constants'
+import { Text } from 'core/01_libraries/Text'
+import { Modify_terrain_functions } from '../Modify_terrain_Functions/Modify_terrain_functions'
+import { TerrainFunctions } from '../Modify_terrain_Functions/Terrain_functions'
+import { TerrainModifyingTrig } from './Terrain_modifying_trig'
 
 const initChangeAllTerrains = () => {
-    // TODO; Used to be private
     let oldTerrainTypes: Array<number> = []
-    // TODO; Used to be private
     let newTerrainTypes: Array<number> = []
-    // TODO; Used to be private
     let lastTerrainArrayId: number
-    // TODO; Used to be private
     let nbNewTerrains: number
-    // TODO; Used to be private
     let nbNewTerrainsAllowed: number
     let udg_changeAllTerrainsAtRevive = false
+    let terrainModifyWorking = false
 
-    const ChangeAllTerrains_Actions = (): void => {
-        let x: number
-        let terrainTypeId: number
-        let done: boolean
-        let j: number
-        //local integer i = 1
-        //loop
-        //exitwhen (i > TERRAIN_MODIFYING_NB_LINES_TO_DO)
-        x = Constants.MAP_MIN_X
-        while (true) {
-            if (x > Constants.MAP_MAX_X) break
-            terrainTypeId = GetTerrainType(x, y)
-            done = false
-            j = 0
-            while (true) {
-                if (j > lastTerrainArrayId || done) break
-                if (terrainTypeId === oldTerrainTypes[j]) {
-                    ChangeTerrainType(x, y, newTerrainTypes[j])
-                    done = true
-                }
-                j = j + 1
-            }
-            x = x + LARGEUR_CASE
-        }
-        y = y + LARGEUR_CASE
-        if (y > Constants.MAP_MAX_Y) {
-            DisableTrigger(GetTriggeringTrigger())
-            RestartEnabledCheckTerrainTriggers()
-            terrainModifyWorking = false
-            return
-        }
-        //i = i + 1
-        //endloop
-    }
-
-    // TODO; Used to be private
     const StartTerrainModifying = (): void => {
-        y = Constants.MAP_MIN_Y
-        StopEnabledCheckTerrainTriggers()
-        TriggerClearActions(gg_trg_Terrain_modifying_trig)
-        TriggerAddAction(gg_trg_Terrain_modifying_trig, ChangeAllTerrains_Actions)
-        EnableTrigger(gg_trg_Terrain_modifying_trig)
+        let y = Constants.MAP_MIN_Y
+        TerrainModifyingTrig.StopEnabledCheckTerrainTriggers()
+        TriggerClearActions(TerrainModifyingTrig.gg_trg_Terrain_modifying_trig)
+        TriggerAddAction(TerrainModifyingTrig.gg_trg_Terrain_modifying_trig, () => {
+            let x: number
+            let terrainTypeId: number
+            let done: boolean
+            let j: number
+            //local integer i = 1
+            //loop
+            //exitwhen (i > TERRAIN_MODIFYING_NB_LINES_TO_DO)
+            x = Constants.MAP_MIN_X
+            while (true) {
+                if (x > Constants.MAP_MAX_X) break
+                terrainTypeId = GetTerrainType(x, y)
+                done = false
+                j = 0
+                while (true) {
+                    if (j > lastTerrainArrayId || done) break
+                    if (terrainTypeId === oldTerrainTypes[j]) {
+                        Modify_terrain_functions.ChangeTerrainType(x, y, newTerrainTypes[j])
+                        done = true
+                    }
+                    j = j + 1
+                }
+                x = x + LARGEUR_CASE
+            }
+            y = y + LARGEUR_CASE
+            if (y > Constants.MAP_MAX_Y) {
+                DisableTrigger(GetTriggeringTrigger())
+                TerrainModifyingTrig.RestartEnabledCheckTerrainTriggers()
+                terrainModifyWorking = false
+                return
+            }
+            //i = i + 1
+            //endloop
+        })
+        EnableTrigger(TerrainModifyingTrig.gg_trg_Terrain_modifying_trig)
         terrainModifyWorking = true
     }
 
-    // TODO; Used to be private
     const GetRandomTerrain_checked = (): number => {
         let i: number
         let rdmTerrain: number
         let alreadyUsed: boolean
         while (true) {
             if (nbNewTerrains >= nbNewTerrainsAllowed) {
-                rdmTerrain = GetRandomUsedTerrain()
+                rdmTerrain = TerrainFunctions.GetRandomUsedTerrain()
             } else {
-                rdmTerrain = GetRandomTerrain()
+                rdmTerrain = TerrainFunctions.GetRandomTerrain()
             }
             alreadyUsed = false
             i = 0
@@ -78,19 +74,18 @@ const initChangeAllTerrains = () => {
             }
             if (!alreadyUsed) break
         }
-        if (!IsTerrainAlreadyUsed(rdmTerrain)) {
+        if (!TerrainFunctions.IsTerrainAlreadyUsed(rdmTerrain)) {
             nbNewTerrains = nbNewTerrains + 1
         }
         return rdmTerrain
     }
 
-    // TODO; Used to be private
     const GetRandomKnownTerrain_checked = (): number => {
         let i: number
         let rdmTerrain: number
         let alreadyUsed: boolean
         while (true) {
-            rdmTerrain = GetRandomUsedTerrain()
+            rdmTerrain = TerrainFunctions.GetRandomUsedTerrain()
             alreadyUsed = false
             i = 0
             while (true) {
@@ -103,13 +98,12 @@ const initChangeAllTerrains = () => {
         return rdmTerrain
     }
 
-    // TODO; Used to be private
     const GetRandomNotKnownTerrain_checked = (): number => {
         let i: number
         let rdmTerrain: number
         let alreadyUsed: boolean
         while (true) {
-            rdmTerrain = GetRandomNotUsedTerrain()
+            rdmTerrain = TerrainFunctions.GetRandomNotUsedTerrain()
             alreadyUsed = false
             i = 0
             while (true) {
@@ -200,7 +194,7 @@ const initChangeAllTerrains = () => {
         while (true) {
             if (i > lastTerrainArrayId) break
             terrainTypes[i].setTerrainTypeId(newTerrainTypes[i])
-            AddNewTerrain(newTerrainTypes[i])
+            TerrainFunctions.AddNewTerrain(newTerrainTypes[i])
             i = i + 1
         }
 

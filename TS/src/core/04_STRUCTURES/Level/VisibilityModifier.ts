@@ -1,5 +1,6 @@
 import { ViewAllHideAll } from 'core/03_view_all_hide_all/View_all_hide_all'
 import { CACHE_SEPARATEUR_PARAM } from 'core/07_TRIGGERS/Save_map_in_gamecache/struct_StringArrayForCache'
+import { Level } from './Level'
 
 export class VisibilityModifier {
     private x1: number

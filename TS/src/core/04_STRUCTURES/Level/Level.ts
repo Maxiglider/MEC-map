@@ -1,5 +1,5 @@
 import { Text } from 'core/01_libraries/Text'
-import { gg_trg____Trig_checkpoint_revive_heroes } from './Trig_checkpoint_revive_heroes'
+import { TrigCheckpointReviveHeroes } from './Trig_checkpoint_revive_heroes'
 
 //Avec le jass : //todomax handle infinite number of monsters and levels
 //nombre maximum de niveaux : 200. Nombre maximum de monstres de chaque type par niveau : 1000.
@@ -78,7 +78,7 @@ export class Level {
     checkpointReviveHeroes(finisher: Escaper) {
         TrigCheckpointReviveHeroes_levelForReviving = this
         TrigCheckpointReviveHeroes_revivingFinisher = finisher
-        TriggerExecute(gg_trg____Trig_checkpoint_revive_heroes)
+        TriggerExecute(TrigCheckpointReviveHeroes.gg_trg____Trig_checkpoint_revive_heroes)
     }
 
     getStart() {

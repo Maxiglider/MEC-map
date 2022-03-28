@@ -1,7 +1,7 @@
 import { CommandExecution } from '../../06_COMMANDS/COMMANDS_vJass/Command_execution'
 import { Escaper } from './Escaper'
 
-export const EscaperSavedCommands = () => {
+const initEscaperSavedCommands = () => {
     const savedCommands: hashtable = InitHashtable()
 
     const execute = (escaper: Escaper, commandName: string): boolean => {
@@ -18,3 +18,5 @@ export const EscaperSavedCommands = () => {
 
     return { execute }
 }
+
+export const EscaperSavedCommands = initEscaperSavedCommands()

@@ -1,3 +1,4 @@
+import { udg_levels } from 'core/08_GAME/Init_structures/Init_struct_levels'
 import { VisibilityModifier } from './VisibilityModifier'
 
 export class VisibilityModifierArray {
@@ -14,20 +15,20 @@ export class VisibilityModifierArray {
         this.lastInstance = -1
     }
 
-    new = (x1: number, y1: number, x2: number, y2: number): VisibilityModifier => {
+    new = (x1: number, y1: number, x2: number, y2: number) => {
         if (this.lastInstance >= 99) {
-            return 0
+            return null
         }
         this.lastInstance = this.lastInstance + 1
-        this.vms[this.lastInstance] = VisibilityModifier.create(x1, y1, x2, y2)
+        this.vms[this.lastInstance] = new VisibilityModifier(x1, y1, x2, y2)
         this.vms[this.lastInstance].level = udg_levels.getLevelFromVisibilityModifierArray(this)
         this.vms[this.lastInstance].arrayId = this.lastInstance
         return this.vms[this.lastInstance]
     }
 
-    newFromExisting = (vm: VisibilityModifier): VisibilityModifier => {
+    newFromExisting = (vm: VisibilityModifier) => {
         if (this.lastInstance >= 199) {
-            return 0
+            return null
         }
         this.lastInstance = this.lastInstance + 1
         this.vms[this.lastInstance] = vm
@@ -39,7 +40,7 @@ export class VisibilityModifierArray {
         let i = 0
         while (true) {
             if (i > this.lastInstance) break
-            if (this.vms[i] !== 0) {
+            if (this.vms[i] !== null) {
                 n = n + 1
             }
             i = i + 1
@@ -47,9 +48,9 @@ export class VisibilityModifierArray {
         return n
     }
 
-    get = (visibilityId: number): VisibilityModifier => {
+    get = (visibilityId: number) => {
         if (visibilityId < 0 || visibilityId > this.lastInstance) {
-            return 0
+            return null
         }
         return this.vms[visibilityId]
     }

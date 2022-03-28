@@ -14,9 +14,9 @@ import { Teleport } from './Teleport'
 
 const initCommandCheat = () => {
     const ExecuteCommandCheat = (escaper: Escaper, cmd: string): boolean => {
-        let name = CommandsFunctions.CmdName(cmd)
-        let noParam = CommandsFunctions.NoParam(cmd)
-        let nbParam = CommandsFunctions.NbParam(cmd)
+        let name = CommandsFunctions.CommandsFunctions.CmdName(cmd)
+        let noParam = CommandsFunctions.CommandsFunctions.NoParam(cmd)
+        let nbParam = CommandsFunctions.CommandsFunctions.NbParam(cmd)
 
         let n: number
         let i: number
@@ -34,10 +34,10 @@ const initCommandCheat = () => {
 
         let param: string
 
-        let param1 = CommandsFunctions.CmdParam(cmd, 1)
-        let param2 = CommandsFunctions.CmdParam(cmd, 2)
-        let param3 = CommandsFunctions.CmdParam(cmd, 3)
-        let param4 = CommandsFunctions.CmdParam(cmd, 4)
+        let param1 = CommandsFunctions.CommandsFunctions.CmdParam(cmd, 1)
+        let param2 = CommandsFunctions.CommandsFunctions.CmdParam(cmd, 2)
+        let param3 = CommandsFunctions.CommandsFunctions.CmdParam(cmd, 3)
+        let param4 = CommandsFunctions.CommandsFunctions.CmdParam(cmd, 4)
 
         let speed: number
 
@@ -67,7 +67,7 @@ const initCommandCheat = () => {
                 Text.P(escaper.getPlayer(), 'slide speed for all is to ' + param1)
                 return true
             }
-            if (CommandsFunctions.IsPlayerColorString(param2)) {
+            if (CommandsFunctions.CommandsFunctions.IsPlayerColorString(param2)) {
                 if (udg_escapers.get(ColorCodes.ColorString2Id(param2)) != 0) {
                     udg_escapers.get(ColorCodes.ColorString2Id(param2)).absoluteSlideSpeed(speed)
                     Text.P(escaper.getPlayer(), 'slide speed for player ' + param2 + ' is to ' + param1)
@@ -98,7 +98,7 @@ const initCommandCheat = () => {
                 Text.P(escaper.getPlayer(), 'slide speed for all depends now on terrains')
                 return true
             }
-            if (CommandsFunctions.IsPlayerColorString(param1)) {
+            if (CommandsFunctions.CommandsFunctions.IsPlayerColorString(param1)) {
                 if (udg_escapers.get(ColorCodes.ColorString2Id(param1)) != 0) {
                     udg_escapers.get(ColorCodes.ColorString2Id(param1)).stopAbsoluteSlideSpeed()
                     Text.P(escaper.getPlayer(), 'slide speed for player ' + param1 + ' depends now on terrains')
@@ -133,7 +133,7 @@ const initCommandCheat = () => {
                 Text.P(escaper.getPlayer(), 'walk speed for all to ' + param1)
                 return true
             }
-            if (CommandsFunctions.IsPlayerColorString(param2)) {
+            if (CommandsFunctions.CommandsFunctions.IsPlayerColorString(param2)) {
                 if (udg_escapers.get(ColorCodes.ColorString2Id(param2)) != 0) {
                     udg_escapers.get(ColorCodes.ColorString2Id(param2)).absoluteWalkSpeed(speed)
                     Text.P(escaper.getPlayer(), 'walk speed for player ' + param2 + ' to ' + param1)
@@ -164,7 +164,7 @@ const initCommandCheat = () => {
                 Text.P(escaper.getPlayer(), 'walk speed for all depends now on terrains')
                 return true
             }
-            if (CommandsFunctions.IsPlayerColorString(param1)) {
+            if (CommandsFunctions.CommandsFunctions.IsPlayerColorString(param1)) {
                 if (udg_escapers.get(ColorCodes.ColorString2Id(param1)) != 0) {
                     udg_escapers.get(ColorCodes.ColorString2Id(param1)).stopAbsoluteWalkSpeed()
                     Text.P(escaper.getPlayer(), 'walk speed for player ' + param1 + ' depends now on terrains')
@@ -207,7 +207,7 @@ const initCommandCheat = () => {
                 }
                 return true
             }
-            if (CommandsFunctions.IsPlayerColorString(param2)) {
+            if (CommandsFunctions.CommandsFunctions.IsPlayerColorString(param2)) {
                 if (udg_escapers.get(ColorCodes.ColorString2Id(param2)) != 0) {
                     if (b) {
                         Teleport.ActivateTeleport(udg_escapers.get(ColorCodes.ColorString2Id(param2)).getHero(), false)
@@ -264,7 +264,7 @@ const initCommandCheat = () => {
                 }
                 return true
             }
-            if (CommandsFunctions.IsPlayerColorString(param1)) {
+            if (CommandsFunctions.CommandsFunctions.IsPlayerColorString(param1)) {
                 if (udg_escapers.get(ColorCodes.ColorString2Id(param1)) != 0) {
                     udg_escapers.get(ColorCodes.ColorString2Id(param1)).reviveAtStart()
                 }
@@ -274,7 +274,7 @@ const initCommandCheat = () => {
 
         //-reviveTo(rto) <Pcolor>   --> revives your hero to an other hero, with the same facing angle
         if (name === 'reviveTo' || name === 'rto') {
-            if (!(nbParam === 1 && CommandsFunctions.IsPlayerColorString(param1))) {
+            if (!(nbParam === 1 && CommandsFunctions.CommandsFunctions.IsPlayerColorString(param1))) {
                 return true
             }
             n = ColorCodes.ColorString2Id(param1)
@@ -406,7 +406,7 @@ const initCommandCheat = () => {
                 }
                 return true
             }
-            if (CommandsFunctions.IsPlayerColorString(param2)) {
+            if (CommandsFunctions.CommandsFunctions.IsPlayerColorString(param2)) {
                 n = ColorCodes.ColorString2Id(param2)
                 if (udg_escapers.get(n) != 0) {
                     udg_escapers.get(n).setGodMode(b)
@@ -465,7 +465,7 @@ const initCommandCheat = () => {
                 }
                 return true
             }
-            if (CommandsFunctions.IsPlayerColorString(param2)) {
+            if (CommandsFunctions.CommandsFunctions.IsPlayerColorString(param2)) {
                 n = ColorCodes.ColorString2Id(param2)
                 if (udg_escapers.get(n) != 0) {
                     udg_escapers.get(n).setGodModeKills(b)

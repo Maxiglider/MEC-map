@@ -12,21 +12,21 @@ const initMeteorFunctions = () => {
         return meteor
     }
 
-    const HeroComingToSlide_CheckItem = (hero: unit): void => {
+    const HeroComingToSlide_CheckItem = (hero: unit) => {
         meteor = UnitItemInSlot(hero, 0)
         if (meteor !== null) {
             SetItemDroppable(meteor, false)
         }
     }
 
-    const HeroComingOutFromSlide_CheckItem = (hero: unit): void => {
+    const HeroComingOutFromSlide_CheckItem = (hero: unit) => {
         meteor = UnitItemInSlot(hero, 0)
         if (meteor !== null) {
             SetItemDroppable(meteor, true)
         }
     }
 
-    const ExecuteRightClicOnUnit = (hero: unit, u: unit): void => {
+    const ExecuteRightClicOnUnit = (hero: unit, u: unit) => {
         let itemCarried = UnitItemInSlot(hero, 0)
         let itemCarriedType = GetItemTypeId(itemCarried)
         if ((itemCarriedType == METEOR_NORMAL || itemCarriedType == METEOR_CHEAT) && GetWidgetLife(u) > 0) {
@@ -34,7 +34,7 @@ const initMeteorFunctions = () => {
         } else {
             BasicFunctions.StopUnit(hero)
         }
-        itemCarried = null
+        ;(itemCarried as any) = null
     }
 
     return { HeroAddCheatMeteor, HeroComingToSlide_CheckItem, HeroComingOutFromSlide_CheckItem, ExecuteRightClicOnUnit }

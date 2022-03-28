@@ -4,7 +4,7 @@ import { Level } from '../Level/Level'
 export const METEOR_NORMAL = FourCC('MND1')
 export const METEOR_CHEAT = FourCC('MCD1')
 
-class Meteor {
+export class Meteor {
     private x: number
     private y: number
     private meteor: item
@@ -38,8 +38,7 @@ class Meteor {
         SetItemUserData(this.meteor, integer(this))
     }
 
-    // TODO; Used to be private
-    onDestroy = (): void => {
+    destroy = () => {
         if (this.meteor !== null) {
             this.removeMeteor()
             this.meteor = null

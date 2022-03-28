@@ -1,43 +1,40 @@
+import { createEvent } from 'Utils/mapUtils'
+import { MonsterInterface } from './MonsterInterface'
 
+const initMonstersClickableSetLife = () => {
+    const monstersClickable = CreateGroup()
+    const PERIOD = 0.1
 
-const initMonstersClickableSetLife = () => { // initializer Init_MonstersClickableSetLife
+    createEvent({
+        events: [t => TriggerRegisterTimerEvent(t, PERIOD, true)],
+        actions: [
+            () => {
+                ForGroup(monstersClickable, () => {
+                    const monsterUnit = GetEnumUnit()
+                    const currentLife = GetUnitState(monsterUnit, UNIT_STATE_LIFE)
+                    const monster = Monster(
+                        LoadInteger(
+                            MonsterInterface.htMonsterId2MonsterHandleId,
+                            MonsterInterface.MONSTER,
+                            GetUnitUserData(monsterUnit)
+                        )
+                    )
+                    const previousLife = I2R(monster.getLife())
+                    let diffLife = RMaxBJ(currentLife, previousLife) - RMinBJ(currentLife, previousLife)
+                    if (diffLife < 100) {
+                        SetUnitLifeBJ(GetEnumUnit(), previousLife - 0.5)
+                    } else {
+                        while (!(diffLife <= 0)) {
+                            monster.setLife(R2I(previousLife) - 10000)
+                            diffLife = diffLife - 10000
+                        }
+                    }
+                })
+            },
+        ],
+    })
 
-
-let monstersClickable: group;
-let trigMonstersClickableSetLife: trigger;
-// TODO; Used to be private
-const PERIOD = 0.1;
-
-
-const MonstersClickableSetLifeForEach = (): void => {
-	let monsterUnit = GetEnumUnit();
-	let currentLife = GetUnitState(monsterUnit, UNIT_STATE_LIFE);
-	let monster = Monster(LoadInteger(htMonsterId2MonsterHandleId, MonsterInterface_MONSTER, GetUnitUserData(monsterUnit)));
-	local real previousLife = I2R(monster.getLife())
-	let diffLife = RMaxBJ(currentLife, previousLife) - RMinBJ(currentLife, previousLife);
-	if ((diffLife < 100)) {
- SetUnitLifeBJ(GetEnumUnit(), previousLife - 0.5)
-	} else {
-		while (true) {
-			if ((diffLife <= 0)) break;
- monster.setLife(R2I(previousLife) - 10000)
-			diffLife = diffLife - 10000;
-		}
-	}
-};
-
-const MonstersClickableSetLife_Actions = (): void => {
-	ForGroup(monstersClickable, MonstersClickableSetLifeForEach)
-};
-
-
-//===========================================================================
-const Init_MonstersClickableSetLife = (): void => {
-	monstersClickable = CreateGroup();
-	trigMonstersClickableSetLife = CreateTrigger();
-	TriggerAddAction(trigMonstersClickableSetLife, MonstersClickableSetLife_Actions)
-	TriggerRegisterTimerEvent(trigMonstersClickableSetLife, PERIOD, true)
-};
-
-
+    return { monstersClickable }
 }
+
+export const MonstersClickableSetLife = initMonstersClickableSetLife()

@@ -93,7 +93,7 @@ const initCommandExecution = () => {
         events: [t => forRange(12, i => TriggerRegisterPlayerChatEvent(t, Player(i), '-', false))],
         actions: [
             () => {
-                if (!CommandsFunctions.IsCmd(GetEventPlayerChatString())) {
+                if (!CommandsFunctions.CommandsFunctions.IsCmd(GetEventPlayerChatString())) {
                     return
                 }
 

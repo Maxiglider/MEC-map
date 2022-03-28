@@ -1,4 +1,4 @@
-const escaperEffectFunctions = () => {
+const initEscaperEffectFunctions = () => {
     const String2BodyPartStr = (s: string) => {
         if (s == 'leftHand' || s == 'lh') {
             return 'hand left'
@@ -79,4 +79,4 @@ const escaperEffectFunctions = () => {
     }
 }
 
-export const EscaperEffectFunctions = escaperEffectFunctions()
+export const EscaperEffectFunctions = initEscaperEffectFunctions()

@@ -32,11 +32,11 @@ const initSaveLoadTerrainWithoutName = () => {
             Text.erA("can't execute two commands of this type simultaneously !")
             return
         }
-        TriggerClearActions(gg_trg_Terrain_modifying_trig)
-        TriggerAddAction(gg_trg_Terrain_modifying_trig, SaveTerrain_Actions)
+        TriggerClearActions(TerrainModifyingTrig.gg_trg_Terrain_modifying_trig)
+        TriggerAddAction(TerrainModifyingTrig.gg_trg_Terrain_modifying_trig, SaveTerrain_Actions)
         terrainSave_id = 0
         y = MAP_MIN_Y
-        EnableTrigger(gg_trg_Terrain_modifying_trig)
+        EnableTrigger(TerrainModifyingTrig.gg_trg_Terrain_modifying_trig)
         terrainModifyWorking = true
     }
 
@@ -59,7 +59,7 @@ const initSaveLoadTerrainWithoutName = () => {
         }
         y = y + LARGEUR_CASE
         if (y > MAP_MAX_Y) {
-            RestartEnabledCheckTerrainTriggers()
+            TerrainModifyingTrig.RestartEnabledCheckTerrainTriggers()
             Text.mkA('Terrain loaded')
             DisableTrigger(GetTriggeringTrigger())
             terrainModifyWorking = false
@@ -74,12 +74,12 @@ const initSaveLoadTerrainWithoutName = () => {
             Text.erA("can't execute two commands of this type simultaneously !")
             return
         }
-        TriggerClearActions(gg_trg_Terrain_modifying_trig)
-        TriggerAddAction(gg_trg_Terrain_modifying_trig, LoadTerrain_Actions)
+        TriggerClearActions(TerrainModifyingTrig.gg_trg_Terrain_modifying_trig)
+        TriggerAddAction(TerrainModifyingTrig.gg_trg_Terrain_modifying_trig, LoadTerrain_Actions)
         terrainSave_id = 0
         y = MAP_MIN_Y
-        EnableTrigger(gg_trg_Terrain_modifying_trig)
+        EnableTrigger(TerrainModifyingTrig.gg_trg_Terrain_modifying_trig)
         terrainModifyWorking = true
-        StopEnabledCheckTerrainTriggers()
+        TerrainModifyingTrig.StopEnabledCheckTerrainTriggers()
     }
 }

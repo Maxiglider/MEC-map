@@ -294,13 +294,13 @@ const setOrder = (cmd: string): boolean => {
 	let terrainTypesOrdered: Array<TerrainType> = [];
 	let nbTerrainsDone: number;
 	let i: number;
-	if ((this.count() !== NbParam(cmd))) {
+	if ((this.count() !== CommandsFunctions.NbParam(cmd))) {
 		return false;
 	}
 	nbTerrainsDone = 0;
 	while (true) {
 		if ((nbTerrainsDone === this.count())) break;
-		terrainType = this.get(CmdParam(cmd, nbTerrainsDone + 1));
+		terrainType = this.get(CommandsFunctions.CmdParam(cmd, nbTerrainsDone + 1));
 		//vérification que le terrain existe
 		if ((terrainType === 0)) {
 			return false;
