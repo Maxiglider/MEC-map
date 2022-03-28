@@ -27,4 +27,12 @@ class MakeCaster extends Make {
             this.escaper.newAction(new MakeCasterAction(this.escaper.getMakingLevel(), caster))
         }
     }
+
+    cancelLastAction() {
+        return false //todomax implement cancel and redo
+    }
+
+    redoLastAction() {
+        return false
+    }
 }

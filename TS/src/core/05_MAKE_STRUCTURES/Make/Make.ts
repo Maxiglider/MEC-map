@@ -59,13 +59,9 @@ export abstract class Make {
         TriggerRegisterUnitEvent(this.t, this.maker, EVENT_UNIT_ISSUED_POINT_ORDER)
     }
 
-    cancelLastAction() {
-        return false
-    }
+    abstract cancelLastAction(): boolean
 
-    redoLastAction() {
-        return false
-    }
+    abstract redoLastAction(): boolean
 }
 
 /* todomax make that not needed

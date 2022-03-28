@@ -1,107 +1,70 @@
+import { BasicFunctions } from '../../01_libraries/Basic_functions'
+import {Text} from "../../01_libraries/Text";
+import {METEOR_NORMAL} from "../../04_STRUCTURES/Meteor/Meteor";
+import { MakeOneByOneOrTwoClicks } from 'core/05_MAKE_STRUCTURES/Make/MakeOneByOneOrTwoClicks'
+import {Meteor} from "../../04_STRUCTURES/Meteor/Meteor";
+
+const {IsItemBetweenLocs} = BasicFunctions
 
 
-const initMakeDeleteMeteors = () => { // needs Make
+class MakeDeleteMeteors extends MakeOneByOneOrTwoClicks{
 
-
-
-//struct MakeDeleteMeteors extends Make
-
-    real lastX
-    real lastY
-// TODO; Used to be private
-     boolean lastLocIsSaved
-// TODO; Used to be private
-	 boolean lastLocSavedIsUsed
-// TODO; Used to be private
-     unit unitLastClic
-// TODO; Used to be private
-     string mode
-	
-	
-
-
-const isLastLocSavedUsed = (): boolean => {
-	return this.lastLocSavedIsUsed;
-};
-
-// TODO; Used to be static
-const create = (maker: unit, mode: string): MakeDeleteMeteors => {
-	//modes : oneByOne, twoClics
-	let m: MakeDeleteMeteors;
-	if ((maker === null || (mode !== "oneByOne" && mode !== "twoClics"))) {
-		return 0;
+	constructor(maker: unit, mode: string) {
+		super(maker, 'deleteMeteors', mode)
 	}
-	m = MakeDeleteMeteors.allocate()
-	m.maker = maker
-	m.makerOwner = GetOwningPlayer(maker)
-	m.kind = "deleteMeteors"
-	m.mode = mode
-	m.lastLocIsSaved = false
-	m.lastLocSavedIsUsed = false
-	m.t = CreateTrigger()
- TriggerAddAction(m.t, Make_GetActions(m.kind))
- TriggerRegisterUnitEvent(m.t, m.maker, EVENT_UNIT_ISSUED_POINT_ORDER)
-	if ((mode === "oneByOne")) {
- TriggerRegisterUnitEvent(m.t, m.maker, EVENT_UNIT_ISSUED_TARGET_ORDER)
+
+	doActions() {
+		if (super.doBaseActions()) {
+			//modes : oneByOne, twoClics
+			let meteor: Meteor;
+			let suppressedMeteors: Meteor[] = []
+			let nbMeteorsRemoved = 0;
+
+			if (this.getMode() == 'oneByOne') {
+				//mode oneClick
+				if ((GetItemTypeId(GetOrderTargetItem()) !== METEOR_NORMAL)) {
+					return;
+				}
+
+				meteor = Meteor.get(GetItemUserData(GetOrderTargetItem()));
+
+				if (meteor && meteor.getItem() ){
+					meteor.removeMeteor()
+					suppressedMeteors.push(meteor)
+					nbMeteorsRemoved = 1;
+				}
+			} else {
+				//mode twoClics
+				if (!this.isLastLocSavedUsed()) {
+					this.saveLoc(this.orderX, this.orderY)
+					return
+				}
+
+				const lastInstanceId = this.escaper.getMakingLevel().meteors.getLastInstanceId()
+
+				for (let i = 0; i <= lastInstanceId; i++) {
+					meteor = this.escaper.getMakingLevel().meteors.get(i)
+					let meteorItem
+
+					if (meteor && (meteorItem = meteor.getItem()) && IsItemBetweenLocs(meteorItem, this.lastX, this.lastY, this.orderX, this.orderY)) {
+						meteor.removeMeteor()
+						suppressedMeteors.push(meteor)
+						nbMeteorsRemoved = nbMeteorsRemoved + 1;
+					}
+				}
+			}
+
+			if (nbMeteorsRemoved <= 1) {
+				Text.mkP(this.makerOwner, I2S(nbMeteorsRemoved) + " meteor removed.")
+			} else {
+				Text.mkP(this.makerOwner, I2S(nbMeteorsRemoved) + " meteors removed.")
+			}
+
+			if (nbMeteorsRemoved > 0) {
+				this.escaper.newAction(new MakeDeleteMeteorsAction(this.escaper.getMakingLevel(), suppressedMeteors))
+			}
+			this.unsaveLocDefinitely()
+		}
+
 	}
-	return m;
-};
-
-const onDestroy = () => {
-	DestroyTrigger(this.t)
-	this.t = null;
-	this.maker = null;
-	RemoveUnit(this.unitLastClic)
-	this.unitLastClic = null;
-};
-
-const saveLoc = (x: number, y: number) => {
-	this.lastX = x;
-	this.lastY = y;
-	this.lastLocIsSaved = true;
-	this.lastLocSavedIsUsed = true;
-	if ((this.unitLastClic === null)) {
-		this.unitLastClic = CreateUnit(this.makerOwner, MAKE_LAST_CLIC_UNIT_ID, x, y, GetRandomDirectionDeg());
-	} else {
-		SetUnitX(this.unitLastClic, x)
-		SetUnitY(this.unitLastClic, y)
-	}
- EscaperFunctions.Hero2Escaper(this.maker).destroyCancelledActions()
-};
-
-const unsaveLoc = (): boolean => {
-	if ((!this.lastLocSavedIsUsed)) {
-		return false;
-	}
-	RemoveUnit(this.unitLastClic)
-	this.unitLastClic = null;
-	this.lastLocSavedIsUsed = false;
-	return true;
-};
-
-const unsaveLocDefinitely = () => {
-	this.unsaveLoc()
-	this.lastLocIsSaved = false;
-};
-
-const cancelLastAction = (): boolean => {
-	return this.unsaveLoc();
-};
-
-const redoLastAction = (): boolean => {
-	if ((this.lastLocIsSaved && !this.lastLocSavedIsUsed)) {
-		this.saveLoc(this.lastX, this.lastY)
-		return true;
-	}
-	return false;
-};
-
-const getMode = (): string => {
-	return this.mode;
-};
-
-//endstruct
-
-
-
 }

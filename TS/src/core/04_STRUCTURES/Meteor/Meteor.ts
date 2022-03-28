@@ -7,30 +7,30 @@ export const METEOR_CHEAT = FourCC('MCD1')
 export class Meteor {
     private x: number
     private y: number
-    private meteor: item
-    level: Level
-    arrayId: number
+    private meteor?: item
+    level?: Level
+    arrayId?: number
 
     constructor(x: number, y: number) {
         this.x = x
         this.y = y
     }
 
-    getItem = (): item => {
+    getItem() {
         return this.meteor
     }
 
-    removeMeteor = () => {
-        if (this.meteor !== null) {
+    removeMeteor = (): void => {
+        if (this.meteor) {
             RemoveItem(this.meteor)
-            this.meteor = null
         }
     }
 
-    createMeteor = () => {
-        if (this.meteor !== null) {
+    createMeteor = (): void => {
+        if (this.meteor) {
             this.removeMeteor()
         }
+
         this.meteor = CreateItem(METEOR_NORMAL, this.x, this.y)
         if (udg_terrainTypes.getTerrainType(this.x, this.y).getKind() == 'slide') {
             SetItemDroppable(this.meteor, false)
@@ -41,13 +41,12 @@ export class Meteor {
     destroy = () => {
         if (this.meteor !== null) {
             this.removeMeteor()
-            this.meteor = null
         }
         this.level.meteors.setMeteorNull(this.arrayId)
     }
 
-    replace = () => {
-        SetItemPosition(this.meteor, this.x, this.y)
+    replace = (): void => {
+        this.meteor && SetItemPosition(this.meteor, this.x, this.y)
     }
 
     toString = (): string => {
