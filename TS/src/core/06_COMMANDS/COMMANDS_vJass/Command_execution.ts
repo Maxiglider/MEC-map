@@ -10,7 +10,7 @@ import { CommandsFunctions } from './Command_functions'
 import { CommandMake } from './Command_make'
 import { CommandTrueMax } from './Command_superadmin'
 
-const initCommandExecution = () => {
+export const initCommandExecution = () => {
     const ExecuteCommandSingle = (escaper: Escaper, cmd: string) => {
         if (!ExecuteCommandAll(escaper, cmd)) {
             if (!((escaper.getPlayer() == Player(0) && Globals.udg_areRedRightsOn) || escaper.canCheat())) {
@@ -93,7 +93,7 @@ const initCommandExecution = () => {
         events: [t => forRange(12, i => TriggerRegisterPlayerChatEvent(t, Player(i), '-', false))],
         actions: [
             () => {
-                if (!CommandsFunctions.CommandsFunctions.IsCmd(GetEventPlayerChatString())) {
+                if (!CommandsFunctions.IsCmd(GetEventPlayerChatString())) {
                     return
                 }
 
@@ -101,8 +101,4 @@ const initCommandExecution = () => {
             },
         ],
     })
-
-    return { ExecuteCommand }
 }
-
-export const CommandExecution = initCommandExecution()

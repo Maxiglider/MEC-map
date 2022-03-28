@@ -11,9 +11,9 @@ import { CommandsFunctions } from './Command_functions'
 
 const initCommandMax = () => {
     const ExecuteCommandMax = (escaper: Escaper, cmd: string): boolean => {
-        let name = CommandsFunctions.CommandsFunctions.CmdName(cmd)
-        let noParam = CommandsFunctions.CommandsFunctions.NoParam(cmd)
-        let nbParam = CommandsFunctions.CommandsFunctions.NbParam(cmd)
+        let name = CommandsFunctions.CmdName(cmd)
+        let noParam = CommandsFunctions.NoParam(cmd)
+        let nbParam = CommandsFunctions.NbParam(cmd)
 
         let n: number
         let i: number
@@ -31,10 +31,10 @@ const initCommandMax = () => {
 
         let param: string
 
-        let param1 = CommandsFunctions.CommandsFunctions.CmdParam(cmd, 1)
-        let param2 = CommandsFunctions.CommandsFunctions.CmdParam(cmd, 2)
-        let param3 = CommandsFunctions.CommandsFunctions.CmdParam(cmd, 3)
-        let param4 = CommandsFunctions.CommandsFunctions.CmdParam(cmd, 4)
+        let param1 = CommandsFunctions.CmdParam(cmd, 1)
+        let param2 = CommandsFunctions.CmdParam(cmd, 2)
+        let param3 = CommandsFunctions.CmdParam(cmd, 3)
+        let param4 = CommandsFunctions.CmdParam(cmd, 4)
 
         let speed: number
 
@@ -97,7 +97,7 @@ const initCommandMax = () => {
                 return true
             }
             if (nbParam === 2) {
-                if (!CommandsFunctions.CommandsFunctions.IsPlayerColorString(param2)) {
+                if (!CommandsFunctions.IsPlayerColorString(param2)) {
                     Text.erP(escaper.getPlayer(), 'param2 should be a player color')
                     return true
                 }
@@ -125,7 +125,7 @@ const initCommandMax = () => {
                 }
                 return true
             }
-            if (CommandsFunctions.CommandsFunctions.IsPlayerColorString(param1)) {
+            if (CommandsFunctions.IsPlayerColorString(param1)) {
                 n = ColorCodes.ColorString2Id(param1)
                 if (udg_escapers.get(n) != 0) {
                     udg_escapers.get(n).giveHeroControl(escaper2)
@@ -242,7 +242,7 @@ const initCommandMax = () => {
                 }
                 return true
             }
-            if (CommandsFunctions.CommandsFunctions.IsPlayerColorString(param2)) {
+            if (CommandsFunctions.IsPlayerColorString(param2)) {
                 n = ColorCodes.ColorString2Id(param2)
                 if (udg_escapers.get(n) != 0) {
                     udg_escapers.get(n).setHasAutorevive(b)
@@ -290,7 +290,7 @@ const initCommandMax = () => {
                 }
                 return true
             }
-            if (CommandsFunctions.CommandsFunctions.IsPlayerColorString(param1)) {
+            if (CommandsFunctions.IsPlayerColorString(param1)) {
                 n = ColorCodes.ColorString2Id(param1)
                 if (udg_escapers.get(n) == 0) {
                     udg_escapers.newAt(n)
@@ -384,7 +384,7 @@ const initCommandMax = () => {
                 }
                 return true
             }
-            if (CommandsFunctions.CommandsFunctions.IsPlayerColorString(param1)) {
+            if (CommandsFunctions.IsPlayerColorString(param1)) {
                 n = ColorCodes.ColorString2Id(param1)
                 if (udg_escapers.get(n) != 0) {
                     if (udg_escapers.get(n) != escaper) {

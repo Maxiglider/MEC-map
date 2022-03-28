@@ -18,6 +18,7 @@ import {
 import { AfkMode } from 'core/08_GAME/Afk_mode/Afk_mode'
 import { gg_trg_InvisUnit_is_getting_damage } from 'core/08_GAME/Death/InvisUnit_is_getting_damage'
 import { CheckTerrainTrigger } from '../../07_TRIGGERS/Slide_and_CheckTerrain_triggers/CheckTerrain'
+import { SlideTrigger } from '../../07_TRIGGERS/Slide_and_CheckTerrain_triggers/Slide'
 import { MessageHeroDies } from '../../08_GAME/Init_game/Message_heroDies'
 import { udg_levels } from '../../08_GAME/Init_structures/Init_struct_levels'
 import { LevelFunctions } from '../Level/Level_functions'
@@ -96,7 +97,7 @@ export class Escaper {
         this.slideSpeed = HERO_SLIDE_SPEED
         this.baseColorId = this.playerId
 
-        this.slide = CreateSlideTrigger(escaperId)
+        this.slide = SlideTrigger.CreateSlideTrigger(escaperId)
         this.checkTerrain = CheckTerrainTrigger.CreateCheckTerrainTrigger(escaperId)
 
         this.cameraField = DEFAULT_CAMERA_FIELD

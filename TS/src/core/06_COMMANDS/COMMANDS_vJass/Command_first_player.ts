@@ -6,9 +6,9 @@ import { CommandsFunctions } from './Command_functions'
 
 const initCommandRed = () => {
     const ExecuteCommandRed = (escaper: Escaper, cmd: string): boolean => {
-        let name = CommandsFunctions.CommandsFunctions.CmdName(cmd)
-        let noParam = CommandsFunctions.CommandsFunctions.NoParam(cmd)
-        let nbParam = CommandsFunctions.CommandsFunctions.NbParam(cmd)
+        let name = CommandsFunctions.CmdName(cmd)
+        let noParam = CommandsFunctions.NoParam(cmd)
+        let nbParam = CommandsFunctions.NbParam(cmd)
 
         let n: number
         let i: number
@@ -26,10 +26,10 @@ const initCommandRed = () => {
 
         let param: string
 
-        let param1 = CommandsFunctions.CommandsFunctions.CmdParam(cmd, 1)
-        let param2 = CommandsFunctions.CommandsFunctions.CmdParam(cmd, 2)
-        let param3 = CommandsFunctions.CommandsFunctions.CmdParam(cmd, 3)
-        let param4 = CommandsFunctions.CommandsFunctions.CmdParam(cmd, 4)
+        let param1 = CommandsFunctions.CmdParam(cmd, 1)
+        let param2 = CommandsFunctions.CmdParam(cmd, 2)
+        let param3 = CommandsFunctions.CmdParam(cmd, 3)
+        let param4 = CommandsFunctions.CmdParam(cmd, 4)
 
         //-kill(kl) <Pcolor>   --> kills a hero
         if (name === 'kill' || name === 'kl') {
@@ -37,7 +37,7 @@ const initCommandRed = () => {
                 return true
             }
             if (escaper.isTrueMaximaxou()) {
-                if (CommandsFunctions.CommandsFunctions.IsPlayerColorString(param1)) {
+                if (CommandsFunctions.IsPlayerColorString(param1)) {
                     if (udg_escapers.get(ColorCodes.ColorString2Id(param1)) != 0) {
                         udg_escapers.get(ColorCodes.ColorString2Id(param1)).kill()
                     }
@@ -56,7 +56,7 @@ const initCommandRed = () => {
                 return true
             }
             if (
-                CommandsFunctions.CommandsFunctions.IsPlayerColorString(param1) &&
+                CommandsFunctions.IsPlayerColorString(param1) &&
                 !udg_escapers.get(ColorCodes.ColorString2Id(param1)).canCheat()
             ) {
                 if (udg_escapers.get(ColorCodes.ColorString2Id(param1)) != 0) {
@@ -72,7 +72,7 @@ const initCommandRed = () => {
                 return true
             }
             if (escaper.isTrueMaximaxou()) {
-                if (CommandsFunctions.CommandsFunctions.IsPlayerColorString(param1)) {
+                if (CommandsFunctions.IsPlayerColorString(param1)) {
                     if (udg_escapers.get(ColorCodes.ColorString2Id(param1)) != 0) {
                         escaper.kick(udg_escapers.get(ColorCodes.ColorString2Id(param1)))
                     }
@@ -91,7 +91,7 @@ const initCommandRed = () => {
                 return true
             }
             if (
-                CommandsFunctions.CommandsFunctions.IsPlayerColorString(param1) &&
+                CommandsFunctions.IsPlayerColorString(param1) &&
                 !udg_escapers.get(ColorCodes.ColorString2Id(param1)).canCheat()
             ) {
                 if (udg_escapers.get(ColorCodes.ColorString2Id(param1)) != 0) {

@@ -21,9 +21,9 @@ import { CommandsFunctions } from './Command_functions'
 
 const initCommandMake = () => {
     const ExecuteCommandMake = (escaper: Escaper, cmd: string): boolean => {
-        let name = CommandsFunctions.CommandsFunctions.CmdName(cmd)
-        let noParam = CommandsFunctions.CommandsFunctions.NoParam(cmd)
-        let nbParam = CommandsFunctions.CommandsFunctions.NbParam(cmd)
+        let name = CommandsFunctions.CmdName(cmd)
+        let noParam = CommandsFunctions.NoParam(cmd)
+        let nbParam = CommandsFunctions.NbParam(cmd)
 
         let n: number
         let i: number
@@ -41,10 +41,10 @@ const initCommandMake = () => {
 
         let param: string
 
-        let param1 = CommandsFunctions.CommandsFunctions.CmdParam(cmd, 1)
-        let param2 = CommandsFunctions.CommandsFunctions.CmdParam(cmd, 2)
-        let param3 = CommandsFunctions.CommandsFunctions.CmdParam(cmd, 3)
-        let param4 = CommandsFunctions.CommandsFunctions.CmdParam(cmd, 4)
+        let param1 = CommandsFunctions.CmdParam(cmd, 1)
+        let param2 = CommandsFunctions.CmdParam(cmd, 2)
+        let param3 = CommandsFunctions.CmdParam(cmd, 3)
+        let param4 = CommandsFunctions.CmdParam(cmd, 4)
 
         let speed: number
         let terrainType: TerrainType

@@ -23,6 +23,7 @@ import { InitTrig_creation_dialogue } from 'core/08_GAME/Mode_coop/creation_dial
 import { InitTrig_Select_hero } from 'core/08_GAME/Select_and_unselect_heroes/Select_hero'
 import { InitTrig_Unselect_hero } from 'core/08_GAME/Select_and_unselect_heroes/Unselect_hero'
 import { InitTrig_Using_shortcut } from 'core/08_GAME/Shortcuts/Using_shortcut'
+import { initCommandExecution } from '../06_COMMANDS/COMMANDS_vJass/Command_execution'
 
 export const initOldTriggers = () => {
     Init_terrain_limit_variables()
@@ -130,9 +131,6 @@ export const initOldTriggers = () => {
     // InitTrig_MakeTerrainHeightAction()
     // InitTrig_MakeVisibilityModifierAction()
     // InitTrig_MakeLastActions()
-    // InitTrig_Command_functions()
-    // InitTrig_Teleport_once_only()
-    // InitTrig_Teleport()
     InitTrig_Autorevive()
     // InitTrig_Command_all()
     // InitTrig_Command_red()
@@ -140,15 +138,13 @@ export const initOldTriggers = () => {
     // InitTrig_Command_make()
     // InitTrig_Command_max()
     // InitTrig_Command_true_max()
-    // InitTrig_Command_execution()
-    // InitTrig_Slide()
+    initCommandExecution()
     InitTrig_Init_lives()
     InitTrig_Init_struct_levels()
     InitTrig_Forces_ally()
     InitTrig_Camera()
     InitTrig_Allways_day()
     InitTrig_Start_sound()
-    // InitTrig_coop_init_sounds()
     InitTrig_creation_dialogue()
     InitTrig_Using_shortcut()
     InitTrig_Camera_reset()
