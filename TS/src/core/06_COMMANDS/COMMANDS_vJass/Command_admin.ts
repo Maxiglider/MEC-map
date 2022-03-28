@@ -6,6 +6,7 @@ import { Text } from 'core/01_libraries/Text'
 import { Escaper } from 'core/04_STRUCTURES/Escaper/Escaper'
 import { udg_escapers } from 'core/08_GAME/Init_structures/Init_escapers'
 import { Globals } from 'core/09_From_old_Worldedit_triggers/globals_variables_and_triggers'
+import { SaveLoadTerrainWithoutName } from '../../07_TRIGGERS/Triggers_to_modify_terrains/Save_load_terrain_without_name'
 import { CommandsFunctions } from './Command_functions'
 
 const initCommandMax = () => {
@@ -58,7 +59,7 @@ const initCommandMax = () => {
         //-saveTerrain(st) [<slotName>]   --> spaces allowed for slotName
         if (name === 'saveTerrain' || name === 'st') {
             if (noParam) {
-                SaveTerrainWithoutName()
+                SaveLoadTerrainWithoutName.SaveTerrainWithoutName()
             } else {
                 SaveTerrainWithName(CommandsFunctions.CmdParam(cmd, 0))
             }
@@ -68,7 +69,7 @@ const initCommandMax = () => {
         //-loadTerrain(lt) [<slotName>]
         if (name === 'loadTerrain' || name === 'lt') {
             if (noParam) {
-                LoadTerrainWithoutName()
+                SaveLoadTerrainWithoutName.LoadTerrainWithoutName()
             } else {
                 if (!LoadTerrainWithName(CommandsFunctions.CmdParam(cmd, 0))) {
                     Text.erP(escaper.getPlayer(), "this terrain save doesn't exist")

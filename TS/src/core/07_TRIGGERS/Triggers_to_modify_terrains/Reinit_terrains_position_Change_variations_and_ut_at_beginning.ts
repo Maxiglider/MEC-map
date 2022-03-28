@@ -1,126 +1,97 @@
+import { Constants, LARGEUR_CASE } from 'core/01_libraries/Constants'
+import { Text } from 'core/01_libraries/Text'
+import { createEvent } from 'Utils/mapUtils'
+import { TerrainTypeFunctions } from '../../04_STRUCTURES/TerrainType/Terrain_type_functions'
+import { Modify_terrain_functions } from '../Modify_terrain_Functions/Modify_terrain_functions'
+import { TerrainFunctions } from '../Modify_terrain_Functions/Terrain_functions'
+import { TerrainModifyingTrig } from './Terrain_modifying_trig'
 
+const initReinitTerrainsPositions = () => {
+    let TERRAIN_SAVE: TerrainType[] = []
+    let terrainSave_id: number
+    let terrainModifyWorking = false
 
-const initReinitTerrainsPositions = () => { // initializer Init_Reinit_terrains_position_Change_variations_and_ut_at_beginning needs AllTerrainFunctions, TerrainModifyingTrig
+    createEvent({
+        events: [t => TriggerRegisterTimerEvent(t, 0, false)],
+        actions: [
+            () => {
+                TriggerClearActions(TerrainModifyingTrig.gg_trg_Terrain_modifying_trig)
+                TriggerAddAction(TerrainModifyingTrig.gg_trg_Terrain_modifying_trig, (): void => {
+                    let terrainType: number
+                    let x = Constants.MAP_MIN_X
+                    while (true) {
+                        if (x > Constants.MAP_MAX_X) break
+                        terrainType = GetTerrainType(x, y)
+                        //mise à jour used terrain (-ut)
+                        TerrainFunctions.AddNewTerrain(terrainType)
+                        //changer variations
+                        Modify_terrain_functions.ChangeTerrainType(x, y, terrainType)
+                        //sauvegarde du terrain
+                        TERRAIN_SAVE[terrainSave_id] = TerrainTypeFunctions.TerrainTypeId2TerrainType(terrainType)
+                        terrainSave_id = terrainSave_id + 1
+                        x = x + LARGEUR_CASE
+                    }
 
+                    y = y + LARGEUR_CASE
+                    if (y > Constants.MAP_MAX_Y) {
+                        terrainModifyWorking = false
+                        DisableTrigger(GetTriggeringTrigger())
+                        return
+                    }
+                })
+                terrainSave_id = 0
+                let y = Constants.MAP_MIN_Y
+                EnableTrigger(TerrainModifyingTrig.gg_trg_Terrain_modifying_trig)
+                terrainModifyWorking = true
+                DestroyTrigger(GetTriggeringTrigger())
+            },
+        ],
+    })
 
-// TODO; Used to be private
-let TERRAIN_SAVE: Array<TerrainType> = [];
-// TODO; Used to be private
-let terrainSave_id: number;
+    //reinitTerrainPositions
+    const StartTerrainModifying = () => {
+        TriggerClearActions(TerrainModifyingTrig.gg_trg_Terrain_modifying_trig)
+        TriggerAddAction(TerrainModifyingTrig.gg_trg_Terrain_modifying_trig, () => {
+            let x: number
+            //local integer i = 1
+            //loop
+            //exitwhen (i > TERRAIN_MODIFYING_NB_LINES_TO_DO)
+            x = Constants.MAP_MIN_X
+            while (true) {
+                if (x > Constants.MAP_MAX_X) break
+                if (TERRAIN_SAVE[terrainSave_id] != 0 && TERRAIN_SAVE[terrainSave_id].getTerrainTypeId() != 0) {
+                    Modify_terrain_functions.ChangeTerrainType(x, y, TERRAIN_SAVE[terrainSave_id].getTerrainTypeId())
+                }
+                terrainSave_id = terrainSave_id + 1
+                x = x + LARGEUR_CASE
+            }
+            y = y + LARGEUR_CASE
+            if (y > Constants.MAP_MAX_Y) {
+                Text.mkA('Terrains position reinitialized !')
+                DisableTrigger(GetTriggeringTrigger())
+                terrainModifyWorking = false
+                TerrainModifyingTrig.RestartEnabledCheckTerrainTriggers()
+                return
+            }
+            //i = i + 1
+            //endloop
+        })
+        terrainSave_id = 0
+        let y = Constants.MAP_MIN_Y
+        EnableTrigger(TerrainModifyingTrig.gg_trg_Terrain_modifying_trig)
+        terrainModifyWorking = true
+        TerrainModifyingTrig.StopEnabledCheckTerrainTriggers()
+    }
 
+    const ReinitTerrainsPosition = (): void => {
+        if (terrainModifyWorking) {
+            Text.erA("can't execute two commands of this type simultaneously !")
+            return
+        }
+        StartTerrainModifying()
+    }
 
-
-//save terrain at init
-
-
-
-// TODO; Used to be private
-const SaveTerrain_Actions = (): void => {
-	let terrainType: number;
-	let x = MAP_MIN_X;
-	while (true) {
-		if ((x > MAP_MAX_X)) break;
-		terrainType = GetTerrainType(x, y);
-		//mise à jour used terrain (-ut)
-		AddNewTerrain(terrainType)
-		//changer variations
-		ChangeTerrainType(x, y, terrainType)
-		//sauvegarde du terrain
-		TERRAIN_SAVE[ terrainSave_id ] = TerrainTypeId2TerrainType(terrainType);
-		terrainSave_id = terrainSave_id + 1;
-		x = x + LARGEUR_CASE;
-	}
-
-	y = y + LARGEUR_CASE;
-	if ((y > MAP_MAX_Y)) {
-		terrainModifyWorking = false;
-		DisableTrigger(GetTriggeringTrigger())
-		return;
-	}
-};
-
-
-// TODO; Used to be private
-const StartSaveTerrain = (): void => {
-	TriggerClearActions(TerrainModifyingTrig.gg_trg_Terrain_modifying_trig)
-	TriggerAddAction(TerrainModifyingTrig.gg_trg_Terrain_modifying_trig, SaveTerrain_Actions)
-	terrainSave_id = 0;
-	y = MAP_MIN_Y;
-	EnableTrigger(TerrainModifyingTrig.gg_trg_Terrain_modifying_trig)
-	terrainModifyWorking = true;
-	DestroyTrigger(GetTriggeringTrigger())
-};
-
-
-const Init_Reinit_terrains_position_Change_variations_and_ut_at_beginning = (): void => {
-	let trig = CreateTrigger();
-	TriggerAddAction(trig, StartSaveTerrain)
-	TriggerRegisterTimerEvent(trig, 0, false)
-	trig = null;
-};
-
-
-
-//=========================================================================
-
-
-//reinitTerrainPositions
-
-
-const ReinitTerrainsPosition_Actions = (): void => {
-	let x: number;
-	//local integer i = 1
-	//loop
-	//exitwhen (i > TERRAIN_MODIFYING_NB_LINES_TO_DO)
-	x = MAP_MIN_X;
-	while (true) {
-		if ((x > MAP_MAX_X)) break;
-		if ( (TERRAIN_SAVE[terrainSave_id] != 0 and TERRAIN_SAVE[terrainSave_id].getTerrainTypeId() != 0) ) {
- ChangeTerrainType(x, y, TERRAIN_SAVE[terrainSave_id].getTerrainTypeId())
-		}
-		terrainSave_id = terrainSave_id + 1;
-		x = x + LARGEUR_CASE;
-	}
-	y = y + LARGEUR_CASE;
-	if ((y > MAP_MAX_Y)) {
-		Text.mkA("Terrains position reinitialized !")
-		DisableTrigger(GetTriggeringTrigger())
-		terrainModifyWorking = false;
-		TerrainModifyingTrig.RestartEnabledCheckTerrainTriggers()
-		return;
-	}
-	//i = i + 1
-	//endloop
-};
-
-
-
-// TODO; Used to be private
-const StartTerrainModifying = (): void => {
-	TriggerClearActions(TerrainModifyingTrig.gg_trg_Terrain_modifying_trig)
-	TriggerAddAction(TerrainModifyingTrig.gg_trg_Terrain_modifying_trig, ReinitTerrainsPosition_Actions)
-	terrainSave_id = 0;
-	y = MAP_MIN_Y;
-	EnableTrigger(TerrainModifyingTrig.gg_trg_Terrain_modifying_trig)
-	terrainModifyWorking = true;
-	TerrainModifyingTrig.StopEnabledCheckTerrainTriggers()
-};
-
-
-
-
-
-const ReinitTerrainsPosition = (): void => {
-	if ((terrainModifyWorking)) {
-		Text.erA("can't execute two commands of this type simultaneously !")
-		return;
-	}
-	StartTerrainModifying()
-};
-
-
-
-
-
-
+    return { ReinitTerrainsPosition }
 }
+
+export const ReinitTerrainsPositions = initReinitTerrainsPositions()

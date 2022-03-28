@@ -9,7 +9,7 @@ import { MonsterNoMoveArray } from '../Monster/MonsterNoMoveArray'
 import { Level } from './Level'
 import { LevelFunctions } from './Level_functions'
 
-const NB_MAX_LEVELS = 50
+export const NB_MAX_LEVELS = 50
 
 export class LevelArray {
     private levels: Level[] = []
