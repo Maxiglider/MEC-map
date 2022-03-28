@@ -44,14 +44,14 @@ const addMonsterOrCaster = (monsterOrCaster: MonsterOrCaster): boolean => {
 	return true;
 };
 
-const onDestroy = (): void => {
+const onDestroy = () => {
  this.monsterOrCaster.destroy()
 	if ((this.nextElement !== 0)) {
  this.nextElement.destroy()
 	}
 };
 
-const executeForAll = (functionName: string): void => {
+const executeForAll = (functionName: string) => {
 	udg_enumMoc = this.monsterOrCaster;
 	ExecuteFunc(functionName)
 	if ((this.nextElement !== 0)) {

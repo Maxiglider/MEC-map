@@ -11,7 +11,7 @@ import { CommandMake } from './Command_make'
 import { CommandTrueMax } from './Command_superadmin'
 
 const initCommandExecution = () => {
-    const ExecuteCommandSingle = (escaper: Escaper, cmd: string): void => {
+    const ExecuteCommandSingle = (escaper: Escaper, cmd: string) => {
         if (!ExecuteCommandAll(escaper, cmd)) {
             if (!((escaper.getPlayer() == Player(0) && Globals.udg_areRedRightsOn) || escaper.canCheat())) {
                 Text.erP(escaper.getPlayer(), 'unknown command or not enough rights')
@@ -43,8 +43,8 @@ const initCommandExecution = () => {
         }
     }
 
-    const ExecuteCommand = (escaper: Escaper, cmd: string): void => {
-        let singleCommands: Array<string> = []
+    const ExecuteCommand = (escaper: Escaper, cmd: string) => {
+        let singleCommands: string[] = []
         let char: string
         let i: number
         let nbParenthesesNonFermees = 0

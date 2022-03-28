@@ -11,7 +11,7 @@ const PERIOD = 0.01;
 
 
 // TODO; Used to be private
-const CasterShot_Actions = (): void => {
+const CasterShot_Actions = () => {
 	let shot = CasterShot(LoadInteger(shotsHashtable, 0, GetHandleId(GetTriggeringTrigger())));
 	shot.x = shot.x + shot.diffX
 	shot.y = shot.y + shot.diffY
@@ -59,7 +59,7 @@ const create = (monsterType: MonsterType, Xdep: number, Ydep: number, angle: num
 	return t;
 };
 
-const onDestroy = (): void => {
+const onDestroy = () => {
 	RemoveUnit(this.unite)
 	this.unite = null;
 	DestroyTrigger(this.trig)
@@ -70,7 +70,7 @@ const onDestroy = (): void => {
 
 
 //===========================================================================
-const InitCasterShot = (): void => {
+const InitCasterShot = () => {
 	shotsHashtable = InitHashtable();
 };
 

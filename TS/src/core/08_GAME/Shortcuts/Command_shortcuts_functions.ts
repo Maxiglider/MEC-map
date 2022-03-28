@@ -16,7 +16,7 @@ const initCommandShortcuts = () => {
         F: [],
     }
 
-    const InitShortcutSkills = (playerId: number): void => {
+    const InitShortcutSkills = (playerId: number) => {
         const hero = udg_escapers.get(playerId).getHero()
 
         if (!hero) {
@@ -34,7 +34,7 @@ const initCommandShortcuts = () => {
         })
     }
 
-    const AssignShortcut = (playerId: number, shortcut: string, command: string): void => {
+    const AssignShortcut = (playerId: number, shortcut: string, command: string) => {
         const hero = udg_escapers.get(playerId).getHero()
 
         if (!hero) {
@@ -55,7 +55,7 @@ const initCommandShortcuts = () => {
         })
     }
 
-    const UnassignShortcut = (playerId: number, shortcut: string): void => {
+    const UnassignShortcut = (playerId: number, shortcut: string) => {
         const hero = udg_escapers.get(playerId).getHero()
 
         if (!hero) {
@@ -108,7 +108,7 @@ const initCommandShortcuts = () => {
         return null
     }
 
-    const DisplayShortcuts = (playerId: number): void => {
+    const DisplayShortcuts = (playerId: number) => {
         Text.P(Player(playerId), ' ')
         Text.P(Player(playerId), ColorCodes.udg_colorCode[playerId] + 'Your shortcuts:')
 

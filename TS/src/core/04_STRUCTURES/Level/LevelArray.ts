@@ -105,7 +105,7 @@ export class LevelArray {
         return true
     }
 
-    restartTheGame = (): void => {
+    restartTheGame = () => {
         if (this.currentLevel === 0) {
             this.currentLevel = NB_MAX_LEVELS
             this.levels[0].activate(false)

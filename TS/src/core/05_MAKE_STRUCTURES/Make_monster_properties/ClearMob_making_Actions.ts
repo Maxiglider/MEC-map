@@ -4,7 +4,7 @@ const initMClearMobActions = () => { // needs TerrainTypeFunctions, Escaper
 
 
 
-const ClearMobMaking_Actions = (): void => {
+const ClearMobMaking_Actions = () => {
 	let escaper = EscaperFunctions.Hero2Escaper(GetTriggerUnit());
 	local Make mkGeneral = escaper.getMake()
 		local MakeClearMob mk = MakeClearMob(integer(mkGeneral))

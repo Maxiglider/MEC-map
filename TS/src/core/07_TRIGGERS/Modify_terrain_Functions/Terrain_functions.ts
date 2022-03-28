@@ -105,7 +105,7 @@ const initTerrainFunctions = () => {
         return str
     }
 
-    const DisplayTerrainDataToPlayer = (p: player, terrain: number): void => {
+    const DisplayTerrainDataToPlayer = (p: player, terrain: number) => {
         DisplayTimedTextToPlayer(p, 0, 0, TERRAIN_DATA_DISPLAY_TIME, TerrainFunctions.GetTerrainData(terrain)!)
     }
 

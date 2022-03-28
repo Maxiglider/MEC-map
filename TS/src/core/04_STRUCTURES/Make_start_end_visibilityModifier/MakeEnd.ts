@@ -36,7 +36,7 @@ const create = (maker: unit): MakeEnd => {
 	return m;
 };
 
-const onDestroy = (): void => {
+const onDestroy = () => {
 	DestroyTrigger(this.t)
 	this.t = null;
 	RemoveUnit(this.unitLastClic)
@@ -44,7 +44,7 @@ const onDestroy = (): void => {
 	this.maker = null;
 };
 
-const saveLoc = (x: number, y: number): void => {
+const saveLoc = (x: number, y: number) => {
 	this.lastX = x;
 	this.lastY = y;
 	this.lastLocIsSaved = true;

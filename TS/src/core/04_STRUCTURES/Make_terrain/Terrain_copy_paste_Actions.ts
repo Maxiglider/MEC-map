@@ -3,7 +3,7 @@
 const initTerrainCopyPasteActions = () => { // needs Escaper
 
 
-const TerrainCopyPaste_Actions = (): void => {
+const TerrainCopyPaste_Actions = () => {
 	let escaper = EscaperFunctions.Hero2Escaper(GetTriggerUnit());
 	local Make mkGeneral = escaper.getMake()
 		local MakeTerrainCopyPaste mk = MakeTerrainCopyPaste(integer(mkGeneral))

@@ -20,14 +20,14 @@ export class Meteor {
         return this.meteor
     }
 
-    removeMeteor = (): void => {
+    removeMeteor = () => {
         if (this.meteor !== null) {
             RemoveItem(this.meteor)
             this.meteor = null
         }
     }
 
-    createMeteor = (): void => {
+    createMeteor = () => {
         if (this.meteor !== null) {
             this.removeMeteor()
         }
@@ -46,7 +46,7 @@ export class Meteor {
         this.level.meteors.setMeteorNull(this.arrayId)
     }
 
-    replace = (): void => {
+    replace = () => {
         SetItemPosition(this.meteor, this.x, this.y)
     }
 

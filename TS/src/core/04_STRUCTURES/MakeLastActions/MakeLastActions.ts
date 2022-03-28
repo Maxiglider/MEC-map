@@ -32,7 +32,7 @@ const create = (owner: Escaper): MakeLastActions => {
 };
 
 // TODO; Used to be private
-const onDestroy = (): void => {
+const onDestroy = () => {
 	let i = 0;
 	while (true) {
 		if ((i > this.lastActionId)) break;
@@ -104,7 +104,7 @@ const redoLastAction = (): boolean => {
 	return true;
 };
 
-const deleteSpecificActionsForLevel = (level: Level): void => {
+const deleteSpecificActionsForLevel = (level: Level) => {
 	//actions spécifiques à un niveau :
 	//MakeMonsterAction
 	//MakeDeleteMonstersAction
@@ -157,7 +157,7 @@ const deleteSpecificActionsForLevel = (level: Level): void => {
 	}
 };
 
-const destroyCancelledActions = (): void => {
+const destroyCancelledActions = () => {
 	if ((this.lastActionEffective === this.lastActionId)) {
 		return;
 	}
@@ -168,7 +168,7 @@ const destroyCancelledActions = (): void => {
 	}
 };
 
-const destroyAllActions = (): void => {
+const destroyAllActions = () => {
 	let i = 0;
 	while (true) {
 		if ((i > this.lastActionId)) break;

@@ -3,7 +3,7 @@
 const initMakeGetUnitTeleportPeriodActions = () => { // needs BasicFunctions, Escaper
 
 
-const GetUnitTeleportPeriod_Actions = (): void => {
+const GetUnitTeleportPeriod_Actions = () => {
 
 	let escaper = EscaperFunctions.Hero2Escaper(GetTriggerUnit());
 	local Make mkGeneral = escaper.getMake()

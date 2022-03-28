@@ -36,7 +36,7 @@ const getSlideSpeed = (): number => {
 	return this.slideSpeed;
 };
 
-const setSlideSpeed = (slideSpeed: number): void => {
+const setSlideSpeed = (slideSpeed: number) => {
 	this.slideSpeed = slideSpeed * SLIDE_PERIOD;
 };
 

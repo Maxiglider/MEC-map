@@ -1,46 +1,38 @@
+const initMakeGetTerrainType = () => {
+    // needs Make
 
+    //struct MakeGetTerrainType extends Make
 
-const initMakeGetTerrainType = () => { // needs Make
+    // TODO; Used to be static
 
+    const create = (maker: unit): MakeGetTerrainType => {
+        let m: MakeGetTerrainType
+        if (maker === null) {
+            return 0
+        }
+        m = MakeGetTerrainType.allocate()
+        m.maker = maker
+        m.makerOwner = GetOwningPlayer(maker)
+        m.kind = 'getTerrainType'
+        m.t = CreateTrigger()
+        TriggerAddAction(m.t, Make_GetActions(m.kind))
+        TriggerRegisterUnitEvent(m.t, m.maker, EVENT_UNIT_ISSUED_POINT_ORDER)
+        return m
+    }
 
+    const onDestroy = () => {
+        DestroyTrigger(this.t)
+        this.t = null
+        this.maker = null
+    }
 
-//struct MakeGetTerrainType extends Make
+    const cancelLastAction = (): boolean => {
+        return false
+    }
 
-// TODO; Used to be static
-	 
+    const redoLastAction = (): boolean => {
+        return false
+    }
 
-
-const create = (maker: unit): MakeGetTerrainType => {
-	let m: MakeGetTerrainType;
-	if ((maker === null)) {
-		return 0;
-	}
-	m = MakeGetTerrainType.allocate()
-	m.maker = maker
-	m.makerOwner = GetOwningPlayer(maker)
-	m.kind = "getTerrainType"
-	m.t = CreateTrigger()
- TriggerAddAction(m.t, Make_GetActions(m.kind))
- TriggerRegisterUnitEvent(m.t, m.maker, EVENT_UNIT_ISSUED_POINT_ORDER)
-	return m;
-};
-
-const onDestroy = (): void => {
-	DestroyTrigger(this.t)
-	this.t = null;
-	this.maker = null;
-};
-
-const cancelLastAction = (): boolean => {
-	return false;
-};
-
-const redoLastAction = (): boolean => {
-	return false;
-};
-
-//endstruct
-
-
-
+    //endstruct
 }

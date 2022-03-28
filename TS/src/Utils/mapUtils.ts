@@ -6,8 +6,8 @@ export const createEvent = ({
     actions,
 }: {
     events: ((t: trigger) => void)[]
-    conditions?: ((this: void) => boolean)[]
-    actions: ((this: void) => void)[]
+    conditions?: ((this) => boolean)[]
+    actions: ((this) => void)[]
 }) => {
     const t = CreateTrigger()
 

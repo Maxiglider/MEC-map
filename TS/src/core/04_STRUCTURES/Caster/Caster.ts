@@ -125,7 +125,7 @@ const create = (casterType: CasterType, x: number, y: number, angle: number): Ca
 };
 
 
-const enable = (): void => {
+const enable = () => {
 	this.nbEscapersInRange = 0;
 	this.canShoot = true;
 	this.casterUnit = NewImmobileMonster(this.casterType.getCasterMonsterType(), this.x, this.y, this.angle)
@@ -139,7 +139,7 @@ const enable = (): void => {
 	this.enabled = true;
 };
 
-const disable = (): void => {
+const disable = () => {
 	RemoveSavedInteger(casterHashtable, 0, GetHandleId(this.trg_unitWithinRange))
 	DestroyTrigger(this.trg_unitWithinRange)
 	this.trg_unitWithinRange = null;
@@ -151,7 +151,7 @@ const disable = (): void => {
 	this.disablingTimer = null;
 };
 
-const killUnit = (): void => {
+const killUnit = () => {
 	KillUnit(this.casterUnit)
 	RemoveSavedInteger(casterHashtable, 0, GetHandleId(this.trg_unitWithinRange))
 	DestroyTrigger(this.trg_unitWithinRange)
@@ -161,7 +161,7 @@ const killUnit = (): void => {
 	this.t = null;
 };
 
-const refresh = (): void => {
+const refresh = () => {
 	let clearMob = ClearTriggerMobId2ClearMob(this.id);
 	let disablingTimer = this.disablingTimer;
 	let isCasterAlive = IsUnitAliveBJ(this.casterUnit);
@@ -189,7 +189,7 @@ const refresh = (): void => {
 	disablingTimer = null;
 };
 
-const onDestroy = (): void => {
+const onDestroy = () => {
 	this.disable()
  this.level.casters.setCasterNull(this.arrayId)
 	if ((ClearTriggerMobId2ClearMob(this.id) !== 0)) {
@@ -198,7 +198,7 @@ const onDestroy = (): void => {
 	CasterHashtableRemoveCasterId(this.id)
 };
 
-const escaperOutOfRangeOrDead = (escaper: Escaper): void => {
+const escaperOutOfRangeOrDead = (escaper: Escaper) => {
 	let i = 0;
 	while (true) {
 		if ((escaper === this.escapersInRange[i] || i === this.nbEscapersInRange)) break;
@@ -214,7 +214,7 @@ const escaperOutOfRangeOrDead = (escaper: Escaper): void => {
 	}
 };
 
-const temporarilyDisable = (disablingTimer: timer): void => {
+const temporarilyDisable = (disablingTimer: timer) => {
 	if ((this.disablingTimer === null || this.disablingTimer === disablingTimer || TimerGetRemaining(disablingTimer) > TimerGetRemaining(this.disablingTimer))) {
 		this.disablingTimer = disablingTimer;
  UnitRemoveAbility(this.casterUnit, this.casterType.getCasterMonsterType().getImmolationSkill())
@@ -224,7 +224,7 @@ const temporarilyDisable = (disablingTimer: timer): void => {
 	}
 };
 
-const temporarilyEnable = (disablingTimer: timer): void => {
+const temporarilyEnable = (disablingTimer: timer) => {
 	if ((this.disablingTimer === disablingTimer)) {
  UnitAddAbility(this.casterUnit, this.casterType.getCasterMonsterType().getImmolationSkill())
 		SetUnitVertexColorBJ(this.casterUnit, this.vcRed, this.vcGreen, this.vcBlue, 0)
@@ -233,7 +233,7 @@ const temporarilyEnable = (disablingTimer: timer): void => {
 	}
 };
 
-const setBaseColor = (colorString: string): void => {
+const setBaseColor = (colorString: string) => {
 	let baseColorId: number;
 	if ((CommandsFunctions.IsColorString(colorString))) {
 		baseColorId = ColorCodes.ColorString2Id(colorString);
@@ -251,7 +251,7 @@ const setBaseColor = (colorString: string): void => {
 	}
 };
 
-const setVertexColor = (vcRed: number, vcGreen: number, vcBlue: number): void => {
+const setVertexColor = (vcRed: number, vcGreen: number, vcBlue: number) => {
 	this.vcRed = vcRed;
 	this.vcGreen = vcGreen;
 	this.vcBlue = vcBlue;
@@ -260,7 +260,7 @@ const setVertexColor = (vcRed: number, vcGreen: number, vcBlue: number): void =>
 	}
 };
 
-const reinitColor = (): void => {
+const reinitColor = () => {
 	let initBaseColorId: number;
 	//changement valeurs des champs
 	this.baseColorId = -1;
@@ -300,7 +300,7 @@ const toString = (): string => {
 
 
 
-const InitCaster = (): void => {
+const InitCaster = () => {
 	casterHashtable = InitHashtable();
 };
 

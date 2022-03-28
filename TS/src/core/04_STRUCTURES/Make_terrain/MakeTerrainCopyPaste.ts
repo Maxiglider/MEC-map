@@ -57,7 +57,7 @@ const create = (maker: unit): MakeTerrainCopyPaste => {
 	return m;
 };
 
-const onDestroy = (): void => {
+const onDestroy = () => {
 	DestroyTrigger(this.t)
 	this.t = null;
 	RemoveUnit(this.unitLastClic1)
@@ -80,7 +80,7 @@ const createUnitClic = (u: unit, x: number, y: number): unit => {
 	return u;
 };
 
-const unsaveLoc = (locId: number): void => {
+const unsaveLoc = (locId: number) => {
 	if ((locId === 1)) {
 		this.isPoint1Used = false;
 		RemoveUnit(this.unitLastClic1)
@@ -100,7 +100,7 @@ const unsaveLoc = (locId: number): void => {
 	}
 };
 
-const unsaveLocDefinitely = (locId: number): void => {
+const unsaveLocDefinitely = (locId: number) => {
 	this.unsaveLoc(locId)
 	if ((locId === 1)) {
 		this.isPoint1Saved = false;
@@ -115,13 +115,13 @@ const unsaveLocDefinitely = (locId: number): void => {
 	}
 };
 
-const unsaveLocsDefinitely = (): void => {
+const unsaveLocsDefinitely = () => {
 	this.unsaveLocDefinitely(1)
 	this.unsaveLocDefinitely(2)
 	this.unsaveLocDefinitely(3)
 };
 
-const saveLoc = (x: number, y: number): void => {
+const saveLoc = (x: number, y: number) => {
 	let action: MakeAction;
 	if ((!this.isPoint1Used)) {
 		this.unitLastClic1 = this.createUnitClic(this.unitLastClic1, x, y);

@@ -51,7 +51,7 @@ const create = (maker: unit, mode: string, period: number): MakeSetUnitTeleportP
 	return m;
 };
 
-const onDestroy = (): void => {
+const onDestroy = () => {
 	DestroyTrigger(this.t)
 	this.t = null;
 	this.maker = null;
@@ -59,7 +59,7 @@ const onDestroy = (): void => {
 	this.unitLastClic = null;
 };
 
-const saveLoc = (x: number, y: number): void => {
+const saveLoc = (x: number, y: number) => {
 	this.lastX = x;
 	this.lastY = y;
 	this.lastLocIsSaved = true;
@@ -83,7 +83,7 @@ const unsaveLoc = (): boolean => {
 	return true;
 };
 
-const unsaveLocDefinitely = (): void => {
+const unsaveLocDefinitely = () => {
 	this.unsaveLoc()
 	this.lastLocIsSaved = false;
 };

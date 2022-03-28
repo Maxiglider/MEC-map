@@ -8,7 +8,7 @@ const initExchangeTerrains = () => {
     let terrainB: number
     let terrainModifyWorking = false
 
-    const StartTerrainModifying = (): void => {
+    const StartTerrainModifying = () => {
         TerrainModifyingTrig.StopEnabledCheckTerrainTriggers()
         TriggerClearActions(TerrainModifyingTrig.gg_trg_Terrain_modifying_trig)
         TriggerAddAction(TerrainModifyingTrig.gg_trg_Terrain_modifying_trig, () => {

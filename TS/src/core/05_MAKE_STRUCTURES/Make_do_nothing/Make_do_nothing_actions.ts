@@ -1,7 +1,7 @@
 const initMakeDoNothingActions = () => {
     // needs BasicFunctions
 
-    const StopTriggerUnit = (): void => {
+    const StopTriggerUnit = () => {
         if (!BasicFunctions.IsLastOrderPause()) {
             BasicFunctions.StopUnit(GetTriggerUnit())
         }

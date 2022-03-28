@@ -3,7 +3,7 @@
 const initMakeExchangeTerrainsActions = () => { // needs Escaper, ExchangeTerrains
 
 
-const MakeExchangeTerrains_Actions = (): void => {
+const MakeExchangeTerrains_Actions = () => {
 	let escaper = EscaperFunctions.Hero2Escaper(GetTriggerUnit());
 	local Make mkGeneral = escaper.getMake()
 		local MakeExchangeTerrains mk = MakeExchangeTerrains(integer(mkGeneral))

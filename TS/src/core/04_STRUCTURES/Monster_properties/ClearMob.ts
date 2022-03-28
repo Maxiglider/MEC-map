@@ -27,7 +27,7 @@ const ClearTriggerMobId2ClearMob = (triggerMobId: number): ClearMob => {
 };
 
 
-const ClearMobTimerExpires = (): void => {
+const ClearMobTimerExpires = () => {
 	let clearMob = ClearMob(LoadInteger(htClearMob, TIMER_ACTIVATED, GetHandleId(GetExpiredTimer())));
 	if ((clearMob !== 0)) {
  clearMob.initialize() //réinitialise la couleur du trigger mob
@@ -36,7 +36,7 @@ const ClearMobTimerExpires = (): void => {
 	}
 };
 
-const ClearMobFrontMontantTimerExpires = (): void => {
+const ClearMobFrontMontantTimerExpires = () => {
 	let clearMob = ClearMob(LoadInteger(htClearMob, TIMER_FRONT_MONTANT, GetHandleId(GetExpiredTimer())));
 	if ((clearMob !== 0)) {
 		if ( (clearMob.isBeingActivated()) ) {
@@ -45,20 +45,20 @@ const ClearMobFrontMontantTimerExpires = (): void => {
 	}
 };
 
-const KillMonsterOrCasterEach = (): void => {
+const KillMonsterOrCasterEach = () => {
  GetEnumMoc().killUnit()
 };
 
-const TemporarilyDisableMonsterOrCasterEach = (): void => {
+const TemporarilyDisableMonsterOrCasterEach = () => {
  GetEnumMoc().temporarilyDisable(udp_currentTimer)
 };
 
-const TemporarilyEnableMonsterOrCasterEach = (): void => {
+const TemporarilyEnableMonsterOrCasterEach = () => {
  GetEnumMoc().temporarilyEnable(udp_currentTimer)
 };
 
 // TODO; Used to be private
-const InitClearMob = (): void => {
+const InitClearMob = () => {
 	htClearMob = InitHashtable();
 };
 
@@ -143,7 +143,7 @@ const create = (triggerMobId: number, disableDuration: number): ClearMob => {
 	return clearMob;
 };
 
-const initialize = (): void => {
+const initialize = () => {
  this.triggerMob.setBaseColor("blue")
  this.triggerMob.setVertexColor(30, 60, 100)
 	if ((this.triggerMobPermanentEffect === null)) {
@@ -152,14 +152,14 @@ const initialize = (): void => {
 	this.enabled = true;
 };
 
-const close = (): void => {
+const close = () => {
 	if ((this.triggerMobPermanentEffect !== null)) {
 		DestroyEffect(this.triggerMobPermanentEffect)
 		this.triggerMobPermanentEffect = null;
 	}
 };
 
-const redoTriggerMobPermanentEffect = (): void => {
+const redoTriggerMobPermanentEffect = () => {
 	if ((this.triggerMobPermanentEffect !== null)) {
 		DestroyEffect(this.triggerMobPermanentEffect)
 	}
@@ -183,14 +183,14 @@ const removeLastBlockMob = (): boolean => {
 	return this.blockMobs.removeLast()
 };
 
-const removeAllBlockMobs = (): void => {
+const removeAllBlockMobs = () => {
 	udp_currentTimer = this.timerActivated;
  this.blockMobs.executeForAll("TemporarilyEnableMonsterOrCasterEach")
  this.blockMobs.destroy()
 	this.blockMobs = 0;
 };
 
-const onDestroy = (): void => {
+const onDestroy = () => {
  RemoveSavedInteger(htClearMob, TRIGGER_MOB, this.triggerMob.getId())
 	RemoveSavedInteger(htClearMob, TIMER_ACTIVATED, GetHandleId(this.timerActivated))
 	RemoveSavedInteger(htClearMob, TIMER_FRONT_MONTANT, GetHandleId(this.timerFrontMontant))
@@ -212,7 +212,7 @@ const isBeingActivated = (): boolean => {
 	return TimerGetRemaining(this.timerActivated) > 0;
 };
 
-const activate = (): void => {
+const activate = () => {
 	if ((!this.enabled)) {
 		return;
 	}

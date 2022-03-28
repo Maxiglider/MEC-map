@@ -3,7 +3,7 @@
 const initMMTeleportActions = () => { // needs BasicFunctions, Escaper
 
 
-const MonsterMakingTeleport_Actions = (): void => {
+const MonsterMakingTeleport_Actions = () => {
 	let escaper = EscaperFunctions.Hero2Escaper(GetTriggerUnit());
 	local Make mkGeneral = escaper.getMake()
 		local MakeMonsterTeleport mk = MakeMonsterTeleport(integer(mkGeneral))

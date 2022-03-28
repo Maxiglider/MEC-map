@@ -29,7 +29,7 @@ const TerrainKillTimer2Escaper = (theTimer: timer): Escaper => {
 };
 
 
-const DeathTerrainKillEscaper_Actions = (): void => {
+const DeathTerrainKillEscaper_Actions = () => {
 	let escaper = TerrainKillTimer2Escaper(GetExpiredTimer());
 	if ((escaper === 0)) {
 		return;

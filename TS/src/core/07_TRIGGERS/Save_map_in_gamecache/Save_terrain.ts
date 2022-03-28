@@ -8,10 +8,10 @@ import { StringArrayForCache } from './struct_StringArrayForCache'
 
 const initSaveTerrain = () => {
     let y: number
-    let terrainTypeIds: Array<number> = []
+    let terrainTypeIds: number[] = []
     let nbTerrainTypesUsed: number
 
-    const SaveTerrainsUsed = (): void => {
+    const SaveTerrainsUsed = () => {
         let i: number
         StringArrayForCache.stringArrayForCache = new StringArrayForCache('terrain', 'terrainsUsed', false)
         i = 0
@@ -24,7 +24,7 @@ const initSaveTerrain = () => {
         Text.A('terrains used saved')
     }
 
-    const SaveMapDimensionsAndCenterOffset = (): void => {
+    const SaveMapDimensionsAndCenterOffset = () => {
         let largeurMap = R2I((Constants.MAP_MAX_X - Constants.MAP_MIN_X) / LARGEUR_CASE)
         let hauteurMap = R2I((Constants.MAP_MAX_Y - Constants.MAP_MIN_Y) / LARGEUR_CASE)
         let offsetX = R2I(Constants.MAP_MIN_X)
@@ -63,9 +63,9 @@ const initSaveTerrain = () => {
         return FunctionsOnNumbers.I2HexaString(nbTerrainTypesUsed - 1)
     }
 
-    const GererOrdreTerrains = (): void => {
+    const GererOrdreTerrains = () => {
         let terrainType: TerrainType
-        let terrainTypes: Array<TerrainType> = []
+        let terrainTypes: TerrainType[] = []
         let nbOrderedTerrains = 0
         let numTerrain = 0
         let ordreMinTerrainId: number
@@ -140,7 +140,7 @@ const initSaveTerrain = () => {
         }
     }
 
-    const SaveTerrain_Actions = (): void => {
+    const SaveTerrain_Actions = () => {
         let x: number
         if (y <= Constants.MAP_MAX_Y) {
             x = Constants.MAP_MIN_X
@@ -160,7 +160,7 @@ const initSaveTerrain = () => {
         }
     }
 
-    const StartSaveTerrain = (): void => {
+    const StartSaveTerrain = () => {
         y = Constants.MAP_MIN_Y
         GererOrdreTerrains()
         StringArrayForCache.stringArrayForCache = new StringArrayForCache('terrain', 'terrainTypes', false)

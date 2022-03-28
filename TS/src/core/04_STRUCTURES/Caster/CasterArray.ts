@@ -71,7 +71,7 @@ const count = (): number => {
 	return nb;
 };
 
-const onDestroy = (): void => {
+const onDestroy = () => {
 	let i = 0;
 	while (true) {
 		if ((i > this.lastInstance)) break;
@@ -83,7 +83,7 @@ const onDestroy = (): void => {
 	this.lastInstance = -1;
 };
 
-const setCasterNull = (casterArrayId: number): void => {
+const setCasterNull = (casterArrayId: number) => {
 	this.casters[ casterArrayId ] = 0;
 };
 
@@ -118,7 +118,7 @@ const getCasterNear = (x: number, y: number): Caster => {
 	return 0;
 };
 
-const createCasters = (): void => {
+const createCasters = () => {
 	let i = 0;
 	while (true) {
 		if ((i > this.lastInstance)) break;
@@ -129,7 +129,7 @@ const createCasters = (): void => {
 	}
 };
 
-const removeCasters = (): void => {
+const removeCasters = () => {
 	let i = 0;
 	while (true) {
 		if ((i > this.lastInstance)) break;
@@ -140,7 +140,7 @@ const removeCasters = (): void => {
 	}
 };
 
-const refreshCastersOfType = (casterType: CasterType): void => {
+const refreshCastersOfType = (casterType: CasterType) => {
 	let i = 0;
 	while (true) {
 		if ((i > this.lastInstance)) break;
@@ -151,7 +151,7 @@ const refreshCastersOfType = (casterType: CasterType): void => {
 	}
 };
 
-const removeCastersOfType = (casterType: CasterType): void => {
+const removeCastersOfType = (casterType: CasterType) => {
 	let i = 0;
 	while (true) {
 		if ((i > this.lastInstance)) break;

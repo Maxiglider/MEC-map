@@ -3,7 +3,7 @@
 const initCasterDeleteActions = () => { // needs BasicFunctions, Escaper
 
 
-const CasterDelete_Actions = (): void => {
+const CasterDelete_Actions = () => {
 
 	//modes : oneByOne, twoClics
 

@@ -11,7 +11,7 @@ const initSaveMapInCache = () => {
     DisableTrigger(SaveMapInCache.trigSaveMapInCache)
     TriggerRegisterTimerEvent(SaveMapInCache.trigSaveMapInCache, LOW_PERIOD_FOR_WORK, true)
 
-    const StartSaveMapInCache = (): void => {
+    const StartSaveMapInCache = () => {
         let i: number
         Text.A('starting saving map in gamecache "epicSlide"...')
         FlushStoredMission(saveMap_cache, 'terrain')

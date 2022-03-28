@@ -21,7 +21,7 @@ const initSaveLevels = () => {
     let trg_startSaveNextLevel: trigger
 
     //casters
-    const SaveCasters_Actions = (): void => {
+    const SaveCasters_Actions = () => {
         let i = 0
         while (true) {
             if (i >= NB_ITEM_TO_SAVE_EACH_TIME) break
@@ -39,7 +39,7 @@ const initSaveLevels = () => {
         }
     }
 
-    const StartSaveCasters = (): void => {
+    const StartSaveCasters = () => {
         if (level.casters.count() == 0) {
             TriggerExecute(trg_startSaveNextLevel)
         } else {
@@ -52,7 +52,7 @@ const initSaveLevels = () => {
     }
 
     //monsterSpawns
-    const SaveMonsterSpawns_Actions = (): void => {
+    const SaveMonsterSpawns_Actions = () => {
         let i = 0
         while (true) {
             if (i >= NB_ITEM_TO_SAVE_EACH_TIME) break
@@ -70,7 +70,7 @@ const initSaveLevels = () => {
         }
     }
 
-    const StartSaveMonsterSpawns = (): void => {
+    const StartSaveMonsterSpawns = () => {
         if (level.monsterSpawns.count() == 0) {
             StartSaveCasters()
         } else {
@@ -87,7 +87,7 @@ const initSaveLevels = () => {
     }
 
     //meteors
-    const SaveMeteors_Actions = (): void => {
+    const SaveMeteors_Actions = () => {
         let i = 0
         while (true) {
             if (i >= NB_ITEM_TO_SAVE_EACH_TIME) break
@@ -105,7 +105,7 @@ const initSaveLevels = () => {
         }
     }
 
-    const StartSaveMeteors = (): void => {
+    const StartSaveMeteors = () => {
         if (level.meteors.count() == 0) {
             StartSaveMonsterSpawns()
         } else {
@@ -118,7 +118,7 @@ const initSaveLevels = () => {
     }
 
     //monsters teleport
-    const SaveMonstersTeleport_Actions = (): void => {
+    const SaveMonstersTeleport_Actions = () => {
         let i = 0
         while (true) {
             if (i >= NB_ITEM_TO_SAVE_EACH_TIME) break
@@ -136,7 +136,7 @@ const initSaveLevels = () => {
         }
     }
 
-    const StartSaveMonstersTeleport = (): void => {
+    const StartSaveMonstersTeleport = () => {
         if (level.monstersTeleport.count() == 0) {
             StartSaveMeteors()
         } else {
@@ -153,7 +153,7 @@ const initSaveLevels = () => {
     }
 
     //monsters multiple patrols
-    const SaveMonstersMultiplePatrols_Actions = (): void => {
+    const SaveMonstersMultiplePatrols_Actions = () => {
         let i = 0
         while (true) {
             if (i >= NB_ITEM_TO_SAVE_EACH_TIME) break
@@ -173,7 +173,7 @@ const initSaveLevels = () => {
         }
     }
 
-    const StartSaveMonstersMultiplePatrols = (): void => {
+    const StartSaveMonstersMultiplePatrols = () => {
         if (level.monstersMultiplePatrols.count() == 0) {
             StartSaveMonstersTeleport()
         } else {
@@ -190,7 +190,7 @@ const initSaveLevels = () => {
     }
 
     //monsters simple patrol
-    const SaveMonstersSimplePatrol_Actions = (): void => {
+    const SaveMonstersSimplePatrol_Actions = () => {
         let i = 0
         while (true) {
             if (i >= NB_ITEM_TO_SAVE_EACH_TIME) break
@@ -210,7 +210,7 @@ const initSaveLevels = () => {
         }
     }
 
-    const StartSaveMonstersSimplePatrol = (): void => {
+    const StartSaveMonstersSimplePatrol = () => {
         if (level.monstersSimplePatrol.count() == 0) {
             StartSaveMonstersMultiplePatrols()
         } else {
@@ -227,7 +227,7 @@ const initSaveLevels = () => {
     }
 
     //monsters no move
-    const SaveMonstersNoMove_Actions = (): void => {
+    const SaveMonstersNoMove_Actions = () => {
         let i = 0
         while (true) {
             if (i >= NB_ITEM_TO_SAVE_EACH_TIME) break
@@ -245,7 +245,7 @@ const initSaveLevels = () => {
         }
     }
 
-    const StartSaveMonstersNoMove = (): void => {
+    const StartSaveMonstersNoMove = () => {
         if (level.monstersNoMove.count() == 0) {
             StartSaveMonstersSimplePatrol()
         } else {
@@ -262,7 +262,7 @@ const initSaveLevels = () => {
     }
 
     //visibilities
-    const SaveVisibilities_Actions = (): void => {
+    const SaveVisibilities_Actions = () => {
         let i = 0
         while (true) {
             if (i >= NB_ITEM_TO_SAVE_EACH_TIME) break
@@ -280,7 +280,7 @@ const initSaveLevels = () => {
         }
     }
 
-    const StartSaveVisibilities = (): void => {
+    const StartSaveVisibilities = () => {
         if (level.visibilities.count() == 0) {
             StartSaveMonstersNoMove()
         } else {
@@ -296,13 +296,13 @@ const initSaveLevels = () => {
         }
     }
 
-    const EndSaveLevel = (): void => {
+    const EndSaveLevel = () => {
         Text.A('all levels saved')
         SaveGameCache(SaveMapInCache.saveMap_cache)
         Text.A('SAVING MAP FINISHED')
     }
 
-    const StartSaveLevel = (): void => {
+    const StartSaveLevel = () => {
         level = udg_levels.get(levelId)
         if (level === null) {
             EndSaveLevel()
@@ -343,7 +343,7 @@ const initSaveLevels = () => {
         }
     }
 
-    const StartSaveLevels = (): void => {
+    const StartSaveLevels = () => {
         let i = 0
         while (true) {
             if (i >= NB_ESCAPERS) break
@@ -358,7 +358,7 @@ const initSaveLevels = () => {
     }
 
     trg_startSaveNextLevel = CreateTrigger()
-    TriggerAddAction(trg_startSaveNextLevel, (): void => {
+    TriggerAddAction(trg_startSaveNextLevel, () => {
         levelId = levelId + 1
         StartSaveLevel()
     })

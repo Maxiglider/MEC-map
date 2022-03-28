@@ -34,7 +34,7 @@ const create = (level: Level, visibilityModifier: VisibilityModifier): MakeVisib
 	return a;
 };
 
-const onDestroy = (): void => {
+const onDestroy = () => {
 	if ((this.visibilityModifierSave !== 0)) {
  this.visibilityModifierSave.destroy()
 	}

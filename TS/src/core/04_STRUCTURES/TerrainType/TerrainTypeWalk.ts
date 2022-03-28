@@ -32,7 +32,7 @@ const getWalkSpeed = (): number => {
 	return this.walkSpeed;
 };
 
-const setWalkSpeed = (walkSpeed: number): void => {
+const setWalkSpeed = (walkSpeed: number) => {
 	this.walkSpeed = walkSpeed;
 };
 

@@ -75,7 +75,7 @@ const remove = (label: string): boolean => {
 	return true;
 };
 
-const displayForPlayer = (p: player): void => {
+const displayForPlayer = (p: player) => {
 	let i = 0;
 	while (true) {
 		if ((i >= this.numberOfCasterTypes)) break;
@@ -87,7 +87,7 @@ const displayForPlayer = (p: player): void => {
 	}
 };
 
-const saveInCache = (): void => {
+const saveInCache = () => {
 	let i: number;
 	StringArrayForCache.stringArrayForCache = new StringArrayForCache("casterTypes", "casterTypes", true)
 	i = 0;

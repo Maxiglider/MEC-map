@@ -43,7 +43,7 @@ export class MeteorArray {
         return this.meteors[n]
     }
 
-    setMeteorNull = (arrayId: number): void => {
+    setMeteorNull = (arrayId: number) => {
         this.meteors[arrayId] = 0
     }
 
@@ -60,7 +60,7 @@ export class MeteorArray {
         return n
     }
 
-    destroy = (): void => {
+    destroy = () => {
         let i = 0
         while (true) {
             if (i > this.lastInstance) break
@@ -86,7 +86,7 @@ export class MeteorArray {
         return true
     }
 
-    createMeteors = (): void => {
+    createMeteors = () => {
         let i = 0
         while (true) {
             if (i > this.lastInstance) break
@@ -97,7 +97,7 @@ export class MeteorArray {
         }
     }
 
-    removeMeteors = (): void => {
+    removeMeteors = () => {
         let i = 0
         while (true) {
             if (i > this.lastInstance) break

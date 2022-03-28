@@ -31,7 +31,7 @@ const create = (level: Level, monster: Monster): MakeMonsterAction => {
 	return a;
 };
 
-const onDestroy = (): void => {
+const onDestroy = () => {
 	if ((!this.isActionMadeB)) {
  this.monster.destroy()
 	}

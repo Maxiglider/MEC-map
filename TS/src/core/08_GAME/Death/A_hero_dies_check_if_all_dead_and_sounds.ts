@@ -13,7 +13,7 @@ export const InitTrig_A_hero_dies_check_if_all_dead_and_sounds = () => {
         events: [t => TriggerRegisterAnyUnitEventBJ(t, EVENT_PLAYER_UNIT_DEATH)],
         conditions: [() => EscaperFunctions.IsHero(GetTriggerUnit())],
         actions: [
-            () => (): void => {
+            () => () => {
                 let hero = GetTriggerUnit()
                 let n = GetUnitUserData(hero)
                 let nbAlive = 0

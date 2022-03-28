@@ -3,7 +3,7 @@
 const initMMMultiplePatrolsActions = () => { // needs BasicFunctions, Escaper
 
 
-const MonsterMakingMultiplePatrols_Actions = (): void => {
+const MonsterMakingMultiplePatrols_Actions = () => {
 	let escaper = EscaperFunctions.Hero2Escaper(GetTriggerUnit());
 	local Make mkGeneral = escaper.getMake()
 		local MakeMonsterMultiplePatrols mk = MakeMonsterMultiplePatrols(integer(mkGeneral))

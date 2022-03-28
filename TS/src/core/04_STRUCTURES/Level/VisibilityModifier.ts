@@ -29,7 +29,7 @@ export class VisibilityModifier {
         this.level.visibilities.setNull(this.arrayId)
     }
 
-    activate = (activ: boolean): void => {
+    activate = (activ: boolean) => {
         if (activ) {
             FogModifierStart(this.fm)
         } else {

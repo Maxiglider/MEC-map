@@ -12,7 +12,7 @@ const initTerrainTypeDeathKillingTimers = () => { // needs TerrainTypeDeathFunct
 	 
 
 
-const onDestroy = (): void => {
+const onDestroy = () => {
 	let i = 0;
 	while (true) {
 		if ((i >= NB_ESCAPERS)) break;
@@ -38,7 +38,7 @@ const create = (): KillingTimers => {
 	return kt;
 };
 
-const start = (timerId: number, time: number): void => {
+const start = (timerId: number, time: number) => {
 	TimerStart(this.timers[timerId], time, false, DeathTerrainKillEscaper_Actions)
 	udg_escapers.get(timerId).currentLevelTouchTerrainDeath = udg_levels.getCurrentLevel()
 };

@@ -35,11 +35,11 @@ const getCliffClassId = (): number => {
 	return this.cliffClassId;
 };
 
-const setType = (terrainTypeId: number): void => {
+const setType = (terrainTypeId: number) => {
 	this.terrainTypeId = terrainTypeId;
 };
 
-const setLabel = (label: string): void => {
+const setLabel = (label: string) => {
 	this.label = label;
 };
 
@@ -64,14 +64,14 @@ const getKind = (): string => {
 	return this.kind;
 };
 
-const onDestroy = (): void => {
+const onDestroy = () => {
 	this.label = null;
 	this.theAlias = null;
 	this.kind = null;
 	this.terrainTypeId = 0;
 };
 
-const displayForPlayer = (p: player): void => {
+const displayForPlayer = (p: player) => {
 	let order: string;
 	let space = "   ";
 	let slide: TerrainTypeSlide;

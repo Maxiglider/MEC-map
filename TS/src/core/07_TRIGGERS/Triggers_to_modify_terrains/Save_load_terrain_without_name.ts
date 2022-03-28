@@ -4,18 +4,18 @@ import { Modify_terrain_functions } from '../Modify_terrain_Functions/Modify_ter
 import { TerrainModifyingTrig } from './Terrain_modifying_trig'
 
 const initSaveLoadTerrainWithoutName = () => {
-    let terrainSave: Array<TerrainType> = []
+    let terrainSave: TerrainType[] = []
     let terrainSave_id: number
     let terrainModifyWorking = false
 
     //save terrain
-    const SaveTerrainWithoutName = (): void => {
+    const SaveTerrainWithoutName = () => {
         if (terrainModifyWorking) {
             Text.erA("can't execute two commands of this type simultaneously !")
             return
         }
         TriggerClearActions(TerrainModifyingTrig.gg_trg_Terrain_modifying_trig)
-        TriggerAddAction(TerrainModifyingTrig.gg_trg_Terrain_modifying_trig, (): void => {
+        TriggerAddAction(TerrainModifyingTrig.gg_trg_Terrain_modifying_trig, () => {
             let x = Constants.MAP_MIN_X
             while (true) {
                 if (x > Constants.MAP_MAX_X) break
@@ -39,13 +39,13 @@ const initSaveLoadTerrainWithoutName = () => {
     }
 
     //load terrain
-    const LoadTerrainWithoutName = (): void => {
+    const LoadTerrainWithoutName = () => {
         if (terrainModifyWorking) {
             Text.erA("can't execute two commands of this type simultaneously !")
             return
         }
         TriggerClearActions(TerrainModifyingTrig.gg_trg_Terrain_modifying_trig)
-        TriggerAddAction(TerrainModifyingTrig.gg_trg_Terrain_modifying_trig, (): void => {
+        TriggerAddAction(TerrainModifyingTrig.gg_trg_Terrain_modifying_trig, () => {
             let x: number
             //local integer i = 1
             //loop

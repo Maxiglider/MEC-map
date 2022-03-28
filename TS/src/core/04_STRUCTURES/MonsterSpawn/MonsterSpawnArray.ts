@@ -86,7 +86,7 @@ const count = (): number => {
 	return n;
 };
 
-const onDestroy = (): void => {
+const onDestroy = () => {
 	let i = 0;
 	while (true) {
 		if ((i > this.lastInstance)) break;
@@ -98,7 +98,7 @@ const onDestroy = (): void => {
 	this.lastInstance = -1;
 };
 
-const setMonsterSpawnNull = (monsterSpawnArrayId: number): void => {
+const setMonsterSpawnNull = (monsterSpawnArrayId: number) => {
 	this.monsterSpawns[ monsterSpawnArrayId ] = 0;
 };
 
@@ -144,7 +144,7 @@ const setFrequence = (label: string, frequence: number): boolean => {
 };
 
 // TODO; Used to be public
-const activate = (): void => {
+const activate = () => {
 	let i = 0;
 	while (true) {
 		if (i > this.lastInstance) break;
@@ -156,7 +156,7 @@ const activate = (): void => {
 };
 
 // TODO; Used to be public
-const desactivate = (): void => {
+const desactivate = () => {
 	let i = 0;
 	while (true) {
 		if (i > this.lastInstance) break;
@@ -167,7 +167,7 @@ const desactivate = (): void => {
 	}
 };
 
-const displayForPlayer = (p: player): void => {
+const displayForPlayer = (p: player) => {
 	let nbMs = 0;
 	let i = 0;
 	while (true) {

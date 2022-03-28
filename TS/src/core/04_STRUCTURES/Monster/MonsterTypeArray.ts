@@ -75,7 +75,7 @@ const remove = (label: string): boolean => {
 	return true;
 };
 
-const displayForPlayer = (p: player): void => {
+const displayForPlayer = (p: player) => {
 	let i = 0;
 	while (true) {
 		if ((i >= this.numberOfMonsterTypes)) break;
@@ -107,7 +107,7 @@ const monsterUnit2MonsterType = (monsterUnit: unit): MonsterType => {
 	return 0;
 };
 
-const saveInCache = (): void => {
+const saveInCache = () => {
 	let i: number;
 	StringArrayForCache.stringArrayForCache = new StringArrayForCache("monsterTypes", "monsterTypes", true)
 	i = 0;

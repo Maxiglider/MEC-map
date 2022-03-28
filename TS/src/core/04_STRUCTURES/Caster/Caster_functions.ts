@@ -49,7 +49,7 @@ let YintersectionDevantHeros: number;
 
 
 // TODO; Used to be private
-const CalculerPointsIntersections = (): void => {
+const CalculerPointsIntersections = () => {
 	let decalSurX = 50;
 	let a: number;
 	let b: number;
@@ -115,7 +115,7 @@ const TrouverTempsIdeal = (tempsMax: number): number => {
 
 
 // TODO; Used to be private
-const CasterTryToShoot = (): void => {
+const CasterTryToShoot = () => {
 	let xHero: number;
 	let yHero: number;
 	let tempsMax: number;
@@ -125,7 +125,7 @@ const CasterTryToShoot = (): void => {
 	let sensPoint2positif: boolean;
 	let tempsPoint1: number;
 	let tempsPoint2: number;
-	let escapersToShoot: Array<Escaper> = [];
+	let escapersToShoot: Escaper[] = [];
 	let nbRemainingEscapersToShoot: number;
 	let i: number;
 	let tirOk = false;
@@ -274,7 +274,7 @@ const CasterTryToShoot = (): void => {
 
 
 
-const CasterUnitWithinRange_Actions = (): void => {
+const CasterUnitWithinRange_Actions = () => {
 	let escaperInRange = EscaperFunctions.Hero2Escaper(GetTriggerUnit());
 	if ((escaperInRange === 0)) {
 		return;

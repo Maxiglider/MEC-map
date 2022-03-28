@@ -16,7 +16,7 @@ const initReinitTerrainsPositions = () => {
         actions: [
             () => {
                 TriggerClearActions(TerrainModifyingTrig.gg_trg_Terrain_modifying_trig)
-                TriggerAddAction(TerrainModifyingTrig.gg_trg_Terrain_modifying_trig, (): void => {
+                TriggerAddAction(TerrainModifyingTrig.gg_trg_Terrain_modifying_trig, () => {
                     let terrainType: number
                     let x = Constants.MAP_MIN_X
                     while (true) {
@@ -83,7 +83,7 @@ const initReinitTerrainsPositions = () => {
         TerrainModifyingTrig.StopEnabledCheckTerrainTriggers()
     }
 
-    const ReinitTerrainsPosition = (): void => {
+    const ReinitTerrainsPosition = () => {
         if (terrainModifyWorking) {
             Text.erA("can't execute two commands of this type simultaneously !")
             return

@@ -6,7 +6,7 @@ const initModifyTerrainFunctions = () => {
         return R2I((maxX - minX) / LARGEUR_CASE) * R2I((maxY - minY) / LARGEUR_CASE)
     }
 
-    const ChangeTerrainType = (x: number, y: number, terrainTypeId: number): void => {
+    const ChangeTerrainType = (x: number, y: number, terrainTypeId: number) => {
         SetTerrainType(x, y, terrainTypeId, -1, 1, 0)
     }
 

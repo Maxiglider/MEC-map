@@ -1,12 +1,10 @@
 import { BasicFunctions } from 'core/01_libraries/Basic_functions'
 
 const initTeleport = () => {
-    // TODO; Used to be private
-    let teleTriggers: Array<trigger> = []
-    // TODO; Used to be private
-    let onceOnly: Array<boolean> = []
+    let teleTriggers: trigger[] = []
+    let onceOnly: boolean[] = []
 
-    const Teleport_Actions = (): void => {
+    const Teleport_Actions = () => {
         let hero: unit | null = GetTriggerUnit()
 
         if (!BasicFunctions.IsIssuedOrder('smart')) {
@@ -24,7 +22,7 @@ const initTeleport = () => {
         hero = null
     }
 
-    const ActivateTeleport = (hero: unit, onceOnlyB: boolean): void => {
+    const ActivateTeleport = (hero: unit, onceOnlyB: boolean) => {
         let escaperId = GetUnitUserData(hero)
         DestroyTrigger(teleTriggers[escaperId])
         teleTriggers[escaperId] = CreateTrigger()
@@ -33,7 +31,7 @@ const initTeleport = () => {
         onceOnly[escaperId] = onceOnlyB
     }
 
-    const DisableTeleport = (hero: unit): void => {
+    const DisableTeleport = (hero: unit) => {
         let escaperId = GetUnitUserData(hero)
         DestroyTrigger(teleTriggers[escaperId])
     }

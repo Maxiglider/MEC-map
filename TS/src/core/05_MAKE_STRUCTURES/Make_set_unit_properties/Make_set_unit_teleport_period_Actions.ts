@@ -3,7 +3,7 @@
 const initMakeSetUnitTeleportPeriodActions = () => { // needs BasicFunctions, Escaper
 
 
-const SetUnitTeleportPeriod_Actions = (): void => {
+const SetUnitTeleportPeriod_Actions = () => {
 
 	//modes : oneByOne, twoClics
 

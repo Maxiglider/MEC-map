@@ -3,7 +3,7 @@ import { SLIDE_PERIOD } from 'core/01_libraries/Constants'
 const initGravity = () => {
     let gravity = -45 * SLIDE_PERIOD
 
-    const SetGravity = (newGravity: number): void => {
+    const SetGravity = (newGravity: number) => {
         gravity = newGravity * SLIDE_PERIOD
     }
 

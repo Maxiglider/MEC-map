@@ -26,12 +26,12 @@ const MakeSimplePatrolAuto_ChangeDistOnTerrain = (newDist: number): boolean => {
 	return true;
 };
 
-const MakeSimplePatrolAuto_ChangeDistOnTerrainDefault = (): void => {
+const MakeSimplePatrolAuto_ChangeDistOnTerrainDefault = () => {
 	distOnTerrain = DIST_ON_TERRAIN_DEFAULT;
 };
 
 
-const MonsterMakingSimplePatrol_Actions = (): void => {
+const MonsterMakingSimplePatrol_Actions = () => {
 	let monster: Monster;
 	let escaper = EscaperFunctions.Hero2Escaper(GetTriggerUnit());
 	local Make mkGeneral = escaper.getMake()

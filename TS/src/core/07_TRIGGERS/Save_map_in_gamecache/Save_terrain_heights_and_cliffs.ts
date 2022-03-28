@@ -11,7 +11,7 @@ const initSaveTerrainHeights = () => {
     let y: number
 
     //save terrain cliff levels
-    const SaveTerrainCliffs_Actions = (): void => {
+    const SaveTerrainCliffs_Actions = () => {
         let x: number
         let cliffLevel: number
 
@@ -36,7 +36,7 @@ const initSaveTerrainHeights = () => {
         }
     }
 
-    const StartSaveTerrainCliffs = (): void => {
+    const StartSaveTerrainCliffs = () => {
         y = Constants.MAP_MIN_Y
         StringArrayForCache.stringArrayForCache = new StringArrayForCache('terrain', 'terrainCliffs', false)
         TriggerClearActions(SaveMapInCache.trigSaveMapInCache)
@@ -46,7 +46,7 @@ const initSaveTerrainHeights = () => {
 
     //save terrain heights
     // TODO; Used to be private
-    const SaveTerrainHeights_Actions = (): void => {
+    const SaveTerrainHeights_Actions = () => {
         let x: number
         let height: number
         let isWater: boolean
@@ -80,7 +80,7 @@ const initSaveTerrainHeights = () => {
         }
     }
 
-    const StartSaveTerrainHeights = (): void => {
+    const StartSaveTerrainHeights = () => {
         y = Constants.MAP_MIN_Y
         StringArrayForCache.stringArrayForCache = new StringArrayForCache('terrain', 'terrainHeights', true)
         TriggerClearActions(SaveMapInCache.trigSaveMapInCache)

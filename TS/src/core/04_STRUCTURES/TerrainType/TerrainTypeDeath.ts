@@ -34,11 +34,11 @@ export class TerrainTypeDeath {
         this.cliffClassId = 1
     }
 
-    onDestroy = (): void => {
+    onDestroy = () => {
         this.killingTimers.destroy()
     }
 
-    setKillingEffectStr = (killingEffectStr: string): void => {
+    setKillingEffectStr = (killingEffectStr: string) => {
         this.killingEffectStr = killingEffectStr
     }
 
@@ -58,7 +58,7 @@ export class TerrainTypeDeath {
         return this.timeToKill
     }
 
-    killEscaper = (escaper: Escaper): void => {
+    killEscaper = (escaper: Escaper) => {
         escaper.enableCheckTerrain(false)
         escaper.enableSlide(false)
         escaper.pause(true)

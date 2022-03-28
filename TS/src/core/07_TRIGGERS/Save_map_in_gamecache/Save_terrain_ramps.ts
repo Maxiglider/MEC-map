@@ -7,7 +7,7 @@ import { StringArrayForCache } from './struct_StringArrayForCache'
 
 const initSaveTerrainRamps = () => {
     let y: number
-    let ramps: Array<boolean> = []
+    let ramps: boolean[] = []
     const DECAL_TEST_PATH = 10
 
     /*
@@ -58,7 +58,7 @@ if one of the N tilepoints is at a cliff level different than CL or CL+1, the ra
     }
 
     //save terrain ramps
-    const SaveTerrainRamps_Actions = (): void => {
+    const SaveTerrainRamps_Actions = () => {
         let x: number
         let currentCliffLevel: number
         let otherCliffLevel: number
@@ -535,7 +535,7 @@ if one of the N tilepoints is at a cliff level different than CL or CL+1, the ra
         }
     }
 
-    const StartSaveTerrainRamps = (): void => {
+    const StartSaveTerrainRamps = () => {
         y = Constants.MAP_MIN_Y
         StringArrayForCache.stringArrayForCache = new StringArrayForCache('terrain', 'terrainRamps', false)
         TriggerClearActions(SaveMapInCache.trigSaveMapInCache)

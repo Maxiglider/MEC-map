@@ -72,7 +72,7 @@ const count = (): number => {
 	return nb;
 };
 
-const onDestroy = (): void => {
+const onDestroy = () => {
 	let i = 0;
 	while (true) {
 		if ((i > this.lastInstance)) break;
@@ -84,7 +84,7 @@ const onDestroy = (): void => {
 	this.lastInstance = -1;
 };
 
-const setClearMobNull = (clearMobArrayId: number): void => {
+const setClearMobNull = (clearMobArrayId: number) => {
 	this.clearMobs[ clearMobArrayId ] = 0;
 };
 
@@ -119,7 +119,7 @@ const getClearMobNear = (x: number, y: number): ClearMob => {
 	return 0;
 };
 
-const initializeClearMobs = (): void => {
+const initializeClearMobs = () => {
 	let i = 0;
 	while (true) {
 		if ((i > this.lastInstance)) break;
@@ -130,7 +130,7 @@ const initializeClearMobs = (): void => {
 	}
 };
 
-const closeClearMobs = (): void => {
+const closeClearMobs = () => {
 	let i = 0;
 	while (true) {
 		if ((i > this.lastInstance)) break;

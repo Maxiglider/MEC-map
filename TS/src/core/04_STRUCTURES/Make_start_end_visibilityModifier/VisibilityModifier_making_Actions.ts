@@ -4,7 +4,7 @@ const initVisibilityModifierMakingActions = () => { // needs Escaper
 
 
 
-const VisibilityModifierMaking_Actions = (): void => {
+const VisibilityModifierMaking_Actions = () => {
 	let newVisibilityModifier: VisibilityModifier;
 	let escaper = EscaperFunctions.Hero2Escaper(GetTriggerUnit());
 	local Make mkGeneral = escaper.getMake()

@@ -7,7 +7,7 @@ const initTerrainTypeNamesAndData = () => {
     const TERRAIN_TYPE_DATA: string[] = []
     const NB_TERRAINS_TOTAL = 177
 
-    const Init_TerrainTypeNamesAndData = (): void => {
+    const Init_TerrainTypeNamesAndData = () => {
         let maxId: number
         let terrain: number
         let grassId: number

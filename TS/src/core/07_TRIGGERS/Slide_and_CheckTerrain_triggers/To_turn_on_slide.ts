@@ -19,12 +19,12 @@ const initTurnOnSlide = () => {
     let canTurn: boolean
 
     //drunk variables
-    let udg_isDrunk: Array<boolean> = []
-    let udg_drunk: Array<number> = []
-    let udg_drunkLevel: Array<number> = []
+    let udg_isDrunk: boolean[] = []
+    let udg_drunk: number[] = []
+    let udg_drunkLevel: number[] = []
     const INITIAL_DRUNK = 10
-    let udg_drunkEffect: Array<effect> = []
-    let DRUNK_EFFECTS: Array<string> = []
+    let udg_drunkEffect: effect[] = []
+    let DRUNK_EFFECTS: string[] = []
     const DRUNK_EFFECT_PETIT = 'Abilities\\Weapons\\BloodElfMissile\\BloodElfMissile.mdl'
     const DRUNK_EFFECT_MOYEN = 'Abilities\\Weapons\\ChimaeraAcidMissile\\ChimaeraAcidMissile.mdl'
     const DRUNK_EFFECT_GROS = 'Abilities\\Weapons\\GreenDragonMissile\\GreenDragonMissile.mdl'
@@ -38,7 +38,7 @@ const initTurnOnSlide = () => {
         return EscaperFunctions.IsHero(GetTriggerUnit()) && escaper.isSliding() && !BasicFunctions.IsLastOrderPause()
     }
 
-    const HandleTurn = (triggerIsToLocation: boolean): void => {
+    const HandleTurn = (triggerIsToLocation: boolean) => {
         //init variables
         slider = GetTriggerUnit()
         n = GetUnitUserData(slider)
@@ -116,7 +116,7 @@ const initTurnOnSlide = () => {
         nbClicsOnSlide[n] = nbClicsOnSlide[n] + 1
     }
 
-    const Trig_to_turn_to_point_Actions = (): void => {
+    const Trig_to_turn_to_point_Actions = () => {
         HandleTurn(true)
     }
 
@@ -125,12 +125,12 @@ const initTurnOnSlide = () => {
         return EscaperFunctions.IsHero(GetTriggerUnit()) && escaper.isSliding()
     }
 
-    const Trig_to_turn_to_widget_Actions = (): void => {
+    const Trig_to_turn_to_widget_Actions = () => {
         HandleTurn(false)
     }
 
     //===========================================================================
-    const Init_ToTurnOnSlide = (): void => {
+    const Init_ToTurnOnSlide = () => {
         let i: number
         //turn to point
         trg_turnToPoint = CreateTrigger()

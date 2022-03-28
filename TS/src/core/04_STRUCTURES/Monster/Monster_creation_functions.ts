@@ -12,13 +12,13 @@ const initMonsterCreationFunctions = () => {
     const ABILITY_ANNULER_VISION = FourCC('A0AV')
     const ABILITY_FORME_CORBEAU = FourCC('Amrf')
 
-    const UnitAddRemoveLifeAbility = (u: unit, lifeAbility: number): void => {
+    const UnitAddRemoveLifeAbility = (u: unit, lifeAbility: number) => {
         UnitAddAbility(u, lifeAbility)
         SetUnitAbilityLevel(u, lifeAbility, 2)
         UnitRemoveAbility(u, lifeAbility)
     }
 
-    const UnitAddMaxLife = (u: unit, lifeToAdd: number): void => {
+    const UnitAddMaxLife = (u: unit, lifeToAdd: number) => {
         while (true) {
             if (lifeToAdd <= 0) break
             if (lifeToAdd >= 10000) {

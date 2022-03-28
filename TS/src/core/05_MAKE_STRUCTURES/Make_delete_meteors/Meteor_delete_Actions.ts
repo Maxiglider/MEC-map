@@ -3,7 +3,7 @@
 const initMeteorDeleteActions = () => { // needs BasicFunctions, Escaper
 
 
-const MeteorDelete_Actions = (): void => {
+const MeteorDelete_Actions = () => {
 
 	//modes : oneByOne, twoClics
 

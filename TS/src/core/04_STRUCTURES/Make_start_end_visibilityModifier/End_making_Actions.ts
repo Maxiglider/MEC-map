@@ -4,7 +4,7 @@ const initEndMakingActions = () => { // needs Escaper
 
 
 
-const EndMaking_Actions = (): void => {
+const EndMaking_Actions = () => {
 	let escaper = EscaperFunctions.Hero2Escaper(GetTriggerUnit());
 	local Make mkGeneral = escaper.getMake()
 		local MakeEnd mk = MakeEnd(integer(mkGeneral))

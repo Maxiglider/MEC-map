@@ -3,7 +3,7 @@
 const initMonsterDeleteActions = () => { // needs BasicFunctions, Escaper
 
 
-const MonsterDelete_Actions = (): void => {
+const MonsterDelete_Actions = () => {
 
 	//modes : oneByOne, all, noMove, move, simplePatrol, multiplePatrols
 

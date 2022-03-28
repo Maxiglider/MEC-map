@@ -3,9 +3,9 @@ import { createEvent } from 'Utils/mapUtils'
 import { udg_escapers } from '../Init_structures/Init_escapers'
 
 const initHeroes = () => {
-    let startPositions: Array<location> = []
-    let startPositionsRandomized: Array<location> = []
-    let playerIdsRandomized: Array<number> = []
+    let startPositions: location[] = []
+    let startPositionsRandomized: location[] = []
+    let playerIdsRandomized: number[] = []
 
     const TIME_BEFORE_HERO_SPAWN = 3
     const TIME_BETWEEN_EACH_HERO_SPAWN = 0.3
@@ -16,8 +16,8 @@ const initHeroes = () => {
     // TODO; Used to be private
     const NB_ROWS = 3
 
-    const RandomizeStartPositionsAndHeroSpawnOrder = (): void => {
-        let alreadyAdded: Array<boolean> = []
+    const RandomizeStartPositionsAndHeroSpawnOrder = () => {
+        let alreadyAdded: boolean[] = []
         let n: number
         let i: number
 
@@ -69,8 +69,8 @@ const initHeroes = () => {
         }
     }
 
-    const Trig_heroes_Actions = (): void => {
-        let alreadyAdded: Array<boolean> = []
+    const Trig_heroes_Actions = () => {
+        let alreadyAdded: boolean[] = []
         let anEffect: effect
         let i: number
         let n: number
@@ -106,7 +106,7 @@ const initHeroes = () => {
     }
 
     //===========================================================================
-    const Init_Heroes = (): void => {
+    const Init_Heroes = () => {
         //define start positions
         let minX = GetRectMinX(gg_rct_departLvl_0)
         let minY = GetRectMinY(gg_rct_departLvl_0)

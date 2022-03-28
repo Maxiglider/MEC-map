@@ -58,7 +58,7 @@ export class MonsterNoMove implements Monster {
         return _this
     }
 
-    removeUnit = (): void => {
+    removeUnit = () => {
         if (this.u !== null) {
             GroupRemoveUnit(MonstersClickableSetLife.monstersClickable, this.u)
             RemoveUnit(this.u)
@@ -67,13 +67,13 @@ export class MonsterNoMove implements Monster {
         }
     }
 
-    killUnit = (): void => {
+    killUnit = () => {
         if (this.u !== null && IsUnitAliveBJ(this.u)) {
             KillUnit(this.u)
         }
     }
 
-    destroy = (): void => {
+    destroy = () => {
         if (this.u !== null) {
             this.removeUnit()
         }
@@ -85,7 +85,7 @@ export class MonsterNoMove implements Monster {
         MonsterHashtableRemoveMonsterId(this.id)
     }
 
-    createUnit = (): void => {
+    createUnit = () => {
         let clearMob = ClearTriggerMobId2ClearMob(this.id)
         let disablingTimer = this.disablingTimer
         let previouslyEnabled = this.u !== null
@@ -125,7 +125,7 @@ export class MonsterNoMove implements Monster {
         return this.life
     }
 
-    setLife = (life: number): void => {
+    setLife = (life: number) => {
         this.life = life
         if (life > 0) {
             SetUnitLifeBJ(this.u, I2R(life) - 0.5)
@@ -159,7 +159,7 @@ export class MonsterNoMove implements Monster {
         return str
     }
 
-    temporarilyDisable = (disablingTimer: timer): void => {
+    temporarilyDisable = (disablingTimer: timer) => {
         if (
             this.disablingTimer === null ||
             this.disablingTimer === disablingTimer ||
@@ -172,7 +172,7 @@ export class MonsterNoMove implements Monster {
         }
     }
 
-    temporarilyEnable = (disablingTimer: timer): void => {
+    temporarilyEnable = (disablingTimer: timer) => {
         if (this.disablingTimer === disablingTimer) {
             UnitAddAbility(this.u, this.mt.getImmolationSkill())
             SetUnitVertexColorBJ(this.u, this.vcRed, this.vcGreen, this.vcBlue, 0)
@@ -180,7 +180,7 @@ export class MonsterNoMove implements Monster {
         }
     }
 
-    setBaseColor = (colorString: string): void => {
+    setBaseColor = (colorString: string) => {
         let baseColorId: number
         if (CommandsFunctions.IsColorString(colorString)) {
             baseColorId = ColorCodes.ColorString2Id(colorString)
@@ -198,7 +198,7 @@ export class MonsterNoMove implements Monster {
         }
     }
 
-    setVertexColor = (vcRed: number, vcGreen: number, vcBlue: number): void => {
+    setVertexColor = (vcRed: number, vcGreen: number, vcBlue: number) => {
         this.vcRed = vcRed
         this.vcGreen = vcGreen
         this.vcBlue = vcBlue
@@ -207,7 +207,7 @@ export class MonsterNoMove implements Monster {
         }
     }
 
-    reinitColor = (): void => {
+    reinitColor = () => {
         let initBaseColorId: number
         //changement valeurs des champs
         this.baseColorId = -1

@@ -59,13 +59,13 @@ export class VisibilityModifierArray {
         return this.lastInstance
     }
 
-    setNull = (arrayId: number): void => {
+    setNull = (arrayId: number) => {
         if (arrayId >= 0 && arrayId <= this.lastInstance) {
             this.vms[arrayId] = 0
         }
     }
 
-    removeAllVisibilityModifiers = (): void => {
+    removeAllVisibilityModifiers = () => {
         while (true) {
             if (this.lastInstance < 0) break
             this.vms[this.lastInstance].destroy()
@@ -84,7 +84,7 @@ export class VisibilityModifierArray {
         return i === 0
     }
 
-    activate = (activ: boolean): void => {
+    activate = (activ: boolean) => {
         let i = 0
         while (true) {
             if (i > this.lastInstance) break

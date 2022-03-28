@@ -73,7 +73,7 @@ const create = (maker: unit, mode: string, mt: MonsterType, period: number, angl
 	return m;
 };
 
-const onDestroy = (): void => {
+const onDestroy = () => {
 	let escaper: Escaper;
 	if ( (this.monster != 0 and this.monster.u != null) ) {
 		escaper = EscaperFunctions.Hero2Escaper(this.maker);
@@ -88,7 +88,7 @@ const onDestroy = (): void => {
 	this.maker = null;
 };
 
-const nextMonster = (): void => {
+const nextMonster = () => {
 	let escaper: Escaper;
 	this.lastLocId = -1;
 	this.locPointeur = -1;
@@ -129,7 +129,7 @@ const getLocPointeur = (): number => {
 	return this.locPointeur;
 };
 
-const setUnitLastClicPosition = (x: number, y: number): void => {
+const setUnitLastClicPosition = (x: number, y: number) => {
 	if ((this.unitLastClic === null)) {
 		this.unitLastClic = CreateUnit(this.makerOwner, MAKE_LAST_CLIC_UNIT_ID, x, y, GetRandomDirectionDeg());
 	} else {
@@ -187,7 +187,7 @@ const unsaveLoc = (): boolean => {
 	return true;
 };
 
-const setMonster = (monster: MonsterTeleport): void => {
+const setMonster = (monster: MonsterTeleport) => {
 	if ((this.monster !== 0)) {
  this.monster.destroy()
 	}

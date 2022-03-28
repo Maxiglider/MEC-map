@@ -4,7 +4,7 @@ const initDeplacementHeroHorsDeathPath = () => {
     // TODO; Used to be private
     const VALEUR_DECALAGE = 60
 
-    const DeplacementHeroHorsDeathPath = (hero: unit): void => {
+    const DeplacementHeroHorsDeathPath = (hero: unit) => {
         let angle: number
         let angleIdeal: number
         let x: number

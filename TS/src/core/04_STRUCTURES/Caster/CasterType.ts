@@ -50,7 +50,7 @@ const create = (label: string, casterMonsterType: MonsterType, projectileMonster
 };
 
 
-const setLabel = (label: string): void => {
+const setLabel = (label: string) => {
 	this.label = label;
 };
 
@@ -59,8 +59,8 @@ const setAlias = (theAlias: string): MonsterType => {
 	return _this;
 };
 
-const refresh = (): void => {
-	let levelsMaking: Array<Level> = [];
+const refresh = () => {
+	let levelsMaking: Level[] = [];
 	let escaper: Escaper;
 	let i: number;
 	let j: number;
@@ -99,7 +99,7 @@ const refresh = (): void => {
 	}
 };
 
-const onDestroy = (): void => {
+const onDestroy = () => {
  udg_levels.removeCastersOfType(this)
 };
 
@@ -107,7 +107,7 @@ const getCasterMonsterType = (): MonsterType => {
 	return this.casterMonsterType;
 };
 
-const setCasterMonsterType = (newCasterMonsterType: MonsterType): void => {
+const setCasterMonsterType = (newCasterMonsterType: MonsterType) => {
 	this.casterMonsterType = newCasterMonsterType;
 	this.refresh()
 };
@@ -116,7 +116,7 @@ const getProjectileMonsterType = (): MonsterType => {
 	return this.projectileMonsterType;
 };
 
-const setProjectileMonsterType = (newProjectileMonsterType: MonsterType): void => {
+const setProjectileMonsterType = (newProjectileMonsterType: MonsterType) => {
 	this.projectileMonsterType = newProjectileMonsterType;
 };
 
@@ -160,11 +160,11 @@ const getAnimation = (): string => {
 	return this.animation;
 };
 
-const setAnimation = (animation: string): void => {
+const setAnimation = (animation: string) => {
 	this.animation = animation;
 };
 
-const displayForPlayer = (p: player): void => {
+const displayForPlayer = (p: player) => {
 	let space = "   ";
 	let display = ColorCodes.udg_colorCode[TEAL] + this.label + " " + this.theAlias + " : ";
 	display = display + this.casterMonsterType.label + space + this.projectileMonsterType.label + space + "range: " + R2S(this.range) + space

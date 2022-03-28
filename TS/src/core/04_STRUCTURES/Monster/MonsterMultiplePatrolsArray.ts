@@ -75,7 +75,7 @@ const count = (): number => {
 	return nb;
 };
 
-const onDestroy = (): void => {
+const onDestroy = () => {
 	let i = 0;
 	while (true) {
 		if ((i > this.lastInstance)) break;
@@ -87,7 +87,7 @@ const onDestroy = (): void => {
 	this.lastInstance = -1;
 };
 
-const setMonsterNull = (monsterArrayId: number): void => {
+const setMonsterNull = (monsterArrayId: number) => {
 	this.monsters[ monsterArrayId ] = 0;
 };
 
@@ -122,7 +122,7 @@ const getMonsterNear = (x: number, y: number): MonsterMultiplePatrols => {
 	return 0;
 };
 
-const createMonsters = (): void => {
+const createMonsters = () => {
 	let i = 0;
 	while (true) {
 		if ((i > this.lastInstance)) break;
@@ -133,7 +133,7 @@ const createMonsters = (): void => {
 	}
 };
 
-const removeMonsters = (): void => {
+const removeMonsters = () => {
 	let i = 0;
 	while (true) {
 		if ((i > this.lastInstance)) break;
@@ -144,7 +144,7 @@ const removeMonsters = (): void => {
 	}
 };
 
-const recreateMonstersOfType = (mt: MonsterType): void => {
+const recreateMonstersOfType = (mt: MonsterType) => {
 	let i = 0;
 	while (true) {
 		if ((i > this.lastInstance)) break;
@@ -155,7 +155,7 @@ const recreateMonstersOfType = (mt: MonsterType): void => {
 	}
 };
 
-const removeMonstersOfType = (mt: MonsterType): void => {
+const removeMonstersOfType = (mt: MonsterType) => {
 	let i = 0;
 	while (true) {
 		if ((i > this.lastInstance)) break;

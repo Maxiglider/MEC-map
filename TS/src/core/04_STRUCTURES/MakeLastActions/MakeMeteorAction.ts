@@ -31,7 +31,7 @@ const create = (level: Level, meteor: Meteor): MakeMeteorAction => {
 	return a;
 };
 
-const onDestroy = (): void => {
+const onDestroy = () => {
 	if ((!this.isActionMadeB)) {
  this.meteor.destroy()
 	}

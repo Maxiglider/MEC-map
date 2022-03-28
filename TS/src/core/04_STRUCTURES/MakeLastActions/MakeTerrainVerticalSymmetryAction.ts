@@ -45,11 +45,11 @@ const create = (x1: number, y1: number, x2: number, y2: number): MakeTerrainVert
 	return a;
 };
 
-const applySymmetry = (): void => {
+const applySymmetry = () => {
 	let i: number;
 	let x: number;
 	let y: number;
-	let terrainTypeIds: Array<number> = [];
+	let terrainTypeIds: number[] = [];
 
 	//sauvegarde du terrain
 	i = 0;

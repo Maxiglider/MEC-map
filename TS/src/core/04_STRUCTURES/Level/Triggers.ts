@@ -6,7 +6,7 @@ export class Trigger {
         ;(this.t as any) = null
     }
 
-    activate = (activ: boolean): void => {
+    activate = (activ: boolean) => {
         if (activ) {
             EnableTrigger(this.t)
         } else {
@@ -29,7 +29,7 @@ export class TriggerArray {
         this.lastInstance = -1
     }
 
-    activate = (activ: boolean): void => {
+    activate = (activ: boolean) => {
         let i = 0
         while (true) {
             if (i > this.lastInstance) break

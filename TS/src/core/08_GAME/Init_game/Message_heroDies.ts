@@ -35,11 +35,11 @@ const initMessageHeroDies = () => {
         }
     }
 
-    const SoundEnd = (): void => {
+    const SoundEnd = () => {
         isSoundPlaying = false
     }
 
-    const PlaySoundHeroDies = (fallenPlayer: player): void => {
+    const PlaySoundHeroDies = (fallenPlayer: player) => {
         if (!isSoundPlaying) {
             if (GetLocalPlayer() === fallenPlayer) {
                 StartSound(GetRandomSoundHeroDies())
@@ -51,7 +51,7 @@ const initMessageHeroDies = () => {
         }
     }
 
-    const DisplayDeathMessagePlayer = (p: player): void => {
+    const DisplayDeathMessagePlayer = (p: player) => {
         let n = GetPlayerId(p)
 
         forRange(12, i => {

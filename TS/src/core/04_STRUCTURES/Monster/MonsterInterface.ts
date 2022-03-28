@@ -44,13 +44,13 @@ const initMonsterInterface = () => {
         return monsterNextId - 1
     }
 
-    const MonsterIdHasBeenSetTo = (monsterId: number): void => {
+    const MonsterIdHasBeenSetTo = (monsterId: number) => {
         if (monsterId >= monsterNextId) {
             monsterNextId = monsterId + 1
         }
     }
 
-    const MonsterHashtableSetMonsterId = (monster: Monster, oldId: number, newId: number): void => {
+    const MonsterHashtableSetMonsterId = (monster: Monster, oldId: number, newId: number) => {
         if (oldId === newId) {
             return
         }
@@ -64,11 +64,11 @@ const initMonsterInterface = () => {
         return Monster(LoadInteger(htMonsterId2MonsterHandleId, MONSTER, monsterId))
     }
 
-    const MonsterHashtableRemoveMonsterId = (id: number): void => {
+    const MonsterHashtableRemoveMonsterId = (id: number) => {
         RemoveSavedInteger(htMonsterId2MonsterHandleId, MONSTER, id)
     }
 
-    const CasterHashtableSetCasterId = (caster: Caster, oldId: number, newId: number): void => {
+    const CasterHashtableSetCasterId = (caster: Caster, oldId: number, newId: number) => {
         if (oldId === newId) {
             return
         }
@@ -82,7 +82,7 @@ const initMonsterInterface = () => {
         return Caster(LoadInteger(htMonsterId2MonsterHandleId, CASTER, casterId))
     }
 
-    const CasterHashtableRemoveCasterId = (id: number): void => {
+    const CasterHashtableRemoveCasterId = (id: number) => {
         RemoveSavedInteger(htMonsterId2MonsterHandleId, CASTER, id)
     }
 

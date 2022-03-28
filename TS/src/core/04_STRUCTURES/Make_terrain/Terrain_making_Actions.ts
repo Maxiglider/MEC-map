@@ -3,7 +3,7 @@
 const initTerrainMakingActions = () => { // needs Escaper
 
 
-const TerrainMaking_Actions = (): void => {
+const TerrainMaking_Actions = () => {
 	let action: MakeAction;
 	let escaper = EscaperFunctions.Hero2Escaper(GetTriggerUnit());
 	local Make mkGeneral = escaper.getMake()

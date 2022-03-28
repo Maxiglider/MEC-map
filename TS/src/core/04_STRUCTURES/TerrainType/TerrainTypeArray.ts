@@ -229,7 +229,7 @@ const getSlide = (id: number): TerrainTypeSlide => {
 	return this.ttSlide[id];
 };
 
-const displayForPlayer = (p: player): void => {
+const displayForPlayer = (p: player) => {
 	let i = 0;
 	while (true) {
 		if ((i >= this.numberOfSlide)) break;
@@ -253,7 +253,7 @@ const displayForPlayer = (p: player): void => {
 	}
 };
 
-const saveInCache = (): void => {
+const saveInCache = () => {
 	let i: number;
 
 	//main tileset
@@ -291,7 +291,7 @@ const count = (): number => {
 //mettre en place l'ordre des terrains au niveau des tilesets
 const setOrder = (cmd: string): boolean => {
 	let terrainType: TerrainType;
-	let terrainTypesOrdered: Array<TerrainType> = [];
+	let terrainTypesOrdered: TerrainType[] = [];
 	let nbTerrainsDone: number;
 	let i: number;
 	if ((this.count() !== CommandsFunctions.NbParam(cmd))) {

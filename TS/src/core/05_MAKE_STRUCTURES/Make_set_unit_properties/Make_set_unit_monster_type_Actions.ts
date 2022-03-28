@@ -3,7 +3,7 @@
 const initMakeSetUnitMonsterTypeActions = () => { // needs BasicFunctions, Escaper
 
 
-const SetUnitMonsterType_Actions = (): void => {
+const SetUnitMonsterType_Actions = () => {
 
 	//modes : oneByOne, twoClics
 

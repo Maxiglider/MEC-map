@@ -44,7 +44,7 @@ const getId = (): number => {
 	return 0;
 };
 
-const killUnit = (): void => {
+const killUnit = () => {
 	if ((this.monster !== 0)) {
  this.monster.killUnit()
 	} else if ((this.caster !== 0)) {
@@ -52,7 +52,7 @@ const killUnit = (): void => {
 	}
 };
 
-const temporarilyDisable = (disablingTimer: timer): void => {
+const temporarilyDisable = (disablingTimer: timer) => {
 	if ((this.monster !== 0)) {
  this.monster.temporarilyDisable(disablingTimer)
 	} else if ((this.caster !== 0)) {
@@ -60,7 +60,7 @@ const temporarilyDisable = (disablingTimer: timer): void => {
 	}
 };
 
-const temporarilyEnable = (enablingTimer: timer): void => {
+const temporarilyEnable = (enablingTimer: timer) => {
 	if ((this.monster !== 0)) {
  this.monster.temporarilyEnable(enablingTimer)
 	} else if ((this.caster !== 0)) {
@@ -68,7 +68,7 @@ const temporarilyEnable = (enablingTimer: timer): void => {
 	}
 };
 
-const setBaseColor = (colorString: string): void => {
+const setBaseColor = (colorString: string) => {
 	if ((this.monster !== 0)) {
  this.monster.setBaseColor(colorString)
 	} else if ((this.caster !== 0)) {
@@ -76,7 +76,7 @@ const setBaseColor = (colorString: string): void => {
 	}
 };
 
-const setVertexColor = (vcRed: number, vcGreen: number, vcBlue: number): void => {
+const setVertexColor = (vcRed: number, vcGreen: number, vcBlue: number) => {
 	if ((this.monster !== 0)) {
  this.monster.setVertexColor(vcRed, vcGreen, vcBlue)
 	} else if ((this.caster !== 0)) {
@@ -84,7 +84,7 @@ const setVertexColor = (vcRed: number, vcGreen: number, vcBlue: number): void =>
 	}
 };
 
-const reinitColor = (): void => {
+const reinitColor = () => {
 	if ((this.monster !== 0)) {
  this.monster.reinitColor()
 	} else if ((this.caster !== 0)) {

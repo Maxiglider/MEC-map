@@ -5,15 +5,15 @@ import { TerrainFunctions } from '../Modify_terrain_Functions/Terrain_functions'
 import { TerrainModifyingTrig } from './Terrain_modifying_trig'
 
 const initChangeAllTerrains = () => {
-    let oldTerrainTypes: Array<number> = []
-    let newTerrainTypes: Array<number> = []
+    let oldTerrainTypes: number[] = []
+    let newTerrainTypes: number[] = []
     let lastTerrainArrayId: number
     let nbNewTerrains: number
     let nbNewTerrainsAllowed: number
     let udg_changeAllTerrainsAtRevive = false
     let terrainModifyWorking = false
 
-    const StartTerrainModifying = (): void => {
+    const StartTerrainModifying = () => {
         let y = Constants.MAP_MIN_Y
         TerrainModifyingTrig.StopEnabledCheckTerrainTriggers()
         TriggerClearActions(TerrainModifyingTrig.gg_trg_Terrain_modifying_trig)
@@ -118,7 +118,7 @@ const initChangeAllTerrains = () => {
 
     const ChangeAllTerrains = (mode: string): boolean => {
         //modes : normal, known, notKnown
-        let terrainTypes: Array<TerrainType> = []
+        let terrainTypes: TerrainType[] = []
         let n: number
         let i: number
 

@@ -40,7 +40,7 @@ const create = (maker: unit, mt: MonsterType, facingAngle: number): MakeMonsterN
 	return m;
 };
 
-const onDestroy = (): void => {
+const onDestroy = () => {
 	DestroyTrigger(this.t)
 	this.t = null;
 	this.maker = null;

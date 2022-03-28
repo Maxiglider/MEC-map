@@ -40,13 +40,13 @@ const create = (maker: unit, disableDuration: number): MakeClearMob => {
 	return m;
 };
 
-const onDestroy = (): void => {
+const onDestroy = () => {
 	DestroyTrigger(this.t)
 	this.t = null;
 	this.maker = null;
 };
 
-const clickMade = (monsterOrCasterId: number): void => {
+const clickMade = (monsterOrCasterId: number) => {
 	let escaper = EscaperFunctions.Hero2Escaper(this.maker);
 	if ((this.pointeurClickedMob === -1)) {
 		if ((ClearTriggerMobId2ClearMob(monsterOrCasterId) !== 0)) {

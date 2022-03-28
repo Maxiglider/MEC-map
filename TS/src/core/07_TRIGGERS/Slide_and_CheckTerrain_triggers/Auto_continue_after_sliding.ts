@@ -2,15 +2,15 @@ import { NB_ESCAPERS } from 'core/01_libraries/Constants'
 import { udg_escapers } from 'core/08_GAME/Init_structures/Init_escapers'
 
 const initAutoContinueAfterSliding = () => {
-    let lastClickedX: Array<number> = []
-    let lastClickedY: Array<number> = []
-    let lastClickedWidgets: Array<widget | null> = []
-    let isLastTargetALocation: Array<boolean> = []
-    let udg_autoContinueAfterSliding: Array<boolean> = []
+    let lastClickedX: number[] = []
+    let lastClickedY: number[] = []
+    let lastClickedWidgets: widget | null[] = []
+    let isLastTargetALocation: boolean[] = []
+    let udg_autoContinueAfterSliding: boolean[] = []
 
     const ECART_MAX_ANGLE = 45
 
-    const AutoContinueAfterSliding = (n: number): void => {
+    const AutoContinueAfterSliding = (n: number) => {
         const hero = udg_escapers.get(n).getHero()
 
         if (!hero) {
@@ -51,12 +51,12 @@ const initAutoContinueAfterSliding = () => {
         }
     }
 
-    const ClearLastClickSave = (n: number): void => {
+    const ClearLastClickSave = (n: number) => {
         isLastTargetALocation[n] = false
         lastClickedWidgets[n] = null
     }
 
-    const Init_AutoContinueAfterSliding = (): void => {
+    const Init_AutoContinueAfterSliding = () => {
         let i = 0
         while (true) {
             if (i >= NB_ESCAPERS) break

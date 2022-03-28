@@ -9,7 +9,7 @@ const initSaveWater = () => {
     let y: number
 
     //save water heights
-    const SaveWaterHeights_Actions = (): void => {
+    const SaveWaterHeights_Actions = () => {
         let x: number
         if (y <= Constants.MAP_MAX_Y) {
             x = Constants.MAP_MIN_X
@@ -27,7 +27,7 @@ const initSaveWater = () => {
         }
     }
 
-    const StartSaveWaterHeights = (): void => {
+    const StartSaveWaterHeights = () => {
         y = Constants.MAP_MIN_Y
         StringArrayForCache.stringArrayForCache = new StringArrayForCache('terrain', 'waterHeights', true)
         TriggerClearActions(SaveMapInCache.trigSaveMapInCache)

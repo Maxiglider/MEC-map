@@ -4,7 +4,7 @@ const initMMNoMoveActions = () => { // needs BasicFunctions, Escaper
 
 
 
-const MonsterMakingNoMove_Actions = (): void => {
+const MonsterMakingNoMove_Actions = () => {
 	let monster: Monster;
 	let escaper = EscaperFunctions.Hero2Escaper(GetTriggerUnit());
 	local Make mkGeneral = escaper.getMake()

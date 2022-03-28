@@ -29,7 +29,7 @@ const initMonsterType = () => { // initializer Init_MonsterType needs Immolation
 	
 
 
-const setLabel = (label: string): void => {
+const setLabel = (label: string) => {
 	this.label = label;
 };
 
@@ -66,8 +66,8 @@ const create = (label: string, unitTypeId: number, scale: number, immolationRadi
 	return mt;
 };
 
-const refresh = (): void => {
-	let levelsMaking: Array<Level> = [];
+const refresh = () => {
+	let levelsMaking: Level[] = [];
 	let escaper: Escaper;
 	let i: number;
 	let j: number;
@@ -106,7 +106,7 @@ const refresh = (): void => {
 	}
 };
 
-const onDestroy = (): void => {
+const onDestroy = () => {
  udg_levels.removeMonstersOfType(this)
 };
 
@@ -222,7 +222,7 @@ const getImmolationRadiusStr = (): string => {
 	return I2S(S2I(immoStr));
 };
 
-const displayForPlayer = (p: player): void => {
+const displayForPlayer = (p: player) => {
 	let space = "   ";
 	let display = udg_colorCode[RED] + this.label + " " + this.theAlias + " : '";
 	let scaleDisplay: string;
@@ -245,7 +245,7 @@ const displayForPlayer = (p: player): void => {
 	Text.P_timed(p, TERRAIN_DATA_DISPLAY_TIME, display)
 };
 
-const displayTotalForPlayer = (p: player): void => {
+const displayTotalForPlayer = (p: player) => {
 	let space = "   ";
 	let display = udg_colorCode[RED] + this.label + " " + this.theAlias + " : '";
 	let scaleDisplay: string;
@@ -282,7 +282,7 @@ const toString = (): string => {
 
 
 //===========================================================================
-const Init_MonsterType = (): void => {};
+const Init_MonsterType = () => {};
 
 
 

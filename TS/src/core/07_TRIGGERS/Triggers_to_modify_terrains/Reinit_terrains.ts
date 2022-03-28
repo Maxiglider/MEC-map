@@ -86,7 +86,7 @@ const initReinitTerrains = () => {
         terrainModifyWorking = true
     }
 
-    const ReinitTerrains = (): void => {
+    const ReinitTerrains = () => {
         let i: number
 
         if (terrainModifyWorking) {

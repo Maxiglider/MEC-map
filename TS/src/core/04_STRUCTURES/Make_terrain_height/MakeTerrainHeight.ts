@@ -40,7 +40,7 @@ const getHeight = (): number => {
 	return this.height;
 };
 
-const onDestroy = (): void => {
+const onDestroy = () => {
 	DestroyTrigger(this.t)
 	this.t = null;
 	this.maker = null;

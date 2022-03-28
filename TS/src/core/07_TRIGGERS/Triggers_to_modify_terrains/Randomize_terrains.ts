@@ -9,7 +9,7 @@ const initRandomizeTerrains = () => {
     let lastTerrainArrayId: number
     let terrainModifyWorking = false
 
-    const StartTerrainModifying = (): void => {
+    const StartTerrainModifying = () => {
         TerrainModifyingTrig.StopEnabledCheckTerrainTriggers()
         TriggerClearActions(TerrainModifyingTrig.gg_trg_Terrain_modifying_trig)
         TriggerAddAction(TerrainModifyingTrig.gg_trg_Terrain_modifying_trig, () => {
@@ -51,10 +51,10 @@ const initRandomizeTerrains = () => {
         terrainModifyWorking = true
     }
 
-    const RandomizeTerrains = (): void => {
+    const RandomizeTerrains = () => {
         let i: number
         let n: number
-        let isTaken: Array<boolean> = []
+        let isTaken: boolean[] = []
         let terrainTypes: TerrainType[] = []
 
         if (terrainModifyWorking) {

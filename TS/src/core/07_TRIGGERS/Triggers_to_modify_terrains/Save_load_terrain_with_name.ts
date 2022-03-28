@@ -10,14 +10,14 @@ const initSaveLoadTerrainWithName = () => {
     let terrainModifyWorking = false
 
     //save terrain
-    const SaveTerrainWithName = (saveName: string): void => {
+    const SaveTerrainWithName = (saveName: string) => {
         if (terrainModifyWorking) {
             Text.erA("can't execute two commands of this type simultaneously !")
             return
         }
         saveNameInt = StringHash(saveName)
         TriggerClearActions(TerrainModifyingTrig.gg_trg_Terrain_modifying_trig)
-        TriggerAddAction(TerrainModifyingTrig.gg_trg_Terrain_modifying_trig, (): void => {
+        TriggerAddAction(TerrainModifyingTrig.gg_trg_Terrain_modifying_trig, () => {
             let x = Constants.MAP_MIN_X
             while (true) {
                 if (x > Constants.MAP_MAX_X) break
@@ -66,7 +66,7 @@ const initSaveLoadTerrainWithName = () => {
             return false
         }
         TriggerClearActions(TerrainModifyingTrig.gg_trg_Terrain_modifying_trig)
-        TriggerAddAction(TerrainModifyingTrig.gg_trg_Terrain_modifying_trig, (): void => {
+        TriggerAddAction(TerrainModifyingTrig.gg_trg_Terrain_modifying_trig, () => {
             let terrainType: TerrainType
             let x: number
             //local integer i = 1

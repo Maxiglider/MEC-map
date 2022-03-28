@@ -3,7 +3,7 @@
 const initTerrainVerticalSymmetryActions = () => { // needs Escaper
 
 
-const TerrainVerticalSymmetry_Actions = (): void => {
+const TerrainVerticalSymmetry_Actions = () => {
 	let action: MakeAction;
 	let escaper = EscaperFunctions.Hero2Escaper(GetTriggerUnit());
 	local Make mkGeneral = escaper.getMake()

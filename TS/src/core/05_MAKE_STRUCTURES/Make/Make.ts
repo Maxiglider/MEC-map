@@ -50,7 +50,7 @@ export abstract class Make {
         return true
     }
 
-    abstract doActions(): void
+    abstract doActions()
 
     enableTrigger() {
         if (this.t) DestroyTrigger(this.t)
