@@ -58,7 +58,7 @@ class MonsterSpawnArray {
         //if (n > this.lastInstance) then
         this.lastInstance = n
         //endif
-        this.monsterSpawns[n] = MonsterSpawn.create(label, mt, sens, frequence, x1, y1, x2, y2)
+        this.monsterSpawns[n] = new MonsterSpawn(label, mt, sens, frequence, x1, y1, x2, y2)
         if (activate) {
             this.monsterSpawns[n].activate()
         }

@@ -37,7 +37,7 @@ export class MonsterMultiplePatrolsArray {
         //if (n > this.lastInstance) then
         this.lastInstance = n
         //endif
-        this.monsters[n] = MonsterMultiplePatrols.create(mt, mode)
+        this.monsters[n] = new MonsterMultiplePatrols(mt, mode)
         if (createUnit) {
             this.monsters[n].createUnit()
         }

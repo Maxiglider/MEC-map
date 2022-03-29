@@ -40,7 +40,7 @@ export class MonsterNoMoveArray {
         //if (n > this.lastInstance) then
         this.lastInstance = n
         //endif
-        this.monsters[n] = MonsterNoMove.create(mt, x, y, angle)
+        this.monsters[n] = new MonsterNoMove(mt, x, y, angle)
         if (createUnit) {
             this.monsters[n].createUnit()
         }

@@ -41,7 +41,7 @@ export class MonsterTeleportArray {
         //if (n > this.lastInstance) then
         this.lastInstance = n
         //endif
-        this.monsters[n] = MonsterTeleport.create(mt, period, angle, mode)
+        this.monsters[n] = new MonsterTeleport(mt, period, angle, mode)
         if (createUnit) {
             this.monsters[n].createUnit()
         }

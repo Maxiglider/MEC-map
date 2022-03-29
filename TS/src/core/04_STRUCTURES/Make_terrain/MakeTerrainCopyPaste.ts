@@ -132,16 +132,7 @@ export class MakeTerrainCopyPaste extends Make {
                     this.isPoint3Saved = true
                     this.isPoint3Used = true
                 } else {
-                    action = MakeTerrainCopyPasteAction.create(
-                        this.x1,
-                        this.y1,
-                        this.x2,
-                        this.y2,
-                        this.x3,
-                        this.y3,
-                        x,
-                        y
-                    )
+                    action = new MakeTerrainCopyPasteAction(this.x1, this.y1, this.x2, this.y2, this.x3, this.y3, x, y)
                     if (action !== 0) {
                         this.unsaveLocsDefinitely()
                         EscaperFunctions.Hero2Escaper(this.maker).newAction(action)

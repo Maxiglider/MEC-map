@@ -35,7 +35,7 @@ export class ClearMobArray {
         //if (n > this.lastInstance) then
         this.lastInstance = n
         //endif
-        this.clearMobs[n] = ClearMob.create(triggerMobId, disableDuration)
+        this.clearMobs[n] = new ClearMob(triggerMobId, disableDuration)
         if (initialize) {
             this.clearMobs[n].initialize()
         }

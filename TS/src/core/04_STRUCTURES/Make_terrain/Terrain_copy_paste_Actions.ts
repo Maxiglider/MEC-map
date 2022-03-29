@@ -1,22 +1,17 @@
+const initTerrainCopyPasteActions = () => {
+    // needs Escaper
 
+    const TerrainCopyPaste_Actions = () => {
+        let escaper = EscaperFunctions.Hero2Escaper(GetTriggerUnit())
+        let mkGeneral: Make = escaper.getMake()
+        let mk: MakeTerrainCopyPaste = MakeTerrainCopyPaste(integer(mkGeneral))
+        let x = GetOrderPointX()
+        let y = GetOrderPointY()
 
-const initTerrainCopyPasteActions = () => { // needs Escaper
-
-
-const TerrainCopyPaste_Actions = () => {
-	let escaper = EscaperFunctions.Hero2Escaper(GetTriggerUnit());
-	local Make mkGeneral = escaper.getMake()
-		local MakeTerrainCopyPaste mk = MakeTerrainCopyPaste(integer(mkGeneral))
-	let x = GetOrderPointX();
-	let y = GetOrderPointY();
-
-	if ((!BasicFunctions.IsIssuedOrder("smart"))) {
-		return;
-	}
- BasicFunctions.StopUnit(mk.maker)	
- mk.saveLoc(x, y)
-};
-
-
-
+        if (!BasicFunctions.IsIssuedOrder('smart')) {
+            return
+        }
+        BasicFunctions.StopUnit(mk.maker)
+        mk.saveLoc(x, y)
+    }
 }

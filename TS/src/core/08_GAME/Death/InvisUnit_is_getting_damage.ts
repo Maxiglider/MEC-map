@@ -1,6 +1,7 @@
 //évènement ajouté à la création de l'unité invisible
 
 import { DUMMY_POWER_CIRCLE, GM_KILLING_EFFECT } from 'core/01_libraries/Constants'
+import { MonsterOrCaster } from 'core/04_STRUCTURES/MonsterOrCaster/MonsterOrCaster'
 import { createEvent } from 'Utils/mapUtils'
 import { udg_escapers } from '../Init_structures/Init_escapers'
 
@@ -49,7 +50,7 @@ export const InitTrig_InvisUnit_is_getting_damage = () => {
                         } else if (escaper.isGodModeOn()) {
                             if (escaper.doesGodModeKills()) {
                                 if (GetUnitUserData(killingUnit) !== 0) {
-                                    moc = MonsterOrCaster.create(GetUnitUserData(killingUnit))
+                                    moc = new MonsterOrCaster(GetUnitUserData(killingUnit))
                                     moc.killUnit() //on ne tue pas directement le monstre, pour pouvoir exécuter des actions secondaires
                                     moc.destroy()
                                 } else {

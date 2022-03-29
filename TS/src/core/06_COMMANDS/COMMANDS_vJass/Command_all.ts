@@ -482,7 +482,7 @@ const initCommandAll = () => {
             //mode recherche
             //param = cmd_param(cmd, 0)
             //n = StringLength(param)
-            //if (SubStringBJ(param, 1, 1) == "\"" and SubStringBJ(param, n, n) == "\"") then
+            //if (SubStringBJ(param, 1, 1) == "\"" && SubStringBJ(param, n, n) == "\"") then
             //    call DisplayTerrainDataSearchToPlayer(TP, SubStringBJ(param, 2, n-1))
             //endif
             return true

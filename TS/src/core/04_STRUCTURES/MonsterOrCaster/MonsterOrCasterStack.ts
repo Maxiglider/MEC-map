@@ -18,7 +18,7 @@ export class MonsterOrCasterStack {
         if (monsterOrCaster === null) {
             return false
         }
-        newElement = this.create(this.monsterOrCaster)
+        newElement = new this(this.monsterOrCaster)
         newElement.nextElement = this.nextElement
         this.monsterOrCaster = monsterOrCaster
         this.nextElement = newElement

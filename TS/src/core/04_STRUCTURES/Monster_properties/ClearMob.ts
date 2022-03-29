@@ -98,7 +98,7 @@ export class ClearMob {
         ) {
             return 0
         }
-        triggerMob = MonsterOrCaster.create(triggerMobId)
+        triggerMob = new MonsterOrCaster(triggerMobId)
         if (triggerMob !== 0) {
             clearMob = ClearMob.allocate()
             clearMob.triggerMob = triggerMob
@@ -153,10 +153,10 @@ export class ClearMob {
             return false
         }
         if (this.blockMobs === 0) {
-            this.blockMobs = MonsterOrCasterStack.create(MonsterOrCaster.create(blockMobId))
+            this.blockMobs = new MonsterOrCasterStack(new MonsterOrCaster(blockMobId))
             return this.blockMobs !== 0
         } else {
-            return this.blockMobs.addMonsterOrCaster(MonsterOrCaster.create(blockMobId))
+            return this.blockMobs.addMonsterOrCaster(new MonsterOrCaster(blockMobId))
         }
     }
 

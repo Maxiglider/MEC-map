@@ -27,7 +27,7 @@ export class TerrainTypeDeath {
         this.terrainTypeId = terrainTypeId
         this.killingEffectStr = killingEffectStr
         this.timeToKill = timeToKill
-        this.killingTimers = KillingTimers.create()
+        this.killingTimers = new KillingTimers()
         this.kind = 'death'
         this.toleranceDist = toleranceDist
         this.orderId = 0

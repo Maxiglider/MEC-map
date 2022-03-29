@@ -32,7 +32,7 @@ export class MonsterTypeArray {
         if (this.isLabelAlreadyUsed(label)) {
             return 0
         }
-        this.monsterTypes[n] = MonsterType.create(label, unitTypeId, scale, immolationRadius, speed, isClickable)
+        this.monsterTypes[n] = new MonsterType(label, unitTypeId, scale, immolationRadius, speed, isClickable)
         if (this.monsterTypes[n] !== 0) {
             this.numberOfMonsterTypes = this.numberOfMonsterTypes + 1
         }
@@ -83,7 +83,7 @@ export class MonsterTypeArray {
     }
 
     monsterUnit2KillEffectStr = (monsterUnit: unit): string => {
-        const moc = MonsterOrCaster.create(GetUnitUserData(monsterUnit))
+        const moc = new MonsterOrCaster(GetUnitUserData(monsterUnit))
         const mt = moc.getMonsterType()
         moc.destroy()
         return mt.getKillingEffectStr()

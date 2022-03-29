@@ -108,7 +108,7 @@ export class TerrainTypeArray {
         ) {
             return 0
         }
-        this.ttWalk[n] = TerrainTypeWalk.create(label, terrainTypeId, walkspeed)
+        this.ttWalk[n] = new TerrainTypeWalk(label, terrainTypeId, walkspeed)
         if (this.ttWalk[n] !== 0) {
             this.numberOfWalk = this.numberOfWalk + 1
         }
@@ -131,7 +131,7 @@ export class TerrainTypeArray {
         ) {
             return 0
         }
-        this.ttDeath[n] = TerrainTypeDeath.create(label, terrainTypeId, killingEffectStr, timeToKill, toleranceDist)
+        this.ttDeath[n] = new TerrainTypeDeath(label, terrainTypeId, killingEffectStr, timeToKill, toleranceDist)
         if (this.ttDeath[n] !== 0) {
             this.numberOfDeath = this.numberOfDeath + 1
         }
@@ -148,7 +148,7 @@ export class TerrainTypeArray {
         ) {
             return 0
         }
-        this.ttSlide[n] = TerrainTypeSlide.create(label, terrainTypeId, slideSpeed, canTurn)
+        this.ttSlide[n] = new TerrainTypeSlide(label, terrainTypeId, slideSpeed, canTurn)
         if (this.ttSlide[n] !== 0) {
             this.numberOfSlide = this.numberOfSlide + 1
         }

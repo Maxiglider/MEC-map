@@ -65,7 +65,7 @@ export class MakeMonsterTeleport extends Make {
         let escaper: Escaper
         if (this.monster != 0 && this.monster.u != null) {
             escaper = EscaperFunctions.Hero2Escaper(this.maker)
-            escaper.newAction(MakeMonsterAction.create(escaper.getMakingLevel(), this.monster))
+            escaper.newAction(new MakeMonsterAction(escaper.getMakingLevel(), this.monster))
         } else {
             this.monster.destroy()
         }
@@ -84,7 +84,7 @@ export class MakeMonsterTeleport extends Make {
         this.unitLastClic = null
         if (this.monster != 0 && this.monster.u != null) {
             escaper = EscaperFunctions.Hero2Escaper(this.maker)
-            escaper.newAction(MakeMonsterAction.create(escaper.getMakingLevel(), this.monster))
+            escaper.newAction(new MakeMonsterAction(escaper.getMakingLevel(), this.monster))
         } else {
             this.monster.destroy()
         }

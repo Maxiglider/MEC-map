@@ -216,7 +216,7 @@ const initCasterFunctions = () => {
                         angleDeTir = Atan2BJ(yHero - y3, xHero - x3)
                         SetUnitFacing(caster.getCasterUnit(), angleDeTir)
                         SetUnitAnimation(caster.getCasterUnit(), caster.getAnimation())
-                        CasterShot.create(
+                        new CasterShot(
                             caster.getProjectileMonsterType(),
                             x3,
                             y3,

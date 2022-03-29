@@ -1014,14 +1014,14 @@ export class Escaper {
 
     makeDoNothing() {
         this.destroyMake()
-        this.make = MakeDoNothing.create(this.hero)
+        this.make = new MakeDoNothing(this.hero)
     }
 
     makeCreateNoMoveMonsters(mt: MonsterType, facingAngle: number) {
         this.onInitMake()
         //mode : noMove
         this.destroyMake()
-        this.make = MakeMonsterNoMove.create(this.hero, mt, facingAngle)
+        this.make = new MakeMonsterNoMove(this.hero, mt, facingAngle)
     }
 
     makeCreateSimplePatrolMonsters(mode: string, mt: MonsterType) {
@@ -1029,7 +1029,7 @@ export class Escaper {
         this.destroyMake()
         //modes : normal, string, auto
         if (mode == 'normal' || mode == 'string' || mode == 'auto') {
-            this.make = MakeMonsterSimplePatrol.create(this.hero, mode, mt)
+            this.make = new MakeMonsterSimplePatrol(this.hero, mode, mt)
         }
     }
 
@@ -1038,7 +1038,7 @@ export class Escaper {
         this.destroyMake()
         //modes : normal, string
         if (mode == 'normal' || mode == 'string') {
-            this.make = MakeMonsterMultiplePatrols.create(this.hero, mode, mt)
+            this.make = new MakeMonsterMultiplePatrols(this.hero, mode, mt)
         }
     }
 
@@ -1047,7 +1047,7 @@ export class Escaper {
         this.destroyMake()
         //modes : normal, string
         if (mode == 'normal' || mode == 'string') {
-            this.make = MakeMonsterTeleport.create(this.hero, mode, mt, period, angle)
+            this.make = new MakeMonsterTeleport(this.hero, mode, mt, period, angle)
         }
     }
 
@@ -1089,7 +1089,7 @@ export class Escaper {
     makeCreateMonsterSpawn(label: string, mt: MonsterType, sens: string, frequence: number) {
         this.onInitMake()
         this.destroyMake()
-        this.make = MakeMonsterSpawn.create(this.hero, label, mt, sens, frequence)
+        this.make = new MakeMonsterSpawn(this.hero, label, mt, sens, frequence)
     }
 
     makeDeleteMonsters(mode: string) {
@@ -1108,7 +1108,7 @@ export class Escaper {
             return
         }
 
-        this.make = MakeDeleteMonsters.create(this.hero, mode)
+        this.make = new MakeDeleteMonsters(this.hero, mode)
     }
 
     makeSetUnitTeleportPeriod(mode: string, period: number) {
@@ -1120,13 +1120,13 @@ export class Escaper {
             return
         }
 
-        this.make = MakeSetUnitTeleportPeriod.create(this.hero, mode, period)
+        this.make = new MakeSetUnitTeleportPeriod(this.hero, mode, period)
     }
 
     makeGetUnitTeleportPeriod() {
         this.onInitMake()
         this.destroyMake()
-        this.make = MakeGetUnitTeleportPeriod.create(this.hero)
+        this.make = new MakeGetUnitTeleportPeriod(this.hero)
     }
 
     makeSetUnitMonsterType(mode: string, mt: MonsterType) {
@@ -1138,13 +1138,13 @@ export class Escaper {
             return
         }
 
-        this.make = MakeSetUnitMonsterType.create(this.hero, mode, mt)
+        this.make = new MakeSetUnitMonsterType(this.hero, mode, mt)
     }
 
     makeCreateMeteor() {
         this.onInitMake()
         this.destroyMake()
-        this.make = MakeMeteor.create(this.hero)
+        this.make = new MakeMeteor(this.hero)
     }
 
     makeDeleteMeteors(mode: string) {
@@ -1156,13 +1156,13 @@ export class Escaper {
             return
         }
 
-        this.make = MakeDeleteMeteors.create(this.hero, mode)
+        this.make = new MakeDeleteMeteors(this.hero, mode)
     }
 
     makeCreateCaster(casterType: ICasterType, angle: number) {
         this.onInitMake()
         this.destroyMake()
-        this.make = MakeCaster.create(this.hero, casterType, angle)
+        this.make = new MakeCaster(this.hero, casterType, angle)
     }
 
     makeDeleteCasters(mode: string) {
@@ -1174,79 +1174,79 @@ export class Escaper {
             return
         }
 
-        this.make = MakeDeleteCasters.create(this.hero, mode)
+        this.make = new MakeDeleteCasters(this.hero, mode)
     }
 
     makeCreateClearMobs(disableDuration: number) {
         this.onInitMake()
         this.destroyMake()
-        this.make = MakeClearMob.create(this.hero, disableDuration)
+        this.make = new MakeClearMob(this.hero, disableDuration)
     }
 
     makeDeleteClearMobs() {
         this.onInitMake()
         this.destroyMake()
-        this.make = MakeDeleteClearMob.create(this.hero)
+        this.make = new MakeDeleteClearMob(this.hero)
     }
 
     makeCreateTerrain(terrainType: TerrainType) {
         this.onInitMake()
         this.destroyMake()
-        this.make = MakeTerrainCreate.create(this.hero, terrainType)
+        this.make = new MakeTerrainCreate(this.hero, terrainType)
     }
 
     makeTerrainCopyPaste() {
         this.onInitMake()
         this.destroyMake()
-        this.make = MakeTerrainCopyPaste.create(this.hero)
+        this.make = new MakeTerrainCopyPaste(this.hero)
     }
 
     makeTerrainVerticalSymmetry() {
         this.onInitMake()
         this.destroyMake()
-        this.make = MakeTerrainVerticalSymmetry.create(this.hero)
+        this.make = new MakeTerrainVerticalSymmetry(this.hero)
     }
 
     makeTerrainHorizontalSymmetry() {
         this.onInitMake()
         this.destroyMake()
-        this.make = MakeTerrainHorizontalSymmetry.create(this.hero)
+        this.make = new MakeTerrainHorizontalSymmetry(this.hero)
     }
 
     makeTerrainHeight(radius: number, height: number) {
         this.onInitMake()
         this.destroyMake()
-        this.make = MakeTerrainHeight.create(this.hero, radius, height)
+        this.make = new MakeTerrainHeight(this.hero, radius, height)
     }
 
     makeGetTerrainType() {
         this.onInitMake()
         this.destroyMake()
-        this.make = MakeGetTerrainType.create(this.hero)
+        this.make = new MakeGetTerrainType(this.hero)
     }
 
     makeExchangeTerrains() {
         this.onInitMake()
         this.destroyMake()
-        this.make = MakeExchangeTerrains.create(this.hero)
+        this.make = new MakeExchangeTerrains(this.hero)
     }
 
     makeCreateStart(forNext: boolean) {
         this.onInitMake()
         this.destroyMake()
-        this.make = MakeStart.create(this.hero, forNext)
+        this.make = new MakeStart(this.hero, forNext)
     }
 
     makeCreateEnd() {
         this.onInitMake()
         this.destroyMake()
-        this.make = MakeEnd.create(this.hero)
+        this.make = new MakeEnd(this.hero)
     }
 
     makeCreateVisibilityModifier() {
         this.onInitMake()
         this.destroyMake()
-        this.make = MakeVisibilityModifier.create(this.hero)
+        this.make = new MakeVisibilityModifier(this.hero)
     }
 
     cancelLastAction() {

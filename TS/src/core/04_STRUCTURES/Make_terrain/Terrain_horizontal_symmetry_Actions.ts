@@ -1,32 +1,28 @@
+const initTerrainHorizontalSymmetryActions = () => {
+    // needs Escaper
 
+    const TerrainHorizontalSymmetry_Actions = () => {
+        let action: MakeAction
+        let escaper = EscaperFunctions.Hero2Escaper(GetTriggerUnit())
+        let mkGeneral: Make = escaper.getMake()
+        let mk: MakeTerrainHorizontalSymmetry = MakeTerrainHorizontalSymmetry(integer(mkGeneral))
+        let x = GetOrderPointX()
+        let y = GetOrderPointY()
 
-const initTerrainHorizontalSymmetryActions = () => { // needs Escaper
-
-
-const TerrainHorizontalSymmetry_Actions = () => {
-	let action: MakeAction;
-	let escaper = EscaperFunctions.Hero2Escaper(GetTriggerUnit());
-	local Make mkGeneral = escaper.getMake()
-		local MakeTerrainHorizontalSymmetry mk = MakeTerrainHorizontalSymmetry(integer(mkGeneral))
-	let x = GetOrderPointX();
-	let y = GetOrderPointY();
-
-	if ((!BasicFunctions.IsIssuedOrder("smart"))) {
-		return;
-	}
- BasicFunctions.StopUnit(mk.maker)	
-	if ( (mk.isLastLocSavedUsed()) ) {
-		action = MakeTerrainHorizontalSymmetryAction.create(mk.lastX, mk.lastY, x, y)
-		if ((action === 0)) {
- Text.erP(escaper.getPlayer(), "too big zone")
-		} else {
- escaper.newAction(action)
- mk.unsaveLocDefinitely()
-		}
-	} else {
- mk.saveLoc(x, y)
-	}
-};
-
-
+        if (!BasicFunctions.IsIssuedOrder('smart')) {
+            return
+        }
+        BasicFunctions.StopUnit(mk.maker)
+        if (mk.isLastLocSavedUsed()) {
+            action = new MakeTerrainHorizontalSymmetryAction(mk.lastX, mk.lastY, x, y)
+            if (action === 0) {
+                Text.erP(escaper.getPlayer(), 'too big zone')
+            } else {
+                escaper.newAction(action)
+                mk.unsaveLocDefinitely()
+            }
+        } else {
+            mk.saveLoc(x, y)
+        }
+    }
 }

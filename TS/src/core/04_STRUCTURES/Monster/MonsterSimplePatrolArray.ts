@@ -40,7 +40,7 @@ export class MonsterSimplePatrolArray {
         //if (n > this.lastInstance) then
         this.lastInstance = n
         //endif
-        this.monsters[n] = MonsterSimplePatrol.create(mt, x1, y1, x2, y2)
+        this.monsters[n] = new MonsterSimplePatrol(mt, x1, y1, x2, y2)
         if (createUnit) {
             this.monsters[n].createUnit()
         }

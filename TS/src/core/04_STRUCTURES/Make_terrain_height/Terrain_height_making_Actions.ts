@@ -1,23 +1,17 @@
+const initTerrainHeightMakingActions = () => {
+    // needs BasicFunctions, Escaper
 
+    const TerrainHeightMaking_Actions = () => {
+        let escaper = EscaperFunctions.Hero2Escaper(GetTriggerUnit())
+        let mkGeneral: Make = escaper.getMake()
+        let mk: MakeTerrainHeight = MakeTerrainHeight(integer(mkGeneral))
+        let x = GetOrderPointX()
+        let y = GetOrderPointY()
 
-const initTerrainHeightMakingActions = () => { // needs BasicFunctions, Escaper
-
-
-
-const TerrainHeightMaking_Actions = () => {
-	let escaper = EscaperFunctions.Hero2Escaper(GetTriggerUnit());
-	local Make mkGeneral = escaper.getMake()
-		local MakeTerrainHeight mk = MakeTerrainHeight(integer(mkGeneral))
-	let x = GetOrderPointX();
-	let y = GetOrderPointY();
-
-	if ((!BasicFunctions.IsIssuedOrder("smart"))) {
-		return;
-	}
- BasicFunctions.StopUnit(mk.maker)
- escaper.newAction(MakeTerrainHeightAction.create(mk.getRadius(), mk.getHeight(), x, y))
-};
-
-
-
+        if (!BasicFunctions.IsIssuedOrder('smart')) {
+            return
+        }
+        BasicFunctions.StopUnit(mk.maker)
+        escaper.newAction(new MakeTerrainHeightAction(mk.getRadius(), mk.getHeight(), x, y))
+    }
 }
