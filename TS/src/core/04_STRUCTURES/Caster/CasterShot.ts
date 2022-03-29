@@ -1,79 +1,53 @@
+import { Constants } from 'core/01_libraries/Constants'
+import { createEvent } from 'Utils/mapUtils'
+import { MonsterCreationFunctions } from '../Monster/Monster_creation_functions'
 
+const PERIOD = 0.01
 
-const initCasterShot = () => { // initializer InitCasterShot needs MonsterCreationFunctions
+export class CasterShot {
+    x: number
+    y: number
+    diffX: number
+    diffY: number
+    nbTeleportationsRestantes: number
+    unite: unit
+    private trig: trigger
 
+    constructor(monsterType: MonsterType, Xdep: number, Ydep: number, angle: number, speed: number, portee: number) {
+        this.x = Xdep
+        this.y = Ydep
+        this.diffX = speed * CosBJ(angle) * PERIOD
+        this.diffY = speed * SinBJ(angle) * PERIOD
+        this.nbTeleportationsRestantes = R2I(portee / speed / PERIOD)
+        this.unite = MonsterCreationFunctions.NewImmobileMonster(monsterType, Xdep, Ydep, angle)
 
-// TODO; Used to be private
-let shotsHashtable: hashtable;
-// TODO; Used to be private
-const PERIOD = 0.01;
+        const shot = this
 
+        this.trig = createEvent({
+            events: [t => TriggerRegisterTimerEvent(t, PERIOD, true)],
+            actions: [
+                () => {
+                    shot.x = shot.x + shot.diffX
+                    shot.y = shot.y + shot.diffY
+                    if (shot.x >= Constants.MAP_MIN_X && shot.x <= Constants.MAP_MAX_X) {
+                        SetUnitX(shot.unite, shot.x)
+                    }
+                    if (shot.y >= Constants.MAP_MIN_Y && shot.y <= Constants.MAP_MAX_Y) {
+                        SetUnitY(shot.unite, shot.y)
+                    }
+                    shot.nbTeleportationsRestantes = shot.nbTeleportationsRestantes - 1
+                    if (shot.nbTeleportationsRestantes == 0) {
+                        shot.destroy()
+                    }
+                },
+            ],
+        })
+    }
 
-
-// TODO; Used to be private
-const CasterShot_Actions = () => {
-	let shot = CasterShot(LoadInteger(shotsHashtable, 0, GetHandleId(GetTriggeringTrigger())));
-	shot.x = shot.x + shot.diffX
-	shot.y = shot.y + shot.diffY
-	if ( (shot.x >= MAP_MIN_X and shot.x <= MAP_MAX_X) ) {
- SetUnitX(shot.unite, shot.x)
-	}
-	if ( (shot.y >= MAP_MIN_Y and shot.y <= MAP_MAX_Y) ) {
- SetUnitY(shot.unite, shot.y)
-	}
-	shot.nbTeleportationsRestantes = shot.nbTeleportationsRestantes - 1
-	if ( (shot.nbTeleportationsRestantes == 0) ) {
- shot.destroy()
-	}
-};
-
-
-
-//struct CasterShot
-
-    real x
-    real y
-    real diffX
-    real diffY
-    integer nbTeleportationsRestantes
-    unit unite
-// TODO; Used to be private
-     trigger trig
-
-// TODO; Used to be static
-     
-
-
-const create = (monsterType: MonsterType, Xdep: number, Ydep: number, angle: number, speed: number, portee: number): CasterShot => {
-	local CasterShot t = CasterShot.allocate()
-	t.x = Xdep
-	t.y = Ydep
-	t.diffX = speed * CosBJ(angle) * PERIOD
-	t.diffY = speed * SinBJ(angle) * PERIOD
-	t.nbTeleportationsRestantes = R2I((portee / speed) / PERIOD)
-	t.unite = NewImmobileMonster(monsterType, Xdep, Ydep, angle)
-	t.trig = CreateTrigger()
- TriggerRegisterTimerEvent(t.trig, PERIOD, true)
- TriggerAddAction(t.trig, function CasterShot_Actions)
- SaveInteger(shotsHashtable, 0, GetHandleId(t.trig), t)
-	return t;
-};
-
-const onDestroy = () => {
-	RemoveUnit(this.unite)
-	this.unite = null;
-	DestroyTrigger(this.trig)
-	this.trig = null;
-};
-
-//endstruct
-
-
-//===========================================================================
-const InitCasterShot = () => {
-	shotsHashtable = InitHashtable();
-};
-
-
-
+    destroy = () => {
+        RemoveUnit(this.unite)
+        ;(this.unite as any) = null
+        DestroyTrigger(this.trig)
+        ;(this.trig as any) = null
+    }
 }
