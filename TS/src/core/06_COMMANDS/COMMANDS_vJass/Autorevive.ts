@@ -1,9 +1,9 @@
 import { EscaperFunctions } from 'core/04_STRUCTURES/Escaper/Escaper_functions'
 import { createEvent } from 'Utils/mapUtils'
 
-let udg_autoreviveDelay = 4
+const InitTrig_Autorevive = () => {
+    let udg_autoreviveDelay = 4
 
-export const InitTrig_Autorevive = () => {
     createEvent({
         events: [t => TriggerRegisterAnyUnitEventBJ(t, EVENT_PLAYER_UNIT_DEATH)],
         conditions: [() => EscaperFunctions.IsHero(GetTriggerUnit())],
@@ -19,4 +19,8 @@ export const InitTrig_Autorevive = () => {
             },
         ],
     })
+
+    return { udg_autoreviveDelay }
 }
+
+export const Trig_Autorevive = InitTrig_Autorevive()

@@ -5,7 +5,6 @@ import { InitTrig_Effect_meteor_on_pick_up } from 'core/04_STRUCTURES/Meteor/Eff
 import { InitTrig_Meteor_being_used } from 'core/04_STRUCTURES/Meteor/Meteor_being_used'
 import { InitTrig_Right_click_on_widget } from 'core/04_STRUCTURES/Meteor/Right_click_on_widget'
 import { InitTrig_Stop_using_normal_meteor } from 'core/04_STRUCTURES/Meteor/Stop_using_normal_meteor'
-import { InitTrig_Autorevive } from 'core/06_COMMANDS/COMMANDS_vJass/Autorevive'
 import { InitTrig_Afk_mode_ordre_recu } from 'core/08_GAME/Afk_mode/Afk_mode_ordre_recu'
 import { InitTrig_Camera_reset } from 'core/08_GAME/Camera_reset/Camera_reset'
 import { InitTrig_A_hero_dies_check_if_all_dead_and_sounds } from 'core/08_GAME/Death/A_hero_dies_check_if_all_dead_and_sounds'
@@ -23,7 +22,6 @@ import { InitTrig_creation_dialogue } from 'core/08_GAME/Mode_coop/creation_dial
 import { InitTrig_Select_hero } from 'core/08_GAME/Select_and_unselect_heroes/Select_hero'
 import { InitTrig_Unselect_hero } from 'core/08_GAME/Select_and_unselect_heroes/Unselect_hero'
 import { InitTrig_Using_shortcut } from 'core/08_GAME/Shortcuts/Using_shortcut'
-import { initCommandExecution } from '../06_COMMANDS/COMMANDS_vJass/Command_execution'
 
 export const initOldTriggers = () => {
     Init_terrain_limit_variables()
@@ -131,8 +129,6 @@ export const initOldTriggers = () => {
     // InitTrig_MakeTerrainHeightAction()
     // InitTrig_MakeVisibilityModifierAction()
     // InitTrig_MakeLastActions()
-    InitTrig_Autorevive()
-    initCommandExecution()
     InitTrig_Init_lives()
     InitTrig_Init_struct_levels()
     InitTrig_Forces_ally()

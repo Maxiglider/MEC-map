@@ -6,9 +6,12 @@ import { Text } from 'core/01_libraries/Text'
 import { ViewAllHideAll } from 'core/03_view_all_hide_all/View_all_hide_all'
 import { Escaper } from 'core/04_STRUCTURES/Escaper/Escaper'
 import { EscaperFunctions } from 'core/04_STRUCTURES/Escaper/Escaper_functions'
+import { METEOR_CHEAT } from 'core/04_STRUCTURES/Meteor/Meteor'
 import { Gravity } from 'core/07_TRIGGERS/Slide_and_CheckTerrain_triggers/Gravity'
 import { udg_escapers } from 'core/08_GAME/Init_structures/Init_escapers'
+import { udg_levels } from 'core/08_GAME/Init_structures/Init_struct_levels'
 import { MeteorFunctions } from '../../04_STRUCTURES/Meteor/Meteor_functions'
+import { Trig_InvisUnit_is_getting_damage } from '../../08_GAME/Death/InvisUnit_is_getting_damage'
 import { CommandsFunctions } from './Command_functions'
 import { Teleport } from './Teleport'
 
@@ -59,7 +62,7 @@ const initCommandCheat = () => {
                 i = 0
                 while (true) {
                     if (i >= NB_ESCAPERS) break
-                    if (udg_escapers.get(i) != 0) {
+                    if (udg_escapers.get(i) != null) {
                         udg_escapers.get(i).absoluteSlideSpeed(speed)
                     }
                     i = i + 1
@@ -68,7 +71,7 @@ const initCommandCheat = () => {
                 return true
             }
             if (CommandsFunctions.IsPlayerColorString(param2)) {
-                if (udg_escapers.get(ColorCodes.ColorString2Id(param2)) != 0) {
+                if (udg_escapers.get(ColorCodes.ColorString2Id(param2)) != null) {
                     udg_escapers.get(ColorCodes.ColorString2Id(param2)).absoluteSlideSpeed(speed)
                     Text.P(escaper.getPlayer(), 'slide speed for player ' + param2 + ' is to ' + param1)
                 }
@@ -90,7 +93,7 @@ const initCommandCheat = () => {
                 i = 0
                 while (true) {
                     if (i >= NB_ESCAPERS) break
-                    if (udg_escapers.get(i) != 0) {
+                    if (udg_escapers.get(i) != null) {
                         udg_escapers.get(i).stopAbsoluteSlideSpeed()
                     }
                     i = i + 1
@@ -99,7 +102,7 @@ const initCommandCheat = () => {
                 return true
             }
             if (CommandsFunctions.IsPlayerColorString(param1)) {
-                if (udg_escapers.get(ColorCodes.ColorString2Id(param1)) != 0) {
+                if (udg_escapers.get(ColorCodes.ColorString2Id(param1)) != null) {
                     udg_escapers.get(ColorCodes.ColorString2Id(param1)).stopAbsoluteSlideSpeed()
                     Text.P(escaper.getPlayer(), 'slide speed for player ' + param1 + ' depends now on terrains')
                 }
@@ -125,7 +128,7 @@ const initCommandCheat = () => {
                 i = 0
                 while (true) {
                     if (i >= NB_ESCAPERS) break
-                    if (udg_escapers.get(i) != 0) {
+                    if (udg_escapers.get(i) != null) {
                         udg_escapers.get(i).absoluteWalkSpeed(speed)
                     }
                     i = i + 1
@@ -134,7 +137,7 @@ const initCommandCheat = () => {
                 return true
             }
             if (CommandsFunctions.IsPlayerColorString(param2)) {
-                if (udg_escapers.get(ColorCodes.ColorString2Id(param2)) != 0) {
+                if (udg_escapers.get(ColorCodes.ColorString2Id(param2)) != null) {
                     udg_escapers.get(ColorCodes.ColorString2Id(param2)).absoluteWalkSpeed(speed)
                     Text.P(escaper.getPlayer(), 'walk speed for player ' + param2 + ' to ' + param1)
                 }
@@ -156,7 +159,7 @@ const initCommandCheat = () => {
                 i = 0
                 while (true) {
                     if (i >= NB_ESCAPERS) break
-                    if (udg_escapers.get(i) != 0) {
+                    if (udg_escapers.get(i) != null) {
                         udg_escapers.get(i).stopAbsoluteWalkSpeed()
                     }
                     i = i + 1
@@ -165,7 +168,7 @@ const initCommandCheat = () => {
                 return true
             }
             if (CommandsFunctions.IsPlayerColorString(param1)) {
-                if (udg_escapers.get(ColorCodes.ColorString2Id(param1)) != 0) {
+                if (udg_escapers.get(ColorCodes.ColorString2Id(param1)) != null) {
                     udg_escapers.get(ColorCodes.ColorString2Id(param1)).stopAbsoluteWalkSpeed()
                     Text.P(escaper.getPlayer(), 'walk speed for player ' + param1 + ' depends now on terrains')
                 }
@@ -180,8 +183,12 @@ const initCommandCheat = () => {
             }
             b = BasicFunctions.S2B(param1)
             if (nbParam === 1) {
-                Teleport.ActivateTeleport(escaper.getHero(), false)
-                Teleport.ActivateTeleport(EscaperFunctions.GetMirrorEscaper(escaper).getHero(), false)
+                const h1 = escaper.getHero()
+                const h2 = EscaperFunctions.GetMirrorEscaper(escaper).getHero()
+
+                h1 && Teleport.ActivateTeleport(h1, false)
+                h2 && Teleport.ActivateTeleport(h2, false)
+
                 return true
             }
             if (!(nbParam == 2 && escaper.isMaximaxou())) {
@@ -191,16 +198,16 @@ const initCommandCheat = () => {
                 i = 0
                 while (true) {
                     if (i >= NB_ESCAPERS) break
-                    if (udg_escapers.get(i) != 0) {
+                    if (udg_escapers.get(i) != null) {
+                        const h1 = udg_escapers.get(i).getHero()
+                        const h2 = EscaperFunctions.GetMirrorEscaper(udg_escapers.get(i)).getHero()
+
                         if (b) {
-                            Teleport.ActivateTeleport(udg_escapers.get(i).getHero(), false)
-                            Teleport.ActivateTeleport(
-                                EscaperFunctions.GetMirrorEscaper(udg_escapers.get(i)).getHero(),
-                                false
-                            )
+                            h1 && Teleport.ActivateTeleport(h1, false)
+                            h2 && Teleport.ActivateTeleport(h2, false)
                         } else {
-                            Teleport.DisableTeleport(udg_escapers.get(i).getHero())
-                            Teleport.DisableTeleport(EscaperFunctions.GetMirrorEscaper(udg_escapers.get(i)).getHero())
+                            h1 && Teleport.DisableTeleport(h1)
+                            h2 && Teleport.DisableTeleport(h2)
                         }
                     }
                     i = i + 1
@@ -208,22 +215,18 @@ const initCommandCheat = () => {
                 return true
             }
             if (CommandsFunctions.IsPlayerColorString(param2)) {
-                if (udg_escapers.get(ColorCodes.ColorString2Id(param2)) != 0) {
+                if (udg_escapers.get(ColorCodes.ColorString2Id(param2)) != null) {
+                    const h1 = udg_escapers.get(ColorCodes.ColorString2Id(param2)).getHero()
+                    const h2 = EscaperFunctions.GetMirrorEscaper(
+                        udg_escapers.get(ColorCodes.ColorString2Id(param2))
+                    ).getHero()
+
                     if (b) {
-                        Teleport.ActivateTeleport(udg_escapers.get(ColorCodes.ColorString2Id(param2)).getHero(), false)
-                        Teleport.ActivateTeleport(
-                            EscaperFunctions.GetMirrorEscaper(
-                                udg_escapers.get(ColorCodes.ColorString2Id(param2))
-                            ).getHero(),
-                            false
-                        )
+                        h1 && Teleport.ActivateTeleport(h1, false)
+                        h2 && Teleport.ActivateTeleport(h2, false)
                     } else {
-                        Teleport.DisableTeleport(udg_escapers.get(ColorCodes.ColorString2Id(param2)).getHero())
-                        Teleport.DisableTeleport(
-                            EscaperFunctions.GetMirrorEscaper(
-                                udg_escapers.get(ColorCodes.ColorString2Id(param2))
-                            ).getHero()
-                        )
+                        h1 && Teleport.DisableTeleport(h1)
+                        h2 && Teleport.DisableTeleport(h2)
                     }
                 }
             }
@@ -235,12 +238,17 @@ const initCommandCheat = () => {
             (name === 'teleport' || name === 't') &&
             (noParam || (nbParam === 1 && (param1 === '0' || S2R(param1) !== 0)))
         ) {
+            const h1 = escaper.getHero()
+            const h2 = EscaperFunctions.GetMirrorEscaper(escaper).getHero()
+
             if (nbParam === 1) {
-                SetUnitFacing(escaper.getHero(), S2R(param1))
-                SetUnitFacing(EscaperFunctions.GetMirrorEscaper(escaper).getHero(), S2R(param1))
+                h1 && SetUnitFacing(h1, S2R(param1))
+                h2 && SetUnitFacing(h2, S2R(param1))
             }
-            Teleport.ActivateTeleport(escaper.getHero(), true)
-            Teleport.ActivateTeleport(EscaperFunctions.GetMirrorEscaper(escaper).getHero(), true)
+
+            h1 && Teleport.ActivateTeleport(h1, true)
+            h2 && Teleport.ActivateTeleport(h2, true)
+
             return true
         }
 
@@ -257,7 +265,7 @@ const initCommandCheat = () => {
                 i = 0
                 while (true) {
                     if (i >= NB_ESCAPERS) break
-                    if (udg_escapers.get(i) != 0) {
+                    if (udg_escapers.get(i) != null) {
                         udg_escapers.get(i).reviveAtStart()
                     }
                     i = i + 1
@@ -265,7 +273,7 @@ const initCommandCheat = () => {
                 return true
             }
             if (CommandsFunctions.IsPlayerColorString(param1)) {
-                if (udg_escapers.get(ColorCodes.ColorString2Id(param1)) != 0) {
+                if (udg_escapers.get(ColorCodes.ColorString2Id(param1)) != null) {
                     udg_escapers.get(ColorCodes.ColorString2Id(param1)).reviveAtStart()
                 }
             }
@@ -278,16 +286,20 @@ const initCommandCheat = () => {
                 return true
             }
             n = ColorCodes.ColorString2Id(param1)
-            if (!udg_escapers.get(n).isAlive() || udg_escapers.get(n) == 0) {
+            if (!udg_escapers.get(n).isAlive() || udg_escapers.get(n) == null) {
                 return true
             }
-            escaper.revive(GetUnitX(udg_escapers.get(n).getHero()), GetUnitY(udg_escapers.get(n).getHero()))
-            escaper.turnInstantly(GetUnitFacing(udg_escapers.get(n).getHero()))
-            EscaperFunctions.GetMirrorEscaper(escaper).revive(
-                GetUnitX(udg_escapers.get(n).getHero()),
-                GetUnitY(udg_escapers.get(n).getHero())
-            )
-            EscaperFunctions.GetMirrorEscaper(escaper).turnInstantly(GetUnitFacing(udg_escapers.get(n).getHero()))
+
+            const hero = udg_escapers.get(n).getHero()
+
+            if (!hero) {
+                return true
+            }
+
+            escaper.revive(GetUnitX(hero), GetUnitY(hero))
+            escaper.turnInstantly(GetUnitFacing(hero))
+            EscaperFunctions.GetMirrorEscaper(escaper).revive(GetUnitX(hero), GetUnitY(hero))
+            EscaperFunctions.GetMirrorEscaper(escaper).turnInstantly(GetUnitFacing(hero))
 
             return true
         }
@@ -295,11 +307,15 @@ const initCommandCheat = () => {
         //-getInfiniteMeteors(gim)   --> puts in your inventory a meteor that doesn't disapear after being used
         if (name === 'getInfiniteMeteors' || name === 'gim') {
             if (noParam) {
-                if (UnitItemInSlot(escaper.getHero(), 0) == null) {
-                    MeteorFunctions.HeroAddCheatMeteor(escaper.getHero())
-                    Text.P(escaper.getPlayer(), 'you get infinite meteors')
-                } else {
-                    Text.erP(escaper.getPlayer(), 'inventory full')
+                const hero = escaper.getHero()
+
+                if (hero) {
+                    if (UnitItemInSlot(hero, 0) == null) {
+                        MeteorFunctions.HeroAddCheatMeteor(hero)
+                        Text.P(escaper.getPlayer(), 'you get infinite meteors')
+                    } else {
+                        Text.erP(escaper.getPlayer(), 'inventory full')
+                    }
                 }
             }
             return true
@@ -308,11 +324,15 @@ const initCommandCheat = () => {
         //-deleteInfiniteMeteors(dim)   --> remove the infinite meteor from your inventory if you have one
         if (name === 'deleteInfiniteMeteors' || name === 'dim') {
             if (noParam) {
-                if (GetItemTypeId(UnitItemInSlot(escaper.getHero(), 0)) == METEOR_CHEAT) {
-                    RemoveItem(UnitItemInSlot(escaper.getHero(), 0))
-                    Text.P(escaper.getPlayer(), 'infinite meteors removed')
-                } else {
-                    Text.erP(escaper.getPlayer(), 'no infinite meteors to remove')
+                const hero = escaper.getHero()
+
+                if (hero) {
+                    if (GetItemTypeId(UnitItemInSlot(hero, 0)) == METEOR_CHEAT) {
+                        RemoveItem(UnitItemInSlot(hero, 0))
+                        Text.P(escaper.getPlayer(), 'infinite meteors removed')
+                    } else {
+                        Text.erP(escaper.getPlayer(), 'no infinite meteors to remove')
+                    }
                 }
             }
             return true
@@ -394,7 +414,7 @@ const initCommandCheat = () => {
                 i = 0
                 while (true) {
                     if (i >= NB_ESCAPERS) break
-                    if (udg_escapers.get(i) != 0) {
+                    if (udg_escapers.get(i) != null) {
                         udg_escapers.get(i).setGodMode(b)
                     }
                     i = i + 1
@@ -408,7 +428,7 @@ const initCommandCheat = () => {
             }
             if (CommandsFunctions.IsPlayerColorString(param2)) {
                 n = ColorCodes.ColorString2Id(param2)
-                if (udg_escapers.get(n) != 0) {
+                if (udg_escapers.get(n) != null) {
                     udg_escapers.get(n).setGodMode(b)
                     if (b) {
                         Text.P(escaper.getPlayer(), 'slider ' + param2 + ' is now invulnerable')
@@ -453,7 +473,7 @@ const initCommandCheat = () => {
                 i = 0
                 while (true) {
                     if (i >= NB_ESCAPERS) break
-                    if (udg_escapers.get(i) != 0) {
+                    if (udg_escapers.get(i) != null) {
                         udg_escapers.get(i).setGodModeKills(b)
                     }
                     i = i + 1
@@ -467,7 +487,7 @@ const initCommandCheat = () => {
             }
             if (CommandsFunctions.IsPlayerColorString(param2)) {
                 n = ColorCodes.ColorString2Id(param2)
-                if (udg_escapers.get(n) != 0) {
+                if (udg_escapers.get(n) != null) {
                     udg_escapers.get(n).setGodModeKills(b)
                     if (b) {
                         Text.P(
@@ -509,8 +529,13 @@ const initCommandCheat = () => {
             if (nbParam !== 1 || (S2R(param1) <= 0 && param1 !== '0')) {
                 return true
             }
-            SetUnitFlyHeight(escaper.getHero(), S2R(param1), 0)
-            SetUnitFlyHeight(EscaperFunctions.GetMirrorEscaper(escaper).getHero(), S2R(param1), 0)
+
+            const h1 = escaper.getHero()
+            const h2 = EscaperFunctions.GetMirrorEscaper(escaper).getHero()
+
+            h1 && SetUnitFlyHeight(h1, S2R(param1), 0)
+            h2 && SetUnitFlyHeight(h2, S2R(param1), 0)
+
             return true
         }
 
@@ -519,7 +544,7 @@ const initCommandCheat = () => {
             if (nbParam !== 1 || (S2R(param1) <= 0 && param1 !== '0')) {
                 return true
             }
-            TAILLE_UNITE = S2R(param1)
+            Trig_InvisUnit_is_getting_damage.TAILLE_UNITE = S2R(param1)
             return true
         }
 

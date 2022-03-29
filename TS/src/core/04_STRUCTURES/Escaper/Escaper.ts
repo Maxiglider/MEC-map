@@ -16,13 +16,16 @@ import {
     TERRAIN_KILL_EFFECT_BODY_PART,
 } from 'core/01_libraries/Constants'
 import { AfkMode } from 'core/08_GAME/Afk_mode/Afk_mode'
-import { gg_trg_InvisUnit_is_getting_damage } from 'core/08_GAME/Death/InvisUnit_is_getting_damage'
+import { udg_escapers } from 'core/08_GAME/Init_structures/Init_escapers'
 import { CheckTerrainTrigger } from '../../07_TRIGGERS/Slide_and_CheckTerrain_triggers/CheckTerrain'
 import { SlideTrigger } from '../../07_TRIGGERS/Slide_and_CheckTerrain_triggers/Slide'
+import { Trig_InvisUnit_is_getting_damage } from '../../08_GAME/Death/InvisUnit_is_getting_damage'
+import { Heroes } from '../../08_GAME/Init_game/Heroes'
 import { MessageHeroDies } from '../../08_GAME/Init_game/Message_heroDies'
 import { udg_levels } from '../../08_GAME/Init_structures/Init_struct_levels'
+import { CommandShortcuts } from '../../08_GAME/Shortcuts/Command_shortcuts_functions'
 import { LevelFunctions } from '../Level/Level_functions'
-import { DEPART_PAR_DEFAUT } from '../Level/StartAndEnd'
+import { DEPART_PAR_DEFAUT, Start } from '../Level/StartAndEnd'
 import { EscaperEffectArray, IEscaperEffectArray } from './EscaperEffectArray'
 import { EscaperFunctions } from './Escaper_functions'
 
@@ -217,16 +220,20 @@ export class Escaper {
         this.SpecialIllidan()
         this.invisUnit = CreateUnit(NEUTRAL_PLAYER, INVIS_UNIT_TYPE_ID, x, y, angle)
         SetUnitUserData(this.invisUnit, GetPlayerId(this.p))
-        TriggerRegisterUnitEvent(gg_trg_InvisUnit_is_getting_damage, this.invisUnit, EVENT_UNIT_DAMAGED)
+        TriggerRegisterUnitEvent(
+            Trig_InvisUnit_is_getting_damage.gg_trg_InvisUnit_is_getting_damage,
+            this.invisUnit,
+            EVENT_UNIT_DAMAGED
+        )
         this.effects.showEffects(this.hero)
         this.lastTerrainType = 0
         TimerStart(
-            afkModeTimers[this.escaperId],
-            timeMinAfk,
+            AfkMode.afkModeTimers[this.escaperId],
+            AfkMode.timeMinAfk,
             false,
             AfkMode.GetAfkModeTimeExpiresCodeFromId(this.escaperId)
         )
-        InitShortcutSkills(GetPlayerId(this.p))
+        CommandShortcuts.InitShortcutSkills(GetPlayerId(this.p))
         EnableTrigger(this.checkTerrain)
         return true
     }
@@ -240,7 +247,7 @@ export class Escaper {
         if (!start) {
             //si le départ du niveau en cours n'existe pas
             start = DEPART_PAR_DEFAUT
-            angle = HERO_START_ANGLE
+            angle = Heroes.HERO_START_ANGLE
         } else {
             angle = GetRandomDirectionDeg()
         }
@@ -327,7 +334,7 @@ export class Escaper {
             if (this.hero) {
                 BasicFunctions.StopUnit(this.hero)
                 heroPos = GetUnitLoc(this.hero)
-                setLastZ(GetLocationZ(heroPos) + GetUnitFlyHeight(this.hero))
+                this.setLastZ(GetLocationZ(heroPos) + GetUnitFlyHeight(this.hero))
                 RemoveLocation(heroPos)
             }
         } else {
@@ -439,8 +446,8 @@ export class Escaper {
         }
 
         TimerStart(
-            afkModeTimers[this.escaperId],
-            timeMinAfk,
+            AfkMode.afkModeTimers[this.escaperId],
+            AfkMode.timeMinAfk,
             false,
             AfkMode.GetAfkModeTimeExpiresCodeFromId(this.escaperId)
         )

@@ -11,7 +11,7 @@ import { CommandsFunctions } from './Command_functions'
 import { CommandMake } from './Command_make'
 import { CommandTrueMax } from './Command_superadmin'
 
-export const initCommandExecution = () => {
+const initCommandExecution = () => {
     const ExecuteCommandSingle = (escaper: Escaper, cmd: string) => {
         if (!CommandAll.ExecuteCommandAll(escaper, cmd)) {
             if (!((escaper.getPlayer() == Player(0) && Globals.udg_areRedRightsOn) || escaper.canCheat())) {
@@ -102,4 +102,8 @@ export const initCommandExecution = () => {
             },
         ],
     })
+
+    return { ExecuteCommand }
 }
+
+export const CommandExecution = initCommandExecution()

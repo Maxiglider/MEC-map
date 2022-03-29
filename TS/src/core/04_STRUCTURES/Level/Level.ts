@@ -1,4 +1,5 @@
 import { Text } from 'core/01_libraries/Text'
+import { udg_lives } from 'core/08_GAME/Init_structures/Init_lives'
 import { TrigCheckpointReviveHeroes } from './Trig_checkpoint_revive_heroes'
 
 //Avec le jass : //todomax handle infinite number of monsters and levels

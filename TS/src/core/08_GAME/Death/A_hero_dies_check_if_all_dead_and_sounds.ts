@@ -1,6 +1,7 @@
 import { COOP_REVIVE_DIST, NB_ESCAPERS } from 'core/01_libraries/Constants'
 import { EscaperFunctions } from 'core/04_STRUCTURES/Escaper/Escaper_functions'
 import { createEvent } from 'Utils/mapUtils'
+import { Globals } from '../../09_From_old_Worldedit_triggers/globals_variables_and_triggers'
 import { AfkMode } from '../Afk_mode/Afk_mode'
 import { udg_escapers } from '../Init_structures/Init_escapers'
 import { DeplacementHeroHorsDeathPath } from '../Mode_coop/deplacement_heros_hors_death_path'
@@ -23,7 +24,7 @@ export const InitTrig_A_hero_dies_check_if_all_dead_and_sounds = () => {
                 let diffY: number
 
                 udg_nbKilled = udg_nbKilled + 1
-                if (udg_nbKilled === 3 && udg_tripleKillSoundOn) {
+                if (udg_nbKilled === 3 && Globals.udg_tripleKillSoundOn) {
                     StartSound(gg_snd_multisquish)
                     udg_nbKilled = 0
                 }
@@ -51,11 +52,11 @@ export const InitTrig_A_hero_dies_check_if_all_dead_and_sounds = () => {
                 if (isAfk[n]) {
                     DestroyTextTag(afkModeTextTags[n])
                 } else {
-                    PauseTimer(afkModeTimers[n])
+                    PauseTimer(AfkMode.afkModeTimers[n])
                 }
 
                 if (AfkMode.AreAllAliveHeroesAfk()) {
-                    KillAllHeroesAfkInFiveSeconds()
+                    AfkMode.KillAllHeroesAfkInFiveSeconds()
                 }
 
                 if (last) {

@@ -3,6 +3,8 @@ import { Text } from 'core/01_libraries/Text'
 import { createEvent } from 'Utils/mapUtils'
 import { ChangeAllTerrains } from '../../07_TRIGGERS/Triggers_to_modify_terrains/Change_all_terrains'
 import { udg_escapers } from '../Init_structures/Init_escapers'
+import { udg_lives } from '../Init_structures/Init_lives'
+import { udg_levels } from '../Init_structures/Init_struct_levels'
 
 let udg_gameIsLost = false
 export let gg_trg_Lose_a_life_and_res: trigger
@@ -25,7 +27,7 @@ export const InitTrig_Lose_a_life_and_res = () => {
                         udg_gameIsLost = false
                     }
                 } else {
-                    if (udg_changeAllTerrainsAtRevive) {
+                    if (ChangeAllTerrains.udg_changeAllTerrainsAtRevive) {
                         TriggerSleepAction(6.0)
                         ChangeAllTerrains.ChangeAllTerrains('normal')
                         TriggerSleepAction(2.0)

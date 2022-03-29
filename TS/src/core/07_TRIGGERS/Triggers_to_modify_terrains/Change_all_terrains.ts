@@ -210,7 +210,7 @@ const initChangeAllTerrains = () => {
         return true
     }
 
-    return { ChangeAllTerrains }
+    return { udg_changeAllTerrainsAtRevive, ChangeAllTerrains }
 }
 
 export const ChangeAllTerrains = initChangeAllTerrains()

@@ -18,9 +18,11 @@ import { Escaper } from 'core/04_STRUCTURES/Escaper/Escaper'
 import { EscaperFunctions } from 'core/04_STRUCTURES/Escaper/Escaper_functions'
 import { Apm } from 'core/08_GAME/Apm_clics_par_minute/Apm'
 import { udg_escapers } from 'core/08_GAME/Init_structures/Init_escapers'
+import { udg_lives } from 'core/08_GAME/Init_structures/Init_lives'
 import { udg_levels } from 'core/08_GAME/Init_structures/Init_struct_levels'
 import { Globals } from 'core/09_From_old_Worldedit_triggers/globals_variables_and_triggers'
 import { EscaperEffectFunctions } from '../../04_STRUCTURES/Escaper/EscaperEffect_functions'
+import { EscaperSavedCommands } from '../../04_STRUCTURES/Escaper/EscaperSavedCommands'
 import { Disco } from '../../04_STRUCTURES/Escaper/Escaper_disco'
 import { TerrainFunctions } from '../../07_TRIGGERS/Modify_terrain_Functions/Terrain_functions'
 import { TerrainTypeFromString } from '../../07_TRIGGERS/Modify_terrain_Functions/Terrain_type_from_string'
@@ -706,7 +708,7 @@ const initCommandAll = () => {
             if (!(nbParam > 1)) {
                 return true
             }
-            udg_savedCommands.new(escaper, param1, '-' + CommandShortcuts.GetStringAssignedFromCommand(cmd))
+            EscaperSavedCommands.newCmd(escaper, param1, '-' + CommandShortcuts.GetStringAssignedFromCommand(cmd))
             Text.P(escaper.getPlayer(), 'new command "' + param1 + '" added')
             return true
         }
@@ -716,7 +718,7 @@ const initCommandAll = () => {
             if (!(nbParam === 1)) {
                 return true
             }
-            if (!udg_savedCommands.execute(escaper, param1)) {
+            if (!EscaperSavedCommands.execute(escaper, param1)) {
                 Text.erP(escaper.getPlayer(), 'unknown command name')
             }
             return true

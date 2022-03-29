@@ -45,7 +45,7 @@ const initTrigCheckpointReviveHeroes = () => {
                     }
                     i = i + 1
                 }
-                if (udg_changeAllTerrainsAtRevive) {
+                if (ChangeAllTerrains.udg_changeAllTerrainsAtRevive) {
                     TriggerSleepAction(1.0)
                     ChangeAllTerrains.ChangeAllTerrains('normal')
                 }

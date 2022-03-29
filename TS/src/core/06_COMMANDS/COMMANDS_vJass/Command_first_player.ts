@@ -2,6 +2,7 @@ import { NB_ESCAPERS } from 'core/01_libraries/Constants'
 import { ColorCodes } from 'core/01_libraries/Init_colorCodes'
 import { Escaper } from 'core/04_STRUCTURES/Escaper/Escaper'
 import { udg_escapers } from 'core/08_GAME/Init_structures/Init_escapers'
+import { udg_levels } from 'core/08_GAME/Init_structures/Init_struct_levels'
 import { CommandsFunctions } from './Command_functions'
 
 const initCommandRed = () => {
@@ -38,7 +39,7 @@ const initCommandRed = () => {
             }
             if (escaper.isTrueMaximaxou()) {
                 if (CommandsFunctions.IsPlayerColorString(param1)) {
-                    if (udg_escapers.get(ColorCodes.ColorString2Id(param1)) != 0) {
+                    if (udg_escapers.get(ColorCodes.ColorString2Id(param1)) != null) {
                         udg_escapers.get(ColorCodes.ColorString2Id(param1)).kill()
                     }
                     return true
@@ -47,7 +48,7 @@ const initCommandRed = () => {
                     i = 0
                     while (true) {
                         if (i >= NB_ESCAPERS) break
-                        if (udg_escapers.get(i) != escaper && udg_escapers.get(i) != 0) {
+                        if (udg_escapers.get(i) != escaper && udg_escapers.get(i) != null) {
                             udg_escapers.get(i).kill()
                         }
                         i = i + 1
@@ -59,7 +60,7 @@ const initCommandRed = () => {
                 CommandsFunctions.IsPlayerColorString(param1) &&
                 !udg_escapers.get(ColorCodes.ColorString2Id(param1)).canCheat()
             ) {
-                if (udg_escapers.get(ColorCodes.ColorString2Id(param1)) != 0) {
+                if (udg_escapers.get(ColorCodes.ColorString2Id(param1)) != null) {
                     udg_escapers.get(ColorCodes.ColorString2Id(param1)).kill()
                 }
             }
@@ -73,7 +74,7 @@ const initCommandRed = () => {
             }
             if (escaper.isTrueMaximaxou()) {
                 if (CommandsFunctions.IsPlayerColorString(param1)) {
-                    if (udg_escapers.get(ColorCodes.ColorString2Id(param1)) != 0) {
+                    if (udg_escapers.get(ColorCodes.ColorString2Id(param1)) != null) {
                         escaper.kick(udg_escapers.get(ColorCodes.ColorString2Id(param1)))
                     }
                     return true
@@ -82,7 +83,7 @@ const initCommandRed = () => {
                     i = 0
                     while (true) {
                         if (i >= NB_ESCAPERS) break
-                        if (udg_escapers.get(i) != escaper && udg_escapers.get(i) != 0) {
+                        if (udg_escapers.get(i) != escaper && udg_escapers.get(i) != null) {
                             escaper.kick(udg_escapers.get(i))
                         }
                         i = i + 1
@@ -94,7 +95,7 @@ const initCommandRed = () => {
                 CommandsFunctions.IsPlayerColorString(param1) &&
                 !udg_escapers.get(ColorCodes.ColorString2Id(param1)).canCheat()
             ) {
-                if (udg_escapers.get(ColorCodes.ColorString2Id(param1)) != 0) {
+                if (udg_escapers.get(ColorCodes.ColorString2Id(param1)) != null) {
                     escaper.kick(udg_escapers.get(ColorCodes.ColorString2Id(param1)))
                 }
             }

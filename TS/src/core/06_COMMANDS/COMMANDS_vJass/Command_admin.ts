@@ -1,12 +1,21 @@
 import { BasicFunctions } from 'core/01_libraries/Basic_functions'
-import { NB_ESCAPERS } from 'core/01_libraries/Constants'
+import { NB_ESCAPERS, NB_PLAYERS_MAX } from 'core/01_libraries/Constants'
 import { FunctionsOnNumbers } from 'core/01_libraries/Functions_on_numbers'
 import { ColorCodes } from 'core/01_libraries/Init_colorCodes'
 import { Text } from 'core/01_libraries/Text'
 import { Escaper } from 'core/04_STRUCTURES/Escaper/Escaper'
+import { EscaperFunctions } from 'core/04_STRUCTURES/Escaper/Escaper_functions'
+import { ReinitTerrains } from 'core/07_TRIGGERS/Triggers_to_modify_terrains/Reinit_terrains'
+import { ReinitTerrainsPositions } from 'core/07_TRIGGERS/Triggers_to_modify_terrains/Reinit_terrains_position_Change_variations_and_ut_at_beginning'
+import { AfkMode } from 'core/08_GAME/Afk_mode/Afk_mode'
 import { udg_escapers } from 'core/08_GAME/Init_structures/Init_escapers'
+import { udg_lives } from 'core/08_GAME/Init_structures/Init_lives'
+import { udg_levels } from 'core/08_GAME/Init_structures/Init_struct_levels'
 import { Globals } from 'core/09_From_old_Worldedit_triggers/globals_variables_and_triggers'
+import { SaveMapInCache } from '../../07_TRIGGERS/Save_map_in_gamecache/SAVE_MAP_in_cache'
 import { SaveLoadTerrainWithoutName } from '../../07_TRIGGERS/Triggers_to_modify_terrains/Save_load_terrain_without_name'
+import { SaveLoadTerrainWithName } from '../../07_TRIGGERS/Triggers_to_modify_terrains/Save_load_terrain_with_name'
+import { Trig_Autorevive } from './Autorevive'
 import { CommandsFunctions } from './Command_functions'
 
 const initCommandMax = () => {
@@ -43,7 +52,7 @@ const initCommandMax = () => {
         //-reinitTerrains(rit)   --> rekinds of terrain
         if (name === 'reinitTerrains' || name === 'rit') {
             if (noParam) {
-                ReinitTerrains()
+                ReinitTerrains.ReinitTerrains()
             }
             return true
         }
@@ -51,7 +60,7 @@ const initCommandMax = () => {
         //-reinitTerrainsPosition(ritp)   --> rethe terrain on the map
         if (name === 'reinitTerrainsPosition' || name === 'ritp') {
             if (noParam) {
-                ReinitTerrainsPosition()
+                ReinitTerrainsPositions.ReinitTerrainsPosition()
             }
             return true
         }
@@ -61,7 +70,7 @@ const initCommandMax = () => {
             if (noParam) {
                 SaveLoadTerrainWithoutName.SaveTerrainWithoutName()
             } else {
-                SaveTerrainWithName(CommandsFunctions.CmdParam(cmd, 0))
+                SaveLoadTerrainWithName.SaveTerrainWithName(CommandsFunctions.CmdParam(cmd, 0))
             }
             return true
         }
@@ -71,7 +80,7 @@ const initCommandMax = () => {
             if (noParam) {
                 SaveLoadTerrainWithoutName.LoadTerrainWithoutName()
             } else {
-                if (!LoadTerrainWithName(CommandsFunctions.CmdParam(cmd, 0))) {
+                if (!SaveLoadTerrainWithName.LoadTerrainWithName(CommandsFunctions.CmdParam(cmd, 0))) {
                     Text.erP(escaper.getPlayer(), "this terrain save doesn't exist")
                 }
             }
@@ -83,7 +92,7 @@ const initCommandMax = () => {
             if (noParam) {
                 return true
             }
-            if (DeleteTerrainSaveWithName(CommandsFunctions.CmdParam(cmd, 0))) {
+            if (SaveLoadTerrainWithName.DeleteTerrainSaveWithName(CommandsFunctions.CmdParam(cmd, 0))) {
                 Text.mkP(escaper.getPlayer(), 'terrain save deleted')
             } else {
                 Text.erP(escaper.getPlayer(), "this terrain save doesn't exist")
@@ -102,7 +111,7 @@ const initCommandMax = () => {
                     return true
                 }
                 escaper2 = udg_escapers.get(ColorCodes.ColorString2Id(param2))
-                if (escaper2 === 0) {
+                if (escaper2 === null) {
                     Text.erP(escaper.getPlayer(), 'escaper ' + param2 + " doesn't exist")
                     return true
                 }
@@ -113,7 +122,7 @@ const initCommandMax = () => {
                 i = 0
                 while (true) {
                     if (i >= NB_ESCAPERS) break
-                    if (udg_escapers.get(i) != 0) {
+                    if (udg_escapers.get(i) !== null) {
                         udg_escapers.get(i).giveHeroControl(escaper2)
                     }
                     i = i + 1
@@ -127,7 +136,7 @@ const initCommandMax = () => {
             }
             if (CommandsFunctions.IsPlayerColorString(param1)) {
                 n = ColorCodes.ColorString2Id(param1)
-                if (udg_escapers.get(n) != 0) {
+                if (udg_escapers.get(n) !== null) {
                     udg_escapers.get(n).giveHeroControl(escaper2)
                     EscaperFunctions.GetMirrorEscaper(udg_escapers.get(n)).giveHeroControl(escaper2)
                 } else {
@@ -149,7 +158,7 @@ const initCommandMax = () => {
                 i = 0
                 while (true) {
                     if (i >= NB_ESCAPERS) break
-                    if (udg_escapers.get(i) != 0) {
+                    if (udg_escapers.get(i) !== null) {
                         udg_escapers.get(i).resetOwner()
                     }
                     i = i + 1
@@ -230,7 +239,7 @@ const initCommandMax = () => {
                 i = 0
                 while (true) {
                     if (i >= NB_ESCAPERS) break
-                    if (udg_escapers.get(i) != 0) {
+                    if (udg_escapers.get(i) !== null) {
                         udg_escapers.get(i).setHasAutorevive(b)
                     }
                     i = i + 1
@@ -244,7 +253,7 @@ const initCommandMax = () => {
             }
             if (CommandsFunctions.IsPlayerColorString(param2)) {
                 n = ColorCodes.ColorString2Id(param2)
-                if (udg_escapers.get(n) != 0) {
+                if (udg_escapers.get(n) !== null) {
                     udg_escapers.get(n).setHasAutorevive(b)
                     if (b) {
                         Text.P(escaper.getPlayer(), 'autorevive to on for player ' + param2)
@@ -276,7 +285,7 @@ const initCommandMax = () => {
                 i = 0
                 while (true) {
                     if (i >= NB_ESCAPERS) break
-                    if (udg_escapers.get(i) == 0) {
+                    if (udg_escapers.get(i) == null) {
                         udg_escapers.newAt(i)
                         if (udg_doubleHeroesEnabled) {
                             udg_escapers.newAt(i + NB_PLAYERS_MAX)
@@ -292,7 +301,7 @@ const initCommandMax = () => {
             }
             if (CommandsFunctions.IsPlayerColorString(param1)) {
                 n = ColorCodes.ColorString2Id(param1)
-                if (udg_escapers.get(n) == 0) {
+                if (udg_escapers.get(n) == null) {
                     udg_escapers.newAt(n)
                     if (udg_doubleHeroesEnabled) {
                         udg_escapers.newAt(n + NB_PLAYERS_MAX)
@@ -322,7 +331,7 @@ const initCommandMax = () => {
                 i = 0
                 while (true) {
                     if (i >= NB_ESCAPERS) break
-                    if (udg_escapers.get(i) != 0 && udg_escapers.get(i) != escaper) {
+                    if (udg_escapers.get(i) != null && udg_escapers.get(i) != escaper) {
                         if (BasicFunctions.IsEscaperInGame(i)) {
                             udg_escapers.get(i).removeHero()
                         } else {
@@ -335,7 +344,7 @@ const initCommandMax = () => {
             }
             if (CommandsFunctions.IsPlayerColorString(param1)) {
                 n = ColorCodes.ColorString2Id(param1)
-                if (udg_escapers.get(n) != 0) {
+                if (udg_escapers.get(n) != null) {
                     if (BasicFunctions.IsEscaperInGame(n)) {
                         udg_escapers.get(n).removeHero()
                     } else {
@@ -370,7 +379,7 @@ const initCommandMax = () => {
                 i = 0
                 while (true) {
                     if (i >= NB_ESCAPERS) break
-                    if (udg_escapers.get(i) != 0 && udg_escapers.get(i) != escaper) {
+                    if (udg_escapers.get(i) != null && udg_escapers.get(i) != escaper) {
                         if (!udg_escapers.get(i).isMaximaxou()) {
                             udg_escapers.get(i).setCanCheat(b)
                         }
@@ -386,7 +395,7 @@ const initCommandMax = () => {
             }
             if (CommandsFunctions.IsPlayerColorString(param1)) {
                 n = ColorCodes.ColorString2Id(param1)
-                if (udg_escapers.get(n) != 0) {
+                if (udg_escapers.get(n) != null) {
                     if (udg_escapers.get(n) != escaper) {
                         if (!udg_escapers.get(n).isMaximaxou()) {
                             udg_escapers.get(n).setCanCheat(b)
@@ -419,7 +428,7 @@ const initCommandMax = () => {
                 Text.erP(escaper.getPlayer(), 'there must be one param which is an integer higher than 0')
                 return true
             }
-            timeMinAfk = S2R(param1)
+            AfkMode.timeMinAfk = S2R(param1)
             Text.P(escaper.getPlayer(), 'afk time to ' + param1)
             return true
         }
@@ -431,7 +440,7 @@ const initCommandMax = () => {
                 return true
             }
             x = S2R(param1)
-            udg_autoreviveDelay = x
+            Trig_Autorevive.udg_autoreviveDelay = x
             if (x > 1) {
                 Text.P(escaper.getPlayer(), 'autorevive delay to ' + R2S(x) + ' seconds')
             } else {
@@ -443,7 +452,7 @@ const initCommandMax = () => {
         //-saveMapInCache(smic)
         if (name === 'saveMapInCache' || name === 'smic') {
             if (noParam) {
-                StartSaveMapInCache()
+                SaveMapInCache.StartSaveMapInCache()
             }
             return true
         }

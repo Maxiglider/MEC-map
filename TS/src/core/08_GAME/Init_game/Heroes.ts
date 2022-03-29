@@ -156,6 +156,8 @@ const initHeroes = () => {
     }
 
     Init_Heroes()
+
+    return { HERO_START_ANGLE }
 }
 
 export const Heroes = initHeroes()

@@ -4,11 +4,10 @@ import { DUMMY_POWER_CIRCLE, GM_KILLING_EFFECT } from 'core/01_libraries/Constan
 import { createEvent } from 'Utils/mapUtils'
 import { udg_escapers } from '../Init_structures/Init_escapers'
 
-let TAILLE_UNITE = 100
-export let gg_trg_InvisUnit_is_getting_damage: trigger
-
 export const InitTrig_InvisUnit_is_getting_damage = () => {
-    gg_trg_InvisUnit_is_getting_damage = createEvent({
+    let TAILLE_UNITE = 100
+
+    let gg_trg_InvisUnit_is_getting_damage = createEvent({
         events: [],
         actions: [
             () => {
@@ -88,4 +87,8 @@ export const InitTrig_InvisUnit_is_getting_damage = () => {
             },
         ],
     })
+
+    return { TAILLE_UNITE, gg_trg_InvisUnit_is_getting_damage }
 }
+
+export const Trig_InvisUnit_is_getting_damage = InitTrig_InvisUnit_is_getting_damage()

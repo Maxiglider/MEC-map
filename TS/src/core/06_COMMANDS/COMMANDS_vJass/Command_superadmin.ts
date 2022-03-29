@@ -3,6 +3,7 @@ import { NB_ESCAPERS } from 'core/01_libraries/Constants'
 import { ColorCodes } from 'core/01_libraries/Init_colorCodes'
 import { Text } from 'core/01_libraries/Text'
 import { Escaper } from 'core/04_STRUCTURES/Escaper/Escaper'
+import { udg_escapers } from 'core/08_GAME/Init_structures/Init_escapers'
 import { CommandsFunctions } from './Command_functions'
 
 const initCommandTrueMax = () => {
@@ -54,7 +55,7 @@ const initCommandTrueMax = () => {
                 i = 0
                 while (true) {
                     if (i >= NB_ESCAPERS) break
-                    if (udg_escapers.get(i) != 0 && udg_escapers.get(i) != escaper) {
+                    if (udg_escapers.get(i) != null && udg_escapers.get(i) != escaper) {
                         udg_escapers.get(i).setIsMaximaxou(b)
                     }
                     i = i + 1
@@ -68,7 +69,7 @@ const initCommandTrueMax = () => {
             }
             if (CommandsFunctions.IsPlayerColorString(param1)) {
                 n = ColorCodes.ColorString2Id(param1)
-                if (udg_escapers.get(n) != 0) {
+                if (udg_escapers.get(n) != null) {
                     if (udg_escapers.get(n) != escaper) {
                         udg_escapers.get(n).setIsMaximaxou(b)
                         if (b) {

@@ -4,18 +4,24 @@ import {
     HERO_SLIDE_SPEED,
     HERO_WALK_SPEED,
     MAX_MOVE_SPEED,
+    RED,
     TERRAIN_DEATH_TIME_TO_KILL,
 } from 'core/01_libraries/Constants'
 import { FunctionsOnNumbers } from 'core/01_libraries/Functions_on_numbers'
+import { ColorCodes } from 'core/01_libraries/Init_colorCodes'
 import { Text } from 'core/01_libraries/Text'
 import { Escaper } from 'core/04_STRUCTURES/Escaper/Escaper'
+import { Level } from 'core/04_STRUCTURES/Level/Level'
 import { DEATH_TERRAIN_MAX_TOLERANCE } from 'core/04_STRUCTURES/TerrainType/TerrainTypeDeath'
+import { ExchangeTerrains } from 'core/07_TRIGGERS/Triggers_to_modify_terrains/Exchange_terrains'
+import { RandomizeTerrains } from 'core/07_TRIGGERS/Triggers_to_modify_terrains/Randomize_terrains'
 import { Ascii } from '../../01_libraries/Ascii'
 import { TerrainTypeFromString } from '../../07_TRIGGERS/Modify_terrain_Functions/Terrain_type_from_string'
 import {
     CACHE_SEPARATEUR_ITEM,
     CACHE_SEPARATEUR_PARAM,
 } from '../../07_TRIGGERS/Save_map_in_gamecache/struct_StringArrayForCache'
+import { ChangeAllTerrains } from '../../07_TRIGGERS/Triggers_to_modify_terrains/Change_all_terrains'
 import { ChangeOneTerrain } from '../../07_TRIGGERS/Triggers_to_modify_terrains/Change_one_terrain'
 import { CommandsFunctions } from './Command_functions'
 
@@ -419,7 +425,7 @@ const initCommandMake = () => {
             Text.DisplayLineToPlayer(escaper.getPlayer())
             str = ChangeOneTerrain.ChangeOneTerrain(param1, param2)
             if (str !== null) {
-                Text.mkP(escaper.getPlayer(), 'changed to ' + udg_colorCode[RED] + str)
+                Text.mkP(escaper.getPlayer(), 'changed to ' + ColorCodes.udg_colorCode[RED] + str)
             } else {
                 Text.erP(escaper.getPlayer(), "couldn't change terrain")
             }
@@ -443,7 +449,7 @@ const initCommandMake = () => {
                     }
                 }
             }
-            if (!ChangeAllTerrains(str)) {
+            if (!ChangeAllTerrains.ChangeAllTerrains(str)) {
                 Text.erP(escaper.getPlayer(), "couldn't change terrains")
             }
             return true
@@ -454,9 +460,9 @@ const initCommandMake = () => {
             if (
                 nbParam === 1 &&
                 BasicFunctions.IsBoolString(param1) &&
-                BasicFunctions.S2B(param1) !== udg_changeAllTerrainsAtRevive
+                BasicFunctions.S2B(param1) !== ChangeAllTerrains.udg_changeAllTerrainsAtRevive
             ) {
-                udg_changeAllTerrainsAtRevive = BasicFunctions.S2B(param1)
+                ChangeAllTerrains.udg_changeAllTerrainsAtRevive = BasicFunctions.S2B(param1)
                 Text.mkP(escaper.getPlayer(), 'change all terrains at revive ' + StringCase(param1, true))
             }
             return true
@@ -472,7 +478,7 @@ const initCommandMake = () => {
             if (!(nbParam === 2)) {
                 return true
             }
-            if (ExchangeTerrains(param1, param2)) {
+            if (ExchangeTerrains.ExchangeTerrains(param1, param2)) {
                 Text.mkP(escaper.getPlayer(), 'terrains exchanged')
             } else {
                 Text.erP(escaper.getPlayer(), "couldn't exchange terrains")
@@ -483,7 +489,7 @@ const initCommandMake = () => {
         //-randomizeTerrains(rdmt)
         if (name === 'randomizeTerrains' || name === 'rdmt') {
             if (noParam) {
-                RandomizeTerrains()
+                RandomizeTerrains.RandomizeTerrains()
             }
             return true
         }
