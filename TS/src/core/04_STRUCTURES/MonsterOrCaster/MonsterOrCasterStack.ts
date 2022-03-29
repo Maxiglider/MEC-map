@@ -1,96 +1,76 @@
+import { MonsterOrCaster } from './MonsterOrCaster'
 
+export class MonsterOrCasterStack {
+    private monsterOrCaster: MonsterOrCaster | null = null
+    private nextElement: MonsterOrCasterStack | null = null
+    private udg_enumMoc: MonsterOrCaster | null = null
 
-const initMonsterOrCasterStack = () => { //
+    constructor(monsterOrCaster: MonsterOrCaster) {
+        if (monsterOrCaster === null) {
+            throw new Error('monsterOrCaster cannot be null')
+        }
 
-// TODO; Used to be private
-let udg_enumMoc: MonsterOrCaster;
+        this.monsterOrCaster = monsterOrCaster
+    }
 
-const GetEnumMoc = (): MonsterOrCaster => {
-	return udg_enumMoc;
-};
+    addMonsterOrCaster = (monsterOrCaster: MonsterOrCaster) => {
+        let newElement: MonsterOrCasterStack
+        if (monsterOrCaster === null) {
+            return false
+        }
+        newElement = this.create(this.monsterOrCaster)
+        newElement.nextElement = this.nextElement
+        this.monsterOrCaster = monsterOrCaster
+        this.nextElement = newElement
+        return true
+    }
 
+    destroy = () => {
+        if (this.monsterOrCaster !== null) {
+            this.monsterOrCaster.destroy()
+        }
 
-//struct MonsterOrCasterStack
+        if (this.nextElement !== null) {
+            this.nextElement.destroy()
+        }
+    }
 
-// TODO; Used to be private
-     MonsterOrCaster monsterOrCaster
-// TODO; Used to be private
-     MonsterOrCasterStack nextElement
+    executeForAll = (functionName: string) => {
+        this.udg_enumMoc = this.monsterOrCaster
+        ExecuteFunc(functionName)
+        if (this.nextElement !== null) {
+            this.nextElement.executeForAll(functionName)
+        }
+    }
 
-// TODO; Used to be static
-     
+    GetEnumMoc = () => this.udg_enumMoc
 
+    containsMob = (mobId: number): boolean => {
+        if (this.monsterOrCaster != null && this.monsterOrCaster.getId() == mobId) {
+            return true
+        } else if (this.nextElement !== null) {
+            return this.nextElement.containsMob(mobId)
+        } else {
+            return false
+        }
+    }
 
-const create = (monsterOrCaster: MonsterOrCaster): MonsterOrCasterStack => {
-	let mocs: MonsterOrCasterStack;
-	if ((monsterOrCaster === 0)) {
-		return 0;
-	}
-	mocs = MonsterOrCasterStack.allocate()
-	mocs.monsterOrCaster = monsterOrCaster
-	mocs.nextElement = 0
-	return mocs;
-};
+    getLast = () => this.monsterOrCaster
 
-const addMonsterOrCaster = (monsterOrCaster: MonsterOrCaster): boolean => {
-	let newElement: MonsterOrCasterStack;
-	if ((monsterOrCaster === 0)) {
-		return false;
-	}
-	newElement = this.create(this.monsterOrCaster);
-	newElement.nextElement = this.nextElement
-	this.monsterOrCaster = monsterOrCaster;
-	this.nextElement = newElement;
-	return true;
-};
-
-const onDestroy = () => {
- this.monsterOrCaster.destroy()
-	if ((this.nextElement !== 0)) {
- this.nextElement.destroy()
-	}
-};
-
-const executeForAll = (functionName: string) => {
-	udg_enumMoc = this.monsterOrCaster;
-	ExecuteFunc(functionName)
-	if ((this.nextElement !== 0)) {
- this.nextElement.executeForAll(functionName)
-	}
-};
-
-const containsMob = (mobId: number): boolean => {
-	if ( (this.monsterOrCaster.getId() == mobId) ) {
-		return true;
-	} else if ((this.nextElement !== 0)) {
-		return this.nextElement.containsMob(mobId)
-	} else {
-		return false;
-	}
-};
-
-const getLast = (): MonsterOrCaster => {
-	return this.monsterOrCaster;
-};
-
-const removeLast = (): boolean => {
-	let oldNextElement = this.nextElement;
-	if ((this.monsterOrCaster === 0)) {
-		return false;
-	}
- this.monsterOrCaster.destroy()
-	if ((this.nextElement !== 0)) {
-		this.monsterOrCaster = this.nextElement.getLast().copy()
-		this.nextElement = this.nextElement.nextElement
-		this.nextElement.nextElement = 0
- this.nextElement.destroy()
-	} else {
-		this.monsterOrCaster = 0;
-	}
-	return true;
-};
-
-//endstruct
-
-
+    removeLast = () => {
+        let oldNextElement = this.nextElement
+        if (this.monsterOrCaster === null) {
+            return false
+        }
+        this.monsterOrCaster.destroy()
+        if (this.nextElement !== null) {
+            this.monsterOrCaster = this.nextElement!.getLast()!.copy()
+            this.nextElement = this.nextElement.nextElement
+            this.nextElement!.nextElement = null
+            this.nextElement!.destroy()
+        } else {
+            this.monsterOrCaster = null
+        }
+        return true
+    }
 }

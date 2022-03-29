@@ -8,6 +8,7 @@ import { Escaper } from '../Escaper/Escaper'
 import { Level } from '../Level/Level'
 import { Monster } from '../Monster/Monster'
 import { MonsterCreationFunctions } from '../Monster/Monster_creation_functions'
+import { CasterFunctions } from './Caster_functions'
 
 const casterHashtable = InitHashtable()
 
@@ -117,7 +118,7 @@ export class Caster {
         SetUnitUserData(this.casterUnit, this.id)
         this.trg_unitWithinRange = CreateTrigger()
         TriggerRegisterUnitInRangeSimple(this.trg_unitWithinRange, this.casterType.getRange(), this.casterUnit)
-        TriggerAddAction(this.trg_unitWithinRange, CasterUnitWithinRange_Actions)
+        TriggerAddAction(this.trg_unitWithinRange, CasterFunctions.CasterUnitWithinRange_Actions)
         SaveInteger(casterHashtable, 0, GetHandleId(this.trg_unitWithinRange), integer(this))
         this.t = CreateTimer()
         SaveInteger(casterHashtable, 1, GetHandleId(this.t), integer(this))
@@ -174,7 +175,7 @@ export class Caster {
         ;(disablingTimer as any) = null
     }
 
-    onDestroy = () => {
+    destroy = () => {
         this.disable()
         this.level.casters.setCasterNull(this.arrayId)
         if (ClearTriggerMobId2ClearMob(this.id) !== 0) {

@@ -1,7 +1,6 @@
 //todomax add clearMob: ClearMob as propery of Monster
 //todomax add getIndex method, with index field, key of udg_monsters and UserData of the unit
 
-
 export interface Monster {
     /* TODO; static */ nbInstances: number = 0
     id: number
@@ -32,6 +31,7 @@ export interface Monster {
     setBaseColor: (colorString: string) => void
     setVertexColor: (vcRed: number, vcGreen: number, vcBlue: number) => void
     reinitColor: () => void
+    destroy: () => void
 }
 
 const initMonster = () => {

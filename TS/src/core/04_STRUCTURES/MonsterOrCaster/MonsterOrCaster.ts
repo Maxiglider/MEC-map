@@ -1,121 +1,112 @@
+import { Caster } from '../Caster/Caster'
+import { Monster } from '../Monster/Monster'
 
+export class MonsterOrCaster {
+    private monster: Monster | null = null
+    private caster: Caster | null = null
 
-const initMonsterOrCaster = () => { // needs Monster
+    constructor(mobId: number) {
+        let monster = Monster.MonsterId2Monster(mobId)
+        let caster: Caster
 
+        if (monster !== null) {
+            this.monster = monster
+            this.caster = null
+        } else {
+            caster = Monster.CasterId2Caster(mobId)
+            if (caster !== null) {
+                this.monster = null
+                this.caster = caster
+            }
+        }
+    }
 
-//struct MonsterOrCaster
+    getId = (): number => {
+        if (this.monster !== null) {
+            return this.monster.getId()
+        } else if (this.caster !== null) {
+            return this.caster.getId()
+        }
+        return 0
+    }
 
-// TODO; Used to be private
-     Monster monster
-// TODO; Used to be private
-     Caster caster
-    
-// TODO; Used to be static
-     
+    killUnit = () => {
+        if (this.monster !== null) {
+            this.monster.killUnit()
+        } else if (this.caster !== null) {
+            this.caster.killUnit()
+        }
+    }
 
+    temporarilyDisable = (disablingTimer: timer) => {
+        if (this.monster !== null) {
+            this.monster.temporarilyDisable(disablingTimer)
+        } else if (this.caster !== null) {
+            this.caster.temporarilyDisable(disablingTimer)
+        }
+    }
 
-const create = (mobId: number): MonsterOrCaster => {
-	let moc: MonsterOrCaster;
-	let monster = MonsterId2Monster(mobId);
-	let caster: Caster;
-	if ((monster !== 0)) {
-		moc = MonsterOrCaster.allocate()
-		moc.monster = monster
-		moc.caster = 0
-	} else {
-		caster = CasterId2Caster(mobId);
-		if ((caster !== 0)) {
-			moc = MonsterOrCaster.allocate()
-			moc.monster = 0
-			moc.caster = caster
-		} else {
-			moc = 0;
-		}
-	}
-	return moc;
-};
+    temporarilyEnable = (enablingTimer: timer) => {
+        if (this.monster !== null) {
+            this.monster.temporarilyEnable(enablingTimer)
+        } else if (this.caster !== null) {
+            this.caster.temporarilyEnable(enablingTimer)
+        }
+    }
 
-const getId = (): number => {
-	if ((this.monster !== 0)) {
-		return this.monster.getId()
-	} else if ((this.caster !== 0)) {
-		return this.caster.getId()
-	}
-	return 0;
-};
+    setBaseColor = (colorString: string) => {
+        if (this.monster !== null) {
+            this.monster.setBaseColor(colorString)
+        } else if (this.caster !== null) {
+            this.caster.setBaseColor(colorString)
+        }
+    }
 
-const killUnit = () => {
-	if ((this.monster !== 0)) {
- this.monster.killUnit()
-	} else if ((this.caster !== 0)) {
- this.caster.killUnit()
-	}
-};
+    setVertexColor = (vcRed: number, vcGreen: number, vcBlue: number) => {
+        if (this.monster !== null) {
+            this.monster.setVertexColor(vcRed, vcGreen, vcBlue)
+        } else if (this.caster !== null) {
+            this.caster.setVertexColor(vcRed, vcGreen, vcBlue)
+        }
+    }
 
-const temporarilyDisable = (disablingTimer: timer) => {
-	if ((this.monster !== 0)) {
- this.monster.temporarilyDisable(disablingTimer)
-	} else if ((this.caster !== 0)) {
- this.caster.temporarilyDisable(disablingTimer)
-	}
-};
+    reinitColor = () => {
+        if (this.monster !== null) {
+            this.monster.reinitColor()
+        } else if (this.caster !== null) {
+            this.caster.reinitColor()
+        }
+    }
 
-const temporarilyEnable = (enablingTimer: timer) => {
-	if ((this.monster !== 0)) {
- this.monster.temporarilyEnable(enablingTimer)
-	} else if ((this.caster !== 0)) {
- this.caster.temporarilyEnable(enablingTimer)
-	}
-};
+    getUnit = () => {
+        if (this.monster !== null) {
+            return this.monster.u
+        } else if (this.caster !== null) {
+            return this.caster.casterUnit
+        }
 
-const setBaseColor = (colorString: string) => {
-	if ((this.monster !== 0)) {
- this.monster.setBaseColor(colorString)
-	} else if ((this.caster !== 0)) {
- this.caster.setBaseColor(colorString)
-	}
-};
+        return null
+    }
 
-const setVertexColor = (vcRed: number, vcGreen: number, vcBlue: number) => {
-	if ((this.monster !== 0)) {
- this.monster.setVertexColor(vcRed, vcGreen, vcBlue)
-	} else if ((this.caster !== 0)) {
- this.caster.setVertexColor(vcRed, vcGreen, vcBlue)
-	}
-};
+    copy = () => {
+        return new MonsterOrCaster(this.getId())
+    }
 
-const reinitColor = () => {
-	if ((this.monster !== 0)) {
- this.monster.reinitColor()
-	} else if ((this.caster !== 0)) {
- this.caster.reinitColor()
-	}
-};
+    getMonsterType = () => {
+        if (this.monster !== null) {
+            return this.monster.getMonsterType()
+        } else if (this.caster !== null) {
+            return this.caster.getCasterType().getCasterMonsterType()
+        }
 
-const getUnit = (): unit => {
-	if ((this.monster !== 0)) {
-		return this.monster.u
-	} else if ((this.caster !== 0)) {
-		return this.caster.casterUnit
-	}
-	return null;
-};
+        return null
+    }
 
-const copy = (): MonsterOrCaster => {
-	return MonsterOrCaster.create(this.getId())
-};
-
-const getMonsterType = (): MonsterType => {
-	if ((this.monster !== 0)) {
-		return this.monster.getMonsterType()
-	} else if ((this.caster !== 0)) {
-		return this.caster.getCasterType().getCasterMonsterType()
-	}
-	return 0;
-};
-
-//endstruct
-
-
-
+    destroy = () => {
+        if (this.monster !== null) {
+            this.monster.destroy()
+        } else if (this.caster !== null) {
+            this.caster.destroy()
+        }
+    }
 }
