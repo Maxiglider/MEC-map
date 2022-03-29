@@ -1,0 +1,42 @@
+import { MakeAction } from './MakeAction'
+
+export class MakeTerrainHeightAction extends MakeAction {
+    private radius: real
+    private height: real
+    private x: real
+    private y: real
+    private terrainDeform: terraindeformation
+
+    constructor(radius: number, height: number, x: number, y: number) {
+        this.radius = radius
+        this.height = height
+        this.x = x
+        this.y = y
+        this.apply()
+        this.isActionMadeB = true
+    }
+
+    apply = (): void => {
+        this.terrainDeform = TerrainDeformCrater(this.x, this.y, this.radius, -this.height, 0, true)
+    }
+
+    cancel = (): boolean => {
+        if (!this.isActionMadeB) {
+            return false
+        }
+        TerrainDeformStop(this.terrainDeform, 0)
+        this.isActionMadeB = false
+        Text_mkP(this.owner.getPlayer(), 'terrain height cancelled')
+        return true
+    }
+
+    redo = (): boolean => {
+        if (this.isActionMadeB) {
+            return false
+        }
+        this.apply()
+        this.isActionMadeB = true
+        Text_mkP(this.owner.getPlayer(), 'terrain height redone')
+        return true
+    }
+}
