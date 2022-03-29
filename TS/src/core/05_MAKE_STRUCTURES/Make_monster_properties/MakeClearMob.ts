@@ -7,7 +7,7 @@ class MakeClearMob extends Make {
 
 	private disableDuration: number
 	private clearMob?: ClearMob
-	private blockMobs: Map<number, Monster>
+	private blockMobs: Monster[]
 	private indexLastBlockNotCancelledMob: number
 	private triggerMob?: Monster
 
@@ -20,7 +20,7 @@ class MakeClearMob extends Make {
 		}
 
 		this.disableDuration = disableDuration
-		this.blockMobs = new Map<number, Monster>()
+		this.blockMobs = []
 		this.indexLastBlockNotCancelledMob = 0
 	}
 
@@ -28,64 +28,38 @@ class MakeClearMob extends Make {
 		this.clearMob = this.escaper.getMakingLevel().clearMobs.new(this.triggerMob, this.disableDuration, true)
 	}
 
-	private addBlockMob(monster:  Monster) {
-		this.clearMob.addBlockMob(monster)
-
+	private addBlockMob(monster: Monster) {
 		//clear entries after the last not cancelled mob
-		let found = this.indexLastBlockNotCancelledMob == 0
-		for(let mobIndex of this.blockMobs.keys()) {
-			if (found) {
-				this.blockMobs.delete(mobIndex)
-			} else {
-				found = mobIndex == this.indexLastBlockNotCancelledMob
-			}
+		const nbBlockMobs = this.blockMobs.length
+		for(let i = this.indexLastBlockNotCancelledMob + 1; i < nbBlockMobs; i++){
+			this.blockMobs.splice(-1,1);
 		}
 
 		//add the block mob
-		this.blockMobs.set(monster.getIndex(), monster)
+		this.clearMob.addBlockMob(monster)
+		this.blockMobs.push(monster)
+		this.indexLastBlockNotCancelledMob++
 	}
 
-	private cancelLastNotCancelledBlockMob() {
+	private cancelOneBlockMob() {
 		if(this.clearMob.removeLastBlockMob()) {
-			if (this.indexLastBlockNotCancelledMob == 0) {
-				return true
+			if (this.indexLastBlockNotCancelledMob != 0) {
+				this.indexLastBlockNotCancelledMob--
 			}
 
-			let found = false
-			let nothingMoreToCancel = true
-
-			for (let mobIndex of Array.from(this.blockMobs.keys()).reverse()) {
-				if (found) {
-					this.indexLastBlockNotCancelledMob = mobIndex
-					nothingMoreToCancel = false
-				} else {
-					found = mobIndex == this.indexLastBlockNotCancelledMob
-				}
-			}
-
-			if (nothingMoreToCancel) {
-				this.indexLastBlockNotCancelledMob = 0
-			}
-			 return true
+			return true
 		}
 
 		return false
 	}
 
-	private redoLastCancelledBlockMob() {
-		//find the last cancelled
-		let found = this.indexLastBlockNotCancelledMob == 0
-		for(let entry of this.blockMobs.entries()) {
-			const mobIndex = entry[0]
-			if (found) {
-				//readd the block mob
-				const monster = entry[1]
-				this.blockMobs.set(mobIndex, monster)
+	private redoOneBlockMob() {
+		if (this.clearMob && this.indexLastBlockNotCancelledMob < this.blockMobs.length - 1){
+			this.indexLastBlockNotCancelledMob++
+			const monster = this.blockMobs[this.indexLastBlockNotCancelledMob]
+			this.clearMob.addBlockMob(monster)
 
-				return true
-			} else {
-				found = mobIndex == this.indexLastBlockNotCancelledMob
-			}
+			return true
 		}
 
 		return false
@@ -128,7 +102,7 @@ class MakeClearMob extends Make {
 
 	cancelLastAction() {
 		if (this.clearMob) {
-			if(this.cancelLastNotCancelledBlockMob()) {
+			if(this.cancelOneBlockMob()) {
 				Text.mkP(this.makerOwner, "last block mob removed")
 			}else {
 				this.clearMob.destroy()
@@ -151,7 +125,7 @@ class MakeClearMob extends Make {
 			} else {
 				return false
 			}
-		}else if (this.redoLastCancelledBlockMob()) {
+		}else if (this.redoOneBlockMob()) {
 				Text.mkP(this.makerOwner, "block mob added")
 			return true
 		} else {
