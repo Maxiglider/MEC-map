@@ -1,5 +1,5 @@
 import { createEvent } from 'Utils/mapUtils'
-import { MonsterInterface } from './MonsterInterface'
+import { Monster } from './Monster'
 
 const initMonstersClickableSetLife = () => {
     const monstersClickable = CreateGroup()
@@ -14,8 +14,8 @@ const initMonstersClickableSetLife = () => {
                     const currentLife = GetUnitState(monsterUnit, UNIT_STATE_LIFE)
                     const monster = Monster(
                         LoadInteger(
-                            MonsterInterface.htMonsterId2MonsterHandleId,
-                            MonsterInterface.MONSTER,
+                            Monster.htMonsterId2MonsterHandleId,
+                            Monster.MONSTER,
                             GetUnitUserData(monsterUnit)
                         )
                     )

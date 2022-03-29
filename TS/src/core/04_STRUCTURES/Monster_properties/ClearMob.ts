@@ -1,6 +1,6 @@
 
 
-const initClearMob = () => { // initializer InitClearMob needs MonsterInterface
+const initClearMob = () => { // initializer InitClearMob needs Monster
 
 
 
@@ -100,7 +100,7 @@ const setDisableDuration = (disableDuration: number): boolean => {
 };
 
 const getTriggerMob = (): MonsterOrCaster => {
-	return this.triggerMob;
+	return this.triggerMob; //return Monster
 };
 
 const setTriggerMob = (newTriggerMob: MonsterOrCaster): boolean => {
@@ -118,7 +118,7 @@ const getBlockMobs = (): MonsterOrCasterStack => {
 };
 
 // TODO; Used to be static
-const create = (triggerMobId: number, disableDuration: number): ClearMob => {
+const create = (triggerMobId: number /* todomax replace with Monster */, disableDuration: number): ClearMob => {
 	let clearMob: ClearMob;
 	let triggerMob: MonsterOrCaster;
 	if ((disableDuration !== 0 && (disableDuration > CLEAR_MOB_MAX_DURATION || disableDuration < FRONT_MONTANT_DURATION))) {

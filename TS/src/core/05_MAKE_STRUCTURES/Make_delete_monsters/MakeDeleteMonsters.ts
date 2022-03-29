@@ -1,6 +1,6 @@
 import {Text} from "../../01_libraries/Text";
 import { MakeOneByOneOrTwoClicks } from 'core/05_MAKE_STRUCTURES/Make/MakeOneByOneOrTwoClicks'
-import {Monster} from "../../04_STRUCTURES/Monster/MonsterInterface";
+import {Monster} from "../../04_STRUCTURES/Monster/Monster";
 
 
 class MakeDeleteMonsters extends MakeOneByOneOrTwoClicks{

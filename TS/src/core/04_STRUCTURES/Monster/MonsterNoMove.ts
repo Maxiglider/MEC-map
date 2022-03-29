@@ -2,7 +2,7 @@ import { MOBS_VARIOUS_COLORS } from 'core/01_libraries/Constants'
 import { ColorCodes } from 'core/01_libraries/Init_colorCodes'
 import { CommandsFunctions } from 'core/06_COMMANDS/COMMANDS_vJass/Command_functions'
 import { CACHE_SEPARATEUR_PARAM } from 'core/07_TRIGGERS/Save_map_in_gamecache/struct_StringArrayForCache'
-import { Monster, MonsterInterface } from './MonsterInterface'
+import { Monster } from './Monster'
 import { MonstersClickableSetLife } from './trig_Monsters_clickable_set_life'
 
 export class MonsterNoMove implements Monster {
@@ -167,8 +167,8 @@ export class MonsterNoMove implements Monster {
         ) {
             this.disablingTimer = disablingTimer
             UnitRemoveAbility(this.u, this.mt.getImmolationSkill())
-            SetUnitVertexColorBJ(this.u, this.vcRed, this.vcGreen, this.vcBlue, MonsterInterface.DISABLE_TRANSPARENCY)
-            this.vcTransparency = MonsterInterface.DISABLE_TRANSPARENCY
+            SetUnitVertexColorBJ(this.u, this.vcRed, this.vcGreen, this.vcBlue, Monster.DISABLE_TRANSPARENCY)
+            this.vcTransparency = Monster.DISABLE_TRANSPARENCY
         }
     }
 

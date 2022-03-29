@@ -1,6 +1,6 @@
+//todomax probably make Caster extends Monster
 
-
-const initCaster = () => { // initializer InitCaster needs MonsterCreationFunctions, CasterFunctions, MonsterInterface, ClearMob
+const initCaster = () => { // initializer InitCaster needs MonsterCreationFunctions, CasterFunctions, Monster, ClearMob
 
 
 // TODO; Used to be public

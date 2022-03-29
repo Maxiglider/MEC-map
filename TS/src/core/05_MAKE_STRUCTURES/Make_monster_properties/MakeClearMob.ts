@@ -1,119 +1,164 @@
+import { Text } from 'core/01_libraries/Text';
+import {Make} from 'core/05_MAKE_STRUCTURES/Make/Make'
+import {Monster} from "../../04_STRUCTURES/Monster/Monster";
 
 
-const initMakeClearMob = () => { // needs Make, ClearMob
+class MakeClearMob extends Make {
+
+	private disableDuration: number
+	private clearMob?: ClearMob
+	private blockMobs: Map<number, Monster>
+	private indexLastBlockNotCancelledMob: number
+	private triggerMob?: Monster
 
 
+	constructor(maker: unit, disableDuration: number) {
+		super(maker, "createClearMob")
 
-//struct MakeClearMob extends Make
+		if (disableDuration !== 0 && (disableDuration > CLEAR_MOB_MAX_DURATION || disableDuration < ClearMob_FRONT_MONTANT_DURATION)) {
+			throw "ClearMob : wrong duration"
+		}
 
-// TODO; Used to be private
-     real disableDuration
-// TODO; Used to be private
-     ClearMob clearMob
-// TODO; Used to be private
-     integer array clickedMobs[500]
-// TODO; Used to be private
-     integer lastClickedMobInd
-// TODO; Used to be private
-     integer pointeurClickedMob
-	
-// TODO; Used to be static
-	 
-
-
-const create = (maker: unit, disableDuration: number): MakeClearMob => {
-	let m: MakeClearMob;
-	if ((maker === null || (disableDuration !== 0 && (disableDuration > CLEAR_MOB_MAX_DURATION || disableDuration < ClearMob_FRONT_MONTANT_DURATION)))) {
-		return 0;
+		this.disableDuration = disableDuration
+		this.blockMobs = new Map<number, Monster>()
+		this.indexLastBlockNotCancelledMob = 0
 	}
-	m = MakeClearMob.allocate()
-	m.maker = maker
-	m.makerOwner = GetOwningPlayer(maker)
-	m.kind = "createClearMob"
-	m.t = CreateTrigger()
- TriggerAddAction(m.t, Make_GetActions(m.kind))
- TriggerRegisterUnitEvent(m.t, maker, EVENT_UNIT_ISSUED_POINT_ORDER)
-	m.lastClickedMobInd = -1
-	m.pointeurClickedMob = -1
-	m.disableDuration = disableDuration
-	m.clearMob = 0
-	return m;
-};
 
-const onDestroy = () => {
-	DestroyTrigger(this.t)
-	this.t = null;
-	this.maker = null;
-};
+	private createClearMob() {
+		this.clearMob = this.escaper.getMakingLevel().clearMobs.new(this.triggerMob, this.disableDuration, true)
+	}
 
-const clickMade = (monsterOrCasterId: number) => {
-	let escaper = EscaperFunctions.Hero2Escaper(this.maker);
-	if ((this.pointeurClickedMob === -1)) {
-		if ((ClearTriggerMobId2ClearMob(monsterOrCasterId) !== 0)) {
-			Text.erP(this.makerOwner, "this monster is already a trigger mob of a clear mob")
-			return;
-		} else {
-			this.clearMob = escaper.getMakingLevel().clearMobs.new(monsterOrCasterId, this.disableDuration, true)
+	private addBlockMob(monster:  Monster) {
+		this.clearMob.addBlockMob(monster)
+
+		//clear entries after the last not cancelled mob
+		let found = this.indexLastBlockNotCancelledMob == 0
+		for(let mobIndex of this.blockMobs.keys()) {
+			if (found) {
+				this.blockMobs.delete(mobIndex)
+			} else {
+				found = mobIndex == this.indexLastBlockNotCancelledMob
+			}
+		}
+
+		//add the block mob
+		this.blockMobs.set(monster.getIndex(), monster)
+	}
+
+	private cancelLastNotCancelledBlockMob() {
+		if(this.clearMob.removeLastBlockMob()) {
+			if (this.indexLastBlockNotCancelledMob == 0) {
+				return true
+			}
+
+			let found = false
+			let nothingMoreToCancel = true
+
+			for (let mobIndex of Array.from(this.blockMobs.keys()).reverse()) {
+				if (found) {
+					this.indexLastBlockNotCancelledMob = mobIndex
+					nothingMoreToCancel = false
+				} else {
+					found = mobIndex == this.indexLastBlockNotCancelledMob
+				}
+			}
+
+			if (nothingMoreToCancel) {
+				this.indexLastBlockNotCancelledMob = 0
+			}
+			 return true
+		}
+
+		return false
+	}
+
+	private redoLastCancelledBlockMob() {
+		//find the last cancelled
+		let found = this.indexLastBlockNotCancelledMob == 0
+		for(let entry of this.blockMobs.entries()) {
+			const mobIndex = entry[0]
+			if (found) {
+				//readd the block mob
+				const monster = entry[1]
+				this.blockMobs.set(mobIndex, monster)
+
+				return true
+			} else {
+				found = mobIndex == this.indexLastBlockNotCancelledMob
+			}
+		}
+
+		return false
+	}
+
+	clickMade(monster: Monster){
+		if (!this.clearMob){
+			//creation of the clearMob
+			this.triggerMob = monster
+			this.createClearMob()
 			Text.mkP(this.makerOwner, "trigger mob added for a new clear mob")
-		}
-	} else {
-		//vérification que le clear mob existe toujours
-		if ( (this.clearMob.getTriggerMob() == 0) ) {
-			Text.erP(this.makerOwner, "the clear mob you are working on has been removed")
- escaper.destroyMake()
-			return;
-		}
-		if ( (this.clearMob.getBlockMobs().containsMob(monsterOrCasterId)) ) {
-			Text.erP(this.makerOwner, "this monster is already a block mob of this clear mob")
-			return;
 		} else {
- this.clearMob.addBlockMob(monsterOrCasterId)
-			Text.mkP(this.makerOwner, "block mob added")
+			//vérification que le clear mob existe toujours
+			if ((this.clearMob.getTriggerMob())) {
+				Text.erP(this.makerOwner, "the clear mob you are working on has been removed")
+				this.escaper.destroyMake()
+				return
+			}
+			if ((this.clearMob.getBlockMobs().containsMob(monster))) {
+				Text.erP(this.makerOwner, "this monster is already a block mob of this clear mob")
+				return;
+			} else {
+				this.addBlockMob(monster)
+				Text.mkP(this.makerOwner, "block mob added")
+			}
 		}
-	}
-	this.pointeurClickedMob = this.pointeurClickedMob + 1;
-	this.lastClickedMobInd = this.pointeurClickedMob;
-};
+	};
 
-const cancelLastAction = (): boolean => {
-	if ((this.pointeurClickedMob > 0)) {
-		if ( (this.clearMob.removeLastBlockMob()) ) {
-			Text.mkP(this.makerOwner, "last block mob removed")
+	doActions() {
+		//recherche du monstre cliqué
+		const monster = this.escaper.getMakingLevel().getMonsterNear(this.orderX, this.orderY)
+
+		//application du clic
+		if (!monster) {
+			Text.erP(this.makerOwner, "no monster clicked for your making level")
 		} else {
-			Text.erP(this.makerOwner, "error, couldn't remove the last block mob")
+			this.clickMade(monster)
 		}
-	} else if ((this.pointeurClickedMob === 0)) {
- this.clearMob.destroy()
-		Text.mkP(this.makerOwner, "clear mob removed")
-	} else {
-		return false;
 	}
-	this.pointeurClickedMob = this.pointeurClickedMob - 1;
-	return true;
-};
 
-const redoLastAction = (): boolean => {
-	let escaper = EscaperFunctions.Hero2Escaper(this.maker);
-	if ((this.pointeurClickedMob === this.lastClickedMobInd)) {
-		return false;
+	cancelLastAction() {
+		if (this.clearMob) {
+			if(this.cancelLastNotCancelledBlockMob()) {
+				Text.mkP(this.makerOwner, "last block mob removed")
+			}else {
+				this.clearMob.destroy()
+				delete this.clearMob
+				Text.mkP(this.makerOwner, "clear mob removed")
+			}
+
+			return true
+		}else {
+			return false
+		}
 	}
-	this.pointeurClickedMob = this.pointeurClickedMob + 1;
-	if ((this.pointeurClickedMob > 0)) {
-		if ( (this.clearMob.addBlockMob(this.clickedMobs[this.pointeurClickedMob])) ) {
-			Text.mkP(this.makerOwner, "block mob added")
+
+	redoLastAction(){
+		if(!this.clearMob) {
+			if (this.triggerMob) {
+				this.createClearMob()
+				Text.mkP(this.makerOwner, "trigger mob added for a new clear mob")
+				return true
+			} else {
+				return false
+			}
+		}else if (this.redoLastCancelledBlockMob()) {
+				Text.mkP(this.makerOwner, "block mob added")
+			return true
 		} else {
-			Text.erP(this.makerOwner, "error, couldn't add the block mob")
+			return false
 		}
-	} else {
-		this.clearMob = escaper.getMakingLevel().clearMobs.new(this.clickedMobs[this.pointeurClickedMob], this.disableDuration, true)
-		Text.mkP(this.makerOwner, "trigger mob added for a new clear mob")
 	}
-	return true;
-};
-
-//endstruct
-
-
 
 }
+
 

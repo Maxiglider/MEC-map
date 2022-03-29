@@ -1,6 +1,6 @@
 
 
-const initMonsterOrCaster = () => { // needs MonsterInterface
+const initMonsterOrCaster = () => { // needs Monster
 
 
 //struct MonsterOrCaster
