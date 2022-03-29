@@ -26,7 +26,7 @@ export class ClearMobArray {
         return this.lastInstance
     }
 
-    new = (triggerMobId: number, disableDuration: number, initialize: boolean): ClearMob => {
+    new = (triggerMob: monster, disableDuration: number, initialize: boolean): ClearMob => {
         //local integer n = this.getFirstEmpty()
         let n = this.lastInstance + 1
         if (n >= MAX_NB_CLEAR_MOB_BY_LEVEL) {

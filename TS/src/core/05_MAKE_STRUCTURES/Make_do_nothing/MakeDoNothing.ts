@@ -10,12 +10,4 @@ export class MakeDoNothing extends Make {
     doActions() {
         super.doBaseActions()
     }
-
-    cancelLastAction() {
-        return false
-    }
-
-    redoLastAction() {
-        return false
-    }
 }

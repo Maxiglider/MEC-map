@@ -11,12 +11,4 @@ export class MakeMeteor extends Make {
             this.escaper.newAction(new MakeMeteorAction(this.escaper.getMakingLevel(), meteor))
         }
     }
-
-    cancelLastAction() {
-        return false //todomax implement cancel and redo
-    }
-
-    redoLastAction() {
-        return false
-    }
 }
