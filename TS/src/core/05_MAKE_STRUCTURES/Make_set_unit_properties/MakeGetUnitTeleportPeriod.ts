@@ -12,12 +12,4 @@ export class MakeGetUnitTeleportPeriod extends Make {
             Text.mkP(this.makerOwner, 'period : ' + R2S(monsterTP.getPeriod()) + ' s')
         }
     }
-
-    cancelLastAction = (): boolean => {
-        return false
-    }
-
-    redoLastAction = (): boolean => {
-        return false
-    }
 }

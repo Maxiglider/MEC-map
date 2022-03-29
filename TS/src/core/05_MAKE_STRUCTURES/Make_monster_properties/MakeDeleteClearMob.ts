@@ -23,12 +23,4 @@ export class MakeDeleteClearMob extends Make {
             Text.erP(this.makerOwner, 'no clear mob clicked for your making level')
         }
     }
-
-    cancelLastAction = (): boolean => {
-        return false
-    }
-
-    redoLastAction = (): boolean => {
-        return false
-    }
 }
