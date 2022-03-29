@@ -1,3 +1,8 @@
+import { Text } from 'core/01_libraries/Text'
+import { Level } from '../Level/Level'
+import { VisibilityModifier } from '../Level/VisibilityModifier'
+import { MakeAction } from './MakeAction'
+
 export class MakeVisibilityModifierAction extends MakeAction {
     private level: Level
     private visibilityModifierSave: VisibilityModifier

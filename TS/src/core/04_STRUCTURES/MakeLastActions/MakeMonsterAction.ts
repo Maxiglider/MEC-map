@@ -1,3 +1,8 @@
+import { Text } from 'core/01_libraries/Text'
+import { Level } from '../Level/Level'
+import { Monster } from '../Monster/Monster'
+import { MakeAction } from './MakeAction'
+
 export class MakeMonsterAction extends MakeAction {
     private monster: Monster
     private level: Level

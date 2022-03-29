@@ -1,3 +1,7 @@
+import { LARGEUR_CASE, NB_MAX_TILES_MODIFIED } from 'core/01_libraries/Constants'
+import { Text } from 'core/01_libraries/Text'
+import { MakeAction } from './MakeAction'
+
 export class MakeTerrainHorizontalSymmetryAction extends MakeAction {
     private minX: number
     private minY: number

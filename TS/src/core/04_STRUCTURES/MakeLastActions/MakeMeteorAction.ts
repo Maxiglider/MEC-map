@@ -1,3 +1,8 @@
+import { Text } from 'core/01_libraries/Text'
+import { Level } from '../Level/Level'
+import { Meteor } from '../Meteor/Meteor'
+import { MakeAction } from './MakeAction'
+
 export class MakeMeteorAction extends MakeAction {
     private meteor: Meteor
     private level: Level

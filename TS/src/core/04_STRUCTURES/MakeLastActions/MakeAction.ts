@@ -1,6 +1,7 @@
 import { Escaper } from '../Escaper/Escaper'
+import { Level } from '../Level/Level'
 
-abstract class MakeAction {
+export abstract class MakeAction {
     isActionMadeB: boolean = true
     owner: Escaper = null
     private level: Level

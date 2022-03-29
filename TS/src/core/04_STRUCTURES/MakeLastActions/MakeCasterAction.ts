@@ -1,5 +1,7 @@
 import { Text } from 'core/01_libraries/Text'
+import { Caster } from '../Caster/Caster'
 import { Level } from '../Level/Level'
+import { MakeAction } from './MakeAction'
 
 export class MakeCasterAction extends MakeAction {
     private caster: Caster
