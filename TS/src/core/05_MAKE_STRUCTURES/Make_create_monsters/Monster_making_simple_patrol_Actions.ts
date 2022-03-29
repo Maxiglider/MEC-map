@@ -2,19 +2,12 @@
 
 const initMMSimplePatrolActions = () => { // needs TerrainTypeFunctions, Escaper
 
-// TODO; Used to be private
 const MIN_DIST = 5;
-// TODO; Used to be private
 const MAX_DIST = 2000;
-// TODO; Used to be private
 const ECART_DIST = 32;
-// TODO; Used to be private
 const ECART_ANGLE = 9;
-// TODO; Used to be private
 const DIST_ON_TERRAIN_MAX = 300;
-// TODO; Used to be private
 const DIST_ON_TERRAIN_DEFAULT = 50;
-// TODO; Used to be private
 let distOnTerrain = 50;
 
 
@@ -184,6 +177,7 @@ const MonsterMakingSimplePatrol_Actions = () => {
 	}
 };
 
+// TODO; ONLY RETURN LAST FUNCTION
 
 
 }

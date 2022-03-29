@@ -1,11 +1,9 @@
-const initMakeDeleteClearMob = () => {
-    // needs Make, ClearMob
+import { Make } from '../Make/Make'
 
-    //struct MakeDeleteClearMob extends Make
-
+export class MakeDeleteClearMob extends Make {
     // TODO; Used to be static
 
-    const create = (maker: unit): MakeDeleteClearMob => {
+    create = (maker: unit): MakeDeleteClearMob => {
         let m: MakeDeleteClearMob
         if (maker === null) {
             return 0
@@ -20,13 +18,13 @@ const initMakeDeleteClearMob = () => {
         return m
     }
 
-    const onDestroy = () => {
+    destroy = () => {
         DestroyTrigger(this.t)
         this.t = null
         this.maker = null
     }
 
-    const clickMade = (monsterOrCasterId: number) => {
+    clickMade = (monsterOrCasterId: number) => {
         let escaper = EscaperFunctions.Hero2Escaper(this.maker)
         let clearMob = ClearTriggerMobId2ClearMob(monsterOrCasterId)
         if (clearMob !== 0) {
@@ -37,13 +35,11 @@ const initMakeDeleteClearMob = () => {
         }
     }
 
-    const cancelLastAction = (): boolean => {
+    cancelLastAction = (): boolean => {
         return false
     }
 
-    const redoLastAction = (): boolean => {
+    redoLastAction = (): boolean => {
         return false
     }
-
-    //endstruct
 }

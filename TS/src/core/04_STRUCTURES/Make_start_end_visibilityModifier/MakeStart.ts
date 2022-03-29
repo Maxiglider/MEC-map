@@ -1,98 +1,81 @@
+import { Make } from 'core/05_MAKE_STRUCTURES/Make/Make'
 
+export class MakeStart extends Make {
+    lastX: real
+    lastY: real
+    private unitLastClic: unit
+    private lastLocIsSaved: boolean
+    private lastLocSavedIsUsed: boolean
+    private forNextB: boolean //à true si on veut créer le start du niveau suivant
 
-const initMakeStart = () => { // needs Make
+    // TODO; Used to be static
+    create = (maker: unit, forNext: boolean): MakeStart => {
+        let m: MakeStart
+        if (maker === null) {
+            return 0
+        }
+        m = MakeStart.allocate()
+        m.maker = maker
+        m.makerOwner = GetOwningPlayer(maker)
+        m.kind = 'startCreate'
+        m.t = CreateTrigger()
+        TriggerAddAction(m.t, Make_GetActions(m.kind))
+        TriggerRegisterUnitEvent(m.t, maker, EVENT_UNIT_ISSUED_POINT_ORDER)
+        m.lastLocIsSaved = false
+        m.lastLocSavedIsUsed = false
+        m.forNextB = forNext
+        return m
+    }
 
+    destroy = () => {
+        DestroyTrigger(this.t)
+        this.t = null
+        RemoveUnit(this.unitLastClic)
+        this.unitLastClic = null
+        this.maker = null
+    }
 
+    saveLoc = (x: number, y: number) => {
+        this.lastX = x
+        this.lastY = y
+        this.lastLocIsSaved = true
+        this.lastLocSavedIsUsed = true
+        if (this.unitLastClic === null) {
+            this.unitLastClic = CreateUnit(this.makerOwner, MAKE_LAST_CLIC_UNIT_ID, x, y, GetRandomDirectionDeg())
+        } else {
+            SetUnitX(this.unitLastClic, x)
+            SetUnitY(this.unitLastClic, y)
+        }
+        EscaperFunctions.Hero2Escaper(this.maker).destroyCancelledActions()
+    }
 
-//struct MakeStart extends Make
+    unsaveLoc = (): boolean => {
+        if (!this.lastLocSavedIsUsed) {
+            return false
+        }
+        RemoveUnit(this.unitLastClic)
+        this.unitLastClic = null
+        this.lastLocSavedIsUsed = false
+        return true
+    }
 
-    real lastX
-    real lastY
-// TODO; Used to be private
-     unit unitLastClic
-// TODO; Used to be private
-     boolean lastLocIsSaved
-// TODO; Used to be private
-	 boolean lastLocSavedIsUsed
-// TODO; Used to be private
-     boolean forNextB //à true si on veut créer le start du niveau suivant
-    
-// TODO; Used to be static
-	 
+    isLastLocSavedUsed = (): boolean => {
+        return this.lastLocSavedIsUsed
+    }
 
+    cancelLastAction = (): boolean => {
+        return this.unsaveLoc()
+    }
 
-const create = (maker: unit, forNext: boolean): MakeStart => {
-	let m: MakeStart;
-	if ((maker === null)) {
-		return 0;
-	}
-	m = MakeStart.allocate()
-	m.maker = maker
-	m.makerOwner = GetOwningPlayer(maker)
-	m.kind = "startCreate"
-	m.t = CreateTrigger()
- TriggerAddAction(m.t, Make_GetActions(m.kind))
- TriggerRegisterUnitEvent(m.t, maker, EVENT_UNIT_ISSUED_POINT_ORDER)
-	m.lastLocIsSaved = false
-	m.lastLocSavedIsUsed = false
-	m.forNextB = forNext
-	return m;
-};
+    redoLastAction = (): boolean => {
+        if (!this.lastLocSavedIsUsed && this.lastLocIsSaved) {
+            this.saveLoc(this.lastX, this.lastY)
+            return true
+        }
+        return false
+    }
 
-const onDestroy = () => {
-	DestroyTrigger(this.t)
-	this.t = null;
-	RemoveUnit(this.unitLastClic)
-	this.unitLastClic = null;
-	this.maker = null;
-};
-
-const saveLoc = (x: number, y: number) => {
-	this.lastX = x;
-	this.lastY = y;
-	this.lastLocIsSaved = true;
-	this.lastLocSavedIsUsed = true;
-	if ((this.unitLastClic === null)) {
-		this.unitLastClic = CreateUnit(this.makerOwner, MAKE_LAST_CLIC_UNIT_ID, x, y, GetRandomDirectionDeg());
-	} else {
-		SetUnitX(this.unitLastClic, x)
-		SetUnitY(this.unitLastClic, y)
-	}
- EscaperFunctions.Hero2Escaper(this.maker).destroyCancelledActions()
-};
-
-const unsaveLoc = (): boolean => {
-	if ((!this.lastLocSavedIsUsed)) {
-		return false;
-	}
-	RemoveUnit(this.unitLastClic)
-	this.unitLastClic = null;
-	this.lastLocSavedIsUsed = false;
-	return true;
-};
-
-const isLastLocSavedUsed = (): boolean => {
-	return this.lastLocSavedIsUsed;
-};
-
-const cancelLastAction = (): boolean => {
-	return this.unsaveLoc();
-};
-
-const redoLastAction = (): boolean => {
-	if ((!this.lastLocSavedIsUsed && this.lastLocIsSaved)) {
-		this.saveLoc(this.lastX, this.lastY)
-		return true;
-	}
-	return false;
-};
-
-const forNext = (): boolean => {
-	return this.forNextB;
-};
-
-//endstruct
-
-
-
+    forNext = (): boolean => {
+        return this.forNextB
+    }
 }

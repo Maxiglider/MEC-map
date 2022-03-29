@@ -11,9 +11,7 @@ const initHeroes = () => {
     const TIME_BETWEEN_EACH_HERO_SPAWN = 0.3
     const HERO_START_ANGLE = 90
     const EFFECT_FOR_MISSING_HEROES = 'Abilities\\Spells\\Undead\\DeathPact\\DeathPactTarget.mdl'
-    // TODO; Used to be private
     const NB_COLUMNS = 4
-    // TODO; Used to be private
     const NB_ROWS = 3
 
     const RandomizeStartPositionsAndHeroSpawnOrder = () => {

@@ -1,11 +1,8 @@
-const initMakeGetTerrainType = () => {
-    // needs Make
+import { Make } from 'core/05_MAKE_STRUCTURES/Make/Make'
 
-    //struct MakeGetTerrainType extends Make
-
+export class MakeGetTerrainType extends Make {
     // TODO; Used to be static
-
-    const create = (maker: unit): MakeGetTerrainType => {
+    create = (maker: unit): MakeGetTerrainType => {
         let m: MakeGetTerrainType
         if (maker === null) {
             return 0
@@ -20,19 +17,17 @@ const initMakeGetTerrainType = () => {
         return m
     }
 
-    const onDestroy = () => {
+    destroy = () => {
         DestroyTrigger(this.t)
         this.t = null
         this.maker = null
     }
 
-    const cancelLastAction = (): boolean => {
+    cancelLastAction = (): boolean => {
         return false
     }
 
-    const redoLastAction = (): boolean => {
+    redoLastAction = (): boolean => {
         return false
     }
-
-    //endstruct
 }

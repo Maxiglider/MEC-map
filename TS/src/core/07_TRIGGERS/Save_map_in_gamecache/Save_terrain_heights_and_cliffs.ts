@@ -45,7 +45,6 @@ const initSaveTerrainHeights = () => {
     }
 
     //save terrain heights
-    // TODO; Used to be private
     const SaveTerrainHeights_Actions = () => {
         let x: number
         let height: number

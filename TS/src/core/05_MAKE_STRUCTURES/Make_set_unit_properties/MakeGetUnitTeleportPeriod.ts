@@ -1,11 +1,9 @@
-const initMakeGetUnitTeleportPeriod = () => {
-    // needs Make
+import { Make } from '../Make/Make'
 
-    //struct MakeGetUnitTeleportPeriod extends Make
-
+export class MakeGetUnitTeleportPeriod extends Make {
     // TODO; Used to be static
 
-    const create = (maker: unit): MakeGetUnitTeleportPeriod => {
+    create = (maker: unit): MakeGetUnitTeleportPeriod => {
         let m: MakeGetUnitTeleportPeriod
         if (maker === null) {
             return 0
@@ -20,19 +18,17 @@ const initMakeGetUnitTeleportPeriod = () => {
         return m
     }
 
-    const onDestroy = () => {
+    destroy = () => {
         DestroyTrigger(this.t)
         this.t = null
         this.maker = null
     }
 
-    const cancelLastAction = (): boolean => {
+    cancelLastAction = (): boolean => {
         return false
     }
 
-    const redoLastAction = (): boolean => {
+    redoLastAction = (): boolean => {
         return false
     }
-
-    //endstruct
 }

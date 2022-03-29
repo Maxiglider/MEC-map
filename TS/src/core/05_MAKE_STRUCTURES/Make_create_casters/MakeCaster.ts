@@ -1,13 +1,11 @@
-import {Make} from 'core/05_MAKE_STRUCTURES/Make/Make'
+import { Make } from 'core/05_MAKE_STRUCTURES/Make/Make'
 
-
-class MakeCaster extends Make {
+export class MakeCaster extends Make {
     private casterType: CasterType
     private angle: number
 
-
     constructor(maker: unit, casterType: CasterType, angle: number) {
-        super(maker, "casterCreate")
+        super(maker, 'casterCreate')
 
         this.casterType = casterType
         this.angle = angle
@@ -21,9 +19,11 @@ class MakeCaster extends Make {
         return this.angle
     }
 
-    doActions(){
-        if(super.doBaseActions()){
-            const caster = this.escaper.getMakingLevel().casters.new(this.getCasterType(), this.orderX, this.orderY, this.getAngle(), true)
+    doActions() {
+        if (super.doBaseActions()) {
+            const caster = this.escaper
+                .getMakingLevel()
+                .casters.new(this.getCasterType(), this.orderX, this.orderY, this.getAngle(), true)
             this.escaper.newAction(new MakeCasterAction(this.escaper.getMakingLevel(), caster))
         }
     }

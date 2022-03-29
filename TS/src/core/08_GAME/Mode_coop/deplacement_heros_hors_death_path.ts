@@ -1,7 +1,5 @@
 const initDeplacementHeroHorsDeathPath = () => {
-    // TODO; Used to be private
     const GRADUATION_ANGLE = 5
-    // TODO; Used to be private
     const VALEUR_DECALAGE = 60
 
     const DeplacementHeroHorsDeathPath = (hero: unit) => {
