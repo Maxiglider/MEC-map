@@ -89,14 +89,16 @@ export class MakeClearMob extends Make {
     }
 
     doActions() {
-        //recherche du monstre cliqué
-        const monster = this.escaper.getMakingLevel().getMonsterNear(this.orderX, this.orderY)
+        if (super.doBaseActions()) {
+            //recherche du monstre cliqué
+            const monster = this.escaper.getMakingLevel().getMonsterNear(this.orderX, this.orderY)
 
-        //application du clic
-        if (!monster) {
-            Text.erP(this.makerOwner, 'no monster clicked for your making level')
-        } else {
-            this.clickMade(monster)
+            //application du clic
+            if (!monster) {
+                Text.erP(this.makerOwner, 'no monster clicked for your making level')
+            } else {
+                this.clickMade(monster)
+            }
         }
     }
 

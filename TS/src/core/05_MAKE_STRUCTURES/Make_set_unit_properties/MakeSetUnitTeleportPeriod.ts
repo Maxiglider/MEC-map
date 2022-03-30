@@ -20,34 +20,36 @@ export class MakeSetUnitTeleportPeriod extends MakeOneByOneOrTwoClicks {
     }
     
     doActions() {
-        let nbMonstersFixed = 0
+        if (super.doBaseActions()) {
+            let nbMonstersFixed = 0
 
-        if (this.getMode() == 'oneByOne') {
-            let monsterTP = this.escaper.getMakingLevel().monstersTeleport.getMonsterNear(this.orderX, this.orderY)
-            if (monsterTP) {
-                monsterTP.setPeriod(this.getPeriod())
-                nbMonstersFixed = 1
+            if (this.getMode() == 'oneByOne') {
+                let monsterTP = this.escaper.getMakingLevel().monstersTeleport.getMonsterNear(this.orderX, this.orderY)
+                if (monsterTP) {
+                    monsterTP.setPeriod(this.getPeriod())
+                    nbMonstersFixed = 1
+                }
+            } else {
+                //mode twoClics
+                if (!this.isLastLocSavedUsed()) {
+                    this.saveLoc(this.orderX, this.orderY)
+                    return
+                }
+
+                //todomax make all Monster<SpecificType>Array extend a new abstract class MonsterArray
+                let monstersTP = this.escaper.getMakingLevel().monstersTeleport.getMonstersBetweenLocs(this.orderX, this.orderY)
+                monstersTP.map(monsterTP => {
+                    monsterTP.setPeriod(this.getPeriod())
+                    nbMonstersFixed++
+                })
             }
-        } else {
-            //mode twoClics
-            if (!this.isLastLocSavedUsed()) {
-                this.saveLoc(this.orderX, this.orderY)
-                return
+
+            if (nbMonstersFixed <= 1) {
+                Text.mkP(this.makerOwner, I2S(nbMonstersFixed) + ' monster fixed.')
+            } else {
+                Text.mkP(this.makerOwner, I2S(nbMonstersFixed) + ' monsters fixed.')
             }
-
-            //todomax make all Monster<SpecificType>Array extend a new abstract class MonsterArray
-            let monstersTP = this.escaper.getMakingLevel().monstersTeleport.getMonstersBetweenLocs(this.orderX, this.orderY)
-            monstersTP.map(monsterTP => {
-                monsterTP.setPeriod(this.getPeriod())
-                nbMonstersFixed++
-            })
+            this.unsaveLocDefinitely()
         }
-
-        if (nbMonstersFixed <= 1) {
-            Text.mkP(this.makerOwner, I2S(nbMonstersFixed) + ' monster fixed.')
-        } else {
-            Text.mkP(this.makerOwner, I2S(nbMonstersFixed) + ' monsters fixed.')
-        }
-        this.unsaveLocDefinitely()
     }
 }

@@ -1,92 +1,197 @@
-import { Make } from '../Make/Make'
+import {MakeOneByOneOrTwoClicks} from "../Make/MakeOneByOneOrTwoClicks";
+import {MonsterType} from "../../04_STRUCTURES/Monster/MonsterType";
+import {Monster} from "../../04_STRUCTURES/Monster/Monster";
+import {BasicFunctions} from "../../01_libraries/Basic_functions";
+import { Text } from "core/01_libraries/Text";
+import {PATROL_DISTANCE_MIN} from "../../01_libraries/Constants";
+import {MakeMonsterAction} from "../../04_STRUCTURES/MakeLastActions/MakeMonsterAction";
+import {IsTerrainTypeOfKind} from "../../04_STRUCTURES/TerrainType/Terrain_type_functions";
 
-export class MakeMonsterSimplePatrol extends Make {
-    private mode: string
+const {GetLocDist} = BasicFunctions
+
+
+export class MakeMonsterSimplePatrol extends MakeOneByOneOrTwoClicks {
+    private static MIN_DIST = 5
+    private static MAX_DIST = 2000
+    private static ECART_DIST = 32
+    private static ECART_ANGLE = 9
+    private static DIST_ON_TERRAIN_MAX = 300
+    private static DIST_ON_TERRAIN_DEFAULT = 50
+
     private mt: MonsterType
-    lastX: number
-    lastY: number
-    private lastLocIsSaved: boolean
-    private lastLocSavedIsUsed: boolean
-    private unitLastClic: unit
+    private distOnTerrain: number
+
+    constructor(maker: unit, mode: string, mt: MonsterType) {
+        const acceptedModes = ["normal", "string", "auto"]
+        super(maker, 'monsterCreateSimplePatrol', mode, acceptedModes)
+
+        if (!mt) {
+            throw this.constructor.name + ' : monster type required'
+        }
+
+        this.mt = mt
+        this.distOnTerrain = MakeMonsterSimplePatrol.DIST_ON_TERRAIN_DEFAULT
+    }
 
     getMonsterType = (): MonsterType => {
         return this.mt
     }
 
-    // TODO; Used to be static
-    create = (maker: unit, mode: string, mt: MonsterType): MakeMonsterSimplePatrol => {
-        let m: MakeMonsterSimplePatrol
-        if (maker === null || (mode !== 'normal' && mode !== 'string' && mode !== 'auto') || mt === 0) {
-            return 0
-        }
-        m = MakeMonsterSimplePatrol.allocate()
-        m.maker = maker
-        m.makerOwner = GetOwningPlayer(maker)
-        m.kind = 'monsterCreateSimplePatrol'
-        m.mode = mode
-        m.mt = mt
-        m.t = CreateTrigger()
-        TriggerAddAction(m.t, Make_GetActions(m.kind))
-        TriggerRegisterUnitEvent(m.t, maker, EVENT_UNIT_ISSUED_POINT_ORDER)
-        m.lastLocIsSaved = false
-        m.lastLocSavedIsUsed = false
-        return m
-    }
-
-    destroy = () => {
-        DestroyTrigger(this.t)
-        this.t = null
-        RemoveUnit(this.unitLastClic)
-        this.unitLastClic = null
-        this.maker = null
-    }
-
-    saveLoc = (x: number, y: number) => {
-        this.lastX = x
-        this.lastY = y
-        this.lastLocIsSaved = true
-        this.lastLocSavedIsUsed = true
-        if (this.unitLastClic === null) {
-            this.unitLastClic = CreateUnit(this.makerOwner, MAKE_LAST_CLIC_UNIT_ID, x, y, GetRandomDirectionDeg())
-        } else {
-            SetUnitX(this.unitLastClic, x)
-            SetUnitY(this.unitLastClic, y)
-        }
-        EscaperFunctions.Hero2Escaper(this.maker).destroyCancelledActions()
-    }
-
-    unsaveLoc = (): boolean => {
-        if (!this.lastLocSavedIsUsed) {
+    //for "auto" mode
+    changeDistOnTerrain(newDist: number) {
+        if (newDist < 0 || newDist > MakeMonsterSimplePatrol.DIST_ON_TERRAIN_MAX) {
             return false
         }
-        RemoveUnit(this.unitLastClic)
-        this.unitLastClic = null
-        this.lastLocSavedIsUsed = false
+
+        this.distOnTerrain = newDist
         return true
     }
 
-    unsaveLocDefinitely = () => {
-        this.unsaveLoc()
-        this.lastLocIsSaved = false
+    //for "auto" mode
+    changeDistOnTerrainDefault() {
+        this.distOnTerrain = MakeMonsterSimplePatrol.DIST_ON_TERRAIN_DEFAULT
     }
 
-    isLastLocSavedUsed = (): boolean => {
-        return this.lastLocSavedIsUsed
-    }
+    doActions() {
+        if (super.doBaseActions()) {
+            let monster: Monster
+            let x1: number = 0
+            let y1: number = 0
+            let x2: number = 0
+            let y2: number = 0
+            let dist: number = 0
+            let angle: number = 0
+            let found: boolean
 
-    cancelLastAction = (): boolean => {
-        return this.unsaveLoc()
-    }
+            //normal or string modes
+            if (['normal', 'string'].includes(this.getMode())) {
+                if (this.isLastLocSavedUsed()) {
+                    if (GetLocDist(this.lastX, this.lastY, this.orderX, this.orderY) <= PATROL_DISTANCE_MIN) {
+                        Text.erP(this.makerOwner, 'Too close to the start location !')
+                        return
+                    } else {
+                        monster = this.escaper
+                            .getMakingLevel()
+                            .monstersSimplePatrol.new(this.getMonsterType(), this.lastX, this.lastY, this.orderX, this.orderY, true)
+                        this.escaper.newAction(new MakeMonsterAction(this.escaper.getMakingLevel(), monster))
+                        
+                        if(this.getMode() == 'normal'){
+                            this.unsaveLocDefinitely()
+                        }else{
+                            //string
+                            this.unsaveLoc()
+                        }
+                    }
+                } else {
+                    this.saveLoc(this.orderX, this.orderY)
+                }
+            }
 
-    redoLastAction = (): boolean => {
-        if (this.lastLocIsSaved && !this.lastLocSavedIsUsed) {
-            this.saveLoc(this.lastX, this.lastY)
-            return true
+            //auto mode
+            if (this.getMode() == 'auto') {
+                if (IsTerrainTypeOfKind(GetTerrainType(this.orderX, this.orderY), 'death')) {
+                    Text.erP(this.makerOwner, 'You clicked on a death terrain !')
+                    return
+                }
+
+                //find approximatively first location
+                found = false
+                dist = MakeMonsterSimplePatrol.MIN_DIST
+                while (true) {
+                    if (found || dist > MakeMonsterSimplePatrol.MAX_DIST) break
+                    angle = 0
+                    x1 = this.orderX + dist * CosBJ(angle)
+                    y1 = this.orderY + dist * SinBJ(angle)
+                    found = IsTerrainTypeOfKind(GetTerrainType(x1, y1), 'death')
+                    if (found) break
+
+                    angle = 90
+                    x1 = this.orderX + dist * CosBJ(angle)
+                    y1 = this.orderY + dist * SinBJ(angle)
+                    found = IsTerrainTypeOfKind(GetTerrainType(x1, y1), 'death')
+                    if (found) break
+
+                    angle = 180
+                    x1 = this.orderX + dist * CosBJ(angle)
+                    y1 = this.orderY + dist * SinBJ(angle)
+                    found = IsTerrainTypeOfKind(GetTerrainType(x1, y1), 'death')
+                    if (found) break
+
+                    angle = 270
+                    x1 = this.orderX + dist * CosBJ(angle)
+                    y1 = this.orderY + dist * SinBJ(angle)
+                    found = IsTerrainTypeOfKind(GetTerrainType(x1, y1), 'death')
+                    if (found) break
+
+                    angle = 1
+                    while (true) {
+                        if (found || angle >= 360) break
+                        x1 = this.orderX + dist * CosBJ(angle)
+                        y1 = this.orderY + dist * SinBJ(angle)
+                        found = IsTerrainTypeOfKind(GetTerrainType(x1, y1), 'death')
+                        angle = angle + MakeMonsterSimplePatrol.ECART_ANGLE
+                    }
+                    angle = angle - MakeMonsterSimplePatrol.ECART_ANGLE
+
+                    dist = dist + MakeMonsterSimplePatrol.ECART_DIST
+                }
+
+                //first location not found
+                if (!found) {
+                    Text.erP(this.makerOwner, 'Death terrain too far !')
+                    return
+                }
+
+                //precise position of first location
+                while (true) {
+                    if (!IsTerrainTypeOfKind(GetTerrainType(x1, y1), 'death')) break
+                    dist = dist - 1
+                    x1 = this.orderX + dist * CosBJ(angle)
+                    y1 = this.orderY + dist * SinBJ(angle)
+                }
+                dist = dist + this.distOnTerrain + 1
+                x1 = this.orderX + dist * CosBJ(angle)
+                y1 = this.orderY + dist * SinBJ(angle)
+
+                //prepare angle for the second location
+                if (angle >= 180) {
+                    angle = angle - 180
+                } else {
+                    angle = angle + 180
+                }
+
+                //find approximatively second location
+                found = false
+                dist = MakeMonsterSimplePatrol.MIN_DIST
+                while (true) {
+                    if (found || dist > MakeMonsterSimplePatrol.MAX_DIST) break
+                    x2 = this.orderX + dist * CosBJ(angle)
+                    y2 = this.orderY + dist * SinBJ(angle)
+                    found = IsTerrainTypeOfKind(GetTerrainType(x2, y2), 'death')
+                    dist = dist + MakeMonsterSimplePatrol.ECART_DIST
+                }
+
+                //second location not found
+                if (!found) {
+                    Text.erP(this.makerOwner, 'Death terrain too far for the second location !')
+                    return
+                }
+
+                //precise position of second location
+                while (true) {
+                    if (!IsTerrainTypeOfKind(GetTerrainType(x2, y2), 'death')) break
+                    dist = dist - 1
+                    x2 = this.orderX + dist * CosBJ(angle)
+                    y2 = this.orderY + dist * SinBJ(angle)
+                }
+                dist = dist + this.distOnTerrain + 1
+                x2 = this.orderX + dist * CosBJ(angle)
+                y2 = this.orderY + dist * SinBJ(angle)
+
+                //the two locations were found, creating monster
+                monster = this.escaper.getMakingLevel().monstersSimplePatrol.new(this.getMonsterType(), x1, y1, x2, y2, true)
+                this.escaper.newAction(new MakeMonsterAction(this.escaper.getMakingLevel(), monster))
+            }
         }
-        return false
-    }
-
-    getMode = (): string => {
-        return this.mode
     }
 }

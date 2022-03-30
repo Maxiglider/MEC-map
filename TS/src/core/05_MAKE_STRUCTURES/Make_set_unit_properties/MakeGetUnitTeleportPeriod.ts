@@ -7,9 +7,11 @@ export class MakeGetUnitTeleportPeriod extends Make {
     }
 
     doActions() {
-        let monsterTP = this.escaper.getMakingLevel().monstersTeleport.getMonsterNear(this.orderX, this.orderY)
-        if (monsterTP) {
-            Text.mkP(this.makerOwner, 'period : ' + R2S(monsterTP.getPeriod()) + ' s')
+        if (super.doBaseActions()) {
+            let monsterTP = this.escaper.getMakingLevel().monstersTeleport.getMonsterNear(this.orderX, this.orderY)
+            if (monsterTP) {
+                Text.mkP(this.makerOwner, 'period : ' + R2S(monsterTP.getPeriod()) + ' s')
+            }
         }
     }
 }

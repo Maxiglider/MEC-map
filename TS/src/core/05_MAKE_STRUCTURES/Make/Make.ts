@@ -23,6 +23,8 @@ export abstract class Make {
     orderY: number = 0
 
     constructor(maker: unit, kind: string) {
+        if(!maker || !UnitExist())
+
         this.maker = maker
         this.makerOwner = GetOwningPlayer(maker)
         this.kind = kind

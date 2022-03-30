@@ -1,16 +1,45 @@
 import { Make } from '../Make/Make'
+import {MonsterTeleport} from "../../04_STRUCTURES/Monster/MonsterTeleport";
+import {MonsterType} from "../../04_STRUCTURES/Monster/MonsterType";
+import {MakeMonsterAction} from "../../04_STRUCTURES/MakeLastActions/MakeMonsterAction";
+import {MakeConsts} from "../Make/Make";
+import { Text } from 'core/01_libraries/Text';
+
+const {WAIT, HIDE} = MonsterTeleport
+const {MAKE_LAST_CLIC_UNIT_ID} = MakeConsts
+
 
 export class MakeMonsterTeleport extends Make {
     private mt: MonsterType
     private period: number
     private angle: number
     private mode: string //normal ou string
-    private lastX: number[]
-    private lastY: number[]
+    private lastX: number[] = []
+    private lastY: number[] = []
     private lastLocId: number
     private locPointeur: number
-    private unitLastClic: unit
-    private monster: MonsterTeleport
+    private unitLastClic?: unit
+    private monster?: MonsterTeleport
+
+    
+    constructor(maker: unit, mode: string, mt: MonsterType, period: number, angle: number){
+        super(maker, 'monsterCreateTeleport')
+        
+        if (mode !== 'normal' && mode !== 'string') {
+            throw this.constructor.name + " : wrong mode \"" + mode + "\""
+        }
+        
+        if(period < MonsterTeleport.MONSTER_TELEPORT_PERIOD_MIN || period > MonsterTeleport.MONSTER_TELEPORT_PERIOD_MAX) {
+            throw this.constructor.name + " : wrong periode \"" + period + "\""
+        }
+        
+        this.mt = mt
+        this.mode = mode
+        this.period = period
+        this.angle = angle
+        this.lastLocId = -1
+        this.locPointeur = -1
+    }
 
     getMonsterType = (): MonsterType => {
         return this.mt
@@ -28,67 +57,19 @@ export class MakeMonsterTeleport extends Make {
         return this.mode
     }
 
-    getMonster = (): MonsterTeleport => {
+    getMonster() {
         return this.monster
     }
 
-    // TODO; Used to be static
-    create = (maker: unit, mode: string, mt: MonsterType, period: number, angle: number): MakeMonsterTeleport => {
-        let m: MakeMonsterTeleport
-        if (
-            maker === null ||
-            mt === 0 ||
-            (mode !== 'normal' && mode !== 'string') ||
-            period < MONSTER_TELEPORT_PERIOD_MIN ||
-            period > MONSTER_TELEPORT_PERIOD_MAX
-        ) {
-            return 0
-        }
-        m = MakeMonsterTeleport.allocate()
-        m.maker = maker
-        m.makerOwner = GetOwningPlayer(maker)
-        m.kind = 'monsterCreateTeleport'
-        m.mt = mt
-        m.mode = mode
-        m.period = period
-        m.angle = angle
-        m.monster = 0
-        m.t = CreateTrigger()
-        TriggerAddAction(m.t, Make_GetActions(m.kind))
-        TriggerRegisterUnitEvent(m.t, m.maker, EVENT_UNIT_ISSUED_POINT_ORDER)
-        m.lastLocId = -1
-        m.locPointeur = -1
-        return m
-    }
-
-    destroy = () => {
-        let escaper: Escaper
-        if (this.monster != 0 && this.monster.u != null) {
-            escaper = EscaperFunctions.Hero2Escaper(this.maker)
-            escaper.newAction(new MakeMonsterAction(escaper.getMakingLevel(), this.monster))
-        } else {
-            this.monster.destroy()
-        }
-        DestroyTrigger(this.t)
-        this.t = null
-        RemoveUnit(this.unitLastClic)
-        this.unitLastClic = null
-        this.maker = null
-    }
-
     nextMonster = () => {
-        let escaper: Escaper
         this.lastLocId = -1
         this.locPointeur = -1
-        RemoveUnit(this.unitLastClic)
-        this.unitLastClic = null
-        if (this.monster != 0 && this.monster.u != null) {
-            escaper = EscaperFunctions.Hero2Escaper(this.maker)
-            escaper.newAction(new MakeMonsterAction(escaper.getMakingLevel(), this.monster))
-        } else {
-            this.monster.destroy()
+        this.unitLastClic && RemoveUnit(this.unitLastClic)
+        delete this.unitLastClic
+        
+        if (this.monster) {
+            this.escaper.newAction(new MakeMonsterAction(this.escaper.getMakingLevel(), this.monster))
         }
-        this.monster = 0
     }
 
     addWaitPeriod = (): boolean => {
@@ -96,7 +77,7 @@ export class MakeMonsterTeleport extends Make {
             return false
         }
         if (this.saveLoc(WAIT, WAIT)) {
-            this.getMonster().addNewLoc(WAIT, WAIT)
+            this.monster && this.monster.addNewLoc(WAIT, WAIT)
             return true
         }
         return false
@@ -107,7 +88,7 @@ export class MakeMonsterTeleport extends Make {
             return false
         }
         if (this.saveLoc(HIDE, HIDE)) {
-            this.getMonster().addNewLoc(HIDE, HIDE)
+            this.monster && this.monster.addNewLoc(HIDE, HIDE)
             return true
         }
         return false
@@ -118,19 +99,18 @@ export class MakeMonsterTeleport extends Make {
     }
 
     setUnitLastClicPosition = (x: number, y: number) => {
-        if (this.unitLastClic === null) {
+        if (!this.unitLastClic) {
             this.unitLastClic = CreateUnit(this.makerOwner, MAKE_LAST_CLIC_UNIT_ID, x, y, GetRandomDirectionDeg())
         } else {
-            //call SetUnitX(this.unitLastClic, x)
-            //call SetUnitY(this.unitLastClic, y)
             SetUnitPosition(this.unitLastClic, x, y)
         }
     }
 
     saveLoc = (x: number, y: number): boolean => {
-        if (this.locPointeur >= MonsterTeleport.NB_MAX_LOC - 1) {
-            return false
-        }
+        //delete MonsterTeleport.NB_MAX_LOC
+        // if (this.locPointeur >= MonsterTeleport.NB_MAX_LOC - 1) {
+        //     return false
+        // }
         this.locPointeur = this.locPointeur + 1
         this.lastX[this.locPointeur] = x
         this.lastY[this.locPointeur] = y
@@ -138,7 +118,7 @@ export class MakeMonsterTeleport extends Make {
         if (!(x === y && (x === WAIT || x === HIDE))) {
             this.setUnitLastClicPosition(x, y)
         }
-        EscaperFunctions.Hero2Escaper(this.maker).destroyCancelledActions()
+        this.escaper.destroyCancelledActions()
         return true
     }
 
@@ -149,7 +129,7 @@ export class MakeMonsterTeleport extends Make {
         if (this.locPointeur < 0) {
             return false
         }
-        this.monster.destroyLastLoc()
+        this.monster && this.monster.destroyLastLoc()
         this.locPointeur = this.locPointeur - 1
         if (this.locPointeur >= 0) {
             x = this.lastX[this.locPointeur]
@@ -164,19 +144,18 @@ export class MakeMonsterTeleport extends Make {
             if (i >= 0) {
                 this.setUnitLastClicPosition(this.lastX[i], this.lastY[i])
             } else {
-                RemoveUnit(this.unitLastClic)
-                this.unitLastClic = null
+                this.unitLastClic && RemoveUnit(this.unitLastClic)
+                delete this.unitLastClic
             }
         } else {
-            RemoveUnit(this.unitLastClic)
-            this.unitLastClic = null
-            this.monster.removeUnit()
+            this.unitLastClic && RemoveUnit(this.unitLastClic)
+            delete this.unitLastClic
         }
         return true
     }
 
     setMonster = (monster: MonsterTeleport) => {
-        if (this.monster !== 0) {
+        if (this.monster) {
             this.monster.destroy()
         }
         this.monster = monster
@@ -189,10 +168,47 @@ export class MakeMonsterTeleport extends Make {
     redoLastAction = (): boolean => {
         if (this.locPointeur < this.lastLocId) {
             this.locPointeur = this.locPointeur + 1
-            this.monster.addNewLoc(this.lastX[this.locPointeur], this.lastY[this.locPointeur])
+            this.monster && this.monster.addNewLoc(this.lastX[this.locPointeur], this.lastY[this.locPointeur])
             this.setUnitLastClicPosition(this.lastX[this.locPointeur], this.lastY[this.locPointeur])
             return true
         }
         return false
+    }
+
+    destroy = () => {
+        if (this.monster) {
+            this.escaper.newAction(new MakeMonsterAction(this.escaper.getMakingLevel(), this.monster))
+        }
+        
+        this.unitLastClic && RemoveUnit(this.unitLastClic)
+        
+        super.destroy()
+    }
+    
+    doActions() {
+        if(super.doBaseActions()){
+            if (this.getLocPointeur() >= 0) {
+                if(this.monster) {
+                    if (!this.monster.addNewLoc(this.orderX, this.orderY)) {
+                        //remove MonsterTeleport.NB_MAX_LOC limitation
+                        Text.erP(
+                            this.makerOwner,
+                            'Number limit of actions reached for this monster ! ( ' + I2S(MonsterTeleport.NB_MAX_LOC) + ' )'
+                        )
+                    } else {
+                        this.saveLoc(this.orderX, this.orderY)
+                    }
+                }
+            } else {
+                MonsterTeleport.destroyLocs()
+                MonsterTeleport.storeNewLoc(this.orderX, this.orderY)
+                this.saveLoc(this.orderX, this.orderY)
+                this.setMonster(
+                    this.escaper
+                        .getMakingLevel()
+                        .monstersTeleport.new(this.getMonsterType(), this.getPeriod(), this.getAngle(), this.getMode(), true)
+                )
+            }
+        }
     }
 }

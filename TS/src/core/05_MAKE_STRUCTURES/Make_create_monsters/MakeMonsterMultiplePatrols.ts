@@ -1,14 +1,33 @@
 import { Make } from '../Make/Make'
+import {MonsterType} from "../../04_STRUCTURES/Monster/MonsterType";
+import {MakeMonsterAction} from "../../04_STRUCTURES/MakeLastActions/MakeMonsterAction";
+import {MakeConsts} from "../Make/Make";
+import { Text } from 'core/01_libraries/Text';
+
 
 export class MakeMonsterMultiplePatrols extends Make {
     private mt: MonsterType
     private mode: string //normal ou string
-    private lastX: number[]
-    private lastY: number[]
-    private lastLocId: integer
-    private locPointeur: integer
-    private unitLastClic: unit
-    private monster: MonsterMultiplePatrols
+    private lastX: number[] = []
+    private lastY: number[] = []
+    private lastLocId: number
+    private locPointeur: number
+    private unitLastClic?: unit
+    private monster?: MonsterMultiplePatrols
+
+
+    constructor(maker: unit, mode: string, mt: MonsterType) {
+        super(maker, 'monsterCreateMultiplePatrols')
+
+        if (mode !== 'normal' && mode !== 'string') {
+            throw this.constructor.name + ' : wrong mode "' + mode + '"'
+        }
+
+        this.mt = mt
+        this.mode = mode
+        this.lastLocId = -1
+        this.locPointeur = -1
+    }
 
     getMonsterType = (): MonsterType => {
         return this.mt
@@ -18,59 +37,20 @@ export class MakeMonsterMultiplePatrols extends Make {
         return this.mode
     }
 
-    getMonster = (): MonsterMultiplePatrols => {
+    getMonster() {
         return this.monster
     }
 
-    // TODO; Used to be static
-    create = (maker: unit, mode: string, mt: MonsterType): MakeMonsterMultiplePatrols => {
-        let m: MakeMonsterMultiplePatrols
-        if (maker === null || mt === 0 || (mode !== 'normal' && mode !== 'string')) {
-            return 0
-        }
-        m = MakeMonsterMultiplePatrols.allocate()
-        m.maker = maker
-        m.makerOwner = GetOwningPlayer(maker)
-        m.kind = 'monsterCreateMultiplePatrols'
-        m.mt = mt
-        m.mode = mode
-        m.monster = 0
-        m.t = CreateTrigger()
-        TriggerAddAction(m.t, Make_GetActions(m.kind))
-        TriggerRegisterUnitEvent(m.t, m.maker, EVENT_UNIT_ISSUED_POINT_ORDER)
-        m.lastLocId = -1
-        m.locPointeur = -1
-        return m
-    }
-
-    destroy = () => {
-        let escaper: Escaper
-        if (this.monster != 0 && this.monster.u != null) {
-            escaper = EscaperFunctions.Hero2Escaper(this.maker)
-            escaper.newAction(new MakeMonsterAction(escaper.getMakingLevel(), this.monster))
-        } else {
-            this.monster.destroy()
-        }
-        DestroyTrigger(this.t)
-        this.t = null
-        RemoveUnit(this.unitLastClic)
-        this.unitLastClic = null
-        this.maker = null
-    }
-
     nextMonster = () => {
-        let escaper: Escaper
         this.lastLocId = -1
         this.locPointeur = -1
-        RemoveUnit(this.unitLastClic)
-        this.unitLastClic = null
-        if (this.monster != 0 && this.monster.u != null) {
-            escaper = EscaperFunctions.Hero2Escaper(this.maker)
-            escaper.newAction(new MakeMonsterAction(escaper.getMakingLevel(), this.monster))
-        } else {
-            this.monster.destroy()
+
+        this.unitLastClic && RemoveUnit(this.unitLastClic)
+        delete this.unitLastClic
+
+        if (this.monster) {
+            this.escaper.newAction(new MakeMonsterAction(this.escaper.getMakingLevel(), this.monster))
         }
-        this.monster = 0
     }
 
     getLocPointeur = (): number => {
@@ -78,61 +58,105 @@ export class MakeMonsterMultiplePatrols extends Make {
     }
 
     setUnitLastClicPosition = (x: number, y: number) => {
-        if (this.unitLastClic === null) {
-            this.unitLastClic = CreateUnit(this.makerOwner, MAKE_LAST_CLIC_UNIT_ID, x, y, GetRandomDirectionDeg())
+        if (!this.unitLastClic) {
+            this.unitLastClic = CreateUnit(this.makerOwner, MakeConsts.MAKE_LAST_CLIC_UNIT_ID, x, y, GetRandomDirectionDeg())
         } else {
-            //call SetUnitX(this.unitLastClic, x)
-            //call SetUnitY(this.unitLastClic, y)
             SetUnitPosition(this.unitLastClic, x, y)
         }
     }
 
     saveLoc = (x: number, y: number) => {
-        if (this.locPointeur >= MonsterMultiplePatrols.NB_MAX_LOC - 1) {
-            return
-        }
         this.locPointeur = this.locPointeur + 1
         this.lastX[this.locPointeur] = x
         this.lastY[this.locPointeur] = y
         this.lastLocId = this.locPointeur
         this.setUnitLastClicPosition(x, y)
-        EscaperFunctions.Hero2Escaper(this.maker).destroyCancelledActions()
+        this.escaper.destroyCancelledActions()
     }
 
     unsaveLoc = (): boolean => {
         if (this.locPointeur < 0) {
             return false
         }
-        this.monster.destroyLastLoc()
+
+        this.monster && this.monster.destroyLastLoc()
+
         this.locPointeur = this.locPointeur - 1
         if (this.locPointeur >= 0) {
             this.setUnitLastClicPosition(this.lastX[this.locPointeur], this.lastY[this.locPointeur])
         } else {
-            RemoveUnit(this.unitLastClic)
-            this.unitLastClic = null
-            this.monster.removeUnit()
+            this.unitLastClic && RemoveUnit(this.unitLastClic)
+            this.monster && this.monster.removeUnit()
         }
         return true
     }
 
     setMonster = (monster: MonsterMultiplePatrols) => {
-        if (this.monster !== 0) {
+        if (this.monster) {
             this.monster.destroy()
         }
         this.monster = monster
     }
 
-    cancelLastAction = (): boolean => {
+    cancelLastAction(){
         return this.unsaveLoc()
     }
 
-    redoLastAction = (): boolean => {
+    redoLastAction(){
         if (this.locPointeur < this.lastLocId) {
             this.locPointeur = this.locPointeur + 1
-            this.monster.addNewLoc(this.lastX[this.locPointeur], this.lastY[this.locPointeur])
+            this.monster && this.monster.addNewLoc(this.lastX[this.locPointeur], this.lastY[this.locPointeur])
             this.setUnitLastClicPosition(this.lastX[this.locPointeur], this.lastY[this.locPointeur])
             return true
         }
         return false
+    }
+
+    destroy = () => {
+        if (this.monster) {
+            this.escaper.newAction(new MakeMonsterAction(this.escaper.getMakingLevel(), this.monster))
+        }
+
+        this.unitLastClic && RemoveUnit(this.unitLastClic)
+        
+        super.destroy()
+    }
+    
+    doActions() {
+        if(super.doBaseActions()) {
+            let erreur: number
+
+            if (this.getLocPointeur() >= 0) {
+                if (this.monster) {
+                    erreur = this.monster.addNewLoc(this.orderX, this.orderY)
+                    if (erreur > 0) {
+
+                        //todomax remove MonsterMultiplePatrols.NB_MAX_LOC and this error
+                        if (erreur === 3) {
+                            Text.erP(
+                                this.makerOwner,
+                                'Number limit of patrol locations reached for this monster ! ( ' +
+                                I2S(MonsterMultiplePatrols.NB_MAX_LOC) +
+                                ' )'
+                            )
+                        }
+
+                        if (erreur === 2) {
+                            Text.erP(this.makerOwner, 'Too close to the last location !')
+                        }
+                        if (erreur === 1) {
+                            Text.erP(this.makerOwner, 'Too close to the first location !')
+                        }
+                    } else {
+                        this.saveLoc(this.orderX, this.orderY)
+                    }
+                }
+            } else {
+                MonsterMultiplePatrols.destroyLocs()
+                MonsterMultiplePatrols.storeNewLoc(this.orderX, this.orderY)
+                this.saveLoc(this.orderX, this.orderY)
+                this.setMonster(this.escaper.getMakingLevel().monstersMultiplePatrols.new(this.getMonsterType(), this.getMode(), true))
+            }
+        }
     }
 }

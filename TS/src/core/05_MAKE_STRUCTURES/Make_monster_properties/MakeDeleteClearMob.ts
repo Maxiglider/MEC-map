@@ -13,14 +13,16 @@ export class MakeDeleteClearMob extends Make {
     }
 
     doActions() {
-        //todomax make Caster extend Monster
+        if (super.doBaseActions()) {
+            //todomax make Caster extend Monster
 
-        //recherche du monsterOrCaster cliqué
-        let clearMob = this.escaper.getMakingLevel().getClearMobNear(this.orderX, this.orderY)
-        if (clearMob) {
-            this.clickMade(clearMob)
-        }else{
-            Text.erP(this.makerOwner, 'no clear mob clicked for your making level')
+            //recherche du monsterOrCaster cliqué
+            let clearMob = this.escaper.getMakingLevel().getClearMobNear(this.orderX, this.orderY)
+            if (clearMob) {
+                this.clickMade(clearMob)
+            } else {
+                Text.erP(this.makerOwner, 'no clear mob clicked for your making level')
+            }
         }
     }
 }
