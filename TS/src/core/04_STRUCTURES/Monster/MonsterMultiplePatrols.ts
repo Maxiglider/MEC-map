@@ -47,20 +47,20 @@ export class MonsterMultiplePatrols implements Monster {
     static Y: number[]
     static staticLastLocInd: number = -1
 
-    private id: integer
+    private id: number
     u: unit | null
     private mt: MonsterType
     private disablingTimer: timer
     //color
-    private baseColorId: integer
+    private baseColorId: number
     private vcRed: real
     private vcGreen: real
     private vcBlue: real
     private vcTransparency: real
 
-    private lastLocInd: integer
-    private currentMove: integer
-    private sens: integer //0 : normal toujours positif, 1 : sens normal avec changement, 2 : sens inversé avec changement
+    private lastLocInd: number
+    private currentMove: number
+    private sens: number //0 : normal toujours positif, 1 : sens normal avec changement, 2 : sens inversé avec changement
 
     private xMap: number[] = []
     private yMap: number[] = []

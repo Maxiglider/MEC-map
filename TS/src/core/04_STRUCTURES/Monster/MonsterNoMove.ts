@@ -50,12 +50,12 @@ export class MonsterNoMove implements Monster {
 
     setId = (id: number): MonsterNoMove => {
         if (id === this.id) {
-            return _this
+            return this
         }
         MonsterHashtableSetMonsterId(_this, this.id, id)
         this.id = id
         MonsterIdHasBeenSetTo(id)
-        return _this
+        return this
     }
 
     removeUnit = () => {

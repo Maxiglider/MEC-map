@@ -1,3 +1,4 @@
+import { MonsterTeleportt } from '../../04_STRUCTURES/Monster/MonsterTeleport'
 import { Make } from '../Make/Make'
 
 export class MakeMonsterTeleport extends Make {
@@ -39,8 +40,8 @@ export class MakeMonsterTeleport extends Make {
             maker === null ||
             mt === 0 ||
             (mode !== 'normal' && mode !== 'string') ||
-            period < MONSTER_TELEPORT_PERIOD_MIN ||
-            period > MONSTER_TELEPORT_PERIOD_MAX
+            period < MonsterTeleportt.MONSTER_TELEPORT_PERIOD_MIN ||
+            period > MonsterTeleportt.MONSTER_TELEPORT_PERIOD_MAX
         ) {
             return 0
         }

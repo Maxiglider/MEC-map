@@ -18,7 +18,7 @@ export class MonsterType {
 
     setAlias = (theAlias: string): MonsterType => {
         this.theAlias = theAlias
-        return _this
+        return this
     }
 
     // TODO; Used to be static
@@ -185,19 +185,19 @@ export class MonsterType {
 
     setKillingEffectStr = (effectStr: string): MonsterType => {
         this.killingEffectStr = effectStr
-        return _this
+        return this
     }
 
     setNbMeteorsToKill = (nbMeteorsToKill: number): MonsterType => {
         //nombre de météores qu'il faut pour tuer le monstre, sachant qu'une météore fait 10k de dégât
         if (nbMeteorsToKill < 1 || nbMeteorsToKill > 9) {
-            return _this
+            return this
         }
         this.maxLife = nbMeteorsToKill * 10000
         if (this.isClickableB) {
             this.refresh()
         }
-        return _this
+        return this
     }
 
     getMaxLife = (): number => {

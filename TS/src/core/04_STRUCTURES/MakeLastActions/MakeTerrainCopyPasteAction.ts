@@ -3,9 +3,9 @@ class MakeTerrainCopyPasteAction {
 
     static terrainSavesBefore: hashtable
     static terrainSavesAfter: hashtable
-    static terrainSaveLastId: integer
+    static terrainSaveLastId: number
 
-    private terrainSaveId: integer
+    private terrainSaveId: number
     private minX: real
     private minY: real
     private maxX: real

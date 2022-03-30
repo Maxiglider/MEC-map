@@ -5,8 +5,8 @@ export class MakeMonsterMultiplePatrols extends Make {
     private mode: string //normal ou string
     private lastX: number[]
     private lastY: number[]
-    private lastLocId: integer
-    private locPointeur: integer
+    private lastLocId: number
+    private locPointeur: number
     private unitLastClic: unit
     private monster: MonsterMultiplePatrols
 

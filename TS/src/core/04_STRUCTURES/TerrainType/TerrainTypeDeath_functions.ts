@@ -3,7 +3,7 @@ const initTerrainTypeDeathFunctions = () => {
 
     const TerrainKillTimer2Escaper = (theTimer: timer): Escaper => {
         let terrainKillTrigger = GetTriggeringTrigger()
-        let terrainTypeDeathMaxId: integer = udg_terrainTypes.numberOfDeath - 1
+        let terrainTypeDeathMaxId: number = udg_terrainTypes.numberOfDeath - 1
         let terrainTypeDeathId: number
         let escaperId = 0
 

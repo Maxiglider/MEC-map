@@ -16,6 +16,7 @@ import { DEATH_TERRAIN_MAX_TOLERANCE } from 'core/04_STRUCTURES/TerrainType/Terr
 import { ExchangeTerrains } from 'core/07_TRIGGERS/Triggers_to_modify_terrains/Exchange_terrains'
 import { RandomizeTerrains } from 'core/07_TRIGGERS/Triggers_to_modify_terrains/Randomize_terrains'
 import { Ascii } from '../../01_libraries/Ascii'
+import { MonsterTeleportt } from '../../04_STRUCTURES/Monster/MonsterTeleport'
 import { TerrainTypeFromString } from '../../07_TRIGGERS/Modify_terrain_Functions/Terrain_type_from_string'
 import {
     CACHE_SEPARATEUR_ITEM,
@@ -1086,13 +1087,13 @@ const initCommandMake = () => {
             }
             //checkParam2
             x = S2R(param2)
-            if (x < MONSTER_TELEPORT_PERIOD_MIN || x > MONSTER_TELEPORT_PERIOD_MAX) {
+            if (x < MonsterTeleportt.MONSTER_TELEPORT_PERIOD_MIN || x > MonsterTeleportt.MONSTER_TELEPORT_PERIOD_MAX) {
                 Text.erP(
                     escaper.getPlayer(),
                     'the period must be between ' +
-                        R2S(MONSTER_TELEPORT_PERIOD_MIN) +
+                        R2S(MonsterTeleportt.MONSTER_TELEPORT_PERIOD_MIN) +
                         ' and ' +
-                        R2S(MONSTER_TELEPORT_PERIOD_MAX)
+                        R2S(MonsterTeleportt.MONSTER_TELEPORT_PERIOD_MAX)
                 )
                 return true
             }
@@ -1118,13 +1119,13 @@ const initCommandMake = () => {
             }
             //checkParam2
             x = S2R(param2)
-            if (x < MONSTER_TELEPORT_PERIOD_MIN || x > MONSTER_TELEPORT_PERIOD_MAX) {
+            if (x < MonsterTeleportt.MONSTER_TELEPORT_PERIOD_MIN || x > MonsterTeleportt.MONSTER_TELEPORT_PERIOD_MAX) {
                 Text.erP(
                     escaper.getPlayer(),
                     'the period must be between ' +
-                        R2S(MONSTER_TELEPORT_PERIOD_MIN) +
+                        R2S(MonsterTeleportt.MONSTER_TELEPORT_PERIOD_MIN) +
                         ' and ' +
-                        R2S(MONSTER_TELEPORT_PERIOD_MAX)
+                        R2S(MonsterTeleportt.MONSTER_TELEPORT_PERIOD_MAX)
                 )
                 return true
             }
@@ -1184,13 +1185,13 @@ const initCommandMake = () => {
             }
             //checkParam1
             x = S2R(param1)
-            if (x < MONSTER_TELEPORT_PERIOD_MIN || x > MONSTER_TELEPORT_PERIOD_MAX) {
+            if (x < MonsterTeleportt.MONSTER_TELEPORT_PERIOD_MIN || x > MonsterTeleportt.MONSTER_TELEPORT_PERIOD_MAX) {
                 Text.erP(
                     escaper.getPlayer(),
                     'the period must be between ' +
-                        R2S(MONSTER_TELEPORT_PERIOD_MIN) +
+                        R2S(MonsterTeleportt.MONSTER_TELEPORT_PERIOD_MIN) +
                         ' and ' +
-                        R2S(MONSTER_TELEPORT_PERIOD_MAX)
+                        R2S(MonsterTeleportt.MONSTER_TELEPORT_PERIOD_MAX)
                 )
                 return true
             }
@@ -1207,13 +1208,13 @@ const initCommandMake = () => {
             }
             //checkParam1
             x = S2R(param1)
-            if (x < MONSTER_TELEPORT_PERIOD_MIN || x > MONSTER_TELEPORT_PERIOD_MAX) {
+            if (x < MonsterTeleportt.MONSTER_TELEPORT_PERIOD_MIN || x > MonsterTeleportt.MONSTER_TELEPORT_PERIOD_MAX) {
                 Text.erP(
                     escaper.getPlayer(),
                     'the period must be between ' +
-                        R2S(MONSTER_TELEPORT_PERIOD_MIN) +
+                        R2S(MonsterTeleportt.MONSTER_TELEPORT_PERIOD_MIN) +
                         ' and ' +
-                        R2S(MONSTER_TELEPORT_PERIOD_MAX)
+                        R2S(MonsterTeleportt.MONSTER_TELEPORT_PERIOD_MAX)
                 )
                 return true
             }
@@ -1241,13 +1242,13 @@ const initCommandMake = () => {
             }
             //checkParam1
             x = S2R(param1)
-            if (x < MONSTER_TELEPORT_PERIOD_MIN || x > MONSTER_TELEPORT_PERIOD_MAX) {
+            if (x < MonsterTeleportt.MONSTER_TELEPORT_PERIOD_MIN || x > MonsterTeleportt.MONSTER_TELEPORT_PERIOD_MAX) {
                 Text.erP(
                     escaper.getPlayer(),
                     'the period must be between ' +
-                        R2S(MONSTER_TELEPORT_PERIOD_MIN) +
+                        R2S(MonsterTeleportt.MONSTER_TELEPORT_PERIOD_MIN) +
                         ' and ' +
-                        R2S(MONSTER_TELEPORT_PERIOD_MAX)
+                        R2S(MonsterTeleportt.MONSTER_TELEPORT_PERIOD_MAX)
                 )
                 return true
             }

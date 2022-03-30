@@ -8,10 +8,9 @@ const initMonsterTeleport = () => {
     const HIDE = 2000000
     const MONSTER_TELEPORT_PERIOD_MIN = 0.1
     const MONSTER_TELEPORT_PERIOD_MAX = 10
-    // TODO; Used to be public
     let monsterTeleportHashtable = InitHashtable()
 
-    const MonsterTeleport_move_Actions = (): void => {
+    const MonsterTeleport_move_Actions = () => {
         let monster: Monster
         let MT = MonsterTeleport(LoadInteger(monsterTeleportHashtable, 0, GetHandleId(GetExpiredTimer())))
         if (MT === 0) {
@@ -19,24 +18,27 @@ const initMonsterTeleport = () => {
         }
         MT.nextMove()
     }
-    //===========================================================
+
+    return { MONSTER_TELEPORT_PERIOD_MIN, MONSTER_TELEPORT_PERIOD_MAX, MonsterTeleport_move_Actions }
 }
+
+export const MonsterTeleportt = initMonsterTeleport()
 
 const MMPNumbers = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19]
 
 export class MonsterTeleport implements Monster {
-    static NB_MAX_LOC: integer = 20
-    static nbInstances: integer = 0
+    static NB_MAX_LOC: number = 20
+    static nbInstances: number = 0
     static X: real[]
     static Y: real[]
-    static staticLastLocInd: integer = -1
+    static staticLastLocInd: number = -1
 
-    private id: integer
+    private id: number
     u: unit
     private mt: MonsterType
     private disablingTimer: timer
     //color
-    private baseColorId: integer
+    private baseColorId: number
     private vcRed: real
     private vcGreen: real
     private vcBlue: real
@@ -45,9 +47,9 @@ export class MonsterTeleport implements Monster {
     private period: real
     private angle: real
 
-    private lastLocInd: integer
-    private currentLoc: integer
-    private sens: integer //0 : normal toujours positif, 1 : sens normal avec changement, 2 : sens inversé avec changement
+    private lastLocInd: number
+    private currentLoc: number
+    private sens: number //0 : normal toujours positif, 1 : sens normal avec changement, 2 : sens inversé avec changement
 
     private xMap: number[] = []
     private yMap: number[] = []
@@ -77,12 +79,12 @@ export class MonsterTeleport implements Monster {
 
     setId = (id: number): MonsterTeleport => {
         if (id === this.id) {
-            return _this
+            return this
         }
         MonsterHashtableSetMonsterId(_this, this.id, id)
         this.id = id
         MonsterIdHasBeenSetTo(id)
-        return _this
+        return this
     }
 
     removeUnit = (): void => {
@@ -123,8 +125,8 @@ export class MonsterTeleport implements Monster {
 
         if (
             (mode !== 'normal' && mode !== 'string') ||
-            period < MONSTER_TELEPORT_PERIOD_MIN ||
-            period > MONSTER_TELEPORT_PERIOD_MAX
+            period < MonsterTeleportt.MONSTER_TELEPORT_PERIOD_MIN ||
+            period > MonsterTeleportt.MONSTER_TELEPORT_PERIOD_MAX
         ) {
             return 0
         }
@@ -166,7 +168,10 @@ export class MonsterTeleport implements Monster {
     }
 
     setPeriod = (period: number): boolean => {
-        if (period < MONSTER_TELEPORT_PERIOD_MIN || period > MONSTER_TELEPORT_PERIOD_MAX) {
+        if (
+            period < MonsterTeleportt.MONSTER_TELEPORT_PERIOD_MIN ||
+            period > MonsterTeleportt.MONSTER_TELEPORT_PERIOD_MAX
+        ) {
             return false
         }
         this.period = period
