@@ -1,6 +1,10 @@
 import { MakeOneByOneOrTwoClicks } from 'core/05_MAKE_STRUCTURES/Make/MakeOneByOneOrTwoClicks'
 import {BasicFunctions} from "../../01_libraries/Basic_functions";
 import {Text} from "../../01_libraries/Text";
+import {MonsterTeleport} from "../../04_STRUCTURES/Monster/MonsterTeleport";
+
+const {MONSTER_TELEPORT_PERIOD_MIN, MONSTER_TELEPORT_PERIOD_MAX} = MonsterTeleport
+
 
 export class MakeSetUnitTeleportPeriod extends MakeOneByOneOrTwoClicks {
     private period: number
