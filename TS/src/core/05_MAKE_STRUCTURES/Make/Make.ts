@@ -1,5 +1,6 @@
 import { BasicFunctions } from 'core/01_libraries/Basic_functions'
 import { EscaperFunctions } from 'core/04_STRUCTURES/Escaper/Escaper_functions'
+import {Escaper} from "../../04_STRUCTURES/Escaper/Escaper";
 const { Hero2Escaper } = EscaperFunctions
 const { IsIssuedOrder, StopUnit } = BasicFunctions
 
@@ -23,12 +24,10 @@ export abstract class Make {
     orderY: number = 0
 
     constructor(maker: unit, kind: string) {
-        if(!maker || !UnitExist())
-
         this.maker = maker
         this.makerOwner = GetOwningPlayer(maker)
         this.kind = kind
-        this.escaper = EscaperFunctions.Hero2Escaper(maker)
+        this.escaper = Hero2Escaper(maker)
 
         this.t = null
         this.enableTrigger()
@@ -41,14 +40,14 @@ export abstract class Make {
     }
 
     doBaseActions() {
-        if (!BasicFunctions.IsIssuedOrder('smart')) {
+        if (!IsIssuedOrder('smart')) {
             return false
         }
 
         this.orderX = GetOrderPointX()
         this.orderY = GetOrderPointY()
 
-        BasicFunctions.StopUnit(this.maker)
+        StopUnit(this.maker)
         return true
     }
 
