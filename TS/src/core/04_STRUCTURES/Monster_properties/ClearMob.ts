@@ -49,7 +49,7 @@ export class ClearMob {
     //50 niveaux * 160
 
     level: Level
-    arrayId: integer
+    arrayId: number
     private triggerMob: MonsterOrCaster
     private blockMobs: MonsterOrCasterStack
     private disableDuration: real //0 = permanent

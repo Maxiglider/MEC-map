@@ -2,9 +2,9 @@ class MakeDeleteMonstersAction {
     // extends MakeAction
 
     static suppressions: hashtable
-    static suppressionLastId: integer
+    static suppressionLastId: number
 
-    private suppressionId: integer
+    private suppressionId: number
     private level: Level
 
     private static onInit = (): void => {

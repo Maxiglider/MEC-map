@@ -31,14 +31,14 @@ const initMonsterSimplePatrol = () => {
 class MonsterSimplePatrol {
     // extends Monster
 
-    static nbInstances: integer = 0
+    static nbInstances: number = 0
 
-    private id: integer
+    private id: number
     u: unit
     private mt: MonsterType
     private disablingTimer: timer
     //color
-    private baseColorId: integer
+    private baseColorId: number
     private vcRed: real
     private vcGreen: real
     private vcBlue: real
@@ -61,12 +61,12 @@ class MonsterSimplePatrol {
 
     setId = (id: number): MonsterSimplePatrol => {
         if (id === this.id) {
-            return _this
+            return this
         }
         MonsterHashtableSetMonsterId(_this, this.id, id)
         this.id = id
         MonsterIdHasBeenSetTo(id)
-        return _this
+        return this
     }
 
     removeUnit = (): void => {

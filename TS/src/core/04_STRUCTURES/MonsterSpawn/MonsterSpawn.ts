@@ -59,7 +59,7 @@ class MonsterSpawn {
     monsters: group
 
     level: Level
-    arrayId: integer
+    arrayId: number
 
     private static onInit = (): void => {
         ht = InitHashtable()

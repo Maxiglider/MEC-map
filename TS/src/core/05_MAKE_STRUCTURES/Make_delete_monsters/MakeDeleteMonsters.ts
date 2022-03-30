@@ -1,6 +1,6 @@
 import { MakeOneByOneOrTwoClicks } from 'core/05_MAKE_STRUCTURES/Make/MakeOneByOneOrTwoClicks'
 import { Text } from '../../01_libraries/Text'
-import { Monster } from '../../04_STRUCTURES/Monster/Monster'
+import { Monster } from '../../04_STRUCTURES/Monster/MonsterInterface'
 
 export class MakeDeleteMonsters extends MakeOneByOneOrTwoClicks {
     constructor(maker: unit, mode: string) {

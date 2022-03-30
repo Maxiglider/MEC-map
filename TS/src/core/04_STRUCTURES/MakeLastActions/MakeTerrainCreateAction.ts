@@ -2,9 +2,9 @@ class MakeTerrainCreateAction {
     // extends MakeAction
 
     static terrainSaves: hashtable
-    static terrainSaveLastId: integer
+    static terrainSaveLastId: number
 
-    private terrainSaveId: integer
+    private terrainSaveId: number
     private terrainTypeNew: TerrainType
     private minX: real
     private minY: real

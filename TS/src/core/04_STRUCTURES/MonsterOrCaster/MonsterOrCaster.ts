@@ -1,5 +1,5 @@
 import { Caster } from '../Caster/Caster'
-import { Monster } from '../Monster/Monster'
+import { Monster } from '../Monster/MonsterInterface'
 
 export class MonsterOrCaster {
     private monster: Monster | null = null

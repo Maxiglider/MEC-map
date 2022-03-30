@@ -69,7 +69,7 @@ endfunction
 	    y = MAP_MIN_Y
 	StringArrayForCache.stringArrayForCache = new StringArrayForCache("terrain", "waterPresence", false)
  TriggerClearActions(SaveMapInCache.trigSaveMapInCache)
- TriggerAddAction(SaveMapInCache.trigSaveMapInCache, function SaveWater_Actions)
+ TriggerAddAction(SaveMapInCache.trigSaveMapInCache, SaveWater_Actions)
  EnableTrigger(SaveMapInCache.trigSaveMapInCache)
 	    */
     }

@@ -1,6 +1,6 @@
 import { Text } from 'core/01_libraries/Text'
 import { Level } from '../Level/Level'
-import { Monster } from '../Monster/Monster'
+import { Monster } from '../Monster/MonsterInterface'
 import { MakeAction } from './MakeAction'
 
 export class MakeMonsterAction extends MakeAction {

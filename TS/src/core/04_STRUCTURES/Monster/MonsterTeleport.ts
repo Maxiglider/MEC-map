@@ -1,14 +1,16 @@
-import { Monster } from './Monster'
+import { MOBS_VARIOUS_COLORS } from 'core/01_libraries/Constants'
+import { CACHE_SEPARATEUR_PARAM } from 'core/07_TRIGGERS/Save_map_in_gamecache/struct_StringArrayForCache'
+import { Monster } from './MonsterInterface'
+import { MonsterType } from './MonsterType'
 
 const initMonsterTeleport = () => {
     const WAIT = 1000000
     const HIDE = 2000000
     const MONSTER_TELEPORT_PERIOD_MIN = 0.1
     const MONSTER_TELEPORT_PERIOD_MAX = 10
-    // TODO; Used to be public
     let monsterTeleportHashtable = InitHashtable()
 
-    const MonsterTeleport_move_Actions = (): void => {
+    const MonsterTeleport_move_Actions = () => {
         let monster: Monster
         let MT = MonsterTeleport(LoadInteger(monsterTeleportHashtable, 0, GetHandleId(GetExpiredTimer())))
         if (MT === 0) {
@@ -16,22 +18,27 @@ const initMonsterTeleport = () => {
         }
         MT.nextMove()
     }
-    //===========================================================
+
+    return { MONSTER_TELEPORT_PERIOD_MIN, MONSTER_TELEPORT_PERIOD_MAX, MonsterTeleport_move_Actions }
 }
 
+export const MonsterTeleportt = initMonsterTeleport()
+
+const MMPNumbers = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19]
+
 export class MonsterTeleport implements Monster {
-    static NB_MAX_LOC: integer = 20
-    static nbInstances: integer = 0
+    static NB_MAX_LOC: number = 20
+    static nbInstances: number = 0
     static X: real[]
     static Y: real[]
-    static staticLastLocInd: integer = -1
+    static staticLastLocInd: number = -1
 
-    private id: integer
+    private id: number
     u: unit
     private mt: MonsterType
     private disablingTimer: timer
     //color
-    private baseColorId: integer
+    private baseColorId: number
     private vcRed: real
     private vcGreen: real
     private vcBlue: real
@@ -40,34 +47,12 @@ export class MonsterTeleport implements Monster {
     private period: real
     private angle: real
 
-    private lastLocInd: integer
-    private currentLoc: integer
-    private sens: integer //0 : normal toujours positif, 1 : sens normal avec changement, 2 : sens inversé avec changement
+    private lastLocInd: number
+    private currentLoc: number
+    private sens: number //0 : normal toujours positif, 1 : sens normal avec changement, 2 : sens inversé avec changement
 
-    //! textmacro MT_Variables takes N
-    private x: real$N$
-    private y: real$N$
-    //! endtextmacro
-    //! runtextmacro MT_Variables( "0"  )
-    //! runtextmacro MT_Variables( "1"  )
-    //! runtextmacro MT_Variables( "2"  )
-    //! runtextmacro MT_Variables( "3"  )
-    //! runtextmacro MT_Variables( "4"  )
-    //! runtextmacro MT_Variables( "5"  )
-    //! runtextmacro MT_Variables( "6"  )
-    //! runtextmacro MT_Variables( "7"  )
-    //! runtextmacro MT_Variables( "8"  )
-    //! runtextmacro MT_Variables( "9"  )
-    //! runtextmacro MT_Variables( "10" )
-    //! runtextmacro MT_Variables( "11" )
-    //! runtextmacro MT_Variables( "12" )
-    //! runtextmacro MT_Variables( "13" )
-    //! runtextmacro MT_Variables( "14" )
-    //! runtextmacro MT_Variables( "15" )
-    //! runtextmacro MT_Variables( "16" )
-    //! runtextmacro MT_Variables( "17" )
-    //! runtextmacro MT_Variables( "18" )
-    //! runtextmacro MT_Variables( "19" )
+    private xMap: number[] = []
+    private yMap: number[] = []
     private t: timer
 
     static count = (): number => {
@@ -94,12 +79,12 @@ export class MonsterTeleport implements Monster {
 
     setId = (id: number): MonsterTeleport => {
         if (id === this.id) {
-            return _this
+            return this
         }
         MonsterHashtableSetMonsterId(_this, this.id, id)
         this.id = id
         MonsterIdHasBeenSetTo(id)
-        return _this
+        return this
     }
 
     removeUnit = (): void => {
@@ -140,8 +125,8 @@ export class MonsterTeleport implements Monster {
 
         if (
             (mode !== 'normal' && mode !== 'string') ||
-            period < MONSTER_TELEPORT_PERIOD_MIN ||
-            period > MONSTER_TELEPORT_PERIOD_MAX
+            period < MonsterTeleportt.MONSTER_TELEPORT_PERIOD_MIN ||
+            period > MonsterTeleportt.MONSTER_TELEPORT_PERIOD_MAX
         ) {
             return 0
         }
@@ -158,32 +143,12 @@ export class MonsterTeleport implements Monster {
         m.t = CreateTimer()
         SaveInteger(monsterTeleportHashtable, 0, GetHandleId(m.t), integer(m))
 
-        //! textmacro MT_create takes N
-        if ($N$ <= MonsterTeleport.staticLastLocInd) {
-            m.x$N$ = MonsterTeleport.X[$N$]
-            m.y$N$ = MonsterTeleport.Y[$N$]
-        }
-        //! endtextmacro
-        //! runtextmacro MT_create( "0"  )
-        //! runtextmacro MT_create( "1"  )
-        //! runtextmacro MT_create( "2"  )
-        //! runtextmacro MT_create( "3"  )
-        //! runtextmacro MT_create( "4"  )
-        //! runtextmacro MT_create( "5"  )
-        //! runtextmacro MT_create( "6"  )
-        //! runtextmacro MT_create( "7"  )
-        //! runtextmacro MT_create( "8"  )
-        //! runtextmacro MT_create( "9"  )
-        //! runtextmacro MT_create( "10" )
-        //! runtextmacro MT_create( "11" )
-        //! runtextmacro MT_create( "12" )
-        //! runtextmacro MT_create( "13" )
-        //! runtextmacro MT_create( "14" )
-        //! runtextmacro MT_create( "15" )
-        //! runtextmacro MT_create( "16" )
-        //! runtextmacro MT_create( "17" )
-        //! runtextmacro MT_create( "18" )
-        //! runtextmacro MT_create( "19" )
+        MMPNumbers.forEach(n => {
+            if (n <= MonsterTeleport.staticLastLocInd) {
+                m.xMap[n] = MonsterTeleport.X[n]
+                m.yMap[n] = MonsterTeleport.Y[n]
+            }
+        })
 
         m.lastLocInd = MonsterTeleport.staticLastLocInd
         //call Text_A("test, lastLocInd == " + I2S(m.lastLocInd))
@@ -203,7 +168,10 @@ export class MonsterTeleport implements Monster {
     }
 
     setPeriod = (period: number): boolean => {
-        if (period < MONSTER_TELEPORT_PERIOD_MIN || period > MONSTER_TELEPORT_PERIOD_MAX) {
+        if (
+            period < MonsterTeleportt.MONSTER_TELEPORT_PERIOD_MIN ||
+            period > MonsterTeleportt.MONSTER_TELEPORT_PERIOD_MAX
+        ) {
             return false
         }
         this.period = period
@@ -314,91 +282,16 @@ export class MonsterTeleport implements Monster {
     }
 
     getX = (id: number): number => {
-        //! textmacro TM_getX takes N
-        if (id === $N$) {
-            return this.x$N$
-        }
-        //! endtextmacro
-        //! runtextmacro TM_getX( "0"  )
-        //! runtextmacro TM_getX( "1"  )
-        //! runtextmacro TM_getX( "2"  )
-        //! runtextmacro TM_getX( "3"  )
-        //! runtextmacro TM_getX( "4"  )
-        //! runtextmacro TM_getX( "5"  )
-        //! runtextmacro TM_getX( "6"  )
-        //! runtextmacro TM_getX( "7"  )
-        //! runtextmacro TM_getX( "8"  )
-        //! runtextmacro TM_getX( "9"  )
-        //! runtextmacro TM_getX( "10" )
-        //! runtextmacro TM_getX( "11" )
-        //! runtextmacro TM_getX( "12" )
-        //! runtextmacro TM_getX( "13" )
-        //! runtextmacro TM_getX( "14" )
-        //! runtextmacro TM_getX( "15" )
-        //! runtextmacro TM_getX( "16" )
-        //! runtextmacro TM_getX( "17" )
-        //! runtextmacro TM_getX( "18" )
-        //! runtextmacro TM_getX( "19" )
-        return 0
+        return this.xMap[id]
     }
 
     getY = (id: number): number => {
-        //! textmacro TM_getY takes N
-        if (id === $N$) {
-            return this.y$N$
-        }
-        //! endtextmacro
-        //! runtextmacro TM_getY( "0"  )
-        //! runtextmacro TM_getY( "1"  )
-        //! runtextmacro TM_getY( "2"  )
-        //! runtextmacro TM_getY( "3"  )
-        //! runtextmacro TM_getY( "4"  )
-        //! runtextmacro TM_getY( "5"  )
-        //! runtextmacro TM_getY( "6"  )
-        //! runtextmacro TM_getY( "7"  )
-        //! runtextmacro TM_getY( "8"  )
-        //! runtextmacro TM_getY( "9"  )
-        //! runtextmacro TM_getY( "10" )
-        //! runtextmacro TM_getY( "11" )
-        //! runtextmacro TM_getY( "12" )
-        //! runtextmacro TM_getY( "13" )
-        //! runtextmacro TM_getY( "14" )
-        //! runtextmacro TM_getY( "15" )
-        //! runtextmacro TM_getY( "16" )
-        //! runtextmacro TM_getY( "17" )
-        //! runtextmacro TM_getY( "18" )
-        //! runtextmacro TM_getY( "19" )
-        return 0
+        return this.yMap[id]
     }
 
     addNewLocAt = (id: number, x: number, y: number): void => {
-        //! textmacro TM_addNewLocAt takes N
-        if (id === $N$) {
-            this.x$N$ = x
-            this.y$N$ = y
-            return
-        }
-        //! endtextmacro
-        //! runtextmacro TM_addNewLocAt( "0"  )
-        //! runtextmacro TM_addNewLocAt( "1"  )
-        //! runtextmacro TM_addNewLocAt( "2"  )
-        //! runtextmacro TM_addNewLocAt( "3"  )
-        //! runtextmacro TM_addNewLocAt( "4"  )
-        //! runtextmacro TM_addNewLocAt( "5"  )
-        //! runtextmacro TM_addNewLocAt( "6"  )
-        //! runtextmacro TM_addNewLocAt( "7"  )
-        //! runtextmacro TM_addNewLocAt( "8"  )
-        //! runtextmacro TM_addNewLocAt( "9"  )
-        //! runtextmacro TM_addNewLocAt( "10" )
-        //! runtextmacro TM_addNewLocAt( "11" )
-        //! runtextmacro TM_addNewLocAt( "12" )
-        //! runtextmacro TM_addNewLocAt( "13" )
-        //! runtextmacro TM_addNewLocAt( "14" )
-        //! runtextmacro TM_addNewLocAt( "15" )
-        //! runtextmacro TM_addNewLocAt( "16" )
-        //! runtextmacro TM_addNewLocAt( "17" )
-        //! runtextmacro TM_addNewLocAt( "18" )
-        //! runtextmacro TM_addNewLocAt( "19" )
+        this.xMap[id] = x
+        this.yMap[id] = y
     }
 
     addNewLoc = (x: number, y: number): boolean => {
@@ -431,7 +324,7 @@ export class MonsterTeleport implements Monster {
     }
 
     setMonsterType = (mt: MonsterType): boolean => {
-        if (mt === 0 || mt === this.mt) {
+        if (mt === null || mt === this.mt) {
             return false
         }
         this.mt = mt
@@ -525,32 +418,15 @@ export class MonsterTeleport implements Monster {
             str = str + 'normal'
         }
         str = str + CACHE_SEPARATEUR_PARAM + R2S(period) + CACHE_SEPARATEUR_PARAM + I2S(R2I(angle))
-        //! textmacro TM_loc_toString takes N
-        if (this.lastLocInd < $N$) {
-            return str
-        }
-        str = str + CACHE_SEPARATEUR_PARAM + I2S(R2I(this.x$N$)) + CACHE_SEPARATEUR_PARAM + I2S(R2I(this.y$N$))
-        //! endtextmacro
-        //! runtextmacro TM_loc_toString( "0"  )
-        //! runtextmacro TM_loc_toString( "1"  )
-        //! runtextmacro TM_loc_toString( "2"  )
-        //! runtextmacro TM_loc_toString( "3"  )
-        //! runtextmacro TM_loc_toString( "4"  )
-        //! runtextmacro TM_loc_toString( "5"  )
-        //! runtextmacro TM_loc_toString( "6"  )
-        //! runtextmacro TM_loc_toString( "7"  )
-        //! runtextmacro TM_loc_toString( "8"  )
-        //! runtextmacro TM_loc_toString( "9"  )
-        //! runtextmacro TM_loc_toString( "10" )
-        //! runtextmacro TM_loc_toString( "11" )
-        //! runtextmacro TM_loc_toString( "12" )
-        //! runtextmacro TM_loc_toString( "13" )
-        //! runtextmacro TM_loc_toString( "14" )
-        //! runtextmacro TM_loc_toString( "15" )
-        //! runtextmacro TM_loc_toString( "16" )
-        //! runtextmacro TM_loc_toString( "17" )
-        //! runtextmacro TM_loc_toString( "18" )
-        //! runtextmacro TM_loc_toString( "19" )
+
+        MMPNumbers.forEach(n => {
+            if (this.lastLocInd < n) {
+                return str
+            }
+
+            str += CACHE_SEPARATEUR_PARAM + I2S(R2I(this.xMap[n])) + CACHE_SEPARATEUR_PARAM + I2S(R2I(this.yMap[n]))
+        })
+
         return str
     }
 }

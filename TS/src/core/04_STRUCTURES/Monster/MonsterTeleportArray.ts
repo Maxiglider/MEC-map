@@ -1,3 +1,4 @@
+import { MonsterTeleportt } from './MonsterTeleport'
 export class MonsterTeleportArray {
     //50 niveaux * 500 monstres
 
@@ -28,8 +29,8 @@ export class MonsterTeleportArray {
         let n: number
         if (
             (mode !== 'normal' && mode !== 'string') ||
-            period < MONSTER_TELEPORT_PERIOD_MIN ||
-            period > MONSTER_TELEPORT_PERIOD_MAX
+            period < MonsterTeleportt.MONSTER_TELEPORT_PERIOD_MIN ||
+            period > MonsterTeleportt.MONSTER_TELEPORT_PERIOD_MAX
         ) {
             return 0
         }
