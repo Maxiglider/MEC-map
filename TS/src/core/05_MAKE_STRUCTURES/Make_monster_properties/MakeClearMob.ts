@@ -1,6 +1,6 @@
 import { Text } from 'core/01_libraries/Text'
 import { Make } from 'core/05_MAKE_STRUCTURES/Make/Make'
-import { Monster } from '../../04_STRUCTURES/Monster/Monster'
+import { Monster } from '../../04_STRUCTURES/Monster/MonsterInterface'
 
 export class MakeClearMob extends Make {
     private disableDuration: number

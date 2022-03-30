@@ -1,5 +1,5 @@
 import { createEvent } from 'Utils/mapUtils'
-import { Monster } from './Monster'
+import { Monster } from './MonsterInterface'
 
 const initMonstersClickableSetLife = () => {
     const monstersClickable = CreateGroup()
@@ -13,11 +13,7 @@ const initMonstersClickableSetLife = () => {
                     const monsterUnit = GetEnumUnit()
                     const currentLife = GetUnitState(monsterUnit, UNIT_STATE_LIFE)
                     const monster = Monster(
-                        LoadInteger(
-                            Monster.htMonsterId2MonsterHandleId,
-                            Monster.MONSTER,
-                            GetUnitUserData(monsterUnit)
-                        )
+                        LoadInteger(Monster.htMonsterId2MonsterHandleId, Monster.MONSTER, GetUnitUserData(monsterUnit))
                     )
                     const previousLife = I2R(monster.getLife())
                     let diffLife = RMaxBJ(currentLife, previousLife) - RMinBJ(currentLife, previousLife)

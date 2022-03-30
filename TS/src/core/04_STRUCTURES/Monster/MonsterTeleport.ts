@@ -1,4 +1,4 @@
-import { Monster } from './Monster'
+import { Monster } from './MonsterInterface'
 
 const initMonsterTeleport = () => {
     const WAIT = 1000000

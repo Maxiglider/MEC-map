@@ -6,7 +6,7 @@ import { CommandsFunctions } from 'core/06_COMMANDS/COMMANDS_vJass/Command_funct
 import { CACHE_SEPARATEUR_PARAM } from 'core/07_TRIGGERS/Save_map_in_gamecache/struct_StringArrayForCache'
 import { Escaper } from '../Escaper/Escaper'
 import { Level } from '../Level/Level'
-import { Monster } from '../Monster/Monster'
+import { Monster } from '../Monster/MonsterInterface'
 import { MonsterCreationFunctions } from '../Monster/Monster_creation_functions'
 import { CasterFunctions } from './Caster_functions'
 

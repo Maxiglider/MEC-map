@@ -1,5 +1,5 @@
 import { udg_levels } from 'core/08_GAME/Init_structures/Init_struct_levels'
-import { Monster } from '../Monster/Monster'
+import { Monster } from '../Monster/MonsterInterface'
 import { Caster } from './Caster'
 import { CasterType } from './CasterType'
 
