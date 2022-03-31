@@ -2,8 +2,8 @@
     "compilerOptions": {
         "baseUrl": "./src",
         "allowJs": true,
-        "target": "es6",
-        "lib": ["es6", "es2020"],
+        "target": "ES6",
+        "lib": ["ES6", "ES2020"],
         "noImplicitAny": true,
         "strict": true,
         "moduleResolution": "classic",
@@ -42,7 +42,8 @@
             "war3-types/core/polyfill",
             "war3-types/special/w3ts"
         ],
-        "skipLibCheck": true
+        "skipLibCheck": true,
+        "forceConsistentCasingInFileNames": true
     },
     "include": ["src"],
     "exclude": [],
