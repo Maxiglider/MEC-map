@@ -74,7 +74,7 @@ export abstract class Monster {
         }
     }
 
-    killUnit = () => {
+    killUnit() {
         if (this.u && IsUnitAliveBJ(this.u)) {
             KillUnit(this.u)
         }
@@ -148,17 +148,6 @@ export abstract class Monster {
         this.mt = mt
         this.createUnit()
         return true
-    }
-
-    toString(){
-        let str: string
-        if (this.mt.theAlias != null && this.mt.theAlias != '') {
-            str = this.mt.theAlias + CACHE_SEPARATEUR_PARAM
-        } else {
-            str = this.mt.label + CACHE_SEPARATEUR_PARAM
-        }
-        str = str + I2S(this.id)
-        return str
     }
 
     temporarilyDisable = (disablingTimer: timer) => {
@@ -243,6 +232,17 @@ export abstract class Monster {
         }
 
         delete udg_monsters[this.id]
+    }
+
+    toString(){
+        let str: string
+        if (this.mt.theAlias != null && this.mt.theAlias != '') {
+            str = this.mt.theAlias + CACHE_SEPARATEUR_PARAM
+        } else {
+            str = this.mt.label + CACHE_SEPARATEUR_PARAM
+        }
+        str = str + I2S(this.id)
+        return str
     }
 }
 

@@ -1,11 +1,10 @@
 import { Make } from '../Make/Make'
-import {MonsterTeleport} from "../../04_STRUCTURES/Monster/MonsterTeleport";
+import {MonsterTeleport, WAIT, HIDE, MONSTER_TELEPORT_PERIOD_MIN, MONSTER_TELEPORT_PERIOD_MAX} from "../../04_STRUCTURES/Monster/MonsterTeleport";
 import {MonsterType} from "../../04_STRUCTURES/Monster/MonsterType";
 import {MakeMonsterAction} from "../../04_STRUCTURES/MakeLastActions/MakeMonsterAction";
 import {MakeConsts} from "../Make/Make";
 import { Text } from 'core/01_libraries/Text';
 
-const {WAIT, HIDE} = MonsterTeleport
 const {MAKE_LAST_CLIC_UNIT_ID} = MakeConsts
 
 
@@ -29,7 +28,7 @@ export class MakeMonsterTeleport extends Make {
             throw this.constructor.name + " : wrong mode \"" + mode + "\""
         }
         
-        if(period < MonsterTeleport.MONSTER_TELEPORT_PERIOD_MIN || period > MonsterTeleport.MONSTER_TELEPORT_PERIOD_MAX) {
+        if(period < MONSTER_TELEPORT_PERIOD_MIN || period > MONSTER_TELEPORT_PERIOD_MAX) {
             throw this.constructor.name + " : wrong periode \"" + period + "\""
         }
         
@@ -189,15 +188,8 @@ export class MakeMonsterTeleport extends Make {
         if(super.doBaseActions()){
             if (this.getLocPointeur() >= 0) {
                 if(this.monster) {
-                    if (!this.monster.addNewLoc(this.orderX, this.orderY)) {
-                        //remove MonsterTeleport.NB_MAX_LOC limitation
-                        Text.erP(
-                            this.makerOwner,
-                            'Number limit of actions reached for this monster ! ( ' + I2S(MonsterTeleport.NB_MAX_LOC) + ' )'
-                        )
-                    } else {
-                        this.saveLoc(this.orderX, this.orderY)
-                    }
+                    this.monster.addNewLoc(this.orderX, this.orderY)
+                    this.saveLoc(this.orderX, this.orderY)
                 }
             } else {
                 MonsterTeleport.destroyLocs()

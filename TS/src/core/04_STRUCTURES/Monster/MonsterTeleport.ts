@@ -1,239 +1,145 @@
 import { MOBS_VARIOUS_COLORS } from 'core/01_libraries/Constants'
 import { CACHE_SEPARATEUR_PARAM } from 'core/07_TRIGGERS/Save_map_in_gamecache/struct_StringArrayForCache'
-import { Monster } from './MonsterInterface'
+import {Monster, udg_monsters} from './Monster'
 import { MonsterType } from './MonsterType'
+import {NewImmobileMonster, NewPatrolMonster} from "./Monster_creation_functions";
 
-const initMonsterTeleport = () => {
-    const WAIT = 1000000
-    const HIDE = 2000000
-    const MONSTER_TELEPORT_PERIOD_MIN = 0.1
-    const MONSTER_TELEPORT_PERIOD_MAX = 10
-    let monsterTeleportHashtable = InitHashtable()
+export const WAIT = 1000000
+export const HIDE = 2000000
+export const MONSTER_TELEPORT_PERIOD_MIN = 0.1
+export const MONSTER_TELEPORT_PERIOD_MAX = 10
 
-    const MonsterTeleport_move_Actions = () => {
-        let monster: Monster
-        let MT = MonsterTeleport(LoadInteger(monsterTeleportHashtable, 0, GetHandleId(GetExpiredTimer())))
-        if (MT === 0) {
-            return
-        }
-        MT.nextMove()
+
+const MonsterTeleport_move_Actions = () => {
+    const monsterTP = MonsterTeleport.anyMonsterTeleportTimerId2MonsterTeleport.get(GetHandleId(GetExpiredTimer()))
+    if(monsterTP) {
+        monsterTP.nextMove()
     }
-
-    return { MONSTER_TELEPORT_PERIOD_MIN, MONSTER_TELEPORT_PERIOD_MAX, MonsterTeleport_move_Actions }
 }
 
-export const MonsterTeleportt = initMonsterTeleport()
 
-const MMPNumbers = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19]
 
-export class MonsterTeleport implements Monster {
-    static NB_MAX_LOC: number = 20
-    static nbInstances: number = 0
-    static X: real[]
-    static Y: real[]
-    static staticLastLocInd: number = -1
+export class MonsterTeleport extends Monster {
+    static X: number[] = []
+    static Y: number[] = []
 
-    private id: number
-    u: unit
-    private mt: MonsterType
-    private disablingTimer: timer
-    //color
-    private baseColorId: number
-    private vcRed: real
-    private vcGreen: real
-    private vcBlue: real
-    private vcTransparency: real
+    static anyMonsterTeleportTimerId2MonsterTeleport: Map<number, MonsterTeleport> = new Map<number, MonsterTeleport>()
 
-    private period: real
-    private angle: real
-
-    private lastLocInd: number
     private currentLoc: number
     private sens: number //0 : normal toujours positif, 1 : sens normal avec changement, 2 : sens inversé avec changement
+    
+    private period: number
+    private angle: number
 
-    private xMap: number[] = []
-    private yMap: number[] = []
+    private x: number[] = []
+    private y: number[] = []
     private t: timer
 
-    static count = (): number => {
-        return MonsterTeleport.nbInstances
+    constructor(mt: MonsterType, period: number, angle: number, mode: string) {
+        super(mt)
+        
+        //mode == "normal" (0, 1, 2, 3, 0 , 1...) ou mode == "string" (0, 1, 2, 3, 2, 1...)
+        if (mode !== 'normal' && mode !== 'string') {
+            throw this.constructor.name + ' : wrong mode "' + mode + '"'
+        }
+
+        if (
+            period < MONSTER_TELEPORT_PERIOD_MIN ||
+            period > MONSTER_TELEPORT_PERIOD_MAX
+        ) {
+            throw this.constructor.name + ' : wrong period "' + period + '"'
+        }
+        
+        if (mode === 'normal') {
+            this.sens = 0
+        } else {
+            this.sens = 1
+        }
+
+        this.angle = angle
+        this.period = period
+
+        this.t = CreateTimer()
+        MonsterTeleport.anyMonsterTeleportTimerId2MonsterTeleport.set(GetHandleId(this.t), this)
+
+        MonsterTeleport.X.map((x, n) => {
+            const y = MonsterTeleport.Y[n]
+
+            this.x[n] = x
+            this.y[n] = y
+        })
+
+        this.currentLoc = -1
+        MonsterTeleport.destroyLocs()
     }
 
-    static storeNewLoc = (x: number, y: number): boolean => {
-        if (MonsterTeleport.staticLastLocInd >= MonsterTeleport.NB_MAX_LOC - 1) {
-            return false
-        }
-        MonsterTeleport.staticLastLocInd = MonsterTeleport.staticLastLocInd + 1
-        MonsterTeleport.X[MonsterTeleport.staticLastLocInd] = x
-        MonsterTeleport.Y[MonsterTeleport.staticLastLocInd] = y
+    static count = (): number => {
+        return udg_monsters.filter(monster => monster instanceof MonsterTeleport).length
+    }
+
+    static storeNewLoc(x: number, y: number){
+        const nbLocsBefore = MonsterTeleport.X.length
+        MonsterTeleport.X[nbLocsBefore] = x
+        MonsterTeleport.Y[nbLocsBefore] = y
         return true
     }
 
-    static destroyLocs = (): void => {
-        MonsterTeleport.staticLastLocInd = -1
+    static destroyLocs(){
+        MonsterTeleport.X = []
+        MonsterTeleport.Y = []
     }
 
-    getId = (): number => {
-        return this.id
+    removeUnit() {
+        super.removeUnit()
+        PauseTimer(this.t)
     }
 
-    setId = (id: number): MonsterTeleport => {
-        if (id === this.id) {
-            return this
-        }
-        MonsterHashtableSetMonsterId(_this, this.id, id)
-        this.id = id
-        MonsterIdHasBeenSetTo(id)
-        return this
+    killUnit() {
+        super.killUnit()
+        PauseTimer(this.t)
     }
-
-    removeUnit = (): void => {
-        if (this.u !== null) {
-            GroupRemoveUnit(monstersClickable, this.u)
-            RemoveUnit(this.u)
-            this.u = null
-            PauseTimer(this.t)
-        }
-    }
-
-    killUnit = (): void => {
-        if (this.u !== null && IsUnitAliveBJ(this.u)) {
-            KillUnit(this.u)
-            PauseTimer(this.t)
-        }
-    }
-
-    private destroy = (): void => {
-        if (this.u !== null) {
-            this.removeUnit()
-        }
-        this.level.monstersTeleport.setMonsterNull(this.arrayId)
-        MonsterTeleport.nbInstances = MonsterTeleport.nbInstances - 1
-        RemoveSavedInteger(monsterTeleportHashtable, 0, GetHandleId(this.t))
-        DestroyTimer(this.t)
-        this.t = null
-        if (ClearTriggerMobId2ClearMob(this.id) !== 0) {
-            ClearTriggerMobId2ClearMob(this.id).destroy()
-        }
-        MonsterHashtableRemoveMonsterId(this.id)
-    }
-
-    static create = (mt: MonsterType, period: number, angle: number, mode: string): MonsterTeleport => {
-        //mode == "normal" (0, 1, 2, 3, 0 , 1...) ou mode == "string" (0, 1, 2, 3, 2, 1...)
-        let m: MonsterTeleport
-        let i: number
-
+    
+    setPeriod(period: number) {
         if (
-            (mode !== 'normal' && mode !== 'string') ||
-            period < MonsterTeleportt.MONSTER_TELEPORT_PERIOD_MIN ||
-            period > MonsterTeleportt.MONSTER_TELEPORT_PERIOD_MAX
-        ) {
-            return 0
-        }
-        m = MonsterTeleport.allocate()
-        MonsterTeleport.nbInstances = MonsterTeleport.nbInstances + 1
-        m.mt = mt
-        if (mode === 'normal') {
-            m.sens = 0
-        } else {
-            m.sens = 1
-        }
-        m.angle = angle
-        m.period = period
-        m.t = CreateTimer()
-        SaveInteger(monsterTeleportHashtable, 0, GetHandleId(m.t), integer(m))
-
-        MMPNumbers.forEach(n => {
-            if (n <= MonsterTeleport.staticLastLocInd) {
-                m.xMap[n] = MonsterTeleport.X[n]
-                m.yMap[n] = MonsterTeleport.Y[n]
-            }
-        })
-
-        m.lastLocInd = MonsterTeleport.staticLastLocInd
-        //call Text_A("test, lastLocInd == " + I2S(m.lastLocInd))
-        m.currentLoc = -1
-        MonsterTeleport.destroyLocs()
-        m.life = 0
-        m.id = GetNextMonsterId()
-        MonsterHashtableSetMonsterId(m, NO_ID, m.id)
-        m.disablingTimer = null
-        //color
-        m.baseColorId = -1
-        m.vcRed = 100
-        m.vcGreen = 100
-        m.vcBlue = 100
-        m.vcTransparency = 0
-        return m
-    }
-
-    setPeriod = (period: number): boolean => {
-        if (
-            period < MonsterTeleportt.MONSTER_TELEPORT_PERIOD_MIN ||
-            period > MonsterTeleportt.MONSTER_TELEPORT_PERIOD_MAX
+            period < MONSTER_TELEPORT_PERIOD_MIN ||
+            period > MONSTER_TELEPORT_PERIOD_MAX
         ) {
             return false
         }
+        
         this.period = period
-        if (this.u !== null && IsUnitAliveBJ(this.u)) {
+        if (this.u && IsUnitAliveBJ(this.u)) {
             TimerStart(this.t, this.period, true, MonsterTeleport_move_Actions)
         }
         return true
     }
 
-    getPeriod = (): number => {
+    getPeriod() {
         return this.period
     }
 
     createUnit = (): void => {
-        let clearMob = ClearTriggerMobId2ClearMob(this.id)
-        let disablingTimer = this.disablingTimer
-        let previouslyEnabled = this.u !== null
-        let isMonsterAlive = IsUnitAliveBJ(this.u)
-        if (previouslyEnabled) {
-            this.removeUnit()
+        if (this.x.length < 1) {
+            return //need at least 1 location to create a unit
         }
-        if (this.lastLocInd <= 0) {
-            return
-        }
-        this.u = NewImmobileMonster(this.mt, this.x0, this.y0, this.angle)
-        SetUnitUserData(this.u, this.id)
+
+        super.createUnit(() => (
+            NewImmobileMonster(this.mt, this.x[0], this.y[0], this.angle)
+        ))
+        
         this.currentLoc = 0
         if (this.sens === 2) {
             this.sens = 1
         }
+        
         TimerStart(this.t, this.period, true, MonsterTeleport_move_Actions)
-        if (this.mt.isClickable()) {
-            this.life = this.mt.getMaxLife()
-            GroupAddUnit(monstersClickable, this.u)
-        }
-        if (previouslyEnabled) {
-            if (disablingTimer !== null && TimerGetRemaining(disablingTimer) > 0) {
-                this.temporarilyDisable(disablingTimer)
-            }
-            if (!isMonsterAlive) {
-                this.killUnit()
-            }
-            if (this.baseColorId !== -1) {
-                if (this.baseColorId === 0) {
-                    SetUnitColor(this.u, PLAYER_COLOR_RED)
-                } else {
-                    SetUnitColor(this.u, ConvertPlayerColor(this.baseColorId))
-                }
-            }
-            SetUnitVertexColorBJ(this.u, this.vcRed, this.vcGreen, this.vcBlue, this.vcTransparency)
-        }
-        if (clearMob !== 0) {
-            clearMob.redoTriggerMobPermanentEffect()
-        }
-        disablingTimer = null
     }
 
-    nextMove = (): void => {
-        let x: number
-        let y: number
+    nextMove() {
+        const lastLocInd = this.x.length - 1
+        
         if (this.sens === 0 || this.sens === 1) {
-            if (this.currentLoc >= this.lastLocInd) {
+            if (this.currentLoc >= lastLocInd) {
                 if (this.sens === 0) {
                     this.currentLoc = 0
                 } else {
@@ -251,180 +157,89 @@ export class MonsterTeleport implements Monster {
                 this.currentLoc = this.currentLoc - 1
             }
         }
-        x = this.getX(this.currentLoc)
-        y = this.getY(this.currentLoc)
-        if (x === HIDE && y === HIDE) {
-            ShowUnit(this.u, false)
-        } else if (x !== WAIT || y !== WAIT) {
-            if (IsUnitHidden(this.u)) {
-                ShowUnit(this.u, true)
-                if (!this.mt.isClickable()) {
-                    UnitRemoveAbility(this.u, FourCC('Aloc'))
-                    UnitAddAbility(this.u, FourCC('Aloc'))
+
+        if(this.u) {
+            let x = this.getX(this.currentLoc)
+            let y = this.getY(this.currentLoc)
+
+            if (x === HIDE && y === HIDE) {
+                ShowUnit(this.u, false)
+            } else if (x !== WAIT || y !== WAIT) {
+                if (IsUnitHidden(this.u)) {
+                    ShowUnit(this.u, true)
+                    if (!this.mt.isClickable()) {
+                        UnitRemoveAbility(this.u, FourCC('Aloc'))
+                        UnitAddAbility(this.u, FourCC('Aloc'))
+                    }
                 }
+                SetUnitX(this.u, x)
+                SetUnitY(this.u, y)
             }
-            SetUnitX(this.u, x)
-            SetUnitY(this.u, y)
-        }
-    }
-
-    getLife = (): number => {
-        return this.life
-    }
-
-    setLife = (life: number): void => {
-        this.life = life
-        if (life > 0) {
-            SetUnitLifeBJ(this.u, I2R(life) - 0.5)
-        } else {
-            this.killUnit()
         }
     }
 
     getX = (id: number): number => {
-        return this.xMap[id]
+        return this.x[id]
     }
 
     getY = (id: number): number => {
-        return this.yMap[id]
+        return this.y[id]
     }
 
     addNewLocAt = (id: number, x: number, y: number): void => {
-        this.xMap[id] = x
-        this.yMap[id] = y
+        this.x[id] = x
+        this.y[id] = y
     }
 
     addNewLoc = (x: number, y: number): boolean => {
-        if (this.lastLocInd >= MonsterTeleport.NB_MAX_LOC - 1) {
-            return false
-        }
-        this.lastLocInd = this.lastLocInd + 1
-        this.addNewLocAt(this.lastLocInd, x, y)
-        if (this.lastLocInd === 1) {
+        let newLastLocInd = this.x.length
+
+        this.addNewLocAt(newLastLocInd, x, y)
+        if (newLastLocInd === 0) {
             this.createUnit()
         }
+
         return true
     }
 
     destroyLastLoc = (): boolean => {
-        if (this.lastLocInd === 1) {
+        let lastLocInd = this.x.length - 1
+
+        if (lastLocInd < 0) {
+            return false
+        }
+
+        if (lastLocInd === 0) {
             PauseTimer(this.t)
-            RemoveUnit(this.u)
-            this.u = null
+            this.u && RemoveUnit(this.u)
         }
-        if (this.lastLocInd < 0) {
-            return false
-        }
-        this.lastLocInd = this.lastLocInd - 1
+
+        delete this.x[lastLocInd]
+        delete this.y[lastLocInd]
+
         return true
     }
 
-    getMonsterType = (): MonsterType => {
-        return this.mt
+    destroy = (): void => {
+        MonsterTeleport.anyMonsterTeleportTimerId2MonsterTeleport.delete(GetHandleId(this.t))
+        DestroyTimer(this.t)
+        super.destroy()
     }
 
-    setMonsterType = (mt: MonsterType): boolean => {
-        if (mt === null || mt === this.mt) {
-            return false
-        }
-        this.mt = mt
-        this.createUnit()
-        return true
-    }
+    toString() {
+        let str = super.toString()
+        str += CACHE_SEPARATEUR_PARAM
 
-    temporarilyDisable = (disablingTimer: timer): void => {
-        if (
-            this.disablingTimer === null ||
-            this.disablingTimer === disablingTimer ||
-            TimerGetRemaining(disablingTimer) > TimerGetRemaining(this.disablingTimer)
-        ) {
-            this.disablingTimer = disablingTimer
-            UnitRemoveAbility(this.u, this.mt.getImmolationSkill())
-            SetUnitVertexColorBJ(this.u, this.vcRed, this.vcGreen, this.vcBlue, DISABLE_TRANSPARENCY)
-            this.vcTransparency = DISABLE_TRANSPARENCY
-        }
-    }
-
-    temporarilyEnable = (disablingTimer: timer): void => {
-        if (this.disablingTimer === disablingTimer) {
-            UnitAddAbility(this.u, this.mt.getImmolationSkill())
-            SetUnitVertexColorBJ(this.u, this.vcRed, this.vcGreen, this.vcBlue, 0)
-            this.vcTransparency = 0
-        }
-    }
-
-    setBaseColor = (colorString: string): void => {
-        let baseColorId: number
-        if (IsColorString(colorString)) {
-            baseColorId = ColorString2Id(colorString)
-            if (baseColorId < 0 || baseColorId > 12) {
-                return
-            }
-            this.baseColorId = baseColorId
-            if (this.u !== null) {
-                if (baseColorId === 0) {
-                    SetUnitColor(this.u, PLAYER_COLOR_RED)
-                } else {
-                    SetUnitColor(this.u, ConvertPlayerColor(baseColorId))
-                }
-            }
-        }
-    }
-
-    setVertexColor = (vcRed: number, vcGreen: number, vcBlue: number): void => {
-        this.vcRed = vcRed
-        this.vcGreen = vcGreen
-        this.vcBlue = vcBlue
-        if (this.u !== null) {
-            SetUnitVertexColorBJ(this.u, vcRed, vcGreen, vcBlue, this.vcTransparency)
-        }
-    }
-
-    reinitColor = (): void => {
-        let initBaseColorId: number
-        //changement valeurs des champs
-        this.baseColorId = -1
-        this.vcRed = 100
-        this.vcGreen = 100
-        this.vcBlue = 100
-        this.vcTransparency = 0
-        //changement couleur du mob actuel
-        if (this.u !== null) {
-            if (MOBS_VARIOUS_COLORS) {
-                initBaseColorId = GetPlayerId(GetOwningPlayer(this.u))
-            } else {
-                initBaseColorId = 12
-            }
-            if (initBaseColorId === 0) {
-                SetUnitColor(this.u, PLAYER_COLOR_RED)
-            } else {
-                SetUnitColor(this.u, ConvertPlayerColor(initBaseColorId))
-            }
-            SetUnitVertexColorBJ(this.u, this.vcRed, this.vcGreen, this.vcBlue, this.vcTransparency)
-        }
-    }
-
-    toString = (): string => {
-        let str: string
-        if (this.mt.theAlias != null && this.mt.theAlias != '') {
-            str = this.mt.theAlias + CACHE_SEPARATEUR_PARAM
-        } else {
-            str = this.mt.label + CACHE_SEPARATEUR_PARAM
-        }
-        str = str + I2S(this.id) + CACHE_SEPARATEUR_PARAM
         if (this.sens > 0) {
-            str = str + 'string'
+            str += 'string'
         } else {
-            str = str + 'normal'
+            str += 'normal'
         }
-        str = str + CACHE_SEPARATEUR_PARAM + R2S(period) + CACHE_SEPARATEUR_PARAM + I2S(R2I(angle))
 
-        MMPNumbers.forEach(n => {
-            if (this.lastLocInd < n) {
-                return str
-            }
+        str += CACHE_SEPARATEUR_PARAM + R2S(this.period) + CACHE_SEPARATEUR_PARAM + I2S(R2I(this.angle))
 
-            str += CACHE_SEPARATEUR_PARAM + I2S(R2I(this.xMap[n])) + CACHE_SEPARATEUR_PARAM + I2S(R2I(this.yMap[n]))
+        this.x.map((x, n) => {
+            str += CACHE_SEPARATEUR_PARAM + I2S(R2I(this.x[n])) + CACHE_SEPARATEUR_PARAM + I2S(R2I(this.y[n]))
         })
 
         return str

@@ -23,7 +23,7 @@ export class MonsterNoMove extends Monster {
     createUnit() {
         super.createUnit(() => (
             NewImmobileMonster(this.mt, this.x, this.y, this.angle)
-        ));
+        ))
     }
 
     toString(){

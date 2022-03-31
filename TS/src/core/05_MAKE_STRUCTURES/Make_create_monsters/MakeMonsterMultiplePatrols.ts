@@ -3,6 +3,7 @@ import {MonsterType} from "../../04_STRUCTURES/Monster/MonsterType";
 import {MakeMonsterAction} from "../../04_STRUCTURES/MakeLastActions/MakeMonsterAction";
 import {MakeConsts} from "../Make/Make";
 import { Text } from 'core/01_libraries/Text';
+import {MonsterMultiplePatrols} from "../../04_STRUCTURES/Monster/MonsterMultiplePatrols";
 
 
 export class MakeMonsterMultiplePatrols extends Make {
@@ -130,17 +131,6 @@ export class MakeMonsterMultiplePatrols extends Make {
                 if (this.monster) {
                     erreur = this.monster.addNewLoc(this.orderX, this.orderY)
                     if (erreur > 0) {
-
-                        //todomax remove MonsterMultiplePatrols.NB_MAX_LOC and this error
-                        if (erreur === 3) {
-                            Text.erP(
-                                this.makerOwner,
-                                'Number limit of patrol locations reached for this monster ! ( ' +
-                                I2S(MonsterMultiplePatrols.NB_MAX_LOC) +
-                                ' )'
-                            )
-                        }
-
                         if (erreur === 2) {
                             Text.erP(this.makerOwner, 'Too close to the last location !')
                         }
