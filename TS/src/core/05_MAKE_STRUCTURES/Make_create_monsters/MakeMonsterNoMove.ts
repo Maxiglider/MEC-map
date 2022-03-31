@@ -1,6 +1,7 @@
 import { Make } from '../Make/Make'
 import {MonsterType} from "../../04_STRUCTURES/Monster/MonsterType";
 import {MakeMonsterAction} from "../../04_STRUCTURES/MakeLastActions/MakeMonsterAction";
+import {MonsterNoMove} from "../../04_STRUCTURES/Monster/MonsterNoMove";
 
 
 export class MakeMonsterNoMove extends Make {
@@ -24,7 +25,8 @@ export class MakeMonsterNoMove extends Make {
 
     doActions() {
         if (super.doBaseActions()) {
-            const monster = this.escaper.getMakingLevel().monstersNoMove.new(this.getMonsterType(), this.orderX, this.orderY, this.getFacingAngle(), true)
+            const monster = new MonsterNoMove(this.getMonsterType(), this.orderX, this.orderY, this.getFacingAngle())
+            this.escaper.getMakingLevel().monsters.new(monster, true)
             this.escaper.newAction(new MakeMonsterAction(this.escaper.getMakingLevel(), monster))
         }
     }

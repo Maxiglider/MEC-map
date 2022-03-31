@@ -34,7 +34,7 @@ let simplePatrolMobs: group
 
 
 
-class MonsterSimplePatrol extends Monster {
+export class MonsterSimplePatrol extends Monster {
     private x1: number
     private y1: number
     private x2: number

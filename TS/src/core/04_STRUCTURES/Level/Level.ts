@@ -1,9 +1,19 @@
 import { Text } from 'core/01_libraries/Text'
 import { udg_lives } from 'core/08_GAME/Init_structures/Init_lives'
 import { TrigCheckpointReviveHeroes } from './Trig_checkpoint_revive_heroes'
+import {MonstersArray} from "../Monster/MonstersArray";
+import {VisibilityModifierArray} from "./VisibilityModifierArray";
+import {TriggerArray} from "./Triggers";
+import {MeteorArray} from "../Meteor/MeteorArray";
+import {CasterArray} from "../Caster/CasterArray";
+import {ClearMobArray} from "../Monster_properties/ClearMobArray";
+import {udg_escapers} from "../../08_GAME/Init_structures/Init_escapers";
+import {Escaper} from "../Escaper/Escaper";
+import {MonsterType} from "../Monster/MonsterType";
+import {CasterType} from "../Caster/CasterType";
+import {udg_levels} from "../../08_GAME/Init_structures/Init_struct_levels";
+import {VisibilityModifier} from "./VisibilityModifier";
 
-//Avec le jass : //todomax handle infinite number of monsters and levels
-//nombre maximum de niveaux : 200. Nombre maximum de monstres de chaque type par niveau : 1000.
 
 export class Level {
     public static earningLivesActivated = true
@@ -11,26 +21,21 @@ export class Level {
     private isActivatedB: boolean
     private startMessage: string
     private livesEarnedAtBeginning: number
-    private start: IStart
-    private end: IEnd
-    visibilities = VisibilityModifierArray()
-    monstersNoMove = MonsterNoMoveArray()
-    monstersSimplePatrol = MonsterSimplePatrolArray()
-    monstersMultiplePatrols = MonsterMultiplePatrolsArray()
-    monstersTeleport = MonsterTeleportArray()
-    monsterSpawns = MonsterSpawnArray()
-    meteors = MeteorArray()
-    casters = CasterArray()
-    clearMobs = ClearMobArray()
-    private triggers = TriggerArray()
+    private start: Start
+    private end: End
+    private triggers: TriggerArray
+
+    visibilities: VisibilityModifierArray
+    monsters: MonstersArray
+    monsterSpawns: MonsterSpawnArray
+    meteors: MeteorArray
+    casters: CasterArray
+    clearMobs: ClearMobArray
 
     constructor() {
         this.visibilities = new VisibilityModifierArray()
         this.triggers = new TriggerArray()
-        this.monstersNoMove = new MonsterNoMoveArray()
-        this.monstersSimplePatrol = new MonsterSimplePatrolArray()
-        this.monstersMultiplePatrols = new MonsterMultiplePatrolsArray()
-        this.monstersTeleport = new MonsterTeleportArray()
+        this.monsters = new MonstersArray(this)
         this.monsterSpawns = new MonsterSpawnArray()
         this.meteors = new MeteorArray()
         this.casters = new CasterArray()
@@ -38,8 +43,8 @@ export class Level {
         this.livesEarnedAtBeginning = 1
         this.isActivatedB = false
         this.startMessage = ''
-        this.start = 0
-        this.end = 0
+        this.start = new Start()
+        this.end = new End()
     }
 
     activate(activ: boolean) {
@@ -49,24 +54,20 @@ export class Level {
         this.triggers.activate(activ)
 
         if (activ) {
-            if (this.startMessage && self.earningLivesActivated) {
+            if (this.startMessage && Level.earningLivesActivated) {
                 Text.A(this.startMessage)
             }
             this.visibilities.activate(true)
-            this.monstersNoMove.createMonsters()
-            this.monstersSimplePatrol.createMonsters()
-            this.monstersMultiplePatrols.createMonsters()
-            this.monstersTeleport.createMonsters()
+            this.monsters.createMonstersUnits()
             this.monsterSpawns.activate()
             this.meteors.createMeteors()
             this.casters.createCasters()
             this.clearMobs.initializeClearMobs()
-            if (Level.earningLivesActivated && getId() > 0) {
+            if (Level.earningLivesActivated && this.getId() > 0) {
                 udg_lives.add(this.livesEarnedAtBeginning)
-            } else this.monstersNoMove.removeMonsters()
-            this.monstersSimplePatrol.removeMonsters()
-            this.monstersMultiplePatrols.removeMonsters()
-            this.monstersTeleport.removeMonsters()
+            }
+        }else{
+            this.monsters.removeMonstersUnits()
             this.monsterSpawns.desactivate()
             this.meteors.removeMeteors()
             this.casters.removeCasters()
@@ -113,17 +114,7 @@ export class Level {
 
     getNbMonsters(mode: string) {
         //modes : all, moving, not moving
-        let nb = 0
-        if (mode == 'all' || mode == 'not moving') {
-            nb += this.monstersNoMove.count() + this.casters.count()
-        }
-        if (mode == 'all' || mode == 'moving') {
-            nb += this.monstersSimplePatrol.count() + this.monstersMultiplePatrols.count()
-        }
-        if (mode == 'all') {
-            nb += this.monstersTeleport.count()
-        }
-        return nb
+        return this.monsters.count(mode)
     }
 
     destroy() {
@@ -131,24 +122,16 @@ export class Level {
         this.end.destroy()
         this.visibilities.destroy()
         this.triggers.destroy()
-        this.monstersNoMove.destroy()
-        this.monstersSimplePatrol.destroy()
-        this.monstersMultiplePatrols.destroy()
-        this.monstersTeleport.destroy()
+        this.monsters.destroy()
+        //todomax destroy spawns missing ?
     }
 
-    recreateMonstersOfType(mt: MonsterType) {
-        this.monstersNoMove.recreateMonstersOfType(mt)
-        this.monstersSimplePatrol.recreateMonstersOfType(mt)
-        this.monstersMultiplePatrols.recreateMonstersOfType(mt)
-        this.monstersTeleport.recreateMonstersOfType(mt)
+    recreateMonstersUnitsOfType(mt: MonsterType) {
+        this.monsters.recreateMonstersUnitsOfType(mt)
     }
 
-    removeMonstersOfType(mt: MonsterType) {
-        this.monstersNoMove.removeMonstersOfType(mt)
-        this.monstersSimplePatrol.removeMonstersOfType(mt)
-        this.monstersMultiplePatrols.removeMonstersOfType(mt)
-        this.monstersTeleport.removeMonstersOfType(mt)
+    clearMonstersOfType(mt: MonsterType) {
+        this.monsters.clearMonstersOfType(mt)
     }
 
     refreshCastersOfType(ct: CasterType) {
@@ -161,8 +144,8 @@ export class Level {
 
     getId() {
         let i = 0
-        while (udg_levels.get(i) != 0) {
-            if (udg_levels.get(i) == this) {
+        while (udg_levels.get(i)) {
+            if (udg_levels.get(i) === this) {
                 return i
             }
             i++

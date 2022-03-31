@@ -62,11 +62,7 @@ export const NewImmobileMonsterForPlayer = (mt: MonsterType, p: player, x: numbe
     } else {
         monster = CreateUnit(p, mt.getUnitTypeId(), x, y, angle)
     }
-    //if (IsHeroUnitId(mt.getUnitTypeId())) then
-    //    call Text.A("hero")
-    //else
-    //    call Text.A("pas hero")
-    //endif
+
     SetUnitUseFood(monster, false)
     if (mt.isClickable()) {
         SetUnitMaxLife(monster, mt.getMaxLife())

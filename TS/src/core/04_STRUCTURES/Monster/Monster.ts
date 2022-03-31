@@ -7,8 +7,26 @@ import {ColorCodes} from "../../01_libraries/Init_colorCodes";
 import {MOBS_VARIOUS_COLORS} from "../../01_libraries/Constants";
 import {ClearMob} from "../Monster_properties/ClearMob";
 import {NewImmobileMonster} from "./Monster_creation_functions";
+import {MonsterSimplePatrol} from "./MonsterSimplePatrol";
+import {MonsterMultiplePatrols} from "./MonsterMultiplePatrols";
+import {MonsterNoMove} from "./MonsterNoMove";
 
 export const udg_monsters: Monster[] = []
+
+export const countMonstersAccordingToMode = (monsters: Monster[], mode?: string) => {
+    if(!mode) mode = 'all'
+
+    let filteredMonsters: Monster[] = []
+    if(mode == 'all'){
+        filteredMonsters = monsters.filter((monster: Monster) => monster !== undefined)
+    }else if(mode == 'moving'){
+        filteredMonsters = monsters.filter((monster: Monster) => monster instanceof MonsterSimplePatrol || monster instanceof MonsterMultiplePatrols)
+    }else if(mode == 'not moving'){
+        filteredMonsters = monsters.filter((monster: Monster) => monster instanceof MonsterNoMove)
+    }
+
+    return filteredMonsters.length
+}
 
 
 export abstract class Monster {
@@ -49,8 +67,8 @@ export abstract class Monster {
         this.vcTransparency = 0
     }
 
-    static count = (): number => {
-        return udg_monsters.filter(monster => monster !== undefined).length
+    static count = (mode?: string): number => {
+        return countMonstersAccordingToMode(udg_monsters, mode)
     }
 
     getId(){
@@ -232,6 +250,10 @@ export abstract class Monster {
         }
 
         delete udg_monsters[this.id]
+
+        if(this.level){
+            this.level.monsters.removeMonster(this.id)
+        }
     }
 
     toString(){
