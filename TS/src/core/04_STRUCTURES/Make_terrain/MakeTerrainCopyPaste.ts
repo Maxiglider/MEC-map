@@ -1,12 +1,12 @@
 import { Make } from 'core/05_MAKE_STRUCTURES/Make/Make'
 
 export class MakeTerrainCopyPaste extends Make {
-    x1: real
-    y1: real
-    x2: real
-    y2: real
-    x3: real
-    y3: real
+    x1: number
+    y1: number
+    x2: number
+    y2: number
+    x3: number
+    y3: number
     private unitLastClic1: unit
     private unitLastClic2: unit
     private unitLastClic3: unit

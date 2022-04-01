@@ -2,6 +2,7 @@ import { BasicFunctions } from 'core/01_libraries/Basic_functions'
 import { CAN_TURN_IN_AIR, NB_ESCAPERS } from 'core/01_libraries/Constants'
 import { Escaper } from 'core/04_STRUCTURES/Escaper/Escaper'
 import { EscaperFunctions } from 'core/04_STRUCTURES/Escaper/Escaper_functions'
+import { udg_symmetryAngle } from 'core/Double_heroes/double_heroes_config'
 
 const initTurnOnSlide = () => {
     //turn variables
@@ -98,8 +99,10 @@ const initTurnOnSlide = () => {
                 }
             } else {
                 SetUnitFacing(slider, angle)
-                if (escaperSecond.isSliding()) {
-                    SetUnitFacing(escaperSecond.getHero(), angleSecond)
+                const h1 = escaperSecond.getHero()
+
+                if (escaperSecond.isSliding() && h1) {
+                    SetUnitFacing(h1, angleSecond)
                 }
             }
             escaper.setSlideLastAngleOrder(angle)

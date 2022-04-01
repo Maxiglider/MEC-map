@@ -34,7 +34,7 @@ export const TerrainTypeId2TerrainType = (terrainTypeId: number): TerrainType | 
 
 export const IsTerrainTypeOfKind = (terrainTypeId: number, terrainTypeKind: string): boolean => {
     let terrainType = TerrainTypeId2TerrainType(terrainTypeId)
-    if (terrainType === 0) {
+    if (terrainType === null) {
         return false
     }
     return terrainTypeKind == terrainType.getKind()

@@ -1,8 +1,8 @@
 import { Make } from 'core/05_MAKE_STRUCTURES/Make/Make'
 
 export class MakeVisibilityModifier extends Make {
-    lastX: real
-    lastY: real
+    lastX: number
+    lastY: number
     private unitLastClic: unit
     private lastLocIsSaved: boolean
     private lastLocSavedIsUsed: boolean

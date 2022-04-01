@@ -1,5 +1,6 @@
 import { Constants, LARGEUR_CASE } from 'core/01_libraries/Constants'
 import { Text } from 'core/01_libraries/Text'
+import { TerrainType } from 'core/04_STRUCTURES/TerrainType/TerrainType'
 import { createEvent } from 'Utils/mapUtils'
 import { TerrainTypeFunctions } from '../../04_STRUCTURES/TerrainType/Terrain_type_functions'
 import { Modify_terrain_functions } from '../Modify_terrain_Functions/Modify_terrain_functions'

@@ -1,8 +1,8 @@
 import { Make } from 'core/05_MAKE_STRUCTURES/Make/Make'
 
 export class MakeTerrainHorizontalSymmetry extends Make {
-    lastX: real
-    lastY: real
+    lastX: number
+    lastY: number
     private lastLocIsSaved: boolean
     private lastLocSavedIsUsed: boolean
     private unitLastClic: unit

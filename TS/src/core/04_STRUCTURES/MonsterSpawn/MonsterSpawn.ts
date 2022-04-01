@@ -49,11 +49,11 @@ class MonsterSpawn {
     private label: string
     private mt: MonsterType
     private sens: string //leftToRight, upToDown, rightToLeft, downToUp
-    private frequence: real
-    private minX: real
-    private minY: real
-    private maxX: real
-    private maxY: real
+    private frequence: number
+    private minX: number
+    private minY: number
+    private maxX: number
+    private maxY: number
     private tSpawn: trigger
     private tUnspawn: trigger
     private unspawnReg: region

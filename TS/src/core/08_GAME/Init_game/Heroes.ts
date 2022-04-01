@@ -1,4 +1,5 @@
 import { NB_ESCAPERS } from 'core/01_libraries/Constants'
+import { udg_doubleHeroesEnabled } from 'core/Double_heroes/double_heroes_config'
 import { createEvent } from 'Utils/mapUtils'
 import { udg_escapers } from '../Init_structures/Init_escapers'
 

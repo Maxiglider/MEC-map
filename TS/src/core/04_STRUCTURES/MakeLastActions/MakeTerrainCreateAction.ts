@@ -7,10 +7,10 @@ class MakeTerrainCreateAction {
 
     private terrainSaveId: number
     private terrainTypeNew: TerrainType
-    private minX: real
-    private minY: real
-    private maxX: real
-    private maxY: real
+    private minX: number
+    private minY: number
+    private maxX: number
+    private maxY: number
 
     private static onInit = (): void => {
         MakeTerrainCreateAction.terrainSaves = InitHashtable()

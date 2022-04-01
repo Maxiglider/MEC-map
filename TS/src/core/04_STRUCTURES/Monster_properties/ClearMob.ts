@@ -1,3 +1,7 @@
+import { Level } from '../Level/Level'
+import { MonsterOrCaster } from '../MonsterOrCaster/MonsterOrCaster'
+import { MonsterOrCasterStack } from '../MonsterOrCaster/MonsterOrCasterStack'
+
 const initClearMob = () => {
     let htClearMob = InitHashtable()
     const CLEAR_MOB_MAX_DURATION = 300
@@ -52,7 +56,7 @@ export class ClearMob {
     arrayId: number
     private triggerMob: MonsterOrCaster
     private blockMobs: MonsterOrCasterStack
-    private disableDuration: real //0 = permanent
+    private disableDuration: number //0 = permanent
     private timerActivated: timer
     private timerFrontMontant: timer //le trigger mob reste en vert pêtant le temps du "front montant"
     enabled: boolean

@@ -7,10 +7,10 @@ class MakeTerrainCopyPasteAction {
     static terrainSaveLastId: number
 
     private terrainSaveId: number
-    private minX: real
-    private minY: real
-    private maxX: real
-    private maxY: real
+    private minX: number
+    private minY: number
+    private maxX: number
+    private maxY: number
 
     private static onInit = (): void => {
         MakeTerrainCopyPasteAction.terrainSavesBefore = InitHashtable()

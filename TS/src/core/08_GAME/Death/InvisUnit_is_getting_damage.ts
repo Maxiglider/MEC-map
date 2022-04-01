@@ -2,6 +2,7 @@
 
 import { DUMMY_POWER_CIRCLE, GM_KILLING_EFFECT } from 'core/01_libraries/Constants'
 import { MonsterOrCaster } from 'core/04_STRUCTURES/MonsterOrCaster/MonsterOrCaster'
+import { ClearMob } from 'core/04_STRUCTURES/Monster_properties/ClearMob'
 import { createEvent } from 'Utils/mapUtils'
 import { udg_monsterTypes } from '../../../../globals'
 import { udg_escapers } from '../Init_structures/Init_escapers'
@@ -23,8 +24,15 @@ export const InitTrig_InvisUnit_is_getting_damage = () => {
                 let eff: effect
                 let x: number
                 let y: number
-                const heroPos = GetUnitLoc(escaper.getHero())
-                const hauteurHero = GetLocationZ(heroPos) + GetUnitFlyHeight(escaper.getHero())
+
+                const hero = escaper.getHero()
+
+                if (!hero) {
+                    return
+                }
+
+                const heroPos = GetUnitLoc(hero)
+                const hauteurHero = GetLocationZ(heroPos) + GetUnitFlyHeight(hero)
                 let killingUnitPos = GetUnitLoc(killingUnit)
                 let hauteurKillingUnit = GetLocationZ(killingUnitPos) + GetUnitFlyHeight(killingUnit)
 

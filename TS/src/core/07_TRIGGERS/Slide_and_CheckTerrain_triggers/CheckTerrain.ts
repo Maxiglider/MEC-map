@@ -2,6 +2,10 @@ import { BasicFunctions } from 'core/01_libraries/Basic_functions'
 import { CHECK_TERRAIN_PERIOD, GM_TOUCH_DEATH_TERRAIN_EFFECT_STR } from 'core/01_libraries/Constants'
 import { EscaperFunctions } from 'core/04_STRUCTURES/Escaper/Escaper_functions'
 import { MeteorFunctions } from 'core/04_STRUCTURES/Meteor/Meteor_functions'
+import { TerrainType } from 'core/04_STRUCTURES/TerrainType/TerrainType'
+import { TerrainTypeDeath } from 'core/04_STRUCTURES/TerrainType/TerrainTypeDeath'
+import { TerrainTypeSlide } from 'core/04_STRUCTURES/TerrainType/TerrainTypeSlide'
+import { TerrainTypeWalk } from 'core/04_STRUCTURES/TerrainType/TerrainTypeWalk'
 import { udg_escapers } from 'core/08_GAME/Init_structures/Init_escapers'
 import { createEvent } from 'Utils/mapUtils'
 import { udg_terrainTypes } from '../../../../globals'
@@ -25,21 +29,21 @@ const initCheckTerrainTrigger = () => {
         const y = GetUnitY(hero)
         const lastTerrainType = escaper.getLastTerrainType()
         const currentTerrainType = udg_terrainTypes.getTerrainType(x, y)
-        const an_effect: effect
+        let an_effect: effect | null
 
-        const touchedByDeathTerrain: boolean
-        const toleranceDist: real
-        const angle: real
-        const xTolerance: real
-        const yTolerance: real
-        const terrainTypeTolerance: TerrainType
-        const wasSliding: boolean
-        const oldSlideSpeed: real
-        const tempRayonTolerance: real
+        let touchedByDeathTerrain: boolean
+        let toleranceDist: number
+        let angle: number
+        let xTolerance: number
+        let yTolerance: number
+        let terrainTypeTolerance: TerrainType
+        let wasSliding: boolean
+        let oldSlideSpeed: number
+        let tempRayonTolerance: number
 
-        const terrainTypeS: TerrainTypeSlide
-        const terrainTypeD: TerrainTypeDeath
-        const terrainTypeW: TerrainTypeWalk
+        let terrainTypeS: TerrainTypeSlide
+        let terrainTypeD: TerrainTypeDeath
+        let terrainTypeW: TerrainTypeWalk
         escaper.moveInvisUnit(x, y)
 
         if (BasicFunctions.IsOnGround(hero)) {
@@ -150,7 +154,10 @@ const initCheckTerrainTrigger = () => {
                                 if (oldSlideSpeed < 0) {
                                     escaper.reverse()
                                 }
-                                if (udg_autoContinueAfterSliding[playerId] && oldSlideSpeed >= 0) {
+                                if (
+                                    AutoContinueAfterSliding.udg_autoContinueAfterSliding[playerId] &&
+                                    oldSlideSpeed >= 0
+                                ) {
                                     AutoContinueAfterSliding.AutoContinueAfterSliding(playerId)
                                 }
                             }
@@ -170,7 +177,7 @@ const initCheckTerrainTrigger = () => {
                         if (oldSlideSpeed < 0) {
                             escaper.reverse()
                         }
-                        if (udg_autoContinueAfterSliding[playerId] && oldSlideSpeed >= 0) {
+                        if (AutoContinueAfterSliding.udg_autoContinueAfterSliding[playerId] && oldSlideSpeed >= 0) {
                             AutoContinueAfterSliding.AutoContinueAfterSliding(playerId)
                         }
                     }

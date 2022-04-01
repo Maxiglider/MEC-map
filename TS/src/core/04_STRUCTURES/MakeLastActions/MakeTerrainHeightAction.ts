@@ -1,10 +1,10 @@
 import { MakeAction } from './MakeAction'
 
 export class MakeTerrainHeightAction extends MakeAction {
-    private radius: real
-    private height: real
-    private x: real
-    private y: real
+    private radius: number
+    private height: number
+    private x: number
+    private y: number
     private terrainDeform: terraindeformation
 
     constructor(radius: number, height: number, x: number, y: number) {

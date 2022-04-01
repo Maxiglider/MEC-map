@@ -5,6 +5,7 @@ import { udg_terrainTypes } from '../../../../globals'
 import { Globals } from '../../09_From_old_Worldedit_triggers/globals_variables_and_triggers'
 import { AfkMode } from '../Afk_mode/Afk_mode'
 import { udg_escapers } from '../Init_structures/Init_escapers'
+import { udg_coopModeActive } from '../Mode_coop/creation_dialogue'
 import { DeplacementHeroHorsDeathPath } from '../Mode_coop/deplacement_heros_hors_death_path'
 import { gg_trg_Lose_a_life_and_res } from './Lose_a_life_and_res'
 
@@ -50,8 +51,8 @@ export const InitTrig_A_hero_dies_check_if_all_dead_and_sounds = () => {
                     }
                 }
 
-                if (isAfk[n]) {
-                    DestroyTextTag(afkModeTextTags[n])
+                if (AfkMode.isAfk[n]) {
+                    DestroyTextTag(AfkMode.afkModeTextTags[n])
                 } else {
                     PauseTimer(AfkMode.afkModeTimers[n])
                 }
@@ -84,8 +85,14 @@ export const InitTrig_A_hero_dies_check_if_all_dead_and_sounds = () => {
                         while (true) {
                             if (i >= NB_ESCAPERS) break
                             if (i != n && udg_escapers.get(i).isAlive()) {
-                                diffX = GetUnitX(udg_escapers.get(i).getHero()) - GetUnitX(hero)
-                                diffY = GetUnitY(udg_escapers.get(i).getHero()) - GetUnitY(hero)
+                                const h1 = udg_escapers.get(i).getHero()
+
+                                if (!h1) {
+                                    continue
+                                }
+
+                                diffX = GetUnitX(h1) - GetUnitX(hero)
+                                diffY = GetUnitY(h1) - GetUnitY(hero)
                                 if (SquareRoot(diffX * diffX + diffY * diffY) < COOP_REVIVE_DIST) {
                                     udg_escapers.get(n).coopReviveHero()
                                     TriggerSleepAction(3.7)

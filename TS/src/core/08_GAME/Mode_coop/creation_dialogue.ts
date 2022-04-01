@@ -4,7 +4,7 @@ let dialChoixModeCoop: dialog
 let dialBoutonAppuye: boolean
 const DIAL_TIME_TO_ANSWER = 10
 let dialTimerTempLimite: timer
-let udg_coopModeActive = true
+export let udg_coopModeActive = true
 
 export const InitTrig_creation_dialogue = () => {
     createEvent({
