@@ -5,6 +5,8 @@ import {MonsterSimplePatrol} from "./MonsterSimplePatrol";
 import {MonsterMultiplePatrols} from "./MonsterMultiplePatrols";
 import {MonsterNoMove} from "./MonsterNoMove";
 import {MonsterType} from "./MonsterType";
+import {CasterType} from "../Caster/CasterType";
+import {Caster} from "../Caster/Caster";
 
 export const MONSTER_NEAR_DIFF_MAX = 64
 
@@ -17,6 +19,10 @@ export class MonsterArray {
     constructor(level: Level) {
         this.level = level
         this.monsters = []
+    }
+
+    getLevel(){
+        return this.level
     }
 
     get(monsterId: number) {
@@ -93,6 +99,20 @@ export class MonsterArray {
             monster.destroy()
         })
     }
+
+    //Special casters
+    refreshCastersOfType(ct: CasterType){
+        this.monsters.map(monster => {
+            monster instanceof Caster && monster.getCasterType() === ct && monster.refresh()
+        })
+    }
+
+    removeCastersOfType(ct: CasterType) {
+        this.monsters.map(monster => {
+            monster instanceof Caster && monster.getCasterType() === ct && monster.destroy()
+        })
+    }
+
 
     //Destroy everything including the monsters
     destroy = () => {

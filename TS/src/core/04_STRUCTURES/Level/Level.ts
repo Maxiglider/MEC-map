@@ -5,7 +5,6 @@ import {MonsterArray} from "../Monster/MonsterArray";
 import {VisibilityModifierArray} from "./VisibilityModifierArray";
 import {TriggerArray} from "./Triggers";
 import {MeteorArray} from "../Meteor/MeteorArray";
-import {CasterArray} from "../Caster/CasterArray";
 import {ClearMobArray} from "../Monster_properties/ClearMobArray";
 import {udg_escapers} from "../../08_GAME/Init_structures/Init_escapers";
 import {Escaper} from "../Escaper/Escaper";
@@ -29,7 +28,6 @@ export class Level {
     monsters: MonsterArray
     monsterSpawns: MonsterSpawnArray
     meteors: MeteorArray
-    casters: CasterArray
     clearMobs: ClearMobArray
 
     constructor() {
@@ -38,7 +36,6 @@ export class Level {
         this.monsters = new MonsterArray(this)
         this.monsterSpawns = new MonsterSpawnArray()
         this.meteors = new MeteorArray()
-        this.casters = new CasterArray()
         this.clearMobs = new ClearMobArray()
         this.livesEarnedAtBeginning = 1
         this.isActivatedB = false
@@ -61,7 +58,6 @@ export class Level {
             this.monsters.createMonstersUnits()
             this.monsterSpawns.activate()
             this.meteors.createMeteors()
-            this.casters.createCasters()
             this.clearMobs.initializeClearMobs()
             if (Level.earningLivesActivated && this.getId() > 0) {
                 udg_lives.add(this.livesEarnedAtBeginning)
@@ -70,14 +66,13 @@ export class Level {
             this.monsters.removeMonstersUnits()
             this.monsterSpawns.desactivate()
             this.meteors.removeMeteors()
-            this.casters.removeCasters()
             udg_escapers.deleteSpecificActionsForLevel(this)
         }
 
         this.isActivatedB = activ
     }
 
-    checkpointReviveHeroes(finisher: Escaper) {
+    checkpointReviveHeroes(finisher: Escaper | null) {
         TrigCheckpointReviveHeroes_levelForReviving = this
         TrigCheckpointReviveHeroes_revivingFinisher = finisher
         TriggerExecute(TrigCheckpointReviveHeroes.gg_trg____Trig_checkpoint_revive_heroes)
@@ -135,11 +130,11 @@ export class Level {
     }
 
     refreshCastersOfType(ct: CasterType) {
-        this.casters.refreshCastersOfType(ct)
+        this.monsters.refreshCastersOfType(ct)
     }
 
     removeCastersOfType(ct: CasterType) {
-        this.casters.removeCastersOfType(ct)
+        this.monsters.removeCastersOfType(ct)
     }
 
     getId() {

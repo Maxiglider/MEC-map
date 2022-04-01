@@ -6,6 +6,7 @@ import { udg_escapers } from 'core/08_GAME/Init_structures/Init_escapers'
 import { udg_levels } from 'core/08_GAME/Init_structures/Init_struct_levels'
 import { Escaper } from '../Escaper/Escaper'
 import { Level } from '../Level/Level'
+import {MonsterType} from "../Monster/MonsterType";
 
 const DEFAULT_CASTER_PROJECTILE_SPEED = 600
 const MIN_CASTER_PROJECTILE_SPEED = 100

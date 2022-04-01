@@ -1,6 +1,5 @@
 import { BasicFunctions } from 'core/01_libraries/Basic_functions'
 import { NB_LIVES_AT_BEGINNING } from 'core/01_libraries/Constants'
-import { ColorCodes } from 'core/01_libraries/Init_colorCodes'
 import { Text } from 'core/01_libraries/Text'
 import { udg_escapers } from 'core/08_GAME/Init_structures/Init_escapers'
 import { udg_lives } from 'core/08_GAME/Init_structures/Init_lives'
@@ -9,6 +8,14 @@ import { gg_trg_apparition_dialogue_et_fermeture_automatique } from 'core/08_GAM
 import { Escaper } from '../Escaper/Escaper'
 import { Level } from './Level'
 import { LevelFunctions } from './Level_functions'
+import {MonsterType} from "../Monster/MonsterType";
+import {MonsterArray} from "../Monster/MonsterArray";
+import {CasterType} from "../Caster/CasterType";
+import {MeteorArray} from "../Meteor/MeteorArray";
+import {VisibilityModifierArray} from "./VisibilityModifierArray";
+import {ClearMobArray} from "../Monster_properties/ClearMobArray";
+import {MonsterSpawnArray} from "../MonsterSpawn/MonsterSpawnArray";
+import {udg_colorCode} from "../../01_libraries/Init_colorCodes";
 
 export const NB_MAX_LEVELS = 50
 
@@ -31,7 +38,7 @@ export class LevelArray {
         this.lastInstance = 0
     }
 
-    goToLevel = (finisher: Escaper, levelId: number): boolean => {
+    goToLevel = (finisher: Escaper | null, levelId: number): boolean => {
         let xCam: number
         let yCam: number
         let i: number
@@ -95,7 +102,7 @@ export class LevelArray {
         if (finisher !== null) {
             BasicFunctions.MoveCamExceptForPlayer(finisher.getPlayer(), xCam, yCam)
             Text.A(
-                ColorCodes.udg_colorCode[GetPlayerId(finisher.getPlayer())] +
+                udg_colorCode[GetPlayerId(finisher.getPlayer())] +
                     'Good job ' +
                     GetPlayerName(finisher.getPlayer()) +
                     ' !'
@@ -111,7 +118,7 @@ export class LevelArray {
             this.currentLevel = NB_MAX_LEVELS
             this.levels[0].activate(false)
         }
-        this.goToLevel(0, 0)
+        this.goToLevel(null, 0)
         udg_lives.setNb(this.levels[0].getNbLives())
         SetCameraPosition(this.levels[0].getStart().getCenterX(), this.levels[0].getStart().getCenterY())
         //coop
@@ -151,52 +158,8 @@ export class LevelArray {
         return this.levels[levelId]
     }
 
-    getLevelFromMonsterNoMoveArray = (ma: MonsterNoMoveArray) => {
-        let i = 0
-        while (true) {
-            if (i > this.lastInstance || this.levels[i].monstersNoMove == ma) break
-            i = i + 1
-        }
-        if (i > this.lastInstance) {
-            return null
-        }
-        return this.levels[i]
-    }
-
-    getLevelFromMonsterSimplePatrolArray = (ma: MonsterSimplePatrolArray) => {
-        let i = 0
-        while (true) {
-            if (i > this.lastInstance || this.levels[i].monstersSimplePatrol == ma) break
-            i = i + 1
-        }
-        if (i > this.lastInstance) {
-            return null
-        }
-        return this.levels[i]
-    }
-
-    getLevelFromMonsterMultiplePatrolsArray = (ma: MonsterMultiplePatrolsArray) => {
-        let i = 0
-        while (true) {
-            if (i > this.lastInstance || this.levels[i].monstersMultiplePatrols == ma) break
-            i = i + 1
-        }
-        if (i > this.lastInstance) {
-            return null
-        }
-        return this.levels[i]
-    }
-
-    getLevelFromMonsterTeleportArray = (ma: MonsterTeleportArray) => {
-        let i = 0
-        while (true) {
-            if (i > this.lastInstance || this.levels[i].monstersTeleport == ma) break
-            i = i + 1
-        }
-        if (i > this.lastInstance) {
-            return null
-        }
-        return this.levels[i]
+    getLevelFromMonsterArray = (ma: MonsterArray) => {
+        return ma.getLevel()
     }
 
     getLevelFromMonsterSpawnArray = (msa: MonsterSpawnArray) => {
@@ -235,18 +198,6 @@ export class LevelArray {
         return this.levels[i]
     }
 
-    getLevelFromCasterArray = (casterArray: CasterArray) => {
-        let i = 0
-        while (true) {
-            if (i > this.lastInstance || this.levels[i].casters == casterArray) break
-            i = i + 1
-        }
-        if (i > this.lastInstance) {
-            return null
-        }
-        return this.levels[i]
-    }
-
     getLevelFromClearMobArray = (clearMobArray: ClearMobArray) => {
         let i = 0
         while (true) {
@@ -259,21 +210,17 @@ export class LevelArray {
         return this.levels[i]
     }
 
-    removeMonstersOfType = (mt: MonsterType) => {
+    clearMonstersOfType = (mt: MonsterType) => {
         let i = 0
-        while (true) {
-            if (i > this.lastInstance) break
-            this.levels[i].removeMonstersOfType(mt)
+        while (i <= this.lastInstance) {
+            this.levels[i].clearMonstersOfType(mt)
             i = i + 1
         }
     }
 
     removeCastersOfType = (ct: CasterType) => {
-        let i = 0
-        while (true) {
-            if (i > this.lastInstance) break
+        for(let i = 0; i <= this.lastInstance; i++){
             this.levels[i].removeCastersOfType(ct)
-            i = i + 1
         }
     }
 
@@ -294,20 +241,3 @@ export class LevelArray {
     }
 }
 
-const ForceGetLevel = (levelId: number) => {
-    let i: number
-    let lastInstance: number
-    if (levelId < 0 || levelId >= NB_MAX_LEVELS) {
-        return null
-    }
-    if (udg_levels === 0) {
-        udg_levels = new LevelArray()
-    }
-    lastInstance = udg_levels.getLastLevelId()
-    while (true) {
-        if (lastInstance >= levelId) break
-        udg_levels.new()
-        lastInstance = udg_levels.getLastLevelId()
-    }
-    return udg_levels.get(levelId)
-}

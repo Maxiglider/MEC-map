@@ -1,5 +1,7 @@
 import { udg_levels } from 'core/08_GAME/Init_structures/Init_struct_levels'
-class MonsterSpawnArray {
+
+
+export class MonsterSpawnArray {
     //50 levels * 100 monster spawns
 
     private monsterSpawns: MonsterSpawn[]

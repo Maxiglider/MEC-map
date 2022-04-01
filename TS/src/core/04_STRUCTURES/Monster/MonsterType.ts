@@ -1,17 +1,71 @@
 import { udg_levels } from 'core/08_GAME/Init_structures/Init_struct_levels'
 import { IMMOLATION_SKILLS } from './Immolation_skills'
+import {
+    MAX_MOVE_SPEED,
+    NB_ESCAPERS,
+    NEUTRAL_PLAYER,
+    RED,
+    TERRAIN_DATA_DISPLAY_TIME
+} from "../../01_libraries/Constants";
+import {Level} from "../Level/Level";
+import {udg_escapers} from "../../08_GAME/Init_structures/Init_escapers";
+import {Ascii2String} from "../../01_libraries/Ascii";
+import {udg_colorCode} from "../../01_libraries/Init_colorCodes";
+import {Text} from 'core/01_libraries/Text'
+import {CACHE_SEPARATEUR_PARAM} from "../../07_TRIGGERS/Save_map_in_gamecache/struct_StringArrayForCache";
+import {BasicFunctions} from "../../01_libraries/Basic_functions";
 
 export class MonsterType {
     label: string
-    theAlias: string
+    theAlias?: string
     private unitTypeId: number
     private scale: number //influe sur la taille de l'unité ; 1.0 donne une taille normale
     private immolationSkill: number
     private speed: number
     private isClickableB: boolean
-    private killingEffectStr: string
+    private killingEffectStr?: string
     private maxLife: number
     private height: number
+
+    constructor(
+        label: string,
+        unitTypeId: number,
+        scale: number,
+        immolationRadius: number,
+        speed: number,
+        isClickable: boolean
+    ) {
+        if (speed <= 0 || speed > MAX_MOVE_SPEED){
+            throw this.constructor.name + " : wrong speed value \"" + speed + "\""
+        }
+
+        if(scale <= 0 && scale !== -1){
+            throw this.constructor.name + " : wrong scale value \"" + scale + "\""
+        }
+
+        if(!(immolationRadius / 5 === I2R(R2I(immolationRadius / 5))) ||
+            immolationRadius < 0 ||
+            immolationRadius > 400
+        ) {
+            throw this.constructor.name + " : wrong immolation radius \"" + immolationRadius + "\""
+        }
+
+        const testMonster = CreateUnit(NEUTRAL_PLAYER, unitTypeId, 0, 0, 0)
+        if (!testMonster) { //todomax check ingame that this error is thrown
+            throw this.constructor.name + " : test unit failed"
+        } else {
+            RemoveUnit(testMonster)
+        }
+
+        this.label = label
+        this.unitTypeId = unitTypeId
+        this.scale = scale
+        this.immolationSkill = IMMOLATION_SKILLS[R2I(immolationRadius / 5)]
+        this.speed = speed
+        this.isClickableB = isClickable
+        this.maxLife = 10000
+        this.height = -1
+    }
 
     setLabel = (label: string) => {
         this.label = label
@@ -22,90 +76,39 @@ export class MonsterType {
         return this
     }
 
-    // TODO; Used to be static
-    create = (
-        label: string,
-        unitTypeId: number,
-        scale: number,
-        immolationRadius: number,
-        speed: number,
-        isClickable: boolean
-    ): MonsterType => {
-        let mt: MonsterType
-        let testMonster: unit
-        if (
-            speed <= 0 ||
-            speed > MAX_MOVE_SPEED ||
-            (scale <= 0 && scale !== -1) ||
-            !(immolationRadius / 5 === I2R(R2I(immolationRadius / 5))) ||
-            immolationRadius < 0 ||
-            immolationRadius > 400
-        ) {
-            return 0
-        }
-        testMonster = CreateUnit(NEUTRAL_PLAYER, unitTypeId, 0, 0, 0)
-        if (testMonster === null) {
-            return 0
-        } else {
-            RemoveUnit(testMonster)
-            testMonster = null
-        }
-        mt = MonsterType.allocate()
-        mt.label = label
-        mt.theAlias = null
-        mt.unitTypeId = unitTypeId
-        mt.scale = scale
-        mt.immolationSkill = IMMOLATION_SKILLS[R2I(immolationRadius / 5)]
-        mt.speed = speed
-        mt.isClickableB = isClickable
-        mt.killingEffectStr = null
-        mt.maxLife = 10000
-        mt.height = -1
-        return mt
-    }
-
     refresh = () => {
         let levelsMaking: Level[] = []
-        let escaper: Escaper
-        let i: number
-        let j: number
         let levelAlreadyChecked: boolean
         let nbLevelsMaking = 0
         const currentLevel = udg_levels.getCurrentLevel()
-        currentLevel.recreateMonstersOfType(this)
-        i = 0
-        while (true) {
-            if (i >= NB_ESCAPERS) break
-            escaper = udg_escapers.get(i)
-            if (escaper !== 0) {
-                if (escaper.getMakingLevel() != currentLevel) {
-                    levelAlreadyChecked = false
-                    j = 0
-                    while (true) {
-                        if (j >= nbLevelsMaking) break
-                        if (escaper.getMakingLevel() == levelsMaking[j]) {
-                            levelAlreadyChecked = true
-                        }
-                        j = j + 1
-                    }
-                    if (!levelAlreadyChecked) {
-                        levelsMaking[nbLevelsMaking] = escaper.getMakingLevel()
-                        nbLevelsMaking = nbLevelsMaking + 1
+        currentLevel.recreateMonstersUnitsOfType(this)
+
+        for(let i = 0; i < NB_ESCAPERS; i++){
+            let escaper = udg_escapers.get(i)
+            if (escaper && escaper.getMakingLevel() != currentLevel) {
+                levelAlreadyChecked = false
+
+                for(let j = 0; j < nbLevelsMaking; j++){
+                    if (escaper.getMakingLevel() == levelsMaking[j]) {
+                        levelAlreadyChecked = true
+                        break
                     }
                 }
+
+                if (!levelAlreadyChecked) {
+                    levelsMaking[nbLevelsMaking] = escaper.getMakingLevel()
+                    nbLevelsMaking++
+                }
             }
-            i = i + 1
         }
-        i = 0
-        while (true) {
-            if (i >= nbLevelsMaking) break
-            levelsMaking[i].recreateMonstersOfType(this)
-            i = i + 1
+
+        for(let i = 0; i < nbLevelsMaking; i++){
+            levelsMaking[i].recreateMonstersUnitsOfType(this)
         }
     }
 
     destroy = () => {
-        udg_levels.removeMonstersOfType(this)
+        udg_levels.clearMonstersOfType(this)
     }
 
     getUnitTypeId = (): number => {
@@ -114,11 +117,12 @@ export class MonsterType {
 
     setUnitTypeId = (unitTypeId: number): boolean => {
         let testMonster = CreateUnit(NEUTRAL_PLAYER, unitTypeId, 0, 0, 0)
-        if (testMonster === null) {
+        if (!testMonster) { //todomax check if this condition works
             return false
         }
+
         RemoveUnit(testMonster)
-        testMonster = null
+
         this.unitTypeId = unitTypeId
         this.refresh()
         return true
@@ -180,7 +184,7 @@ export class MonsterType {
         return true
     }
 
-    getKillingEffectStr = (): string => {
+    getKillingEffectStr() {
         return this.killingEffectStr
     }
 

@@ -44,11 +44,7 @@ export const EscaperArray = () => {
     }
 
     const get = (id: number) => {
-        if (!escapers[id]) {
-            throw new Error()
-        }
-
-        return escapers[id]!
+        return escapers[id]
     }
 
     const nullify = (id: number) => {
