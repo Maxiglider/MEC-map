@@ -22,7 +22,7 @@ export class MonsterNoMove extends Monster {
 
     createUnit() {
         super.createUnit(() => (
-            NewImmobileMonster(this.mt, this.x, this.y, this.angle)
+            this.mt ? NewImmobileMonster(this.mt, this.x, this.y, this.angle) : undefined
         ))
     }
 
@@ -31,10 +31,5 @@ export class MonsterNoMove extends Monster {
         str += CACHE_SEPARATEUR_PARAM + I2S(R2I(this.x)) + CACHE_SEPARATEUR_PARAM + I2S(R2I(this.y))
         str = str + CACHE_SEPARATEUR_PARAM + I2S(R2I(this.angle))
         return str
-    }
-
-    destroy(){
-        this.level && this.level.monstersNoMove.setMonsterNull(this.id)
-        super.destroy()
     }
 }

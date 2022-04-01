@@ -144,7 +144,7 @@ export class MonsterMultiplePatrols extends Monster {
         }
 
         super.createUnit(() => (
-            NewPatrolMonster(this.mt, this.x[0], this.y[0], this.x[1], this.y[1])
+            this.mt ? NewPatrolMonster(this.mt, this.x[0], this.y[0], this.x[1], this.y[1]) : undefined
         ))
     
         this.currentMove = 1

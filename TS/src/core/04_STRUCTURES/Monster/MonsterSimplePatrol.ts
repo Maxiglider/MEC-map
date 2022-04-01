@@ -69,7 +69,7 @@ export class MonsterSimplePatrol extends Monster {
 
     createUnit = (): void => {
         super.createUnit(() => (
-            NewPatrolMonster(this.mt, this.x1, this.y1, this.x2, this.y2)
+            this.mt ? NewPatrolMonster(this.mt, this.x1, this.y1, this.x2, this.y2) : undefined
         ))
 
         this.u && GroupAddUnit(simplePatrolMobs, this.u)
@@ -80,10 +80,5 @@ export class MonsterSimplePatrol extends Monster {
         str += CACHE_SEPARATEUR_PARAM + I2S(R2I(this.x1)) + CACHE_SEPARATEUR_PARAM + I2S(R2I(this.y1))
         str += CACHE_SEPARATEUR_PARAM + I2S(R2I(this.x2)) + CACHE_SEPARATEUR_PARAM + I2S(R2I(this.y2))
         return str
-    }
-
-    destroy(){
-        this.level && this.level.monstersSimplePatrol.setMonsterNull(this.id)
-        super.destroy()
     }
 }

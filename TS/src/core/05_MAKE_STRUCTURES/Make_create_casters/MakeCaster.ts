@@ -1,4 +1,6 @@
 import { Make } from 'core/05_MAKE_STRUCTURES/Make/Make'
+import {Caster} from "../../04_STRUCTURES/Caster/Caster";
+import {MakeCasterAction} from "../../04_STRUCTURES/MakeLastActions/MakeCasterAction";
 
 export class MakeCaster extends Make {
     private casterType: CasterType
@@ -21,9 +23,8 @@ export class MakeCaster extends Make {
 
     doActions() {
         if (super.doBaseActions()) {
-            const caster = this.escaper
-                .getMakingLevel()
-                .casters.new(this.getCasterType(), this.orderX, this.orderY, this.getAngle(), true)
+            const caster = new Caster(this.getCasterType(), this.orderX, this.orderY, this.getAngle())
+            this.escaper.getMakingLevel().monsters.new(caster, true)
             this.escaper.newAction(new MakeCasterAction(this.escaper.getMakingLevel(), caster))
         }
     }

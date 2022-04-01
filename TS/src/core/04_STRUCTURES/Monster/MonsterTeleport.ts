@@ -124,7 +124,7 @@ export class MonsterTeleport extends Monster {
         }
 
         super.createUnit(() => (
-            NewImmobileMonster(this.mt, this.x[0], this.y[0], this.angle)
+            this.mt ? NewImmobileMonster(this.mt, this.x[0], this.y[0], this.angle) : undefined
         ))
         
         this.currentLoc = 0
@@ -167,7 +167,7 @@ export class MonsterTeleport extends Monster {
             } else if (x !== WAIT || y !== WAIT) {
                 if (IsUnitHidden(this.u)) {
                     ShowUnit(this.u, true)
-                    if (!this.mt.isClickable()) {
+                    if (this.mt && !this.mt.isClickable()) {
                         UnitRemoveAbility(this.u, FourCC('Aloc'))
                         UnitAddAbility(this.u, FourCC('Aloc'))
                     }

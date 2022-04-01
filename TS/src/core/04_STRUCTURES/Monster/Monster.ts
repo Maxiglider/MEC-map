@@ -34,10 +34,10 @@ export abstract class Monster {
 
     id: number
     u?: unit
-    mt: MonsterType
+    mt?: MonsterType
     level?: Level
     life: number
-    createUnitFunc?: () => unit
+    createUnitFunc?: () => unit | undefined
 
     //color
     private baseColorId: number
@@ -47,12 +47,12 @@ export abstract class Monster {
     private vcTransparency: number
 
     //disabling
-    private disablingTimer?: timer
+    protected disablingTimer?: timer
 
     //clear mob that this mob is trigger mob
-    private clearMob?: ClearMob
+    protected clearMob?: ClearMob
 
-    constructor(monsterType: MonsterType) {
+    constructor(monsterType?: MonsterType) {
         this.mt = monsterType
         this.id = udg_monsters.length
         udg_monsters[this.id] = this
@@ -98,7 +98,7 @@ export abstract class Monster {
         }
     }
 
-    createUnit(createUnitFunc?: () => unit){
+    createUnit(createUnitFunc?: () => unit | undefined){
         if(createUnitFunc){
             this.createUnitFunc = createUnitFunc
         }
@@ -114,11 +114,11 @@ export abstract class Monster {
         }
         this.u = this.createUnitFunc()
 
-        SetUnitUserData(this.u, this.id)
+        this.u && SetUnitUserData(this.u, this.id)
 
-        if (this.mt.isClickable()) {
+        if (this.mt && this.mt.isClickable()) {
             this.life = this.mt.getMaxLife()
-            GroupAddUnit(MonstersClickableSetLife.monstersClickable, this.u)
+            this.u && GroupAddUnit(MonstersClickableSetLife.monstersClickable, this.u)
         }
 
         if (previouslyEnabled) {
@@ -130,12 +130,12 @@ export abstract class Monster {
             }
             if (this.baseColorId !== -1) {
                 if (this.baseColorId === 0) {
-                    SetUnitColor(this.u, PLAYER_COLOR_RED)
+                    this.u && SetUnitColor(this.u, PLAYER_COLOR_RED)
                 } else {
-                    SetUnitColor(this.u, ConvertPlayerColor(this.baseColorId))
+                    this.u && SetUnitColor(this.u, ConvertPlayerColor(this.baseColorId))
                 }
             }
-            SetUnitVertexColorBJ(this.u, this.vcRed, this.vcGreen, this.vcBlue, this.vcTransparency)
+            this.u && SetUnitVertexColorBJ(this.u, this.vcRed, this.vcGreen, this.vcBlue, this.vcTransparency)
         }
         if (this.clearMob) {
             this.clearMob.redoTriggerMobPermanentEffect()
@@ -155,7 +155,7 @@ export abstract class Monster {
         }
     }
 
-    getMonsterType = (): MonsterType => {
+    getMonsterType(){
         return this.mt
     }
 
@@ -175,7 +175,7 @@ export abstract class Monster {
             TimerGetRemaining(disablingTimer) > TimerGetRemaining(this.disablingTimer)
         ) {
             this.disablingTimer = disablingTimer
-            this.u && UnitRemoveAbility(this.u, this.mt.getImmolationSkill())
+            this.mt && this.u && UnitRemoveAbility(this.u, this.mt.getImmolationSkill())
             this.u && SetUnitVertexColorBJ(this.u, this.vcRed, this.vcGreen, this.vcBlue, Monster.DISABLE_TRANSPARENCY)
             this.vcTransparency = Monster.DISABLE_TRANSPARENCY
         }
@@ -183,7 +183,7 @@ export abstract class Monster {
 
     temporarilyEnable = (disablingTimer: timer) => {
         if (this.disablingTimer === disablingTimer) {
-            this.u && UnitAddAbility(this.u, this.mt.getImmolationSkill())
+            this.mt && this.u && UnitAddAbility(this.u, this.mt.getImmolationSkill())
             this.u && SetUnitVertexColorBJ(this.u, this.vcRed, this.vcGreen, this.vcBlue, 0)
             this.vcTransparency = 0
         }
@@ -254,16 +254,20 @@ export abstract class Monster {
         if(this.level){
             this.level.monsters.removeMonster(this.id)
         }
+
+        this.level && this.level.monsters.removeMonster(this.id)
     }
 
     toString(){
-        let str: string
-        if (this.mt.theAlias != null && this.mt.theAlias != '') {
-            str = this.mt.theAlias + CACHE_SEPARATEUR_PARAM
-        } else {
-            str = this.mt.label + CACHE_SEPARATEUR_PARAM
+        let str: string = ''
+        if(this.mt) {
+            if (this.mt.theAlias != null && this.mt.theAlias != '') {
+                str = this.mt.theAlias + CACHE_SEPARATEUR_PARAM
+            } else {
+                str = this.mt.label + CACHE_SEPARATEUR_PARAM
+            }
+            str = str + I2S(this.id)
         }
-        str = str + I2S(this.id)
         return str
     }
 }
