@@ -1,3 +1,4 @@
+import { udg_levels } from 'core/08_GAME/Init_structures/Init_struct_levels'
 import { IMMOLATION_SKILLS } from './Immolation_skills'
 
 export class MonsterType {

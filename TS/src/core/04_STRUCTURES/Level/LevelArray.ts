@@ -5,8 +5,8 @@ import { Text } from 'core/01_libraries/Text'
 import { udg_escapers } from 'core/08_GAME/Init_structures/Init_escapers'
 import { udg_lives } from 'core/08_GAME/Init_structures/Init_lives'
 import { udg_levels } from 'core/08_GAME/Init_structures/Init_struct_levels'
+import { gg_trg_apparition_dialogue_et_fermeture_automatique } from 'core/08_GAME/Mode_coop/creation_dialogue'
 import { Escaper } from '../Escaper/Escaper'
-import { MonsterNoMoveArray } from '../Monster/MonsterNoMoveArray'
 import { Level } from './Level'
 import { LevelFunctions } from './Level_functions'
 
@@ -69,7 +69,7 @@ export class LevelArray {
         }
         xCam = this.levels[levelId].getStart().getCenterX()
         yCam = this.levels[levelId].getStart().getCenterY()
-        if (finisher !== 0) {
+        if (finisher !== null) {
             BasicFunctions.MoveCamExceptForPlayer(finisher.getPlayer(), xCam, yCam)
         } else {
             SetCameraPosition(xCam, yCam)
@@ -92,7 +92,7 @@ export class LevelArray {
         this.levels[this.currentLevel].checkpointReviveHeroes(finisher)
         xCam = this.levels[this.currentLevel].getStart().getCenterX()
         yCam = this.levels[this.currentLevel].getStart().getCenterY()
-        if (finisher !== 0) {
+        if (finisher !== null) {
             BasicFunctions.MoveCamExceptForPlayer(finisher.getPlayer(), xCam, yCam)
             Text.A(
                 ColorCodes.udg_colorCode[GetPlayerId(finisher.getPlayer())] +

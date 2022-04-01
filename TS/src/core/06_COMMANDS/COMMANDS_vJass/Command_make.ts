@@ -5,7 +5,7 @@ import {
     HERO_WALK_SPEED,
     MAX_MOVE_SPEED,
     RED,
-    TERRAIN_DEATH_TIME_TO_KILL,
+    TERRAIN_DEATH_TIME_TO_KILL
 } from 'core/01_libraries/Constants'
 import { FunctionsOnNumbers } from 'core/01_libraries/Functions_on_numbers'
 import { ColorCodes } from 'core/01_libraries/Init_colorCodes'
@@ -15,13 +15,14 @@ import { Level } from 'core/04_STRUCTURES/Level/Level'
 import { DEATH_TERRAIN_MAX_TOLERANCE } from 'core/04_STRUCTURES/TerrainType/TerrainTypeDeath'
 import { ExchangeTerrains } from 'core/07_TRIGGERS/Triggers_to_modify_terrains/Exchange_terrains'
 import { RandomizeTerrains } from 'core/07_TRIGGERS/Triggers_to_modify_terrains/Randomize_terrains'
+import { udg_levels } from 'core/08_GAME/Init_structures/Init_struct_levels'
 import { udg_casterTypes, udg_monsterTypes, udg_terrainTypes } from '../../../../globals'
 import { Ascii } from '../../01_libraries/Ascii'
 import { MonsterTeleportt } from '../../04_STRUCTURES/Monster/MonsterTeleport'
 import { TerrainTypeFromString } from '../../07_TRIGGERS/Modify_terrain_Functions/Terrain_type_from_string'
 import {
     CACHE_SEPARATEUR_ITEM,
-    CACHE_SEPARATEUR_PARAM,
+    CACHE_SEPARATEUR_PARAM
 } from '../../07_TRIGGERS/Save_map_in_gamecache/struct_StringArrayForCache'
 import { ChangeAllTerrains } from '../../07_TRIGGERS/Triggers_to_modify_terrains/Change_all_terrains'
 import { ChangeOneTerrain } from '../../07_TRIGGERS/Triggers_to_modify_terrains/Change_one_terrain'
