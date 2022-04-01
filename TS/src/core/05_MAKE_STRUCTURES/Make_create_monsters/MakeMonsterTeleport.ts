@@ -195,11 +195,10 @@ export class MakeMonsterTeleport extends Make {
                 MonsterTeleport.destroyLocs()
                 MonsterTeleport.storeNewLoc(this.orderX, this.orderY)
                 this.saveLoc(this.orderX, this.orderY)
-                this.setMonster(
-                    this.escaper
-                        .getMakingLevel()
-                        .monstersTeleport.new(this.getMonsterType(), this.getPeriod(), this.getAngle(), this.getMode(), true)
-                )
+
+                const monster = new MonsterTeleport(this.getMonsterType(), this.getPeriod(), this.getAngle(), this.getMode())
+                this.escaper.getMakingLevel().monsters.new(monster, true)
+                this.setMonster(monster)
             }
         }
     }

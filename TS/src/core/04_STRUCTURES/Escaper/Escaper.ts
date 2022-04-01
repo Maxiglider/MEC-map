@@ -28,6 +28,10 @@ import { LevelFunctions } from '../Level/Level_functions'
 import { DEPART_PAR_DEFAUT, Start } from '../Level/StartAndEnd'
 import { EscaperEffectArray, IEscaperEffectArray } from './EscaperEffectArray'
 import { EscaperFunctions } from './Escaper_functions'
+import {Level} from "../Level/Level";
+import {MakeDoNothing} from "../../05_MAKE_STRUCTURES/Make_do_nothing/MakeDoNothing";
+import {MakeMonsterNoMove} from "../../05_MAKE_STRUCTURES/Make_create_monsters/MakeMonsterNoMove";
+import {MonsterType} from "../Monster/MonsterType";
 
 const SHOW_REVIVE_EFFECTS = false
 
@@ -981,11 +985,12 @@ export class Escaper {
         return true
     }
 
-    getMakingLevel() {
-        if (this.makingLevel == 0) {
+    getMakingLevel(): Level {
+        if (this.makingLevel) {
+            return this.makingLevel
+        }else{
             return udg_levels.getCurrentLevel()
         }
-        return this.makingLevel
     }
 
     isMakingCurrentLevel() {

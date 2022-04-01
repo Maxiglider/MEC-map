@@ -6,6 +6,7 @@ import { Text } from "core/01_libraries/Text";
 import {PATROL_DISTANCE_MIN} from "../../01_libraries/Constants";
 import {MakeMonsterAction} from "../../04_STRUCTURES/MakeLastActions/MakeMonsterAction";
 import {IsTerrainTypeOfKind} from "../../04_STRUCTURES/TerrainType/Terrain_type_functions";
+import {MonsterSimplePatrol} from "../../04_STRUCTURES/Monster/MonsterSimplePatrol";
 
 const {GetLocDist} = BasicFunctions
 
@@ -54,7 +55,7 @@ export class MakeMonsterSimplePatrol extends MakeOneByOneOrTwoClicks {
 
     doActions() {
         if (super.doBaseActions()) {
-            let monster: Monster
+            let monster: MonsterSimplePatrol | null = null
             let x1: number = 0
             let y1: number = 0
             let x2: number = 0
@@ -70,10 +71,7 @@ export class MakeMonsterSimplePatrol extends MakeOneByOneOrTwoClicks {
                         Text.erP(this.makerOwner, 'Too close to the start location !')
                         return
                     } else {
-                        monster = this.escaper
-                            .getMakingLevel()
-                            .monstersSimplePatrol.new(this.getMonsterType(), this.lastX, this.lastY, this.orderX, this.orderY, true)
-                        this.escaper.newAction(new MakeMonsterAction(this.escaper.getMakingLevel(), monster))
+                        monster = new MonsterSimplePatrol(this.getMonsterType(), this.lastX, this.lastY, this.orderX, this.orderY)
                         
                         if(this.getMode() == 'normal'){
                             this.unsaveLocDefinitely()
@@ -189,7 +187,11 @@ export class MakeMonsterSimplePatrol extends MakeOneByOneOrTwoClicks {
                 y2 = this.orderY + dist * SinBJ(angle)
 
                 //the two locations were found, creating monster
-                monster = this.escaper.getMakingLevel().monstersSimplePatrol.new(this.getMonsterType(), x1, y1, x2, y2, true)
+                monster = new MonsterSimplePatrol(this.getMonsterType(), x1, y1, x2, y2)
+            }
+
+            if(monster){
+                this.escaper.getMakingLevel().monsters.new(monster, true)
                 this.escaper.newAction(new MakeMonsterAction(this.escaper.getMakingLevel(), monster))
             }
         }

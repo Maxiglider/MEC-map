@@ -1,7 +1,7 @@
 import { Text } from 'core/01_libraries/Text'
 import { udg_lives } from 'core/08_GAME/Init_structures/Init_lives'
 import { TrigCheckpointReviveHeroes } from './Trig_checkpoint_revive_heroes'
-import {MonstersArray} from "../Monster/MonstersArray";
+import {MonsterArray} from "../Monster/MonsterArray";
 import {VisibilityModifierArray} from "./VisibilityModifierArray";
 import {TriggerArray} from "./Triggers";
 import {MeteorArray} from "../Meteor/MeteorArray";
@@ -26,7 +26,7 @@ export class Level {
     private triggers: TriggerArray
 
     visibilities: VisibilityModifierArray
-    monsters: MonstersArray
+    monsters: MonsterArray
     monsterSpawns: MonsterSpawnArray
     meteors: MeteorArray
     casters: CasterArray
@@ -35,7 +35,7 @@ export class Level {
     constructor() {
         this.visibilities = new VisibilityModifierArray()
         this.triggers = new TriggerArray()
-        this.monsters = new MonstersArray(this)
+        this.monsters = new MonsterArray(this)
         this.monsterSpawns = new MonsterSpawnArray()
         this.meteors = new MeteorArray()
         this.casters = new CasterArray()

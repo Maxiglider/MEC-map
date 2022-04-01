@@ -10,7 +10,7 @@ export const MONSTER_NEAR_DIFF_MAX = 64
 
 
 //represents the monsters in a level
-export class MonstersArray {
+export class MonsterArray {
     private monsters: Monster[] //same ids as in udg_monsters
     private level: Level
 

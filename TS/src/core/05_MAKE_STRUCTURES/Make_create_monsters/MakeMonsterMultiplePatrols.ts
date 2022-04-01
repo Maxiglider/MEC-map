@@ -145,7 +145,10 @@ export class MakeMonsterMultiplePatrols extends Make {
                 MonsterMultiplePatrols.destroyLocs()
                 MonsterMultiplePatrols.storeNewLoc(this.orderX, this.orderY)
                 this.saveLoc(this.orderX, this.orderY)
-                this.setMonster(this.escaper.getMakingLevel().monstersMultiplePatrols.new(this.getMonsterType(), this.getMode(), true))
+
+                const monster = new MonsterMultiplePatrols(this.getMonsterType(), this.getMode())
+                this.escaper.getMakingLevel().monsters.new(monster, true)
+                this.setMonster(monster)
             }
         }
     }
