@@ -1,4 +1,5 @@
 import { BasicFunctions } from 'core/01_libraries/Basic_functions'
+import { udg_terrainTypes } from '../../../../globals'
 import { METEOR_CHEAT, METEOR_NORMAL } from './Meteor'
 
 const initMeteorFunctions = () => {

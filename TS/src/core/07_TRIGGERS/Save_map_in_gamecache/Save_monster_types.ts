@@ -1,4 +1,5 @@
 import { Text } from 'core/01_libraries/Text'
+import { udg_monsterTypes } from '../../../../globals'
 import { SaveCasterTypes } from './Save_caster_types'
 
 const initSaveMonsterTypes = () => {

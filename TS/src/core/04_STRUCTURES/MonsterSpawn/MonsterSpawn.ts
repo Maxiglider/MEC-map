@@ -1,3 +1,4 @@
+import { udg_monsterTypes } from '../../../../globals'
 const initMonsterSpawn = () => {
     const RemoveEnumMonster = (): void => {
         RemoveUnit(GetEnumUnit())

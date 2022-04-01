@@ -1,3 +1,4 @@
+import { udg_terrainTypes } from '../../../../globals'
 class MakeTerrainCopyPasteAction {
     // extends MakeAction
 

@@ -1,4 +1,5 @@
-import {TerrainType} from "./TerrainType";
+import { udg_terrainTypes } from '../../../../globals'
+import { TerrainType } from './TerrainType'
 
 export const TerrainTypeId2TerrainType = (terrainTypeId: number): TerrainType | null => {
     let i = 0
@@ -38,4 +39,3 @@ export const IsTerrainTypeOfKind = (terrainTypeId: number, terrainTypeKind: stri
     }
     return terrainTypeKind == terrainType.getKind()
 }
-

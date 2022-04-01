@@ -3,6 +3,7 @@
 import { DUMMY_POWER_CIRCLE, GM_KILLING_EFFECT } from 'core/01_libraries/Constants'
 import { MonsterOrCaster } from 'core/04_STRUCTURES/MonsterOrCaster/MonsterOrCaster'
 import { createEvent } from 'Utils/mapUtils'
+import { udg_monsterTypes } from '../../../../globals'
 import { udg_escapers } from '../Init_structures/Init_escapers'
 
 export const InitTrig_InvisUnit_is_getting_damage = () => {

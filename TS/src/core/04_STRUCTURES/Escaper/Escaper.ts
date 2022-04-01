@@ -17,6 +17,7 @@ import {
 } from 'core/01_libraries/Constants'
 import { AfkMode } from 'core/08_GAME/Afk_mode/Afk_mode'
 import { udg_escapers } from 'core/08_GAME/Init_structures/Init_escapers'
+import { udg_terrainTypes } from '../../../../globals'
 import { CheckTerrainTrigger } from '../../07_TRIGGERS/Slide_and_CheckTerrain_triggers/CheckTerrain'
 import { SlideTrigger } from '../../07_TRIGGERS/Slide_and_CheckTerrain_triggers/Slide'
 import { Trig_InvisUnit_is_getting_damage } from '../../08_GAME/Death/InvisUnit_is_getting_damage'

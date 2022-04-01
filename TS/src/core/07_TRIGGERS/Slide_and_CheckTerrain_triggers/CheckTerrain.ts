@@ -4,6 +4,7 @@ import { EscaperFunctions } from 'core/04_STRUCTURES/Escaper/Escaper_functions'
 import { MeteorFunctions } from 'core/04_STRUCTURES/Meteor/Meteor_functions'
 import { udg_escapers } from 'core/08_GAME/Init_structures/Init_escapers'
 import { createEvent } from 'Utils/mapUtils'
+import { udg_terrainTypes } from '../../../../globals'
 import { AutoContinueAfterSliding } from './Auto_continue_after_sliding'
 
 const initCheckTerrainTrigger = () => {
