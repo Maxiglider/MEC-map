@@ -1,6 +1,7 @@
 import { COOP_REVIVE_DIST, NB_ESCAPERS } from 'core/01_libraries/Constants'
 import { EscaperFunctions } from 'core/04_STRUCTURES/Escaper/Escaper_functions'
 import { createEvent } from 'Utils/mapUtils'
+import { udg_terrainTypes } from '../../../../globals'
 import { Globals } from '../../09_From_old_Worldedit_triggers/globals_variables_and_triggers'
 import { AfkMode } from '../Afk_mode/Afk_mode'
 import { udg_escapers } from '../Init_structures/Init_escapers'

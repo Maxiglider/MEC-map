@@ -103,7 +103,7 @@ function updateTSConfig(mapFolder: string) {
     plugin.entryFile = path.resolve(tsconfig.tstl.luaBundleEntry).replace(/\\/g, '/')
     plugin.outputDir = path.resolve('dist', mapFolder).replace(/\\/g, '/')
 
-    writeFileSync('tsconfig.json', JSON.stringify(tsconfig, undefined, 2))
+    writeFileSync('tsconfig.json', JSON.stringify(tsconfig, undefined, 4))
 }
 
 /**
