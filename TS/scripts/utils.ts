@@ -23,7 +23,7 @@ export interface IProjectConfig {
 export function loadJsonFile(fname: string) {
     try {
         return JSON.parse(fs.readFileSync(fname).toString())
-    } catch (e) {
+    } catch (e: any) {
         logger.error(e.toString())
         return {}
     }
@@ -153,7 +153,7 @@ export function compileMap(config: IProjectConfig) {
         }
         //contents = luamin.minify(contents);
         fs.writeFileSync(mapLua, contents)
-    } catch (err) {
+    } catch (err: any) {
         logger.error(err.toString())
         return false
     }
