@@ -13,7 +13,7 @@ import {
     NEUTRAL_PLAYER,
     POWER_CIRCLE,
     SLIDE_PERIOD,
-    TERRAIN_KILL_EFFECT_BODY_PART
+    TERRAIN_KILL_EFFECT_BODY_PART,
 } from 'core/01_libraries/Constants'
 import { udg_colorCode } from 'core/01_libraries/Init_colorCodes'
 import { Text } from 'core/01_libraries/Text'
@@ -35,9 +35,9 @@ import { AfkMode } from 'core/08_GAME/Afk_mode/Afk_mode'
 import { udg_escapers } from 'core/08_GAME/Init_structures/Init_escapers'
 import { udg_coop_index_son } from 'core/08_GAME/Mode_coop/coop_init_sounds'
 import { udg_terrainTypes } from '../../../../globals'
-import { Make } from "../../05_MAKE_STRUCTURES/Make/Make"
-import { MakeMonsterNoMove } from "../../05_MAKE_STRUCTURES/Make_create_monsters/MakeMonsterNoMove"
-import { MakeDoNothing } from "../../05_MAKE_STRUCTURES/Make_do_nothing/MakeDoNothing"
+import { Make } from '../../05_MAKE_STRUCTURES/Make/Make'
+import { MakeMonsterNoMove } from '../../05_MAKE_STRUCTURES/Make_create_monsters/MakeMonsterNoMove'
+import { MakeDoNothing } from '../../05_MAKE_STRUCTURES/Make_do_nothing/MakeDoNothing'
 import { CheckTerrainTrigger } from '../../07_TRIGGERS/Slide_and_CheckTerrain_triggers/CheckTerrain'
 import { SlideTrigger } from '../../07_TRIGGERS/Slide_and_CheckTerrain_triggers/Slide'
 import { Trig_InvisUnit_is_getting_damage } from '../../08_GAME/Death/InvisUnit_is_getting_damage'
@@ -45,11 +45,11 @@ import { Heroes } from '../../08_GAME/Init_game/Heroes'
 import { MessageHeroDies } from '../../08_GAME/Init_game/Message_heroDies'
 import { udg_levels } from '../../08_GAME/Init_structures/Init_struct_levels'
 import { CommandShortcuts } from '../../08_GAME/Shortcuts/Command_shortcuts_functions'
-import { Level } from "../Level/Level"
+import { Level } from '../Level/Level'
 import { LevelFunctions } from '../Level/Level_functions'
 import { DEPART_PAR_DEFAUT } from '../Level/StartAndEnd'
 import { MakeAction } from '../MakeLastActions/MakeAction'
-import { MakeLastActions } from "../MakeLastActions/MakeLastActions"
+import { MakeLastActions } from '../MakeLastActions/MakeLastActions'
 import { MakeExchangeTerrains } from '../Make_exchange_terrains/MakeExchangeTerrains'
 import { MakeGetTerrainType } from '../Make_get_info/MakeGetTerrainType'
 import { MakeEnd } from '../Make_start_end_visibilityModifier/MakeEnd'
@@ -60,9 +60,9 @@ import { MakeTerrainCreate } from '../Make_terrain/MakeTerrainCreate'
 import { MakeTerrainHorizontalSymmetry } from '../Make_terrain/MakeTerrainHorizontalSymmetry'
 import { MakeTerrainVerticalSymmetry } from '../Make_terrain/MakeTerrainVerticalSymmetry'
 import { MakeTerrainHeight } from '../Make_terrain_height/MakeTerrainHeight'
-import { Meteor, METEOR_NORMAL } from "../Meteor/Meteor"
-import { MonsterType } from "../Monster/MonsterType"
-import { TerrainType } from "../TerrainType/TerrainType"
+import { Meteor, METEOR_NORMAL } from '../Meteor/Meteor'
+import { MonsterType } from '../Monster/MonsterType'
+import { TerrainType } from '../TerrainType/TerrainType'
 import { TerrainTypeSlide } from '../TerrainType/TerrainTypeSlide'
 import { TerrainTypeWalk } from '../TerrainType/TerrainTypeWalk'
 import { EscaperEffectArray, IEscaperEffectArray } from './EscaperEffectArray'
@@ -280,7 +280,7 @@ export class Escaper {
     createHeroAtStart() {
         let x: number
         let y: number
-        let start?: Start = udg_levels.getCurrentLevel().getStart()
+        let start = udg_levels.getCurrentLevel().getStart()
         let angle: number
 
         if (!start) {
@@ -1023,7 +1023,7 @@ export class Escaper {
     getMakingLevel(): Level {
         if (this.makingLevel) {
             return this.makingLevel
-        }else{
+        } else {
             return udg_levels.getCurrentLevel()
         }
     }
