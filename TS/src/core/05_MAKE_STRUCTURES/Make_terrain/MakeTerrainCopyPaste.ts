@@ -117,8 +117,10 @@ export class MakeTerrainCopyPaste extends Make {
                         const action = new MakeTerrainCopyPasteAction(this.x1, this.y1, this.x2, this.y2, this.x3, this.y3, x, y)
                         this.unsaveLocsDefinitely()
                         this.escaper.newAction(action)
-                    }catch(e){
-                        Text.erP(this.makerOwner, 'paste zone out of bounds')
+                    }catch(error){
+                        if(typeof error == 'string')                        {
+                            Text.erP(this.makerOwner, error)
+                        }
                     }
                 }
             }

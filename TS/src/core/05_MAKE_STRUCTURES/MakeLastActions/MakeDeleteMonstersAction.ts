@@ -1,98 +1,59 @@
 import { Level } from '../../04_STRUCTURES/Level/Level'
 import { Monster } from '../../04_STRUCTURES/Monster/Monster'
+import {MakeAction} from "./MakeAction";
+import {Text} from "../../01_libraries/Text";
 
-class MakeDeleteMonstersAction {
-    // extends MakeAction
+class MakeDeleteMonstersAction extends MakeAction {
+    private suppressedMonsters: Monster[]
 
-    static suppressions: hashtable
-    static suppressionLastId: number
+    constructor(level: Level, suppressedMonsters: Monster[]) {
+        super(level)
 
-    private suppressionId: number
-    private level: Level
-
-    private static onInit = (): void => {
-        MakeDeleteMonstersAction.suppressions = InitHashtable()
-        MakeDeleteMonstersAction.suppressionLastId = -1
-    }
-
-    static newSuppression = (suppression: hashtable): number => {
-        let i: number
-        let suppressionId = MakeDeleteMonstersAction.suppressionLastId + 1
-        MakeDeleteMonstersAction.suppressionLastId = suppressionId
-        i = 0
-        while (true) {
-            if (!HaveSavedInteger(suppression, 0, i)) break
-            SaveInteger(MakeDeleteMonstersAction.suppressions, suppressionId, i, LoadInteger(suppression, 0, i))
-            i = i + 1
+        if(suppressedMonsters.length == 0){
+            throw "no monster suppressed"
         }
-        return suppressionId
+
+        this.suppressedMonsters = suppressedMonsters
     }
 
-    static removeSuppression = (suppressionId: number): void => {
-        FlushChildHashtable(MakeDeleteMonstersAction.suppressions, suppressionId)
-    }
-
-    getLevel = (): Level => {
-        return this.level
-    }
-
-    static create = (level: Level, suppression: hashtable): MakeDeleteMonstersAction => {
-        let a: MakeDeleteMonstersAction
-        if (suppression === null) {
-            return 0
-        }
-        a = MakeDeleteMonstersAction.allocate()
-        a.isActionMadeB = true
-        a.suppressionId = MakeDeleteMonstersAction.newSuppression(suppression)
-        a.level = level
-        return a
-    }
-
-    onDestroy = (): void => {
-        let i: number
+    destroy = (): void => {
         if (this.isActionMadeB) {
             //suppression définitive des mobs
-            i = 0
-            while (true) {
-                if (!HaveSavedInteger(MakeDeleteMonstersAction.suppressions, this.suppressionId, i)) break
-                Monster(LoadInteger(MakeDeleteMonstersAction.suppressions, this.suppressionId, i)).destroy()
-                i = i + 1
-            }
+            this.suppressedMonsters.map(monster => {
+                monster.destroy()
+            })
         }
-        MakeDeleteMonstersAction.removeSuppression(this.suppressionId)
     }
 
     cancel = (): boolean => {
-        let i: number
         if (!this.isActionMadeB) {
             return false
         }
+
         //création des monstres supprimés
-        i = 0
-        while (true) {
-            if (!HaveSavedInteger(MakeDeleteMonstersAction.suppressions, this.suppressionId, i)) break
-            Monster(LoadInteger(MakeDeleteMonstersAction.suppressions, this.suppressionId, i)).createUnit()
-            i = i + 1
-        }
+        this.suppressedMonsters.map(monster => {
+            monster.createUnit()
+        })
+
         this.isActionMadeB = false
-        Text_mkP(this.owner.getPlayer(), 'monster deleting cancelled')
+        this.owner && Text.mkP(this.owner.getPlayer(), 'monster deleting cancelled')
+
         return true
     }
 
     redo = (): boolean => {
-        let i: number
         if (this.isActionMadeB) {
             return false
         }
+
         //suppression des monstres recréés
-        i = 0
-        while (true) {
-            if (!HaveSavedInteger(MakeDeleteMonstersAction.suppressions, this.suppressionId, i)) break
-            Monster(LoadInteger(MakeDeleteMonstersAction.suppressions, this.suppressionId, i)).removeUnit()
-            i = i + 1
-        }
+        this.suppressedMonsters.map(monster => {
+            monster.removeUnit()
+        })
+
         this.isActionMadeB = true
-        Text_mkP(this.owner.getPlayer(), 'monster deleting redone')
+        this.owner && Text.mkP(this.owner.getPlayer(), 'monster deleting redone')
+        
         return true
     }
 }

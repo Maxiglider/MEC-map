@@ -5,23 +5,10 @@ import { MakeAction } from './MakeAction'
 
 export class MakeMeteorAction extends MakeAction {
     private meteor: Meteor
-    private level: Level
 
-    getLevel = (): Level => {
-        return this.level
-    }
-
-    // TODO; Used to be static
-    create = (level: Level, meteor: Meteor): MakeMeteorAction => {
-        let a: MakeMeteorAction
-        if (meteor == 0 || meteor.getItem() == null) {
-            return 0
-        }
-        a = MakeMeteorAction.allocate()
-        a.isActionMadeB = true
-        a.meteor = meteor
-        a.level = level
-        return a
+    constructor(level: Level, meteor: Meteor) {
+        super(level)
+        this.meteor = meteor
     }
 
     destroy = () => {
@@ -34,9 +21,9 @@ export class MakeMeteorAction extends MakeAction {
         if (!this.isActionMadeB) {
             return false
         }
-        this.meteor.removeMeteor()
+        this.meteor.removeMeteorItem()
         this.isActionMadeB = false
-        Text.mkP(this.owner.getPlayer(), 'meteor creation cancelled')
+        this.owner && Text.mkP(this.owner.getPlayer(), 'meteor creation cancelled')
         return true
     }
 
@@ -44,9 +31,9 @@ export class MakeMeteorAction extends MakeAction {
         if (this.isActionMadeB) {
             return false
         }
-        this.meteor.createMeteor()
+        this.meteor.createMeteorItem()
         this.isActionMadeB = true
-        Text.mkP(this.owner.getPlayer(), 'meteor creation redone')
+        this.owner && Text.mkP(this.owner.getPlayer(), 'meteor creation redone')
         return true
     }
 }

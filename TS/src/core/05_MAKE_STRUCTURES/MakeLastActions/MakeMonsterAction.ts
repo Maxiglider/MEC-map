@@ -1,27 +1,14 @@
 import { Text } from 'core/01_libraries/Text'
 import { Level } from '../../04_STRUCTURES/Level/Level'
-import { Monster } from '../Monster/MonsterInterface'
 import { MakeAction } from './MakeAction'
+import {Monster} from "../../04_STRUCTURES/Monster/Monster";
 
 export class MakeMonsterAction extends MakeAction {
     private monster: Monster
-    private level: Level
 
-    getLevel = (): Level => {
-        return this.level
-    }
-
-    // TODO; Used to be static
-    create = (level: Level, monster: Monster): MakeMonsterAction => {
-        let a: MakeMonsterAction
-        if (monster == 0 || monster.u == null) {
-            return 0
-        }
-        a = MakeMonsterAction.allocate()
-        a.isActionMadeB = true
-        a.monster = monster
-        a.level = level
-        return a
+    constructor(level: Level, monster: Monster) {
+        super(level)
+        this.monster = monster
     }
 
     destroy = () => {
@@ -36,7 +23,7 @@ export class MakeMonsterAction extends MakeAction {
         }
         this.monster.removeUnit()
         this.isActionMadeB = false
-        Text.mkP(this.owner.getPlayer(), 'monster creation cancelled')
+        this.owner && Text.mkP(this.owner.getPlayer(), 'monster creation cancelled')
         return true
     }
 
@@ -46,7 +33,7 @@ export class MakeMonsterAction extends MakeAction {
         }
         this.monster.createUnit()
         this.isActionMadeB = true
-        Text.mkP(this.owner.getPlayer(), 'monster creation redone')
+        this.owner && Text.mkP(this.owner.getPlayer(), 'monster creation redone')
         return true
     }
 }

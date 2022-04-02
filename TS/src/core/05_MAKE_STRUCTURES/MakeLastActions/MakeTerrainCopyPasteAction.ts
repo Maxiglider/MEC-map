@@ -2,33 +2,21 @@ import { LARGEUR_CASE } from 'core/01_libraries/Constants'
 import { udg_terrainTypes } from '../../../../globals'
 import { TerrainType } from '../../04_STRUCTURES/TerrainType/TerrainType'
 import {MakeAction} from "./MakeAction";
+import {Constants} from "core/01_libraries/Constants";
+import {ChangeTerrainType} from "../../07_TRIGGERS/Modify_terrain_Functions/Modify_terrain_functions";
+import {Text} from "../../01_libraries/Text";
+
+const {MAP_MIN_X, MAP_MIN_Y, MAP_MAX_X, MAP_MAX_Y} = Constants
+
 
 export class MakeTerrainCopyPasteAction extends MakeAction {
-    static terrainSavesBefore: hashtable
-    static terrainSavesAfter: hashtable
-    static terrainSaveLastId: number
-
-    private terrainSaveId: number
     private minX: number
     private minY: number
     private maxX: number
     private maxY: number
 
-    private static onInit = (): void => {
-        MakeTerrainCopyPasteAction.terrainSavesBefore = InitHashtable()
-        MakeTerrainCopyPasteAction.terrainSavesAfter = InitHashtable()
-        MakeTerrainCopyPasteAction.terrainSaveLastId = -1
-    }
-
-    static newTerrainSaveId = (): number => {
-        MakeTerrainCopyPasteAction.terrainSaveLastId = MakeTerrainCopyPasteAction.terrainSaveLastId + 1
-        return MakeTerrainCopyPasteAction.terrainSaveLastId
-    }
-
-    static removeTerrainSave = (terrainSaveId: number): void => {
-        FlushChildHashtable(MakeTerrainCopyPasteAction.terrainSavesBefore, terrainSaveId)
-        FlushChildHashtable(MakeTerrainCopyPasteAction.terrainSavesAfter, terrainSaveId)
-    }
+    private terrainTypesBefore: TerrainType[][]
+    private terrainTypesAfter: TerrainType[][]
 
     constructor(
         x1: number,
@@ -40,14 +28,12 @@ export class MakeTerrainCopyPasteAction extends MakeAction {
         x4: number,
         y4: number
     ) {
-        let a: MakeTerrainCopyPasteAction
+        super()
+
         let xCopy: number
         let yCopy: number
         let xPaste: number
         let yPaste: number
-        let i: number
-        let terrainType: TerrainType
-        let terrainTypeId: number
 
         let minXcopy = RMinBJ(x1, x2)
         let maxXcopy = RMaxBJ(x1, x2)
@@ -59,6 +45,7 @@ export class MakeTerrainCopyPasteAction extends MakeAction {
 
         let minXpaste: number
         let minYpaste: number
+
         if (x4 > x3) {
             //direction droite
             minXpaste = x3
@@ -80,44 +67,34 @@ export class MakeTerrainCopyPasteAction extends MakeAction {
             minYpaste < MAP_MIN_Y ||
             minYpaste + diffY > MAP_MAX_Y
         ) {
-            return 0
+            throw "out of bounds"
         }
-        a = MakeTerrainCopyPasteAction.allocate()
-        a.terrainSaveId = MakeTerrainCopyPasteAction.newTerrainSaveId()
-        a.minX = minXpaste
-        a.minY = minYpaste
-        a.maxX = minXpaste + diffX
-        a.maxY = minYpaste + diffY
 
-        i = 0
+        this.minX = minXpaste
+        this.minY = minYpaste
+        this.maxX = minXpaste + diffX
+        this.maxY = minYpaste + diffY
+
+        this.terrainTypesBefore = []
+        this.terrainTypesAfter = []
+
         xPaste = minXpaste
         yPaste = minYpaste
         xCopy = minXcopy
         yCopy = minYcopy
-        while (true) {
-            if (yCopy > maxYcopy) break
-            while (true) {
-                if (xCopy > maxXcopy) break
-                SaveInteger(
-                    MakeTerrainCopyPasteAction.terrainSavesBefore,
-                    a.terrainSaveId,
-                    i,
-                    integer(udg_terrainTypes.getTerrainType(xPaste, yPaste))
-                )
-                terrainType = udg_terrainTypes.getTerrainType(xCopy, yCopy)
-                SaveInteger(
-                    MakeTerrainCopyPasteAction.terrainSavesAfter,
-                    a.terrainSaveId,
-                    i,
-                    integer(udg_terrainTypes.getTerrainType(xCopy, yCopy))
-                )
-                if (terrainType !== 0) {
-                    terrainTypeId = terrainType.getTerrainTypeId()
+        while (yCopy <= maxYcopy) {
+            while (xCopy <= maxXcopy) {
+                this.terrainTypesBefore[xPaste][yPaste] = udg_terrainTypes.getTerrainType(xPaste, yPaste)
+
+                const terrainType = udg_terrainTypes.getTerrainType(xCopy, yCopy)
+                this.terrainTypesAfter[xPaste][yPaste] = terrainType
+
+                if (terrainType) {
+                    const terrainTypeId = terrainType.getTerrainTypeId()
                     if (terrainTypeId !== 0) {
                         ChangeTerrainType(xPaste, yPaste, terrainTypeId)
                     }
                 }
-                i = i + 1
                 xPaste = xPaste + LARGEUR_CASE
                 xCopy = xCopy + LARGEUR_CASE
             }
@@ -126,34 +103,20 @@ export class MakeTerrainCopyPasteAction extends MakeAction {
             yPaste = yPaste + LARGEUR_CASE
             yCopy = yCopy + LARGEUR_CASE
         }
-        a.isActionMadeB = true
-        return a
-    }
 
-    private onDestroy = (): void => {
-        MakeTerrainCopyPasteAction.removeTerrainSave(this.terrainSaveId)
+        this.isActionMadeB = true
     }
 
     terrainModificationCancel = (): void => {
-        let terrainType: TerrainType
-        let x: number
-        let y: number
-        let i: number
+        let x = this.minX
+        let y = this.minY
 
-        i = 0
-        x = this.minX
-        y = this.minY
-        while (true) {
-            if (y > this.maxY) break
-            while (true) {
-                if (x > this.maxX) break
-                terrainType = TerrainType(
-                    LoadInteger(MakeTerrainCopyPasteAction.terrainSavesBefore, this.terrainSaveId, i)
-                )
-                if (terrainType != 0 && terrainType.getTerrainTypeId() != 0) {
+        while (y <= this.maxY){
+            while (x <= this.maxX){
+                const terrainType = this.terrainTypesBefore[x][y]
+                if (terrainType && terrainType.getTerrainTypeId() != 0) {
                     ChangeTerrainType(x, y, terrainType.getTerrainTypeId())
                 }
-                i = i + 1
                 x = x + LARGEUR_CASE
             }
             x = this.minX
@@ -162,25 +125,15 @@ export class MakeTerrainCopyPasteAction extends MakeAction {
     }
 
     terrainModificationRedo = (): void => {
-        let terrainType: TerrainType
-        let x: number
-        let y: number
-        let i: number
+        let x = this.minX
+        let y = this.minY
 
-        i = 0
-        x = this.minX
-        y = this.minY
-        while (true) {
-            if (y > this.maxY) break
-            while (true) {
-                if (x > this.maxX) break
-                terrainType = TerrainType(
-                    LoadInteger(MakeTerrainCopyPasteAction.terrainSavesAfter, this.terrainSaveId, i)
-                )
-                if (terrainType != 0 && terrainType.getTerrainTypeId() != 0) {
+        while (y <= this.maxY){
+            while (x <= this.maxX){
+                const terrainType = this.terrainTypesAfter[x][y]
+                if (terrainType && terrainType.getTerrainTypeId() != 0) {
                     ChangeTerrainType(x, y, terrainType.getTerrainTypeId())
                 }
-                i = i + 1
                 x = x + LARGEUR_CASE
             }
             x = this.minX
@@ -194,7 +147,7 @@ export class MakeTerrainCopyPasteAction extends MakeAction {
         }
         this.terrainModificationCancel()
         this.isActionMadeB = false
-        Text_mkP(this.owner.getPlayer(), 'terrain copy/paste cancelled')
+        this.owner && Text.mkP(this.owner.getPlayer(), 'terrain copy/paste cancelled')
         return true
     }
 
@@ -204,7 +157,11 @@ export class MakeTerrainCopyPasteAction extends MakeAction {
         }
         this.terrainModificationRedo()
         this.isActionMadeB = true
-        Text_mkP(this.owner.getPlayer(), 'terrain copy/paste redone')
+        this.owner && Text.mkP(this.owner.getPlayer(), 'terrain copy/paste redone')
         return true
+    }
+
+    destroy(){
+        //nothing needed
     }
 }

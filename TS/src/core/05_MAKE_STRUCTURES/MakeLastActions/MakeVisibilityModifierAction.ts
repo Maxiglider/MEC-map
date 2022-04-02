@@ -4,58 +4,53 @@ import { VisibilityModifier } from '../../04_STRUCTURES/Level/VisibilityModifier
 import { MakeAction } from './MakeAction'
 
 export class MakeVisibilityModifierAction extends MakeAction {
-    private level: Level
-    private visibilityModifierSave: VisibilityModifier
+    private visibilityModifierSave?: VisibilityModifier
     private visibilityModifierPointeur: VisibilityModifier //pointe vers le vm effectif
 
-    getLevel = (): Level => {
-        return this.level
-    }
+    constructor(level: Level, visibilityModifier: VisibilityModifier) {
+        super(level)
 
-    // TODO; Used to be static
-    create = (level: Level, visibilityModifier: VisibilityModifier): MakeVisibilityModifierAction => {
-        let a: MakeVisibilityModifierAction
-        if (visibilityModifier === 0) {
-            return 0
-        }
-        a = MakeVisibilityModifierAction.allocate()
-        a.isActionMadeB = true
-        a.level = level
-        a.visibilityModifierSave = 0
-        a.visibilityModifierPointeur = visibilityModifier
-        return a
-    }
-
-    destroy = () => {
-        if (this.visibilityModifierSave !== 0) {
-            this.visibilityModifierSave.destroy()
-        }
+        this.isActionMadeB = true
+        this.visibilityModifierPointeur = visibilityModifier
     }
 
     cancel = (): boolean => {
         if (!this.isActionMadeB) {
             return false
         }
+
         this.visibilityModifierSave = this.visibilityModifierPointeur.copy()
         this.visibilityModifierPointeur.destroy()
         this.isActionMadeB = false
-        Text.mkP(this.owner.getPlayer(), 'visibility creation cancelled')
+
+        this.owner && Text.mkP(this.owner.getPlayer(), 'visibility creation cancelled')
+
         return true
     }
 
     redo = (): boolean => {
-        if (this.isActionMadeB) {
+        if (this.isActionMadeB || !this.level || !this.visibilityModifierSave) {
             return false
         }
-        this.visibilityModifierPointeur = this.level.newVisibilityModifierFromExisting(this.visibilityModifierSave)
-        if (this.visibilityModifierPointeur === 0) {
-            Text.erP(this.owner.getPlayer(), "can't recreate visibility, full for this level")
-        } else {
-            this.visibilityModifierPointeur.activate(true)
+
+        const vm = this.level.newVisibilityModifierFromExisting(this.visibilityModifierSave)
+        if(!vm){
+            this.owner && Text.erP(this.owner.getPlayer(), "can't recreate visibility, full for this level")
+        }else{
+            this.visibilityModifierPointeur = vm
+            vm.activate(true)
+            delete this.visibilityModifierSave
         }
-        this.visibilityModifierSave = 0
+
         this.isActionMadeB = true
-        Text.mkP(this.owner.getPlayer(), 'visibility creation redone')
+        this.owner && Text.mkP(this.owner.getPlayer(), 'visibility creation redone')
+
         return true
+    }
+
+    destroy = () => {
+        if (this.visibilityModifierSave) {
+            this.visibilityModifierSave.destroy()
+        }
     }
 }

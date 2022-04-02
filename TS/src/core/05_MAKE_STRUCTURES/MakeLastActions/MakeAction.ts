@@ -2,16 +2,17 @@ import { Escaper } from '../../04_STRUCTURES/Escaper/Escaper'
 import { Level } from '../../04_STRUCTURES/Level/Level'
 
 export abstract class MakeAction {
-    isActionMadeB: boolean = true
-    owner: Escaper = null
-    private level: Level
+    isActionMadeB: boolean
+    owner?: Escaper
+    protected level?: Level
 
-    abstract cancel()
+    abstract cancel(): boolean
     abstract redo(): boolean
-    abstract destroy()
+    abstract destroy(): void
 
-    constructor(level: Level) {
+    constructor(level?: Level) {
         this.level = level
+        this.isActionMadeB = true
     }
 
     getLevel() {

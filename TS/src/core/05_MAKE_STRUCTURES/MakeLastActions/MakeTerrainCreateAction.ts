@@ -1,111 +1,72 @@
-import { LARGEUR_CASE, NB_MAX_TILES_MODIFIED } from 'core/01_libraries/Constants'
+import { LARGEUR_CASE } from 'core/01_libraries/Constants'
 import { udg_terrainTypes } from '../../../../globals'
 import { TerrainType } from '../../04_STRUCTURES/TerrainType/TerrainType'
 import {MakeAction} from "./MakeAction";
+import {ChangeTerrainBetween, ChangeTerrainType} from "../../07_TRIGGERS/Modify_terrain_Functions/Modify_terrain_functions";
+import {Text} from "../../01_libraries/Text";
 
 
 export class MakeTerrainCreateAction extends MakeAction {
+    private terrainTypesBefore: TerrainType[][]
+    private terrainTypeNew: TerrainType
+
+    private minX: number
+    private minY: number
+    private maxX: number
+    private maxY: number
+
     constructor(
         terrainTypeNew: TerrainType,
         x1: number,
         y1: number,
         x2: number,
         y2: number
-    ): MakeTerrainCreateAction => {
-        let terrainSave: hashtable
-        let terrainSaveId: number
-        let a: MakeTerrainCreateAction
-        let x: number
-        let y: number
-        let i: number
+    ) {
+        super()
 
-        let minX = RMinBJ(x1, x2)
-        let maxX = RMaxBJ(x1, x2)
-        let minY = RMinBJ(y1, y2)
-        let maxY = RMaxBJ(y1, y2)
-        if (terrainTypeNew == 0 || terrainTypeNew.getTerrainTypeId() == 0) {
-            return -1 //"this terrain type doesn't exist anymore"
-        }
-        if (GetNbCaseBetween(minX, minY, maxX, maxY) > NB_MAX_TILES_MODIFIED) {
-            return 0 //too big zone
-        }
-        a = MakeTerrainCreateAction.allocate()
-        terrainSave = MakeTerrainCreateAction.terrainSaves
-        a.terrainSaveId = MakeTerrainCreateAction.newTerrainSaveId()
+        this.minX = RMinBJ(x1, x2)
+        this.maxX = RMaxBJ(x1, x2)
+        this.minY = RMinBJ(y1, y2)
+        this.maxY = RMaxBJ(y1, y2)
 
-        i = 0
-        x = minX
-        y = minY
-        while (true) {
-            if (y > maxY) break
-            while (true) {
-                if (x > maxX) break
-                SaveInteger(terrainSave, a.terrainSaveId, i, integer(udg_terrainTypes.getTerrainType(x, y)))
-                i = i + 1
+        if (!terrainTypeNew || terrainTypeNew.getTerrainTypeId() == 0) {
+            throw "this terrain type doesn't exist anymore"
+        }
+
+        this.terrainTypesBefore = []
+
+        let x = this.minX
+        let y = this.minY
+
+        while(y <= this.maxY){
+            while(x <= this.maxX){
+                this.terrainTypesBefore[x][y] = udg_terrainTypes.getTerrainType(x, y)
                 x = x + LARGEUR_CASE
             }
-            x = minX
+            x = this.minX
             y = y + LARGEUR_CASE
         }
-        terrainSave = null
-        ChangeTerrainBetween(terrainTypeNew.getTerrainTypeId(), minX, minY, maxX, maxY)
-        a.terrainTypeNew = terrainTypeNew
-        a.minX = minX
-        a.maxX = maxX
-        a.minY = minY
-        a.maxY = maxY
-        a.isActionMadeB = true
-        return a
+
+        ChangeTerrainBetween(terrainTypeNew.getTerrainTypeId(), this.minX, this.minY, this.maxX, this.maxY)
+
+        this.terrainTypeNew = terrainTypeNew
+        this.isActionMadeB = true
     }
 
-    static terrainSaves: hashtable
-    static terrainSaveLastId: number
-
-    private terrainSaveId: number
-    private terrainTypeNew: TerrainType
-    private minX: number
-    private minY: number
-    private maxX: number
-    private maxY: number
-
-    private static onInit = (): void => {
-        MakeTerrainCreateAction.terrainSaves = InitHashtable()
-        MakeTerrainCreateAction.terrainSaveLastId = -1
-    }
-
-    static newTerrainSaveId = (): number => {
-        MakeTerrainCreateAction.terrainSaveLastId = MakeTerrainCreateAction.terrainSaveLastId + 1
-        return MakeTerrainCreateAction.terrainSaveLastId
-    }
-
-    static removeTerrainSave = (terrainSaveId: number): void => {
-        FlushChildHashtable(MakeTerrainCreateAction.terrainSaves, terrainSaveId)
-    }
-
-
-
-    private onDestroy = (): void => {
-        MakeTerrainCreateAction.removeTerrainSave(this.terrainSaveId)
+    destroy(){
+        //nothing needed
     }
 
     terrainModificationCancel = (): void => {
-        let terrainType: TerrainType
-        let x: number
-        let y: number
-        let i: number
+        let x = this.minX
+        let y = this.minY
 
-        i = 0
-        x = this.minX
-        y = this.minY
-        while (true) {
-            if (y > this.maxY) break
-            while (true) {
-                if (x > this.maxX) break
-                terrainType = TerrainType(LoadInteger(MakeTerrainCreateAction.terrainSaves, this.terrainSaveId, i))
-                if (terrainType != 0 && terrainType.getTerrainTypeId() != 0) {
+        while (y <= this.maxY) {
+            while (x <= this.maxX){
+                const terrainType = this.terrainTypesBefore[x][y]
+                if (terrainType && terrainType.getTerrainTypeId() != 0) {
                     ChangeTerrainType(x, y, terrainType.getTerrainTypeId())
                 }
-                i = i + 1
                 x = x + LARGEUR_CASE
             }
             x = this.minX
@@ -114,9 +75,9 @@ export class MakeTerrainCreateAction extends MakeAction {
     }
 
     terrainModificationRedo = (): void => {
-        let terrainTypeId = this.terrainTypeNew.getTerrainTypeId()
+        const terrainTypeId = this.terrainTypeNew.getTerrainTypeId()
         if (terrainTypeId === 0) {
-            Text_erP(this.owner.getPlayer(), "the terrain type for this action doesn't exist anymore")
+            this.owner && Text.erP(this.owner.getPlayer(), "the terrain type for this action doesn't exist anymore")
         } else {
             ChangeTerrainBetween(terrainTypeId, this.minX, this.minY, this.maxX, this.maxY)
         }
@@ -126,9 +87,11 @@ export class MakeTerrainCreateAction extends MakeAction {
         if (!this.isActionMadeB) {
             return false
         }
+
         this.terrainModificationCancel()
         this.isActionMadeB = false
-        Text_mkP(this.owner.getPlayer(), 'terrain creation cancelled')
+        this.owner && Text.mkP(this.owner.getPlayer(), 'terrain creation cancelled')
+
         return true
     }
 
@@ -136,9 +99,11 @@ export class MakeTerrainCreateAction extends MakeAction {
         if (this.isActionMadeB) {
             return false
         }
+
         this.terrainModificationRedo()
         this.isActionMadeB = true
-        Text_mkP(this.owner.getPlayer(), 'terrain creation redone')
+        this.owner && Text.mkP(this.owner.getPlayer(), 'terrain creation redone')
+
         return true
     }
 }

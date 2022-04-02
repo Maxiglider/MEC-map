@@ -1,13 +1,16 @@
 import { MakeAction } from './MakeAction'
+import {Text} from "../../01_libraries/Text";
 
 export class MakeTerrainHeightAction extends MakeAction {
     private radius: number
     private height: number
     private x: number
     private y: number
-    private terrainDeform: terraindeformation
+    private terrainDeform?: terraindeformation
 
     constructor(radius: number, height: number, x: number, y: number) {
+        super()
+
         this.radius = radius
         this.height = height
         this.x = x
@@ -24,9 +27,11 @@ export class MakeTerrainHeightAction extends MakeAction {
         if (!this.isActionMadeB) {
             return false
         }
-        TerrainDeformStop(this.terrainDeform, 0)
+
+        this.terrainDeform && TerrainDeformStop(this.terrainDeform, 0)
         this.isActionMadeB = false
-        Text_mkP(this.owner.getPlayer(), 'terrain height cancelled')
+        this.owner && Text.mkP(this.owner.getPlayer(), 'terrain height cancelled')
+
         return true
     }
 
@@ -34,9 +39,15 @@ export class MakeTerrainHeightAction extends MakeAction {
         if (this.isActionMadeB) {
             return false
         }
+
         this.apply()
         this.isActionMadeB = true
-        Text_mkP(this.owner.getPlayer(), 'terrain height redone')
+        this.owner && Text.mkP(this.owner.getPlayer(), 'terrain height redone')
+
         return true
+    }
+
+    destroy(){
+        //nothing needed
     }
 }
