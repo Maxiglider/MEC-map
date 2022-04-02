@@ -1,7 +1,7 @@
 //évènement ajouté à la création de l'unité invisible
 
 import { DUMMY_POWER_CIRCLE, GM_KILLING_EFFECT } from 'core/01_libraries/Constants'
-import { MonsterOrCaster } from 'core/04_STRUCTURES/MonsterOrCaster/MonsterOrCaster'
+import { Monster } from 'core/04_STRUCTURES/Monster/Monster'
 import { ClearMob } from 'core/04_STRUCTURES/Monster_properties/ClearMob'
 import { createEvent } from 'Utils/mapUtils'
 import { udg_monsterTypes } from '../../../../globals'
@@ -14,14 +14,19 @@ export const InitTrig_InvisUnit_is_getting_damage = () => {
         events: [],
         actions: [
             () => {
-                let invisUnit = GetTriggerUnit()
+                let invisUnit: unit | null = GetTriggerUnit()
                 let n = GetUnitUserData(invisUnit)
                 const escaper = udg_escapers.get(n)
-                let killingUnit = GetEventDamageSource()
+
+                if (!escaper) {
+                    return
+                }
+
+                let killingUnit: unit | null = GetEventDamageSource()
                 let clearMob: ClearMob
-                let moc: MonsterOrCaster
+                let moc: Monster
                 let effectStr: string
-                let eff: effect
+                let eff: effect | null
                 let x: number
                 let y: number
 
@@ -31,9 +36,9 @@ export const InitTrig_InvisUnit_is_getting_damage = () => {
                     return
                 }
 
-                const heroPos = GetUnitLoc(hero)
+                let heroPos: location | null = GetUnitLoc(hero)
                 const hauteurHero = GetLocationZ(heroPos) + GetUnitFlyHeight(hero)
-                let killingUnitPos = GetUnitLoc(killingUnit)
+                let killingUnitPos: location | null = GetUnitLoc(killingUnit)
                 let hauteurKillingUnit = GetLocationZ(killingUnitPos) + GetUnitFlyHeight(killingUnit)
 
                 RemoveLocation(heroPos)
@@ -48,13 +53,13 @@ export const InitTrig_InvisUnit_is_getting_damage = () => {
 
                 if (RAbsBJ(hauteurHero - hauteurKillingUnit) < TAILLE_UNITE) {
                     if (GetUnitTypeId(killingUnit) === DUMMY_POWER_CIRCLE) {
-                        udg_escapers.get(GetUnitUserData(killingUnit)).coopReviveHero()
+                        udg_escapers.get(GetUnitUserData(killingUnit))?.coopReviveHero()
                         invisUnit = null
                         killingUnit = null
                         return
                     } else {
                         clearMob = ClearTriggerMobId2ClearMob(GetUnitUserData(killingUnit))
-                        if (clearMob !== 0) {
+                        if (clearMob !== null) {
                             clearMob.activate()
                         } else if (escaper.isGodModeOn()) {
                             if (escaper.doesGodModeKills()) {

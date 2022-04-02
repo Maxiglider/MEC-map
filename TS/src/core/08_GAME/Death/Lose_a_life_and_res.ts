@@ -37,9 +37,7 @@ export const InitTrig_Lose_a_life_and_res = () => {
                     i = 0
                     while (true) {
                         if (i >= NB_ESCAPERS) break
-                        if (udg_escapers.get(i) !== null) {
-                            udg_escapers.get(i).reviveAtStart()
-                        }
+                        udg_escapers.get(i)?.reviveAtStart()
                         i = i + 1
                     }
                     Text.A('|cff5c2e2eYou have lost a life !')

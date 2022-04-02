@@ -70,7 +70,7 @@ const initHeroes = () => {
 
     const Trig_heroes_Actions = () => {
         let alreadyAdded: boolean[] = []
-        let anEffect: effect
+        let anEffect: effect | null
         let i: number
         let n: number
 
@@ -86,7 +86,7 @@ const initHeroes = () => {
             if (udg_escapers.get(n) !== null) {
                 udg_escapers
                     .get(n)
-                    .createHero(
+                    ?.createHero(
                         GetLocationX(startPositionsRandomized[n]),
                         GetLocationY(startPositionsRandomized[n]),
                         HERO_START_ANGLE
@@ -95,7 +95,7 @@ const initHeroes = () => {
                 anEffect = AddSpecialEffectLoc(EFFECT_FOR_MISSING_HEROES, startPositionsRandomized[n])
                 DestroyEffect(anEffect)
             }
-            startPositionsRandomized[n] = null
+            ;(startPositionsRandomized[n] as any) = null
             TriggerSleepAction(TIME_BETWEEN_EACH_HERO_SPAWN)
             i = i + 1
         }
