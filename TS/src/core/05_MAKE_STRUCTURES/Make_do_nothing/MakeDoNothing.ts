@@ -1,6 +1,4 @@
-import { Make, MakeConsts } from 'core/05_MAKE_STRUCTURES/Make/Make'
-
-const { MAKE_LAST_CLIC_UNIT_ID } = MakeConsts
+import { Make } from 'core/05_MAKE_STRUCTURES/Make/Make'
 
 export class MakeDoNothing extends Make {
     constructor(maker: unit) {

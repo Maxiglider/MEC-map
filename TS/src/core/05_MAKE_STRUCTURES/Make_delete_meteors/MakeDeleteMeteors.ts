@@ -1,7 +1,7 @@
 import { IsItemBetweenLocs } from 'core/01_libraries/Basic_functions'
 import { MakeOneByOneOrTwoClicks } from 'core/05_MAKE_STRUCTURES/Make/MakeOneByOneOrTwoClicks'
 import { Text } from '../../01_libraries/Text'
-import { Meteor, METEOR_NORMAL } from '../../04_STRUCTURES/Meteor/Meteor'
+import {Meteor, METEOR_NORMAL, udg_meteors} from '../../04_STRUCTURES/Meteor/Meteor'
 
 export class MakeDeleteMeteors extends MakeOneByOneOrTwoClicks {
     constructor(maker: unit, mode: string) {
@@ -21,10 +21,10 @@ export class MakeDeleteMeteors extends MakeOneByOneOrTwoClicks {
                     return
                 }
 
-                meteor = Meteor.get(GetItemUserData(GetOrderTargetItem()))
+                meteor = udg_meteors[GetItemUserData(GetOrderTargetItem())]
 
                 if (meteor && meteor.getItem()) {
-                    meteor.removeMeteor()
+                    meteor.removeMeteorItem()
                     suppressedMeteors.push(meteor)
                     nbMeteorsRemoved = 1
                 }
@@ -35,22 +35,13 @@ export class MakeDeleteMeteors extends MakeOneByOneOrTwoClicks {
                     return
                 }
 
-                const lastInstanceId = this.escaper.getMakingLevel().meteors.getLastInstanceId()
+                const meteors = this.escaper.getMakingLevel().meteors.getMeteorsBetweenLocs(this.lastX, this.lastY, this.orderX, this.orderY)
 
-                for (let i = 0; i <= lastInstanceId; i++) {
-                    meteor = this.escaper.getMakingLevel().meteors.get(i)
-                    let meteorItem
-
-                    if (
-                        meteor &&
-                        (meteorItem = meteor.getItem()) &&
-                        IsItemBetweenLocs(meteorItem, this.lastX, this.lastY, this.orderX, this.orderY)
-                    ) {
-                        meteor.removeMeteor()
-                        suppressedMeteors.push(meteor)
-                        nbMeteorsRemoved = nbMeteorsRemoved + 1
-                    }
-                }
+                meteors.map(meteor => {
+                    meteor.removeMeteorItem()
+                    suppressedMeteors.push(meteor)
+                    nbMeteorsRemoved = nbMeteorsRemoved + 1
+                })
             }
 
             if (nbMeteorsRemoved <= 1) {

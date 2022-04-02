@@ -25,7 +25,13 @@ export abstract class Make {
         this.maker = maker
         this.makerOwner = GetOwningPlayer(maker)
         this.kind = kind
-        this.escaper = Hero2Escaper(maker)
+
+        const escaper = Hero2Escaper(maker)
+        if(!escaper){
+            throw "Make : escaper not found"
+        }
+
+        this.escaper = escaper
 
         this.t = null
         this.enableTrigger()

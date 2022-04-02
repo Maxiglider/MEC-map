@@ -29,16 +29,14 @@ export class MakeDeleteMonsters extends MakeOneByOneOrTwoClicks {
                     return
                 }
 
-                let monsters = this.escaper
-                    .getMakingLevel()
-                    .getMonstersBetweenLocs(this.lastX, this.lastY, this.orderX, this.orderY)
+                let monsters = this.escaper.getMakingLevel().monsters.getMonstersBetweenLocs(this.lastX, this.lastY, this.orderX, this.orderY)
 
                 monsters.map(monster => {
                     monster.removeUnit()
                     suppressedMonsters.push(monster)
                 })
 
-                nbMonstersRemoved = monsters.length()
+                nbMonstersRemoved = monsters.length
             }
 
             if (nbMonstersRemoved <= 1) {

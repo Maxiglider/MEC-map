@@ -1,6 +1,7 @@
 import { Level } from '../Level/Level'
 import { MONSTER_NEAR_DIFF_MAX } from '../Monster/MonsterArray'
 import { Meteor } from './Meteor'
+import {IsItemBetweenLocs, IsUnitBetweenLocs} from "../../01_libraries/Basic_functions";
 
 export class MeteorArray {
     private meteors: Meteor[]
@@ -82,5 +83,18 @@ export class MeteorArray {
         })
 
         return null
+    }
+
+    getMeteorsBetweenLocs(x1: number, y1: number, x2: number, y2: number) {
+        return this.meteors.filter(meteor => {
+            const item = meteor.getItem()
+            if (item) {
+                if (IsItemBetweenLocs(item, x1, y1, x2, y2)) {
+                    return true
+                }
+            }
+
+            return false
+        })
     }
 }
