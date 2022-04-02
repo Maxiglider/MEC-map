@@ -40,7 +40,8 @@ export class MakeTerrainCreateAction extends MakeAction {
 
         while(y <= this.maxY){
             while(x <= this.maxX){
-                this.terrainTypesBefore[x][y] = udg_terrainTypes.getTerrainType(x, y)
+                const tt = udg_terrainTypes.getTerrainType(x, y)
+                if(tt) this.terrainTypesBefore[x][y] = tt
                 x = x + LARGEUR_CASE
             }
             x = this.minX

@@ -661,7 +661,7 @@ export class Escaper {
         return this.slideSpeed
     }
 
-    getnumberSlideSpeed() {
+    getRealSlideSpeed() {
         return this.slideSpeed / SLIDE_PERIOD
     }
 

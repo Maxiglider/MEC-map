@@ -1,10 +1,6 @@
-import { NB_MAX_TILES_MODIFIED } from 'core/01_libraries/Constants'
 import { Text } from 'core/01_libraries/Text'
 import {Make, MAKE_LAST_CLIC_UNIT_ID} from 'core/05_MAKE_STRUCTURES/Make/Make'
-import {GetNbCaseBetween} from "../../07_TRIGGERS/Modify_terrain_Functions/Modify_terrain_functions";
 import {MakeTerrainCopyPasteAction} from "../MakeLastActions/MakeTerrainCopyPasteAction";
-import {Hero2Escaper} from "../../04_STRUCTURES/Escaper/Escaper_functions";
-import {IsIssuedOrder, StopUnit} from "../../01_libraries/Basic_functions";
 
 export class MakeTerrainCopyPaste extends Make {
     x1: number = 0
@@ -95,10 +91,6 @@ export class MakeTerrainCopyPaste extends Make {
             this.unsaveLocDefinitely(3)
         } else {
             if (!this.isPoint2Used) {
-                if (GetNbCaseBetween(this.x1, this.y1, x, y) > NB_MAX_TILES_MODIFIED) {
-                    Text.erP(this.makerOwner, 'Too big zone !')
-                    return
-                }
                 this.unitLastClic2 = this.createUnitClic(this.unitLastClic2, x, y)
                 this.x2 = x
                 this.y2 = y

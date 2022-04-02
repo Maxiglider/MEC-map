@@ -1,146 +1,153 @@
-import { IsOnGround } from 'core/01_libraries/Basic_functions'
-import { Escaper } from '../Escaper/Escaper'
-import { Hero2Escaper } from '../Escaper/Escaper_functions'
-import { Caster } from './Caster'
-import { CasterShot } from './CasterShot'
+import {IsOnGround} from 'core/01_libraries/Basic_functions'
+import {Escaper} from '../Escaper/Escaper'
+import {Hero2Escaper} from '../Escaper/Escaper_functions'
+import {Caster} from './Caster'
+import {CasterShot} from './CasterShot'
 
-const initCasterFunctions = () => {
-    let escaper: Escaper
-    let caster: Caster
-    const PRECISION_TIR = 40
-    const PRECISION_DIFF_POS_HERO = 20
-    const ECART_CHECK = 0.05
 
-    let x1: number
-    let y1: number
-    let angleSlider: number
-    let sliderSpeed: number
-    let x2: number
-    let y2: number
-    let x3: number
-    let y3: number
-    let k1: number
-    let k2: number
-    let Xk1: number
-    let Yk1: number
-    let Xk2: number
-    let Yk2: number
-    let XintersectionDevantHeros: number
-    let YintersectionDevantHeros: number
+let escaper: Escaper
+let caster: Caster
+const PRECISION_TIR = 40
+const PRECISION_DIFF_POS_HERO = 20
+const ECART_CHECK = 0.05
 
-    const CalculerPointsIntersections = () => {
-        let decalSurX = 50
-        let a: number
-        let b: number
-        let c: number
-        let discriminant: number
-        if (sliderSpeed >= 0) {
-            angleSlider = GetUnitFacing(escaper.getHero())
-        } else {
-            angleSlider = GetUnitFacing(escaper.getHero()) + 180
-        }
-        x2 = x1 + decalSurX
-        y2 = y1 + TanBJ(angleSlider) * decalSurX
-        a = (x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1)
-        b = 2 * ((x2 - x1) * (x1 - x3) + (y2 - y1) * (y1 - y3))
-        c = x3 * x3 + y3 * y3 + x1 * x1 + y1 * y1 - 2 * (x3 * x1 + y3 * y1) - caster.getRange() * caster.getRange()
-        discriminant = b * b - 4 * a * c
-        if (discriminant < 0) {
-            k1 = 0
-            k2 = 0
-        } else {
-            k1 = (-b + SquareRoot(b * b - 4 * a * c)) / (2 * a)
-            Xk1 = x1 + k1 * (x2 - x1)
-            Yk1 = y1 + k1 * (y2 - y1)
-            k2 = (-b - SquareRoot(b * b - 4 * a * c)) / (2 * a)
-            Xk2 = x1 + k2 * (x2 - x1)
-            Yk2 = y1 + k2 * (y2 - y1)
-        }
+let x1: number
+let y1: number
+let angleSlider: number
+let sliderSpeed: number
+let x2: number
+let y2: number
+let x3: number
+let y3: number
+let k1: number
+let k2: number
+let Xk1: number
+let Yk1: number
+let Xk2: number
+let Yk2: number
+let XintersectionDevantHeros: number
+let YintersectionDevantHeros: number
+
+const CalculerPointsIntersections = () => {
+    let decalSurX = 50
+    let a: number
+    let b: number
+    let c: number
+    let discriminant: number
+
+    const hero = escaper.getHero()
+    if(!hero) return
+
+    if (sliderSpeed >= 0) {
+        angleSlider = GetUnitFacing(hero)
+    } else {
+        angleSlider = GetUnitFacing(hero) + 180
     }
 
-    const TrouverTempsIdeal = (tempsMax: number): number => {
-        let diffTemps = PRECISION_DIFF_POS_HERO / sliderSpeed
-        let temps = 0
-        let xHero: number
-        let yHero: number
-        let xBoule: number
-        let yBoule: number
-        let angleBouleHero: number
-        let distHeroBoule: number
-        let distHeroBouleMin = 99999999999
-        let tempsIdeal = 0
-        while (true) {
-            if (temps >= tempsMax) break
-            xHero = x1 + sliderSpeed * CosBJ(angleSlider) * temps
-            yHero = y1 + sliderSpeed * SinBJ(angleSlider) * temps
-            angleBouleHero = Atan2BJ(yHero - y3, xHero - x3)
-            xBoule = x3 + caster.getProjectileSpeed() * CosBJ(angleBouleHero) * temps
-            yBoule = y3 + caster.getProjectileSpeed() * SinBJ(angleBouleHero) * temps
-            distHeroBoule = SquareRoot((xHero - xBoule) * (xHero - xBoule) + (yHero - yBoule) * (yHero - yBoule))
-            if (distHeroBoule < distHeroBouleMin) {
-                distHeroBouleMin = distHeroBoule
-                tempsIdeal = temps
-            }
-            temps = temps + diffTemps
+    x2 = x1 + decalSurX
+    y2 = y1 + TanBJ(angleSlider) * decalSurX
+    a = (x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1)
+    b = 2 * ((x2 - x1) * (x1 - x3) + (y2 - y1) * (y1 - y3))
+    c = x3 * x3 + y3 * y3 + x1 * x1 + y1 * y1 - 2 * (x3 * x1 + y3 * y1) - caster.getRange() * caster.getRange()
+    discriminant = b * b - 4 * a * c
+    if (discriminant < 0) {
+        k1 = 0
+        k2 = 0
+    } else {
+        k1 = (-b + SquareRoot(b * b - 4 * a * c)) / (2 * a)
+        Xk1 = x1 + k1 * (x2 - x1)
+        Yk1 = y1 + k1 * (y2 - y1)
+        k2 = (-b - SquareRoot(b * b - 4 * a * c)) / (2 * a)
+        Xk2 = x1 + k2 * (x2 - x1)
+        Yk2 = y1 + k2 * (y2 - y1)
+    }
+}
+
+const TrouverTempsIdeal = (tempsMax: number): number => {
+    let diffTemps = PRECISION_DIFF_POS_HERO / sliderSpeed
+    let temps = 0
+    let xHero: number
+    let yHero: number
+    let xBoule: number
+    let yBoule: number
+    let angleBouleHero: number
+    let distHeroBoule: number
+    let distHeroBouleMin = 99999999999
+    let tempsIdeal = 0
+    while (true) {
+        if (temps >= tempsMax) break
+        xHero = x1 + sliderSpeed * CosBJ(angleSlider) * temps
+        yHero = y1 + sliderSpeed * SinBJ(angleSlider) * temps
+        angleBouleHero = Atan2BJ(yHero - y3, xHero - x3)
+        xBoule = x3 + caster.getProjectileSpeed() * CosBJ(angleBouleHero) * temps
+        yBoule = y3 + caster.getProjectileSpeed() * SinBJ(angleBouleHero) * temps
+        distHeroBoule = SquareRoot((xHero - xBoule) * (xHero - xBoule) + (yHero - yBoule) * (yHero - yBoule))
+        if (distHeroBoule < distHeroBouleMin) {
+            distHeroBouleMin = distHeroBoule
+            tempsIdeal = temps
         }
-        if (distHeroBouleMin > PRECISION_TIR) {
-            tempsIdeal = -1
-        }
-        return tempsIdeal
+        temps = temps + diffTemps
+    }
+    if (distHeroBouleMin > PRECISION_TIR) {
+        tempsIdeal = -1
+    }
+    return tempsIdeal
+}
+
+const CasterTryToShoot = () => {
+    let xHero: number = 0
+    let yHero: number = 0
+    let tempsMax: number
+    let tempsIdeal: number
+    let angleDeTir: number
+    let sensPoint1positif: boolean
+    let sensPoint2positif: boolean
+    let tempsPoint1: number
+    let tempsPoint2: number
+    let escapersToShoot: Escaper[] = []
+    let nbRemainingEscapersToShoot: number
+    let i: number
+    let tirOk = false
+    let estShootable: boolean
+    let numEscaper: number
+
+    //récupération du caster et vérification qu'il existe toujours
+    const caster = Caster.anyTimerId2Caster.get(GetHandleId(GetExpiredTimer()))
+    if (!caster || !caster.u) {
+        return
     }
 
-    const CasterTryToShoot = () => {
-        let xHero: number
-        let yHero: number
-        let tempsMax: number
-        let tempsIdeal: number
-        let angleDeTir: number
-        let sensPoint1positif: boolean
-        let sensPoint2positif: boolean
-        let tempsPoint1: number
-        let tempsPoint2: number
-        let escapersToShoot: Escaper[] = []
-        let nbRemainingEscapersToShoot: number
-        let i: number
-        let tirOk = false
-        let estShootable: boolean
-        let numEscaper: number
+    //détermination des escapers à viser
+    i = 0
+    while (i < caster.nbEscapersInRange) {
+        escapersToShoot[i] = caster.escapersInRange[i]
+        i = i + 1
+    }
+    nbRemainingEscapersToShoot = caster.nbEscapersInRange
 
-        //récupération du caster et vérification qu'il existe toujours
-        caster = Caster(LoadInteger(Caster_casterHashtable, 1, GetHandleId(GetExpiredTimer())))
-        if (caster.casterUnit == null) {
-            return
-        }
+    while (!tirOk && nbRemainingEscapersToShoot > 0) {
+        //choix d'un escaper au hasard
+        numEscaper = GetRandomInt(0, nbRemainingEscapersToShoot - 1)
+        escaper = escapersToShoot[numEscaper]
+        const hero = escaper.getHero()
 
-        //détermination des escapers à viser
-        i = 0
-        while (true) {
-            if (i >= caster.nbEscapersInRange) break
-            escapersToShoot[i] = caster.escapersInRange[i]
-            i = i + 1
-        }
-        nbRemainingEscapersToShoot = caster.nbEscapersInRange
-
-        while (true) {
-            if (tirOk || nbRemainingEscapersToShoot === 0) break
-            //choix d'un escaper au hasard
-            numEscaper = GetRandomInt(0, nbRemainingEscapersToShoot - 1)
-            escaper = escapersToShoot[numEscaper]
+        if(hero) {
             //vérification que l'escaper est shootable (vivant et à portée de tir)
             estShootable = false
             if (escaper.isAlive()) {
-                x1 = GetUnitX(escaper.getHero())
-                y1 = GetUnitY(escaper.getHero())
+                x1 = GetUnitX(hero)
+                y1 = GetUnitY(hero)
                 x3 = caster.getX()
                 y3 = caster.getY()
+
                 //vérification que le héros est à portée de tir
                 estShootable = SquareRoot((x1 - x3) * (x1 - x3) + (y1 - y3) * (y1 - y3)) <= caster.getRange()
             }
+
             if (!estShootable) {
                 caster.escaperOutOfRangeOrDead(escaper)
                 i = numEscaper
-                while (true) {
-                    if (i === nbRemainingEscapersToShoot - 1) break
+                while (i !== nbRemainingEscapersToShoot - 1) {
                     escapersToShoot[i] = escapersToShoot[i + 1]
                     i = i + 1
                 }
@@ -149,7 +156,7 @@ const initCasterFunctions = () => {
                 //tir si possible
                 if (escaper.isSliding()) {
                     sliderSpeed = escaper.getRealSlideSpeed()
-                } else if (GetUnitCurrentOrder(escaper.getHero()) != 0) {
+                } else if (GetUnitCurrentOrder(hero) != 0) {
                     sliderSpeed = escaper.getWalkSpeed()
                 } else {
                     sliderSpeed = 0
@@ -166,6 +173,7 @@ const initCasterFunctions = () => {
                     if (k1 === 0 && k2 === 0) {
                         return
                     }
+
                     //sens points
                     if (CosBJ(angleSlider) !== 0) {
                         sensPoint1positif = (Xk1 - x1) * CosBJ(angleSlider) > 0
@@ -174,6 +182,7 @@ const initCasterFunctions = () => {
                         sensPoint1positif = (Yk1 - y1) * SinBJ(angleSlider) > 0
                         sensPoint2positif = (Yk2 - y1) * SinBJ(angleSlider) > 0
                     }
+
                     //déterminer lequel des deux points d'intersection est devant le héros
                     if (sensPoint1positif === sensPoint2positif) {
                         //calcul du temps pour chaque point pour trouver le plus éloigné qui est le bon
@@ -201,7 +210,7 @@ const initCasterFunctions = () => {
                     }
 
                     //trouver temps idéal
-                    if (IsOnGround(escaper.getHero())) {
+                    if (IsOnGround(hero)) {
                         tempsIdeal = TrouverTempsIdeal(tempsMax)
                     } else {
                         tempsIdeal = -1
@@ -212,11 +221,12 @@ const initCasterFunctions = () => {
                         tirOk = true
                     }
                 }
+
                 if (tirOk) {
                     if (caster.isEnabled()) {
                         angleDeTir = Atan2BJ(yHero - y3, xHero - x3)
-                        SetUnitFacing(caster.getCasterUnit(), angleDeTir)
-                        SetUnitAnimation(caster.getCasterUnit(), caster.getAnimation())
+                        SetUnitFacing(caster.u, angleDeTir)
+                        SetUnitAnimation(caster.u, caster.getAnimation())
                         new CasterShot(
                             caster.getProjectileMonsterType(),
                             x3,
@@ -229,8 +239,7 @@ const initCasterFunctions = () => {
                 } else {
                     //on retire l'escaper du pick aléatoire
                     i = numEscaper
-                    while (true) {
-                        if (i === nbRemainingEscapersToShoot - 1) break
+                    while (i !== nbRemainingEscapersToShoot - 1) {
                         escapersToShoot[i] = escapersToShoot[i + 1]
                         i = i + 1
                     }
@@ -238,35 +247,35 @@ const initCasterFunctions = () => {
                     tirOk = false
                 }
             }
-            //pas de n = n + 1
         }
-        if (tirOk) {
-            //on attend que le temps soit écoulé pour un autre tir
-            TimerStart(caster.t, caster.getLoadTime(), false, CasterTryToShoot)
-            caster.canShoot = false
-        } else if (caster.nbEscapersInRange == 0) {
-            //plus aucun héros à portée, on stoppe tout
-            caster.canShoot = true
-        } else {
-            //héros à portée mais impossible de tirer, on attend un peu et on réessaie
-            TimerStart(caster.t, ECART_CHECK, false, CasterTryToShoot)
-        }
+        //pas de n = n + 1
     }
 
-    const CasterUnitWithinRange_Actions = () => {
-        let escaperInRange = Hero2Escaper(GetTriggerUnit())
-        if (escaperInRange === null) {
-            return
-        }
-        caster = Caster(LoadInteger(Caster_casterHashtable, 0, GetHandleId(GetTriggeringTrigger())))
-        caster.escapersInRange[caster.nbEscapersInRange] = escaperInRange
-        caster.nbEscapersInRange = caster.nbEscapersInRange + 1
-        if (caster.canShoot) {
-            TimerStart(caster.t, 0, false, CasterTryToShoot)
-        }
+    if (tirOk) {
+        //on attend que le temps soit écoulé pour un autre tir
+        caster.t && TimerStart(caster.t, caster.getLoadTime(), false, CasterTryToShoot)
+        caster.canShoot = false
+    } else if (caster.nbEscapersInRange == 0) {
+        //plus aucun héros à portée, on stoppe tout
+        caster.canShoot = true
+    } else {
+        //héros à portée mais impossible de tirer, on attend un peu et on réessaie
+        caster.t && TimerStart(caster.t, ECART_CHECK, false, CasterTryToShoot)
     }
-
-    return { CasterUnitWithinRange_Actions }
 }
 
-export const CasterFunctions = initCasterFunctions()
+export const CasterUnitWithinRange_Actions = () => {
+    let escaperInRange = Hero2Escaper(GetTriggerUnit())
+    if (escaperInRange === null) {
+        return
+    }
+
+    const caster = Caster.anyTriggerWithinRangeId2Caster.get(GetHandleId(GetTriggeringTrigger()))
+    if(caster) {
+        caster.escapersInRange[caster.nbEscapersInRange] = escaperInRange
+        caster.nbEscapersInRange++
+        if (caster.canShoot) {
+            caster.t && TimerStart(caster.t, 0, false, CasterTryToShoot)
+        }
+    }
+}

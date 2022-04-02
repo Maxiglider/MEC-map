@@ -44,7 +44,7 @@ export class TerrainTypeArray {
         return null
     }
 
-    getTerrainType = (x: number, y: number) => {
+    getTerrainType = (x: number, y: number): TerrainType | null => {
         let terrainTypeId = GetTerrainType(x, y)
         let i = 0
         while (true) {

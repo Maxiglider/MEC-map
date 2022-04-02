@@ -3,7 +3,7 @@ import { Monster } from '../../04_STRUCTURES/Monster/Monster'
 import {MakeAction} from "./MakeAction";
 import {Text} from "../../01_libraries/Text";
 
-class MakeDeleteMonstersAction extends MakeAction {
+export class MakeDeleteMonstersAction extends MakeAction {
     private suppressedMonsters: Monster[]
 
     constructor(level: Level, suppressedMonsters: Monster[]) {

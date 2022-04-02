@@ -1,4 +1,4 @@
-import {LARGEUR_CASE, NB_MAX_TILES_MODIFIED} from 'core/01_libraries/Constants'
+import {LARGEUR_CASE} from 'core/01_libraries/Constants'
 import {CanUseTerrain} from "./Terrain_functions";
 
 export const GetNbCaseBetween = (minX: number, minY: number, maxX: number, maxY: number): number => {
@@ -18,13 +18,6 @@ export const ChangeTerrainBetween = (terrainType: number, x1: number, y1: number
     let r: number
     let x: number
     let y: number
-
-    //call Text.A( "nbCases == " + I2S( GetNbCaseBetween( minX, minY, maxX, maxY ) ) )
-    //call Text.A( "changing terrain to : " + TerrainTypeId2TerrainTypeAsciiString( terrainType ) )
-
-    if (GetNbCaseBetween(minX, minY, maxX, maxY) > NB_MAX_TILES_MODIFIED) {
-        return false
-    }
 
     if (!CanUseTerrain(terrainType)) {
         return false

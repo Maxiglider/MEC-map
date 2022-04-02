@@ -7,9 +7,8 @@ import {
     WAIT,
 } from '../../04_STRUCTURES/Monster/MonsterTeleport'
 import { MonsterType } from '../../04_STRUCTURES/Monster/MonsterType'
-import { Make, MakeConsts } from '../Make/Make'
+import {Make, MAKE_LAST_CLIC_UNIT_ID} from '../Make/Make'
 
-const { MAKE_LAST_CLIC_UNIT_ID } = MakeConsts
 
 export class MakeMonsterTeleport extends Make {
     private mt: MonsterType

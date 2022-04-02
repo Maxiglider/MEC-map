@@ -11,13 +11,10 @@ export class MakeExchangeTerrains extends MakeOneByOneOrTwoClicks {
     
     doActions() {
         if(super.doBaseActions()){
-            let terrainTypeA: TerrainType
-            let terrainTypeB: TerrainType
-
             if (this.isLastLocSavedUsed()) {
-                terrainTypeA = udg_terrainTypes.getTerrainType(this.lastX, this.lastY)
-                terrainTypeB = udg_terrainTypes.getTerrainType(this.orderX, this.orderY)
-                ExchangeTerrains(terrainTypeA.label, terrainTypeB.label)
+                const terrainTypeA = udg_terrainTypes.getTerrainType(this.lastX, this.lastY)
+                const terrainTypeB = udg_terrainTypes.getTerrainType(this.orderX, this.orderY)
+                terrainTypeA && terrainTypeB && ExchangeTerrains(terrainTypeA.label, terrainTypeB.label)
                 this.unsaveLocDefinitely()
             } else {
                 this.saveLoc(this.orderX, this.orderY)

@@ -1,6 +1,5 @@
-import { Make } from 'core/05_MAKE_STRUCTURES/Make/Make'
+import {Make, MAKE_LAST_CLIC_UNIT_ID} from 'core/05_MAKE_STRUCTURES/Make/Make'
 
-const { MAKE_LAST_CLIC_UNIT_ID } = MakeConsts
 
 export abstract class MakeOneByOneOrTwoClicks extends Make {
     lastX: number = 0

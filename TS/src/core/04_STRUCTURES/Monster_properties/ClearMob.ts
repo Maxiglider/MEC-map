@@ -3,11 +3,13 @@ import {Monster} from "../Monster/Monster";
 import {MonsterArray} from "../Monster/MonsterArray";
 
 
-const CLEAR_MOB_MAX_DURATION = 300
+export const CLEAR_MOB_MAX_DURATION = 300
+export const FRONT_MONTANT_DURATION = 0.03
+
 const TRIGGER_MOB = 0
 const TIMER_ACTIVATED = 1
 const TIMER_FRONT_MONTANT = 2
-const FRONT_MONTANT_DURATION = 0.03
+
 let udp_currentTimer: timer
 const TRIGGER_MOB_PERMANENT_EFFECT = 'Abilities\\Spells\\Orc\\StasisTrap\\StasisTotemTarget.mdl'
 

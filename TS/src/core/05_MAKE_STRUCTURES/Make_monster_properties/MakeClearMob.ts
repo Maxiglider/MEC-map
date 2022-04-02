@@ -1,5 +1,5 @@
 import { Text } from 'core/01_libraries/Text'
-import { ClearMob } from 'core/04_STRUCTURES/Monster_properties/ClearMob'
+import {CLEAR_MOB_MAX_DURATION, ClearMob, FRONT_MONTANT_DURATION} from 'core/04_STRUCTURES/Monster_properties/ClearMob'
 import { Make } from 'core/05_MAKE_STRUCTURES/Make/Make'
 import { Monster } from '../../04_STRUCTURES/Monster/Monster'
 
@@ -15,7 +15,7 @@ export class MakeClearMob extends Make {
 
         if (
             disableDuration !== 0 &&
-            (disableDuration > CLEAR_MOB_MAX_DURATION || disableDuration < ClearMob_FRONT_MONTANT_DURATION)
+            (disableDuration > CLEAR_MOB_MAX_DURATION || disableDuration < FRONT_MONTANT_DURATION)
         ) {
             throw 'ClearMob : wrong duration'
         }
@@ -26,7 +26,9 @@ export class MakeClearMob extends Make {
     }
 
     private createClearMob() {
-        this.clearMob = this.escaper.getMakingLevel().clearMobs.new(this.triggerMob, this.disableDuration, true)
+        if(this.triggerMob) {
+            this.clearMob = this.escaper.getMakingLevel().clearMobs.new(this.triggerMob, this.disableDuration, true)
+        }
     }
 
     private addBlockMob(monster: Monster) {
@@ -79,7 +81,7 @@ export class MakeClearMob extends Make {
                 this.escaper.destroyMake()
                 return
             }
-            if (this.clearMob.getBlockMobs().containsMob(monster)) {
+            if (this.clearMob.getBlockMobs().containsMonster(monster)) {
                 Text.erP(this.makerOwner, 'this monster is already a block mob of this clear mob')
                 return
             } else {

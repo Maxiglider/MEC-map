@@ -2,7 +2,7 @@ import { Text } from 'core/01_libraries/Text'
 import { MakeMonsterAction } from '../MakeLastActions/MakeMonsterAction'
 import { MonsterMultiplePatrols } from '../../04_STRUCTURES/Monster/MonsterMultiplePatrols'
 import { MonsterType } from '../../04_STRUCTURES/Monster/MonsterType'
-import { Make, MakeConsts } from '../Make/Make'
+import {Make, MAKE_LAST_CLIC_UNIT_ID} from '../Make/Make'
 
 export class MakeMonsterMultiplePatrols extends Make {
     private mt: MonsterType
@@ -59,7 +59,7 @@ export class MakeMonsterMultiplePatrols extends Make {
         if (!this.unitLastClic) {
             this.unitLastClic = CreateUnit(
                 this.makerOwner,
-                MakeConsts.MAKE_LAST_CLIC_UNIT_ID,
+                MAKE_LAST_CLIC_UNIT_ID,
                 x,
                 y,
                 GetRandomDirectionDeg()

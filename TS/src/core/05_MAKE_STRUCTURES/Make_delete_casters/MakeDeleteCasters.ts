@@ -2,6 +2,8 @@ import { IsUnitBetweenLocs } from 'core/01_libraries/Basic_functions'
 import { Caster } from 'core/04_STRUCTURES/Caster/Caster'
 import { MakeOneByOneOrTwoClicks } from 'core/05_MAKE_STRUCTURES/Make/MakeOneByOneOrTwoClicks'
 import { Text } from '../../01_libraries/Text'
+import {MakeDeleteMonsters} from "../Make_delete_monsters/MakeDeleteMonsters";
+import {MakeDeleteMonstersAction} from "../MakeLastActions/MakeDeleteMonstersAction";
 
 export class MakeDeleteCasters extends MakeOneByOneOrTwoClicks {
     constructor(maker: unit, mode: string) {
@@ -35,7 +37,7 @@ export class MakeDeleteCasters extends MakeOneByOneOrTwoClicks {
 
                 casters.map(caster => {
                     caster.removeUnit()
-                    suppressedCasters.push(caster)
+                    caster instanceof Caster && suppressedCasters.push(caster)
                     nbCastersRemoved++
                 })
             }
@@ -47,7 +49,7 @@ export class MakeDeleteCasters extends MakeOneByOneOrTwoClicks {
             }
 
             if (nbCastersRemoved > 0) {
-                this.escaper.newAction(new MakeDeleteCastersAction(this.escaper.getMakingLevel(), suppressedCasters))
+                this.escaper.newAction(new MakeDeleteMonstersAction(this.escaper.getMakingLevel(), suppressedCasters))
             }
             this.unsaveLocDefinitely()
         }

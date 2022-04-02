@@ -3,7 +3,7 @@ import { Meteor } from '../../04_STRUCTURES/Meteor/Meteor'
 import {MakeAction} from "./MakeAction";
 import {Text} from "../../01_libraries/Text";
 
-class MakeDeleteMeteorsAction extends MakeAction {
+export class MakeDeleteMeteorsAction extends MakeAction {
     private suppressedMeteors
 
     constructor(level: Level, suppressedMeteors: Meteor[]) {

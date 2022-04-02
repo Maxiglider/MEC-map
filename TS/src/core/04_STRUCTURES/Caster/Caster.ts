@@ -4,7 +4,7 @@ import { Monster } from '../Monster/Monster'
 import { MonsterType } from '../Monster/MonsterType'
 import { NewImmobileMonster } from '../Monster/Monster_creation_functions'
 import { CasterType } from './CasterType'
-import { CasterFunctions } from './Caster_functions'
+import {CasterUnitWithinRange_Actions} from './Caster_functions'
 
 export class Caster extends Monster {
     private casterType: CasterType
@@ -12,10 +12,10 @@ export class Caster extends Monster {
     private y: number
     private angle: number
     private trg_unitWithinRange?: trigger
-    private escapersInRange: Escaper[]
-    private nbEscapersInRange: number
-    private canShoot: boolean
-    private t?: timer
+    public escapersInRange: Escaper[]
+    public nbEscapersInRange: number
+    public canShoot: boolean
+    public t?: timer
     private enabled: boolean
 
     static anyTriggerWithinRangeId2Caster = new Map<number, Caster>()
@@ -83,7 +83,7 @@ export class Caster extends Monster {
 
         this.trg_unitWithinRange = CreateTrigger()
         this.u && TriggerRegisterUnitInRangeSimple(this.trg_unitWithinRange, this.casterType.getRange(), this.u)
-        TriggerAddAction(this.trg_unitWithinRange, CasterFunctions.CasterUnitWithinRange_Actions)
+        TriggerAddAction(this.trg_unitWithinRange, CasterUnitWithinRange_Actions)
         Caster.anyTriggerWithinRangeId2Caster.set(GetHandleId(this.trg_unitWithinRange), this)
 
         this.t = CreateTimer()

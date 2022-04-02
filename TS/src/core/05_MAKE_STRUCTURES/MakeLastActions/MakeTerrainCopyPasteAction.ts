@@ -84,12 +84,13 @@ export class MakeTerrainCopyPasteAction extends MakeAction {
         yCopy = minYcopy
         while (yCopy <= maxYcopy) {
             while (xCopy <= maxXcopy) {
-                this.terrainTypesBefore[xPaste][yPaste] = udg_terrainTypes.getTerrainType(xPaste, yPaste)
+                let tt = udg_terrainTypes.getTerrainType(xPaste, yPaste)
+                if(tt) this.terrainTypesBefore[xPaste][yPaste] = tt
 
                 const terrainType = udg_terrainTypes.getTerrainType(xCopy, yCopy)
-                this.terrainTypesAfter[xPaste][yPaste] = terrainType
 
                 if (terrainType) {
+                    this.terrainTypesAfter[xPaste][yPaste] = terrainType
                     const terrainTypeId = terrainType.getTerrainTypeId()
                     if (terrainTypeId !== 0) {
                         ChangeTerrainType(xPaste, yPaste, terrainTypeId)
