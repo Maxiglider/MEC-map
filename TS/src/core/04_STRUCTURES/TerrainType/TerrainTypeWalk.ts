@@ -1,24 +1,18 @@
+import { CanUseTerrain } from 'core/07_TRIGGERS/Modify_terrain_Functions/Terrain_functions'
 import { TerrainType } from './TerrainType'
 
 export class TerrainTypeWalk extends TerrainType {
     private walkSpeed: number
 
-    // TODO; Used to be static
+    constructor(label: string, terrainTypeId: number, walkSpeed: number) {
+        super(label, terrainTypeId, null, 'walk', 0, 1)
 
-    create = (label: string, terrainTypeId: number, walkSpeed: number): TerrainTypeWalk => {
-        let tt: TerrainTypeWalk
         if (!CanUseTerrain(terrainTypeId)) {
-            return 0
+            // check shoulda been done sooner
+            throw new Error('bad code, ttw')
         }
-        tt = TerrainTypeWalk.allocate()
-        tt.label = label
-        tt.theAlias = null
-        tt.terrainTypeId = terrainTypeId
-        tt.walkSpeed = walkSpeed
-        tt.kind = 'walk'
-        tt.orderId = 0
-        tt.cliffClassId = 1
-        return tt
+
+        this.walkSpeed = walkSpeed
     }
 
     getWalkSpeed = (): number => {

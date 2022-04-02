@@ -8,12 +8,14 @@ import {
     MainEscaperToSecondaryOne,
 } from 'core/04_STRUCTURES/Escaper/Escaper_functions'
 import { TerrainTypeSlide } from 'core/04_STRUCTURES/TerrainType/TerrainTypeSlide'
+import { Apm } from 'core/08_GAME/Apm_clics_par_minute/Apm'
 import { udg_symmetryAngle } from 'core/Double_heroes/double_heroes_config'
+import { createEvent, forRange } from 'Utils/mapUtils'
+import { AutoContinueAfterSliding } from './Auto_continue_after_sliding'
 
 const initTurnOnSlide = () => {
     //turn variables
-    let escaper: Escaper
-    let escaperSecond: Escaper
+    let escaperSecond: Escaper | null
     let slider: unit
     let n: number
     let sliderX: number
@@ -40,12 +42,13 @@ const initTurnOnSlide = () => {
     let trg_turnToPoint: trigger
     let trg_turnToWidget: trigger
 
-    const Trig_to_turn_to_point_Conditions = (): boolean => {
-        escaper = Hero2Escaper(GetTriggerUnit())
-        return IsHero(GetTriggerUnit()) && escaper.isSliding() && !IsLastOrderPause()
-    }
-
     const HandleTurn = (triggerIsToLocation: boolean) => {
+        const escaper = Hero2Escaper(GetTriggerUnit())
+
+        if (!escaper) {
+            return
+        }
+
         //init variables
         slider = GetTriggerUnit()
         n = GetUnitUserData(slider)
@@ -88,7 +91,7 @@ const initTurnOnSlide = () => {
 
         //turn hero
         if (IsOnGround(slider)) {
-            if (escaper.getLastTerrainType().kind == 'slide') {
+            if (escaper.getLastTerrainType()?.kind == 'slide') {
                 canTurn = TerrainTypeSlide(integer(escaper.getLastTerrainType())).getCanTurn()
             }
         } else {
@@ -100,64 +103,59 @@ const initTurnOnSlide = () => {
         if (canTurn) {
             if (escaper.isAbsoluteInstantTurn()) {
                 escaper.turnInstantly(angle)
-                if (escaperSecond.isSliding()) {
+                if (escaperSecond?.isSliding()) {
                     escaperSecond.turnInstantly(angleSecond)
                 }
             } else {
                 SetUnitFacing(slider, angle)
-                const h1 = escaperSecond.getHero()
+                const h1 = escaperSecond?.getHero()
 
-                if (escaperSecond.isSliding() && h1) {
+                if (escaperSecond?.isSliding() && h1) {
                     SetUnitFacing(h1, angleSecond)
                 }
             }
             escaper.setSlideLastAngleOrder(angle)
-            if (escaperSecond.isSliding()) {
+            if (escaperSecond?.isSliding()) {
                 escaperSecond.setSlideLastAngleOrder(angleSecond)
             }
         }
 
         //save click
-        lastClickedX[n] = orderX
-        lastClickedY[n] = orderY
-        isLastTargetALocation[n] = triggerIsToLocation
+        AutoContinueAfterSliding.lastClickedX[n] = orderX
+        AutoContinueAfterSliding.lastClickedY[n] = orderY
+        AutoContinueAfterSliding.isLastTargetALocation[n] = triggerIsToLocation
 
-        nbClicsOnSlide[n] = nbClicsOnSlide[n] + 1
+        Apm.nbClicsOnSlide[n] = Apm.nbClicsOnSlide[n] + 1
     }
 
-    const Trig_to_turn_to_point_Actions = () => {
-        HandleTurn(true)
-    }
-
-    const Trig_to_turn_to_widget_Conditions = (): boolean => {
-        escaper = Hero2Escaper(GetTriggerUnit())
-        return IsHero(GetTriggerUnit()) && escaper.isSliding()
-    }
-
-    const Trig_to_turn_to_widget_Actions = () => {
-        HandleTurn(false)
-    }
-
-    //===========================================================================
     const Init_ToTurnOnSlide = () => {
-        let i: number
         //turn to point
-        trg_turnToPoint = CreateTrigger()
-        TriggerRegisterAnyUnitEventBJ(trg_turnToPoint, EVENT_PLAYER_UNIT_ISSUED_POINT_ORDER)
-        TriggerAddCondition(trg_turnToPoint, Condition(Trig_to_turn_to_point_Conditions))
-        TriggerAddAction(trg_turnToPoint, Trig_to_turn_to_point_Actions)
+        trg_turnToPoint = createEvent({
+            events: [t => TriggerRegisterAnyUnitEventBJ(t, EVENT_PLAYER_UNIT_ISSUED_POINT_ORDER)],
+            conditions: [
+                () => {
+                    const escaper = Hero2Escaper(GetTriggerUnit())
+                    return IsHero(GetTriggerUnit()) && !!escaper?.isSliding() && !IsLastOrderPause()
+                },
+            ],
+            actions: [() => HandleTurn(true)],
+        })
+
         //turn to widget
-        trg_turnToWidget = CreateTrigger()
-        TriggerRegisterAnyUnitEventBJ(trg_turnToWidget, EVENT_PLAYER_UNIT_ISSUED_TARGET_ORDER)
-        TriggerAddCondition(trg_turnToWidget, Condition(Trig_to_turn_to_widget_Conditions))
-        TriggerAddAction(trg_turnToWidget, Trig_to_turn_to_widget_Actions)
+        trg_turnToWidget = createEvent({
+            events: [t => TriggerRegisterAnyUnitEventBJ(t, EVENT_PLAYER_UNIT_ISSUED_TARGET_ORDER)],
+            conditions: [
+                () => {
+                    const escaper = Hero2Escaper(GetTriggerUnit())
+                    return IsHero(GetTriggerUnit()) && !!escaper?.isSliding()
+                },
+            ],
+            actions: [() => HandleTurn(false)],
+        })
+
         //drunk mode
-        i = 0
-        while (true) {
-            if (i >= NB_ESCAPERS) break
-            udg_drunk[i] = INITIAL_DRUNK
-            i = i + 1
-        }
+        forRange(NB_ESCAPERS, i => (udg_drunk[i] = INITIAL_DRUNK))
+
         DRUNK_EFFECTS[1] = DRUNK_EFFECT_PETIT
         DRUNK_EFFECTS[2] = DRUNK_EFFECT_MOYEN
         DRUNK_EFFECTS[3] = DRUNK_EFFECT_GROS

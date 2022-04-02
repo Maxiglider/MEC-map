@@ -6,7 +6,7 @@ import { Modify_terrain_functions } from '../Modify_terrain_Functions/Modify_ter
 import { TerrainModifyingTrig } from './Terrain_modifying_trig'
 
 const initSaveLoadTerrainWithoutName = () => {
-    let terrainSave: TerrainType[] = []
+    let terrainSave: (TerrainType | null)[] = []
     let terrainSave_id: number
     let terrainModifyWorking = false
 
@@ -55,9 +55,13 @@ const initSaveLoadTerrainWithoutName = () => {
             x = Constants.MAP_MIN_X
             while (true) {
                 if (x > Constants.MAP_MAX_X) break
-                if (terrainSave[terrainSave_id] !== 0) {
-                    Modify_terrain_functions.ChangeTerrainType(x, y, terrainSave[terrainSave_id].getTerrainTypeId())
+
+                const terrainType = terrainSave[terrainSave_id]
+
+                if (terrainType !== null) {
+                    Modify_terrain_functions.ChangeTerrainType(x, y, terrainType.getTerrainTypeId())
                 }
+
                 terrainSave_id = terrainSave_id + 1
                 x = x + LARGEUR_CASE
             }

@@ -55,7 +55,11 @@ export class KillingTimers {
             }
         })
 
-        udg_escapers.get(timerId).currentLevelTouchTerrainDeath = udg_levels.getCurrentLevel()
+        const escaper = udg_escapers.get(timerId)
+
+        if (escaper) {
+            escaper.currentLevelTouchTerrainDeath = udg_levels.getCurrentLevel()
+        }
     }
 
     get = (id: number): timer => this.timers[id]

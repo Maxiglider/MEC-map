@@ -70,7 +70,7 @@ const initSaveTerrain = () => {
         let terrainTypes: TerrainType[] = []
         let nbOrderedTerrains = 0
         let numTerrain = 0
-        let ordreMinTerrainId: number
+        let ordreMinTerrainId: number = -1
         let ordreMin: number
         //récupération de tous les terrains
         let i = 0

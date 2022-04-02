@@ -1,10 +1,11 @@
+import { CanUseTerrain } from 'core/07_TRIGGERS/Modify_terrain_Functions/Terrain_functions'
 import { Escaper } from '../Escaper/Escaper'
+import { TerrainType } from './TerrainType'
 import { KillingTimers } from './TerrainTypeDeath_KillingTimers'
 
 export const DEATH_TERRAIN_MAX_TOLERANCE = 50
 
-// TODO; extends TerrainType
-export class TerrainTypeDeath {
+export class TerrainTypeDeath extends TerrainType {
     private killingEffectStr: string
     private timeToKill: number
     private killingTimers: KillingTimers
@@ -17,22 +18,17 @@ export class TerrainTypeDeath {
         timeToKill: number,
         toleranceDist: number
     ) {
-        let i: number
+        super(label, terrainTypeId, null, 'death', 0, 1)
 
         if (!CanUseTerrain(terrainTypeId)) {
-            return 0
+            // check shoulda been done sooner
+            throw new Error('bad code, ttd')
         }
 
-        this.label = label
-        this.theAlias = null
-        this.terrainTypeId = terrainTypeId
         this.killingEffectStr = killingEffectStr
         this.timeToKill = timeToKill
         this.killingTimers = new KillingTimers()
-        this.kind = 'death'
         this.toleranceDist = toleranceDist
-        this.orderId = 0
-        this.cliffClassId = 1
     }
 
     onDestroy = () => {

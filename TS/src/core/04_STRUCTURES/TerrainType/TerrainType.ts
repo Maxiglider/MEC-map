@@ -3,6 +3,7 @@ import { B2S } from 'core/01_libraries/Basic_functions'
 import { SLIDE_PERIOD, TERRAIN_DATA_DISPLAY_TIME } from 'core/01_libraries/Constants'
 import { COLOR_TERRAIN_DEATH, COLOR_TERRAIN_SLIDE, COLOR_TERRAIN_WALK } from 'core/01_libraries/Init_colorCodes'
 import { Text } from 'core/01_libraries/Text'
+import { CanUseTerrain } from 'core/07_TRIGGERS/Modify_terrain_Functions/Terrain_functions'
 import { CACHE_SEPARATEUR_PARAM } from 'core/07_TRIGGERS/Save_map_in_gamecache/struct_StringArrayForCache'
 import { TerrainTypeDeath } from './TerrainTypeDeath'
 import { TerrainTypeSlide } from './TerrainTypeSlide'
@@ -10,11 +11,27 @@ import { TerrainTypeWalk } from './TerrainTypeWalk'
 
 export class TerrainType {
     label: string
-    theAlias: string
+    theAlias: string | null
     kind: string
     terrainTypeId: number
     orderId: number //numéro du terrain (ordre des tilesets), de 1 à 16
     cliffClassId: number //cliff class 1 or 2, depending of the main tileset
+
+    constructor(
+        label: string,
+        terrainTypeId: number,
+        theAlias: string | null,
+        kind: string,
+        orderId: number,
+        cliffClassId: number
+    ) {
+        this.label = label
+        this.terrainTypeId = terrainTypeId
+        this.theAlias = theAlias
+        this.kind = kind
+        this.orderId = orderId
+        this.cliffClassId = cliffClassId
+    }
 
     setOrderId = (orderId: number): TerrainType => {
         this.orderId = orderId

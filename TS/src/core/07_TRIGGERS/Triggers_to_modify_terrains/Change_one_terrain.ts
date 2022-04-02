@@ -1,9 +1,8 @@
 import { Constants, LARGEUR_CASE } from 'core/01_libraries/Constants'
 import { Text } from 'core/01_libraries/Text'
-import { TerrainType } from 'core/04_STRUCTURES/TerrainType/TerrainType'
 import { udg_terrainTypes } from '../../../../globals'
 import { Modify_terrain_functions } from '../Modify_terrain_Functions/Modify_terrain_functions'
-import { TerrainFunctions } from '../Modify_terrain_Functions/Terrain_functions'
+import { GetTerrainData } from '../Modify_terrain_Functions/Terrain_functions'
 import { TerrainTypeFromString } from '../Modify_terrain_Functions/Terrain_type_from_string'
 import { TerrainModifyingTrig } from './Terrain_modifying_trig'
 
@@ -44,13 +43,12 @@ const initChangeOneTerrain = () => {
     }
 
     const ChangeOneTerrain = (terrainTypeLabel: string, newTerrainType: string) => {
-        let terrainType: TerrainType
         if (terrainModifyWorking) {
             Text.erA("can't execute two commands of this type simultaneously !")
             return null
         }
-        terrainType = udg_terrainTypes.get(terrainTypeLabel)
-        if (terrainType === 0) {
+        const terrainType = udg_terrainTypes.get(terrainTypeLabel)
+        if (terrainType === null) {
             return null
         }
         oldTerrain = terrainType.getTerrainTypeId()
@@ -66,7 +64,7 @@ const initChangeOneTerrain = () => {
         }
 
         StartTerrainModifying()
-        return TerrainFunctions.GetTerrainData(newTerrain)
+        return GetTerrainData(newTerrain)
     }
 
     return { ChangeOneTerrain }

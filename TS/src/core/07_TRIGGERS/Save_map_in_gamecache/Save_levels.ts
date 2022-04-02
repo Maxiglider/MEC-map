@@ -322,7 +322,7 @@ const initSaveLevels = () => {
             StringArrayForCache.stringArrayForCache.push(I2S(level.getNbLives()))
             StringArrayForCache.stringArrayForCache.writeInCache()
             //start
-            if (level.getStart() != 0) {
+            if (level.getStart() != null) {
                 StringArrayForCache.stringArrayForCache = new StringArrayForCache(
                     'level' + I2S(levelId),
                     'start',
@@ -332,7 +332,7 @@ const initSaveLevels = () => {
                 StringArrayForCache.stringArrayForCache.writeInCache()
             }
             //end
-            if (level.getEnd() != 0) {
+            if (level.getEnd() != null) {
                 StringArrayForCache.stringArrayForCache = new StringArrayForCache('level' + I2S(levelId), 'end', false)
                 StringArrayForCache.stringArrayForCache.push(level.getEnd().toString())
                 StringArrayForCache.stringArrayForCache.writeInCache()
@@ -347,9 +347,12 @@ const initSaveLevels = () => {
         let i = 0
         while (true) {
             if (i >= NB_ESCAPERS) break
-            if (udg_escapers.get(i) != null) {
-                udg_escapers.get(i).destroyMake()
-                udg_escapers.get(i).destroyAllSavedActions()
+
+            const escaper = udg_escapers.get(i)
+
+            if (escaper !== null) {
+                escaper.destroyMake()
+                escaper.destroyAllSavedActions()
             }
             i = i + 1
         }

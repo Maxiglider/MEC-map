@@ -34,7 +34,7 @@ export const InitTrig_A_hero_dies_check_if_all_dead_and_sounds = () => {
                 i = 0
                 while (true) {
                     if (i >= NB_ESCAPERS) break
-                    if (udg_escapers.get(i).isAlive()) {
+                    if (udg_escapers.get(i)?.isAlive()) {
                         nbAlive = nbAlive + 1
                     }
                     i = i + 1
@@ -76,7 +76,7 @@ export const InitTrig_A_hero_dies_check_if_all_dead_and_sounds = () => {
                         }
 
                         //déplacement du héros si mort sur le death path
-                        if (udg_terrainTypes.getTerrainType(GetUnitX(hero), GetUnitY(hero)).getKind() == 'death') {
+                        if (udg_terrainTypes.getTerrainType(GetUnitX(hero), GetUnitY(hero))?.getKind() === 'death') {
                             DeplacementHeroHorsDeathPath.DeplacementHeroHorsDeathPath(hero)
                         }
 
@@ -84,8 +84,8 @@ export const InitTrig_A_hero_dies_check_if_all_dead_and_sounds = () => {
                         i = 0
                         while (true) {
                             if (i >= NB_ESCAPERS) break
-                            if (i != n && udg_escapers.get(i).isAlive()) {
-                                const h1 = udg_escapers.get(i).getHero()
+                            if (i != n && udg_escapers.get(i)?.isAlive()) {
+                                const h1 = udg_escapers.get(i)?.getHero()
 
                                 if (!h1) {
                                     continue
@@ -94,7 +94,7 @@ export const InitTrig_A_hero_dies_check_if_all_dead_and_sounds = () => {
                                 diffX = GetUnitX(h1) - GetUnitX(hero)
                                 diffY = GetUnitY(h1) - GetUnitY(hero)
                                 if (SquareRoot(diffX * diffX + diffY * diffY) < COOP_REVIVE_DIST) {
-                                    udg_escapers.get(n).coopReviveHero()
+                                    udg_escapers.get(n)?.coopReviveHero()
                                     TriggerSleepAction(3.7)
                                     udg_nbKilled = udg_nbKilled - 1
                                     return
@@ -102,7 +102,7 @@ export const InitTrig_A_hero_dies_check_if_all_dead_and_sounds = () => {
                             }
                             i = i + 1
                         }
-                        udg_escapers.get(n).enableTrigCoopRevive()
+                        udg_escapers.get(n)?.enableTrigCoopRevive()
                         TriggerSleepAction(3.7)
                     } else {
                         TriggerSleepAction(5)

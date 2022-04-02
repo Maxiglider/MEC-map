@@ -1,27 +1,21 @@
 import { SLIDE_PERIOD } from 'core/01_libraries/Constants'
+import { CanUseTerrain } from 'core/07_TRIGGERS/Modify_terrain_Functions/Terrain_functions'
 import { TerrainType } from './TerrainType'
 
 export class TerrainTypeSlide extends TerrainType {
     private slideSpeed: number
     private canTurn: boolean
 
-    // TODO; Used to be static
+    constructor(label: string, terrainTypeId: number, slideSpeed: number, canTurn: boolean) {
+        super(label, terrainTypeId, null, 'slide', 0, 1)
 
-    create = (label: string, terrainTypeId: number, slideSpeed: number, canTurn: boolean): TerrainTypeSlide => {
-        let tt: TerrainTypeSlide
         if (!CanUseTerrain(terrainTypeId)) {
-            return 0
+            // check shoulda been done sooner
+            throw new Error('bad code, tts')
         }
-        tt = TerrainTypeSlide.allocate()
-        tt.label = label
-        tt.theAlias = null
-        tt.terrainTypeId = terrainTypeId
-        tt.kind = 'slide'
-        tt.slideSpeed = slideSpeed * SLIDE_PERIOD
-        tt.canTurn = canTurn
-        tt.orderId = 0
-        tt.cliffClassId = 1
-        return tt
+
+        this.slideSpeed = slideSpeed * SLIDE_PERIOD
+        this.canTurn = canTurn
     }
 
     getSlideSpeed = (): number => {

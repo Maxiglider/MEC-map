@@ -16,7 +16,7 @@ const initTerrainModifyingTrig = () => {
     TriggerRegisterTimerEvent(TerrainModifyingTrig.gg_trg_Terrain_modifying_trig, LOW_PERIOD_FOR_WORK, true)
 
     const StopEnabledCheckTerrainTriggers = () => {
-        let escaper: Escaper
+        let escaper: Escaper | null
         let i = 0
         while (true) {
             if (i >= NB_ESCAPERS) break
@@ -34,7 +34,7 @@ const initTerrainModifyingTrig = () => {
     }
 
     const RestartEnabledCheckTerrainTriggers = () => {
-        let escaper: Escaper
+        let escaper: Escaper | null
         let i = 0
         while (true) {
             if (i >= NB_ESCAPERS) break

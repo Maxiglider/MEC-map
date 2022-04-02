@@ -63,7 +63,7 @@ const initReinitTerrains = () => {
                 done = false
                 j = 0
                 while (true) {
-                    if (terrainTypes[j] === 0 || done) break
+                    if (terrainTypes[j] === null || done) break
                     if (terrainTypeId === terrainTypeIdsToReplace[j]) {
                         Modify_terrain_functions.ChangeTerrainType(x, y, terrainTypeIds[j])
                         done = true
@@ -98,7 +98,7 @@ const initReinitTerrains = () => {
 
         i = 0
         while (true) {
-            if (terrainTypes[i] === 0) break
+            if (terrainTypes[i] === null) break
             terrainTypeIdsToReplace[i] = terrainTypes[i].getTerrainTypeId()
             terrainTypes[i].setTerrainTypeId(terrainTypeIds[i])
             i = i + 1
