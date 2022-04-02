@@ -12,6 +12,7 @@ import {MonsterType} from "../Monster/MonsterType";
 import {CasterType} from "../Caster/CasterType";
 import {udg_levels} from "../../08_GAME/Init_structures/Init_struct_levels";
 import {VisibilityModifier} from "./VisibilityModifier";
+import {End, Start} from "./StartAndEnd";
 
 
 export class Level {
@@ -20,8 +21,8 @@ export class Level {
     private isActivatedB: boolean
     private startMessage: string
     private livesEarnedAtBeginning: number
-    private start: Start
-    private end: End
+    private start?: Start
+    private end?: End
     private triggers: TriggerArray
 
     visibilities: VisibilityModifierArray
@@ -40,14 +41,12 @@ export class Level {
         this.livesEarnedAtBeginning = 1
         this.isActivatedB = false
         this.startMessage = ''
-        this.start = new Start()
-        this.end = new End()
     }
 
     activate(activ: boolean) {
         if (this.isActivatedB == activ) return
 
-        this.end.activate(activ)
+        this.end && this.end.activate(activ)
         this.triggers.activate(activ)
 
         if (activ) {
@@ -83,20 +82,20 @@ export class Level {
     }
 
     getStartRandomX() {
-        return this.start.getRandomX()
+        return this.start ? this.start.getRandomX() : 0
     }
 
     getStartRandomY() {
-        return this.start.getRandomY()
+        return this.start ? this.start.getRandomY() : 0
     }
 
     newStart(x1: number, y1: number, x2: number, y2: number) {
-        this.start.destroy()
+        this.start && this.start.destroy()
         this.start = new Start(x1, y1, x2, y2)
     }
 
     newEnd(x1: number, y1: number, x2: number, y2: number) {
-        this.end.destroy()
+        this.end && this.end.destroy()
         this.end = new End(x1, y1, x2, y2)
         if (this.isActivatedB) {
             this.end.activate(true)
@@ -113,8 +112,8 @@ export class Level {
     }
 
     destroy() {
-        this.start.destroy()
-        this.end.destroy()
+        this.start && this.start.destroy()
+        this.end && this.end.destroy()
         this.visibilities.destroy()
         this.triggers.destroy()
         this.monsters.destroy()

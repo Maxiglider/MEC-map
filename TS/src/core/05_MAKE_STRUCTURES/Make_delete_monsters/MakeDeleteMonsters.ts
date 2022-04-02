@@ -16,7 +16,7 @@ export class MakeDeleteMonsters extends MakeOneByOneOrTwoClicks {
 
             if (this.getMode() == 'oneByOne') {
                 //mode oneClick
-                let monster = this.escaper.getMakingLevel().getMonsterNear(this.orderX, this.orderY)
+                let monster = this.escaper.getMakingLevel().monsters.getMonsterNear(this.orderX, this.orderY)
                 if (monster) {
                     monster.removeUnit()
                     suppressedMonsters.push(monster)

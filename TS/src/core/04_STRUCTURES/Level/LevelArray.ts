@@ -1,9 +1,7 @@
-import { BasicFunctions } from 'core/01_libraries/Basic_functions'
 import { NB_LIVES_AT_BEGINNING } from 'core/01_libraries/Constants'
 import { Text } from 'core/01_libraries/Text'
 import { udg_escapers } from 'core/08_GAME/Init_structures/Init_escapers'
 import { udg_lives } from 'core/08_GAME/Init_structures/Init_lives'
-import { udg_levels } from 'core/08_GAME/Init_structures/Init_struct_levels'
 import { gg_trg_apparition_dialogue_et_fermeture_automatique } from 'core/08_GAME/Mode_coop/creation_dialogue'
 import { Escaper } from '../Escaper/Escaper'
 import { Level } from './Level'
@@ -16,6 +14,7 @@ import {VisibilityModifierArray} from "./VisibilityModifierArray";
 import {ClearMobArray} from "../Monster_properties/ClearMobArray";
 import {MonsterSpawnArray} from "../MonsterSpawn/MonsterSpawnArray";
 import {udg_colorCode} from "../../01_libraries/Init_colorCodes";
+import {MoveCamExceptForPlayer} from "../../01_libraries/Basic_functions";
 
 export const NB_MAX_LEVELS = 50
 
@@ -74,13 +73,9 @@ export class LevelArray {
                 }
             }
         }
-        xCam = this.levels[levelId].getStart().getCenterX()
-        yCam = this.levels[levelId].getStart().getCenterY()
-        if (finisher !== null) {
-            BasicFunctions.MoveCamExceptForPlayer(finisher.getPlayer(), xCam, yCam)
-        } else {
-            SetCameraPosition(xCam, yCam)
-        }
+
+        this.moveCamToStart(this.levels[levelId], finisher)
+
         return true
     }
 
@@ -97,20 +92,35 @@ export class LevelArray {
         }
         this.levels[this.currentLevel].activate(true)
         this.levels[this.currentLevel].checkpointReviveHeroes(finisher)
-        xCam = this.levels[this.currentLevel].getStart().getCenterX()
-        yCam = this.levels[this.currentLevel].getStart().getCenterY()
-        if (finisher !== null) {
-            BasicFunctions.MoveCamExceptForPlayer(finisher.getPlayer(), xCam, yCam)
+
+        if(this.moveCamToStart(this.levels[this.currentLevel], finisher) && finisher){
             Text.A(
                 udg_colorCode[GetPlayerId(finisher.getPlayer())] +
-                    'Good job ' +
-                    GetPlayerName(finisher.getPlayer()) +
-                    ' !'
+                'Good job ' +
+                GetPlayerName(finisher.getPlayer()) +
+                ' !'
             )
-        } else {
-            SetCameraPosition(xCam, yCam)
         }
+
         return true
+    }
+
+    moveCamToStart(level: Level, finisher: Escaper | null){
+        const start = level.getStart()
+
+        if(start) {
+            const xCam = start.getCenterX()
+            const yCam = start.getCenterY()
+            if (finisher) {
+                MoveCamExceptForPlayer(finisher.getPlayer(), xCam, yCam)
+            } else {
+                SetCameraPosition(xCam, yCam)
+            }
+
+            return true
+        }else{
+            return false
+        }
     }
 
     restartTheGame = () => {
@@ -120,7 +130,10 @@ export class LevelArray {
         }
         this.goToLevel(null, 0)
         udg_lives.setNb(this.levels[0].getNbLives())
-        SetCameraPosition(this.levels[0].getStart().getCenterX(), this.levels[0].getStart().getCenterY())
+
+        const start = this.levels[0].getStart()
+        start && SetCameraPosition(start.getCenterX(), start.getCenterY())
+
         //coop
         TriggerExecute(gg_trg_apparition_dialogue_et_fermeture_automatique)
     }

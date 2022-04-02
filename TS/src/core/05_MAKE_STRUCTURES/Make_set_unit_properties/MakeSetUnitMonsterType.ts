@@ -21,7 +21,7 @@ export class MakeSetUnitMonsterType extends MakeOneByOneOrTwoClicks {
             let nbMonstersFixed = 0
 
             if (this.getMode() == 'oneByOne') {
-                let monster = this.escaper.getMakingLevel().getMonsterNear(this.orderX, this.orderY)
+                let monster = this.escaper.getMakingLevel().monsters.getMonsterNear(this.orderX, this.orderY)
                 if (monster) {
                     if (monster.setMonsterType(this.getMonsterType())) {
                         nbMonstersFixed = 1
@@ -35,7 +35,7 @@ export class MakeSetUnitMonsterType extends MakeOneByOneOrTwoClicks {
                 }
 
                 //todomax getMonsters method in Level class to union all types of Monsters in an array of Monster
-                let monsters = escaper.getMakingLevel().getMonstersBetweenLocs(this.orderX, this.orderY)
+                let monsters = this.escaper.getMakingLevel().monsters.getMonstersBetweenLocs(this.lastX, this.lastY, this.orderX, this.orderY)
                 monsters.map(monster => {
                     if (monster.setMonsterType(this.getMonsterType())) {
                         nbMonstersFixed++

@@ -2,7 +2,8 @@ import { Text } from 'core/01_libraries/Text'
 import { CACHE_SEPARATEUR_PARAM } from 'core/07_TRIGGERS/Save_map_in_gamecache/struct_StringArrayForCache'
 import { udg_levels } from 'core/08_GAME/Init_structures/Init_struct_levels'
 import { createEvent } from 'Utils/mapUtils'
-import { EscaperFunctions } from '../Escaper/Escaper_functions'
+import {Hero2Escaper} from "../Escaper/Escaper_functions";
+
 
 abstract class RectInterface {
     minX: number
@@ -19,6 +20,10 @@ abstract class RectInterface {
         this.r = Rect(this.minX, this.minY, this.maxX, this.maxY)
     }
 
+    destroy = () => {
+        RemoveRect(this.r)
+    }
+
     toString = () => {
         let minX = I2S(R2I(this.minX))
         let minY = I2S(R2I(this.minY))
@@ -32,11 +37,6 @@ abstract class RectInterface {
 export class Start extends RectInterface {
     constructor(x1: number, y1: number, x2: number, y2: number) {
         super(RMinBJ(x1, x2), RMinBJ(y1, y2), RMaxBJ(x1, x2), RMaxBJ(y1, y2))
-    }
-
-    destroy = () => {
-        RemoveRect(this.r)
-        ;(this.r as any) = null
     }
 
     getRandomX = () => {
@@ -66,7 +66,7 @@ export class End extends RectInterface {
             events: [t => TriggerRegisterEnterRectSimple(t, this.r)],
             actions: [
                 () => {
-                    const finisher = EscaperFunctions.Hero2Escaper(GetTriggerUnit())
+                    const finisher = Hero2Escaper(GetTriggerUnit())
 
                     if (finisher === null) {
                         return
@@ -95,11 +95,10 @@ export class End extends RectInterface {
     }
 
     destroy = () => {
-        RemoveRect(this.r)
-        ;(this.r as any) = null
+        super.destroy()
         DestroyTrigger(this.endReaching)
-        ;(this.endReaching as any) = null
     }
 }
+
 
 export const DEPART_PAR_DEFAUT = new Start(-500, -500, 500, 500)

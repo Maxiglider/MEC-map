@@ -1,4 +1,3 @@
-import { BasicFunctions } from 'core/01_libraries/Basic_functions'
 import {
     DEFAULT_CAMERA_FIELD,
     DUMMY_POWER_CIRCLE,
@@ -28,11 +27,14 @@ import { CommandShortcuts } from '../../08_GAME/Shortcuts/Command_shortcuts_func
 import { LevelFunctions } from '../Level/Level_functions'
 import { DEPART_PAR_DEFAUT, Start } from '../Level/StartAndEnd'
 import { EscaperEffectArray, IEscaperEffectArray } from './EscaperEffectArray'
-import { EscaperFunctions } from './Escaper_functions'
 import {Level} from "../Level/Level";
 import {MakeDoNothing} from "../../05_MAKE_STRUCTURES/Make_do_nothing/MakeDoNothing";
 import {MakeMonsterNoMove} from "../../05_MAKE_STRUCTURES/Make_create_monsters/MakeMonsterNoMove";
 import {MonsterType} from "../Monster/MonsterType";
+import {TerrainType} from "../TerrainType/TerrainType";
+import {Make} from "../../05_MAKE_STRUCTURES/Make/Make";
+import {MakeLastActions} from "../MakeLastActions/MakeLastActions";
+import {Meteor, METEOR_NORMAL} from "../Meteor/Meteor";
 
 const SHOW_REVIVE_EFFECTS = false
 
@@ -155,7 +157,7 @@ export class Escaper {
     //item method
     resetItem() {
         //renvoie true si le héros portait un item
-        if (this.hero && UnitHasItemOfTypeBJ(this.hero, Meteor.METEOR_NORMAL)) {
+        if (this.hero && UnitHasItemOfTypeBJ(this.hero, METEOR_NORMAL)) {
             SetItemDroppable(UnitItemInSlot(this.hero, 0), true)
             Meteor.get(GetItemUserData(UnitItemInSlot(this.hero, 0))).replace()
             this.removeEffectMeteor()
@@ -183,8 +185,8 @@ export class Escaper {
 
     //select method
     selectHero() {
-        SelectUnitAddForPlayer(this.hero, this.controler.getPlayer())
-        setIsHeroSelectedForPlayer(this.controler.getPlayer(), true)
+        this.hero && SelectUnitAddForPlayer(this.hero, this.controler.getPlayer())
+        this.setIsHeroSelectedForPlayer(this.controler.getPlayer(), true)
     }
 
     //creation method
@@ -231,7 +233,7 @@ export class Escaper {
             EVENT_UNIT_DAMAGED
         )
         this.effects.showEffects(this.hero)
-        this.lastTerrainType = 0
+        delete this.lastTerrainType
         TimerStart(
             AfkMode.afkModeTimers[this.escaperId],
             AfkMode.timeMinAfk,
@@ -246,7 +248,7 @@ export class Escaper {
     createHeroAtStart() {
         let x: number
         let y: number
-        let start: Start = udg_levels.getCurrentLevel().getStart()
+        let start?: Start = udg_levels.getCurrentLevel().getStart()
         let angle: number
 
         if (!start) {

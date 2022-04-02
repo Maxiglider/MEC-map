@@ -1,12 +1,9 @@
-import { udg_levels } from 'core/08_GAME/Init_structures/Init_struct_levels'
 import {countMonstersAccordingToMode, Monster} from "./Monster";
 import {Level} from "../Level/Level";
-import {MonsterSimplePatrol} from "./MonsterSimplePatrol";
-import {MonsterMultiplePatrols} from "./MonsterMultiplePatrols";
-import {MonsterNoMove} from "./MonsterNoMove";
 import {MonsterType} from "./MonsterType";
 import {CasterType} from "../Caster/CasterType";
 import {Caster} from "../Caster/Caster";
+import {IsUnitBetweenLocs} from "../../01_libraries/Basic_functions";
 
 export const MONSTER_NEAR_DIFF_MAX = 64
 
@@ -48,19 +45,35 @@ export class MonsterArray {
         delete this.monsters[monsterId]
     }
 
-    getMonsterNear = (x: number, y: number) => {
+    getMonsterNear = (x: number, y: number, filterMonsterClassName?: string): Monster | null => {
         this.monsters.map(monster => {
             if(monster && monster.u){
                 const xMob = GetUnitX(monster.u)
                 const yMob = GetUnitY(monster.u)
 
-                if (RAbsBJ(x - xMob) < MONSTER_NEAR_DIFF_MAX && RAbsBJ(y - yMob) < MONSTER_NEAR_DIFF_MAX) {
-                    return monster
+                if(!filterMonsterClassName || monster.constructor.name === filterMonsterClassName) {
+                    if (RAbsBJ(x - xMob) < MONSTER_NEAR_DIFF_MAX && RAbsBJ(y - yMob) < MONSTER_NEAR_DIFF_MAX) { //todomax check that the filter like that works
+                        return monster
+                    }
                 }
             }
         })
 
         return null
+    }
+
+    getMonstersBetweenLocs(x1: number, y1: number, x2: number, y2: number, filterMonsterClassName?: string) {
+        return this.monsters.filter(monster => {
+            if (monster && monster.u) {
+                if (!filterMonsterClassName || monster.constructor.name === filterMonsterClassName) { //todomax check that the filter like that works
+                    if (IsUnitBetweenLocs(monster.u, x1, y1, x2, y2)) {
+                        return true
+                    }
+                }
+            }
+
+            return false
+        })
     }
 
     createMonstersUnits = () => {

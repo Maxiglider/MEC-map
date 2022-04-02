@@ -1,5 +1,4 @@
 import { NB_ESCAPERS, TEAL, TERRAIN_DATA_DISPLAY_TIME } from 'core/01_libraries/Constants'
-import { ColorCodes } from 'core/01_libraries/Init_colorCodes'
 import { Text } from 'core/01_libraries/Text'
 import { CACHE_SEPARATEUR_PARAM } from 'core/07_TRIGGERS/Save_map_in_gamecache/struct_StringArrayForCache'
 import { udg_escapers } from 'core/08_GAME/Init_structures/Init_escapers'
@@ -7,6 +6,7 @@ import { udg_levels } from 'core/08_GAME/Init_structures/Init_struct_levels'
 import { Escaper } from '../Escaper/Escaper'
 import { Level } from '../Level/Level'
 import {MonsterType} from "../Monster/MonsterType";
+import {udg_colorCode} from "../../01_libraries/Init_colorCodes";
 
 const DEFAULT_CASTER_PROJECTILE_SPEED = 600
 const MIN_CASTER_PROJECTILE_SPEED = 100
@@ -17,7 +17,7 @@ const DEFAULT_CASTER_ANIMATION = 'spell'
 
 export class CasterType {
     label: string
-    theAlias: string
+    theAlias?: string
     private casterMonsterType: MonsterType
     private projectileMonsterType: MonsterType
     private range: number
@@ -51,48 +51,41 @@ export class CasterType {
         this.label = label
     }
 
-    setAlias = (theAlias: string): MonsterType => {
+    setAlias(theAlias: string) {
         this.theAlias = theAlias
         return this
     }
 
     refresh = () => {
         let levelsMaking: Level[] = []
-        let escaper: Escaper
-        let i: number
-        let j: number
         let levelAlreadyChecked: boolean
         let nbLevelsMaking = 0
         const currentLevel = udg_levels.getCurrentLevel()
         currentLevel.refreshCastersOfType(this)
-        i = 0
-        while (true) {
-            if (i >= NB_ESCAPERS) break
-            escaper = udg_escapers.get(i)
-            if (escaper !== null) {
+
+        for(let i = 0; i < NB_ESCAPERS; i++){
+            const escaper = udg_escapers.get(i)
+            if (escaper) {
                 if (escaper.getMakingLevel() != currentLevel) {
                     levelAlreadyChecked = false
-                    j = 0
-                    while (true) {
-                        if (j >= nbLevelsMaking) break
+
+                    for(let j = 0; j < nbLevelsMaking; j++){
                         if (escaper.getMakingLevel() == levelsMaking[j]) {
                             levelAlreadyChecked = true
+                            break
                         }
-                        j = j + 1
                     }
+
                     if (!levelAlreadyChecked) {
                         levelsMaking[nbLevelsMaking] = escaper.getMakingLevel()
-                        nbLevelsMaking = nbLevelsMaking + 1
+                        nbLevelsMaking++
                     }
                 }
             }
-            i = i + 1
         }
-        i = 0
-        while (true) {
-            if (i >= nbLevelsMaking) break
+
+        for(let i = 0; i < nbLevelsMaking; i++){
             levelsMaking[i].refreshCastersOfType(this)
-            i = i + 1
         }
     }
 
@@ -163,7 +156,7 @@ export class CasterType {
 
     displayForPlayer = (p: player) => {
         let space = '   '
-        let display = ColorCodes.udg_colorCode[TEAL] + this.label + ' ' + this.theAlias + ' : '
+        let display = udg_colorCode[TEAL] + this.label + ' ' + this.theAlias + ' : '
         display =
             display +
             this.casterMonsterType.label +
