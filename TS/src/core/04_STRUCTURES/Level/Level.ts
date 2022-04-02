@@ -1,6 +1,5 @@
 import { Text } from 'core/01_libraries/Text'
 import { udg_lives } from 'core/08_GAME/Init_structures/Init_lives'
-import { TrigCheckpointReviveHeroes } from './Trig_checkpoint_revive_heroes'
 import {MonsterArray} from "../Monster/MonsterArray";
 import {VisibilityModifierArray} from "./VisibilityModifierArray";
 import {TriggerArray} from "./Triggers";
@@ -13,6 +12,8 @@ import {CasterType} from "../Caster/CasterType";
 import {udg_levels} from "../../08_GAME/Init_structures/Init_struct_levels";
 import {VisibilityModifier} from "./VisibilityModifier";
 import {End, Start} from "./StartAndEnd";
+import {MonsterSpawnArray} from "../MonsterSpawn/MonsterSpawnArray";
+import {checkPointReviveHeroes} from "./checkpointReviveHeroes_function";
 
 
 export class Level {
@@ -35,8 +36,8 @@ export class Level {
         this.visibilities = new VisibilityModifierArray()
         this.triggers = new TriggerArray()
         this.monsters = new MonsterArray(this)
-        this.monsterSpawns = new MonsterSpawnArray()
-        this.meteors = new MeteorArray()
+        this.monsterSpawns = new MonsterSpawnArray(this)
+        this.meteors = new MeteorArray(this)
         this.clearMobs = new ClearMobArray()
         this.livesEarnedAtBeginning = 1
         this.isActivatedB = false
@@ -56,15 +57,15 @@ export class Level {
             this.visibilities.activate(true)
             this.monsters.createMonstersUnits()
             this.monsterSpawns.activate()
-            this.meteors.createMeteors()
+            this.meteors.createMeteorsItems()
             this.clearMobs.initializeClearMobs()
             if (Level.earningLivesActivated && this.getId() > 0) {
                 udg_lives.add(this.livesEarnedAtBeginning)
             }
         }else{
             this.monsters.removeMonstersUnits()
-            this.monsterSpawns.desactivate()
-            this.meteors.removeMeteors()
+            this.monsterSpawns.deactivate()
+            this.meteors.removeMeteorsItems()
             udg_escapers.deleteSpecificActionsForLevel(this)
         }
 
@@ -72,9 +73,7 @@ export class Level {
     }
 
     checkpointReviveHeroes(finisher: Escaper | null) {
-        TrigCheckpointReviveHeroes_levelForReviving = this
-        TrigCheckpointReviveHeroes_revivingFinisher = finisher
-        TriggerExecute(TrigCheckpointReviveHeroes.gg_trg____Trig_checkpoint_revive_heroes)
+        checkPointReviveHeroes(this, finisher)
     }
 
     getStart() {

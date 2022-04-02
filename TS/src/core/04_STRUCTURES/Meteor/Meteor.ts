@@ -5,49 +5,63 @@ import { Level } from '../Level/Level'
 export const METEOR_NORMAL = FourCC('MND1')
 export const METEOR_CHEAT = FourCC('MCD1')
 
+export const udg_meteors: Meteor[] = []
+
+
 export class Meteor {
+    private id: number
     private x: number
     private y: number
-    private meteor?: item
+    private item?: item
     level?: Level
     arrayId?: number
 
     constructor(x: number, y: number) {
         this.x = x
         this.y = y
+
+        this.id = udg_meteors.length
+        udg_meteors[this.id] = this
+    }
+
+    getId(){
+        return this.id
     }
 
     getItem() {
-        return this.meteor
+        return this.item
     }
 
-    removeMeteor = () => {
-        if (this.meteor) {
-            RemoveItem(this.meteor)
+    removeMeteorItem = () => {
+        if (this.item) {
+            RemoveItem(this.item)
         }
     }
 
-    createMeteor = () => {
-        if (this.meteor) {
-            this.removeMeteor()
+    createMeteorItem = () => {
+        if (this.item) {
+            this.removeMeteorItem()
         }
 
-        this.meteor = CreateItem(METEOR_NORMAL, this.x, this.y)
+        this.item = CreateItem(METEOR_NORMAL, this.x, this.y)
         if (udg_terrainTypes.getTerrainType(this.x, this.y).getKind() == 'slide') {
-            SetItemDroppable(this.meteor, false)
+            SetItemDroppable(this.item, false)
         }
-        SetItemUserData(this.meteor, integer(this))
+        SetItemUserData(this.item, this.id)
     }
 
     destroy = () => {
-        if (this.meteor !== null) {
-            this.removeMeteor()
+        if (this.item !== null) {
+            this.removeMeteorItem()
         }
-        this.level.meteors.setMeteorNull(this.arrayId)
+
+        this.level && this.level.meteors.removeMeteor(this.id)
+
+        delete udg_meteors[this.id]
     }
 
     replace = () => {
-        this.meteor && SetItemPosition(this.meteor, this.x, this.y)
+        this.item && SetItemPosition(this.item, this.x, this.y)
     }
 
     toString = (): string => {

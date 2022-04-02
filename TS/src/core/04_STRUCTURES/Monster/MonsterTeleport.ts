@@ -23,7 +23,7 @@ export class MonsterTeleport extends Monster {
     static X: number[] = []
     static Y: number[] = []
 
-    static anyMonsterTeleportTimerId2MonsterTeleport: Map<number, MonsterTeleport> = new Map<number, MonsterTeleport>()
+    static anyMonsterTeleportTimerId2MonsterTeleport = new Map<number, MonsterTeleport>()
 
     private currentLoc: number
     private sens: number //0 : normal toujours positif, 1 : sens normal avec changement, 2 : sens inversé avec changement

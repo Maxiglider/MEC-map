@@ -19,8 +19,8 @@ export class Caster extends Monster {
     private t?: timer
     private enabled: boolean
 
-    static anyTriggerWithinRangeId2Caster: Map<number, Caster> = new Map<number, Caster>()
-    static anyTimerId2Caster: Map<number, Caster> = new Map<number, Caster>()
+    static anyTriggerWithinRangeId2Caster = new Map<number, Caster>()
+    static anyTimerId2Caster = new Map<number, Caster>()
 
     constructor(casterType: CasterType, x: number, y: number, angle: number) {
         super()

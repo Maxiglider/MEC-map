@@ -27,7 +27,7 @@ export class MonsterArray {
     }
 
     new = (monster: Monster, createUnit: boolean) => {
-        let n = monster.getId()
+        const n = monster.getId()
         this.monsters[n] = monster
 
         if (createUnit) {
@@ -100,9 +100,13 @@ export class MonsterArray {
 
     //Destroy one monster
     clearMonster = (monsterId: number) => {
-        this.monsters[monsterId].destroy()
-        delete this.monsters[monsterId]
-        return true
+        if(this.monsters[monsterId]) {
+            this.monsters[monsterId].destroy()
+            delete this.monsters[monsterId]
+            return true
+        }else{
+            return false
+        }
     }
 
     //Destroy monsters of one type

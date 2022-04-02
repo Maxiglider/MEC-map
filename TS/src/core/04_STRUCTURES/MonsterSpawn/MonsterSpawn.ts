@@ -1,50 +1,66 @@
-import { udg_monsterTypes } from '../../../../globals'
-const initMonsterSpawn = () => {
-    const RemoveEnumMonster = (): void => {
-        RemoveUnit(GetEnumUnit())
-    }
+import {udg_monsterTypes} from '../../../../globals'
+import {MonsterType} from "../Monster/MonsterType";
+import {Level} from "../Level/Level";
+import {ENNEMY_PLAYER, GREY, MOBS_VARIOUS_COLORS, TERRAIN_DATA_DISPLAY_TIME} from "../../01_libraries/Constants";
+import {GetCurrentMonsterPlayer} from "../../01_libraries/Basic_functions";
+import {NewImmobileMonsterForPlayer} from "../Monster/Monster_creation_functions";
+import {udg_colorCode} from "../../01_libraries/Init_colorCodes";
+import {Text} from "../../01_libraries/Text";
+import {CACHE_SEPARATEUR_PARAM} from "../../07_TRIGGERS/Save_map_in_gamecache/struct_StringArrayForCache";
 
-    let ht: hashtable
-    const DECALAGE_UNSPAWN = 200
-    const DELAY_BETWEEN_SPAWN_AND_MOVEMENT = 0.5
 
-    const MonsterStartMovement = (): void => {
-        let mobTimer = GetExpiredTimer()
-        let ms = MonsterSpawn(LoadInteger(ht, 1, GetHandleId(mobTimer)))
-        let mobUnit = LoadUnitHandle(ht, 2, GetHandleId(mobTimer))
-        ms.startMobMovement(mobUnit)
-        UnitAddAbility(mobUnit, FourCC('Aloc'))
-        DestroyTimer(mobTimer)
-        mobUnit = null
-        mobTimer = null
-    }
+const DECALAGE_UNSPAWN = 200
+const DELAY_BETWEEN_SPAWN_AND_MOVEMENT = 0.5
 
-    const MonsterSpawn_Actions = (): void => {
-        let ms = MonsterSpawn(LoadInteger(ht, 0, GetHandleId(GetTriggeringTrigger())))
-        let mobUnit = ms.createMob()
-        let mobTimer = CreateTimer()
-        SaveInteger(ht, 1, GetHandleId(mobTimer), integer(ms))
-        SaveUnitHandle(ht, 2, GetHandleId(mobTimer), mobUnit)
-        TimerStart(mobTimer, DELAY_BETWEEN_SPAWN_AND_MOVEMENT, false, MonsterStartMovement)
-        SetUnitOwner(mobUnit, ENNEMY_PLAYER, false)
-        ShowUnit(mobUnit, false)
-        UnitRemoveAbility(mobUnit, FourCC('Aloc'))
-        GroupAddUnit(ms.monsters, mobUnit)
-        mobUnit = null
-        mobTimer = null
-    }
 
-    const UnspawMonster_Actions = (): void => {
-        let ms = MonsterSpawn(LoadInteger(ht, 0, GetHandleId(GetTriggeringTrigger())))
-        if (IsUnitInGroup(GetTriggerUnit(), ms.monsters)) {
-            GroupRemoveUnit(ms.monsters, GetTriggerUnit())
-            RemoveUnit(GetTriggerUnit())
+const RemoveEnumMonster = (): void => {
+    RemoveUnit(GetEnumUnit())
+}
+
+const MonsterStartMovement = (): void => {
+    let mobTimer = GetExpiredTimer()
+    let ms = MonsterSpawn.anyTimerId2MonsterSpawn.get(GetHandleId(mobTimer)) //todomax check that it works
+    if(ms) {
+        let mobUnit = MonsterSpawn.anyTimerId2Unit.get(GetHandleId(mobTimer))
+        if(mobUnit){
+            ms.startMobMovement(mobUnit)
+            UnitAddAbility(mobUnit, FourCC('Aloc'))
+            DestroyTimer(mobTimer)
         }
     }
 }
 
-class MonsterSpawn {
-    // //50 levels * 100 monster spawns
+const MonsterSpawn_Actions = (): void => {
+    let ms = MonsterSpawn.anyTrigId2MonsterSpawn.get(GetHandleId(GetTriggeringTrigger()))
+    if(ms) {
+        let mobUnit = ms.createMob()
+        let mobTimer = CreateTimer()
+        MonsterSpawn.anyTimerId2MonsterSpawn.set(GetHandleId(mobTimer), ms)
+        MonsterSpawn.anyTimerId2Unit.set(GetHandleId(mobTimer), mobUnit)
+        TimerStart(mobTimer, DELAY_BETWEEN_SPAWN_AND_MOVEMENT, false, MonsterStartMovement)
+        SetUnitOwner(mobUnit, ENNEMY_PLAYER, false)
+        ShowUnit(mobUnit, false)
+        UnitRemoveAbility(mobUnit, FourCC('Aloc'))
+        ms.monsters && GroupAddUnit(ms.monsters, mobUnit)
+    }
+}
+
+const UnspawMonster_Actions = (): void => {
+    let ms = MonsterSpawn.anyTrigId2MonsterSpawn.get(GetHandleId(GetTriggeringTrigger()))
+    if (ms && ms.monsters && IsUnitInGroup(GetTriggerUnit(), ms.monsters)) {
+        GroupRemoveUnit(ms.monsters, GetTriggerUnit())
+        RemoveUnit(GetTriggerUnit())
+    }
+}
+
+
+export const udg_monsterSpawns: MonsterSpawn[] = []
+
+
+export class MonsterSpawn {
+    static anyTrigId2MonsterSpawn = new Map<number, MonsterSpawn>()
+    static anyTimerId2Unit = new Map<number, unit>()
+    static anyTimerId2MonsterSpawn = new Map<number, MonsterSpawn>()
 
     private label: string
     private mt: MonsterType
@@ -54,44 +70,65 @@ class MonsterSpawn {
     private minY: number
     private maxX: number
     private maxY: number
-    private tSpawn: trigger
-    private tUnspawn: trigger
-    private unspawnReg: region
-    monsters: group
+    private tSpawn?: trigger
+    private tUnspawn?: trigger
+    private unspawnReg?: region
+    monsters?: group
 
-    level: Level
-    arrayId: number
+    level?: Level
+    id: number
 
-    private static onInit = (): void => {
-        ht = InitHashtable()
-        //0, tSpawn --> MonsterSpawn
-        //0, tUnspawn --> MonsterSpawn
-        //1, timer --> MonsterSpawn
-        //2, timer --> unité mob
+    constructor(
+        label: string,
+        mt: MonsterType,
+        sens: string,
+        frequence: number,
+        x1: number,
+        y1: number,
+        x2: number,
+        y2: number
+    ) {
+        this.label = label
+        this.mt = mt
+        this.sens = sens
+        this.frequence = frequence
+        this.minX = RMinBJ(x1, x2)
+        this.minY = RMinBJ(y1, y2)
+        this.maxX = RMaxBJ(x1, x2)
+        this.maxY = RMaxBJ(y1, y2)
+
+        this.id = udg_monsterSpawns.length
+        udg_monsterSpawns[this.id] = this
     }
 
-    // TODO; Used to be public
+    getId(){
+        return this.id
+    }
+
     getLabel = (): string => {
         return this.label
     }
 
-    desactivate = (): void => {
-        if (this.unspawnReg !== null) {
+    deactivate = (): void => { //todomax former name : desactivate
+        if (this.unspawnReg) {
             RemoveRegion(this.unspawnReg)
-            this.unspawnReg = null
+            delete this.unspawnReg
         }
-        if (this.tSpawn !== null) {
+
+        if (this.tSpawn) {
             DestroyTrigger(this.tSpawn)
-            this.tSpawn = null
+            delete this.tSpawn
         }
-        if (this.tUnspawn !== null) {
+
+        if (this.tUnspawn) {
             DestroyTrigger(this.tUnspawn)
-            this.tUnspawn = null
+            delete this.tUnspawn
         }
-        if (this.monsters !== null) {
+
+        if (this.monsters) {
             ForGroup(this.monsters, RemoveEnumMonster)
             DestroyGroup(this.monsters)
-            this.monsters = null
+            delete this.monsters
         }
     }
 
@@ -101,6 +138,7 @@ class MonsterSpawn {
         let y1: number
         let x2: number
         let y2: number
+
         //leftToRight, upToDown, rightToLeft, downToUp
         if (this.sens === 'leftToRight') {
             x1 = this.maxX
@@ -124,6 +162,7 @@ class MonsterSpawn {
             y2 = this.maxY
         }
         r = Rect(x1, y1, x2, y2)
+
         this.unspawnReg = CreateRegion()
         RegionAddRect(this.unspawnReg, r)
         RemoveRect(r)
@@ -131,42 +170,23 @@ class MonsterSpawn {
 
     activate = (): void => {
         this.monsters = CreateGroup()
+
         this.tSpawn = CreateTrigger()
-        SaveInteger(ht, 0, GetHandleId(this.tSpawn), integer(this))
+        MonsterSpawn.anyTrigId2MonsterSpawn.set(GetHandleId(this.tSpawn), this)
         TriggerRegisterTimerEvent(this.tSpawn, 1 / this.frequence, true)
         TriggerAddAction(this.tSpawn, MonsterSpawn_Actions)
+
         this.createUnspawnReg()
         this.tUnspawn = CreateTrigger()
-        SaveInteger(ht, 0, GetHandleId(this.tUnspawn), integer(this))
-        TriggerRegisterEnterRegion(this.tUnspawn, this.unspawnReg, null)
+        MonsterSpawn.anyTrigId2MonsterSpawn.set(GetHandleId(this.tUnspawn), this)
+        this.unspawnReg && TriggerRegisterEnterRegion(this.tUnspawn, this.unspawnReg, null)
         TriggerAddAction(this.tUnspawn, UnspawMonster_Actions)
     }
 
-    private onDestroy = (): void => {
-        this.desactivate()
-        this.level.monsterSpawns.setMonsterSpawnNull(this.arrayId)
-    }
-
-    static create = (
-        label: string,
-        mt: MonsterType,
-        sens: string,
-        frequence: number,
-        x1: number,
-        y1: number,
-        x2: number,
-        y2: number
-    ): MonsterSpawn => {
-        let ms = MonsterSpawn.allocate()
-        ms.label = label
-        ms.mt = mt
-        ms.sens = sens
-        ms.frequence = frequence
-        ms.minX = RMinBJ(x1, x2)
-        ms.minY = RMinBJ(y1, y2)
-        ms.maxX = RMaxBJ(x1, x2)
-        ms.maxY = RMaxBJ(y1, y2)
-        return ms
+    destroy = (): void => {
+        this.deactivate()
+        this.level && this.level.monsterSpawns.removeMonsterSpawn(this.id)
+        delete udg_monsterSpawns[this.id]
     }
 
     startMobMovement = (mobUnit: unit): void => {
@@ -209,9 +229,9 @@ class MonsterSpawn {
         IssuePointOrder(mobUnit, 'move', x2, y2)
     }
 
-    // TODO; Used to be public
     createMob = (): unit => {
         let angle: number
+
         //leftToRight, upToDown, rightToLeft, downToUp
         if (this.sens === 'leftToRight') {
             angle = 180
@@ -231,41 +251,35 @@ class MonsterSpawn {
         )
     }
 
-    // TODO; Used to be public
     setLabel = (newLabel: string): void => {
         this.label = newLabel
     }
 
-    // TODO; Used to be public
     setMonsterType = (mt: MonsterType): void => {
         this.mt = mt
     }
 
-    // TODO; Used to be public
     setSens = (sens: string): void => {
         this.sens = sens
-        this.desactivate()
+        this.deactivate()
         this.activate()
     }
 
-    // TODO; Used to be public
     setFrequence = (frequence: number): void => {
         this.frequence = frequence
-        DestroyTrigger(this.tSpawn)
+        this.tSpawn && DestroyTrigger(this.tSpawn)
         this.tSpawn = CreateTrigger()
-        SaveInteger(ht, 0, GetHandleId(this.tSpawn), integer(this))
+        MonsterSpawn.anyTrigId2MonsterSpawn.set(GetHandleId(this.tSpawn), this)
         TriggerRegisterTimerEvent(this.tSpawn, 1 / this.frequence, true)
         TriggerAddAction(this.tSpawn, MonsterSpawn_Actions)
     }
 
-    // TODO; Used to be public
     displayForPlayer = (p: player): void => {
         let display =
             udg_colorCode[GREY] + this.label + ' : ' + this.mt.label + '   ' + this.sens + '   ' + R2S(this.frequence)
-        Text_P_timed(p, TERRAIN_DATA_DISPLAY_TIME, display)
+        Text.P_timed(p, TERRAIN_DATA_DISPLAY_TIME, display)
     }
 
-    // TODO; Used to be public
     toString = (): string => {
         let str = this.label + CACHE_SEPARATEUR_PARAM
         if (this.mt.theAlias != null && this.mt.theAlias != '') {

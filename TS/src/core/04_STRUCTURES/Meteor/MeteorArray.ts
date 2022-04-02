@@ -1,132 +1,87 @@
-import { udg_levels } from 'core/08_GAME/Init_structures/Init_struct_levels'
-import { MONSTER_NEAR_DIFF_MAX } from '../Monster/MonsterNoMoveArray'
 import { Meteor } from './Meteor'
+import {Level} from "../Level/Level";
+import {MONSTER_NEAR_DIFF_MAX} from "../Monster/MonsterArray";
 
-const MAX_NB_METEORS = 100
+
 
 export class MeteorArray {
-    private meteors: Meteor[] = []
-    private lastInstance = -1
+    private meteors: Meteor[]
+    private level: Level
 
-    getFirstEmpty = (): number => {
-        let i = 0
-        while (true) {
-            if (i > this.lastInstance || this.meteors[i] === null) break
-            i = i + 1
-        }
-        return i
+    constructor(level: Level) {
+        this.level = level
+        this.meteors = []
     }
 
-    get = (arrayId: number) => {
-        if (arrayId < 0 || arrayId > this.lastInstance) {
-            return null
-        }
-
-        return this.meteors[arrayId]
+    get = (meteorId: number) => {
+        return this.meteors[meteorId]
     }
 
-    new = (x: number, y: number, createMeteor: boolean) => {
-        //local integer n = this.getFirstEmpty()
-        let n = this.lastInstance + 1
-        if (n >= MAX_NB_METEORS) {
-            return null
-        }
-        //if (n > this.lastInstance) then
-        this.lastInstance = n
-        //endif
-        this.meteors[n] = new Meteor(x, y)
+    new = (meteor: Meteor, createMeteor: boolean) => {
+        const n = meteor.getId()
+        this.meteors[n] = meteor
+
         if (createMeteor) {
-            this.meteors[n].createMeteor()
+            meteor.createMeteorItem()
         }
-        this.meteors[n].level = udg_levels.getLevelFromMeteorArray(this)
-        this.meteors[n].arrayId = n
-        return this.meteors[n]
+
+        meteor.level = this.level
     }
 
-    setMeteorNull = (arrayId: number) => {
-        this.meteors[arrayId] = 0
+    removeMeteor = (meteorId: number) => { //todomax former name : setMeteorNull
+        delete this.meteors[meteorId]
     }
 
     count = (): number => {
-        let n = 0
-        let i = 0
-        while (true) {
-            if (i > this.lastInstance) break
-            if (this.meteors[i] !== null) {
-                n = n + 1
-            }
-            i = i + 1
-        }
-        return n
+        return this.meteors.filter(meteor => meteor !== undefined).length
     }
 
     destroy = () => {
-        let i = 0
-        while (true) {
-            if (i > this.lastInstance) break
-            if (this.meteors[i] !== null) {
-                this.meteors[i].destroy()
-            }
-            i = i + 1
-        }
-        this.lastInstance = -1
+        this.meteors.map(meteor => {
+            meteor.destroy()
+        })
     }
 
     clearMeteor = (meteorId: number): boolean => {
-        let i = 0
-        while (true) {
-            if (this.meteors[i] === Meteor(meteorId) || i > this.lastInstance) break
-            i = i + 1
-        }
-        if (i > this.lastInstance) {
+        if(this.meteors[meteorId]) {
+            this.meteors[meteorId].destroy()
+            delete this.meteors[meteorId]
+            return true
+        }else{
             return false
         }
-        this.meteors[i].destroy()
-        this.meteors[i] = 0
-        return true
     }
 
-    createMeteors = () => {
-        let i = 0
-        while (true) {
-            if (i > this.lastInstance) break
-            if (this.meteors[i] !== null) {
-                this.meteors[i].createMeteor()
+    createMeteorsItems = () => {
+        this.meteors.map(meteor => {
+            if(meteor){
+                meteor.createMeteorItem()
             }
-            i = i + 1
-        }
+        })
     }
 
-    removeMeteors = () => {
-        let i = 0
-        while (true) {
-            if (i > this.lastInstance) break
-            if (this.meteors[i] !== null) {
-                this.meteors[i].removeMeteor()
+    removeMeteorsItems = () => {
+        this.meteors.map(meteor => {
+            if(meteor){
+                meteor.removeMeteorItem()
             }
-            i = i + 1
-        }
+        })
     }
 
     getMeteorNear = (x: number, y: number) => {
-        let xMeteor: number
-        let yMeteor: number
-        let i = 0
-        while (true) {
-            if (i > this.lastInstance) break
-            if (this.meteors[i] != null && this.meteors[i].getItem() != null) {
-                xMeteor = GetItemX(this.meteors[i].getItem())
-                yMeteor = GetItemY(this.meteors[i].getItem())
-                if (RAbsBJ(x - xMeteor) < MONSTER_NEAR_DIFF_MAX && RAbsBJ(y - yMeteor) < MONSTER_NEAR_DIFF_MAX) {
-                    return this.meteors[i]
+        this.meteors.map(meteor => {
+            if(meteor){
+                const item = meteor.getItem()
+                if(item) {
+                    const xMeteor = GetItemX(item)
+                    const yMeteor = GetItemY(item)
+                    if (RAbsBJ(x - xMeteor) < MONSTER_NEAR_DIFF_MAX && RAbsBJ(y - yMeteor) < MONSTER_NEAR_DIFF_MAX) {
+                        return meteor
+                    }
                 }
             }
-            i = i + 1
-        }
-        return null
-    }
+        })
 
-    getLastInstanceId = (): number => {
-        return this.lastInstance
+        return null
     }
 }
