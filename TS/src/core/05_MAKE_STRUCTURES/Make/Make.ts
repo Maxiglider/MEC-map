@@ -2,15 +2,11 @@ import { IsIssuedOrder, StopUnit } from 'core/01_libraries/Basic_functions'
 import { Hero2Escaper } from 'core/04_STRUCTURES/Escaper/Escaper_functions'
 import { Escaper } from '../../04_STRUCTURES/Escaper/Escaper'
 
-export const MakeConsts: {
-    MAKE_LAST_CLIC_UNIT_ID: number
-    MAKE_CANT_CANCEL_MORE: string
-    MAKE_CANT_REDO_MORE: string
-} = {
-    MAKE_LAST_CLIC_UNIT_ID: FourCC('e001'), //à remplacer par l'id de l'unité choisie (need couleur variable)
-    MAKE_CANT_CANCEL_MORE: 'Nothing else to cancel !',
-    MAKE_CANT_REDO_MORE: 'Nothing else to redo !',
-}
+
+export const MAKE_LAST_CLIC_UNIT_ID = FourCC('e001') //à remplacer par l'id de l'unité choisie (need couleur variable)
+export const MAKE_CANT_CANCEL_MORE = 'Nothing else to cancel !'
+export const MAKE_CANT_REDO_MORE = 'Nothing else to redo !'
+
 
 export abstract class Make {
     makerOwner: player

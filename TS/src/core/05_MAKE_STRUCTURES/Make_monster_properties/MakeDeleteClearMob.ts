@@ -17,7 +17,8 @@ export class MakeDeleteClearMob extends Make {
             //todomax make Caster extend Monster
 
             //recherche du monsterOrCaster cliqué
-            let clearMob = this.escaper.getMakingLevel().getClearMobNear(this.orderX, this.orderY)
+            const monster = this.escaper.getMakingLevel().monsters.getMonsterNear(this.orderX, this.orderY)
+            const clearMob = monster?.getClearMob()
             if (clearMob) {
                 this.clickMade(clearMob)
             } else {

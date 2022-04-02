@@ -1,76 +1,21 @@
-import { Make } from 'core/05_MAKE_STRUCTURES/Make/Make'
-import { Hero2Escaper } from '../../04_STRUCTURES/Escaper/Escaper_functions'
+import {Text} from "../../01_libraries/Text";
+import {MakeOneByOneOrTwoClicks} from "../Make/MakeOneByOneOrTwoClicks";
 
-export class MakeEnd extends Make {
-    lastX: number
-    lastY: number
-    private unitLastClic: unit
-    private lastLocIsSaved: boolean
-    private lastLocSavedIsUsed: boolean
 
-    // TODO; Used to be static
-    create = (maker: unit): MakeEnd => {
-        let m: MakeEnd
-        if (maker === null) {
-            return 0
+export class MakeEnd extends MakeOneByOneOrTwoClicks {
+    constructor(maker: unit) {
+        super(maker, 'endCreate')
+    }
+    
+    doActions() {
+        if(super.doBaseActions()){
+            if (this.isLastLocSavedUsed()) {
+                this.escaper.getMakingLevel().newEnd(this.lastX, this.lastY, this.orderX, this.orderY)
+                Text.mkP(this.makerOwner, 'end made for level ' + I2S(this.escaper.getMakingLevel().getId()))
+                this.escaper.destroyMake()
+            } else {
+                this.saveLoc(this.orderX, this.orderY)
+            }
         }
-        m = MakeEnd.allocate()
-        m.maker = maker
-        m.makerOwner = GetOwningPlayer(maker)
-        m.kind = 'endCreate'
-        m.t = CreateTrigger()
-        TriggerAddAction(m.t, Make_GetActions(m.kind))
-        TriggerRegisterUnitEvent(m.t, maker, EVENT_UNIT_ISSUED_POINT_ORDER)
-        m.lastLocIsSaved = false
-        m.lastLocSavedIsUsed = false
-        return m
-    }
-
-    destroy = () => {
-        DestroyTrigger(this.t)
-        this.t = null
-        RemoveUnit(this.unitLastClic)
-        this.unitLastClic = null
-        this.maker = null
-    }
-
-    saveLoc = (x: number, y: number) => {
-        this.lastX = x
-        this.lastY = y
-        this.lastLocIsSaved = true
-        this.lastLocSavedIsUsed = true
-        if (this.unitLastClic === null) {
-            this.unitLastClic = CreateUnit(this.makerOwner, MAKE_LAST_CLIC_UNIT_ID, x, y, GetRandomDirectionDeg())
-        } else {
-            SetUnitX(this.unitLastClic, x)
-            SetUnitY(this.unitLastClic, y)
-        }
-        Hero2Escaper(this.maker).destroyCancelledActions()
-    }
-
-    unsaveLoc = (): boolean => {
-        if (!this.lastLocSavedIsUsed) {
-            return false
-        }
-        RemoveUnit(this.unitLastClic)
-        this.unitLastClic = null
-        this.lastLocSavedIsUsed = false
-        return true
-    }
-
-    isLastLocSavedUsed = (): boolean => {
-        return this.lastLocSavedIsUsed
-    }
-
-    cancelLastAction = (): boolean => {
-        return this.unsaveLoc()
-    }
-
-    redoLastAction = (): boolean => {
-        if (!this.lastLocSavedIsUsed && this.lastLocIsSaved) {
-            this.saveLoc(this.lastX, this.lastY)
-            return true
-        }
-        return false
     }
 }

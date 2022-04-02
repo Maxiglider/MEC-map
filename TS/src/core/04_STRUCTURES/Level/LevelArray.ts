@@ -139,9 +139,6 @@ export class LevelArray {
     }
 
     new = (): boolean => {
-        if (this.lastInstance >= NB_MAX_LEVELS - 1) {
-            return false
-        }
         this.lastInstance = this.lastInstance + 1
         this.levels[this.lastInstance] = new Level()
         return true

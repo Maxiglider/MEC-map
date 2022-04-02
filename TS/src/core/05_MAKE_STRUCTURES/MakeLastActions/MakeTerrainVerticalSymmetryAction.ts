@@ -8,8 +8,7 @@ export class MakeTerrainVerticalSymmetryAction extends MakeAction {
     private maxX: number
     private maxY: number
 
-    // TODO; Used to be static
-    create = (x1: number, y1: number, x2: number, y2: number): MakeTerrainVerticalSymmetryAction => {
+    constructor(x1: number, y1: number, x2: number, y2: number): MakeTerrainVerticalSymmetryAction => {
         let a: MakeTerrainVerticalSymmetryAction
 
         let minX = RMinBJ(x1, x2)

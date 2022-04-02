@@ -28,9 +28,10 @@ export class MakeSetUnitTeleportPeriod extends MakeOneByOneOrTwoClicks {
             let nbMonstersFixed = 0
 
             if (this.getMode() == 'oneByOne') {
-                let monsterTP = this.escaper
+                const monsterTP = this.escaper
                     .getMakingLevel()
                     .monsters.getMonsterNear(this.orderX, this.orderY, 'MonsterTeleport')
+
                 if (monsterTP instanceof MonsterTeleport) {
                     monsterTP.setPeriod(this.getPeriod())
                     nbMonstersFixed = 1
@@ -43,7 +44,7 @@ export class MakeSetUnitTeleportPeriod extends MakeOneByOneOrTwoClicks {
                 }
 
                 //todomax make all Monster<SpecificType>Array extend a new abstract class MonsterArray
-                let monstersTP = this.escaper
+                const monstersTP = this.escaper
                     .getMakingLevel()
                     .monsters.getMonstersBetweenLocs(
                         this.lastX,
@@ -52,6 +53,7 @@ export class MakeSetUnitTeleportPeriod extends MakeOneByOneOrTwoClicks {
                         this.orderY,
                         'MonsterTeleport'
                     )
+
                 monstersTP.map(monsterTP => {
                     if (monsterTP instanceof MonsterTeleport) monsterTP.setPeriod(this.getPeriod())
                     nbMonstersFixed++

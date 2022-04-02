@@ -79,6 +79,10 @@ export abstract class Monster {
         this.clearMob = clearMob
     }
 
+    getClearMob(){
+        return this.clearMob
+    }
+
     removeClearMob() {
         delete this.clearMob
     }

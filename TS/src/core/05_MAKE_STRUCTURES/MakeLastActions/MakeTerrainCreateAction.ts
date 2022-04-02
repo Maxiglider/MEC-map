@@ -1,34 +1,11 @@
 import { LARGEUR_CASE, NB_MAX_TILES_MODIFIED } from 'core/01_libraries/Constants'
 import { udg_terrainTypes } from '../../../../globals'
 import { TerrainType } from '../../04_STRUCTURES/TerrainType/TerrainType'
-class MakeTerrainCreateAction {
-    // extends MakeAction
+import {MakeAction} from "./MakeAction";
 
-    static terrainSaves: hashtable
-    static terrainSaveLastId: number
 
-    private terrainSaveId: number
-    private terrainTypeNew: TerrainType
-    private minX: number
-    private minY: number
-    private maxX: number
-    private maxY: number
-
-    private static onInit = (): void => {
-        MakeTerrainCreateAction.terrainSaves = InitHashtable()
-        MakeTerrainCreateAction.terrainSaveLastId = -1
-    }
-
-    static newTerrainSaveId = (): number => {
-        MakeTerrainCreateAction.terrainSaveLastId = MakeTerrainCreateAction.terrainSaveLastId + 1
-        return MakeTerrainCreateAction.terrainSaveLastId
-    }
-
-    static removeTerrainSave = (terrainSaveId: number): void => {
-        FlushChildHashtable(MakeTerrainCreateAction.terrainSaves, terrainSaveId)
-    }
-
-    static create = (
+export class MakeTerrainCreateAction extends MakeAction {
+    constructor(
         terrainTypeNew: TerrainType,
         x1: number,
         y1: number,
@@ -47,10 +24,10 @@ class MakeTerrainCreateAction {
         let minY = RMinBJ(y1, y2)
         let maxY = RMaxBJ(y1, y2)
         if (terrainTypeNew == 0 || terrainTypeNew.getTerrainTypeId() == 0) {
-            return -1
+            return -1 //"this terrain type doesn't exist anymore"
         }
         if (GetNbCaseBetween(minX, minY, maxX, maxY) > NB_MAX_TILES_MODIFIED) {
-            return 0
+            return 0 //too big zone
         }
         a = MakeTerrainCreateAction.allocate()
         terrainSave = MakeTerrainCreateAction.terrainSaves
@@ -80,6 +57,32 @@ class MakeTerrainCreateAction {
         a.isActionMadeB = true
         return a
     }
+
+    static terrainSaves: hashtable
+    static terrainSaveLastId: number
+
+    private terrainSaveId: number
+    private terrainTypeNew: TerrainType
+    private minX: number
+    private minY: number
+    private maxX: number
+    private maxY: number
+
+    private static onInit = (): void => {
+        MakeTerrainCreateAction.terrainSaves = InitHashtable()
+        MakeTerrainCreateAction.terrainSaveLastId = -1
+    }
+
+    static newTerrainSaveId = (): number => {
+        MakeTerrainCreateAction.terrainSaveLastId = MakeTerrainCreateAction.terrainSaveLastId + 1
+        return MakeTerrainCreateAction.terrainSaveLastId
+    }
+
+    static removeTerrainSave = (terrainSaveId: number): void => {
+        FlushChildHashtable(MakeTerrainCreateAction.terrainSaves, terrainSaveId)
+    }
+
+
 
     private onDestroy = (): void => {
         MakeTerrainCreateAction.removeTerrainSave(this.terrainSaveId)

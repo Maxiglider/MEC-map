@@ -1,88 +1,39 @@
-import { Make } from 'core/05_MAKE_STRUCTURES/Make/Make'
-import { Hero2Escaper } from '../../04_STRUCTURES/Escaper/Escaper_functions'
 import { TerrainType } from '../../04_STRUCTURES/TerrainType/TerrainType'
+import {MakeOneByOneOrTwoClicks} from "../Make/MakeOneByOneOrTwoClicks";
+import {MakeAction} from "../MakeLastActions/MakeAction";
+import {Text} from "../../01_libraries/Text";
+import {MakeTerrainCreateAction} from "../MakeLastActions/MakeTerrainCreateAction";
 
-export class MakeTerrainCreate extends Make {
-    lastX: number
-    lastY: number
-    private lastLocIsSaved: boolean
-    private lastLocSavedIsUsed: boolean
-    private unitLastClic: unit
+
+export class MakeTerrainCreate extends MakeOneByOneOrTwoClicks {
     private terrainType: TerrainType
 
-    isLastLocSavedUsed = (): boolean => {
-        return this.lastLocSavedIsUsed
+    constructor(maker: unit, terrainType: TerrainType) {
+        super(maker, 'terrainCreate')
+        this.terrainType = terrainType
     }
 
     getTerrainType = (): TerrainType => {
         return this.terrainType
     }
-
-    // TODO; Used to be static
-    create = (maker: unit, terrainType: TerrainType): MakeTerrainCreate => {
-        let m: MakeTerrainCreate
-        if (maker === null || terrainType === 0) {
-            return 0
+    
+    doActions() {
+        if(super.doBaseActions()){
+            let action: MakeAction
+            
+            if (this.isLastLocSavedUsed()) {
+                try {
+                    action = new MakeTerrainCreateAction(this.getTerrainType(), this.lastX, this.lastY, this.orderX, this.orderY)
+                    this.escaper.newAction(action)
+                    this.unsaveLocDefinitely()
+                }catch(error){
+                    if(typeof error == 'string') {
+                        Text.erP(this.escaper.getPlayer(), error)
+                    }
+                }
+            } else {
+                this.saveLoc(this.orderX, this.orderY)
+            }
         }
-        m = MakeTerrainCreate.allocate()
-        m.maker = maker
-        m.makerOwner = GetOwningPlayer(maker)
-        m.terrainType = terrainType
-        m.kind = 'terrainCreate'
-        m.t = CreateTrigger()
-        TriggerAddAction(m.t, Make_GetActions(m.kind))
-        TriggerRegisterUnitEvent(m.t, maker, EVENT_UNIT_ISSUED_POINT_ORDER)
-        m.lastLocIsSaved = false
-        m.lastLocSavedIsUsed = false
-        return m
-    }
-
-    destroy = () => {
-        DestroyTrigger(this.t)
-        this.t = null
-        RemoveUnit(this.unitLastClic)
-        this.unitLastClic = null
-        this.maker = null
-    }
-
-    saveLoc = (x: number, y: number) => {
-        this.lastX = x
-        this.lastY = y
-        this.lastLocIsSaved = true
-        this.lastLocSavedIsUsed = true
-        if (this.unitLastClic === null) {
-            this.unitLastClic = CreateUnit(this.makerOwner, MAKE_LAST_CLIC_UNIT_ID, x, y, GetRandomDirectionDeg())
-        } else {
-            SetUnitX(this.unitLastClic, x)
-            SetUnitY(this.unitLastClic, y)
-        }
-        Hero2Escaper(this.maker).destroyCancelledActions()
-    }
-
-    unsaveLoc = (): boolean => {
-        if (!this.lastLocSavedIsUsed) {
-            return false
-        }
-        RemoveUnit(this.unitLastClic)
-        this.unitLastClic = null
-        this.lastLocSavedIsUsed = false
-        return true
-    }
-
-    unsaveLocDefinitely = () => {
-        this.unsaveLoc()
-        this.lastLocIsSaved = false
-    }
-
-    cancelLastAction = (): boolean => {
-        return this.unsaveLoc()
-    }
-
-    redoLastAction = (): boolean => {
-        if (this.lastLocIsSaved && !this.lastLocSavedIsUsed) {
-            this.saveLoc(this.lastX, this.lastY)
-            return true
-        }
-        return false
     }
 }

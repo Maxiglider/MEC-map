@@ -8,8 +8,7 @@ export class MakeTerrainHorizontalSymmetryAction extends MakeAction {
     private maxX: number
     private maxY: number
 
-    // TODO; Used to be static
-    create = (x1: number, y1: number, x2: number, y2: number): MakeTerrainHorizontalSymmetryAction => {
+    constructor(x1: number, y1: number, x2: number, y2: number): MakeTerrainHorizontalSymmetryAction => {
         let a: MakeTerrainHorizontalSymmetryAction
 
         let minX = RMinBJ(x1, x2)
@@ -24,7 +23,7 @@ export class MakeTerrainHorizontalSymmetryAction extends MakeAction {
         maxY = I2R(R2I(maxY / LARGEUR_CASE)) * LARGEUR_CASE
 
         if (GetNbCaseBetween(minX, minY, maxX, maxY) > NB_MAX_TILES_MODIFIED) {
-            return 0
+            return 0 //too big zone
         }
         a = MakeTerrainHorizontalSymmetryAction.allocate()
         a.minX = minX

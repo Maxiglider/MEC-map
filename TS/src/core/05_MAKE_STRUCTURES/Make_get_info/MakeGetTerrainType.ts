@@ -1,33 +1,16 @@
 import { Make } from 'core/05_MAKE_STRUCTURES/Make/Make'
+import {Text} from "../../01_libraries/Text";
+import {GetTerrainData} from "../../07_TRIGGERS/Modify_terrain_Functions/Terrain_functions";
 
 export class MakeGetTerrainType extends Make {
-    // TODO; Used to be static
-    create = (maker: unit): MakeGetTerrainType => {
-        let m: MakeGetTerrainType
-        if (maker === null) {
-            return 0
+    constructor(maker: unit) {
+        super(maker, 'getTerrainType')
+    }
+
+    doActions() {
+        if(super.doBaseActions()){
+            const terrainData = GetTerrainData(GetTerrainType(this.orderX, this.orderY))
+            terrainData && Text.P(this.makerOwner, terrainData)
         }
-        m = MakeGetTerrainType.allocate()
-        m.maker = maker
-        m.makerOwner = GetOwningPlayer(maker)
-        m.kind = 'getTerrainType'
-        m.t = CreateTrigger()
-        TriggerAddAction(m.t, Make_GetActions(m.kind))
-        TriggerRegisterUnitEvent(m.t, m.maker, EVENT_UNIT_ISSUED_POINT_ORDER)
-        return m
-    }
-
-    destroy = () => {
-        DestroyTrigger(this.t)
-        this.t = null
-        this.maker = null
-    }
-
-    cancelLastAction = (): boolean => {
-        return false
-    }
-
-    redoLastAction = (): boolean => {
-        return false
     }
 }

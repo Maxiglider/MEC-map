@@ -1,19 +1,21 @@
 import { NB_MAX_TILES_MODIFIED } from 'core/01_libraries/Constants'
 import { Text } from 'core/01_libraries/Text'
-import { Make } from 'core/05_MAKE_STRUCTURES/Make/Make'
-import { Hero2Escaper } from '../../04_STRUCTURES/Escaper/Escaper_functions'
-import { MakeAction } from '../MakeLastActions/MakeAction'
+import {Make, MAKE_LAST_CLIC_UNIT_ID} from 'core/05_MAKE_STRUCTURES/Make/Make'
+import {GetNbCaseBetween} from "../../07_TRIGGERS/Modify_terrain_Functions/Modify_terrain_functions";
+import {MakeTerrainCopyPasteAction} from "../MakeLastActions/MakeTerrainCopyPasteAction";
+import {Hero2Escaper} from "../../04_STRUCTURES/Escaper/Escaper_functions";
+import {IsIssuedOrder, StopUnit} from "../../01_libraries/Basic_functions";
 
 export class MakeTerrainCopyPaste extends Make {
-    x1: number
-    y1: number
-    x2: number
-    y2: number
-    x3: number
-    y3: number
-    private unitLastClic1: unit
-    private unitLastClic2: unit
-    private unitLastClic3: unit
+    x1: number = 0
+    y1: number = 0
+    x2: number = 0
+    y2: number = 0
+    x3: number = 0
+    y3: number = 0
+    private unitLastClic1?: unit
+    private unitLastClic2?: unit
+    private unitLastClic3?: unit
     private isPoint1Saved: boolean
     private isPoint2Saved: boolean
     private isPoint3Saved: boolean
@@ -21,42 +23,28 @@ export class MakeTerrainCopyPaste extends Make {
     private isPoint2Used: boolean
     private isPoint3Used: boolean
 
-    // TODO; Used to be static
-    create = (maker: unit): MakeTerrainCopyPaste => {
-        let m: MakeTerrainCopyPaste
-        if (maker === null) {
-            return 0
-        }
-        m = MakeTerrainCopyPaste.allocate()
-        m.maker = maker
-        m.makerOwner = GetOwningPlayer(maker)
-        m.kind = 'terrainCopyPaste'
-        m.t = CreateTrigger()
-        TriggerAddAction(m.t, Make_GetActions(m.kind))
-        TriggerRegisterUnitEvent(m.t, maker, EVENT_UNIT_ISSUED_POINT_ORDER)
-        m.isPoint1Saved = false
-        m.isPoint2Saved = false
-        m.isPoint3Saved = false
-        m.isPoint1Used = false
-        m.isPoint2Used = false
-        m.isPoint3Used = false
-        return m
+
+    constructor(maker: unit) {
+        super(maker, 'terrainCopyPaste')
+
+        this.isPoint1Saved = false
+        this.isPoint2Saved = false
+        this.isPoint3Saved = false
+        this.isPoint1Used = false
+        this.isPoint2Used = false
+        this.isPoint3Used = false
     }
 
     destroy = () => {
-        DestroyTrigger(this.t)
-        this.t = null
-        RemoveUnit(this.unitLastClic1)
-        this.unitLastClic1 = null
-        RemoveUnit(this.unitLastClic2)
-        this.unitLastClic2 = null
-        RemoveUnit(this.unitLastClic3)
-        this.unitLastClic3 = null
-        this.maker = null
+        super.destroy()
+
+        this.unitLastClic1 && RemoveUnit(this.unitLastClic1)
+        this.unitLastClic2 && RemoveUnit(this.unitLastClic2)
+        this.unitLastClic3 && RemoveUnit(this.unitLastClic3)
     }
 
-    private createUnitClic = (u: unit, x: number, y: number): unit => {
-        if (u === null) {
+    private createUnitClic = (u: unit | undefined, x: number, y: number): unit => {
+        if (!u) {
             u = CreateUnit(this.makerOwner, MAKE_LAST_CLIC_UNIT_ID, x, y, GetRandomDirectionDeg())
         } else {
             SetUnitX(u, x)
@@ -68,20 +56,13 @@ export class MakeTerrainCopyPaste extends Make {
     unsaveLoc = (locId: number) => {
         if (locId === 1) {
             this.isPoint1Used = false
-            RemoveUnit(this.unitLastClic1)
-            this.unitLastClic1 = null
-        } else {
-            if (locId === 2) {
-                this.isPoint2Used = false
-                RemoveUnit(this.unitLastClic2)
-                this.unitLastClic2 = null
-            } else {
-                if (locId === 3) {
-                    this.isPoint3Used = false
-                    RemoveUnit(this.unitLastClic3)
-                    this.unitLastClic3 = null
-                }
-            }
+            this.unitLastClic1 && RemoveUnit(this.unitLastClic1)
+        } else if (locId === 2) {
+            this.isPoint2Used = false
+            this.unitLastClic2 && RemoveUnit(this.unitLastClic2)
+        } else if (locId === 3) {
+            this.isPoint3Used = false
+            this.unitLastClic3 && RemoveUnit(this.unitLastClic3)
         }
     }
 
@@ -89,16 +70,13 @@ export class MakeTerrainCopyPaste extends Make {
         this.unsaveLoc(locId)
         if (locId === 1) {
             this.isPoint1Saved = false
-        } else {
-            if (locId === 2) {
-                this.isPoint2Saved = false
-            } else {
-                if (locId === 3) {
-                    this.isPoint3Saved = false
-                }
-            }
+        } else if (locId === 2) {
+            this.isPoint2Saved = false
+        } else if (locId === 3) {
+            this.isPoint3Saved = false
         }
     }
+
 
     unsaveLocsDefinitely = () => {
         this.unsaveLocDefinitely(1)
@@ -107,7 +85,6 @@ export class MakeTerrainCopyPaste extends Make {
     }
 
     saveLoc = (x: number, y: number) => {
-        let action: MakeAction
         if (!this.isPoint1Used) {
             this.unitLastClic1 = this.createUnitClic(this.unitLastClic1, x, y)
             this.x1 = x
@@ -136,34 +113,32 @@ export class MakeTerrainCopyPaste extends Make {
                     this.isPoint3Saved = true
                     this.isPoint3Used = true
                 } else {
-                    action = new MakeTerrainCopyPasteAction(this.x1, this.y1, this.x2, this.y2, this.x3, this.y3, x, y)
-                    if (action !== 0) {
+                    try{
+                        const action = new MakeTerrainCopyPasteAction(this.x1, this.y1, this.x2, this.y2, this.x3, this.y3, x, y)
                         this.unsaveLocsDefinitely()
-                        Hero2Escaper(this.maker).newAction(action)
-                    } else {
+                        this.escaper.newAction(action)
+                    }catch(e){
                         Text.erP(this.makerOwner, 'paste zone out of bounds')
                     }
                 }
             }
         }
-        Hero2Escaper(this.maker).destroyCancelledActions()
+
+        this.escaper.destroyCancelledActions()
     }
 
     cancelLastAction = (): boolean => {
         if (this.isPoint3Used) {
             this.unsaveLoc(3)
             return true
-        } else {
-            if (this.isPoint2Used) {
-                this.unsaveLoc(2)
-                return true
-            } else {
-                if (this.isPoint1Used) {
-                    this.unsaveLoc(1)
-                    return true
-                }
-            }
+        } else if (this.isPoint2Used) {
+            this.unsaveLoc(2)
+            return true
+        } else if (this.isPoint1Used) {
+            this.unsaveLoc(1)
+            return true
         }
+
         return false
     }
 
@@ -171,17 +146,20 @@ export class MakeTerrainCopyPaste extends Make {
         if (this.isPoint1Saved && !this.isPoint1Used) {
             this.saveLoc(this.x1, this.y1)
             return true
-        } else {
-            if (this.isPoint2Saved && !this.isPoint2Used) {
-                this.saveLoc(this.x2, this.y2)
-                return true
-            } else {
-                if (this.isPoint3Saved && !this.isPoint3Used) {
-                    this.saveLoc(this.x3, this.y3)
-                    return true
-                }
-            }
+        } else if (this.isPoint2Saved && !this.isPoint2Used) {
+            this.saveLoc(this.x2, this.y2)
+            return true
+        } else if (this.isPoint3Saved && !this.isPoint3Used) {
+            this.saveLoc(this.x3, this.y3)
+            return true
         }
+
         return false
+    }
+
+    doActions() {
+        if(super.doBaseActions()){
+            this.saveLoc(this.orderX, this.orderY)
+        }
     }
 }

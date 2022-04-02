@@ -1,4 +1,4 @@
-import { Make, MakeConsts } from 'core/05_MAKE_STRUCTURES/Make/Make'
+import { Make } from 'core/05_MAKE_STRUCTURES/Make/Make'
 
 const { MAKE_LAST_CLIC_UNIT_ID } = MakeConsts
 
@@ -12,7 +12,7 @@ export abstract class MakeOneByOneOrTwoClicks extends Make {
     private mode: string
     private acceptedModes: string[] = ['oneByOne', 'twoClics']
 
-    constructor(maker: unit, kind: string, mode: string, acceptedModes: string[] | null = null) {
+    constructor(maker: unit, kind: string, mode: string = "", acceptedModes: string[] | null = null) {
         //modes : oneByOne, twoClics
         super(maker, kind)
 

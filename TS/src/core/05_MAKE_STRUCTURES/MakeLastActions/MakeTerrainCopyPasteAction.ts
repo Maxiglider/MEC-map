@@ -1,10 +1,9 @@
 import { LARGEUR_CASE } from 'core/01_libraries/Constants'
 import { udg_terrainTypes } from '../../../../globals'
 import { TerrainType } from '../../04_STRUCTURES/TerrainType/TerrainType'
+import {MakeAction} from "./MakeAction";
 
-class MakeTerrainCopyPasteAction {
-    // extends MakeAction
-
+export class MakeTerrainCopyPasteAction extends MakeAction {
     static terrainSavesBefore: hashtable
     static terrainSavesAfter: hashtable
     static terrainSaveLastId: number
@@ -31,7 +30,7 @@ class MakeTerrainCopyPasteAction {
         FlushChildHashtable(MakeTerrainCopyPasteAction.terrainSavesAfter, terrainSaveId)
     }
 
-    static create = (
+    constructor(
         x1: number,
         y1: number,
         x2: number,
@@ -40,7 +39,7 @@ class MakeTerrainCopyPasteAction {
         y3: number,
         x4: number,
         y4: number
-    ): MakeTerrainCopyPasteAction => {
+    ) {
         let a: MakeTerrainCopyPasteAction
         let xCopy: number
         let yCopy: number
