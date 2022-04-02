@@ -6,7 +6,7 @@ const initDoubleKill = () => {
     TriggerRegisterAnyUnitEventBJ(triggerDoubleKill, EVENT_PLAYER_UNIT_DEATH)
     TriggerAddAction(triggerDoubleKill, () => {
         if (udg_doubleHeroesEnabled && IsHero(GetTriggerUnit())) {
-            GetMirrorEscaper(Hero2Escaper(GetTriggerUnit())).kill()
+            GetMirrorEscaper(Hero2Escaper(GetTriggerUnit()))?.kill()
         }
     })
 }

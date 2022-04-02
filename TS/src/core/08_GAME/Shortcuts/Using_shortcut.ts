@@ -15,7 +15,16 @@ export const InitTrig_Using_shortcut = () => {
         actions: [
             () => {
                 const escaper = Hero2Escaper(GetTriggerUnit())
+
+                if (!escaper) {
+                    return
+                }
+
                 const p = escaper.getPlayer()
+
+                if (!p) {
+                    return
+                }
 
                 shortcuts.forEach(sc => {
                     if (GetSpellAbilityId() === FourCC(`SC${sc}o`)) {

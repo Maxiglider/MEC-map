@@ -8,16 +8,10 @@ const LIVES_PLAYER = Player(6) //GREEN
 export type ILives = ReturnType<typeof Lives>
 
 export const Lives = () => {
-    let nb: number
+    let nb = udg_levels.get(0)?.getNbLives() || NB_LIVES_AT_BEGINNING
     let lb: leaderboard
 
     const init = () => {
-        if (udg_levels.get(0) != 0) {
-            nb = udg_levels.get(0).getNbLives()
-        } else {
-            nb = NB_LIVES_AT_BEGINNING
-        }
-
         lb = CreateLeaderboardBJ(GetPlayersAll(), '')
         LeaderboardAddItemBJ(Player(0), lb, 'Game time', 0)
         LeaderboardSetPlayerItemStyleBJ(Player(0), lb, true, false, false)

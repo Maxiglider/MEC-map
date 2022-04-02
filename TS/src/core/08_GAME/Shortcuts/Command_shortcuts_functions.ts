@@ -1,4 +1,5 @@
 import { GREY } from 'core/01_libraries/Constants'
+import { udg_colorCode } from 'core/01_libraries/Init_colorCodes'
 import { Text } from 'core/01_libraries/Text'
 import { udg_escapers } from '../Init_structures/Init_escapers'
 import { shortcuts } from './Using_shortcut'
@@ -16,7 +17,7 @@ const initCommandShortcuts = () => {
     }
 
     const InitShortcutSkills = (playerId: number) => {
-        const hero = udg_escapers.get(playerId).getHero()
+        const hero = udg_escapers.get(playerId)?.getHero()
 
         if (!hero) {
             return
@@ -34,7 +35,7 @@ const initCommandShortcuts = () => {
     }
 
     const AssignShortcut = (playerId: number, shortcut: string, command: string) => {
-        const hero = udg_escapers.get(playerId).getHero()
+        const hero = udg_escapers.get(playerId)?.getHero()
 
         if (!hero) {
             return
@@ -55,7 +56,7 @@ const initCommandShortcuts = () => {
     }
 
     const UnassignShortcut = (playerId: number, shortcut: string) => {
-        const hero = udg_escapers.get(playerId).getHero()
+        const hero = udg_escapers.get(playerId)?.getHero()
 
         if (!hero) {
             return

@@ -7,7 +7,7 @@ export const InitTrig_Unselect_hero = () => {
         actions: [
             () => {
                 if (IsHero(GetTriggerUnit())) {
-                    Hero2Escaper(GetTriggerUnit()).setIsHeroSelectedForPlayer(GetTriggerPlayer(), false)
+                    Hero2Escaper(GetTriggerUnit())?.setIsHeroSelectedForPlayer(GetTriggerPlayer(), false)
                 }
             },
         ],
