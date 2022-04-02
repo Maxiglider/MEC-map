@@ -1,4 +1,3 @@
-import { BasicFunctions } from 'core/01_libraries/Basic_functions'
 import { Constants, LARGEUR_CASE } from 'core/01_libraries/Constants'
 import { FunctionsOnNumbers } from 'core/01_libraries/Functions_on_numbers'
 import { Text } from 'core/01_libraries/Text'
@@ -19,7 +18,7 @@ const initSaveTerrainHeights = () => {
             x = Constants.MAP_MIN_X
             while (true) {
                 if (x > Constants.MAP_MAX_X) break
-                if (BasicFunctions.IsNearBounds(x, y)) {
+                if (IsNearBounds(x, y)) {
                     cliffLevel = 2
                 } else {
                     cliffLevel = GetTerrainCliffLevel(x, y)
@@ -55,8 +54,8 @@ const initSaveTerrainHeights = () => {
             while (true) {
                 if (x > Constants.MAP_MAX_X) break
                 height = ZLibrary.GetSurfaceZ(x, y)
-                //if (!BasicFunctions.IsNearBounds(x, y) && (GetTerrainCliffLevel(x, y) != 2 || height != 0)) then //if surfaceZ is 0 && cliff level 2, we consider it's a "default tilepoint", with no water, && we avoid the GetTerrainZ call (which is heavy)
-                /*if (!BasicFunctions.IsNearBounds(x, y) && !IsTerrainPathable(x, y, PATHING_TYPE_FLOATABILITY)) then
+                //if (!IsNearBounds(x, y) && (GetTerrainCliffLevel(x, y) != 2 || height != 0)) then //if surfaceZ is 0 && cliff level 2, we consider it's a "default tilepoint", with no water, && we avoid the GetTerrainZ call (which is heavy)
+                /*if (!IsNearBounds(x, y) && !IsTerrainPathable(x, y, PATHING_TYPE_FLOATABILITY)) then
 			                    //near bounds, GetTerrainZ crashes the game
 			                    //warning, PATHING_TYPE_FLOATABILITY doesn't find water everywhere there is (little spaces of water won't be detected), but I see no other solution
 			                    height = ZLibrary.GetTerrainZ(x, y)

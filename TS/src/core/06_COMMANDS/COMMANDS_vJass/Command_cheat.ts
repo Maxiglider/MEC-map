@@ -1,11 +1,8 @@
-import { BasicFunctions } from 'core/01_libraries/Basic_functions'
 import { NB_ESCAPERS, SLIDE_PERIOD } from 'core/01_libraries/Constants'
 import { FunctionsOnNumbers } from 'core/01_libraries/Functions_on_numbers'
-import { ColorCodes } from 'core/01_libraries/Init_colorCodes'
 import { Text } from 'core/01_libraries/Text'
 import { ViewAllHideAll } from 'core/03_view_all_hide_all/View_all_hide_all'
 import { Escaper } from 'core/04_STRUCTURES/Escaper/Escaper'
-import { EscaperFunctions } from 'core/04_STRUCTURES/Escaper/Escaper_functions'
 import { METEOR_CHEAT } from 'core/04_STRUCTURES/Meteor/Meteor'
 import { Gravity } from 'core/07_TRIGGERS/Slide_and_CheckTerrain_triggers/Gravity'
 import { udg_escapers } from 'core/08_GAME/Init_structures/Init_escapers'
@@ -71,8 +68,8 @@ const initCommandCheat = () => {
                 return true
             }
             if (CommandsFunctions.IsPlayerColorString(param2)) {
-                if (udg_escapers.get(ColorCodes.ColorString2Id(param2)) != null) {
-                    udg_escapers.get(ColorCodes.ColorString2Id(param2)).absoluteSlideSpeed(speed)
+                if (udg_escapers.get(ColorString2Id(param2)) != null) {
+                    udg_escapers.get(ColorString2Id(param2)).absoluteSlideSpeed(speed)
                     Text.P(escaper.getPlayer(), 'slide speed for player ' + param2 + ' is to ' + param1)
                 }
             }
@@ -102,8 +99,8 @@ const initCommandCheat = () => {
                 return true
             }
             if (CommandsFunctions.IsPlayerColorString(param1)) {
-                if (udg_escapers.get(ColorCodes.ColorString2Id(param1)) != null) {
-                    udg_escapers.get(ColorCodes.ColorString2Id(param1)).stopAbsoluteSlideSpeed()
+                if (udg_escapers.get(ColorString2Id(param1)) != null) {
+                    udg_escapers.get(ColorString2Id(param1)).stopAbsoluteSlideSpeed()
                     Text.P(escaper.getPlayer(), 'slide speed for player ' + param1 + ' depends now on terrains')
                 }
             }
@@ -137,8 +134,8 @@ const initCommandCheat = () => {
                 return true
             }
             if (CommandsFunctions.IsPlayerColorString(param2)) {
-                if (udg_escapers.get(ColorCodes.ColorString2Id(param2)) != null) {
-                    udg_escapers.get(ColorCodes.ColorString2Id(param2)).absoluteWalkSpeed(speed)
+                if (udg_escapers.get(ColorString2Id(param2)) != null) {
+                    udg_escapers.get(ColorString2Id(param2)).absoluteWalkSpeed(speed)
                     Text.P(escaper.getPlayer(), 'walk speed for player ' + param2 + ' to ' + param1)
                 }
             }
@@ -168,8 +165,8 @@ const initCommandCheat = () => {
                 return true
             }
             if (CommandsFunctions.IsPlayerColorString(param1)) {
-                if (udg_escapers.get(ColorCodes.ColorString2Id(param1)) != null) {
-                    udg_escapers.get(ColorCodes.ColorString2Id(param1)).stopAbsoluteWalkSpeed()
+                if (udg_escapers.get(ColorString2Id(param1)) != null) {
+                    udg_escapers.get(ColorString2Id(param1)).stopAbsoluteWalkSpeed()
                     Text.P(escaper.getPlayer(), 'walk speed for player ' + param1 + ' depends now on terrains')
                 }
             }
@@ -178,13 +175,13 @@ const initCommandCheat = () => {
 
         //-canTeleport(ct) <boolean canTeleport>   --> teleport trigger must have been enabled by the admin
         if (name === 'canTeleport' || name === 'ct') {
-            if (!BasicFunctions.IsBoolString(param1)) {
+            if (!IsBoolString(param1)) {
                 return true
             }
-            b = BasicFunctions.S2B(param1)
+            b = S2B(param1)
             if (nbParam === 1) {
                 const h1 = escaper.getHero()
-                const h2 = EscaperFunctions.GetMirrorEscaper(escaper).getHero()
+                const h2 = GetMirrorEscaper(escaper).getHero()
 
                 h1 && Teleport.ActivateTeleport(h1, false)
                 h2 && Teleport.ActivateTeleport(h2, false)
@@ -200,7 +197,7 @@ const initCommandCheat = () => {
                     if (i >= NB_ESCAPERS) break
                     if (udg_escapers.get(i) != null) {
                         const h1 = udg_escapers.get(i).getHero()
-                        const h2 = EscaperFunctions.GetMirrorEscaper(udg_escapers.get(i)).getHero()
+                        const h2 = GetMirrorEscaper(udg_escapers.get(i)).getHero()
 
                         if (b) {
                             h1 && Teleport.ActivateTeleport(h1, false)
@@ -215,11 +212,9 @@ const initCommandCheat = () => {
                 return true
             }
             if (CommandsFunctions.IsPlayerColorString(param2)) {
-                if (udg_escapers.get(ColorCodes.ColorString2Id(param2)) != null) {
-                    const h1 = udg_escapers.get(ColorCodes.ColorString2Id(param2)).getHero()
-                    const h2 = EscaperFunctions.GetMirrorEscaper(
-                        udg_escapers.get(ColorCodes.ColorString2Id(param2))
-                    ).getHero()
+                if (udg_escapers.get(ColorString2Id(param2)) != null) {
+                    const h1 = udg_escapers.get(ColorString2Id(param2)).getHero()
+                    const h2 = GetMirrorEscaper(udg_escapers.get(ColorString2Id(param2))).getHero()
 
                     if (b) {
                         h1 && Teleport.ActivateTeleport(h1, false)
@@ -239,7 +234,7 @@ const initCommandCheat = () => {
             (noParam || (nbParam === 1 && (param1 === '0' || S2R(param1) !== 0)))
         ) {
             const h1 = escaper.getHero()
-            const h2 = EscaperFunctions.GetMirrorEscaper(escaper).getHero()
+            const h2 = GetMirrorEscaper(escaper).getHero()
 
             if (nbParam === 1) {
                 h1 && SetUnitFacing(h1, S2R(param1))
@@ -273,8 +268,8 @@ const initCommandCheat = () => {
                 return true
             }
             if (CommandsFunctions.IsPlayerColorString(param1)) {
-                if (udg_escapers.get(ColorCodes.ColorString2Id(param1)) != null) {
-                    udg_escapers.get(ColorCodes.ColorString2Id(param1)).reviveAtStart()
+                if (udg_escapers.get(ColorString2Id(param1)) != null) {
+                    udg_escapers.get(ColorString2Id(param1)).reviveAtStart()
                 }
             }
             return true
@@ -285,7 +280,7 @@ const initCommandCheat = () => {
             if (!(nbParam === 1 && CommandsFunctions.IsPlayerColorString(param1))) {
                 return true
             }
-            n = ColorCodes.ColorString2Id(param1)
+            n = ColorString2Id(param1)
             if (!udg_escapers.get(n).isAlive() || udg_escapers.get(n) == null) {
                 return true
             }
@@ -298,8 +293,8 @@ const initCommandCheat = () => {
 
             escaper.revive(GetUnitX(hero), GetUnitY(hero))
             escaper.turnInstantly(GetUnitFacing(hero))
-            EscaperFunctions.GetMirrorEscaper(escaper).revive(GetUnitX(hero), GetUnitY(hero))
-            EscaperFunctions.GetMirrorEscaper(escaper).turnInstantly(GetUnitFacing(hero))
+            GetMirrorEscaper(escaper).revive(GetUnitX(hero), GetUnitY(hero))
+            GetMirrorEscaper(escaper).turnInstantly(GetUnitFacing(hero))
 
             return true
         }
@@ -391,8 +386,8 @@ const initCommandCheat = () => {
                 Text.erP(escaper.getPlayer(), 'one or two params for this command')
                 return true
             }
-            if (BasicFunctions.IsBoolString(param1)) {
-                b = BasicFunctions.S2B(param1)
+            if (IsBoolString(param1)) {
+                b = S2B(param1)
             } else {
                 Text.erP(escaper.getPlayer(), 'param1 must be a boolean')
                 return true
@@ -427,7 +422,7 @@ const initCommandCheat = () => {
                 return true
             }
             if (CommandsFunctions.IsPlayerColorString(param2)) {
-                n = ColorCodes.ColorString2Id(param2)
+                n = ColorString2Id(param2)
                 if (udg_escapers.get(n) != null) {
                     udg_escapers.get(n).setGodMode(b)
                     if (b) {
@@ -450,8 +445,8 @@ const initCommandCheat = () => {
                 Text.erP(escaper.getPlayer(), 'one or two params for this command')
                 return true
             }
-            if (BasicFunctions.IsBoolString(param1)) {
-                b = BasicFunctions.S2B(param1)
+            if (IsBoolString(param1)) {
+                b = S2B(param1)
             } else {
                 Text.erP(escaper.getPlayer(), 'param1 must be a boolean')
                 return true
@@ -486,7 +481,7 @@ const initCommandCheat = () => {
                 return true
             }
             if (CommandsFunctions.IsPlayerColorString(param2)) {
-                n = ColorCodes.ColorString2Id(param2)
+                n = ColorString2Id(param2)
                 if (udg_escapers.get(n) != null) {
                     udg_escapers.get(n).setGodModeKills(b)
                     if (b) {
@@ -531,7 +526,7 @@ const initCommandCheat = () => {
             }
 
             const h1 = escaper.getHero()
-            const h2 = EscaperFunctions.GetMirrorEscaper(escaper).getHero()
+            const h2 = GetMirrorEscaper(escaper).getHero()
 
             h1 && SetUnitFlyHeight(h1, S2R(param1), 0)
             h2 && SetUnitFlyHeight(h2, S2R(param1), 0)
@@ -550,10 +545,10 @@ const initCommandCheat = () => {
 
         //-instantTurn
         if (name === 'instantTurn' || name === 'it') {
-            if (nbParam === 1 && BasicFunctions.IsBoolString(param1)) {
-                if (escaper.isAbsoluteInstantTurn() != BasicFunctions.S2B(param1)) {
-                    escaper.setAbsoluteInstantTurn(BasicFunctions.S2B(param1))
-                    if (BasicFunctions.S2B(param1)) {
+            if (nbParam === 1 && IsBoolString(param1)) {
+                if (escaper.isAbsoluteInstantTurn() != S2B(param1)) {
+                    escaper.setAbsoluteInstantTurn(S2B(param1))
+                    if (S2B(param1)) {
                         Text.P(escaper.getPlayer(), 'instant turn on')
                     } else {
                         Text.P(escaper.getPlayer(), 'instant turn off')

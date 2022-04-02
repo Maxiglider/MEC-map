@@ -1,5 +1,4 @@
 import { NB_PLAYERS_MAX } from 'core/01_libraries/Constants'
-import { ColorCodes } from 'core/01_libraries/Init_colorCodes'
 
 const initCommandsFunctions = () => {
     //gives the name of the entered command  ////the name of the entered command is <command_name>
@@ -90,11 +89,11 @@ const initCommandsFunctions = () => {
     }
 
     const IsColorString = (colorString: string): boolean => {
-        return ColorCodes.ColorString2Id(colorString) >= 0
+        return ColorString2Id(colorString) >= 0
     }
 
     const IsPlayerColorString = (colorString: string): boolean => {
-        return ColorCodes.ColorString2Id(colorString) >= 0 && ColorCodes.ColorString2Id(colorString) <= NB_PLAYERS_MAX
+        return ColorString2Id(colorString) >= 0 && ColorString2Id(colorString) <= NB_PLAYERS_MAX
     }
 
     return { CmdName, IsCmd, CmdParam, NbParam, NoParam, IsColorString, IsPlayerColorString }

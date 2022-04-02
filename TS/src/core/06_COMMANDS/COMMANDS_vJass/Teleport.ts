@@ -1,5 +1,3 @@
-import { BasicFunctions } from 'core/01_libraries/Basic_functions'
-
 const initTeleport = () => {
     let teleTriggers: trigger[] = []
     let onceOnly: boolean[] = []
@@ -7,10 +5,10 @@ const initTeleport = () => {
     const Teleport_Actions = () => {
         let hero: unit | null = GetTriggerUnit()
 
-        if (!BasicFunctions.IsIssuedOrder('smart')) {
+        if (!IsIssuedOrder('smart')) {
             return
         }
-        BasicFunctions.StopUnit(hero)
+        StopUnit(hero)
 
         SetUnitX(hero, GetOrderPointX())
         SetUnitY(hero, GetOrderPointY())

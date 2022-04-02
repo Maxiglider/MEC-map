@@ -1,10 +1,7 @@
-import { BasicFunctions } from 'core/01_libraries/Basic_functions'
 import { NB_ESCAPERS, NB_PLAYERS_MAX } from 'core/01_libraries/Constants'
 import { FunctionsOnNumbers } from 'core/01_libraries/Functions_on_numbers'
-import { ColorCodes } from 'core/01_libraries/Init_colorCodes'
 import { Text } from 'core/01_libraries/Text'
 import { Escaper } from 'core/04_STRUCTURES/Escaper/Escaper'
-import { EscaperFunctions } from 'core/04_STRUCTURES/Escaper/Escaper_functions'
 import { ReinitTerrains } from 'core/07_TRIGGERS/Triggers_to_modify_terrains/Reinit_terrains'
 import { ReinitTerrainsPositions } from 'core/07_TRIGGERS/Triggers_to_modify_terrains/Reinit_terrains_position_Change_variations_and_ut_at_beginning'
 import { AfkMode } from 'core/08_GAME/Afk_mode/Afk_mode'
@@ -112,7 +109,7 @@ const initCommandMax = () => {
                     Text.erP(escaper.getPlayer(), 'param2 should be a player color')
                     return true
                 }
-                escaper2 = udg_escapers.get(ColorCodes.ColorString2Id(param2))
+                escaper2 = udg_escapers.get(ColorString2Id(param2))
                 if (escaper2 === null) {
                     Text.erP(escaper.getPlayer(), 'escaper ' + param2 + " doesn't exist")
                     return true
@@ -137,10 +134,10 @@ const initCommandMax = () => {
                 return true
             }
             if (CommandsFunctions.IsPlayerColorString(param1)) {
-                n = ColorCodes.ColorString2Id(param1)
+                n = ColorString2Id(param1)
                 if (udg_escapers.get(n) !== null) {
                     udg_escapers.get(n).giveHeroControl(escaper2)
-                    EscaperFunctions.GetMirrorEscaper(udg_escapers.get(n)).giveHeroControl(escaper2)
+                    GetMirrorEscaper(udg_escapers.get(n)).giveHeroControl(escaper2)
                 } else {
                     Text.erP(escaper.getPlayer(), 'escaper ' + param1 + " doesn't exist")
                     return true
@@ -184,11 +181,11 @@ const initCommandMax = () => {
             if (!(nbParam === 1)) {
                 return true
             }
-            if (!BasicFunctions.IsBoolString(param1)) {
+            if (!IsBoolString(param1)) {
                 Text.erP(escaper.getPlayer(), 'param1 should be a boolean or a real')
                 return true
             }
-            if (BasicFunctions.S2B(param1)) {
+            if (S2B(param1)) {
                 EnableTrigger(gg_trg_Teleport)
                 Text.P(escaper.getPlayer(), 'teleport on')
             } else {
@@ -200,11 +197,11 @@ const initCommandMax = () => {
 
         //-redRights(redr) <boolean status>
         if (name === 'redRights' || name === 'redr') {
-            if (!(nbParam === 1 && BasicFunctions.IsBoolString(param1))) {
+            if (!(nbParam === 1 && IsBoolString(param1))) {
                 return true
             }
-            Globals.udg_areRedRightsOn = BasicFunctions.S2B(param1)
-            if (BasicFunctions.S2B(param1)) {
+            Globals.udg_areRedRightsOn = S2B(param1)
+            if (S2B(param1)) {
                 Text.P(escaper.getPlayer(), 'red rights on')
             } else {
                 Text.P(escaper.getPlayer(), 'red rights off')
@@ -219,11 +216,11 @@ const initCommandMax = () => {
                 Text.P(escaper.getPlayer(), 'you have now autorevive to on')
                 return true
             }
-            if (!BasicFunctions.IsBoolString(param1)) {
+            if (!IsBoolString(param1)) {
                 Text.erP(escaper.getPlayer(), 'param1 should be a boolean')
                 return true
             }
-            b = BasicFunctions.S2B(param1)
+            b = S2B(param1)
             if (nbParam === 1) {
                 escaper.setHasAutorevive(b)
                 if (b) {
@@ -254,7 +251,7 @@ const initCommandMax = () => {
                 return true
             }
             if (CommandsFunctions.IsPlayerColorString(param2)) {
-                n = ColorCodes.ColorString2Id(param2)
+                n = ColorString2Id(param2)
                 if (udg_escapers.get(n) !== null) {
                     udg_escapers.get(n).setHasAutorevive(b)
                     if (b) {
@@ -302,7 +299,7 @@ const initCommandMax = () => {
                 return true
             }
             if (CommandsFunctions.IsPlayerColorString(param1)) {
-                n = ColorCodes.ColorString2Id(param1)
+                n = ColorString2Id(param1)
                 if (udg_escapers.get(n) == null) {
                     udg_escapers.newAt(n)
                     if (udg_doubleHeroesEnabled) {
@@ -334,7 +331,7 @@ const initCommandMax = () => {
                 while (true) {
                     if (i >= NB_ESCAPERS) break
                     if (udg_escapers.get(i) != null && udg_escapers.get(i) != escaper) {
-                        if (BasicFunctions.IsEscaperInGame(i)) {
+                        if (IsEscaperInGame(i)) {
                             udg_escapers.get(i).removeHero()
                         } else {
                             udg_escapers.remove(i)
@@ -345,9 +342,9 @@ const initCommandMax = () => {
                 return true
             }
             if (CommandsFunctions.IsPlayerColorString(param1)) {
-                n = ColorCodes.ColorString2Id(param1)
+                n = ColorString2Id(param1)
                 if (udg_escapers.get(n) != null) {
-                    if (BasicFunctions.IsEscaperInGame(n)) {
+                    if (IsEscaperInGame(n)) {
                         udg_escapers.get(n).removeHero()
                     } else {
                         udg_escapers.remove(n)
@@ -368,8 +365,8 @@ const initCommandMax = () => {
                 return true
             }
             if (nbParam === 2) {
-                if (BasicFunctions.IsBoolString(param2)) {
-                    b = BasicFunctions.S2B(param2)
+                if (IsBoolString(param2)) {
+                    b = S2B(param2)
                 } else {
                     Text.erP(escaper.getPlayer(), 'param2 must be a boolean')
                     return true
@@ -396,7 +393,7 @@ const initCommandMax = () => {
                 return true
             }
             if (CommandsFunctions.IsPlayerColorString(param1)) {
-                n = ColorCodes.ColorString2Id(param1)
+                n = ColorString2Id(param1)
                 if (udg_escapers.get(n) != null) {
                     if (udg_escapers.get(n) != escaper) {
                         if (!udg_escapers.get(n).isMaximaxou()) {

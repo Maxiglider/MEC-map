@@ -2,7 +2,6 @@ import { Constants, LARGEUR_CASE } from 'core/01_libraries/Constants'
 import { FunctionsOnNumbers } from 'core/01_libraries/Functions_on_numbers'
 import { Text } from 'core/01_libraries/Text'
 import { udg_terrainTypes } from '../../../../globals'
-import { Ascii } from '../../01_libraries/Ascii'
 import { SaveMapInCache } from './SAVE_MAP_in_cache'
 import { SaveTerrainHeights } from './Save_terrain_heights_and_cliffs'
 import { StringArrayForCache } from './struct_StringArrayForCache'
@@ -18,7 +17,7 @@ const initSaveTerrain = () => {
         i = 0
         while (true) {
             if (i >= nbTerrainTypesUsed) break
-            StringArrayForCache.stringArrayForCache.push(Ascii.Ascii2String(terrainTypeIds[i]))
+            StringArrayForCache.stringArrayForCache.push(Ascii2String(terrainTypeIds[i]))
             i = i + 1
         }
         StringArrayForCache.stringArrayForCache.writeInCache()

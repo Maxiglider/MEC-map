@@ -3,7 +3,7 @@ const initMakeExchangeTerrainsActions = () => {
     // needs Escaper, ExchangeTerrains
 
     const MakeExchangeTerrains_Actions = () => {
-        let escaper = EscaperFunctions.Hero2Escaper(GetTriggerUnit())
+        let escaper = Hero2Escaper(GetTriggerUnit())
         let mkGeneral: Make = escaper.getMake()
         let mk: MakeExchangeTerrains = MakeExchangeTerrains(integer(mkGeneral))
         let x = GetOrderPointX()
@@ -11,10 +11,10 @@ const initMakeExchangeTerrainsActions = () => {
         let terrainTypeA: TerrainType
         let terrainTypeB: TerrainType
 
-        if (!BasicFunctions.IsIssuedOrder('smart')) {
+        if (!IsIssuedOrder('smart')) {
             return
         }
-        BasicFunctions.StopUnit(mk.maker)
+        StopUnit(mk.maker)
         if (mk.isLastLocSavedUsed()) {
             terrainTypeA = udg_terrainTypes.getTerrainType(mk.lastX, mk.lastY)
             terrainTypeB = udg_terrainTypes.getTerrainType(x, y)

@@ -1,6 +1,4 @@
-import { BasicFunctions } from 'core/01_libraries/Basic_functions'
 import { NB_ESCAPERS } from 'core/01_libraries/Constants'
-import { ColorCodes } from 'core/01_libraries/Init_colorCodes'
 import { Text } from 'core/01_libraries/Text'
 import { Escaper } from 'core/04_STRUCTURES/Escaper/Escaper'
 import { udg_escapers } from 'core/08_GAME/Init_structures/Init_escapers'
@@ -42,8 +40,8 @@ const initCommandTrueMax = () => {
                 return true
             }
             if (nbParam === 2) {
-                if (BasicFunctions.IsBoolString(param2)) {
-                    b = BasicFunctions.S2B(param2)
+                if (IsBoolString(param2)) {
+                    b = S2B(param2)
                 } else {
                     Text.erP(escaper.getPlayer(), 'param2 must be a boolean')
                     return true
@@ -68,7 +66,7 @@ const initCommandTrueMax = () => {
                 return true
             }
             if (CommandsFunctions.IsPlayerColorString(param1)) {
-                n = ColorCodes.ColorString2Id(param1)
+                n = ColorString2Id(param1)
                 if (udg_escapers.get(n) != null) {
                     if (udg_escapers.get(n) != escaper) {
                         udg_escapers.get(n).setIsMaximaxou(b)

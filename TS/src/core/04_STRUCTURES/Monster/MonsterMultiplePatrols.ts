@@ -1,16 +1,11 @@
 import { BasicFunctions } from 'core/01_libraries/Basic_functions'
-import { MOBS_VARIOUS_COLORS, PATROL_DISTANCE_MIN } from 'core/01_libraries/Constants'
-import { ColorCodes } from 'core/01_libraries/Init_colorCodes'
+import { PATROL_DISTANCE_MIN } from 'core/01_libraries/Constants'
 import { CACHE_SEPARATEUR_PARAM } from 'core/07_TRIGGERS/Save_map_in_gamecache/struct_StringArrayForCache'
-import { CommandsFunctions } from '../../06_COMMANDS/COMMANDS_vJass/Command_functions'
-import { EscaperFunctions } from '../Escaper/Escaper_functions'
-import { Monster } from './Monster'
+import { Monster, udg_monsters } from './Monster'
 import { MonsterType } from './MonsterType'
-import { MonstersClickableSetLife } from './trig_Monsters_clickable_set_life'
-import {udg_monsters} from "./Monster";
-import {NewPatrolMonster} from "./Monster_creation_functions";
+import { NewPatrolMonster } from './Monster_creation_functions'
 
-const {GetLocDist} = BasicFunctions
+const { GetLocDist } = BasicFunctions
 
 const NewRegion = (x: number, y: number): region => {
     let r = Rect(x - 16, y - 16, x + 16, y + 16)
@@ -23,7 +18,7 @@ const NewRegion = (x: number, y: number): region => {
 const MonsterMultiplePatrols_move_Actions = (): void => {
     let monster: Monster
     let MMP: MonsterMultiplePatrols
-    if (EscaperFunctions.IsHero(GetTriggerUnit())) {
+    if (IsHero(GetTriggerUnit())) {
         return
     }
     monster = udg_monsters[GetUnitUserData(GetTriggerUnit())]
@@ -33,9 +28,6 @@ const MonsterMultiplePatrols_move_Actions = (): void => {
         }
     }
 }
-
-
-
 
 export class MonsterMultiplePatrols extends Monster {
     static X: number[]
@@ -50,7 +42,7 @@ export class MonsterMultiplePatrols extends Monster {
     private t: trigger[] = []
     private currentTrigger?: trigger
 
-    constructor(mt: MonsterType, mode: string){
+    constructor(mt: MonsterType, mode: string) {
         super(mt)
 
         //mode == "normal" (0, 1, 2, 3, 0 , 1...) ou mode == "string" (0, 1, 2, 3, 2, 1...)
@@ -66,7 +58,7 @@ export class MonsterMultiplePatrols extends Monster {
 
         MonsterMultiplePatrols.X.map((x, n) => {
             const y = MonsterMultiplePatrols.Y[n]
-            
+
             this.x[n] = x
             this.y[n] = y
             this.r[n] = NewRegion(x, y)
@@ -84,19 +76,19 @@ export class MonsterMultiplePatrols extends Monster {
         return udg_monsters.filter(monster => monster instanceof MonsterMultiplePatrols).length
     }
 
-    static storeNewLoc(x: number, y: number){
+    static storeNewLoc(x: number, y: number) {
         const nbLocsBefore = MonsterMultiplePatrols.X.length
         MonsterMultiplePatrols.X[nbLocsBefore] = x
         MonsterMultiplePatrols.Y[nbLocsBefore] = y
         return true
     }
 
-    static destroyLocs(){
+    static destroyLocs() {
         MonsterMultiplePatrols.X = []
         MonsterMultiplePatrols.Y = []
     }
 
-    getCurrentTrigger(){
+    getCurrentTrigger() {
         return this.currentTrigger
     }
 
@@ -113,7 +105,7 @@ export class MonsterMultiplePatrols extends Monster {
     nextMove() {
         const lastLocInd = this.x.length - 1
         this.disableTrigger(this.currentMove)
-        
+
         if (this.sens === 0 || this.sens === 1) {
             if (this.currentMove >= lastLocInd) {
                 if (this.sens === 0) {
@@ -133,20 +125,19 @@ export class MonsterMultiplePatrols extends Monster {
                 this.currentMove = this.currentMove - 1
             }
         }
-        
+
         this.activateMove(this.currentMove)
     }
-
 
     createUnit = (): void => {
         if (this.x.length < 2) {
             return //need at least 2 locations to create a unit
         }
 
-        super.createUnit(() => (
+        super.createUnit(() =>
             this.mt ? NewPatrolMonster(this.mt, this.x[0], this.y[0], this.x[1], this.y[1]) : undefined
-        ))
-    
+        )
+
         this.currentMove = 1
         if (this.sens === 2) {
             this.sens = 1
@@ -169,15 +160,15 @@ export class MonsterMultiplePatrols extends Monster {
         if (lastLocInd < 0) {
             return false
         }
-        
+
         DestroyTrigger(this.t[lastLocInd])
         RemoveRegion(this.r[lastLocInd])
-        
+
         delete this.t[lastLocInd]
         delete this.r[lastLocInd]
         delete this.x[lastLocInd]
         delete this.y[lastLocInd]
-        
+
         if (lastLocInd === 1) {
             this.removeUnit()
         }
@@ -186,7 +177,7 @@ export class MonsterMultiplePatrols extends Monster {
             this.currentMove = this.currentMove - 1
             this.activateMove(this.currentMove)
         }
-        
+
         return true
     }
 
@@ -203,10 +194,7 @@ export class MonsterMultiplePatrols extends Monster {
     addNewLoc(x: number, y: number) {
         let lastLocInd = this.x.length - 1
 
-        if (
-            GetLocDist(this.getX(lastLocInd), this.getY(lastLocInd), x, y) <=
-            PATROL_DISTANCE_MIN
-        ) {
+        if (GetLocDist(this.getX(lastLocInd), this.getY(lastLocInd), x, y) <= PATROL_DISTANCE_MIN) {
             return 2
         }
 
@@ -225,7 +213,7 @@ export class MonsterMultiplePatrols extends Monster {
     }
 
     destroy() {
-        while(this.destroyLastLoc()){}
+        while (this.destroyLastLoc()) {}
         super.destroy()
     }
 

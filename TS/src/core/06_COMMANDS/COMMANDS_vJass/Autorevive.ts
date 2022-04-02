@@ -1,4 +1,3 @@
-import { EscaperFunctions } from 'core/04_STRUCTURES/Escaper/Escaper_functions'
 import { createEvent } from 'Utils/mapUtils'
 
 const InitTrig_Autorevive = () => {
@@ -6,10 +5,10 @@ const InitTrig_Autorevive = () => {
 
     createEvent({
         events: [t => TriggerRegisterAnyUnitEventBJ(t, EVENT_PLAYER_UNIT_DEATH)],
-        conditions: [() => EscaperFunctions.IsHero(GetTriggerUnit())],
+        conditions: [() => IsHero(GetTriggerUnit())],
         actions: [
             () => {
-                let escaper = EscaperFunctions.Hero2Escaper(GetTriggerUnit())
+                let escaper = Hero2Escaper(GetTriggerUnit())
 
                 if (escaper.hasAutorevive()) {
                     TriggerSleepAction(udg_autoreviveDelay)

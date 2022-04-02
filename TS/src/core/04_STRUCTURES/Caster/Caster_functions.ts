@@ -1,6 +1,4 @@
-import { BasicFunctions } from 'core/01_libraries/Basic_functions'
 import { Escaper } from '../Escaper/Escaper'
-import { EscaperFunctions } from '../Escaper/Escaper_functions'
 import { Caster } from './Caster'
 
 const initCasterFunctions = () => {
@@ -200,7 +198,7 @@ const initCasterFunctions = () => {
                     }
 
                     //trouver temps idéal
-                    if (BasicFunctions.IsOnGround(escaper.getHero())) {
+                    if (IsOnGround(escaper.getHero())) {
                         tempsIdeal = TrouverTempsIdeal(tempsMax)
                     } else {
                         tempsIdeal = -1
@@ -253,7 +251,7 @@ const initCasterFunctions = () => {
     }
 
     const CasterUnitWithinRange_Actions = () => {
-        let escaperInRange = EscaperFunctions.Hero2Escaper(GetTriggerUnit())
+        let escaperInRange = Hero2Escaper(GetTriggerUnit())
         if (escaperInRange === null) {
             return
         }

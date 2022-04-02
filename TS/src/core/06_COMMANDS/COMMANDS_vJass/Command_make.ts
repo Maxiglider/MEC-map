@@ -1,14 +1,12 @@
-import { BasicFunctions } from 'core/01_libraries/Basic_functions'
 import {
     DEFAULT_MONSTER_SPEED,
     HERO_SLIDE_SPEED,
     HERO_WALK_SPEED,
     MAX_MOVE_SPEED,
     RED,
-    TERRAIN_DEATH_TIME_TO_KILL
+    TERRAIN_DEATH_TIME_TO_KILL,
 } from 'core/01_libraries/Constants'
 import { FunctionsOnNumbers } from 'core/01_libraries/Functions_on_numbers'
-import { ColorCodes } from 'core/01_libraries/Init_colorCodes'
 import { Text } from 'core/01_libraries/Text'
 import { Escaper } from 'core/04_STRUCTURES/Escaper/Escaper'
 import { Level } from 'core/04_STRUCTURES/Level/Level'
@@ -17,12 +15,11 @@ import { ExchangeTerrains } from 'core/07_TRIGGERS/Triggers_to_modify_terrains/E
 import { RandomizeTerrains } from 'core/07_TRIGGERS/Triggers_to_modify_terrains/Randomize_terrains'
 import { udg_levels } from 'core/08_GAME/Init_structures/Init_struct_levels'
 import { udg_casterTypes, udg_monsterTypes, udg_terrainTypes } from '../../../../globals'
-import { Ascii } from '../../01_libraries/Ascii'
 import { MonsterTeleportt } from '../../04_STRUCTURES/Monster/MonsterTeleport'
 import { TerrainTypeFromString } from '../../07_TRIGGERS/Modify_terrain_Functions/Terrain_type_from_string'
 import {
     CACHE_SEPARATEUR_ITEM,
-    CACHE_SEPARATEUR_PARAM
+    CACHE_SEPARATEUR_PARAM,
 } from '../../07_TRIGGERS/Save_map_in_gamecache/struct_StringArrayForCache'
 import { ChangeAllTerrains } from '../../07_TRIGGERS/Triggers_to_modify_terrains/Change_all_terrains'
 import { ChangeOneTerrain } from '../../07_TRIGGERS/Triggers_to_modify_terrains/Change_one_terrain'
@@ -74,9 +71,9 @@ const initCommandMake = () => {
                 speed = HERO_WALK_SPEED
             }
             if (
-                BasicFunctions.StringContainsChar(param1, CACHE_SEPARATEUR_ITEM) ||
-                BasicFunctions.StringContainsChar(param1, CACHE_SEPARATEUR_PARAM) ||
-                BasicFunctions.StringContainsChar(param1, '"')
+                StringContainsChar(param1, CACHE_SEPARATEUR_ITEM) ||
+                StringContainsChar(param1, CACHE_SEPARATEUR_PARAM) ||
+                StringContainsChar(param1, '"')
             ) {
                 Text.erP(
                     escaper.getPlayer(),
@@ -106,9 +103,9 @@ const initCommandMake = () => {
             if (nbParam >= 3) {
                 str = param3
                 if (
-                    BasicFunctions.StringContainsChar(param3, CACHE_SEPARATEUR_ITEM) ||
-                    BasicFunctions.StringContainsChar(param3, CACHE_SEPARATEUR_PARAM) ||
-                    BasicFunctions.StringContainsChar(param3, '"')
+                    StringContainsChar(param3, CACHE_SEPARATEUR_ITEM) ||
+                    StringContainsChar(param3, CACHE_SEPARATEUR_PARAM) ||
+                    StringContainsChar(param3, '"')
                 ) {
                     Text.erP(
                         escaper.getPlayer(),
@@ -128,9 +125,9 @@ const initCommandMake = () => {
                 x = TERRAIN_DEATH_TIME_TO_KILL
             }
             if (
-                BasicFunctions.StringContainsChar(param1, CACHE_SEPARATEUR_ITEM) ||
-                BasicFunctions.StringContainsChar(param1, CACHE_SEPARATEUR_PARAM) ||
-                BasicFunctions.StringContainsChar(param1, '"')
+                StringContainsChar(param1, CACHE_SEPARATEUR_ITEM) ||
+                StringContainsChar(param1, CACHE_SEPARATEUR_PARAM) ||
+                StringContainsChar(param1, '"')
             ) {
                 Text.erP(
                     escaper.getPlayer(),
@@ -169,18 +166,18 @@ const initCommandMake = () => {
                 speed = HERO_SLIDE_SPEED
             }
             if (nbParam === 4) {
-                if (!BasicFunctions.IsBoolString(param4)) {
+                if (!IsBoolString(param4)) {
                     Text.erP(escaper.getPlayer(), 'the property "canTurn" must be a boolean (true or false)')
                     return true
                 }
-                b = BasicFunctions.S2B(param4)
+                b = S2B(param4)
             } else {
                 b = true
             }
             if (
-                BasicFunctions.StringContainsChar(param1, CACHE_SEPARATEUR_ITEM) ||
-                BasicFunctions.StringContainsChar(param1, CACHE_SEPARATEUR_PARAM) ||
-                BasicFunctions.StringContainsChar(param1, '"')
+                StringContainsChar(param1, CACHE_SEPARATEUR_ITEM) ||
+                StringContainsChar(param1, CACHE_SEPARATEUR_PARAM) ||
+                StringContainsChar(param1, '"')
             ) {
                 Text.erP(
                     escaper.getPlayer(),
@@ -214,9 +211,9 @@ const initCommandMake = () => {
             }
             if (b) {
                 if (
-                    BasicFunctions.StringContainsChar(param2, CACHE_SEPARATEUR_ITEM) ||
-                    BasicFunctions.StringContainsChar(param2, CACHE_SEPARATEUR_PARAM) ||
-                    BasicFunctions.StringContainsChar(param2, '"')
+                    StringContainsChar(param2, CACHE_SEPARATEUR_ITEM) ||
+                    StringContainsChar(param2, CACHE_SEPARATEUR_PARAM) ||
+                    StringContainsChar(param2, '"')
                 ) {
                     Text.erP(
                         escaper.getPlayer(),
@@ -243,9 +240,9 @@ const initCommandMake = () => {
             }
             if (b) {
                 if (
-                    BasicFunctions.StringContainsChar(param2, CACHE_SEPARATEUR_ITEM) ||
-                    BasicFunctions.StringContainsChar(param2, CACHE_SEPARATEUR_PARAM) ||
-                    BasicFunctions.StringContainsChar(param2, '"')
+                    StringContainsChar(param2, CACHE_SEPARATEUR_ITEM) ||
+                    StringContainsChar(param2, CACHE_SEPARATEUR_PARAM) ||
+                    StringContainsChar(param2, '"')
                 ) {
                     Text.erP(
                         escaper.getPlayer(),
@@ -299,9 +296,9 @@ const initCommandMake = () => {
                 return true
             }
             if (
-                BasicFunctions.StringContainsChar(param2, CACHE_SEPARATEUR_ITEM) ||
-                BasicFunctions.StringContainsChar(param2, CACHE_SEPARATEUR_PARAM) ||
-                BasicFunctions.StringContainsChar(param2, '"')
+                StringContainsChar(param2, CACHE_SEPARATEUR_ITEM) ||
+                StringContainsChar(param2, CACHE_SEPARATEUR_PARAM) ||
+                StringContainsChar(param2, '"')
             ) {
                 Text.erP(
                     escaper.getPlayer(),
@@ -400,18 +397,18 @@ const initCommandMake = () => {
                 Text.erP(escaper.getPlayer(), 'the terrain must be of slide type')
                 return true
             }
-            if (!BasicFunctions.IsBoolString(param2)) {
+            if (!IsBoolString(param2)) {
                 Text.erP(escaper.getPlayer(), 'the property "canTurn" must be a boolean (true or false)')
                 return true
             }
-            if (TerrainTypeSlide(integer(terrainType)).setCanTurn(BasicFunctions.S2B(param2))) {
-                if (BasicFunctions.S2B(param2)) {
+            if (TerrainTypeSlide(integer(terrainType)).setCanTurn(S2B(param2))) {
+                if (S2B(param2)) {
                     Text.mkP(escaper.getPlayer(), 'the heroes can now turn on this slide terrain')
                 } else {
                     Text.mkP(escaper.getPlayer(), "the heroes can't turn on this slide terrain anymore")
                 }
             } else {
-                if (BasicFunctions.S2B(param2)) {
+                if (S2B(param2)) {
                     Text.erP(escaper.getPlayer(), 'the heroes can already turn on this slide terrain')
                 } else {
                     Text.erP(escaper.getPlayer(), "the heroes already can't turn on this slide terrain")
@@ -428,7 +425,7 @@ const initCommandMake = () => {
             Text.DisplayLineToPlayer(escaper.getPlayer())
             str = ChangeOneTerrain.ChangeOneTerrain(param1, param2)
             if (str !== null) {
-                Text.mkP(escaper.getPlayer(), 'changed to ' + ColorCodes.udg_colorCode[RED] + str)
+                Text.mkP(escaper.getPlayer(), 'changed to ' + udg_colorCode[RED] + str)
             } else {
                 Text.erP(escaper.getPlayer(), "couldn't change terrain")
             }
@@ -462,10 +459,10 @@ const initCommandMake = () => {
         if (name === 'changeAllTerrainsAtRevive' || name === 'chatar') {
             if (
                 nbParam === 1 &&
-                BasicFunctions.IsBoolString(param1) &&
-                BasicFunctions.S2B(param1) !== ChangeAllTerrains.udg_changeAllTerrainsAtRevive
+                IsBoolString(param1) &&
+                S2B(param1) !== ChangeAllTerrains.udg_changeAllTerrainsAtRevive
             ) {
-                ChangeAllTerrains.udg_changeAllTerrainsAtRevive = BasicFunctions.S2B(param1)
+                ChangeAllTerrains.udg_changeAllTerrainsAtRevive = S2B(param1)
                 Text.mkP(escaper.getPlayer(), 'change all terrains at revive ' + StringCase(param1, true))
             }
             return true
@@ -647,14 +644,14 @@ const initCommandMake = () => {
                         //checkParam6
                         if (nbParam === 6) {
                             str = CommandsFunctions.CmdParam(cmd, 6)
-                            if (!BasicFunctions.IsBoolString(str)) {
+                            if (!IsBoolString(str)) {
                                 Text.erP(
                                     escaper.getPlayer(),
                                     "wrong \"is clickable\" value ; should be 'true', 'false', '0' or '1'"
                                 )
                                 return true
                             }
-                            b = BasicFunctions.S2B(str)
+                            b = S2B(str)
                         } else {
                             b = false
                         }
@@ -674,9 +671,9 @@ const initCommandMake = () => {
                 b = false
             }
             if (
-                BasicFunctions.StringContainsChar(param1, CACHE_SEPARATEUR_ITEM) ||
-                BasicFunctions.StringContainsChar(param1, CACHE_SEPARATEUR_PARAM) ||
-                BasicFunctions.StringContainsChar(param1, '"')
+                StringContainsChar(param1, CACHE_SEPARATEUR_ITEM) ||
+                StringContainsChar(param1, CACHE_SEPARATEUR_PARAM) ||
+                StringContainsChar(param1, '"')
             ) {
                 Text.erP(
                     escaper.getPlayer(),
@@ -684,10 +681,7 @@ const initCommandMake = () => {
                 )
                 return true
             }
-            if (
-                udg_monsterTypes.new(param1, Ascii.String2Ascii(SubStringBJ(param2, 2, 5)), x, S2R(param3), speed, b) ==
-                0
-            ) {
+            if (udg_monsterTypes.new(param1, String2Ascii(SubStringBJ(param2, 2, 5)), x, S2R(param3), speed, b) == 0) {
                 Text.erP(escaper.getPlayer(), "couldn't create the monster type")
             } else {
                 Text.mkP(escaper.getPlayer(), 'monster type "' + param1 + '" created')
@@ -706,9 +700,9 @@ const initCommandMake = () => {
             }
             if (b) {
                 if (
-                    BasicFunctions.StringContainsChar(param2, CACHE_SEPARATEUR_ITEM) ||
-                    BasicFunctions.StringContainsChar(param2, CACHE_SEPARATEUR_PARAM) ||
-                    BasicFunctions.StringContainsChar(param2, '"')
+                    StringContainsChar(param2, CACHE_SEPARATEUR_ITEM) ||
+                    StringContainsChar(param2, CACHE_SEPARATEUR_PARAM) ||
+                    StringContainsChar(param2, '"')
                 ) {
                     Text.erP(
                         escaper.getPlayer(),
@@ -735,9 +729,9 @@ const initCommandMake = () => {
             }
             if (b) {
                 if (
-                    BasicFunctions.StringContainsChar(param2, CACHE_SEPARATEUR_ITEM) ||
-                    BasicFunctions.StringContainsChar(param2, CACHE_SEPARATEUR_PARAM) ||
-                    BasicFunctions.StringContainsChar(param2, '"')
+                    StringContainsChar(param2, CACHE_SEPARATEUR_ITEM) ||
+                    StringContainsChar(param2, CACHE_SEPARATEUR_PARAM) ||
+                    StringContainsChar(param2, '"')
                 ) {
                     Text.erP(
                         escaper.getPlayer(),
@@ -770,7 +764,7 @@ const initCommandMake = () => {
                 Text.erP(escaper.getPlayer(), "wrong unit type id (exemple : 'hfoo')")
                 return true
             }
-            if (udg_monsterTypes.get(param1).setUnitTypeId(Ascii.String2Ascii(SubStringBJ(param2, 2, 5)))) {
+            if (udg_monsterTypes.get(param1).setUnitTypeId(String2Ascii(SubStringBJ(param2, 2, 5)))) {
                 Text.mkP(escaper.getPlayer(), 'unit type changed')
             } else {
                 Text.erP(escaper.getPlayer(), "this unit type doesn't exist")
@@ -867,18 +861,18 @@ const initCommandMake = () => {
                 return true
             }
             //checkParam2
-            if (!BasicFunctions.IsBoolString(param2)) {
+            if (!IsBoolString(param2)) {
                 Text.erP(escaper.getPlayer(), "wrong \"is clickable\" value ; should be 'true', 'false', '0' or '1'")
                 return true
             }
-            if (udg_monsterTypes.get(param1).setIsClickable(BasicFunctions.S2B(param2))) {
-                if (BasicFunctions.S2B(param2)) {
+            if (udg_monsterTypes.get(param1).setIsClickable(S2B(param2))) {
+                if (S2B(param2)) {
                     Text.mkP(escaper.getPlayer(), 'this monster type is now clickable')
                 } else {
                     Text.mkP(escaper.getPlayer(), 'this monster type is now unclickable')
                 }
             } else {
-                if (BasicFunctions.S2B(param2)) {
+                if (S2B(param2)) {
                     Text.erP(escaper.getPlayer(), 'this monster type is already clickable')
                 } else {
                     Text.erP(escaper.getPlayer(), 'this monster type is already unclickable')
@@ -898,9 +892,9 @@ const initCommandMake = () => {
                 return true
             }
             if (
-                BasicFunctions.StringContainsChar(param2, CACHE_SEPARATEUR_ITEM) ||
-                BasicFunctions.StringContainsChar(param2, CACHE_SEPARATEUR_PARAM) ||
-                BasicFunctions.StringContainsChar(param2, '"')
+                StringContainsChar(param2, CACHE_SEPARATEUR_ITEM) ||
+                StringContainsChar(param2, CACHE_SEPARATEUR_PARAM) ||
+                StringContainsChar(param2, '"')
             ) {
                 Text.erP(
                     escaper.getPlayer(),
@@ -1819,9 +1813,9 @@ const initCommandMake = () => {
             }
             //apply command
             if (
-                BasicFunctions.StringContainsChar(param1, CACHE_SEPARATEUR_ITEM) ||
-                BasicFunctions.StringContainsChar(param1, CACHE_SEPARATEUR_PARAM) ||
-                BasicFunctions.StringContainsChar(param1, '"')
+                StringContainsChar(param1, CACHE_SEPARATEUR_ITEM) ||
+                StringContainsChar(param1, CACHE_SEPARATEUR_PARAM) ||
+                StringContainsChar(param1, '"')
             ) {
                 Text.erP(
                     escaper.getPlayer(),
@@ -1853,9 +1847,9 @@ const initCommandMake = () => {
             }
             if (b) {
                 if (
-                    BasicFunctions.StringContainsChar(param2, CACHE_SEPARATEUR_ITEM) ||
-                    BasicFunctions.StringContainsChar(param2, CACHE_SEPARATEUR_PARAM) ||
-                    BasicFunctions.StringContainsChar(param2, '"')
+                    StringContainsChar(param2, CACHE_SEPARATEUR_ITEM) ||
+                    StringContainsChar(param2, CACHE_SEPARATEUR_PARAM) ||
+                    StringContainsChar(param2, '"')
                 ) {
                     Text.erP(
                         escaper.getPlayer(),
@@ -1882,9 +1876,9 @@ const initCommandMake = () => {
             }
             if (b) {
                 if (
-                    BasicFunctions.StringContainsChar(param2, CACHE_SEPARATEUR_ITEM) ||
-                    BasicFunctions.StringContainsChar(param2, CACHE_SEPARATEUR_PARAM) ||
-                    BasicFunctions.StringContainsChar(param2, '"')
+                    StringContainsChar(param2, CACHE_SEPARATEUR_ITEM) ||
+                    StringContainsChar(param2, CACHE_SEPARATEUR_PARAM) ||
+                    StringContainsChar(param2, '"')
                 ) {
                     Text.erP(
                         escaper.getPlayer(),
@@ -2153,7 +2147,7 @@ const initCommandMake = () => {
                     'main tile: ' +
                         udg_terrainTypes.getMainTileset() +
                         ' = ' +
-                        BasicFunctions.tileset2tilesetString(udg_terrainTypes.getMainTileset())
+                        tileset2tilesetString(udg_terrainTypes.getMainTileset())
                 )
             }
             return true

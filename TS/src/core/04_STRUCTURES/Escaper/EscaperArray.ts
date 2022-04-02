@@ -1,4 +1,3 @@
-import { BasicFunctions } from 'core/01_libraries/Basic_functions'
 import { NB_ESCAPERS } from 'core/01_libraries/Constants'
 import { Level } from '../Level/Level'
 import { Escaper } from './Escaper'
@@ -11,7 +10,7 @@ export const EscaperArray = () => {
     let escaperId = 0
 
     while (!(escaperId >= NB_ESCAPERS)) {
-        if (BasicFunctions.IsEscaperInGame(escaperId)) {
+        if (IsEscaperInGame(escaperId)) {
             escapers[escaperId] = new Escaper(escaperId)
         } else {
             escapers[escaperId] = null

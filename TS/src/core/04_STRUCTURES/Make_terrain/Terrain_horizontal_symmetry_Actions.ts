@@ -3,16 +3,16 @@ const initTerrainHorizontalSymmetryActions = () => {
 
     const TerrainHorizontalSymmetry_Actions = () => {
         let action: MakeAction
-        let escaper = EscaperFunctions.Hero2Escaper(GetTriggerUnit())
+        let escaper = Hero2Escaper(GetTriggerUnit())
         let mkGeneral: Make = escaper.getMake()
         let mk: MakeTerrainHorizontalSymmetry = MakeTerrainHorizontalSymmetry(integer(mkGeneral))
         let x = GetOrderPointX()
         let y = GetOrderPointY()
 
-        if (!BasicFunctions.IsIssuedOrder('smart')) {
+        if (!IsIssuedOrder('smart')) {
             return
         }
-        BasicFunctions.StopUnit(mk.maker)
+        StopUnit(mk.maker)
         if (mk.isLastLocSavedUsed()) {
             action = new MakeTerrainHorizontalSymmetryAction(mk.lastX, mk.lastY, x, y)
             if (action === 0) {

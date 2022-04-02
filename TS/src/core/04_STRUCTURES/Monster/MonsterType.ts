@@ -1,19 +1,18 @@
+import { Text } from 'core/01_libraries/Text'
 import { udg_levels } from 'core/08_GAME/Init_structures/Init_struct_levels'
-import { IMMOLATION_SKILLS } from './Immolation_skills'
+import { Ascii2String } from '../../01_libraries/Ascii'
 import {
     MAX_MOVE_SPEED,
     NB_ESCAPERS,
     NEUTRAL_PLAYER,
     RED,
-    TERRAIN_DATA_DISPLAY_TIME
-} from "../../01_libraries/Constants";
-import {Level} from "../Level/Level";
-import {udg_escapers} from "../../08_GAME/Init_structures/Init_escapers";
-import {Ascii2String} from "../../01_libraries/Ascii";
-import {udg_colorCode} from "../../01_libraries/Init_colorCodes";
-import {Text} from 'core/01_libraries/Text'
-import {CACHE_SEPARATEUR_PARAM} from "../../07_TRIGGERS/Save_map_in_gamecache/struct_StringArrayForCache";
-import {BasicFunctions} from "../../01_libraries/Basic_functions";
+    TERRAIN_DATA_DISPLAY_TIME,
+} from '../../01_libraries/Constants'
+import { udg_colorCode } from '../../01_libraries/Init_colorCodes'
+import { CACHE_SEPARATEUR_PARAM } from '../../07_TRIGGERS/Save_map_in_gamecache/struct_StringArrayForCache'
+import { udg_escapers } from '../../08_GAME/Init_structures/Init_escapers'
+import { Level } from '../Level/Level'
+import { IMMOLATION_SKILLS } from './Immolation_skills'
 
 export class MonsterType {
     label: string
@@ -35,24 +34,26 @@ export class MonsterType {
         speed: number,
         isClickable: boolean
     ) {
-        if (speed <= 0 || speed > MAX_MOVE_SPEED){
-            throw this.constructor.name + " : wrong speed value \"" + speed + "\""
+        if (speed <= 0 || speed > MAX_MOVE_SPEED) {
+            throw this.constructor.name + ' : wrong speed value "' + speed + '"'
         }
 
-        if(scale <= 0 && scale !== -1){
-            throw this.constructor.name + " : wrong scale value \"" + scale + "\""
+        if (scale <= 0 && scale !== -1) {
+            throw this.constructor.name + ' : wrong scale value "' + scale + '"'
         }
 
-        if(!(immolationRadius / 5 === I2R(R2I(immolationRadius / 5))) ||
+        if (
+            !(immolationRadius / 5 === I2R(R2I(immolationRadius / 5))) ||
             immolationRadius < 0 ||
             immolationRadius > 400
         ) {
-            throw this.constructor.name + " : wrong immolation radius \"" + immolationRadius + "\""
+            throw this.constructor.name + ' : wrong immolation radius "' + immolationRadius + '"'
         }
 
         const testMonster = CreateUnit(NEUTRAL_PLAYER, unitTypeId, 0, 0, 0)
-        if (!testMonster) { //todomax check ingame that this error is thrown
-            throw this.constructor.name + " : test unit failed"
+        if (!testMonster) {
+            //todomax check ingame that this error is thrown
+            throw this.constructor.name + ' : test unit failed'
         } else {
             RemoveUnit(testMonster)
         }
@@ -83,12 +84,12 @@ export class MonsterType {
         const currentLevel = udg_levels.getCurrentLevel()
         currentLevel.recreateMonstersUnitsOfType(this)
 
-        for(let i = 0; i < NB_ESCAPERS; i++){
+        for (let i = 0; i < NB_ESCAPERS; i++) {
             let escaper = udg_escapers.get(i)
             if (escaper && escaper.getMakingLevel() != currentLevel) {
                 levelAlreadyChecked = false
 
-                for(let j = 0; j < nbLevelsMaking; j++){
+                for (let j = 0; j < nbLevelsMaking; j++) {
                     if (escaper.getMakingLevel() == levelsMaking[j]) {
                         levelAlreadyChecked = true
                         break
@@ -102,7 +103,7 @@ export class MonsterType {
             }
         }
 
-        for(let i = 0; i < nbLevelsMaking; i++){
+        for (let i = 0; i < nbLevelsMaking; i++) {
             levelsMaking[i].recreateMonstersUnitsOfType(this)
         }
     }
@@ -117,7 +118,8 @@ export class MonsterType {
 
     setUnitTypeId = (unitTypeId: number): boolean => {
         let testMonster = CreateUnit(NEUTRAL_PLAYER, unitTypeId, 0, 0, 0)
-        if (!testMonster) { //todomax check if this condition works
+        if (!testMonster) {
+            //todomax check if this condition works
             return false
         }
 
@@ -300,12 +302,7 @@ export class MonsterType {
         let str = this.label + CACHE_SEPARATEUR_PARAM + this.theAlias + CACHE_SEPARATEUR_PARAM
         str = str + Ascii2String(this.unitTypeId) + CACHE_SEPARATEUR_PARAM + R2S(this.scale) + CACHE_SEPARATEUR_PARAM
         str = str + this.getImmolationRadiusStr() + CACHE_SEPARATEUR_PARAM + R2S(this.speed) + CACHE_SEPARATEUR_PARAM
-        str =
-            str +
-            BasicFunctions.B2S(this.isClickableB) +
-            CACHE_SEPARATEUR_PARAM +
-            this.killingEffectStr +
-            CACHE_SEPARATEUR_PARAM
+        str = str + B2S(this.isClickableB) + CACHE_SEPARATEUR_PARAM + this.killingEffectStr + CACHE_SEPARATEUR_PARAM
         str = str + I2S(this.maxLife / 10000) + CACHE_SEPARATEUR_PARAM + R2S(this.height)
         return str
     }

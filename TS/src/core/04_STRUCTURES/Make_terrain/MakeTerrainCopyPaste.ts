@@ -135,14 +135,14 @@ export class MakeTerrainCopyPaste extends Make {
                     action = new MakeTerrainCopyPasteAction(this.x1, this.y1, this.x2, this.y2, this.x3, this.y3, x, y)
                     if (action !== 0) {
                         this.unsaveLocsDefinitely()
-                        EscaperFunctions.Hero2Escaper(this.maker).newAction(action)
+                        Hero2Escaper(this.maker).newAction(action)
                     } else {
                         Text.erP(this.makerOwner, 'paste zone out of bounds')
                     }
                 }
             }
         }
-        EscaperFunctions.Hero2Escaper(this.maker).destroyCancelledActions()
+        Hero2Escaper(this.maker).destroyCancelledActions()
     }
 
     cancelLastAction = (): boolean => {

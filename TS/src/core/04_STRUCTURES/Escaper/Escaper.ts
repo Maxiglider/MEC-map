@@ -1,3 +1,4 @@
+import { StopUnit } from 'core/01_libraries/Basic_functions'
 import {
     DEFAULT_CAMERA_FIELD,
     DUMMY_POWER_CIRCLE,
@@ -12,11 +13,31 @@ import {
     NEUTRAL_PLAYER,
     POWER_CIRCLE,
     SLIDE_PERIOD,
-    TERRAIN_KILL_EFFECT_BODY_PART,
+    TERRAIN_KILL_EFFECT_BODY_PART
 } from 'core/01_libraries/Constants'
+import { udg_colorCode } from 'core/01_libraries/Init_colorCodes'
+import { Text } from 'core/01_libraries/Text'
+import { MakeCaster } from 'core/05_MAKE_STRUCTURES/Make_create_casters/MakeCaster'
+import { MakeMeteor } from 'core/05_MAKE_STRUCTURES/Make_create_meteors/MakeMeteor'
+import { MakeMonsterMultiplePatrols } from 'core/05_MAKE_STRUCTURES/Make_create_monsters/MakeMonsterMultiplePatrols'
+import { MakeMonsterSimplePatrol } from 'core/05_MAKE_STRUCTURES/Make_create_monsters/MakeMonsterSimplePatrol'
+import { MakeMonsterTeleport } from 'core/05_MAKE_STRUCTURES/Make_create_monsters/MakeMonsterTeleport'
+import { MakeMonsterSpawn } from 'core/05_MAKE_STRUCTURES/Make_create_monster_spawn/MakeMonsterSpawn'
+import { MakeDeleteCasters } from 'core/05_MAKE_STRUCTURES/Make_delete_casters/MakeDeleteCasters'
+import { MakeDeleteMeteors } from 'core/05_MAKE_STRUCTURES/Make_delete_meteors/MakeDeleteMeteors'
+import { MakeDeleteMonsters } from 'core/05_MAKE_STRUCTURES/Make_delete_monsters/MakeDeleteMonsters'
+import { MakeClearMob } from 'core/05_MAKE_STRUCTURES/Make_monster_properties/MakeClearMob'
+import { MakeDeleteClearMob } from 'core/05_MAKE_STRUCTURES/Make_monster_properties/MakeDeleteClearMob'
+import { MakeGetUnitTeleportPeriod } from 'core/05_MAKE_STRUCTURES/Make_set_unit_properties/MakeGetUnitTeleportPeriod'
+import { MakeSetUnitMonsterType } from 'core/05_MAKE_STRUCTURES/Make_set_unit_properties/MakeSetUnitMonsterType'
+import { MakeSetUnitTeleportPeriod } from 'core/05_MAKE_STRUCTURES/Make_set_unit_properties/MakeSetUnitTeleportPeriod'
 import { AfkMode } from 'core/08_GAME/Afk_mode/Afk_mode'
 import { udg_escapers } from 'core/08_GAME/Init_structures/Init_escapers'
+import { udg_coop_index_son } from 'core/08_GAME/Mode_coop/coop_init_sounds'
 import { udg_terrainTypes } from '../../../../globals'
+import { Make } from "../../05_MAKE_STRUCTURES/Make/Make"
+import { MakeMonsterNoMove } from "../../05_MAKE_STRUCTURES/Make_create_monsters/MakeMonsterNoMove"
+import { MakeDoNothing } from "../../05_MAKE_STRUCTURES/Make_do_nothing/MakeDoNothing"
 import { CheckTerrainTrigger } from '../../07_TRIGGERS/Slide_and_CheckTerrain_triggers/CheckTerrain'
 import { SlideTrigger } from '../../07_TRIGGERS/Slide_and_CheckTerrain_triggers/Slide'
 import { Trig_InvisUnit_is_getting_damage } from '../../08_GAME/Death/InvisUnit_is_getting_damage'
@@ -24,17 +45,28 @@ import { Heroes } from '../../08_GAME/Init_game/Heroes'
 import { MessageHeroDies } from '../../08_GAME/Init_game/Message_heroDies'
 import { udg_levels } from '../../08_GAME/Init_structures/Init_struct_levels'
 import { CommandShortcuts } from '../../08_GAME/Shortcuts/Command_shortcuts_functions'
+import { Level } from "../Level/Level"
 import { LevelFunctions } from '../Level/Level_functions'
-import { DEPART_PAR_DEFAUT, Start } from '../Level/StartAndEnd'
+import { DEPART_PAR_DEFAUT } from '../Level/StartAndEnd'
+import { MakeAction } from '../MakeLastActions/MakeAction'
+import { MakeLastActions } from "../MakeLastActions/MakeLastActions"
+import { MakeExchangeTerrains } from '../Make_exchange_terrains/MakeExchangeTerrains'
+import { MakeGetTerrainType } from '../Make_get_info/MakeGetTerrainType'
+import { MakeEnd } from '../Make_start_end_visibilityModifier/MakeEnd'
+import { MakeStart } from '../Make_start_end_visibilityModifier/MakeStart'
+import { MakeVisibilityModifier } from '../Make_start_end_visibilityModifier/MakeVisibilityModifier'
+import { MakeTerrainCopyPaste } from '../Make_terrain/MakeTerrainCopyPaste'
+import { MakeTerrainCreate } from '../Make_terrain/MakeTerrainCreate'
+import { MakeTerrainHorizontalSymmetry } from '../Make_terrain/MakeTerrainHorizontalSymmetry'
+import { MakeTerrainVerticalSymmetry } from '../Make_terrain/MakeTerrainVerticalSymmetry'
+import { MakeTerrainHeight } from '../Make_terrain_height/MakeTerrainHeight'
+import { Meteor, METEOR_NORMAL } from "../Meteor/Meteor"
+import { MonsterType } from "../Monster/MonsterType"
+import { TerrainType } from "../TerrainType/TerrainType"
+import { TerrainTypeSlide } from '../TerrainType/TerrainTypeSlide'
+import { TerrainTypeWalk } from '../TerrainType/TerrainTypeWalk'
 import { EscaperEffectArray, IEscaperEffectArray } from './EscaperEffectArray'
-import {Level} from "../Level/Level";
-import {MakeDoNothing} from "../../05_MAKE_STRUCTURES/Make_do_nothing/MakeDoNothing";
-import {MakeMonsterNoMove} from "../../05_MAKE_STRUCTURES/Make_create_monsters/MakeMonsterNoMove";
-import {MonsterType} from "../Monster/MonsterType";
-import {TerrainType} from "../TerrainType/TerrainType";
-import {Make} from "../../05_MAKE_STRUCTURES/Make/Make";
-import {MakeLastActions} from "../MakeLastActions/MakeLastActions";
-import {Meteor, METEOR_NORMAL} from "../Meteor/Meteor";
+import { ColorInfo, GetMirrorEscaper } from './Escaper_functions'
 
 const SHOW_REVIVE_EFFECTS = false
 
@@ -296,7 +328,7 @@ export class Escaper {
         ShowUnit(this.dummyPowerCircle, false)
 
         if (!this.isEscaperSecondary()) {
-            EscaperFunctions.GetMirrorEscaper(this).removeHero()
+            GetMirrorEscaper(this).removeHero()
         }
     }
 
@@ -339,7 +371,7 @@ export class Escaper {
             EnableTrigger(this.slide)
 
             if (this.hero) {
-                BasicFunctions.StopUnit(this.hero)
+                StopUnit(this.hero)
                 heroPos = GetUnitLoc(this.hero)
                 this.setLastZ(GetLocationZ(heroPos) + GetUnitFlyHeight(this.hero))
                 RemoveLocation(heroPos)
@@ -474,7 +506,7 @@ export class Escaper {
         const y: number = udg_levels.getCurrentLevel().getStartRandomY()
 
         if (!this.isEscaperSecondary()) {
-            EscaperFunctions.GetMirrorEscaper(this).reviveAtStart()
+            GetMirrorEscaper(this).reviveAtStart()
         }
 
         return this.revive(x, y)
@@ -567,7 +599,7 @@ export class Escaper {
         this.effects.new(efStr, this.hero, bodyPart)
 
         if (!this.isEscaperSecondary()) {
-            EscaperFunctions.GetMirrorEscaper(this).newEffect(efStr, bodyPart)
+            GetMirrorEscaper(this).newEffect(efStr, bodyPart)
         }
     }
 
@@ -575,7 +607,7 @@ export class Escaper {
         this.effects.destroyLastEffects(numEfToDestroy)
 
         if (!this.isEscaperSecondary()) {
-            EscaperFunctions.GetMirrorEscaper(this).destroyLastEffects(numEfToDestroy)
+            GetMirrorEscaper(this).destroyLastEffects(numEfToDestroy)
         }
     }
 
@@ -583,7 +615,7 @@ export class Escaper {
         this.effects.hideEffects()
 
         if (!this.isEscaperSecondary()) {
-            EscaperFunctions.GetMirrorEscaper(this).hideEffects()
+            GetMirrorEscaper(this).hideEffects()
         }
     }
 
@@ -591,7 +623,7 @@ export class Escaper {
         this.hero && this.effects.showEffects(this.hero)
 
         if (!this.isEscaperSecondary()) {
-            EscaperFunctions.GetMirrorEscaper(this).showEffects()
+            GetMirrorEscaper(this).showEffects()
         }
     }
 
@@ -646,7 +678,7 @@ export class Escaper {
         this.slideSpeed = slideSpeed
 
         if (!this.isEscaperSecondary()) {
-            EscaperFunctions.GetMirrorEscaper(this).absoluteSlideSpeed(slideSpeed)
+            GetMirrorEscaper(this).absoluteSlideSpeed(slideSpeed)
         }
     }
 
@@ -663,7 +695,7 @@ export class Escaper {
             }
 
             if (!this.isEscaperSecondary()) {
-                EscaperFunctions.GetMirrorEscaper(this).stopAbsoluteSlideSpeed()
+                GetMirrorEscaper(this).stopAbsoluteSlideSpeed()
             }
         }
     }
@@ -677,7 +709,7 @@ export class Escaper {
         this.setWalkSpeed(walkSpeed)
 
         if (!this.isEscaperSecondary()) {
-            EscaperFunctions.GetMirrorEscaper(this).absoluteWalkSpeed(walkSpeed)
+            GetMirrorEscaper(this).absoluteWalkSpeed(walkSpeed)
         }
     }
 
@@ -693,7 +725,7 @@ export class Escaper {
             }
 
             if (!this.isEscaperSecondary()) {
-                EscaperFunctions.GetMirrorEscaper(this).stopAbsoluteWalkSpeed()
+                GetMirrorEscaper(this).stopAbsoluteWalkSpeed()
             }
         }
     }
@@ -706,7 +738,7 @@ export class Escaper {
         this.instantTurnAbsolute = flag
 
         if (!this.isEscaperSecondary()) {
-            EscaperFunctions.GetMirrorEscaper(this).setAbsoluteInstantTurn(flag)
+            GetMirrorEscaper(this).setAbsoluteInstantTurn(flag)
         }
     }
 
@@ -715,7 +747,7 @@ export class Escaper {
         this.godMode = godMode
 
         if (!this.isEscaperSecondary()) {
-            EscaperFunctions.GetMirrorEscaper(this).setGodMode(godMode)
+            GetMirrorEscaper(this).setGodMode(godMode)
         }
     }
 
@@ -723,7 +755,7 @@ export class Escaper {
         this.godModeKills = godModeKills
 
         if (!this.isEscaperSecondary()) {
-            EscaperFunctions.GetMirrorEscaper(this).setGodModeKills(godModeKills)
+            GetMirrorEscaper(this).setGodModeKills(godModeKills)
         }
     }
 
@@ -750,8 +782,8 @@ export class Escaper {
         }
 
         if (!this.isEscaperSecondary()) {
-            EscaperFunctions.ColorInfo(this, this.p)
-            EscaperFunctions.GetMirrorEscaper(this).setBaseColor(baseColorId)
+            ColorInfo(this, this.p)
+            GetMirrorEscaper(this).setBaseColor(baseColorId)
         }
         return true
     }
@@ -770,7 +802,7 @@ export class Escaper {
         }
 
         if (!this.isEscaperSecondary()) {
-            EscaperFunctions.GetMirrorEscaper(this).setBaseColorDisco(baseColorId)
+            GetMirrorEscaper(this).setBaseColorDisco(baseColorId)
         }
 
         return true
@@ -787,7 +819,7 @@ export class Escaper {
         this.vcRed = vcRed
 
         if (!this.isEscaperSecondary()) {
-            EscaperFunctions.GetMirrorEscaper(this).setVcRed(vcRed)
+            GetMirrorEscaper(this).setVcRed(vcRed)
         }
 
         return true
@@ -800,7 +832,7 @@ export class Escaper {
         this.vcGreen = vcGreen
 
         if (!this.isEscaperSecondary()) {
-            EscaperFunctions.GetMirrorEscaper(this).setVcGreen(vcGreen)
+            GetMirrorEscaper(this).setVcGreen(vcGreen)
         }
 
         return true
@@ -812,7 +844,7 @@ export class Escaper {
         }
 
         if (!this.isEscaperSecondary()) {
-            EscaperFunctions.GetMirrorEscaper(this).setVcBlue(vcBlue)
+            GetMirrorEscaper(this).setVcBlue(vcBlue)
         }
 
         this.vcBlue = vcBlue
@@ -853,8 +885,8 @@ export class Escaper {
         SetUnitVertexColorBJ(this.hero, this.vcRed, this.vcGreen, this.vcBlue, this.vcTransparency)
 
         if (!this.isEscaperSecondary()) {
-            EscaperFunctions.ColorInfo(this, this.p)
-            EscaperFunctions.GetMirrorEscaper(this).refreshVertexColor()
+            ColorInfo(this, this.p)
+            GetMirrorEscaper(this).refreshVertexColor()
         }
     }
 
@@ -929,7 +961,7 @@ export class Escaper {
                 ' !'
         )
         kicked.destroy()
-        EscaperFunctions.GetMirrorEscaper(kicked).destroy()
+        GetMirrorEscaper(kicked).destroy()
     }
 
     //autorevive methods
@@ -1008,7 +1040,7 @@ export class Escaper {
         delete this.make
 
         if (!this.isEscaperSecondary()) {
-            EscaperFunctions.GetMirrorEscaper(this).destroyMake()
+            GetMirrorEscaper(this).destroyMake()
         }
 
         return true
@@ -1016,7 +1048,7 @@ export class Escaper {
 
     onInitMake() {
         if (!this.isEscaperSecondary()) {
-            EscaperFunctions.GetMirrorEscaper(this).makeDoNothing()
+            GetMirrorEscaper(this).makeDoNothing()
         }
     }
 
@@ -1319,7 +1351,7 @@ export class Escaper {
 
     //coop reviving
     coopReviveHero() {
-        const mirrorEscaper: Escaper = EscaperFunctions.GetMirrorEscaper(this)
+        const mirrorEscaper: Escaper = GetMirrorEscaper(this)
         const mirrorHero = mirrorEscaper?.getHero()
 
         if (this.hero) {

@@ -157,10 +157,7 @@ export class TerrainType {
         if (this.kind === 'slide') {
             slide = TerrainTypeSlide(integer(this))
             str =
-                str +
-                I2S(R2I(slide.getSlideSpeed() / SLIDE_PERIOD)) +
-                CACHE_SEPARATEUR_PARAM +
-                BasicFunctions.B2S(slide.getCanTurn())
+                str + I2S(R2I(slide.getSlideSpeed() / SLIDE_PERIOD)) + CACHE_SEPARATEUR_PARAM + B2S(slide.getCanTurn())
         } else {
             if (this.kind === 'walk') {
                 walk = TerrainTypeWalk(integer(this))

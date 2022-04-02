@@ -2,17 +2,17 @@ const initStartMakingActions = () => {
     // needs Escaper
 
     const StartMaking_Actions = () => {
-        let escaper = EscaperFunctions.Hero2Escaper(GetTriggerUnit())
+        let escaper = Hero2Escaper(GetTriggerUnit())
         let mkGeneral: Make = escaper.getMake()
         let mk: MakeStart = MakeStart(integer(mkGeneral))
         let x = GetOrderPointX()
         let y = GetOrderPointY()
         let level: Level
 
-        if (!BasicFunctions.IsIssuedOrder('smart')) {
+        if (!IsIssuedOrder('smart')) {
             return
         }
-        BasicFunctions.StopUnit(mk.maker)
+        StopUnit(mk.maker)
         if (mk.isLastLocSavedUsed()) {
             level = escaper.getMakingLevel()
             if (mk.forNext()) {

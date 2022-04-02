@@ -1,5 +1,4 @@
 import { GREY } from 'core/01_libraries/Constants'
-import { ColorCodes } from 'core/01_libraries/Init_colorCodes'
 import { Text } from 'core/01_libraries/Text'
 import { udg_escapers } from '../Init_structures/Init_escapers'
 import { shortcuts } from './Using_shortcut'
@@ -110,19 +109,13 @@ const initCommandShortcuts = () => {
 
     const DisplayShortcuts = (playerId: number) => {
         Text.P(Player(playerId), ' ')
-        Text.P(Player(playerId), ColorCodes.udg_colorCode[playerId] + 'Your shortcuts:')
+        Text.P(Player(playerId), udg_colorCode[playerId] + 'Your shortcuts:')
 
         shortcuts.forEach(sc => {
             if (shortcutCommands[sc][playerId] == null) {
-                Text.P(
-                    Player(playerId),
-                    ColorCodes.udg_colorCode[playerId] + '$shortcut$: |r' + ColorCodes.udg_colorCode[GREY] + 'none'
-                )
+                Text.P(Player(playerId), udg_colorCode[playerId] + '$shortcut$: |r' + udg_colorCode[GREY] + 'none')
             } else {
-                Text.P(
-                    Player(playerId),
-                    ColorCodes.udg_colorCode[playerId] + '$shortcut$: |r' + shortcutCommands[sc][playerId]
-                )
+                Text.P(Player(playerId), udg_colorCode[playerId] + '$shortcut$: |r' + shortcutCommands[sc][playerId])
             }
         })
     }

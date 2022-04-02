@@ -1,5 +1,4 @@
 import { NB_ESCAPERS } from 'core/01_libraries/Constants'
-import { ColorCodes } from 'core/01_libraries/Init_colorCodes'
 import { Escaper } from 'core/04_STRUCTURES/Escaper/Escaper'
 import { udg_escapers } from 'core/08_GAME/Init_structures/Init_escapers'
 import { udg_levels } from 'core/08_GAME/Init_structures/Init_struct_levels'
@@ -39,8 +38,8 @@ const initCommandRed = () => {
             }
             if (escaper.isTrueMaximaxou()) {
                 if (CommandsFunctions.IsPlayerColorString(param1)) {
-                    if (udg_escapers.get(ColorCodes.ColorString2Id(param1)) != null) {
-                        udg_escapers.get(ColorCodes.ColorString2Id(param1)).kill()
+                    if (udg_escapers.get(ColorString2Id(param1)) != null) {
+                        udg_escapers.get(ColorString2Id(param1)).kill()
                     }
                     return true
                 }
@@ -56,12 +55,9 @@ const initCommandRed = () => {
                 }
                 return true
             }
-            if (
-                CommandsFunctions.IsPlayerColorString(param1) &&
-                !udg_escapers.get(ColorCodes.ColorString2Id(param1)).canCheat()
-            ) {
-                if (udg_escapers.get(ColorCodes.ColorString2Id(param1)) != null) {
-                    udg_escapers.get(ColorCodes.ColorString2Id(param1)).kill()
+            if (CommandsFunctions.IsPlayerColorString(param1) && !udg_escapers.get(ColorString2Id(param1)).canCheat()) {
+                if (udg_escapers.get(ColorString2Id(param1)) != null) {
+                    udg_escapers.get(ColorString2Id(param1)).kill()
                 }
             }
             return true
@@ -74,8 +70,8 @@ const initCommandRed = () => {
             }
             if (escaper.isTrueMaximaxou()) {
                 if (CommandsFunctions.IsPlayerColorString(param1)) {
-                    if (udg_escapers.get(ColorCodes.ColorString2Id(param1)) != null) {
-                        escaper.kick(udg_escapers.get(ColorCodes.ColorString2Id(param1)))
+                    if (udg_escapers.get(ColorString2Id(param1)) != null) {
+                        escaper.kick(udg_escapers.get(ColorString2Id(param1)))
                     }
                     return true
                 }
@@ -91,12 +87,9 @@ const initCommandRed = () => {
                 }
                 return true
             }
-            if (
-                CommandsFunctions.IsPlayerColorString(param1) &&
-                !udg_escapers.get(ColorCodes.ColorString2Id(param1)).canCheat()
-            ) {
-                if (udg_escapers.get(ColorCodes.ColorString2Id(param1)) != null) {
-                    escaper.kick(udg_escapers.get(ColorCodes.ColorString2Id(param1)))
+            if (CommandsFunctions.IsPlayerColorString(param1) && !udg_escapers.get(ColorString2Id(param1)).canCheat()) {
+                if (udg_escapers.get(ColorString2Id(param1)) != null) {
+                    escaper.kick(udg_escapers.get(ColorString2Id(param1)))
                 }
             }
             return true

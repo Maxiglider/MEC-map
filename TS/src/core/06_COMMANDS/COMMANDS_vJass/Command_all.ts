@@ -1,4 +1,3 @@
-import { BasicFunctions } from 'core/01_libraries/Basic_functions'
 import {
     BLUE,
     DEFAULT_CAMERA_FIELD,
@@ -12,10 +11,8 @@ import {
     TERRAIN_DATA_DISPLAY_TIME,
 } from 'core/01_libraries/Constants'
 import { FunctionsOnNumbers } from 'core/01_libraries/Functions_on_numbers'
-import { ColorCodes } from 'core/01_libraries/Init_colorCodes'
 import { Text } from 'core/01_libraries/Text'
 import { Escaper } from 'core/04_STRUCTURES/Escaper/Escaper'
-import { EscaperFunctions } from 'core/04_STRUCTURES/Escaper/Escaper_functions'
 import { Apm } from 'core/08_GAME/Apm_clics_par_minute/Apm'
 import { udg_escapers } from 'core/08_GAME/Init_structures/Init_escapers'
 import { udg_lives } from 'core/08_GAME/Init_structures/Init_lives'
@@ -62,11 +59,11 @@ const initCommandAll = () => {
         //-<color>   --> change the base color of the hero
         if (CommandsFunctions.IsColorString(name)) {
             if (noParam) {
-                escaper.setBaseColor(ColorCodes.ColorString2Id(name))
+                escaper.setBaseColor(ColorString2Id(name))
                 return true
             }
             if (nbParam == 1 && escaper.isTrueMaximaxou() && CommandsFunctions.IsPlayerColorString(param1)) {
-                udg_escapers.get(ColorCodes.ColorString2Id(param1)).setBaseColor(ColorCodes.ColorString2Id(name))
+                udg_escapers.get(ColorString2Id(param1)).setBaseColor(ColorString2Id(name))
             }
             return true
         }
@@ -78,7 +75,7 @@ const initCommandAll = () => {
                     if (!(CommandsFunctions.IsPlayerColorString(param1) && escaper.isTrueMaximaxou())) {
                         return true
                     }
-                    escaper = udg_escapers.get(ColorCodes.ColorString2Id(param1))
+                    escaper = udg_escapers.get(ColorString2Id(param1))
                 }
                 escaper.setVcRed(GetRandomPercentageBJ())
                 escaper.setVcGreen(GetRandomPercentageBJ())
@@ -88,28 +85,25 @@ const initCommandAll = () => {
                     return true
                 }
                 if (!escaper.setVcRed(I2R(FunctionsOnNumbers.PercentageStringOrX2Integer(param1)))) {
-                    Text.P(
-                        escaper.getPlayer(),
-                        ColorCodes.udg_colorCode[RED] + 'Red : not a correct percentage (' + param1 + ')'
-                    )
+                    Text.P(escaper.getPlayer(), udg_colorCode[RED] + 'Red : not a correct percentage (' + param1 + ')')
                 }
                 if (!escaper.setVcGreen(I2R(FunctionsOnNumbers.PercentageStringOrX2Integer(param2)))) {
                     Text.P(
                         escaper.getPlayer(),
-                        ColorCodes.udg_colorCode[GREEN] + 'Green : not a correct percentage (' + param2 + ')'
+                        udg_colorCode[GREEN] + 'Green : not a correct percentage (' + param2 + ')'
                     )
                 }
                 if (!escaper.setVcBlue(I2R(FunctionsOnNumbers.PercentageStringOrX2Integer(param3)))) {
                     Text.P(
                         escaper.getPlayer(),
-                        ColorCodes.udg_colorCode[BLUE] + 'Blue : not a correct percentage (' + param3 + ')'
+                        udg_colorCode[BLUE] + 'Blue : not a correct percentage (' + param3 + ')'
                     )
                 }
                 if (nbParam === 4) {
                     if (!escaper.setVcTransparency(I2R(FunctionsOnNumbers.PercentageStringOrX2Integer(param4)))) {
                         Text.P(
                             escaper.getPlayer(),
-                            ColorCodes.udg_colorCode[GREY] + 'Transparency : not a correct percentage (' + param4 + ')'
+                            udg_colorCode[GREY] + 'Transparency : not a correct percentage (' + param4 + ')'
                         )
                     }
                 }
@@ -129,10 +123,7 @@ const initCommandAll = () => {
                 return true
             }
             if (!escaper.setVcRed(I2R(FunctionsOnNumbers.PercentageStringOrX2Integer(param1)))) {
-                Text.P(
-                    escaper.getPlayer(),
-                    ColorCodes.udg_colorCode[RED] + 'Red : not a correct percentage (' + param1 + ')'
-                )
+                Text.P(escaper.getPlayer(), udg_colorCode[RED] + 'Red : not a correct percentage (' + param1 + ')')
                 return true
             }
             escaper.refreshVertexColor()
@@ -150,10 +141,7 @@ const initCommandAll = () => {
                 return true
             }
             if (!escaper.setVcGreen(I2R(FunctionsOnNumbers.PercentageStringOrX2Integer(param1)))) {
-                Text.P(
-                    escaper.getPlayer(),
-                    ColorCodes.udg_colorCode[GREEN] + 'Green : not a correct percentage (' + param1 + ')'
-                )
+                Text.P(escaper.getPlayer(), udg_colorCode[GREEN] + 'Green : not a correct percentage (' + param1 + ')')
                 return true
             }
             escaper.refreshVertexColor()
@@ -171,10 +159,7 @@ const initCommandAll = () => {
                 return true
             }
             if (!escaper.setVcBlue(I2R(FunctionsOnNumbers.PercentageStringOrX2Integer(param1)))) {
-                Text.P(
-                    escaper.getPlayer(),
-                    ColorCodes.udg_colorCode[BLUE] + 'Blue : not a correct percentage (' + param1 + ')'
-                )
+                Text.P(escaper.getPlayer(), udg_colorCode[BLUE] + 'Blue : not a correct percentage (' + param1 + ')')
                 return true
             }
             escaper.refreshVertexColor()
@@ -194,7 +179,7 @@ const initCommandAll = () => {
             if (!escaper.setVcTransparency(I2R(FunctionsOnNumbers.PercentageStringOrX2Integer(param1)))) {
                 Text.P(
                     escaper.getPlayer(),
-                    ColorCodes.udg_colorCode[GREY] + 'Transparency : not a correct percentage (' + param1 + ')'
+                    udg_colorCode[GREY] + 'Transparency : not a correct percentage (' + param1 + ')'
                 )
                 return true
             }
@@ -211,7 +196,7 @@ const initCommandAll = () => {
                 if (!(escaper.isTrueMaximaxou() && CommandsFunctions.IsPlayerColorString(param1))) {
                     return true
                 }
-                escaper = udg_escapers.get(ColorCodes.ColorString2Id(param1))
+                escaper = udg_escapers.get(ColorString2Id(param1))
             }
             escaper.setVcRed(100)
             escaper.setVcGreen(100)
@@ -224,11 +209,11 @@ const initCommandAll = () => {
         //-colorInfo(ci) [<Pcolor>]   --> displays base color and vertex color of a hero
         if (name === 'colorInfo' || name === 'ci') {
             if (noParam) {
-                EscaperFunctions.ColorInfo(escaper, escaper.getPlayer())
+                ColorInfo(escaper, escaper.getPlayer())
                 return true
             }
             if (nbParam === 1 && CommandsFunctions.IsPlayerColorString(param1)) {
-                EscaperFunctions.ColorInfo(udg_escapers.get(ColorCodes.ColorString2Id(param1)), escaper.getPlayer())
+                ColorInfo(udg_escapers.get(ColorString2Id(param1)), escaper.getPlayer())
                 return true
             }
             return true
@@ -240,7 +225,7 @@ const initCommandAll = () => {
                 return true
             }
             if (nbParam == 2 && escaper.isTrueMaximaxou() && CommandsFunctions.IsPlayerColorString(param2)) {
-                escaper = udg_escapers.get(ColorCodes.ColorString2Id(param2))
+                escaper = udg_escapers.get(ColorString2Id(param2))
             } else {
                 if (nbParam !== 1) {
                     return true
@@ -283,7 +268,7 @@ const initCommandAll = () => {
                 return true
             }
             if (nbParam == 2 && escaper.isTrueMaximaxou() && CommandsFunctions.IsPlayerColorString(param2)) {
-                escaper = udg_escapers.get(ColorCodes.ColorString2Id(param2))
+                escaper = udg_escapers.get(ColorString2Id(param2))
             } else {
                 if (nbParam !== 1) {
                     return true
@@ -313,7 +298,7 @@ const initCommandAll = () => {
                     if (!escaper.isTrueMaximaxou()) {
                         return true
                     }
-                    escaper = udg_escapers.get(ColorCodes.ColorString2Id(param1))
+                    escaper = udg_escapers.get(ColorString2Id(param1))
                     n = LIMIT_NB_HERO_EFFECTS
                 } else {
                     n = S2I(param1)
@@ -367,7 +352,7 @@ const initCommandAll = () => {
                 SetUnitAnimation(hero, CommandsFunctions.CmdParam(cmd, 0))
 
                 if (!escaper.isEscaperSecondary()) {
-                    const hero2 = EscaperFunctions.GetMirrorEscaper(escaper).getHero()
+                    const hero2 = GetMirrorEscaper(escaper).getHero()
 
                     if (hero2) {
                         SetUnitAnimation(hero2, CommandsFunctions.CmdParam(cmd, 0))
@@ -436,12 +421,12 @@ const initCommandAll = () => {
         if ((name === 'kick' || name === 'kc') && noParam) {
             CustomDefeatBJ(escaper.getPlayer(), 'You have kicked... yourself.')
             Text.A(
-                ColorCodes.udg_colorCode[GetPlayerId(escaper.getPlayer())] +
+                udg_colorCode[GetPlayerId(escaper.getPlayer())] +
                     GetPlayerName(escaper.getPlayer()) +
                     ' has kicked himself !'
             )
             escaper.destroy()
-            EscaperFunctions.GetMirrorEscaper(escaper).destroy()
+            GetMirrorEscaper(escaper).destroy()
             return true
         }
 
@@ -517,11 +502,11 @@ const initCommandAll = () => {
                             DestroyTrigger(escaper.discoTrigger)
                             ;(escaper.discoTrigger as any) = null
 
-                            const discoTrigger = EscaperFunctions.GetMirrorEscaper(escaper).discoTrigger
+                            const discoTrigger = GetMirrorEscaper(escaper).discoTrigger
 
                             if (discoTrigger) {
                                 DestroyTrigger(discoTrigger)
-                                ;(EscaperFunctions.GetMirrorEscaper(escaper).discoTrigger as any) = null
+                                ;(GetMirrorEscaper(escaper).discoTrigger as any) = null
                             }
 
                             Text.P(escaper.getPlayer(), 'disco off')
@@ -533,7 +518,7 @@ const initCommandAll = () => {
                 }
             }
 
-            ;[escaper.discoTrigger, EscaperFunctions.GetMirrorEscaper(escaper).discoTrigger].forEach(trigger => {
+            ;[escaper.discoTrigger, GetMirrorEscaper(escaper).discoTrigger].forEach(trigger => {
                 if (trigger) {
                     DestroyTrigger(trigger)
                     trigger = CreateTrigger()
@@ -549,7 +534,7 @@ const initCommandAll = () => {
         //-clearText(clr)   --> remove the text on the screen
         if (name === 'clearText' || name === 'clr') {
             if (noParam) {
-                BasicFunctions.ClearTextForPlayer(escaper.getPlayer())
+                ClearTextForPlayer(escaper.getPlayer())
             }
             return true
         }
@@ -561,12 +546,12 @@ const initCommandAll = () => {
                 Text.P_timed(
                     escaper.getPlayer(),
                     TERRAIN_DATA_DISPLAY_TIME,
-                    ColorCodes.udg_colorCode[TEAL] + '       Used terrains :'
+                    udg_colorCode[TEAL] + '       Used terrains :'
                 )
                 i = 0
                 while (true) {
                     if (i >= Globals.udg_nb_used_terrains) break
-                    str = ColorCodes.udg_colorCode[TEAL] + I2S(i + 1) + ' : '
+                    str = udg_colorCode[TEAL] + I2S(i + 1) + ' : '
                     str = str + TerrainFunctions.GetTerrainData(Globals.udg_used_terrain_types[i])
                     Text.P_timed(escaper.getPlayer(), TERRAIN_DATA_DISPLAY_TIME, str)
                     i = i + 1
@@ -640,15 +625,14 @@ const initCommandAll = () => {
         //-autoContinueAfterSliding(acas) <boolean status>
         if (name === 'autoContinueAfterSliding' || name === 'acas') {
             k = GetPlayerId(escaper.getPlayer())
-            if (nbParam === 1 && BasicFunctions.IsBoolString(param1)) {
-                if (AutoContinueAfterSliding.udg_autoContinueAfterSliding[k] !== BasicFunctions.S2B(param1)) {
-                    AutoContinueAfterSliding.udg_autoContinueAfterSliding[k] = BasicFunctions.S2B(param1)
+            if (nbParam === 1 && IsBoolString(param1)) {
+                if (AutoContinueAfterSliding.udg_autoContinueAfterSliding[k] !== S2B(param1)) {
+                    AutoContinueAfterSliding.udg_autoContinueAfterSliding[k] = S2B(param1)
                     if (k < NB_PLAYERS_MAX) {
-                        AutoContinueAfterSliding.udg_autoContinueAfterSliding[k + NB_PLAYERS_MAX] =
-                            BasicFunctions.S2B(param1)
+                        AutoContinueAfterSliding.udg_autoContinueAfterSliding[k + NB_PLAYERS_MAX] = S2B(param1)
                     }
 
-                    if (BasicFunctions.S2B(param1)) {
+                    if (S2B(param1)) {
                         Text.P(escaper.getPlayer(), 'auto continue after sliding on')
                     } else {
                         Text.P(escaper.getPlayer(), 'auto continue after sliding off')
@@ -735,9 +719,9 @@ const initCommandAll = () => {
 
         //-leaderboard
         if (name === 'leaderboard' || name === 'ldb') {
-            if (nbParam === 1 && BasicFunctions.IsBoolString(param1)) {
+            if (nbParam === 1 && IsBoolString(param1)) {
                 if (GetLocalPlayer() == escaper.getPlayer()) {
-                    LeaderboardDisplay(udg_lives.getLeaderboard(), BasicFunctions.S2B(param1))
+                    LeaderboardDisplay(udg_lives.getLeaderboard(), S2B(param1))
                 }
             }
             return true

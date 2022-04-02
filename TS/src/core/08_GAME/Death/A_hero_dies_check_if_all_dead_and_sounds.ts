@@ -1,5 +1,4 @@
 import { COOP_REVIVE_DIST, NB_ESCAPERS } from 'core/01_libraries/Constants'
-import { EscaperFunctions } from 'core/04_STRUCTURES/Escaper/Escaper_functions'
 import { createEvent } from 'Utils/mapUtils'
 import { udg_terrainTypes } from '../../../../globals'
 import { Globals } from '../../09_From_old_Worldedit_triggers/globals_variables_and_triggers'
@@ -14,7 +13,7 @@ let udg_nbKilled = 0
 export const InitTrig_A_hero_dies_check_if_all_dead_and_sounds = () => {
     createEvent({
         events: [t => TriggerRegisterAnyUnitEventBJ(t, EVENT_PLAYER_UNIT_DEATH)],
-        conditions: [() => EscaperFunctions.IsHero(GetTriggerUnit())],
+        conditions: [() => IsHero(GetTriggerUnit())],
         actions: [
             () => () => {
                 let hero = GetTriggerUnit()

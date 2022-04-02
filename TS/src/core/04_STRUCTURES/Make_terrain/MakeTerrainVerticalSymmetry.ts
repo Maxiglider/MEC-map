@@ -48,7 +48,7 @@ export class MakeTerrainVerticalSymmetry extends Make {
             SetUnitX(this.unitLastClic, x)
             SetUnitY(this.unitLastClic, y)
         }
-        EscaperFunctions.Hero2Escaper(this.maker).destroyCancelledActions()
+        Hero2Escaper(this.maker).destroyCancelledActions()
     }
 
     unsaveLoc = (): boolean => {

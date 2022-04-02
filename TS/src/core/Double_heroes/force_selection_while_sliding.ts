@@ -1,6 +1,5 @@
 import { NB_PLAYERS_MAX } from 'core/01_libraries/Constants'
 import { Escaper } from 'core/04_STRUCTURES/Escaper/Escaper'
-import { EscaperFunctions } from 'core/04_STRUCTURES/Escaper/Escaper_functions'
 import { udg_escapers } from 'core/08_GAME/Init_structures/Init_escapers'
 import { udg_doubleHeroesEnabled } from './double_heroes_config'
 
@@ -17,7 +16,7 @@ const initForceSelectionWhileSliding = () => {
                 if (i >= NB_PLAYERS_MAX) break
                 escaper1 = udg_escapers.get(i)
                 if (escaper1 !== null) {
-                    escaper2 = EscaperFunctions.GetMirrorEscaper(escaper1)
+                    escaper2 = GetMirrorEscaper(escaper1)
                     if (escaper1.isSliding() || escaper2.isSliding()) {
                         const h1 = escaper1.getHero()
                         const h2 = escaper2.getHero()
@@ -27,7 +26,7 @@ const initForceSelectionWhileSliding = () => {
 
                         if (isSelected1 !== isSelected2) {
                             //forcer la sélection des deux héros
-                            EscaperFunctions.ForceSelectHeroes(escaper1)
+                            ForceSelectHeroes(escaper1)
                         }
                     }
                 }

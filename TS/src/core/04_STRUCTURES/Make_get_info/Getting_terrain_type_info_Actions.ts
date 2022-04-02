@@ -4,16 +4,16 @@ const initGettingTerrainTypeInfoActions = () => {
     // needs Escaper
 
     const GettingTerrainTypeInfo_Actions = () => {
-        const escaper = EscaperFunctions.Hero2Escaper(GetTriggerUnit())
+        const escaper = Hero2Escaper(GetTriggerUnit())
         const mkGeneral: Make = escaper.getMake()
         const mk: MakeGetTerrainType = MakeGetTerrainType(integer(mkGeneral))
         const x = GetOrderPointX()
         const y = GetOrderPointY()
 
-        if (!BasicFunctions.IsIssuedOrder('smart')) {
+        if (!IsIssuedOrder('smart')) {
             return
         }
-        BasicFunctions.StopUnit(mk.maker)
+        StopUnit(mk.maker)
         Text.P(mk.makerOwner, GetTerrainData(GetTerrainType(x, y)))
     }
 }

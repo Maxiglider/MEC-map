@@ -1,6 +1,4 @@
-import { BasicFunctions } from 'core/01_libraries/Basic_functions'
 import { CHECK_TERRAIN_PERIOD, GM_TOUCH_DEATH_TERRAIN_EFFECT_STR } from 'core/01_libraries/Constants'
-import { EscaperFunctions } from 'core/04_STRUCTURES/Escaper/Escaper_functions'
 import { MeteorFunctions } from 'core/04_STRUCTURES/Meteor/Meteor_functions'
 import { TerrainType } from 'core/04_STRUCTURES/TerrainType/TerrainType'
 import { TerrainTypeDeath } from 'core/04_STRUCTURES/TerrainType/TerrainTypeDeath'
@@ -46,7 +44,7 @@ const initCheckTerrainTrigger = () => {
         let terrainTypeW: TerrainTypeWalk
         escaper.moveInvisUnit(x, y)
 
-        if (BasicFunctions.IsOnGround(hero)) {
+        if (IsOnGround(hero)) {
             if (lastTerrainType == currentTerrainType && currentTerrainType.getKind() != 'death') {
                 return
             }
@@ -115,8 +113,8 @@ const initCheckTerrainTrigger = () => {
                             terrainTypeD = TerrainTypeDeath(integer(currentTerrainType))
                             terrainTypeD.killEscaper(escaper)
                             escaper.enableSlide(false)
-                            terrainTypeD.killEscaper(EscaperFunctions.GetMirrorEscaper(escaper))
-                            EscaperFunctions.GetMirrorEscaper(escaper).enableSlide(false)
+                            terrainTypeD.killEscaper(GetMirrorEscaper(escaper))
+                            GetMirrorEscaper(escaper).enableSlide(false)
                         }
                     } else {
                         if (terrainTypeTolerance.getKind() == 'slide') {

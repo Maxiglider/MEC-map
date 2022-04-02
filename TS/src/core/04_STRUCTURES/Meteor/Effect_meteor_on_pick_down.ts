@@ -1,5 +1,4 @@
 import { createEvent } from 'Utils/mapUtils'
-import { EscaperFunctions } from '../Escaper/Escaper_functions'
 import { METEOR_CHEAT, METEOR_NORMAL } from './Meteor'
 
 export const InitTrig_Effect_meteor_on_pick_down = () => {
@@ -9,7 +8,7 @@ export const InitTrig_Effect_meteor_on_pick_down = () => {
             () => {
                 if (
                     !(
-                        EscaperFunctions.IsHero(GetTriggerUnit()) &&
+                        IsHero(GetTriggerUnit()) &&
                         (GetItemTypeId(GetManipulatedItem()) === METEOR_NORMAL ||
                             GetItemTypeId(GetManipulatedItem()) === METEOR_CHEAT)
                     )
@@ -17,7 +16,7 @@ export const InitTrig_Effect_meteor_on_pick_down = () => {
                     return
                 }
 
-                EscaperFunctions.Hero2Escaper(GetTriggerUnit()).removeEffectMeteor()
+                Hero2Escaper(GetTriggerUnit()).removeEffectMeteor()
             },
         ],
     })

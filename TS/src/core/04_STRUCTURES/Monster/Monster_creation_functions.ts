@@ -1,6 +1,5 @@
-import { BasicFunctions } from 'core/01_libraries/Basic_functions'
 import { ENNEMY_PLAYER, MOBS_VARIOUS_COLORS } from 'core/01_libraries/Constants'
-import {MonsterType} from "./MonsterType";
+import { MonsterType } from './MonsterType'
 
 let monster: unit
 let ATTACK_SKILL = FourCC('Aatk')
@@ -93,7 +92,7 @@ export const NewImmobileMonster = (mt: MonsterType, x: number, y: number, angle:
     if (mt.isClickable()) {
         p = ENNEMY_PLAYER
     } else {
-        p = BasicFunctions.GetCurrentMonsterPlayer()
+        p = GetCurrentMonsterPlayer()
     }
     return NewImmobileMonsterForPlayer(mt, p, x, y, angle)
 }

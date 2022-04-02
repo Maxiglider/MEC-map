@@ -1,4 +1,3 @@
-import { ColorCodes } from 'core/01_libraries/Init_colorCodes'
 import { Text } from 'core/01_libraries/Text'
 import { forRange } from 'Utils/mapUtils'
 
@@ -58,10 +57,7 @@ const initMessageHeroDies = () => {
             if (n === i) {
                 TimerStart(CreateTimer(), TIME_BETWEEN_DEATH_AND_MESSAGE, false, () => {
                     PlaySoundHeroDies(Player(i))
-                    Text.A_timed(
-                        MESSAGE_DURATION,
-                        ColorCodes.udg_colorCode[i] + GetPlayerName(Player(i)) + '|r has fallen.'
-                    )
+                    Text.A_timed(MESSAGE_DURATION, udg_colorCode[i] + GetPlayerName(Player(i)) + '|r has fallen.')
                     DestroyTimer(GetExpiredTimer())
                 })
             }

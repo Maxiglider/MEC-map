@@ -1,7 +1,5 @@
-import { BasicFunctions } from 'core/01_libraries/Basic_functions'
 import { CAN_TURN_IN_AIR, NB_ESCAPERS } from 'core/01_libraries/Constants'
 import { Escaper } from 'core/04_STRUCTURES/Escaper/Escaper'
-import { EscaperFunctions } from 'core/04_STRUCTURES/Escaper/Escaper_functions'
 import { udg_symmetryAngle } from 'core/Double_heroes/double_heroes_config'
 
 const initTurnOnSlide = () => {
@@ -35,8 +33,8 @@ const initTurnOnSlide = () => {
     let trg_turnToWidget: trigger
 
     const Trig_to_turn_to_point_Conditions = (): boolean => {
-        escaper = EscaperFunctions.Hero2Escaper(GetTriggerUnit())
-        return EscaperFunctions.IsHero(GetTriggerUnit()) && escaper.isSliding() && !BasicFunctions.IsLastOrderPause()
+        escaper = Hero2Escaper(GetTriggerUnit())
+        return IsHero(GetTriggerUnit()) && escaper.isSliding() && !IsLastOrderPause()
     }
 
     const HandleTurn = (triggerIsToLocation: boolean) => {
@@ -56,13 +54,13 @@ const initTurnOnSlide = () => {
         }
 
         //stop hero
-        BasicFunctions.StopUnit(slider)
+        StopUnit(slider)
 
-        if (EscaperFunctions.isSecondaryHero(slider)) {
+        if (isSecondaryHero(slider)) {
             return
         }
 
-        escaperSecond = EscaperFunctions.MainEscaperToSecondaryOne(escaper)
+        escaperSecond = MainEscaperToSecondaryOne(escaper)
 
         //angle
         //if (udg_isMirrorModeOn_j[n]) then
@@ -81,7 +79,7 @@ const initTurnOnSlide = () => {
         }
 
         //turn hero
-        if (BasicFunctions.IsOnGround(slider)) {
+        if (IsOnGround(slider)) {
             if (escaper.getLastTerrainType().kind == 'slide') {
                 canTurn = TerrainTypeSlide(integer(escaper.getLastTerrainType())).getCanTurn()
             }
@@ -89,7 +87,7 @@ const initTurnOnSlide = () => {
             canTurn = CAN_TURN_IN_AIR
         }
 
-        angleSecond = BasicFunctions.ApplyAngleSymmetry(angle, udg_symmetryAngle)
+        angleSecond = ApplyAngleSymmetry(angle, udg_symmetryAngle)
 
         if (canTurn) {
             if (escaper.isAbsoluteInstantTurn()) {
@@ -124,8 +122,8 @@ const initTurnOnSlide = () => {
     }
 
     const Trig_to_turn_to_widget_Conditions = (): boolean => {
-        escaper = EscaperFunctions.Hero2Escaper(GetTriggerUnit())
-        return EscaperFunctions.IsHero(GetTriggerUnit()) && escaper.isSliding()
+        escaper = Hero2Escaper(GetTriggerUnit())
+        return IsHero(GetTriggerUnit()) && escaper.isSliding()
     }
 
     const Trig_to_turn_to_widget_Actions = () => {

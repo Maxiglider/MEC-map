@@ -1,4 +1,3 @@
-import { BasicFunctions } from 'core/01_libraries/Basic_functions'
 import { Constants, LARGEUR_CASE } from 'core/01_libraries/Constants'
 import { Text } from 'core/01_libraries/Text'
 import { SaveMapInCache } from './SAVE_MAP_in_cache'
@@ -81,7 +80,7 @@ if one of the N tilepoints is at a cliff level different than CL or CL+1, the ra
                 if (x > Constants.MAP_MAX_X) break
                 ramp = false
 
-                if (!BasicFunctions.IsNearBounds(x, y)) {
+                if (!IsNearBounds(x, y)) {
                     currentCliffLevel = GetTerrainCliffLevel(x, y)
                     isRampMiddleRaisedB = false
 
