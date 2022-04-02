@@ -6,9 +6,7 @@ export const InitTrig_Camera_reset = () => {
         events: [t => forRange(12, i => TriggerRegisterPlayerEventEndCinematic(t, Player(i)))],
         actions: [
             () => {
-                const TP = GetTriggerPlayer()
-                const TPN = GetPlayerId(TP)
-                udg_escapers.get(TPN).resetCamera()
+                udg_escapers.get(GetPlayerId(GetTriggerPlayer()))?.resetCamera()
             },
         ],
     })

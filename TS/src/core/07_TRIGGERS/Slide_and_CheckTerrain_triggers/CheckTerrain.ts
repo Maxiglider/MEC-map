@@ -19,6 +19,10 @@ const initCheckTerrainTrigger = () => {
     const CheckTerrain_Actions = (playerId: number) => {
         const escaper = udg_escapers.get(playerId)
 
+        if (!escaper) {
+            return
+        }
+
         const hero = escaper.getHero()
 
         if (!hero) {
@@ -36,7 +40,7 @@ const initCheckTerrainTrigger = () => {
         let angle: number
         let xTolerance: number
         let yTolerance: number
-        let terrainTypeTolerance: TerrainType
+        let terrainTypeTolerance: TerrainType | null = null
         let wasSliding: boolean
         let oldSlideSpeed: number
         let tempRayonTolerance: number
@@ -47,7 +51,10 @@ const initCheckTerrainTrigger = () => {
         escaper.moveInvisUnit(x, y)
 
         if (IsOnGround(hero)) {
-            if (lastTerrainType == currentTerrainType && currentTerrainType.getKind() != 'death') {
+            if (
+                !currentTerrainType ||
+                (lastTerrainType == currentTerrainType && currentTerrainType.getKind() != 'death')
+            ) {
                 return
             }
             escaper.setLastTerrainType(currentTerrainType)
@@ -98,7 +105,7 @@ const initCheckTerrainTrigger = () => {
                                 xTolerance = x + tempRayonTolerance * CosBJ(angle)
                                 yTolerance = y + tempRayonTolerance * SinBJ(angle)
                                 terrainTypeTolerance = udg_terrainTypes.getTerrainType(xTolerance, yTolerance)
-                                if (terrainTypeTolerance.getKind() != 'death') {
+                                if (terrainTypeTolerance?.getKind() != 'death') {
                                     touchedByDeathTerrain = false
                                 }
                                 angle = angle + TOLERANCE_ANGLE_DIFF
@@ -115,11 +122,16 @@ const initCheckTerrainTrigger = () => {
                             terrainTypeD = TerrainTypeDeath(integer(currentTerrainType))
                             terrainTypeD.killEscaper(escaper)
                             escaper.enableSlide(false)
-                            terrainTypeD.killEscaper(GetMirrorEscaper(escaper))
-                            GetMirrorEscaper(escaper).enableSlide(false)
+
+                            const mirrorEscaper = GetMirrorEscaper(escaper)
+
+                            if (mirrorEscaper) {
+                                terrainTypeD.killEscaper(mirrorEscaper)
+                                mirrorEscaper.enableSlide(false)
+                            }
                         }
                     } else {
-                        if (terrainTypeTolerance.getKind() == 'slide') {
+                        if (terrainTypeTolerance?.getKind() == 'slide') {
                             terrainTypeS = TerrainTypeSlide(integer(terrainTypeTolerance))
                             oldSlideSpeed = escaper.getSlideSpeed()
                             escaper.enableSlide(true)
@@ -161,7 +173,7 @@ const initCheckTerrainTrigger = () => {
                                     AutoContinueAfterSliding.AutoContinueAfterSliding(playerId)
                                 }
                             }
-                            if (terrainTypeTolerance.getKind() == 'walk') {
+                            if (terrainTypeTolerance?.getKind() == 'walk') {
                                 if (!escaper.isAbsoluteWalkSpeed()) {
                                     terrainTypeW = TerrainTypeWalk(integer(terrainTypeTolerance))
                                     escaper.setWalkSpeed(terrainTypeW.getWalkSpeed())
@@ -172,7 +184,7 @@ const initCheckTerrainTrigger = () => {
                 } else {
                     // walk ou rien du tout (pseudo walk)
                     escaper.enableSlide(false)
-                    if (lastTerrainType.getKind() == 'slide') {
+                    if (lastTerrainType?.getKind() == 'slide') {
                         MeteorFunctions.HeroComingOutFromSlide_CheckItem(hero)
                         if (oldSlideSpeed < 0) {
                             escaper.reverse()

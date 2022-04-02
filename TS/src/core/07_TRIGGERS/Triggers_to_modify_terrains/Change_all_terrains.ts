@@ -1,9 +1,16 @@
 import { Constants, LARGEUR_CASE, NB_MAX_OF_TERRAINS } from 'core/01_libraries/Constants'
 import { Text } from 'core/01_libraries/Text'
 import { TerrainType } from 'core/04_STRUCTURES/TerrainType/TerrainType'
+import { Globals } from 'core/09_From_old_Worldedit_triggers/globals_variables_and_triggers'
 import { udg_terrainTypes } from '../../../../globals'
 import { Modify_terrain_functions } from '../Modify_terrain_Functions/Modify_terrain_functions'
-import { TerrainFunctions } from '../Modify_terrain_Functions/Terrain_functions'
+import {
+    AddNewTerrain,
+    GetRandomNotUsedTerrain,
+    GetRandomTerrain,
+    GetRandomUsedTerrain,
+    IsTerrainAlreadyUsed,
+} from '../Modify_terrain_Functions/Terrain_functions'
 import { TerrainModifyingTrig } from './Terrain_modifying_trig'
 
 const initChangeAllTerrains = () => {
@@ -63,9 +70,9 @@ const initChangeAllTerrains = () => {
         let alreadyUsed: boolean
         while (true) {
             if (nbNewTerrains >= nbNewTerrainsAllowed) {
-                rdmTerrain = TerrainFunctions.GetRandomUsedTerrain()
+                rdmTerrain = GetRandomUsedTerrain()
             } else {
-                rdmTerrain = TerrainFunctions.GetRandomTerrain()
+                rdmTerrain = GetRandomTerrain()
             }
             alreadyUsed = false
             i = 0
@@ -76,7 +83,7 @@ const initChangeAllTerrains = () => {
             }
             if (!alreadyUsed) break
         }
-        if (!TerrainFunctions.IsTerrainAlreadyUsed(rdmTerrain)) {
+        if (!IsTerrainAlreadyUsed(rdmTerrain)) {
             nbNewTerrains = nbNewTerrains + 1
         }
         return rdmTerrain
@@ -87,7 +94,7 @@ const initChangeAllTerrains = () => {
         let rdmTerrain: number
         let alreadyUsed: boolean
         while (true) {
-            rdmTerrain = TerrainFunctions.GetRandomUsedTerrain()
+            rdmTerrain = GetRandomUsedTerrain()
             alreadyUsed = false
             i = 0
             while (true) {
@@ -105,7 +112,7 @@ const initChangeAllTerrains = () => {
         let rdmTerrain: number
         let alreadyUsed: boolean
         while (true) {
-            rdmTerrain = TerrainFunctions.GetRandomNotUsedTerrain()
+            rdmTerrain = GetRandomNotUsedTerrain()
             alreadyUsed = false
             i = 0
             while (true) {
@@ -133,7 +140,7 @@ const initChangeAllTerrains = () => {
         i = 0
         while (true) {
             terrainTypes[n] = udg_terrainTypes.getWalk(i)
-            if (terrainTypes[n] === 0) break
+            if (terrainTypes[n] === null) break
             oldTerrainTypes[n] = terrainTypes[n].getTerrainTypeId()
             n = n + 1
             i = i + 1
@@ -141,7 +148,7 @@ const initChangeAllTerrains = () => {
         i = 0
         while (true) {
             terrainTypes[n] = udg_terrainTypes.getDeath(i)
-            if (terrainTypes[n] === 0) break
+            if (terrainTypes[n] === null) break
             oldTerrainTypes[n] = terrainTypes[n].getTerrainTypeId()
             n = n + 1
             i = i + 1
@@ -149,14 +156,14 @@ const initChangeAllTerrains = () => {
         i = 0
         while (true) {
             terrainTypes[n] = udg_terrainTypes.getSlide(i)
-            if (terrainTypes[n] === 0) break
+            if (terrainTypes[n] === null) break
             oldTerrainTypes[n] = terrainTypes[n].getTerrainTypeId()
             n = n + 1
             i = i + 1
         }
 
         lastTerrainArrayId = n - 1
-        nbNewTerrainsAllowed = NB_MAX_OF_TERRAINS - udg_nb_used_terrains
+        nbNewTerrainsAllowed = NB_MAX_OF_TERRAINS - Globals.udg_nb_used_terrains
 
         if (mode === 'normal') {
             nbNewTerrains = 0
@@ -196,7 +203,7 @@ const initChangeAllTerrains = () => {
         while (true) {
             if (i > lastTerrainArrayId) break
             terrainTypes[i].setTerrainTypeId(newTerrainTypes[i])
-            TerrainFunctions.AddNewTerrain(newTerrainTypes[i])
+            AddNewTerrain(newTerrainTypes[i])
             i = i + 1
         }
 

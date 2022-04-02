@@ -1,5 +1,5 @@
 import { FunctionsOnNumbers } from 'core/01_libraries/Functions_on_numbers'
-import { TerrainFunctions } from './Terrain_functions'
+import { GetRandomNotUsedTerrain, GetRandomTerrain, GetRandomUsedTerrain } from './Terrain_functions'
 import { TerrainTypeAsciiConversion } from './Terrain_type_ascii_conversion'
 import { TerrainTypeGrass } from './Terrain_type_grass'
 import { TerrainTypeMax } from './Terrain_type_max'
@@ -22,15 +22,15 @@ const initTerrainTypeFromString = () => {
         }
 
         if (str === 'x') {
-            return TerrainFunctions.GetRandomTerrain()
+            return GetRandomTerrain()
         }
 
         if (str === 'xnk') {
-            return TerrainFunctions.GetRandomNotUsedTerrain()
+            return GetRandomNotUsedTerrain()
         }
 
         if (str === 'xak') {
-            return TerrainFunctions.GetRandomUsedTerrain()
+            return GetRandomUsedTerrain()
         }
 
         return 0

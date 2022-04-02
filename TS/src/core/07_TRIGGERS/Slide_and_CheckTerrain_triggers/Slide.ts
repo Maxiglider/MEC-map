@@ -5,8 +5,12 @@ import { createEvent } from 'Utils/mapUtils'
 import { Gravity } from './Gravity'
 
 const initSlideTrigger = () => {
-    const Slide_$n$_Actions = ($n$: number) => {
-        const escaper = udg_escapers.get($n$)
+    const Slide_Actions = (n: number) => {
+        const escaper = udg_escapers.get(n)
+
+        if (!escaper) {
+            return
+        }
 
         const hero = escaper.getHero()
         const lastZ = escaper.getLastZ()
@@ -36,7 +40,7 @@ const initSlideTrigger = () => {
             escaper.moveHero(newX, newY)
         }
 
-        Apm.timeOnSlide[$n$] = Apm.timeOnSlide[$n$] + SLIDE_PERIOD
+        Apm.timeOnSlide[n] = Apm.timeOnSlide[n] + SLIDE_PERIOD
 
         //gestion de la hauteur du héros
         if (height > 1) {
@@ -71,7 +75,7 @@ const initSlideTrigger = () => {
     const CreateSlideTrigger = (playerId: number): trigger => {
         const slideTrigger = createEvent({
             events: [t => TriggerRegisterTimerEventPeriodic(t, SLIDE_PERIOD)],
-            actions: [() => Slide_$n$_Actions(playerId)],
+            actions: [() => Slide_Actions(playerId)],
         })
 
         DisableTrigger(slideTrigger)

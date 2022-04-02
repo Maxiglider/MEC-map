@@ -1,5 +1,5 @@
 import { LARGEUR_CASE, NB_MAX_TILES_MODIFIED } from 'core/01_libraries/Constants'
-import { TerrainFunctions } from './Terrain_functions'
+import { CanUseTerrain } from './Terrain_functions'
 
 const initModifyTerrainFunctions = () => {
     const GetNbCaseBetween = (minX: number, minY: number, maxX: number, maxY: number): number => {
@@ -27,7 +27,7 @@ const initModifyTerrainFunctions = () => {
             return false
         }
 
-        if (!TerrainFunctions.CanUseTerrain(terrainType)) {
+        if (!CanUseTerrain(terrainType)) {
             return false
         }
 

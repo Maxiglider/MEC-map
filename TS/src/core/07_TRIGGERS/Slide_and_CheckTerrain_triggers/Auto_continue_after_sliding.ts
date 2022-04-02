@@ -4,14 +4,14 @@ import { udg_escapers } from 'core/08_GAME/Init_structures/Init_escapers'
 const initAutoContinueAfterSliding = () => {
     let lastClickedX: number[] = []
     let lastClickedY: number[] = []
-    let lastClickedWidgets: widget | null[] = []
+    let lastClickedWidgets: (widget | null)[] = []
     let isLastTargetALocation: boolean[] = []
     let udg_autoContinueAfterSliding: boolean[] = []
 
     const ECART_MAX_ANGLE = 45
 
     const AutoContinueAfterSliding = (n: number) => {
-        const hero = udg_escapers.get(n).getHero()
+        const hero = udg_escapers.get(n)?.getHero()
 
         if (!hero) {
             return
@@ -67,7 +67,14 @@ const initAutoContinueAfterSliding = () => {
 
     Init_AutoContinueAfterSliding()
 
-    return { udg_autoContinueAfterSliding, AutoContinueAfterSliding, ClearLastClickSave }
+    return {
+        lastClickedX,
+        lastClickedY,
+        isLastTargetALocation,
+        udg_autoContinueAfterSliding,
+        AutoContinueAfterSliding,
+        ClearLastClickSave,
+    }
 }
 
 export const AutoContinueAfterSliding = initAutoContinueAfterSliding()
