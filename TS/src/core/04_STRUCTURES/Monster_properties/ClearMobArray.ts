@@ -1,130 +1,98 @@
-import { udg_levels } from 'core/08_GAME/Init_structures/Init_struct_levels'
 import { MONSTER_NEAR_DIFF_MAX } from '../Monster/MonsterArray'
 import { ClearMob } from './ClearMob'
+import {Level} from "../Level/Level";
+import {Monster} from "../Monster/Monster";
 
 export class ClearMobArray {
-    //50 niveaux * 160 monstres
-
+    private level: Level
     private clearMobs: ClearMob[] = []
-    private lastInstance = -1
 
-    getFirstEmpty = (): number => {
-        let i = 0
-        while (true) {
-            if (i > this.lastInstance || this.clearMobs[i] === 0) break
-            i = i + 1
-        }
-        return i
+    constructor(level: Level) {
+        this.level = level
     }
 
-    get = (arrayId: number): ClearMob => {
-        if (arrayId < 0 || arrayId > this.lastInstance) {
-            return 0
+    get(arrayId: number) {
+        if (arrayId < 0 || arrayId > this.clearMobs.length - 1) {
+            return null
         }
         return this.clearMobs[arrayId]
     }
 
     getLastInstanceId = (): number => {
-        return this.lastInstance
+        return this.clearMobs.length - 1
     }
 
-    new = (triggerMob: monster, disableDuration: number, initialize: boolean): ClearMob => {
-        //local integer n = this.getFirstEmpty()
-        let n = this.lastInstance + 1
-        if (n >= MAX_NB_CLEAR_MOB_BY_LEVEL) {
-            return 0
-        }
-        //if (n > this.lastInstance) then
-        this.lastInstance = n
-        //endif
-        this.clearMobs[n] = new ClearMob(triggerMobId, disableDuration)
+    new = (triggerMob: Monster, disableDuration: number, initialize: boolean): ClearMob => {
+        let n = this.clearMobs.length
+
+        this.clearMobs[n] = new ClearMob(triggerMob, disableDuration)
         if (initialize) {
             this.clearMobs[n].initialize()
         }
-        this.clearMobs[n].level = udg_levels.getLevelFromClearMobArray(this)
-        this.clearMobs[n].arrayId = n
+        this.clearMobs[n].level = this.level
+        this.clearMobs[n].id = n
+
         return this.clearMobs[n]
     }
 
     count = (): number => {
-        let nb = 0
-        let i = 0
-        while (true) {
-            if (i > this.lastInstance) break
-            if (this.clearMobs[i] !== 0) {
-                nb = nb + 1
-            }
-            i = i + 1
-        }
-        return nb
+        return this.clearMobs.filter(clearMob => clearMob !== undefined).length
     }
 
     destroy = () => {
-        let i = 0
-        while (true) {
-            if (i > this.lastInstance) break
-            if (this.clearMobs[i] !== 0) {
-                this.clearMobs[i].destroy()
-            }
-            i = i + 1
-        }
-        this.lastInstance = -1
+        this.clearMobs.map(clearMob => clearMob.destroy())
     }
 
-    setClearMobNull = (clearMobArrayId: number) => {
-        this.clearMobs[clearMobArrayId] = 0
+    removeClearMob = (clearMobArrayId: number) => {
+        delete this.clearMobs[clearMobArrayId]
     }
 
     clearClearMob = (clearMobId: number): boolean => {
-        let i = 0
-        while (true) {
-            if (this.clearMobs[i] === ClearMob(clearMobId) || i > this.lastInstance) break
-            i = i + 1
-        }
-        if (i > this.lastInstance) {
+        if(this.clearMobs[clearMobId]){
+            this.clearMobs[clearMobId].destroy()
+            delete this.clearMobs[clearMobId]
+            return true
+        }else{
             return false
         }
-        this.clearMobs[i].destroy()
-        return true
     }
 
-    getClearMobNear = (x: number, y: number): ClearMob => {
+    getClearMobNear(x: number, y: number) {
         let xMob: number
         let yMob: number
         let i = 0
-        while (true) {
-            if (i > this.lastInstance) break
-            if (this.clearMobs[i] != 0 && this.clearMobs[i].getTriggerMob().getUnit() != null) {
-                xMob = GetUnitX(this.clearMobs[i].getTriggerMob().getUnit())
-                yMob = GetUnitY(this.clearMobs[i].getTriggerMob().getUnit())
-                if (RAbsBJ(x - xMob) < MONSTER_NEAR_DIFF_MAX && RAbsBJ(y - yMob) < MONSTER_NEAR_DIFF_MAX) {
-                    return this.clearMobs[i]
+
+        while (i <= this.clearMobs.length) {
+            if (this.clearMobs[i]) {
+                const unit = this.clearMobs[i].getTriggerMob().u
+
+                if(unit) {
+                    xMob = GetUnitX(unit)
+                    yMob = GetUnitY(unit)
+                    if (RAbsBJ(x - xMob) < MONSTER_NEAR_DIFF_MAX && RAbsBJ(y - yMob) < MONSTER_NEAR_DIFF_MAX) {
+                        return this.clearMobs[i]
+                    }
                 }
             }
-            i = i + 1
+            i++
         }
-        return 0
+
+        return null
     }
 
     initializeClearMobs = () => {
-        let i = 0
-        while (true) {
-            if (i > this.lastInstance) break
-            if (this.clearMobs[i] !== 0) {
-                this.clearMobs[i].initialize()
+        this.clearMobs.map(clearMob => {
+            if(clearMob){
+                clearMob.initialize()
             }
-            i = i + 1
-        }
+        })
     }
 
     closeClearMobs = () => {
-        let i = 0
-        while (true) {
-            if (i > this.lastInstance) break
-            if (this.clearMobs[i] !== 0) {
-                this.clearMobs[i].close()
+        this.clearMobs.map(clearMob => {
+            if(clearMob){
+                clearMob.close()
             }
-            i = i + 1
-        }
+        })
     }
 }

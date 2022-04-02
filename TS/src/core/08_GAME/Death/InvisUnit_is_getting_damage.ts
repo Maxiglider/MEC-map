@@ -1,7 +1,7 @@
 //évènement ajouté à la création de l'unité invisible
 
 import { DUMMY_POWER_CIRCLE, GM_KILLING_EFFECT } from 'core/01_libraries/Constants'
-import { Monster } from 'core/04_STRUCTURES/Monster/Monster'
+import {Monster, udg_monsters} from 'core/04_STRUCTURES/Monster/Monster'
 import { ClearMob } from 'core/04_STRUCTURES/Monster_properties/ClearMob'
 import { createEvent } from 'Utils/mapUtils'
 import { udg_monsterTypes } from '../../../../globals'
@@ -23,7 +23,7 @@ export const InitTrig_InvisUnit_is_getting_damage = () => {
                 }
 
                 let killingUnit: unit | null = GetEventDamageSource()
-                let clearMob: ClearMob
+                let clearMob: ClearMob | undefined
                 let moc: Monster
                 let effectStr: string
                 let eff: effect | null
@@ -58,15 +58,15 @@ export const InitTrig_InvisUnit_is_getting_damage = () => {
                         killingUnit = null
                         return
                     } else {
-                        clearMob = ClearTriggerMobId2ClearMob(GetUnitUserData(killingUnit))
-                        if (clearMob !== null) {
+                        const monster = udg_monsters[GetUnitUserData(killingUnit)]
+                        clearMob = monster.getClearMob()
+                        if (clearMob) {
                             clearMob.activate()
                         } else if (escaper.isGodModeOn()) {
                             if (escaper.doesGodModeKills()) {
                                 if (GetUnitUserData(killingUnit) !== 0) {
-                                    moc = new MonsterOrCaster(GetUnitUserData(killingUnit))
-                                    moc.killUnit() //on ne tue pas directement le monstre, pour pouvoir exécuter des actions secondaires
-                                    moc.destroy()
+                                    monster.killUnit() //on ne tue pas directement le monstre, pour pouvoir exécuter des actions secondaires
+                                    monster.destroy()
                                 } else {
                                     KillUnit(killingUnit)
                                 }

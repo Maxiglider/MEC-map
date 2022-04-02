@@ -10,9 +10,9 @@ export const MONSTER_NEAR_DIFF_MAX = 64
 //represents the monsters in a level
 export class MonsterArray {
     private monsters: Monster[] //same ids as in udg_monsters
-    private level: Level
+    private level?: Level
 
-    constructor(level: Level) {
+    constructor(level?: Level) {
         this.level = level
         this.monsters = []
     }
@@ -132,6 +132,36 @@ export class MonsterArray {
     removeCastersOfType(ct: CasterType) {
         this.monsters.map(monster => {
             monster instanceof Caster && monster.getCasterType() === ct && monster.destroy()
+        })
+    }
+
+    containsMonster(monster: Monster){
+        return this.monsters.filter(mob => mob == monster).length > 0
+    }
+
+    getLast(){
+        const filteredMonsters = this.monsters.filter(monster => monster !== undefined)
+        return filteredMonsters[filteredMonsters.length - 1]
+    }
+
+    removeLast(){
+        let i = this.monsters.length - 1
+
+        while(i >= 0){
+            if(this.monsters[i]){
+                this.monsters[i].destroy()
+                delete this.monsters[i]
+                return true
+            }
+            i--
+        }
+
+        return false
+    }
+
+    executeForAll(callback: Function){
+        this.monsters.filter(monster => monster !== undefined).map(monster => {
+            callback(monster)
         })
     }
 

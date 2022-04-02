@@ -1,64 +1,89 @@
-import { Level } from '../Level/Level'
+import {Level} from '../Level/Level'
+import {Monster} from "../Monster/Monster";
+import {MonsterArray} from "../Monster/MonsterArray";
 
-const initClearMob = () => {
-    let htClearMob = InitHashtable()
-    const CLEAR_MOB_MAX_DURATION = 300
-    const TRIGGER_MOB = 0
-    const TIMER_ACTIVATED = 1
-    const TIMER_FRONT_MONTANT = 2
-    // TODO; Used to be public
-    const FRONT_MONTANT_DURATION = 0.03
-    let udp_currentTimer: timer
-    const MAX_NB_CLEAR_MOB_BY_LEVEL = 160
-    const TRIGGER_MOB_PERMANENT_EFFECT = 'Abilities\\Spells\\Orc\\StasisTrap\\StasisTotemTarget.mdl'
 
-    const ClearTriggerMobId2ClearMob = (triggerMobId: number): ClearMob => {
-        return ClearMob(LoadInteger(htClearMob, 0, triggerMobId))
-    }
+const CLEAR_MOB_MAX_DURATION = 300
+const TRIGGER_MOB = 0
+const TIMER_ACTIVATED = 1
+const TIMER_FRONT_MONTANT = 2
+const FRONT_MONTANT_DURATION = 0.03
+let udp_currentTimer: timer
+const TRIGGER_MOB_PERMANENT_EFFECT = 'Abilities\\Spells\\Orc\\StasisTrap\\StasisTotemTarget.mdl'
 
-    const ClearMobTimerExpires = () => {
-        let clearMob = ClearMob(LoadInteger(htClearMob, TIMER_ACTIVATED, GetHandleId(GetExpiredTimer())))
-        if (clearMob !== 0) {
-            clearMob.initialize() //réinitialise la couleur du trigger mob
-            udp_currentTimer = GetExpiredTimer()
-            clearMob.getBlockMobs().executeForAll('TemporarilyEnableMonsterOrCasterEach')
-        }
-    }
 
-    const ClearMobFrontMontantTimerExpires = () => {
-        let clearMob = ClearMob(LoadInteger(htClearMob, TIMER_FRONT_MONTANT, GetHandleId(GetExpiredTimer())))
-        if (clearMob !== 0) {
-            if (clearMob.isBeingActivated()) {
-                clearMob.getTriggerMob().setVertexColor(70, 100, 70)
-            }
-        }
-    }
+const ClearMobTimerExpires = () => {
+    const clearMob = ClearMob.anyTimerActivatedId2ClearMob.get(GetHandleId(GetExpiredTimer()))
 
-    const KillMonsterOrCasterEach = () => {
-        GetEnumMoc().killUnit()
-    }
-
-    const TemporarilyDisableMonsterOrCasterEach = () => {
-        GetEnumMoc().temporarilyDisable(udp_currentTimer)
-    }
-
-    const TemporarilyEnableMonsterOrCasterEach = () => {
-        GetEnumMoc().temporarilyEnable(udp_currentTimer)
+    if (clearMob) {
+        clearMob.initialize() //réinitialise la couleur du trigger mob
+        udp_currentTimer = GetExpiredTimer()
+        clearMob.getBlockMobs().executeForAll(TemporarilyEnableMonster)
     }
 }
 
-export class ClearMob {
-    //50 niveaux * 160
+const ClearMobFrontMontantTimerExpires = () => {
+    const clearMob = ClearMob.anyTimerFrontMontantId2ClearMob.get(GetHandleId(GetExpiredTimer()))
 
-    level: Level
-    arrayId: number
-    private triggerMob: MonsterOrCaster
-    private blockMobs: MonsterOrCasterStack
+    if (clearMob) {
+        if (clearMob.isBeingActivated()) {
+            clearMob.getTriggerMob().setVertexColor(70, 100, 70)
+        }
+    }
+}
+
+const KillMonster = (monster: Monster) => {
+    monster.killUnit()
+}
+
+const TemporarilyDisableMonster = (monster: Monster) => {
+    monster.temporarilyDisable(udp_currentTimer)
+}
+
+const TemporarilyEnableMonster = (monster: Monster) => {
+    monster.temporarilyEnable(udp_currentTimer)
+}
+
+
+
+export class ClearMob {
+    static anyTimerFrontMontantId2ClearMob = new Map<number, ClearMob>()
+    static anyTimerActivatedId2ClearMob = new Map<number, ClearMob>()
+    static anyTriggerMob2ClearMob = new Map<Monster, ClearMob>()
+
+    level?: Level
+    private triggerMob: Monster
+    private blockMobs: MonsterArray
     private disableDuration: number //0 = permanent
     private timerActivated: timer
     private timerFrontMontant: timer //le trigger mob reste en vert pêtant le temps du "front montant"
     enabled: boolean
-    private triggerMobPermanentEffect: effect
+    private triggerMobPermanentEffect?: effect
+    id: number = -1
+
+
+    constructor(triggerMob: Monster, disableDuration: number) {
+        if (
+            disableDuration !== 0 &&
+            (disableDuration > CLEAR_MOB_MAX_DURATION || disableDuration < FRONT_MONTANT_DURATION)
+        ) {
+            throw this.constructor.name + " : wrong disable duration"
+        }
+
+        this.triggerMob = triggerMob
+
+        this.disableDuration = disableDuration
+        this.timerActivated = CreateTimer()
+        this.timerFrontMontant = CreateTimer()
+
+        this.enabled = true
+
+        ClearMob.anyTriggerMob2ClearMob.set(triggerMob, this)
+        ClearMob.anyTimerActivatedId2ClearMob.set(GetHandleId(this.timerActivated), this)
+        ClearMob.anyTimerFrontMontantId2ClearMob.set(GetHandleId(this.timerFrontMontant), this)
+
+        this.blockMobs = new MonsterArray()
+    }
 
     getDisableDuration = (): number => {
         return this.disableDuration
@@ -72,60 +97,33 @@ export class ClearMob {
         return true
     }
 
-    getTriggerMob = (): MonsterOrCaster => {
-        return this.triggerMob //return Monster
+    getTriggerMob = (): Monster => {
+        return this.triggerMob
     }
 
-    setTriggerMob = (newTriggerMob: MonsterOrCaster): boolean => {
-        if (newTriggerMob === 0 || this.triggerMob === newTriggerMob) {
+    setTriggerMob = (newTriggerMob: Monster): boolean => {
+        if (!newTriggerMob || this.triggerMob === newTriggerMob) {
             return false
         }
-        RemoveSavedInteger(htClearMob, TRIGGER_MOB, this.triggerMob.getId())
-        SaveInteger(htClearMob, TRIGGER_MOB, newTriggerMob.getId(), integer(this))
+
+        ClearMob.anyTriggerMob2ClearMob.delete(this.triggerMob)
+        ClearMob.anyTriggerMob2ClearMob.set(newTriggerMob, this)
         this.triggerMob = newTriggerMob
+
         return true
     }
 
-    getBlockMobs = (): MonsterOrCasterStack => {
+    getBlockMobs() {
         return this.blockMobs
-    }
-
-    // TODO; Used to be static
-    create = (triggerMobId: number /* todomax replace with Monster */, disableDuration: number): ClearMob => {
-        let clearMob: ClearMob
-        let triggerMob: MonsterOrCaster
-        if (
-            disableDuration !== 0 &&
-            (disableDuration > CLEAR_MOB_MAX_DURATION || disableDuration < FRONT_MONTANT_DURATION)
-        ) {
-            return 0
-        }
-        triggerMob = new MonsterOrCaster(triggerMobId)
-        if (triggerMob !== 0) {
-            clearMob = ClearMob.allocate()
-            clearMob.triggerMob = triggerMob
-        } else {
-            return 0
-        }
-        clearMob.blockMobs = 0
-        clearMob.disableDuration = disableDuration
-        clearMob.timerActivated = CreateTimer()
-        clearMob.timerFrontMontant = CreateTimer()
-        clearMob.triggerMobPermanentEffect = null
-        clearMob.enabled = true
-        SaveInteger(htClearMob, TRIGGER_MOB, triggerMobId, integer(clearMob))
-        SaveInteger(htClearMob, TIMER_ACTIVATED, GetHandleId(clearMob.timerActivated), integer(clearMob))
-        SaveInteger(htClearMob, TIMER_FRONT_MONTANT, GetHandleId(clearMob.timerFrontMontant), integer(clearMob))
-        return clearMob
     }
 
     initialize = () => {
         this.triggerMob.setBaseColor('blue')
         this.triggerMob.setVertexColor(30, 60, 100)
-        if (this.triggerMobPermanentEffect === null) {
-            this.triggerMobPermanentEffect = AddSpecialEffectTarget(
+        if (!this.triggerMobPermanentEffect && this.triggerMob.u) {
+             this.triggerMobPermanentEffect = AddSpecialEffectTarget(
                 TRIGGER_MOB_PERMANENT_EFFECT,
-                this.triggerMob.getUnit(),
+                this.triggerMob.u,
                 'origin'
             )
         }
@@ -133,33 +131,34 @@ export class ClearMob {
     }
 
     close = () => {
-        if (this.triggerMobPermanentEffect !== null) {
+        if (this.triggerMobPermanentEffect) {
             DestroyEffect(this.triggerMobPermanentEffect)
-            this.triggerMobPermanentEffect = null
+            delete this.triggerMobPermanentEffect
         }
     }
 
     redoTriggerMobPermanentEffect = () => {
-        if (this.triggerMobPermanentEffect !== null) {
+        if (this.triggerMobPermanentEffect) {
             DestroyEffect(this.triggerMobPermanentEffect)
+            delete this.triggerMobPermanentEffect
         }
-        this.triggerMobPermanentEffect = AddSpecialEffectTarget(
-            TRIGGER_MOB_PERMANENT_EFFECT,
-            this.triggerMob.getUnit(),
-            'origin'
-        )
+
+        if(this.triggerMob.u) {
+            this.triggerMobPermanentEffect = AddSpecialEffectTarget(
+                TRIGGER_MOB_PERMANENT_EFFECT,
+                this.triggerMob.u,
+                'origin'
+            )
+        }
     }
 
-    addBlockMob = (blockMobId: number): boolean => {
-        if (this.blockMobs.containsMob(blockMobId)) {
+    addBlockMob = (monster: Monster): boolean => {
+        if (this.blockMobs.containsMonster(monster)) {
             return false
         }
-        if (this.blockMobs === 0) {
-            this.blockMobs = new MonsterOrCasterStack(new MonsterOrCaster(blockMobId))
-            return this.blockMobs !== 0
-        } else {
-            return this.blockMobs.addMonsterOrCaster(new MonsterOrCaster(blockMobId))
-        }
+
+        this.blockMobs.new(monster, false)
+        return true
     }
 
     removeLastBlockMob = (): boolean => {
@@ -169,27 +168,30 @@ export class ClearMob {
 
     removeAllBlockMobs = () => {
         udp_currentTimer = this.timerActivated
-        this.blockMobs.executeForAll('TemporarilyEnableMonsterOrCasterEach')
+
+        this.blockMobs
+        this.blockMobs.executeForAll(TemporarilyEnableMonster)
         this.blockMobs.destroy()
-        this.blockMobs = 0
+        this.blockMobs = new MonsterArray()
     }
 
     destroy = () => {
-        RemoveSavedInteger(htClearMob, TRIGGER_MOB, this.triggerMob.getId())
-        RemoveSavedInteger(htClearMob, TIMER_ACTIVATED, GetHandleId(this.timerActivated))
-        RemoveSavedInteger(htClearMob, TIMER_FRONT_MONTANT, GetHandleId(this.timerFrontMontant))
+        ClearMob.anyTriggerMob2ClearMob.delete(this.triggerMob)
+        ClearMob.anyTimerActivatedId2ClearMob.delete(GetHandleId(this.timerActivated))
+        ClearMob.anyTimerFrontMontantId2ClearMob.delete(GetHandleId(this.timerFrontMontant))
+
         this.close()
         this.triggerMob.reinitColor()
         this.triggerMob.destroy()
-        this.triggerMob = 0
+
         udp_currentTimer = this.timerActivated
-        this.blockMobs.executeForAll('TemporarilyEnableMonsterOrCasterEach')
+        this.blockMobs.executeForAll(TemporarilyEnableMonster)
         this.blockMobs.destroy()
         DestroyTimer(this.timerActivated)
-        this.timerActivated = null
+
         DestroyTimer(this.timerFrontMontant)
-        this.timerFrontMontant = null
-        this.level.clearMobs.setClearMobNull(this.arrayId)
+
+        this.level && this.level.clearMobs.removeClearMob(this.id)
     }
 
     isBeingActivated = (): boolean => {
@@ -201,12 +203,12 @@ export class ClearMob {
             return
         }
         if (this.disableDuration === 0) {
-            this.blockMobs.executeForAll('KillMonsterOrCasterEach')
+            this.blockMobs.executeForAll(KillMonster)
             this.enabled = false
         } else {
             udp_currentTimer = this.timerActivated
             TimerStart(this.timerActivated, this.disableDuration, false, ClearMobTimerExpires)
-            this.blockMobs.executeForAll('TemporarilyDisableMonsterOrCasterEach')
+            this.blockMobs.executeForAll(TemporarilyDisableMonster)
             TimerStart(this.timerFrontMontant, FRONT_MONTANT_DURATION, false, ClearMobFrontMontantTimerExpires)
         }
         //dans tous les cas le trigger mob "s'active"
