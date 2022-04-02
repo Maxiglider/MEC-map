@@ -1,7 +1,7 @@
 import { Make } from 'core/05_MAKE_STRUCTURES/Make/Make'
 import { Caster } from '../../04_STRUCTURES/Caster/Caster'
 import { CasterType } from '../../04_STRUCTURES/Caster/CasterType'
-import { MakeCasterAction } from '../../04_STRUCTURES/MakeLastActions/MakeCasterAction'
+import { MakeCasterAction } from '../MakeLastActions/MakeCasterAction'
 
 export class MakeCaster extends Make {
     private casterType: CasterType

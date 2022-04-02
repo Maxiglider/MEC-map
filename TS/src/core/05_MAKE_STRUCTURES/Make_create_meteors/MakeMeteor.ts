@@ -1,4 +1,4 @@
-import { MakeMeteorAction } from 'core/04_STRUCTURES/MakeLastActions/MakeMeteorAction'
+import { MakeMeteorAction } from 'core/05_MAKE_STRUCTURES/MakeLastActions/MakeMeteorAction'
 import { Make } from 'core/05_MAKE_STRUCTURES/Make/Make'
 
 export class MakeMeteor extends Make {

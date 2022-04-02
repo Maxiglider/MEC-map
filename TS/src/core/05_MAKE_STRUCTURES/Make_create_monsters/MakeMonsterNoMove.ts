@@ -1,4 +1,4 @@
-import { MakeMonsterAction } from '../../04_STRUCTURES/MakeLastActions/MakeMonsterAction'
+import { MakeMonsterAction } from '../MakeLastActions/MakeMonsterAction'
 import { MonsterNoMove } from '../../04_STRUCTURES/Monster/MonsterNoMove'
 import { MonsterType } from '../../04_STRUCTURES/Monster/MonsterType'
 import { Make } from '../Make/Make'

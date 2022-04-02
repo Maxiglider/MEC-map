@@ -1,7 +1,7 @@
 import { GetLocDist } from 'core/01_libraries/Basic_functions'
 import { Text } from 'core/01_libraries/Text'
 import { PATROL_DISTANCE_MIN } from '../../01_libraries/Constants'
-import { MakeMonsterAction } from '../../04_STRUCTURES/MakeLastActions/MakeMonsterAction'
+import { MakeMonsterAction } from '../MakeLastActions/MakeMonsterAction'
 import { MonsterSimplePatrol } from '../../04_STRUCTURES/Monster/MonsterSimplePatrol'
 import { MonsterType } from '../../04_STRUCTURES/Monster/MonsterType'
 import { IsTerrainTypeOfKind } from '../../04_STRUCTURES/TerrainType/Terrain_type_functions'

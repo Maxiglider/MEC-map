@@ -1,5 +1,5 @@
 import { Text } from 'core/01_libraries/Text'
-import { MakeMonsterAction } from '../../04_STRUCTURES/MakeLastActions/MakeMonsterAction'
+import { MakeMonsterAction } from '../MakeLastActions/MakeMonsterAction'
 import { MonsterMultiplePatrols } from '../../04_STRUCTURES/Monster/MonsterMultiplePatrols'
 import { MonsterType } from '../../04_STRUCTURES/Monster/MonsterType'
 import { Make, MakeConsts } from '../Make/Make'

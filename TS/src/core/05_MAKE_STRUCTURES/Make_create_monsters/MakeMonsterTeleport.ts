@@ -1,4 +1,4 @@
-import { MakeMonsterAction } from '../../04_STRUCTURES/MakeLastActions/MakeMonsterAction'
+import { MakeMonsterAction } from '../MakeLastActions/MakeMonsterAction'
 import {
     HIDE,
     MonsterTeleport,
