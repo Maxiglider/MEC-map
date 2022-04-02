@@ -1,3 +1,4 @@
+import { Hero2Escaper, IsHero } from 'core/04_STRUCTURES/Escaper/Escaper_functions'
 import { createEvent } from 'Utils/mapUtils'
 
 const InitTrig_Autorevive = () => {

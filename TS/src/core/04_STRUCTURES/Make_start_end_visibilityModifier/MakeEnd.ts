@@ -1,4 +1,5 @@
 import { Make } from 'core/05_MAKE_STRUCTURES/Make/Make'
+import { Hero2Escaper } from '../Escaper/Escaper_functions'
 
 export class MakeEnd extends Make {
     lastX: number

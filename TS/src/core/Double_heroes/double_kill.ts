@@ -1,3 +1,4 @@
+import { GetMirrorEscaper, Hero2Escaper, IsHero } from 'core/04_STRUCTURES/Escaper/Escaper_functions'
 import { udg_doubleHeroesEnabled } from './double_heroes_config'
 
 const initDoubleKill = () => {

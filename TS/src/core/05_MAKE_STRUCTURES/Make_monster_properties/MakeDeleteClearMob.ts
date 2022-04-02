@@ -1,9 +1,9 @@
+import { Text } from '../../01_libraries/Text'
+import { ClearMob } from '../../04_STRUCTURES/Monster_properties/ClearMob'
 import { Make } from '../Make/Make'
-import {Text} from "../../01_libraries/Text";
-import {ClearMob} from "../../04_STRUCTURES/Monster_properties/ClearMob";
 
 export class MakeDeleteClearMob extends Make {
-    constructor(maker: unit){
+    constructor(maker: unit) {
         super(maker, 'deleteClearMob')
     }
 

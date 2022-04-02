@@ -1,3 +1,6 @@
+import { Level } from '../Level/Level'
+import { Monster } from '../Monster/Monster'
+
 class MakeDeleteMonstersAction {
     // extends MakeAction
 

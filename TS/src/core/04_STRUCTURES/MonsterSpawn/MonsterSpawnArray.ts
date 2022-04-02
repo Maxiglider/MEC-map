@@ -1,9 +1,7 @@
-import { udg_levels } from 'core/08_GAME/Init_structures/Init_struct_levels'
-import {MonsterType} from "../Monster/MonsterType";
-import {MonsterSpawn} from "./MonsterSpawn";
-import {Level} from "../Level/Level";
-import {Text} from "../../01_libraries/Text";
-
+import { Text } from '../../01_libraries/Text'
+import { Level } from '../Level/Level'
+import { MonsterType } from '../Monster/MonsterType'
+import { MonsterSpawn } from './MonsterSpawn'
 
 export class MonsterSpawnArray {
     private monsterSpawns: MonsterSpawn[]
@@ -19,13 +17,11 @@ export class MonsterSpawnArray {
     }
 
     getFromLabel = (label: string): MonsterSpawn | null => {
-        const filteredMS = this.monsterSpawns.filter(ms => (
-            ms.getLabel() === label
-        ))
+        const filteredMS = this.monsterSpawns.filter(ms => ms.getLabel() === label)
 
-        if(filteredMS.length > 0){
+        if (filteredMS.length > 0) {
             return filteredMS[0]
-        }else{
+        } else {
             return null
         }
     }
@@ -70,7 +66,7 @@ export class MonsterSpawnArray {
         if (ms) {
             ms.setMonsterType(mt)
             return true
-        }else{
+        } else {
             return false
         }
     }
@@ -80,7 +76,7 @@ export class MonsterSpawnArray {
         if (ms) {
             ms.setSens(sens)
             return true
-        }else{
+        } else {
             return false
         }
     }
@@ -90,7 +86,7 @@ export class MonsterSpawnArray {
         if (ms) {
             ms.setFrequence(frequence)
             return true
-        }else{
+        } else {
             return false
         }
     }
@@ -109,9 +105,9 @@ export class MonsterSpawnArray {
 
     displayForPlayer = (p: player) => {
         let nbMs = this.count()
-        if(nbMs == 0){
+        if (nbMs == 0) {
             Text.erP(p, 'no monster spawn for this level')
-        }else{
+        } else {
             this.monsterSpawns.map(ms => {
                 ms && ms.displayForPlayer(p)
             })
@@ -122,7 +118,7 @@ export class MonsterSpawnArray {
         const msWithOldLabel = this.getFromLabel(oldLabel)
         const msWithNewLabel = this.getFromLabel(newLabel)
 
-        if(!msWithOldLabel || msWithNewLabel){
+        if (!msWithOldLabel || msWithNewLabel) {
             return false
         }
 

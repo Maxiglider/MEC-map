@@ -1,4 +1,7 @@
+import { LARGEUR_CASE } from 'core/01_libraries/Constants'
 import { udg_terrainTypes } from '../../../../globals'
+import { TerrainType } from '../TerrainType/TerrainType'
+
 class MakeTerrainCopyPasteAction {
     // extends MakeAction
 

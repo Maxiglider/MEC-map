@@ -1,4 +1,5 @@
 import { Escaper } from '../Escaper/Escaper'
+import { KillingTimers } from './TerrainTypeDeath_KillingTimers'
 
 export const DEATH_TERRAIN_MAX_TOLERANCE = 50
 

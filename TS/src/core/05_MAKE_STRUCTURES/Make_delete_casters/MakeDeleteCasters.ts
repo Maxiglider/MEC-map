@@ -1,16 +1,13 @@
+import { Caster } from 'core/04_STRUCTURES/Caster/Caster'
+import { MakeOneByOneOrTwoClicks } from 'core/05_MAKE_STRUCTURES/Make/MakeOneByOneOrTwoClicks'
 import { BasicFunctions } from '../../01_libraries/Basic_functions'
 import { Text } from '../../01_libraries/Text'
-import { MakeConsts } from '../Make/Make'
-import { MakeOneByOneOrTwoClicks } from 'core/05_MAKE_STRUCTURES/Make/MakeOneByOneOrTwoClicks'
 
 const { IsUnitBetweenLocs } = BasicFunctions
 
-
-
 export class MakeDeleteCasters extends MakeOneByOneOrTwoClicks {
-
     constructor(maker: unit, mode: string) {
-        super(maker, 'deleteCasters', mode);
+        super(maker, 'deleteCasters', mode)
     }
 
     doActions() {
@@ -42,13 +39,7 @@ export class MakeDeleteCasters extends MakeOneByOneOrTwoClicks {
                     if (
                         caster &&
                         caster.casterUnit &&
-                        IsUnitBetweenLocs(
-                            caster.casterUnit,
-                            this.lastX,
-                            this.lastY,
-                            this.orderX,
-                            this.orderY
-                        )
+                        IsUnitBetweenLocs(caster.casterUnit, this.lastX, this.lastY, this.orderX, this.orderY)
                     ) {
                         caster.disable()
                         suppressedCasters.push(caster)
@@ -69,5 +60,4 @@ export class MakeDeleteCasters extends MakeOneByOneOrTwoClicks {
             this.unsaveLocDefinitely()
         }
     }
-
 }

@@ -1,3 +1,4 @@
+import { Hero2Escaper, IsHero } from 'core/04_STRUCTURES/Escaper/Escaper_functions'
 import { createEvent, forRange } from 'Utils/mapUtils'
 
 export const InitTrig_Select_hero = () => {

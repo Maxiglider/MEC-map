@@ -1,4 +1,5 @@
 import { createEvent } from 'Utils/mapUtils'
+import { Hero2Escaper, IsHero } from '../Escaper/Escaper_functions'
 import { METEOR_CHEAT, METEOR_NORMAL } from './Meteor'
 
 export const InitTrig_Effect_meteor_on_pick_down = () => {

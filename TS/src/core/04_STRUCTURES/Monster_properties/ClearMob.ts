@@ -1,6 +1,4 @@
 import { Level } from '../Level/Level'
-import { MonsterOrCaster } from '../MonsterOrCaster/MonsterOrCaster'
-import { MonsterOrCasterStack } from '../MonsterOrCaster/MonsterOrCasterStack'
 
 const initClearMob = () => {
     let htClearMob = InitHashtable()

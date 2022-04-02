@@ -1,8 +1,7 @@
+import { MakeMonsterAction } from '../../04_STRUCTURES/MakeLastActions/MakeMonsterAction'
+import { MonsterNoMove } from '../../04_STRUCTURES/Monster/MonsterNoMove'
+import { MonsterType } from '../../04_STRUCTURES/Monster/MonsterType'
 import { Make } from '../Make/Make'
-import {MonsterType} from "../../04_STRUCTURES/Monster/MonsterType";
-import {MakeMonsterAction} from "../../04_STRUCTURES/MakeLastActions/MakeMonsterAction";
-import {MonsterNoMove} from "../../04_STRUCTURES/Monster/MonsterNoMove";
-
 
 export class MakeMonsterNoMove extends Make {
     private mt: MonsterType
@@ -31,7 +30,8 @@ export class MakeMonsterNoMove extends Make {
         }
     }
 
-    cancelLastAction = (): boolean => { //implement cancel/redo
+    cancelLastAction = (): boolean => {
+        //implement cancel/redo
         return false
     }
 

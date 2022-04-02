@@ -2,8 +2,7 @@ import { Text } from 'core/01_libraries/Text'
 import { CACHE_SEPARATEUR_PARAM } from 'core/07_TRIGGERS/Save_map_in_gamecache/struct_StringArrayForCache'
 import { udg_levels } from 'core/08_GAME/Init_structures/Init_struct_levels'
 import { createEvent } from 'Utils/mapUtils'
-import {Hero2Escaper} from "../Escaper/Escaper_functions";
-
+import { Hero2Escaper } from '../Escaper/Escaper_functions'
 
 abstract class RectInterface {
     minX: number
@@ -99,6 +98,5 @@ export class End extends RectInterface {
         DestroyTrigger(this.endReaching)
     }
 }
-
 
 export const DEPART_PAR_DEFAUT = new Start(-500, -500, 500, 500)

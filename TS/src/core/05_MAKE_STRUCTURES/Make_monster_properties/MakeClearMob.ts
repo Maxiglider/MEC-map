@@ -1,4 +1,5 @@
 import { Text } from 'core/01_libraries/Text'
+import { ClearMob } from 'core/04_STRUCTURES/Monster_properties/ClearMob'
 import { Make } from 'core/05_MAKE_STRUCTURES/Make/Make'
 import { Monster } from '../../04_STRUCTURES/Monster/MonsterInterface'
 

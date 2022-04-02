@@ -1,5 +1,4 @@
-const TABLE_ASCII =
-    ' !"#$%&\'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~'
+const TABLE_ASCII = ' !"#$%&\'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~'
 const DEBUT_TABLE_ASCII = 32
 const TAILLE_TABLE_ASCII = StringLength(TABLE_ASCII)
 
@@ -17,7 +16,7 @@ export const CaractereVersAscii = (caractere: string): number => {
             curseurSurTableAscii >= TAILLE_TABLE_ASCII ||
             SubString(TABLE_ASCII, curseurSurTableAscii, curseurSurTableAscii + 1) == caractere
         )
-        ) {
+    ) {
         curseurSurTableAscii = curseurSurTableAscii + 1
     }
 

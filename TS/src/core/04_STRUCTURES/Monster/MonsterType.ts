@@ -1,3 +1,4 @@
+import { B2S } from 'core/01_libraries/Basic_functions'
 import { Text } from 'core/01_libraries/Text'
 import { udg_levels } from 'core/08_GAME/Init_structures/Init_struct_levels'
 import { Ascii2String } from '../../01_libraries/Ascii'

@@ -7,7 +7,6 @@ export const METEOR_CHEAT = FourCC('MCD1')
 
 export const udg_meteors: Meteor[] = []
 
-
 export class Meteor {
     private id: number
     private x: number
@@ -24,7 +23,7 @@ export class Meteor {
         udg_meteors[this.id] = this
     }
 
-    getId(){
+    getId() {
         return this.id
     }
 

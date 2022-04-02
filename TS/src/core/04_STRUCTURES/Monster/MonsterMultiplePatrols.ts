@@ -1,11 +1,10 @@
-import { BasicFunctions } from 'core/01_libraries/Basic_functions'
+import { GetLocDist } from 'core/01_libraries/Basic_functions'
 import { PATROL_DISTANCE_MIN } from 'core/01_libraries/Constants'
 import { CACHE_SEPARATEUR_PARAM } from 'core/07_TRIGGERS/Save_map_in_gamecache/struct_StringArrayForCache'
+import { IsHero } from '../Escaper/Escaper_functions'
 import { Monster, udg_monsters } from './Monster'
 import { MonsterType } from './MonsterType'
 import { NewPatrolMonster } from './Monster_creation_functions'
-
-const { GetLocDist } = BasicFunctions
 
 const NewRegion = (x: number, y: number): region => {
     let r = Rect(x - 16, y - 16, x + 16, y + 16)

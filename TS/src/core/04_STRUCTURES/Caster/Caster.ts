@@ -1,11 +1,10 @@
 import { CACHE_SEPARATEUR_PARAM } from 'core/07_TRIGGERS/Save_map_in_gamecache/struct_StringArrayForCache'
 import { Escaper } from '../Escaper/Escaper'
 import { Monster } from '../Monster/Monster'
+import { MonsterType } from '../Monster/MonsterType'
 import { NewImmobileMonster } from '../Monster/Monster_creation_functions'
+import { CasterType } from './CasterType'
 import { CasterFunctions } from './Caster_functions'
-import {CasterType} from "./CasterType";
-import {MonsterType} from "../Monster/MonsterType";
-
 
 export class Caster extends Monster {
     private casterType: CasterType
@@ -80,14 +79,7 @@ export class Caster extends Monster {
         this.nbEscapersInRange = 0
         this.canShoot = true
 
-        super.createUnit(() => (
-            NewImmobileMonster(
-                this.casterType.getCasterMonsterType(),
-                this.x,
-                this.y,
-                this.angle
-            )
-        ))
+        super.createUnit(() => NewImmobileMonster(this.casterType.getCasterMonsterType(), this.x, this.y, this.angle))
 
         this.trg_unitWithinRange = CreateTrigger()
         this.u && TriggerRegisterUnitInRangeSimple(this.trg_unitWithinRange, this.casterType.getRange(), this.u)
@@ -100,14 +92,14 @@ export class Caster extends Monster {
         this.enabled = true
     }
 
-    destroyTriggers(){
-        if(this.trg_unitWithinRange) {
+    destroyTriggers() {
+        if (this.trg_unitWithinRange) {
             Caster.anyTriggerWithinRangeId2Caster.delete(GetHandleId(this.trg_unitWithinRange))
             DestroyTrigger(this.trg_unitWithinRange)
             delete this.trg_unitWithinRange
         }
 
-        if(this.t){
+        if (this.t) {
             Caster.anyTimerId2Caster.delete(GetHandleId(this.t))
             DestroyTimer(this.t)
             delete this.t
@@ -143,7 +135,7 @@ export class Caster extends Monster {
         }
 
         if (i < this.nbEscapersInRange) {
-            while(i !== this.nbEscapersInRange - 1) {
+            while (i !== this.nbEscapersInRange - 1) {
                 this.escapersInRange[i] = this.escapersInRange[i + 1]
                 i = i + 1
             }

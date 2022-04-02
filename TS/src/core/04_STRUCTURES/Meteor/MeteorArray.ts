@@ -1,8 +1,6 @@
+import { Level } from '../Level/Level'
+import { MONSTER_NEAR_DIFF_MAX } from '../Monster/MonsterArray'
 import { Meteor } from './Meteor'
-import {Level} from "../Level/Level";
-import {MONSTER_NEAR_DIFF_MAX} from "../Monster/MonsterArray";
-
-
 
 export class MeteorArray {
     private meteors: Meteor[]
@@ -28,7 +26,8 @@ export class MeteorArray {
         meteor.level = this.level
     }
 
-    removeMeteor = (meteorId: number) => { //todomax former name : setMeteorNull
+    removeMeteor = (meteorId: number) => {
+        //todomax former name : setMeteorNull
         delete this.meteors[meteorId]
     }
 
@@ -43,18 +42,18 @@ export class MeteorArray {
     }
 
     clearMeteor = (meteorId: number): boolean => {
-        if(this.meteors[meteorId]) {
+        if (this.meteors[meteorId]) {
             this.meteors[meteorId].destroy()
             delete this.meteors[meteorId]
             return true
-        }else{
+        } else {
             return false
         }
     }
 
     createMeteorsItems = () => {
         this.meteors.map(meteor => {
-            if(meteor){
+            if (meteor) {
                 meteor.createMeteorItem()
             }
         })
@@ -62,7 +61,7 @@ export class MeteorArray {
 
     removeMeteorsItems = () => {
         this.meteors.map(meteor => {
-            if(meteor){
+            if (meteor) {
                 meteor.removeMeteorItem()
             }
         })
@@ -70,9 +69,9 @@ export class MeteorArray {
 
     getMeteorNear = (x: number, y: number) => {
         this.meteors.map(meteor => {
-            if(meteor){
+            if (meteor) {
                 const item = meteor.getItem()
-                if(item) {
+                if (item) {
                     const xMeteor = GetItemX(item)
                     const yMeteor = GetItemY(item)
                     if (RAbsBJ(x - xMeteor) < MONSTER_NEAR_DIFF_MAX && RAbsBJ(y - yMeteor) < MONSTER_NEAR_DIFF_MAX) {

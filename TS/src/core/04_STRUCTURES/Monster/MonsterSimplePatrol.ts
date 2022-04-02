@@ -1,8 +1,8 @@
 //todomax execute this at start of the game
-import {Monster, udg_monsters} from "./Monster";
-import {NewPatrolMonster} from "./Monster_creation_functions";
-import {CACHE_SEPARATEUR_PARAM} from "../../07_TRIGGERS/Save_map_in_gamecache/struct_StringArrayForCache";
-import {MonsterType} from "./MonsterType";
+import { CACHE_SEPARATEUR_PARAM } from '../../07_TRIGGERS/Save_map_in_gamecache/struct_StringArrayForCache'
+import { Monster, udg_monsters } from './Monster'
+import { MonsterType } from './MonsterType'
+import { NewPatrolMonster } from './Monster_creation_functions'
 
 const initMonsterSimplePatrol = () => {
     //vérification que les monstres multi-patrouilles patrouillent bien
@@ -31,8 +31,6 @@ const initMonsterSimplePatrol = () => {
 }
 
 let simplePatrolMobs: group
-
-
 
 export class MonsterSimplePatrol extends Monster {
     private x1: number
@@ -68,9 +66,7 @@ export class MonsterSimplePatrol extends Monster {
     }
 
     createUnit = (): void => {
-        super.createUnit(() => (
-            this.mt ? NewPatrolMonster(this.mt, this.x1, this.y1, this.x2, this.y2) : undefined
-        ))
+        super.createUnit(() => (this.mt ? NewPatrolMonster(this.mt, this.x1, this.y1, this.x2, this.y2) : undefined))
 
         this.u && GroupAddUnit(simplePatrolMobs, this.u)
     }

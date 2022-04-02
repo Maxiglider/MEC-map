@@ -1,3 +1,9 @@
+import { IsIssuedOrder, StopUnit } from 'core/01_libraries/Basic_functions'
+import { Make } from 'core/05_MAKE_STRUCTURES/Make/Make'
+import { Hero2Escaper } from '../Escaper/Escaper_functions'
+import { MakeTerrainHeightAction } from '../MakeLastActions/MakeTerrainHeightAction'
+import { MakeTerrainHeight } from './MakeTerrainHeight'
+
 const initTerrainHeightMakingActions = () => {
     // needs BasicFunctions, Escaper
 

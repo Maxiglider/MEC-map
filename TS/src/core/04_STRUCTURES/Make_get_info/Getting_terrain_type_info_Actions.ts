@@ -1,4 +1,9 @@
+import { IsIssuedOrder, StopUnit } from 'core/01_libraries/Basic_functions'
 import { Text } from 'core/01_libraries/Text'
+import { Make } from 'core/05_MAKE_STRUCTURES/Make/Make'
+import { TerrainFunctions } from '../../07_TRIGGERS/Modify_terrain_Functions/Terrain_functions'
+import { Hero2Escaper } from '../Escaper/Escaper_functions'
+import { MakeGetTerrainType } from './MakeGetTerrainType'
 
 const initGettingTerrainTypeInfoActions = () => {
     // needs Escaper
@@ -14,6 +19,6 @@ const initGettingTerrainTypeInfoActions = () => {
             return
         }
         StopUnit(mk.maker)
-        Text.P(mk.makerOwner, GetTerrainData(GetTerrainType(x, y)))
+        Text.P(mk.makerOwner, TerrainFunctions.GetTerrainData(GetTerrainType(x, y)))
     }
 }

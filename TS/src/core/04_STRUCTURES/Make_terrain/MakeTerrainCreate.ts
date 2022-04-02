@@ -1,4 +1,6 @@
 import { Make } from 'core/05_MAKE_STRUCTURES/Make/Make'
+import { Hero2Escaper } from '../Escaper/Escaper_functions'
+import { TerrainType } from '../TerrainType/TerrainType'
 
 export class MakeTerrainCreate extends Make {
     lastX: number

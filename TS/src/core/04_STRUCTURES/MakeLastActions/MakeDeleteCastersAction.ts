@@ -1,3 +1,6 @@
+import { Caster } from '../Caster/Caster'
+import { Level } from '../Level/Level'
+
 class MakeDeleteCastersAction {
     // extends MakeAction
 

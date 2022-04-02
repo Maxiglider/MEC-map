@@ -1,6 +1,7 @@
 import { Constants } from 'core/01_libraries/Constants'
 import { createEvent } from 'Utils/mapUtils'
-import { MonsterCreationFunctions } from '../Monster/Monster_creation_functions'
+import { MonsterType } from '../Monster/MonsterType'
+import { NewImmobileMonster } from '../Monster/Monster_creation_functions'
 
 const PERIOD = 0.01
 
@@ -19,7 +20,7 @@ export class CasterShot {
         this.diffX = speed * CosBJ(angle) * PERIOD
         this.diffY = speed * SinBJ(angle) * PERIOD
         this.nbTeleportationsRestantes = R2I(portee / speed / PERIOD)
-        this.unite = MonsterCreationFunctions.NewImmobileMonster(monsterType, Xdep, Ydep, angle)
+        this.unite = NewImmobileMonster(monsterType, Xdep, Ydep, angle)
 
         const shot = this
 

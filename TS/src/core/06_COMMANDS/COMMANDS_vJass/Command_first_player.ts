@@ -1,4 +1,5 @@
 import { NB_ESCAPERS } from 'core/01_libraries/Constants'
+import { ColorString2Id } from 'core/01_libraries/Init_colorCodes'
 import { Escaper } from 'core/04_STRUCTURES/Escaper/Escaper'
 import { udg_escapers } from 'core/08_GAME/Init_structures/Init_escapers'
 import { udg_levels } from 'core/08_GAME/Init_structures/Init_struct_levels'

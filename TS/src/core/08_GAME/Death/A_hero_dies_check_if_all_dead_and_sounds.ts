@@ -1,4 +1,5 @@
 import { COOP_REVIVE_DIST, NB_ESCAPERS } from 'core/01_libraries/Constants'
+import { IsHero } from 'core/04_STRUCTURES/Escaper/Escaper_functions'
 import { createEvent } from 'Utils/mapUtils'
 import { udg_terrainTypes } from '../../../../globals'
 import { Globals } from '../../09_From_old_Worldedit_triggers/globals_variables_and_triggers'

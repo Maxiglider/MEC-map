@@ -1,11 +1,8 @@
-import {BasicFunctions} from "../../01_libraries/Basic_functions";
-import {Text} from "../../01_libraries/Text";
 import { Make, MakeConsts } from 'core/05_MAKE_STRUCTURES/Make/Make'
 
 const { MAKE_LAST_CLIC_UNIT_ID } = MakeConsts
 
-
-export abstract class MakeOneByOneOrTwoClicks extends Make{
+export abstract class MakeOneByOneOrTwoClicks extends Make {
     lastX: number = 0
     lastY: number = 0
 
@@ -19,7 +16,7 @@ export abstract class MakeOneByOneOrTwoClicks extends Make{
         //modes : oneByOne, twoClics
         super(maker, kind)
 
-        if(acceptedModes){
+        if (acceptedModes) {
             this.acceptedModes = acceptedModes
         }
 

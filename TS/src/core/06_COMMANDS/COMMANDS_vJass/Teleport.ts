@@ -1,3 +1,5 @@
+import { IsIssuedOrder, StopUnit } from 'core/01_libraries/Basic_functions'
+
 const initTeleport = () => {
     let teleTriggers: trigger[] = []
     let onceOnly: boolean[] = []

@@ -1,4 +1,6 @@
+import { IsOnGround } from 'core/01_libraries/Basic_functions'
 import { CHECK_TERRAIN_PERIOD, GM_TOUCH_DEATH_TERRAIN_EFFECT_STR } from 'core/01_libraries/Constants'
+import { GetMirrorEscaper } from 'core/04_STRUCTURES/Escaper/Escaper_functions'
 import { MeteorFunctions } from 'core/04_STRUCTURES/Meteor/Meteor_functions'
 import { TerrainType } from 'core/04_STRUCTURES/TerrainType/TerrainType'
 import { TerrainTypeDeath } from 'core/04_STRUCTURES/TerrainType/TerrainTypeDeath'

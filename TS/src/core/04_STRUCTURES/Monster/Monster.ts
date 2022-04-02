@@ -1,33 +1,33 @@
-import {MonsterType} from "./MonsterType";
-import {Level} from "../Level/Level";
-import {MonstersClickableSetLife} from "./trig_Monsters_clickable_set_life";
-import {CACHE_SEPARATEUR_PARAM} from "../../07_TRIGGERS/Save_map_in_gamecache/struct_StringArrayForCache";
-import {CommandsFunctions} from "../../06_COMMANDS/COMMANDS_vJass/Command_functions";
-import {MOBS_VARIOUS_COLORS} from "../../01_libraries/Constants";
-import {ClearMob} from "../Monster_properties/ClearMob";
-import {NewImmobileMonster} from "./Monster_creation_functions";
-import {MonsterSimplePatrol} from "./MonsterSimplePatrol";
-import {MonsterMultiplePatrols} from "./MonsterMultiplePatrols";
-import {MonsterNoMove} from "./MonsterNoMove";
-import {ColorString2Id} from "../../01_libraries/Init_colorCodes";
+import { MOBS_VARIOUS_COLORS } from '../../01_libraries/Constants'
+import { ColorString2Id } from '../../01_libraries/Init_colorCodes'
+import { CommandsFunctions } from '../../06_COMMANDS/COMMANDS_vJass/Command_functions'
+import { CACHE_SEPARATEUR_PARAM } from '../../07_TRIGGERS/Save_map_in_gamecache/struct_StringArrayForCache'
+import { Level } from '../Level/Level'
+import { ClearMob } from '../Monster_properties/ClearMob'
+import { MonsterMultiplePatrols } from './MonsterMultiplePatrols'
+import { MonsterNoMove } from './MonsterNoMove'
+import { MonsterSimplePatrol } from './MonsterSimplePatrol'
+import { MonsterType } from './MonsterType'
+import { MonstersClickableSetLife } from './trig_Monsters_clickable_set_life'
 
 export const udg_monsters: Monster[] = []
 
 export const countMonstersAccordingToMode = (monsters: Monster[], mode?: string) => {
-    if(!mode) mode = 'all'
+    if (!mode) mode = 'all'
 
     let filteredMonsters: Monster[] = []
-    if(mode == 'all'){
+    if (mode == 'all') {
         filteredMonsters = monsters.filter((monster: Monster) => monster !== undefined)
-    }else if(mode == 'moving'){
-        filteredMonsters = monsters.filter((monster: Monster) => monster instanceof MonsterSimplePatrol || monster instanceof MonsterMultiplePatrols)
-    }else if(mode == 'not moving'){
+    } else if (mode == 'moving') {
+        filteredMonsters = monsters.filter(
+            (monster: Monster) => monster instanceof MonsterSimplePatrol || monster instanceof MonsterMultiplePatrols
+        )
+    } else if (mode == 'not moving') {
         filteredMonsters = monsters.filter((monster: Monster) => monster instanceof MonsterNoMove)
     }
 
     return filteredMonsters.length
 }
-
 
 export abstract class Monster {
     public static DISABLE_TRANSPARENCY = 80
@@ -71,19 +71,19 @@ export abstract class Monster {
         return countMonstersAccordingToMode(udg_monsters, mode)
     }
 
-    getId(){
+    getId() {
         return this.id
     }
 
-    setClearMob(clearMob: ClearMob){
+    setClearMob(clearMob: ClearMob) {
         this.clearMob = clearMob
     }
 
-    removeClearMob(){
+    removeClearMob() {
         delete this.clearMob
     }
 
-    removeUnit(){
+    removeUnit() {
         if (this.u) {
             GroupRemoveUnit(MonstersClickableSetLife.monstersClickable, this.u)
             RemoveUnit(this.u)
@@ -98,12 +98,12 @@ export abstract class Monster {
         }
     }
 
-    createUnit(createUnitFunc?: () => unit | undefined){
-        if(createUnitFunc){
+    createUnit(createUnitFunc?: () => unit | undefined) {
+        if (createUnitFunc) {
             this.createUnitFunc = createUnitFunc
         }
 
-        if(!this.createUnitFunc){
+        if (!this.createUnitFunc) {
             return
         }
 
@@ -155,7 +155,7 @@ export abstract class Monster {
         }
     }
 
-    getMonsterType(){
+    getMonsterType() {
         return this.mt
     }
 
@@ -240,7 +240,7 @@ export abstract class Monster {
         }
     }
 
-    destroy(){
+    destroy() {
         if (this.u) {
             this.removeUnit()
         }
@@ -251,16 +251,16 @@ export abstract class Monster {
 
         delete udg_monsters[this.id]
 
-        if(this.level){
+        if (this.level) {
             this.level.monsters.removeMonster(this.id)
         }
 
         this.level && this.level.monsters.removeMonster(this.id)
     }
 
-    toString(){
+    toString() {
         let str: string = ''
-        if(this.mt) {
+        if (this.mt) {
             if (this.mt.theAlias != null && this.mt.theAlias != '') {
                 str = this.mt.theAlias + CACHE_SEPARATEUR_PARAM
             } else {
@@ -271,4 +271,3 @@ export abstract class Monster {
         return str
     }
 }
-

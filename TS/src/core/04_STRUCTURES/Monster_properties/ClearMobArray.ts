@@ -1,4 +1,5 @@
 import { udg_levels } from 'core/08_GAME/Init_structures/Init_struct_levels'
+import { MONSTER_NEAR_DIFF_MAX } from '../Monster/MonsterArray'
 import { ClearMob } from './ClearMob'
 
 export class ClearMobArray {

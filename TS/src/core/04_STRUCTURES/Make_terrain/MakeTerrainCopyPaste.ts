@@ -1,4 +1,8 @@
+import { NB_MAX_TILES_MODIFIED } from 'core/01_libraries/Constants'
+import { Text } from 'core/01_libraries/Text'
 import { Make } from 'core/05_MAKE_STRUCTURES/Make/Make'
+import { Hero2Escaper } from '../Escaper/Escaper_functions'
+import { MakeAction } from '../MakeLastActions/MakeAction'
 
 export class MakeTerrainCopyPaste extends Make {
     x1: number

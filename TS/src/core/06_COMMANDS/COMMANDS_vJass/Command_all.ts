@@ -1,3 +1,4 @@
+import { ClearTextForPlayer, IsBoolString, S2B } from 'core/01_libraries/Basic_functions'
 import {
     BLUE,
     DEFAULT_CAMERA_FIELD,
@@ -11,8 +12,10 @@ import {
     TERRAIN_DATA_DISPLAY_TIME,
 } from 'core/01_libraries/Constants'
 import { FunctionsOnNumbers } from 'core/01_libraries/Functions_on_numbers'
+import { ColorString2Id, udg_colorCode } from 'core/01_libraries/Init_colorCodes'
 import { Text } from 'core/01_libraries/Text'
 import { Escaper } from 'core/04_STRUCTURES/Escaper/Escaper'
+import { ColorInfo, GetMirrorEscaper } from 'core/04_STRUCTURES/Escaper/Escaper_functions'
 import { Apm } from 'core/08_GAME/Apm_clics_par_minute/Apm'
 import { udg_escapers } from 'core/08_GAME/Init_structures/Init_escapers'
 import { udg_lives } from 'core/08_GAME/Init_structures/Init_lives'

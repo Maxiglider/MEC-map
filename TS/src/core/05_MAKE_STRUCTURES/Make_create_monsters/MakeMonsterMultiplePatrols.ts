@@ -1,10 +1,8 @@
-import { Make } from '../Make/Make'
-import {MonsterType} from "../../04_STRUCTURES/Monster/MonsterType";
-import {MakeMonsterAction} from "../../04_STRUCTURES/MakeLastActions/MakeMonsterAction";
-import {MakeConsts} from "../Make/Make";
-import { Text } from 'core/01_libraries/Text';
-import {MonsterMultiplePatrols} from "../../04_STRUCTURES/Monster/MonsterMultiplePatrols";
-
+import { Text } from 'core/01_libraries/Text'
+import { MakeMonsterAction } from '../../04_STRUCTURES/MakeLastActions/MakeMonsterAction'
+import { MonsterMultiplePatrols } from '../../04_STRUCTURES/Monster/MonsterMultiplePatrols'
+import { MonsterType } from '../../04_STRUCTURES/Monster/MonsterType'
+import { Make, MakeConsts } from '../Make/Make'
 
 export class MakeMonsterMultiplePatrols extends Make {
     private mt: MonsterType
@@ -15,7 +13,6 @@ export class MakeMonsterMultiplePatrols extends Make {
     private locPointeur: number
     private unitLastClic?: unit
     private monster?: MonsterMultiplePatrols
-
 
     constructor(maker: unit, mode: string, mt: MonsterType) {
         super(maker, 'monsterCreateMultiplePatrols')
@@ -60,7 +57,13 @@ export class MakeMonsterMultiplePatrols extends Make {
 
     setUnitLastClicPosition = (x: number, y: number) => {
         if (!this.unitLastClic) {
-            this.unitLastClic = CreateUnit(this.makerOwner, MakeConsts.MAKE_LAST_CLIC_UNIT_ID, x, y, GetRandomDirectionDeg())
+            this.unitLastClic = CreateUnit(
+                this.makerOwner,
+                MakeConsts.MAKE_LAST_CLIC_UNIT_ID,
+                x,
+                y,
+                GetRandomDirectionDeg()
+            )
         } else {
             SetUnitPosition(this.unitLastClic, x, y)
         }
@@ -99,11 +102,11 @@ export class MakeMonsterMultiplePatrols extends Make {
         this.monster = monster
     }
 
-    cancelLastAction(){
+    cancelLastAction() {
         return this.unsaveLoc()
     }
 
-    redoLastAction(){
+    redoLastAction() {
         if (this.locPointeur < this.lastLocId) {
             this.locPointeur = this.locPointeur + 1
             this.monster && this.monster.addNewLoc(this.lastX[this.locPointeur], this.lastY[this.locPointeur])
@@ -119,12 +122,12 @@ export class MakeMonsterMultiplePatrols extends Make {
         }
 
         this.unitLastClic && RemoveUnit(this.unitLastClic)
-        
+
         super.destroy()
     }
-    
+
     doActions() {
-        if(super.doBaseActions()) {
+        if (super.doBaseActions()) {
             let erreur: number
 
             if (this.getLocPointeur() >= 0) {

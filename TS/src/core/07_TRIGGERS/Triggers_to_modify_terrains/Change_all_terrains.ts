@@ -1,5 +1,6 @@
 import { Constants, LARGEUR_CASE, NB_MAX_OF_TERRAINS } from 'core/01_libraries/Constants'
 import { Text } from 'core/01_libraries/Text'
+import { TerrainType } from 'core/04_STRUCTURES/TerrainType/TerrainType'
 import { udg_terrainTypes } from '../../../../globals'
 import { Modify_terrain_functions } from '../Modify_terrain_Functions/Modify_terrain_functions'
 import { TerrainFunctions } from '../Modify_terrain_Functions/Terrain_functions'

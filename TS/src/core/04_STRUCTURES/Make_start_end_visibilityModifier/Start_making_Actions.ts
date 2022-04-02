@@ -1,3 +1,11 @@
+import { IsIssuedOrder, StopUnit } from 'core/01_libraries/Basic_functions'
+import { Text } from 'core/01_libraries/Text'
+import { Make } from 'core/05_MAKE_STRUCTURES/Make/Make'
+import { udg_levels } from 'core/08_GAME/Init_structures/Init_struct_levels'
+import { Hero2Escaper } from '../Escaper/Escaper_functions'
+import { Level } from '../Level/Level'
+import { MakeStart } from './MakeStart'
+
 const initStartMakingActions = () => {
     // needs Escaper
 

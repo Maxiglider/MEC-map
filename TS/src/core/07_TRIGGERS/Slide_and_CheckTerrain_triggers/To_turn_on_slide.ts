@@ -1,5 +1,13 @@
+import { ApplyAngleSymmetry, IsLastOrderPause, IsOnGround, StopUnit } from 'core/01_libraries/Basic_functions'
 import { CAN_TURN_IN_AIR, NB_ESCAPERS } from 'core/01_libraries/Constants'
 import { Escaper } from 'core/04_STRUCTURES/Escaper/Escaper'
+import {
+    Hero2Escaper,
+    IsHero,
+    isSecondaryHero,
+    MainEscaperToSecondaryOne,
+} from 'core/04_STRUCTURES/Escaper/Escaper_functions'
+import { TerrainTypeSlide } from 'core/04_STRUCTURES/TerrainType/TerrainTypeSlide'
 import { udg_symmetryAngle } from 'core/Double_heroes/double_heroes_config'
 
 const initTurnOnSlide = () => {

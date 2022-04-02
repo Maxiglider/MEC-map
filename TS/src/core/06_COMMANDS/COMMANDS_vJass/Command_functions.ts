@@ -1,4 +1,5 @@
 import { NB_PLAYERS_MAX } from 'core/01_libraries/Constants'
+import { ColorString2Id } from 'core/01_libraries/Init_colorCodes'
 
 const initCommandsFunctions = () => {
     //gives the name of the entered command  ////the name of the entered command is <command_name>

@@ -1,12 +1,15 @@
-import { Make } from '../Make/Make'
-import {MonsterTeleport, WAIT, HIDE, MONSTER_TELEPORT_PERIOD_MIN, MONSTER_TELEPORT_PERIOD_MAX} from "../../04_STRUCTURES/Monster/MonsterTeleport";
-import {MonsterType} from "../../04_STRUCTURES/Monster/MonsterType";
-import {MakeMonsterAction} from "../../04_STRUCTURES/MakeLastActions/MakeMonsterAction";
-import {MakeConsts} from "../Make/Make";
-import { Text } from 'core/01_libraries/Text';
+import { MakeMonsterAction } from '../../04_STRUCTURES/MakeLastActions/MakeMonsterAction'
+import {
+    HIDE,
+    MonsterTeleport,
+    MONSTER_TELEPORT_PERIOD_MAX,
+    MONSTER_TELEPORT_PERIOD_MIN,
+    WAIT,
+} from '../../04_STRUCTURES/Monster/MonsterTeleport'
+import { MonsterType } from '../../04_STRUCTURES/Monster/MonsterType'
+import { Make, MakeConsts } from '../Make/Make'
 
-const {MAKE_LAST_CLIC_UNIT_ID} = MakeConsts
-
+const { MAKE_LAST_CLIC_UNIT_ID } = MakeConsts
 
 export class MakeMonsterTeleport extends Make {
     private mt: MonsterType
@@ -20,18 +23,17 @@ export class MakeMonsterTeleport extends Make {
     private unitLastClic?: unit
     private monster?: MonsterTeleport
 
-    
-    constructor(maker: unit, mode: string, mt: MonsterType, period: number, angle: number){
+    constructor(maker: unit, mode: string, mt: MonsterType, period: number, angle: number) {
         super(maker, 'monsterCreateTeleport')
-        
+
         if (mode !== 'normal' && mode !== 'string') {
-            throw this.constructor.name + " : wrong mode \"" + mode + "\""
+            throw this.constructor.name + ' : wrong mode "' + mode + '"'
         }
-        
-        if(period < MONSTER_TELEPORT_PERIOD_MIN || period > MONSTER_TELEPORT_PERIOD_MAX) {
-            throw this.constructor.name + " : wrong periode \"" + period + "\""
+
+        if (period < MONSTER_TELEPORT_PERIOD_MIN || period > MONSTER_TELEPORT_PERIOD_MAX) {
+            throw this.constructor.name + ' : wrong periode "' + period + '"'
         }
-        
+
         this.mt = mt
         this.mode = mode
         this.period = period
@@ -65,7 +67,7 @@ export class MakeMonsterTeleport extends Make {
         this.locPointeur = -1
         this.unitLastClic && RemoveUnit(this.unitLastClic)
         delete this.unitLastClic
-        
+
         if (this.monster) {
             this.escaper.newAction(new MakeMonsterAction(this.escaper.getMakingLevel(), this.monster))
         }
@@ -178,16 +180,16 @@ export class MakeMonsterTeleport extends Make {
         if (this.monster) {
             this.escaper.newAction(new MakeMonsterAction(this.escaper.getMakingLevel(), this.monster))
         }
-        
+
         this.unitLastClic && RemoveUnit(this.unitLastClic)
-        
+
         super.destroy()
     }
-    
+
     doActions() {
-        if(super.doBaseActions()){
+        if (super.doBaseActions()) {
             if (this.getLocPointeur() >= 0) {
-                if(this.monster) {
+                if (this.monster) {
                     this.monster.addNewLoc(this.orderX, this.orderY)
                     this.saveLoc(this.orderX, this.orderY)
                 }
@@ -196,7 +198,12 @@ export class MakeMonsterTeleport extends Make {
                 MonsterTeleport.storeNewLoc(this.orderX, this.orderY)
                 this.saveLoc(this.orderX, this.orderY)
 
-                const monster = new MonsterTeleport(this.getMonsterType(), this.getPeriod(), this.getAngle(), this.getMode())
+                const monster = new MonsterTeleport(
+                    this.getMonsterType(),
+                    this.getPeriod(),
+                    this.getAngle(),
+                    this.getMode()
+                )
                 this.escaper.getMakingLevel().monsters.new(monster, true)
                 this.setMonster(monster)
             }

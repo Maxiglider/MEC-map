@@ -3,18 +3,18 @@ import { Text } from 'core/01_libraries/Text'
 import { udg_escapers } from 'core/08_GAME/Init_structures/Init_escapers'
 import { udg_lives } from 'core/08_GAME/Init_structures/Init_lives'
 import { gg_trg_apparition_dialogue_et_fermeture_automatique } from 'core/08_GAME/Mode_coop/creation_dialogue'
+import { MoveCamExceptForPlayer } from '../../01_libraries/Basic_functions'
+import { udg_colorCode } from '../../01_libraries/Init_colorCodes'
+import { CasterType } from '../Caster/CasterType'
 import { Escaper } from '../Escaper/Escaper'
+import { MeteorArray } from '../Meteor/MeteorArray'
+import { MonsterArray } from '../Monster/MonsterArray'
+import { MonsterType } from '../Monster/MonsterType'
+import { MonsterSpawnArray } from '../MonsterSpawn/MonsterSpawnArray'
+import { ClearMobArray } from '../Monster_properties/ClearMobArray'
 import { Level } from './Level'
 import { LevelFunctions } from './Level_functions'
-import {MonsterType} from "../Monster/MonsterType";
-import {MonsterArray} from "../Monster/MonsterArray";
-import {CasterType} from "../Caster/CasterType";
-import {MeteorArray} from "../Meteor/MeteorArray";
-import {VisibilityModifierArray} from "./VisibilityModifierArray";
-import {ClearMobArray} from "../Monster_properties/ClearMobArray";
-import {MonsterSpawnArray} from "../MonsterSpawn/MonsterSpawnArray";
-import {udg_colorCode} from "../../01_libraries/Init_colorCodes";
-import {MoveCamExceptForPlayer} from "../../01_libraries/Basic_functions";
+import { VisibilityModifierArray } from './VisibilityModifierArray'
 
 export const NB_MAX_LEVELS = 50
 
@@ -93,22 +93,22 @@ export class LevelArray {
         this.levels[this.currentLevel].activate(true)
         this.levels[this.currentLevel].checkpointReviveHeroes(finisher)
 
-        if(this.moveCamToStart(this.levels[this.currentLevel], finisher) && finisher){
+        if (this.moveCamToStart(this.levels[this.currentLevel], finisher) && finisher) {
             Text.A(
                 udg_colorCode[GetPlayerId(finisher.getPlayer())] +
-                'Good job ' +
-                GetPlayerName(finisher.getPlayer()) +
-                ' !'
+                    'Good job ' +
+                    GetPlayerName(finisher.getPlayer()) +
+                    ' !'
             )
         }
 
         return true
     }
 
-    moveCamToStart(level: Level, finisher: Escaper | null){
+    moveCamToStart(level: Level, finisher: Escaper | null) {
         const start = level.getStart()
 
-        if(start) {
+        if (start) {
             const xCam = start.getCenterX()
             const yCam = start.getCenterY()
             if (finisher) {
@@ -118,7 +118,7 @@ export class LevelArray {
             }
 
             return true
-        }else{
+        } else {
             return false
         }
     }
@@ -232,7 +232,7 @@ export class LevelArray {
     }
 
     removeCastersOfType = (ct: CasterType) => {
-        for(let i = 0; i <= this.lastInstance; i++){
+        for (let i = 0; i <= this.lastInstance; i++) {
             this.levels[i].removeCastersOfType(ct)
         }
     }
@@ -253,4 +253,3 @@ export class LevelArray {
         return nb
     }
 }
-

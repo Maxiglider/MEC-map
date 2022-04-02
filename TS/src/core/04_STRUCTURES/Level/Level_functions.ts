@@ -5,7 +5,7 @@ import { Level } from './Level'
 
 const initLevelFunctions = () => {
     const IsLevelBeingMade = (level: Level): boolean => {
-        for(let i = 0; i < NB_ESCAPERS; i++){
+        for (let i = 0; i < NB_ESCAPERS; i++) {
             const escaper = udg_escapers.get(i)
             if (escaper) {
                 if (escaper.getMakingLevel() == level) {

@@ -1,15 +1,13 @@
-import {MakeOneByOneOrTwoClicks} from "../Make/MakeOneByOneOrTwoClicks";
-import {MonsterType} from "../../04_STRUCTURES/Monster/MonsterType";
-import {Monster} from "../../04_STRUCTURES/Monster/Monster";
-import {BasicFunctions} from "../../01_libraries/Basic_functions";
-import { Text } from "core/01_libraries/Text";
-import {PATROL_DISTANCE_MIN} from "../../01_libraries/Constants";
-import {MakeMonsterAction} from "../../04_STRUCTURES/MakeLastActions/MakeMonsterAction";
-import {IsTerrainTypeOfKind} from "../../04_STRUCTURES/TerrainType/Terrain_type_functions";
-import {MonsterSimplePatrol} from "../../04_STRUCTURES/Monster/MonsterSimplePatrol";
+import { Text } from 'core/01_libraries/Text'
+import { BasicFunctions } from '../../01_libraries/Basic_functions'
+import { PATROL_DISTANCE_MIN } from '../../01_libraries/Constants'
+import { MakeMonsterAction } from '../../04_STRUCTURES/MakeLastActions/MakeMonsterAction'
+import { MonsterSimplePatrol } from '../../04_STRUCTURES/Monster/MonsterSimplePatrol'
+import { MonsterType } from '../../04_STRUCTURES/Monster/MonsterType'
+import { IsTerrainTypeOfKind } from '../../04_STRUCTURES/TerrainType/Terrain_type_functions'
+import { MakeOneByOneOrTwoClicks } from '../Make/MakeOneByOneOrTwoClicks'
 
-const {GetLocDist} = BasicFunctions
-
+const { GetLocDist } = BasicFunctions
 
 export class MakeMonsterSimplePatrol extends MakeOneByOneOrTwoClicks {
     private static MIN_DIST = 5
@@ -23,7 +21,7 @@ export class MakeMonsterSimplePatrol extends MakeOneByOneOrTwoClicks {
     private distOnTerrain: number
 
     constructor(maker: unit, mode: string, mt: MonsterType) {
-        const acceptedModes = ["normal", "string", "auto"]
+        const acceptedModes = ['normal', 'string', 'auto']
         super(maker, 'monsterCreateSimplePatrol', mode, acceptedModes)
 
         if (!mt) {
@@ -71,11 +69,17 @@ export class MakeMonsterSimplePatrol extends MakeOneByOneOrTwoClicks {
                         Text.erP(this.makerOwner, 'Too close to the start location !')
                         return
                     } else {
-                        monster = new MonsterSimplePatrol(this.getMonsterType(), this.lastX, this.lastY, this.orderX, this.orderY)
-                        
-                        if(this.getMode() == 'normal'){
+                        monster = new MonsterSimplePatrol(
+                            this.getMonsterType(),
+                            this.lastX,
+                            this.lastY,
+                            this.orderX,
+                            this.orderY
+                        )
+
+                        if (this.getMode() == 'normal') {
                             this.unsaveLocDefinitely()
-                        }else{
+                        } else {
                             //string
                             this.unsaveLoc()
                         }
@@ -190,7 +194,7 @@ export class MakeMonsterSimplePatrol extends MakeOneByOneOrTwoClicks {
                 monster = new MonsterSimplePatrol(this.getMonsterType(), x1, y1, x2, y2)
             }
 
-            if(monster){
+            if (monster) {
                 this.escaper.getMakingLevel().monsters.new(monster, true)
                 this.escaper.newAction(new MakeMonsterAction(this.escaper.getMakingLevel(), monster))
             }

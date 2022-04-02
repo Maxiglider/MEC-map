@@ -1,5 +1,8 @@
+import { IsOnGround } from 'core/01_libraries/Basic_functions'
 import { Escaper } from '../Escaper/Escaper'
+import { Hero2Escaper } from '../Escaper/Escaper_functions'
 import { Caster } from './Caster'
+import { CasterShot } from './CasterShot'
 
 const initCasterFunctions = () => {
     let escaper: Escaper

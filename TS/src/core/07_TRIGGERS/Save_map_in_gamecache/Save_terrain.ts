@@ -1,6 +1,8 @@
+import { Ascii2String } from 'core/01_libraries/Ascii'
 import { Constants, LARGEUR_CASE } from 'core/01_libraries/Constants'
 import { FunctionsOnNumbers } from 'core/01_libraries/Functions_on_numbers'
 import { Text } from 'core/01_libraries/Text'
+import { TerrainType } from 'core/04_STRUCTURES/TerrainType/TerrainType'
 import { udg_terrainTypes } from '../../../../globals'
 import { SaveMapInCache } from './SAVE_MAP_in_cache'
 import { SaveTerrainHeights } from './Save_terrain_heights_and_cliffs'
@@ -74,7 +76,7 @@ const initSaveTerrain = () => {
         let i = 0
         while (true) {
             terrainType = udg_terrainTypes.getWalk(i)
-            if (terrainType === 0) break
+            if (terrainType === null) break
             terrainTypes[numTerrain] = terrainType
             numTerrain = numTerrain + 1
             i = i + 1
@@ -82,7 +84,7 @@ const initSaveTerrain = () => {
         i = 0
         while (true) {
             terrainType = udg_terrainTypes.getSlide(i)
-            if (terrainType === 0) break
+            if (terrainType === null) break
             terrainTypes[numTerrain] = terrainType
             numTerrain = numTerrain + 1
             i = i + 1
@@ -90,7 +92,7 @@ const initSaveTerrain = () => {
         i = 0
         while (true) {
             terrainType = udg_terrainTypes.getDeath(i)
-            if (terrainType === 0) break
+            if (terrainType === null) break
             terrainTypes[numTerrain] = terrainType
             numTerrain = numTerrain + 1
             i = i + 1

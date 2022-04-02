@@ -1,4 +1,6 @@
+import { LARGEUR_CASE, NB_MAX_TILES_MODIFIED } from 'core/01_libraries/Constants'
 import { udg_terrainTypes } from '../../../../globals'
+import { TerrainType } from '../TerrainType/TerrainType'
 class MakeTerrainCreateAction {
     // extends MakeAction
 

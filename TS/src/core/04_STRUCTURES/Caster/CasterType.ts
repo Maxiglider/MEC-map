@@ -3,10 +3,9 @@ import { Text } from 'core/01_libraries/Text'
 import { CACHE_SEPARATEUR_PARAM } from 'core/07_TRIGGERS/Save_map_in_gamecache/struct_StringArrayForCache'
 import { udg_escapers } from 'core/08_GAME/Init_structures/Init_escapers'
 import { udg_levels } from 'core/08_GAME/Init_structures/Init_struct_levels'
-import { Escaper } from '../Escaper/Escaper'
+import { udg_colorCode } from '../../01_libraries/Init_colorCodes'
 import { Level } from '../Level/Level'
-import {MonsterType} from "../Monster/MonsterType";
-import {udg_colorCode} from "../../01_libraries/Init_colorCodes";
+import { MonsterType } from '../Monster/MonsterType'
 
 const DEFAULT_CASTER_PROJECTILE_SPEED = 600
 const MIN_CASTER_PROJECTILE_SPEED = 100
@@ -63,13 +62,13 @@ export class CasterType {
         const currentLevel = udg_levels.getCurrentLevel()
         currentLevel.refreshCastersOfType(this)
 
-        for(let i = 0; i < NB_ESCAPERS; i++){
+        for (let i = 0; i < NB_ESCAPERS; i++) {
             const escaper = udg_escapers.get(i)
             if (escaper) {
                 if (escaper.getMakingLevel() != currentLevel) {
                     levelAlreadyChecked = false
 
-                    for(let j = 0; j < nbLevelsMaking; j++){
+                    for (let j = 0; j < nbLevelsMaking; j++) {
                         if (escaper.getMakingLevel() == levelsMaking[j]) {
                             levelAlreadyChecked = true
                             break
@@ -84,7 +83,7 @@ export class CasterType {
             }
         }
 
-        for(let i = 0; i < nbLevelsMaking; i++){
+        for (let i = 0; i < nbLevelsMaking; i++) {
             levelsMaking[i].refreshCastersOfType(this)
         }
     }

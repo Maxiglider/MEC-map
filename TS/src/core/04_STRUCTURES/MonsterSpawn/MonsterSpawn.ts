@@ -1,17 +1,15 @@
-import {udg_monsterTypes} from '../../../../globals'
-import {MonsterType} from "../Monster/MonsterType";
-import {Level} from "../Level/Level";
-import {ENNEMY_PLAYER, GREY, MOBS_VARIOUS_COLORS, TERRAIN_DATA_DISPLAY_TIME} from "../../01_libraries/Constants";
-import {GetCurrentMonsterPlayer} from "../../01_libraries/Basic_functions";
-import {NewImmobileMonsterForPlayer} from "../Monster/Monster_creation_functions";
-import {udg_colorCode} from "../../01_libraries/Init_colorCodes";
-import {Text} from "../../01_libraries/Text";
-import {CACHE_SEPARATEUR_PARAM} from "../../07_TRIGGERS/Save_map_in_gamecache/struct_StringArrayForCache";
-
+import { udg_monsterTypes } from '../../../../globals'
+import { GetCurrentMonsterPlayer } from '../../01_libraries/Basic_functions'
+import { ENNEMY_PLAYER, GREY, MOBS_VARIOUS_COLORS, TERRAIN_DATA_DISPLAY_TIME } from '../../01_libraries/Constants'
+import { udg_colorCode } from '../../01_libraries/Init_colorCodes'
+import { Text } from '../../01_libraries/Text'
+import { CACHE_SEPARATEUR_PARAM } from '../../07_TRIGGERS/Save_map_in_gamecache/struct_StringArrayForCache'
+import { Level } from '../Level/Level'
+import { MonsterType } from '../Monster/MonsterType'
+import { NewImmobileMonsterForPlayer } from '../Monster/Monster_creation_functions'
 
 const DECALAGE_UNSPAWN = 200
 const DELAY_BETWEEN_SPAWN_AND_MOVEMENT = 0.5
-
 
 const RemoveEnumMonster = (): void => {
     RemoveUnit(GetEnumUnit())
@@ -20,9 +18,9 @@ const RemoveEnumMonster = (): void => {
 const MonsterStartMovement = (): void => {
     let mobTimer = GetExpiredTimer()
     let ms = MonsterSpawn.anyTimerId2MonsterSpawn.get(GetHandleId(mobTimer)) //todomax check that it works
-    if(ms) {
+    if (ms) {
         let mobUnit = MonsterSpawn.anyTimerId2Unit.get(GetHandleId(mobTimer))
-        if(mobUnit){
+        if (mobUnit) {
             ms.startMobMovement(mobUnit)
             UnitAddAbility(mobUnit, FourCC('Aloc'))
             DestroyTimer(mobTimer)
@@ -32,7 +30,7 @@ const MonsterStartMovement = (): void => {
 
 const MonsterSpawn_Actions = (): void => {
     let ms = MonsterSpawn.anyTrigId2MonsterSpawn.get(GetHandleId(GetTriggeringTrigger()))
-    if(ms) {
+    if (ms) {
         let mobUnit = ms.createMob()
         let mobTimer = CreateTimer()
         MonsterSpawn.anyTimerId2MonsterSpawn.set(GetHandleId(mobTimer), ms)
@@ -53,9 +51,7 @@ const UnspawMonster_Actions = (): void => {
     }
 }
 
-
 export const udg_monsterSpawns: MonsterSpawn[] = []
-
 
 export class MonsterSpawn {
     static anyTrigId2MonsterSpawn = new Map<number, MonsterSpawn>()
@@ -101,7 +97,7 @@ export class MonsterSpawn {
         udg_monsterSpawns[this.id] = this
     }
 
-    getId(){
+    getId() {
         return this.id
     }
 
@@ -109,7 +105,8 @@ export class MonsterSpawn {
         return this.label
     }
 
-    deactivate = (): void => { //todomax former name : desactivate
+    deactivate = (): void => {
+        //todomax former name : desactivate
         if (this.unspawnReg) {
             RemoveRegion(this.unspawnReg)
             delete this.unspawnReg

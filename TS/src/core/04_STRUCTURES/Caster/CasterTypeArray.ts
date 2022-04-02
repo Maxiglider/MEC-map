@@ -1,15 +1,14 @@
 import { Text } from 'core/01_libraries/Text'
 import { StringArrayForCache } from 'core/07_TRIGGERS/Save_map_in_gamecache/struct_StringArrayForCache'
+import { MonsterType } from '../Monster/MonsterType'
 import { CasterType } from './CasterType'
-import {MonsterType} from "../Monster/MonsterType";
-
 
 export class CasterTypeArray {
     private casterTypes: CasterType[] = []
     private numberOfCasterTypes = 0
 
     get = (label: string) => {
-        for(let i = 0; i < this.numberOfCasterTypes; i++){
+        for (let i = 0; i < this.numberOfCasterTypes; i++) {
             if (this.casterTypes[i].label == label || this.casterTypes[i].theAlias == label) {
                 return this.casterTypes[i]
             }

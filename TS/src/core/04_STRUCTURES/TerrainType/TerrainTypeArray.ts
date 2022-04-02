@@ -1,4 +1,11 @@
+import { tileset2tilesetChar } from 'core/01_libraries/Basic_functions'
+import { Text } from 'core/01_libraries/Text'
+import { CommandsFunctions } from 'core/06_COMMANDS/COMMANDS_vJass/Command_functions'
 import { StringArrayForCache } from 'core/07_TRIGGERS/Save_map_in_gamecache/struct_StringArrayForCache'
+import { TerrainType } from './TerrainType'
+import { TerrainTypeDeath } from './TerrainTypeDeath'
+import { TerrainTypeSlide } from './TerrainTypeSlide'
+import { TerrainTypeWalk } from './TerrainTypeWalk'
 
 export class TerrainTypeArray {
     private ttWalk: TerrainTypeWalk[] //le nombre de terrains du jeu est de 177

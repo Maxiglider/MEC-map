@@ -1,14 +1,12 @@
 import { NB_ESCAPERS } from 'core/01_libraries/Constants'
 import { udg_escapers } from 'core/08_GAME/Init_structures/Init_escapers'
+import { StopUnit } from '../../01_libraries/Basic_functions'
 import { ChangeAllTerrains } from '../../07_TRIGGERS/Triggers_to_modify_terrains/Change_all_terrains'
 import { Escaper } from '../Escaper/Escaper'
 import { Level } from './Level'
-import {StopUnit} from "../../01_libraries/Basic_functions";
-
-
 
 export const checkPointReviveHeroes = (levelForRevining: Level, revivingFinisher: Escaper | null) => {
-    for(let i = 0; i < NB_ESCAPERS; i++){
+    for (let i = 0; i < NB_ESCAPERS; i++) {
         const escaper = udg_escapers.get(i)
         if (escaper && escaper !== revivingFinisher) {
             const unit = escaper.getHero()
@@ -31,7 +29,7 @@ export const checkPointReviveHeroes = (levelForRevining: Level, revivingFinisher
 
     TriggerSleepAction(1)
 
-    for(let i = 0; i < NB_ESCAPERS; i++){
+    for (let i = 0; i < NB_ESCAPERS; i++) {
         const escaper = udg_escapers.get(i)
         if (escaper && escaper !== revivingFinisher) {
             escaper.pause(false)

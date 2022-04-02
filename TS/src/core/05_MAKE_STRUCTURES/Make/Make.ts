@@ -1,8 +1,6 @@
-import { BasicFunctions } from 'core/01_libraries/Basic_functions'
-import { EscaperFunctions } from 'core/04_STRUCTURES/Escaper/Escaper_functions'
-import {Escaper} from "../../04_STRUCTURES/Escaper/Escaper";
-const { Hero2Escaper } = EscaperFunctions
-const { IsIssuedOrder, StopUnit } = BasicFunctions
+import { IsIssuedOrder, StopUnit } from 'core/01_libraries/Basic_functions'
+import { Hero2Escaper } from 'core/04_STRUCTURES/Escaper/Escaper_functions'
+import { Escaper } from '../../04_STRUCTURES/Escaper/Escaper'
 
 export const MakeConsts: {
     MAKE_LAST_CLIC_UNIT_ID: number

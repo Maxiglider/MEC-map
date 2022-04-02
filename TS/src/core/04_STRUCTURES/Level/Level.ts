@@ -1,20 +1,19 @@
 import { Text } from 'core/01_libraries/Text'
 import { udg_lives } from 'core/08_GAME/Init_structures/Init_lives'
-import {MonsterArray} from "../Monster/MonsterArray";
-import {VisibilityModifierArray} from "./VisibilityModifierArray";
-import {TriggerArray} from "./Triggers";
-import {MeteorArray} from "../Meteor/MeteorArray";
-import {ClearMobArray} from "../Monster_properties/ClearMobArray";
-import {udg_escapers} from "../../08_GAME/Init_structures/Init_escapers";
-import {Escaper} from "../Escaper/Escaper";
-import {MonsterType} from "../Monster/MonsterType";
-import {CasterType} from "../Caster/CasterType";
-import {udg_levels} from "../../08_GAME/Init_structures/Init_struct_levels";
-import {VisibilityModifier} from "./VisibilityModifier";
-import {End, Start} from "./StartAndEnd";
-import {MonsterSpawnArray} from "../MonsterSpawn/MonsterSpawnArray";
-import {checkPointReviveHeroes} from "./checkpointReviveHeroes_function";
-
+import { udg_escapers } from '../../08_GAME/Init_structures/Init_escapers'
+import { udg_levels } from '../../08_GAME/Init_structures/Init_struct_levels'
+import { CasterType } from '../Caster/CasterType'
+import { Escaper } from '../Escaper/Escaper'
+import { MeteorArray } from '../Meteor/MeteorArray'
+import { MonsterArray } from '../Monster/MonsterArray'
+import { MonsterType } from '../Monster/MonsterType'
+import { MonsterSpawnArray } from '../MonsterSpawn/MonsterSpawnArray'
+import { ClearMobArray } from '../Monster_properties/ClearMobArray'
+import { checkPointReviveHeroes } from './checkpointReviveHeroes_function'
+import { End, Start } from './StartAndEnd'
+import { TriggerArray } from './Triggers'
+import { VisibilityModifier } from './VisibilityModifier'
+import { VisibilityModifierArray } from './VisibilityModifierArray'
 
 export class Level {
     public static earningLivesActivated = true
@@ -62,7 +61,7 @@ export class Level {
             if (Level.earningLivesActivated && this.getId() > 0) {
                 udg_lives.add(this.livesEarnedAtBeginning)
             }
-        }else{
+        } else {
             this.monsters.removeMonstersUnits()
             this.monsterSpawns.deactivate()
             this.meteors.removeMeteorsItems()

@@ -1,8 +1,7 @@
 import { createEvent } from 'Utils/mapUtils'
-import {METEOR_NORMAL, udg_meteors} from './Meteor'
+import { Hero2Escaper } from '../Escaper/Escaper_functions'
+import { METEOR_NORMAL, udg_meteors } from './Meteor'
 import { gg_trg_Stop_using_normal_meteor } from './Stop_using_normal_meteor'
-import {Hero2Escaper} from "../Escaper/Escaper_functions";
-
 
 export const InitTrig_Meteor_being_used = () => {
     createEvent({

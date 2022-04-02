@@ -1,3 +1,4 @@
+import { IsNearBounds } from 'core/01_libraries/Basic_functions'
 import { Constants, LARGEUR_CASE } from 'core/01_libraries/Constants'
 import { FunctionsOnNumbers } from 'core/01_libraries/Functions_on_numbers'
 import { Text } from 'core/01_libraries/Text'

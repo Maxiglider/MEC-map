@@ -1,5 +1,11 @@
 import { Text } from 'core/01_libraries/Text'
 import { Escaper } from '../Escaper/Escaper'
+import { Level } from '../Level/Level'
+import { MakeAction } from './MakeAction'
+import { MakeCasterAction } from './MakeCasterAction'
+import { MakeMeteorAction } from './MakeMeteorAction'
+import { MakeMonsterAction } from './MakeMonsterAction'
+import { MakeVisibilityModifierAction } from './MakeVisibilityModifierAction'
 
 NB_MAX_ACTIONS_SAVED = 30
 

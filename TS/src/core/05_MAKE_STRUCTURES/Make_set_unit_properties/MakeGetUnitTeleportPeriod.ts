@@ -1,8 +1,8 @@
+import { Text } from '../../01_libraries/Text'
 import { Make } from '../Make/Make'
-import {Text} from "../../01_libraries/Text";
 
 export class MakeGetUnitTeleportPeriod extends Make {
-    constructor(maker: unit){
+    constructor(maker: unit) {
         super(maker, 'getUnitTeleportPeriod')
     }
 

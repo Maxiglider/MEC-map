@@ -1,4 +1,11 @@
 import { NB_MAX_OF_TERRAINS, RED, TERRAIN_DATA_DISPLAY_TIME } from 'core/01_libraries/Constants'
+import {
+    COLOR_TERRAIN_DEATH,
+    COLOR_TERRAIN_SLIDE,
+    COLOR_TERRAIN_WALK,
+    udg_colorCode,
+} from 'core/01_libraries/Init_colorCodes'
+import { TerrainType } from 'core/04_STRUCTURES/TerrainType/TerrainType'
 import { Globals } from 'core/09_From_old_Worldedit_triggers/globals_variables_and_triggers'
 import { TerrainTypeFunctions } from '../../04_STRUCTURES/TerrainType/Terrain_type_functions'
 import { TerrainTypeMax } from './Terrain_type_max'
@@ -85,7 +92,7 @@ const initTerrainFunctions = () => {
         str = udg_colorCode[RED] + TerrainTypeNamesAndData.TERRAIN_TYPE_DATA[maxId]
 
         terrainType = TerrainTypeFunctions.TerrainTypeId2TerrainType(terrain)
-        if (terrainType !== 0) {
+        if (terrainType !== null) {
             if (terrainType.getKind() == 'slide') {
                 str = str + COLOR_TERRAIN_SLIDE
             } else {

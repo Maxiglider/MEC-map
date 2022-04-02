@@ -1,35 +1,36 @@
 import { MakeOneByOneOrTwoClicks } from 'core/05_MAKE_STRUCTURES/Make/MakeOneByOneOrTwoClicks'
-import {Text} from "../../01_libraries/Text";
+import { Text } from '../../01_libraries/Text'
 import {
+    MonsterTeleport,
     MONSTER_TELEPORT_PERIOD_MAX,
     MONSTER_TELEPORT_PERIOD_MIN,
-    MonsterTeleport
-} from "../../04_STRUCTURES/Monster/MonsterTeleport";
-
+} from '../../04_STRUCTURES/Monster/MonsterTeleport'
 
 export class MakeSetUnitTeleportPeriod extends MakeOneByOneOrTwoClicks {
     private period: number
 
     constructor(maker: unit, mode: string, period: number) {
         super(maker, 'setUnitTeleportPeriod', mode)
-        
+
         if (period < MONSTER_TELEPORT_PERIOD_MIN || period > MONSTER_TELEPORT_PERIOD_MAX) {
-            throw this.constructor.name + " : wrong period \"" + period + "\""
+            throw this.constructor.name + ' : wrong period "' + period + '"'
         }
-        
+
         this.period = period
     }
 
     getPeriod = (): number => {
         return this.period
     }
-    
+
     doActions() {
         if (super.doBaseActions()) {
             let nbMonstersFixed = 0
 
             if (this.getMode() == 'oneByOne') {
-                let monsterTP = this.escaper.getMakingLevel().monsters.getMonsterNear(this.orderX, this.orderY, 'MonsterTeleport')
+                let monsterTP = this.escaper
+                    .getMakingLevel()
+                    .monsters.getMonsterNear(this.orderX, this.orderY, 'MonsterTeleport')
                 if (monsterTP instanceof MonsterTeleport) {
                     monsterTP.setPeriod(this.getPeriod())
                     nbMonstersFixed = 1
@@ -42,10 +43,17 @@ export class MakeSetUnitTeleportPeriod extends MakeOneByOneOrTwoClicks {
                 }
 
                 //todomax make all Monster<SpecificType>Array extend a new abstract class MonsterArray
-                let monstersTP = this.escaper.getMakingLevel().monsters.getMonstersBetweenLocs(this.lastX, this.lastY, this.orderX, this.orderY, 'MonsterTeleport')
+                let monstersTP = this.escaper
+                    .getMakingLevel()
+                    .monsters.getMonstersBetweenLocs(
+                        this.lastX,
+                        this.lastY,
+                        this.orderX,
+                        this.orderY,
+                        'MonsterTeleport'
+                    )
                 monstersTP.map(monsterTP => {
-                    if(monsterTP instanceof MonsterTeleport)
-                    monsterTP.setPeriod(this.getPeriod())
+                    if (monsterTP instanceof MonsterTeleport) monsterTP.setPeriod(this.getPeriod())
                     nbMonstersFixed++
                 })
             }
