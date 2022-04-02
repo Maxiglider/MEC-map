@@ -1,9 +1,7 @@
+import { IsUnitBetweenLocs } from 'core/01_libraries/Basic_functions'
 import { Caster } from 'core/04_STRUCTURES/Caster/Caster'
 import { MakeOneByOneOrTwoClicks } from 'core/05_MAKE_STRUCTURES/Make/MakeOneByOneOrTwoClicks'
-import { BasicFunctions } from '../../01_libraries/Basic_functions'
 import { Text } from '../../01_libraries/Text'
-
-const { IsUnitBetweenLocs } = BasicFunctions
 
 export class MakeDeleteCasters extends MakeOneByOneOrTwoClicks {
     constructor(maker: unit, mode: string) {
