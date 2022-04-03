@@ -189,7 +189,7 @@ local function require(file, ...)
 
         if ____moduleCache2[file] == 1 then
             ____moduleCircular = true
-            ____moduleCache2[file] = { value = 2 }
+            ____moduleCache2[file] = 2
         end
 
         if ____moduleCircular then
@@ -197,7 +197,7 @@ local function require(file, ...)
         end
 
         if ____moduleCache2[file] == nil then
-            ____moduleCache2[file] = { value = 1 }
+            ____moduleCache2[file] = 1
         end
 
         ____moduleCache[file] = { value = (select("#", ...) > 0) and module(...) or module(file) }
