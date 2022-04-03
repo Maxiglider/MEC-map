@@ -2,8 +2,8 @@ import { NB_ESCAPERS } from 'core/01_libraries/Constants'
  import { udg_escapers } from '../../../../globals'
 import { StopUnit } from '../../01_libraries/Basic_functions'
 import { ChangeAllTerrains } from '../../07_TRIGGERS/Triggers_to_modify_terrains/Change_all_terrains'
-import { Escaper } from '../Escaper/Escaper'
-import { Level } from './Level'
+import type { Escaper } from '../Escaper/Escaper'
+import type { Level } from './Level'
 
 export const checkPointReviveHeroes = (levelForRevining: Level, revivingFinisher: Escaper | undefined) => {
     for (let i = 0; i < NB_ESCAPERS; i++) {
