@@ -1,14 +1,11 @@
 import { LOW_PERIOD_FOR_WORK } from 'core/01_libraries/Constants'
-import { Text } from 'core/01_libraries/Text'
-import { SaveTerrain } from './Save_terrain'
-import { SaveTerrainConfigInCache } from './Save_terrain_config'
 
 const initSaveMapInCache = () => {
     const saveMap_cache = InitGameCache('epicSlide')
     const trigSaveMapInCache = CreateTrigger()
 
-    DisableTrigger(SaveMapInCache.trigSaveMapInCache)
-    TriggerRegisterTimerEvent(SaveMapInCache.trigSaveMapInCache, LOW_PERIOD_FOR_WORK, true)
+    DisableTrigger(trigSaveMapInCache)
+    TriggerRegisterTimerEvent(trigSaveMapInCache, LOW_PERIOD_FOR_WORK, true)
 
     const StartSaveMapInCache = () => {
         /*let i: number
