@@ -9,7 +9,11 @@ const InitTrig_Autorevive = () => {
         conditions: [() => IsHero(GetTriggerUnit())],
         actions: [
             () => {
-                let escaper = Hero2Escaper(GetTriggerUnit())
+                const escaper = Hero2Escaper(GetTriggerUnit())
+
+                if (!escaper) {
+                    return
+                }
 
                 if (escaper.hasAutorevive()) {
                     TriggerSleepAction(udg_autoreviveDelay)

@@ -98,7 +98,13 @@ const initCommandExecution = () => {
                     return
                 }
 
-                ExecuteCommand(udg_escapers.get(GetPlayerId(GetTriggerPlayer())), GetEventPlayerChatString())
+                const escaper = udg_escapers.get(GetPlayerId(GetTriggerPlayer()))
+
+                if (!escaper) {
+                    return
+                }
+
+                ExecuteCommand(escaper, GetEventPlayerChatString())
             },
         ],
     })

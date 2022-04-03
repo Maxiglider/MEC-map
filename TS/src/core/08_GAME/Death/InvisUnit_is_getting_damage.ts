@@ -1,7 +1,7 @@
 //évènement ajouté à la création de l'unité invisible
 
 import { DUMMY_POWER_CIRCLE, GM_KILLING_EFFECT } from 'core/01_libraries/Constants'
-import {Monster, udg_monsters} from 'core/04_STRUCTURES/Monster/Monster'
+import { Monster, udg_monsters } from 'core/04_STRUCTURES/Monster/Monster'
 import { ClearMob } from 'core/04_STRUCTURES/Monster_properties/ClearMob'
 import { createEvent } from 'Utils/mapUtils'
 import { udg_monsterTypes } from '../../../../globals'
@@ -25,7 +25,7 @@ export const InitTrig_InvisUnit_is_getting_damage = () => {
                 let killingUnit: unit | null = GetEventDamageSource()
                 let clearMob: ClearMob | undefined
                 let moc: Monster
-                let effectStr: string
+                let effectStr: string | null
                 let eff: effect | null
                 let x: number
                 let y: number

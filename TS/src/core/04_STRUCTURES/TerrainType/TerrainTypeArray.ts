@@ -339,7 +339,7 @@ export class TerrainTypeArray {
         return true
     }
 
-    setMainTile = (tileset: string): boolean => {
+    setMainTileset = (tileset: string): boolean => {
         let tilesetChar = tileset2tilesetChar(tileset)
         if (tilesetChar !== '') {
             this.mainTileset = tilesetChar
@@ -348,7 +348,7 @@ export class TerrainTypeArray {
         return false
     }
 
-    getMainTile = (): string => {
+    getMainTileset = (): string => {
         return this.mainTileset
     }
 }

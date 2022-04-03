@@ -15,16 +15,16 @@ import { FunctionsOnNumbers } from 'core/01_libraries/Functions_on_numbers'
 import { ColorString2Id, udg_colorCode } from 'core/01_libraries/Init_colorCodes'
 import { Text } from 'core/01_libraries/Text'
 import { Escaper } from 'core/04_STRUCTURES/Escaper/Escaper'
+import { execute, newCmd } from 'core/04_STRUCTURES/Escaper/EscaperSavedCommands'
 import { ColorInfo, GetMirrorEscaper } from 'core/04_STRUCTURES/Escaper/Escaper_functions'
+import { DisplayTerrainDataToPlayer, GetTerrainData } from 'core/07_TRIGGERS/Modify_terrain_Functions/Terrain_functions'
 import { Apm } from 'core/08_GAME/Apm_clics_par_minute/Apm'
 import { udg_escapers } from 'core/08_GAME/Init_structures/Init_escapers'
 import { udg_lives } from 'core/08_GAME/Init_structures/Init_lives'
 import { udg_levels } from 'core/08_GAME/Init_structures/Init_struct_levels'
 import { Globals } from 'core/09_From_old_Worldedit_triggers/globals_variables_and_triggers'
 import { EscaperEffectFunctions } from '../../04_STRUCTURES/Escaper/EscaperEffect_functions'
-import { EscaperSavedCommands } from '../../04_STRUCTURES/Escaper/EscaperSavedCommands'
 import { Disco } from '../../04_STRUCTURES/Escaper/Escaper_disco'
-import { TerrainFunctions } from '../../07_TRIGGERS/Modify_terrain_Functions/Terrain_functions'
 import { TerrainTypeFromString } from '../../07_TRIGGERS/Modify_terrain_Functions/Terrain_type_from_string'
 import { TerrainTypeNamesAndData } from '../../07_TRIGGERS/Modify_terrain_Functions/Terrain_type_names_and_data'
 import { AutoContinueAfterSliding } from '../../07_TRIGGERS/Slide_and_CheckTerrain_triggers/Auto_continue_after_sliding'
@@ -66,7 +66,7 @@ const initCommandAll = () => {
                 return true
             }
             if (nbParam == 1 && escaper.isTrueMaximaxou() && CommandsFunctions.IsPlayerColorString(param1)) {
-                udg_escapers.get(ColorString2Id(param1)).setBaseColor(ColorString2Id(name))
+                udg_escapers.get(ColorString2Id(param1))?.setBaseColor(ColorString2Id(name))
             }
             return true
         }
@@ -355,7 +355,7 @@ const initCommandAll = () => {
                 SetUnitAnimation(hero, CommandsFunctions.CmdParam(cmd, 0))
 
                 if (!escaper.isEscaperSecondary()) {
-                    const hero2 = GetMirrorEscaper(escaper).getHero()
+                    const hero2 = GetMirrorEscaper(escaper)?.getHero()
 
                     if (hero2) {
                         SetUnitAnimation(hero2, CommandsFunctions.CmdParam(cmd, 0))
@@ -429,7 +429,7 @@ const initCommandAll = () => {
                     ' has kicked himself !'
             )
             escaper.destroy()
-            GetMirrorEscaper(escaper).destroy()
+            GetMirrorEscaper(escaper)?.destroy()
             return true
         }
 
@@ -443,7 +443,7 @@ const initCommandAll = () => {
             if (nbParam === 1) {
                 n = TerrainTypeFromString.TerrainTypeString2TerrainTypeId(param1)
                 if (n !== 0) {
-                    TerrainFunctions.DisplayTerrainDataToPlayer(escaper.getPlayer(), n)
+                    DisplayTerrainDataToPlayer(escaper.getPlayer(), n)
                 }
                 return true
             }
@@ -460,7 +460,7 @@ const initCommandAll = () => {
                         Text.DisplayLineToPlayer(escaper.getPlayer())
                         while (true) {
                             if (i > n) break
-                            TerrainFunctions.DisplayTerrainDataToPlayer(escaper.getPlayer(), i)
+                            DisplayTerrainDataToPlayer(escaper.getPlayer(), i)
                             i = i + 1
                         }
                     }
@@ -505,11 +505,11 @@ const initCommandAll = () => {
                             DestroyTrigger(escaper.discoTrigger)
                             ;(escaper.discoTrigger as any) = null
 
-                            const discoTrigger = GetMirrorEscaper(escaper).discoTrigger
+                            const discoTrigger = GetMirrorEscaper(escaper)?.discoTrigger
 
                             if (discoTrigger) {
                                 DestroyTrigger(discoTrigger)
-                                ;(GetMirrorEscaper(escaper).discoTrigger as any) = null
+                                ;(GetMirrorEscaper(escaper)!.discoTrigger as any) = null
                             }
 
                             Text.P(escaper.getPlayer(), 'disco off')
@@ -521,7 +521,7 @@ const initCommandAll = () => {
                 }
             }
 
-            ;[escaper.discoTrigger, GetMirrorEscaper(escaper).discoTrigger].forEach(trigger => {
+            ;[escaper.discoTrigger, GetMirrorEscaper(escaper)?.discoTrigger].forEach(trigger => {
                 if (trigger) {
                     DestroyTrigger(trigger)
                     trigger = CreateTrigger()
@@ -555,7 +555,7 @@ const initCommandAll = () => {
                 while (true) {
                     if (i >= Globals.udg_nb_used_terrains) break
                     str = udg_colorCode[TEAL] + I2S(i + 1) + ' : '
-                    str = str + TerrainFunctions.GetTerrainData(Globals.udg_used_terrain_types[i])
+                    str = str + GetTerrainData(Globals.udg_used_terrain_types[i])
                     Text.P_timed(escaper.getPlayer(), TERRAIN_DATA_DISPLAY_TIME, str)
                     i = i + 1
                 }
@@ -695,7 +695,7 @@ const initCommandAll = () => {
             if (!(nbParam > 1)) {
                 return true
             }
-            EscaperSavedCommands.newCmd(escaper, param1, '-' + CommandShortcuts.GetStringAssignedFromCommand(cmd))
+            newCmd(escaper, param1, '-' + CommandShortcuts.GetStringAssignedFromCommand(cmd))
             Text.P(escaper.getPlayer(), 'new command "' + param1 + '" added')
             return true
         }
@@ -705,7 +705,7 @@ const initCommandAll = () => {
             if (!(nbParam === 1)) {
                 return true
             }
-            if (!EscaperSavedCommands.execute(escaper, param1)) {
+            if (!execute(escaper, param1)) {
                 Text.erP(escaper.getPlayer(), 'unknown command name')
             }
             return true

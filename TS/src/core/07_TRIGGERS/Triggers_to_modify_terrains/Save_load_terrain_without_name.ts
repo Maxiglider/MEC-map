@@ -2,7 +2,7 @@ import { Constants, LARGEUR_CASE } from 'core/01_libraries/Constants'
 import { Text } from 'core/01_libraries/Text'
 import { TerrainType } from 'core/04_STRUCTURES/TerrainType/TerrainType'
 import { udg_terrainTypes } from '../../../../globals'
-import { Modify_terrain_functions } from '../Modify_terrain_Functions/Modify_terrain_functions'
+import { ChangeTerrainType } from '../Modify_terrain_Functions/Modify_terrain_functions'
 import { TerrainModifyingTrig } from './Terrain_modifying_trig'
 
 const initSaveLoadTerrainWithoutName = () => {
@@ -59,7 +59,7 @@ const initSaveLoadTerrainWithoutName = () => {
                 const terrainType = terrainSave[terrainSave_id]
 
                 if (terrainType !== null) {
-                    Modify_terrain_functions.ChangeTerrainType(x, y, terrainType.getTerrainTypeId())
+                    ChangeTerrainType(x, y, terrainType.getTerrainTypeId())
                 }
 
                 terrainSave_id = terrainSave_id + 1

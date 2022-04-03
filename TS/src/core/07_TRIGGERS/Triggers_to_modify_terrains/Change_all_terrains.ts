@@ -3,7 +3,7 @@ import { Text } from 'core/01_libraries/Text'
 import { TerrainType } from 'core/04_STRUCTURES/TerrainType/TerrainType'
 import { Globals } from 'core/09_From_old_Worldedit_triggers/globals_variables_and_triggers'
 import { udg_terrainTypes } from '../../../../globals'
-import { Modify_terrain_functions } from '../Modify_terrain_Functions/Modify_terrain_functions'
+import { ChangeTerrainType } from '../Modify_terrain_Functions/Modify_terrain_functions'
 import {
     AddNewTerrain,
     GetRandomNotUsedTerrain,
@@ -43,7 +43,7 @@ const initChangeAllTerrains = () => {
                 while (true) {
                     if (j > lastTerrainArrayId || done) break
                     if (terrainTypeId === oldTerrainTypes[j]) {
-                        Modify_terrain_functions.ChangeTerrainType(x, y, newTerrainTypes[j])
+                        ChangeTerrainType(x, y, newTerrainTypes[j])
                         done = true
                     }
                     j = j + 1

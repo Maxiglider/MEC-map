@@ -1,7 +1,7 @@
 import { Text } from 'core/01_libraries/Text'
 import { StringArrayForCache } from 'core/07_TRIGGERS/Save_map_in_gamecache/struct_StringArrayForCache'
+import { udg_monsters } from './Monster'
 import { MonsterType } from './MonsterType'
-import {udg_monsters} from "./Monster";
 
 export class MonsterTypeArray {
     private monsterTypes: MonsterType[] = []
@@ -39,8 +39,8 @@ export class MonsterTypeArray {
         try {
             this.monsterTypes[n] = new MonsterType(label, unitTypeId, scale, immolationRadius, speed, isClickable)
             this.numberOfMonsterTypes = this.numberOfMonsterTypes + 1
-        }catch(error){
-            if(typeof error == 'string'){
+        } catch (error) {
+            if (typeof error == 'string') {
                 Text.erA(error)
             }
         }
@@ -98,7 +98,7 @@ export class MonsterTypeArray {
         const mt = monster.getMonsterType()
         monster.destroy()
 
-        return mt?.getKillingEffectStr()
+        return mt?.getKillingEffectStr() || null
     }
 
     monsterUnit2MonsterType(monsterUnit: unit) {

@@ -3,7 +3,7 @@ import { Text } from 'core/01_libraries/Text'
 import { TerrainType } from 'core/04_STRUCTURES/TerrainType/TerrainType'
 import { createEvent } from 'Utils/mapUtils'
 import { udg_terrainTypes } from '../../../../globals'
-import { Modify_terrain_functions } from '../Modify_terrain_Functions/Modify_terrain_functions'
+import { ChangeTerrainType } from '../Modify_terrain_Functions/Modify_terrain_functions'
 import { TerrainModifyingTrig } from './Terrain_modifying_trig'
 
 const initReinitTerrains = () => {
@@ -65,7 +65,7 @@ const initReinitTerrains = () => {
                 while (true) {
                     if (terrainTypes[j] === null || done) break
                     if (terrainTypeId === terrainTypeIdsToReplace[j]) {
-                        Modify_terrain_functions.ChangeTerrainType(x, y, terrainTypeIds[j])
+                        ChangeTerrainType(x, y, terrainTypeIds[j])
                         done = true
                     }
                     j = j + 1

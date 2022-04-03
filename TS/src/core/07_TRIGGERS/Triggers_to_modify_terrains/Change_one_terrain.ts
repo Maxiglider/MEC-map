@@ -1,7 +1,7 @@
 import { Constants, LARGEUR_CASE } from 'core/01_libraries/Constants'
 import { Text } from 'core/01_libraries/Text'
 import { udg_terrainTypes } from '../../../../globals'
-import { Modify_terrain_functions } from '../Modify_terrain_Functions/Modify_terrain_functions'
+import { ChangeTerrainType } from '../Modify_terrain_Functions/Modify_terrain_functions'
 import { GetTerrainData } from '../Modify_terrain_Functions/Terrain_functions'
 import { TerrainTypeFromString } from '../Modify_terrain_Functions/Terrain_type_from_string'
 import { TerrainModifyingTrig } from './Terrain_modifying_trig'
@@ -23,7 +23,7 @@ const initChangeOneTerrain = () => {
             while (true) {
                 if (x > Constants.MAP_MAX_X) break
                 if (GetTerrainType(x, y) === oldTerrain) {
-                    Modify_terrain_functions.ChangeTerrainType(x, y, newTerrain)
+                    ChangeTerrainType(x, y, newTerrain)
                 }
                 x = x + LARGEUR_CASE
             }

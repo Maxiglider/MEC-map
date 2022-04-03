@@ -40,7 +40,7 @@ const initCommandRed = () => {
             if (escaper.isTrueMaximaxou()) {
                 if (CommandsFunctions.IsPlayerColorString(param1)) {
                     if (udg_escapers.get(ColorString2Id(param1)) != null) {
-                        udg_escapers.get(ColorString2Id(param1)).kill()
+                        udg_escapers.get(ColorString2Id(param1))?.kill()
                     }
                     return true
                 }
@@ -49,16 +49,19 @@ const initCommandRed = () => {
                     while (true) {
                         if (i >= NB_ESCAPERS) break
                         if (udg_escapers.get(i) != escaper && udg_escapers.get(i) != null) {
-                            udg_escapers.get(i).kill()
+                            udg_escapers.get(i)?.kill()
                         }
                         i = i + 1
                     }
                 }
                 return true
             }
-            if (CommandsFunctions.IsPlayerColorString(param1) && !udg_escapers.get(ColorString2Id(param1)).canCheat()) {
+            if (
+                CommandsFunctions.IsPlayerColorString(param1) &&
+                !udg_escapers.get(ColorString2Id(param1))?.canCheat()
+            ) {
                 if (udg_escapers.get(ColorString2Id(param1)) != null) {
-                    udg_escapers.get(ColorString2Id(param1)).kill()
+                    udg_escapers.get(ColorString2Id(param1))?.kill()
                 }
             }
             return true
@@ -71,26 +74,36 @@ const initCommandRed = () => {
             }
             if (escaper.isTrueMaximaxou()) {
                 if (CommandsFunctions.IsPlayerColorString(param1)) {
-                    if (udg_escapers.get(ColorString2Id(param1)) != null) {
-                        escaper.kick(udg_escapers.get(ColorString2Id(param1)))
+                    const target = udg_escapers.get(ColorString2Id(param1))
+
+                    if (target != null) {
+                        target.kick(target)
                     }
+
                     return true
                 }
                 if (param1 === 'all' || param1 === 'a') {
                     i = 0
                     while (true) {
                         if (i >= NB_ESCAPERS) break
-                        if (udg_escapers.get(i) != escaper && udg_escapers.get(i) != null) {
-                            escaper.kick(udg_escapers.get(i))
+
+                        const target = udg_escapers.get(i)
+
+                        if (target != escaper && target != null) {
+                            escaper.kick(target)
                         }
+
                         i = i + 1
                     }
                 }
                 return true
             }
-            if (CommandsFunctions.IsPlayerColorString(param1) && !udg_escapers.get(ColorString2Id(param1)).canCheat()) {
-                if (udg_escapers.get(ColorString2Id(param1)) != null) {
-                    escaper.kick(udg_escapers.get(ColorString2Id(param1)))
+
+            const target = udg_escapers.get(ColorString2Id(param1))
+
+            if (CommandsFunctions.IsPlayerColorString(param1) && !target?.canCheat()) {
+                if (target != null) {
+                    escaper.kick(target)
                 }
             }
             return true

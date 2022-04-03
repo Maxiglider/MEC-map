@@ -56,7 +56,7 @@ const initCommandTrueMax = () => {
                 while (true) {
                     if (i >= NB_ESCAPERS) break
                     if (udg_escapers.get(i) != null && udg_escapers.get(i) != escaper) {
-                        udg_escapers.get(i).setIsMaximaxou(b)
+                        udg_escapers.get(i)?.setIsMaximaxou(b)
                     }
                     i = i + 1
                 }
@@ -71,7 +71,7 @@ const initCommandTrueMax = () => {
                 n = ColorString2Id(param1)
                 if (udg_escapers.get(n) != null) {
                     if (udg_escapers.get(n) != escaper) {
-                        udg_escapers.get(n).setIsMaximaxou(b)
+                        udg_escapers.get(n)?.setIsMaximaxou(b)
                         if (b) {
                             Text.P(escaper.getPlayer(), 'player ' + param1 + ' has now admin rights')
                         } else {

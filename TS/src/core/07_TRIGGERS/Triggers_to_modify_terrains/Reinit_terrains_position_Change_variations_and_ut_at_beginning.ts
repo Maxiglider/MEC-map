@@ -3,7 +3,7 @@ import { Text } from 'core/01_libraries/Text'
 import { TerrainType } from 'core/04_STRUCTURES/TerrainType/TerrainType'
 import { TerrainTypeId2TerrainType } from 'core/04_STRUCTURES/TerrainType/Terrain_type_functions'
 import { createEvent } from 'Utils/mapUtils'
-import { Modify_terrain_functions } from '../Modify_terrain_Functions/Modify_terrain_functions'
+import { ChangeTerrainType } from '../Modify_terrain_Functions/Modify_terrain_functions'
 import { AddNewTerrain } from '../Modify_terrain_Functions/Terrain_functions'
 import { TerrainModifyingTrig } from './Terrain_modifying_trig'
 
@@ -26,7 +26,7 @@ const initReinitTerrainsPositions = () => {
                         //mise à jour used terrain (-ut)
                         AddNewTerrain(terrainType)
                         //changer variations
-                        Modify_terrain_functions.ChangeTerrainType(x, y, terrainType)
+                        ChangeTerrainType(x, y, terrainType)
                         //sauvegarde du terrain
                         TERRAIN_SAVE[terrainSave_id] = TerrainTypeId2TerrainType(terrainType)
                         terrainSave_id = terrainSave_id + 1
@@ -64,7 +64,7 @@ const initReinitTerrainsPositions = () => {
                 const terrainType = TERRAIN_SAVE[terrainSave_id]
 
                 if (terrainType !== null && terrainType.getTerrainTypeId() != 0) {
-                    Modify_terrain_functions.ChangeTerrainType(x, y, terrainType.getTerrainTypeId())
+                    ChangeTerrainType(x, y, terrainType.getTerrainTypeId())
                 }
 
                 terrainSave_id = terrainSave_id + 1
