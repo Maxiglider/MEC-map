@@ -1,5 +1,6 @@
 import { CACHE_SEPARATEUR_PARAM } from 'core/07_TRIGGERS/Save_map_in_gamecache/struct_StringArrayForCache'
-import { udg_terrainTypes } from '../../../../globals'
+import { getUdgTerrainTypes } from '../../../../globals'
+const udg_terrainTypes = getUdgTerrainTypes()
 import { Level } from '../Level/Level'
 
 export const METEOR_NORMAL = FourCC('MND1')

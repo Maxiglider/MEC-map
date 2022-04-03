@@ -1,4 +1,5 @@
-import { udg_terrainTypes } from '../../../../globals'
+import { getUdgTerrainTypes } from '../../../../globals'
+const udg_terrainTypes = getUdgTerrainTypes()
 import { TerrainType } from './TerrainType'
 
 export const TerrainTypeId2TerrainType = (terrainTypeId: number): TerrainType | null => {

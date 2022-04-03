@@ -2,9 +2,11 @@ import { NB_ESCAPERS } from 'core/01_libraries/Constants'
 import { Text } from 'core/01_libraries/Text'
 import { createEvent } from 'Utils/mapUtils'
 import { ChangeAllTerrains } from '../../07_TRIGGERS/Triggers_to_modify_terrains/Change_all_terrains'
-import { udg_escapers } from '../../../../globals'
+import { getUdgEscapers } from '../../../../globals'
+const udg_escapers = getUdgEscapers()
 import { udg_lives } from '../Init_structures/Init_lives'
-import { udg_levels } from "../../../../globals";
+import { getUdgLevels } from "../../../../globals"
+const udg_levels = getUdgLevels()
 
 let udg_gameIsLost = false
 export let gg_trg_Lose_a_life_and_res: trigger

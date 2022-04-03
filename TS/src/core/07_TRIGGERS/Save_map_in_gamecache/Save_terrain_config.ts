@@ -1,5 +1,6 @@
 import { Text } from 'core/01_libraries/Text'
-import { udg_terrainTypes } from '../../../../globals'
+import { getUdgTerrainTypes } from '../../../../globals'
+const udg_terrainTypes = getUdgTerrainTypes()
 
 const initSaveTerrainConfigInCache = () => {
     const SaveTerrainConfig = () => {

@@ -2,7 +2,8 @@ import { NB_PLAYERS_MAX } from 'core/01_libraries/Constants'
 import { udg_colorCode } from 'core/01_libraries/Init_colorCodes'
 import { createEvent, forRange } from 'Utils/mapUtils'
 import { AfkMode } from '../Afk_mode/Afk_mode'
-import { udg_escapers } from '../../../../globals'
+import { getUdgEscapers } from '../../../../globals'
+const udg_escapers = getUdgEscapers()
 
 export const InitTrig_A_player_leaves = () => {
     createEvent({

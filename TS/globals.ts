@@ -8,15 +8,19 @@ import type {Monster} from "./src/core/04_STRUCTURES/Monster/Monster";
 
 
 //Escapers
-export let udg_escapers: EscaperArray
+let udg_escapers: EscaperArray
 
 export const setUdgEscapers = (escaperArray: EscaperArray) => {
     udg_escapers = escaperArray
 }
 
+export const getUdgEscapers = () => {
+    return udg_escapers
+}
+
 
 //Levels
-export let udg_levels: LevelArray
+let udg_levels: LevelArray
 
 export const setUdgLEvels = (la: LevelArray) => {
     if(!udg_levels) {
@@ -24,28 +28,44 @@ export const setUdgLEvels = (la: LevelArray) => {
     }
 }
 
+export const getUdgLevels = () => {
+    return udg_levels
+}
+
 
 //Terrain types
-export let udg_terrainTypes: TerrainTypeArray
+let udg_terrainTypes: TerrainTypeArray
 
 export const setUdgTerrainTypes = (tta: TerrainTypeArray) => {
     udg_terrainTypes = tta
 }
 
+export const getUdgTerrainTypes = () => {
+    return udg_terrainTypes
+}
+
 
 //Caster types
-export let udg_casterTypes: CasterTypeArray
+let udg_casterTypes: CasterTypeArray
 
 export const setUdgCasterTypes = (cta: CasterTypeArray) => {
     udg_casterTypes = cta
 }
 
+export const getUdgCasterTypes = () => {
+    return udg_casterTypes
+}
+
 
 //Monster types
-export let udg_monsterTypes: MonsterTypeArray
+let udg_monsterTypes: MonsterTypeArray
 
 export const setUdgMonsterTypes = (mta: MonsterTypeArray) => {
     udg_monsterTypes = mta
+}
+
+export const getUdgMonsterTypes = () => {
+    return udg_monsterTypes
 }
 
 

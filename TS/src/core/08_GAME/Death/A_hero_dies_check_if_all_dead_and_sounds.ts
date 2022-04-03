@@ -1,10 +1,12 @@
 import { COOP_REVIVE_DIST, NB_ESCAPERS } from 'core/01_libraries/Constants'
 import { IsHero } from 'core/04_STRUCTURES/Escaper/Escaper_functions'
 import { createEvent } from 'Utils/mapUtils'
-import { udg_terrainTypes } from '../../../../globals'
+import { getUdgTerrainTypes } from '../../../../globals'
+const udg_terrainTypes = getUdgTerrainTypes()
 import { Globals } from '../../09_From_old_Worldedit_triggers/globals_variables_and_triggers'
 import { AfkMode } from '../Afk_mode/Afk_mode'
-import { udg_escapers } from '../../../../globals'
+import { getUdgEscapers } from '../../../../globals'
+const udg_escapers = getUdgEscapers()
 import { udg_coopModeActive } from '../Mode_coop/creation_dialogue'
 import { DeplacementHeroHorsDeathPath } from '../Mode_coop/deplacement_heros_hors_death_path'
 import { gg_trg_Lose_a_life_and_res } from './Lose_a_life_and_res'

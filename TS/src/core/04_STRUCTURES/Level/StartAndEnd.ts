@@ -1,6 +1,7 @@
 import { Text } from 'core/01_libraries/Text'
 //import { CACHE_SEPARATEUR_PARAM } from 'core/07_TRIGGERS/Save_map_in_gamecache/struct_StringArrayForCache'
-import { udg_levels } from "../../../../globals";
+import { getUdgLevels } from "../../../../globals"
+const udg_levels = getUdgLevels()
 import { createEvent } from 'Utils/mapUtils'
 import { Hero2Escaper } from '../Escaper/Escaper_functions'
 

@@ -4,8 +4,15 @@ import { DUMMY_POWER_CIRCLE, GM_KILLING_EFFECT } from 'core/01_libraries/Constan
 import { Monster } from 'core/04_STRUCTURES/Monster/Monster'
 import { ClearMob } from 'core/04_STRUCTURES/Monster_properties/ClearMob'
 import { createEvent } from 'Utils/mapUtils'
-import {udg_monsters, udg_monsterTypes} from '../../../../globals'
-import { udg_escapers } from '../../../../globals'
+import {
+    getUdgEscapers,
+    getUdgMonsterTypes, udg_monsters,
+} from '../../../../globals'
+
+const udg_escapers = getUdgEscapers()
+const udg_monsterTypes = getUdgMonsterTypes()
+
+
 
 export const InitTrig_InvisUnit_is_getting_damage = () => {
     let TAILLE_UNITE = 100

@@ -1,8 +1,11 @@
 import { NB_ESCAPERS } from 'core/01_libraries/Constants'
- import { udg_escapers } from '../../../../globals'
-import { udg_levels } from "../../../../globals";
+ import { getUdgEscapers } from '../../../../globals'
+const udg_escapers = getUdgEscapers()
+import { getUdgLevels } from "../../../../globals"
+const udg_levels = getUdgLevels()
 import { forRange } from 'Utils/mapUtils'
-import { udg_terrainTypes } from '../../../../globals'
+import { getUdgTerrainTypes } from '../../../../globals'
+const udg_terrainTypes = getUdgTerrainTypes()
 
 export class KillingTimers {
     private timers: timer[] = []

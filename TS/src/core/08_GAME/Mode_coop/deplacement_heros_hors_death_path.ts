@@ -1,4 +1,5 @@
-import { udg_terrainTypes } from '../../../../globals'
+import { getUdgTerrainTypes } from '../../../../globals'
+const udg_terrainTypes = getUdgTerrainTypes()
 const initDeplacementHeroHorsDeathPath = () => {
     const GRADUATION_ANGLE = 5
     const VALEUR_DECALAGE = 60

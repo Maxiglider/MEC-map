@@ -1,5 +1,6 @@
 import { Text } from 'core/01_libraries/Text'
-import { udg_casterTypes } from '../../../../globals'
+import { getUdgCasterTypes } from '../../../../globals'
+const udg_casterTypes = getUdgCasterTypes()
 //import { SaveLevels } from './Save_levels'
 
 const initSaveCasterTypes = () => {

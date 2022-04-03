@@ -2,7 +2,8 @@ import { Constants, LARGEUR_CASE, NB_MAX_OF_TERRAINS } from 'core/01_libraries/C
 import { Text } from 'core/01_libraries/Text'
 import { TerrainType } from 'core/04_STRUCTURES/TerrainType/TerrainType'
 import { Globals } from 'core/09_From_old_Worldedit_triggers/globals_variables_and_triggers'
-import { udg_terrainTypes } from '../../../../globals'
+import { getUdgTerrainTypes } from '../../../../globals'
+const udg_terrainTypes = getUdgTerrainTypes()
 import { ChangeTerrainType } from '../Modify_terrain_Functions/Modify_terrain_functions'
 import {
     AddNewTerrain,

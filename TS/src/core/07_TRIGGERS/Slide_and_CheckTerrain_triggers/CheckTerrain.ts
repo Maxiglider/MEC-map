@@ -6,9 +6,11 @@ import { TerrainType } from 'core/04_STRUCTURES/TerrainType/TerrainType'
 import { TerrainTypeDeath } from 'core/04_STRUCTURES/TerrainType/TerrainTypeDeath'
 import { TerrainTypeSlide } from 'core/04_STRUCTURES/TerrainType/TerrainTypeSlide'
 import { TerrainTypeWalk } from 'core/04_STRUCTURES/TerrainType/TerrainTypeWalk'
- import { udg_escapers } from '../../../../globals'
+ import { getUdgEscapers } from '../../../../globals'
+const udg_escapers = getUdgEscapers()
 import { createEvent } from 'Utils/mapUtils'
-import { udg_terrainTypes } from '../../../../globals'
+import { getUdgTerrainTypes } from '../../../../globals'
+const udg_terrainTypes = getUdgTerrainTypes()
 import { AutoContinueAfterSliding } from './Auto_continue_after_sliding'
 
 const initCheckTerrainTrigger = () => {

@@ -1,5 +1,6 @@
 import { LARGEUR_CASE } from 'core/01_libraries/Constants'
-import { udg_terrainTypes } from '../../../../globals'
+import { getUdgTerrainTypes } from '../../../../globals'
+const udg_terrainTypes = getUdgTerrainTypes()
 import { TerrainType } from '../../04_STRUCTURES/TerrainType/TerrainType'
 import {MakeAction} from "./MakeAction";
 import {Constants} from "core/01_libraries/Constants";

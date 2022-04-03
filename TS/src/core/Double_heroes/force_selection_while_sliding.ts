@@ -1,7 +1,9 @@
 import { NB_PLAYERS_MAX } from 'core/01_libraries/Constants'
 import { ForceSelectHeroes, GetMirrorEscaper } from 'core/04_STRUCTURES/Escaper/Escaper_functions'
- import { udg_escapers } from '../../../globals'
+ import {getUdgEscapers} from '../../../globals'
 import { udg_doubleHeroesEnabled } from './double_heroes_config'
+
+const udg_escapers = getUdgEscapers()
 
 const initForceSelectionWhileSliding = () => {
     const ForceSelectionWhileSliding_Actions = (): void => {

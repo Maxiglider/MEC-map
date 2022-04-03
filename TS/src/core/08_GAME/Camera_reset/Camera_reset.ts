@@ -1,4 +1,5 @@
- import { udg_escapers } from '../../../../globals'
+ import { getUdgEscapers } from '../../../../globals'
+const udg_escapers = getUdgEscapers()
 import { createEvent, forRange } from 'Utils/mapUtils'
 
 export const InitTrig_Camera_reset = () => {

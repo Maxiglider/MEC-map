@@ -1,5 +1,6 @@
 import { NB_ESCAPERS } from 'core/01_libraries/Constants'
-import { udg_escapers } from '../../../../globals'
+import { getUdgEscapers } from '../../../../globals'
+const udg_escapers = getUdgEscapers()
 
 const initDisco = () => {
     const ApplyRandomColor = (n: number) => {

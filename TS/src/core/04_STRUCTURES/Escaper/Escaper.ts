@@ -33,7 +33,7 @@ import { MakeSetUnitMonsterType } from 'core/05_MAKE_STRUCTURES/Make_set_unit_pr
 import { MakeSetUnitTeleportPeriod } from 'core/05_MAKE_STRUCTURES/Make_set_unit_properties/MakeSetUnitTeleportPeriod'
 import { AfkMode } from 'core/08_GAME/Afk_mode/Afk_mode'
 import { udg_coop_index_son } from 'core/08_GAME/Mode_coop/coop_init_sounds'
-import {udg_escapers, udg_terrainTypes} from '../../../../globals'
+import {getUdgEscapers, getUdgTerrainTypes} from '../../../../globals'
 import type { Make } from '../../05_MAKE_STRUCTURES/Make/Make'
 import type { MakeAction } from '../../05_MAKE_STRUCTURES/MakeLastActions/MakeAction'
 import { MakeLastActions } from '../../05_MAKE_STRUCTURES/MakeLastActions/MakeLastActions'
@@ -54,7 +54,8 @@ import { SlideTrigger } from '../../07_TRIGGERS/Slide_and_CheckTerrain_triggers/
 import { Trig_InvisUnit_is_getting_damage } from '../../08_GAME/Death/InvisUnit_is_getting_damage'
 import {HERO_START_ANGLE} from '../../08_GAME/Init_game/Heroes'
 import { MessageHeroDies } from '../../08_GAME/Init_game/Message_heroDies'
-import { udg_levels } from "../../../../globals";
+import { getUdgLevels } from "../../../../globals"
+const udg_levels = getUdgLevels()
 import { Level } from '../Level/Level'
 import { DEPART_PAR_DEFAUT } from '../Level/StartAndEnd'
 import {METEOR_NORMAL, udg_meteors} from '../Meteor/Meteor'
@@ -69,6 +70,8 @@ import type {CasterType} from "../Caster/CasterType";
 import {CommandShortcuts} from "../../08_GAME/Shortcuts/Using_shortcut";
 
 const SHOW_REVIVE_EFFECTS = false
+const udg_escapers = getUdgEscapers()
+const udg_terrainTypes = getUdgTerrainTypes()
 
 export class Escaper {
     private escaperId: number

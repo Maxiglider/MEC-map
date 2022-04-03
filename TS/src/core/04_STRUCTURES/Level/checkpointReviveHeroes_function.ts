@@ -1,5 +1,6 @@
 import { NB_ESCAPERS } from 'core/01_libraries/Constants'
- import { udg_escapers } from '../../../../globals'
+ import { getUdgEscapers } from '../../../../globals'
+const udg_escapers = getUdgEscapers()
 import { StopUnit } from '../../01_libraries/Basic_functions'
 import { ChangeAllTerrains } from '../../07_TRIGGERS/Triggers_to_modify_terrains/Change_all_terrains'
 import type { Escaper } from '../Escaper/Escaper'

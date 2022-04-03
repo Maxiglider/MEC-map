@@ -1,11 +1,13 @@
 import { NB_ESCAPERS, TEAL, TERRAIN_DATA_DISPLAY_TIME } from 'core/01_libraries/Constants'
 import { Text } from 'core/01_libraries/Text'
 import { CACHE_SEPARATEUR_PARAM } from 'core/07_TRIGGERS/Save_map_in_gamecache/struct_StringArrayForCache'
-import { udg_escapers, udg_levels } from '../../../../globals'
+import {getUdgEscapers, getUdgLevels} from '../../../../globals'
 import { udg_colorCode } from '../../01_libraries/Init_colorCodes'
 import { Level } from '../Level/Level'
 import { MonsterType } from '../Monster/MonsterType'
 
+const udg_escapers = getUdgEscapers()
+const udg_levels = getUdgLevels()
 
 export const DEFAULT_CASTER_PROJECTILE_SPEED = 600
 export const MIN_CASTER_PROJECTILE_SPEED = 100

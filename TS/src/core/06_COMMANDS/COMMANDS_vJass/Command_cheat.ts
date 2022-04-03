@@ -7,8 +7,10 @@ import {Escaper} from 'core/04_STRUCTURES/Escaper/Escaper'
 import {GetMirrorEscaper} from 'core/04_STRUCTURES/Escaper/Escaper_functions'
 import {METEOR_CHEAT} from 'core/04_STRUCTURES/Meteor/Meteor'
 import {Gravity} from 'core/07_TRIGGERS/Slide_and_CheckTerrain_triggers/Gravity'
- import { udg_escapers } from '../../../../globals'
-import { udg_levels } from "../../../../globals";
+ import { getUdgEscapers } from '../../../../globals'
+const udg_escapers = getUdgEscapers()
+import { getUdgLevels } from "../../../../globals"
+const udg_levels = getUdgLevels()
 import {MeteorFunctions} from '../../04_STRUCTURES/Meteor/Meteor_functions'
 import {Trig_InvisUnit_is_getting_damage} from '../../08_GAME/Death/InvisUnit_is_getting_damage'
 import {CmdName, CmdParam, IsPlayerColorString, NbParam, NoParam} from "./Command_functions";

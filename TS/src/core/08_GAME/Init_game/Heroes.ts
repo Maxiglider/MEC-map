@@ -1,7 +1,7 @@
 import {NB_ESCAPERS} from 'core/01_libraries/Constants'
 import {udg_doubleHeroesEnabled} from 'core/Double_heroes/double_heroes_config'
 import {createEvent} from 'Utils/mapUtils'
-import {udg_escapers} from '../../../../globals'
+import {getUdgEscapers} from '../../../../globals'
 
 
 let startPositions: location[] = []
@@ -84,8 +84,8 @@ const Trig_heroes_Actions = () => {
     while (true) {
         if (i >= NB_ESCAPERS) break
         n = playerIdsRandomized[i]
-        if (udg_escapers.get(n) !== null) {
-            udg_escapers
+        if (getUdgEscapers().get(n)) {
+            getUdgEscapers()
                 .get(n)
                 ?.createHero(
                     GetLocationX(startPositionsRandomized[n]),

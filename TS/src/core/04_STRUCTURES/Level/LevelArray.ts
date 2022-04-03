@@ -14,7 +14,9 @@ import type { ClearMobArray } from '../Monster_properties/ClearMobArray'
 import { Level } from './Level'
 import type { VisibilityModifierArray } from './VisibilityModifierArray'
 import {IsLevelBeingMade} from "./Level_functions";
-import {udg_escapers} from "../../../../globals";
+import {getUdgEscapers} from "../../../../globals";
+
+const udg_escapers = getUdgEscapers()
 
 
 export class LevelArray {

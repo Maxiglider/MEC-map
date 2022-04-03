@@ -1,6 +1,7 @@
 import {MakeOneByOneOrTwoClicks} from "../Make/MakeOneByOneOrTwoClicks";
 import {Level} from "../../04_STRUCTURES/Level/Level";
-import { udg_levels } from "../../../../globals";
+import { getUdgLevels } from "../../../../globals"
+const udg_levels = getUdgLevels()
 import {Text} from "../../01_libraries/Text";
 
 

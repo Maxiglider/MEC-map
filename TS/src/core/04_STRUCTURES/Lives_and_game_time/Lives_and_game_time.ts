@@ -1,7 +1,8 @@
 import { NB_LIVES_AT_BEGINNING } from 'core/01_libraries/Constants'
 import { udg_colorCode } from 'core/01_libraries/Init_colorCodes'
 import { Text } from 'core/01_libraries/Text'
-import { udg_levels } from "../../../../globals";
+import { getUdgLevels } from "../../../../globals"
+const udg_levels = getUdgLevels()
 
 const LIVES_PLAYER = Player(6) //GREEN
 

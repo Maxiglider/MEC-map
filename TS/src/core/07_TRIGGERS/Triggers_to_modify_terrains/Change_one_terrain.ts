@@ -1,6 +1,7 @@
 import { Constants, LARGEUR_CASE } from 'core/01_libraries/Constants'
 import { Text } from 'core/01_libraries/Text'
-import { udg_terrainTypes } from '../../../../globals'
+import { getUdgTerrainTypes } from '../../../../globals'
+const udg_terrainTypes = getUdgTerrainTypes()
 import { ChangeTerrainType } from '../Modify_terrain_Functions/Modify_terrain_functions'
 import { GetTerrainData } from '../Modify_terrain_Functions/Terrain_functions'
 import { TerrainTypeFromString } from '../Modify_terrain_Functions/Terrain_type_from_string'

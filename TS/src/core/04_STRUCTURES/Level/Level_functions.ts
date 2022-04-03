@@ -1,6 +1,9 @@
 import {NB_ESCAPERS} from 'core/01_libraries/Constants'
-import { udg_escapers, udg_levels } from "../../../../globals";
+import {getUdgEscapers, getUdgLevels} from "../../../../globals";
 import {Level} from './Level'
+
+const udg_escapers = getUdgEscapers()
+const udg_levels = getUdgLevels()
 
 export const IsLevelBeingMade = (level: Level): boolean => {
     for (let i = 0; i < NB_ESCAPERS; i++) {

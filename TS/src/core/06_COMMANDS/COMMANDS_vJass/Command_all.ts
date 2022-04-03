@@ -17,9 +17,11 @@ import {Escaper} from 'core/04_STRUCTURES/Escaper/Escaper'
 import {ColorInfo, GetMirrorEscaper} from 'core/04_STRUCTURES/Escaper/Escaper_functions'
 import {DisplayTerrainDataToPlayer, GetTerrainData} from 'core/07_TRIGGERS/Modify_terrain_Functions/Terrain_functions'
 import {Apm} from 'core/08_GAME/Apm_clics_par_minute/Apm'
- import { udg_escapers } from '../../../../globals'
+ import { getUdgEscapers } from '../../../../globals'
+const udg_escapers = getUdgEscapers()
 import {udg_lives} from 'core/08_GAME/Init_structures/Init_lives'
-import { udg_levels } from "../../../../globals";
+import { getUdgLevels } from "../../../../globals"
+const udg_levels = getUdgLevels()
 import {Globals} from 'core/09_From_old_Worldedit_triggers/globals_variables_and_triggers'
 import {EscaperEffectFunctions} from '../../04_STRUCTURES/Escaper/EscaperEffect_functions'
 import {Disco} from '../../04_STRUCTURES/Escaper/Escaper_disco'

@@ -1,6 +1,7 @@
 import { B2S } from 'core/01_libraries/Basic_functions'
 import { Text } from 'core/01_libraries/Text'
-import { udg_levels } from "../../../../globals";
+import { getUdgLevels } from "../../../../globals"
+const udg_levels = getUdgLevels()
 import { Ascii2String } from '../../01_libraries/Ascii'
 import {
     MAX_MOVE_SPEED,
@@ -11,7 +12,8 @@ import {
 } from '../../01_libraries/Constants'
 import { udg_colorCode } from '../../01_libraries/Init_colorCodes'
 import { CACHE_SEPARATEUR_PARAM } from '../../07_TRIGGERS/Save_map_in_gamecache/struct_StringArrayForCache'
- import { udg_escapers } from '../../../../globals'
+ import { getUdgEscapers } from '../../../../globals'
+const udg_escapers = getUdgEscapers()
 import { Level } from '../Level/Level'
 import { IMMOLATION_SKILLS } from './Immolation_skills'
 

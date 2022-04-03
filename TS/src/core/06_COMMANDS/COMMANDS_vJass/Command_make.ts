@@ -18,8 +18,12 @@ import {TerrainTypeSlide} from 'core/04_STRUCTURES/TerrainType/TerrainTypeSlide'
 import {TerrainTypeWalk} from 'core/04_STRUCTURES/TerrainType/TerrainTypeWalk'
 import {ExchangeTerrains} from 'core/07_TRIGGERS/Triggers_to_modify_terrains/Exchange_terrains'
 import {RandomizeTerrains} from 'core/07_TRIGGERS/Triggers_to_modify_terrains/Randomize_terrains'
-import { udg_levels } from "../../../../globals";
-import {udg_casterTypes, udg_monsterTypes, udg_terrainTypes} from '../../../../globals'
+import {
+    getUdgCasterTypes,
+    getUdgLevels,
+    getUdgMonsterTypes,
+    getUdgTerrainTypes
+} from "../../../../globals"
 import {TerrainTypeFromString} from '../../07_TRIGGERS/Modify_terrain_Functions/Terrain_type_from_string'
 import {
     CACHE_SEPARATEUR_ITEM,
@@ -38,6 +42,12 @@ import {
     DEFAULT_CASTER_RANGE, MIN_CASTER_LOAD_TIME, MIN_CASTER_PROJECTILE_SPEED
 } from "../../04_STRUCTURES/Caster/CasterType";
 
+
+
+const udg_levels = getUdgLevels()
+const udg_casterTypes = getUdgCasterTypes()
+const udg_monsterTypes = getUdgMonsterTypes()
+const udg_terrainTypes = getUdgTerrainTypes()
 
 export const ExecuteCommandMake = (escaper: Escaper, cmd: string): boolean => {
     let name = CmdName(cmd)

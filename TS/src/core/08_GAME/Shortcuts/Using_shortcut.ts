@@ -3,10 +3,13 @@ import { Text } from 'core/01_libraries/Text'
 import { Hero2Escaper, IsHero } from 'core/04_STRUCTURES/Escaper/Escaper_functions'
 import { literalArray } from 'Utils/ArrayUtils'
 import { createEvent } from 'Utils/mapUtils'
-import {udg_escapers} from "../../../../globals";
+import {
+    getUdgEscapers,
+} from "../../../../globals";
 import {GREY} from "../../01_libraries/Constants";
 import {execute} from "../../04_STRUCTURES/Escaper/EscaperSavedCommands";
 
+const udg_escapers = getUdgEscapers()
 
 const initCommandShortcuts = () => {
     const shortcutCommands: { [K in typeof shortcuts[0]]: (string | null)[] } = {

@@ -1,8 +1,10 @@
 import {NB_ESCAPERS} from 'core/01_libraries/Constants'
 import {ColorString2Id} from 'core/01_libraries/Init_colorCodes'
 import {Escaper} from 'core/04_STRUCTURES/Escaper/Escaper'
- import { udg_escapers } from '../../../../globals'
-import { udg_levels } from "../../../../globals";
+ import { getUdgEscapers } from '../../../../globals'
+const udg_escapers = getUdgEscapers()
+import { getUdgLevels } from "../../../../globals"
+const udg_levels = getUdgLevels()
 import {CmdName, CmdParam, IsPlayerColorString, NbParam, NoParam} from './Command_functions'
 
 

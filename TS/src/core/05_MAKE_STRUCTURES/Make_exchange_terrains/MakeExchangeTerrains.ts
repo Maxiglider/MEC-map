@@ -1,7 +1,8 @@
 import {MakeOneByOneOrTwoClicks} from "../Make/MakeOneByOneOrTwoClicks";
-import {TerrainType} from "../../04_STRUCTURES/TerrainType/TerrainType";
-import {udg_terrainTypes} from "../../../../globals";
+import {getUdgTerrainTypes} from "../../../../globals";
 import {ExchangeTerrains} from "../../07_TRIGGERS/Triggers_to_modify_terrains/Exchange_terrains";
+
+const udg_terrainTypes = getUdgTerrainTypes()
 
 
 export class MakeExchangeTerrains extends MakeOneByOneOrTwoClicks {
