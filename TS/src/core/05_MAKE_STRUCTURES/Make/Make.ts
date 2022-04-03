@@ -2,11 +2,9 @@ import { IsIssuedOrder, StopUnit } from 'core/01_libraries/Basic_functions'
 import { Hero2Escaper } from 'core/04_STRUCTURES/Escaper/Escaper_functions'
 import { Escaper } from '../../04_STRUCTURES/Escaper/Escaper'
 
-
 export const MAKE_LAST_CLIC_UNIT_ID = FourCC('e001') //à remplacer par l'id de l'unité choisie (need couleur variable)
 export const MAKE_CANT_CANCEL_MORE = 'Nothing else to cancel !'
 export const MAKE_CANT_REDO_MORE = 'Nothing else to redo !'
-
 
 export abstract class Make {
     makerOwner: player
@@ -24,8 +22,8 @@ export abstract class Make {
         this.kind = kind
 
         const escaper = Hero2Escaper(maker)
-        if(!escaper){
-            throw "Make : escaper not found"
+        if (!escaper) {
+            throw 'Make : escaper not found'
         }
 
         this.escaper = escaper
@@ -54,7 +52,7 @@ export abstract class Make {
         return true
     }
 
-    abstract doActions(): void
+    abstract doActions(this: void): void
 
     enableTrigger() {
         if (this.t) DestroyTrigger(this.t)

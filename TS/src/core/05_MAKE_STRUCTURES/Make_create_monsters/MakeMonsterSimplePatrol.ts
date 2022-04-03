@@ -1,11 +1,11 @@
 import { GetLocDist } from 'core/01_libraries/Basic_functions'
 import { Text } from 'core/01_libraries/Text'
 import { PATROL_DISTANCE_MIN } from '../../01_libraries/Constants'
-import { MakeMonsterAction } from '../MakeLastActions/MakeMonsterAction'
 import { MonsterSimplePatrol } from '../../04_STRUCTURES/Monster/MonsterSimplePatrol'
 import { MonsterType } from '../../04_STRUCTURES/Monster/MonsterType'
 import { IsTerrainTypeOfKind } from '../../04_STRUCTURES/TerrainType/Terrain_type_functions'
 import { MakeOneByOneOrTwoClicks } from '../Make/MakeOneByOneOrTwoClicks'
+import { MakeMonsterAction } from '../MakeLastActions/MakeMonsterAction'
 
 export class MakeMonsterSimplePatrol extends MakeOneByOneOrTwoClicks {
     private static MIN_DIST = 5
@@ -19,8 +19,7 @@ export class MakeMonsterSimplePatrol extends MakeOneByOneOrTwoClicks {
     private mt: MonsterType
 
     constructor(maker: unit, mode: string, mt: MonsterType) {
-        const acceptedModes = ['normal', 'string', 'auto']
-        super(maker, 'monsterCreateSimplePatrol', mode, acceptedModes)
+        super(maker, 'monsterCreateSimplePatrol', mode, ['normal', 'string', 'auto'])
 
         if (!mt) {
             throw this.constructor.name + ' : monster type required'
