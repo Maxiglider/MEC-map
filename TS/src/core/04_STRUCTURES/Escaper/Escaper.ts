@@ -1316,7 +1316,7 @@ export class Escaper {
 
         if (this.hero) {
             this.revive(GetUnitX(this.hero), GetUnitY(this.hero))
-            RunSoundOnUnit(udg_coop_index_son, this.hero)
+            //RunSoundOnUnit(udg_coop_index_son, this.hero) //todomax make sound work
             SetUnitAnimation(this.hero, 'channel')
             this.absoluteSlideSpeed(0)
             this.setCoopInvul(true)
@@ -1324,7 +1324,7 @@ export class Escaper {
 
         if (mirrorHero && mirrorEscaper) {
             mirrorEscaper.revive(GetUnitX(mirrorHero), GetUnitY(mirrorHero))
-            RunSoundOnUnit(udg_coop_index_son, mirrorHero)
+            //RunSoundOnUnit(udg_coop_index_son, mirrorHero)
             SetUnitAnimation(mirrorHero, 'channel')
             mirrorEscaper.absoluteSlideSpeed(0)
             mirrorEscaper.setCoopInvul(true)

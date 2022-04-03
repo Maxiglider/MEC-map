@@ -1,3 +1,4 @@
+/*  todomax Remake all this for Reforged with TS
 import { NB_ESCAPERS } from 'core/01_libraries/Constants'
 import { Text } from 'core/01_libraries/Text'
 import { Level } from 'core/04_STRUCTURES/Level/Level'
@@ -370,3 +371,5 @@ const initSaveLevels = () => {
 }
 
 export const SaveLevels = initSaveLevels()
+
+ */
