@@ -1,6 +1,6 @@
 import { LOW_PERIOD_FOR_WORK, NB_ESCAPERS } from 'core/01_libraries/Constants'
 import { Escaper } from 'core/04_STRUCTURES/Escaper/Escaper'
- import { udg_escapers } from '../../../../globals'
+import { udg_escapers } from '../../../../globals'
 
 export let gg_trg_Terrain_modifying_trig: trigger
 
@@ -12,8 +12,8 @@ const initTerrainModifyingTrig = () => {
     //maintenant on fait ligne par ligne (--> 1)
 
     gg_trg_Terrain_modifying_trig = CreateTrigger()
-    DisableTrigger(TerrainModifyingTrig.gg_trg_Terrain_modifying_trig)
-    TriggerRegisterTimerEvent(TerrainModifyingTrig.gg_trg_Terrain_modifying_trig, LOW_PERIOD_FOR_WORK, true)
+    DisableTrigger(gg_trg_Terrain_modifying_trig)
+    TriggerRegisterTimerEvent(gg_trg_Terrain_modifying_trig, LOW_PERIOD_FOR_WORK, true)
 
     const StopEnabledCheckTerrainTriggers = () => {
         let escaper: Escaper | null
