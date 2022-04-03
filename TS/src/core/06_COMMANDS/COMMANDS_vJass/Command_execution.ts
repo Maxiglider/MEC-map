@@ -112,7 +112,7 @@ createEvent({
 
 
 //Handle buffer of commands
-createEvent({
+createEvent({ //todomax find a better solution than a periodic timer
     events: [t => TriggerRegisterTimerEvent(t, 0.001, true)],
     actions: [
         () => {
