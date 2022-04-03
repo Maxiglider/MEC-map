@@ -1,8 +1,9 @@
 //todomax execute this at start of the game
 import { CACHE_SEPARATEUR_PARAM } from '../../07_TRIGGERS/Save_map_in_gamecache/struct_StringArrayForCache'
-import { Monster, udg_monsters } from './Monster'
+import { Monster } from './Monster'
 import { MonsterType } from './MonsterType'
 import { NewPatrolMonster } from './Monster_creation_functions'
+import {udg_monsters} from "../../../../globals";
 
 const initMonsterSimplePatrol = () => {
     //vérification que les monstres multi-patrouilles patrouillent bien

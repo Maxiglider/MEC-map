@@ -1,7 +1,7 @@
 import { Text } from 'core/01_libraries/Text'
 import { StringArrayForCache } from 'core/07_TRIGGERS/Save_map_in_gamecache/struct_StringArrayForCache'
-import { udg_monsters } from './Monster'
 import { MonsterType } from './MonsterType'
+import {udg_monsters} from "../../../../globals";
 
 export class MonsterTypeArray {
     private monsterTypes: MonsterType[] = []

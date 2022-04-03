@@ -1,7 +1,8 @@
 import { CACHE_SEPARATEUR_PARAM } from 'core/07_TRIGGERS/Save_map_in_gamecache/struct_StringArrayForCache'
-import { Monster, udg_monsters } from './Monster'
+import { Monster } from './Monster'
 import { MonsterType } from './MonsterType'
 import { NewImmobileMonster } from './Monster_creation_functions'
+import {udg_monsters} from "../../../../globals";
 
 export class MonsterNoMove extends Monster {
     private x: number

@@ -3,6 +3,7 @@ import type { MonsterTypeArray } from './src/core/04_STRUCTURES/Monster/MonsterT
 import type { TerrainTypeArray } from './src/core/04_STRUCTURES/TerrainType/TerrainTypeArray'
 import type { EscaperArray } from './src/core/04_STRUCTURES/Escaper/EscaperArray'
 import type {LevelArray} from "./src/core/04_STRUCTURES/Level/LevelArray";
+import type {Monster} from "./src/core/04_STRUCTURES/Monster/Monster";
 
 
 
@@ -32,6 +33,14 @@ export const setUdgTerrainTypes = (tta: TerrainTypeArray) => {
 }
 
 
+//Caster types
+export let udg_casterTypes: CasterTypeArray
+
+export const setUdgCasterTypes = (cta: CasterTypeArray) => {
+    udg_casterTypes = cta
+}
+
+
 //Monster types
 export let udg_monsterTypes: MonsterTypeArray
 
@@ -40,9 +49,5 @@ export const setUdgMonsterTypes = (mta: MonsterTypeArray) => {
 }
 
 
-//Caster types
-export let udg_casterTypes: CasterTypeArray
-
-export const setUdgCasterTypes = (cta: CasterTypeArray) => {
-    udg_casterTypes = cta
-}
+//Monsters
+export let udg_monsters: Monster[] = []

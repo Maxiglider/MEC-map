@@ -1,5 +1,5 @@
 import { createEvent } from 'Utils/mapUtils'
-import { udg_monsters } from './Monster'
+import {udg_monsters} from "../../../../globals";
 
 const initMonstersClickableSetLife = () => {
     const monstersClickable = CreateGroup()

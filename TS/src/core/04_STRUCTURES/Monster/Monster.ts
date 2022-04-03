@@ -9,8 +9,8 @@ import { MonsterNoMove } from './MonsterNoMove'
 import { MonsterSimplePatrol } from './MonsterSimplePatrol'
 import { MonsterType } from './MonsterType'
 import { MonstersClickableSetLife } from './trig_Monsters_clickable_set_life'
+import {udg_monsters} from "../../../../globals";
 
-export const udg_monsters: Monster[] = []
 
 export const countMonstersAccordingToMode = (monsters: Monster[], mode?: string) => {
     if (!mode) mode = 'all'
@@ -55,6 +55,7 @@ export abstract class Monster {
     constructor(monsterType?: MonsterType) {
         this.mt = monsterType
         this.id = udg_monsters.length
+
         udg_monsters[this.id] = this
 
         this.life = 0
