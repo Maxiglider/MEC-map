@@ -7,7 +7,14 @@ import { udg_colorCode } from '../../01_libraries/Init_colorCodes'
 import { Level } from '../Level/Level'
 import { MonsterType } from '../Monster/MonsterType'
 
-const MIN_CASTER_LOAD_TIME = 0.2
+
+export const DEFAULT_CASTER_PROJECTILE_SPEED = 600
+export const MIN_CASTER_PROJECTILE_SPEED = 100
+export const DEFAULT_CASTER_RANGE = 1000
+export const MIN_CASTER_LOAD_TIME = 0.2
+export const DEFAULT_CASTER_LOAD_TIME = 1.0
+export const DEFAULT_CASTER_ANIMATION = "spell"
+
 
 export class CasterType {
     label: string

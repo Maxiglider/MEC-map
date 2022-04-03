@@ -1,42 +1,37 @@
-import { IsIssuedOrder, StopUnit } from 'core/01_libraries/Basic_functions'
+import {IsIssuedOrder, StopUnit} from 'core/01_libraries/Basic_functions'
 
-const initTeleport = () => {
-    let teleTriggers: trigger[] = []
-    let onceOnly: boolean[] = []
 
-    const Teleport_Actions = () => {
-        let hero: unit | null = GetTriggerUnit()
+let teleTriggers: trigger[] = []
+let onceOnly: boolean[] = []
 
-        if (!IsIssuedOrder('smart')) {
-            return
-        }
-        StopUnit(hero)
+const Teleport_Actions = () => {
+    let hero: unit | null = GetTriggerUnit()
 
-        SetUnitX(hero, GetOrderPointX())
-        SetUnitY(hero, GetOrderPointY())
+    if (!IsIssuedOrder('smart')) {
+        return
+    }
+    StopUnit(hero)
 
-        if (onceOnly[GetUnitUserData(hero)]) {
-            DestroyTrigger(GetTriggeringTrigger())
-        }
+    SetUnitX(hero, GetOrderPointX())
+    SetUnitY(hero, GetOrderPointY())
 
-        hero = null
+    if (onceOnly[GetUnitUserData(hero)]) {
+        DestroyTrigger(GetTriggeringTrigger())
     }
 
-    const ActivateTeleport = (hero: unit, onceOnlyB: boolean) => {
-        let escaperId = GetUnitUserData(hero)
-        DestroyTrigger(teleTriggers[escaperId])
-        teleTriggers[escaperId] = CreateTrigger()
-        TriggerAddAction(teleTriggers[escaperId], Teleport_Actions)
-        TriggerRegisterUnitEvent(teleTriggers[escaperId], hero, EVENT_UNIT_ISSUED_POINT_ORDER)
-        onceOnly[escaperId] = onceOnlyB
-    }
-
-    const DisableTeleport = (hero: unit) => {
-        let escaperId = GetUnitUserData(hero)
-        DestroyTrigger(teleTriggers[escaperId])
-    }
-
-    return { ActivateTeleport, DisableTeleport }
+    hero = null
 }
 
-export const Teleport = initTeleport()
+export const ActivateTeleport = (hero: unit, onceOnlyB: boolean) => {
+    let escaperId = GetUnitUserData(hero)
+    DestroyTrigger(teleTriggers[escaperId])
+    teleTriggers[escaperId] = CreateTrigger()
+    TriggerAddAction(teleTriggers[escaperId], Teleport_Actions)
+    TriggerRegisterUnitEvent(teleTriggers[escaperId], hero, EVENT_UNIT_ISSUED_POINT_ORDER)
+    onceOnly[escaperId] = onceOnlyB
+}
+
+export const DisableTeleport = (hero: unit) => {
+    let escaperId = GetUnitUserData(hero)
+    DestroyTrigger(teleTriggers[escaperId])
+}

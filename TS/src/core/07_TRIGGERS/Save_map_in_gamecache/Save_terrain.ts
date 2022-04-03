@@ -54,7 +54,7 @@ const initSaveTerrain = () => {
         while (true) {
             if (i >= nbTerrainTypesUsed) break
             if (terrainTypeId === terrainTypeIds[i]) {
-                return FunctionsOnNumbers.I2HexaString(i)
+                return I2HexaString(i)
             }
             i = i + 1
         }
@@ -62,7 +62,7 @@ const initSaveTerrain = () => {
             terrainTypeIds[nbTerrainTypesUsed] = terrainTypeId
             nbTerrainTypesUsed = nbTerrainTypesUsed + 1
         }
-        return FunctionsOnNumbers.I2HexaString(nbTerrainTypesUsed - 1)
+        return I2HexaString(nbTerrainTypesUsed - 1)
     }
 
     const GererOrdreTerrains = () => {

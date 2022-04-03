@@ -10,7 +10,7 @@ export const InitTrig_A_player_leaves = () => {
         actions: [
             () => {
                 let n = GetPlayerId(GetTriggerPlayer())
-                udg_escapers.remove(n)
+                udg_escapers.destroyEscaper(n)
                 AfkMode.StopAfk(n)
                 AfkMode.StopAfk(n + NB_PLAYERS_MAX)
                 DisplayTextToForce(

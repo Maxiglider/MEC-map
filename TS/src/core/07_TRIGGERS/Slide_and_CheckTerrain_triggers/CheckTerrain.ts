@@ -45,9 +45,6 @@ const initCheckTerrainTrigger = () => {
         let oldSlideSpeed: number
         let tempRayonTolerance: number
 
-        let terrainTypeS: TerrainTypeSlide
-        let terrainTypeD: TerrainTypeDeath
-        let terrainTypeW: TerrainTypeWalk
         escaper.moveInvisUnit(x, y)
 
         if (IsOnGround(hero)) {
@@ -61,16 +58,15 @@ const initCheckTerrainTrigger = () => {
             wasSliding = escaper.isSliding()
             oldSlideSpeed = escaper.getSlideSpeed()
 
-            if (currentTerrainType.getKind() == 'slide') {
-                terrainTypeS = TerrainTypeSlide(integer(currentTerrainType))
+            if (currentTerrainType instanceof TerrainTypeSlide) {
                 escaper.enableSlide(true)
                 if (!wasSliding) {
                     MeteorFunctions.HeroComingToSlide_CheckItem(hero)
                     AutoContinueAfterSliding.ClearLastClickSave(playerId)
                 }
                 if (!escaper.isAbsoluteSlideSpeed()) {
-                    escaper.setSlideSpeed(terrainTypeS.getSlideSpeed())
-                    if (terrainTypeS.getSlideSpeed() < 0) {
+                    escaper.setSlideSpeed(currentTerrainType.getSlideSpeed())
+                    if (currentTerrainType.getSlideSpeed() < 0) {
                         if (wasSliding) {
                             if (oldSlideSpeed >= 0) {
                                 escaper.reverse()
@@ -87,10 +83,9 @@ const initCheckTerrainTrigger = () => {
                     }
                 }
             } else {
-                if (currentTerrainType.getKind() == 'death') {
-                    terrainTypeD = TerrainTypeDeath(integer(currentTerrainType))
+                if (currentTerrainType instanceof  TerrainTypeDeath) {
                     touchedByDeathTerrain = true
-                    toleranceDist = terrainTypeD.getToleranceDist()
+                    toleranceDist = currentTerrainType.getToleranceDist()
                     if (toleranceDist != 0) {
                         tempRayonTolerance = INIT_RAYON_TOLERANCE
                         while (true) {
@@ -119,30 +114,28 @@ const initCheckTerrainTrigger = () => {
                             DestroyEffect(an_effect)
                             an_effect = null
                         } else {
-                            terrainTypeD = TerrainTypeDeath(integer(currentTerrainType))
-                            terrainTypeD.killEscaper(escaper)
+                            currentTerrainType.killEscaper(escaper)
                             escaper.enableSlide(false)
 
                             const mirrorEscaper = GetMirrorEscaper(escaper)
 
                             if (mirrorEscaper) {
-                                terrainTypeD.killEscaper(mirrorEscaper)
+                                currentTerrainType.killEscaper(mirrorEscaper)
                                 mirrorEscaper.enableSlide(false)
                             }
                         }
                     } else {
-                        if (terrainTypeTolerance?.getKind() == 'slide') {
-                            terrainTypeS = TerrainTypeSlide(integer(terrainTypeTolerance))
+                        if (terrainTypeTolerance instanceof TerrainTypeSlide) {
                             oldSlideSpeed = escaper.getSlideSpeed()
                             escaper.enableSlide(true)
-                            escaper.setSlideSpeed(terrainTypeS.getSlideSpeed())
+                            escaper.setSlideSpeed(terrainTypeTolerance.getSlideSpeed())
                             if (!wasSliding) {
                                 MeteorFunctions.HeroComingToSlide_CheckItem(hero)
                                 AutoContinueAfterSliding.ClearLastClickSave(playerId)
                             }
                             if (!escaper.isAbsoluteSlideSpeed()) {
-                                escaper.setSlideSpeed(terrainTypeS.getSlideSpeed())
-                                if (terrainTypeS.getSlideSpeed() < 0) {
+                                escaper.setSlideSpeed(terrainTypeTolerance.getSlideSpeed())
+                                if (terrainTypeTolerance.getSlideSpeed() < 0) {
                                     if (wasSliding) {
                                         if (oldSlideSpeed >= 0) {
                                             escaper.reverse()
@@ -173,10 +166,9 @@ const initCheckTerrainTrigger = () => {
                                     AutoContinueAfterSliding.AutoContinueAfterSliding(playerId)
                                 }
                             }
-                            if (terrainTypeTolerance?.getKind() == 'walk') {
+                            if (terrainTypeTolerance instanceof TerrainTypeWalk) {
                                 if (!escaper.isAbsoluteWalkSpeed()) {
-                                    terrainTypeW = TerrainTypeWalk(integer(terrainTypeTolerance))
-                                    escaper.setWalkSpeed(terrainTypeW.getWalkSpeed())
+                                    escaper.setWalkSpeed(terrainTypeTolerance.getWalkSpeed())
                                 }
                             }
                         }
@@ -193,10 +185,9 @@ const initCheckTerrainTrigger = () => {
                             AutoContinueAfterSliding.AutoContinueAfterSliding(playerId)
                         }
                     }
-                    if (currentTerrainType.getKind() == 'walk') {
+                    if (currentTerrainType instanceof TerrainTypeWalk) {
                         if (!escaper.isAbsoluteWalkSpeed()) {
-                            terrainTypeW = TerrainTypeWalk(integer(currentTerrainType))
-                            escaper.setWalkSpeed(terrainTypeW.getWalkSpeed())
+                            escaper.setWalkSpeed(currentTerrainType.getWalkSpeed())
                         }
                     }
                 }

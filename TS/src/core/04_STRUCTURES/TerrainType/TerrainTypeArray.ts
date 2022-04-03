@@ -1,11 +1,11 @@
 import { tileset2tilesetChar } from 'core/01_libraries/Basic_functions'
 import { Text } from 'core/01_libraries/Text'
-import { CommandsFunctions } from 'core/06_COMMANDS/COMMANDS_vJass/Command_functions'
 import { StringArrayForCache } from 'core/07_TRIGGERS/Save_map_in_gamecache/struct_StringArrayForCache'
 import { TerrainType } from './TerrainType'
 import { TerrainTypeDeath } from './TerrainTypeDeath'
 import { TerrainTypeSlide } from './TerrainTypeSlide'
 import { TerrainTypeWalk } from './TerrainTypeWalk'
+import {CmdParam, NbParam} from "../../06_COMMANDS/COMMANDS_vJass/Command_functions";
 
 export class TerrainTypeArray {
     private ttWalk: TerrainTypeWalk[] = [] //le nombre de terrains du jeu est de 177
@@ -176,7 +176,6 @@ export class TerrainTypeArray {
                 i = i + 1
             }
             if (i < this.numberOfWalk) {
-                position = i
                 i = i + 1
                 while (true) {
                     if (i >= this.numberOfWalk) break
@@ -194,7 +193,6 @@ export class TerrainTypeArray {
                 i = i + 1
             }
             if (i < this.numberOfDeath) {
-                position = i
                 i = i + 1
                 while (true) {
                     if (i >= this.numberOfDeath) break
@@ -212,7 +210,6 @@ export class TerrainTypeArray {
                 i = i + 1
             }
             if (i < this.numberOfSlide) {
-                position = i
                 i = i + 1
                 while (true) {
                     if (i >= this.numberOfSlide) break
@@ -305,13 +302,13 @@ export class TerrainTypeArray {
         let terrainTypesOrdered: TerrainType[] = []
         let nbTerrainsDone: number
         let i: number
-        if (this.count() !== CommandsFunctions.NbParam(cmd)) {
+        if (this.count() !== NbParam(cmd)) {
             return false
         }
         nbTerrainsDone = 0
         while (true) {
             if (nbTerrainsDone === this.count()) break
-            terrainType = this.get(CommandsFunctions.CmdParam(cmd, nbTerrainsDone + 1))
+            terrainType = this.get(CmdParam(cmd, nbTerrainsDone + 1))
             //vérification que le terrain existe
             if (terrainType === null) {
                 return false

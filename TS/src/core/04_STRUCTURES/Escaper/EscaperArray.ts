@@ -41,7 +41,7 @@ export class EscaperArray {
         delete this.escapers[id]
     }
 
-    destroyEscaper = (id: number) => { //former "remove"
+    destroyEscaper = (id: number) => {
         if (this.escapers[id]) {
             this.escapers[id].destroy()
         }

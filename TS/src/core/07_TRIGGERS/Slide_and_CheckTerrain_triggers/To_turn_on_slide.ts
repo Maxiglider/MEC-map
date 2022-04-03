@@ -91,8 +91,9 @@ const initTurnOnSlide = () => {
 
         //turn hero
         if (IsOnGround(slider)) {
-            if (escaper.getLastTerrainType()?.kind == 'slide') {
-                canTurn = TerrainTypeSlide(integer(escaper.getLastTerrainType())).getCanTurn()
+            const terrainType = escaper.getLastTerrainType()
+            if (terrainType instanceof TerrainTypeSlide) {
+                canTurn = terrainType.getCanTurn()
             }
         } else {
             canTurn = CAN_TURN_IN_AIR

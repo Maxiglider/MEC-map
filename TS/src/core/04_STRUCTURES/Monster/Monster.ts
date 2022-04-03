@@ -1,6 +1,5 @@
 import { MOBS_VARIOUS_COLORS } from '../../01_libraries/Constants'
 import { ColorString2Id } from '../../01_libraries/Init_colorCodes'
-import { CommandsFunctions } from '../../06_COMMANDS/COMMANDS_vJass/Command_functions'
 import { CACHE_SEPARATEUR_PARAM } from '../../07_TRIGGERS/Save_map_in_gamecache/struct_StringArrayForCache'
 import { Level } from '../Level/Level'
 import { ClearMob } from '../Monster_properties/ClearMob'
@@ -9,6 +8,7 @@ import { MonsterNoMove } from './MonsterNoMove'
 import { MonsterSimplePatrol } from './MonsterSimplePatrol'
 import { MonsterType } from './MonsterType'
 import { MonstersClickableSetLife } from './trig_Monsters_clickable_set_life'
+import {IsColorString} from "../../06_COMMANDS/COMMANDS_vJass/Command_functions";
 
 export const udg_monsters: Monster[] = []
 
@@ -195,7 +195,7 @@ export abstract class Monster {
 
     setBaseColor = (colorString: string) => {
         let baseColorId: number
-        if (CommandsFunctions.IsColorString(colorString)) {
+        if (IsColorString(colorString)) {
             baseColorId = ColorString2Id(colorString)
             if (baseColorId < 0 || baseColorId > 12) {
                 return

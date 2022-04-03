@@ -71,7 +71,7 @@ export class Level {
         this.isActivatedB = activ
     }
 
-    checkpointReviveHeroes(finisher: Escaper | null) {
+    checkpointReviveHeroes(finisher: Escaper | undefined) {
         checkPointReviveHeroes(this, finisher)
     }
 

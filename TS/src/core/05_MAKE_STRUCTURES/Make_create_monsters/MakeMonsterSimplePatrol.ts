@@ -14,9 +14,9 @@ export class MakeMonsterSimplePatrol extends MakeOneByOneOrTwoClicks {
     private static ECART_ANGLE = 9
     private static DIST_ON_TERRAIN_MAX = 300
     private static DIST_ON_TERRAIN_DEFAULT = 50
+    private static distOnTerrain: number = 50
 
     private mt: MonsterType
-    private distOnTerrain: number
 
     constructor(maker: unit, mode: string, mt: MonsterType) {
         const acceptedModes = ['normal', 'string', 'auto']
@@ -27,7 +27,6 @@ export class MakeMonsterSimplePatrol extends MakeOneByOneOrTwoClicks {
         }
 
         this.mt = mt
-        this.distOnTerrain = MakeMonsterSimplePatrol.DIST_ON_TERRAIN_DEFAULT
     }
 
     getMonsterType = (): MonsterType => {
@@ -35,18 +34,18 @@ export class MakeMonsterSimplePatrol extends MakeOneByOneOrTwoClicks {
     }
 
     //for "auto" mode
-    changeDistOnTerrain(newDist: number) {
+    static changeDistOnTerrain(newDist: number) {
         if (newDist < 0 || newDist > MakeMonsterSimplePatrol.DIST_ON_TERRAIN_MAX) {
             return false
         }
 
-        this.distOnTerrain = newDist
+        MakeMonsterSimplePatrol.distOnTerrain = newDist
         return true
     }
 
     //for "auto" mode
-    changeDistOnTerrainDefault() {
-        this.distOnTerrain = MakeMonsterSimplePatrol.DIST_ON_TERRAIN_DEFAULT
+    static changeDistOnTerrainDefault() {
+        MakeMonsterSimplePatrol.distOnTerrain = MakeMonsterSimplePatrol.DIST_ON_TERRAIN_DEFAULT
     }
 
     doActions() {
@@ -149,7 +148,7 @@ export class MakeMonsterSimplePatrol extends MakeOneByOneOrTwoClicks {
                     x1 = this.orderX + dist * CosBJ(angle)
                     y1 = this.orderY + dist * SinBJ(angle)
                 }
-                dist = dist + this.distOnTerrain + 1
+                dist = dist + MakeMonsterSimplePatrol.distOnTerrain + 1
                 x1 = this.orderX + dist * CosBJ(angle)
                 y1 = this.orderY + dist * SinBJ(angle)
 
@@ -184,7 +183,7 @@ export class MakeMonsterSimplePatrol extends MakeOneByOneOrTwoClicks {
                     x2 = this.orderX + dist * CosBJ(angle)
                     y2 = this.orderY + dist * SinBJ(angle)
                 }
-                dist = dist + this.distOnTerrain + 1
+                dist = dist + MakeMonsterSimplePatrol.distOnTerrain + 1
                 x2 = this.orderX + dist * CosBJ(angle)
                 y2 = this.orderY + dist * SinBJ(angle)
 

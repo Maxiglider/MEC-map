@@ -1,10 +1,10 @@
 import { udg_colorCode } from 'core/01_libraries/Init_colorCodes'
 import { Text } from 'core/01_libraries/Text'
 import { Hero2Escaper, IsHero } from 'core/04_STRUCTURES/Escaper/Escaper_functions'
-import { CommandExecution } from 'core/06_COMMANDS/COMMANDS_vJass/Command_execution'
 import { literalArray } from 'Utils/ArrayUtils'
 import { createEvent } from 'Utils/mapUtils'
 import { CommandShortcuts } from './Command_shortcuts_functions'
+import {ExecuteCommand} from "../../06_COMMANDS/COMMANDS_vJass/Command_execution";
 
 export const shortcuts = literalArray(['A', 'Z', 'E', 'R', 'Q', 'S', 'D', 'F'])
 
@@ -42,7 +42,7 @@ export const InitTrig_Using_shortcut = () => {
                             return
                         }
 
-                        CommandExecution.ExecuteCommand(escaper, targetCmd)
+                        ExecuteCommand(escaper, targetCmd)
                     }
                 })
             },

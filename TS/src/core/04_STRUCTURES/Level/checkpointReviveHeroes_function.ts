@@ -5,7 +5,7 @@ import { ChangeAllTerrains } from '../../07_TRIGGERS/Triggers_to_modify_terrains
 import { Escaper } from '../Escaper/Escaper'
 import { Level } from './Level'
 
-export const checkPointReviveHeroes = (levelForRevining: Level, revivingFinisher: Escaper | null) => {
+export const checkPointReviveHeroes = (levelForRevining: Level, revivingFinisher: Escaper | undefined) => {
     for (let i = 0; i < NB_ESCAPERS; i++) {
         const escaper = udg_escapers.get(i)
         if (escaper && escaper !== revivingFinisher) {

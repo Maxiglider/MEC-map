@@ -1,5 +1,5 @@
-import { CommandExecution } from '../../06_COMMANDS/COMMANDS_vJass/Command_execution'
 import { Escaper } from './Escaper'
+import {ExecuteCommand} from "../../06_COMMANDS/COMMANDS_vJass/Command_execution";
 
 
 
@@ -15,7 +15,7 @@ export const execute = (escaper: Escaper, commandName: string): boolean => {
     if (!cmd) {
         return false
     } else {
-        CommandExecution.ExecuteCommand(escaper, cmd)
+        ExecuteCommand(escaper, cmd)
     }
 
     return true

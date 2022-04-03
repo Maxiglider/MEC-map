@@ -37,7 +37,7 @@ export class LevelArray {
         this.lastInstance = 0
     }
 
-    goToLevel = (finisher: Escaper | null, levelId: number): boolean => {
+    goToLevel = (finisher: Escaper | undefined, levelId: number): boolean => {
         let i: number
         let previousLevelId = this.currentLevel
 
@@ -81,7 +81,7 @@ export class LevelArray {
         return true
     }
 
-    goToNextLevel = (finisher: Escaper): boolean => {
+    goToNextLevel = (finisher?: Escaper): boolean => {
         let xCam: number
         let yCam: number
         if (this.currentLevel >= this.lastInstance) {
@@ -107,7 +107,7 @@ export class LevelArray {
         return true
     }
 
-    moveCamToStart(level: Level, finisher: Escaper | null) {
+    moveCamToStart(level: Level, finisher: Escaper | undefined) {
         const start = level.getStart()
 
         if (start) {
@@ -130,7 +130,7 @@ export class LevelArray {
             this.currentLevel = NB_MAX_LEVELS
             this.levels[0].activate(false)
         }
-        this.goToLevel(null, 0)
+        this.goToLevel(undefined, 0)
         udg_lives.setNb(this.levels[0].getNbLives())
 
         const start = this.levels[0].getStart()

@@ -772,7 +772,7 @@ export class Escaper {
             return false
         }
         this.baseColorId = baseColorId
-        if (this.hero != null) {
+        if (this.hero) {
             if (baseColorId == 0) {
                 SetUnitColor(this.hero, PLAYER_COLOR_RED)
             } else {
@@ -792,7 +792,7 @@ export class Escaper {
             return false
         }
         this.baseColorId = baseColorId
-        if (this.hero != null) {
+        if (this.hero) {
             if (baseColorId == 0) {
                 SetUnitColor(this.hero, PLAYER_COLOR_RED)
             } else {

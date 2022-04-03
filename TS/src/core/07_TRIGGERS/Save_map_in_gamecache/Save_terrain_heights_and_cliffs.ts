@@ -24,7 +24,7 @@ const initSaveTerrainHeights = () => {
                 } else {
                     cliffLevel = GetTerrainCliffLevel(x, y)
                 }
-                StringArrayForCache.stringArrayForCache.push(FunctionsOnNumbers.I2HexaString(cliffLevel))
+                StringArrayForCache.stringArrayForCache.push(I2HexaString(cliffLevel))
                 x = x + LARGEUR_CASE
             }
             y = y + LARGEUR_CASE
