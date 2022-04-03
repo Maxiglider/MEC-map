@@ -1,5 +1,3 @@
-// TODO; Unused?
-
-const initNoSelectionCircle = () => {
+export const initNoSelectionCircle = () => {
     EnableSelect(true, false)
 }
