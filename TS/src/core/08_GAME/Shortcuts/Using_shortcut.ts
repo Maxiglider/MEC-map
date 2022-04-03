@@ -3,9 +3,9 @@ import { Text } from 'core/01_libraries/Text'
 import { Hero2Escaper, IsHero } from 'core/04_STRUCTURES/Escaper/Escaper_functions'
 import { literalArray } from 'Utils/ArrayUtils'
 import { createEvent } from 'Utils/mapUtils'
-import {ExecuteCommand} from "../../06_COMMANDS/COMMANDS_vJass/Command_execution";
 import {udg_escapers} from "../../../../globals";
 import {GREY} from "../../01_libraries/Constants";
+import {execute} from "../../04_STRUCTURES/Escaper/EscaperSavedCommands";
 
 
 const initCommandShortcuts = () => {
@@ -176,7 +176,7 @@ export const InitTrig_Using_shortcut = () => {
                             return
                         }
 
-                        ExecuteCommand(escaper, targetCmd)
+                        execute(escaper, targetCmd, true)
                     }
                 })
             },

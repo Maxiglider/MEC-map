@@ -10,6 +10,7 @@ import {ExecuteCommandMax} from "./Command_admin";
 import {ExecuteCommandTrueMax} from "./Command_superadmin";
 import {IsCmd} from "./Command_functions";
 import {ExecuteCommandMake} from "./Command_make";
+import {commandsBuffer} from "../../04_STRUCTURES/Escaper/EscaperSavedCommands";
 
 
 const ExecuteCommandSingle = (escaper: Escaper, cmd: string) => {
@@ -107,4 +108,21 @@ createEvent({
             ExecuteCommand(escaper, GetEventPlayerChatString())
         },
     ],
+})
+
+
+//Handle buffer of commands
+createEvent({
+    events: [t => TriggerRegisterTimerEvent(t, 0.001, true)],
+    actions: [
+        () => {
+            if(commandsBuffer.length > 0){
+                commandsBuffer.map(command => {
+                    ExecuteCommand(command.escaper, command.cmd)
+                })
+
+                commandsBuffer.length = 0
+            }
+        }
+    ]
 })

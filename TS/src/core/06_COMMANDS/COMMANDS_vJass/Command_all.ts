@@ -14,7 +14,6 @@ import {
 import {ColorString2Id, udg_colorCode} from 'core/01_libraries/Init_colorCodes'
 import {Text} from 'core/01_libraries/Text'
 import {Escaper} from 'core/04_STRUCTURES/Escaper/Escaper'
-import {execute, newCmd} from 'core/04_STRUCTURES/Escaper/EscaperSavedCommands'
 import {ColorInfo, GetMirrorEscaper} from 'core/04_STRUCTURES/Escaper/Escaper_functions'
 import {DisplayTerrainDataToPlayer, GetTerrainData} from 'core/07_TRIGGERS/Modify_terrain_Functions/Terrain_functions'
 import {Apm} from 'core/08_GAME/Apm_clics_par_minute/Apm'
@@ -31,6 +30,7 @@ import {TurnOnSlide} from '../../07_TRIGGERS/Slide_and_CheckTerrain_triggers/To_
 import {CmdName, CmdParam, IsColorString, IsPlayerColorString, NbParam, NoParam} from "./Command_functions";
 import {IsInteger, PercentageStringOrX2Integer} from "../../01_libraries/Functions_on_numbers";
 import {CommandShortcuts} from "../../08_GAME/Shortcuts/Using_shortcut";
+import {execute, newCmd} from "../../04_STRUCTURES/Escaper/EscaperSavedCommands";
 
 
 export const ExecuteCommandAll = (escaper: Escaper, cmd: string): boolean => {
