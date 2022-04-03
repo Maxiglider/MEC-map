@@ -16,7 +16,6 @@ import type { VisibilityModifierArray } from './VisibilityModifierArray'
 import {IsLevelBeingMade} from "./Level_functions";
 import {udg_escapers} from "../../../../globals";
 
-export const NB_MAX_LEVELS = 50
 
 export class LevelArray {
     private levels: Level[] = []
@@ -46,32 +45,28 @@ export class LevelArray {
         }
 
         this.currentLevel = levelId
-        if (previousLevelId !== NB_MAX_LEVELS) {
-            if (!IsLevelBeingMade(this.levels[previousLevelId])) {
-                udg_escapers.destroyMakesIfForSpecificLevel_currentLevel()
-                this.levels[previousLevelId].activate(false)
-            }
+        if (!IsLevelBeingMade(this.levels[previousLevelId])) {
+            udg_escapers.destroyMakesIfForSpecificLevel_currentLevel()
+            this.levels[previousLevelId].activate(false)
         }
 
         this.levels[this.currentLevel].activate(true)
         this.levels[this.currentLevel].checkpointReviveHeroes(finisher)
 
-        if (previousLevelId !== NB_MAX_LEVELS) {
-            if (levelId > previousLevelId + 1) {
-                i = previousLevelId + 1
+        if (levelId > previousLevelId + 1) {
+            i = previousLevelId + 1
+            while (true) {
+                if (i >= levelId) break
+                this.levels[i].activateVisibilities(true)
+                i = i + 1
+            }
+        } else {
+            if (levelId < previousLevelId) {
+                i = levelId + 1
                 while (true) {
-                    if (i >= levelId) break
-                    this.levels[i].activateVisibilities(true)
+                    if (i > previousLevelId) break
+                    this.levels[i].activateVisibilities(false)
                     i = i + 1
-                }
-            } else {
-                if (levelId < previousLevelId) {
-                    i = levelId + 1
-                    while (true) {
-                        if (i > previousLevelId) break
-                        this.levels[i].activateVisibilities(false)
-                        i = i + 1
-                    }
                 }
             }
         }
@@ -127,7 +122,6 @@ export class LevelArray {
 
     restartTheGame = () => {
         if (this.currentLevel === 0) {
-            this.currentLevel = NB_MAX_LEVELS
             this.levels[0].activate(false)
         }
         this.goToLevel(undefined, 0)
