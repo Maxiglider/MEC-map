@@ -3,93 +3,62 @@ import { NB_ESCAPERS } from 'core/01_libraries/Constants'
 import { Level } from '../Level/Level'
 import { Escaper } from './Escaper'
 
-export type IEscaperArray = ReturnType<typeof EscaperArray>
 
-export const EscaperArray = () => {
-    const escapers: (Escaper | null)[] = []
-
-    let escaperId = 0
-
-    while (!(escaperId >= NB_ESCAPERS)) {
-        if (IsEscaperInGame(escaperId)) {
-            escapers[escaperId] = new Escaper(escaperId)
-        } else {
-            escapers[escaperId] = null
+export class EscaperArray {
+    private escapers: Escaper[]
+    
+    constructor() {
+        this.escapers = []
+        
+        for(let escaperId = 0; escaperId < NB_ESCAPERS; escaperId++) {
+            if (IsEscaperInGame(escaperId)) {
+                this.escapers[escaperId] = new Escaper(escaperId)
+            }
         }
-        escaperId = escaperId + 1
     }
 
-    const newAt = (id: number) => {
+    newAt = (id: number) => {
         if (id < 0 || id >= NB_ESCAPERS) {
             return
         }
-        if (escapers[id] != null) {
+        
+        if (this.escapers[id]) {
             return
         }
-        escapers[id] = new Escaper(id)
+
+        this.escapers[id] = new Escaper(id)
     }
 
-    const count = () => {
-        let n = 0
-        let i = 0
+    count = () => {
+        return this.escapers.filter(escaper => escaper !== undefined).length
+    }
 
-        while (!(i >= NB_ESCAPERS)) {
-            if (escapers[i] != null) {
-                n = n + 1
-            }
-            i = i + 1
+    get = (id: number) => {
+        return this.escapers[id]
+    }
+
+    removeEscaper = (id: number) => {
+        delete this.escapers[id]
+    }
+
+    destroyEscaper = (id: number) => { //former "remove"
+        if (this.escapers[id]) {
+            this.escapers[id].destroy()
         }
 
-        return n
+        delete this.escapers[id]
     }
 
-    const get = (id: number) => {
-        return escapers[id]
+    deleteSpecificActionsForLevel = (level: Level) => {
+        this.escapers.map(escaper => {
+            escaper && escaper.deleteSpecificActionsForLevel(level)
+        })
     }
 
-    const nullify = (id: number) => {
-        escapers[id] = null
-    }
-
-    const remove = (id: number) => {
-        if (escapers[id]) {
-            escapers[id]!.destroy()
-        }
-
-        escapers[id] = null
-    }
-
-    const deleteSpecificActionsForLevel = (level: Level) => {
-        let i = 0
-
-        while (!(i >= NB_ESCAPERS)) {
-            if (escapers[i] != null) {
-                escapers[i]!.deleteSpecificActionsForLevel(level)
-            }
-            i = i + 1
-        }
-    }
-
-    const destroyMakesIfForSpecificLevel_currentLevel = () => {
-        //destroy le make des escapers si c'est un make pour spécifique level et que l'escaper make pour le "current_level"
-        let doDestroy: boolean
-        let i = 0
-
-        while (!(i >= NB_ESCAPERS)) {
-            if (escapers[i] != null && escapers[i]!.isMakingCurrentLevel()) {
-                escapers[i]!.destroyMakeIfForSpecificLevel()
-            }
-            i = i + 1
-        }
-    }
-
-    return {
-        newAt,
-        count,
-        get,
-        nullify,
-        remove,
-        deleteSpecificActionsForLevel,
-        destroyMakesIfForSpecificLevel_currentLevel,
+    destroyMakesIfForSpecificLevel_currentLevel = () => {
+        //destroy le make des this.escapers si c'est un make pour spécifique level et que l'escaper make pour le "current_level"
+        this.escapers.map(escaper => {
+            escaper && escaper.isMakingCurrentLevel() && escaper.destroyMakeIfForSpecificLevel()
+        })
     }
 }

@@ -4,7 +4,7 @@ import {Text} from "../../01_libraries/Text";
 
 export class MakeTerrainVerticalSymmetry extends MakeOneByOneOrTwoClicks {
     constructor(maker: unit) {
-        super(maker, 'terrainVerticalSymmetry')
+        super(maker, 'terrainVerticalSymmetry', "", null, false)
     }
 
     doActions(){

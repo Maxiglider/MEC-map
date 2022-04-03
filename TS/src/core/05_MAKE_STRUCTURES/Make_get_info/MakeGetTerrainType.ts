@@ -4,7 +4,7 @@ import {GetTerrainData} from "../../07_TRIGGERS/Modify_terrain_Functions/Terrain
 
 export class MakeGetTerrainType extends Make {
     constructor(maker: unit) {
-        super(maker, 'getTerrainType')
+        super(maker, 'getTerrainType', false)
     }
 
     doActions() {

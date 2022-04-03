@@ -7,7 +7,7 @@ export class MakeTerrainHeight extends Make {
 
 
     constructor(maker: unit, radius: number, height: number) {
-        super(maker, 'terrainHeight')
+        super(maker, 'terrainHeight', false)
 
         this.radius = radius
         this.height = height

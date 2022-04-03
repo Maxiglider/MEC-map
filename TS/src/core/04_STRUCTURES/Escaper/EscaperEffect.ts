@@ -1,19 +1,20 @@
-export type IEscaperEffect = ReturnType<typeof EscaperEffect>
+export class EscaperEffect {
+    private ef: effect
+    private efStr: string
+    private bodyPart: string
 
-export const EscaperEffect = (efStr: string, u: unit, bodyPart: string) => {
-    let ef: effect | null = AddSpecialEffectTarget(efStr, u, bodyPart)
-
-    const destroy = () => {
-        if (ef !== null) {
-            DestroyEffect(ef)
-            ef = null
-        }
+    constructor(efStr: string, u: unit, bodyPart: string) {
+        this.efStr = efStr
+        this.bodyPart = bodyPart
+        this.ef = AddSpecialEffectTarget(efStr, u, bodyPart)
     }
 
-    const recreate = (u: unit) => {
-        destroy()
-        ef = AddSpecialEffectTarget(efStr, u, bodyPart)
+    recreate = (u: unit) => {
+        this.destroy()
+        this.ef = AddSpecialEffectTarget(this.efStr, u, this.bodyPart)
     }
 
-    return { efStr, bodyPart, ef, destroy, recreate }
+    destroy = () => {
+        DestroyEffect(this.ef)
+    }
 }

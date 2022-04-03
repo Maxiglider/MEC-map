@@ -21,7 +21,7 @@ export class MakeTerrainCopyPaste extends Make {
 
 
     constructor(maker: unit) {
-        super(maker, 'terrainCopyPaste')
+        super(maker, 'terrainCopyPaste', false)
 
         this.isPoint1Saved = false
         this.isPoint2Saved = false

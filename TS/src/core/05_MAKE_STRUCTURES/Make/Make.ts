@@ -16,8 +16,9 @@ export abstract class Make {
     escaper: Escaper
     orderX: number = 0
     orderY: number = 0
+    forSpecificLevel: boolean
 
-    constructor(maker: unit, kind: string) {
+    constructor(maker: unit, kind: string, forSpecificLevel = true) {
         this.maker = maker
         this.makerOwner = GetOwningPlayer(maker)
         this.kind = kind
@@ -31,6 +32,8 @@ export abstract class Make {
 
         this.t = null
         this.enableTrigger()
+
+        this.forSpecificLevel = forSpecificLevel
     }
 
     destroy() {

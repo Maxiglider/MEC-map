@@ -11,9 +11,9 @@ export abstract class MakeOneByOneOrTwoClicks extends Make {
     private mode: string
     private acceptedModes: string[] = ['oneByOne', 'twoClics']
 
-    constructor(maker: unit, kind: string, mode: string = "", acceptedModes: string[] | null = null) {
+    constructor(maker: unit, kind: string, mode: string = "", acceptedModes: string[] | null = null, forSpecificLevel = true) {
         //modes : oneByOne, twoClics
-        super(maker, kind)
+        super(maker, kind, forSpecificLevel)
 
         if (acceptedModes) {
             this.acceptedModes = acceptedModes

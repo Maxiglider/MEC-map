@@ -43,7 +43,6 @@ export class MakeSetUnitTeleportPeriod extends MakeOneByOneOrTwoClicks {
                     return
                 }
 
-                //todomax make all Monster<SpecificType>Array extend a new abstract class MonsterArray
                 const monstersTP = this.escaper
                     .getMakingLevel()
                     .monsters.getMonstersBetweenLocs(

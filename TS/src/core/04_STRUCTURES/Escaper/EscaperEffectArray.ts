@@ -1,86 +1,58 @@
-import { EscaperEffect, IEscaperEffect } from './EscaperEffect'
+import { EscaperEffect } from './EscaperEffect'
 
-export type IEscaperEffectArray = ReturnType<typeof EscaperEffectArray>
 
-export const EscaperEffectArray = () => {
-    const efs: IEscaperEffect[] = []
-    let lastInstance: number = -1
+const NB_EFFECTS_LIMIT = 20
 
-    const newEffect = (efStr: string, u: unit, bodyPart: string) => {
-        let i: number
+export class EscaperEffectArray {
+    private efs: EscaperEffect[] = []
+    
 
-        if (lastInstance >= 19) {
-            efs[0].destroy()
+    new = (efStr: string, u: unit, bodyPart: string) => {
+        let lastInstance = this.efs.length - 1
 
-            i = 0
+        if (lastInstance >= NB_EFFECTS_LIMIT - 1) {
+            this.efs[0].destroy()
 
-            while (!(i >= 19)) {
-                efs[i] = efs[i + 1]
-                i = i + 1
+            for(let i = 0; i < 19; i++){
+                this.efs[i] = this.efs[i + 1]
             }
         } else {
             lastInstance = lastInstance + 1
         }
 
-        efs[lastInstance] = EscaperEffect(efStr, u, bodyPart)
+        this.efs[lastInstance] = new EscaperEffect(efStr, u, bodyPart)
     }
 
-    const count = () => {
-        let n = 0
-        let i = 0
-
-        while (!(i > lastInstance)) {
-            if (!!efs[i]) {
-                n = n + 1
-            }
-
-            i = i + 1
-        }
-
-        return n
+    count = () => {
+        return this.efs.length
     }
 
-    const destroy = () => {
-        while (!(lastInstance < 0)) {
-            efs[lastInstance].destroy()
-            lastInstance = lastInstance - 1
-        }
-    }
-
-    const destroyLastEffects = (numEfToDestroy: number) => {
+    destroyLastEffects = (numEfToDestroy: number) => {
         let i = numEfToDestroy
+        let lastInstance = this.efs.length - 1
 
-        while (!(i <= 0 || lastInstance < 0)) {
-            efs[lastInstance].destroy()
-            lastInstance = lastInstance - 1
-            i = i - 1
+        while (i > 0 && lastInstance >= 0) {
+            this.efs[lastInstance] && this.efs[lastInstance].destroy()
+            delete this.efs[lastInstance]
+            lastInstance--
+            i--
         }
     }
 
-    const hideEffects = () => {
-        let i = 0
-
-        while (!(i > lastInstance)) {
-            efs[i].destroy()
-            i = i + 1
-        }
+    hideEffects = () => {
+        this.efs.map(ef => {
+            ef && ef.destroy()
+        })
     }
 
-    const showEffects = (u: unit) => {
-        let i = 0
-
-        while (!(i > lastInstance)) {
-            efs[i].recreate(u)
-            i = i + 1
-        }
+    showEffects = (u: unit) => {
+        this.efs.map(ef => {
+            ef && ef.recreate(u)
+        })
     }
 
-    return {
-        newEffect,
-        count,
-        destroy,
-        destroyLastEffects,
-        hideEffects,
-        showEffects,
+    destroy = () => {
+        this.destroyLastEffects(NB_EFFECTS_LIMIT)
+        this.efs = []
     }
 }
