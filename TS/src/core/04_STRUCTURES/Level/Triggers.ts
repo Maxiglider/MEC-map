@@ -16,7 +16,7 @@ export class Trigger {
 }
 
 export class TriggerArray {
-    private triggers: Trigger[] = []
+    private triggers: Trigger[] = [] //todomax handle this error
     private lastInstance = -1
 
     destroy = () => {

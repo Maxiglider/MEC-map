@@ -35,7 +35,6 @@ const initMeteorFunctions = () => {
         } else {
             StopUnit(hero)
         }
-        ;(itemCarried as any) = null
     }
 
     return { HeroAddCheatMeteor, HeroComingToSlide_CheckItem, HeroComingOutFromSlide_CheckItem, ExecuteRightClicOnUnit }

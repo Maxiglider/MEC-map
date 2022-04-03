@@ -3,7 +3,6 @@ import {NB_ESCAPERS, SLIDE_PERIOD} from 'core/01_libraries/Constants'
 import {IsInteger, IsPositiveInteger} from 'core/01_libraries/Functions_on_numbers'
 import {ColorString2Id} from 'core/01_libraries/Init_colorCodes'
 import {Text} from 'core/01_libraries/Text'
-import {ViewAllHideAll} from 'core/03_view_all_hide_all/View_all_hide_all'
 import {Escaper} from 'core/04_STRUCTURES/Escaper/Escaper'
 import {GetMirrorEscaper} from 'core/04_STRUCTURES/Escaper/Escaper_functions'
 import {METEOR_CHEAT} from 'core/04_STRUCTURES/Meteor/Meteor'
@@ -14,6 +13,7 @@ import {MeteorFunctions} from '../../04_STRUCTURES/Meteor/Meteor_functions'
 import {Trig_InvisUnit_is_getting_damage} from '../../08_GAME/Death/InvisUnit_is_getting_damage'
 import {CmdName, CmdParam, IsPlayerColorString, NbParam, NoParam} from "./Command_functions";
 import {ActivateTeleport} from "./Teleport";
+import {udg_viewAll} from "../../03_view_all_hide_all/View_all_hide_all";
 
 
 export const ExecuteCommandCheat = (escaper: Escaper, cmd: string): boolean => {
@@ -319,7 +319,7 @@ export const ExecuteCommandCheat = (escaper: Escaper, cmd: string): boolean => {
     //-viewAll(va)   --> displays the whole map
     if (name === 'viewAll' || name === 'va') {
         if (noParam) {
-            FogModifierStart(ViewAllHideAll.udg_viewAll)
+            FogModifierStart(udg_viewAll)
         }
         return true
     }
@@ -327,7 +327,7 @@ export const ExecuteCommandCheat = (escaper: Escaper, cmd: string): boolean => {
     //-hideAll(ha)   --> puts the map view back to normal
     if (name === 'hideAll' || name === 'ha') {
         if (noParam) {
-            FogModifierStop(ViewAllHideAll.udg_viewAll)
+            FogModifierStop(udg_viewAll)
         }
         return true
     }

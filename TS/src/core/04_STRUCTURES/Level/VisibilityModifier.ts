@@ -1,6 +1,6 @@
-import { ViewAllHideAll } from 'core/03_view_all_hide_all/View_all_hide_all'
 import { CACHE_SEPARATEUR_PARAM } from 'core/07_TRIGGERS/Save_map_in_gamecache/struct_StringArrayForCache'
 import { Level } from './Level'
+import {RefreshHideAllVM} from "../../03_view_all_hide_all/View_all_hide_all";
 
 export class VisibilityModifier {
     private x1: number
@@ -20,7 +20,7 @@ export class VisibilityModifier {
         this.fm = CreateFogModifierRect(Player(0), FOG_OF_WAR_VISIBLE, visionRect, true, false)
 
         RemoveRect(visionRect)
-        ViewAllHideAll.RefreshHideAllVM()
+        RefreshHideAllVM()
     }
 
     destroy = () => {
