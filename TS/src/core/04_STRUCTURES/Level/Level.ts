@@ -1,6 +1,6 @@
 import { Text } from 'core/01_libraries/Text'
 import { udg_lives } from 'core/08_GAME/Init_structures/Init_lives'
- import { udg_escapers } from '../../../../globals'
+import { udg_escapers } from '../../../../globals'
 import { udg_levels } from "../../../../globals";
 import type { CasterType } from '../Caster/CasterType'
 import type { Escaper } from '../Escaper/Escaper'
@@ -24,6 +24,7 @@ export class Level {
     private start?: Start
     private end?: End
     private triggers: TriggerArray
+    private id: number
 
     visibilities: VisibilityModifierArray
     monsters: MonsterArray
@@ -31,7 +32,7 @@ export class Level {
     meteors: MeteorArray
     clearMobs: ClearMobArray
 
-    constructor() {
+    constructor(id: number) {
         this.visibilities = new VisibilityModifierArray(this)
         this.triggers = new TriggerArray()
         this.monsters = new MonsterArray(this)
@@ -41,6 +42,7 @@ export class Level {
         this.livesEarnedAtBeginning = 1
         this.isActivatedB = false
         this.startMessage = ''
+        this.id = id
     }
 
     activate(activ: boolean) {
@@ -135,14 +137,7 @@ export class Level {
     }
 
     getId() {
-        let i = 0
-        while (udg_levels.get(i)) {
-            if (udg_levels.get(i) === this) {
-                return i
-            }
-            i++
-        }
-        return -1
+        return this.id
     }
 
     isActivated() {

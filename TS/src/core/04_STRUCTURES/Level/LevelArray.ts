@@ -28,7 +28,7 @@ export class LevelArray {
         let x2 = GetRectMaxX(gg_rct_departLvl_0)
         let y2 = GetRectMaxY(gg_rct_departLvl_0)
 
-        this.levels[0] = new Level()
+        this.levels[0] = new Level(0)
         this.levels[0].newStart(x1, y1, x2, y2)
         this.levels[0].setNbLivesEarned(NB_LIVES_AT_BEGINNING)
         this.levels[0].activate(true)
@@ -136,7 +136,7 @@ export class LevelArray {
 
     new = (): boolean => {
         this.lastInstance = this.lastInstance + 1
-        this.levels[this.lastInstance] = new Level()
+        this.levels[this.lastInstance] = new Level(this.lastInstance)
         return true
     }
 
