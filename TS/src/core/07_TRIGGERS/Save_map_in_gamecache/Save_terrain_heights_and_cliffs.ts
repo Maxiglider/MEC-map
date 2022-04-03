@@ -1,11 +1,11 @@
 import { IsNearBounds } from 'core/01_libraries/Basic_functions'
 import { Constants, LARGEUR_CASE } from 'core/01_libraries/Constants'
-import { FunctionsOnNumbers } from 'core/01_libraries/Functions_on_numbers'
 import { Text } from 'core/01_libraries/Text'
 import { ZLibrary } from 'core/02_bibliotheques_externes/ZLibrary'
 import { SaveMapInCache } from './SAVE_MAP_in_cache'
 import { SaveTerrainRamps } from './Save_terrain_ramps'
 import { StringArrayForCache } from './struct_StringArrayForCache'
+import {I2HexaString} from "../../01_libraries/Functions_on_numbers";
 
 const initSaveTerrainHeights = () => {
     let y: number

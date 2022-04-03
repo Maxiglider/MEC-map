@@ -1,12 +1,12 @@
 import { Ascii2String } from 'core/01_libraries/Ascii'
 import { Constants, LARGEUR_CASE } from 'core/01_libraries/Constants'
-import { FunctionsOnNumbers } from 'core/01_libraries/Functions_on_numbers'
 import { Text } from 'core/01_libraries/Text'
 import { TerrainType } from 'core/04_STRUCTURES/TerrainType/TerrainType'
 import { udg_terrainTypes } from '../../../../globals'
 import { SaveMapInCache } from './SAVE_MAP_in_cache'
 import { SaveTerrainHeights } from './Save_terrain_heights_and_cliffs'
 import { StringArrayForCache } from './struct_StringArrayForCache'
+import {I2HexaString} from "../../01_libraries/Functions_on_numbers";
 
 const initSaveTerrain = () => {
     let y: number
