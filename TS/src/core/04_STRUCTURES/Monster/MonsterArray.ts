@@ -1,9 +1,10 @@
 import { IsUnitBetweenLocs } from '../../01_libraries/Basic_functions'
 import { Caster } from '../Caster/Caster'
-import { CasterType } from '../Caster/CasterType'
-import { Level } from '../Level/Level'
-import { countMonstersAccordingToMode, Monster } from './Monster'
-import { MonsterType } from './MonsterType'
+import type { CasterType } from '../Caster/CasterType'
+import type { Level } from '../Level/Level'
+import { countMonstersAccordingToMode } from './Monster'
+import type {Monster} from './Monster'
+import type { MonsterType } from './MonsterType'
 
 export const MONSTER_NEAR_DIFF_MAX = 64
 

@@ -102,5 +102,5 @@ export class End extends RectInterface {
 export let DEPART_PAR_DEFAUT: Start
 
 export const init_StartAndEnd = () => {
-    DEPART_PAR_DEFAUT = new Start(-500, -500, 500, 500)
+    DEPART_PAR_DEFAUT = new Start(-50, -50, 50, 50)
 }

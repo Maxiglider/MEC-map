@@ -5,7 +5,7 @@ import { Monster, udg_monsters } from 'core/04_STRUCTURES/Monster/Monster'
 import { ClearMob } from 'core/04_STRUCTURES/Monster_properties/ClearMob'
 import { createEvent } from 'Utils/mapUtils'
 import { udg_monsterTypes } from '../../../../globals'
-import { udg_escapers } from '../Init_structures/Init_escapers'
+import { udg_escapers } from '../../../../globals'
 
 export const InitTrig_InvisUnit_is_getting_damage = () => {
     let TAILLE_UNITE = 100

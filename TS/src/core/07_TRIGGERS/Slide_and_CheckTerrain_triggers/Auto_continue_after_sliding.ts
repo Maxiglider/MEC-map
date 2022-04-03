@@ -1,5 +1,5 @@
 import { NB_ESCAPERS } from 'core/01_libraries/Constants'
-import { udg_escapers } from 'core/08_GAME/Init_structures/Init_escapers'
+ import { udg_escapers } from '../../../../globals'
 
 const initAutoContinueAfterSliding = () => {
     let lastClickedX: number[] = []

@@ -1,6 +1,6 @@
 import {Text} from 'core/01_libraries/Text'
 import {Escaper} from 'core/04_STRUCTURES/Escaper/Escaper'
-import {udg_escapers} from 'core/08_GAME/Init_structures/Init_escapers'
+ import { udg_escapers } from '../../../../globals'
 import {Globals} from 'core/09_From_old_Worldedit_triggers/globals_variables_and_triggers'
 import {createEvent, forRange} from 'Utils/mapUtils'
 import {ExecuteCommandRed} from "./Command_first_player";

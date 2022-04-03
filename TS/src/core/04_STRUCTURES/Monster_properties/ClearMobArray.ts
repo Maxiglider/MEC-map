@@ -1,7 +1,7 @@
 import { MONSTER_NEAR_DIFF_MAX } from '../Monster/MonsterArray'
 import { ClearMob } from './ClearMob'
-import {Level} from "../Level/Level";
-import {Monster} from "../Monster/Monster";
+import type {Level} from "../Level/Level";
+import type {Monster} from "../Monster/Monster";
 
 export class ClearMobArray {
     private level: Level

@@ -1,6 +1,6 @@
 import { IsEscaperInGame } from 'core/01_libraries/Basic_functions'
 import { NB_ESCAPERS } from 'core/01_libraries/Constants'
-import { Level } from '../Level/Level'
+import type { Level } from '../Level/Level'
 import { Escaper } from './Escaper'
 
 

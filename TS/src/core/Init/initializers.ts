@@ -5,7 +5,7 @@ import {initNoSelectionCircle} from "../08_GAME/Init_game/No_selection_circle";
 
 export const initializers = () => {
     init_StartAndEnd()
-    init_globals()
-    initViewAllHideAll()
-    initNoSelectionCircle()
+    // init_globals()
+    // initViewAllHideAll()
+    // initNoSelectionCircle()
 }

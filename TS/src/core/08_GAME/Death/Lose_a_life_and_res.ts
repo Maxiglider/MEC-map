@@ -2,7 +2,7 @@ import { NB_ESCAPERS } from 'core/01_libraries/Constants'
 import { Text } from 'core/01_libraries/Text'
 import { createEvent } from 'Utils/mapUtils'
 import { ChangeAllTerrains } from '../../07_TRIGGERS/Triggers_to_modify_terrains/Change_all_terrains'
-import { udg_escapers } from '../Init_structures/Init_escapers'
+import { udg_escapers } from '../../../../globals'
 import { udg_lives } from '../Init_structures/Init_lives'
 import { udg_levels } from '../Init_structures/Init_struct_levels'
 

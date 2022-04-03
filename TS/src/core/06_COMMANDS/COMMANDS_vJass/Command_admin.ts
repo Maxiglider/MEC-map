@@ -9,7 +9,7 @@ import {
     ReinitTerrainsPositions
 } from 'core/07_TRIGGERS/Triggers_to_modify_terrains/Reinit_terrains_position_Change_variations_and_ut_at_beginning'
 import {AfkMode} from 'core/08_GAME/Afk_mode/Afk_mode'
-import {udg_escapers} from 'core/08_GAME/Init_structures/Init_escapers'
+ import { udg_escapers } from '../../../../globals'
 import {udg_lives} from 'core/08_GAME/Init_structures/Init_lives'
 import {udg_levels} from 'core/08_GAME/Init_structures/Init_struct_levels'
 import {Globals} from 'core/09_From_old_Worldedit_triggers/globals_variables_and_triggers'

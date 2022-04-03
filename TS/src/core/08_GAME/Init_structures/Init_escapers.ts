@@ -1,8 +1,8 @@
 import { EscaperArray } from 'core/04_STRUCTURES/Escaper/EscaperArray'
+import {setUdgEscapers} from "../../../../globals";
 
-export let udg_escapers: EscaperArray
 
 
 export const initEscapers = () => {
-    udg_escapers = new EscaperArray()
+    setUdgEscapers(new EscaperArray())
 }

@@ -1,7 +1,7 @@
 import { Text } from '../../01_libraries/Text'
-import { Level } from '../Level/Level'
-import { MonsterType } from '../Monster/MonsterType'
-import { MonsterSpawn } from './MonsterSpawn'
+import type { Level } from '../Level/Level'
+import type { MonsterType } from '../Monster/MonsterType'
+import type { MonsterSpawn } from './MonsterSpawn'
 
 export class MonsterSpawnArray {
     private monsterSpawns: MonsterSpawn[]

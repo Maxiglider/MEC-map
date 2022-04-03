@@ -1,4 +1,4 @@
-import { Level } from '../Level/Level'
+import type { Level } from '../Level/Level'
 import { MONSTER_NEAR_DIFF_MAX } from '../Monster/MonsterArray'
 import { Meteor } from './Meteor'
 import {IsItemBetweenLocs, IsUnitBetweenLocs} from "../../01_libraries/Basic_functions";

@@ -1,5 +1,5 @@
 import { NB_ESCAPERS } from 'core/01_libraries/Constants'
-import { udg_escapers } from 'core/08_GAME/Init_structures/Init_escapers'
+ import { udg_escapers } from '../../../../globals'
 import { StopUnit } from '../../01_libraries/Basic_functions'
 import { ChangeAllTerrains } from '../../07_TRIGGERS/Triggers_to_modify_terrains/Change_all_terrains'
 import { Escaper } from '../Escaper/Escaper'

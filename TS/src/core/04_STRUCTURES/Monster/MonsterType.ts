@@ -11,7 +11,7 @@ import {
 } from '../../01_libraries/Constants'
 import { udg_colorCode } from '../../01_libraries/Init_colorCodes'
 import { CACHE_SEPARATEUR_PARAM } from '../../07_TRIGGERS/Save_map_in_gamecache/struct_StringArrayForCache'
-import { udg_escapers } from '../../08_GAME/Init_structures/Init_escapers'
+ import { udg_escapers } from '../../../../globals'
 import { Level } from '../Level/Level'
 import { IMMOLATION_SKILLS } from './Immolation_skills'
 

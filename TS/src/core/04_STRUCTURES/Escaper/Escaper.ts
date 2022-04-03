@@ -32,11 +32,10 @@ import { MakeGetUnitTeleportPeriod } from 'core/05_MAKE_STRUCTURES/Make_set_unit
 import { MakeSetUnitMonsterType } from 'core/05_MAKE_STRUCTURES/Make_set_unit_properties/MakeSetUnitMonsterType'
 import { MakeSetUnitTeleportPeriod } from 'core/05_MAKE_STRUCTURES/Make_set_unit_properties/MakeSetUnitTeleportPeriod'
 import { AfkMode } from 'core/08_GAME/Afk_mode/Afk_mode'
-import { udg_escapers } from 'core/08_GAME/Init_structures/Init_escapers'
 import { udg_coop_index_son } from 'core/08_GAME/Mode_coop/coop_init_sounds'
-import { udg_terrainTypes } from '../../../../globals'
-import { Make } from '../../05_MAKE_STRUCTURES/Make/Make'
-import { MakeAction } from '../../05_MAKE_STRUCTURES/MakeLastActions/MakeAction'
+import {udg_escapers, udg_terrainTypes} from '../../../../globals'
+import type { Make } from '../../05_MAKE_STRUCTURES/Make/Make'
+import type { MakeAction } from '../../05_MAKE_STRUCTURES/MakeLastActions/MakeAction'
 import { MakeLastActions } from '../../05_MAKE_STRUCTURES/MakeLastActions/MakeLastActions'
 import { MakeMonsterNoMove } from '../../05_MAKE_STRUCTURES/Make_create_monsters/MakeMonsterNoMove'
 import { MakeDoNothing } from '../../05_MAKE_STRUCTURES/Make_do_nothing/MakeDoNothing'
@@ -60,14 +59,14 @@ import { CommandShortcuts } from '../../08_GAME/Shortcuts/Command_shortcuts_func
 import { Level } from '../Level/Level'
 import { DEPART_PAR_DEFAUT } from '../Level/StartAndEnd'
 import {Meteor, METEOR_NORMAL, udg_meteors} from '../Meteor/Meteor'
-import { MonsterType } from '../Monster/MonsterType'
-import { TerrainType } from '../TerrainType/TerrainType'
+import type { MonsterType } from '../Monster/MonsterType'
+import type { TerrainType } from '../TerrainType/TerrainType'
 import { TerrainTypeSlide } from '../TerrainType/TerrainTypeSlide'
 import { TerrainTypeWalk } from '../TerrainType/TerrainTypeWalk'
 import { EscaperEffectArray } from './EscaperEffectArray'
 import { ColorInfo, GetMirrorEscaper } from './Escaper_functions'
 import {IsLevelBeingMade} from "../Level/Level_functions";
-import {CasterType} from "../Caster/CasterType";
+import type {CasterType} from "../Caster/CasterType";
 
 const SHOW_REVIVE_EFFECTS = false
 
@@ -689,7 +688,7 @@ export class Escaper {
 
             if (this.hero && this.isAlive()) {
                 const currentTerrainType = udg_terrainTypes.getTerrainType(GetUnitX(this.hero), GetUnitY(this.hero))
-                if (currentTerrainType instanceof  TerrainTypeSlide) {
+                if (currentTerrainType instanceof TerrainTypeSlide) {
                     this.setSlideSpeed(currentTerrainType.getSlideSpeed())
                 }
             }
@@ -718,7 +717,7 @@ export class Escaper {
             this.walkSpeedAbsolute = false
             if (this.hero && this.isAlive()) {
                 const currentTerrainType = udg_terrainTypes.getTerrainType(GetUnitX(this.hero), GetUnitY(this.hero))
-                if (currentTerrainType instanceof  TerrainTypeWalk) {
+                if (currentTerrainType instanceof TerrainTypeWalk) {
                     this.setWalkSpeed(currentTerrainType.getWalkSpeed())
                 }
             }

@@ -10,10 +10,10 @@ const tsMain = () => {
     initializers()
 
     //triggers
-    initOldTriggers()
+    // initOldTriggers()
 
     //escapers
-    initEscapers()
+    // initEscapers()
 }
 
 addScriptHook(W3TS_HOOK.MAIN_AFTER, errorHandler(tsMain))

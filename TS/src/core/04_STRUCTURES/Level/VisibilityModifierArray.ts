@@ -1,5 +1,5 @@
 import { VisibilityModifier } from './VisibilityModifier'
-import {Level} from "./Level";
+import type {Level} from "./Level";
 
 export class VisibilityModifierArray {
     private level: Level

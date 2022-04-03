@@ -1,20 +1,20 @@
 import { NB_LIVES_AT_BEGINNING } from 'core/01_libraries/Constants'
 import { Text } from 'core/01_libraries/Text'
-import { udg_escapers } from 'core/08_GAME/Init_structures/Init_escapers'
 import { udg_lives } from 'core/08_GAME/Init_structures/Init_lives'
 import { gg_trg_apparition_dialogue_et_fermeture_automatique } from 'core/08_GAME/Mode_coop/creation_dialogue'
 import { MoveCamExceptForPlayer } from '../../01_libraries/Basic_functions'
 import { udg_colorCode } from '../../01_libraries/Init_colorCodes'
-import { CasterType } from '../Caster/CasterType'
-import { Escaper } from '../Escaper/Escaper'
-import { MeteorArray } from '../Meteor/MeteorArray'
-import { MonsterArray } from '../Monster/MonsterArray'
-import { MonsterType } from '../Monster/MonsterType'
-import { MonsterSpawnArray } from '../MonsterSpawn/MonsterSpawnArray'
-import { ClearMobArray } from '../Monster_properties/ClearMobArray'
+import type { CasterType } from '../Caster/CasterType'
+import type { Escaper } from '../Escaper/Escaper'
+import type { MeteorArray } from '../Meteor/MeteorArray'
+import type { MonsterArray } from '../Monster/MonsterArray'
+import type { MonsterType } from '../Monster/MonsterType'
+import type { MonsterSpawnArray } from '../MonsterSpawn/MonsterSpawnArray'
+import type { ClearMobArray } from '../Monster_properties/ClearMobArray'
 import { Level } from './Level'
-import { VisibilityModifierArray } from './VisibilityModifierArray'
+import type { VisibilityModifierArray } from './VisibilityModifierArray'
 import {IsLevelBeingMade} from "./Level_functions";
+import {udg_escapers} from "../../../../globals";
 
 export const NB_MAX_LEVELS = 50
 
