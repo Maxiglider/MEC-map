@@ -5,7 +5,7 @@ import {
     COLOR_TERRAIN_WALK,
     udg_colorCode,
 } from 'core/01_libraries/Init_colorCodes'
-import {TerrainType} from 'core/04_STRUCTURES/TerrainType/TerrainType'
+import type {TerrainType} from 'core/04_STRUCTURES/TerrainType/TerrainType'
 import {Globals} from 'core/09_From_old_Worldedit_triggers/globals_variables_and_triggers'
 import {TerrainTypeMax} from './Terrain_type_max'
 import {TerrainTypeNamesAndData} from './Terrain_type_names_and_data'
