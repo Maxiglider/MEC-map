@@ -6,7 +6,7 @@ import { Text } from '../../01_libraries/Text'
 import { CACHE_SEPARATEUR_PARAM } from '../../07_TRIGGERS/Save_map_in_gamecache/struct_StringArrayForCache'
 import { Level } from '../Level/Level'
 import { MonsterType } from '../Monster/MonsterType'
-import { NewImmobileMonsterForPlayer } from '../Monster/Monster_creation_functions'
+import { NewImmobileMonsterForPlayer } from '../Monster/Monster_functions'
 
 const DECALAGE_UNSPAWN = 200
 const DELAY_BETWEEN_SPAWN_AND_MOVEMENT = 0.5

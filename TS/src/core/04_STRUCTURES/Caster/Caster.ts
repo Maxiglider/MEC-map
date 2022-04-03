@@ -2,7 +2,7 @@ import { CACHE_SEPARATEUR_PARAM } from 'core/07_TRIGGERS/Save_map_in_gamecache/s
 import { Escaper } from '../Escaper/Escaper'
 import { Monster } from '../Monster/Monster'
 import { MonsterType } from '../Monster/MonsterType'
-import { NewImmobileMonster } from '../Monster/Monster_creation_functions'
+import { NewImmobileMonster } from '../Monster/Monster_functions'
 import { CasterType } from './CasterType'
 import {CasterUnitWithinRange_Actions} from './Caster_functions'
 

@@ -104,3 +104,5 @@ export const NewPatrolMonster = (mt: MonsterType, x1: number, y1: number, x2: nu
     IssuePointOrder(monster, 'patrol', x2, y2)
     return monster
 }
+
+

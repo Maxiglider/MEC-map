@@ -2,7 +2,7 @@
 import { CACHE_SEPARATEUR_PARAM } from '../../07_TRIGGERS/Save_map_in_gamecache/struct_StringArrayForCache'
 import { Monster } from './Monster'
 import { MonsterType } from './MonsterType'
-import { NewPatrolMonster } from './Monster_creation_functions'
+import { NewPatrolMonster } from './Monster_functions'
 import {udg_monsters} from "../../../../globals";
 
 const initMonsterSimplePatrol = () => {

@@ -2,7 +2,7 @@ import { IsUnitBetweenLocs } from '../../01_libraries/Basic_functions'
 import { Caster } from '../Caster/Caster'
 import type { CasterType } from '../Caster/CasterType'
 import type { Level } from '../Level/Level'
-import { countMonstersAccordingToMode } from './Monster'
+import { countMonstersAccordingToMode } from './Monster_count'
 import type {Monster} from './Monster'
 import type { MonsterType } from './MonsterType'
 

@@ -1,7 +1,7 @@
 import { Constants } from 'core/01_libraries/Constants'
 import { createEvent } from 'Utils/mapUtils'
 import { MonsterType } from '../Monster/MonsterType'
-import { NewImmobileMonster } from '../Monster/Monster_creation_functions'
+import { NewImmobileMonster } from '../Monster/Monster_functions'
 
 const PERIOD = 0.01
 

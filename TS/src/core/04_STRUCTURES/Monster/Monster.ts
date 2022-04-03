@@ -4,30 +4,10 @@ import { IsColorString } from '../../06_COMMANDS/COMMANDS_vJass/Command_function
 import { CACHE_SEPARATEUR_PARAM } from '../../07_TRIGGERS/Save_map_in_gamecache/struct_StringArrayForCache'
 import { Level } from '../Level/Level'
 import { ClearMob } from '../Monster_properties/ClearMob'
-import { MonsterMultiplePatrols } from './MonsterMultiplePatrols'
-import { MonsterNoMove } from './MonsterNoMove'
-import { MonsterSimplePatrol } from './MonsterSimplePatrol'
 import { MonsterType } from './MonsterType'
 import { MonstersClickableSetLife } from './trig_Monsters_clickable_set_life'
 import {udg_monsters} from "../../../../globals";
 
-
-export const countMonstersAccordingToMode = (monsters: Monster[], mode?: string) => {
-    if (!mode) mode = 'all'
-
-    let filteredMonsters: Monster[] = []
-    if (mode == 'all') {
-        filteredMonsters = monsters.filter((monster: Monster) => monster !== undefined)
-    } else if (mode == 'moving') {
-        filteredMonsters = monsters.filter(
-            (monster: Monster) => monster instanceof MonsterSimplePatrol || monster instanceof MonsterMultiplePatrols
-        )
-    } else if (mode == 'not moving') {
-        filteredMonsters = monsters.filter((monster: Monster) => monster instanceof MonsterNoMove)
-    }
-
-    return filteredMonsters.length
-}
 
 export abstract class Monster {
     public static DISABLE_TRANSPARENCY = 80
@@ -66,10 +46,6 @@ export abstract class Monster {
         this.vcGreen = 100
         this.vcBlue = 100
         this.vcTransparency = 0
-    }
-
-    static count = (mode?: string): number => {
-        return countMonstersAccordingToMode(udg_monsters, mode)
     }
 
     getId() {

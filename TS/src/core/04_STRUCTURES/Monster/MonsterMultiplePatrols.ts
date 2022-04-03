@@ -4,7 +4,7 @@ import { CACHE_SEPARATEUR_PARAM } from 'core/07_TRIGGERS/Save_map_in_gamecache/s
 import { IsHero } from '../Escaper/Escaper_functions'
 import { Monster } from './Monster'
 import { MonsterType } from './MonsterType'
-import { NewPatrolMonster } from './Monster_creation_functions'
+import { NewPatrolMonster } from './Monster_functions'
 import {udg_monsters} from "../../../../globals";
 
 const NewRegion = (x: number, y: number): region => {
