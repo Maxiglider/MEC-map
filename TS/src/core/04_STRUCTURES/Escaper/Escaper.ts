@@ -55,7 +55,6 @@ import { Trig_InvisUnit_is_getting_damage } from '../../08_GAME/Death/InvisUnit_
 import { Heroes } from '../../08_GAME/Init_game/Heroes'
 import { MessageHeroDies } from '../../08_GAME/Init_game/Message_heroDies'
 import { udg_levels } from "../../../../globals";
-import { CommandShortcuts } from '../../08_GAME/Shortcuts/Command_shortcuts_functions'
 import { Level } from '../Level/Level'
 import { DEPART_PAR_DEFAUT } from '../Level/StartAndEnd'
 import {Meteor, METEOR_NORMAL, udg_meteors} from '../Meteor/Meteor'
@@ -67,6 +66,7 @@ import { EscaperEffectArray } from './EscaperEffectArray'
 import { ColorInfo, GetMirrorEscaper } from './Escaper_functions'
 import {IsLevelBeingMade} from "../Level/Level_functions";
 import type {CasterType} from "../Caster/CasterType";
+import {CommandShortcuts} from "../../08_GAME/Shortcuts/Using_shortcut";
 
 const SHOW_REVIVE_EFFECTS = false
 

@@ -28,9 +28,9 @@ import {TerrainTypeFromString} from '../../07_TRIGGERS/Modify_terrain_Functions/
 import {TerrainTypeNamesAndData} from '../../07_TRIGGERS/Modify_terrain_Functions/Terrain_type_names_and_data'
 import {AutoContinueAfterSliding} from '../../07_TRIGGERS/Slide_and_CheckTerrain_triggers/Auto_continue_after_sliding'
 import {TurnOnSlide} from '../../07_TRIGGERS/Slide_and_CheckTerrain_triggers/To_turn_on_slide'
-import {CommandShortcuts} from '../../08_GAME/Shortcuts/Command_shortcuts_functions'
 import {CmdName, CmdParam, IsColorString, IsPlayerColorString, NbParam, NoParam} from "./Command_functions";
 import {IsInteger, PercentageStringOrX2Integer} from "../../01_libraries/Functions_on_numbers";
+import {CommandShortcuts} from "../../08_GAME/Shortcuts/Using_shortcut";
 
 
 export const ExecuteCommandAll = (escaper: Escaper, cmd: string): boolean => {
