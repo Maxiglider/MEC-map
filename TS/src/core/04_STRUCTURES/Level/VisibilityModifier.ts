@@ -8,8 +8,8 @@ export class VisibilityModifier {
     private x2: number
     private y2: number
     private fm: fogmodifier
-    level: Level
-    arrayId: number
+    level?: Level
+    id?: number
 
     constructor(x1: number, y1: number, x2: number, y2: number) {
         let visionRect = Rect(x1, y1, x2, y2)
@@ -18,15 +18,14 @@ export class VisibilityModifier {
         this.x2 = x2
         this.y2 = y2
         this.fm = CreateFogModifierRect(Player(0), FOG_OF_WAR_VISIBLE, visionRect, true, false)
+
         RemoveRect(visionRect)
-        ;(visionRect as any) = null
         ViewAllHideAll.RefreshHideAllVM()
     }
 
     destroy = () => {
         DestroyFogModifier(this.fm)
-        ;(this.fm as any) = null
-        this.level.visibilities.setNull(this.arrayId)
+        this.level && this.id && this.level.visibilities.removeVisibility(this.id)
     }
 
     activate = (activ: boolean) => {

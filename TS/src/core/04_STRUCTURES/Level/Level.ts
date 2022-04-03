@@ -32,12 +32,12 @@ export class Level {
     clearMobs: ClearMobArray
 
     constructor() {
-        this.visibilities = new VisibilityModifierArray()
+        this.visibilities = new VisibilityModifierArray(this)
         this.triggers = new TriggerArray()
         this.monsters = new MonsterArray(this)
         this.monsterSpawns = new MonsterSpawnArray(this)
         this.meteors = new MeteorArray(this)
-        this.clearMobs = new ClearMobArray()
+        this.clearMobs = new ClearMobArray(this)
         this.livesEarnedAtBeginning = 1
         this.isActivatedB = false
         this.startMessage = ''

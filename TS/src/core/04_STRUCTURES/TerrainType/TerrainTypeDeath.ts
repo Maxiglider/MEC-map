@@ -31,10 +31,6 @@ export class TerrainTypeDeath extends TerrainType {
         this.toleranceDist = toleranceDist
     }
 
-    onDestroy = () => {
-        this.killingTimers.destroy()
-    }
-
     setKillingEffectStr = (killingEffectStr: string) => {
         this.killingEffectStr = killingEffectStr
     }
@@ -77,5 +73,9 @@ export class TerrainTypeDeath extends TerrainType {
         }
         this.toleranceDist = toleranceDist
         return true
+    }
+
+    destroy() {
+        this.killingTimers.destroy()
     }
 }

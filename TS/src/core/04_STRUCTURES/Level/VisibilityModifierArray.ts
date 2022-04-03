@@ -1,95 +1,74 @@
-import { udg_levels } from 'core/08_GAME/Init_structures/Init_struct_levels'
 import { VisibilityModifier } from './VisibilityModifier'
+import {Level} from "./Level";
 
 export class VisibilityModifierArray {
+    private level: Level
     private vms: VisibilityModifier[] = []
-    private lastInstance = -1
 
-    destroy = () => {
-        let i = 0
-        while (true) {
-            if (i > this.lastInstance) break
-            this.vms[i].destroy()
-            i = i + 1
-        }
-        this.lastInstance = -1
+    constructor(level: Level) {
+        this.level = level
     }
 
     new = (x1: number, y1: number, x2: number, y2: number) => {
-        if (this.lastInstance >= 99) {
-            return null
-        }
-        this.lastInstance = this.lastInstance + 1
-        this.vms[this.lastInstance] = new VisibilityModifier(x1, y1, x2, y2)
-        this.vms[this.lastInstance].level = udg_levels.getLevelFromVisibilityModifierArray(this)
-        this.vms[this.lastInstance].arrayId = this.lastInstance
-        return this.vms[this.lastInstance]
+        const n = this.vms.length
+        this.vms[n] = new VisibilityModifier(x1, y1, x2, y2)
+        this.vms[n].level = this.level
+        this.vms[n].id = n
+        return this.vms[n]
     }
 
     newFromExisting = (vm: VisibilityModifier) => {
-        if (this.lastInstance >= 199) {
-            return null
-        }
-        this.lastInstance = this.lastInstance + 1
-        this.vms[this.lastInstance] = vm
+        const n = this.vms.length
+        this.vms[n] = vm
         return vm
     }
 
     count = (): number => {
-        let n = 0
-        let i = 0
-        while (true) {
-            if (i > this.lastInstance) break
-            if (this.vms[i] !== null) {
-                n = n + 1
-            }
-            i = i + 1
-        }
-        return n
+        return this.vms.filter(vm => vm !== undefined).length
     }
 
     get = (visibilityId: number) => {
-        if (visibilityId < 0 || visibilityId > this.lastInstance) {
+        if (visibilityId < 0 || visibilityId > this.vms.length) {
             return null
         }
         return this.vms[visibilityId]
     }
 
     getLastInstanceId = (): number => {
-        return this.lastInstance
+        return this.vms.length - 1
     }
 
-    setNull = (arrayId: number) => {
-        if (arrayId >= 0 && arrayId <= this.lastInstance) {
-            this.vms[arrayId] = 0
-        }
+    removeVisibility = (arrayId: number) => {
+        delete this.vms[arrayId]
     }
 
     removeAllVisibilityModifiers = () => {
-        while (true) {
-            if (this.lastInstance < 0) break
-            this.vms[this.lastInstance].destroy()
-            this.lastInstance = this.lastInstance - 1
-        }
+        this.vms.map(vm => {
+            vm && vm.destroy()
+        })
     }
 
     removeLasts = (numberOfVMToRemove: number): boolean => {
+        const vms = this.vms.filter(vm => vm !== undefined).reverse()
+
         let i = numberOfVMToRemove
-        while (true) {
-            if (i <= 0 || this.lastInstance < 0) break
-            this.vms[this.lastInstance].destroy()
-            this.lastInstance = this.lastInstance - 1
+        while (i > 0 && vms.length > 0) {
+            vms[0].destroy()
+            vms.shift()
             i = i - 1
         }
         return i === 0
     }
 
     activate = (activ: boolean) => {
-        let i = 0
-        while (true) {
-            if (i > this.lastInstance) break
-            this.vms[i].activate(activ)
-            i = i + 1
-        }
+        this.vms.map(vm => {
+            vm && vm.activate(activ)
+        })
+    }
+
+    destroy = () => {
+        this.vms.map(vm => {
+            vm && vm.destroy()
+        })
     }
 }

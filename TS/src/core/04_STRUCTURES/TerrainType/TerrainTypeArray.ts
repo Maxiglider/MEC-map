@@ -222,7 +222,9 @@ export class TerrainTypeArray {
                 this.numberOfSlide = this.numberOfSlide - 1
             }
         }
+
         tt.destroy()
+
         return true
     }
 

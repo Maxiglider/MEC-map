@@ -13,8 +13,8 @@ import { MonsterType } from '../Monster/MonsterType'
 import { MonsterSpawnArray } from '../MonsterSpawn/MonsterSpawnArray'
 import { ClearMobArray } from '../Monster_properties/ClearMobArray'
 import { Level } from './Level'
-import { LevelFunctions } from './Level_functions'
 import { VisibilityModifierArray } from './VisibilityModifierArray'
+import {IsLevelBeingMade} from "./Level_functions";
 
 export const NB_MAX_LEVELS = 50
 
@@ -38,22 +38,24 @@ export class LevelArray {
     }
 
     goToLevel = (finisher: Escaper | null, levelId: number): boolean => {
-        let xCam: number
-        let yCam: number
         let i: number
         let previousLevelId = this.currentLevel
+
         if (levelId < 0 || levelId > this.lastInstance || levelId === this.currentLevel) {
             return false
         }
+
         this.currentLevel = levelId
         if (previousLevelId !== NB_MAX_LEVELS) {
-            if (!LevelFunctions.IsLevelBeingMade(this.levels[previousLevelId])) {
+            if (!IsLevelBeingMade(this.levels[previousLevelId])) {
                 udg_escapers.destroyMakesIfForSpecificLevel_currentLevel()
                 this.levels[previousLevelId].activate(false)
             }
         }
+
         this.levels[this.currentLevel].activate(true)
         this.levels[this.currentLevel].checkpointReviveHeroes(finisher)
+
         if (previousLevelId !== NB_MAX_LEVELS) {
             if (levelId > previousLevelId + 1) {
                 i = previousLevelId + 1
@@ -86,7 +88,7 @@ export class LevelArray {
             return false
         }
         this.currentLevel = this.currentLevel + 1
-        if (!LevelFunctions.IsLevelBeingMade(this.levels[this.currentLevel - 1])) {
+        if (!IsLevelBeingMade(this.levels[this.currentLevel - 1])) {
             udg_escapers.destroyMakesIfForSpecificLevel_currentLevel()
             this.levels[this.currentLevel - 1].activate(false)
         }

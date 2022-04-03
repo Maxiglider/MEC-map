@@ -43,7 +43,7 @@ export class Meteor {
         }
 
         this.item = CreateItem(METEOR_NORMAL, this.x, this.y)
-        if (udg_terrainTypes.getTerrainType(this.x, this.y).getKind() == 'slide') {
+        if (udg_terrainTypes.getTerrainType(this.x, this.y)?.getKind() == 'slide') {
             SetItemDroppable(this.item, false)
         }
         SetItemUserData(this.item, this.id)

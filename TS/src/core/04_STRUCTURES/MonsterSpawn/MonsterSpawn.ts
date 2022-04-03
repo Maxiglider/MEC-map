@@ -216,7 +216,7 @@ export class MonsterSpawn {
         }
         SetUnitX(mobUnit, x1)
         SetUnitY(mobUnit, y1)
-        if (udg_monsterTypes.monsterUnit2MonsterType(mobUnit).isClickable()) {
+        if (udg_monsterTypes.monsterUnit2MonsterType(mobUnit)?.isClickable()) {
             p = ENNEMY_PLAYER
         } else {
             p = GetCurrentMonsterPlayer()

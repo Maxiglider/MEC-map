@@ -1,15 +1,15 @@
-import { Ascii2String } from 'core/01_libraries/Ascii'
-import { B2S } from 'core/01_libraries/Basic_functions'
-import { SLIDE_PERIOD, TERRAIN_DATA_DISPLAY_TIME } from 'core/01_libraries/Constants'
-import { COLOR_TERRAIN_DEATH, COLOR_TERRAIN_SLIDE, COLOR_TERRAIN_WALK } from 'core/01_libraries/Init_colorCodes'
-import { Text } from 'core/01_libraries/Text'
-import { CanUseTerrain } from 'core/07_TRIGGERS/Modify_terrain_Functions/Terrain_functions'
-import { CACHE_SEPARATEUR_PARAM } from 'core/07_TRIGGERS/Save_map_in_gamecache/struct_StringArrayForCache'
-import { TerrainTypeDeath } from './TerrainTypeDeath'
-import { TerrainTypeSlide } from './TerrainTypeSlide'
-import { TerrainTypeWalk } from './TerrainTypeWalk'
+import {Ascii2String} from 'core/01_libraries/Ascii'
+import {B2S} from 'core/01_libraries/Basic_functions'
+import {SLIDE_PERIOD, TERRAIN_DATA_DISPLAY_TIME} from 'core/01_libraries/Constants'
+import {COLOR_TERRAIN_DEATH, COLOR_TERRAIN_SLIDE, COLOR_TERRAIN_WALK} from 'core/01_libraries/Init_colorCodes'
+import {Text} from 'core/01_libraries/Text'
+import {CanUseTerrain} from 'core/07_TRIGGERS/Modify_terrain_Functions/Terrain_functions'
+import {CACHE_SEPARATEUR_PARAM} from 'core/07_TRIGGERS/Save_map_in_gamecache/struct_StringArrayForCache'
+import {TerrainTypeDeath} from './TerrainTypeDeath'
+import {TerrainTypeSlide} from './TerrainTypeSlide'
+import {TerrainTypeWalk} from './TerrainTypeWalk'
 
-export class TerrainType {
+export abstract class TerrainType {
     label: string
     theAlias: string | null
     kind: string
@@ -35,7 +35,7 @@ export class TerrainType {
 
     setOrderId = (orderId: number): TerrainType => {
         this.orderId = orderId
-        return TerrainType(integer(this))
+        return this
     }
 
     getOrderId = (): number => {
@@ -46,7 +46,7 @@ export class TerrainType {
         if (cliffClassId === 1 || cliffClassId === 2) {
             this.cliffClassId = cliffClassId
         }
-        return TerrainType(integer(this))
+        return this
     }
 
     getCliffClassId = (): number => {
@@ -63,7 +63,7 @@ export class TerrainType {
 
     setAlias = (theAlias: string): TerrainType => {
         this.theAlias = theAlias
-        return TerrainType(integer(this))
+        return this
     }
 
     getTerrainTypeId = (): number => {
@@ -82,33 +82,25 @@ export class TerrainType {
         return this.kind
     }
 
-    destroy = () => {
-        this.label = null
-        this.theAlias = null
-        this.kind = null
-        this.terrainTypeId = 0
-    }
-
     displayForPlayer = (p: player) => {
         let order: string
         let space = '   '
-        let slide: TerrainTypeSlide
-        let walk: TerrainTypeWalk
-        let death: TerrainTypeDeath
         let displayCanTurn: string
-        let display: string
+        let display: string = ""
+
         if (this.orderId !== 0) {
             order = ' (order ' + I2S(this.orderId) + ')'
         } else {
             order = ''
         }
-        if (this.kind === 'slide') {
-            slide = TerrainTypeSlide(integer(this))
-            if (slide.getCanTurn()) {
+
+        if (this instanceof TerrainTypeSlide) {
+            if (this.getCanTurn()) {
                 displayCanTurn = 'can turn'
             } else {
                 displayCanTurn = "can't turn"
             }
+
             display =
                 COLOR_TERRAIN_SLIDE +
                 this.label +
@@ -119,53 +111,47 @@ export class TerrainType {
                 Ascii2String(this.terrainTypeId) +
                 "'" +
                 space
-            display = display + I2S(R2I(slide.getSlideSpeed() / SLIDE_PERIOD)) + space + displayCanTurn
-        } else {
-            if (this.kind === 'walk') {
-                walk = TerrainTypeWalk(integer(this))
-                display =
-                    COLOR_TERRAIN_WALK +
-                    this.label +
-                    ' ' +
-                    this.theAlias +
-                    order +
-                    " : '" +
-                    Ascii2String(this.terrainTypeId) +
-                    "'" +
-                    space
-                display = display + I2S(R2I(walk.getWalkSpeed()))
-            } else {
-                if (this.kind === 'death') {
-                    death = TerrainTypeDeath(integer(this))
-                    display =
-                        COLOR_TERRAIN_DEATH +
-                        this.label +
-                        ' ' +
-                        this.theAlias +
-                        order +
-                        " : '" +
-                        Ascii2String(this.terrainTypeId) +
-                        "'" +
-                        space
-                    display =
-                        display +
-                        R2S(death.getTimeToKill()) +
-                        space +
-                        death.getKillingEffectStr() +
-                        space +
-                        I2S(R2I(death.getToleranceDist()))
-                }
-            }
+            display = display + I2S(R2I(this.getSlideSpeed() / SLIDE_PERIOD)) + space + displayCanTurn
+        } else if (this instanceof TerrainTypeWalk) {
+            display =
+                COLOR_TERRAIN_WALK +
+                this.label +
+                ' ' +
+                this.theAlias +
+                order +
+                " : '" +
+                Ascii2String(this.terrainTypeId) +
+                "'" +
+                space
+            display = display + I2S(R2I(this.getWalkSpeed()))
+        } else if (this instanceof TerrainTypeDeath) {
+            display =
+                COLOR_TERRAIN_DEATH +
+                this.label +
+                ' ' +
+                this.theAlias +
+                order +
+                " : '" +
+                Ascii2String(this.terrainTypeId) +
+                "'" +
+                space
+            display =
+                display +
+                R2S(this.getTimeToKill()) +
+                space +
+                this.getKillingEffectStr() +
+                space +
+                I2S(R2I(this.getToleranceDist()))
         }
+
         //display cliff class
-        display = display + space + 'cliff' + I2S(this.cliffClassId)
+        display += space + 'cliff' + I2S(this.cliffClassId)
         Text.P_timed(p, TERRAIN_DATA_DISPLAY_TIME, display)
     }
 
+    abstract destroy(): void
+
     toString = (): string => {
-        let slide: TerrainTypeSlide
-        let walk: TerrainTypeWalk
-        let death: TerrainTypeDeath
         let str =
             this.label +
             CACHE_SEPARATEUR_PARAM +
@@ -181,23 +167,18 @@ export class TerrainType {
             CACHE_SEPARATEUR_PARAM +
             I2S(this.cliffClassId) +
             CACHE_SEPARATEUR_PARAM
-        if (this.kind === 'slide') {
-            slide = TerrainTypeSlide(integer(this))
+
+        if (this instanceof TerrainTypeSlide) {
             str =
-                str + I2S(R2I(slide.getSlideSpeed() / SLIDE_PERIOD)) + CACHE_SEPARATEUR_PARAM + B2S(slide.getCanTurn())
-        } else {
-            if (this.kind === 'walk') {
-                walk = TerrainTypeWalk(integer(this))
-                str = str + I2S(R2I(walk.getWalkSpeed()))
-            } else {
-                if (this.kind === 'death') {
-                    death = TerrainTypeDeath(integer(this))
-                    str = str + death.getKillingEffectStr() + CACHE_SEPARATEUR_PARAM
-                    str = str + R2S(death.getTimeToKill()) + CACHE_SEPARATEUR_PARAM
-                    str = str + R2S(death.getToleranceDist())
-                }
-            }
+                str + I2S(R2I(this.getSlideSpeed() / SLIDE_PERIOD)) + CACHE_SEPARATEUR_PARAM + B2S(this.getCanTurn())
+        } else if (this instanceof TerrainTypeWalk) {
+            str = str + I2S(R2I(this.getWalkSpeed()))
+        } else if (this instanceof TerrainTypeDeath) {
+            str = str + this.getKillingEffectStr() + CACHE_SEPARATEUR_PARAM
+            str = str + R2S(this.getTimeToKill()) + CACHE_SEPARATEUR_PARAM
+            str = str + R2S(this.getToleranceDist())
         }
+
         return str
     }
 }

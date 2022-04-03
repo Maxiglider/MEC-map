@@ -37,4 +37,8 @@ export class TerrainTypeSlide extends TerrainType {
         this.canTurn = canTurn
         return true
     }
+
+    destroy(){
+
+    }
 }

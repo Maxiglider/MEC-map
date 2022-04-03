@@ -22,4 +22,8 @@ export class TerrainTypeWalk extends TerrainType {
     setWalkSpeed = (walkSpeed: number) => {
         this.walkSpeed = walkSpeed
     }
+
+    destroy() {
+
+    }
 }

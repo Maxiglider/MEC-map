@@ -17,7 +17,7 @@ export const InitTrig_Effect_meteor_on_pick_down = () => {
                     return
                 }
 
-                Hero2Escaper(GetTriggerUnit()).removeEffectMeteor()
+                Hero2Escaper(GetTriggerUnit())?.removeEffectMeteor()
             },
         ],
     })

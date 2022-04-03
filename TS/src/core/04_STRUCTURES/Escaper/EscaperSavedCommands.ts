@@ -1,26 +1,22 @@
 import { CommandExecution } from '../../06_COMMANDS/COMMANDS_vJass/Command_execution'
 import { Escaper } from './Escaper'
 
-const initEscaperSavedCommands = () => {
-    const savedCommands = InitHashtable()
 
-    const newCmd = (escaper: Escaper, commandName: string, command: string) => {
-        SaveStr(savedCommands, escaper, StringHash(commandName), command)
-    }
 
-    const execute = (escaper: Escaper, commandName: string): boolean => {
-        const cmd = LoadStr(savedCommands, escaper, StringHash(commandName))
+const savedCommands: (Map<string, string>)[] = []
 
-        if (cmd == null) {
-            return false
-        } else {
-            CommandExecution.ExecuteCommand(escaper, cmd)
-        }
-
-        return true
-    }
-
-    return { savedCommands, newCmd, execute }
+export const newCmd = (escaper: Escaper, commandName: string, command: string) => {
+    savedCommands[escaper.getEscaperId()].set(commandName, command)
 }
 
-export const EscaperSavedCommands = initEscaperSavedCommands()
+export const execute = (escaper: Escaper, commandName: string): boolean => {
+    const cmd = savedCommands[escaper.getEscaperId()].get(commandName)
+
+    if (!cmd) {
+        return false
+    } else {
+        CommandExecution.ExecuteCommand(escaper, cmd)
+    }
+
+    return true
+}

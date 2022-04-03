@@ -7,7 +7,7 @@ const initMeteorFunctions = () => {
 
     const HeroAddCheatMeteor = (hero: unit): item => {
         meteor = UnitAddItemById(hero, METEOR_CHEAT)
-        if (udg_terrainTypes.getTerrainType(GetUnitX(hero), GetUnitY(hero)).getKind() == 'slide') {
+        if (udg_terrainTypes.getTerrainType(GetUnitX(hero), GetUnitY(hero))?.getKind() == 'slide') {
             SetItemDroppable(meteor, false)
         }
         return meteor
