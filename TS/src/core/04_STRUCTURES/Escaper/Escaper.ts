@@ -52,12 +52,12 @@ import { MakeTerrainHeight } from '../../05_MAKE_STRUCTURES/Make_terrain_height/
 import { CheckTerrainTrigger } from '../../07_TRIGGERS/Slide_and_CheckTerrain_triggers/CheckTerrain'
 import { SlideTrigger } from '../../07_TRIGGERS/Slide_and_CheckTerrain_triggers/Slide'
 import { Trig_InvisUnit_is_getting_damage } from '../../08_GAME/Death/InvisUnit_is_getting_damage'
-import { Heroes } from '../../08_GAME/Init_game/Heroes'
+import {HERO_START_ANGLE} from '../../08_GAME/Init_game/Heroes'
 import { MessageHeroDies } from '../../08_GAME/Init_game/Message_heroDies'
 import { udg_levels } from "../../../../globals";
 import { Level } from '../Level/Level'
 import { DEPART_PAR_DEFAUT } from '../Level/StartAndEnd'
-import {Meteor, METEOR_NORMAL, udg_meteors} from '../Meteor/Meteor'
+import {METEOR_NORMAL, udg_meteors} from '../Meteor/Meteor'
 import type { MonsterType } from '../Monster/MonsterType'
 import type { TerrainType } from '../TerrainType/TerrainType'
 import { TerrainTypeSlide } from '../TerrainType/TerrainTypeSlide'
@@ -286,7 +286,7 @@ export class Escaper {
         if (!start) {
             //si le départ du niveau en cours n'existe pas
             start = DEPART_PAR_DEFAUT
-            angle = Heroes.HERO_START_ANGLE
+            angle = HERO_START_ANGLE
         } else {
             angle = GetRandomDirectionDeg()
         }
