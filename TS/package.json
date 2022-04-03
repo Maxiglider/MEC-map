@@ -6,6 +6,7 @@
     "main": "src/main.ts",
     "scripts": {
         "test": "ts-node --transpile-only scripts/test.ts",
+        "test-launch": "ts-node --transpile-only scripts/test.ts --launch",
         "build": "ts-node --transpile-only scripts/build.ts",
         "dev": "npm-watch",
         "build:defs": "ts-node scripts/dev"

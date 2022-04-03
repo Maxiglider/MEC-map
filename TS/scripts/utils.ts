@@ -147,6 +147,72 @@ export function compileMap(config: IProjectConfig) {
         let contents = fs.readFileSync(mapLua).toString() + fs.readFileSync(tsLua).toString()
         contents = processScriptIncludes(contents)
 
+        // Replace require functionality to support circular dependency detection
+        contents = contents.replace(
+            `local ____modules = {}
+local ____moduleCache = {}
+local ____originalRequire = require
+local function require(file, ...)
+    if ____moduleCache[file] then
+        return ____moduleCache[file].value
+    end
+    if ____modules[file] then
+        local module = ____modules[file]
+        ____moduleCache[file] = { value = (select("#", ...) > 0) and module(...) or module(file) }
+        return ____moduleCache[file].value
+    else
+        if ____originalRequire then
+            return ____originalRequire(file)
+        else
+            error("module '" .. file .. "' not found")
+        end
+    end
+end`,
+            `local ____modules = {}
+local ____moduleCache = {}
+
+local ____moduleCache2 = {}
+local ____moduleCircular = false
+local ____moduleCircularArray = {}
+
+local ____originalRequire = require
+local function require(file, ...)
+    if ____moduleCache[file] then
+        return ____moduleCache[file].value
+    end
+    if ____modules[file] then
+        local module = ____modules[file]
+
+        if ____moduleCache2[file] == 2 then
+            error("Circular require detected: " .. table.concat(____moduleCircularArray, " -> ") .. " -> " .. file)
+        end
+
+        if ____moduleCache2[file] == 1 then
+            ____moduleCircular = true
+            ____moduleCache2[file] = { value = 2 }
+        end
+
+        if ____moduleCircular then
+            ____moduleCircularArray[#____moduleCircularArray + 1] = file
+        end
+
+        if ____moduleCache2[file] == nil then
+            ____moduleCache2[file] = { value = 1 }
+        end
+
+        ____moduleCache[file] = { value = (select("#", ...) > 0) and module(...) or module(file) }
+
+        return ____moduleCache[file].value
+    else
+        if ____originalRequire then
+            return ____originalRequire(file)
+        else
+            error("module '" .. file .. "' not found")
+        end
+    end
+end`
+        )
+
         if (config.minifyScript) {
             logger.info(`Minifying script...`)
             contents = luamin.minify(contents.toString())

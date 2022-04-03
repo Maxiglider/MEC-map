@@ -3,11 +3,14 @@ import { compileMap, IProjectConfig, loadJsonFile, logger } from './utils'
 
 function main() {
     const config: IProjectConfig = loadJsonFile('config.json')
-    const result = compileMap(config)
 
-    if (!result) {
-        logger.error(`Failed to compile map.`)
-        return
+    if (process.argv[2] !== '--launch') {
+        const result = compileMap(config)
+
+        if (!result) {
+            logger.error(`Failed to compile map.`)
+            return
+        }
     }
 
     const cwd = process.cwd()
