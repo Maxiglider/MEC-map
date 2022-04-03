@@ -54,7 +54,7 @@ import { SlideTrigger } from '../../07_TRIGGERS/Slide_and_CheckTerrain_triggers/
 import { Trig_InvisUnit_is_getting_damage } from '../../08_GAME/Death/InvisUnit_is_getting_damage'
 import { Heroes } from '../../08_GAME/Init_game/Heroes'
 import { MessageHeroDies } from '../../08_GAME/Init_game/Message_heroDies'
-import { udg_levels } from '../../08_GAME/Init_structures/Init_struct_levels'
+import { udg_levels } from "../../../../globals";
 import { CommandShortcuts } from '../../08_GAME/Shortcuts/Command_shortcuts_functions'
 import { Level } from '../Level/Level'
 import { DEPART_PAR_DEFAUT } from '../Level/StartAndEnd'

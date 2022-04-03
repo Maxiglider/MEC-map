@@ -1,7 +1,7 @@
 import { Text } from 'core/01_libraries/Text'
 import { udg_lives } from 'core/08_GAME/Init_structures/Init_lives'
  import { udg_escapers } from '../../../../globals'
-import { udg_levels } from '../../08_GAME/Init_structures/Init_struct_levels'
+import { udg_levels } from "../../../../globals";
 import type { CasterType } from '../Caster/CasterType'
 import type { Escaper } from '../Escaper/Escaper'
 import { MeteorArray } from '../Meteor/MeteorArray'

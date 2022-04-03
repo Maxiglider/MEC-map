@@ -4,7 +4,7 @@ import { createEvent } from 'Utils/mapUtils'
 import { ChangeAllTerrains } from '../../07_TRIGGERS/Triggers_to_modify_terrains/Change_all_terrains'
 import { udg_escapers } from '../../../../globals'
 import { udg_lives } from '../Init_structures/Init_lives'
-import { udg_levels } from '../Init_structures/Init_struct_levels'
+import { udg_levels } from "../../../../globals";
 
 let udg_gameIsLost = false
 export let gg_trg_Lose_a_life_and_res: trigger

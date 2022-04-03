@@ -1,6 +1,6 @@
 import {MakeOneByOneOrTwoClicks} from "../Make/MakeOneByOneOrTwoClicks";
 import {Level} from "../../04_STRUCTURES/Level/Level";
-import {udg_levels} from "../../08_GAME/Init_structures/Init_struct_levels";
+import { udg_levels } from "../../../../globals";
 import {Text} from "../../01_libraries/Text";
 
 

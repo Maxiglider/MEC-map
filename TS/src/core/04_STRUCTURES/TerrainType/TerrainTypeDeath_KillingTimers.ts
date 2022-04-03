@@ -1,6 +1,6 @@
 import { NB_ESCAPERS } from 'core/01_libraries/Constants'
  import { udg_escapers } from '../../../../globals'
-import { udg_levels } from 'core/08_GAME/Init_structures/Init_struct_levels'
+import { udg_levels } from "../../../../globals";
 import { forRange } from 'Utils/mapUtils'
 import { udg_terrainTypes } from '../../../../globals'
 

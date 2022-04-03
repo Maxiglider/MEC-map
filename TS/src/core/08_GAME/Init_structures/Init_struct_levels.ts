@@ -1,9 +1,8 @@
 import { LevelArray } from 'core/04_STRUCTURES/Level/LevelArray'
+import {setUdgLEvels} from "../../../../globals";
 
-export let udg_levels: LevelArray
+
 
 export const InitTrig_Init_struct_levels = () => {
-    if (!udg_levels) {
-        udg_levels = new LevelArray()
-    }
+    setUdgLEvels(new LevelArray())
 }

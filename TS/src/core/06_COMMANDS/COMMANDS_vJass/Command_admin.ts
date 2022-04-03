@@ -11,7 +11,7 @@ import {
 import {AfkMode} from 'core/08_GAME/Afk_mode/Afk_mode'
  import { udg_escapers } from '../../../../globals'
 import {udg_lives} from 'core/08_GAME/Init_structures/Init_lives'
-import {udg_levels} from 'core/08_GAME/Init_structures/Init_struct_levels'
+import { udg_levels } from "../../../../globals";
 import {Globals} from 'core/09_From_old_Worldedit_triggers/globals_variables_and_triggers'
 import {udg_doubleHeroesEnabled} from 'core/Double_heroes/double_heroes_config'
 import {udg_casterTypes, udg_monsterTypes, udg_terrainTypes} from '../../../../globals'

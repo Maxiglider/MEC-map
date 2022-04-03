@@ -18,7 +18,7 @@ import {TerrainTypeSlide} from 'core/04_STRUCTURES/TerrainType/TerrainTypeSlide'
 import {TerrainTypeWalk} from 'core/04_STRUCTURES/TerrainType/TerrainTypeWalk'
 import {ExchangeTerrains} from 'core/07_TRIGGERS/Triggers_to_modify_terrains/Exchange_terrains'
 import {RandomizeTerrains} from 'core/07_TRIGGERS/Triggers_to_modify_terrains/Randomize_terrains'
-import {udg_levels} from 'core/08_GAME/Init_structures/Init_struct_levels'
+import { udg_levels } from "../../../../globals";
 import {udg_casterTypes, udg_monsterTypes, udg_terrainTypes} from '../../../../globals'
 import {TerrainTypeFromString} from '../../07_TRIGGERS/Modify_terrain_Functions/Terrain_type_from_string'
 import {

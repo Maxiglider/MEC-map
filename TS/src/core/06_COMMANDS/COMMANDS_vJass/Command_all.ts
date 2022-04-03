@@ -20,7 +20,7 @@ import {DisplayTerrainDataToPlayer, GetTerrainData} from 'core/07_TRIGGERS/Modif
 import {Apm} from 'core/08_GAME/Apm_clics_par_minute/Apm'
  import { udg_escapers } from '../../../../globals'
 import {udg_lives} from 'core/08_GAME/Init_structures/Init_lives'
-import {udg_levels} from 'core/08_GAME/Init_structures/Init_struct_levels'
+import { udg_levels } from "../../../../globals";
 import {Globals} from 'core/09_From_old_Worldedit_triggers/globals_variables_and_triggers'
 import {EscaperEffectFunctions} from '../../04_STRUCTURES/Escaper/EscaperEffect_functions'
 import {Disco} from '../../04_STRUCTURES/Escaper/Escaper_disco'
