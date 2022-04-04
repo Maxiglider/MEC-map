@@ -80,13 +80,11 @@ export const GetTerrainData = (terrain: number) => {
 
     if (terrain > TerrainTypeNamesAndData.NB_TERRAINS_TOTAL) {
         maxId = TerrainTypeMax.TerrainTypeId2TerrainTypeMaxId(terrain)
+    } else if (terrain > 0) {
+        maxId = terrain
+        terrain = TerrainTypeMax.TerrainTypeMaxId2TerrainTypeId(maxId)
     } else {
-        if (terrain > 0) {
-            maxId = terrain
-            terrain = TerrainTypeMax.TerrainTypeMaxId2TerrainTypeId(maxId)
-        } else {
-            return null
-        }
+        return null
     }
     str = udg_colorCode[RED] + TerrainTypeNamesAndData.TERRAIN_TYPE_DATA[maxId]
 

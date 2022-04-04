@@ -4,6 +4,11 @@ import type { Level } from '../Level/Level'
 import { Escaper } from './Escaper'
 
 
+interface EscaperCallback{
+    (escaper: Escaper): void
+}
+
+
 export class EscaperArray {
     private escapers: Escaper[]
     
@@ -47,6 +52,22 @@ export class EscaperArray {
         }
 
         delete this.escapers[id]
+    }
+
+    forMainEscapers(callback: EscaperCallback){
+        this.escapers.map(escaper => {
+            if(escaper && !escaper.isEscaperSecondary()){
+                callback(escaper)
+            }
+        })
+    }
+
+    forAll(callback: EscaperCallback){
+        this.escapers.map(escaper => {
+            if(escaper){
+                callback(escaper)
+            }
+        })
     }
 
     deleteSpecificActionsForLevel = (level: Level) => {

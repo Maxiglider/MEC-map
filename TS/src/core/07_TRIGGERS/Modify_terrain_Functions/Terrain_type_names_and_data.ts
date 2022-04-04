@@ -1,13 +1,16 @@
-import { TerrainTypeAsciiConversion } from './Terrain_type_ascii_conversion'
 import { TerrainTypeGrass } from './Terrain_type_grass'
 import { TerrainTypeMax } from './Terrain_type_max'
 
-const initTerrainTypeNamesAndData = () => {
-    const TERRAIN_TYPE_NAMES: string[] = []
-    const TERRAIN_TYPE_DATA: string[] = []
-    const NB_TERRAINS_TOTAL = 177
 
-    const Init_TerrainTypeNamesAndData = () => {
+
+const TERRAIN_TYPE_NAMES: string[] = []
+const TERRAIN_TYPE_DATA: string[] = []
+const NB_TERRAINS_TOTAL = 177
+
+
+const initTerrainTypeNamesAndData = () => {
+
+    const init_TerrainTypeNamesAndData = () => {
         let maxId: number
         let terrain: number
         let grassId: number
@@ -192,25 +195,27 @@ const initTerrainTypeNamesAndData = () => {
         TERRAIN_TYPE_NAMES[177] = "Village en automne - Falaise d'herbe épaisse"
 
         maxId = 1
-        while (true) {
-            if (maxId > NB_TERRAINS_TOTAL) break
+        while (maxId <= NB_TERRAINS_TOTAL) {
             terrain = TerrainTypeMax.TerrainTypeMaxId2TerrainTypeId(maxId)
             S =
                 TERRAIN_TYPE_NAMES[maxId] +
                 ' :    ' +
                 I2S(maxId) +
-                '    ' +
-                TerrainTypeAsciiConversion.TerrainTypeId2TerrainTypeAsciiString(terrain)
+                '    ' + "'" +
+                TerrainTypeMax.TerrainTypeId2TerrainTypeAsciiString(terrain) + "'"
             grassId = TerrainTypeGrass.TerrainTypeMaxId2GrassId(maxId)
             if (grassId !== 0) {
                 S = S + '    g' + I2S(grassId)
             }
+
             TERRAIN_TYPE_DATA[maxId] = S
             maxId = maxId + 1
         }
     }
 
-    return { TERRAIN_TYPE_NAMES, TERRAIN_TYPE_DATA, NB_TERRAINS_TOTAL, Init_TerrainTypeNamesAndData }
+    return { TERRAIN_TYPE_NAMES, TERRAIN_TYPE_DATA, NB_TERRAINS_TOTAL, init_TerrainTypeNamesAndData }
 }
 
 export const TerrainTypeNamesAndData = initTerrainTypeNamesAndData()
+
+export const init_TerrainTypeNamesAndData = initTerrainTypeNamesAndData().init_TerrainTypeNamesAndData

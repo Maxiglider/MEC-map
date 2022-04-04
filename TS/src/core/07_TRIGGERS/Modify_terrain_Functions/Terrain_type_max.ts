@@ -359,15 +359,33 @@ const initTerrainTypeMax = () => {
         cQc1: 177,
     }
 
+    const reversedTerrainMapFourCC = (function(){
+        const mapFourCC: {[x: number]: number} = {}
+
+        for(let str in reversedTerrainMap){
+            mapFourCC[FourCC(str)] = reversedTerrainMap[str]
+        }
+
+        return mapFourCC
+    })()
+
     const TerrainTypeMaxId2TerrainTypeId = (maxId: number): number => {
         return terrainMap[maxId] ? FourCC(terrainMap[maxId]) : 0
     }
 
     const TerrainTypeId2TerrainTypeMaxId = (terrainTypeId: number): number => {
-        return reversedTerrainMap[terrainTypeId] || 0
+        return reversedTerrainMapFourCC[terrainTypeId] || 0
     }
 
-    return { TerrainTypeMaxId2TerrainTypeId, TerrainTypeId2TerrainTypeMaxId }
+    const TerrainTypeId2TerrainTypeAsciiString = (terrainType: number): string => {
+        return terrainMap[reversedTerrainMapFourCC[terrainType]] || 'none'
+    }
+
+    const TerrainTypeAsciiString2TerrainTypeId = (terrainTypeAsciiString: string): number => {
+        return FourCC(terrainMap[reversedTerrainMap[terrainTypeAsciiString]]) || 0
+    }
+
+    return { TerrainTypeMaxId2TerrainTypeId, TerrainTypeId2TerrainTypeMaxId, TerrainTypeAsciiString2TerrainTypeId, TerrainTypeId2TerrainTypeAsciiString }
 }
 
 export const TerrainTypeMax = initTerrainTypeMax()

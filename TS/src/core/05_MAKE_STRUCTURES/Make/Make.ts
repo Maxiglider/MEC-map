@@ -45,11 +45,15 @@ export abstract class Make {
             return false
         }
 
-        this.orderX = GetOrderPointX()
-        this.orderY = GetOrderPointY()
+        const _this = Hero2Escaper(GetTriggerUnit())?.getMake()
+        if(!_this) return false
 
-        StopUnit(this.maker)
-        return true
+        _this.orderX = GetOrderPointX()
+        _this.orderY = GetOrderPointY()
+
+        StopUnit(_this.maker)
+
+        return _this
     }
 
     abstract doActions(this: void): void

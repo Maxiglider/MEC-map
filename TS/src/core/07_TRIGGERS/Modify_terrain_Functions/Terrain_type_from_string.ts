@@ -1,5 +1,4 @@
 import { GetRandomNotUsedTerrain, GetRandomTerrain, GetRandomUsedTerrain } from './Terrain_functions'
-import { TerrainTypeAsciiConversion } from './Terrain_type_ascii_conversion'
 import { TerrainTypeGrass } from './Terrain_type_grass'
 import { TerrainTypeMax } from './Terrain_type_max'
 import {IsPositiveInteger} from "../../01_libraries/Functions_on_numbers";
@@ -18,7 +17,7 @@ const initTerrainTypeFromString = () => {
         }
 
         if (StringLength(str) === 6 && SubStringBJ(str, 1, 1) === "'" && SubStringBJ(str, 6, 6) === "'") {
-            return TerrainTypeAsciiConversion.TerrainTypeAsciiString2TerrainTypeId(str)
+            return TerrainTypeMax.TerrainTypeAsciiString2TerrainTypeId(str)
         }
 
         if (str === 'x') {

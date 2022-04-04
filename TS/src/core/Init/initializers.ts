@@ -6,6 +6,8 @@ import {Init_Heroes} from "../08_GAME/Init_game/Heroes";
 import {initGameTime} from "../04_STRUCTURES/Lives_and_game_time/Time_of_game_trigger";
 import {initOldTriggers} from "./init_old_triggers";
 import {init_commandExecution} from "../06_COMMANDS/COMMANDS_vJass/Command_execution";
+import {makingRightsToAll} from "../06_COMMANDS/Rights/manage_rights";
+import {init_TerrainTypeNamesAndData} from "../07_TRIGGERS/Modify_terrain_Functions/Terrain_type_names_and_data";
 
 export const initializers = () => {
     initArrays()
@@ -16,4 +18,8 @@ export const initializers = () => {
     initGameTime()
     initOldTriggers()
     init_commandExecution()
+    init_TerrainTypeNamesAndData()
+
+    //todomax disable this line at end
+    makingRightsToAll()
 }
