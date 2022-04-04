@@ -64,10 +64,6 @@ export abstract class Make {
     enableTrigger() {
         if (this.t) DestroyTrigger(this.t)
 
-        // this.t = CreateTrigger()
-        // TriggerAddAction(this.t, TriggerActions)
-        // TriggerRegisterUnitEvent(this.t, this.maker, EVENT_UNIT_ISSUED_POINT_ORDER)
-
         this.t = createEvent({
             events: [t => TriggerRegisterUnitEvent(t, this.maker, EVENT_UNIT_ISSUED_POINT_ORDER)],
             actions: [TriggerActions],

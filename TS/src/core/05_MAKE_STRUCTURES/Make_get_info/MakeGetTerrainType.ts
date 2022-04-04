@@ -6,11 +6,10 @@ import {TerrainTypeNamesAndData} from "../../07_TRIGGERS/Modify_terrain_Function
 
 export class MakeGetTerrainType extends Make {
     constructor(maker: unit) {
-        print('MakeGetTerrainType')
         super(maker, 'getTerrainType', false)
     }
 
-    doActions() {
+    doActions = () => {
         if(super.doBaseActions()){
             const terrainData = GetTerrainData(GetTerrainType(this.orderX, this.orderY))
             terrainData && Text.P(this.makerOwner, terrainData)
