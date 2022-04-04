@@ -1,6 +1,6 @@
 import { NB_ESCAPERS } from 'core/01_libraries/Constants'
 import { udg_doubleHeroesEnabled } from 'core/Double_heroes/double_heroes_config'
-import { createTimer } from 'Utils/mapUtils'
+import { createEvent } from 'Utils/mapUtils'
 import { getUdgEscapers } from '../../../../globals'
 
 let startPositions: location[] = []
@@ -148,5 +148,8 @@ export const Init_Heroes = () => {
         }
     }
 
-    createTimer(spawnPeriod, false, Trig_heroes_Actions)
+    createEvent({
+        events: [t => TriggerRegisterTimerEvent(t, spawnPeriod, false)],
+        actions: [() => Trig_heroes_Actions()],
+    })
 }
