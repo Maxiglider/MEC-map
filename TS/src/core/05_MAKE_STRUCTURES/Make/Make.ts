@@ -1,10 +1,17 @@
 import { IsIssuedOrder, StopUnit } from 'core/01_libraries/Basic_functions'
 import { Hero2Escaper } from 'core/04_STRUCTURES/Escaper/Escaper_functions'
 import { Escaper } from '../../04_STRUCTURES/Escaper/Escaper'
+import {createEvent} from "../../../Utils/mapUtils";
 
 export const MAKE_LAST_CLIC_UNIT_ID = FourCC('e001') //à remplacer par l'id de l'unité choisie (need couleur variable)
 export const MAKE_CANT_CANCEL_MORE = 'Nothing else to cancel !'
 export const MAKE_CANT_REDO_MORE = 'Nothing else to redo !'
+
+
+const TriggerActions = () => {
+    Hero2Escaper(GetTriggerUnit())?.getMake()?.doActions()
+}
+
 
 export abstract class Make {
     makerOwner: player
@@ -45,24 +52,26 @@ export abstract class Make {
             return false
         }
 
-        const _this = Hero2Escaper(GetTriggerUnit())?.getMake()
-        if(!_this) return false
+        this.orderX = GetOrderPointX()
+        this.orderY = GetOrderPointY()
 
-        _this.orderX = GetOrderPointX()
-        _this.orderY = GetOrderPointY()
-
-        StopUnit(_this.maker)
-
-        return _this
+        StopUnit(this.maker)
+        return true
     }
 
     abstract doActions(this: void): void
 
     enableTrigger() {
         if (this.t) DestroyTrigger(this.t)
-        this.t = CreateTrigger()
-        TriggerAddAction(this.t, this.doActions)
-        TriggerRegisterUnitEvent(this.t, this.maker, EVENT_UNIT_ISSUED_POINT_ORDER)
+
+        // this.t = CreateTrigger()
+        // TriggerAddAction(this.t, TriggerActions)
+        // TriggerRegisterUnitEvent(this.t, this.maker, EVENT_UNIT_ISSUED_POINT_ORDER)
+
+        this.t = createEvent({
+            events: [t => TriggerRegisterUnitEvent(t, this.maker, EVENT_UNIT_ISSUED_POINT_ORDER)],
+            actions: [TriggerActions],
+        })
     }
 
     cancelLastAction() {
