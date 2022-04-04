@@ -6,68 +6,75 @@ import type {LevelArray} from "./src/core/04_STRUCTURES/Level/LevelArray";
 import type {Monster} from "./src/core/04_STRUCTURES/Monster/Monster";
 
 
+//GLOBALS
+
+const globals: {
+    escapers?: EscaperArray,
+    levels?: LevelArray,
+    terrainTypes?: TerrainTypeArray,
+    casterTypes?: CasterTypeArray,
+    monsterTypes?: MonsterTypeArray
+} = {}
+
+
+
+
+//SETTERS - GETTERS
 
 //Escapers
-let udg_escapers: EscaperArray
-
 export const setUdgEscapers = (escaperArray: EscaperArray) => {
-    udg_escapers = escaperArray
+    globals.escapers = escaperArray
 }
 
-export const getUdgEscapers = () => {
-    return udg_escapers
+export const getUdgEscapers = (): EscaperArray => {
+    if(!globals.escapers) throw "globals.escapers called before init"
+    return globals.escapers
 }
 
 
 //Levels
-let udg_levels: LevelArray
-
 export const setUdgLEvels = (la: LevelArray) => {
-    if(!udg_levels) {
-        udg_levels = la
-    }
+    globals.levels = la
 }
 
-export const getUdgLevels = () => {
-    return udg_levels
+export const getUdgLevels = (): LevelArray => {
+    if(!globals.levels) throw "globals.levels called before init"
+    return globals.levels
 }
 
 
 //Terrain types
-let udg_terrainTypes: TerrainTypeArray
-
 export const setUdgTerrainTypes = (tta: TerrainTypeArray) => {
-    udg_terrainTypes = tta
+    globals.terrainTypes = tta
 }
 
-export const getUdgTerrainTypes = () => {
-    return udg_terrainTypes
+export const getUdgTerrainTypes = (): TerrainTypeArray => {
+    if(!globals.terrainTypes) throw "globals.terrainTypes called before init"
+    return globals.terrainTypes
 }
 
 
 //Caster types
-let udg_casterTypes: CasterTypeArray
-
 export const setUdgCasterTypes = (cta: CasterTypeArray) => {
-    udg_casterTypes = cta
+    globals.casterTypes = cta
 }
 
-export const getUdgCasterTypes = () => {
-    return udg_casterTypes
+export const getUdgCasterTypes = (): CasterTypeArray => {
+    if(!globals.casterTypes) throw "globals.casterTypes called before init"
+    return globals.casterTypes
 }
 
 
 //Monster types
-let udg_monsterTypes: MonsterTypeArray
-
 export const setUdgMonsterTypes = (mta: MonsterTypeArray) => {
-    udg_monsterTypes = mta
+    globals.monsterTypes = mta
 }
 
-export const getUdgMonsterTypes = () => {
-    return udg_monsterTypes
+export const getUdgMonsterTypes = (): MonsterTypeArray => {
+    if(!globals.monsterTypes) throw "globals.monsterTypes called before init"
+    return globals.monsterTypes
 }
 
 
 //Monsters
-export let udg_monsters: Monster[] = []
+export const udg_monsters: Monster[] = []
