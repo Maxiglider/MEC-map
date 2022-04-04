@@ -1,6 +1,4 @@
-import { NB_ESCAPERS } from 'core/01_libraries/Constants'
 import { getUdgEscapers } from '../../../../globals'
-
 
 const initDisco = () => {
     const ApplyRandomColor = (n: number) => {
@@ -23,17 +21,7 @@ const initDisco = () => {
         }
     }
 
-    const Disco_Actions = () => {
-        let n = 0
-
-        while (!(getUdgEscapers().get(n)?.discoTrigger === GetTriggeringTrigger())) {
-            if (n >= NB_ESCAPERS) {
-                return
-            }
-
-            n = n + 1
-        }
-
+    const Disco_Actions = (n: number) => {
         ApplyRandomColor(n)
     }
 
