@@ -3,10 +3,7 @@
         "baseUrl": "./src",
         "allowJs": true,
         "target": "ES6",
-        "lib": [
-            "ES6",
-            "ES2020"
-        ],
+        "lib": ["ES6", "ES2020"],
         "noImplicitAny": true,
         "strict": true,
         "moduleResolution": "classic",
@@ -22,9 +19,9 @@
         "plugins": [
             {
                 "transform": "war3-transformer",
-                "mapDir": "C:/MAMP/www/mec-map/TS/maps/map.w3x",
-                "entryFile": "C:/MAMP/www/mec-map/TS/src/main.ts",
-                "outputDir": "C:/MAMP/www/mec-map/TS/dist/map.w3x"
+                "mapDir": "C:/Users/Stan/Node/MEC-map/TS/maps/map.w3x",
+                "entryFile": "C:/Users/Stan/Node/MEC-map/TS/src/main.ts",
+                "outputDir": "C:/Users/Stan/Node/MEC-map/TS/dist/map.w3x"
             }
         ],
         "types": [
@@ -48,9 +45,7 @@
         "skipLibCheck": true,
         "forceConsistentCasingInFileNames": true
     },
-    "include": [
-        "src"
-    ],
+    "include": ["src"],
     "exclude": [],
     "tstl": {
         "luaTarget": "5.3",
