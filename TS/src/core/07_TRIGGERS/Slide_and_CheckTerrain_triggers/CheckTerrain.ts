@@ -12,10 +12,13 @@ import { getUdgTerrainTypes } from '../../../../globals'
 
 import { AutoContinueAfterSliding } from './Auto_continue_after_sliding'
 
+
+const TOLERANCE_ANGLE_DIFF = 5
+const TOLERANCE_RAYON_DIFF = 20
+const INIT_RAYON_TOLERANCE = 20
+
+
 const initCheckTerrainTrigger = () => {
-    const TOLERANCE_ANGLE_DIFF = 5
-    const TOLERANCE_RAYON_DIFF = 20
-    const INIT_RAYON_TOLERANCE = 20
 
     const CheckTerrain_Actions = (playerId: number) => {
         const escaper = getUdgEscapers().get(playerId)

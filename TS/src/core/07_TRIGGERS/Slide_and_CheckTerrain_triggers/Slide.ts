@@ -18,9 +18,7 @@ const initSlideTrigger = () => {
         const speedZ = escaper.getSpeedZ()
         const oldDiffZ = escaper.getOldDiffZ()
 
-        if (!hero || !lastZ || !speedZ || !oldDiffZ) {
-            return
-        }
+        if(!hero) return
 
         const angle = Deg2Rad(GetUnitFacing(hero))
         const heroPos = GetUnitLoc(hero)
@@ -70,7 +68,6 @@ const initSlideTrigger = () => {
         escaper.setLastZ(z)
         escaper.setOldDiffZ(diffZ)
         RemoveLocation(heroPos)
-        ;(heroPos as any) = null
     }
 
     const CreateSlideTrigger = (playerId: number): trigger => {

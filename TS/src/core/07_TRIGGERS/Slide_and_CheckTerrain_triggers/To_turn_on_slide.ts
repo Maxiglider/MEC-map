@@ -168,3 +168,5 @@ const initTurnOnSlide = () => {
 }
 
 export const TurnOnSlide = initTurnOnSlide()
+
+export const init_ToTurnOnSlide = TurnOnSlide.init_ToTurnOnSlide

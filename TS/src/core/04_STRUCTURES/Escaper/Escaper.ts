@@ -110,9 +110,9 @@ export class Escaper {
 
     private itemInInventory?: item
 
-    private lastZ?: number
-    private oldDiffZ?: number
-    private speedZ?: number
+    private lastZ: number = 0
+    private oldDiffZ: number = 0
+    private speedZ: number = 0
 
     private slideLastAngleOrder: number
     private isHeroSelectedB: boolean

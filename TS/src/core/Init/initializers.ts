@@ -8,6 +8,7 @@ import {initOldTriggers} from "./init_old_triggers";
 import {init_commandExecution} from "../06_COMMANDS/COMMANDS_vJass/Command_execution";
 import {makingRightsToAll} from "../06_COMMANDS/Rights/manage_rights";
 import {init_TerrainTypeNamesAndData} from "../07_TRIGGERS/Modify_terrain_Functions/Terrain_type_names_and_data";
+import {init_ToTurnOnSlide} from "../07_TRIGGERS/Slide_and_CheckTerrain_triggers/To_turn_on_slide";
 
 export const initializers = () => {
     initArrays()
@@ -19,6 +20,7 @@ export const initializers = () => {
     initOldTriggers()
     init_commandExecution()
     init_TerrainTypeNamesAndData()
+    init_ToTurnOnSlide()
 
     //todomax disable this line at end
     makingRightsToAll()
