@@ -1,7 +1,7 @@
 import { Text } from 'core/01_libraries/Text'
 import { Escaper } from 'core/04_STRUCTURES/Escaper/Escaper'
 import { Globals } from 'core/09_From_old_Worldedit_triggers/globals_variables_and_triggers'
-import { createEvent, forRange } from 'Utils/mapUtils'
+import { createEvent, createTimer, forRange } from 'Utils/mapUtils'
 import { getUdgEscapers } from '../../../../globals'
 import { NB_PLAYERS_MAX } from '../../01_libraries/Constants'
 import { commandsBuffer } from '../../04_STRUCTURES/Escaper/EscaperSavedCommands'
@@ -112,19 +112,14 @@ export const init_commandExecution = () => {
     })
 
     //Handle buffer of commands
-    createEvent({
-        //todomax find a better solution than a periodic timer
-        events: [t => TriggerRegisterTimerEvent(t, 0.001, true)],
-        actions: [
-            () => {
-                if (commandsBuffer.length > 0) {
-                    commandsBuffer.map(command => {
-                        ExecuteCommand(command.escaper, command.cmd)
-                    })
+    //todomax find a better solution than a periodic timer
+    createTimer(0.001, true, () => {
+        if (commandsBuffer.length > 0) {
+            commandsBuffer.map(command => {
+                ExecuteCommand(command.escaper, command.cmd)
+            })
 
-                    commandsBuffer.length = 0
-                }
-            },
-        ],
+            commandsBuffer.length = 0
+        }
     })
 }

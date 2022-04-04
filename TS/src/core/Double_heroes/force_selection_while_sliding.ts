@@ -1,9 +1,8 @@
 import { NB_PLAYERS_MAX } from 'core/01_libraries/Constants'
 import { ForceSelectHeroes, GetMirrorEscaper } from 'core/04_STRUCTURES/Escaper/Escaper_functions'
- import {getUdgEscapers} from '../../../globals'
+import { createTimer } from 'Utils/mapUtils'
+import { getUdgEscapers } from '../../../globals'
 import { udg_doubleHeroesEnabled } from './double_heroes_config'
-
-
 
 export const init_forceSelectionWhileSliding = () => {
     const ForceSelectionWhileSliding_Actions = (): void => {
@@ -37,7 +36,5 @@ export const init_forceSelectionWhileSliding = () => {
         }
     }
 
-    let trig = CreateTrigger()
-    TriggerRegisterTimerEvent(trig, 0.1, true)
-    TriggerAddAction(trig, ForceSelectionWhileSliding_Actions)
+    createTimer(0.1, true, ForceSelectionWhileSliding_Actions)
 }

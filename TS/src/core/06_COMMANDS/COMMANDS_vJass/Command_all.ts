@@ -1,4 +1,4 @@
-import {ClearTextForPlayer, IsBoolString, S2B} from 'core/01_libraries/Basic_functions'
+import { ClearTextForPlayer, IsBoolString, S2B } from 'core/01_libraries/Basic_functions'
 import {
     BLUE,
     DEFAULT_CAMERA_FIELD,
@@ -11,29 +11,26 @@ import {
     TEAL,
     TERRAIN_DATA_DISPLAY_TIME,
 } from 'core/01_libraries/Constants'
-import {ColorString2Id, udg_colorCode} from 'core/01_libraries/Init_colorCodes'
-import {Text} from 'core/01_libraries/Text'
-import {Escaper} from 'core/04_STRUCTURES/Escaper/Escaper'
-import {ColorInfo, GetMirrorEscaper} from 'core/04_STRUCTURES/Escaper/Escaper_functions'
-import {DisplayTerrainDataToPlayer, GetTerrainData} from 'core/07_TRIGGERS/Modify_terrain_Functions/Terrain_functions'
-import {Apm} from 'core/08_GAME/Apm_clics_par_minute/Apm'
- import { getUdgEscapers } from '../../../../globals'
-
-import {udg_lives} from 'core/08_GAME/Init_structures/Init_lives'
-import { getUdgLevels } from "../../../../globals"
-
-import {Globals} from 'core/09_From_old_Worldedit_triggers/globals_variables_and_triggers'
-import {EscaperEffectFunctions} from '../../04_STRUCTURES/Escaper/EscaperEffect_functions'
-import {Disco} from '../../04_STRUCTURES/Escaper/Escaper_disco'
-import {TerrainTypeFromString} from '../../07_TRIGGERS/Modify_terrain_Functions/Terrain_type_from_string'
-import {TerrainTypeNamesAndData} from '../../07_TRIGGERS/Modify_terrain_Functions/Terrain_type_names_and_data'
-import {AutoContinueAfterSliding} from '../../07_TRIGGERS/Slide_and_CheckTerrain_triggers/Auto_continue_after_sliding'
-import {TurnOnSlide} from '../../07_TRIGGERS/Slide_and_CheckTerrain_triggers/To_turn_on_slide'
-import {CmdName, CmdParam, IsColorString, IsPlayerColorString, NbParam, NoParam} from "./Command_functions";
-import {IsInteger, PercentageStringOrX2Integer} from "../../01_libraries/Functions_on_numbers";
-import {CommandShortcuts} from "../../08_GAME/Shortcuts/Using_shortcut";
-import {execute, newCmd} from "../../04_STRUCTURES/Escaper/EscaperSavedCommands";
-
+import { ColorString2Id, udg_colorCode } from 'core/01_libraries/Init_colorCodes'
+import { Text } from 'core/01_libraries/Text'
+import { Escaper } from 'core/04_STRUCTURES/Escaper/Escaper'
+import { ColorInfo, GetMirrorEscaper } from 'core/04_STRUCTURES/Escaper/Escaper_functions'
+import { DisplayTerrainDataToPlayer, GetTerrainData } from 'core/07_TRIGGERS/Modify_terrain_Functions/Terrain_functions'
+import { Apm } from 'core/08_GAME/Apm_clics_par_minute/Apm'
+import { udg_lives } from 'core/08_GAME/Init_structures/Init_lives'
+import { Globals } from 'core/09_From_old_Worldedit_triggers/globals_variables_and_triggers'
+import { createTimer } from 'Utils/mapUtils'
+import { getUdgEscapers, getUdgLevels } from '../../../../globals'
+import { IsInteger, PercentageStringOrX2Integer } from '../../01_libraries/Functions_on_numbers'
+import { EscaperEffectFunctions } from '../../04_STRUCTURES/Escaper/EscaperEffect_functions'
+import { execute, newCmd } from '../../04_STRUCTURES/Escaper/EscaperSavedCommands'
+import { Disco } from '../../04_STRUCTURES/Escaper/Escaper_disco'
+import { TerrainTypeFromString } from '../../07_TRIGGERS/Modify_terrain_Functions/Terrain_type_from_string'
+import { TerrainTypeNamesAndData } from '../../07_TRIGGERS/Modify_terrain_Functions/Terrain_type_names_and_data'
+import { AutoContinueAfterSliding } from '../../07_TRIGGERS/Slide_and_CheckTerrain_triggers/Auto_continue_after_sliding'
+import { TurnOnSlide } from '../../07_TRIGGERS/Slide_and_CheckTerrain_triggers/To_turn_on_slide'
+import { CommandShortcuts } from '../../08_GAME/Shortcuts/Using_shortcut'
+import { CmdName, CmdParam, IsColorString, IsPlayerColorString, NbParam, NoParam } from './Command_functions'
 
 export const ExecuteCommandAll = (escaper: Escaper, cmd: string): boolean => {
     let name = CmdName(cmd)
@@ -93,16 +90,10 @@ export const ExecuteCommandAll = (escaper: Escaper, cmd: string): boolean => {
                 Text.P(escaper.getPlayer(), udg_colorCode[RED] + 'Red : not a correct percentage (' + param1 + ')')
             }
             if (!escaper.setVcGreen(I2R(PercentageStringOrX2Integer(param2)))) {
-                Text.P(
-                    escaper.getPlayer(),
-                    udg_colorCode[GREEN] + 'Green : not a correct percentage (' + param2 + ')'
-                )
+                Text.P(escaper.getPlayer(), udg_colorCode[GREEN] + 'Green : not a correct percentage (' + param2 + ')')
             }
             if (!escaper.setVcBlue(I2R(PercentageStringOrX2Integer(param3)))) {
-                Text.P(
-                    escaper.getPlayer(),
-                    udg_colorCode[BLUE] + 'Blue : not a correct percentage (' + param3 + ')'
-                )
+                Text.P(escaper.getPlayer(), udg_colorCode[BLUE] + 'Blue : not a correct percentage (' + param3 + ')')
             }
             if (nbParam === 4) {
                 if (!escaper.setVcTransparency(I2R(PercentageStringOrX2Integer(param4)))) {
@@ -427,8 +418,8 @@ export const ExecuteCommandAll = (escaper: Escaper, cmd: string): boolean => {
         CustomDefeatBJ(escaper.getPlayer(), 'You have kicked... yourself.')
         Text.A(
             udg_colorCode[GetPlayerId(escaper.getPlayer())] +
-            GetPlayerName(escaper.getPlayer()) +
-            ' has kicked himself !'
+                GetPlayerName(escaper.getPlayer()) +
+                ' has kicked himself !'
         )
         escaper.destroy()
         GetMirrorEscaper(escaper)?.destroy()
@@ -504,15 +495,12 @@ export const ExecuteCommandAll = (escaper: Escaper, cmd: string): boolean => {
                     }
                 } else {
                     if (param1 == 'off' && escaper.discoTrigger != null) {
-                        DestroyTrigger(escaper.discoTrigger)
-                        ;(escaper.discoTrigger as any) = null
+                        escaper.discoTrigger.destroy()
 
                         const discoTrigger = GetMirrorEscaper(escaper)?.discoTrigger
 
-                        if (discoTrigger) {
-                            DestroyTrigger(discoTrigger)
-                            ;(GetMirrorEscaper(escaper)!.discoTrigger as any) = null
-                        }
+                        discoTrigger?.destroy()
+                        GetMirrorEscaper(escaper)?.discoTrigger?.destroy()
 
                         Text.P(escaper.getPlayer(), 'disco off')
                     }
@@ -523,14 +511,17 @@ export const ExecuteCommandAll = (escaper: Escaper, cmd: string): boolean => {
             }
         }
 
-        ;[escaper.discoTrigger, GetMirrorEscaper(escaper)?.discoTrigger].forEach(trigger => {
-            if (trigger) {
-                DestroyTrigger(trigger)
-                trigger = CreateTrigger()
-                TriggerAddAction(trigger, Disco.Disco_Actions)
-                TriggerRegisterTimerEvent(trigger, 10 / I2R(n), true) //n changements en 10 secondes
-            }
-        })
+        if (escaper.discoTrigger) {
+            escaper.discoTrigger.destroy()
+            escaper.discoTrigger = createTimer(10 / I2R(n), true, Disco.Disco_Actions) //n changements en 10 secondes
+        }
+
+        const mirrorEscaper = GetMirrorEscaper(escaper)
+
+        if (mirrorEscaper?.discoTrigger) {
+            mirrorEscaper.discoTrigger.destroy()
+            mirrorEscaper.discoTrigger = createTimer(10 / I2R(n), true, Disco.Disco_Actions) //n changements en 10 secondes
+        }
 
         Text.P(escaper.getPlayer(), 'disco : ' + I2S(n) + ' changes in 10 seconds')
         return true
@@ -548,11 +539,7 @@ export const ExecuteCommandAll = (escaper: Escaper, cmd: string): boolean => {
     if (name === 'usedTerrains' || name === 'ut') {
         if (noParam) {
             Text.DisplayLineToPlayer(escaper.getPlayer())
-            Text.P_timed(
-                escaper.getPlayer(),
-                TERRAIN_DATA_DISPLAY_TIME,
-                udg_colorCode[TEAL] + '       Used terrains :'
-            )
+            Text.P_timed(escaper.getPlayer(), TERRAIN_DATA_DISPLAY_TIME, udg_colorCode[TEAL] + '       Used terrains :')
             i = 0
             while (true) {
                 if (i >= Globals.udg_nb_used_terrains) break

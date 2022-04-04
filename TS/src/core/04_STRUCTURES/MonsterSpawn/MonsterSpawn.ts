@@ -1,5 +1,6 @@
+import { createTimer } from 'Utils/mapUtils'
+import { Timer } from 'w3ts'
 import { getUdgMonsterTypes } from '../../../../globals'
-
 import { GetCurrentMonsterPlayer } from '../../01_libraries/Basic_functions'
 import { ENNEMY_PLAYER, GREY, MOBS_VARIOUS_COLORS, TERRAIN_DATA_DISPLAY_TIME } from '../../01_libraries/Constants'
 import { udg_colorCode } from '../../01_libraries/Init_colorCodes'
@@ -67,7 +68,7 @@ export class MonsterSpawn {
     private minY: number
     private maxX: number
     private maxY: number
-    private tSpawn?: trigger
+    private tSpawn?: Timer
     private tUnspawn?: trigger
     private unspawnReg?: region
     monsters?: group
@@ -113,10 +114,8 @@ export class MonsterSpawn {
             delete this.unspawnReg
         }
 
-        if (this.tSpawn) {
-            DestroyTrigger(this.tSpawn)
-            delete this.tSpawn
-        }
+        this.tSpawn?.destroy()
+        delete this.tSpawn
 
         if (this.tUnspawn) {
             DestroyTrigger(this.tUnspawn)
@@ -169,10 +168,8 @@ export class MonsterSpawn {
     activate = (): void => {
         this.monsters = CreateGroup()
 
-        this.tSpawn = CreateTrigger()
-        MonsterSpawn.anyTrigId2MonsterSpawn.set(GetHandleId(this.tSpawn), this)
-        TriggerRegisterTimerEvent(this.tSpawn, 1 / this.frequence, true)
-        TriggerAddAction(this.tSpawn, MonsterSpawn_Actions)
+        this.tSpawn = createTimer(1 / this.frequence, true, MonsterSpawn_Actions)
+        MonsterSpawn.anyTrigId2MonsterSpawn.set(GetHandleId(this.tSpawn.handle), this)
 
         this.createUnspawnReg()
         this.tUnspawn = CreateTrigger()
@@ -265,11 +262,9 @@ export class MonsterSpawn {
 
     setFrequence = (frequence: number): void => {
         this.frequence = frequence
-        this.tSpawn && DestroyTrigger(this.tSpawn)
-        this.tSpawn = CreateTrigger()
-        MonsterSpawn.anyTrigId2MonsterSpawn.set(GetHandleId(this.tSpawn), this)
-        TriggerRegisterTimerEvent(this.tSpawn, 1 / this.frequence, true)
-        TriggerAddAction(this.tSpawn, MonsterSpawn_Actions)
+        this.tSpawn?.destroy()
+        this.tSpawn = createTimer(1 / this.frequence, true, MonsterSpawn_Actions)
+        MonsterSpawn.anyTrigId2MonsterSpawn.set(GetHandleId(this.tSpawn.handle), this)
     }
 
     displayForPlayer = (p: player): void => {

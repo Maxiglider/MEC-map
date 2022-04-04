@@ -1,8 +1,7 @@
-import {NB_ESCAPERS} from 'core/01_libraries/Constants'
-import {udg_doubleHeroesEnabled} from 'core/Double_heroes/double_heroes_config'
-import {createEvent} from 'Utils/mapUtils'
-import {getUdgEscapers} from '../../../../globals'
-
+import { NB_ESCAPERS } from 'core/01_libraries/Constants'
+import { udg_doubleHeroesEnabled } from 'core/Double_heroes/double_heroes_config'
+import { createTimer } from 'Utils/mapUtils'
+import { getUdgEscapers } from '../../../../globals'
 
 let startPositions: location[] = []
 let startPositionsRandomized: location[] = []
@@ -74,8 +73,6 @@ const Trig_heroes_Actions = () => {
     let anEffect: effect | null
     let i: number
     let n: number
-
-    
 
     //randomize start positions
     RandomizeStartPositionsAndHeroSpawnOrder()
@@ -151,8 +148,5 @@ export const Init_Heroes = () => {
         }
     }
 
-    createEvent({
-        events: [t => TriggerRegisterTimerEvent(t, spawnPeriod, false)],
-        actions: [() => Trig_heroes_Actions()],
-    })
+    createTimer(spawnPeriod, false, Trig_heroes_Actions)
 }

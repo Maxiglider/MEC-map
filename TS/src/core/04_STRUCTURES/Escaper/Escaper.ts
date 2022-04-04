@@ -32,8 +32,8 @@ import { MakeGetUnitTeleportPeriod } from 'core/05_MAKE_STRUCTURES/Make_set_unit
 import { MakeSetUnitMonsterType } from 'core/05_MAKE_STRUCTURES/Make_set_unit_properties/MakeSetUnitMonsterType'
 import { MakeSetUnitTeleportPeriod } from 'core/05_MAKE_STRUCTURES/Make_set_unit_properties/MakeSetUnitTeleportPeriod'
 import { AfkMode } from 'core/08_GAME/Afk_mode/Afk_mode'
-import { udg_coop_index_son } from 'core/08_GAME/Mode_coop/coop_init_sounds'
-import {getUdgEscapers, getUdgTerrainTypes} from '../../../../globals'
+import { Timer } from 'w3ts'
+import { getUdgEscapers, getUdgLevels, getUdgTerrainTypes } from '../../../../globals'
 import type { Make } from '../../05_MAKE_STRUCTURES/Make/Make'
 import type { MakeAction } from '../../05_MAKE_STRUCTURES/MakeLastActions/MakeAction'
 import { MakeLastActions } from '../../05_MAKE_STRUCTURES/MakeLastActions/MakeLastActions'
@@ -52,26 +52,22 @@ import { MakeTerrainHeight } from '../../05_MAKE_STRUCTURES/Make_terrain_height/
 import { CheckTerrainTrigger } from '../../07_TRIGGERS/Slide_and_CheckTerrain_triggers/CheckTerrain'
 import { SlideTrigger } from '../../07_TRIGGERS/Slide_and_CheckTerrain_triggers/Slide'
 import { Trig_InvisUnit_is_getting_damage } from '../../08_GAME/Death/InvisUnit_is_getting_damage'
-import {HERO_START_ANGLE} from '../../08_GAME/Init_game/Heroes'
+import { HERO_START_ANGLE } from '../../08_GAME/Init_game/Heroes'
 import { MessageHeroDies } from '../../08_GAME/Init_game/Message_heroDies'
-import { getUdgLevels } from "../../../../globals"
-
+import { CommandShortcuts } from '../../08_GAME/Shortcuts/Using_shortcut'
+import type { CasterType } from '../Caster/CasterType'
 import { Level } from '../Level/Level'
+import { IsLevelBeingMade } from '../Level/Level_functions'
 import { DEPART_PAR_DEFAUT } from '../Level/StartAndEnd'
-import {METEOR_NORMAL, udg_meteors} from '../Meteor/Meteor'
+import { METEOR_NORMAL, udg_meteors } from '../Meteor/Meteor'
 import type { MonsterType } from '../Monster/MonsterType'
 import type { TerrainType } from '../TerrainType/TerrainType'
 import { TerrainTypeSlide } from '../TerrainType/TerrainTypeSlide'
 import { TerrainTypeWalk } from '../TerrainType/TerrainTypeWalk'
 import { EscaperEffectArray } from './EscaperEffectArray'
 import { ColorInfo, GetMirrorEscaper } from './Escaper_functions'
-import {IsLevelBeingMade} from "../Level/Level_functions";
-import type {CasterType} from "../Caster/CasterType";
-import {CommandShortcuts} from "../../08_GAME/Shortcuts/Using_shortcut";
 
 const SHOW_REVIVE_EFFECTS = false
-
-
 
 export class Escaper {
     private escaperId: number
@@ -125,7 +121,7 @@ export class Escaper {
 
     private animSpeedSecondaryHero: number
 
-    public discoTrigger?: trigger
+    public discoTrigger?: Timer
     public currentLevelTouchTerrainDeath?: Level //pour le terrain qui tue, vérifie s'il faut bien tuer l'escaper
 
     //coop
@@ -347,7 +343,7 @@ export class Escaper {
         DestroyTrigger(this.slide)
         DestroyTrigger(this.checkTerrain)
 
-        this.discoTrigger && DestroyTrigger(this.discoTrigger)
+        this.discoTrigger?.destroy()
         delete this.discoTrigger
 
         getUdgEscapers().removeEscaper(this.escaperId)
@@ -1113,16 +1109,16 @@ export class Escaper {
 
     makeCreateMonsterSpawn(label: string, mt: MonsterType, sens: string, frequence: number) {
         this.destroyMake()
-        if(this.hero) this.make = new MakeMonsterSpawn(this.hero, label, mt, sens, frequence)
+        if (this.hero) this.make = new MakeMonsterSpawn(this.hero, label, mt, sens, frequence)
     }
 
     makeDeleteMonsters(mode: string) {
         this.destroyMake()
 
-        try{
-            if(this.hero) this.make = new MakeDeleteMonsters(this.hero, mode)
-        }catch(error){
-            if(typeof error == 'string'){
+        try {
+            if (this.hero) this.make = new MakeDeleteMonsters(this.hero, mode)
+        } catch (error) {
+            if (typeof error == 'string') {
                 Text.erP(this.p, error)
             }
         }
@@ -1131,10 +1127,10 @@ export class Escaper {
     makeSetUnitTeleportPeriod(mode: string, period: number) {
         this.destroyMake()
 
-        try{
-            if(this.hero) this.make = new MakeSetUnitTeleportPeriod(this.hero, mode, period)
-        }catch(error){
-            if(typeof error == 'string'){
+        try {
+            if (this.hero) this.make = new MakeSetUnitTeleportPeriod(this.hero, mode, period)
+        } catch (error) {
+            if (typeof error == 'string') {
                 Text.erP(this.p, error)
             }
         }
@@ -1142,16 +1138,16 @@ export class Escaper {
 
     makeGetUnitTeleportPeriod() {
         this.destroyMake()
-        if(this.hero) this.make = new MakeGetUnitTeleportPeriod(this.hero)
+        if (this.hero) this.make = new MakeGetUnitTeleportPeriod(this.hero)
     }
 
     makeSetUnitMonsterType(mode: string, mt: MonsterType) {
         this.destroyMake()
 
-        try{
-            if(this.hero) this.make = new MakeSetUnitMonsterType(this.hero, mode, mt)
-        }catch(error){
-            if(typeof error == 'string'){
+        try {
+            if (this.hero) this.make = new MakeSetUnitMonsterType(this.hero, mode, mt)
+        } catch (error) {
+            if (typeof error == 'string') {
                 Text.erP(this.p, error)
             }
         }
@@ -1159,16 +1155,16 @@ export class Escaper {
 
     makeCreateMeteor() {
         this.destroyMake()
-        if(this.hero) this.make = new MakeMeteor(this.hero)
+        if (this.hero) this.make = new MakeMeteor(this.hero)
     }
 
     makeDeleteMeteors(mode: string) {
         this.destroyMake()
 
-        try{
-            if(this.hero) this.make = new MakeDeleteMeteors(this.hero, mode)
-        }catch(error){
-            if(typeof error == 'string'){
+        try {
+            if (this.hero) this.make = new MakeDeleteMeteors(this.hero, mode)
+        } catch (error) {
+            if (typeof error == 'string') {
                 Text.erP(this.p, error)
             }
         }
@@ -1176,16 +1172,16 @@ export class Escaper {
 
     makeCreateCaster(casterType: CasterType, angle: number) {
         this.destroyMake()
-        if(this.hero) this.make = new MakeCaster(this.hero, casterType, angle)
+        if (this.hero) this.make = new MakeCaster(this.hero, casterType, angle)
     }
 
     makeDeleteCasters(mode: string) {
         this.destroyMake()
 
-        try{
-            if(this.hero) this.make = new MakeDeleteCasters(this.hero, mode)
-        }catch(error){
-            if(typeof error == 'string'){
+        try {
+            if (this.hero) this.make = new MakeDeleteCasters(this.hero, mode)
+        } catch (error) {
+            if (typeof error == 'string') {
                 Text.erP(this.p, error)
             }
         }
@@ -1193,62 +1189,62 @@ export class Escaper {
 
     makeCreateClearMobs(disableDuration: number) {
         this.destroyMake()
-        if(this.hero) this.make = new MakeClearMob(this.hero, disableDuration)
+        if (this.hero) this.make = new MakeClearMob(this.hero, disableDuration)
     }
 
     makeDeleteClearMobs() {
         this.destroyMake()
-        if(this.hero) this.make = new MakeDeleteClearMob(this.hero)
+        if (this.hero) this.make = new MakeDeleteClearMob(this.hero)
     }
 
     makeCreateTerrain(terrainType: TerrainType) {
         this.destroyMake()
-        if(this.hero) this.make = new MakeTerrainCreate(this.hero, terrainType)
+        if (this.hero) this.make = new MakeTerrainCreate(this.hero, terrainType)
     }
 
     makeTerrainCopyPaste() {
         this.destroyMake()
-        if(this.hero) this.make = new MakeTerrainCopyPaste(this.hero)
+        if (this.hero) this.make = new MakeTerrainCopyPaste(this.hero)
     }
 
     makeTerrainVerticalSymmetry() {
         this.destroyMake()
-        if(this.hero) this.make = new MakeTerrainVerticalSymmetry(this.hero)
+        if (this.hero) this.make = new MakeTerrainVerticalSymmetry(this.hero)
     }
 
     makeTerrainHorizontalSymmetry() {
         this.destroyMake()
-        if(this.hero) this.make = new MakeTerrainHorizontalSymmetry(this.hero)
+        if (this.hero) this.make = new MakeTerrainHorizontalSymmetry(this.hero)
     }
 
     makeTerrainHeight(radius: number, height: number) {
         this.destroyMake()
-        if(this.hero) this.make = new MakeTerrainHeight(this.hero, radius, height)
+        if (this.hero) this.make = new MakeTerrainHeight(this.hero, radius, height)
     }
 
     makeGetTerrainType() {
         this.destroyMake()
-        if(this.hero) this.make = new MakeGetTerrainType(this.hero)
+        if (this.hero) this.make = new MakeGetTerrainType(this.hero)
     }
 
     makeExchangeTerrains() {
         this.destroyMake()
-        if(this.hero) this.make = new MakeExchangeTerrains(this.hero)
+        if (this.hero) this.make = new MakeExchangeTerrains(this.hero)
     }
 
     makeCreateStart(forNext: boolean) {
         this.destroyMake()
-        if(this.hero) this.make = new MakeStart(this.hero, forNext)
+        if (this.hero) this.make = new MakeStart(this.hero, forNext)
     }
 
     makeCreateEnd() {
         this.destroyMake()
-        if(this.hero) this.make = new MakeEnd(this.hero)
+        if (this.hero) this.make = new MakeEnd(this.hero)
     }
 
     makeCreateVisibilityModifier() {
         this.destroyMake()
-        if(this.hero) this.make = new MakeVisibilityModifier(this.hero)
+        if (this.hero) this.make = new MakeVisibilityModifier(this.hero)
     }
 
     cancelLastAction() {

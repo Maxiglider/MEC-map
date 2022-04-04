@@ -1,9 +1,10 @@
 //todomax execute this at start of the game
+import { createTimer } from 'Utils/mapUtils'
+import { udg_monsters } from '../../../../globals'
 import { CACHE_SEPARATEUR_PARAM } from '../../07_TRIGGERS/Save_map_in_gamecache/struct_StringArrayForCache'
 import { Monster } from './Monster'
 import { MonsterType } from './MonsterType'
 import { NewPatrolMonster } from './Monster_functions'
-import {udg_monsters} from "../../../../globals";
 
 const initMonsterSimplePatrol = () => {
     //vérification que les monstres multi-patrouilles patrouillent bien
@@ -22,9 +23,7 @@ const initMonsterSimplePatrol = () => {
     }
 
     const Init_MonsterSimplePatrol = (): void => {
-        let trigCheckSimplePatrolMobs = CreateTrigger()
-        TriggerAddAction(trigCheckSimplePatrolMobs, CheckSimplePatrolMobs_Actions)
-        TriggerRegisterTimerEvent(trigCheckSimplePatrolMobs, checkSimplePatrolMobsPeriod, true)
+        createTimer(checkSimplePatrolMobsPeriod, true, CheckSimplePatrolMobs_Actions)
     }
 
     Init_MonsterSimplePatrol()
