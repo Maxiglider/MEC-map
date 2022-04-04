@@ -75,6 +75,8 @@ const Trig_heroes_Actions = () => {
     let i: number
     let n: number
 
+    
+
     //randomize start positions
     RandomizeStartPositionsAndHeroSpawnOrder()
 

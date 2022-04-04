@@ -1,7 +1,7 @@
 import { LOW_PERIOD_FOR_WORK, NB_ESCAPERS } from 'core/01_libraries/Constants'
 import { Escaper } from 'core/04_STRUCTURES/Escaper/Escaper'
 import { getUdgEscapers } from '../../../../globals'
-const udg_escapers = getUdgEscapers()
+
 
 export let gg_trg_Terrain_modifying_trig: trigger
 
@@ -21,7 +21,7 @@ const initTerrainModifyingTrig = () => {
         let i = 0
         while (true) {
             if (i >= NB_ESCAPERS) break
-            escaper = udg_escapers.get(i)
+            escaper = getUdgEscapers().get(i)
             if (escaper !== null) {
                 if (escaper.doesCheckTerrain()) {
                     wasCheckTerrainTriggerOn[i] = true
@@ -39,7 +39,7 @@ const initTerrainModifyingTrig = () => {
         let i = 0
         while (true) {
             if (i >= NB_ESCAPERS) break
-            escaper = udg_escapers.get(i)
+            escaper = getUdgEscapers().get(i)
             if (escaper !== null) {
                 if (wasCheckTerrainTriggerOn[i]) {
                     escaper.enableCheckTerrain(true)

@@ -3,8 +3,8 @@ import { NB_ESCAPERS } from 'core/01_libraries/Constants'
 import { Text } from 'core/01_libraries/Text'
 import { Level } from 'core/04_STRUCTURES/Level/Level'
  import { getUdgEscapers } from '../../../../globals'
-const udg_escapers = getUdgEscapers()
-import { udg_levels } from 'core/08_GAME/Init_structures/Init_struct_levels'
+
+import { getUdgLevels() } from 'core/08_GAME/Init_structures/Init_struct_levels'
 import { SaveMapInCache } from './SAVE_MAP_in_cache'
 import { StringArrayForCache } from './struct_StringArrayForCache'
 
@@ -305,7 +305,7 @@ const initSaveLevels = () => {
     }
 
     const StartSaveLevel = () => {
-        level = udg_levels.get(levelId)
+        level = getUdgLevels().get(levelId)
         if (level === null) {
             EndSaveLevel()
         } else {
@@ -350,7 +350,7 @@ const initSaveLevels = () => {
         while (true) {
             if (i >= NB_ESCAPERS) break
 
-            const escaper = udg_escapers.get(i)
+            const escaper = getUdgEscapers().get(i)
 
             if (escaper !== null) {
                 escaper.destroyMake()

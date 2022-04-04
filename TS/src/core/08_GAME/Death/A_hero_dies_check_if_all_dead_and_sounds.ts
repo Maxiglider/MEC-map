@@ -2,11 +2,11 @@ import { COOP_REVIVE_DIST, NB_ESCAPERS } from 'core/01_libraries/Constants'
 import { IsHero } from 'core/04_STRUCTURES/Escaper/Escaper_functions'
 import { createEvent } from 'Utils/mapUtils'
 import { getUdgTerrainTypes } from '../../../../globals'
-const udg_terrainTypes = getUdgTerrainTypes()
+
 import { Globals } from '../../09_From_old_Worldedit_triggers/globals_variables_and_triggers'
 import { AfkMode } from '../Afk_mode/Afk_mode'
 import { getUdgEscapers } from '../../../../globals'
-const udg_escapers = getUdgEscapers()
+
 import { udg_coopModeActive } from '../Mode_coop/creation_dialogue'
 import { DeplacementHeroHorsDeathPath } from '../Mode_coop/deplacement_heros_hors_death_path'
 import { gg_trg_Lose_a_life_and_res } from './Lose_a_life_and_res'
@@ -36,7 +36,7 @@ export const InitTrig_A_hero_dies_check_if_all_dead_and_sounds = () => {
                 i = 0
                 while (true) {
                     if (i >= NB_ESCAPERS) break
-                    if (udg_escapers.get(i)?.isAlive()) {
+                    if (getUdgEscapers().get(i)?.isAlive()) {
                         nbAlive = nbAlive + 1
                     }
                     i = i + 1
@@ -78,7 +78,7 @@ export const InitTrig_A_hero_dies_check_if_all_dead_and_sounds = () => {
                         }
 
                         //déplacement du héros si mort sur le death path
-                        if (udg_terrainTypes.getTerrainType(GetUnitX(hero), GetUnitY(hero))?.getKind() === 'death') {
+                        if (getUdgTerrainTypes().getTerrainType(GetUnitX(hero), GetUnitY(hero))?.getKind() === 'death') {
                             DeplacementHeroHorsDeathPath.DeplacementHeroHorsDeathPath(hero)
                         }
 
@@ -86,8 +86,8 @@ export const InitTrig_A_hero_dies_check_if_all_dead_and_sounds = () => {
                         i = 0
                         while (true) {
                             if (i >= NB_ESCAPERS) break
-                            if (i != n && udg_escapers.get(i)?.isAlive()) {
-                                const h1 = udg_escapers.get(i)?.getHero()
+                            if (i != n && getUdgEscapers().get(i)?.isAlive()) {
+                                const h1 = getUdgEscapers().get(i)?.getHero()
 
                                 if (!h1) {
                                     continue
@@ -96,7 +96,7 @@ export const InitTrig_A_hero_dies_check_if_all_dead_and_sounds = () => {
                                 diffX = GetUnitX(h1) - GetUnitX(hero)
                                 diffY = GetUnitY(h1) - GetUnitY(hero)
                                 if (SquareRoot(diffX * diffX + diffY * diffY) < COOP_REVIVE_DIST) {
-                                    udg_escapers.get(n)?.coopReviveHero()
+                                    getUdgEscapers().get(n)?.coopReviveHero()
                                     TriggerSleepAction(3.7)
                                     udg_nbKilled = udg_nbKilled - 1
                                     return
@@ -104,7 +104,7 @@ export const InitTrig_A_hero_dies_check_if_all_dead_and_sounds = () => {
                             }
                             i = i + 1
                         }
-                        udg_escapers.get(n)?.enableTrigCoopRevive()
+                        getUdgEscapers().get(n)?.enableTrigCoopRevive()
                         TriggerSleepAction(3.7)
                     } else {
                         TriggerSleepAction(5)

@@ -9,7 +9,6 @@ import {
 import {GREY} from "../../01_libraries/Constants";
 import {execute} from "../../04_STRUCTURES/Escaper/EscaperSavedCommands";
 
-const udg_escapers = getUdgEscapers()
 
 const initCommandShortcuts = () => {
     const shortcutCommands: { [K in typeof shortcuts[0]]: (string | null)[] } = {
@@ -24,7 +23,7 @@ const initCommandShortcuts = () => {
     }
 
     const InitShortcutSkills = (playerId: number) => {
-        const hero = udg_escapers.get(playerId)?.getHero()
+        const hero = getUdgEscapers().get(playerId)?.getHero()
 
         if (!hero) {
             return
@@ -42,7 +41,7 @@ const initCommandShortcuts = () => {
     }
 
     const AssignShortcut = (playerId: number, shortcut: string, command: string) => {
-        const hero = udg_escapers.get(playerId)?.getHero()
+        const hero = getUdgEscapers().get(playerId)?.getHero()
 
         if (!hero) {
             return
@@ -63,7 +62,7 @@ const initCommandShortcuts = () => {
     }
 
     const UnassignShortcut = (playerId: number, shortcut: string) => {
-        const hero = udg_escapers.get(playerId)?.getHero()
+        const hero = getUdgEscapers().get(playerId)?.getHero()
 
         if (!hero) {
             return

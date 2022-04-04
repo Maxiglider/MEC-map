@@ -2,7 +2,7 @@ import { EscaperArray } from 'core/04_STRUCTURES/Escaper/EscaperArray'
 import {
     setUdgCasterTypes,
     setUdgEscapers,
-    setUdgLEvels,
+    setUdgLevels,
     setUdgMonsterTypes,
     setUdgTerrainTypes
 } from "../../../globals";
@@ -20,7 +20,7 @@ const initEscapers = () => {
 
 //Levels
 const initLevels = () => {
-    setUdgLEvels(new LevelArray())
+    setUdgLevels(new LevelArray())
 }
 
 

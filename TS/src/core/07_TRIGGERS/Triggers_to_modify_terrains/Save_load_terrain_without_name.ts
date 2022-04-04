@@ -2,7 +2,7 @@ import { Constants, LARGEUR_CASE } from 'core/01_libraries/Constants'
 import { Text } from 'core/01_libraries/Text'
 import { TerrainType } from 'core/04_STRUCTURES/TerrainType/TerrainType'
 import { getUdgTerrainTypes } from '../../../../globals'
-const udg_terrainTypes = getUdgTerrainTypes()
+
 import { ChangeTerrainType } from '../Modify_terrain_Functions/Modify_terrain_functions'
 import { TerrainModifyingTrig } from './Terrain_modifying_trig'
 
@@ -22,7 +22,7 @@ const initSaveLoadTerrainWithoutName = () => {
             let x = Constants.MAP_MIN_X
             while (true) {
                 if (x > Constants.MAP_MAX_X) break
-                terrainSave[terrainSave_id] = udg_terrainTypes.getTerrainType(x, y)
+                terrainSave[terrainSave_id] = getUdgTerrainTypes().getTerrainType(x, y)
                 terrainSave_id = terrainSave_id + 1
                 x = x + LARGEUR_CASE
             }

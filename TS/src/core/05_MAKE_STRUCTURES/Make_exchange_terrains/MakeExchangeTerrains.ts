@@ -2,7 +2,7 @@ import {MakeOneByOneOrTwoClicks} from "../Make/MakeOneByOneOrTwoClicks";
 import {getUdgTerrainTypes} from "../../../../globals";
 import {ExchangeTerrains} from "../../07_TRIGGERS/Triggers_to_modify_terrains/Exchange_terrains";
 
-const udg_terrainTypes = getUdgTerrainTypes()
+
 
 
 export class MakeExchangeTerrains extends MakeOneByOneOrTwoClicks {
@@ -13,8 +13,8 @@ export class MakeExchangeTerrains extends MakeOneByOneOrTwoClicks {
     doActions() {
         if(super.doBaseActions()){
             if (this.isLastLocSavedUsed()) {
-                const terrainTypeA = udg_terrainTypes.getTerrainType(this.lastX, this.lastY)
-                const terrainTypeB = udg_terrainTypes.getTerrainType(this.orderX, this.orderY)
+                const terrainTypeA = getUdgTerrainTypes().getTerrainType(this.lastX, this.lastY)
+                const terrainTypeB = getUdgTerrainTypes().getTerrainType(this.orderX, this.orderY)
                 terrainTypeA && terrainTypeB && ExchangeTerrains(terrainTypeA.label, terrainTypeB.label)
                 this.unsaveLocDefinitely()
             } else {

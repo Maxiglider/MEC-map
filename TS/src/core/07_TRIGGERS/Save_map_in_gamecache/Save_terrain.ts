@@ -3,7 +3,7 @@ import { Constants, LARGEUR_CASE } from 'core/01_libraries/Constants'
 import { Text } from 'core/01_libraries/Text'
 import { TerrainType } from 'core/04_STRUCTURES/TerrainType/TerrainType'
 import { getUdgTerrainTypes } from '../../../../globals'
-const udg_terrainTypes = getUdgTerrainTypes()
+
 import { SaveMapInCache } from './SAVE_MAP_in_cache'
 import { SaveTerrainHeights } from './Save_terrain_heights_and_cliffs'
 import { StringArrayForCache } from './struct_StringArrayForCache'
@@ -76,7 +76,7 @@ const initSaveTerrain = () => {
         //récupération de tous les terrains
         let i = 0
         while (true) {
-            terrainType = udg_terrainTypes.getWalk(i)
+            terrainType = getUdgTerrainTypes().getWalk(i)
             if (terrainType === null) break
             terrainTypes[numTerrain] = terrainType
             numTerrain = numTerrain + 1
@@ -84,7 +84,7 @@ const initSaveTerrain = () => {
         }
         i = 0
         while (true) {
-            terrainType = udg_terrainTypes.getSlide(i)
+            terrainType = getUdgTerrainTypes().getSlide(i)
             if (terrainType === null) break
             terrainTypes[numTerrain] = terrainType
             numTerrain = numTerrain + 1
@@ -92,7 +92,7 @@ const initSaveTerrain = () => {
         }
         i = 0
         while (true) {
-            terrainType = udg_terrainTypes.getDeath(i)
+            terrainType = getUdgTerrainTypes().getDeath(i)
             if (terrainType === null) break
             terrainTypes[numTerrain] = terrainType
             numTerrain = numTerrain + 1
@@ -101,7 +101,7 @@ const initSaveTerrain = () => {
         //suppression des terrains non ordonnés du tableau
         i = 0
         while (true) {
-            if (i == udg_terrainTypes.count()) break
+            if (i == getUdgTerrainTypes().count()) break
             if (terrainTypes[i].getOrderId() != 0) {
                 if (i !== nbOrderedTerrains) {
                     terrainTypes[nbOrderedTerrains] = terrainTypes[i]

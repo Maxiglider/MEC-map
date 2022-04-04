@@ -9,8 +9,8 @@ import {
     getUdgMonsterTypes, udg_monsters,
 } from '../../../../globals'
 
-const udg_escapers = getUdgEscapers()
-const udg_monsterTypes = getUdgMonsterTypes()
+
+
 
 
 
@@ -23,7 +23,7 @@ export const InitTrig_InvisUnit_is_getting_damage = () => {
             () => {
                 let invisUnit: unit | null = GetTriggerUnit()
                 let n = GetUnitUserData(invisUnit)
-                const escaper = udg_escapers.get(n)
+                const escaper = getUdgEscapers().get(n)
 
                 if (!escaper) {
                     return
@@ -60,7 +60,7 @@ export const InitTrig_InvisUnit_is_getting_damage = () => {
 
                 if (RAbsBJ(hauteurHero - hauteurKillingUnit) < TAILLE_UNITE) {
                     if (GetUnitTypeId(killingUnit) === DUMMY_POWER_CIRCLE) {
-                        udg_escapers.get(GetUnitUserData(killingUnit))?.coopReviveHero()
+                        getUdgEscapers().get(GetUnitUserData(killingUnit))?.coopReviveHero()
                         invisUnit = null
                         killingUnit = null
                         return
@@ -91,7 +91,7 @@ export const InitTrig_InvisUnit_is_getting_damage = () => {
                             escaper.kill()
 
                             //effet de tuation du héros par le monstre, suivant le type du monstre
-                            effectStr = udg_monsterTypes.monsterUnit2KillEffectStr(killingUnit)
+                            effectStr = getUdgMonsterTypes().monsterUnit2KillEffectStr(killingUnit)
                             if (effectStr !== null) {
                                 x = GetUnitX(invisUnit)
                                 y = GetUnitY(invisUnit)

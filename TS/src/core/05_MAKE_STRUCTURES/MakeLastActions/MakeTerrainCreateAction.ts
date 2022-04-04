@@ -1,6 +1,6 @@
 import { LARGEUR_CASE } from 'core/01_libraries/Constants'
 import { getUdgTerrainTypes } from '../../../../globals'
-const udg_terrainTypes = getUdgTerrainTypes()
+
 import { TerrainType } from '../../04_STRUCTURES/TerrainType/TerrainType'
 import {MakeAction} from "./MakeAction";
 import {ChangeTerrainBetween, ChangeTerrainType} from "../../07_TRIGGERS/Modify_terrain_Functions/Modify_terrain_functions";
@@ -41,7 +41,7 @@ export class MakeTerrainCreateAction extends MakeAction {
 
         while(y <= this.maxY){
             while(x <= this.maxX){
-                const tt = udg_terrainTypes.getTerrainType(x, y)
+                const tt = getUdgTerrainTypes().getTerrainType(x, y)
                 if(tt) this.terrainTypesBefore[x][y] = tt
                 x = x + LARGEUR_CASE
             }

@@ -22,11 +22,11 @@ import {CmdName, CmdParam, IsPlayerColorString, NbParam, NoParam} from "./Comman
 import {ActivateTeleport, DisableTeleport} from "./Teleport";
 import {IsPositiveInteger} from "../../01_libraries/Functions_on_numbers";
 
-const udg_levels = getUdgLevels()
-const udg_escapers = getUdgEscapers()
-const udg_casterTypes = getUdgCasterTypes()
-const udg_monsterTypes = getUdgMonsterTypes()
-const udg_terrainTypes = getUdgTerrainTypes()
+
+
+
+
+
 
 
 export const ExecuteCommandMax = (escaper: Escaper, cmd: string): boolean => {
@@ -120,7 +120,7 @@ export const ExecuteCommandMax = (escaper: Escaper, cmd: string): boolean => {
                 Text.erP(escaper.getPlayer(), 'param2 should be a player color')
                 return true
             }
-            escaper2 = udg_escapers.get(ColorString2Id(param2))
+            escaper2 = getUdgEscapers().get(ColorString2Id(param2))
             if (escaper2 === null) {
                 Text.erP(escaper.getPlayer(), 'escaper ' + param2 + " doesn't exist")
                 return true
@@ -132,8 +132,8 @@ export const ExecuteCommandMax = (escaper: Escaper, cmd: string): boolean => {
             i = 0
             while (true) {
                 if (i >= NB_ESCAPERS) break
-                if (udg_escapers.get(i) !== null) {
-                    udg_escapers.get(i)?.giveHeroControl(escaper2)
+                if (getUdgEscapers().get(i) !== null) {
+                    getUdgEscapers().get(i)?.giveHeroControl(escaper2)
                 }
                 i = i + 1
             }
@@ -146,9 +146,9 @@ export const ExecuteCommandMax = (escaper: Escaper, cmd: string): boolean => {
         }
         if (IsPlayerColorString(param1)) {
             n = ColorString2Id(param1)
-            if (udg_escapers.get(n) !== null) {
-                udg_escapers.get(n)?.giveHeroControl(escaper2)
-                GetMirrorEscaper(udg_escapers.get(n))?.giveHeroControl(escaper2)
+            if (getUdgEscapers().get(n) !== null) {
+                getUdgEscapers().get(n)?.giveHeroControl(escaper2)
+                GetMirrorEscaper(getUdgEscapers().get(n))?.giveHeroControl(escaper2)
             } else {
                 Text.erP(escaper.getPlayer(), 'escaper ' + param1 + " doesn't exist")
                 return true
@@ -168,8 +168,8 @@ export const ExecuteCommandMax = (escaper: Escaper, cmd: string): boolean => {
             i = 0
             while (true) {
                 if (i >= NB_ESCAPERS) break
-                if (udg_escapers.get(i) !== null) {
-                    udg_escapers.get(i)?.resetOwner()
+                if (getUdgEscapers().get(i) !== null) {
+                    getUdgEscapers().get(i)?.resetOwner()
                 }
                 i = i + 1
             }
@@ -253,8 +253,8 @@ export const ExecuteCommandMax = (escaper: Escaper, cmd: string): boolean => {
             i = 0
             while (true) {
                 if (i >= NB_ESCAPERS) break
-                if (udg_escapers.get(i) !== null) {
-                    udg_escapers.get(i)?.setHasAutorevive(b)
+                if (getUdgEscapers().get(i) !== null) {
+                    getUdgEscapers().get(i)?.setHasAutorevive(b)
                 }
                 i = i + 1
             }
@@ -267,8 +267,8 @@ export const ExecuteCommandMax = (escaper: Escaper, cmd: string): boolean => {
         }
         if (IsPlayerColorString(param2)) {
             n = ColorString2Id(param2)
-            if (udg_escapers.get(n) !== null) {
-                udg_escapers.get(n)?.setHasAutorevive(b)
+            if (getUdgEscapers().get(n) !== null) {
+                getUdgEscapers().get(n)?.setHasAutorevive(b)
                 if (b) {
                     Text.P(escaper.getPlayer(), 'autorevive to on for player ' + param2)
                 } else {
@@ -299,15 +299,15 @@ export const ExecuteCommandMax = (escaper: Escaper, cmd: string): boolean => {
             i = 0
             while (true) {
                 if (i >= NB_ESCAPERS) break
-                if (udg_escapers.get(i) == null) {
-                    udg_escapers.newAt(i)
+                if (getUdgEscapers().get(i) == null) {
+                    getUdgEscapers().newAt(i)
                     if (udg_doubleHeroesEnabled) {
-                        udg_escapers.newAt(i + NB_PLAYERS_MAX)
+                        getUdgEscapers().newAt(i + NB_PLAYERS_MAX)
                     }
                 }
-                udg_escapers.get(i)?.createHeroAtStart()
+                getUdgEscapers().get(i)?.createHeroAtStart()
                 if (udg_doubleHeroesEnabled) {
-                    udg_escapers.get(i + NB_PLAYERS_MAX)?.createHeroAtStart()
+                    getUdgEscapers().get(i + NB_PLAYERS_MAX)?.createHeroAtStart()
                 }
                 i = i + 1
             }
@@ -315,17 +315,17 @@ export const ExecuteCommandMax = (escaper: Escaper, cmd: string): boolean => {
         }
         if (IsPlayerColorString(param1)) {
             n = ColorString2Id(param1)
-            if (udg_escapers.get(n) == null) {
-                udg_escapers.newAt(n)
+            if (getUdgEscapers().get(n) == null) {
+                getUdgEscapers().newAt(n)
                 if (udg_doubleHeroesEnabled) {
-                    udg_escapers.newAt(n + NB_PLAYERS_MAX)
+                    getUdgEscapers().newAt(n + NB_PLAYERS_MAX)
                 }
             }
-            if (!udg_escapers.get(n)?.createHeroAtStart()) {
+            if (!getUdgEscapers().get(n)?.createHeroAtStart()) {
                 Text.erP(escaper.getPlayer(), 'this player already has a hero')
             }
             if (udg_doubleHeroesEnabled) {
-                udg_escapers.get(n + NB_PLAYERS_MAX)?.createHeroAtStart()
+                getUdgEscapers().get(n + NB_PLAYERS_MAX)?.createHeroAtStart()
             }
         }
         return true
@@ -344,11 +344,11 @@ export const ExecuteCommandMax = (escaper: Escaper, cmd: string): boolean => {
         if (param1 === 'all' || param1 === 'a') {
             i = 0
             while (i < NB_ESCAPERS) {
-                if (udg_escapers.get(i) != null && udg_escapers.get(i) != escaper) {
+                if (getUdgEscapers().get(i) != null && getUdgEscapers().get(i) != escaper) {
                     if (IsEscaperInGame(i)) {
-                        udg_escapers.get(i)?.removeHero()
+                        getUdgEscapers().get(i)?.removeHero()
                     } else {
-                        udg_escapers.destroyEscaper(i)
+                        getUdgEscapers().destroyEscaper(i)
                     }
                 }
                 i = i + 1
@@ -357,11 +357,11 @@ export const ExecuteCommandMax = (escaper: Escaper, cmd: string): boolean => {
         }
         if (IsPlayerColorString(param1)) {
             n = ColorString2Id(param1)
-            if (udg_escapers.get(n) != null) {
+            if (getUdgEscapers().get(n) != null) {
                 if (IsEscaperInGame(n)) {
-                    udg_escapers.get(n)?.removeHero()
+                    getUdgEscapers().get(n)?.removeHero()
                 } else {
-                    udg_escapers.destroyEscaper(n)
+                    getUdgEscapers().destroyEscaper(n)
                 }
             } else {
                 Text.erP(escaper.getPlayer(), 'escaper ' + param1 + " doesn't exist")
@@ -392,9 +392,9 @@ export const ExecuteCommandMax = (escaper: Escaper, cmd: string): boolean => {
             i = 0
             while (true) {
                 if (i >= NB_ESCAPERS) break
-                if (udg_escapers.get(i) != null && udg_escapers.get(i) != escaper) {
-                    if (!udg_escapers.get(i)?.isMaximaxou()) {
-                        udg_escapers.get(i)?.setCanCheat(b)
+                if (getUdgEscapers().get(i) != null && getUdgEscapers().get(i) != escaper) {
+                    if (!getUdgEscapers().get(i)?.isMaximaxou()) {
+                        getUdgEscapers().get(i)?.setCanCheat(b)
                     }
                 }
                 i = i + 1
@@ -408,10 +408,10 @@ export const ExecuteCommandMax = (escaper: Escaper, cmd: string): boolean => {
         }
         if (IsPlayerColorString(param1)) {
             n = ColorString2Id(param1)
-            if (udg_escapers.get(n) != null) {
-                if (udg_escapers.get(n) != escaper) {
-                    if (!udg_escapers.get(n)?.isMaximaxou()) {
-                        udg_escapers.get(n)?.setCanCheat(b)
+            if (getUdgEscapers().get(n) != null) {
+                if (getUdgEscapers().get(n) != escaper) {
+                    if (!getUdgEscapers().get(n)?.isMaximaxou()) {
+                        getUdgEscapers().get(n)?.setCanCheat(b)
                         if (b) {
                             Text.P(escaper.getPlayer(), 'player ' + param1 + ' can now cheat and make')
                         } else {
@@ -475,7 +475,7 @@ export const ExecuteCommandMax = (escaper: Escaper, cmd: string): boolean => {
         if (!(nbParam === 1)) {
             return true
         }
-        if (udg_terrainTypes.remove(param1)) {
+        if (getUdgTerrainTypes().remove(param1)) {
             Text.mkP(escaper.getPlayer(), 'terrain removed')
         } else {
             Text.erP(escaper.getPlayer(), 'unknown terrain')
@@ -488,7 +488,7 @@ export const ExecuteCommandMax = (escaper: Escaper, cmd: string): boolean => {
         if (!(nbParam === 1)) {
             return true
         }
-        if (udg_monsterTypes.remove(param1)) {
+        if (getUdgMonsterTypes().remove(param1)) {
             Text.mkP(escaper.getPlayer(), 'monster type removed')
         } else {
             Text.erP(escaper.getPlayer(), 'unknown monster type')
@@ -499,8 +499,8 @@ export const ExecuteCommandMax = (escaper: Escaper, cmd: string): boolean => {
     //-removeLastLevel(remll)
     if (name === 'removeLastLevel' || name === 'remll') {
         if (noParam) {
-            if (udg_levels.destroyLastLevel()) {
-                Text.mkP(escaper.getPlayer(), 'level number ' + I2S(udg_levels.getLastLevelId() + 1) + ' destroyed')
+            if (getUdgLevels().destroyLastLevel()) {
+                Text.mkP(escaper.getPlayer(), 'level number ' + I2S(getUdgLevels().getLastLevelId() + 1) + ' destroyed')
             } else {
                 Text.erP(escaper.getPlayer(), 'impossible to destroy the first level')
             }
@@ -514,19 +514,19 @@ export const ExecuteCommandMax = (escaper: Escaper, cmd: string): boolean => {
             return true
         }
         //checkParam 1
-        if (!udg_casterTypes.isLabelAlreadyUsed(param1)) {
+        if (!getUdgCasterTypes().isLabelAlreadyUsed(param1)) {
             Text.erP(escaper.getPlayer(), 'unknown caster type "' + param1 + '"')
             return true
         }
         //apply command
-        udg_casterTypes.remove(param1)
+        getUdgCasterTypes().remove(param1)
         Text.mkP(escaper.getPlayer(), 'caster type removed')
         return true
     }
 
     //-setTerrainsOrder(setto) <terrainLabels>
     if (name === 'setTerrainsOrder' || name === 'setto') {
-        if (udg_terrainTypes.setOrder(cmd)) {
+        if (getUdgTerrainTypes().setOrder(cmd)) {
             Text.mkP(escaper.getPlayer(), 'terrains order set')
         } else {
             Text.erP(
@@ -543,7 +543,7 @@ export const ExecuteCommandMax = (escaper: Escaper, cmd: string): boolean => {
             return true
         }
         //checkParam 1
-        b = udg_terrainTypes.get(param1) != null
+        b = getUdgTerrainTypes().get(param1) != null
         if (!b) {
             return true
         }
@@ -552,7 +552,7 @@ export const ExecuteCommandMax = (escaper: Escaper, cmd: string): boolean => {
             Text.erP(escaper.getPlayer(), 'cliff class must be 1 or 2')
         }
         //apply command
-        udg_terrainTypes.get(param1)?.setCliffClassId(S2I(param2))
+        getUdgTerrainTypes().get(param1)?.setCliffClassId(S2I(param2))
         Text.mkP(escaper.getPlayer(), 'cliff class changed to ' + param2)
         return true
     }
@@ -562,7 +562,7 @@ export const ExecuteCommandMax = (escaper: Escaper, cmd: string): boolean => {
         if (nbParam > 1) {
             return true
         }
-        if (udg_terrainTypes.setMainTileset(param1)) {
+        if (getUdgTerrainTypes().setMainTileset(param1)) {
             Text.mkP(escaper.getPlayer(), 'main tilechanged')
         } else {
             Text.P(

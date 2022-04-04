@@ -3,7 +3,7 @@ import { udg_colorCode } from 'core/01_libraries/Init_colorCodes'
 import { createEvent, forRange } from 'Utils/mapUtils'
 import { AfkMode } from '../Afk_mode/Afk_mode'
 import { getUdgEscapers } from '../../../../globals'
-const udg_escapers = getUdgEscapers()
+
 
 export const InitTrig_A_player_leaves = () => {
     createEvent({
@@ -11,7 +11,7 @@ export const InitTrig_A_player_leaves = () => {
         actions: [
             () => {
                 let n = GetPlayerId(GetTriggerPlayer())
-                udg_escapers.destroyEscaper(n)
+                getUdgEscapers().destroyEscaper(n)
                 AfkMode.StopAfk(n)
                 AfkMode.StopAfk(n + NB_PLAYERS_MAX)
                 DisplayTextToForce(

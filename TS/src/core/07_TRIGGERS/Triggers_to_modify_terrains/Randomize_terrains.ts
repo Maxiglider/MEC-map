@@ -2,7 +2,7 @@ import { Constants, LARGEUR_CASE } from 'core/01_libraries/Constants'
 import { Text } from 'core/01_libraries/Text'
 import { TerrainType } from 'core/04_STRUCTURES/TerrainType/TerrainType'
 import { getUdgTerrainTypes } from '../../../../globals'
-const udg_terrainTypes = getUdgTerrainTypes()
+
 import { ChangeTerrainType } from '../Modify_terrain_Functions/Modify_terrain_functions'
 import { TerrainModifyingTrig } from './Terrain_modifying_trig'
 
@@ -68,7 +68,7 @@ const initRandomizeTerrains = () => {
         n = 0
         i = 0
         while (true) {
-            terrainTypes[n] = udg_terrainTypes.getWalk(i)
+            terrainTypes[n] = getUdgTerrainTypes().getWalk(i)
             if (terrainTypes[n] === null) break
             oldTerrainTypes[n] = terrainTypes[n].getTerrainTypeId()
             n = n + 1
@@ -76,7 +76,7 @@ const initRandomizeTerrains = () => {
         }
         i = 0
         while (true) {
-            terrainTypes[n] = udg_terrainTypes.getDeath(i)
+            terrainTypes[n] = getUdgTerrainTypes().getDeath(i)
             if (terrainTypes[n] === null) break
             oldTerrainTypes[n] = terrainTypes[n].getTerrainTypeId()
             n = n + 1
@@ -84,7 +84,7 @@ const initRandomizeTerrains = () => {
         }
         i = 0
         while (true) {
-            terrainTypes[n] = udg_terrainTypes.getSlide(i)
+            terrainTypes[n] = getUdgTerrainTypes().getSlide(i)
             if (terrainTypes[n] === null) break
             oldTerrainTypes[n] = terrainTypes[n].getTerrainTypeId()
             n = n + 1

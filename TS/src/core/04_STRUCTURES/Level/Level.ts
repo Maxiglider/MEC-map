@@ -1,9 +1,9 @@
 import { Text } from 'core/01_libraries/Text'
 import { udg_lives } from 'core/08_GAME/Init_structures/Init_lives'
 import { getUdgEscapers } from '../../../../globals'
-const udg_escapers = getUdgEscapers()
+
 import { getUdgLevels } from "../../../../globals"
-const udg_levels = getUdgLevels()
+
 import type { CasterType } from '../Caster/CasterType'
 import type { Escaper } from '../Escaper/Escaper'
 import { MeteorArray } from '../Meteor/MeteorArray'
@@ -69,7 +69,7 @@ export class Level {
             this.monsters.removeMonstersUnits()
             this.monsterSpawns.deactivate()
             this.meteors.removeMeteorsItems()
-            udg_escapers.deleteSpecificActionsForLevel(this)
+            getUdgEscapers().deleteSpecificActionsForLevel(this)
         }
 
         this.isActivatedB = activ

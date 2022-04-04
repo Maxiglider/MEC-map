@@ -3,7 +3,7 @@ import { Text } from 'core/01_libraries/Text'
 import { TerrainType } from 'core/04_STRUCTURES/TerrainType/TerrainType'
 import { createEvent } from 'Utils/mapUtils'
 import { getUdgTerrainTypes } from '../../../../globals'
-const udg_terrainTypes = getUdgTerrainTypes()
+
 import { ChangeTerrainType } from '../Modify_terrain_Functions/Modify_terrain_functions'
 import { TerrainModifyingTrig } from './Terrain_modifying_trig'
 
@@ -20,24 +20,24 @@ const initReinitTerrains = () => {
                 let n = 0
                 let i = 0
                 while (true) {
-                    if (i >= udg_terrainTypes.numberOfWalk) break
-                    terrainTypes[n] = udg_terrainTypes.getWalk(i)
+                    if (i >= getUdgTerrainTypes().numberOfWalk) break
+                    terrainTypes[n] = getUdgTerrainTypes().getWalk(i)
                     terrainTypeIds[n] = terrainTypes[n].getTerrainTypeId()
                     n = n + 1
                     i = i + 1
                 }
                 i = 0
                 while (true) {
-                    if (i >= udg_terrainTypes.numberOfDeath) break
-                    terrainTypes[n] = udg_terrainTypes.getDeath(i)
+                    if (i >= getUdgTerrainTypes().numberOfDeath) break
+                    terrainTypes[n] = getUdgTerrainTypes().getDeath(i)
                     terrainTypeIds[n] = terrainTypes[n].getTerrainTypeId()
                     n = n + 1
                     i = i + 1
                 }
                 i = 0
                 while (true) {
-                    if (i >= udg_terrainTypes.numberOfSlide) break
-                    terrainTypes[n] = udg_terrainTypes.getSlide(i)
+                    if (i >= getUdgTerrainTypes().numberOfSlide) break
+                    terrainTypes[n] = getUdgTerrainTypes().getSlide(i)
                     terrainTypeIds[n] = terrainTypes[n].getTerrainTypeId()
                     n = n + 1
                     i = i + 1

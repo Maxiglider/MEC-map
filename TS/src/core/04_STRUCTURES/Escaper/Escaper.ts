@@ -55,7 +55,7 @@ import { Trig_InvisUnit_is_getting_damage } from '../../08_GAME/Death/InvisUnit_
 import {HERO_START_ANGLE} from '../../08_GAME/Init_game/Heroes'
 import { MessageHeroDies } from '../../08_GAME/Init_game/Message_heroDies'
 import { getUdgLevels } from "../../../../globals"
-const udg_levels = getUdgLevels()
+
 import { Level } from '../Level/Level'
 import { DEPART_PAR_DEFAUT } from '../Level/StartAndEnd'
 import {METEOR_NORMAL, udg_meteors} from '../Meteor/Meteor'
@@ -70,8 +70,8 @@ import type {CasterType} from "../Caster/CasterType";
 import {CommandShortcuts} from "../../08_GAME/Shortcuts/Using_shortcut";
 
 const SHOW_REVIVE_EFFECTS = false
-const udg_escapers = getUdgEscapers()
-const udg_terrainTypes = getUdgTerrainTypes()
+
+
 
 export class Escaper {
     private escaperId: number
@@ -283,7 +283,7 @@ export class Escaper {
     createHeroAtStart() {
         let x: number
         let y: number
-        let start = udg_levels.getCurrentLevel()?.getStart()
+        let start = getUdgLevels().getCurrentLevel()?.getStart()
         let angle: number
 
         if (!start) {
@@ -350,7 +350,7 @@ export class Escaper {
         this.discoTrigger && DestroyTrigger(this.discoTrigger)
         delete this.discoTrigger
 
-        udg_escapers.removeEscaper(this.escaperId)
+        getUdgEscapers().removeEscaper(this.escaperId)
 
         //coop
         RemoveUnit(this.powerCircle)
@@ -505,8 +505,8 @@ export class Escaper {
     }
 
     reviveAtStart() {
-        const x: number = udg_levels.getCurrentLevel().getStartRandomX()
-        const y: number = udg_levels.getCurrentLevel().getStartRandomY()
+        const x: number = getUdgLevels().getCurrentLevel().getStartRandomX()
+        const y: number = getUdgLevels().getCurrentLevel().getStartRandomY()
 
         if (!this.isEscaperSecondary()) {
             GetMirrorEscaper(this)?.reviveAtStart()
@@ -690,7 +690,7 @@ export class Escaper {
             this.slideSpeedAbsolute = false
 
             if (this.hero && this.isAlive()) {
-                const currentTerrainType = udg_terrainTypes.getTerrainType(GetUnitX(this.hero), GetUnitY(this.hero))
+                const currentTerrainType = getUdgTerrainTypes().getTerrainType(GetUnitX(this.hero), GetUnitY(this.hero))
                 if (currentTerrainType instanceof TerrainTypeSlide) {
                     this.setSlideSpeed(currentTerrainType.getSlideSpeed())
                 }
@@ -719,7 +719,7 @@ export class Escaper {
         if (this.walkSpeedAbsolute) {
             this.walkSpeedAbsolute = false
             if (this.hero && this.isAlive()) {
-                const currentTerrainType = udg_terrainTypes.getTerrainType(GetUnitX(this.hero), GetUnitY(this.hero))
+                const currentTerrainType = getUdgTerrainTypes().getTerrainType(GetUnitX(this.hero), GetUnitY(this.hero))
                 if (currentTerrainType instanceof TerrainTypeWalk) {
                     this.setWalkSpeed(currentTerrainType.getWalkSpeed())
                 }
@@ -997,7 +997,7 @@ export class Escaper {
         if (oldMakingLevel && !IsLevelBeingMade(oldMakingLevel)) {
             oldMakingLevel.activate(false)
 
-            if (udg_levels.getCurrentLevel().getId() < oldMakingLevel.getId()) {
+            if (getUdgLevels().getCurrentLevel().getId() < oldMakingLevel.getId()) {
                 oldMakingLevel.activateVisibilities(false)
             }
         }
@@ -1013,7 +1013,7 @@ export class Escaper {
         if (this.makingLevel) {
             return this.makingLevel
         } else {
-            return udg_levels.getCurrentLevel()
+            return getUdgLevels().getCurrentLevel()
         }
     }
 

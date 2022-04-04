@@ -1,6 +1,6 @@
 import { LARGEUR_CASE } from 'core/01_libraries/Constants'
 import { getUdgTerrainTypes } from '../../../../globals'
-const udg_terrainTypes = getUdgTerrainTypes()
+
 import { TerrainType } from '../../04_STRUCTURES/TerrainType/TerrainType'
 import {MakeAction} from "./MakeAction";
 import {Constants} from "core/01_libraries/Constants";
@@ -85,10 +85,10 @@ export class MakeTerrainCopyPasteAction extends MakeAction {
         yCopy = minYcopy
         while (yCopy <= maxYcopy) {
             while (xCopy <= maxXcopy) {
-                let tt = udg_terrainTypes.getTerrainType(xPaste, yPaste)
+                let tt = getUdgTerrainTypes().getTerrainType(xPaste, yPaste)
                 if(tt) this.terrainTypesBefore[xPaste][yPaste] = tt
 
-                const terrainType = udg_terrainTypes.getTerrainType(xCopy, yCopy)
+                const terrainType = getUdgTerrainTypes().getTerrainType(xCopy, yCopy)
 
                 if (terrainType) {
                     this.terrainTypesAfter[xPaste][yPaste] = terrainType

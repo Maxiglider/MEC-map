@@ -1,7 +1,7 @@
 import { B2S } from 'core/01_libraries/Basic_functions'
 import { Text } from 'core/01_libraries/Text'
 import { getUdgLevels } from "../../../../globals"
-const udg_levels = getUdgLevels()
+
 import { Ascii2String } from '../../01_libraries/Ascii'
 import {
     MAX_MOVE_SPEED,
@@ -13,7 +13,7 @@ import {
 import { udg_colorCode } from '../../01_libraries/Init_colorCodes'
 import { CACHE_SEPARATEUR_PARAM } from '../../07_TRIGGERS/Save_map_in_gamecache/struct_StringArrayForCache'
  import { getUdgEscapers } from '../../../../globals'
-const udg_escapers = getUdgEscapers()
+
 import { Level } from '../Level/Level'
 import { IMMOLATION_SKILLS } from './Immolation_skills'
 
@@ -84,11 +84,11 @@ export class MonsterType {
         let levelsMaking: Level[] = []
         let levelAlreadyChecked: boolean
         let nbLevelsMaking = 0
-        const currentLevel = udg_levels.getCurrentLevel()
+        const currentLevel = getUdgLevels().getCurrentLevel()
         currentLevel.recreateMonstersUnitsOfType(this)
 
         for (let i = 0; i < NB_ESCAPERS; i++) {
-            let escaper = udg_escapers.get(i)
+            let escaper = getUdgEscapers().get(i)
             if (escaper && escaper.getMakingLevel() != currentLevel) {
                 levelAlreadyChecked = false
 
@@ -112,7 +112,7 @@ export class MonsterType {
     }
 
     destroy = () => {
-        udg_levels.clearMonstersOfType(this)
+        getUdgLevels().clearMonstersOfType(this)
     }
 
     getUnitTypeId = (): number => {

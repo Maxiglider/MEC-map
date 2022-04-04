@@ -1,7 +1,7 @@
 import {MakeOneByOneOrTwoClicks} from "../Make/MakeOneByOneOrTwoClicks";
 import {Level} from "../../04_STRUCTURES/Level/Level";
 import { getUdgLevels } from "../../../../globals"
-const udg_levels = getUdgLevels()
+
 import {Text} from "../../01_libraries/Text";
 
 
@@ -24,11 +24,11 @@ export class MakeStart extends MakeOneByOneOrTwoClicks {
             if (this.isLastLocSavedUsed()) {
                 level = this.escaper.getMakingLevel()
                 if (this.forNext()) {
-                    if (!udg_levels.get(level.getId() + 1)) {
-                        udg_levels.new()
+                    if (!getUdgLevels().get(level.getId() + 1)) {
+                        getUdgLevels().new()
                     }
 
-                    level = udg_levels.get(level.getId() + 1)
+                    level = getUdgLevels().get(level.getId() + 1)
                     if (!level) {
                         Text.erP(this.escaper.getPlayer(), "erreur d'origine inconnue")
                         this.escaper.destroyMake()

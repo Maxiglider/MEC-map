@@ -18,10 +18,10 @@ import {ColorInfo, GetMirrorEscaper} from 'core/04_STRUCTURES/Escaper/Escaper_fu
 import {DisplayTerrainDataToPlayer, GetTerrainData} from 'core/07_TRIGGERS/Modify_terrain_Functions/Terrain_functions'
 import {Apm} from 'core/08_GAME/Apm_clics_par_minute/Apm'
  import { getUdgEscapers } from '../../../../globals'
-const udg_escapers = getUdgEscapers()
+
 import {udg_lives} from 'core/08_GAME/Init_structures/Init_lives'
 import { getUdgLevels } from "../../../../globals"
-const udg_levels = getUdgLevels()
+
 import {Globals} from 'core/09_From_old_Worldedit_triggers/globals_variables_and_triggers'
 import {EscaperEffectFunctions} from '../../04_STRUCTURES/Escaper/EscaperEffect_functions'
 import {Disco} from '../../04_STRUCTURES/Escaper/Escaper_disco'
@@ -68,7 +68,7 @@ export const ExecuteCommandAll = (escaper: Escaper, cmd: string): boolean => {
             return true
         }
         if (nbParam == 1 && escaper.isTrueMaximaxou() && IsPlayerColorString(param1)) {
-            udg_escapers.get(ColorString2Id(param1))?.setBaseColor(ColorString2Id(name))
+            getUdgEscapers().get(ColorString2Id(param1))?.setBaseColor(ColorString2Id(name))
         }
         return true
     }
@@ -80,7 +80,7 @@ export const ExecuteCommandAll = (escaper: Escaper, cmd: string): boolean => {
                 if (!(IsPlayerColorString(param1) && escaper.isTrueMaximaxou())) {
                     return true
                 }
-                escaper = udg_escapers.get(ColorString2Id(param1))
+                escaper = getUdgEscapers().get(ColorString2Id(param1))
             }
             escaper.setVcRed(GetRandomPercentageBJ())
             escaper.setVcGreen(GetRandomPercentageBJ())
@@ -201,7 +201,7 @@ export const ExecuteCommandAll = (escaper: Escaper, cmd: string): boolean => {
             if (!(escaper.isTrueMaximaxou() && IsPlayerColorString(param1))) {
                 return true
             }
-            escaper = udg_escapers.get(ColorString2Id(param1))
+            escaper = getUdgEscapers().get(ColorString2Id(param1))
         }
         escaper.setVcRed(100)
         escaper.setVcGreen(100)
@@ -218,7 +218,7 @@ export const ExecuteCommandAll = (escaper: Escaper, cmd: string): boolean => {
             return true
         }
         if (nbParam === 1 && IsPlayerColorString(param1)) {
-            ColorInfo(udg_escapers.get(ColorString2Id(param1)), escaper.getPlayer())
+            ColorInfo(getUdgEscapers().get(ColorString2Id(param1)), escaper.getPlayer())
             return true
         }
         return true
@@ -230,7 +230,7 @@ export const ExecuteCommandAll = (escaper: Escaper, cmd: string): boolean => {
             return true
         }
         if (nbParam == 2 && escaper.isTrueMaximaxou() && IsPlayerColorString(param2)) {
-            escaper = udg_escapers.get(ColorString2Id(param2))
+            escaper = getUdgEscapers().get(ColorString2Id(param2))
         } else {
             if (nbParam !== 1) {
                 return true
@@ -273,7 +273,7 @@ export const ExecuteCommandAll = (escaper: Escaper, cmd: string): boolean => {
             return true
         }
         if (nbParam == 2 && escaper.isTrueMaximaxou() && IsPlayerColorString(param2)) {
-            escaper = udg_escapers.get(ColorString2Id(param2))
+            escaper = getUdgEscapers().get(ColorString2Id(param2))
         } else {
             if (nbParam !== 1) {
                 return true
@@ -303,7 +303,7 @@ export const ExecuteCommandAll = (escaper: Escaper, cmd: string): boolean => {
                 if (!escaper.isTrueMaximaxou()) {
                     return true
                 }
-                escaper = udg_escapers.get(ColorString2Id(param1))
+                escaper = getUdgEscapers().get(ColorString2Id(param1))
                 n = LIMIT_NB_HERO_EFFECTS
             } else {
                 n = S2I(param1)
@@ -374,17 +374,17 @@ export const ExecuteCommandAll = (escaper: Escaper, cmd: string): boolean => {
             return true
         }
         if (noParam || param1 === 'moving' || param1 === 'm') {
-            n = udg_levels.getNbMonsters('moving')
+            n = getUdgLevels().getNbMonsters('moving')
             Text.P(escaper.getPlayer(), 'There are ' + I2S(n) + ' moving monsters in the map.')
             return true
         }
         if (param1 === 'all' || param1 === 'a') {
-            n = udg_levels.getNbMonsters('all')
+            n = getUdgLevels().getNbMonsters('all')
             Text.P(escaper.getPlayer(), 'There are ' + I2S(n) + ' monsters in the map.')
             return true
         }
         if (param1 === 'notMoving' || param1 === 'nm') {
-            n = udg_levels.getNbMonsters('not moving')
+            n = getUdgLevels().getNbMonsters('not moving')
             Text.P(escaper.getPlayer(), 'There are ' + I2S(n) + ' non moving monsters in the map.')
             return true
         }
@@ -397,17 +397,17 @@ export const ExecuteCommandAll = (escaper: Escaper, cmd: string): boolean => {
             return true
         }
         if (noParam || param1 === 'moving' || param1 === 'm') {
-            n = udg_levels.getCurrentLevel().getNbMonsters('moving')
+            n = getUdgLevels().getCurrentLevel().getNbMonsters('moving')
             Text.P(escaper.getPlayer(), 'There are ' + I2S(n) + ' moving monsters in this level.')
             return true
         }
         if (param1 === 'all' || param1 === 'a') {
-            n = udg_levels.getCurrentLevel().getNbMonsters('all')
+            n = getUdgLevels().getCurrentLevel().getNbMonsters('all')
             Text.P(escaper.getPlayer(), 'There are ' + I2S(n) + ' monsters in this level.')
             return true
         }
         if (param1 === 'notMoving' || param1 === 'nm') {
-            n = udg_levels.getCurrentLevel().getNbMonsters('not moving')
+            n = getUdgLevels().getCurrentLevel().getNbMonsters('not moving')
             Text.P(escaper.getPlayer(), 'There are ' + I2S(n) + ' non moving monsters in this level.')
             return true
         }
@@ -718,7 +718,7 @@ export const ExecuteCommandAll = (escaper: Escaper, cmd: string): boolean => {
         if (!noParam) {
             return true
         }
-        Text.P(escaper.getPlayer(), 'the current level is number ' + I2S(udg_levels.getCurrentLevel().getId()))
+        Text.P(escaper.getPlayer(), 'the current level is number ' + I2S(getUdgLevels().getCurrentLevel().getId()))
         return true
     }
 

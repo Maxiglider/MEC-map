@@ -1,6 +1,6 @@
 import { CACHE_SEPARATEUR_PARAM } from 'core/07_TRIGGERS/Save_map_in_gamecache/struct_StringArrayForCache'
 import { getUdgTerrainTypes } from '../../../../globals'
-const udg_terrainTypes = getUdgTerrainTypes()
+
 import { Level } from '../Level/Level'
 
 export const METEOR_NORMAL = FourCC('MND1')
@@ -44,7 +44,7 @@ export class Meteor {
         }
 
         this.item = CreateItem(METEOR_NORMAL, this.x, this.y)
-        if (udg_terrainTypes.getTerrainType(this.x, this.y)?.getKind() == 'slide') {
+        if (getUdgTerrainTypes().getTerrainType(this.x, this.y)?.getKind() == 'slide') {
             SetItemDroppable(this.item, false)
         }
         SetItemUserData(this.item, this.id)

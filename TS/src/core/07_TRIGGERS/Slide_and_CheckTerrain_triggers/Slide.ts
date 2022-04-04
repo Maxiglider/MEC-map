@@ -1,13 +1,13 @@
 import { CAN_TURN_IN_AIR, Constants, SLIDE_PERIOD } from 'core/01_libraries/Constants'
 import { Apm } from 'core/08_GAME/Apm_clics_par_minute/Apm'
  import { getUdgEscapers } from '../../../../globals'
-const udg_escapers = getUdgEscapers()
+
 import { createEvent } from 'Utils/mapUtils'
 import { Gravity } from './Gravity'
 
 const initSlideTrigger = () => {
     const Slide_Actions = (n: number) => {
-        const escaper = udg_escapers.get(n)
+        const escaper = getUdgEscapers().get(n)
 
         if (!escaper) {
             return

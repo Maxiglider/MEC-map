@@ -3,7 +3,7 @@ import { Text } from 'core/01_libraries/Text'
 import { TerrainType } from 'core/04_STRUCTURES/TerrainType/TerrainType'
 import { Globals } from 'core/09_From_old_Worldedit_triggers/globals_variables_and_triggers'
 import { getUdgTerrainTypes } from '../../../../globals'
-const udg_terrainTypes = getUdgTerrainTypes()
+
 import { ChangeTerrainType } from '../Modify_terrain_Functions/Modify_terrain_functions'
 import {
     AddNewTerrain,
@@ -140,7 +140,7 @@ const initChangeAllTerrains = () => {
         n = 0
         i = 0
         while (true) {
-            terrainTypes[n] = udg_terrainTypes.getWalk(i)
+            terrainTypes[n] = getUdgTerrainTypes().getWalk(i)
             if (terrainTypes[n] === null) break
             oldTerrainTypes[n] = terrainTypes[n].getTerrainTypeId()
             n = n + 1
@@ -148,7 +148,7 @@ const initChangeAllTerrains = () => {
         }
         i = 0
         while (true) {
-            terrainTypes[n] = udg_terrainTypes.getDeath(i)
+            terrainTypes[n] = getUdgTerrainTypes().getDeath(i)
             if (terrainTypes[n] === null) break
             oldTerrainTypes[n] = terrainTypes[n].getTerrainTypeId()
             n = n + 1
@@ -156,7 +156,7 @@ const initChangeAllTerrains = () => {
         }
         i = 0
         while (true) {
-            terrainTypes[n] = udg_terrainTypes.getSlide(i)
+            terrainTypes[n] = getUdgTerrainTypes().getSlide(i)
             if (terrainTypes[n] === null) break
             oldTerrainTypes[n] = terrainTypes[n].getTerrainTypeId()
             n = n + 1

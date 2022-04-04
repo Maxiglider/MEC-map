@@ -1,5 +1,5 @@
  import { getUdgEscapers } from '../../../../globals'
-const udg_escapers = getUdgEscapers()
+
 import { createEvent, forRange } from 'Utils/mapUtils'
 
 export const InitTrig_Camera_reset = () => {
@@ -7,7 +7,7 @@ export const InitTrig_Camera_reset = () => {
         events: [t => forRange(12, i => TriggerRegisterPlayerEventEndCinematic(t, Player(i)))],
         actions: [
             () => {
-                udg_escapers.get(GetPlayerId(GetTriggerPlayer()))?.resetCamera()
+                getUdgEscapers().get(GetPlayerId(GetTriggerPlayer()))?.resetCamera()
             },
         ],
     })

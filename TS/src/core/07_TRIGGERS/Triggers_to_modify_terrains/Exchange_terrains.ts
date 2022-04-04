@@ -1,7 +1,7 @@
 import { Constants, LARGEUR_CASE } from 'core/01_libraries/Constants'
 import { Text } from 'core/01_libraries/Text'
 import { getUdgTerrainTypes } from '../../../../globals'
-const udg_terrainTypes = getUdgTerrainTypes()
+
 import { ChangeTerrainType } from '../Modify_terrain_Functions/Modify_terrain_functions'
 import { TerrainModifyingTrig } from './Terrain_modifying_trig'
 
@@ -43,8 +43,8 @@ const StartTerrainModifying = () => {
 }
 
 export const ExchangeTerrains = (terrainTypeLabelA: string, terrainTypeLabelB: string): boolean => {
-    const terrainTypeA = udg_terrainTypes.get(terrainTypeLabelA)
-    const terrainTypeB = udg_terrainTypes.get(terrainTypeLabelB)
+    const terrainTypeA = getUdgTerrainTypes().get(terrainTypeLabelA)
+    const terrainTypeB = getUdgTerrainTypes().get(terrainTypeLabelB)
     if (terrainTypeA === terrainTypeB || !terrainTypeA || !terrainTypeB) {
         return false
     }

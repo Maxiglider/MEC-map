@@ -7,10 +7,9 @@ import { TerrainTypeDeath } from 'core/04_STRUCTURES/TerrainType/TerrainTypeDeat
 import { TerrainTypeSlide } from 'core/04_STRUCTURES/TerrainType/TerrainTypeSlide'
 import { TerrainTypeWalk } from 'core/04_STRUCTURES/TerrainType/TerrainTypeWalk'
  import { getUdgEscapers } from '../../../../globals'
-const udg_escapers = getUdgEscapers()
 import { createEvent } from 'Utils/mapUtils'
 import { getUdgTerrainTypes } from '../../../../globals'
-const udg_terrainTypes = getUdgTerrainTypes()
+
 import { AutoContinueAfterSliding } from './Auto_continue_after_sliding'
 
 const initCheckTerrainTrigger = () => {
@@ -19,7 +18,7 @@ const initCheckTerrainTrigger = () => {
     const INIT_RAYON_TOLERANCE = 20
 
     const CheckTerrain_Actions = (playerId: number) => {
-        const escaper = udg_escapers.get(playerId)
+        const escaper = getUdgEscapers().get(playerId)
 
         if (!escaper) {
             return
@@ -34,7 +33,7 @@ const initCheckTerrainTrigger = () => {
         const x = GetUnitX(hero)
         const y = GetUnitY(hero)
         const lastTerrainType = escaper.getLastTerrainType()
-        const currentTerrainType = udg_terrainTypes.getTerrainType(x, y)
+        const currentTerrainType = getUdgTerrainTypes().getTerrainType(x, y)
         let an_effect: effect | null
 
         let touchedByDeathTerrain: boolean
@@ -101,7 +100,7 @@ const initCheckTerrainTrigger = () => {
                                 }
                                 xTolerance = x + tempRayonTolerance * CosBJ(angle)
                                 yTolerance = y + tempRayonTolerance * SinBJ(angle)
-                                terrainTypeTolerance = udg_terrainTypes.getTerrainType(xTolerance, yTolerance)
+                                terrainTypeTolerance = getUdgTerrainTypes().getTerrainType(xTolerance, yTolerance)
                                 if (terrainTypeTolerance?.getKind() != 'death') {
                                     touchedByDeathTerrain = false
                                 }

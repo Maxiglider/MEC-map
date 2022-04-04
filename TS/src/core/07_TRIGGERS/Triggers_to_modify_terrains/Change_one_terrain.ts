@@ -1,7 +1,7 @@
 import { Constants, LARGEUR_CASE } from 'core/01_libraries/Constants'
 import { Text } from 'core/01_libraries/Text'
 import { getUdgTerrainTypes } from '../../../../globals'
-const udg_terrainTypes = getUdgTerrainTypes()
+
 import { ChangeTerrainType } from '../Modify_terrain_Functions/Modify_terrain_functions'
 import { GetTerrainData } from '../Modify_terrain_Functions/Terrain_functions'
 import { TerrainTypeFromString } from '../Modify_terrain_Functions/Terrain_type_from_string'
@@ -48,7 +48,7 @@ const initChangeOneTerrain = () => {
             Text.erA("can't execute two commands of this type simultaneously !")
             return null
         }
-        const terrainType = udg_terrainTypes.get(terrainTypeLabel)
+        const terrainType = getUdgTerrainTypes().get(terrainTypeLabel)
         if (terrainType === null) {
             return null
         }
@@ -57,7 +57,7 @@ const initChangeOneTerrain = () => {
         if (newTerrain === 0) {
             return null
         }
-        if (udg_terrainTypes.isTerrainTypeIdAlreadyUsed(newTerrain)) {
+        if (getUdgTerrainTypes().isTerrainTypeIdAlreadyUsed(newTerrain)) {
             return null
         }
         if (!terrainType.setTerrainTypeId(newTerrain)) {

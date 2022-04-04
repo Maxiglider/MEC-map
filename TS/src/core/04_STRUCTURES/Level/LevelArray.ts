@@ -16,7 +16,7 @@ import type { VisibilityModifierArray } from './VisibilityModifierArray'
 import {IsLevelBeingMade} from "./Level_functions";
 import {getUdgEscapers} from "../../../../globals";
 
-const udg_escapers = getUdgEscapers()
+
 
 
 export class LevelArray {
@@ -48,7 +48,7 @@ export class LevelArray {
 
         this.currentLevel = levelId
         if (!IsLevelBeingMade(this.levels[previousLevelId])) {
-            udg_escapers.destroyMakesIfForSpecificLevel_currentLevel()
+            getUdgEscapers().destroyMakesIfForSpecificLevel_currentLevel()
             this.levels[previousLevelId].activate(false)
         }
 
@@ -86,7 +86,7 @@ export class LevelArray {
         }
         this.currentLevel = this.currentLevel + 1
         if (!IsLevelBeingMade(this.levels[this.currentLevel - 1])) {
-            udg_escapers.destroyMakesIfForSpecificLevel_currentLevel()
+            getUdgEscapers().destroyMakesIfForSpecificLevel_currentLevel()
             this.levels[this.currentLevel - 1].activate(false)
         }
         this.levels[this.currentLevel].activate(true)

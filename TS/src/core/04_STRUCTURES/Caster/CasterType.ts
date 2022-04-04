@@ -6,8 +6,8 @@ import { udg_colorCode } from '../../01_libraries/Init_colorCodes'
 import { Level } from '../Level/Level'
 import { MonsterType } from '../Monster/MonsterType'
 
-const udg_escapers = getUdgEscapers()
-const udg_levels = getUdgLevels()
+
+
 
 export const DEFAULT_CASTER_PROJECTILE_SPEED = 600
 export const MIN_CASTER_PROJECTILE_SPEED = 100
@@ -62,11 +62,11 @@ export class CasterType {
         let levelsMaking: Level[] = []
         let levelAlreadyChecked: boolean
         let nbLevelsMaking = 0
-        const currentLevel = udg_levels.getCurrentLevel()
+        const currentLevel = getUdgLevels().getCurrentLevel()
         currentLevel.refreshCastersOfType(this)
 
         for (let i = 0; i < NB_ESCAPERS; i++) {
-            const escaper = udg_escapers.get(i)
+            const escaper = getUdgEscapers().get(i)
             if (escaper) {
                 if (escaper.getMakingLevel() != currentLevel) {
                     levelAlreadyChecked = false
@@ -92,7 +92,7 @@ export class CasterType {
     }
 
     destroy = () => {
-        udg_levels.removeCastersOfType(this)
+        getUdgLevels().removeCastersOfType(this)
     }
 
     getCasterMonsterType = (): MonsterType => {

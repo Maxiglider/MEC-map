@@ -1,11 +1,11 @@
 import { NB_ESCAPERS } from 'core/01_libraries/Constants'
  import { getUdgEscapers } from '../../../../globals'
-const udg_escapers = getUdgEscapers()
+
 import { getUdgLevels } from "../../../../globals"
-const udg_levels = getUdgLevels()
+
 import { forRange } from 'Utils/mapUtils'
 import { getUdgTerrainTypes } from '../../../../globals'
-const udg_terrainTypes = getUdgTerrainTypes()
+
 
 export class KillingTimers {
     private timers: timer[] = []
@@ -19,7 +19,7 @@ export class KillingTimers {
     }
 
     TerrainKillTimer2Escaper = (theTimer: timer) => {
-        const terrainTypeDeathMaxId = udg_terrainTypes.numberOfDeath - 1
+        const terrainTypeDeathMaxId = getUdgTerrainTypes().numberOfDeath - 1
         let terrainTypeDeathId = 0
         let escaperId = 0
 
@@ -27,8 +27,8 @@ export class KillingTimers {
             escaperId = 0
 
             while (!(escaperId >= NB_ESCAPERS)) {
-                if (theTimer == udg_terrainTypes.getDeath(terrainTypeDeathId).getTimer(escaperId)) {
-                    return udg_escapers.get(escaperId)
+                if (theTimer == getUdgTerrainTypes().getDeath(terrainTypeDeathId).getTimer(escaperId)) {
+                    return getUdgEscapers().get(escaperId)
                 }
 
                 escaperId = escaperId + 1
@@ -49,7 +49,7 @@ export class KillingTimers {
             escaper.pause(false)
             escaper.destroyTerrainKillEffect()
 
-            if (escaper.currentLevelTouchTerrainDeath == udg_levels.getCurrentLevel()) {
+            if (escaper.currentLevelTouchTerrainDeath == getUdgLevels().getCurrentLevel()) {
                 escaper.kill()
             } else {
                 if (escaper.isAlive()) {
@@ -58,10 +58,10 @@ export class KillingTimers {
             }
         })
 
-        const escaper = udg_escapers.get(timerId)
+        const escaper = getUdgEscapers().get(timerId)
 
         if (escaper) {
-            escaper.currentLevelTouchTerrainDeath = udg_levels.getCurrentLevel()
+            escaper.currentLevelTouchTerrainDeath = getUdgLevels().getCurrentLevel()
         }
     }
 

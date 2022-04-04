@@ -1,6 +1,6 @@
 import { StopUnit } from 'core/01_libraries/Basic_functions'
 import { getUdgTerrainTypes } from '../../../../globals'
-const udg_terrainTypes = getUdgTerrainTypes()
+
 import { METEOR_CHEAT, METEOR_NORMAL } from './Meteor'
 
 const initMeteorFunctions = () => {
@@ -8,7 +8,7 @@ const initMeteorFunctions = () => {
 
     const HeroAddCheatMeteor = (hero: unit): item => {
         meteor = UnitAddItemById(hero, METEOR_CHEAT)
-        if (udg_terrainTypes.getTerrainType(GetUnitX(hero), GetUnitY(hero))?.getKind() == 'slide') {
+        if (getUdgTerrainTypes().getTerrainType(GetUnitX(hero), GetUnitY(hero))?.getKind() == 'slide') {
             SetItemDroppable(meteor, false)
         }
         return meteor

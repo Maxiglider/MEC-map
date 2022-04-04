@@ -1,6 +1,6 @@
 import { NB_ESCAPERS } from 'core/01_libraries/Constants'
  import { getUdgEscapers } from '../../../../globals'
-const udg_escapers = getUdgEscapers()
+
 
 const initAutoContinueAfterSliding = () => {
     let lastClickedX: number[] = []
@@ -12,7 +12,7 @@ const initAutoContinueAfterSliding = () => {
     const ECART_MAX_ANGLE = 45
 
     const AutoContinueAfterSliding = (n: number) => {
-        const hero = udg_escapers.get(n)?.getHero()
+        const hero = getUdgEscapers().get(n)?.getHero()
 
         if (!hero) {
             return

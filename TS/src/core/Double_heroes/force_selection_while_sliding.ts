@@ -3,7 +3,7 @@ import { ForceSelectHeroes, GetMirrorEscaper } from 'core/04_STRUCTURES/Escaper/
  import {getUdgEscapers} from '../../../globals'
 import { udg_doubleHeroesEnabled } from './double_heroes_config'
 
-const udg_escapers = getUdgEscapers()
+
 
 const initForceSelectionWhileSliding = () => {
     const ForceSelectionWhileSliding_Actions = (): void => {
@@ -16,7 +16,7 @@ const initForceSelectionWhileSliding = () => {
         if (udg_doubleHeroesEnabled) {
             while (true) {
                 if (i >= NB_PLAYERS_MAX) break
-                escaper1 = udg_escapers.get(i)
+                escaper1 = getUdgEscapers().get(i)
                 if (escaper1 !== null) {
                     escaper2 = GetMirrorEscaper(escaper1)
                     if (escaper1.isSliding() || escaper2?.isSliding()) {

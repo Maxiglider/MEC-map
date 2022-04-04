@@ -23,56 +23,61 @@ const globals: {
 
 //Escapers
 export const setUdgEscapers = (escaperArray: EscaperArray) => {
+    //print('called setUdgEscapers')
     globals.escapers = escaperArray
 }
 
 export const getUdgEscapers = (): EscaperArray => {
-    if(!globals.escapers) throw "globals.escapers called before init"
-    return globals.escapers
+    //print('called getUdgEscapers')
+    return <EscaperArray>globals.escapers
 }
 
 
 //Levels
-export const setUdgLEvels = (la: LevelArray) => {
+export const setUdgLevels = (la: LevelArray) => {
+    //print('called setUdgLevels')
     globals.levels = la
 }
 
 export const getUdgLevels = (): LevelArray => {
-    if(!globals.levels) throw "globals.levels called before init"
-    return globals.levels
+    //print('called getUdgLevels')
+    return <LevelArray>globals.levels
 }
 
 
 //Terrain types
 export const setUdgTerrainTypes = (tta: TerrainTypeArray) => {
+    //print('called setUdgTerrainTypes')
     globals.terrainTypes = tta
 }
 
 export const getUdgTerrainTypes = (): TerrainTypeArray => {
-    if(!globals.terrainTypes) throw "globals.terrainTypes called before init"
-    return globals.terrainTypes
+    //print('called getUdgTerrainTypes')
+    return <TerrainTypeArray>globals.terrainTypes
 }
 
 
 //Caster types
 export const setUdgCasterTypes = (cta: CasterTypeArray) => {
+    //print('called setUdgCasterTypes')
     globals.casterTypes = cta
 }
 
 export const getUdgCasterTypes = (): CasterTypeArray => {
-    if(!globals.casterTypes) throw "globals.casterTypes called before init"
-    return globals.casterTypes
+    //print('called getUdgCasterTypes')
+    return <CasterTypeArray>globals.casterTypes
 }
 
 
 //Monster types
 export const setUdgMonsterTypes = (mta: MonsterTypeArray) => {
+    //print('called setUdgMonsterTypes')
     globals.monsterTypes = mta
 }
 
 export const getUdgMonsterTypes = (): MonsterTypeArray => {
-    if(!globals.monsterTypes) throw "globals.monsterTypes called before init"
-    return globals.monsterTypes
+    //print('called getUdgMonsterTypes')
+    return <MonsterTypeArray>globals.monsterTypes
 }
 
 

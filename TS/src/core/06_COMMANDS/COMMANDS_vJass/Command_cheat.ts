@@ -8,9 +8,9 @@ import {GetMirrorEscaper} from 'core/04_STRUCTURES/Escaper/Escaper_functions'
 import {METEOR_CHEAT} from 'core/04_STRUCTURES/Meteor/Meteor'
 import {Gravity} from 'core/07_TRIGGERS/Slide_and_CheckTerrain_triggers/Gravity'
  import { getUdgEscapers } from '../../../../globals'
-const udg_escapers = getUdgEscapers()
+
 import { getUdgLevels } from "../../../../globals"
-const udg_levels = getUdgLevels()
+
 import {MeteorFunctions} from '../../04_STRUCTURES/Meteor/Meteor_functions'
 import {Trig_InvisUnit_is_getting_damage} from '../../08_GAME/Death/InvisUnit_is_getting_damage'
 import {CmdName, CmdParam, IsPlayerColorString, NbParam, NoParam} from "./Command_functions";
@@ -64,8 +64,8 @@ export const ExecuteCommandCheat = (escaper: Escaper, cmd: string): boolean => {
             i = 0
             while (true) {
                 if (i >= NB_ESCAPERS) break
-                if (udg_escapers.get(i) != null) {
-                    udg_escapers.get(i)?.absoluteSlideSpeed(speed)
+                if (getUdgEscapers().get(i) != null) {
+                    getUdgEscapers().get(i)?.absoluteSlideSpeed(speed)
                 }
                 i = i + 1
             }
@@ -73,8 +73,8 @@ export const ExecuteCommandCheat = (escaper: Escaper, cmd: string): boolean => {
             return true
         }
         if (IsPlayerColorString(param2)) {
-            if (udg_escapers.get(ColorString2Id(param2)) != null) {
-                udg_escapers.get(ColorString2Id(param2))?.absoluteSlideSpeed(speed)
+            if (getUdgEscapers().get(ColorString2Id(param2)) != null) {
+                getUdgEscapers().get(ColorString2Id(param2))?.absoluteSlideSpeed(speed)
                 Text.P(escaper.getPlayer(), 'slide speed for player ' + param2 + ' is to ' + param1)
             }
         }
@@ -95,8 +95,8 @@ export const ExecuteCommandCheat = (escaper: Escaper, cmd: string): boolean => {
             i = 0
             while (true) {
                 if (i >= NB_ESCAPERS) break
-                if (udg_escapers.get(i) != null) {
-                    udg_escapers.get(i)?.stopAbsoluteSlideSpeed()
+                if (getUdgEscapers().get(i) != null) {
+                    getUdgEscapers().get(i)?.stopAbsoluteSlideSpeed()
                 }
                 i = i + 1
             }
@@ -104,8 +104,8 @@ export const ExecuteCommandCheat = (escaper: Escaper, cmd: string): boolean => {
             return true
         }
         if (IsPlayerColorString(param1)) {
-            if (udg_escapers.get(ColorString2Id(param1)) != null) {
-                udg_escapers.get(ColorString2Id(param1))?.stopAbsoluteSlideSpeed()
+            if (getUdgEscapers().get(ColorString2Id(param1)) != null) {
+                getUdgEscapers().get(ColorString2Id(param1))?.stopAbsoluteSlideSpeed()
                 Text.P(escaper.getPlayer(), 'slide speed for player ' + param1 + ' depends now on terrains')
             }
         }
@@ -130,8 +130,8 @@ export const ExecuteCommandCheat = (escaper: Escaper, cmd: string): boolean => {
             i = 0
             while (true) {
                 if (i >= NB_ESCAPERS) break
-                if (udg_escapers.get(i) != null) {
-                    udg_escapers.get(i)?.absoluteWalkSpeed(speed)
+                if (getUdgEscapers().get(i) != null) {
+                    getUdgEscapers().get(i)?.absoluteWalkSpeed(speed)
                 }
                 i = i + 1
             }
@@ -139,8 +139,8 @@ export const ExecuteCommandCheat = (escaper: Escaper, cmd: string): boolean => {
             return true
         }
         if (IsPlayerColorString(param2)) {
-            if (udg_escapers.get(ColorString2Id(param2)) != null) {
-                udg_escapers.get(ColorString2Id(param2))?.absoluteWalkSpeed(speed)
+            if (getUdgEscapers().get(ColorString2Id(param2)) != null) {
+                getUdgEscapers().get(ColorString2Id(param2))?.absoluteWalkSpeed(speed)
                 Text.P(escaper.getPlayer(), 'walk speed for player ' + param2 + ' to ' + param1)
             }
         }
@@ -161,8 +161,8 @@ export const ExecuteCommandCheat = (escaper: Escaper, cmd: string): boolean => {
             i = 0
             while (true) {
                 if (i >= NB_ESCAPERS) break
-                if (udg_escapers.get(i) != null) {
-                    udg_escapers.get(i)?.stopAbsoluteWalkSpeed()
+                if (getUdgEscapers().get(i) != null) {
+                    getUdgEscapers().get(i)?.stopAbsoluteWalkSpeed()
                 }
                 i = i + 1
             }
@@ -170,8 +170,8 @@ export const ExecuteCommandCheat = (escaper: Escaper, cmd: string): boolean => {
             return true
         }
         if (IsPlayerColorString(param1)) {
-            if (udg_escapers.get(ColorString2Id(param1)) != null) {
-                udg_escapers.get(ColorString2Id(param1))?.stopAbsoluteWalkSpeed()
+            if (getUdgEscapers().get(ColorString2Id(param1)) != null) {
+                getUdgEscapers().get(ColorString2Id(param1))?.stopAbsoluteWalkSpeed()
                 Text.P(escaper.getPlayer(), 'walk speed for player ' + param1 + ' depends now on terrains')
             }
         }
@@ -210,16 +210,16 @@ export const ExecuteCommandCheat = (escaper: Escaper, cmd: string): boolean => {
             i = 0
             while (true) {
                 if (i >= NB_ESCAPERS) break
-                if (udg_escapers.get(i) != null) {
-                    udg_escapers.get(i)?.reviveAtStart()
+                if (getUdgEscapers().get(i) != null) {
+                    getUdgEscapers().get(i)?.reviveAtStart()
                 }
                 i = i + 1
             }
             return true
         }
         if (IsPlayerColorString(param1)) {
-            if (udg_escapers.get(ColorString2Id(param1)) != null) {
-                udg_escapers.get(ColorString2Id(param1))?.reviveAtStart()
+            if (getUdgEscapers().get(ColorString2Id(param1)) != null) {
+                getUdgEscapers().get(ColorString2Id(param1))?.reviveAtStart()
             }
         }
         return true
@@ -231,11 +231,11 @@ export const ExecuteCommandCheat = (escaper: Escaper, cmd: string): boolean => {
             return true
         }
         n = ColorString2Id(param1)
-        if (!udg_escapers.get(n)?.isAlive() || udg_escapers.get(n) == null) {
+        if (!getUdgEscapers().get(n)?.isAlive() || getUdgEscapers().get(n) == null) {
             return true
         }
 
-        const hero = udg_escapers.get(n)?.getHero()
+        const hero = getUdgEscapers().get(n)?.getHero()
 
         if (!hero) {
             return true
@@ -286,7 +286,7 @@ export const ExecuteCommandCheat = (escaper: Escaper, cmd: string): boolean => {
     //-endLevel(el)   --> go to the end of the current level
     if (name === 'endLevel' || name === 'el') {
         if (noParam) {
-            udg_levels.goToNextLevel()
+            getUdgLevels().goToNextLevel()
         }
         return true
     }
@@ -303,15 +303,15 @@ export const ExecuteCommandCheat = (escaper: Escaper, cmd: string): boolean => {
         }
 
         n = S2I(param1)
-        if (udg_levels.getCurrentLevel().getId() == n) {
+        if (getUdgLevels().getCurrentLevel().getId() == n) {
             Text.erP(escaper.getPlayer(), 'you already are in this level')
             return true
         }
 
-        if (!udg_levels.goToLevel(undefined, n)) {
+        if (!getUdgLevels().goToLevel(undefined, n)) {
             Text.erP(
                 escaper.getPlayer(),
-                "this levels doesn't exist (level max : " + I2S(udg_levels.getLastLevelId()) + ')'
+                "this levels doesn't exist (level max : " + I2S(getUdgLevels().getLastLevelId()) + ')'
             )
         }
 
@@ -363,8 +363,8 @@ export const ExecuteCommandCheat = (escaper: Escaper, cmd: string): boolean => {
             i = 0
             while (true) {
                 if (i >= NB_ESCAPERS) break
-                if (udg_escapers.get(i) != null) {
-                    udg_escapers.get(i)?.setGodMode(b)
+                if (getUdgEscapers().get(i) != null) {
+                    getUdgEscapers().get(i)?.setGodMode(b)
                 }
                 i = i + 1
             }
@@ -377,8 +377,8 @@ export const ExecuteCommandCheat = (escaper: Escaper, cmd: string): boolean => {
         }
         if (IsPlayerColorString(param2)) {
             n = ColorString2Id(param2)
-            if (udg_escapers.get(n) != null) {
-                udg_escapers.get(n)?.setGodMode(b)
+            if (getUdgEscapers().get(n) != null) {
+                getUdgEscapers().get(n)?.setGodMode(b)
                 if (b) {
                     Text.P(escaper.getPlayer(), 'slider ' + param2 + ' is now invulnerable')
                 } else {
@@ -422,8 +422,8 @@ export const ExecuteCommandCheat = (escaper: Escaper, cmd: string): boolean => {
             i = 0
             while (true) {
                 if (i >= NB_ESCAPERS) break
-                if (udg_escapers.get(i) != null) {
-                    udg_escapers.get(i)?.setGodModeKills(b)
+                if (getUdgEscapers().get(i) != null) {
+                    getUdgEscapers().get(i)?.setGodModeKills(b)
                 }
                 i = i + 1
             }
@@ -436,8 +436,8 @@ export const ExecuteCommandCheat = (escaper: Escaper, cmd: string): boolean => {
         }
         if (IsPlayerColorString(param2)) {
             n = ColorString2Id(param2)
-            if (udg_escapers.get(n) != null) {
-                udg_escapers.get(n)?.setGodModeKills(b)
+            if (getUdgEscapers().get(n) != null) {
+                getUdgEscapers().get(n)?.setGodModeKills(b)
                 if (b) {
                     Text.P(
                         escaper.getPlayer(),

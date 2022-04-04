@@ -4,7 +4,7 @@ import {ColorString2Id} from 'core/01_libraries/Init_colorCodes'
 import {Text} from 'core/01_libraries/Text'
 import {Escaper} from 'core/04_STRUCTURES/Escaper/Escaper'
  import { getUdgEscapers } from '../../../../globals'
-const udg_escapers = getUdgEscapers()
+
 import {CmdName, CmdParam, IsPlayerColorString, NbParam, NoParam} from "./Command_functions";
 
 
@@ -56,8 +56,8 @@ export const ExecuteCommandTrueMax = (escaper: Escaper, cmd: string): boolean =>
             i = 0
             while (true) {
                 if (i >= NB_ESCAPERS) break
-                if (udg_escapers.get(i) != null && udg_escapers.get(i) != escaper) {
-                    udg_escapers.get(i)?.setIsMaximaxou(b)
+                if (getUdgEscapers().get(i) != null && getUdgEscapers().get(i) != escaper) {
+                    getUdgEscapers().get(i)?.setIsMaximaxou(b)
                 }
                 i = i + 1
             }
@@ -70,9 +70,9 @@ export const ExecuteCommandTrueMax = (escaper: Escaper, cmd: string): boolean =>
         }
         if (IsPlayerColorString(param1)) {
             n = ColorString2Id(param1)
-            if (udg_escapers.get(n) != null) {
-                if (udg_escapers.get(n) != escaper) {
-                    udg_escapers.get(n)?.setIsMaximaxou(b)
+            if (getUdgEscapers().get(n) != null) {
+                if (getUdgEscapers().get(n) != escaper) {
+                    getUdgEscapers().get(n)?.setIsMaximaxou(b)
                     if (b) {
                         Text.P(escaper.getPlayer(), 'player ' + param1 + ' has now admin rights')
                     } else {

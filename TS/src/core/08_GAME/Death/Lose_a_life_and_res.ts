@@ -3,10 +3,10 @@ import { Text } from 'core/01_libraries/Text'
 import { createEvent } from 'Utils/mapUtils'
 import { ChangeAllTerrains } from '../../07_TRIGGERS/Triggers_to_modify_terrains/Change_all_terrains'
 import { getUdgEscapers } from '../../../../globals'
-const udg_escapers = getUdgEscapers()
+
 import { udg_lives } from '../Init_structures/Init_lives'
 import { getUdgLevels } from "../../../../globals"
-const udg_levels = getUdgLevels()
+
 
 let udg_gameIsLost = false
 export let gg_trg_Lose_a_life_and_res: trigger
@@ -25,7 +25,7 @@ export const InitTrig_Lose_a_life_and_res = () => {
                         TriggerSleepAction(2)
                         DisplayTextToForce(GetPlayersAll(), 'The game will restart in 10 seconds.')
                         TriggerSleepAction(10.0)
-                        udg_levels.restartTheGame()
+                        getUdgLevels().restartTheGame()
                         udg_gameIsLost = false
                     }
                 } else {
@@ -39,7 +39,7 @@ export const InitTrig_Lose_a_life_and_res = () => {
                     i = 0
                     while (true) {
                         if (i >= NB_ESCAPERS) break
-                        udg_escapers.get(i)?.reviveAtStart()
+                        getUdgEscapers().get(i)?.reviveAtStart()
                         i = i + 1
                     }
                     Text.A('|cff5c2e2eYou have lost a life !')

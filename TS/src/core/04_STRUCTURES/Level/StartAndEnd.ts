@@ -1,7 +1,7 @@
 import { Text } from 'core/01_libraries/Text'
 //import { CACHE_SEPARATEUR_PARAM } from 'core/07_TRIGGERS/Save_map_in_gamecache/struct_StringArrayForCache'
 import { getUdgLevels } from "../../../../globals"
-const udg_levels = getUdgLevels()
+
 import { createEvent } from 'Utils/mapUtils'
 import { Hero2Escaper } from '../Escaper/Escaper_functions'
 
@@ -74,12 +74,12 @@ export class End extends RectInterface {
                         return
                     }
 
-                    if (!udg_levels.goToNextLevel(finisher)) {
+                    if (!getUdgLevels().goToNextLevel(finisher)) {
                         Text.A('Good job ! You have finished the game.')
                         TriggerSleepAction(2)
                         Text.A('restart in 10 seconds')
                         TriggerSleepAction(10)
-                        udg_levels.restartTheGame()
+                        getUdgLevels().restartTheGame()
                     }
                 },
             ],

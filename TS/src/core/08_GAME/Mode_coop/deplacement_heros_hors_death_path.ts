@@ -1,5 +1,5 @@
 import { getUdgTerrainTypes } from '../../../../globals'
-const udg_terrainTypes = getUdgTerrainTypes()
+
 const initDeplacementHeroHorsDeathPath = () => {
     const GRADUATION_ANGLE = 5
     const VALEUR_DECALAGE = 60
@@ -22,7 +22,7 @@ const initDeplacementHeroHorsDeathPath = () => {
         let angleNonDeathTrouveALInstant = false
 
         //vérification que le héros est sur le terrain qui tue
-        if (udg_terrainTypes.getTerrainType(xHero, yHero)?.getKind() !== 'death') {
+        if (getUdgTerrainTypes().getTerrainType(xHero, yHero)?.getKind() !== 'death') {
             return
         }
 
@@ -32,7 +32,7 @@ const initDeplacementHeroHorsDeathPath = () => {
             if (angle >= 360) break
             x = xHero + VALEUR_DECALAGE * CosBJ(angle)
             y = yHero + VALEUR_DECALAGE * SinBJ(angle)
-            if (udg_terrainTypes.getTerrainType(x, y)?.getKind() !== 'death') {
+            if (getUdgTerrainTypes().getTerrainType(x, y)?.getKind() !== 'death') {
                 if (!angleNonDeathTrouveALInstant) {
                     if (dernierAngleNonDeath === 0) {
                         premierAngleNonDeath = angle

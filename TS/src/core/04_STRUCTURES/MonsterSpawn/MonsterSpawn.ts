@@ -1,5 +1,5 @@
 import { getUdgMonsterTypes } from '../../../../globals'
-const udg_monsterTypes = getUdgMonsterTypes()
+
 import { GetCurrentMonsterPlayer } from '../../01_libraries/Basic_functions'
 import { ENNEMY_PLAYER, GREY, MOBS_VARIOUS_COLORS, TERRAIN_DATA_DISPLAY_TIME } from '../../01_libraries/Constants'
 import { udg_colorCode } from '../../01_libraries/Init_colorCodes'
@@ -217,7 +217,7 @@ export class MonsterSpawn {
         }
         SetUnitX(mobUnit, x1)
         SetUnitY(mobUnit, y1)
-        if (udg_monsterTypes.monsterUnit2MonsterType(mobUnit)?.isClickable()) {
+        if (getUdgMonsterTypes().monsterUnit2MonsterType(mobUnit)?.isClickable()) {
             p = ENNEMY_PLAYER
         } else {
             p = GetCurrentMonsterPlayer()
