@@ -1,3 +1,5 @@
+import {stringReplaceAll} from "../../01_libraries/Basic_functions";
+
 const initTerrainTypeMax = () => {
     const terrainMap: { [x: number]: string } = {
         1: 'Ldrt',
@@ -382,7 +384,8 @@ const initTerrainTypeMax = () => {
     }
 
     const TerrainTypeAsciiString2TerrainTypeId = (terrainTypeAsciiString: string): number => {
-        return FourCC(terrainMap[reversedTerrainMap[terrainTypeAsciiString]]) || 0
+        const withoutQuotes = stringReplaceAll("'", "", terrainTypeAsciiString)
+        return FourCC(terrainMap[reversedTerrainMap[withoutQuotes]]) || 0
     }
 
     return { TerrainTypeMaxId2TerrainTypeId, TerrainTypeId2TerrainTypeMaxId, TerrainTypeAsciiString2TerrainTypeId, TerrainTypeId2TerrainTypeAsciiString }

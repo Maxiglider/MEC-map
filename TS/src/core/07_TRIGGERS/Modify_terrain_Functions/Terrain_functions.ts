@@ -13,8 +13,7 @@ import {TerrainTypeId2TerrainType} from "../../04_STRUCTURES/TerrainType/Terrain
 
 export const IsTerrainAlreadyUsed = (terrainType: number): boolean => {
     let i = 0
-    while (true) {
-        if (Globals.udg_used_terrain_types[i] === 0) break
+    while (Globals.udg_used_terrain_types[i]) {
         if (Globals.udg_used_terrain_types[i] === terrainType) {
             return true
         }

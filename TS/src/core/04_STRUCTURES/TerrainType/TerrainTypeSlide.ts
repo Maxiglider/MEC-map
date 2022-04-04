@@ -5,7 +5,7 @@ import {COLOR_TERRAIN_SLIDE} from "../../01_libraries/Init_colorCodes";
 import {B2S} from "../../01_libraries/Basic_functions";
 import {CACHE_SEPARATEUR_PARAM} from "../../07_TRIGGERS/Save_map_in_gamecache/struct_StringArrayForCache";
 import {Text} from "../../01_libraries/Text";
-import {Ascii2String} from "../../01_libraries/Ascii";
+import {TerrainTypeMax} from "../../07_TRIGGERS/Modify_terrain_Functions/Terrain_type_max";
 
 export class TerrainTypeSlide extends TerrainType {
     private slideSpeed: number
@@ -65,10 +65,10 @@ export class TerrainTypeSlide extends TerrainType {
             COLOR_TERRAIN_SLIDE +
             this.label +
             ' ' +
-            this.theAlias +
+            (this.theAlias || '') +
             order +
             " : '" +
-            Ascii2String(this.terrainTypeId) +
+            TerrainTypeMax.TerrainTypeId2TerrainTypeAsciiString(this.terrainTypeId) +
             "'" +
             space
         display = display + I2S(R2I(this.getSlideSpeed() / SLIDE_PERIOD)) + space + displayCanTurn
@@ -90,7 +90,7 @@ export class TerrainTypeSlide extends TerrainType {
             str +
             this.kind +
             CACHE_SEPARATEUR_PARAM +
-            Ascii2String(this.terrainTypeId) +
+            TerrainTypeMax.TerrainTypeId2TerrainTypeAsciiString(this.terrainTypeId) +
             CACHE_SEPARATEUR_PARAM +
             I2S(this.cliffClassId) +
             CACHE_SEPARATEUR_PARAM

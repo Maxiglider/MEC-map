@@ -97,16 +97,17 @@ export const ExecuteCommandMake = (escaper: Escaper, cmd: string): boolean => {
             )
             return true
         }
-        if (
-            !getUdgTerrainTypes().newWalk(
+
+        try {
+            getUdgTerrainTypes().newWalk(
                 param1,
                 TerrainTypeFromString.TerrainTypeString2TerrainTypeId(param2),
                 speed
             )
-        ) {
-            Text.erP(escaper.getPlayer(), 'impossible to add this new terrain type')
-        } else {
+
             Text.mkP(escaper.getPlayer(), 'new terrain type "' + param1 + '" added')
+        } catch(error) {
+            Text.erP(escaper.getPlayer(), 'impossible to add this new terrain type')
         }
         return true
     }
@@ -151,19 +152,21 @@ export const ExecuteCommandMake = (escaper: Escaper, cmd: string): boolean => {
             )
             return true
         }
-        if (
-            !getUdgTerrainTypes().newDeath(
+
+        try {
+            getUdgTerrainTypes().newDeath(
                 param1,
                 TerrainTypeFromString.TerrainTypeString2TerrainTypeId(param2),
                 str,
                 x,
                 0
             )
-        ) {
-            Text.erP(escaper.getPlayer(), 'impossible to add this new terrain type')
-        } else {
+
             Text.mkP(escaper.getPlayer(), 'new terrain type "' + param1 + '" added')
+        } catch(error) {
+            Text.erP(escaper.getPlayer(), 'impossible to add this new terrain type')
         }
+
         return true
     }
 
@@ -201,18 +204,20 @@ export const ExecuteCommandMake = (escaper: Escaper, cmd: string): boolean => {
             )
             return true
         }
-        if (
-            !getUdgTerrainTypes().newSlide(
+
+        try {
+            getUdgTerrainTypes().newSlide(
                 param1,
                 TerrainTypeFromString.TerrainTypeString2TerrainTypeId(param2),
                 speed,
                 b
             )
-        ) {
-            Text.erP(escaper.getPlayer(), 'impossible to add this new terrain type')
-        } else {
+
             Text.mkP(escaper.getPlayer(), 'new terrain type "' + param1 + '" added')
+        } catch(error) {
+            Text.erP(escaper.getPlayer(), 'impossible to add this new terrain type')
         }
+
         return true
     }
 

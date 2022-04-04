@@ -16,6 +16,9 @@ export abstract class TerrainType {
         orderId: number,
         cliffClassId: number
     ) {
+        if(terrainTypeId == 0){
+            throw "Wrong terrain type id"
+        }
         this.label = label
         this.terrainTypeId = terrainTypeId
         this.theAlias = theAlias

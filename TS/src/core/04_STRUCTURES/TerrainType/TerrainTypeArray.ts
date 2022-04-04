@@ -74,30 +74,25 @@ export class TerrainTypeArray {
     }
 
     isTerrainTypeIdAlreadyUsed = (terrainTypeId: number): boolean => {
-        let i = 0
-        while (true) {
-            if (i >= this.numberOfWalk) break
+
+        for(let i = 0; i < this.numberOfWalk; i++){
             if (terrainTypeId == this.ttWalk[i].getTerrainTypeId()) {
                 return true
             }
-            i = i + 1
         }
-        i = 0
-        while (true) {
-            if (i >= this.numberOfDeath) break
+
+        for(let i = 0; i < this.numberOfDeath; i++){
             if (terrainTypeId == this.ttDeath[i].getTerrainTypeId()) {
                 return true
             }
-            i = i + 1
         }
-        i = 0
-        while (true) {
-            if (i >= this.numberOfSlide) break
+
+        for(let i = 0; i < this.numberOfSlide; i++){
             if (terrainTypeId == this.ttSlide[i].getTerrainTypeId()) {
                 return true
             }
-            i = i + 1
         }
+
         return false
     }
 
