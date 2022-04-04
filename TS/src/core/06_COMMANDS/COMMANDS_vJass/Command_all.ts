@@ -513,14 +513,16 @@ export const ExecuteCommandAll = (escaper: Escaper, cmd: string): boolean => {
 
         if (escaper.discoTrigger) {
             escaper.discoTrigger.destroy()
-            escaper.discoTrigger = createTimer(10 / I2R(n), true, () => Disco.Disco_Actions(n)) //n changements en 10 secondes
+            escaper.discoTrigger = createTimer(10 / I2R(n), true, () => Disco.Disco_Actions(escaper.getEscaperId())) //n changements en 10 secondes
         }
 
         const mirrorEscaper = GetMirrorEscaper(escaper)
 
         if (mirrorEscaper?.discoTrigger) {
             mirrorEscaper.discoTrigger.destroy()
-            mirrorEscaper.discoTrigger = createTimer(10 / I2R(n), true, () => Disco.Disco_Actions(n)) //n changements en 10 secondes
+            mirrorEscaper.discoTrigger = createTimer(10 / I2R(n), true, () =>
+                Disco.Disco_Actions(escaper.getEscaperId())
+            ) //n changements en 10 secondes
         }
 
         Text.P(escaper.getPlayer(), 'disco : ' + I2S(n) + ' changes in 10 seconds')
