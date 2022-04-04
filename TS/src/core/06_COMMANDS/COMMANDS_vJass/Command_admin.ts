@@ -9,7 +9,7 @@ import {
     ReinitTerrainsPositions
 } from 'core/07_TRIGGERS/Triggers_to_modify_terrains/Reinit_terrains_position_Change_variations_and_ut_at_beginning'
 import {AfkMode} from 'core/08_GAME/Afk_mode/Afk_mode'
-import {getUdgCasterTypes, getUdgEscapers, getUdgMonsterTypes, getUdgTerrainTypes} from '../../../../globals'
+import {getUdgCasterTypes, getUdgEscapers, getUdgMonsterTypes, getUdgTerrainTypes, globals} from '../../../../globals'
 import {udg_lives} from 'core/08_GAME/Init_structures/Init_lives'
 import { getUdgLevels } from "../../../../globals"
 import {Globals} from 'core/09_From_old_Worldedit_triggers/globals_variables_and_triggers'
@@ -17,7 +17,6 @@ import {udg_doubleHeroesEnabled} from 'core/Double_heroes/double_heroes_config'
 import {SaveMapInCache} from '../../07_TRIGGERS/Save_map_in_gamecache/SAVE_MAP_in_cache'
 import {SaveLoadTerrainWithoutName} from '../../07_TRIGGERS/Triggers_to_modify_terrains/Save_load_terrain_without_name'
 import {SaveLoadTerrainWithName} from '../../07_TRIGGERS/Triggers_to_modify_terrains/Save_load_terrain_with_name'
-import {Trig_Autorevive} from './Autorevive'
 import {CmdName, CmdParam, IsPlayerColorString, NbParam, NoParam} from "./Command_functions";
 import {ActivateTeleport, DisableTeleport} from "./Teleport";
 import {IsPositiveInteger} from "../../01_libraries/Functions_on_numbers";
@@ -453,7 +452,7 @@ export const ExecuteCommandMax = (escaper: Escaper, cmd: string): boolean => {
             return true
         }
         x = S2R(param1)
-        Trig_Autorevive.udg_autoreviveDelay = x
+        globals.autoreviveDelay = x
         if (x > 1) {
             Text.P(escaper.getPlayer(), 'autorevive delay to ' + R2S(x) + ' seconds')
         } else {

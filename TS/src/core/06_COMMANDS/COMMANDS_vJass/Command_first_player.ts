@@ -1,7 +1,7 @@
 import {NB_ESCAPERS} from 'core/01_libraries/Constants'
 import {ColorString2Id} from 'core/01_libraries/Init_colorCodes'
 import {Escaper} from 'core/04_STRUCTURES/Escaper/Escaper'
- import { getUdgEscapers } from '../../../../globals'
+import { getUdgEscapers } from '../../../../globals'
 
 import { getUdgLevels } from "../../../../globals"
 

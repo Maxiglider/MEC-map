@@ -8,12 +8,14 @@ import type {Monster} from "./src/core/04_STRUCTURES/Monster/Monster";
 
 //GLOBALS
 
-const globals: {
+export const globals: {
     escapers?: EscaperArray,
     levels?: LevelArray,
     terrainTypes?: TerrainTypeArray,
     casterTypes?: CasterTypeArray,
     monsterTypes?: MonsterTypeArray
+    coopModeActive?: boolean,
+    autoreviveDelay?: number
 } = {}
 
 

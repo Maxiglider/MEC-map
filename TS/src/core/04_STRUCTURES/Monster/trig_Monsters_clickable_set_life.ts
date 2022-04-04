@@ -5,33 +5,35 @@ const initMonstersClickableSetLife = () => {
     const monstersClickable = CreateGroup()
     const PERIOD = 0.1
 
-    createEvent({
-        events: [t => TriggerRegisterTimerEvent(t, PERIOD, true)],
-        actions: [
-            () => {
-                ForGroup(monstersClickable, () => {
-                    const monsterUnit = GetEnumUnit()
-                    const currentLife = GetUnitState(monsterUnit, UNIT_STATE_LIFE)
-                    const monster = udg_monsters[GetUnitUserData(monsterUnit)]
+    const init_TrigMonstersClickableSetLife = () => {
+        createEvent({
+            events: [t => TriggerRegisterTimerEvent(t, PERIOD, true)],
+            actions: [
+                () => {
+                    ForGroup(monstersClickable, () => {
+                        const monsterUnit = GetEnumUnit()
+                        const currentLife = GetUnitState(monsterUnit, UNIT_STATE_LIFE)
+                        const monster = udg_monsters[GetUnitUserData(monsterUnit)]
 
-                    if (monster) {
-                        const previousLife = I2R(monster.getLife())
-                        let diffLife = RMaxBJ(currentLife, previousLife) - RMinBJ(currentLife, previousLife)
-                        if (diffLife < 100) {
-                            SetUnitLifeBJ(GetEnumUnit(), previousLife - 0.5)
-                        } else {
-                            while (!(diffLife <= 0)) {
-                                monster.setLife(R2I(previousLife) - 10000)
-                                diffLife = diffLife - 10000
+                        if (monster) {
+                            const previousLife = I2R(monster.getLife())
+                            let diffLife = RMaxBJ(currentLife, previousLife) - RMinBJ(currentLife, previousLife)
+                            if (diffLife < 100) {
+                                SetUnitLifeBJ(GetEnumUnit(), previousLife - 0.5)
+                            } else {
+                                while (!(diffLife <= 0)) {
+                                    monster.setLife(R2I(previousLife) - 10000)
+                                    diffLife = diffLife - 10000
+                                }
                             }
                         }
-                    }
-                })
-            },
-        ],
-    })
+                    })
+                },
+            ],
+        })
+    }
 
-    return { monstersClickable }
+    return { monstersClickable, init_TrigMonstersClickableSetLife }
 }
 
 export const MonstersClickableSetLife = initMonstersClickableSetLife()

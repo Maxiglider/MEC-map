@@ -12,6 +12,7 @@ import {ExecuteCommandTrueMax} from "./Command_superadmin";
 import {IsCmd} from "./Command_functions";
 import {ExecuteCommandMake} from "./Command_make";
 import {commandsBuffer} from "../../04_STRUCTURES/Escaper/EscaperSavedCommands";
+import {NB_PLAYERS_MAX} from "../../01_libraries/Constants";
 
 
 const ExecuteCommandSingle = (escaper: Escaper, cmd: string) => {
@@ -92,38 +93,41 @@ export const ExecuteCommand = (escaper: Escaper, cmd: string) => {
     }
 }
 
-createEvent({
-    events: [t => forRange(12, i => TriggerRegisterPlayerChatEvent(t, Player(i), '-', false))],
-    actions: [
-        () => {
-            if (!IsCmd(GetEventPlayerChatString())) {
-                return
-            }
 
-            const escaper = getUdgEscapers().get(GetPlayerId(GetTriggerPlayer()))
+export const init_commandExecution = () => {
+    createEvent({
+        events: [t => forRange(NB_PLAYERS_MAX, i => TriggerRegisterPlayerChatEvent(t, Player(i), '-', false))],
+        actions: [
+            () => {
+                if (!IsCmd(GetEventPlayerChatString())) {
+                    return
+                }
 
-            if (!escaper) {
-                return
-            }
+                const escaper = getUdgEscapers().get(GetPlayerId(GetTriggerPlayer()))
 
-            ExecuteCommand(escaper, GetEventPlayerChatString())
-        },
-    ],
-})
+                if (!escaper) {
+                    return
+                }
+
+                ExecuteCommand(escaper, GetEventPlayerChatString())
+            },
+        ],
+    })
 
 
 //Handle buffer of commands
-createEvent({ //todomax find a better solution than a periodic timer
-    events: [t => TriggerRegisterTimerEvent(t, 0.001, true)],
-    actions: [
-        () => {
-            if(commandsBuffer.length > 0){
-                commandsBuffer.map(command => {
-                    ExecuteCommand(command.escaper, command.cmd)
-                })
+    createEvent({ //todomax find a better solution than a periodic timer
+        events: [t => TriggerRegisterTimerEvent(t, 0.001, true)],
+        actions: [
+            () => {
+                if (commandsBuffer.length > 0) {
+                    commandsBuffer.map(command => {
+                        ExecuteCommand(command.escaper, command.cmd)
+                    })
 
-                commandsBuffer.length = 0
+                    commandsBuffer.length = 0
+                }
             }
-        }
-    ]
-})
+        ]
+    })
+}

@@ -7,47 +7,51 @@ import { ChangeTerrainType } from '../Modify_terrain_Functions/Modify_terrain_fu
 import { AddNewTerrain } from '../Modify_terrain_Functions/Terrain_functions'
 import { TerrainModifyingTrig } from './Terrain_modifying_trig'
 
+//todomax fix this inifite loops
+
 const initReinitTerrainsPositions = () => {
     let TERRAIN_SAVE: (TerrainType | null)[] = []
     let terrainSave_id: number
     let terrainModifyWorking = false
 
-    createEvent({
-        events: [t => TriggerRegisterTimerEvent(t, 0, false)],
-        actions: [
-            () => {
-                TriggerClearActions(TerrainModifyingTrig.gg_trg_Terrain_modifying_trig)
-                TriggerAddAction(TerrainModifyingTrig.gg_trg_Terrain_modifying_trig, () => {
-                    let terrainType: number
-                    let x = Constants.MAP_MIN_X
-                    while (true) {
-                        if (x > Constants.MAP_MAX_X) break
-                        terrainType = GetTerrainType(x, y)
-                        //mise à jour used terrain (-ut)
-                        AddNewTerrain(terrainType)
-                        //changer variations
-                        ChangeTerrainType(x, y, terrainType)
-                        //sauvegarde du terrain
-                        TERRAIN_SAVE[terrainSave_id] = TerrainTypeId2TerrainType(terrainType)
-                        terrainSave_id = terrainSave_id + 1
-                        x = x + LARGEUR_CASE
-                    }
+    const init_reinitTerrainsPositions = () => {
+        createEvent({
+            events: [t => TriggerRegisterTimerEvent(t, 0, false)],
+            actions: [
+                () => {
+                    TriggerClearActions(TerrainModifyingTrig.gg_trg_Terrain_modifying_trig)
+                    TriggerAddAction(TerrainModifyingTrig.gg_trg_Terrain_modifying_trig, () => {
+                        let terrainType: number
+                        let x = Constants.MAP_MIN_X
+                        while (true) {
+                            if (x > Constants.MAP_MAX_X) break
+                            terrainType = GetTerrainType(x, y)
+                            //mise à jour used terrain (-ut)
+                            AddNewTerrain(terrainType)
+                            //changer variations
+                            ChangeTerrainType(x, y, terrainType)
+                            //sauvegarde du terrain
+                            TERRAIN_SAVE[terrainSave_id] = TerrainTypeId2TerrainType(terrainType)
+                            terrainSave_id = terrainSave_id + 1
+                            x = x + LARGEUR_CASE
+                        }
 
-                    y = y + LARGEUR_CASE
-                    if (y > Constants.MAP_MAX_Y) {
-                        terrainModifyWorking = false
-                        DisableTrigger(GetTriggeringTrigger())
-                        return
-                    }
-                })
-                terrainSave_id = 0
-                let y = Constants.MAP_MIN_Y
-                EnableTrigger(TerrainModifyingTrig.gg_trg_Terrain_modifying_trig)
-                terrainModifyWorking = true
-                DestroyTrigger(GetTriggeringTrigger())
-            },
-        ],
-    })
+                        y = y + LARGEUR_CASE
+                        if (y > Constants.MAP_MAX_Y) {
+                            terrainModifyWorking = false
+                            DisableTrigger(GetTriggeringTrigger())
+                            return
+                        }
+                    })
+                    terrainSave_id = 0
+                    let y = Constants.MAP_MIN_Y
+                    EnableTrigger(TerrainModifyingTrig.gg_trg_Terrain_modifying_trig)
+                    terrainModifyWorking = true
+                    DestroyTrigger(GetTriggeringTrigger())
+                },
+            ],
+        })
+    }
 
     //reinitTerrainPositions
     const StartTerrainModifying = () => {
@@ -96,7 +100,7 @@ const initReinitTerrainsPositions = () => {
         StartTerrainModifying()
     }
 
-    return { ReinitTerrainsPosition }
+    return { ReinitTerrainsPosition, init_reinitTerrainsPositions }
 }
 
 export const ReinitTerrainsPositions = initReinitTerrainsPositions()

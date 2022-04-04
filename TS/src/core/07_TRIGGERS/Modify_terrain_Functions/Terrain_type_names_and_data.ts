@@ -210,9 +210,7 @@ const initTerrainTypeNamesAndData = () => {
         }
     }
 
-    Init_TerrainTypeNamesAndData()
-
-    return { TERRAIN_TYPE_NAMES, TERRAIN_TYPE_DATA, NB_TERRAINS_TOTAL }
+    return { TERRAIN_TYPE_NAMES, TERRAIN_TYPE_DATA, NB_TERRAINS_TOTAL, Init_TerrainTypeNamesAndData }
 }
 
 export const TerrainTypeNamesAndData = initTerrainTypeNamesAndData()

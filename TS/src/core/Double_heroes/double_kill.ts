@@ -1,7 +1,7 @@
 import { GetMirrorEscaper, Hero2Escaper, IsHero } from 'core/04_STRUCTURES/Escaper/Escaper_functions'
 import { udg_doubleHeroesEnabled } from './double_heroes_config'
 
-const initDoubleKill = () => {
+export const init_doubleKill = () => {
     let triggerDoubleKill = CreateTrigger()
     TriggerRegisterAnyUnitEventBJ(triggerDoubleKill, EVENT_PLAYER_UNIT_DEATH)
     TriggerAddAction(triggerDoubleKill, () => {
@@ -11,4 +11,3 @@ const initDoubleKill = () => {
     })
 }
 
-export const DoubleKill = initDoubleKill()

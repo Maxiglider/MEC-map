@@ -7,11 +7,14 @@ import { Globals } from '../../09_From_old_Worldedit_triggers/globals_variables_
 import { AfkMode } from '../Afk_mode/Afk_mode'
 import { getUdgEscapers } from '../../../../globals'
 
-import { udg_coopModeActive } from '../Mode_coop/creation_dialogue'
+import { globals} from "../../../../globals";
 import { DeplacementHeroHorsDeathPath } from '../Mode_coop/deplacement_heros_hors_death_path'
 import { gg_trg_Lose_a_life_and_res } from './Lose_a_life_and_res'
 
 let udg_nbKilled = 0
+
+
+
 
 export const InitTrig_A_hero_dies_check_if_all_dead_and_sounds = () => {
     createEvent({
@@ -67,7 +70,7 @@ export const InitTrig_A_hero_dies_check_if_all_dead_and_sounds = () => {
                     TriggerSleepAction(3)
                 } else {
                     //coop
-                    if (udg_coopModeActive) {
+                    if (globals.coopModeActive) {
                         TriggerSleepAction(1.3)
 
                         //si héros déjà vivant, inutile de le ressuciter

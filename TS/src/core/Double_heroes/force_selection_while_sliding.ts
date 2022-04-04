@@ -5,7 +5,7 @@ import { udg_doubleHeroesEnabled } from './double_heroes_config'
 
 
 
-const initForceSelectionWhileSliding = () => {
+export const init_forceSelectionWhileSliding = () => {
     const ForceSelectionWhileSliding_Actions = (): void => {
         let escaper1
         let escaper2
@@ -41,5 +41,3 @@ const initForceSelectionWhileSliding = () => {
     TriggerRegisterTimerEvent(trig, 0.1, true)
     TriggerAddAction(trig, ForceSelectionWhileSliding_Actions)
 }
-
-export const ForceSelectionWhileSliding = initForceSelectionWhileSliding()

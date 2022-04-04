@@ -13,38 +13,40 @@ const initReinitTerrains = () => {
     let terrainTypeIdsToReplace: number[] = []
     let terrainModifyWorking = false
 
-    createEvent({
-        events: [t => TriggerRegisterTimerEvent(t, 0, false)],
-        actions: [
-            () => {
-                let n = 0
-                let i = 0
-                while (true) {
-                    if (i >= getUdgTerrainTypes().numberOfWalk) break
-                    terrainTypes[n] = getUdgTerrainTypes().getWalk(i)
-                    terrainTypeIds[n] = terrainTypes[n].getTerrainTypeId()
-                    n = n + 1
-                    i = i + 1
-                }
-                i = 0
-                while (true) {
-                    if (i >= getUdgTerrainTypes().numberOfDeath) break
-                    terrainTypes[n] = getUdgTerrainTypes().getDeath(i)
-                    terrainTypeIds[n] = terrainTypes[n].getTerrainTypeId()
-                    n = n + 1
-                    i = i + 1
-                }
-                i = 0
-                while (true) {
-                    if (i >= getUdgTerrainTypes().numberOfSlide) break
-                    terrainTypes[n] = getUdgTerrainTypes().getSlide(i)
-                    terrainTypeIds[n] = terrainTypes[n].getTerrainTypeId()
-                    n = n + 1
-                    i = i + 1
-                }
-            },
-        ],
-    })
+    const init_ReinitAtStart = () => {
+        createEvent({
+            events: [t => TriggerRegisterTimerEvent(t, 0, false)],
+            actions: [
+                () => {
+                    let n = 0
+                    let i = 0
+                    while (true) {
+                        if (i >= getUdgTerrainTypes().numberOfWalk) break
+                        terrainTypes[n] = getUdgTerrainTypes().getWalk(i)
+                        terrainTypeIds[n] = terrainTypes[n].getTerrainTypeId()
+                        n = n + 1
+                        i = i + 1
+                    }
+                    i = 0
+                    while (true) {
+                        if (i >= getUdgTerrainTypes().numberOfDeath) break
+                        terrainTypes[n] = getUdgTerrainTypes().getDeath(i)
+                        terrainTypeIds[n] = terrainTypes[n].getTerrainTypeId()
+                        n = n + 1
+                        i = i + 1
+                    }
+                    i = 0
+                    while (true) {
+                        if (i >= getUdgTerrainTypes().numberOfSlide) break
+                        terrainTypes[n] = getUdgTerrainTypes().getSlide(i)
+                        terrainTypeIds[n] = terrainTypes[n].getTerrainTypeId()
+                        n = n + 1
+                        i = i + 1
+                    }
+                },
+            ],
+        })
+    }
 
     const StartTerrainModifying = () => {
         TerrainModifyingTrig.StopEnabledCheckTerrainTriggers()
@@ -107,7 +109,7 @@ const initReinitTerrains = () => {
         StartTerrainModifying()
     }
 
-    return { ReinitTerrains }
+    return { ReinitTerrains, init_ReinitAtStart }
 }
 
 export const ReinitTerrains = initReinitTerrains()

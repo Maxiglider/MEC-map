@@ -28,6 +28,8 @@ const initTurnOnSlide = () => {
     let canTurn: boolean
 
     //drunk variables
+
+    //todomax put udg_isDrunk in globals.ts
     let udg_isDrunk: boolean[] = []
     let udg_drunk: number[] = []
     let udg_drunkLevel: number[] = []
@@ -129,7 +131,7 @@ const initTurnOnSlide = () => {
         Apm.nbClicsOnSlide[n] = Apm.nbClicsOnSlide[n] + 1
     }
 
-    const Init_ToTurnOnSlide = () => {
+    const init_ToTurnOnSlide = () => {
         //turn to point
         trg_turnToPoint = createEvent({
             events: [t => TriggerRegisterAnyUnitEventBJ(t, EVENT_PLAYER_UNIT_ISSUED_POINT_ORDER)],
@@ -162,9 +164,7 @@ const initTurnOnSlide = () => {
         DRUNK_EFFECTS[3] = DRUNK_EFFECT_GROS
     }
 
-    Init_ToTurnOnSlide()
-
-    return { udg_isDrunk, udg_drunk, udg_drunkLevel, udg_drunkEffect, DRUNK_EFFECTS }
+    return { udg_isDrunk, udg_drunk, udg_drunkLevel, udg_drunkEffect, DRUNK_EFFECTS, init_ToTurnOnSlide }
 }
 
 export const TurnOnSlide = initTurnOnSlide()

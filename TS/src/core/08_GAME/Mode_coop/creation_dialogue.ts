@@ -1,14 +1,12 @@
 import { createEvent } from 'Utils/mapUtils'
-import {NB_PLAYERS_MAX} from "../../01_libraries/Constants";
+import {globals} from "../../../../globals";
 
 let dialChoixModeCoop: dialog
+let dialBoutonAppuye: boolean
 const DIAL_TIME_TO_ANSWER = 10
 let dialTimerTempLimite: timer
-export let udg_coopModeActive = true
 
-let dialBouton = {
-    pressed: false
-}
+globals.coopModeActive = true
 
 export const InitTrig_creation_dialogue = () => {
     createEvent({
@@ -25,9 +23,9 @@ export const InitTrig_creation_dialogue = () => {
                     events: [t => TriggerRegisterDialogEventBJ(t, dialChoixModeCoop)],
                     actions: [
                         () => {
-                            udg_coopModeActive = GetClickedButton() === btnChoixCoop
-                            dialBouton.pressed = true
-                            if (udg_coopModeActive) {
+                            globals.coopModeActive = GetClickedButton() === btnChoixCoop
+                            dialBoutonAppuye = true
+                            if (globals.coopModeActive) {
                                 DisplayTextToForce(GetPlayersAll(), 'coop mode chosen by first player')
                             } else {
                                 DisplayTextToForce(GetPlayersAll(), 'solo mode chosen by first player')
@@ -50,20 +48,21 @@ export const gg_trg_apparition_dialogue_et_fermeture_automatique = createEvent({
                 if (
                     (GetPlayerController(Player(i)) === MAP_CONTROL_USER &&
                         GetPlayerSlotState(Player(i)) === PLAYER_SLOT_STATE_PLAYING) ||
-                    i >= NB_PLAYERS_MAX
+                    i > 11
                 )
                     break
                 i = i + 1
             }
-            if (i >= NB_PLAYERS_MAX) {
+            if (i > 11) {
                 return
             }
             const udg_joueurDialogue = Player(i)
             DialogDisplay(udg_joueurDialogue, dialChoixModeCoop, true)
+            let dialBoutonAppuye = false
             TimerStart(dialTimerTempLimite, DIAL_TIME_TO_ANSWER, false, () => {
-                if (!dialBouton.pressed) {
+                if (!dialBoutonAppuye) {
                     DialogDisplay(udg_joueurDialogue, dialChoixModeCoop, false)
-                    if (udg_coopModeActive) {
+                    if (globals.coopModeActive) {
                         DisplayTextToForce(GetPlayersAll(), 'coop mode automatically chosen')
                     } else {
                         DisplayTextToForce(GetPlayersAll(), 'solo mode automatically chosen')

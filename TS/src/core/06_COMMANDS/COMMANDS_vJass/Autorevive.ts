@@ -1,8 +1,10 @@
 import { Hero2Escaper, IsHero } from 'core/04_STRUCTURES/Escaper/Escaper_functions'
 import { createEvent } from 'Utils/mapUtils'
+import {globals} from "../../../../globals";
 
-const InitTrig_Autorevive = () => {
-    let udg_autoreviveDelay = 4
+
+export const InitTrig_Autorevive = () => {
+    globals.autoreviveDelay = 4
 
     createEvent({
         events: [t => TriggerRegisterAnyUnitEventBJ(t, EVENT_PLAYER_UNIT_DEATH)],
@@ -16,15 +18,12 @@ const InitTrig_Autorevive = () => {
                 }
 
                 if (escaper.hasAutorevive()) {
-                    TriggerSleepAction(udg_autoreviveDelay)
+                    globals.autoreviveDelay !== undefined && TriggerSleepAction(globals.autoreviveDelay)
                     escaper.reviveAtStart()
                     escaper.selectHero()
                 }
             },
         ],
     })
-
-    return { udg_autoreviveDelay }
 }
 
-export const Trig_Autorevive = InitTrig_Autorevive()
