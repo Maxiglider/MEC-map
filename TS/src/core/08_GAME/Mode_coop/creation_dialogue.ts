@@ -1,10 +1,14 @@
 import { createEvent } from 'Utils/mapUtils'
+import {NB_PLAYERS_MAX} from "../../01_libraries/Constants";
 
 let dialChoixModeCoop: dialog
-let dialBoutonAppuye: boolean
 const DIAL_TIME_TO_ANSWER = 10
 let dialTimerTempLimite: timer
 export let udg_coopModeActive = true
+
+let dialBouton = {
+    pressed: false
+}
 
 export const InitTrig_creation_dialogue = () => {
     createEvent({
@@ -22,7 +26,7 @@ export const InitTrig_creation_dialogue = () => {
                     actions: [
                         () => {
                             udg_coopModeActive = GetClickedButton() === btnChoixCoop
-                            dialBoutonAppuye = true
+                            dialBouton.pressed = true
                             if (udg_coopModeActive) {
                                 DisplayTextToForce(GetPlayersAll(), 'coop mode chosen by first player')
                             } else {
@@ -46,19 +50,18 @@ export const gg_trg_apparition_dialogue_et_fermeture_automatique = createEvent({
                 if (
                     (GetPlayerController(Player(i)) === MAP_CONTROL_USER &&
                         GetPlayerSlotState(Player(i)) === PLAYER_SLOT_STATE_PLAYING) ||
-                    i > 11
+                    i >= NB_PLAYERS_MAX
                 )
                     break
                 i = i + 1
             }
-            if (i > 11) {
+            if (i >= NB_PLAYERS_MAX) {
                 return
             }
             const udg_joueurDialogue = Player(i)
             DialogDisplay(udg_joueurDialogue, dialChoixModeCoop, true)
-            let dialBoutonAppuye = false
             TimerStart(dialTimerTempLimite, DIAL_TIME_TO_ANSWER, false, () => {
-                if (!dialBoutonAppuye) {
+                if (!dialBouton.pressed) {
                     DialogDisplay(udg_joueurDialogue, dialChoixModeCoop, false)
                     if (udg_coopModeActive) {
                         DisplayTextToForce(GetPlayersAll(), 'coop mode automatically chosen')
