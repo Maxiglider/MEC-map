@@ -27,7 +27,7 @@ export const CmdName = (str: string): string => {
 }
 
 export const IsCmd = (str: string): boolean => {
-    return CmdName(str) !== null
+    return CmdName(str) !== ''
 }
 
 //gives the parameter number 'paramNumber' of the entered command : <paramX>
@@ -78,15 +78,14 @@ export const CmdParam = (str: string, paramNumber: number): string => {
 
 export const NbParam = (str: string): number => {
     let i = 1
-    while (true) {
-        if (CmdParam(str, i) === null) break
+    while (CmdParam(str, i) !== '') {
         i = i + 1
     }
     return i - 1
 }
 
 export const NoParam = (str: string): boolean => {
-    return CmdParam(str, 0) === null
+    return CmdParam(str, 0) === ''
 }
 
 export const IsColorString = (colorString: string): boolean => {
