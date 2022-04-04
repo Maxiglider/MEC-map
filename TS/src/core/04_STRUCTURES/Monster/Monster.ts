@@ -64,7 +64,7 @@ export abstract class Monster {
         delete this.clearMob
     }
 
-    removeUnit = () => {
+    removeUnit() {
         if (this.u) {
             GroupRemoveUnit(MonstersClickableSetLife.monstersClickable, this.u)
             RemoveUnit(this.u)
@@ -73,7 +73,7 @@ export abstract class Monster {
         }
     }
 
-    killUnit = () => {
+    killUnit() {
         if (this.u && IsUnitAliveBJ(this.u)) {
             KillUnit(this.u)
         }
@@ -221,7 +221,7 @@ export abstract class Monster {
         }
     }
 
-    destroy = () => {
+    destroy() {
         if (this.u) {
             this.removeUnit()
         }
@@ -239,7 +239,7 @@ export abstract class Monster {
         this.level && this.level.monsters.removeMonster(this.id)
     }
 
-    toString = () => {
+    toString() {
         let str: string = ''
         if (this.mt) {
             if (this.mt.theAlias != null && this.mt.theAlias != '') {

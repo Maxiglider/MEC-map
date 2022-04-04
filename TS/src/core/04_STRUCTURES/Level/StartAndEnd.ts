@@ -22,7 +22,7 @@ abstract class RectInterface {
         this.r = Rect(this.minX, this.minY, this.maxX, this.maxY)
     }
 
-    destroy = () => {
+    destroy() {
         RemoveRect(this.r)
     }
 

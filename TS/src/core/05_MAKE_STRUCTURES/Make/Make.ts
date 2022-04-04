@@ -41,13 +41,13 @@ export abstract class Make {
         this.forSpecificLevel = forSpecificLevel
     }
 
-    destroy = () => {
+    destroy() {
         if (this.t) {
             DestroyTrigger(this.t)
         }
     }
 
-    doBaseActions = () => {
+    doBaseActions() {
         if (!IsIssuedOrder('smart')) {
             return false
         }
