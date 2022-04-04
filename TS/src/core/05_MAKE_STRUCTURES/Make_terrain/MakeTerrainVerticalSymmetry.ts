@@ -7,7 +7,7 @@ export class MakeTerrainVerticalSymmetry extends MakeOneByOneOrTwoClicks {
         super(maker, 'terrainVerticalSymmetry', "", null, false)
     }
 
-    doActions(){
+    doActions = () => {
         if(super.doBaseActions()){
             if (this.isLastLocSavedUsed()) {
                 try{

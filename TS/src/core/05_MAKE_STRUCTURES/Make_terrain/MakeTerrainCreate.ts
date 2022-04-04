@@ -17,7 +17,7 @@ export class MakeTerrainCreate extends MakeOneByOneOrTwoClicks {
         return this.terrainType
     }
     
-    doActions() {
+    doActions = () => {
         if(super.doBaseActions()){
             let action: MakeAction
             

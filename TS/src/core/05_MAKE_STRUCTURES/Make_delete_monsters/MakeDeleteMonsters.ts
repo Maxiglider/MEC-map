@@ -9,7 +9,7 @@ export class MakeDeleteMonsters extends MakeOneByOneOrTwoClicks {
         super(maker, 'deleteMonsters', mode, acceptedModes)
     }
 
-    doActions() {
+    doActions = () => {
         if (super.doBaseActions()) {
             //modes : oneByOne, all, noMove, move, simplePatrol, multiplePatrols
             let suppressedMonsters: Monster[] = []

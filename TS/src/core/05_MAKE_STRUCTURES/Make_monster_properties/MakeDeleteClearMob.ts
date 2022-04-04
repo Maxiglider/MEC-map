@@ -12,7 +12,7 @@ export class MakeDeleteClearMob extends Make {
         Text.mkP(this.makerOwner, 'clear mob removed')
     }
 
-    doActions() {
+    doActions = () => {
         if (super.doBaseActions()) {
             //todomax make Caster extend Monster
 

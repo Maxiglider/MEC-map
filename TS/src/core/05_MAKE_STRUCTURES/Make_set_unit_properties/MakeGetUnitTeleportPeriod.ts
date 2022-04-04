@@ -7,7 +7,7 @@ export class MakeGetUnitTeleportPeriod extends Make {
         super(maker, 'getUnitTeleportPeriod')
     }
 
-    doActions() {
+    doActions = () => {
         if (super.doBaseActions()) {
             const monster = this.escaper.getMakingLevel().monsters.getMonsterNear(this.orderX, this.orderY)
             if (monster instanceof MonsterTeleport) {

@@ -151,7 +151,7 @@ export class MakeTerrainCopyPaste extends Make {
         return false
     }
 
-    doActions() {
+    doActions = () => {
         if(super.doBaseActions()){
             this.saveLoc(this.orderX, this.orderY)
         }

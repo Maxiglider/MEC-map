@@ -5,7 +5,7 @@ export class MakeDoNothing extends Make {
         super(maker, 'doNothing', false)
     }
 
-    doActions() {
+    doActions = () => {
         super.doBaseActions()
     }
 }

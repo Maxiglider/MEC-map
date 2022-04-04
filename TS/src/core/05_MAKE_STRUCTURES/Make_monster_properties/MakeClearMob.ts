@@ -91,7 +91,7 @@ export class MakeClearMob extends Make {
         }
     }
 
-    doActions() {
+    doActions = () => {
         if (super.doBaseActions()) {
             //recherche du monstre cliqué
             const monster = this.escaper.getMakingLevel().monsters.getMonsterNear(this.orderX, this.orderY)
@@ -105,7 +105,7 @@ export class MakeClearMob extends Make {
         }
     }
 
-    cancelLastAction() {
+    cancelLastAction = () => {
         if (this.clearMob) {
             if (this.cancelOneBlockMob()) {
                 Text.mkP(this.makerOwner, 'last block mob removed')
@@ -121,7 +121,7 @@ export class MakeClearMob extends Make {
         }
     }
 
-    redoLastAction() {
+    redoLastAction = () => {
         if (!this.clearMob) {
             if (this.triggerMob) {
                 this.createClearMob()

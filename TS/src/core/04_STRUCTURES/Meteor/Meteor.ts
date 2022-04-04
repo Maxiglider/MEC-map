@@ -24,11 +24,11 @@ export class Meteor {
         udg_meteors[this.id] = this
     }
 
-    getId() {
+    getId = () => {
         return this.id
     }
 
-    getItem() {
+    getItem = () => {
         return this.item
     }
 

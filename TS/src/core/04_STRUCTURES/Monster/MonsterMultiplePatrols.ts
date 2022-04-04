@@ -88,7 +88,7 @@ export class MonsterMultiplePatrols extends Monster {
         MonsterMultiplePatrols.Y = []
     }
 
-    getCurrentTrigger() {
+    getCurrentTrigger = () => {
         return this.currentTrigger
     }
 
@@ -102,7 +102,7 @@ export class MonsterMultiplePatrols extends Monster {
         this.u && IssuePointOrder(this.u, 'move', this.x[id], this.y[id])
     }
 
-    nextMove() {
+    nextMove = () => {
         const lastLocInd = this.x.length - 1
         this.disableTrigger(this.currentMove)
 
@@ -212,12 +212,12 @@ export class MonsterMultiplePatrols extends Monster {
         return 0
     }
 
-    destroy() {
+    destroy = () => {
         while (this.destroyLastLoc()) {}
         super.destroy()
     }
 
-    toString() {
+    toString = () => {
         let str = super.toString()
         str += CACHE_SEPARATEUR_PARAM
 

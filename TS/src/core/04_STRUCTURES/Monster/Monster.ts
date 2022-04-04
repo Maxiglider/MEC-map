@@ -48,7 +48,7 @@ export abstract class Monster {
         this.vcTransparency = 0
     }
 
-    getId() {
+    getId = () => {
         return this.id
     }
 
@@ -56,15 +56,15 @@ export abstract class Monster {
         this.clearMob = clearMob
     }
 
-    getClearMob() {
+    getClearMob = () => {
         return this.clearMob
     }
 
-    removeClearMob() {
+    removeClearMob = () => {
         delete this.clearMob
     }
 
-    removeUnit() {
+    removeUnit = () => {
         if (this.u) {
             GroupRemoveUnit(MonstersClickableSetLife.monstersClickable, this.u)
             RemoveUnit(this.u)
@@ -73,7 +73,7 @@ export abstract class Monster {
         }
     }
 
-    killUnit() {
+    killUnit = () => {
         if (this.u && IsUnitAliveBJ(this.u)) {
             KillUnit(this.u)
         }
@@ -136,7 +136,7 @@ export abstract class Monster {
         }
     }
 
-    getMonsterType() {
+    getMonsterType = () => {
         return this.mt
     }
 
@@ -221,7 +221,7 @@ export abstract class Monster {
         }
     }
 
-    destroy() {
+    destroy = () => {
         if (this.u) {
             this.removeUnit()
         }
@@ -239,7 +239,7 @@ export abstract class Monster {
         this.level && this.level.monsters.removeMonster(this.id)
     }
 
-    toString() {
+    toString = () => {
         let str: string = ''
         if (this.mt) {
             if (this.mt.theAlias != null && this.mt.theAlias != '') {

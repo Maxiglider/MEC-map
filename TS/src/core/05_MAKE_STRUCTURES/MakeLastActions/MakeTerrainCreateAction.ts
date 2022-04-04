@@ -55,7 +55,7 @@ export class MakeTerrainCreateAction extends MakeAction {
         this.isActionMadeB = true
     }
 
-    destroy(){
+    destroy = () => {
         //nothing needed
     }
 

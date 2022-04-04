@@ -17,7 +17,7 @@ export class MakeStart extends MakeOneByOneOrTwoClicks {
         return this.forNextB
     }
     
-    doActions() {
+    doActions = () => {
         if(super.doBaseActions()){
             let level: Level | null
 

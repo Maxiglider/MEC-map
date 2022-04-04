@@ -79,15 +79,15 @@ export class Level {
         checkPointReviveHeroes(this, finisher)
     }
 
-    getStart() {
+    getStart = () => {
         return this.start
     }
 
-    getStartRandomX() {
+    getStartRandomX = () => {
         return this.start ? this.start.getRandomX() : 0
     }
 
-    getStartRandomY() {
+    getStartRandomY = () => {
         return this.start ? this.start.getRandomY() : 0
     }
 
@@ -104,7 +104,7 @@ export class Level {
         }
     }
 
-    getEnd() {
+    getEnd = () => {
         return this.end
     }
 
@@ -113,7 +113,7 @@ export class Level {
         return this.monsters.count(mode)
     }
 
-    destroy() {
+    destroy = () => {
         this.start && this.start.destroy()
         this.end && this.end.destroy()
         this.visibilities.destroy()
@@ -138,11 +138,11 @@ export class Level {
         this.monsters.removeCastersOfType(ct)
     }
 
-    getId() {
+    getId = () => {
         return this.id
     }
 
-    isActivated() {
+    isActivated = () => {
         return this.isActivatedB
     }
 
@@ -158,7 +158,7 @@ export class Level {
         return true
     }
 
-    getNbLives() {
+    getNbLives = () => {
         return this.livesEarnedAtBeginning
     }
 
@@ -170,7 +170,7 @@ export class Level {
         return this.visibilities.newFromExisting(vm)
     }
 
-    removeVisibilities() {
+    removeVisibilities = () => {
         this.visibilities.removeAllVisibilityModifiers()
     }
 
@@ -182,7 +182,7 @@ export class Level {
         this.startMessage = str
     }
 
-    getStartMessage() {
+    getStartMessage = () => {
         return this.startMessage
     }
 }

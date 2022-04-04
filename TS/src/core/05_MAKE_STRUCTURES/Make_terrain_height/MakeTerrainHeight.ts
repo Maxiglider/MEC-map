@@ -21,7 +21,7 @@ export class MakeTerrainHeight extends Make {
         return this.height
     }
 
-    doActions() {
+    doActions = () => {
         if(super.doBaseActions()){
             this.escaper.newAction(new MakeTerrainHeightAction(this.getRadius(), this.getHeight(), this.orderX, this.orderY))
         }

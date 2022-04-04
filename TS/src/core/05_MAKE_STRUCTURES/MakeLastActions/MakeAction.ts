@@ -15,7 +15,7 @@ export abstract class MakeAction {
         this.isActionMadeB = true
     }
 
-    getLevel() {
+    getLevel = () => {
         return this.level
     }
 }

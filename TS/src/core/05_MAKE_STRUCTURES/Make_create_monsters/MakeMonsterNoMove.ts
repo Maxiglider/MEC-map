@@ -22,7 +22,7 @@ export class MakeMonsterNoMove extends Make {
         return this.facingAngle
     }
 
-    doActions() {
+    doActions = () => {
         if (super.doBaseActions()) {
             const monster = new MonsterNoMove(this.getMonsterType(), this.orderX, this.orderY, this.getFacingAngle())
             this.escaper.getMakingLevel().monsters.new(monster, true)

@@ -35,7 +35,7 @@ export class MakeMonsterMultiplePatrols extends Make {
         return this.mode
     }
 
-    getMonster() {
+    getMonster = () => {
         return this.monster
     }
 
@@ -102,11 +102,11 @@ export class MakeMonsterMultiplePatrols extends Make {
         this.monster = monster
     }
 
-    cancelLastAction() {
+    cancelLastAction = () => {
         return this.unsaveLoc()
     }
 
-    redoLastAction() {
+    redoLastAction = () => {
         if (this.locPointeur < this.lastLocId) {
             this.locPointeur = this.locPointeur + 1
             this.monster && this.monster.addNewLoc(this.lastX[this.locPointeur], this.lastY[this.locPointeur])
@@ -126,7 +126,7 @@ export class MakeMonsterMultiplePatrols extends Make {
         super.destroy()
     }
 
-    doActions() {
+    doActions = () => {
         if (super.doBaseActions()) {
             let erreur: number
 

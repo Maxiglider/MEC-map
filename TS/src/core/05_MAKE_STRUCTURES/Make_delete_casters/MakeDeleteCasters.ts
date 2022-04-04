@@ -10,7 +10,7 @@ export class MakeDeleteCasters extends MakeOneByOneOrTwoClicks {
         super(maker, 'deleteCasters', mode)
     }
 
-    doActions() {
+    doActions = () => {
         if (super.doBaseActions()) {
             //modes : oneByOne, twoClics
             let caster: Caster | null

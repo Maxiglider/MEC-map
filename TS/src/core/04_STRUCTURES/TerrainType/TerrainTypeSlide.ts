@@ -100,7 +100,7 @@ export class TerrainTypeSlide extends TerrainType {
         return str
     }
 
-    destroy(){
+    destroy = () => {
 
     }
 }

@@ -18,7 +18,7 @@ export class MakeMonsterSpawn extends MakeOneByOneOrTwoClicks {
         this.frequence = frequence
     }
 
-    doActions() {
+    doActions = () => {
         if (super.doBaseActions()) {
             if (this.isLastLocSavedUsed()) {
                 const level = this.escaper.getMakingLevel()

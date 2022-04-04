@@ -16,7 +16,7 @@ export class MakeDeleteMeteorsAction extends MakeAction {
         this.suppressedMeteors = suppressedMeteors
     }
 
-    destroy() {
+    destroy = () => {
         if (this.isActionMadeB) {
             //suppression définitive des météores
             this.suppressedMeteors.map(meteor => {

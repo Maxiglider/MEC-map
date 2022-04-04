@@ -84,7 +84,7 @@ export class MakeTerrainHorizontalSymmetryAction extends MakeAction {
         return true
     }
 
-    destroy(){
+    destroy = () => {
         //nothing needed
     }
 }

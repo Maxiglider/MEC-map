@@ -41,13 +41,13 @@ export abstract class Make {
         this.forSpecificLevel = forSpecificLevel
     }
 
-    destroy() {
+    destroy = () => {
         if (this.t) {
             DestroyTrigger(this.t)
         }
     }
 
-    doBaseActions() {
+    doBaseActions = () => {
         if (!IsIssuedOrder('smart')) {
             return false
         }
@@ -61,7 +61,7 @@ export abstract class Make {
 
     abstract doActions(this: void): void
 
-    enableTrigger() {
+    enableTrigger = () => {
         if (this.t) DestroyTrigger(this.t)
 
         this.t = createEvent({
@@ -70,11 +70,11 @@ export abstract class Make {
         })
     }
 
-    cancelLastAction() {
+    cancelLastAction = () => {
         return false
     }
 
-    redoLastAction() {
+    redoLastAction = () => {
         return false
     }
 }

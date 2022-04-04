@@ -7,7 +7,7 @@ export class MakeEnd extends MakeOneByOneOrTwoClicks {
         super(maker, 'endCreate')
     }
     
-    doActions() {
+    doActions = () => {
         if(super.doBaseActions()){
             if (this.isLastLocSavedUsed()) {
                 this.escaper.getMakingLevel().newEnd(this.lastX, this.lastY, this.orderX, this.orderY)

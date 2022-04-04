@@ -28,7 +28,7 @@ export abstract class MakeOneByOneOrTwoClicks extends Make {
         this.lastLocSavedIsUsed = false
     }
 
-    isLastLocSavedUsed() {
+    isLastLocSavedUsed = () => {
         return this.lastLocSavedIsUsed
     }
 
@@ -48,7 +48,7 @@ export abstract class MakeOneByOneOrTwoClicks extends Make {
         this.escaper.destroyCancelledActions()
     }
 
-    unsaveLoc() {
+    unsaveLoc = () => {
         if (!this.lastLocSavedIsUsed) {
             return false
         }
@@ -59,16 +59,16 @@ export abstract class MakeOneByOneOrTwoClicks extends Make {
         return true
     }
 
-    unsaveLocDefinitely() {
+    unsaveLocDefinitely = () => {
         this.unsaveLoc()
         this.lastLocIsSaved = false
     }
 
-    cancelLastAction() {
+    cancelLastAction = () => {
         return this.unsaveLoc()
     }
 
-    redoLastAction() {
+    redoLastAction = () => {
         if (this.lastLocIsSaved && !this.lastLocSavedIsUsed) {
             this.saveLoc(this.lastX, this.lastY)
             return true
@@ -76,11 +76,11 @@ export abstract class MakeOneByOneOrTwoClicks extends Make {
         return false
     }
 
-    getMode() {
+    getMode = () => {
         return this.mode
     }
 
-    destroy() {
+    destroy = () => {
         super.destroy()
 
         if (this.unitLastClic) {

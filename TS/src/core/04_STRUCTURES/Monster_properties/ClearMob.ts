@@ -115,7 +115,7 @@ export class ClearMob {
         return true
     }
 
-    getBlockMobs() {
+    getBlockMobs = () => {
         return this.blockMobs
     }
 

@@ -14,7 +14,7 @@ export class MakeSetUnitMonsterType extends MakeOneByOneOrTwoClicks {
         return this.mt
     }
 
-    doActions() {
+    doActions = () => {
         if (super.doBaseActions()) {
             //modes : oneByOne, twoClics
             let nbMonstersFixed = 0

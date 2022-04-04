@@ -99,7 +99,7 @@ export class MonsterSpawn {
         udg_monsterSpawns[this.id] = this
     }
 
-    getId() {
+    getId = () => {
         return this.id
     }
 

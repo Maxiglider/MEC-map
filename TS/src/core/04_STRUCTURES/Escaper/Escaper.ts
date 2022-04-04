@@ -181,12 +181,12 @@ export class Escaper {
         ShowUnit(this.dummyPowerCircle, false)
     }
 
-    getEscaperId() {
+    getEscaperId = () => {
         return this.escaperId
     }
 
     //item method
-    resetItem() {
+    resetItem = () => {
         //renvoie true si le héros portait un item
         if (this.hero && UnitHasItemOfTypeBJ(this.hero, METEOR_NORMAL)) {
             SetItemDroppable(UnitItemInSlot(this.hero, 0), true)
@@ -197,7 +197,7 @@ export class Escaper {
         return false
     }
 
-    addEffectMeteor() {
+    addEffectMeteor = () => {
         if (!this.meteorEffect && this.hero) {
             this.meteorEffect = AddSpecialEffectTarget(
                 'Abilities\\Weapons\\DemonHunterMissile\\DemonHunterMissile.mdl',
@@ -207,7 +207,7 @@ export class Escaper {
         }
     }
 
-    removeEffectMeteor() {
+    removeEffectMeteor = () => {
         if (this.meteorEffect) {
             DestroyEffect(this.meteorEffect)
             delete this.meteorEffect
@@ -215,7 +215,7 @@ export class Escaper {
     }
 
     //select method
-    selectHero() {
+    selectHero = () => {
         this.hero && SelectUnitAddForPlayer(this.hero, this.controler.getPlayer())
         this.setIsHeroSelectedForPlayer(this.controler.getPlayer(), true)
     }
@@ -276,7 +276,7 @@ export class Escaper {
         return true
     }
 
-    createHeroAtStart() {
+    createHeroAtStart = () => {
         let x: number
         let y: number
         let start = getUdgLevels().getCurrentLevel()?.getStart()
@@ -295,7 +295,7 @@ export class Escaper {
         return this.createHero(x, y, angle)
     }
 
-    removeHero() {
+    removeHero = () => {
         if (!this.hero) {
             return
         }
@@ -331,7 +331,7 @@ export class Escaper {
         }
     }
 
-    destroy() {
+    destroy = () => {
         this.removeHero()
 
         if (this.terrainKillEffect) {
@@ -354,7 +354,7 @@ export class Escaper {
     }
 
     //getId method
-    getId() {
+    getId = () => {
         return this.escaperId
     }
 
@@ -387,7 +387,7 @@ export class Escaper {
         this.slideLastAngleOrder = angle
     }
 
-    getSlideLastAngleOrder() {
+    getSlideLastAngleOrder = () => {
         return this.slideLastAngleOrder
     }
 
@@ -403,11 +403,11 @@ export class Escaper {
         return true
     }
 
-    isSliding() {
+    isSliding = () => {
         return IsTriggerEnabled(this.slide)
     }
 
-    doesCheckTerrain() {
+    doesCheckTerrain = () => {
         return IsTriggerEnabled(this.checkTerrain)
     }
 
@@ -427,19 +427,19 @@ export class Escaper {
     }
 
     //hero methods
-    getHero() {
+    getHero = () => {
         return this.hero
     }
 
-    isAlive() {
+    isAlive = () => {
         return this.hero && IsUnitAliveBJ(this.hero)
     }
 
-    isPaused() {
+    isPaused = () => {
         return this.hero && IsUnitPaused(this.hero)
     }
 
-    kill() {
+    kill = () => {
         if (this.isAlive()) {
             this.resetItem()
             this.hero && KillUnit(this.hero)
@@ -462,7 +462,7 @@ export class Escaper {
         return true
     }
 
-    SpecialIllidan() {
+    SpecialIllidan = () => {
         this.hero && SetUnitAnimation(this.hero, 'Morph Alternate')
     }
 
@@ -500,7 +500,7 @@ export class Escaper {
         return true
     }
 
-    reviveAtStart() {
+    reviveAtStart = () => {
         const x: number = getUdgLevels().getCurrentLevel().getStartRandomX()
         const y: number = getUdgLevels().getCurrentLevel().getStartRandomY()
 
@@ -567,7 +567,7 @@ export class Escaper {
         CommandShortcuts.InitShortcutSkills(GetPlayerId(this.p))
     }
 
-    reverse() {
+    reverse = () => {
         if (!this.hero) return
 
         const angle: number = GetUnitFacing(this.hero) + 180
@@ -583,7 +583,7 @@ export class Escaper {
         this.controler = escaper
     }
 
-    resetOwner() {
+    resetOwner = () => {
         this.giveHeroControl(this)
     }
 
@@ -610,7 +610,7 @@ export class Escaper {
         }
     }
 
-    hideEffects() {
+    hideEffects = () => {
         this.effects.hideEffects()
 
         if (!this.isEscaperSecondary()) {
@@ -618,7 +618,7 @@ export class Escaper {
         }
     }
 
-    showEffects() {
+    showEffects = () => {
         this.hero && this.effects.showEffects(this.hero)
 
         if (!this.isEscaperSecondary()) {
@@ -627,7 +627,7 @@ export class Escaper {
     }
 
     //terrainKill methods
-    destroyTerrainKillEffect() {
+    destroyTerrainKillEffect = () => {
         this.terrainKillEffect && DestroyEffect(this.terrainKillEffect)
     }
 
@@ -638,7 +638,7 @@ export class Escaper {
     }
 
     //lastTerrainType methods
-    getLastTerrainType() {
+    getLastTerrainType = () => {
         return this.lastTerrainType
     }
 
@@ -656,19 +656,19 @@ export class Escaper {
         this.hero && SetUnitMoveSpeed(this.hero, ws)
     }
 
-    getSlideSpeed() {
+    getSlideSpeed = () => {
         return this.slideSpeed
     }
 
-    getRealSlideSpeed() {
+    getRealSlideSpeed = () => {
         return this.slideSpeed / SLIDE_PERIOD
     }
 
-    getWalkSpeed() {
+    getWalkSpeed = () => {
         return this.walkSpeed
     }
 
-    isAbsoluteSlideSpeed() {
+    isAbsoluteSlideSpeed = () => {
         return this.slideSpeedAbsolute
     }
 
@@ -681,7 +681,7 @@ export class Escaper {
         }
     }
 
-    stopAbsoluteSlideSpeed() {
+    stopAbsoluteSlideSpeed = () => {
         if (this.slideSpeedAbsolute) {
             this.slideSpeedAbsolute = false
 
@@ -698,7 +698,7 @@ export class Escaper {
         }
     }
 
-    isAbsoluteWalkSpeed() {
+    isAbsoluteWalkSpeed = () => {
         return this.walkSpeedAbsolute
     }
 
@@ -711,7 +711,7 @@ export class Escaper {
         }
     }
 
-    stopAbsoluteWalkSpeed() {
+    stopAbsoluteWalkSpeed = () => {
         if (this.walkSpeedAbsolute) {
             this.walkSpeedAbsolute = false
             if (this.hero && this.isAlive()) {
@@ -727,7 +727,7 @@ export class Escaper {
         }
     }
 
-    isAbsoluteInstantTurn() {
+    isAbsoluteInstantTurn = () => {
         return this.instantTurnAbsolute
     }
 
@@ -756,11 +756,11 @@ export class Escaper {
         }
     }
 
-    isGodModeOn() {
+    isGodModeOn = () => {
         return this.godMode
     }
 
-    doesGodModeKills() {
+    doesGodModeKills = () => {
         return this.godModeKills
     }
 
@@ -805,7 +805,7 @@ export class Escaper {
         return true
     }
 
-    getBaseColor() {
+    getBaseColor = () => {
         return this.baseColorId
     }
 
@@ -862,23 +862,23 @@ export class Escaper {
         return true
     }
 
-    getVcRed() {
+    getVcRed = () => {
         return this.vcRed
     }
 
-    getVcGreen() {
+    getVcGreen = () => {
         return this.vcGreen
     }
 
-    getVcBlue() {
+    getVcBlue = () => {
         return this.vcBlue
     }
 
-    getVcTransparency() {
+    getVcTransparency = () => {
         return this.vcTransparency
     }
 
-    refreshVertexColor() {
+    refreshVertexColor = () => {
         this.hero && SetUnitVertexColorBJ(this.hero, this.vcRed, this.vcGreen, this.vcBlue, this.vcTransparency)
 
         if (!this.isEscaperSecondary()) {
@@ -912,24 +912,24 @@ export class Escaper {
         this.isTrueMaximaxouB = isTrueMaximaxou
     }
 
-    canCheat() {
+    canCheat = () => {
         return this.canCheatB
     }
 
-    isMaximaxou() {
+    isMaximaxou = () => {
         return this.isMaximaxouB
     }
 
-    isTrueMaximaxou() {
+    isTrueMaximaxou = () => {
         return this.isTrueMaximaxouB
     }
 
     //autres
-    getPlayer() {
+    getPlayer = () => {
         return this.p
     }
 
-    getControler() {
+    getControler = () => {
         return this.controler
     }
 
@@ -938,11 +938,11 @@ export class Escaper {
         SetCameraFieldForPlayer(this.p, CAMERA_FIELD_TARGET_DISTANCE, I2R(cameraField), 0)
     }
 
-    getCameraField() {
+    getCameraField = () => {
         return this.cameraField
     }
 
-    resetCamera() {
+    resetCamera = () => {
         ResetToGameCameraForPlayer(this.p, 0)
         SetCameraFieldForPlayer(this.p, CAMERA_FIELD_TARGET_DISTANCE, this.cameraField, 0)
     }
@@ -962,7 +962,7 @@ export class Escaper {
     }
 
     //autorevive methods
-    hasAutorevive() {
+    hasAutorevive = () => {
         return this.hasAutoreviveB
     }
 
@@ -971,11 +971,11 @@ export class Escaper {
     }
 
     //make methods
-    getMake() {
+    getMake = () => {
         return this.make
     }
 
-    destroyMakeIfForSpecificLevel() {
+    destroyMakeIfForSpecificLevel = () => {
         if (this.make && this.make.forSpecificLevel) {
             this.destroyMake()
         }
@@ -1013,11 +1013,11 @@ export class Escaper {
         }
     }
 
-    isMakingCurrentLevel() {
+    isMakingCurrentLevel = () => {
         return !!this.makingLevel
     }
 
-    destroyMake() {
+    destroyMake = () => {
         if (!this.make) {
             return false
         }
@@ -1032,13 +1032,13 @@ export class Escaper {
         return true
     }
 
-    onInitMake() {
+    onInitMake = () => {
         if (!this.isEscaperSecondary()) {
             GetMirrorEscaper(this)?.makeDoNothing()
         }
     }
 
-    makeDoNothing() {
+    makeDoNothing = () => {
         this.destroyMake()
         if (this.hero) this.make = new MakeDoNothing(this.hero)
     }
@@ -1077,7 +1077,7 @@ export class Escaper {
         }
     }
 
-    makeMmpOrMtNext() {
+    makeMmpOrMtNext = () => {
         if (!this.make) {
             return false
         }
@@ -1091,7 +1091,7 @@ export class Escaper {
         return true
     }
 
-    makeMonsterTeleportWait() {
+    makeMonsterTeleportWait = () => {
         this.onInitMake()
         if (!this.make || !(this.make instanceof MakeMonsterTeleport)) {
             return false
@@ -1099,7 +1099,7 @@ export class Escaper {
         return this.make.addWaitPeriod()
     }
 
-    makeMonsterTeleportHide() {
+    makeMonsterTeleportHide = () => {
         this.onInitMake()
         if (!this.make || !(this.make instanceof MakeMonsterTeleport)) {
             return false
@@ -1136,7 +1136,7 @@ export class Escaper {
         }
     }
 
-    makeGetUnitTeleportPeriod() {
+    makeGetUnitTeleportPeriod = () => {
         this.destroyMake()
         if (this.hero) this.make = new MakeGetUnitTeleportPeriod(this.hero)
     }
@@ -1153,7 +1153,7 @@ export class Escaper {
         }
     }
 
-    makeCreateMeteor() {
+    makeCreateMeteor = () => {
         this.destroyMake()
         if (this.hero) this.make = new MakeMeteor(this.hero)
     }
@@ -1192,7 +1192,7 @@ export class Escaper {
         if (this.hero) this.make = new MakeClearMob(this.hero, disableDuration)
     }
 
-    makeDeleteClearMobs() {
+    makeDeleteClearMobs = () => {
         this.destroyMake()
         if (this.hero) this.make = new MakeDeleteClearMob(this.hero)
     }
@@ -1202,17 +1202,17 @@ export class Escaper {
         if (this.hero) this.make = new MakeTerrainCreate(this.hero, terrainType)
     }
 
-    makeTerrainCopyPaste() {
+    makeTerrainCopyPaste = () => {
         this.destroyMake()
         if (this.hero) this.make = new MakeTerrainCopyPaste(this.hero)
     }
 
-    makeTerrainVerticalSymmetry() {
+    makeTerrainVerticalSymmetry = () => {
         this.destroyMake()
         if (this.hero) this.make = new MakeTerrainVerticalSymmetry(this.hero)
     }
 
-    makeTerrainHorizontalSymmetry() {
+    makeTerrainHorizontalSymmetry = () => {
         this.destroyMake()
         if (this.hero) this.make = new MakeTerrainHorizontalSymmetry(this.hero)
     }
@@ -1222,12 +1222,12 @@ export class Escaper {
         if (this.hero) this.make = new MakeTerrainHeight(this.hero, radius, height)
     }
 
-    makeGetTerrainType() {
+    makeGetTerrainType = () => {
         this.destroyMake()
         if (this.hero) this.make = new MakeGetTerrainType(this.hero)
     }
 
-    makeExchangeTerrains() {
+    makeExchangeTerrains = () => {
         this.destroyMake()
         if (this.hero) this.make = new MakeExchangeTerrains(this.hero)
     }
@@ -1237,17 +1237,17 @@ export class Escaper {
         if (this.hero) this.make = new MakeStart(this.hero, forNext)
     }
 
-    makeCreateEnd() {
+    makeCreateEnd = () => {
         this.destroyMake()
         if (this.hero) this.make = new MakeEnd(this.hero)
     }
 
-    makeCreateVisibilityModifier() {
+    makeCreateVisibilityModifier = () => {
         this.destroyMake()
         if (this.hero) this.make = new MakeVisibilityModifier(this.hero)
     }
 
-    cancelLastAction() {
+    cancelLastAction = () => {
         if (this.make) {
             if (this.make.cancelLastAction()) {
                 return true
@@ -1256,7 +1256,7 @@ export class Escaper {
         return this.makeLastActions.cancelLastAction()
     }
 
-    redoLastAction() {
+    redoLastAction = () => {
         if (this.makeLastActions.redoLastAction()) {
             return true
         }
@@ -1274,16 +1274,16 @@ export class Escaper {
         return this.makeLastActions.newAction(action)
     }
 
-    destroyAllSavedActions() {
+    destroyAllSavedActions = () => {
         this.makeLastActions.destroyAllActions()
     }
 
-    destroyCancelledActions() {
+    destroyCancelledActions = () => {
         this.makeLastActions.destroyCancelledActions()
     }
 
     //for gravity gestion
-    getLastZ() {
+    getLastZ = () => {
         return this.lastZ
     }
 
@@ -1291,7 +1291,7 @@ export class Escaper {
         this.lastZ = lastZ
     }
 
-    getOldDiffZ() {
+    getOldDiffZ = () => {
         return this.oldDiffZ
     }
 
@@ -1299,7 +1299,7 @@ export class Escaper {
         this.oldDiffZ = oldDiffZ
     }
 
-    getSpeedZ() {
+    getSpeedZ = () => {
         return this.speedZ
     }
 
@@ -1308,7 +1308,7 @@ export class Escaper {
     }
 
     //coop reviving
-    coopReviveHero() {
+    coopReviveHero = () => {
         const mirrorEscaper = GetMirrorEscaper(this)
         const mirrorHero = mirrorEscaper?.getHero()
 
@@ -1342,7 +1342,7 @@ export class Escaper {
         mirrorEscaper?.setCoopInvul(false)
     }
 
-    isCoopInvul() {
+    isCoopInvul = () => {
         return this.coopInvul
     }
 
@@ -1350,7 +1350,7 @@ export class Escaper {
         this.coopInvul = invul
     }
 
-    enableTrigCoopRevive() {
+    enableTrigCoopRevive = () => {
         if (this.hero) {
             ShowUnit(this.powerCircle, true)
             SetUnitPathing(this.powerCircle, false)
@@ -1361,14 +1361,14 @@ export class Escaper {
         }
     }
 
-    refreshCerclePosition() {
+    refreshCerclePosition = () => {
         if (!IsUnitHidden(this.powerCircle) && this.hero) {
             SetUnitPosition(this.powerCircle, GetUnitX(this.hero), GetUnitY(this.hero))
             SetUnitPosition(this.dummyPowerCircle, GetUnitX(this.hero), GetUnitY(this.hero))
         }
     }
 
-    isEscaperSecondary() {
+    isEscaperSecondary = () => {
         return this.escaperId >= NB_PLAYERS_MAX
     }
 }

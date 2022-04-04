@@ -18,7 +18,7 @@ export class MonsterArray {
         this.monsters = []
     }
 
-    getLevel() {
+    getLevel = () => {
         return this.level
     }
 
@@ -140,12 +140,12 @@ export class MonsterArray {
         return this.monsters.filter(mob => mob == monster).length > 0
     }
 
-    getLast(){
+    getLast = () => {
         const filteredMonsters = this.monsters.filter(monster => monster !== undefined)
         return filteredMonsters[filteredMonsters.length - 1]
     }
 
-    removeLast(){
+    removeLast = () => {
         let i = this.monsters.length - 1
 
         while(i >= 0){

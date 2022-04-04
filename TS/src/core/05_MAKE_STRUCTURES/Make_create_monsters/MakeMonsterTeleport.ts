@@ -57,7 +57,7 @@ export class MakeMonsterTeleport extends Make {
         return this.mode
     }
 
-    getMonster() {
+    getMonster = () => {
         return this.monster
     }
 
@@ -185,7 +185,7 @@ export class MakeMonsterTeleport extends Make {
         super.destroy()
     }
 
-    doActions() {
+    doActions = () => {
         if (super.doBaseActions()) {
             if (this.getLocPointeur() >= 0) {
                 if (this.monster) {

@@ -189,7 +189,7 @@ export class MonsterType {
         return true
     }
 
-    getKillingEffectStr() {
+    getKillingEffectStr = () => {
         return this.killingEffectStr
     }
 

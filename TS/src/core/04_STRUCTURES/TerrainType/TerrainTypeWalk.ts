@@ -81,7 +81,7 @@ export class TerrainTypeWalk extends TerrainType {
         return str
     }
 
-    destroy() {
+    destroy = () => {
 
     }
 }

@@ -138,7 +138,7 @@ export class TerrainTypeDeath extends TerrainType {
         return str
     }
 
-    destroy() {
+    destroy = () => {
         this.killingTimers.destroy()
     }
 }

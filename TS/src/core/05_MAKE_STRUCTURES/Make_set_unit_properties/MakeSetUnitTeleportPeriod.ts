@@ -23,7 +23,7 @@ export class MakeSetUnitTeleportPeriod extends MakeOneByOneOrTwoClicks {
         return this.period
     }
 
-    doActions() {
+    doActions = () => {
         if (super.doBaseActions()) {
             let nbMonstersFixed = 0
 

@@ -10,7 +10,7 @@ export class MakeExchangeTerrains extends MakeOneByOneOrTwoClicks {
         super(maker, 'exchangeTerrains', "", null, false)
     }
     
-    doActions() {
+    doActions = () => {
         if(super.doBaseActions()){
             if (this.isLastLocSavedUsed()) {
                 const terrainTypeA = getUdgTerrainTypes().getTerrainType(this.lastX, this.lastY)

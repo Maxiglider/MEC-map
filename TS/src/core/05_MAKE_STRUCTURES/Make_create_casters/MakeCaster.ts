@@ -14,15 +14,15 @@ export class MakeCaster extends Make {
         this.angle = angle
     }
 
-    getCasterType() {
+    getCasterType = () => {
         return this.casterType
     }
 
-    getAngle() {
+    getAngle = () => {
         return this.angle
     }
 
-    doActions() {
+    doActions = () => {
         if (super.doBaseActions()) {
             const caster = new Caster(this.getCasterType(), this.orderX, this.orderY, this.getAngle())
             this.escaper.getMakingLevel().monsters.new(caster, true)

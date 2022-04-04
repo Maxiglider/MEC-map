@@ -83,12 +83,12 @@ export class MonsterTeleport extends Monster {
         MonsterTeleport.Y = []
     }
 
-    removeUnit() {
+    removeUnit = () => {
         super.removeUnit()
         PauseTimer(this.t)
     }
 
-    killUnit() {
+    killUnit = () => {
         super.killUnit()
         PauseTimer(this.t)
     }
@@ -105,7 +105,7 @@ export class MonsterTeleport extends Monster {
         return true
     }
 
-    getPeriod() {
+    getPeriod = () => {
         return this.period
     }
 
@@ -124,7 +124,7 @@ export class MonsterTeleport extends Monster {
         TimerStart(this.t, this.period, true, MonsterTeleport_move_Actions)
     }
 
-    nextMove() {
+    nextMove = () => {
         const lastLocInd = this.x.length - 1
 
         if (this.sens === 0 || this.sens === 1) {
@@ -215,7 +215,7 @@ export class MonsterTeleport extends Monster {
         super.destroy()
     }
 
-    toString() {
+    toString = () => {
         let str = super.toString()
         str += CACHE_SEPARATEUR_PARAM
 

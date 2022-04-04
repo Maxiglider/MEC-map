@@ -47,7 +47,7 @@ export class MakeMonsterSimplePatrol extends MakeOneByOneOrTwoClicks {
         MakeMonsterSimplePatrol.distOnTerrain = MakeMonsterSimplePatrol.DIST_ON_TERRAIN_DEFAULT
     }
 
-    doActions() {
+    doActions = () => {
         if (super.doBaseActions()) {
             let monster: MonsterSimplePatrol | null = null
             let x1: number = 0

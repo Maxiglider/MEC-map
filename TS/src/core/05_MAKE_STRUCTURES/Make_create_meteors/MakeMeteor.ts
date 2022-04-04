@@ -7,7 +7,7 @@ export class MakeMeteor extends Make {
         super(maker, 'meteorCreate')
     }
 
-    doActions() {
+    doActions = () => {
         if (super.doBaseActions()) {
             const meteor = new Meteor(this.orderX, this.orderY)
             this.escaper.getMakingLevel().meteors.new(meteor, true)

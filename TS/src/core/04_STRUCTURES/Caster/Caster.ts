@@ -338,7 +338,7 @@ export class Caster extends Monster {
         return this.casterType.getProjectileSpeed()
     }
 
-    getCasterUnit() {
+    getCasterUnit = () => {
         return this.u
     }
 
@@ -375,7 +375,7 @@ export class Caster extends Monster {
         this.enabled = true
     }
 
-    destroyTriggers() {
+    destroyTriggers = () => {
         if (this.trg_unitWithinRange) {
             Caster.anyTriggerWithinRangeId2Caster.delete(GetHandleId(this.trg_unitWithinRange))
             DestroyTrigger(this.trg_unitWithinRange)

@@ -163,7 +163,7 @@ export class MakeTerrainCopyPasteAction extends MakeAction {
         return true
     }
 
-    destroy(){
+    destroy = () => {
         //nothing needed
     }
 }

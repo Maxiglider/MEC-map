@@ -8,7 +8,7 @@ export class MakeVisibilityModifier extends MakeOneByOneOrTwoClicks {
         super(maker, 'visibilityModifierCreate')
     }
     
-    doActions() {
+    doActions = () => {
         if(super.doBaseActions()){
             let newVisibilityModifier: VisibilityModifier | null
             

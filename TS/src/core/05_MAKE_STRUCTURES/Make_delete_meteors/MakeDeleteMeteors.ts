@@ -8,7 +8,7 @@ export class MakeDeleteMeteors extends MakeOneByOneOrTwoClicks {
         super(maker, 'deleteMeteors', mode)
     }
 
-    doActions() {
+    doActions = () => {
         if (super.doBaseActions()) {
             //modes : oneByOne, twoClics
             let meteor: Meteor
