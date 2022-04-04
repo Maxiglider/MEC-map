@@ -45,9 +45,7 @@
         "skipLibCheck": true,
         "forceConsistentCasingInFileNames": true
     },
-    "include": [
-        "src"
-    ],
+    "include": ["src"],
     "exclude": [],
     "tstl": {
         "luaTarget": "5.3",
