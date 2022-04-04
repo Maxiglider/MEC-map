@@ -1,19 +1,17 @@
-import {Text} from 'core/01_libraries/Text'
-import {Escaper} from 'core/04_STRUCTURES/Escaper/Escaper'
- import { getUdgEscapers } from '../../../../globals'
-
-import {Globals} from 'core/09_From_old_Worldedit_triggers/globals_variables_and_triggers'
-import {createEvent, forRange} from 'Utils/mapUtils'
-import {ExecuteCommandRed} from "./Command_first_player";
-import {ExecuteCommandAll} from "./Command_all";
-import {ExecuteCommandCheat} from "./Command_cheat";
-import {ExecuteCommandMax} from "./Command_admin";
-import {ExecuteCommandTrueMax} from "./Command_superadmin";
-import {IsCmd} from "./Command_functions";
-import {ExecuteCommandMake} from "./Command_make";
-import {commandsBuffer} from "../../04_STRUCTURES/Escaper/EscaperSavedCommands";
-import {NB_PLAYERS_MAX} from "../../01_libraries/Constants";
-
+import { Text } from 'core/01_libraries/Text'
+import { Escaper } from 'core/04_STRUCTURES/Escaper/Escaper'
+import { Globals } from 'core/09_From_old_Worldedit_triggers/globals_variables_and_triggers'
+import { createEvent, forRange } from 'Utils/mapUtils'
+import { getUdgEscapers } from '../../../../globals'
+import { NB_PLAYERS_MAX } from '../../01_libraries/Constants'
+import { commandsBuffer } from '../../04_STRUCTURES/Escaper/EscaperSavedCommands'
+import { ExecuteCommandMax } from './Command_admin'
+import { ExecuteCommandAll } from './Command_all'
+import { ExecuteCommandCheat } from './Command_cheat'
+import { ExecuteCommandRed } from './Command_first_player'
+import { IsCmd } from './Command_functions'
+import { ExecuteCommandMake } from './Command_make'
+import { ExecuteCommandTrueMax } from './Command_superadmin'
 
 const ExecuteCommandSingle = (escaper: Escaper, cmd: string) => {
     if (!ExecuteCommandAll(escaper, cmd)) {
@@ -79,7 +77,7 @@ export const ExecuteCommand = (escaper: Escaper, cmd: string) => {
             }
         }
         if (char !== ',' || nbParenthesesNonFermees > 0) {
-            singleCommands[singleCommandId] = singleCommands[singleCommandId] + char
+            singleCommands[singleCommandId] = (singleCommands[singleCommandId] || '') + char
         }
         charId = charId + 1
     }
@@ -92,7 +90,6 @@ export const ExecuteCommand = (escaper: Escaper, cmd: string) => {
         i = i + 1
     }
 }
-
 
 export const init_commandExecution = () => {
     createEvent({
@@ -114,9 +111,9 @@ export const init_commandExecution = () => {
         ],
     })
 
-
-//Handle buffer of commands
-    createEvent({ //todomax find a better solution than a periodic timer
+    //Handle buffer of commands
+    createEvent({
+        //todomax find a better solution than a periodic timer
         events: [t => TriggerRegisterTimerEvent(t, 0.001, true)],
         actions: [
             () => {
@@ -127,7 +124,7 @@ export const init_commandExecution = () => {
 
                     commandsBuffer.length = 0
                 }
-            }
-        ]
+            },
+        ],
     })
 }
