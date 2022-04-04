@@ -105,7 +105,7 @@ const Trig_heroes_Actions = () => {
 }
 
 //===========================================================================
-export const Init_Heroes = () => {
+export const init_Heroes = () => {
     //define start positions
     let minX = GetRectMinX(gg_rct_departLvl_0)
     let minY = GetRectMinY(gg_rct_departLvl_0)
