@@ -1,12 +1,11 @@
 import { MakeOneByOneOrTwoClicks } from 'core/05_MAKE_STRUCTURES/Make/MakeOneByOneOrTwoClicks'
 import { Text } from '../../01_libraries/Text'
 import { Monster } from '../../04_STRUCTURES/Monster/Monster'
-import {MakeDeleteMonstersAction} from "../MakeLastActions/MakeDeleteMonstersAction";
+import { MakeDeleteMonstersAction } from '../MakeLastActions/MakeDeleteMonstersAction'
 
 export class MakeDeleteMonsters extends MakeOneByOneOrTwoClicks {
     constructor(maker: unit, mode: string) {
-        const acceptedModes = ['oneByOne', 'all', 'noMove', 'move', 'simplePatrol', 'multiplePatrols']
-        super(maker, 'deleteMonsters', mode, acceptedModes)
+        super(maker, 'deleteMonsters', mode, ['oneByOne', 'all', 'noMove', 'move', 'simplePatrol', 'multiplePatrols'])
     }
 
     doActions = () => {
@@ -30,7 +29,9 @@ export class MakeDeleteMonsters extends MakeOneByOneOrTwoClicks {
                     return
                 }
 
-                let monsters = this.escaper.getMakingLevel().monsters.getMonstersBetweenLocs(this.lastX, this.lastY, this.orderX, this.orderY)
+                let monsters = this.escaper
+                    .getMakingLevel()
+                    .monsters.getMonstersBetweenLocs(this.lastX, this.lastY, this.orderX, this.orderY)
 
                 monsters.map(monster => {
                     monster.removeUnit()
