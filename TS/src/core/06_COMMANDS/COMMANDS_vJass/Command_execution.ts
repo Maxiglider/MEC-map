@@ -12,37 +12,40 @@ import { ExecuteCommandRed } from './Command_first_player'
 import { IsCmd } from './Command_functions'
 import { ExecuteCommandMake } from './Command_make'
 import { ExecuteCommandTrueMax } from './Command_superadmin'
+import {catchAndDisplay} from "../../01_libraries/Basic_functions";
 
 const ExecuteCommandSingle = (escaper: Escaper, cmd: string) => {
-    if (!ExecuteCommandAll(escaper, cmd)) {
-        if (!((escaper.getPlayer() == Player(0) && Globals.udg_areRedRightsOn) || escaper.canCheat())) {
-            Text.erP(escaper.getPlayer(), 'unknown command or not enough rights')
-            return
-        }
-        if (!ExecuteCommandRed(escaper, cmd)) {
-            if (!escaper.canCheat()) {
+    catchAndDisplay(() => {
+        if (!ExecuteCommandAll(escaper, cmd)) {
+            if (!((escaper.getPlayer() == Player(0) && Globals.udg_areRedRightsOn) || escaper.canCheat())) {
                 Text.erP(escaper.getPlayer(), 'unknown command or not enough rights')
                 return
             }
-            if (!ExecuteCommandCheat(escaper, cmd)) {
-                if (!ExecuteCommandMake(escaper, cmd)) {
-                    if (!escaper.isMaximaxou()) {
-                        Text.erP(escaper.getPlayer(), 'unknown command or not enough rights')
-                        return
-                    }
-                    if (!ExecuteCommandMax(escaper, cmd)) {
-                        if (!escaper.isTrueMaximaxou()) {
+            if (!ExecuteCommandRed(escaper, cmd)) {
+                if (!escaper.canCheat()) {
+                    Text.erP(escaper.getPlayer(), 'unknown command or not enough rights')
+                    return
+                }
+                if (!ExecuteCommandCheat(escaper, cmd)) {
+                    if (!ExecuteCommandMake(escaper, cmd)) {
+                        if (!escaper.isMaximaxou()) {
                             Text.erP(escaper.getPlayer(), 'unknown command or not enough rights')
                             return
                         }
-                        if (!ExecuteCommandTrueMax(escaper, cmd)) {
-                            Text.erP(escaper.getPlayer(), 'unknown command')
+                        if (!ExecuteCommandMax(escaper, cmd)) {
+                            if (!escaper.isTrueMaximaxou()) {
+                                Text.erP(escaper.getPlayer(), 'unknown command or not enough rights')
+                                return
+                            }
+                            if (!ExecuteCommandTrueMax(escaper, cmd)) {
+                                Text.erP(escaper.getPlayer(), 'unknown command')
+                            }
                         }
                     }
                 }
             }
         }
-    }
+    }, escaper.getPlayer())
 }
 
 export const ExecuteCommand = (escaper: Escaper, cmd: string) => {

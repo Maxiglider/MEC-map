@@ -12,11 +12,6 @@ export class TerrainTypeWalk extends TerrainType {
     constructor(label: string, terrainTypeId: number, walkSpeed: number) {
         super(label, terrainTypeId, null, 'walk', 0, 1)
 
-        if (!CanUseTerrain(terrainTypeId)) {
-            // check shoulda been done sooner
-            throw new Error('bad code, ttw')
-        }
-
         this.walkSpeed = walkSpeed
     }
 

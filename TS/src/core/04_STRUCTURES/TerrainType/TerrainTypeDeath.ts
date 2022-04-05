@@ -25,11 +25,6 @@ export class TerrainTypeDeath extends TerrainType {
     ) {
         super(label, terrainTypeId, null, 'death', 0, 1)
 
-        if (!CanUseTerrain(terrainTypeId)) {
-            // check shoulda been done sooner
-            throw new Error('bad code, ttd')
-        }
-
         this.killingEffectStr = killingEffectStr
         this.timeToKill = timeToKill
         this.killingTimers = new KillingTimers()

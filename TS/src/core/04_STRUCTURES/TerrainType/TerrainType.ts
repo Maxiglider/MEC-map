@@ -19,6 +19,11 @@ export abstract class TerrainType {
         if(terrainTypeId == 0){
             throw "Wrong terrain type id"
         }
+
+        if (!CanUseTerrain(terrainTypeId)) {
+            throw 'Terrain limit reached'
+        }
+
         this.label = label
         this.terrainTypeId = terrainTypeId
         this.theAlias = theAlias

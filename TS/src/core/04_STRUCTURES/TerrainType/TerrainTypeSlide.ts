@@ -14,11 +14,6 @@ export class TerrainTypeSlide extends TerrainType {
     constructor(label: string, terrainTypeId: number, slideSpeed: number, canTurn: boolean) {
         super(label, terrainTypeId, null, 'slide', 0, 1)
 
-        if (!CanUseTerrain(terrainTypeId)) {
-            // check shoulda been done sooner
-            throw new Error('bad code, tts')
-        }
-
         this.slideSpeed = slideSpeed * SLIDE_PERIOD
         this.canTurn = canTurn
     }
