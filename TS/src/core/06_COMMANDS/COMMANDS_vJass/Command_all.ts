@@ -496,10 +496,6 @@ export const ExecuteCommandAll = (escaper: Escaper, cmd: string): boolean => {
                 } else {
                     if (param1 == 'off' && escaper.discoTrigger != null) {
                         escaper.discoTrigger.destroy()
-
-                        const discoTrigger = GetMirrorEscaper(escaper)?.discoTrigger
-
-                        discoTrigger?.destroy()
                         GetMirrorEscaper(escaper)?.discoTrigger?.destroy()
 
                         Text.P(escaper.getPlayer(), 'disco off')
@@ -511,15 +507,13 @@ export const ExecuteCommandAll = (escaper: Escaper, cmd: string): boolean => {
             }
         }
 
-        if (escaper.discoTrigger) {
-            escaper.discoTrigger.destroy()
-            escaper.discoTrigger = createTimer(10 / I2R(n), true, () => Disco.Disco_Actions(escaper.getEscaperId())) //n changements en 10 secondes
-        }
+        escaper.discoTrigger?.destroy()
+        escaper.discoTrigger = createTimer(10 / I2R(n), true, () => Disco.Disco_Actions(escaper.getEscaperId())) //n changements en 10 secondes
 
         const mirrorEscaper = GetMirrorEscaper(escaper)
 
-        if (mirrorEscaper?.discoTrigger) {
-            mirrorEscaper.discoTrigger.destroy()
+        if (mirrorEscaper) {
+            mirrorEscaper.discoTrigger?.destroy()
             mirrorEscaper.discoTrigger = createTimer(10 / I2R(n), true, () =>
                 Disco.Disco_Actions(escaper.getEscaperId())
             ) //n changements en 10 secondes
