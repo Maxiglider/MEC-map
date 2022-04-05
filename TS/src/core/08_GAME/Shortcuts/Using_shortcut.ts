@@ -3,12 +3,9 @@ import { Text } from 'core/01_libraries/Text'
 import { Hero2Escaper, IsHero } from 'core/04_STRUCTURES/Escaper/Escaper_functions'
 import { literalArray } from 'Utils/ArrayUtils'
 import { createEvent } from 'Utils/mapUtils'
-import {
-    getUdgEscapers,
-} from "../../../../globals";
-import {GREY} from "../../01_libraries/Constants";
-import {execute} from "../../04_STRUCTURES/Escaper/EscaperSavedCommands";
-
+import { getUdgEscapers } from '../../../../globals'
+import { GREY } from '../../01_libraries/Constants'
+import { execute } from '../../04_STRUCTURES/Escaper/EscaperSavedCommands'
 
 const initCommandShortcuts = () => {
     const shortcutCommands: { [K in typeof shortcuts[0]]: (string | null)[] } = {
@@ -120,9 +117,9 @@ const initCommandShortcuts = () => {
 
         shortcuts.forEach(sc => {
             if (shortcutCommands[sc][playerId] == null) {
-                Text.P(Player(playerId), udg_colorCode[playerId] + '$shortcut$: |r' + udg_colorCode[GREY] + 'none')
+                Text.P(Player(playerId), udg_colorCode[playerId] + sc + ': |r' + udg_colorCode[GREY] + 'none')
             } else {
-                Text.P(Player(playerId), udg_colorCode[playerId] + '$shortcut$: |r' + shortcutCommands[sc][playerId])
+                Text.P(Player(playerId), udg_colorCode[playerId] + sc + ': |r' + shortcutCommands[sc][playerId])
             }
         })
     }
@@ -139,8 +136,6 @@ const initCommandShortcuts = () => {
 }
 
 export const CommandShortcuts = initCommandShortcuts()
-
-
 
 export const shortcuts = literalArray(['A', 'Z', 'E', 'R', 'Q', 'S', 'D', 'F'])
 

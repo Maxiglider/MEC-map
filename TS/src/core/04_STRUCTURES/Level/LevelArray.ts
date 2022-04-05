@@ -1,9 +1,10 @@
 import { NB_LIVES_AT_BEGINNING } from 'core/01_libraries/Constants'
 import { Text } from 'core/01_libraries/Text'
-import { udg_lives } from 'core/08_GAME/Init_structures/Init_lives'
 import { gg_trg_apparition_dialogue_et_fermeture_automatique } from 'core/08_GAME/Mode_coop/creation_dialogue'
+import { getUdgEscapers } from '../../../../globals'
 import { MoveCamExceptForPlayer } from '../../01_libraries/Basic_functions'
 import { udg_colorCode } from '../../01_libraries/Init_colorCodes'
+import { getUdgLives } from '../../08_GAME/Init_structures/Init_lives'
 import type { CasterType } from '../Caster/CasterType'
 import type { Escaper } from '../Escaper/Escaper'
 import type { MeteorArray } from '../Meteor/MeteorArray'
@@ -12,12 +13,8 @@ import type { MonsterType } from '../Monster/MonsterType'
 import type { MonsterSpawnArray } from '../MonsterSpawn/MonsterSpawnArray'
 import type { ClearMobArray } from '../Monster_properties/ClearMobArray'
 import { Level } from './Level'
+import { IsLevelBeingMade } from './Level_functions'
 import type { VisibilityModifierArray } from './VisibilityModifierArray'
-import {IsLevelBeingMade} from "./Level_functions";
-import {getUdgEscapers} from "../../../../globals";
-
-
-
 
 export class LevelArray {
     private levels: Level[] = []
@@ -127,7 +124,7 @@ export class LevelArray {
             this.levels[0].activate(false)
         }
         this.goToLevel(undefined, 0)
-        udg_lives.setNb(this.levels[0].getNbLives())
+        getUdgLives().setNb(this.levels[0].getNbLives())
 
         const start = this.levels[0].getStart()
         start && SetCameraPosition(start.getCenterX(), start.getCenterY())

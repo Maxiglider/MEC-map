@@ -1,32 +1,29 @@
-import {IsBoolString, IsEscaperInGame, S2B} from 'core/01_libraries/Basic_functions'
-import {NB_ESCAPERS, NB_PLAYERS_MAX} from 'core/01_libraries/Constants'
-import {ColorString2Id} from 'core/01_libraries/Init_colorCodes'
-import {Text} from 'core/01_libraries/Text'
-import {Escaper} from 'core/04_STRUCTURES/Escaper/Escaper'
-import {GetMirrorEscaper} from 'core/04_STRUCTURES/Escaper/Escaper_functions'
-import {ReinitTerrains} from 'core/07_TRIGGERS/Triggers_to_modify_terrains/Reinit_terrains'
+import { IsBoolString, IsEscaperInGame, S2B } from 'core/01_libraries/Basic_functions'
+import { NB_ESCAPERS, NB_PLAYERS_MAX } from 'core/01_libraries/Constants'
+import { ColorString2Id } from 'core/01_libraries/Init_colorCodes'
+import { Text } from 'core/01_libraries/Text'
+import { Escaper } from 'core/04_STRUCTURES/Escaper/Escaper'
+import { GetMirrorEscaper } from 'core/04_STRUCTURES/Escaper/Escaper_functions'
+import { ReinitTerrains } from 'core/07_TRIGGERS/Triggers_to_modify_terrains/Reinit_terrains'
+import { ReinitTerrainsPositions } from 'core/07_TRIGGERS/Triggers_to_modify_terrains/Reinit_terrains_position_Change_variations_and_ut_at_beginning'
+import { AfkMode } from 'core/08_GAME/Afk_mode/Afk_mode'
+import { Globals } from 'core/09_From_old_Worldedit_triggers/globals_variables_and_triggers'
+import { udg_doubleHeroesEnabled } from 'core/Double_heroes/double_heroes_config'
 import {
-    ReinitTerrainsPositions
-} from 'core/07_TRIGGERS/Triggers_to_modify_terrains/Reinit_terrains_position_Change_variations_and_ut_at_beginning'
-import {AfkMode} from 'core/08_GAME/Afk_mode/Afk_mode'
-import {getUdgCasterTypes, getUdgEscapers, getUdgMonsterTypes, getUdgTerrainTypes, globals} from '../../../../globals'
-import {udg_lives} from 'core/08_GAME/Init_structures/Init_lives'
-import { getUdgLevels } from "../../../../globals"
-import {Globals} from 'core/09_From_old_Worldedit_triggers/globals_variables_and_triggers'
-import {udg_doubleHeroesEnabled} from 'core/Double_heroes/double_heroes_config'
-import {SaveMapInCache} from '../../07_TRIGGERS/Save_map_in_gamecache/SAVE_MAP_in_cache'
-import {SaveLoadTerrainWithoutName} from '../../07_TRIGGERS/Triggers_to_modify_terrains/Save_load_terrain_without_name'
-import {SaveLoadTerrainWithName} from '../../07_TRIGGERS/Triggers_to_modify_terrains/Save_load_terrain_with_name'
-import {CmdName, CmdParam, IsPlayerColorString, NbParam, NoParam} from "./Command_functions";
-import {ActivateTeleport, DisableTeleport} from "./Teleport";
-import {IsPositiveInteger} from "../../01_libraries/Functions_on_numbers";
-
-
-
-
-
-
-
+    getUdgCasterTypes,
+    getUdgEscapers,
+    getUdgLevels,
+    getUdgMonsterTypes,
+    getUdgTerrainTypes,
+    globals,
+} from '../../../../globals'
+import { IsPositiveInteger } from '../../01_libraries/Functions_on_numbers'
+import { SaveMapInCache } from '../../07_TRIGGERS/Save_map_in_gamecache/SAVE_MAP_in_cache'
+import { SaveLoadTerrainWithoutName } from '../../07_TRIGGERS/Triggers_to_modify_terrains/Save_load_terrain_without_name'
+import { SaveLoadTerrainWithName } from '../../07_TRIGGERS/Triggers_to_modify_terrains/Save_load_terrain_with_name'
+import { getUdgLives } from '../../08_GAME/Init_structures/Init_lives'
+import { CmdName, CmdParam, IsPlayerColorString, NbParam, NoParam } from './Command_functions'
+import { ActivateTeleport, DisableTeleport } from './Teleport'
 
 export const ExecuteCommandMax = (escaper: Escaper, cmd: string): boolean => {
     let name = CmdName(cmd)
@@ -182,7 +179,7 @@ export const ExecuteCommandMax = (escaper: Escaper, cmd: string): boolean => {
         if (!(nbParam === 1 && IsPositiveInteger(param1))) {
             return true
         }
-        udg_lives.setNb(S2I(param1))
+        getUdgLives().setNb(S2I(param1))
         return true
     }
 
@@ -195,7 +192,7 @@ export const ExecuteCommandMax = (escaper: Escaper, cmd: string): boolean => {
             Text.erP(escaper.getPlayer(), 'param1 should be a boolean or a real')
             return true
         }
-        
+
         const hero = escaper.getHero()
         if (hero) {
             if (S2B(param1)) {
@@ -306,7 +303,9 @@ export const ExecuteCommandMax = (escaper: Escaper, cmd: string): boolean => {
                 }
                 getUdgEscapers().get(i)?.createHeroAtStart()
                 if (udg_doubleHeroesEnabled) {
-                    getUdgEscapers().get(i + NB_PLAYERS_MAX)?.createHeroAtStart()
+                    getUdgEscapers()
+                        .get(i + NB_PLAYERS_MAX)
+                        ?.createHeroAtStart()
                 }
                 i = i + 1
             }
@@ -324,7 +323,9 @@ export const ExecuteCommandMax = (escaper: Escaper, cmd: string): boolean => {
                 Text.erP(escaper.getPlayer(), 'this player already has a hero')
             }
             if (udg_doubleHeroesEnabled) {
-                getUdgEscapers().get(n + NB_PLAYERS_MAX)?.createHeroAtStart()
+                getUdgEscapers()
+                    .get(n + NB_PLAYERS_MAX)
+                    ?.createHeroAtStart()
             }
         }
         return true
@@ -567,44 +568,44 @@ export const ExecuteCommandMax = (escaper: Escaper, cmd: string): boolean => {
             Text.P(
                 escaper.getPlayer(),
                 'available tilesets : ' +
-                Text.MAKE_TEXT_COLORCODE +
-                'auto|r ; ' +
-                Text.MAKE_TEXT_COLORCODE +
-                'A|r = Ashenvale ; ' +
-                Text.MAKE_TEXT_COLORCODE +
-                'B|r = Barrens ; ' +
-                Text.MAKE_TEXT_COLORCODE +
-                'C|r = Felwood ; ' +
-                Text.MAKE_TEXT_COLORCODE +
-                'D|r = Dungeon ; ' +
-                Text.MAKE_TEXT_COLORCODE +
-                'F|r = Lordaeron Fall ; ' +
-                Text.MAKE_TEXT_COLORCODE +
-                'G|r = Underground ; ' +
-                Text.MAKE_TEXT_COLORCODE +
-                'L|r = Lordaeron Summer ; ' +
-                Text.MAKE_TEXT_COLORCODE +
-                'N|r = Northrend ; ' +
-                Text.MAKE_TEXT_COLORCODE +
-                'Q|r = Village Fall ; ' +
-                Text.MAKE_TEXT_COLORCODE +
-                'V|r = Village ; ' +
-                Text.MAKE_TEXT_COLORCODE +
-                'W|r = Lordaeron Winter ; ' +
-                Text.MAKE_TEXT_COLORCODE +
-                'X|r = Dalaran ; ' +
-                Text.MAKE_TEXT_COLORCODE +
-                'Y|r = Cityscape ; ' +
-                Text.MAKE_TEXT_COLORCODE +
-                'Z|r = Sunken Ruins ; ' +
-                Text.MAKE_TEXT_COLORCODE +
-                'I|r = Icecrown ; ' +
-                Text.MAKE_TEXT_COLORCODE +
-                'J|r = Dalaran Ruins ; ' +
-                Text.MAKE_TEXT_COLORCODE +
-                'O|r = Outland ; ' +
-                Text.MAKE_TEXT_COLORCODE +
-                'K|r = Black Citadel'
+                    Text.MAKE_TEXT_COLORCODE +
+                    'auto|r ; ' +
+                    Text.MAKE_TEXT_COLORCODE +
+                    'A|r = Ashenvale ; ' +
+                    Text.MAKE_TEXT_COLORCODE +
+                    'B|r = Barrens ; ' +
+                    Text.MAKE_TEXT_COLORCODE +
+                    'C|r = Felwood ; ' +
+                    Text.MAKE_TEXT_COLORCODE +
+                    'D|r = Dungeon ; ' +
+                    Text.MAKE_TEXT_COLORCODE +
+                    'F|r = Lordaeron Fall ; ' +
+                    Text.MAKE_TEXT_COLORCODE +
+                    'G|r = Underground ; ' +
+                    Text.MAKE_TEXT_COLORCODE +
+                    'L|r = Lordaeron Summer ; ' +
+                    Text.MAKE_TEXT_COLORCODE +
+                    'N|r = Northrend ; ' +
+                    Text.MAKE_TEXT_COLORCODE +
+                    'Q|r = Village Fall ; ' +
+                    Text.MAKE_TEXT_COLORCODE +
+                    'V|r = Village ; ' +
+                    Text.MAKE_TEXT_COLORCODE +
+                    'W|r = Lordaeron Winter ; ' +
+                    Text.MAKE_TEXT_COLORCODE +
+                    'X|r = Dalaran ; ' +
+                    Text.MAKE_TEXT_COLORCODE +
+                    'Y|r = Cityscape ; ' +
+                    Text.MAKE_TEXT_COLORCODE +
+                    'Z|r = Sunken Ruins ; ' +
+                    Text.MAKE_TEXT_COLORCODE +
+                    'I|r = Icecrown ; ' +
+                    Text.MAKE_TEXT_COLORCODE +
+                    'J|r = Dalaran Ruins ; ' +
+                    Text.MAKE_TEXT_COLORCODE +
+                    'O|r = Outland ; ' +
+                    Text.MAKE_TEXT_COLORCODE +
+                    'K|r = Black Citadel'
             )
         }
         return true

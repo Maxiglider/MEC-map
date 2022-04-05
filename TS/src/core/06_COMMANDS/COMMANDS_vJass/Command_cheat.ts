@@ -1,22 +1,18 @@
-import {IsBoolString, S2B} from 'core/01_libraries/Basic_functions'
-import {NB_ESCAPERS, SLIDE_PERIOD} from 'core/01_libraries/Constants'
-import {IsInteger, IsPositiveInteger} from 'core/01_libraries/Functions_on_numbers'
-import {ColorString2Id} from 'core/01_libraries/Init_colorCodes'
-import {Text} from 'core/01_libraries/Text'
-import {Escaper} from 'core/04_STRUCTURES/Escaper/Escaper'
-import {GetMirrorEscaper} from 'core/04_STRUCTURES/Escaper/Escaper_functions'
-import {METEOR_CHEAT} from 'core/04_STRUCTURES/Meteor/Meteor'
-import {Gravity} from 'core/07_TRIGGERS/Slide_and_CheckTerrain_triggers/Gravity'
- import { getUdgEscapers } from '../../../../globals'
-
-import { getUdgLevels } from "../../../../globals"
-
-import {MeteorFunctions} from '../../04_STRUCTURES/Meteor/Meteor_functions'
-import {Trig_InvisUnit_is_getting_damage} from '../../08_GAME/Death/InvisUnit_is_getting_damage'
-import {CmdName, CmdParam, IsPlayerColorString, NbParam, NoParam} from "./Command_functions";
-import {ActivateTeleport} from "./Teleport";
-import {udg_viewAll} from "../../03_view_all_hide_all/View_all_hide_all";
-
+import { IsBoolString, S2B } from 'core/01_libraries/Basic_functions'
+import { NB_ESCAPERS, SLIDE_PERIOD } from 'core/01_libraries/Constants'
+import { IsInteger, IsPositiveInteger } from 'core/01_libraries/Functions_on_numbers'
+import { ColorString2Id } from 'core/01_libraries/Init_colorCodes'
+import { Text } from 'core/01_libraries/Text'
+import { Escaper } from 'core/04_STRUCTURES/Escaper/Escaper'
+import { GetMirrorEscaper } from 'core/04_STRUCTURES/Escaper/Escaper_functions'
+import { METEOR_CHEAT } from 'core/04_STRUCTURES/Meteor/Meteor'
+import { Gravity } from 'core/07_TRIGGERS/Slide_and_CheckTerrain_triggers/Gravity'
+import { getUdgEscapers, getUdgLevels } from '../../../../globals'
+import { getUdgViewAll } from '../../03_view_all_hide_all/View_all_hide_all'
+import { MeteorFunctions } from '../../04_STRUCTURES/Meteor/Meteor_functions'
+import { Trig_InvisUnit_is_getting_damage } from '../../08_GAME/Death/InvisUnit_is_getting_damage'
+import { CmdName, CmdParam, IsPlayerColorString, NbParam, NoParam } from './Command_functions'
+import { ActivateTeleport } from './Teleport'
 
 export const ExecuteCommandCheat = (escaper: Escaper, cmd: string): boolean => {
     let name = CmdName(cmd)
@@ -321,7 +317,7 @@ export const ExecuteCommandCheat = (escaper: Escaper, cmd: string): boolean => {
     //-viewAll(va)   --> displays the whole map
     if (name === 'viewAll' || name === 'va') {
         if (noParam) {
-            FogModifierStart(udg_viewAll)
+            FogModifierStart(getUdgViewAll())
         }
         return true
     }
@@ -329,7 +325,7 @@ export const ExecuteCommandCheat = (escaper: Escaper, cmd: string): boolean => {
     //-hideAll(ha)   --> puts the map view back to normal
     if (name === 'hideAll' || name === 'ha') {
         if (noParam) {
-            FogModifierStop(udg_viewAll)
+            FogModifierStop(getUdgViewAll())
         }
         return true
     }
@@ -439,10 +435,7 @@ export const ExecuteCommandCheat = (escaper: Escaper, cmd: string): boolean => {
             if (getUdgEscapers().get(n) != null) {
                 getUdgEscapers().get(n)?.setGodModeKills(b)
                 if (b) {
-                    Text.P(
-                        escaper.getPlayer(),
-                        'god mode of slider ' + param2 + ' now kills monsters (if activated)'
-                    )
+                    Text.P(escaper.getPlayer(), 'god mode of slider ' + param2 + ' now kills monsters (if activated)')
                 } else {
                     Text.P(escaper.getPlayer(), 'god mode of slider ' + param2 + " doesn't kill monsters anymore")
                 }

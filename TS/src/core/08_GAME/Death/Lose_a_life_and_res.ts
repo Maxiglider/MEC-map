@@ -1,12 +1,9 @@
 import { NB_ESCAPERS } from 'core/01_libraries/Constants'
 import { Text } from 'core/01_libraries/Text'
 import { createEvent } from 'Utils/mapUtils'
+import { getUdgEscapers, getUdgLevels } from '../../../../globals'
 import { ChangeAllTerrains } from '../../07_TRIGGERS/Triggers_to_modify_terrains/Change_all_terrains'
-import { getUdgEscapers } from '../../../../globals'
-
-import { udg_lives } from '../Init_structures/Init_lives'
-import { getUdgLevels } from "../../../../globals"
-
+import { getUdgLives } from '../Init_structures/Init_lives'
 
 let udg_gameIsLost = false
 export let gg_trg_Lose_a_life_and_res: trigger
@@ -17,8 +14,8 @@ export const InitTrig_Lose_a_life_and_res = () => {
         actions: [
             () => {
                 let i: number
-                udg_lives.loseALife()
-                if (udg_lives.get() < 0) {
+                getUdgLives().loseALife()
+                if (getUdgLives().get() < 0) {
                     if (!udg_gameIsLost) {
                         udg_gameIsLost = true
                         DisplayTextToForce(GetPlayersAll(), 'You have no more lives !')

@@ -17,7 +17,6 @@ import { Escaper } from 'core/04_STRUCTURES/Escaper/Escaper'
 import { ColorInfo, GetMirrorEscaper } from 'core/04_STRUCTURES/Escaper/Escaper_functions'
 import { DisplayTerrainDataToPlayer, GetTerrainData } from 'core/07_TRIGGERS/Modify_terrain_Functions/Terrain_functions'
 import { Apm } from 'core/08_GAME/Apm_clics_par_minute/Apm'
-import { udg_lives } from 'core/08_GAME/Init_structures/Init_lives'
 import { Globals } from 'core/09_From_old_Worldedit_triggers/globals_variables_and_triggers'
 import { createTimer } from 'Utils/mapUtils'
 import { getUdgEscapers, getUdgLevels } from '../../../../globals'
@@ -29,6 +28,7 @@ import { TerrainTypeFromString } from '../../07_TRIGGERS/Modify_terrain_Function
 import { TerrainTypeNamesAndData } from '../../07_TRIGGERS/Modify_terrain_Functions/Terrain_type_names_and_data'
 import { AutoContinueAfterSliding } from '../../07_TRIGGERS/Slide_and_CheckTerrain_triggers/Auto_continue_after_sliding'
 import { TurnOnSlide } from '../../07_TRIGGERS/Slide_and_CheckTerrain_triggers/To_turn_on_slide'
+import { getUdgLives } from '../../08_GAME/Init_structures/Init_lives'
 import { CommandShortcuts } from '../../08_GAME/Shortcuts/Using_shortcut'
 import { CmdName, CmdParam, IsColorString, IsPlayerColorString, NbParam, NoParam } from './Command_functions'
 
@@ -709,7 +709,7 @@ export const ExecuteCommandAll = (escaper: Escaper, cmd: string): boolean => {
     if (name === 'leaderboard' || name === 'ldb') {
         if (nbParam === 1 && IsBoolString(param1)) {
             if (GetLocalPlayer() == escaper.getPlayer()) {
-                LeaderboardDisplay(udg_lives.getLeaderboard(), S2B(param1))
+                LeaderboardDisplay(getUdgLives().getLeaderboard(), S2B(param1))
             }
         }
         return true

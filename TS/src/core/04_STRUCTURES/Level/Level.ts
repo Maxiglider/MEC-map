@@ -1,9 +1,6 @@
 import { Text } from 'core/01_libraries/Text'
-import { udg_lives } from 'core/08_GAME/Init_structures/Init_lives'
 import { getUdgEscapers } from '../../../../globals'
-
-import { getUdgLevels } from "../../../../globals"
-
+import { getUdgLives } from '../../08_GAME/Init_structures/Init_lives'
 import type { CasterType } from '../Caster/CasterType'
 import type { Escaper } from '../Escaper/Escaper'
 import { MeteorArray } from '../Meteor/MeteorArray'
@@ -63,7 +60,7 @@ export class Level {
             this.meteors.createMeteorsItems()
             this.clearMobs.initializeClearMobs()
             if (Level.earningLivesActivated && this.getId() > 0) {
-                udg_lives.add(this.livesEarnedAtBeginning)
+                getUdgLives().add(this.livesEarnedAtBeginning)
             }
         } else {
             this.monsters.removeMonstersUnits()
