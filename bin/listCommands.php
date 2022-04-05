@@ -7,16 +7,16 @@
  */
 
 
-const COMMANDS_DIR = __DIR__."/../core/06 - COMMANDS/COMMANDS vJass/";
+const COMMANDS_DIR = __DIR__."/../core/06_COMMANDS/COMMANDS_vJass/";
 
 
 $commandsRubrics = [
-	"ALL" => "Command all.j",
-	"FIRST PLAYER" => "Command first player.j",
-	"CHEATS" => "Command cheat.j",
-	"MAKE" => "Command make.j",
-	"ADMIN" => "Command admin.j",
-	"SUPERADMIN" => "Command superadmin.j"
+	"ALL" => "Command_all.j.php",
+	"FIRST PLAYER" => "Command_first_player.j",
+	"CHEATS" => "Command_cheat.j",
+	"MAKE" => "Command_make.j",
+	"ADMIN" => "Command_admin.j",
+	"SUPERADMIN" => "Command_superadmin.j"
 ];
 
 $output = "";
