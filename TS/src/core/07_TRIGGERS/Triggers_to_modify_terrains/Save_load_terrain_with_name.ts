@@ -2,7 +2,7 @@ import { Constants, LARGEUR_CASE } from 'core/01_libraries/Constants'
 import { Text } from 'core/01_libraries/Text'
 import { TerrainType } from 'core/04_STRUCTURES/TerrainType/TerrainType'
 import { getUdgTerrainTypes } from '../../../../globals'
-
+import { errorHandler } from '../../../Utils/mapUtils'
 import { ChangeTerrainType } from '../Modify_terrain_Functions/Modify_terrain_functions'
 import { TerrainModifyingTrig } from './Terrain_modifying_trig'
 
@@ -23,22 +23,25 @@ const initSaveLoadTerrainWithName = () => {
 
         TriggerClearActions(TerrainModifyingTrig.gg_trg_Terrain_modifying_trig)
 
-        TriggerAddAction(TerrainModifyingTrig.gg_trg_Terrain_modifying_trig, () => {
-            let x = Constants.MAP_MIN_X
-            while (x <= Constants.MAP_MAX_X) {
-                terrainSave[x][y] = getUdgTerrainTypes().getTerrainType(x, y)
-                x += LARGEUR_CASE
-            }
+        TriggerAddAction(
+            TerrainModifyingTrig.gg_trg_Terrain_modifying_trig,
+            errorHandler(() => {
+                let x = Constants.MAP_MIN_X
+                while (x <= Constants.MAP_MAX_X) {
+                    terrainSave[x][y] = getUdgTerrainTypes().getTerrainType(x, y)
+                    x += LARGEUR_CASE
+                }
 
-            y = y + LARGEUR_CASE
-            if (y > Constants.MAP_MAX_Y) {
-                terrainModifyWorking = false
-                DisableTrigger(GetTriggeringTrigger())
-                Text.mkA('Terrain saved')
+                y = y + LARGEUR_CASE
+                if (y > Constants.MAP_MAX_Y) {
+                    terrainModifyWorking = false
+                    DisableTrigger(GetTriggeringTrigger())
+                    Text.mkA('Terrain saved')
 
-                terrainSaves.set(saveName, terrainSave)
-            }
-        })
+                    terrainSaves.set(saveName, terrainSave)
+                }
+            })
+        )
 
         EnableTrigger(TerrainModifyingTrig.gg_trg_Terrain_modifying_trig)
         terrainModifyWorking = true
@@ -63,31 +66,34 @@ const initSaveLoadTerrainWithName = () => {
         }
 
         const terrainSave = terrainSaves.get(saveName)
-        if(!terrainSave){
+        if (!terrainSave) {
             return false
         }
 
         TriggerClearActions(TerrainModifyingTrig.gg_trg_Terrain_modifying_trig)
-        TriggerAddAction(TerrainModifyingTrig.gg_trg_Terrain_modifying_trig, () => {
-            let terrainType: TerrainType | null
+        TriggerAddAction(
+            TerrainModifyingTrig.gg_trg_Terrain_modifying_trig,
+            errorHandler(() => {
+                let terrainType: TerrainType | null
 
-            let x = Constants.MAP_MIN_X
-            while (x <= Constants.MAP_MAX_X) {
-                terrainType = terrainSave[x][y]
-                if (terrainType !== null) {
-                    ChangeTerrainType(x, y, terrainType.getTerrainTypeId())
+                let x = Constants.MAP_MIN_X
+                while (x <= Constants.MAP_MAX_X) {
+                    terrainType = terrainSave[x][y]
+                    if (terrainType !== null) {
+                        ChangeTerrainType(x, y, terrainType.getTerrainTypeId())
+                    }
+                    x = x + LARGEUR_CASE
                 }
-                x = x + LARGEUR_CASE
-            }
 
-            y = y + LARGEUR_CASE
-            if (y > Constants.MAP_MAX_Y) {
-                TerrainModifyingTrig.RestartEnabledCheckTerrainTriggers()
-                Text.mkA('Terrain loaded')
-                DisableTrigger(GetTriggeringTrigger())
-                terrainModifyWorking = false
-            }
-        })
+                y = y + LARGEUR_CASE
+                if (y > Constants.MAP_MAX_Y) {
+                    TerrainModifyingTrig.RestartEnabledCheckTerrainTriggers()
+                    Text.mkA('Terrain loaded')
+                    DisableTrigger(GetTriggeringTrigger())
+                    terrainModifyWorking = false
+                }
+            })
+        )
 
         let y = Constants.MAP_MIN_Y
         EnableTrigger(TerrainModifyingTrig.gg_trg_Terrain_modifying_trig)

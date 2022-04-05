@@ -1,14 +1,13 @@
 import { CACHE_SEPARATEUR_PARAM } from 'core/07_TRIGGERS/Save_map_in_gamecache/struct_StringArrayForCache'
+import { errorHandler } from '../../../Utils/mapUtils'
+import { IsOnGround } from '../../01_libraries/Basic_functions'
 import { Escaper } from '../Escaper/Escaper'
+import { Hero2Escaper } from '../Escaper/Escaper_functions'
 import { Monster } from '../Monster/Monster'
 import { MonsterType } from '../Monster/MonsterType'
 import { NewImmobileMonster } from '../Monster/Monster_functions'
+import { CasterShot } from './CasterShot'
 import { CasterType } from './CasterType'
-import {IsOnGround} from "../../01_libraries/Basic_functions";
-import {CasterShot} from "./CasterShot";
-import {Hero2Escaper} from "../Escaper/Escaper_functions";
-
-
 
 let escaper: Escaper
 let caster: Caster
@@ -41,7 +40,7 @@ const CalculerPointsIntersections = () => {
     let discriminant: number
 
     const hero = escaper.getHero()
-    if(!hero) return
+    if (!hero) return
 
     if (sliderSpeed >= 0) {
         angleSlider = GetUnitFacing(hero)
@@ -136,7 +135,7 @@ const CasterTryToShoot = () => {
         escaper = escapersToShoot[numEscaper]
         const hero = escaper.getHero()
 
-        if(hero) {
+        if (hero) {
             //vérification que l'escaper est shootable (vivant et à portée de tir)
             estShootable = false
             if (escaper.isAlive()) {
@@ -276,7 +275,7 @@ export const CasterUnitWithinRange_Actions = () => {
     }
 
     const caster = Caster.anyTriggerWithinRangeId2Caster.get(GetHandleId(GetTriggeringTrigger()))
-    if(caster) {
+    if (caster) {
         caster.escapersInRange[caster.nbEscapersInRange] = escaperInRange
         caster.nbEscapersInRange++
         if (caster.canShoot) {
@@ -284,7 +283,6 @@ export const CasterUnitWithinRange_Actions = () => {
         }
     }
 }
-
 
 /**
  * Caster class
@@ -366,7 +364,7 @@ export class Caster extends Monster {
 
         this.trg_unitWithinRange = CreateTrigger()
         this.u && TriggerRegisterUnitInRangeSimple(this.trg_unitWithinRange, this.casterType.getRange(), this.u)
-        TriggerAddAction(this.trg_unitWithinRange, CasterUnitWithinRange_Actions)
+        TriggerAddAction(this.trg_unitWithinRange, errorHandler(CasterUnitWithinRange_Actions))
         Caster.anyTriggerWithinRangeId2Caster.set(GetHandleId(this.trg_unitWithinRange), this)
 
         this.t = CreateTimer()

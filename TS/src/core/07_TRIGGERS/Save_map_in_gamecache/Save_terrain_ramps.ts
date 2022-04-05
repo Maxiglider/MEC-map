@@ -1,6 +1,7 @@
 import { IsNearBounds } from 'core/01_libraries/Basic_functions'
 import { Constants, LARGEUR_CASE } from 'core/01_libraries/Constants'
 import { Text } from 'core/01_libraries/Text'
+import { errorHandler } from '../../../Utils/mapUtils'
 import { SaveMapInCache } from './SAVE_MAP_in_cache'
 import { SaveWater } from './Save_water'
 import { StringArrayForCache } from './struct_StringArrayForCache'
@@ -539,7 +540,7 @@ if one of the N tilepoints is at a cliff level different than CL or CL+1, the ra
         y = Constants.MAP_MIN_Y
         StringArrayForCache.stringArrayForCache = new StringArrayForCache('terrain', 'terrainRamps', false)
         TriggerClearActions(SaveMapInCache.trigSaveMapInCache)
-        TriggerAddAction(SaveMapInCache.trigSaveMapInCache, SaveTerrainRamps_Actions)
+        TriggerAddAction(SaveMapInCache.trigSaveMapInCache, errorHandler(SaveTerrainRamps_Actions))
         EnableTrigger(SaveMapInCache.trigSaveMapInCache)
     }
 

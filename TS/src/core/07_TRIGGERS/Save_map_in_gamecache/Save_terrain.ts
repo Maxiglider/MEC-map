@@ -3,11 +3,11 @@ import { Constants, LARGEUR_CASE } from 'core/01_libraries/Constants'
 import { Text } from 'core/01_libraries/Text'
 import { TerrainType } from 'core/04_STRUCTURES/TerrainType/TerrainType'
 import { getUdgTerrainTypes } from '../../../../globals'
-
+import { errorHandler } from '../../../Utils/mapUtils'
+import { I2HexaString } from '../../01_libraries/Functions_on_numbers'
 import { SaveMapInCache } from './SAVE_MAP_in_cache'
 import { SaveTerrainHeights } from './Save_terrain_heights_and_cliffs'
 import { StringArrayForCache } from './struct_StringArrayForCache'
-import {I2HexaString} from "../../01_libraries/Functions_on_numbers";
 
 const initSaveTerrain = () => {
     let y: number
@@ -168,7 +168,7 @@ const initSaveTerrain = () => {
         GererOrdreTerrains()
         StringArrayForCache.stringArrayForCache = new StringArrayForCache('terrain', 'terrainTypes', false)
         TriggerClearActions(SaveMapInCache.trigSaveMapInCache)
-        TriggerAddAction(SaveMapInCache.trigSaveMapInCache, SaveTerrain_Actions)
+        TriggerAddAction(SaveMapInCache.trigSaveMapInCache, errorHandler(SaveTerrain_Actions))
         EnableTrigger(SaveMapInCache.trigSaveMapInCache)
     }
 

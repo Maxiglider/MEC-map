@@ -1,5 +1,5 @@
-import {IsIssuedOrder, StopUnit} from 'core/01_libraries/Basic_functions'
-
+import { IsIssuedOrder, StopUnit } from 'core/01_libraries/Basic_functions'
+import { errorHandler } from '../../../Utils/mapUtils'
 
 let teleTriggers: trigger[] = []
 let onceOnly: boolean[] = []
@@ -26,7 +26,7 @@ export const ActivateTeleport = (hero: unit, onceOnlyB: boolean) => {
     let escaperId = GetUnitUserData(hero)
     DestroyTrigger(teleTriggers[escaperId])
     teleTriggers[escaperId] = CreateTrigger()
-    TriggerAddAction(teleTriggers[escaperId], Teleport_Actions)
+    TriggerAddAction(teleTriggers[escaperId], errorHandler(Teleport_Actions))
     TriggerRegisterUnitEvent(teleTriggers[escaperId], hero, EVENT_UNIT_ISSUED_POINT_ORDER)
     onceOnly[escaperId] = onceOnlyB
 }

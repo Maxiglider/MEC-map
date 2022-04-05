@@ -1,6 +1,7 @@
 import { createTimer } from 'Utils/mapUtils'
 import { Timer } from 'w3ts'
 import { getUdgMonsterTypes } from '../../../../globals'
+import { errorHandler } from '../../../Utils/mapUtils'
 import { GetCurrentMonsterPlayer } from '../../01_libraries/Basic_functions'
 import { ENNEMY_PLAYER, GREY, MOBS_VARIOUS_COLORS, TERRAIN_DATA_DISPLAY_TIME } from '../../01_libraries/Constants'
 import { udg_colorCode } from '../../01_libraries/Init_colorCodes'
@@ -175,7 +176,7 @@ export class MonsterSpawn {
         this.tUnspawn = CreateTrigger()
         MonsterSpawn.anyTrigId2MonsterSpawn.set(GetHandleId(this.tUnspawn), this)
         this.unspawnReg && TriggerRegisterEnterRegion(this.tUnspawn, this.unspawnReg, null)
-        TriggerAddAction(this.tUnspawn, UnspawMonster_Actions)
+        TriggerAddAction(this.tUnspawn, errorHandler(UnspawMonster_Actions))
     }
 
     destroy = (): void => {

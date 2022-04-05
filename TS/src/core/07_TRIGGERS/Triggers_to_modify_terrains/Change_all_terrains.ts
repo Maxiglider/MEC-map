@@ -3,7 +3,7 @@ import { Text } from 'core/01_libraries/Text'
 import { TerrainType } from 'core/04_STRUCTURES/TerrainType/TerrainType'
 import { Globals } from 'core/09_From_old_Worldedit_triggers/globals_variables_and_triggers'
 import { getUdgTerrainTypes } from '../../../../globals'
-
+import { errorHandler } from '../../../Utils/mapUtils'
 import { ChangeTerrainType } from '../Modify_terrain_Functions/Modify_terrain_functions'
 import {
     AddNewTerrain,
@@ -27,40 +27,43 @@ const initChangeAllTerrains = () => {
         let y = Constants.MAP_MIN_Y
         TerrainModifyingTrig.StopEnabledCheckTerrainTriggers()
         TriggerClearActions(TerrainModifyingTrig.gg_trg_Terrain_modifying_trig)
-        TriggerAddAction(TerrainModifyingTrig.gg_trg_Terrain_modifying_trig, () => {
-            let x: number
-            let terrainTypeId: number
-            let done: boolean
-            let j: number
-            //local integer i = 1
-            //loop
-            //exitwhen (i > TERRAIN_MODIFYING_NB_LINES_TO_DO)
-            x = Constants.MAP_MIN_X
-            while (true) {
-                if (x > Constants.MAP_MAX_X) break
-                terrainTypeId = GetTerrainType(x, y)
-                done = false
-                j = 0
+        TriggerAddAction(
+            TerrainModifyingTrig.gg_trg_Terrain_modifying_trig,
+            errorHandler(() => {
+                let x: number
+                let terrainTypeId: number
+                let done: boolean
+                let j: number
+                //local integer i = 1
+                //loop
+                //exitwhen (i > TERRAIN_MODIFYING_NB_LINES_TO_DO)
+                x = Constants.MAP_MIN_X
                 while (true) {
-                    if (j > lastTerrainArrayId || done) break
-                    if (terrainTypeId === oldTerrainTypes[j]) {
-                        ChangeTerrainType(x, y, newTerrainTypes[j])
-                        done = true
+                    if (x > Constants.MAP_MAX_X) break
+                    terrainTypeId = GetTerrainType(x, y)
+                    done = false
+                    j = 0
+                    while (true) {
+                        if (j > lastTerrainArrayId || done) break
+                        if (terrainTypeId === oldTerrainTypes[j]) {
+                            ChangeTerrainType(x, y, newTerrainTypes[j])
+                            done = true
+                        }
+                        j = j + 1
                     }
-                    j = j + 1
+                    x = x + LARGEUR_CASE
                 }
-                x = x + LARGEUR_CASE
-            }
-            y = y + LARGEUR_CASE
-            if (y > Constants.MAP_MAX_Y) {
-                DisableTrigger(GetTriggeringTrigger())
-                TerrainModifyingTrig.RestartEnabledCheckTerrainTriggers()
-                terrainModifyWorking = false
-                return
-            }
-            //i = i + 1
-            //endloop
-        })
+                y = y + LARGEUR_CASE
+                if (y > Constants.MAP_MAX_Y) {
+                    DisableTrigger(GetTriggeringTrigger())
+                    TerrainModifyingTrig.RestartEnabledCheckTerrainTriggers()
+                    terrainModifyWorking = false
+                    return
+                }
+                //i = i + 1
+                //endloop
+            })
+        )
         EnableTrigger(TerrainModifyingTrig.gg_trg_Terrain_modifying_trig)
         terrainModifyWorking = true
     }

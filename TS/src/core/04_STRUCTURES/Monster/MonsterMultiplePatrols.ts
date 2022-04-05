@@ -1,11 +1,12 @@
 import { GetLocDist } from 'core/01_libraries/Basic_functions'
 import { PATROL_DISTANCE_MIN } from 'core/01_libraries/Constants'
 import { CACHE_SEPARATEUR_PARAM } from 'core/07_TRIGGERS/Save_map_in_gamecache/struct_StringArrayForCache'
+import { udg_monsters } from '../../../../globals'
+import { errorHandler } from '../../../Utils/mapUtils'
 import { IsHero } from '../Escaper/Escaper_functions'
 import { Monster } from './Monster'
 import { MonsterType } from './MonsterType'
 import { NewPatrolMonster } from './Monster_functions'
-import {udg_monsters} from "../../../../globals";
 
 const NewRegion = (x: number, y: number): region => {
     let r = Rect(x - 16, y - 16, x + 16, y + 16)
@@ -64,7 +65,7 @@ export class MonsterMultiplePatrols extends Monster {
             this.r[n] = NewRegion(x, y)
             this.t[n] = CreateTrigger()
             DisableTrigger(this.t[n])
-            TriggerAddAction(this.t[n], MonsterMultiplePatrols_move_Actions)
+            TriggerAddAction(this.t[n], errorHandler(MonsterMultiplePatrols_move_Actions))
             TriggerRegisterEnterRegionSimple(this.t[n], this.r[n])
         })
 
@@ -187,7 +188,7 @@ export class MonsterMultiplePatrols extends Monster {
         this.r[id] = NewRegion(x, y)
         this.t[id] = CreateTrigger()
         DisableTrigger(this.t[id])
-        TriggerAddAction(this.t[id], MonsterMultiplePatrols_move_Actions)
+        TriggerAddAction(this.t[id], errorHandler(MonsterMultiplePatrols_move_Actions))
         TriggerRegisterEnterRegionSimple(this.t[id], this.r[id])
     }
 

@@ -1,6 +1,7 @@
 import { Constants, LARGEUR_CASE } from 'core/01_libraries/Constants'
 import { Text } from 'core/01_libraries/Text'
 import { ZLibrary } from 'core/02_bibliotheques_externes/ZLibrary'
+import { errorHandler } from '../../../Utils/mapUtils'
 import { SaveMapInCache } from './SAVE_MAP_in_cache'
 import { SaveMonsterTypes } from './Save_monster_types'
 import { StringArrayForCache } from './struct_StringArrayForCache'
@@ -31,7 +32,7 @@ const initSaveWater = () => {
         y = Constants.MAP_MIN_Y
         StringArrayForCache.stringArrayForCache = new StringArrayForCache('terrain', 'waterHeights', true)
         TriggerClearActions(SaveMapInCache.trigSaveMapInCache)
-        TriggerAddAction(SaveMapInCache.trigSaveMapInCache, SaveWaterHeights_Actions)
+        TriggerAddAction(SaveMapInCache.trigSaveMapInCache, errorHandler(SaveWaterHeights_Actions))
         EnableTrigger(SaveMapInCache.trigSaveMapInCache)
     }
 

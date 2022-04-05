@@ -3,6 +3,7 @@ import { Text } from 'core/01_libraries/Text'
 import { TerrainType } from 'core/04_STRUCTURES/TerrainType/TerrainType'
 import { TerrainTypeId2TerrainType } from 'core/04_STRUCTURES/TerrainType/Terrain_type_functions'
 import { createTimer } from 'Utils/mapUtils'
+import { errorHandler } from '../../../Utils/mapUtils'
 import { ChangeTerrainType } from '../Modify_terrain_Functions/Modify_terrain_functions'
 import { AddNewTerrain } from '../Modify_terrain_Functions/Terrain_functions'
 import { TerrainModifyingTrig } from './Terrain_modifying_trig'
@@ -17,29 +18,32 @@ const initReinitTerrainsPositions = () => {
     const init_reinitTerrainsPositions = () => {
         createTimer(0, false, () => {
             TriggerClearActions(TerrainModifyingTrig.gg_trg_Terrain_modifying_trig)
-            TriggerAddAction(TerrainModifyingTrig.gg_trg_Terrain_modifying_trig, () => {
-                let terrainType: number
-                let x = Constants.MAP_MIN_X
-                while (true) {
-                    if (x > Constants.MAP_MAX_X) break
-                    terrainType = GetTerrainType(x, y)
-                    //mise à jour used terrain (-ut)
-                    AddNewTerrain(terrainType)
-                    //changer variations
-                    ChangeTerrainType(x, y, terrainType)
-                    //sauvegarde du terrain
-                    TERRAIN_SAVE[terrainSave_id] = TerrainTypeId2TerrainType(terrainType)
-                    terrainSave_id = terrainSave_id + 1
-                    x = x + LARGEUR_CASE
-                }
+            TriggerAddAction(
+                TerrainModifyingTrig.gg_trg_Terrain_modifying_trig,
+                errorHandler(() => {
+                    let terrainType: number
+                    let x = Constants.MAP_MIN_X
+                    while (true) {
+                        if (x > Constants.MAP_MAX_X) break
+                        terrainType = GetTerrainType(x, y)
+                        //mise à jour used terrain (-ut)
+                        AddNewTerrain(terrainType)
+                        //changer variations
+                        ChangeTerrainType(x, y, terrainType)
+                        //sauvegarde du terrain
+                        TERRAIN_SAVE[terrainSave_id] = TerrainTypeId2TerrainType(terrainType)
+                        terrainSave_id = terrainSave_id + 1
+                        x = x + LARGEUR_CASE
+                    }
 
-                y = y + LARGEUR_CASE
-                if (y > Constants.MAP_MAX_Y) {
-                    terrainModifyWorking = false
-                    DisableTrigger(GetTriggeringTrigger())
-                    return
-                }
-            })
+                    y = y + LARGEUR_CASE
+                    if (y > Constants.MAP_MAX_Y) {
+                        terrainModifyWorking = false
+                        DisableTrigger(GetTriggeringTrigger())
+                        return
+                    }
+                })
+            )
             terrainSave_id = 0
             let y = Constants.MAP_MIN_Y
             EnableTrigger(TerrainModifyingTrig.gg_trg_Terrain_modifying_trig)
@@ -51,35 +55,38 @@ const initReinitTerrainsPositions = () => {
     //reinitTerrainPositions
     const StartTerrainModifying = () => {
         TriggerClearActions(TerrainModifyingTrig.gg_trg_Terrain_modifying_trig)
-        TriggerAddAction(TerrainModifyingTrig.gg_trg_Terrain_modifying_trig, () => {
-            let x: number
-            //local integer i = 1
-            //loop
-            //exitwhen (i > TERRAIN_MODIFYING_NB_LINES_TO_DO)
-            x = Constants.MAP_MIN_X
-            while (true) {
-                if (x > Constants.MAP_MAX_X) break
+        TriggerAddAction(
+            TerrainModifyingTrig.gg_trg_Terrain_modifying_trig,
+            errorHandler(() => {
+                let x: number
+                //local integer i = 1
+                //loop
+                //exitwhen (i > TERRAIN_MODIFYING_NB_LINES_TO_DO)
+                x = Constants.MAP_MIN_X
+                while (true) {
+                    if (x > Constants.MAP_MAX_X) break
 
-                const terrainType = TERRAIN_SAVE[terrainSave_id]
+                    const terrainType = TERRAIN_SAVE[terrainSave_id]
 
-                if (terrainType !== null && terrainType.getTerrainTypeId() != 0) {
-                    ChangeTerrainType(x, y, terrainType.getTerrainTypeId())
+                    if (terrainType !== null && terrainType.getTerrainTypeId() != 0) {
+                        ChangeTerrainType(x, y, terrainType.getTerrainTypeId())
+                    }
+
+                    terrainSave_id = terrainSave_id + 1
+                    x = x + LARGEUR_CASE
                 }
-
-                terrainSave_id = terrainSave_id + 1
-                x = x + LARGEUR_CASE
-            }
-            y = y + LARGEUR_CASE
-            if (y > Constants.MAP_MAX_Y) {
-                Text.mkA('Terrains position reinitialized !')
-                DisableTrigger(GetTriggeringTrigger())
-                terrainModifyWorking = false
-                TerrainModifyingTrig.RestartEnabledCheckTerrainTriggers()
-                return
-            }
-            //i = i + 1
-            //endloop
-        })
+                y = y + LARGEUR_CASE
+                if (y > Constants.MAP_MAX_Y) {
+                    Text.mkA('Terrains position reinitialized !')
+                    DisableTrigger(GetTriggeringTrigger())
+                    terrainModifyWorking = false
+                    TerrainModifyingTrig.RestartEnabledCheckTerrainTriggers()
+                    return
+                }
+                //i = i + 1
+                //endloop
+            })
+        )
         terrainSave_id = 0
         let y = Constants.MAP_MIN_Y
         EnableTrigger(TerrainModifyingTrig.gg_trg_Terrain_modifying_trig)
