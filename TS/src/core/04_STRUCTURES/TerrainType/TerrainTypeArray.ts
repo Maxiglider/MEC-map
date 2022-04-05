@@ -1,11 +1,11 @@
 import { tileset2tilesetChar } from 'core/01_libraries/Basic_functions'
 import { Text } from 'core/01_libraries/Text'
 import { StringArrayForCache } from 'core/07_TRIGGERS/Save_map_in_gamecache/struct_StringArrayForCache'
+import { CmdParam, NbParam } from '../../06_COMMANDS/COMMANDS_vJass/Command_functions'
 import { TerrainType } from './TerrainType'
 import { TerrainTypeDeath } from './TerrainTypeDeath'
 import { TerrainTypeSlide } from './TerrainTypeSlide'
 import { TerrainTypeWalk } from './TerrainTypeWalk'
-import {CmdParam, NbParam} from "../../06_COMMANDS/COMMANDS_vJass/Command_functions";
 
 export class TerrainTypeArray {
     private ttWalk: TerrainTypeWalk[] = [] //le nombre de terrains du jeu est de 177
@@ -74,20 +74,19 @@ export class TerrainTypeArray {
     }
 
     isTerrainTypeIdAlreadyUsed = (terrainTypeId: number): boolean => {
-
-        for(let i = 0; i < this.numberOfWalk; i++){
+        for (let i = 0; i < this.numberOfWalk; i++) {
             if (terrainTypeId == this.ttWalk[i].getTerrainTypeId()) {
                 return true
             }
         }
 
-        for(let i = 0; i < this.numberOfDeath; i++){
+        for (let i = 0; i < this.numberOfDeath; i++) {
             if (terrainTypeId == this.ttDeath[i].getTerrainTypeId()) {
                 return true
             }
         }
 
-        for(let i = 0; i < this.numberOfSlide; i++){
+        for (let i = 0; i < this.numberOfSlide; i++) {
             if (terrainTypeId == this.ttSlide[i].getTerrainTypeId()) {
                 return true
             }
@@ -142,6 +141,7 @@ export class TerrainTypeArray {
 
     newSlide = (label: string, terrainTypeId: number, slideSpeed: number, canTurn: boolean) => {
         let n = this.numberOfSlide
+
         if (
             this.count() >= 16 ||
             this.isLabelAlreadyUsed(label) ||
@@ -154,6 +154,7 @@ export class TerrainTypeArray {
         if (this.ttSlide[n] !== null) {
             this.numberOfSlide = this.numberOfSlide + 1
         }
+
         return this.ttSlide[n]
     }
 
