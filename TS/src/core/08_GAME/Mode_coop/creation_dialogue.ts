@@ -23,9 +23,9 @@ export const InitTrig_creation_dialogue = () => {
                     globals.coopModeActive = GetClickedButton() === btnChoixCoop
                     dialBoutonAppuye = true
                     if (globals.coopModeActive) {
-                        DisplayTextToForce(GetPlayersAll(), 'coop mode chosen by first player')
+                        DisplayTextToForce(GetPlayersAll(), 'Coop mode chosen by first player')
                     } else {
-                        DisplayTextToForce(GetPlayersAll(), 'solo mode chosen by first player')
+                        DisplayTextToForce(GetPlayersAll(), 'Solo mode chosen by first player')
                     }
                 },
             ],
@@ -58,9 +58,9 @@ export const gg_trg_apparition_dialogue_et_fermeture_automatique = createEvent({
                 if (!dialBoutonAppuye) {
                     DialogDisplay(udg_joueurDialogue, dialChoixModeCoop, false)
                     if (globals.coopModeActive) {
-                        DisplayTextToForce(GetPlayersAll(), 'coop mode automatically chosen')
+                        DisplayTextToForce(GetPlayersAll(), 'Coop mode automatically chosen')
                     } else {
-                        DisplayTextToForce(GetPlayersAll(), 'solo mode automatically chosen')
+                        DisplayTextToForce(GetPlayersAll(), 'Solo mode automatically chosen')
                     }
                 }
             })

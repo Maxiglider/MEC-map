@@ -33,17 +33,11 @@ export class MonsterTypeArray {
     ) {
         let n = this.numberOfMonsterTypes
         if (this.isLabelAlreadyUsed(label)) {
-            return null
+            throw 'Label already used'
         }
 
-        try {
-            this.monsterTypes[n] = new MonsterType(label, unitTypeId, scale, immolationRadius, speed, isClickable)
-            this.numberOfMonsterTypes = this.numberOfMonsterTypes + 1
-        } catch (error) {
-            if (typeof error == 'string') {
-                Text.erA(error)
-            }
-        }
+        this.monsterTypes[n] = new MonsterType(label, unitTypeId, scale, immolationRadius, speed, isClickable)
+        this.numberOfMonsterTypes = this.numberOfMonsterTypes + 1
     }
 
     remove = (label: string): boolean => {

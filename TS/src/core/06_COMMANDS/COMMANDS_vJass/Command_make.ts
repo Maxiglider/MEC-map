@@ -600,12 +600,12 @@ export const ExecuteCommandMake = (escaper: Escaper, cmd: string): boolean => {
         }
         //checkParam1
         if (getUdgMonsterTypes().isLabelAlreadyUsed(param1)) {
-            Text.erP(escaper.getPlayer(), 'label "' + param1 + '" already used')
+            Text.erP(escaper.getPlayer(), 'Label "' + param1 + '" already used')
             return true
         }
         //checkParam2
         if (!(StringLength(param2) === 6 && SubStringBJ(param2, 1, 1) === "'" && SubStringBJ(param2, 6, 6) === "'")) {
-            Text.erP(escaper.getPlayer(), "wrong unit type id (exemple : 'hfoo')")
+            Text.erP(escaper.getPlayer(), "Wrong unit type id (exemple : 'hfoo')")
             return true
         }
         //checkParam3
@@ -614,7 +614,7 @@ export const ExecuteCommandMake = (escaper: Escaper, cmd: string): boolean => {
             if (!(x / 5 === I2R(R2I(x / 5))) || x < 0 || x > 400) {
                 Text.erP(
                     escaper.getPlayer(),
-                    'wrong immolation radius ; should be an integer divisible by 5 and between 0 and 400'
+                    'Wrong immolation radius ; should be an integer divisible by 5 and between 0 and 400'
                 )
                 return true
             }
@@ -622,7 +622,7 @@ export const ExecuteCommandMake = (escaper: Escaper, cmd: string): boolean => {
             if (nbParam >= 4) {
                 str = CmdParam(cmd, 4)
                 if (!IsPositiveInteger(str) || S2I(str) > MAX_MOVE_SPEED) {
-                    Text.erP(escaper.getPlayer(), 'wrong speed value ; should be a positive integer between 0 and 522')
+                    Text.erP(escaper.getPlayer(), 'Wrong speed value ; should be a positive integer between 0 and 522')
                     return true
                 }
                 speed = S2R(str)
@@ -632,7 +632,7 @@ export const ExecuteCommandMake = (escaper: Escaper, cmd: string): boolean => {
                     if (S2R(str) <= 0 && str !== 'default' && str !== 'd') {
                         Text.erP(
                             escaper.getPlayer(),
-                            'wrong scale value ; should be a real upper than 0 or "default" or "d"'
+                            'Wrong scale value ; should be a real upper than 0 or "default" or "d"'
                         )
                         return true
                     }
@@ -647,7 +647,7 @@ export const ExecuteCommandMake = (escaper: Escaper, cmd: string): boolean => {
                         if (!IsBoolString(str)) {
                             Text.erP(
                                 escaper.getPlayer(),
-                                "wrong \"is clickable\" value ; should be 'true', 'false', '0' or '1'"
+                                "Wrong \"is clickable\" value ; should be 'true', 'false', '0' or '1'"
                             )
                             return true
                         }
@@ -677,15 +677,15 @@ export const ExecuteCommandMake = (escaper: Escaper, cmd: string): boolean => {
         ) {
             Text.erP(
                 escaper.getPlayer(),
-                'characters ", ' + CACHE_SEPARATEUR_ITEM + ' and ' + CACHE_SEPARATEUR_PARAM + ' not allowed'
+                'Characters ", ' + CACHE_SEPARATEUR_ITEM + ' and ' + CACHE_SEPARATEUR_PARAM + ' not allowed'
             )
             return true
         }
-        if (!getUdgMonsterTypes().new(param1, String2Ascii(SubStringBJ(param2, 2, 5)), x, S2R(param3), speed, b)) {
-            Text.erP(escaper.getPlayer(), "couldn't create the monster type")
-        } else {
-            Text.mkP(escaper.getPlayer(), 'monster type "' + param1 + '" created')
-        }
+
+        getUdgMonsterTypes().new(param1, String2Ascii(SubStringBJ(param2, 2, 5)), x, S2R(param3), speed, b)
+
+        Text.mkP(escaper.getPlayer(), 'Monster type "' + param1 + '" created')
+
         return true
     }
 
@@ -1791,23 +1791,23 @@ export const ExecuteCommandMake = (escaper: Escaper, cmd: string): boolean => {
         }
         //checkParam1
         if (getUdgCasterTypes().isLabelAlreadyUsed(param1)) {
-            Text.erP(escaper.getPlayer(), 'label "' + param1 + '" already used')
+            Text.erP(escaper.getPlayer(), 'Label "' + param1 + '" already used')
             return true
         }
         //checkParam2
         if (!getUdgMonsterTypes().isLabelAlreadyUsed(param2)) {
-            Text.erP(escaper.getPlayer(), 'unknown monster type "' + param2 + '"')
+            Text.erP(escaper.getPlayer(), 'Unknown monster type "' + param2 + '"')
             return true
         }
         //checkParam3
         if (!getUdgMonsterTypes().isLabelAlreadyUsed(param3)) {
-            Text.erP(escaper.getPlayer(), 'unknown monster type "' + param3 + '"')
+            Text.erP(escaper.getPlayer(), 'Unknown monster type "' + param3 + '"')
             return true
         }
         //checkParam4 range
         if (nbParam >= 4) {
             if (S2R(param4) <= 0) {
-                Text.erP(escaper.getPlayer(), 'the range must be a real higher than 0')
+                Text.erP(escaper.getPlayer(), 'The range must be a real higher than 0')
                 return true
             }
             x = S2R(param4)
@@ -1816,7 +1816,7 @@ export const ExecuteCommandMake = (escaper: Escaper, cmd: string): boolean => {
                 if (S2R(CmdParam(cmd, 5)) < MIN_CASTER_PROJECTILE_SPEED) {
                     Text.erP(
                         escaper.getPlayer(),
-                        'the projectile speed must be a real higher or equals to ' + R2S(MIN_CASTER_PROJECTILE_SPEED)
+                        'The projectile speed must be a real higher or equals to ' + R2S(MIN_CASTER_PROJECTILE_SPEED)
                     )
                     return true
                 }
@@ -1826,7 +1826,7 @@ export const ExecuteCommandMake = (escaper: Escaper, cmd: string): boolean => {
                     if (S2R(CmdParam(cmd, 6)) < MIN_CASTER_LOAD_TIME) {
                         Text.erP(
                             escaper.getPlayer(),
-                            'the load time must be a real higher or equals to ' + R2S(MIN_CASTER_LOAD_TIME)
+                            'The load time must be a real higher or equals to ' + R2S(MIN_CASTER_LOAD_TIME)
                         )
                         return true
                     }

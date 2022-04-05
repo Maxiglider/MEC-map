@@ -476,9 +476,9 @@ export const ExecuteCommandMax = (escaper: Escaper, cmd: string): boolean => {
             return true
         }
         if (getUdgTerrainTypes().remove(param1)) {
-            Text.mkP(escaper.getPlayer(), 'terrain removed')
+            Text.mkP(escaper.getPlayer(), 'Terrain removed')
         } else {
-            Text.erP(escaper.getPlayer(), 'unknown terrain')
+            Text.erP(escaper.getPlayer(), 'Unknown terrain')
         }
         return true
     }

@@ -1032,26 +1032,18 @@ export class Escaper {
         return true
     }
 
-    onInitMake = () => {
-        if (!this.isEscaperSecondary()) {
-            GetMirrorEscaper(this)?.makeDoNothing()
-        }
-    }
-
     makeDoNothing = () => {
         this.destroyMake()
         if (this.hero) this.make = new MakeDoNothing(this.hero)
     }
 
     makeCreateNoMoveMonsters(mt: MonsterType, facingAngle: number) {
-        this.onInitMake()
         //mode : noMove
         this.destroyMake()
         if (this.hero) this.make = new MakeMonsterNoMove(this.hero, mt, facingAngle)
     }
 
     makeCreateSimplePatrolMonsters(mode: string, mt: MonsterType) {
-        this.onInitMake()
         this.destroyMake()
         //modes : normal, string, auto
         if (mode == 'normal' || mode == 'string' || mode == 'auto') {
@@ -1060,7 +1052,6 @@ export class Escaper {
     }
 
     makeCreateMultiplePatrolsMonsters(mode: string, mt: MonsterType) {
-        this.onInitMake()
         this.destroyMake()
         //modes : normal, string
         if (mode == 'normal' || mode == 'string') {
@@ -1069,7 +1060,6 @@ export class Escaper {
     }
 
     makeCreateTeleportMonsters(mode: string, mt: MonsterType, period: number, angle: number) {
-        this.onInitMake()
         this.destroyMake()
         //modes : normal, string
         if (mode == 'normal' || mode == 'string') {
@@ -1092,7 +1082,6 @@ export class Escaper {
     }
 
     makeMonsterTeleportWait = () => {
-        this.onInitMake()
         if (!this.make || !(this.make instanceof MakeMonsterTeleport)) {
             return false
         }
@@ -1100,7 +1089,6 @@ export class Escaper {
     }
 
     makeMonsterTeleportHide = () => {
-        this.onInitMake()
         if (!this.make || !(this.make instanceof MakeMonsterTeleport)) {
             return false
         }

@@ -55,8 +55,7 @@ export class MonsterType {
 
         const testMonster = CreateUnit(NEUTRAL_PLAYER, unitTypeId, 0, 0, 0)
         if (!testMonster) {
-            //todomax check ingame that this error is thrown
-            throw this.constructor.name + ' : test unit failed'
+            throw 'Unit type unknown'
         } else {
             RemoveUnit(testMonster)
         }

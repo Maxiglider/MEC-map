@@ -10,6 +10,7 @@ import {makingRightsToAll} from "../06_COMMANDS/Rights/manage_rights";
 import {init_TerrainTypeNamesAndData} from "../07_TRIGGERS/Modify_terrain_Functions/Terrain_type_names_and_data";
 import {init_ToTurnOnSlide} from "../07_TRIGGERS/Slide_and_CheckTerrain_triggers/To_turn_on_slide";
 import {init_Apm} from "../08_GAME/Apm_clics_par_minute/Apm";
+import {init_StopSecondIfMake} from "../07_TRIGGERS/Handling_secondary_hero/Stop_second_if_make";
 
 export const initializers = () => {
     initArrays()
@@ -23,6 +24,7 @@ export const initializers = () => {
     init_commandExecution()
     init_TerrainTypeNamesAndData()
     init_ToTurnOnSlide()
+    init_StopSecondIfMake()
 
     //todomax disable this line at end
     makingRightsToAll()
