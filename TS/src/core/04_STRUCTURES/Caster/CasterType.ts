@@ -37,7 +37,7 @@ export class CasterType {
         animation: string
     ) {
         if (range <= 0 || projectileSpeed <= 0) {
-            throw new Error('CasterType: range and projectileSpeed must be positive')
+            throw 'CasterType: range and projectileSpeed must be positive'
         }
 
         this.label = label

@@ -1,4 +1,8 @@
 import {CanUseTerrain} from 'core/07_TRIGGERS/Modify_terrain_Functions/Terrain_functions'
+import {COLOR_TERRAIN_DEATH} from "../../01_libraries/Init_colorCodes";
+import {Ascii2String} from "../../01_libraries/Ascii";
+
+export const DISPLAY_SPACE = '   '
 
 export abstract class TerrainType {
     label: string
@@ -82,6 +86,27 @@ export abstract class TerrainType {
     }
 
     abstract displayForPlayer(p: player): void
+
+    baseTextForDisplay = () => {
+        let order: string
+        if (this.orderId !== 0) {
+            order = ' (order ' + I2S(this.orderId) + ')'
+        } else {
+            order = ''
+        }
+
+        let display =
+            COLOR_TERRAIN_DEATH +
+            this.label +
+            ((this.theAlias && this.theAlias != '') ? ' ' + this.theAlias : '') +
+            order +
+            " : '" +
+            Ascii2String(this.terrainTypeId) +
+            "'" +
+            DISPLAY_SPACE
+
+        return display
+    }
 
     abstract toString(): string
 

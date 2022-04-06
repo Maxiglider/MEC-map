@@ -1,6 +1,6 @@
 import {SLIDE_PERIOD, TERRAIN_DATA_DISPLAY_TIME} from 'core/01_libraries/Constants'
 import { CanUseTerrain } from 'core/07_TRIGGERS/Modify_terrain_Functions/Terrain_functions'
-import { TerrainType } from './TerrainType'
+import {DISPLAY_SPACE, TerrainType} from './TerrainType'
 import {COLOR_TERRAIN_SLIDE} from "../../01_libraries/Init_colorCodes";
 import {B2S} from "../../01_libraries/Basic_functions";
 import {CACHE_SEPARATEUR_PARAM} from "../../07_TRIGGERS/Save_map_in_gamecache/struct_StringArrayForCache";
@@ -39,37 +39,19 @@ export class TerrainTypeSlide extends TerrainType {
     }
 
     displayForPlayer = (p: player) => {
-        let order: string
-        let space = '   '
+        let display = this.baseTextForDisplay()
+
         let displayCanTurn: string
-        let display: string = ""
-
-        if (this.orderId !== 0) {
-            order = ' (order ' + I2S(this.orderId) + ')'
-        } else {
-            order = ''
-        }
-
         if (this.getCanTurn()) {
             displayCanTurn = 'can turn'
         } else {
             displayCanTurn = "can't turn"
         }
 
-        display =
-            COLOR_TERRAIN_SLIDE +
-            this.label +
-            ' ' +
-            (this.theAlias || '') +
-            order +
-            " : '" +
-            TerrainTypeMax.TerrainTypeId2TerrainTypeAsciiString(this.terrainTypeId) +
-            "'" +
-            space
-        display = display + I2S(R2I(this.getSlideSpeed() / SLIDE_PERIOD)) + space + displayCanTurn
+        display = display + I2S(R2I(this.getSlideSpeed() / SLIDE_PERIOD)) + DISPLAY_SPACE + displayCanTurn
 
         //display cliff class
-        display += space + 'cliff' + I2S(this.cliffClassId)
+        display += DISPLAY_SPACE + 'cliff' + I2S(this.cliffClassId)
         Text.P_timed(p, TERRAIN_DATA_DISPLAY_TIME, display)
     }
 

@@ -74,10 +74,10 @@ export const Ascii2String = (source: number): string => {
     let modulo = 1 //Pour éviter une initialisation à 0.
 
     while (!(resultatIntermediaire == '' || modulo <= 0)) {
-        modulo = source - (source / 256) * 256
+        modulo = source - Math.round(source / 256) * 256
         resultatIntermediaire = AsciiVersCaractere(modulo)
         resultat = resultatIntermediaire + resultat
-        source = source / 256
+        source = Math.round(source / 256)
     }
 
     if (modulo == 0) {

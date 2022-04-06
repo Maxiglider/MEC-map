@@ -1,5 +1,5 @@
 import { CanUseTerrain } from 'core/07_TRIGGERS/Modify_terrain_Functions/Terrain_functions'
-import { TerrainType } from './TerrainType'
+import {DISPLAY_SPACE, TerrainType} from './TerrainType'
 import {TERRAIN_DATA_DISPLAY_TIME} from "../../01_libraries/Constants";
 import {COLOR_TERRAIN_WALK} from "../../01_libraries/Init_colorCodes";
 import {CACHE_SEPARATEUR_PARAM} from "../../07_TRIGGERS/Save_map_in_gamecache/struct_StringArrayForCache";
@@ -24,33 +24,12 @@ export class TerrainTypeWalk extends TerrainType {
     }
 
     displayForPlayer = (p: player) => {
-        let order: string
-        let space = '   '
-        let displayCanTurn: string
-        let display: string = ""
+        let display = this.baseTextForDisplay()
 
-        if (this.orderId !== 0) {
-            order = ' (order ' + I2S(this.orderId) + ')'
-        } else {
-            order = ''
-        }
-
-
-        display =
-            COLOR_TERRAIN_WALK +
-            this.label +
-            ' ' +
-            this.theAlias +
-            order +
-            " : '" +
-            Ascii2String(this.terrainTypeId) +
-            "'" +
-            space
-        display = display + I2S(R2I(this.getWalkSpeed()))
-
+        display += I2S(R2I(this.getWalkSpeed()))
 
         //display cliff class
-        display += space + 'cliff' + I2S(this.cliffClassId)
+        display += DISPLAY_SPACE + 'cliff' + I2S(this.cliffClassId)
         Text.P_timed(p, TERRAIN_DATA_DISPLAY_TIME, display)
     }
 
