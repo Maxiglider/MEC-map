@@ -1,6 +1,7 @@
 import { execSync } from 'child_process'
 import { writeFileSync } from 'fs'
 import * as fs from 'fs-extra'
+import { EOL } from 'os'
 import * as path from 'path'
 import { createLogger, format, transports } from 'winston'
 const { combine, timestamp, printf } = format
@@ -144,7 +145,24 @@ export function compileMap(config: IProjectConfig) {
     }
 
     try {
-        let contents = fs.readFileSync(mapLua).toString() + fs.readFileSync(tsLua).toString()
+        let contents =
+            fs
+                .readdirSync('./src/lualibs')
+                .filter(s => s.endsWith('.lua'))
+                .map(s =>
+                    [
+                        `${s.replace('.lua', '')} = function()`,
+                        fs
+                            .readFileSync(`./src/lualibs/${s}`)
+                            .toString()
+                            .replace(new RegExp('(^function.*?\\()', 'gm'), '$1dis, '),
+                        'end',
+                        EOL,
+                    ].join(EOL)
+                )
+                .join(EOL) +
+            fs.readFileSync(mapLua).toString() +
+            fs.readFileSync(tsLua).toString()
         contents = processScriptIncludes(contents)
 
         // Replace require functionality to support circular dependency detection
