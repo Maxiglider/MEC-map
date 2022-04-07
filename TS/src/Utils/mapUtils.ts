@@ -34,11 +34,14 @@ export const createTimer = (timeout: number, periodic: boolean, handlerFunc: () 
 
 export const errorHandler = (cb: () => void, errorCb?: (e: any) => void) => {
     return () => {
-        try {
-            cb()
-        } catch (e) {
-            print(`Error caught: ${e}`)
-            errorCb && errorCb(e)
+        const [a, b] = pcall(cb);
+
+        if(!a){
+            if(typeof b == 'string') {
+                print("Error caught: " + b)
+            }
+
+            errorCb && errorCb(b)
         }
     }
 }

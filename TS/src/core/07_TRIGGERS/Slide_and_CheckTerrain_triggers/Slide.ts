@@ -21,11 +21,10 @@ const initSlideTrigger = () => {
         if(!hero) return
 
         const angle = Deg2Rad(GetUnitFacing(hero))
-        const heroPos = GetUnitLoc(hero)
-        const newX = GetLocationX(heroPos) + escaper.getSlideMovePerPeriod() * Cos(angle)
-        const newY = GetLocationY(heroPos) + escaper.getSlideMovePerPeriod() * Sin(angle)
+        const newX = GetUnitX(hero) + escaper.getSlideMovePerPeriod() * Cos(angle)
+        const newY = GetUnitY(hero) + escaper.getSlideMovePerPeriod() * Sin(angle)
 
-        const z = GetLocationZ(heroPos)
+        const z = BlzGetUnitZ(hero)
         const diffZ = z - lastZ //différence de hauteur au niveau du terrain
         let height = GetUnitFlyHeight(hero)
         let delta: number
@@ -67,7 +66,6 @@ const initSlideTrigger = () => {
         }
         escaper.setLastZ(z)
         escaper.setOldDiffZ(diffZ)
-        RemoveLocation(heroPos)
     }
 
     const CreateSlideTimer = (escaperId: number) => {
