@@ -1,6 +1,6 @@
 <?php
 /**
- * Créé avec PhpStorm.
+ * Crï¿½ï¿½ avec PhpStorm.
  * Auteur: Max
  * Date: 26/03/2022
  * Heure: 00:57
@@ -8,7 +8,9 @@
 
 
 
-const DATA_FILE = __DIR__."/mec_data.txt";
+//const DATA_FILE = __DIR__."/mec_data.txt";
+const DATA_FILE = "C:\SaveSurDrive\OneDrive\Documents\Warcraft III\CustomMapData\MEC_log.txt";
+const OUT_FILE = __DIR__."/MEC_outLog.txt";
 
 
 if(!is_file(DATA_FILE)){
@@ -19,13 +21,15 @@ if(!is_file(DATA_FILE)){
 $content = file_get_contents(DATA_FILE);
 
 
+preg_match_all('/call BlzSendSyncData\(".*?",".{16}(.+?)"/', $content, $matches, PREG_SET_ORDER);
 
-if(preg_match('/call BlzSendSyncData\(".*?","(.+?)"/', $content, $match)){
-    $base64 = $match[1];
-    $uncodedContent = base64_decode($base64);
-    $finalString = preg_replace('/^.+?{/', '{', $uncodedContent);
-
-    echo $finalString;
-}else{
-    echo "no content found";
+$base64 = "";
+foreach($matches as $match) {
+    $base64 .= $match[1];
 }
+
+$uncodedContent = base64_decode($base64);
+
+
+file_put_contents(OUT_FILE, $uncodedContent);
+echo $uncodedContent;
