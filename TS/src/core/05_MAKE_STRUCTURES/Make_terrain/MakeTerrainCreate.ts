@@ -9,7 +9,7 @@ export class MakeTerrainCreate extends MakeOneByOneOrTwoClicks {
     private terrainType: TerrainType
 
     constructor(maker: unit, terrainType: TerrainType) {
-        super(maker, 'terrainCreate', "", null, false)
+        super(maker, 'terrainCreate', "", [""], false)
         this.terrainType = terrainType
     }
 

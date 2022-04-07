@@ -1,6 +1,5 @@
 import {String2Ascii} from 'core/01_libraries/Ascii'
 import {
-    catchAndDisplay,
     IsBoolString,
     S2B,
     StringContainsChar,
@@ -258,9 +257,9 @@ export const ExecuteCommandMake = (escaper: Escaper, cmd: string): boolean => {
                 return true
             }
             getUdgTerrainTypes().get(param1)?.setAlias(param2)
-            Text.mkP(escaper.getPlayer(), 'alias changed to "' + param2 + '"')
+            Text.mkP(escaper.getPlayer(), 'Alias changed to "' + param2 + '"')
         } else {
-            Text.erP(escaper.getPlayer(), 'impossible to change alias')
+            Text.erP(escaper.getPlayer(), 'Impossible to change alias')
         }
         return true
     }
@@ -272,19 +271,19 @@ export const ExecuteCommandMake = (escaper: Escaper, cmd: string): boolean => {
         }
         terrainType = getUdgTerrainTypes().get(param1)
         if (!terrainType) {
-            Text.erP(escaper.getPlayer(), 'unknown terrain')
+            Text.erP(escaper.getPlayer(), 'Unknown terrain')
             return true
         }
         if (!(terrainType instanceof TerrainTypeWalk)) {
-            Text.erP(escaper.getPlayer(), 'the terrain must be of walk type')
+            Text.erP(escaper.getPlayer(), 'The terrain must be of walk type')
             return true
         }
         if (!IsPositiveInteger(param2) || S2R(param2) > 522) {
-            Text.erP(escaper.getPlayer(), 'wrong speed value, should be a real between 0 and 522')
+            Text.erP(escaper.getPlayer(), 'Wrong speed value, should be a real between 0 and 522')
             return true
         }
         terrainType.setWalkSpeed(S2R(param2))
-        Text.mkP(escaper.getPlayer(), 'terrain walk speed changed')
+        Text.mkP(escaper.getPlayer(), 'Terrain walk speed changed')
         return true
     }
 
@@ -295,11 +294,11 @@ export const ExecuteCommandMake = (escaper: Escaper, cmd: string): boolean => {
         }
         terrainType = getUdgTerrainTypes().get(param1)
         if (!terrainType) {
-            Text.erP(escaper.getPlayer(), 'unknown terrain')
+            Text.erP(escaper.getPlayer(), 'Unknown terrain')
             return true
         }
         if (!(terrainType instanceof TerrainTypeDeath)) {
-            Text.erP(escaper.getPlayer(), 'the terrain must be of death type')
+            Text.erP(escaper.getPlayer(), 'The terrain must be of death type')
             return true
         }
         if (
@@ -309,12 +308,12 @@ export const ExecuteCommandMake = (escaper: Escaper, cmd: string): boolean => {
         ) {
             Text.erP(
                 escaper.getPlayer(),
-                'characters ", ' + CACHE_SEPARATEUR_ITEM + ' and ' + CACHE_SEPARATEUR_PARAM + ' not allowed'
+                'Characters ", ' + CACHE_SEPARATEUR_ITEM + ' and ' + CACHE_SEPARATEUR_PARAM + ' not allowed'
             )
             return true
         }
         terrainType.setKillingEffectStr(param2)
-        Text.mkP(escaper.getPlayer(), 'terrain kill effect changed')
+        Text.mkP(escaper.getPlayer(), 'Terrain kill effect changed')
         return true
     }
 

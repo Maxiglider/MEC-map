@@ -15,8 +15,11 @@ export const globals: {
     casterTypes?: CasterTypeArray,
     monsterTypes?: MonsterTypeArray
     coopModeActive?: boolean,
-    autoreviveDelay?: number
-} = {}
+    autoreviveDelay?: number,
+    logStrings: string[]
+} = {
+    logStrings: []
+}
 
 
 

@@ -1,4 +1,3 @@
-import { CanUseTerrain } from 'core/07_TRIGGERS/Modify_terrain_Functions/Terrain_functions'
 import {DISPLAY_SPACE, TerrainType} from './TerrainType'
 import {TERRAIN_DATA_DISPLAY_TIME} from "../../01_libraries/Constants";
 import {COLOR_TERRAIN_WALK} from "../../01_libraries/Init_colorCodes";
@@ -21,6 +20,10 @@ export class TerrainTypeWalk extends TerrainType {
 
     setWalkSpeed = (walkSpeed: number) => {
         this.walkSpeed = walkSpeed
+    }
+
+    getColor = () => {
+        return COLOR_TERRAIN_WALK
     }
 
     displayForPlayer = (p: player) => {

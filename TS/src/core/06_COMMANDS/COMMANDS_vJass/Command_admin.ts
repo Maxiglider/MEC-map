@@ -24,6 +24,7 @@ import { SaveLoadTerrainWithName } from '../../07_TRIGGERS/Triggers_to_modify_te
 import { getUdgLives } from '../../08_GAME/Init_structures/Init_lives'
 import { CmdName, CmdParam, IsPlayerColorString, NbParam, NoParam } from './Command_functions'
 import { ActivateTeleport, DisableTeleport } from './Teleport'
+import {flushLogs} from "../../../../../core/Log/log";
 
 export const ExecuteCommandMax = (escaper: Escaper, cmd: string): boolean => {
     let name = CmdName(cmd)
@@ -608,6 +609,12 @@ export const ExecuteCommandMax = (escaper: Escaper, cmd: string): boolean => {
                     'K|r = Black Citadel'
             )
         }
+        return true
+    }
+
+    //-logs
+    if (name === 'logs' && noParam){
+        flushLogs()
         return true
     }
 

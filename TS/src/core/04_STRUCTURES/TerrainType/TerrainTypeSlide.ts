@@ -1,5 +1,4 @@
 import {SLIDE_PERIOD, TERRAIN_DATA_DISPLAY_TIME} from 'core/01_libraries/Constants'
-import { CanUseTerrain } from 'core/07_TRIGGERS/Modify_terrain_Functions/Terrain_functions'
 import {DISPLAY_SPACE, TerrainType} from './TerrainType'
 import {COLOR_TERRAIN_SLIDE} from "../../01_libraries/Init_colorCodes";
 import {B2S} from "../../01_libraries/Basic_functions";
@@ -36,6 +35,10 @@ export class TerrainTypeSlide extends TerrainType {
         }
         this.canTurn = canTurn
         return true
+    }
+
+    getColor = () => {
+        return COLOR_TERRAIN_SLIDE
     }
 
     displayForPlayer = (p: player) => {

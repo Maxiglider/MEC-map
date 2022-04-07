@@ -1,4 +1,3 @@
-import { CanUseTerrain } from 'core/07_TRIGGERS/Modify_terrain_Functions/Terrain_functions'
 import type { Escaper } from '../Escaper/Escaper'
 import {DISPLAY_SPACE, TerrainType} from './TerrainType'
 import { KillingTimers } from './TerrainTypeDeath_KillingTimers'
@@ -73,6 +72,10 @@ export class TerrainTypeDeath extends TerrainType {
         }
         this.toleranceDist = toleranceDist
         return true
+    }
+
+    getColor = () => {
+        return COLOR_TERRAIN_DEATH
     }
 
     displayForPlayer = (p: player) => {

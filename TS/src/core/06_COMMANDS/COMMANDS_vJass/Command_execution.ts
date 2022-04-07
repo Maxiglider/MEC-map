@@ -1,4 +1,4 @@
-import { Text } from 'core/01_libraries/Text'
+import {catchAndDisplay, Text} from 'core/01_libraries/Text'
 import { Escaper } from 'core/04_STRUCTURES/Escaper/Escaper'
 import { Globals } from 'core/09_From_old_Worldedit_triggers/globals_variables_and_triggers'
 import { createEvent, createTimer, forRange } from 'Utils/mapUtils'
@@ -12,7 +12,6 @@ import { ExecuteCommandRed } from './Command_first_player'
 import { IsCmd } from './Command_functions'
 import { ExecuteCommandMake } from './Command_make'
 import { ExecuteCommandTrueMax } from './Command_superadmin'
-import {catchAndDisplay} from "../../01_libraries/Basic_functions";
 
 const ExecuteCommandSingle = (escaper: Escaper, cmd: string) => {
     catchAndDisplay(() => {

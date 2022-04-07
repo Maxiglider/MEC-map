@@ -1,5 +1,4 @@
 import {CanUseTerrain} from 'core/07_TRIGGERS/Modify_terrain_Functions/Terrain_functions'
-import {COLOR_TERRAIN_DEATH} from "../../01_libraries/Init_colorCodes";
 import {Ascii2String} from "../../01_libraries/Ascii";
 
 export const DISPLAY_SPACE = '   '
@@ -25,7 +24,7 @@ export abstract class TerrainType {
         }
 
         if (!CanUseTerrain(terrainTypeId)) {
-            throw 'Terrain limit reached'
+            throw 'Terrain tiles number limit reached'
         }
 
         this.label = label
@@ -85,6 +84,8 @@ export abstract class TerrainType {
         return this.kind
     }
 
+    abstract getColor(): string
+
     abstract displayForPlayer(p: player): void
 
     baseTextForDisplay = () => {
@@ -96,7 +97,7 @@ export abstract class TerrainType {
         }
 
         let display =
-            COLOR_TERRAIN_DEATH +
+            this.getColor() +
             this.label +
             ((this.theAlias && this.theAlias != '') ? ' ' + this.theAlias : '') +
             order +

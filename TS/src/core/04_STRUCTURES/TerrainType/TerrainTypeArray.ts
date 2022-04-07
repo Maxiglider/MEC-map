@@ -44,6 +44,11 @@ export class TerrainTypeArray {
         return null
     }
 
+    getAll(){
+        const all: TerrainType[] = [...this.ttWalk, ...this.ttSlide, ...this.ttDeath]
+        return all
+    }
+
     getTerrainType = (x: number, y: number): TerrainType | null => {
         let terrainTypeId = GetTerrainType(x, y)
         let i = 0
