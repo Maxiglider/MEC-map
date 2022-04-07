@@ -6,7 +6,7 @@ import { TerrainType } from 'core/04_STRUCTURES/TerrainType/TerrainType'
 import { TerrainTypeDeath } from 'core/04_STRUCTURES/TerrainType/TerrainTypeDeath'
 import { TerrainTypeSlide } from 'core/04_STRUCTURES/TerrainType/TerrainTypeSlide'
 import { TerrainTypeWalk } from 'core/04_STRUCTURES/TerrainType/TerrainTypeWalk'
- import { getUdgEscapers } from '../../../../globals'
+ import {getUdgEscapers} from '../../../../globals'
 import { createEvent } from 'Utils/mapUtils'
 import { getUdgTerrainTypes } from '../../../../globals'
 

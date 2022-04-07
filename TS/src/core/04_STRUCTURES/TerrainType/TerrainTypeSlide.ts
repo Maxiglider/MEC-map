@@ -13,7 +13,7 @@ export class TerrainTypeSlide extends TerrainType {
     constructor(label: string, terrainTypeId: number, slideSpeed: number, canTurn: boolean) {
         super(label, terrainTypeId, null, 'slide', 0, 1)
 
-        this.slideSpeed = slideSpeed * SLIDE_PERIOD
+        this.slideSpeed = slideSpeed
         this.canTurn = canTurn
     }
 
@@ -22,7 +22,7 @@ export class TerrainTypeSlide extends TerrainType {
     }
 
     setSlideSpeed = (slideSpeed: number) => {
-        this.slideSpeed = slideSpeed * SLIDE_PERIOD
+        this.slideSpeed = slideSpeed
     }
 
     getCanTurn = (): boolean => {
@@ -51,7 +51,7 @@ export class TerrainTypeSlide extends TerrainType {
             displayCanTurn = "can't turn"
         }
 
-        display = display + I2S(R2I(this.getSlideSpeed() / SLIDE_PERIOD)) + DISPLAY_SPACE + displayCanTurn
+        display = display + I2S(R2I(this.getSlideSpeed())) + DISPLAY_SPACE + displayCanTurn
 
         //display cliff class
         display += DISPLAY_SPACE + 'cliff' + I2S(this.cliffClassId)
@@ -75,7 +75,7 @@ export class TerrainTypeSlide extends TerrainType {
             I2S(this.cliffClassId) +
             CACHE_SEPARATEUR_PARAM
 
-        str += I2S(R2I(this.getSlideSpeed() / SLIDE_PERIOD)) + CACHE_SEPARATEUR_PARAM + B2S(this.getCanTurn())
+        str += I2S(R2I(this.getSlideSpeed())) + CACHE_SEPARATEUR_PARAM + B2S(this.getCanTurn())
 
         return str
     }

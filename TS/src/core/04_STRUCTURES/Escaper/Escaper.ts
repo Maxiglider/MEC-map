@@ -78,12 +78,13 @@ export class Escaper {
     private invisUnit?: unit
     private walkSpeed: number
     private slideSpeed: number
+    private slideMovePerPeriod: number
     private baseColorId: number
     private cameraField: number
     private lastTerrainType?: TerrainType
     private controler: Escaper
 
-    private slide: trigger
+    private slide?: Timer
     private checkTerrain: trigger
 
     private vcRed: number
@@ -136,9 +137,9 @@ export class Escaper {
         this.p = Player(this.playerId)
         this.walkSpeed = HERO_WALK_SPEED
         this.slideSpeed = HERO_SLIDE_SPEED
+        this.slideMovePerPeriod = HERO_SLIDE_SPEED * SLIDE_PERIOD
         this.baseColorId = this.playerId
 
-        this.slide = SlideTrigger.CreateSlideTrigger(escaperId)
         this.checkTerrain = CheckTerrainTrigger.CreateCheckTerrainTrigger(escaperId)
 
         this.cameraField = DEFAULT_CAMERA_FIELD
@@ -320,7 +321,7 @@ export class Escaper {
         this.effects.hideEffects()
 
         DisableTrigger(this.checkTerrain)
-        DisableTrigger(this.slide)
+        this.slide && this.slide.destroy()
 
         //coop
         ShowUnit(this.powerCircle, false)
@@ -340,7 +341,7 @@ export class Escaper {
         }
         this.effects.destroy()
 
-        DestroyTrigger(this.slide)
+        this.slide && this.slide.destroy()
         DestroyTrigger(this.checkTerrain)
 
         this.discoTrigger?.destroy()
@@ -362,12 +363,8 @@ export class Escaper {
     enableSlide(doEnable: boolean) {
         let heroPos: location
 
-        if (IsTriggerEnabled(this.slide) == doEnable) {
-            return false
-        }
-
         if (doEnable) {
-            EnableTrigger(this.slide)
+            this.slide = SlideTrigger.CreateSlideTimer(this.escaperId)
 
             if (this.hero) {
                 StopUnit(this.hero)
@@ -376,7 +373,7 @@ export class Escaper {
                 RemoveLocation(heroPos)
             }
         } else {
-            DisableTrigger(this.slide)
+            this.slide && this.slide.destroy()
             this.slideLastAngleOrder = -1
         }
 
@@ -404,7 +401,7 @@ export class Escaper {
     }
 
     isSliding = () => {
-        return IsTriggerEnabled(this.slide)
+        return !!this.slide
     }
 
     doesCheckTerrain = () => {
@@ -649,6 +646,11 @@ export class Escaper {
     //speed methods
     setSlideSpeed(ss: number) {
         this.slideSpeed = ss
+        this.slideMovePerPeriod = ss * SLIDE_PERIOD
+    }
+
+    getSlideMovePerPeriod = () => {
+        return this.slideMovePerPeriod
     }
 
     setWalkSpeed(ws: number) {
@@ -658,10 +660,6 @@ export class Escaper {
 
     getSlideSpeed = () => {
         return this.slideSpeed
-    }
-
-    getRealSlideSpeed = () => {
-        return this.slideSpeed / SLIDE_PERIOD
     }
 
     getWalkSpeed = () => {
@@ -675,6 +673,7 @@ export class Escaper {
     absoluteSlideSpeed(slideSpeed: number) {
         this.slideSpeedAbsolute = true
         this.slideSpeed = slideSpeed
+        this.slideMovePerPeriod = slideSpeed * SLIDE_PERIOD
 
         if (!this.isEscaperSecondary()) {
             GetMirrorEscaper(this)?.absoluteSlideSpeed(slideSpeed)

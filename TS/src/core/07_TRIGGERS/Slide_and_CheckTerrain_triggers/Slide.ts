@@ -1,8 +1,8 @@
 import { CAN_TURN_IN_AIR, Constants, SLIDE_PERIOD } from 'core/01_libraries/Constants'
 import { Apm } from 'core/08_GAME/Apm_clics_par_minute/Apm'
- import { getUdgEscapers } from '../../../../globals'
+ import {getUdgEscapers} from '../../../../globals'
 
-import { createEvent } from 'Utils/mapUtils'
+import {createTimer} from 'Utils/mapUtils'
 import { Gravity } from './Gravity'
 
 const initSlideTrigger = () => {
@@ -22,8 +22,8 @@ const initSlideTrigger = () => {
 
         const angle = Deg2Rad(GetUnitFacing(hero))
         const heroPos = GetUnitLoc(hero)
-        const newX = GetLocationX(heroPos) + escaper.getSlideSpeed() * Cos(angle)
-        const newY = GetLocationY(heroPos) + escaper.getSlideSpeed() * Sin(angle)
+        const newX = GetLocationX(heroPos) + escaper.getSlideMovePerPeriod() * Cos(angle)
+        const newY = GetLocationY(heroPos) + escaper.getSlideMovePerPeriod() * Sin(angle)
 
         const z = GetLocationZ(heroPos)
         const diffZ = z - lastZ //différence de hauteur au niveau du terrain
@@ -70,18 +70,11 @@ const initSlideTrigger = () => {
         RemoveLocation(heroPos)
     }
 
-    const CreateSlideTrigger = (playerId: number): trigger => {
-        const slideTrigger = createEvent({
-            events: [t => TriggerRegisterTimerEventPeriodic(t, SLIDE_PERIOD)],
-            actions: [() => Slide_Actions(playerId)],
-        })
-
-        DisableTrigger(slideTrigger)
-
-        return slideTrigger
+    const CreateSlideTimer = (escaperId: number) => {
+        return createTimer(SLIDE_PERIOD, true, () => Slide_Actions(escaperId))
     }
 
-    return { CreateSlideTrigger }
+    return { CreateSlideTimer }
 }
 
 export const SlideTrigger = initSlideTrigger()

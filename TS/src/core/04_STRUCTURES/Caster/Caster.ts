@@ -159,7 +159,7 @@ const CasterTryToShoot = () => {
             } else {
                 //tir si possible
                 if (escaper.isSliding()) {
-                    sliderSpeed = escaper.getRealSlideSpeed()
+                    sliderSpeed = escaper.getSlideSpeed()
                 } else if (GetUnitCurrentOrder(hero) != 0) {
                     sliderSpeed = escaper.getWalkSpeed()
                 } else {
