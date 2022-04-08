@@ -1380,7 +1380,7 @@ export const ExecuteCommandMake = (escaper: Escaper, cmd: string): boolean => {
             Text.erP(escaper.getPlayer(), 'uncorrect number of parameters')
             return true
         }
-        if (!escaper.getMakingLevel().monsterSpawns.getFromLabel(param1)) {
+        if (escaper.getMakingLevel().monsterSpawns.getFromLabel(param1)) {
             Text.erP(escaper.getPlayer(), 'a monster spawn with label "' + param1 + '" already exists for this level')
             return true
         }

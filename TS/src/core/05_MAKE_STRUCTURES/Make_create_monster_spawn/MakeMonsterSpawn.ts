@@ -10,7 +10,7 @@ export class MakeMonsterSpawn extends MakeOneByOneOrTwoClicks {
     frequence: number
 
     constructor(maker: unit, label: string, mt: MonsterType, sens: string, frequence: number) {
-        super(maker, 'monsterSpawnCreate', '')
+        super(maker, 'monsterSpawnCreate', '', [''])
 
         this.label = label
         this.mt = mt
