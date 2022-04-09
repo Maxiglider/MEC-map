@@ -11,7 +11,7 @@ import {
     TEAL,
     TERRAIN_DATA_DISPLAY_TIME,
 } from 'core/01_libraries/Constants'
-import { udg_colorCode } from 'core/01_libraries/Init_colorCodes'
+import {ColorString2Id, udg_colorCode} from 'core/01_libraries/Init_colorCodes'
 import { Text } from 'core/01_libraries/Text'
 import { Escaper } from 'core/04_STRUCTURES/Escaper/Escaper'
 import { ColorInfo, GetMirrorEscaper } from 'core/04_STRUCTURES/Escaper/Escaper_functions'
@@ -61,11 +61,11 @@ export const ExecuteCommandAll = (escaper: Escaper, cmd: string): boolean => {
     //-<color>   --> change the base color of the hero
     if (IsColorString(name)) {
         if (noParam) {
-            escaper.setBaseColor(resolvePlayerId(name))
+            escaper.setBaseColor(ColorString2Id(name))
             return true
         }
         if (nbParam == 1 && escaper.isTrueMaximaxou() && isPlayerId(param1)) {
-            getUdgEscapers().get(resolvePlayerId(param1))?.setBaseColor(resolvePlayerId(param1))
+            getUdgEscapers().get(resolvePlayerId(param1))?.setBaseColor(ColorString2Id(name))
         }
         return true
     }
