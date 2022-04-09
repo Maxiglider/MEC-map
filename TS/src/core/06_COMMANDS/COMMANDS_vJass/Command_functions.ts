@@ -130,12 +130,6 @@ export const resolvePlayerId = (arg: string) => {
         return cachedPlayerNames[arg.toLowerCase()]
     }
 
-    print(
-        json().encode(cachedPlayerNames),
-        GetPlayerName(Player(0)).toLowerCase(),
-        GetPlayerName(Player(1)).toLowerCase()
-    )
-
     if (targetPlayer === -1) {
         throw `Invalid player: '${arg}'`
     }
