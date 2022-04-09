@@ -5,15 +5,12 @@ import {udg_monsters} from "../../../../globals";
 
 export class MonsterTypeArray {
     private monsterTypes: MonsterType[] = []
-    private numberOfMonsterTypes = 0
 
-    get(label: string) {
-        let i = 0
-        while (i < this.numberOfMonsterTypes) {
-            if (this.monsterTypes[i].label == label || this.monsterTypes[i].theAlias == label) {
-                return this.monsterTypes[i]
+    get = (label: string) => {
+        for(let monsterType of this.monsterTypes){
+            if (monsterType.label == label || monsterType.theAlias == label) {
+                return monsterType
             }
-            i = i + 1
         }
 
         return null
@@ -31,58 +28,34 @@ export class MonsterTypeArray {
         speed: number,
         isClickable: boolean
     ) {
-        let n = this.numberOfMonsterTypes
         if (this.isLabelAlreadyUsed(label)) {
             throw 'Label already used'
         }
 
-        this.monsterTypes[n] = new MonsterType(label, unitTypeId, scale, immolationRadius, speed, isClickable)
-        this.numberOfMonsterTypes = this.numberOfMonsterTypes + 1
+        const len = this.monsterTypes.length
+        this.monsterTypes[len] = new MonsterType(label, unitTypeId, scale, immolationRadius, speed, isClickable)
     }
 
     remove = (label: string): boolean => {
-        let position: number
-        let i: number
-        let mt = this.get(label)
-        if (!mt) {
-            return false
-        }
+        const len = this.monsterTypes.length
 
-        i = 0
-        while (true) {
-            if (
-                this.monsterTypes[i].label == label ||
-                this.monsterTypes[i].theAlias == label ||
-                i >= this.numberOfMonsterTypes
-            )
-                break
-            i = i + 1
-        }
-
-        if (i < this.numberOfMonsterTypes) {
-            position = i
-            i = i + 1
-            while (true) {
-                if (i >= this.numberOfMonsterTypes) break
-                this.monsterTypes[i - 1] = this.monsterTypes[i]
-                i = i + 1
+        for(let i = 0; i < len; i++){
+            if (this.monsterTypes[i].label == label || this.monsterTypes[i].theAlias == label) {
+                this.monsterTypes[i].destroy()
+                table.remove(this.monsterTypes, i)
+                return true
             }
-            this.numberOfMonsterTypes = this.numberOfMonsterTypes - 1
         }
-        mt.destroy()
 
-        return true
+        return false
     }
 
     displayForPlayer = (p: player) => {
-        let i = 0
-        while (true) {
-            if (i >= this.numberOfMonsterTypes) break
-            this.monsterTypes[i].displayForPlayer(p)
-            i = i + 1
+        for(let monsterType of this.monsterTypes){
+            monsterType.displayForPlayer(p)
         }
 
-        if (this.numberOfMonsterTypes === 0) {
+        if (this.monsterTypes.length === 0) {
             Text.erP(p, 'no monster type saved')
         }
     }
@@ -95,24 +68,12 @@ export class MonsterTypeArray {
         return mt?.getKillingEffectStr() || null
     }
 
-    monsterUnit2MonsterType(monsterUnit: unit) {
-        let monsterUnitTypeId = GetUnitTypeId(monsterUnit)
-        let i = 0
-        while (i < this.numberOfMonsterTypes) {
-            if (this.monsterTypes[i].getUnitTypeId() == monsterUnitTypeId) {
-                return this.monsterTypes[i]
-            }
-            i = i + 1
-        }
-        return null
-    }
-
     saveInCache = () => {
         let i: number
         StringArrayForCache.stringArrayForCache = new StringArrayForCache('monsterTypes', 'monsterTypes', true)
         i = 0
         while (true) {
-            if (i >= this.numberOfMonsterTypes) break
+            if (i >= this.monsterTypes.length) break
             StringArrayForCache.stringArrayForCache.push(this.monsterTypes[i].toString())
             i = i + 1
         }
