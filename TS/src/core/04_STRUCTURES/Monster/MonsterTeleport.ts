@@ -83,7 +83,7 @@ export class MonsterTeleport extends Monster {
         MonsterTeleport.Y = []
     }
 
-    removeUnit = () => {
+    removeUnit() {
         super.removeUnit()
         PauseTimer(this.t)
     }

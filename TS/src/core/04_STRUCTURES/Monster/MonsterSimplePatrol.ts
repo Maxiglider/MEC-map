@@ -51,7 +51,7 @@ export class MonsterSimplePatrol extends Monster {
         return udg_monsters.filter(monster => monster instanceof MonsterSimplePatrol).length
     }
 
-    removeUnit = (): void => {
+    removeUnit() {
         if (this.u) {
             GroupRemoveUnit(simplePatrolMobs, this.u)
             super.removeUnit()

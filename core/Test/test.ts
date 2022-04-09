@@ -6,5 +6,5 @@ export const init_Test = () => {
     makingRightsToAll()
     ExecuteCommand(getUdgEscapers().get(0), "-va, news slide 'Nsnw', setta slide s, news reverse 5 -400, setta reverse rev, newd death 1 Abilities\\Spells\\NightElf\\EntanglingRoots\\EntanglingRootsTarget.mdl, setta death d, neww walk 97, setta walk w")
 
-    ExecuteCommand(getUdgEscapers().get(0), "-newm caisse 'cais'")
+    ExecuteCommand(getUdgEscapers().get(0), "-newm caisse 'cais', newm naga 'nnsw'")
 }

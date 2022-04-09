@@ -1444,7 +1444,7 @@ export const ExecuteCommandMake = (escaper: Escaper, cmd: string): boolean => {
             return true
         }
 
-        const monsterType = getUdgMonsterTypes().get(param1)
+        const monsterType = getUdgMonsterTypes().get(param2)
         if (!monsterType) {
             Text.erP(escaper.getPlayer(), 'unknown monster type "' + param2 + '"')
             return true

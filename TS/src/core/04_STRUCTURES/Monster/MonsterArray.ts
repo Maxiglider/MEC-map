@@ -46,7 +46,7 @@ export class MonsterArray {
     }
 
     getMonsterNear = (x: number, y: number, filterMonsterClassName?: string): Monster | null => {
-        this.monsters.map(monster => {
+        for (let monster of this.monsters) {
             if (monster && monster.u) {
                 const xMob = GetUnitX(monster.u)
                 const yMob = GetUnitY(monster.u)
@@ -58,7 +58,7 @@ export class MonsterArray {
                     }
                 }
             }
-        })
+        }
 
         return null
     }

@@ -52,7 +52,7 @@ export abstract class Monster {
         return this.id
     }
 
-    setClearMob(clearMob: ClearMob) {
+    setClearMob = (clearMob: ClearMob) => {
         this.clearMob = clearMob
     }
 

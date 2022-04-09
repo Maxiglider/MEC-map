@@ -74,6 +74,10 @@ export class MonsterType {
         this.label = label
     }
 
+    getLabel = () => {
+        return this.label
+    }
+
     setAlias = (theAlias: string): MonsterType => {
         this.theAlias = theAlias
         return this

@@ -24,7 +24,7 @@ const MonsterStartMovement = (): void => {
         let mobUnit = MonsterSpawn.anyTimerId2Unit.get(GetHandleId(mobTimer))
         MonsterSpawn.anyTimerId2Unit.delete(GetHandleId(mobTimer))
         if (mobUnit) {
-            ms.startMobMovement(mobUnit)
+            ms.startMobMovement(mobUnit, ms)
             UnitAddAbility(mobUnit, FourCC('Aloc'))
             DestroyTimer(mobTimer)
         }
@@ -108,6 +108,10 @@ export class MonsterSpawn {
         return this.label
     }
 
+    getMonsterType = () => {
+        return this.mt
+    }
+
     deactivate = (): void => {
         //todomax former name : desactivate
         if (this.unspawnReg) {
@@ -189,7 +193,7 @@ export class MonsterSpawn {
         delete udg_monsterSpawns[this.id]
     }
 
-    startMobMovement = (mobUnit: unit): void => {
+    startMobMovement = (mobUnit: unit, ms: MonsterSpawn): void => {
         let p: player
         let x1: number
         let y1: number
@@ -219,7 +223,7 @@ export class MonsterSpawn {
         }
         SetUnitX(mobUnit, x1)
         SetUnitY(mobUnit, y1)
-        if (getUdgMonsterTypes().monsterUnit2MonsterType(mobUnit)?.isClickable()) {
+        if (ms.getMonsterType().isClickable()) {
             p = ENNEMY_PLAYER
         } else {
             p = GetCurrentMonsterPlayer()

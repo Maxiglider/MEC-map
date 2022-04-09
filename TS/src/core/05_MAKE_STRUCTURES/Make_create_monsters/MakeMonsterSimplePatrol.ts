@@ -77,7 +77,7 @@ export class MakeMonsterSimplePatrol extends MakeOneByOneOrTwoClicks {
                             this.unsaveLocDefinitely()
                         } else {
                             //string
-                            this.unsaveLoc()
+                            this.saveLoc(this.orderX, this.orderY)
                         }
                     }
                 } else {

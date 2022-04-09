@@ -66,6 +66,7 @@ import { TerrainTypeSlide } from '../TerrainType/TerrainTypeSlide'
 import { TerrainTypeWalk } from '../TerrainType/TerrainTypeWalk'
 import { EscaperEffectArray } from './EscaperEffectArray'
 import { ColorInfo, GetMirrorEscaper } from './Escaper_functions'
+import {createTimer} from "../../../Utils/mapUtils";
 
 const SHOW_REVIVE_EFFECTS = false
 
@@ -1018,12 +1019,10 @@ export class Escaper {
             return false
         }
 
-        this.make.destroy()
-        delete this.make
-
-        if (!this.isEscaperSecondary()) {
-            GetMirrorEscaper(this)?.destroyMake()
-        }
+        createTimer(0, false, () => { //destroying make a bit later allow to prevent secondary hero from moving
+            this.make && this.make.destroy()
+            delete this.make
+        })
 
         return true
     }
@@ -1356,3 +1355,6 @@ export class Escaper {
         return this.escaperId >= NB_PLAYERS_MAX
     }
 }
+
+
+

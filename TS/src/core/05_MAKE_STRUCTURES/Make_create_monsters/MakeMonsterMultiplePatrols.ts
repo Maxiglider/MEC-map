@@ -48,6 +48,7 @@ export class MakeMonsterMultiplePatrols extends Make {
 
         if (this.monster) {
             this.escaper.newAction(new MakeMonsterAction(this.escaper.getMakingLevel(), this.monster))
+            delete this.monster
         }
     }
 

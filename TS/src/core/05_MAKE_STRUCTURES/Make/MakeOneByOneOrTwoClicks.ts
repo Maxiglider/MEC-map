@@ -32,18 +32,14 @@ export abstract class MakeOneByOneOrTwoClicks extends Make {
         return this.lastLocSavedIsUsed
     }
 
-    saveLoc(x: number, y: number) {
+    saveLoc = (x: number, y: number) => {
         this.lastX = x
         this.lastY = y
         this.lastLocIsSaved = true
         this.lastLocSavedIsUsed = true
 
-        if (!this.unitLastClic) {
-            this.unitLastClic = CreateUnit(this.makerOwner, MAKE_LAST_CLIC_UNIT_ID, x, y, GetRandomDirectionDeg())
-        } else {
-            SetUnitX(this.unitLastClic, x)
-            SetUnitY(this.unitLastClic, y)
-        }
+        this.unitLastClic && RemoveUnit(this.unitLastClic)
+        this.unitLastClic = CreateUnit(this.makerOwner, MAKE_LAST_CLIC_UNIT_ID, x, y, GetRandomDirectionDeg())
 
         this.escaper.destroyCancelledActions()
     }
@@ -62,6 +58,8 @@ export abstract class MakeOneByOneOrTwoClicks extends Make {
     unsaveLocDefinitely = () => {
         this.unsaveLoc()
         this.lastLocIsSaved = false
+        this.unitLastClic && RemoveUnit(this.unitLastClic)
+        delete this.unitLastClic
     }
 
     cancelLastAction = () => {
