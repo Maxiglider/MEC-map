@@ -1,5 +1,15 @@
+import { stringReplaceAll } from 'core/01_libraries/Basic_functions'
 import { NB_ESCAPERS, NB_PLAYERS_MAX } from 'core/01_libraries/Constants'
 import { ColorString2Id } from 'core/01_libraries/Init_colorCodes'
+import { forRange } from 'Utils/mapUtils'
+
+const cachedPlayerNames: { [x: string]: number } = {}
+
+export const initCachedPlayerNames = () => {
+    forRange(24, i => {
+        cachedPlayerNames[stringReplaceAll(' ', '_', GetPlayerName(Player(i)).toLowerCase())] = i
+    })
+}
 
 //gives the name of the entered command  ////the name of the entered command is <command_name>
 export const CmdName = (str: string): string => {
@@ -116,7 +126,15 @@ export const resolvePlayerId = (arg: string) => {
         if (a > 0 && a <= NB_ESCAPERS) {
             targetPlayer = a - 1
         }
+    } else if (cachedPlayerNames[arg.toLowerCase()]) {
+        return cachedPlayerNames[arg.toLowerCase()]
     }
+
+    print(
+        json().encode(cachedPlayerNames),
+        GetPlayerName(Player(0)).toLowerCase(),
+        GetPlayerName(Player(1)).toLowerCase()
+    )
 
     if (targetPlayer === -1) {
         throw `Invalid player: '${arg}'`
