@@ -6,8 +6,7 @@ import {MakeAction} from "./MakeAction";
 import {ChangeTerrainType} from "../../07_TRIGGERS/Modify_terrain_Functions/Modify_terrain_functions";
 import {Text} from "../../01_libraries/Text";
 import {globals} from "../../../../globals";
-
-const {MAP_MIN_X, MAP_MIN_Y, MAP_MAX_X, MAP_MAX_Y} = globals
+import {ArrayHandler} from "../../../Utils/ArrayHandler";
 
 
 export class MakeTerrainCopyPasteAction extends MakeAction {
@@ -30,6 +29,8 @@ export class MakeTerrainCopyPasteAction extends MakeAction {
         y4: number
     ) {
         super()
+
+        const {MAP_MIN_X, MAP_MIN_Y, MAP_MAX_X, MAP_MAX_Y} = globals
 
         let xCopy: number
         let yCopy: number
@@ -82,8 +83,8 @@ export class MakeTerrainCopyPasteAction extends MakeAction {
         this.maxX = minXpaste + diffX
         this.maxY = minYpaste + diffY
 
-        this.terrainTypesBefore = []
-        this.terrainTypesAfter = []
+        this.terrainTypesBefore = ArrayHandler.getNewArray()
+        this.terrainTypesAfter = ArrayHandler.getNewArray()
 
         xPaste = minXpaste
         yPaste = minYpaste
@@ -92,11 +93,16 @@ export class MakeTerrainCopyPasteAction extends MakeAction {
         while (yCopy <= maxYcopy) {
             while (xCopy <= maxXcopy) {
                 let tt = getUdgTerrainTypes().getTerrainType(xPaste, yPaste)
-                if(tt) this.terrainTypesBefore[xPaste][yPaste] = tt
+
+                if(tt){
+                    !this.terrainTypesBefore[xPaste] && (this.terrainTypesBefore[xPaste] = ArrayHandler.getNewArray())
+                    this.terrainTypesBefore[xPaste][yPaste] = tt
+                }
 
                 const terrainType = getUdgTerrainTypes().getTerrainType(xCopy, yCopy)
 
                 if (terrainType) {
+                    !this.terrainTypesAfter[xPaste] && (this.terrainTypesAfter[xPaste] = ArrayHandler.getNewArray())
                     this.terrainTypesAfter[xPaste][yPaste] = terrainType
                     const terrainTypeId = terrainType.getTerrainTypeId()
                     if (terrainTypeId !== 0) {
@@ -170,6 +176,7 @@ export class MakeTerrainCopyPasteAction extends MakeAction {
     }
 
     destroy = () => {
-        //nothing needed
+        ArrayHandler.clearArrayOfArray(this.terrainTypesBefore)
+        ArrayHandler.clearArrayOfArray(this.terrainTypesAfter)
     }
 }
