@@ -1,17 +1,17 @@
 import {MakeOneByOneOrTwoClicks} from "../Make/MakeOneByOneOrTwoClicks";
-import {MakeTerrainHorizontalSymmetryAction} from "../MakeLastActions/MakeTerrainHorizontalSymmetryAction";
 import {Text} from "../../01_libraries/Text";
+import {MakeTerrainVerticalSymmetryAction} from "../MakeLastActions/MakeTerrainVerticalSymmetryAction";
 
 export class MakeTerrainVerticalSymmetry extends MakeOneByOneOrTwoClicks {
     constructor(maker: unit) {
-        super(maker, 'terrainVerticalSymmetry', "", null, false)
+        super(maker, 'terrainVerticalSymmetry', "", [""], false)
     }
 
     doActions = () => {
         if(super.doBaseActions()){
             if (this.isLastLocSavedUsed()) {
                 try{
-                    const action = new MakeTerrainHorizontalSymmetryAction(this.lastX, this.lastY, this.orderX, this.orderY)
+                    const action = new MakeTerrainVerticalSymmetryAction(this.lastX, this.lastY, this.orderX, this.orderY)
                     this.escaper.newAction(action)
                     this.unsaveLocDefinitely()
                 }catch(error){

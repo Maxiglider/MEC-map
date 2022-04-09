@@ -7,7 +7,7 @@ import {ExchangeTerrains} from "../../07_TRIGGERS/Triggers_to_modify_terrains/Ex
 
 export class MakeExchangeTerrains extends MakeOneByOneOrTwoClicks {
     constructor(maker: unit) {
-        super(maker, 'exchangeTerrains', "", null, false)
+        super(maker, 'exchangeTerrains', "", [""], false)
     }
     
     doActions = () => {

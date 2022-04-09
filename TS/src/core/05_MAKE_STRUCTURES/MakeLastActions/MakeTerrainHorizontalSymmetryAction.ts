@@ -2,6 +2,7 @@ import { LARGEUR_CASE } from 'core/01_libraries/Constants'
 import { Text } from 'core/01_libraries/Text'
 import { MakeAction } from './MakeAction'
 import {ChangeTerrainType, GetNbCaseBetween} from "../../07_TRIGGERS/Modify_terrain_Functions/Modify_terrain_functions";
+import {ArrayHandler} from "../../../Utils/ArrayHandler";
 
 export class MakeTerrainHorizontalSymmetryAction extends MakeAction {
     private minX: number
@@ -28,7 +29,7 @@ export class MakeTerrainHorizontalSymmetryAction extends MakeAction {
     }
 
     applySymmetry = () => {
-        let terrainTypeIds: number[] = []
+        let terrainTypeIds: number[] = ArrayHandler.getNewArray()
 
         //sauvegarde du terrain
         let i = 0
@@ -59,6 +60,8 @@ export class MakeTerrainHorizontalSymmetryAction extends MakeAction {
             x = this.maxX
             y = y + LARGEUR_CASE
         }
+
+        ArrayHandler.clearArray(terrainTypeIds)
     }
 
     cancel = (): boolean => {
