@@ -1,12 +1,9 @@
-import {IsBoolString, S2B} from 'core/01_libraries/Basic_functions'
-import {NB_ESCAPERS} from 'core/01_libraries/Constants'
-import {ColorString2Id} from 'core/01_libraries/Init_colorCodes'
-import {Text} from 'core/01_libraries/Text'
-import {Escaper} from 'core/04_STRUCTURES/Escaper/Escaper'
- import { getUdgEscapers } from '../../../../globals'
-
-import {CmdName, CmdParam, IsPlayerColorString, NbParam, NoParam} from "./Command_functions";
-
+import { IsBoolString, S2B } from 'core/01_libraries/Basic_functions'
+import { NB_ESCAPERS } from 'core/01_libraries/Constants'
+import { Text } from 'core/01_libraries/Text'
+import { Escaper } from 'core/04_STRUCTURES/Escaper/Escaper'
+import { getUdgEscapers } from '../../../../globals'
+import { CmdName, CmdParam, isPlayerId, NbParam, NoParam, resolvePlayerId } from './Command_functions'
 
 export const ExecuteCommandTrueMax = (escaper: Escaper, cmd: string): boolean => {
     let name = CmdName(cmd)
@@ -68,8 +65,8 @@ export const ExecuteCommandTrueMax = (escaper: Escaper, cmd: string): boolean =>
             }
             return true
         }
-        if (IsPlayerColorString(param1)) {
-            n = ColorString2Id(param1)
+        if (isPlayerId(param1)) {
+            n = resolvePlayerId(param1)
             if (getUdgEscapers().get(n) != null) {
                 if (getUdgEscapers().get(n) != escaper) {
                     getUdgEscapers().get(n)?.setIsMaximaxou(b)

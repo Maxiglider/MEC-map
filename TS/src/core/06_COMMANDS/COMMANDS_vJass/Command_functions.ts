@@ -1,6 +1,15 @@
-import {NB_PLAYERS_MAX} from 'core/01_libraries/Constants'
-import {ColorString2Id} from 'core/01_libraries/Init_colorCodes'
+import { stringReplaceAll } from 'core/01_libraries/Basic_functions'
+import { NB_ESCAPERS, NB_PLAYERS_MAX } from 'core/01_libraries/Constants'
+import { ColorString2Id } from 'core/01_libraries/Init_colorCodes'
+import { forRange } from 'Utils/mapUtils'
 
+const cachedPlayerNames: { [x: string]: number } = {}
+
+export const initCachedPlayerNames = () => {
+    forRange(24, i => {
+        cachedPlayerNames[stringReplaceAll(' ', '_', GetPlayerName(Player(i)).toLowerCase())] = i
+    })
+}
 
 //gives the name of the entered command  ////the name of the entered command is <command_name>
 export const CmdName = (str: string): string => {
@@ -94,4 +103,37 @@ export const IsColorString = (colorString: string): boolean => {
 
 export const IsPlayerColorString = (colorString: string): boolean => {
     return ColorString2Id(colorString) >= 0 && ColorString2Id(colorString) <= NB_PLAYERS_MAX
+}
+
+export const isPlayerId = (arg: string) => {
+    try {
+        return !!resolvePlayerId(arg)
+    } catch {
+        return false
+    }
+}
+
+export const resolvePlayerId = (arg: string) => {
+    const larg = arg.toLowerCase()
+    let targetPlayer = -1
+
+    if (larg === 's' || larg === 'sel' || larg === 'select' || larg === 'selected') {
+        throw 'Not yet implemented'
+    } else if (IsPlayerColorString(larg)) {
+        targetPlayer = ColorString2Id(larg)
+    } else if (S2I(larg) !== 0) {
+        const a = S2I(larg)
+
+        if (a > 0 && a <= NB_ESCAPERS) {
+            targetPlayer = a - 1
+        }
+    } else if (cachedPlayerNames[larg]) {
+        return cachedPlayerNames[larg]
+    }
+
+    if (targetPlayer === -1) {
+        throw `Invalid player: '${arg}'`
+    }
+
+    return targetPlayer
 }
