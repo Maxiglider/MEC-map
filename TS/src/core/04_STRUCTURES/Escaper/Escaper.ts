@@ -361,8 +361,6 @@ export class Escaper {
 
     //trigger methods
     enableSlide(doEnable: boolean) {
-        let heroPos: location
-
         if (doEnable) {
             this.slide = SlideTrigger.CreateSlideTimer(this.escaperId)
 
@@ -372,6 +370,7 @@ export class Escaper {
             }
         } else {
             this.slide && this.slide.destroy()
+            delete this.slide
             this.slideLastAngleOrder = -1
         }
 
