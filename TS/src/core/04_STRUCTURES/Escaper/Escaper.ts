@@ -368,9 +368,7 @@ export class Escaper {
 
             if (this.hero) {
                 StopUnit(this.hero)
-                heroPos = GetUnitLoc(this.hero)
-                this.setLastZ(GetLocationZ(heroPos) + GetUnitFlyHeight(this.hero))
-                RemoveLocation(heroPos)
+                this.setLastZ(BlzGetUnitZ(this.hero) + GetUnitFlyHeight(this.hero))
             }
         } else {
             this.slide && this.slide.destroy()

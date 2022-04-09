@@ -43,15 +43,9 @@ export const InitTrig_InvisUnit_is_getting_damage = () => {
                     return
                 }
 
-                let heroPos: location | null = GetUnitLoc(hero)
-                const hauteurHero = GetLocationZ(heroPos) + GetUnitFlyHeight(hero)
-                let killingUnitPos: location | null = GetUnitLoc(killingUnit)
-                let hauteurKillingUnit = GetLocationZ(killingUnitPos) + GetUnitFlyHeight(killingUnit)
+                const hauteurHero = BlzGetUnitZ(hero) + GetUnitFlyHeight(hero)
+                let hauteurKillingUnit = BlzGetUnitZ(killingUnit) + GetUnitFlyHeight(killingUnit)
 
-                RemoveLocation(heroPos)
-                RemoveLocation(killingUnitPos)
-                heroPos = null
-                killingUnitPos = null
                 if (!escaper.isAlive()) {
                     invisUnit = null
                     killingUnit = null

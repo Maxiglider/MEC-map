@@ -128,7 +128,7 @@ if one of the N tilepoints is at a cliff level different than CL or CL+1, the ra
                                             loc2 = Location(otherX + LARGEUR_CASE, y)
                                         }
                                         if (
-                                            GetLocationZ(loc1) !== GetLocationZ(loc2) &&
+                                            GetLocationZ(loc1) !== GetLocationZ(loc2) && //todomax remove leak locations
                                             GetTerrainCliffLevelBJ(loc1) === GetTerrainCliffLevelBJ(loc2)
                                         ) {
                                             ramp = true
