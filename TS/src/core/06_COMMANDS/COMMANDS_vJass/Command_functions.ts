@@ -114,20 +114,21 @@ export const isPlayerId = (arg: string) => {
 }
 
 export const resolvePlayerId = (arg: string) => {
+    const larg = arg.toLowerCase()
     let targetPlayer = -1
 
-    if (arg === 'sel' || arg === 'select' || arg === 'selected') {
+    if (larg === 's' || larg === 'sel' || larg === 'select' || larg === 'selected') {
         throw 'Not yet implemented'
-    } else if (IsPlayerColorString(arg)) {
-        targetPlayer = ColorString2Id(arg)
-    } else if (S2I(arg) !== 0) {
-        const a = S2I(arg)
+    } else if (IsPlayerColorString(larg)) {
+        targetPlayer = ColorString2Id(larg)
+    } else if (S2I(larg) !== 0) {
+        const a = S2I(larg)
 
         if (a > 0 && a <= NB_ESCAPERS) {
             targetPlayer = a - 1
         }
-    } else if (cachedPlayerNames[arg.toLowerCase()]) {
-        return cachedPlayerNames[arg.toLowerCase()]
+    } else if (cachedPlayerNames[larg]) {
+        return cachedPlayerNames[larg]
     }
 
     if (targetPlayer === -1) {
