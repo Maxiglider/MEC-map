@@ -1,12 +1,7 @@
-import {NB_ESCAPERS} from 'core/01_libraries/Constants'
-import {ColorString2Id} from 'core/01_libraries/Init_colorCodes'
-import {Escaper} from 'core/04_STRUCTURES/Escaper/Escaper'
-import { getUdgEscapers } from '../../../../globals'
-
-import { getUdgLevels } from "../../../../globals"
-
-import {CmdName, CmdParam, IsPlayerColorString, NbParam, NoParam} from './Command_functions'
-
+import { NB_ESCAPERS } from 'core/01_libraries/Constants'
+import { Escaper } from 'core/04_STRUCTURES/Escaper/Escaper'
+import { getUdgEscapers, getUdgLevels } from '../../../../globals'
+import { CmdName, CmdParam, isPlayerId, NbParam, NoParam, resolvePlayerId } from './Command_functions'
 
 export const ExecuteCommandRed = (escaper: Escaper, cmd: string): boolean => {
     let name = CmdName(cmd)
@@ -40,9 +35,9 @@ export const ExecuteCommandRed = (escaper: Escaper, cmd: string): boolean => {
             return true
         }
         if (escaper.isTrueMaximaxou()) {
-            if (IsPlayerColorString(param1)) {
-                if (getUdgEscapers().get(ColorString2Id(param1)) != null) {
-                    getUdgEscapers().get(ColorString2Id(param1))?.kill()
+            if (isPlayerId(param1)) {
+                if (getUdgEscapers().get(resolvePlayerId(param1)) != null) {
+                    getUdgEscapers().get(resolvePlayerId(param1))?.kill()
                 }
                 return true
             }
@@ -58,12 +53,9 @@ export const ExecuteCommandRed = (escaper: Escaper, cmd: string): boolean => {
             }
             return true
         }
-        if (
-            IsPlayerColorString(param1) &&
-            !getUdgEscapers().get(ColorString2Id(param1))?.canCheat()
-        ) {
-            if (getUdgEscapers().get(ColorString2Id(param1)) != null) {
-                getUdgEscapers().get(ColorString2Id(param1))?.kill()
+        if (isPlayerId(param1) && !getUdgEscapers().get(resolvePlayerId(param1))?.canCheat()) {
+            if (getUdgEscapers().get(resolvePlayerId(param1)) != null) {
+                getUdgEscapers().get(resolvePlayerId(param1))?.kill()
             }
         }
         return true
@@ -75,8 +67,8 @@ export const ExecuteCommandRed = (escaper: Escaper, cmd: string): boolean => {
             return true
         }
         if (escaper.isTrueMaximaxou()) {
-            if (IsPlayerColorString(param1)) {
-                const target = getUdgEscapers().get(ColorString2Id(param1))
+            if (isPlayerId(param1)) {
+                const target = getUdgEscapers().get(resolvePlayerId(param1))
 
                 if (target != null) {
                     target.kick(target)
@@ -101,9 +93,9 @@ export const ExecuteCommandRed = (escaper: Escaper, cmd: string): boolean => {
             return true
         }
 
-        const target = getUdgEscapers().get(ColorString2Id(param1))
+        const target = getUdgEscapers().get(resolvePlayerId(param1))
 
-        if (IsPlayerColorString(param1) && !target?.canCheat()) {
+        if (isPlayerId(param1) && !target?.canCheat()) {
             if (target != null) {
                 escaper.kick(target)
             }

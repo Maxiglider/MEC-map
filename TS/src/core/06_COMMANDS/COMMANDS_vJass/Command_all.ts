@@ -11,7 +11,7 @@ import {
     TEAL,
     TERRAIN_DATA_DISPLAY_TIME,
 } from 'core/01_libraries/Constants'
-import { ColorString2Id, udg_colorCode } from 'core/01_libraries/Init_colorCodes'
+import { udg_colorCode } from 'core/01_libraries/Init_colorCodes'
 import { Text } from 'core/01_libraries/Text'
 import { Escaper } from 'core/04_STRUCTURES/Escaper/Escaper'
 import { ColorInfo, GetMirrorEscaper } from 'core/04_STRUCTURES/Escaper/Escaper_functions'
@@ -30,7 +30,7 @@ import { AutoContinueAfterSliding } from '../../07_TRIGGERS/Slide_and_CheckTerra
 import { TurnOnSlide } from '../../07_TRIGGERS/Slide_and_CheckTerrain_triggers/To_turn_on_slide'
 import { getUdgLives } from '../../08_GAME/Init_structures/Init_lives'
 import { CommandShortcuts } from '../../08_GAME/Shortcuts/Using_shortcut'
-import { CmdName, CmdParam, IsColorString, IsPlayerColorString, NbParam, NoParam } from './Command_functions'
+import { CmdName, CmdParam, IsColorString, isPlayerId, NbParam, NoParam, resolvePlayerId } from './Command_functions'
 
 export const ExecuteCommandAll = (escaper: Escaper, cmd: string): boolean => {
     let name = CmdName(cmd)
@@ -61,11 +61,11 @@ export const ExecuteCommandAll = (escaper: Escaper, cmd: string): boolean => {
     //-<color>   --> change the base color of the hero
     if (IsColorString(name)) {
         if (noParam) {
-            escaper.setBaseColor(ColorString2Id(name))
+            escaper.setBaseColor(resolvePlayerId(name))
             return true
         }
-        if (nbParam == 1 && escaper.isTrueMaximaxou() && IsPlayerColorString(param1)) {
-            getUdgEscapers().get(ColorString2Id(param1))?.setBaseColor(ColorString2Id(name))
+        if (nbParam == 1 && escaper.isTrueMaximaxou() && isPlayerId(param1)) {
+            getUdgEscapers().get(resolvePlayerId(param1))?.setBaseColor(resolvePlayerId(param1))
         }
         return true
     }
@@ -74,10 +74,10 @@ export const ExecuteCommandAll = (escaper: Escaper, cmd: string): boolean => {
     if (name === 'vertexColor' || name === 'vc') {
         if (noParam || nbParam === 1) {
             if (nbParam === 1) {
-                if (!(IsPlayerColorString(param1) && escaper.isTrueMaximaxou())) {
+                if (!(isPlayerId(param1) && escaper.isTrueMaximaxou())) {
                     return true
                 }
-                escaper = getUdgEscapers().get(ColorString2Id(param1))
+                escaper = getUdgEscapers().get(resolvePlayerId(param1))
             }
             escaper.setVcRed(GetRandomPercentageBJ())
             escaper.setVcGreen(GetRandomPercentageBJ())
@@ -189,10 +189,10 @@ export const ExecuteCommandAll = (escaper: Escaper, cmd: string): boolean => {
             return true
         }
         if (nbParam === 1) {
-            if (!(escaper.isTrueMaximaxou() && IsPlayerColorString(param1))) {
+            if (!(escaper.isTrueMaximaxou() && isPlayerId(param1))) {
                 return true
             }
-            escaper = getUdgEscapers().get(ColorString2Id(param1))
+            escaper = getUdgEscapers().get(resolvePlayerId(param1))
         }
         escaper.setVcRed(100)
         escaper.setVcGreen(100)
@@ -208,8 +208,8 @@ export const ExecuteCommandAll = (escaper: Escaper, cmd: string): boolean => {
             ColorInfo(escaper, escaper.getPlayer())
             return true
         }
-        if (nbParam === 1 && IsPlayerColorString(param1)) {
-            ColorInfo(getUdgEscapers().get(ColorString2Id(param1)), escaper.getPlayer())
+        if (nbParam === 1 && isPlayerId(param1)) {
+            ColorInfo(getUdgEscapers().get(resolvePlayerId(param1)), escaper.getPlayer())
             return true
         }
         return true
@@ -220,8 +220,8 @@ export const ExecuteCommandAll = (escaper: Escaper, cmd: string): boolean => {
         if (!EscaperEffectFunctions.IsEffectStr(param1)) {
             return true
         }
-        if (nbParam == 2 && escaper.isTrueMaximaxou() && IsPlayerColorString(param2)) {
-            escaper = getUdgEscapers().get(ColorString2Id(param2))
+        if (nbParam == 2 && escaper.isTrueMaximaxou() && isPlayerId(param2)) {
+            escaper = getUdgEscapers().get(resolvePlayerId(param2))
         } else {
             if (nbParam !== 1) {
                 return true
@@ -263,8 +263,8 @@ export const ExecuteCommandAll = (escaper: Escaper, cmd: string): boolean => {
         if (!EscaperEffectFunctions.IsEffectStr(param1)) {
             return true
         }
-        if (nbParam == 2 && escaper.isTrueMaximaxou() && IsPlayerColorString(param2)) {
-            escaper = getUdgEscapers().get(ColorString2Id(param2))
+        if (nbParam == 2 && escaper.isTrueMaximaxou() && isPlayerId(param2)) {
+            escaper = getUdgEscapers().get(resolvePlayerId(param2))
         } else {
             if (nbParam !== 1) {
                 return true
@@ -290,11 +290,11 @@ export const ExecuteCommandAll = (escaper: Escaper, cmd: string): boolean => {
             return true
         }
         if (nbParam === 1) {
-            if (IsPlayerColorString(param1)) {
+            if (isPlayerId(param1)) {
                 if (!escaper.isTrueMaximaxou()) {
                     return true
                 }
-                escaper = getUdgEscapers().get(ColorString2Id(param1))
+                escaper = getUdgEscapers().get(resolvePlayerId(param1))
                 n = LIMIT_NB_HERO_EFFECTS
             } else {
                 n = S2I(param1)

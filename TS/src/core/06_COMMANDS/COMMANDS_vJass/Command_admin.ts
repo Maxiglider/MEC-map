@@ -1,6 +1,5 @@
 import { IsBoolString, IsEscaperInGame, S2B } from 'core/01_libraries/Basic_functions'
 import { NB_ESCAPERS, NB_PLAYERS_MAX } from 'core/01_libraries/Constants'
-import { ColorString2Id } from 'core/01_libraries/Init_colorCodes'
 import { Text } from 'core/01_libraries/Text'
 import { Escaper } from 'core/04_STRUCTURES/Escaper/Escaper'
 import { GetMirrorEscaper } from 'core/04_STRUCTURES/Escaper/Escaper_functions'
@@ -9,6 +8,7 @@ import { ReinitTerrainsPositions } from 'core/07_TRIGGERS/Triggers_to_modify_ter
 import { AfkMode } from 'core/08_GAME/Afk_mode/Afk_mode'
 import { Globals } from 'core/09_From_old_Worldedit_triggers/globals_variables_and_triggers'
 import { udg_doubleHeroesEnabled } from 'core/Double_heroes/double_heroes_config'
+import { flushLogs } from '../../../../../core/Log/log'
 import {
     getUdgCasterTypes,
     getUdgEscapers,
@@ -22,9 +22,8 @@ import { SaveMapInCache } from '../../07_TRIGGERS/Save_map_in_gamecache/SAVE_MAP
 import { SaveLoadTerrainWithoutName } from '../../07_TRIGGERS/Triggers_to_modify_terrains/Save_load_terrain_without_name'
 import { SaveLoadTerrainWithName } from '../../07_TRIGGERS/Triggers_to_modify_terrains/Save_load_terrain_with_name'
 import { getUdgLives } from '../../08_GAME/Init_structures/Init_lives'
-import { CmdName, CmdParam, IsPlayerColorString, NbParam, NoParam } from './Command_functions'
+import { CmdName, CmdParam, isPlayerId, NbParam, NoParam, resolvePlayerId } from './Command_functions'
 import { ActivateTeleport, DisableTeleport } from './Teleport'
-import {flushLogs} from "../../../../../core/Log/log";
 
 export const ExecuteCommandMax = (escaper: Escaper, cmd: string): boolean => {
     let name = CmdName(cmd)
@@ -113,11 +112,11 @@ export const ExecuteCommandMax = (escaper: Escaper, cmd: string): boolean => {
             return true
         }
         if (nbParam === 2) {
-            if (!IsPlayerColorString(param2)) {
+            if (!isPlayerId(param2)) {
                 Text.erP(escaper.getPlayer(), 'param2 should be a player color')
                 return true
             }
-            escaper2 = getUdgEscapers().get(ColorString2Id(param2))
+            escaper2 = getUdgEscapers().get(resolvePlayerId(param2))
             if (escaper2 === null) {
                 Text.erP(escaper.getPlayer(), 'escaper ' + param2 + " doesn't exist")
                 return true
@@ -141,8 +140,8 @@ export const ExecuteCommandMax = (escaper: Escaper, cmd: string): boolean => {
             }
             return true
         }
-        if (IsPlayerColorString(param1)) {
-            n = ColorString2Id(param1)
+        if (isPlayerId(param1)) {
+            n = resolvePlayerId(param1)
             if (getUdgEscapers().get(n) !== null) {
                 getUdgEscapers().get(n)?.giveHeroControl(escaper2)
                 GetMirrorEscaper(getUdgEscapers().get(n))?.giveHeroControl(escaper2)
@@ -262,8 +261,8 @@ export const ExecuteCommandMax = (escaper: Escaper, cmd: string): boolean => {
             }
             return true
         }
-        if (IsPlayerColorString(param2)) {
-            n = ColorString2Id(param2)
+        if (isPlayerId(param2)) {
+            n = resolvePlayerId(param2)
             if (getUdgEscapers().get(n) !== null) {
                 getUdgEscapers().get(n)?.setHasAutorevive(b)
                 if (b) {
@@ -312,8 +311,8 @@ export const ExecuteCommandMax = (escaper: Escaper, cmd: string): boolean => {
             }
             return true
         }
-        if (IsPlayerColorString(param1)) {
-            n = ColorString2Id(param1)
+        if (isPlayerId(param1)) {
+            n = resolvePlayerId(param1)
             if (getUdgEscapers().get(n) == null) {
                 getUdgEscapers().newAt(n)
                 if (udg_doubleHeroesEnabled) {
@@ -356,8 +355,8 @@ export const ExecuteCommandMax = (escaper: Escaper, cmd: string): boolean => {
             }
             return true
         }
-        if (IsPlayerColorString(param1)) {
-            n = ColorString2Id(param1)
+        if (isPlayerId(param1)) {
+            n = resolvePlayerId(param1)
             if (getUdgEscapers().get(n) != null) {
                 if (IsEscaperInGame(n)) {
                     getUdgEscapers().get(n)?.removeHero()
@@ -407,8 +406,8 @@ export const ExecuteCommandMax = (escaper: Escaper, cmd: string): boolean => {
             }
             return true
         }
-        if (IsPlayerColorString(param1)) {
-            n = ColorString2Id(param1)
+        if (isPlayerId(param1)) {
+            n = resolvePlayerId(param1)
             if (getUdgEscapers().get(n) != null) {
                 if (getUdgEscapers().get(n) != escaper) {
                     if (!getUdgEscapers().get(n)?.isMaximaxou()) {
@@ -613,7 +612,7 @@ export const ExecuteCommandMax = (escaper: Escaper, cmd: string): boolean => {
     }
 
     //-logs
-    if (name === 'logs' && noParam){
+    if (name === 'logs' && noParam) {
         flushLogs()
         return true
     }

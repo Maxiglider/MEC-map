@@ -1,6 +1,5 @@
-import {NB_PLAYERS_MAX} from 'core/01_libraries/Constants'
-import {ColorString2Id} from 'core/01_libraries/Init_colorCodes'
-
+import { NB_ESCAPERS, NB_PLAYERS_MAX } from 'core/01_libraries/Constants'
+import { ColorString2Id } from 'core/01_libraries/Init_colorCodes'
 
 //gives the name of the entered command  ////the name of the entered command is <command_name>
 export const CmdName = (str: string): string => {
@@ -94,4 +93,34 @@ export const IsColorString = (colorString: string): boolean => {
 
 export const IsPlayerColorString = (colorString: string): boolean => {
     return ColorString2Id(colorString) >= 0 && ColorString2Id(colorString) <= NB_PLAYERS_MAX
+}
+
+export const isPlayerId = (arg: string) => {
+    try {
+        return !!resolvePlayerId(arg)
+    } catch {
+        return false
+    }
+}
+
+export const resolvePlayerId = (arg: string) => {
+    let targetPlayer = -1
+
+    if (arg === 'sel' || arg === 'select' || arg === 'selected') {
+        throw 'Not yet implemented'
+    } else if (IsPlayerColorString(arg)) {
+        targetPlayer = ColorString2Id(arg)
+    } else if (S2I(arg) !== 0) {
+        const a = S2I(arg)
+
+        if (a > 0 && a <= NB_ESCAPERS) {
+            targetPlayer = a - 1
+        }
+    }
+
+    if (targetPlayer === -1) {
+        throw `Invalid player: '${arg}'`
+    }
+
+    return targetPlayer
 }
