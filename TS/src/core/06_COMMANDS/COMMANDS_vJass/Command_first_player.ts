@@ -71,7 +71,7 @@ export const ExecuteCommandRed = (escaper: Escaper, cmd: string): boolean => {
                 const target = getUdgEscapers().get(resolvePlayerId(param1))
 
                 if (target != null) {
-                    target.kick(target)
+                    escaper.kick(target)
                 }
 
                 return true
