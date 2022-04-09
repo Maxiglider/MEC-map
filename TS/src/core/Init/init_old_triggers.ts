@@ -1,4 +1,3 @@
-import { Init_terrain_limit_variables } from 'core/01_libraries/Init_terrain_limit_variables'
 import { initGameTime } from 'core/04_STRUCTURES/Lives_and_game_time/Time_of_game_trigger'
 import { InitTrig_Effect_meteor_on_pick_down } from 'core/04_STRUCTURES/Meteor/Effect_meteor_on_pick_down'
 import { InitTrig_Effect_meteor_on_pick_up } from 'core/04_STRUCTURES/Meteor/Effect_meteor_on_pick_up'
@@ -23,8 +22,6 @@ import { InitTrig_Unselect_hero } from 'core/08_GAME/Select_and_unselect_heroes/
 import { InitTrig_Using_shortcut } from 'core/08_GAME/Shortcuts/Using_shortcut'
 
 export const initOldTriggers = () => {
-    Init_terrain_limit_variables()
-
     // TODO; External libraries of which I'm not sure yet how they're called
     // InitTrig_StringUtils()
     // InitTrig_Stack()

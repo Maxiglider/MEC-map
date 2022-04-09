@@ -1,4 +1,4 @@
-import { Text } from 'core/01_libraries/Text'
+import {Text} from 'core/01_libraries/Text'
 import {Make, MAKE_LAST_CLIC_UNIT_ID} from 'core/05_MAKE_STRUCTURES/Make/Make'
 import {MakeTerrainCopyPasteAction} from "../MakeLastActions/MakeTerrainCopyPasteAction";
 
@@ -89,31 +89,27 @@ export class MakeTerrainCopyPaste extends Make {
             this.isPoint1Used = true
             this.unsaveLocDefinitely(2)
             this.unsaveLocDefinitely(3)
+        } else if (!this.isPoint2Used) {
+            this.unitLastClic2 = this.createUnitClic(this.unitLastClic2, x, y)
+            this.x2 = x
+            this.y2 = y
+            this.isPoint2Saved = true
+            this.isPoint2Used = true
+            this.unsaveLocDefinitely(3)
+        } else if (!this.isPoint3Used) {
+            this.unitLastClic3 = this.createUnitClic(this.unitLastClic3, x, y)
+            this.x3 = x
+            this.y3 = y
+            this.isPoint3Saved = true
+            this.isPoint3Used = true
         } else {
-            if (!this.isPoint2Used) {
-                this.unitLastClic2 = this.createUnitClic(this.unitLastClic2, x, y)
-                this.x2 = x
-                this.y2 = y
-                this.isPoint2Saved = true
-                this.isPoint2Used = true
-                this.unsaveLocDefinitely(3)
-            } else {
-                if (!this.isPoint3Used) {
-                    this.unitLastClic3 = this.createUnitClic(this.unitLastClic3, x, y)
-                    this.x3 = x
-                    this.y3 = y
-                    this.isPoint3Saved = true
-                    this.isPoint3Used = true
-                } else {
-                    try{
-                        const action = new MakeTerrainCopyPasteAction(this.x1, this.y1, this.x2, this.y2, this.x3, this.y3, x, y)
-                        this.unsaveLocsDefinitely()
-                        this.escaper.newAction(action)
-                    }catch(error){
-                        if(typeof error == 'string')                        {
-                            Text.erP(this.makerOwner, error)
-                        }
-                    }
+            try {
+                const action = new MakeTerrainCopyPasteAction(this.x1, this.y1, this.x2, this.y2, this.x3, this.y3, x, y)
+                this.unsaveLocsDefinitely()
+                this.escaper.newAction(action)
+            } catch (error) {
+                if (typeof error == 'string') {
+                    Text.erP(this.makerOwner, error)
                 }
             }
         }
@@ -152,7 +148,7 @@ export class MakeTerrainCopyPaste extends Make {
     }
 
     doActions = () => {
-        if(super.doBaseActions()){
+        if (super.doBaseActions()) {
             this.saveLoc(this.orderX, this.orderY)
         }
     }

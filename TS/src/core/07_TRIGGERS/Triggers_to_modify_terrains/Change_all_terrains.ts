@@ -1,9 +1,9 @@
-import {Constants, LARGEUR_CASE, NB_MAX_OF_TERRAINS} from 'core/01_libraries/Constants'
+import {LARGEUR_CASE, NB_MAX_OF_TERRAINS} from 'core/01_libraries/Constants'
 import {Text} from 'core/01_libraries/Text'
 import {TerrainType} from 'core/04_STRUCTURES/TerrainType/TerrainType'
 import {Globals} from 'core/09_From_old_Worldedit_triggers/globals_variables_and_triggers'
+import {globals} from "../../../../globals";
 import {getUdgTerrainTypes} from '../../../../globals'
-import {errorHandler} from '../../../Utils/mapUtils'
 import {ChangeTerrainType} from '../Modify_terrain_Functions/Modify_terrain_functions'
 import {
     AddNewTerrain,
@@ -12,9 +12,7 @@ import {
     GetRandomUsedTerrain,
     IsTerrainAlreadyUsed,
 } from '../Modify_terrain_Functions/Terrain_functions'
-import {TerrainModifyingTrig} from './Terrain_modifying_trig'
 import {TerrainTypeMax} from "../Modify_terrain_Functions/Terrain_type_max";
-import {log} from "../../../../../core/Log/log";
 
 const initChangeAllTerrains = () => {
     let oldTerrainTypes: number[] = []
@@ -27,17 +25,17 @@ const initChangeAllTerrains = () => {
     let getTerrainNbEach: number[] = []
 
     const ModifyTerrain = () => {
-        let y = Constants.MAP_MIN_Y
+        let y = globals.MAP_MIN_Y
 
         let x: number
         let terrainTypeId: number
         let done: boolean
         let j: number
 
-        while (y <= Constants.MAP_MAX_Y) {
-            x = Constants.MAP_MIN_X
+        while (y <= globals.MAP_MAX_Y) {
+            x = globals.MAP_MIN_X
 
-            while (x <= Constants.MAP_MAX_X) {
+            while (x <= globals.MAP_MAX_X) {
                 terrainTypeId = GetTerrainType(x, y)
 
                 let newGet = false

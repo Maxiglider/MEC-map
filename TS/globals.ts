@@ -16,9 +16,17 @@ export const globals: {
     monsterTypes?: MonsterTypeArray
     coopModeActive?: boolean,
     autoreviveDelay?: number,
-    logStrings: string[]
+    logStrings: string[],
+    MAP_MIN_X: number,
+    MAP_MAX_X: number,
+    MAP_MIN_Y: number,
+    MAP_MAX_Y: number,
 } = {
-    logStrings: []
+    logStrings: [],
+    MAP_MIN_X: 0,
+    MAP_MAX_X: 0,
+    MAP_MIN_Y: 0,
+    MAP_MAX_Y: 0,
 }
 
 

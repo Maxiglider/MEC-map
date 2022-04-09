@@ -1,8 +1,8 @@
 import { Ascii2String } from 'core/01_libraries/Ascii'
-import { Constants, LARGEUR_CASE } from 'core/01_libraries/Constants'
+import { LARGEUR_CASE } from 'core/01_libraries/Constants'
 import { Text } from 'core/01_libraries/Text'
 import { TerrainType } from 'core/04_STRUCTURES/TerrainType/TerrainType'
-import { getUdgTerrainTypes } from '../../../../globals'
+import {getUdgTerrainTypes, globals} from '../../../../globals'
 import { errorHandler } from '../../../Utils/mapUtils'
 import { I2HexaString } from '../../01_libraries/Functions_on_numbers'
 import { SaveMapInCache } from './SAVE_MAP_in_cache'
@@ -28,10 +28,10 @@ const initSaveTerrain = () => {
     }
 
     const SaveMapDimensionsAndCenterOffset = () => {
-        let largeurMap = R2I((Constants.MAP_MAX_X - Constants.MAP_MIN_X) / LARGEUR_CASE)
-        let hauteurMap = R2I((Constants.MAP_MAX_Y - Constants.MAP_MIN_Y) / LARGEUR_CASE)
-        let offsetX = R2I(Constants.MAP_MIN_X)
-        let offsetY = R2I(Constants.MAP_MIN_Y)
+        let largeurMap = R2I((globals.MAP_MAX_X - globals.MAP_MIN_X) / LARGEUR_CASE)
+        let hauteurMap = R2I((globals.MAP_MAX_Y - globals.MAP_MIN_Y) / LARGEUR_CASE)
+        let offsetX = R2I(globals.MAP_MIN_X)
+        let offsetY = R2I(globals.MAP_MIN_Y)
         StringArrayForCache.stringArrayForCache = new StringArrayForCache('terrain', 'largeur', false)
         StringArrayForCache.stringArrayForCache.push(I2S(largeurMap))
         StringArrayForCache.stringArrayForCache.writeInCache()
@@ -145,10 +145,10 @@ const initSaveTerrain = () => {
 
     const SaveTerrain_Actions = () => {
         let x: number
-        if (y <= Constants.MAP_MAX_Y) {
-            x = Constants.MAP_MIN_X
+        if (y <= globals.MAP_MAX_Y) {
+            x = globals.MAP_MIN_X
             while (true) {
-                if (x > Constants.MAP_MAX_X) break
+                if (x > globals.MAP_MAX_X) break
                 StringArrayForCache.stringArrayForCache.push(GetTerrainId(x, y))
                 x = x + LARGEUR_CASE
             }
@@ -164,7 +164,7 @@ const initSaveTerrain = () => {
     }
 
     const StartSaveTerrain = () => {
-        y = Constants.MAP_MIN_Y
+        y = globals.MAP_MIN_Y
         GererOrdreTerrains()
         StringArrayForCache.stringArrayForCache = new StringArrayForCache('terrain', 'terrainTypes', false)
         TriggerClearActions(SaveMapInCache.trigSaveMapInCache)

@@ -1,10 +1,11 @@
-import { Constants, LARGEUR_CASE } from 'core/01_libraries/Constants'
+import { LARGEUR_CASE } from 'core/01_libraries/Constants'
 import { Text } from 'core/01_libraries/Text'
 import { ZLibrary } from 'core/02_bibliotheques_externes/ZLibrary'
 import { errorHandler } from '../../../Utils/mapUtils'
 import { SaveMapInCache } from './SAVE_MAP_in_cache'
 import { SaveMonsterTypes } from './Save_monster_types'
 import { StringArrayForCache } from './struct_StringArrayForCache'
+import {globals} from "../../../../globals";
 
 const initSaveWater = () => {
     let y: number
@@ -12,10 +13,10 @@ const initSaveWater = () => {
     //save water heights
     const SaveWaterHeights_Actions = () => {
         let x: number
-        if (y <= Constants.MAP_MAX_Y) {
-            x = Constants.MAP_MIN_X
+        if (y <= globals.MAP_MAX_Y) {
+            x = globals.MAP_MIN_X
             while (true) {
-                if (x > Constants.MAP_MAX_X) break
+                if (x > globals.MAP_MAX_X) break
                 StringArrayForCache.stringArrayForCache.push(I2S(R2I(ZLibrary.GetSurfaceZ(x, y))))
                 x = x + LARGEUR_CASE
             }
@@ -29,7 +30,7 @@ const initSaveWater = () => {
     }
 
     const StartSaveWaterHeights = () => {
-        y = Constants.MAP_MIN_Y
+        y = globals.MAP_MIN_Y
         StringArrayForCache.stringArrayForCache = new StringArrayForCache('terrain', 'waterHeights', true)
         TriggerClearActions(SaveMapInCache.trigSaveMapInCache)
         TriggerAddAction(SaveMapInCache.trigSaveMapInCache, errorHandler(SaveWaterHeights_Actions))

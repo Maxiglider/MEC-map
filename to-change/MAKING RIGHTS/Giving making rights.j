@@ -15,7 +15,7 @@ function Trig_Giving_making_rights_Actions takes nothing returns nothing
             if(udg_escapers.get(playerId) != 0)then
                 call udg_escapers.get(playerId).setCanCheat(true)
             endif
-    endloop            
+    endloop
 endfunction
 
 //===========================================================================

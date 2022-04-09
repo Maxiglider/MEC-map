@@ -1,5 +1,5 @@
 import { IsNearBounds } from 'core/01_libraries/Basic_functions'
-import { Constants, LARGEUR_CASE } from 'core/01_libraries/Constants'
+import { LARGEUR_CASE } from 'core/01_libraries/Constants'
 import { Text } from 'core/01_libraries/Text'
 import { ZLibrary } from 'core/02_bibliotheques_externes/ZLibrary'
 import { errorHandler } from '../../../Utils/mapUtils'
@@ -7,6 +7,7 @@ import { I2HexaString } from '../../01_libraries/Functions_on_numbers'
 import { SaveMapInCache } from './SAVE_MAP_in_cache'
 import { SaveTerrainRamps } from './Save_terrain_ramps'
 import { StringArrayForCache } from './struct_StringArrayForCache'
+import {globals} from "../../../../globals";
 
 const initSaveTerrainHeights = () => {
     let y: number
@@ -16,10 +17,10 @@ const initSaveTerrainHeights = () => {
         let x: number
         let cliffLevel: number
 
-        if (y <= Constants.MAP_MAX_Y) {
-            x = Constants.MAP_MIN_X
+        if (y <= globals.MAP_MAX_Y) {
+            x = globals.MAP_MIN_X
             while (true) {
-                if (x > Constants.MAP_MAX_X) break
+                if (x > globals.MAP_MAX_X) break
                 if (IsNearBounds(x, y)) {
                     cliffLevel = 2
                 } else {
@@ -38,7 +39,7 @@ const initSaveTerrainHeights = () => {
     }
 
     const StartSaveTerrainCliffs = () => {
-        y = Constants.MAP_MIN_Y
+        y = globals.MAP_MIN_Y
         StringArrayForCache.stringArrayForCache = new StringArrayForCache('terrain', 'terrainCliffs', false)
         TriggerClearActions(SaveMapInCache.trigSaveMapInCache)
         TriggerAddAction(SaveMapInCache.trigSaveMapInCache, errorHandler(SaveTerrainCliffs_Actions))
@@ -51,10 +52,10 @@ const initSaveTerrainHeights = () => {
         let height: number
         let isWater: boolean
 
-        if (y <= Constants.MAP_MAX_Y) {
-            x = Constants.MAP_MIN_X
+        if (y <= globals.MAP_MAX_Y) {
+            x = globals.MAP_MIN_X
             while (true) {
-                if (x > Constants.MAP_MAX_X) break
+                if (x > globals.MAP_MAX_X) break
                 height = ZLibrary.GetSurfaceZ(x, y)
                 //if (!IsNearBounds(x, y) && (GetTerrainCliffLevel(x, y) != 2 || height != 0)) then //if surfaceZ is 0 && cliff level 2, we consider it's a "default tilepoint", with no water, && we avoid the GetTerrainZ call (which is heavy)
                 /*if (!IsNearBounds(x, y) && !IsTerrainPathable(x, y, PATHING_TYPE_FLOATABILITY)) then
@@ -81,7 +82,7 @@ const initSaveTerrainHeights = () => {
     }
 
     const StartSaveTerrainHeights = () => {
-        y = Constants.MAP_MIN_Y
+        y = globals.MAP_MIN_Y
         StringArrayForCache.stringArrayForCache = new StringArrayForCache('terrain', 'terrainHeights', true)
         TriggerClearActions(SaveMapInCache.trigSaveMapInCache)
         TriggerAddAction(SaveMapInCache.trigSaveMapInCache, errorHandler(SaveTerrainHeights_Actions))

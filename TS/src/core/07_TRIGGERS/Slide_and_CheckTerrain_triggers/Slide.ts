@@ -1,6 +1,8 @@
-import { CAN_TURN_IN_AIR, Constants, SLIDE_PERIOD } from 'core/01_libraries/Constants'
+import { CAN_TURN_IN_AIR, SLIDE_PERIOD } from 'core/01_libraries/Constants'
 import { Apm } from 'core/08_GAME/Apm_clics_par_minute/Apm'
- import {getUdgEscapers} from '../../../../globals'
+import {getUdgEscapers} from '../../../../globals'
+import {globals} from "../../../../globals";
+
 
 import {createTimer} from 'Utils/mapUtils'
 import { Gravity } from './Gravity'
@@ -30,10 +32,10 @@ const initSlideTrigger = () => {
         let delta: number
 
         if (
-            newX >= Constants.MAP_MIN_X &&
-            newX <= Constants.MAP_MAX_X &&
-            newY >= Constants.MAP_MIN_Y &&
-            newY <= Constants.MAP_MAX_Y
+            newX >= globals.MAP_MIN_X &&
+            newX <= globals.MAP_MAX_X &&
+            newY >= globals.MAP_MIN_Y &&
+            newY <= globals.MAP_MAX_Y
         ) {
             escaper.moveHero(newX, newY)
         }

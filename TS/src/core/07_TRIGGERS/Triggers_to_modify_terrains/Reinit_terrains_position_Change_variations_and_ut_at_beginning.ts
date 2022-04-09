@@ -1,4 +1,4 @@
-import { Constants, LARGEUR_CASE } from 'core/01_libraries/Constants'
+import { LARGEUR_CASE } from 'core/01_libraries/Constants'
 import { Text } from 'core/01_libraries/Text'
 import { TerrainType } from 'core/04_STRUCTURES/TerrainType/TerrainType'
 import { TerrainTypeId2TerrainType } from 'core/04_STRUCTURES/TerrainType/Terrain_type_functions'
@@ -7,6 +7,7 @@ import { errorHandler } from '../../../Utils/mapUtils'
 import { ChangeTerrainType } from '../Modify_terrain_Functions/Modify_terrain_functions'
 import { AddNewTerrain } from '../Modify_terrain_Functions/Terrain_functions'
 import { TerrainModifyingTrig } from './Terrain_modifying_trig'
+import {globals} from "../../../../globals";
 
 //todomax fix this inifite loops
 
@@ -22,9 +23,9 @@ const initReinitTerrainsPositions = () => {
                 TerrainModifyingTrig.gg_trg_Terrain_modifying_trig,
                 errorHandler(() => {
                     let terrainType: number
-                    let x = Constants.MAP_MIN_X
+                    let x = globals.MAP_MIN_X
                     while (true) {
-                        if (x > Constants.MAP_MAX_X) break
+                        if (x > globals.MAP_MAX_X) break
                         terrainType = GetTerrainType(x, y)
                         //mise à jour used terrain (-ut)
                         AddNewTerrain(terrainType)
@@ -37,7 +38,7 @@ const initReinitTerrainsPositions = () => {
                     }
 
                     y = y + LARGEUR_CASE
-                    if (y > Constants.MAP_MAX_Y) {
+                    if (y > globals.MAP_MAX_Y) {
                         terrainModifyWorking = false
                         DisableTrigger(GetTriggeringTrigger())
                         return
@@ -45,7 +46,7 @@ const initReinitTerrainsPositions = () => {
                 })
             )
             terrainSave_id = 0
-            let y = Constants.MAP_MIN_Y
+            let y = globals.MAP_MIN_Y
             EnableTrigger(TerrainModifyingTrig.gg_trg_Terrain_modifying_trig)
             terrainModifyWorking = true
             DestroyTrigger(GetTriggeringTrigger())
@@ -62,9 +63,9 @@ const initReinitTerrainsPositions = () => {
                 //local integer i = 1
                 //loop
                 //exitwhen (i > TERRAIN_MODIFYING_NB_LINES_TO_DO)
-                x = Constants.MAP_MIN_X
+                x = globals.MAP_MIN_X
                 while (true) {
-                    if (x > Constants.MAP_MAX_X) break
+                    if (x > globals.MAP_MAX_X) break
 
                     const terrainType = TERRAIN_SAVE[terrainSave_id]
 
@@ -76,7 +77,7 @@ const initReinitTerrainsPositions = () => {
                     x = x + LARGEUR_CASE
                 }
                 y = y + LARGEUR_CASE
-                if (y > Constants.MAP_MAX_Y) {
+                if (y > globals.MAP_MAX_Y) {
                     Text.mkA('Terrains position reinitialized !')
                     DisableTrigger(GetTriggeringTrigger())
                     terrainModifyWorking = false
@@ -88,7 +89,7 @@ const initReinitTerrainsPositions = () => {
             })
         )
         terrainSave_id = 0
-        let y = Constants.MAP_MIN_Y
+        let y = globals.MAP_MIN_Y
         EnableTrigger(TerrainModifyingTrig.gg_trg_Terrain_modifying_trig)
         terrainModifyWorking = true
         TerrainModifyingTrig.StopEnabledCheckTerrainTriggers()

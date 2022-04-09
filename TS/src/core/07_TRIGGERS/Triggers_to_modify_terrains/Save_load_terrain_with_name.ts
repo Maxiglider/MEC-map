@@ -1,10 +1,11 @@
-import { Constants, LARGEUR_CASE } from 'core/01_libraries/Constants'
+import { LARGEUR_CASE } from 'core/01_libraries/Constants'
 import { Text } from 'core/01_libraries/Text'
 import { TerrainType } from 'core/04_STRUCTURES/TerrainType/TerrainType'
 import { getUdgTerrainTypes } from '../../../../globals'
 import { errorHandler } from '../../../Utils/mapUtils'
 import { ChangeTerrainType } from '../Modify_terrain_Functions/Modify_terrain_functions'
 import { TerrainModifyingTrig } from './Terrain_modifying_trig'
+import {globals} from "../../../../globals";
 
 const initSaveLoadTerrainWithName = () => {
     let terrainSaves = new Map<string, (TerrainType | null)[][]>()
@@ -19,21 +20,21 @@ const initSaveLoadTerrainWithName = () => {
 
         const terrainSave: (TerrainType | null)[][] = []
 
-        let y = Constants.MAP_MIN_Y
+        let y = globals.MAP_MIN_Y
 
         TriggerClearActions(TerrainModifyingTrig.gg_trg_Terrain_modifying_trig)
 
         TriggerAddAction(
             TerrainModifyingTrig.gg_trg_Terrain_modifying_trig,
             errorHandler(() => {
-                let x = Constants.MAP_MIN_X
-                while (x <= Constants.MAP_MAX_X) {
+                let x = globals.MAP_MIN_X
+                while (x <= globals.MAP_MAX_X) {
                     terrainSave[x][y] = getUdgTerrainTypes().getTerrainType(x, y)
                     x += LARGEUR_CASE
                 }
 
                 y = y + LARGEUR_CASE
-                if (y > Constants.MAP_MAX_Y) {
+                if (y > globals.MAP_MAX_Y) {
                     terrainModifyWorking = false
                     DisableTrigger(GetTriggeringTrigger())
                     Text.mkA('Terrain saved')
@@ -76,8 +77,8 @@ const initSaveLoadTerrainWithName = () => {
             errorHandler(() => {
                 let terrainType: TerrainType | null
 
-                let x = Constants.MAP_MIN_X
-                while (x <= Constants.MAP_MAX_X) {
+                let x = globals.MAP_MIN_X
+                while (x <= globals.MAP_MAX_X) {
                     terrainType = terrainSave[x][y]
                     if (terrainType !== null) {
                         ChangeTerrainType(x, y, terrainType.getTerrainTypeId())
@@ -86,7 +87,7 @@ const initSaveLoadTerrainWithName = () => {
                 }
 
                 y = y + LARGEUR_CASE
-                if (y > Constants.MAP_MAX_Y) {
+                if (y > globals.MAP_MAX_Y) {
                     TerrainModifyingTrig.RestartEnabledCheckTerrainTriggers()
                     Text.mkA('Terrain loaded')
                     DisableTrigger(GetTriggeringTrigger())
@@ -95,7 +96,7 @@ const initSaveLoadTerrainWithName = () => {
             })
         )
 
-        let y = Constants.MAP_MIN_Y
+        let y = globals.MAP_MIN_Y
         EnableTrigger(TerrainModifyingTrig.gg_trg_Terrain_modifying_trig)
         terrainModifyWorking = true
         TerrainModifyingTrig.StopEnabledCheckTerrainTriggers()

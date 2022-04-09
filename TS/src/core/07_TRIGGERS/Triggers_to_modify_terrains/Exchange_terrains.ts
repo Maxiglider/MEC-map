@@ -1,9 +1,10 @@
-import { Constants, LARGEUR_CASE } from 'core/01_libraries/Constants'
+import { LARGEUR_CASE } from 'core/01_libraries/Constants'
 import { Text } from 'core/01_libraries/Text'
 import { getUdgTerrainTypes } from '../../../../globals'
 import { errorHandler } from '../../../Utils/mapUtils'
 import { ChangeTerrainType } from '../Modify_terrain_Functions/Modify_terrain_functions'
 import { TerrainModifyingTrig } from './Terrain_modifying_trig'
+import {globals} from "../../../../globals";
 
 let terrainA: number
 let terrainB: number
@@ -18,9 +19,9 @@ const StartTerrainModifying = () => {
             let x: number
             let terrainType: number
 
-            x = Constants.MAP_MIN_X
+            x = globals.MAP_MIN_X
             while (true) {
-                if (x > Constants.MAP_MAX_X) break
+                if (x > globals.MAP_MAX_X) break
                 terrainType = GetTerrainType(x, y)
                 if (terrainType === terrainA) {
                     ChangeTerrainType(x, y, terrainB)
@@ -32,7 +33,7 @@ const StartTerrainModifying = () => {
                 x = x + LARGEUR_CASE
             }
             y = y + LARGEUR_CASE
-            if (y > Constants.MAP_MAX_Y) {
+            if (y > globals.MAP_MAX_Y) {
                 DisableTrigger(GetTriggeringTrigger())
                 TerrainModifyingTrig.RestartEnabledCheckTerrainTriggers()
                 terrainModifyWorking = false
@@ -40,7 +41,7 @@ const StartTerrainModifying = () => {
             }
         })
     )
-    let y = Constants.MAP_MIN_Y
+    let y = globals.MAP_MIN_Y
     EnableTrigger(TerrainModifyingTrig.gg_trg_Terrain_modifying_trig)
     terrainModifyWorking = true
 }

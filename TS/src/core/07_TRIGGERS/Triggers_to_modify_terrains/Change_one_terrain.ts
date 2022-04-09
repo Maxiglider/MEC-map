@@ -1,11 +1,9 @@
-import {Constants, LARGEUR_CASE} from 'core/01_libraries/Constants'
-import {Text} from 'core/01_libraries/Text'
+import {LARGEUR_CASE} from 'core/01_libraries/Constants'
 import {getUdgTerrainTypes} from '../../../../globals'
-import {errorHandler} from '../../../Utils/mapUtils'
 import {ChangeTerrainType} from '../Modify_terrain_Functions/Modify_terrain_functions'
 import {GetTerrainData} from '../Modify_terrain_Functions/Terrain_functions'
 import {TerrainTypeFromString} from '../Modify_terrain_Functions/Terrain_type_from_string'
-import {TerrainModifyingTrig} from './Terrain_modifying_trig'
+import {globals} from "../../../../globals";
 
 const initChangeOneTerrain = () => {
     let oldTerrain: number
@@ -13,11 +11,11 @@ const initChangeOneTerrain = () => {
     let terrainModifyWorking = false
 
     const ModifyTerrain = () => {
-        let y = Constants.MAP_MIN_Y
+        let y = globals.MAP_MIN_Y
 
-        while (y <= Constants.MAP_MAX_Y) {
-            let x = Constants.MAP_MIN_X
-            while (x <= Constants.MAP_MAX_X) {
+        while (y <= globals.MAP_MAX_Y) {
+            let x = globals.MAP_MIN_X
+            while (x <= globals.MAP_MAX_X) {
                 if (GetTerrainType(x, y) === oldTerrain) {
                     ChangeTerrainType(x, y, newTerrain)
                 }

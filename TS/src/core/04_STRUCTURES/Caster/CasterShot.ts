@@ -1,4 +1,4 @@
-import { Constants } from 'core/01_libraries/Constants'
+import {globals} from "../../../../globals";
 import { createTimer } from 'Utils/mapUtils'
 import { Timer } from 'w3ts'
 import { MonsterType } from '../Monster/MonsterType'
@@ -28,10 +28,10 @@ export class CasterShot {
         this.trig = createTimer(PERIOD, true, () => {
             shot.x = shot.x + shot.diffX
             shot.y = shot.y + shot.diffY
-            if (shot.x >= Constants.MAP_MIN_X && shot.x <= Constants.MAP_MAX_X) {
+            if (shot.x >= globals.MAP_MIN_X && shot.x <= globals.MAP_MAX_X) {
                 SetUnitX(shot.unite, shot.x)
             }
-            if (shot.y >= Constants.MAP_MIN_Y && shot.y <= Constants.MAP_MAX_Y) {
+            if (shot.y >= globals.MAP_MIN_Y && shot.y <= globals.MAP_MAX_Y) {
                 SetUnitY(shot.unite, shot.y)
             }
             shot.nbTeleportationsRestantes = shot.nbTeleportationsRestantes - 1

@@ -3,11 +3,11 @@ import { getUdgTerrainTypes } from '../../../../globals'
 
 import { TerrainType } from '../../04_STRUCTURES/TerrainType/TerrainType'
 import {MakeAction} from "./MakeAction";
-import {Constants} from "core/01_libraries/Constants";
 import {ChangeTerrainType} from "../../07_TRIGGERS/Modify_terrain_Functions/Modify_terrain_functions";
 import {Text} from "../../01_libraries/Text";
+import {globals} from "../../../../globals";
 
-const {MAP_MIN_X, MAP_MIN_Y, MAP_MAX_X, MAP_MAX_Y} = Constants
+const {MAP_MIN_X, MAP_MIN_Y, MAP_MAX_X, MAP_MAX_Y} = globals
 
 
 export class MakeTerrainCopyPasteAction extends MakeAction {
@@ -44,6 +44,8 @@ export class MakeTerrainCopyPasteAction extends MakeAction {
         let diffX = maxXcopy - minXcopy
         let diffY = maxYcopy - minYcopy
 
+        print("diffX " + diffX + " ; diffY " + diffY)
+
         let minXpaste: number
         let minYpaste: number
 
@@ -61,6 +63,10 @@ export class MakeTerrainCopyPasteAction extends MakeAction {
             //direction bas
             minYpaste = y3 - diffY
         }
+
+        print("minXpaste : " + minXpaste + " ; minXpaste : " + minXpaste +" ; minYpaste : " + minYpaste +" ; minYpaste : " + minYpaste)
+        print("MAP_MIN_X : " + MAP_MIN_X + " ; MAP_MAX_X : " + MAP_MAX_X + " ; MAP_MIN_Y : " + MAP_MIN_Y + " ; MAP_MAX_Y : " + MAP_MAX_Y + " ; diffX : " + diffX )
+
 
         if (
             minXpaste < MAP_MIN_X ||

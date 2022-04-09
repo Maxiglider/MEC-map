@@ -1,4 +1,4 @@
-import { Constants, LARGEUR_CASE } from 'core/01_libraries/Constants'
+import { LARGEUR_CASE } from 'core/01_libraries/Constants'
 import { Text } from 'core/01_libraries/Text'
 import { TerrainType } from 'core/04_STRUCTURES/TerrainType/TerrainType'
 import { createTimer } from 'Utils/mapUtils'
@@ -6,6 +6,7 @@ import { getUdgTerrainTypes } from '../../../../globals'
 import { errorHandler } from '../../../Utils/mapUtils'
 import { ChangeTerrainType } from '../Modify_terrain_Functions/Modify_terrain_functions'
 import { TerrainModifyingTrig } from './Terrain_modifying_trig'
+import {globals} from "../../../../globals";
 
 const initReinitTerrains = () => {
     let terrainTypes: TerrainType[] = []
@@ -56,9 +57,9 @@ const initReinitTerrains = () => {
                 //local integer i = 1
                 //loop
                 //exitwhen (i > TERRAIN_MODIFYING_NB_LINES_TO_DO)
-                x = Constants.MAP_MIN_X
+                x = globals.MAP_MIN_X
                 while (true) {
-                    if (x > Constants.MAP_MAX_X) break
+                    if (x > globals.MAP_MAX_X) break
                     terrainTypeId = GetTerrainType(x, y)
                     done = false
                     j = 0
@@ -73,7 +74,7 @@ const initReinitTerrains = () => {
                     x = x + LARGEUR_CASE
                 }
                 y = y + LARGEUR_CASE
-                if (y > Constants.MAP_MAX_Y) {
+                if (y > globals.MAP_MAX_Y) {
                     DisableTrigger(GetTriggeringTrigger())
                     TerrainModifyingTrig.RestartEnabledCheckTerrainTriggers()
                     terrainModifyWorking = false
@@ -84,7 +85,7 @@ const initReinitTerrains = () => {
                 //endloop
             })
         )
-        let y = Constants.MAP_MIN_Y
+        let y = globals.MAP_MIN_Y
         EnableTrigger(TerrainModifyingTrig.gg_trg_Terrain_modifying_trig)
         terrainModifyWorking = true
     }

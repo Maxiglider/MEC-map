@@ -1,10 +1,11 @@
 import { IsNearBounds } from 'core/01_libraries/Basic_functions'
-import { Constants, LARGEUR_CASE } from 'core/01_libraries/Constants'
+import { LARGEUR_CASE } from 'core/01_libraries/Constants'
 import { Text } from 'core/01_libraries/Text'
 import { errorHandler } from '../../../Utils/mapUtils'
 import { SaveMapInCache } from './SAVE_MAP_in_cache'
 import { SaveWater } from './Save_water'
 import { StringArrayForCache } from './struct_StringArrayForCache'
+import {globals} from "../../../../globals";
 
 const initSaveTerrainRamps = () => {
     let y: number
@@ -76,10 +77,10 @@ if one of the N tilepoints is at a cliff level different than CL or CL+1, the ra
         let signX: number
         let signY: number
 
-        if (y <= Constants.MAP_MAX_Y) {
-            x = Constants.MAP_MIN_X
+        if (y <= globals.MAP_MAX_Y) {
+            x = globals.MAP_MIN_X
             while (true) {
-                if (x > Constants.MAP_MAX_X) break
+                if (x > globals.MAP_MAX_X) break
                 ramp = false
 
                 if (!IsNearBounds(x, y)) {
@@ -90,7 +91,7 @@ if one of the N tilepoints is at a cliff level different than CL or CL+1, the ra
                         //droite
                         otherX = x + LARGEUR_CASE
                         otherY = y
-                        if (otherX <= Constants.MAP_MAX_X) {
+                        if (otherX <= globals.MAP_MAX_X) {
                             otherCliffLevel = GetTerrainCliffLevel(otherX, otherY)
 
                             otherX = x + LARGEUR_CASE / 2
@@ -160,7 +161,7 @@ if one of the N tilepoints is at a cliff level different than CL or CL+1, the ra
                                 } else {
                                     //il peut y avoir une rampe s'il y a une falaise juste après, vers le haut et walkable
                                     otherX = x + LARGEUR_CASE * 2
-                                    if (otherX <= Constants.MAP_MAX_X) {
+                                    if (otherX <= globals.MAP_MAX_X) {
                                         otherCliffLevel2 = GetTerrainCliffLevel(otherX, otherY)
                                         if (currentCliffLevel < otherCliffLevel2) {
                                             otherX = otherX - LARGEUR_CASE / 2
@@ -189,7 +190,7 @@ if one of the N tilepoints is at a cliff level different than CL or CL+1, the ra
                         //gauche
                         otherX = x - LARGEUR_CASE
                         otherY = y
-                        if (otherX >= Constants.MAP_MIN_X) {
+                        if (otherX >= globals.MAP_MIN_X) {
                             otherCliffLevel = GetTerrainCliffLevel(otherX, otherY)
 
                             otherX = x - LARGEUR_CASE / 2
@@ -259,7 +260,7 @@ if one of the N tilepoints is at a cliff level different than CL or CL+1, the ra
                                 } else {
                                     //il peut y avoir une rampe s'il y a une falaise juste après, vers le haut et walkable
                                     otherX = x - LARGEUR_CASE * 2
-                                    if (otherX >= Constants.MAP_MIN_X) {
+                                    if (otherX >= globals.MAP_MIN_X) {
                                         otherCliffLevel2 = GetTerrainCliffLevel(otherX, otherY)
                                         if (currentCliffLevel < otherCliffLevel2) {
                                             otherX = otherX + LARGEUR_CASE / 2
@@ -288,7 +289,7 @@ if one of the N tilepoints is at a cliff level different than CL or CL+1, the ra
                         //haut
                         otherX = x
                         otherY = y + LARGEUR_CASE
-                        if (otherY <= Constants.MAP_MAX_Y) {
+                        if (otherY <= globals.MAP_MAX_Y) {
                             otherCliffLevel = GetTerrainCliffLevel(otherX, otherY)
 
                             otherY = y + LARGEUR_CASE / 2
@@ -358,7 +359,7 @@ if one of the N tilepoints is at a cliff level different than CL or CL+1, the ra
                                 } else {
                                     //il peut y avoir une rampe s'il y a une falaise juste après, vers le haut et walkable
                                     otherY = y + LARGEUR_CASE * 2
-                                    if (otherY <= Constants.MAP_MAX_Y) {
+                                    if (otherY <= globals.MAP_MAX_Y) {
                                         otherCliffLevel2 = GetTerrainCliffLevel(otherX, otherY)
                                         if (currentCliffLevel < otherCliffLevel2) {
                                             otherY = otherY - LARGEUR_CASE / 2
@@ -387,7 +388,7 @@ if one of the N tilepoints is at a cliff level different than CL or CL+1, the ra
                         //bas
                         otherX = x
                         otherY = y - LARGEUR_CASE
-                        if (otherY >= Constants.MAP_MIN_Y) {
+                        if (otherY >= globals.MAP_MIN_Y) {
                             otherCliffLevel = GetTerrainCliffLevel(otherX, otherY)
 
                             otherY = y - LARGEUR_CASE / 2
@@ -457,7 +458,7 @@ if one of the N tilepoints is at a cliff level different than CL or CL+1, the ra
                                 } else {
                                     //il peut y avoir une rampe s'il y a une falaise juste après, vers le haut et walkable
                                     otherY = y - LARGEUR_CASE * 2
-                                    if (otherY >= Constants.MAP_MIN_Y) {
+                                    if (otherY >= globals.MAP_MIN_Y) {
                                         otherCliffLevel2 = GetTerrainCliffLevel(otherX, otherY)
                                         if (currentCliffLevel < otherCliffLevel2) {
                                             otherY = otherY + LARGEUR_CASE / 2
@@ -537,7 +538,7 @@ if one of the N tilepoints is at a cliff level different than CL or CL+1, the ra
     }
 
     const StartSaveTerrainRamps = () => {
-        y = Constants.MAP_MIN_Y
+        y = globals.MAP_MIN_Y
         StringArrayForCache.stringArrayForCache = new StringArrayForCache('terrain', 'terrainRamps', false)
         TriggerClearActions(SaveMapInCache.trigSaveMapInCache)
         TriggerAddAction(SaveMapInCache.trigSaveMapInCache, errorHandler(SaveTerrainRamps_Actions))
