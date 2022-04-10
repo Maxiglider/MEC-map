@@ -5,6 +5,7 @@ import type { Level } from '../Level/Level'
 import type { Monster } from './Monster'
 import type { MonsterType } from './MonsterType'
 import { countMonstersAccordingToMode } from './Monster_count'
+import {ArrayHandler} from "../../../Utils/ArrayHandler";
 
 export const MONSTER_NEAR_DIFF_MAX = 64
 
@@ -63,10 +64,23 @@ export class MonsterArray {
         return null
     }
 
-    getMonstersBetweenLocs(x1: number, y1: number, x2: number, y2: number, filterMonsterClassName?: string) {
-        return this.monsters.filter(monster => {
+    getMonstersBetweenLocs(x1: number, y1: number, x2: number, y2: number, filterMonsterClassName?: string | string[]) {
+        let filterMonsterClassNameArr: string[] | null = null
+        let clearArrayAtEnd = false
+
+        if(filterMonsterClassName){
+            if(typeof filterMonsterClassName == 'string'){
+                filterMonsterClassNameArr = ArrayHandler.getNewArray()
+                clearArrayAtEnd = true
+                filterMonsterClassNameArr[0] = filterMonsterClassName
+            }else{
+                filterMonsterClassNameArr = filterMonsterClassName
+            }
+        }
+
+        const filteredMonsters = this.monsters.filter(monster => {
             if (monster && monster.u) {
-                if (!filterMonsterClassName || monster.constructor.name === filterMonsterClassName) {
+                if (!filterMonsterClassNameArr || filterMonsterClassNameArr.includes(monster.constructor.name)) {
                     //todomax check that the filter like that works
                     if (IsUnitBetweenLocs(monster.u, x1, y1, x2, y2)) {
                         return true
@@ -76,6 +90,12 @@ export class MonsterArray {
 
             return false
         })
+
+        if(clearArrayAtEnd){
+            filterMonsterClassNameArr && ArrayHandler.clearArray(filterMonsterClassNameArr)
+        }
+
+        return filteredMonsters
     }
 
     createMonstersUnits = () => {

@@ -251,12 +251,15 @@ export class MonsterType {
         } else {
             heightDisplay = I2S(R2I(this.height))
         }
-        display = display + Ascii2String(this.unitTypeId) + "'" + space + "'" + Ascii2String(this.immolationSkill) + "'"
+        display = display + Ascii2String(this.unitTypeId) + "'"
         display =
             display +
             space +
             'speed_' +
             I2S(R2I(this.speed)) +
+            space +
+            'immo_' +
+            this.getImmolationRadiusStr() +
             space +
             'scale_' +
             scaleDisplay +
@@ -284,12 +287,15 @@ export class MonsterType {
         } else {
             heightDisplay = I2S(R2I(this.height))
         }
-        display = display + Ascii2String(this.unitTypeId) + "'" + space + "'" + Ascii2String(this.immolationSkill) + "'"
+        display = display + Ascii2String(this.unitTypeId) + "'" + space
         display =
             display +
             space +
             'speed_' +
             I2S(R2I(this.speed)) +
+            space +
+            'immo_' +
+            this.getImmolationRadiusStr()
             space +
             'scale_' +
             scaleDisplay +

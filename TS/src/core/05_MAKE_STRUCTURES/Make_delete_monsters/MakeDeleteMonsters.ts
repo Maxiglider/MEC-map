@@ -2,6 +2,11 @@ import { MakeOneByOneOrTwoClicks } from 'core/05_MAKE_STRUCTURES/Make/MakeOneByO
 import { Text } from '../../01_libraries/Text'
 import { Monster } from '../../04_STRUCTURES/Monster/Monster'
 import { MakeDeleteMonstersAction } from '../MakeLastActions/MakeDeleteMonstersAction'
+import {ArrayHandler} from "../../../Utils/ArrayHandler";
+import {MonsterNoMove} from "../../04_STRUCTURES/Monster/MonsterNoMove";
+import {arrayPush} from "../../01_libraries/Basic_functions";
+import {MonsterSimplePatrol} from "../../04_STRUCTURES/Monster/MonsterSimplePatrol";
+import {MonsterMultiplePatrols} from "../../04_STRUCTURES/Monster/MonsterMultiplePatrols";
 
 export class MakeDeleteMonsters extends MakeOneByOneOrTwoClicks {
     constructor(maker: unit, mode: string) {
@@ -29,9 +34,30 @@ export class MakeDeleteMonsters extends MakeOneByOneOrTwoClicks {
                     return
                 }
 
+                let filterMonsterClassNameArr: string[] | undefined = undefined
+
+                if (this.getMode() != 'all') {
+                    filterMonsterClassNameArr = ArrayHandler.getNewArray()
+
+                    if (this.getMode() == 'noMove') {
+                        arrayPush(filterMonsterClassNameArr, 'MonsterNoMove')
+                    } else {
+                        if(this.getMode() == 'move' || this.getMode() == 'simplePatrol'){
+                            arrayPush(filterMonsterClassNameArr, 'MonsterSimplePatrol')
+                        }
+                        if(this.getMode() == 'move' || this.getMode() == 'multiplePatrols'){
+                            arrayPush(filterMonsterClassNameArr, 'MonsterMultiplePatrols')
+                        }
+                    }
+                }
+
                 let monsters = this.escaper
-                    .getMakingLevel()
-                    .monsters.getMonstersBetweenLocs(this.lastX, this.lastY, this.orderX, this.orderY)
+                        .getMakingLevel()
+                        .monsters.getMonstersBetweenLocs(this.lastX, this.lastY, this.orderX, this.orderY, filterMonsterClassNameArr)
+
+                if(filterMonsterClassNameArr){
+                    ArrayHandler.clearArray(filterMonsterClassNameArr)
+                }
 
                 for (const monster of monsters) {
                     monster.removeUnit()
