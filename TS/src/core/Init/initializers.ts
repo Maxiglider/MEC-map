@@ -11,9 +11,10 @@ import { init_ToTurnOnSlide } from '../07_TRIGGERS/Slide_and_CheckTerrain_trigge
 import { init_Apm } from '../08_GAME/Apm_clics_par_minute/Apm'
 import { init_Heroes } from '../08_GAME/Init_game/Heroes'
 import { initNoSelectionCircle } from '../08_GAME/Init_game/No_selection_circle'
+import { initSelectUnit } from '../08_GAME/select_unit'
+import { init_doubleKill } from '../Double_heroes/double_kill'
 import { initArrays } from './initArrays'
 import { initOldTriggers } from './init_old_triggers'
-import {init_doubleKill} from "../Double_heroes/double_kill";
 
 export const initializers = () => {
     init_terrain_limit_variables()
@@ -23,6 +24,7 @@ export const initializers = () => {
     initNoSelectionCircle()
     init_Apm()
     init_Heroes()
+    initSelectUnit()
     initGameTime()
     initOldTriggers()
     init_commandExecution()

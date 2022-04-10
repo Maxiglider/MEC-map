@@ -34,6 +34,7 @@ import { MakeSetUnitTeleportPeriod } from 'core/05_MAKE_STRUCTURES/Make_set_unit
 import { AfkMode } from 'core/08_GAME/Afk_mode/Afk_mode'
 import { Timer } from 'w3ts'
 import { getUdgEscapers, getUdgLevels, getUdgTerrainTypes } from '../../../../globals'
+import { createTimer } from '../../../Utils/mapUtils'
 import type { Make } from '../../05_MAKE_STRUCTURES/Make/Make'
 import type { MakeAction } from '../../05_MAKE_STRUCTURES/MakeLastActions/MakeAction'
 import { MakeLastActions } from '../../05_MAKE_STRUCTURES/MakeLastActions/MakeLastActions'
@@ -66,7 +67,6 @@ import { TerrainTypeSlide } from '../TerrainType/TerrainTypeSlide'
 import { TerrainTypeWalk } from '../TerrainType/TerrainTypeWalk'
 import { EscaperEffectArray } from './EscaperEffectArray'
 import { ColorInfo, GetMirrorEscaper } from './Escaper_functions'
-import {createTimer} from "../../../Utils/mapUtils";
 
 const SHOW_REVIVE_EFFECTS = false
 
@@ -118,6 +118,7 @@ export class Escaper {
 
     private slideLastAngleOrder: number
     private isHeroSelectedB: boolean
+    private selectedPlayerId: number = -1
 
     private instantTurnAbsolute: boolean
 
@@ -588,6 +589,12 @@ export class Escaper {
         }
     }
 
+    setSelectedPlayerId = (playerId: number) => {
+        this.selectedPlayerId = playerId
+    }
+
+    getSelectedPlayerId = () => this.selectedPlayerId
+
     //effects methods
     newEffect(efStr: string, bodyPart: string) {
         this.hero && this.effects.new(efStr, this.hero, bodyPart)
@@ -1019,7 +1026,8 @@ export class Escaper {
             return false
         }
 
-        createTimer(0, false, () => { //destroying make a bit later allow to prevent secondary hero from moving
+        createTimer(0, false, () => {
+            //destroying make a bit later allow to prevent secondary hero from moving
             this.make && this.make.destroy()
             delete this.make
         })
@@ -1355,6 +1363,3 @@ export class Escaper {
         return this.escaperId >= NB_PLAYERS_MAX
     }
 }
-
-
-

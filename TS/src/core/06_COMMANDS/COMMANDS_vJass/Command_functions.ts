@@ -2,6 +2,7 @@ import { stringReplaceAll } from 'core/01_libraries/Basic_functions'
 import { NB_ESCAPERS, NB_PLAYERS_MAX } from 'core/01_libraries/Constants'
 import { ColorString2Id } from 'core/01_libraries/Init_colorCodes'
 import { forRange } from 'Utils/mapUtils'
+import { getUdgEscapers } from '../../../../globals'
 
 const cachedPlayerNames: { [x: string]: number } = {}
 
@@ -118,7 +119,11 @@ export const resolvePlayerId = (arg: string) => {
     let targetPlayer = -1
 
     if (larg === 's' || larg === 'sel' || larg === 'select' || larg === 'selected') {
-        throw 'Not yet implemented'
+        const a = getUdgEscapers().get(GetPlayerId(GetTriggerPlayer()))?.getSelectedPlayerId()
+
+        if (a > 0 && a <= NB_ESCAPERS) {
+            targetPlayer = a
+        }
     } else if (IsPlayerColorString(larg)) {
         targetPlayer = ColorString2Id(larg)
     } else if (S2I(larg) !== 0) {
