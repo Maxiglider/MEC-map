@@ -1,5 +1,6 @@
 import { NB_ESCAPERS } from 'core/01_libraries/Constants'
- import { getUdgEscapers } from '../../../../globals'
+import { forRange } from 'Utils/mapUtils'
+import { getUdgEscapers } from '../../../../globals'
 
 //todomax put udg_autoContinueAfterSliding in globals.ts
 
@@ -9,6 +10,8 @@ const initAutoContinueAfterSliding = () => {
     let lastClickedWidgets: (widget | null)[] = []
     let isLastTargetALocation: boolean[] = []
     let udg_autoContinueAfterSliding: boolean[] = []
+
+    forRange(NB_ESCAPERS, i => (udg_autoContinueAfterSliding[i] = true))
 
     const ECART_MAX_ANGLE = 45
 
@@ -58,16 +61,6 @@ const initAutoContinueAfterSliding = () => {
         lastClickedWidgets[n] = null
     }
 
-    const Init_AutoContinueAfterSliding = () => {
-        return
-        let i = 0
-        while (true) {
-            if (i >= NB_ESCAPERS) break
-            udg_autoContinueAfterSliding[i] = true
-            i = i + 1
-        }
-    }
-
     return {
         lastClickedX,
         lastClickedY,
@@ -75,7 +68,6 @@ const initAutoContinueAfterSliding = () => {
         udg_autoContinueAfterSliding,
         AutoContinueAfterSliding,
         ClearLastClickSave,
-        Init_AutoContinueAfterSliding
     }
 }
 

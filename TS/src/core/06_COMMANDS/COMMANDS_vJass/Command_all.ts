@@ -11,7 +11,7 @@ import {
     TEAL,
     TERRAIN_DATA_DISPLAY_TIME,
 } from 'core/01_libraries/Constants'
-import {ColorString2Id, udg_colorCode} from 'core/01_libraries/Init_colorCodes'
+import { ColorString2Id, udg_colorCode } from 'core/01_libraries/Init_colorCodes'
 import { Text } from 'core/01_libraries/Text'
 import { Escaper } from 'core/04_STRUCTURES/Escaper/Escaper'
 import { ColorInfo, GetMirrorEscaper } from 'core/04_STRUCTURES/Escaper/Escaper_functions'
@@ -290,17 +290,19 @@ export const ExecuteCommandAll = (escaper: Escaper, cmd: string): boolean => {
             return true
         }
         if (nbParam === 1) {
-            if (isPlayerId(param1)) {
+            if (S2I(param1) !== 0) {
+                n = S2I(param1)
+                if (n < 1 || n > LIMIT_NB_HERO_EFFECTS) {
+                    return true
+                }
+            } else if (isPlayerId(param1)) {
                 if (!escaper.isTrueMaximaxou()) {
                     return true
                 }
                 escaper = getUdgEscapers().get(resolvePlayerId(param1))
                 n = LIMIT_NB_HERO_EFFECTS
             } else {
-                n = S2I(param1)
-                if (n < 1 || n > LIMIT_NB_HERO_EFFECTS) {
-                    return true
-                }
+                n = 0
             }
         } else {
             n = LIMIT_NB_HERO_EFFECTS
