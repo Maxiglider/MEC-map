@@ -1,8 +1,8 @@
 import { CACHE_SEPARATEUR_PARAM } from 'core/07_TRIGGERS/Save_map_in_gamecache/struct_StringArrayForCache'
+import { udg_monsters } from '../../../../globals'
 import { Monster } from './Monster'
 import { MonsterType } from './MonsterType'
 import { NewImmobileMonster } from './Monster_functions'
-import {udg_monsters} from "../../../../globals";
 
 export class MonsterNoMove extends Monster {
     private x: number
@@ -17,9 +17,7 @@ export class MonsterNoMove extends Monster {
         this.angle = angle
     }
 
-    static count = (): number => {
-        return udg_monsters.filter(monster => monster instanceof MonsterNoMove).length
-    }
+    static count = () => udg_monsters.filter(monster => monster instanceof MonsterNoMove).length
 
     createUnit = () => {
         super.createUnit(() => (this.mt ? NewImmobileMonster(this.mt, this.x, this.y, this.angle) : undefined))

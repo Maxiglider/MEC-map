@@ -36,9 +36,7 @@ export class MonsterSpawnArray {
         monsterSpawn.level = this.level
     }
 
-    count = (): number => {
-        return this.monsterSpawns.filter(ms => ms !== undefined).length
-    }
+    count = () => this.monsterSpawns.length
 
     destroy = () => {
         for (const ms of this.monsterSpawns) {

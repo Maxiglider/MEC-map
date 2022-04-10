@@ -32,9 +32,7 @@ export class MeteorArray {
         delete this.meteors[meteorId]
     }
 
-    count = (): number => {
-        return this.meteors.filter(meteor => meteor !== undefined).length
-    }
+    count = () => this.meteors.length
 
     destroy = () => {
         for (const meteor of this.meteors) {

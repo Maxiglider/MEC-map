@@ -32,9 +32,7 @@ export class EscaperArray {
         this.escapers[id] = new Escaper(id)
     }
 
-    count = () => {
-        return this.escapers.filter(escaper => escaper !== undefined).length
-    }
+    count = () => this.escapers.length
 
     get = (id: number) => {
         return this.escapers[id]
