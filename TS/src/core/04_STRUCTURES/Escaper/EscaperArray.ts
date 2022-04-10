@@ -8,7 +8,7 @@ interface EscaperCallback {
 }
 
 export class EscaperArray {
-    private escapers: Escaper[]
+    private escapers: { [x: number]: Escaper }
 
     constructor() {
         this.escapers = []
@@ -32,7 +32,15 @@ export class EscaperArray {
         this.escapers[id] = new Escaper(id)
     }
 
-    count = () => this.escapers.length
+    count = () => {
+        let n = 0
+
+        for (const [_k, _v] of pairs(this.escapers)) {
+            n++
+        }
+
+        return n
+    }
 
     get = (id: number) => {
         return this.escapers[id]
@@ -51,7 +59,7 @@ export class EscaperArray {
     }
 
     forMainEscapers(callback: EscaperCallback) {
-        for (const escaper of this.escapers) {
+        for (const [_, escaper] of pairs(this.escapers)) {
             if (!escaper.isEscaperSecondary()) {
                 callback(escaper)
             }
@@ -59,20 +67,20 @@ export class EscaperArray {
     }
 
     forAll(callback: EscaperCallback) {
-        for (const escaper of this.escapers) {
+        for (const [_, escaper] of pairs(this.escapers)) {
             callback(escaper)
         }
     }
 
     deleteSpecificActionsForLevel = (level: Level) => {
-        for (const escaper of this.escapers) {
+        for (const [_, escaper] of pairs(this.escapers)) {
             escaper.deleteSpecificActionsForLevel(level)
         }
     }
 
     destroyMakesIfForSpecificLevel_currentLevel = () => {
         //destroy le make des this.escapers si c'est un make pour spécifique level et que l'escaper make pour le "current_level"
-        for (const escaper of this.escapers) {
+        for (const [_, escaper] of pairs(this.escapers)) {
             escaper.isMakingCurrentLevel() && escaper.destroyMakeIfForSpecificLevel()
         }
     }
