@@ -366,14 +366,14 @@ export const ExecuteCommandAll = (escaper: Escaper, cmd: string): boolean => {
         if (!(noParam || nbParam === 1)) {
             return true
         }
-        if (noParam || param1 === 'moving' || param1 === 'm') {
-            n = getUdgLevels().getNbMonsters('moving')
-            Text.P(escaper.getPlayer(), 'There are ' + I2S(n) + ' moving monsters in the map.')
-            return true
-        }
-        if (param1 === 'all' || param1 === 'a') {
+        if (noParam || param1 === 'all' || param1 === 'a') {
             n = getUdgLevels().getNbMonsters('all')
             Text.P(escaper.getPlayer(), 'There are ' + I2S(n) + ' monsters in the map.')
+            return true
+        }
+        if (param1 === 'moving' || param1 === 'm') {
+            n = getUdgLevels().getNbMonsters('moving')
+            Text.P(escaper.getPlayer(), 'There are ' + I2S(n) + ' moving monsters in the map.')
             return true
         }
         if (param1 === 'notMoving' || param1 === 'nm') {
@@ -389,14 +389,14 @@ export const ExecuteCommandAll = (escaper: Escaper, cmd: string): boolean => {
         if (!(noParam || nbParam === 1)) {
             return true
         }
-        if (noParam || param1 === 'moving' || param1 === 'm') {
-            n = getUdgLevels().getCurrentLevel().getNbMonsters('moving')
-            Text.P(escaper.getPlayer(), 'There are ' + I2S(n) + ' moving monsters in this level.')
-            return true
-        }
-        if (param1 === 'all' || param1 === 'a') {
+        if (noParam || param1 === 'all' || param1 === 'a') {
             n = getUdgLevels().getCurrentLevel().getNbMonsters('all')
             Text.P(escaper.getPlayer(), 'There are ' + I2S(n) + ' monsters in this level.')
+            return true
+        }
+        if (param1 === 'moving' || param1 === 'm') {
+            n = getUdgLevels().getCurrentLevel().getNbMonsters('moving')
+            Text.P(escaper.getPlayer(), 'There are ' + I2S(n) + ' moving monsters in this level.')
             return true
         }
         if (param1 === 'notMoving' || param1 === 'nm') {
