@@ -1,6 +1,6 @@
 import { CACHE_SEPARATEUR_PARAM } from 'core/07_TRIGGERS/Save_map_in_gamecache/struct_StringArrayForCache'
 import { errorHandler } from '../../../Utils/mapUtils'
-import {B2S, IsOnGround} from '../../01_libraries/Basic_functions'
+import { IsOnGround } from '../../01_libraries/Basic_functions'
 import { Escaper } from '../Escaper/Escaper'
 import { Hero2Escaper } from '../Escaper/Escaper_functions'
 import { Monster } from '../Monster/Monster'
@@ -71,7 +71,7 @@ const CalculerPointsIntersections = () => {
 
 const TrouverTempsIdeal = (tempsMax: number): number => {
     let tempsIdeal = 0
-    if(caster) {
+    if (caster) {
         let diffTemps = PRECISION_DIFF_POS_HERO / sliderSpeed
         let temps = 0
         let xHero: number
@@ -274,7 +274,6 @@ const CasterTryToShoot = () => {
 
 const errorHandlerCasterTryToShoot = errorHandler(CasterTryToShoot)
 
-
 export const CasterUnitWithinRange_Actions = () => {
     let escaperInRange = Hero2Escaper(GetTriggerUnit())
     if (!escaperInRange) {
@@ -300,7 +299,7 @@ export class Caster extends Monster {
     private y: number
     private angle: number
     private trg_unitWithinRange?: trigger
-    public escapersInRange: Escaper[]
+    public escapersInRange: Escaper[] = []
     public nbEscapersInRange: number
     public canShoot: boolean
     public t?: timer
@@ -317,7 +316,6 @@ export class Caster extends Monster {
         this.y = y
         this.angle = angle
 
-        this.escapersInRange = []
         this.nbEscapersInRange = 0
         this.canShoot = true
         this.enabled = false

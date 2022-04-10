@@ -1,26 +1,25 @@
 import type { CasterTypeArray } from './src/core/04_STRUCTURES/Caster/CasterTypeArray'
+import type { EscaperArray } from './src/core/04_STRUCTURES/Escaper/EscaperArray'
+import type { LevelArray } from './src/core/04_STRUCTURES/Level/LevelArray'
+import type { Monster } from './src/core/04_STRUCTURES/Monster/Monster'
 import type { MonsterTypeArray } from './src/core/04_STRUCTURES/Monster/MonsterTypeArray'
 import type { TerrainTypeArray } from './src/core/04_STRUCTURES/TerrainType/TerrainTypeArray'
-import type { EscaperArray } from './src/core/04_STRUCTURES/Escaper/EscaperArray'
-import type {LevelArray} from "./src/core/04_STRUCTURES/Level/LevelArray";
-import type {Monster} from "./src/core/04_STRUCTURES/Monster/Monster";
-
 
 //GLOBALS
 
 export const globals: {
-    escapers?: EscaperArray,
-    levels?: LevelArray,
-    terrainTypes?: TerrainTypeArray,
-    casterTypes?: CasterTypeArray,
+    escapers?: EscaperArray
+    levels?: LevelArray
+    terrainTypes?: TerrainTypeArray
+    casterTypes?: CasterTypeArray
     monsterTypes?: MonsterTypeArray
-    coopModeActive?: boolean,
-    autoreviveDelay?: number,
-    logStrings: string[],
-    MAP_MIN_X: number,
-    MAP_MAX_X: number,
-    MAP_MIN_Y: number,
-    MAP_MAX_Y: number,
+    coopModeActive?: boolean
+    autoreviveDelay?: number
+    logStrings: string[]
+    MAP_MIN_X: number
+    MAP_MAX_X: number
+    MAP_MIN_Y: number
+    MAP_MAX_Y: number
 } = {
     logStrings: [],
     MAP_MIN_X: 0,
@@ -28,9 +27,6 @@ export const globals: {
     MAP_MIN_Y: 0,
     MAP_MAX_Y: 0,
 }
-
-
-
 
 //SETTERS - GETTERS
 
@@ -45,7 +41,6 @@ export const getUdgEscapers = (): EscaperArray => {
     return <EscaperArray>globals.escapers
 }
 
-
 //Levels
 export const setUdgLevels = (la: LevelArray) => {
     //print('called setUdgLevels')
@@ -56,7 +51,6 @@ export const getUdgLevels = (): LevelArray => {
     //print('called getUdgLevels')
     return <LevelArray>globals.levels
 }
-
 
 //Terrain types
 export const setUdgTerrainTypes = (tta: TerrainTypeArray) => {
@@ -69,7 +63,6 @@ export const getUdgTerrainTypes = (): TerrainTypeArray => {
     return <TerrainTypeArray>globals.terrainTypes
 }
 
-
 //Caster types
 export const setUdgCasterTypes = (cta: CasterTypeArray) => {
     //print('called setUdgCasterTypes')
@@ -80,7 +73,6 @@ export const getUdgCasterTypes = (): CasterTypeArray => {
     //print('called getUdgCasterTypes')
     return <CasterTypeArray>globals.casterTypes
 }
-
 
 //Monster types
 export const setUdgMonsterTypes = (mta: MonsterTypeArray) => {
@@ -93,6 +85,15 @@ export const getUdgMonsterTypes = (): MonsterTypeArray => {
     return <MonsterTypeArray>globals.monsterTypes
 }
 
-
 //Monsters
-export const udg_monsters: Monster[] = []
+export const udg_monsters: { [x: number]: Monster } = {}
+
+export const udg_monsters_count = () => {
+    let n = 0
+
+    for (const [_k, _v] of pairs(udg_monsters)) {
+        n++
+    }
+
+    return n
+}

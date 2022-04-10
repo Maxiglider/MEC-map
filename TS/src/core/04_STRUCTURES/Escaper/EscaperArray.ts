@@ -8,11 +8,9 @@ interface EscaperCallback {
 }
 
 export class EscaperArray {
-    private escapers: { [x: number]: Escaper }
+    private escapers: { [x: number]: Escaper } = {}
 
     constructor() {
-        this.escapers = []
-
         for (let escaperId = 0; escaperId < NB_ESCAPERS; escaperId++) {
             if (IsEscaperInGame(escaperId)) {
                 this.escapers[escaperId] = new Escaper(escaperId)

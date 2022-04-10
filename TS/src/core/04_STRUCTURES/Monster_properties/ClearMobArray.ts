@@ -5,25 +5,25 @@ import { ClearMob } from './ClearMob'
 
 export class ClearMobArray {
     private level: Level
-    private clearMobs: ClearMob[] = []
+    private clearMobs: { [x: number]: ClearMob } = {}
 
     constructor(level: Level) {
         this.level = level
     }
 
     get(arrayId: number) {
-        if (arrayId < 0 || arrayId > this.clearMobs.length - 1) {
+        if (arrayId < 0 || arrayId > this.count() - 1) {
             return null
         }
         return this.clearMobs[arrayId]
     }
 
     getLastInstanceId = (): number => {
-        return this.clearMobs.length - 1
+        return this.count() - 1
     }
 
     new = (triggerMob: Monster, disableDuration: number, initialize: boolean): ClearMob => {
-        let n = this.clearMobs.length
+        let n = this.count()
 
         this.clearMobs[n] = new ClearMob(triggerMob, disableDuration)
         if (initialize) {
@@ -35,10 +35,18 @@ export class ClearMobArray {
         return this.clearMobs[n]
     }
 
-    count = () => this.clearMobs.length
+    count = () => {
+        let n = 0
+
+        for (const [_k, _v] of pairs(this.clearMobs)) {
+            n++
+        }
+
+        return n
+    }
 
     destroy = () => {
-        for (const clearMob of this.clearMobs) {
+        for (const [_, clearMob] of pairs(this.clearMobs)) {
             clearMob.destroy()
         }
     }
@@ -62,7 +70,7 @@ export class ClearMobArray {
         let yMob: number
         let i = 0
 
-        while (i <= this.clearMobs.length) {
+        while (i <= this.count()) {
             if (this.clearMobs[i]) {
                 const unit = this.clearMobs[i].getTriggerMob().u
 
@@ -81,13 +89,13 @@ export class ClearMobArray {
     }
 
     initializeClearMobs = () => {
-        for (const clearMob of this.clearMobs) {
+        for (const [_, clearMob] of pairs(this.clearMobs)) {
             clearMob.initialize()
         }
     }
 
     closeClearMobs = () => {
-        for (const clearMob of this.clearMobs) {
+        for (const [_, clearMob] of pairs(this.clearMobs)) {
             clearMob.close()
         }
     }

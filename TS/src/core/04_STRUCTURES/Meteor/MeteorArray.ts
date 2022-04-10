@@ -4,12 +4,11 @@ import { MONSTER_NEAR_DIFF_MAX } from '../Monster/MonsterArray'
 import { Meteor } from './Meteor'
 
 export class MeteorArray {
-    private meteors: Meteor[]
+    private meteors: { [x: number]: Meteor } = {}
     private level: Level
 
     constructor(level: Level) {
         this.level = level
-        this.meteors = []
     }
 
     get = (meteorId: number) => {
@@ -32,10 +31,18 @@ export class MeteorArray {
         delete this.meteors[meteorId]
     }
 
-    count = () => this.meteors.length
+    count = () => {
+        let n = 0
+
+        for (const [_k, _v] of pairs(this.meteors)) {
+            n++
+        }
+
+        return n
+    }
 
     destroy = () => {
-        for (const meteor of this.meteors) {
+        for (const [_, meteor] of pairs(this.meteors)) {
             meteor.destroy()
         }
     }
@@ -51,19 +58,19 @@ export class MeteorArray {
     }
 
     createMeteorsItems = () => {
-        for (const meteor of this.meteors) {
+        for (const [_, meteor] of pairs(this.meteors)) {
             meteor.createMeteorItem()
         }
     }
 
     removeMeteorsItems = () => {
-        for (const meteor of this.meteors) {
+        for (const [_, meteor] of pairs(this.meteors)) {
             meteor.removeMeteorItem()
         }
     }
 
     getMeteorNear = (x: number, y: number) => {
-        for (const meteor of this.meteors) {
+        for (const [_, meteor] of pairs(this.meteors)) {
             const item = meteor.getItem()
             if (item) {
                 const xMeteor = GetItemX(item)
@@ -78,7 +85,7 @@ export class MeteorArray {
     }
 
     getMeteorsBetweenLocs(x1: number, y1: number, x2: number, y2: number) {
-        return this.meteors.filter(meteor => {
+        return Object.values(this.meteors).filter(meteor => {
             const item = meteor.getItem()
             if (item) {
                 if (IsItemBetweenLocs(item, x1, y1, x2, y2)) {

@@ -1,12 +1,16 @@
 import { Text } from 'core/01_libraries/Text'
-import {CLEAR_MOB_MAX_DURATION, ClearMob, FRONT_MONTANT_DURATION} from 'core/04_STRUCTURES/Monster_properties/ClearMob'
+import {
+    ClearMob,
+    CLEAR_MOB_MAX_DURATION,
+    FRONT_MONTANT_DURATION,
+} from 'core/04_STRUCTURES/Monster_properties/ClearMob'
 import { Make } from 'core/05_MAKE_STRUCTURES/Make/Make'
 import { Monster } from '../../04_STRUCTURES/Monster/Monster'
 
 export class MakeClearMob extends Make {
     private disableDuration: number
     private clearMob?: ClearMob
-    private blockMobs: Monster[]
+    private blockMobs: Monster[] = []
     private indexLastBlockNotCancelledMob: number
     private triggerMob?: Monster
 
@@ -21,12 +25,11 @@ export class MakeClearMob extends Make {
         }
 
         this.disableDuration = disableDuration
-        this.blockMobs = []
         this.indexLastBlockNotCancelledMob = 0
     }
 
     private createClearMob() {
-        if(this.triggerMob) {
+        if (this.triggerMob) {
             this.clearMob = this.escaper.getMakingLevel().clearMobs.new(this.triggerMob, this.disableDuration, true)
         }
     }

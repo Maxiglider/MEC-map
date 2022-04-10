@@ -1,3 +1,4 @@
+import { ArrayHandler } from '../../../Utils/ArrayHandler'
 import { IsUnitBetweenLocs } from '../../01_libraries/Basic_functions'
 import { Caster } from '../Caster/Caster'
 import type { CasterType } from '../Caster/CasterType'
@@ -5,18 +6,16 @@ import type { Level } from '../Level/Level'
 import type { Monster } from './Monster'
 import type { MonsterType } from './MonsterType'
 import { countMonstersAccordingToMode } from './Monster_count'
-import {ArrayHandler} from "../../../Utils/ArrayHandler";
 
 export const MONSTER_NEAR_DIFF_MAX = 64
 
 //represents the monsters in a level
 export class MonsterArray {
-    private monsters: Monster[] //same ids as in udg_monsters
+    private monsters: { [x: number]: Monster } = {} //same ids as in udg_monsters
     private level?: Level
 
     constructor(level?: Level) {
         this.level = level
-        this.monsters = []
     }
 
     getLevel = () => {
@@ -38,7 +37,7 @@ export class MonsterArray {
     }
 
     count = (mode?: string) => {
-        return countMonstersAccordingToMode(this.monsters, mode)
+        return countMonstersAccordingToMode(Object.values(this.monsters), mode)
     }
 
     //Juste remove the monster from this level
@@ -47,7 +46,7 @@ export class MonsterArray {
     }
 
     getMonsterNear = (x: number, y: number, filterMonsterClassName?: string): Monster | null => {
-        for (let monster of this.monsters) {
+        for (const [_, monster] of pairs(this.monsters)) {
             if (monster && monster.u) {
                 const xMob = GetUnitX(monster.u)
                 const yMob = GetUnitY(monster.u)
@@ -68,17 +67,17 @@ export class MonsterArray {
         let filterMonsterClassNameArr: string[] | null = null
         let clearArrayAtEnd = false
 
-        if(filterMonsterClassName){
-            if(typeof filterMonsterClassName == 'string'){
+        if (filterMonsterClassName) {
+            if (typeof filterMonsterClassName == 'string') {
                 filterMonsterClassNameArr = ArrayHandler.getNewArray()
                 clearArrayAtEnd = true
                 filterMonsterClassNameArr[0] = filterMonsterClassName
-            }else{
+            } else {
                 filterMonsterClassNameArr = filterMonsterClassName
             }
         }
 
-        const filteredMonsters = this.monsters.filter(monster => {
+        const filteredMonsters = Object.values(this.monsters).filter(monster => {
             if (monster && monster.u) {
                 if (!filterMonsterClassNameArr || filterMonsterClassNameArr.includes(monster.constructor.name)) {
                     //todomax check that the filter like that works
@@ -91,7 +90,7 @@ export class MonsterArray {
             return false
         })
 
-        if(clearArrayAtEnd){
+        if (clearArrayAtEnd) {
             filterMonsterClassNameArr && ArrayHandler.clearArray(filterMonsterClassNameArr)
         }
 
@@ -99,19 +98,19 @@ export class MonsterArray {
     }
 
     createMonstersUnits = () => {
-        for (const monster of this.monsters) {
+        for (const [_, monster] of pairs(this.monsters)) {
             monster.createUnit()
         }
     }
 
     removeMonstersUnits = () => {
-        for (const monster of this.monsters) {
+        for (const [_, monster] of pairs(this.monsters)) {
             monster.removeUnit()
         }
     }
 
     recreateMonstersUnitsOfType = (mt: MonsterType) => {
-        this.monsters
+        Object.values(this.monsters)
             .filter(monster => monster && monster.getMonsterType() == mt)
             .forEach(monster => monster.createUnit())
     }
@@ -129,7 +128,7 @@ export class MonsterArray {
 
     //Destroy monsters of one type
     clearMonstersOfType = (mt: MonsterType) => {
-        this.monsters
+        Object.values(this.monsters)
             .filter(monster => monster && monster.getMonsterType() == mt)
             .forEach(monster => {
                 delete this.monsters[monster.getId()]
@@ -139,28 +138,28 @@ export class MonsterArray {
 
     //Special casters
     refreshCastersOfType(ct: CasterType) {
-        for (const monster of this.monsters) {
+        for (const [_, monster] of pairs(this.monsters)) {
             monster instanceof Caster && monster.getCasterType() === ct && monster.refresh()
         }
     }
 
     removeCastersOfType(ct: CasterType) {
-        for (const monster of this.monsters) {
+        for (const [_, monster] of pairs(this.monsters)) {
             monster instanceof Caster && monster.getCasterType() === ct && monster.destroy()
         }
     }
 
     containsMonster(monster: Monster) {
-        return this.monsters.filter(mob => mob == monster).length > 0
+        return Object.values(this.monsters).filter(mob => mob == monster).length > 0
     }
 
     getLast = () => {
-        const filteredMonsters = this.monsters.filter(monster => monster !== undefined)
+        const filteredMonsters = Object.values(this.monsters).filter(monster => monster !== undefined)
         return filteredMonsters[filteredMonsters.length - 1]
     }
 
     removeLast = () => {
-        let i = this.monsters.length - 1
+        let i = this.count() - 1
 
         while (i >= 0) {
             if (this.monsters[i]) {
@@ -175,7 +174,7 @@ export class MonsterArray {
     }
 
     executeForAll(callback: Function) {
-        this.monsters
+        Object.values(this.monsters)
             .filter(monster => monster !== undefined)
             .forEach(monster => {
                 callback(monster)
@@ -184,7 +183,7 @@ export class MonsterArray {
 
     //Destroy everything including the monsters
     destroy = () => {
-        for (const monster of this.monsters) {
+        for (const [_, monster] of pairs(this.monsters)) {
             monster.destroy()
         }
     }

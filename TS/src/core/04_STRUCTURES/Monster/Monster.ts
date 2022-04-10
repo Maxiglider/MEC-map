@@ -1,4 +1,4 @@
-import { udg_monsters } from '../../../../globals'
+import { udg_monsters, udg_monsters_count } from '../../../../globals'
 import { MOBS_VARIOUS_COLORS } from '../../01_libraries/Constants'
 import { ColorString2Id } from '../../01_libraries/Init_colorCodes'
 import { IsColorString } from '../../06_COMMANDS/COMMANDS_vJass/Command_functions'
@@ -33,7 +33,7 @@ export abstract class Monster {
 
     constructor(monsterType?: MonsterType) {
         this.mt = monsterType
-        this.id = udg_monsters.length
+        this.id = udg_monsters_count()
 
         udg_monsters[this.id] = this
 

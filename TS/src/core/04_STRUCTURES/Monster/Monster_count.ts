@@ -1,7 +1,7 @@
-import {Monster} from "./Monster";
-import {MonsterSimplePatrol} from "./MonsterSimplePatrol";
-import {MonsterMultiplePatrols} from "./MonsterMultiplePatrols";
-import {MonsterNoMove} from "./MonsterNoMove";
+import { Monster } from './Monster'
+import { MonsterMultiplePatrols } from './MonsterMultiplePatrols'
+import { MonsterNoMove } from './MonsterNoMove'
+import { MonsterSimplePatrol } from './MonsterSimplePatrol'
 
 export const countMonstersAccordingToMode = (monsters: Monster[], mode?: string) => {
     if (!mode) mode = 'all'

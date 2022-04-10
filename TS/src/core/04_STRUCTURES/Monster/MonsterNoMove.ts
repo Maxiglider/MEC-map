@@ -17,7 +17,7 @@ export class MonsterNoMove extends Monster {
         this.angle = angle
     }
 
-    static count = () => udg_monsters.filter(monster => monster instanceof MonsterNoMove).length
+    static count = () => Object.values(udg_monsters).filter(monster => monster instanceof MonsterNoMove).length
 
     createUnit = () => {
         super.createUnit(() => (this.mt ? NewImmobileMonster(this.mt, this.x, this.y, this.angle) : undefined))

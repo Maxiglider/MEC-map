@@ -3,14 +3,14 @@ import { VisibilityModifier } from './VisibilityModifier'
 
 export class VisibilityModifierArray {
     private level: Level
-    private vms: VisibilityModifier[] = []
+    private vms: { [x: number]: VisibilityModifier } = {}
 
     constructor(level: Level) {
         this.level = level
     }
 
     new = (x1: number, y1: number, x2: number, y2: number) => {
-        const n = this.vms.length
+        const n = this.count()
         this.vms[n] = new VisibilityModifier(x1, y1, x2, y2)
         this.vms[n].level = this.level
         this.vms[n].id = n
@@ -18,22 +18,30 @@ export class VisibilityModifierArray {
     }
 
     newFromExisting = (vm: VisibilityModifier) => {
-        const n = this.vms.length
+        const n = this.count()
         this.vms[n] = vm
         return vm
     }
 
-    count = () => this.vms.length
+    count = () => {
+        let n = 0
+
+        for (const [_k, _v] of pairs(this.vms)) {
+            n++
+        }
+
+        return n
+    }
 
     get = (visibilityId: number) => {
-        if (visibilityId < 0 || visibilityId > this.vms.length) {
+        if (visibilityId < 0 || visibilityId > this.count()) {
             return null
         }
         return this.vms[visibilityId]
     }
 
     getLastInstanceId = (): number => {
-        return this.vms.length - 1
+        return this.count() - 1
     }
 
     removeVisibility = (arrayId: number) => {
@@ -41,13 +49,15 @@ export class VisibilityModifierArray {
     }
 
     removeAllVisibilityModifiers = () => {
-        for (const vm of this.vms) {
+        for (const [_, vm] of pairs(this.vms)) {
             vm.destroy()
         }
     }
 
     removeLasts = (numberOfVMToRemove: number): boolean => {
-        const vms = this.vms.filter(vm => vm !== undefined).reverse()
+        const vms = Object.values(this.vms)
+            .filter(vm => vm !== undefined)
+            .reverse()
 
         let i = numberOfVMToRemove
         while (i > 0 && vms.length > 0) {
@@ -59,13 +69,13 @@ export class VisibilityModifierArray {
     }
 
     activate = (activ: boolean) => {
-        for (const vm of this.vms) {
+        for (const [_, vm] of pairs(this.vms)) {
             vm.activate(activ)
         }
     }
 
     destroy = () => {
-        for (const vm of this.vms) {
+        for (const [_, vm] of pairs(this.vms)) {
             vm.destroy()
         }
     }

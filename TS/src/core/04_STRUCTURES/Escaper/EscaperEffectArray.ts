@@ -3,10 +3,10 @@ import { EscaperEffect } from './EscaperEffect'
 const NB_EFFECTS_LIMIT = 20
 
 export class EscaperEffectArray {
-    private efs: EscaperEffect[] = []
+    private efs: { [x: number]: EscaperEffect } = {}
 
     new = (efStr: string, u: unit, bodyPart: string) => {
-        let lastInstance = this.efs.length - 1
+        let lastInstance = this.count() - 1
 
         if (lastInstance >= NB_EFFECTS_LIMIT - 1) {
             this.efs[0].destroy()
@@ -21,11 +21,19 @@ export class EscaperEffectArray {
         this.efs[lastInstance] = new EscaperEffect(efStr, u, bodyPart)
     }
 
-    count = () => this.efs.length
+    count = () => {
+        let n = 0
+
+        for (const [_k, _v] of pairs(this.efs)) {
+            n++
+        }
+
+        return n
+    }
 
     destroyLastEffects = (numEfToDestroy: number) => {
         let i = numEfToDestroy
-        let lastInstance = this.efs.length - 1
+        let lastInstance = this.count() - 1
 
         while (i > 0 && lastInstance >= 0) {
             this.efs[lastInstance] && this.efs[lastInstance].destroy()
@@ -36,19 +44,19 @@ export class EscaperEffectArray {
     }
 
     hideEffects = () => {
-        for (const ef of this.efs) {
+        for (const [_, ef] of pairs(this.efs)) {
             ef.destroy()
         }
     }
 
     showEffects = (u: unit) => {
-        for (const ef of this.efs) {
+        for (const [_, ef] of pairs(this.efs)) {
             ef.recreate(u)
         }
     }
 
     destroy = () => {
         this.destroyLastEffects(NB_EFFECTS_LIMIT)
-        this.efs = []
+        this.efs = {}
     }
 }

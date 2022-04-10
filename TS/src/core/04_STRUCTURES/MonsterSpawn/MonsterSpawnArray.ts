@@ -4,12 +4,11 @@ import type { MonsterType } from '../Monster/MonsterType'
 import type { MonsterSpawn } from './MonsterSpawn'
 
 export class MonsterSpawnArray {
-    private monsterSpawns: MonsterSpawn[]
+    private monsterSpawns: { [x: number]: MonsterSpawn } = {}
     private level: Level
 
     constructor(level: Level) {
         this.level = level
-        this.monsterSpawns = []
     }
 
     get = (arrayId: number): MonsterSpawn => {
@@ -17,7 +16,7 @@ export class MonsterSpawnArray {
     }
 
     getFromLabel = (label: string): MonsterSpawn | null => {
-        return this.monsterSpawns.find(ms => ms.getLabel() === label) || null
+        return Object.values(this.monsterSpawns).find(ms => ms.getLabel() === label) || null
     }
 
     new(monsterSpawn: MonsterSpawn, activate: boolean) {
@@ -30,10 +29,18 @@ export class MonsterSpawnArray {
         monsterSpawn.level = this.level
     }
 
-    count = () => this.monsterSpawns.length
+    count = () => {
+        let n = 0
+
+        for (const [_k, _v] of pairs(this.monsterSpawns)) {
+            n++
+        }
+
+        return n
+    }
 
     destroy = () => {
-        for (const ms of this.monsterSpawns) {
+        for (const [_, ms] of pairs(this.monsterSpawns)) {
             ms.destroy()
         }
     }
@@ -84,13 +91,13 @@ export class MonsterSpawnArray {
     }
 
     activate = () => {
-        for (const ms of this.monsterSpawns) {
+        for (const [_, ms] of pairs(this.monsterSpawns)) {
             ms.activate()
         }
     }
 
     deactivate = () => {
-        for (const ms of this.monsterSpawns) {
+        for (const [_, ms] of pairs(this.monsterSpawns)) {
             ms.deactivate()
         }
     }
@@ -100,7 +107,7 @@ export class MonsterSpawnArray {
         if (nbMs == 0) {
             Text.erP(p, 'no monster spawn for this level')
         } else {
-            for (const ms of this.monsterSpawns) {
+            for (const [_, ms] of pairs(this.monsterSpawns)) {
                 ms.displayForPlayer(p)
             }
         }

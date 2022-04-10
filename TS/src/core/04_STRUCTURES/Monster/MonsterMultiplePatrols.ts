@@ -73,7 +73,7 @@ export class MonsterMultiplePatrols extends Monster {
         MonsterMultiplePatrols.destroyLocs()
     }
 
-    static count = () => udg_monsters.filter(monster => monster instanceof MonsterMultiplePatrols).length
+    static count = () => Object.values(udg_monsters).filter(monster => monster instanceof MonsterMultiplePatrols).length
 
     static storeNewLoc(x: number, y: number) {
         const nbLocsBefore = MonsterMultiplePatrols.X.length

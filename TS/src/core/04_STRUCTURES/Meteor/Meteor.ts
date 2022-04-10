@@ -1,12 +1,21 @@
 import { CACHE_SEPARATEUR_PARAM } from 'core/07_TRIGGERS/Save_map_in_gamecache/struct_StringArrayForCache'
 import { getUdgTerrainTypes } from '../../../../globals'
-
 import { Level } from '../Level/Level'
 
 export const METEOR_NORMAL = FourCC('MND1')
 export const METEOR_CHEAT = FourCC('MCD1')
 
-export const udg_meteors: Meteor[] = []
+export const udg_meteors: { [x: number]: Meteor } = {}
+
+const udg_meteors_count = () => {
+    let n = 0
+
+    for (const [_k, _v] of pairs(udg_meteors)) {
+        n++
+    }
+
+    return n
+}
 
 export class Meteor {
     private id: number
@@ -20,7 +29,7 @@ export class Meteor {
         this.x = x
         this.y = y
 
-        this.id = udg_meteors.length
+        this.id = udg_meteors_count()
         udg_meteors[this.id] = this
     }
 

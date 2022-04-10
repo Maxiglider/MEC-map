@@ -1,5 +1,3 @@
-import { getUdgMonsterTypes } from '../../../../globals'
-
 import { GetCurrentMonsterPlayer } from '../../01_libraries/Basic_functions'
 import { ENNEMY_PLAYER, GREY, MOBS_VARIOUS_COLORS, TERRAIN_DATA_DISPLAY_TIME } from '../../01_libraries/Constants'
 import { udg_colorCode } from '../../01_libraries/Init_colorCodes'
@@ -54,7 +52,17 @@ const UnspawMonster_Actions = (): void => {
     }
 }
 
-export const udg_monsterSpawns: MonsterSpawn[] = []
+export const udg_monsterSpawns: { [x: number]: MonsterSpawn } = {}
+
+const udg_monsterSpawns_count = () => {
+    let n = 0
+
+    for (const [_k, _v] of pairs(udg_monsterSpawns)) {
+        n++
+    }
+
+    return n
+}
 
 export class MonsterSpawn {
     static anyTrigId2MonsterSpawn = new Map<number, MonsterSpawn>()
@@ -96,7 +104,7 @@ export class MonsterSpawn {
         this.maxX = RMaxBJ(x1, x2)
         this.maxY = RMaxBJ(y1, y2)
 
-        this.id = udg_monsterSpawns.length
+        this.id = udg_monsterSpawns_count()
         udg_monsterSpawns[this.id] = this
     }
 
