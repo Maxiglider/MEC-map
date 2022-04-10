@@ -1,7 +1,6 @@
 import { Hero2Escaper, IsHero } from 'core/04_STRUCTURES/Escaper/Escaper_functions'
 import { createEvent } from 'Utils/mapUtils'
-import {globals} from "../../../../globals";
-
+import { globals } from '../../../../globals'
 
 export const InitTrig_Autorevive = () => {
     globals.autoreviveDelay = 4
@@ -26,4 +25,3 @@ export const InitTrig_Autorevive = () => {
         ],
     })
 }
-
