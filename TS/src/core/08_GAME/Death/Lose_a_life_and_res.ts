@@ -6,10 +6,10 @@ import { ChangeAllTerrains } from '../../07_TRIGGERS/Triggers_to_modify_terrains
 import { getUdgLives } from '../Init_structures/Init_lives'
 
 let udg_gameIsLost = false
-export let gg_trg_Lose_a_life_and_res: trigger
+export const gg_trg_Lose_a_life_and_res: { trigger: trigger } = {} as any
 
 export const InitTrig_Lose_a_life_and_res = () => {
-    gg_trg_Lose_a_life_and_res = createEvent({
+    gg_trg_Lose_a_life_and_res.trigger = createEvent({
         events: [],
         actions: [
             () => {

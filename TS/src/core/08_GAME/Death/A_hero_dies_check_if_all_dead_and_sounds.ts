@@ -1,27 +1,20 @@
 import { COOP_REVIVE_DIST, NB_ESCAPERS } from 'core/01_libraries/Constants'
 import { IsHero } from 'core/04_STRUCTURES/Escaper/Escaper_functions'
 import { createEvent } from 'Utils/mapUtils'
-import { getUdgTerrainTypes } from '../../../../globals'
-
+import { getUdgEscapers, getUdgTerrainTypes, globals } from '../../../../globals'
 import { Globals } from '../../09_From_old_Worldedit_triggers/globals_variables_and_triggers'
 import { AfkMode } from '../Afk_mode/Afk_mode'
-import { getUdgEscapers } from '../../../../globals'
-
-import { globals} from "../../../../globals";
 import { DeplacementHeroHorsDeathPath } from '../Mode_coop/deplacement_heros_hors_death_path'
 import { gg_trg_Lose_a_life_and_res } from './Lose_a_life_and_res'
 
 let udg_nbKilled = 0
-
-
-
 
 export const InitTrig_A_hero_dies_check_if_all_dead_and_sounds = () => {
     createEvent({
         events: [t => TriggerRegisterAnyUnitEventBJ(t, EVENT_PLAYER_UNIT_DEATH)],
         conditions: [() => IsHero(GetTriggerUnit())],
         actions: [
-            () => () => {
+            () => {
                 let hero = GetTriggerUnit()
                 let n = GetUnitUserData(hero)
                 let nbAlive = 0
@@ -46,7 +39,7 @@ export const InitTrig_A_hero_dies_check_if_all_dead_and_sounds = () => {
                 }
 
                 if (nbAlive === 0) {
-                    TriggerExecute(gg_trg_Lose_a_life_and_res)
+                    TriggerExecute(gg_trg_Lose_a_life_and_res.trigger)
                     TriggerSleepAction(2)
                     StartSound(gg_snd_questFailed)
                     last = true
@@ -81,7 +74,9 @@ export const InitTrig_A_hero_dies_check_if_all_dead_and_sounds = () => {
                         }
 
                         //déplacement du héros si mort sur le death path
-                        if (getUdgTerrainTypes().getTerrainType(GetUnitX(hero), GetUnitY(hero))?.getKind() === 'death') {
+                        if (
+                            getUdgTerrainTypes().getTerrainType(GetUnitX(hero), GetUnitY(hero))?.getKind() === 'death'
+                        ) {
                             DeplacementHeroHorsDeathPath.DeplacementHeroHorsDeathPath(hero)
                         }
 
