@@ -609,8 +609,8 @@ export const ExecuteCommandMake = (escaper: Escaper, cmd: string): boolean => {
         }
         //checkParam3
         if (nbParam >= 3) {
-            x = S2R(param3)
-            if (!(x / 5 === I2R(R2I(x / 5))) || x < 0 || x > 400) {
+            x = S2I(param3)
+            if (x % 5 != 0 || x < 0 || x > 400) {
                 Text.erP(
                     escaper.getPlayer(),
                     'Wrong immolation radius ; should be an integer divisible by 5 and between 0 and 400'
@@ -637,9 +637,8 @@ export const ExecuteCommandMake = (escaper: Escaper, cmd: string): boolean => {
                     }
                     if (str === 'default' || str === 'd') {
                         x = -1
-                    } else {
-                        x = S2R(str)
                     }
+
                     //checkParam6
                     if (nbParam === 6) {
                         str = CmdParam(cmd, 6)
@@ -784,8 +783,8 @@ export const ExecuteCommandMake = (escaper: Escaper, cmd: string): boolean => {
             return true
         }
         //checkParam2
-        x = S2R(param2)
-        if (!(x / 5 === I2R(R2I(x / 5))) || x < 0 || x > 400) {
+        x = S2I(param2)
+        if (x % 5 != 0 || x < 0 || x > 400) {
             Text.erP(
                 escaper.getPlayer(),
                 'wrong immolation radius ; should be an integer divisible by 5 and between 0 and 400'

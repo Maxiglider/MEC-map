@@ -46,7 +46,7 @@ export class MonsterType {
         }
 
         if (
-            !(immolationRadius / 5 === I2R(R2I(immolationRadius / 5))) ||
+            R2I(immolationRadius) % 5 != 0 ||
             immolationRadius < 0 ||
             immolationRadius > 400
         ) {
@@ -155,7 +155,7 @@ export class MonsterType {
 
     setImmolation = (immolationRadius: number): boolean => {
         if (
-            !(immolationRadius / 5 === I2R(R2I(immolationRadius / 5))) ||
+            R2I(immolationRadius) % 5 != 0 ||
             immolationRadius < 0 ||
             immolationRadius > 400
         ) {
