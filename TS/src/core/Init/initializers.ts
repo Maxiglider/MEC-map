@@ -3,6 +3,7 @@ import { init_terrain_limit_variables } from '../01_libraries/Init_terrain_limit
 import { initViewAllHideAll } from '../03_view_all_hide_all/View_all_hide_all'
 import { init_StartAndEnd } from '../04_STRUCTURES/Level/StartAndEnd'
 import { initGameTime } from '../04_STRUCTURES/Lives_and_game_time/Time_of_game_trigger'
+import { InitTrig_Autorevive } from '../06_COMMANDS/COMMANDS_vJass/Autorevive'
 import { init_commandExecution } from '../06_COMMANDS/COMMANDS_vJass/Command_execution'
 import { initCachedPlayerNames } from '../06_COMMANDS/COMMANDS_vJass/Command_functions'
 import { init_StopSecondIfMake } from '../07_TRIGGERS/Handling_secondary_hero/Stop_second_if_make'
@@ -33,6 +34,7 @@ export const initializers = () => {
     init_StopSecondIfMake()
     initCachedPlayerNames()
     init_doubleKill()
+    InitTrig_Autorevive()
 
     //todomax disable this line at end
     init_Test()
