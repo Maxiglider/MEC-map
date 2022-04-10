@@ -1,7 +1,7 @@
 import { MakeOneByOneOrTwoClicks } from 'core/05_MAKE_STRUCTURES/Make/MakeOneByOneOrTwoClicks'
 import { Text } from '../../01_libraries/Text'
-import {Meteor, METEOR_NORMAL, udg_meteors} from '../../04_STRUCTURES/Meteor/Meteor'
-import {MakeDeleteMeteorsAction} from "../MakeLastActions/MakeDeleteMeteorsAction";
+import { Meteor, METEOR_NORMAL, udg_meteors } from '../../04_STRUCTURES/Meteor/Meteor'
+import { MakeDeleteMeteorsAction } from '../MakeLastActions/MakeDeleteMeteorsAction'
 
 export class MakeDeleteMeteors extends MakeOneByOneOrTwoClicks {
     constructor(maker: unit, mode: string) {
@@ -35,13 +35,15 @@ export class MakeDeleteMeteors extends MakeOneByOneOrTwoClicks {
                     return
                 }
 
-                const meteors = this.escaper.getMakingLevel().meteors.getMeteorsBetweenLocs(this.lastX, this.lastY, this.orderX, this.orderY)
+                const meteors = this.escaper
+                    .getMakingLevel()
+                    .meteors.getMeteorsBetweenLocs(this.lastX, this.lastY, this.orderX, this.orderY)
 
-                meteors.map(meteor => {
+                for (const meteor of meteors) {
                     meteor.removeMeteorItem()
                     suppressedMeteors.push(meteor)
                     nbMeteorsRemoved = nbMeteorsRemoved + 1
-                })
+                }
             }
 
             if (nbMeteorsRemoved <= 1) {

@@ -1,8 +1,8 @@
 import { CACHE_SEPARATEUR_PARAM } from 'core/07_TRIGGERS/Save_map_in_gamecache/struct_StringArrayForCache'
+import { udg_monsters } from '../../../../globals'
 import { Monster } from './Monster'
 import { MonsterType } from './MonsterType'
 import { NewImmobileMonster } from './Monster_functions'
-import {udg_monsters} from "../../../../globals";
 
 export const WAIT = 1000000
 export const HIDE = 2000000
@@ -56,7 +56,7 @@ export class MonsterTeleport extends Monster {
         this.t = CreateTimer()
         MonsterTeleport.anyMonsterTeleportTimerId2MonsterTeleport.set(GetHandleId(this.t), this)
 
-        MonsterTeleport.X.map((x, n) => {
+        MonsterTeleport.X.forEach((x, n) => {
             const y = MonsterTeleport.Y[n]
 
             this.x[n] = x
@@ -227,7 +227,7 @@ export class MonsterTeleport extends Monster {
 
         str += CACHE_SEPARATEUR_PARAM + R2S(this.period) + CACHE_SEPARATEUR_PARAM + I2S(R2I(this.angle))
 
-        this.x.map((x, n) => {
+        this.x.forEach((x, n) => {
             str += CACHE_SEPARATEUR_PARAM + I2S(R2I(this.x[n])) + CACHE_SEPARATEUR_PARAM + I2S(R2I(this.y[n]))
         })
 

@@ -1,5 +1,5 @@
+import type { Level } from './Level'
 import { VisibilityModifier } from './VisibilityModifier'
-import type {Level} from "./Level";
 
 export class VisibilityModifierArray {
     private level: Level
@@ -43,9 +43,9 @@ export class VisibilityModifierArray {
     }
 
     removeAllVisibilityModifiers = () => {
-        this.vms.map(vm => {
-            vm && vm.destroy()
-        })
+        for (const vm of this.vms) {
+            vm.destroy()
+        }
     }
 
     removeLasts = (numberOfVMToRemove: number): boolean => {
@@ -61,14 +61,14 @@ export class VisibilityModifierArray {
     }
 
     activate = (activ: boolean) => {
-        this.vms.map(vm => {
-            vm && vm.activate(activ)
-        })
+        for (const vm of this.vms) {
+            vm.activate(activ)
+        }
     }
 
     destroy = () => {
-        this.vms.map(vm => {
-            vm && vm.destroy()
-        })
+        for (const vm of this.vms) {
+            vm.destroy()
+        }
     }
 }

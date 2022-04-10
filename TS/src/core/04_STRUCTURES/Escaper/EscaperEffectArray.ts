@@ -1,11 +1,9 @@
 import { EscaperEffect } from './EscaperEffect'
 
-
 const NB_EFFECTS_LIMIT = 20
 
 export class EscaperEffectArray {
     private efs: EscaperEffect[] = []
-    
 
     new = (efStr: string, u: unit, bodyPart: string) => {
         let lastInstance = this.efs.length - 1
@@ -13,7 +11,7 @@ export class EscaperEffectArray {
         if (lastInstance >= NB_EFFECTS_LIMIT - 1) {
             this.efs[0].destroy()
 
-            for(let i = 0; i < 19; i++){
+            for (let i = 0; i < 19; i++) {
                 this.efs[i] = this.efs[i + 1]
             }
         } else {
@@ -40,15 +38,15 @@ export class EscaperEffectArray {
     }
 
     hideEffects = () => {
-        this.efs.map(ef => {
-            ef && ef.destroy()
-        })
+        for (const ef of this.efs) {
+            ef.destroy()
+        }
     }
 
     showEffects = (u: unit) => {
-        this.efs.map(ef => {
-            ef && ef.recreate(u)
-        })
+        for (const ef of this.efs) {
+            ef.recreate(u)
+        }
     }
 
     destroy = () => {

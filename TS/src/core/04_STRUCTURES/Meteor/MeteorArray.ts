@@ -1,7 +1,7 @@
+import { IsItemBetweenLocs } from '../../01_libraries/Basic_functions'
 import type { Level } from '../Level/Level'
 import { MONSTER_NEAR_DIFF_MAX } from '../Monster/MonsterArray'
 import { Meteor } from './Meteor'
-import {IsItemBetweenLocs, IsUnitBetweenLocs} from "../../01_libraries/Basic_functions";
 
 export class MeteorArray {
     private meteors: Meteor[]
@@ -37,9 +37,9 @@ export class MeteorArray {
     }
 
     destroy = () => {
-        this.meteors.map(meteor => {
+        for (const meteor of this.meteors) {
             meteor.destroy()
-        })
+        }
     }
 
     clearMeteor = (meteorId: number): boolean => {
@@ -53,34 +53,28 @@ export class MeteorArray {
     }
 
     createMeteorsItems = () => {
-        this.meteors.map(meteor => {
-            if (meteor) {
-                meteor.createMeteorItem()
-            }
-        })
+        for (const meteor of this.meteors) {
+            meteor.createMeteorItem()
+        }
     }
 
     removeMeteorsItems = () => {
-        this.meteors.map(meteor => {
-            if (meteor) {
-                meteor.removeMeteorItem()
-            }
-        })
+        for (const meteor of this.meteors) {
+            meteor.removeMeteorItem()
+        }
     }
 
     getMeteorNear = (x: number, y: number) => {
-        this.meteors.map(meteor => {
-            if (meteor) {
-                const item = meteor.getItem()
-                if (item) {
-                    const xMeteor = GetItemX(item)
-                    const yMeteor = GetItemY(item)
-                    if (RAbsBJ(x - xMeteor) < MONSTER_NEAR_DIFF_MAX && RAbsBJ(y - yMeteor) < MONSTER_NEAR_DIFF_MAX) {
-                        return meteor
-                    }
+        for (const meteor of this.meteors) {
+            const item = meteor.getItem()
+            if (item) {
+                const xMeteor = GetItemX(item)
+                const yMeteor = GetItemY(item)
+                if (RAbsBJ(x - xMeteor) < MONSTER_NEAR_DIFF_MAX && RAbsBJ(y - yMeteor) < MONSTER_NEAR_DIFF_MAX) {
+                    return meteor
                 }
             }
-        })
+        }
 
         return null
     }

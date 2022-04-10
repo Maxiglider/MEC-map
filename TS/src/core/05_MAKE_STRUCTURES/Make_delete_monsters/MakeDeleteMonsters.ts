@@ -33,10 +33,10 @@ export class MakeDeleteMonsters extends MakeOneByOneOrTwoClicks {
                     .getMakingLevel()
                     .monsters.getMonstersBetweenLocs(this.lastX, this.lastY, this.orderX, this.orderY)
 
-                monsters.map(monster => {
+                for (const monster of monsters) {
                     monster.removeUnit()
                     suppressedMonsters.push(monster)
-                })
+                }
 
                 nbMonstersRemoved = monsters.length
             }

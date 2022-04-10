@@ -1,7 +1,7 @@
+import { Text } from '../../01_libraries/Text'
 import { Level } from '../../04_STRUCTURES/Level/Level'
 import { Monster } from '../../04_STRUCTURES/Monster/Monster'
-import {MakeAction} from "./MakeAction";
-import {Text} from "../../01_libraries/Text";
+import { MakeAction } from './MakeAction'
 
 export class MakeDeleteMonstersAction extends MakeAction {
     private suppressedMonsters: Monster[]
@@ -9,8 +9,8 @@ export class MakeDeleteMonstersAction extends MakeAction {
     constructor(level: Level, suppressedMonsters: Monster[]) {
         super(level)
 
-        if(suppressedMonsters.length == 0){
-            throw "no monster suppressed"
+        if (suppressedMonsters.length == 0) {
+            throw 'no monster suppressed'
         }
 
         this.suppressedMonsters = suppressedMonsters
@@ -19,9 +19,9 @@ export class MakeDeleteMonstersAction extends MakeAction {
     destroy = (): void => {
         if (this.isActionMadeB) {
             //suppression définitive des mobs
-            this.suppressedMonsters.map(monster => {
+            for (const monster of this.suppressedMonsters) {
                 monster.destroy()
-            })
+            }
         }
     }
 
@@ -31,9 +31,9 @@ export class MakeDeleteMonstersAction extends MakeAction {
         }
 
         //création des monstres supprimés
-        this.suppressedMonsters.map(monster => {
+        for (const monster of this.suppressedMonsters) {
             monster.createUnit()
-        })
+        }
 
         this.isActionMadeB = false
         this.owner && Text.mkP(this.owner.getPlayer(), 'monster deleting cancelled')
@@ -47,13 +47,13 @@ export class MakeDeleteMonstersAction extends MakeAction {
         }
 
         //suppression des monstres recréés
-        this.suppressedMonsters.map(monster => {
+        for (const monster of this.suppressedMonsters) {
             monster.removeUnit()
-        })
+        }
 
         this.isActionMadeB = true
         this.owner && Text.mkP(this.owner.getPlayer(), 'monster deleting redone')
-        
+
         return true
     }
 }

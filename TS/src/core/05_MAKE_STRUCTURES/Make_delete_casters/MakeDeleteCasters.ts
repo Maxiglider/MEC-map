@@ -1,9 +1,7 @@
-import { IsUnitBetweenLocs } from 'core/01_libraries/Basic_functions'
 import { Caster } from 'core/04_STRUCTURES/Caster/Caster'
 import { MakeOneByOneOrTwoClicks } from 'core/05_MAKE_STRUCTURES/Make/MakeOneByOneOrTwoClicks'
 import { Text } from '../../01_libraries/Text'
-import {MakeDeleteMonsters} from "../Make_delete_monsters/MakeDeleteMonsters";
-import {MakeDeleteMonstersAction} from "../MakeLastActions/MakeDeleteMonstersAction";
+import { MakeDeleteMonstersAction } from '../MakeLastActions/MakeDeleteMonstersAction'
 
 export class MakeDeleteCasters extends MakeOneByOneOrTwoClicks {
     constructor(maker: unit, mode: string) {
@@ -19,8 +17,10 @@ export class MakeDeleteCasters extends MakeOneByOneOrTwoClicks {
 
             if (this.getMode() == 'oneByOne') {
                 //mode oneClick
-                const monster = this.escaper.getMakingLevel().monsters.getMonsterNear(this.orderX, this.orderY, 'Caster')
-                caster = (monster instanceof Caster) ? monster : null
+                const monster = this.escaper
+                    .getMakingLevel()
+                    .monsters.getMonsterNear(this.orderX, this.orderY, 'Caster')
+                caster = monster instanceof Caster ? monster : null
                 if (caster && caster.u) {
                     caster.removeUnit()
                     suppressedCasters.push(caster)
@@ -33,13 +33,15 @@ export class MakeDeleteCasters extends MakeOneByOneOrTwoClicks {
                     return
                 }
 
-                const casters = this.escaper.getMakingLevel().monsters.getMonstersBetweenLocs(this.lastX, this.lastY, this.orderX, this.orderY, 'Caster')
+                const casters = this.escaper
+                    .getMakingLevel()
+                    .monsters.getMonstersBetweenLocs(this.lastX, this.lastY, this.orderX, this.orderY, 'Caster')
 
-                casters.map(caster => {
+                for (const caster of casters) {
                     caster.removeUnit()
                     caster instanceof Caster && suppressedCasters.push(caster)
                     nbCastersRemoved++
-                })
+                }
             }
 
             if (nbCastersRemoved <= 1) {

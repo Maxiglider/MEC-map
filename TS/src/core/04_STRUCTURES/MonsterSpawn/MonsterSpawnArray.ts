@@ -41,9 +41,9 @@ export class MonsterSpawnArray {
     }
 
     destroy = () => {
-        this.monsterSpawns.map(ms => {
-            ms && ms.destroy()
-        })
+        for (const ms of this.monsterSpawns) {
+            ms.destroy()
+        }
     }
 
     removeMonsterSpawn = (monsterSpawnId: number) => {
@@ -92,15 +92,15 @@ export class MonsterSpawnArray {
     }
 
     activate = () => {
-        this.monsterSpawns.map(ms => {
-            ms && ms.activate()
-        })
+        for (const ms of this.monsterSpawns) {
+            ms.activate()
+        }
     }
 
     deactivate = () => {
-        this.monsterSpawns.map(ms => {
-            ms && ms.deactivate()
-        })
+        for (const ms of this.monsterSpawns) {
+            ms.deactivate()
+        }
     }
 
     displayForPlayer = (p: player) => {
@@ -108,9 +108,9 @@ export class MonsterSpawnArray {
         if (nbMs == 0) {
             Text.erP(p, 'no monster spawn for this level')
         } else {
-            this.monsterSpawns.map(ms => {
-                ms && ms.displayForPlayer(p)
-            })
+            for (const ms of this.monsterSpawns) {
+                ms.displayForPlayer(p)
+            }
         }
     }
 

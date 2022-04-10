@@ -1,10 +1,9 @@
-import {LARGEUR_CASE, NB_MAX_OF_TERRAINS} from 'core/01_libraries/Constants'
-import {Text} from 'core/01_libraries/Text'
-import {TerrainType} from 'core/04_STRUCTURES/TerrainType/TerrainType'
-import {Globals} from 'core/09_From_old_Worldedit_triggers/globals_variables_and_triggers'
-import {globals} from "../../../../globals";
-import {getUdgTerrainTypes} from '../../../../globals'
-import {ChangeTerrainType} from '../Modify_terrain_Functions/Modify_terrain_functions'
+import { LARGEUR_CASE, NB_MAX_OF_TERRAINS } from 'core/01_libraries/Constants'
+import { Text } from 'core/01_libraries/Text'
+import { TerrainType } from 'core/04_STRUCTURES/TerrainType/TerrainType'
+import { Globals } from 'core/09_From_old_Worldedit_triggers/globals_variables_and_triggers'
+import { getUdgTerrainTypes, globals } from '../../../../globals'
+import { ChangeTerrainType } from '../Modify_terrain_Functions/Modify_terrain_functions'
 import {
     AddNewTerrain,
     GetRandomNotUsedTerrain,
@@ -12,7 +11,7 @@ import {
     GetRandomUsedTerrain,
     IsTerrainAlreadyUsed,
 } from '../Modify_terrain_Functions/Terrain_functions'
-import {TerrainTypeMax} from "../Modify_terrain_Functions/Terrain_type_max";
+import { TerrainTypeMax } from '../Modify_terrain_Functions/Terrain_type_max'
 
 const initChangeAllTerrains = () => {
     let oldTerrainTypes: number[] = []
@@ -124,7 +123,7 @@ const initChangeAllTerrains = () => {
         return rdmTerrain
     }
 
-    const ChangeAllTerrains = (mode = "normal"): boolean => {
+    const ChangeAllTerrains = (mode = 'normal'): boolean => {
         oldTerrainTypes = []
         newTerrainTypes = []
         lastTerrainArrayId = 0
@@ -133,7 +132,6 @@ const initChangeAllTerrains = () => {
         udg_changeAllTerrainsAtRevive = false
         terrainModifyWorking = false
         getTerrainNbEach = []
-
 
         //modes : normal, known, notKnown
         let terrainTypes: TerrainType[] = []
@@ -147,10 +145,11 @@ const initChangeAllTerrains = () => {
 
         n = 0
         const allTT = getUdgTerrainTypes().getAll()
-        allTT.map(TT => {
+
+        for (const TT of allTT) {
             oldTerrainTypes[n] = TT.getTerrainTypeId()
             n++
-        })
+        }
 
         lastTerrainArrayId = n - 1
         nbNewTerrainsAllowed = NB_MAX_OF_TERRAINS - Globals.udg_nb_used_terrains
@@ -185,18 +184,17 @@ const initChangeAllTerrains = () => {
 
         ModifyTerrain()
 
-
         n = 0
-        allTT.map(TT => {
+        for (const TT of allTT) {
             TT.setTerrainTypeId(newTerrainTypes[n])
             AddNewTerrain(newTerrainTypes[n])
             n++
-        })
+        }
 
         return true
     }
 
-    return {udg_changeAllTerrainsAtRevive, ChangeAllTerrains}
+    return { udg_changeAllTerrainsAtRevive, ChangeAllTerrains }
 }
 
 export const ChangeAllTerrains = initChangeAllTerrains()

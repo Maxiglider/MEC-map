@@ -1,7 +1,7 @@
+import { Text } from '../../01_libraries/Text'
 import { Level } from '../../04_STRUCTURES/Level/Level'
 import { Meteor } from '../../04_STRUCTURES/Meteor/Meteor'
-import {MakeAction} from "./MakeAction";
-import {Text} from "../../01_libraries/Text";
+import { MakeAction } from './MakeAction'
 
 export class MakeDeleteMeteorsAction extends MakeAction {
     private suppressedMeteors
@@ -9,8 +9,8 @@ export class MakeDeleteMeteorsAction extends MakeAction {
     constructor(level: Level, suppressedMeteors: Meteor[]) {
         super(level)
 
-        if(suppressedMeteors.length == 0){
-            throw "no meteor suppressed"
+        if (suppressedMeteors.length == 0) {
+            throw 'no meteor suppressed'
         }
 
         this.suppressedMeteors = suppressedMeteors
@@ -19,9 +19,9 @@ export class MakeDeleteMeteorsAction extends MakeAction {
     destroy = () => {
         if (this.isActionMadeB) {
             //suppression définitive des météores
-            this.suppressedMeteors.map(meteor => {
+            for (const meteor of this.suppressedMeteors) {
                 meteor.destroy()
-            })
+            }
         }
     }
 
@@ -31,9 +31,9 @@ export class MakeDeleteMeteorsAction extends MakeAction {
         }
 
         //création des météores supprimées
-        this.suppressedMeteors.map(meteor => {
+        for (const meteor of this.suppressedMeteors) {
             meteor.createMeteorItem()
-        })
+        }
 
         this.isActionMadeB = false
         this.owner && Text.mkP(this.owner.getPlayer(), 'meteor deleting cancelled')
@@ -47,9 +47,9 @@ export class MakeDeleteMeteorsAction extends MakeAction {
         }
 
         //suppression des météores recréés
-        this.suppressedMeteors.map(meteor => {
+        for (const meteor of this.suppressedMeteors) {
             meteor.removeMeteorItem()
-        })
+        }
 
         this.isActionMadeB = true
         this.owner && Text.mkP(this.owner.getPlayer(), 'meteor deleting redone')

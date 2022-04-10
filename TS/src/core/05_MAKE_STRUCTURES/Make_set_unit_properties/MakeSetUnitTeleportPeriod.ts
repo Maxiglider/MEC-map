@@ -53,10 +53,10 @@ export class MakeSetUnitTeleportPeriod extends MakeOneByOneOrTwoClicks {
                         'MonsterTeleport'
                     )
 
-                monstersTP.map(monsterTP => {
+                for (const monsterTP of monstersTP) {
                     if (monsterTP instanceof MonsterTeleport) monsterTP.setPeriod(this.getPeriod())
                     nbMonstersFixed++
-                })
+                }
             }
 
             if (nbMonstersFixed <= 1) {

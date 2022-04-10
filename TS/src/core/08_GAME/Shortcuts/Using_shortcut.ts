@@ -26,7 +26,7 @@ const initCommandShortcuts = () => {
             return
         }
 
-        shortcuts.forEach(sc => {
+        for (const sc of shortcuts) {
             if (shortcutCommands[sc][playerId] == null) {
                 UnitRemoveAbility(hero, FourCC(`SC${sc}o`))
                 UnitAddAbility(hero, FourCC(`SC${sc}u`))
@@ -34,7 +34,7 @@ const initCommandShortcuts = () => {
                 UnitRemoveAbility(hero, FourCC(`SC${sc}u`))
                 UnitAddAbility(hero, FourCC(`SC${sc}o`))
             }
-        })
+        }
     }
 
     const AssignShortcut = (playerId: number, shortcut: string, command: string) => {
@@ -46,7 +46,7 @@ const initCommandShortcuts = () => {
 
         shortcut = StringCase(shortcut, true)
 
-        shortcuts.forEach(sc => {
+        for (const sc of shortcuts) {
             if (shortcut == sc) {
                 if (shortcutCommands[sc][playerId] == null) {
                     UnitRemoveAbility(hero, FourCC(`SC${shortcut}u`))
@@ -55,7 +55,7 @@ const initCommandShortcuts = () => {
                 shortcutCommands[sc][playerId] = '-' + command
                 return
             }
-        })
+        }
     }
 
     const UnassignShortcut = (playerId: number, shortcut: string) => {
@@ -67,7 +67,7 @@ const initCommandShortcuts = () => {
 
         shortcut = StringCase(shortcut, true)
 
-        shortcuts.forEach(sc => {
+        for (const sc of shortcuts) {
             if (shortcut == sc) {
                 if (shortcutCommands[sc][playerId] != null) {
                     UnitRemoveAbility(hero, FourCC(`SC${shortcut}o`))
@@ -76,7 +76,7 @@ const initCommandShortcuts = () => {
                 }
                 return
             }
-        })
+        }
     }
 
     const IsShortcut = (S: string): boolean => {
@@ -115,13 +115,13 @@ const initCommandShortcuts = () => {
         Text.P(Player(playerId), ' ')
         Text.P(Player(playerId), udg_colorCode[playerId] + 'Your shortcuts:')
 
-        shortcuts.forEach(sc => {
+        for (const sc of shortcuts) {
             if (shortcutCommands[sc][playerId] == null) {
                 Text.P(Player(playerId), udg_colorCode[playerId] + sc + ': |r' + udg_colorCode[GREY] + 'none')
             } else {
                 Text.P(Player(playerId), udg_colorCode[playerId] + sc + ': |r' + shortcutCommands[sc][playerId])
             }
-        })
+        }
     }
 
     return {
@@ -157,7 +157,7 @@ export const InitTrig_Using_shortcut = () => {
                     return
                 }
 
-                shortcuts.forEach(sc => {
+                for (const sc of shortcuts) {
                     if (GetSpellAbilityId() === FourCC(`SC${sc}o`)) {
                         Text.P(
                             p,
@@ -175,7 +175,7 @@ export const InitTrig_Using_shortcut = () => {
 
                         execute(escaper, targetCmd, true)
                     }
-                })
+                }
             },
         ],
     })

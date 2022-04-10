@@ -57,7 +57,7 @@ export class MonsterMultiplePatrols extends Monster {
             this.sens = 1
         }
 
-        MonsterMultiplePatrols.X.map((x, n) => {
+        MonsterMultiplePatrols.X.forEach((x, n) => {
             const y = MonsterMultiplePatrols.Y[n]
 
             this.x[n] = x
@@ -228,7 +228,7 @@ export class MonsterMultiplePatrols extends Monster {
             str += 'normal'
         }
 
-        this.x.map((x, n) => {
+        this.x.forEach((x, n) => {
             str += CACHE_SEPARATEUR_PARAM + I2S(R2I(this.x[n])) + CACHE_SEPARATEUR_PARAM + I2S(R2I(this.y[n]))
         })
 

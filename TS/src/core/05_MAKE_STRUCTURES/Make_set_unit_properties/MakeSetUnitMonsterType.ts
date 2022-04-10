@@ -37,11 +37,12 @@ export class MakeSetUnitMonsterType extends MakeOneByOneOrTwoClicks {
                 let monsters = this.escaper
                     .getMakingLevel()
                     .monsters.getMonstersBetweenLocs(this.lastX, this.lastY, this.orderX, this.orderY)
-                monsters.map(monster => {
+
+                for (const monster of monsters) {
                     if (monster.setMonsterType(this.getMonsterType())) {
                         nbMonstersFixed++
                     }
-                })
+                }
             }
 
             if (nbMonstersFixed <= 1) {

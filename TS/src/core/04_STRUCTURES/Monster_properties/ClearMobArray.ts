@@ -1,7 +1,7 @@
+import type { Level } from '../Level/Level'
+import type { Monster } from '../Monster/Monster'
 import { MONSTER_NEAR_DIFF_MAX } from '../Monster/MonsterArray'
 import { ClearMob } from './ClearMob'
-import type {Level} from "../Level/Level";
-import type {Monster} from "../Monster/Monster";
 
 export class ClearMobArray {
     private level: Level
@@ -40,7 +40,9 @@ export class ClearMobArray {
     }
 
     destroy = () => {
-        this.clearMobs.map(clearMob => clearMob.destroy())
+        for (const clearMob of this.clearMobs) {
+            clearMob.destroy()
+        }
     }
 
     removeClearMob = (clearMobArrayId: number) => {
@@ -48,11 +50,11 @@ export class ClearMobArray {
     }
 
     clearClearMob = (clearMobId: number): boolean => {
-        if(this.clearMobs[clearMobId]){
+        if (this.clearMobs[clearMobId]) {
             this.clearMobs[clearMobId].destroy()
             delete this.clearMobs[clearMobId]
             return true
-        }else{
+        } else {
             return false
         }
     }
@@ -66,7 +68,7 @@ export class ClearMobArray {
             if (this.clearMobs[i]) {
                 const unit = this.clearMobs[i].getTriggerMob().u
 
-                if(unit) {
+                if (unit) {
                     xMob = GetUnitX(unit)
                     yMob = GetUnitY(unit)
                     if (RAbsBJ(x - xMob) < MONSTER_NEAR_DIFF_MAX && RAbsBJ(y - yMob) < MONSTER_NEAR_DIFF_MAX) {
@@ -81,18 +83,14 @@ export class ClearMobArray {
     }
 
     initializeClearMobs = () => {
-        this.clearMobs.map(clearMob => {
-            if(clearMob){
-                clearMob.initialize()
-            }
-        })
+        for (const clearMob of this.clearMobs) {
+            clearMob.initialize()
+        }
     }
 
     closeClearMobs = () => {
-        this.clearMobs.map(clearMob => {
-            if(clearMob){
-                clearMob.close()
-            }
-        })
+        for (const clearMob of this.clearMobs) {
+            clearMob.close()
+        }
     }
 }
