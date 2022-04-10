@@ -21,7 +21,7 @@ export const InitTrig_InvisUnit_is_getting_damage = () => {
         events: [],
         actions: [
             () => {
-                let invisUnit: unit | null = GetTriggerUnit()
+                let invisUnit: unit = GetTriggerUnit()
                 let n = GetUnitUserData(invisUnit)
                 const escaper = getUdgEscapers().get(n)
 
@@ -29,10 +29,8 @@ export const InitTrig_InvisUnit_is_getting_damage = () => {
                     return
                 }
 
-                let killingUnit: unit | null = GetEventDamageSource()
+                let killingUnit: unit = GetEventDamageSource()
                 let clearMob: ClearMob | undefined
-                let moc: Monster
-                let effectStr: string | null
                 let eff: effect | null
                 let x: number
                 let y: number
@@ -47,16 +45,12 @@ export const InitTrig_InvisUnit_is_getting_damage = () => {
                 let hauteurKillingUnit = BlzGetUnitZ(killingUnit) + GetUnitFlyHeight(killingUnit)
 
                 if (!escaper.isAlive()) {
-                    invisUnit = null
-                    killingUnit = null
                     return
                 }
 
                 if (RAbsBJ(hauteurHero - hauteurKillingUnit) < TAILLE_UNITE) {
                     if (GetUnitTypeId(killingUnit) === DUMMY_POWER_CIRCLE) {
                         getUdgEscapers().get(GetUnitUserData(killingUnit))?.coopReviveHero()
-                        invisUnit = null
-                        killingUnit = null
                         return
                     } else {
                         const monster = udg_monsters[GetUnitUserData(killingUnit)]
@@ -64,42 +58,39 @@ export const InitTrig_InvisUnit_is_getting_damage = () => {
                         if (clearMob) {
                             clearMob.activate()
                         } else if (escaper.isGodModeOn()) {
-                            if (escaper.doesGodModeKills()) {
-                                if (GetUnitUserData(killingUnit) !== 0) {
-                                    monster.killUnit() //on ne tue pas directement le monstre, pour pouvoir exécuter des actions secondaires
-                                    monster.destroy()
-                                } else {
-                                    KillUnit(killingUnit)
-                                }
-                            }
+                            //god mode effect
                             x = GetUnitX(killingUnit)
                             y = GetUnitY(killingUnit)
                             eff = AddSpecialEffect(GM_KILLING_EFFECT, x, y)
                             DestroyEffect(eff)
-                            eff = null
-                            invisUnit = null
-                            killingUnit = null
+
+                            //kill monster
+                            if (escaper.doesGodModeKills()) {
+                                print("monster killing")
+                                if (GetUnitUserData(killingUnit) !== 0) {
+                                    monster.killUnit() //on ne tue pas directement le monstre, pour pouvoir exécuter des actions secondaires éventuelles de la méthode killUnit
+                                } else {
+                                    KillUnit(killingUnit)
+                                }
+                            }
                             return
                         }
+
                         if (!escaper.isCoopInvul()) {
                             escaper.kill()
 
                             //effet de tuation du héros par le monstre, suivant le type du monstre
-                            effectStr = getUdgMonsterTypes().monsterUnit2KillEffectStr(killingUnit)
-                            if (effectStr !== null) {
+                            const effectStr = getUdgMonsterTypes().monsterUnit2KillEffectStr(killingUnit)
+                            if (effectStr) {
                                 x = GetUnitX(invisUnit)
                                 y = GetUnitY(invisUnit)
                                 eff = AddSpecialEffect(effectStr, x, y)
                                 TriggerSleepAction(3)
                                 DestroyEffect(eff)
-                                eff = null
                             }
                         }
                     }
                 }
-
-                invisUnit = null
-                killingUnit = null
             },
         ],
     })

@@ -63,9 +63,7 @@ export class MonsterTypeArray {
     monsterUnit2KillEffectStr(monsterUnit: unit) {
         const monster = udg_monsters[GetUnitUserData(monsterUnit)]
         const mt = monster.getMonsterType()
-        monster.destroy()
-
-        return mt?.getKillingEffectStr() || null
+        return mt?.getKillingEffectStr()
     }
 
     saveInCache = () => {
