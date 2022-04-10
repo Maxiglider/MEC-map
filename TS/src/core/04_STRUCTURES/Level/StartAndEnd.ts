@@ -70,7 +70,7 @@ export class End extends RectInterface {
                 () => {
                     const finisher = Hero2Escaper(GetTriggerUnit())
 
-                    if (finisher === null) {
+                    if (!finisher) {
                         return
                     }
 

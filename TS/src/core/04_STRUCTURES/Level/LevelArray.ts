@@ -44,7 +44,7 @@ export class LevelArray {
         }
 
         this.currentLevel = levelId
-        if (!IsLevelBeingMade(this.levels[previousLevelId])) {
+        if (previousLevelId > -1 && !IsLevelBeingMade(this.levels[previousLevelId])) {
             getUdgEscapers().destroyMakesIfForSpecificLevel_currentLevel()
             this.levels[previousLevelId].activate(false)
         }
@@ -76,8 +76,6 @@ export class LevelArray {
     }
 
     goToNextLevel = (finisher?: Escaper): boolean => {
-        let xCam: number
-        let yCam: number
         if (this.currentLevel >= this.lastInstance) {
             return false
         }
@@ -121,6 +119,7 @@ export class LevelArray {
 
     restartTheGame = () => {
         if (this.currentLevel === 0) {
+            this.currentLevel = -1 //to assure level changing
             this.levels[0].activate(false)
         }
         this.goToLevel(undefined, 0)

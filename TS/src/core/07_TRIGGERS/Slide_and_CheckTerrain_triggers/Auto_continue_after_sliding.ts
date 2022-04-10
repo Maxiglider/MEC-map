@@ -2,7 +2,6 @@ import { NB_ESCAPERS } from 'core/01_libraries/Constants'
 import { forRange } from 'Utils/mapUtils'
 import { getUdgEscapers } from '../../../../globals'
 
-//todomax put udg_autoContinueAfterSliding in globals.ts
 
 const initAutoContinueAfterSliding = () => {
     let lastClickedX: number[] = []
