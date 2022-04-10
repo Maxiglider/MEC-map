@@ -4,7 +4,7 @@ import {MakeOneByOneOrTwoClicks} from "../Make/MakeOneByOneOrTwoClicks";
 
 export class MakeEnd extends MakeOneByOneOrTwoClicks {
     constructor(maker: unit) {
-        super(maker, 'endCreate')
+        super(maker, 'endCreate', "", [""])
     }
     
     doActions = () => {

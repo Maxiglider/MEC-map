@@ -9,7 +9,7 @@ export class MakeStart extends MakeOneByOneOrTwoClicks {
     private forNextB: boolean //à true si on veut créer le start du niveau suivant
 
     constructor(maker: unit, forNext: boolean) {
-        super(maker, 'startCreate')
+        super(maker, 'startCreate', "", [""])
         this.forNextB = forNext
     }
 
