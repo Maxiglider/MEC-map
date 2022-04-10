@@ -13,6 +13,7 @@ import { init_Heroes } from '../08_GAME/Init_game/Heroes'
 import { initNoSelectionCircle } from '../08_GAME/Init_game/No_selection_circle'
 import { initArrays } from './initArrays'
 import { initOldTriggers } from './init_old_triggers'
+import {init_doubleKill} from "../Double_heroes/double_kill";
 
 export const initializers = () => {
     init_terrain_limit_variables()
@@ -29,6 +30,7 @@ export const initializers = () => {
     init_ToTurnOnSlide()
     init_StopSecondIfMake()
     initCachedPlayerNames()
+    init_doubleKill()
 
     //todomax disable this line at end
     init_Test()
