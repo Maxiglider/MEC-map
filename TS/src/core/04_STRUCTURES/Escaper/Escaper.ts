@@ -1026,11 +1026,18 @@ export class Escaper {
             return false
         }
 
-        createTimer(0, false, () => {
-            //destroying make a bit later allow to prevent secondary hero from moving
-            this.make && this.make.destroy()
-            delete this.make
-        })
+        this.make && this.make.destroy()
+        delete this.make
+
+        if(!this.isEscaperSecondary()) {
+            createTimer(0, false, () => {
+                //prevent secondary hero from moving at end of make
+                const hero = GetMirrorEscaper(this)?.hero
+                if(hero){
+                    StopUnit(hero)
+                }
+            })
+        }
 
         return true
     }
