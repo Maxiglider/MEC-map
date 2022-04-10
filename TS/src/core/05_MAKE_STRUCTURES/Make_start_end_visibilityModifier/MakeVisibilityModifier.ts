@@ -5,7 +5,7 @@ import {MakeVisibilityModifierAction} from "../MakeLastActions/MakeVisibilityMod
 
 export class MakeVisibilityModifier extends MakeOneByOneOrTwoClicks {
     constructor(maker: unit) {
-        super(maker, 'visibilityModifierCreate')
+        super(maker, 'visibilityModifierCreate', "", [""])
     }
     
     doActions = () => {

@@ -46,7 +46,7 @@ export const ExecuteCommandCheat = (escaper: Escaper, cmd: string): boolean => {
         if (!IsInteger(param1)) {
             return true
         }
-        speed = S2R(param1) * SLIDE_PERIOD
+        speed = S2R(param1)
         if (nbParam === 1) {
             escaper.absoluteSlideSpeed(speed)
             Text.P(escaper.getPlayer(), 'your slide speed is to ' + param1)

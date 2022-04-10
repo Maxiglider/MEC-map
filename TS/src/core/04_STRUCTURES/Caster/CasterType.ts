@@ -158,7 +158,8 @@ export class CasterType {
 
     displayForPlayer = (p: player) => {
         let space = '   '
-        let display = udg_colorCode[TEAL] + this.label + ' ' + this.theAlias + ' : '
+        const aliasDisplay = this.theAlias ? ' ' + this.theAlias : ''
+        let display = udg_colorCode[TEAL] + this.label + aliasDisplay + ' : '
         display =
             display +
             this.casterMonsterType.label +
