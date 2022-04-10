@@ -1,3 +1,4 @@
+import { udg_monsters } from '../../../../globals'
 import { MOBS_VARIOUS_COLORS } from '../../01_libraries/Constants'
 import { ColorString2Id } from '../../01_libraries/Init_colorCodes'
 import { IsColorString } from '../../06_COMMANDS/COMMANDS_vJass/Command_functions'
@@ -6,8 +7,6 @@ import { Level } from '../Level/Level'
 import { ClearMob } from '../Monster_properties/ClearMob'
 import { MonsterType } from './MonsterType'
 import { MonstersClickableSetLife } from './trig_Monsters_clickable_set_life'
-import {udg_monsters} from "../../../../globals";
-
 
 export abstract class Monster {
     public static DISABLE_TRANSPARENCY = 80
@@ -232,11 +231,7 @@ export abstract class Monster {
 
         delete udg_monsters[this.id]
 
-        if (this.level) {
-            this.level.monsters.removeMonster(this.id)
-        }
-
-        this.level && this.level.monsters.removeMonster(this.id)
+        this.level?.monsters.removeMonster(this.id)
     }
 
     toString() {

@@ -3,13 +3,11 @@ import { Escaper } from '../../04_STRUCTURES/Escaper/Escaper'
 import { Level } from '../../04_STRUCTURES/Level/Level'
 import { MakeAction } from './MakeAction'
 
-
 export class MakeLastActions {
     private lastActions: MakeAction[] = []
     private lastActionId = -1
     private lastActionEffective = -1 //anciennement appelé "pointeur"
     private owner: Escaper
-
 
     constructor(owner: Escaper) {
         this.owner = owner
@@ -21,7 +19,7 @@ export class MakeLastActions {
         if (this.lastActionEffective < this.lastActionId) {
             //suppression des actions annulées (à l'ajout d'une nouvelle action)
             i = this.lastActionEffective + 1
-            while(i <= this.lastActionId){
+            while (i <= this.lastActionId) {
                 this.lastActions[i].destroy()
                 i++
             }
@@ -79,17 +77,16 @@ export class MakeLastActions {
     deleteSpecificActionsForLevel = (level: Level) => {
         const lastActionEffective = this.lastActions[this.lastActionEffective]
 
-        for(let i = 0; i <= this.lastActionId; i++){
-            if(this.lastActions[i].getLevel() == level) {
-                this.lastActions[i].destroy()
-                delete this.lastActions[i]
+        for (const action of this.lastActions) {
+            if (action.getLevel() === level) {
+                action.destroy()
             }
         }
 
-        this.lastActions = this.lastActions.filter(action => action !== undefined);
+        this.lastActions = this.lastActions.filter(action => action.getLevel() !== level)
         this.lastActionId = this.lastActions.length - 1
 
-        if(lastActionEffective) {
+        if (lastActionEffective) {
             for (let i = 0; i <= this.lastActionId; i++) {
                 if (this.lastActions[i] == lastActionEffective) {
                     this.lastActionEffective = i
@@ -104,7 +101,7 @@ export class MakeLastActions {
             return
         }
 
-        while(this.lastActionId > this.lastActionEffective){
+        while (this.lastActionId > this.lastActionEffective) {
             this.lastActions[this.lastActionId].destroy()
             this.lastActionId--
         }
@@ -112,7 +109,7 @@ export class MakeLastActions {
 
     destroyAllActions = () => {
         let i = 0
-        while(i <= this.lastActionId){
+        while (i <= this.lastActionId) {
             this.lastActions[i].destroy()
             i = i + 1
         }
