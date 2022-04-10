@@ -35,9 +35,7 @@ export class ClearMobArray {
         return this.clearMobs[n]
     }
 
-    count = (): number => {
-        return this.clearMobs.filter(clearMob => clearMob !== undefined).length
-    }
+    count = () => this.clearMobs.length
 
     destroy = () => {
         for (const clearMob of this.clearMobs) {

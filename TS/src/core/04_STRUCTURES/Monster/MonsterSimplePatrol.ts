@@ -47,9 +47,7 @@ export class MonsterSimplePatrol extends Monster {
         this.y2 = y2
     }
 
-    static count = (): number => {
-        return udg_monsters.filter(monster => monster instanceof MonsterSimplePatrol).length
-    }
+    static count = () => udg_monsters.filter(monster => monster instanceof MonsterSimplePatrol).length
 
     removeUnit() {
         if (this.u) {

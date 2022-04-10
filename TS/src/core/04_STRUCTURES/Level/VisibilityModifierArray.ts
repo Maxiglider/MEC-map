@@ -23,9 +23,7 @@ export class VisibilityModifierArray {
         return vm
     }
 
-    count = (): number => {
-        return this.vms.filter(vm => vm !== undefined).length
-    }
+    count = () => this.vms.length
 
     get = (visibilityId: number) => {
         if (visibilityId < 0 || visibilityId > this.vms.length) {

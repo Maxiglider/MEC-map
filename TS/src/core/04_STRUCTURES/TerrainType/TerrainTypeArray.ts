@@ -44,7 +44,7 @@ export class TerrainTypeArray {
         return null
     }
 
-    getAll(){
+    getAll() {
         const all: TerrainType[] = [...this.ttWalk, ...this.ttSlide, ...this.ttDeath]
         return all
     }
@@ -107,9 +107,9 @@ export class TerrainTypeArray {
     newWalk = (label: string, terrainTypeId: number, walkspeed: number) => {
         let n = this.numberOfWalk
 
-        if (this.isLabelAlreadyUsed(label)) throw "Label already used"
-        if (this.isTerrainTypeIdAlreadyUsed(terrainTypeId)) throw "Terrain type already used"
-        if (terrainTypeId === 0) throw "Wrong terrain type"
+        if (this.isLabelAlreadyUsed(label)) throw 'Label already used'
+        if (this.isTerrainTypeIdAlreadyUsed(terrainTypeId)) throw 'Terrain type already used'
+        if (terrainTypeId === 0) throw 'Wrong terrain type'
 
         this.ttWalk[n] = new TerrainTypeWalk(label, terrainTypeId, walkspeed)
         if (this.ttWalk[n] !== null) {
@@ -127,9 +127,9 @@ export class TerrainTypeArray {
     ) => {
         let n = this.numberOfDeath
 
-        if (this.isLabelAlreadyUsed(label)) throw "Label already used"
-        if (this.isTerrainTypeIdAlreadyUsed(terrainTypeId)) throw "Terrain type already used"
-        if (terrainTypeId === 0) throw "Wrong terrain type"
+        if (this.isLabelAlreadyUsed(label)) throw 'Label already used'
+        if (this.isTerrainTypeIdAlreadyUsed(terrainTypeId)) throw 'Terrain type already used'
+        if (terrainTypeId === 0) throw 'Wrong terrain type'
 
         this.ttDeath[n] = new TerrainTypeDeath(label, terrainTypeId, killingEffectStr, timeToKill, toleranceDist)
         if (this.ttDeath[n] !== null) {
@@ -141,9 +141,9 @@ export class TerrainTypeArray {
     newSlide = (label: string, terrainTypeId: number, slideSpeed: number, canTurn: boolean) => {
         let n = this.numberOfSlide
 
-        if (this.isLabelAlreadyUsed(label)) throw "Label already used"
-        if (this.isTerrainTypeIdAlreadyUsed(terrainTypeId)) throw "Terrain type already used"
-        if (terrainTypeId === 0) throw "Wrong terrain type"
+        if (this.isLabelAlreadyUsed(label)) throw 'Label already used'
+        if (this.isTerrainTypeIdAlreadyUsed(terrainTypeId)) throw 'Terrain type already used'
+        if (terrainTypeId === 0) throw 'Wrong terrain type'
 
         this.ttSlide[n] = new TerrainTypeSlide(label, terrainTypeId, slideSpeed, canTurn)
         if (this.ttSlide[n] !== null) {
@@ -283,9 +283,7 @@ export class TerrainTypeArray {
         StringArrayForCache.stringArrayForCache.writeInCache()
     }
 
-    count = (): number => {
-        return this.numberOfWalk + this.numberOfSlide + this.numberOfDeath
-    }
+    count = () => this.numberOfWalk + this.numberOfSlide + this.numberOfDeath
 
     //mettre en place l'ordre des terrains au niveau des tilesets
     setOrder = (cmd: string): boolean => {

@@ -17,13 +17,7 @@ export class MonsterSpawnArray {
     }
 
     getFromLabel = (label: string): MonsterSpawn | null => {
-        const filteredMS = this.monsterSpawns.filter(ms => ms.getLabel() === label)
-
-        if (filteredMS.length > 0) {
-            return filteredMS[0]
-        } else {
-            return null
-        }
+        return this.monsterSpawns.find(ms => ms.getLabel() === label) || null
     }
 
     new(monsterSpawn: MonsterSpawn, activate: boolean) {
@@ -36,9 +30,7 @@ export class MonsterSpawnArray {
         monsterSpawn.level = this.level
     }
 
-    count = (): number => {
-        return this.monsterSpawns.filter(ms => ms !== undefined).length
-    }
+    count = () => this.monsterSpawns.length
 
     destroy = () => {
         for (const ms of this.monsterSpawns) {

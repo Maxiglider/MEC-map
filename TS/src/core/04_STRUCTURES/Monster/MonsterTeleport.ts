@@ -67,9 +67,7 @@ export class MonsterTeleport extends Monster {
         MonsterTeleport.destroyLocs()
     }
 
-    static count = (): number => {
-        return udg_monsters.filter(monster => monster instanceof MonsterTeleport).length
-    }
+    static count = () => udg_monsters.filter(monster => monster instanceof MonsterTeleport).length
 
     static storeNewLoc(x: number, y: number) {
         const nbLocsBefore = MonsterTeleport.X.length

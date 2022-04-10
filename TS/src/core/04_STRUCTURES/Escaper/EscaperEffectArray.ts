@@ -21,9 +21,7 @@ export class EscaperEffectArray {
         this.efs[lastInstance] = new EscaperEffect(efStr, u, bodyPart)
     }
 
-    count = () => {
-        return this.efs.length
-    }
+    count = () => this.efs.length
 
     destroyLastEffects = (numEfToDestroy: number) => {
         let i = numEfToDestroy

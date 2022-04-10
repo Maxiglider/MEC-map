@@ -148,9 +148,7 @@ export class LevelArray {
         return true
     }
 
-    count = (): number => {
-        return this.lastInstance + 1
-    }
+    count = () => this.levels.length
 
     getCurrentLevel = (): Level => {
         return this.levels[this.currentLevel]
