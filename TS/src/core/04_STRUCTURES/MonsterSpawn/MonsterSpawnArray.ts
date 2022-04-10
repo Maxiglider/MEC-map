@@ -17,13 +17,7 @@ export class MonsterSpawnArray {
     }
 
     getFromLabel = (label: string): MonsterSpawn | null => {
-        const filteredMS = this.monsterSpawns.filter(ms => ms.getLabel() === label)
-
-        if (filteredMS.length > 0) {
-            return filteredMS[0]
-        } else {
-            return null
-        }
+        return this.monsterSpawns.find(ms => ms.getLabel() === label) || null
     }
 
     new(monsterSpawn: MonsterSpawn, activate: boolean) {
