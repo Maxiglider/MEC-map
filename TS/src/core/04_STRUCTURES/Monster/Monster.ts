@@ -1,4 +1,4 @@
-import { udg_monsters, udg_monsters_count } from '../../../../globals'
+import { udg_monsters } from '../../../../globals'
 import { MOBS_VARIOUS_COLORS } from '../../01_libraries/Constants'
 import { ColorString2Id } from '../../01_libraries/Init_colorCodes'
 import { IsColorString } from '../../06_COMMANDS/COMMANDS_vJass/Command_functions'
@@ -10,6 +10,9 @@ import {monstersClickable} from "./trig_Monsters_clickable_set_life";
 
 export abstract class Monster {
     public static DISABLE_TRANSPARENCY = 80
+
+    private static lastInstanceId = -1
+
 
     id: number
     u?: unit
@@ -33,7 +36,7 @@ export abstract class Monster {
 
     constructor(monsterType?: MonsterType) {
         this.mt = monsterType
-        this.id = ++udg_monsters_count.lastInstanceId
+        this.id = ++Monster.lastInstanceId
 
         udg_monsters[this.id] = this
 
