@@ -33,7 +33,7 @@ export abstract class Monster {
 
     constructor(monsterType?: MonsterType) {
         this.mt = monsterType
-        this.id = udg_monsters_count()
+        this.id = ++udg_monsters_count.lastInstanceId
 
         udg_monsters[this.id] = this
 

@@ -1,7 +1,6 @@
-import {Level} from '../Level/Level'
-import {Monster} from "../Monster/Monster";
-import {MonsterArray} from "../Monster/MonsterArray";
-
+import { Level } from '../Level/Level'
+import { Monster } from '../Monster/Monster'
+import { MonsterArray } from '../Monster/MonsterArray'
 
 export const CLEAR_MOB_MAX_DURATION = 300
 export const FRONT_MONTANT_DURATION = 0.03
@@ -12,7 +11,6 @@ const TIMER_FRONT_MONTANT = 2
 
 let udp_currentTimer: timer
 const TRIGGER_MOB_PERMANENT_EFFECT = 'Abilities\\Spells\\Orc\\StasisTrap\\StasisTotemTarget.mdl'
-
 
 const ClearMobTimerExpires = () => {
     const clearMob = ClearMob.anyTimerActivatedId2ClearMob.get(GetHandleId(GetExpiredTimer()))
@@ -46,8 +44,6 @@ const TemporarilyEnableMonster = (monster: Monster) => {
     monster.temporarilyEnable(udp_currentTimer)
 }
 
-
-
 export class ClearMob {
     static anyTimerFrontMontantId2ClearMob = new Map<number, ClearMob>()
     static anyTimerActivatedId2ClearMob = new Map<number, ClearMob>()
@@ -63,13 +59,12 @@ export class ClearMob {
     private triggerMobPermanentEffect?: effect
     id: number = -1
 
-
     constructor(triggerMob: Monster, disableDuration: number) {
         if (
             disableDuration !== 0 &&
             (disableDuration > CLEAR_MOB_MAX_DURATION || disableDuration < FRONT_MONTANT_DURATION)
         ) {
-            throw this.constructor.name + " : wrong disable duration"
+            throw this.constructor.name + ' : wrong disable duration'
         }
 
         this.triggerMob = triggerMob
@@ -123,7 +118,7 @@ export class ClearMob {
         this.triggerMob.setBaseColor('blue')
         this.triggerMob.setVertexColor(30, 60, 100)
         if (!this.triggerMobPermanentEffect && this.triggerMob.u) {
-             this.triggerMobPermanentEffect = AddSpecialEffectTarget(
+            this.triggerMobPermanentEffect = AddSpecialEffectTarget(
                 TRIGGER_MOB_PERMANENT_EFFECT,
                 this.triggerMob.u,
                 'origin'
@@ -145,7 +140,7 @@ export class ClearMob {
             delete this.triggerMobPermanentEffect
         }
 
-        if(this.triggerMob.u) {
+        if (this.triggerMob.u) {
             this.triggerMobPermanentEffect = AddSpecialEffectTarget(
                 TRIGGER_MOB_PERMANENT_EFFECT,
                 this.triggerMob.u,
@@ -164,7 +159,7 @@ export class ClearMob {
     }
 
     removeLastBlockMob = (): boolean => {
-        this.blockMobs.getLast().temporarilyEnable(this.timerActivated)
+        this.blockMobs.getLast()?.temporarilyEnable(this.timerActivated)
         return this.blockMobs.removeLast()
     }
 

@@ -2,6 +2,7 @@ import type { Level } from './Level'
 import { VisibilityModifier } from './VisibilityModifier'
 
 export class VisibilityModifierArray {
+    private lastInstance = -1
     private level: Level
     private vms: { [x: number]: VisibilityModifier } = {}
 
@@ -10,16 +11,16 @@ export class VisibilityModifierArray {
     }
 
     new = (x1: number, y1: number, x2: number, y2: number) => {
-        const n = this.count()
-        this.vms[n] = new VisibilityModifier(x1, y1, x2, y2)
-        this.vms[n].level = this.level
-        this.vms[n].id = n
-        return this.vms[n]
+        this.lastInstance++
+        this.vms[this.lastInstance] = new VisibilityModifier(x1, y1, x2, y2)
+        this.vms[this.lastInstance].level = this.level
+        this.vms[this.lastInstance].id = this.lastInstance
+        return this.vms[this.lastInstance]
     }
 
     newFromExisting = (vm: VisibilityModifier) => {
-        const n = this.count()
-        this.vms[n] = vm
+        this.lastInstance++
+        this.vms[this.lastInstance] = vm
         return vm
     }
 
@@ -34,14 +35,14 @@ export class VisibilityModifierArray {
     }
 
     get = (visibilityId: number) => {
-        if (visibilityId < 0 || visibilityId > this.count()) {
+        if (visibilityId < 0 || visibilityId > this.lastInstance) {
             return null
         }
         return this.vms[visibilityId]
     }
 
     getLastInstanceId = (): number => {
-        return this.count() - 1
+        return this.lastInstance
     }
 
     removeVisibility = (arrayId: number) => {

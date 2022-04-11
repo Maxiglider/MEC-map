@@ -3,22 +3,21 @@ import { EscaperEffect } from './EscaperEffect'
 const NB_EFFECTS_LIMIT = 20
 
 export class EscaperEffectArray {
+    private lastInstance = -1
     private efs: { [x: number]: EscaperEffect } = {}
 
     new = (efStr: string, u: unit, bodyPart: string) => {
-        let lastInstance = this.count() - 1
-
-        if (lastInstance >= NB_EFFECTS_LIMIT - 1) {
+        if (this.lastInstance >= NB_EFFECTS_LIMIT - 1) {
             this.efs[0].destroy()
 
             for (let i = 0; i < 19; i++) {
                 this.efs[i] = this.efs[i + 1]
             }
         } else {
-            lastInstance = lastInstance + 1
+            this.lastInstance++
         }
 
-        this.efs[lastInstance] = new EscaperEffect(efStr, u, bodyPart)
+        this.efs[this.lastInstance] = new EscaperEffect(efStr, u, bodyPart)
     }
 
     count = () => {
@@ -33,12 +32,11 @@ export class EscaperEffectArray {
 
     destroyLastEffects = (numEfToDestroy: number) => {
         let i = numEfToDestroy
-        let lastInstance = this.count() - 1
 
-        while (i > 0 && lastInstance >= 0) {
-            this.efs[lastInstance] && this.efs[lastInstance].destroy()
-            delete this.efs[lastInstance]
-            lastInstance--
+        while (i > 0 && this.lastInstance >= 0) {
+            this.efs[this.lastInstance] && this.efs[this.lastInstance].destroy()
+            delete this.efs[this.lastInstance]
+            this.lastInstance--
             i--
         }
     }

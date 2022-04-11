@@ -4,6 +4,7 @@ import type { MonsterType } from '../Monster/MonsterType'
 import type { MonsterSpawn } from './MonsterSpawn'
 
 export class MonsterSpawnArray {
+    private lastInstanceId = -1
     private monsterSpawns: { [x: number]: MonsterSpawn } = {}
     private level: Level
 
@@ -23,6 +24,11 @@ export class MonsterSpawnArray {
         }
 
         return null
+    }
+
+    getNextId = () => {
+        this.lastInstanceId++
+        return this.lastInstanceId
     }
 
     new(monsterSpawn: MonsterSpawn, activate: boolean) {

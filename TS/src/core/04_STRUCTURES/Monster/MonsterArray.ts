@@ -160,19 +160,22 @@ export class MonsterArray {
     }
 
     getLast = () => {
-        return this.monsters[this.count() - 1]
+        let last = null
+
+        for (const [_, monster] of pairs(this.monsters)) {
+            last = monster
+        }
+
+        return last
     }
 
     removeLast = () => {
-        let i = this.count() - 1
+        const last = this.getLast()
 
-        while (i >= 0) {
-            if (this.monsters[i]) {
-                this.monsters[i].destroy()
-                delete this.monsters[i]
-                return true
-            }
-            i--
+        if (last) {
+            last.destroy()
+            delete this.monsters[last.id]
+            return true
         }
 
         return false

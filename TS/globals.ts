@@ -88,12 +88,4 @@ export const getUdgMonsterTypes = (): MonsterTypeArray => {
 //Monsters
 export const udg_monsters: { [x: number]: Monster } = {}
 
-export const udg_monsters_count = () => {
-    let n = 0
-
-    for (const [_k, _v] of pairs(udg_monsters)) {
-        n++
-    }
-
-    return n
-}
+export const udg_monsters_count = { lastInstanceId: -1 }
