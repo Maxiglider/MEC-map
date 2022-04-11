@@ -53,7 +53,7 @@ export const gg_trg_apparition_dialogue_et_fermeture_automatique = createEvent({
             }
             const udg_joueurDialogue = Player(i)
             DialogDisplay(udg_joueurDialogue, dialChoixModeCoop, true)
-            let dialBoutonAppuye = false
+            dialBoutonAppuye = false
             TimerStart(dialTimerTempLimite, DIAL_TIME_TO_ANSWER, false, () => {
                 if (!dialBoutonAppuye) {
                     DialogDisplay(udg_joueurDialogue, dialChoixModeCoop, false)
