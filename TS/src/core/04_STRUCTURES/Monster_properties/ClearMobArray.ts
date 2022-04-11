@@ -3,6 +3,8 @@ import type { Monster } from '../Monster/Monster'
 import { MONSTER_NEAR_DIFF_MAX } from '../Monster/MonsterArray'
 import { ClearMob } from './ClearMob'
 
+let lastInstance = -1
+
 export class ClearMobArray {
     private level: Level
     private clearMobs: { [x: number]: ClearMob } = {}
@@ -12,18 +14,18 @@ export class ClearMobArray {
     }
 
     get(arrayId: number) {
-        if (arrayId < 0 || arrayId > this.count() - 1) {
+        if (arrayId < 0 || arrayId > lastInstance) {
             return null
         }
         return this.clearMobs[arrayId]
     }
 
     getLastInstanceId = (): number => {
-        return this.count() - 1
+        return lastInstance
     }
 
     new = (triggerMob: Monster, disableDuration: number, initialize: boolean): ClearMob => {
-        let n = this.count()
+        let n = ++lastInstance
 
         this.clearMobs[n] = new ClearMob(triggerMob, disableDuration)
         if (initialize) {
@@ -70,7 +72,7 @@ export class ClearMobArray {
         let yMob: number
         let i = 0
 
-        while (i <= this.count()) {
+        while (i <= lastInstance) {
             if (this.clearMobs[i]) {
                 const unit = this.clearMobs[i].getTriggerMob().u
 
