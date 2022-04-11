@@ -47,7 +47,17 @@ export class MonsterSimplePatrol extends Monster {
         this.y2 = y2
     }
 
-    static count = () => Object.values(udg_monsters).filter(monster => monster instanceof MonsterSimplePatrol).length
+    static count = () => {
+        let n = 0
+
+        for (const [_, monster] of pairs(udg_monsters)) {
+            if (monster instanceof MonsterSimplePatrol) {
+                n++
+            }
+        }
+
+        return n
+    }
 
     removeUnit() {
         if (this.u) {

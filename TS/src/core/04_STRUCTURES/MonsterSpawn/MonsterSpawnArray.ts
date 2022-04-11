@@ -15,8 +15,14 @@ export class MonsterSpawnArray {
         return this.monsterSpawns[arrayId]
     }
 
-    getFromLabel = (label: string): MonsterSpawn | null => {
-        return Object.values(this.monsterSpawns).find(ms => ms.getLabel() === label) || null
+    getFromLabel = (label: string) => {
+        for (const [_, ms] of pairs(this.monsterSpawns)) {
+            if (ms.getLabel() === label) {
+                return ms
+            }
+        }
+
+        return null
     }
 
     new(monsterSpawn: MonsterSpawn, activate: boolean) {

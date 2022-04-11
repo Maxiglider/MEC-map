@@ -1,5 +1,7 @@
 import { Caster } from 'core/04_STRUCTURES/Caster/Caster'
 import { MakeOneByOneOrTwoClicks } from 'core/05_MAKE_STRUCTURES/Make/MakeOneByOneOrTwoClicks'
+import { ArrayHandler } from 'Utils/ArrayHandler'
+import { arrayPush } from '../../01_libraries/Basic_functions'
 import { Text } from '../../01_libraries/Text'
 import { MakeDeleteMonstersAction } from '../MakeLastActions/MakeDeleteMonstersAction'
 
@@ -23,7 +25,7 @@ export class MakeDeleteCasters extends MakeOneByOneOrTwoClicks {
                 caster = monster instanceof Caster ? monster : null
                 if (caster && caster.u) {
                     caster.removeUnit()
-                    suppressedCasters.push(caster)
+                    arrayPush(suppressedCasters, caster)
                     nbCastersRemoved = 1
                 }
             } else {
@@ -39,9 +41,11 @@ export class MakeDeleteCasters extends MakeOneByOneOrTwoClicks {
 
                 for (const caster of casters) {
                     caster.removeUnit()
-                    caster instanceof Caster && suppressedCasters.push(caster)
+                    caster instanceof Caster && arrayPush(suppressedCasters, caster)
                     nbCastersRemoved++
                 }
+
+                ArrayHandler.clearArray(casters)
             }
 
             if (nbCastersRemoved <= 1) {

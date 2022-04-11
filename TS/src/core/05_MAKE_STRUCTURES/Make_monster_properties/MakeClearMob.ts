@@ -1,3 +1,4 @@
+import { arrayPush } from 'core/01_libraries/Basic_functions'
 import { Text } from 'core/01_libraries/Text'
 import {
     ClearMob,
@@ -43,7 +44,7 @@ export class MakeClearMob extends Make {
 
         //add the block mob
         this.clearMob && this.clearMob.addBlockMob(monster)
-        this.blockMobs.push(monster)
+        arrayPush(this.blockMobs, monster)
         this.indexLastBlockNotCancelledMob++
     }
 

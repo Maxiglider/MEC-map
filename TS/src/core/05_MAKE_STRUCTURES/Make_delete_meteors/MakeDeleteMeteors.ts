@@ -1,4 +1,6 @@
 import { MakeOneByOneOrTwoClicks } from 'core/05_MAKE_STRUCTURES/Make/MakeOneByOneOrTwoClicks'
+import { ArrayHandler } from 'Utils/ArrayHandler'
+import { arrayPush } from '../../01_libraries/Basic_functions'
 import { Text } from '../../01_libraries/Text'
 import { Meteor, METEOR_NORMAL, udg_meteors } from '../../04_STRUCTURES/Meteor/Meteor'
 import { MakeDeleteMeteorsAction } from '../MakeLastActions/MakeDeleteMeteorsAction'
@@ -25,7 +27,7 @@ export class MakeDeleteMeteors extends MakeOneByOneOrTwoClicks {
 
                 if (meteor && meteor.getItem()) {
                     meteor.removeMeteorItem()
-                    suppressedMeteors.push(meteor)
+                    arrayPush(suppressedMeteors, meteor)
                     nbMeteorsRemoved = 1
                 }
             } else {
@@ -41,9 +43,11 @@ export class MakeDeleteMeteors extends MakeOneByOneOrTwoClicks {
 
                 for (const meteor of meteors) {
                     meteor.removeMeteorItem()
-                    suppressedMeteors.push(meteor)
+                    arrayPush(suppressedMeteors, meteor)
                     nbMeteorsRemoved = nbMeteorsRemoved + 1
                 }
+
+                ArrayHandler.clearArray(meteors)
             }
 
             if (nbMeteorsRemoved <= 1) {

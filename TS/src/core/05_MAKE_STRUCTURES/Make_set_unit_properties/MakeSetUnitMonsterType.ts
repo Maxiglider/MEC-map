@@ -1,4 +1,5 @@
 import { MakeOneByOneOrTwoClicks } from 'core/05_MAKE_STRUCTURES/Make/MakeOneByOneOrTwoClicks'
+import { ArrayHandler } from '../../../Utils/ArrayHandler'
 import { Text } from '../../01_libraries/Text'
 import { MonsterType } from '../../04_STRUCTURES/Monster/MonsterType'
 
@@ -34,7 +35,7 @@ export class MakeSetUnitMonsterType extends MakeOneByOneOrTwoClicks {
                 }
 
                 //todomax getMonsters method in Level class to union all types of Monsters in an array of Monster
-                let monsters = this.escaper
+                const monsters = this.escaper
                     .getMakingLevel()
                     .monsters.getMonstersBetweenLocs(this.lastX, this.lastY, this.orderX, this.orderY)
 
@@ -43,6 +44,8 @@ export class MakeSetUnitMonsterType extends MakeOneByOneOrTwoClicks {
                         nbMonstersFixed++
                     }
                 }
+
+                ArrayHandler.clearArray(monsters)
             }
 
             if (nbMonstersFixed <= 1) {

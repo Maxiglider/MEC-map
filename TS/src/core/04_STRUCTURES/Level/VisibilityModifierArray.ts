@@ -54,19 +54,20 @@ export class VisibilityModifierArray {
         }
     }
 
-    removeLasts = (numberOfVMToRemove: number): boolean => {
-        const vms = Object.values(this.vms)
-            .filter(vm => vm !== undefined)
-            .reverse()
+    // Unused
+    // removeLasts = (numberOfVMToRemove: number): boolean => {
+    //     const vms = this.vms
+    //         .filter(vm => vm !== undefined)
+    //         .reverse()
 
-        let i = numberOfVMToRemove
-        while (i > 0 && vms.length > 0) {
-            vms[0].destroy()
-            vms.shift()
-            i = i - 1
-        }
-        return i === 0
-    }
+    //     let i = numberOfVMToRemove
+    //     while (i > 0 && vms.length > 0) {
+    //         vms[0].destroy()
+    //         vms.shift()
+    //         i = i - 1
+    //     }
+    //     return i === 0
+    // }
 
     activate = (activ: boolean) => {
         for (const [_, vm] of pairs(this.vms)) {

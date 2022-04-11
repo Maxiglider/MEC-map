@@ -1,3 +1,4 @@
+import { arrayPush } from '../../01_libraries/Basic_functions'
 import { Escaper } from './Escaper'
 
 const savedCommands: { [escaperId: number]: { [commandName: string]: string } } = {}
@@ -24,10 +25,7 @@ export const execute = (escaper: Escaper, commandName: string, directCommand = f
     if (!cmd) {
         return false
     } else {
-        commandsBuffer.push({
-            escaper,
-            cmd,
-        })
+        arrayPush(commandsBuffer, { escaper, cmd })
     }
 
     return true

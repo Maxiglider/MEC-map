@@ -1,12 +1,9 @@
 import { MakeOneByOneOrTwoClicks } from 'core/05_MAKE_STRUCTURES/Make/MakeOneByOneOrTwoClicks'
+import { ArrayHandler } from '../../../Utils/ArrayHandler'
+import { arrayPush } from '../../01_libraries/Basic_functions'
 import { Text } from '../../01_libraries/Text'
 import { Monster } from '../../04_STRUCTURES/Monster/Monster'
 import { MakeDeleteMonstersAction } from '../MakeLastActions/MakeDeleteMonstersAction'
-import {ArrayHandler} from "../../../Utils/ArrayHandler";
-import {MonsterNoMove} from "../../04_STRUCTURES/Monster/MonsterNoMove";
-import {arrayPush} from "../../01_libraries/Basic_functions";
-import {MonsterSimplePatrol} from "../../04_STRUCTURES/Monster/MonsterSimplePatrol";
-import {MonsterMultiplePatrols} from "../../04_STRUCTURES/Monster/MonsterMultiplePatrols";
 
 export class MakeDeleteMonsters extends MakeOneByOneOrTwoClicks {
     constructor(maker: unit, mode: string) {
@@ -24,7 +21,7 @@ export class MakeDeleteMonsters extends MakeOneByOneOrTwoClicks {
                 let monster = this.escaper.getMakingLevel().monsters.getMonsterNear(this.orderX, this.orderY)
                 if (monster) {
                     monster.removeUnit()
-                    suppressedMonsters.push(monster)
+                    arrayPush(suppressedMonsters, monster)
                     nbMonstersRemoved = 1
                 }
             } else {
@@ -42,29 +39,37 @@ export class MakeDeleteMonsters extends MakeOneByOneOrTwoClicks {
                     if (this.getMode() == 'noMove') {
                         arrayPush(filterMonsterClassNameArr, 'MonsterNoMove')
                     } else {
-                        if(this.getMode() == 'move' || this.getMode() == 'simplePatrol'){
+                        if (this.getMode() == 'move' || this.getMode() == 'simplePatrol') {
                             arrayPush(filterMonsterClassNameArr, 'MonsterSimplePatrol')
                         }
-                        if(this.getMode() == 'move' || this.getMode() == 'multiplePatrols'){
+                        if (this.getMode() == 'move' || this.getMode() == 'multiplePatrols') {
                             arrayPush(filterMonsterClassNameArr, 'MonsterMultiplePatrols')
                         }
                     }
                 }
 
-                let monsters = this.escaper
-                        .getMakingLevel()
-                        .monsters.getMonstersBetweenLocs(this.lastX, this.lastY, this.orderX, this.orderY, filterMonsterClassNameArr)
+                const monsters = this.escaper
+                    .getMakingLevel()
+                    .monsters.getMonstersBetweenLocs(
+                        this.lastX,
+                        this.lastY,
+                        this.orderX,
+                        this.orderY,
+                        filterMonsterClassNameArr
+                    )
 
-                if(filterMonsterClassNameArr){
+                if (filterMonsterClassNameArr) {
                     ArrayHandler.clearArray(filterMonsterClassNameArr)
                 }
 
                 for (const monster of monsters) {
                     monster.removeUnit()
-                    suppressedMonsters.push(monster)
+                    arrayPush(suppressedMonsters, monster)
                 }
 
                 nbMonstersRemoved = monsters.length
+
+                ArrayHandler.clearArray(monsters)
             }
 
             if (nbMonstersRemoved <= 1) {

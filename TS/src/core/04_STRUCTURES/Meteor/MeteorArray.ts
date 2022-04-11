@@ -1,4 +1,5 @@
-import { IsItemBetweenLocs } from '../../01_libraries/Basic_functions'
+import { ArrayHandler } from 'Utils/ArrayHandler'
+import { arrayPush, IsItemBetweenLocs } from '../../01_libraries/Basic_functions'
 import type { Level } from '../Level/Level'
 import { MONSTER_NEAR_DIFF_MAX } from '../Monster/MonsterArray'
 import { Meteor } from './Meteor'
@@ -85,15 +86,16 @@ export class MeteorArray {
     }
 
     getMeteorsBetweenLocs(x1: number, y1: number, x2: number, y2: number) {
-        return Object.values(this.meteors).filter(meteor => {
-            const item = meteor.getItem()
-            if (item) {
-                if (IsItemBetweenLocs(item, x1, y1, x2, y2)) {
-                    return true
-                }
-            }
+        const arr = ArrayHandler.getNewArray<Meteor>()
 
-            return false
-        })
+        for (const [_, meteor] of pairs(this.meteors)) {
+            const item = meteor.getItem()
+
+            if (item && IsItemBetweenLocs(item, x1, y1, x2, y2)) {
+                arrayPush(arr, meteor)
+            }
+        }
+
+        return arr
     }
 }
