@@ -1,17 +1,15 @@
 import { IsIssuedOrder, StopUnit } from 'core/01_libraries/Basic_functions'
 import { Hero2Escaper } from 'core/04_STRUCTURES/Escaper/Escaper_functions'
+import { createEvent } from '../../../Utils/mapUtils'
 import { Escaper } from '../../04_STRUCTURES/Escaper/Escaper'
-import {createEvent} from "../../../Utils/mapUtils";
 
 export const MAKE_LAST_CLIC_UNIT_ID = FourCC('e001') //à remplacer par l'id de l'unité choisie (need couleur variable)
 export const MAKE_CANT_CANCEL_MORE = 'Nothing else to cancel !'
 export const MAKE_CANT_REDO_MORE = 'Nothing else to redo !'
 
-
 const TriggerActions = () => {
     Hero2Escaper(GetTriggerUnit())?.getMake()?.doActions()
 }
-
 
 export abstract class Make {
     makerOwner: player

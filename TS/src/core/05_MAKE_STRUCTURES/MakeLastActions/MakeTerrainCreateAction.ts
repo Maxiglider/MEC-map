@@ -1,11 +1,12 @@
 import { LARGEUR_CASE } from 'core/01_libraries/Constants'
 import { getUdgTerrainTypes } from '../../../../globals'
-
+import { Text } from '../../01_libraries/Text'
 import { TerrainType } from '../../04_STRUCTURES/TerrainType/TerrainType'
-import {MakeAction} from "./MakeAction";
-import {ChangeTerrainBetween, ChangeTerrainType} from "../../07_TRIGGERS/Modify_terrain_Functions/Modify_terrain_functions";
-import {Text} from "../../01_libraries/Text";
-
+import {
+    ChangeTerrainBetween,
+    ChangeTerrainType,
+} from '../../07_TRIGGERS/Modify_terrain_Functions/Modify_terrain_functions'
+import { MakeAction } from './MakeAction'
 
 export class MakeTerrainCreateAction extends MakeAction {
     private terrainTypesBefore: TerrainType[][]
@@ -16,13 +17,7 @@ export class MakeTerrainCreateAction extends MakeAction {
     private maxX: number
     private maxY: number
 
-    constructor(
-        terrainTypeNew: TerrainType,
-        x1: number,
-        y1: number,
-        x2: number,
-        y2: number
-    ) {
+    constructor(terrainTypeNew: TerrainType, x1: number, y1: number, x2: number, y2: number) {
         super()
 
         this.minX = RMinBJ(x1, x2)
@@ -39,10 +34,10 @@ export class MakeTerrainCreateAction extends MakeAction {
         let x = this.minX
         let y = this.minY
 
-        while(y <= this.maxY){
-            while(x <= this.maxX){
+        while (y <= this.maxY) {
+            while (x <= this.maxX) {
                 const tt = getUdgTerrainTypes().getTerrainType(x, y)
-                if(tt){
+                if (tt) {
                     !this.terrainTypesBefore[x] && (this.terrainTypesBefore[x] = [])
                     this.terrainTypesBefore[x][y] = tt
                 }
@@ -62,12 +57,12 @@ export class MakeTerrainCreateAction extends MakeAction {
         //nothing needed
     }
 
-    terrainModificationCancel = (): void => {
+    terrainModificationCancel = () => {
         let x = this.minX
         let y = this.minY
 
         while (y <= this.maxY) {
-            while (x <= this.maxX){
+            while (x <= this.maxX) {
                 const terrainType = this.terrainTypesBefore[x][y]
                 if (terrainType && terrainType.getTerrainTypeId() != 0) {
                     ChangeTerrainType(x, y, terrainType.getTerrainTypeId())
@@ -79,7 +74,7 @@ export class MakeTerrainCreateAction extends MakeAction {
         }
     }
 
-    terrainModificationRedo = (): void => {
+    terrainModificationRedo = () => {
         const terrainTypeId = this.terrainTypeNew.getTerrainTypeId()
         if (terrainTypeId === 0) {
             this.owner && Text.erP(this.owner.getPlayer(), "the terrain type for this action doesn't exist anymore")

@@ -16,7 +16,7 @@ export class MakeDeleteMonstersAction extends MakeAction {
         this.suppressedMonsters = suppressedMonsters
     }
 
-    destroy = (): void => {
+    destroy = () => {
         if (this.isActionMadeB) {
             //suppression définitive des mobs
             for (const monster of this.suppressedMonsters) {

@@ -12,17 +12,17 @@ const initMonsterSimplePatrol = () => {
 
     const checkSimplePatrolMobsPeriod = 5
 
-    const CheckSimplePatrolMobsEnum = (): void => {
+    const CheckSimplePatrolMobsEnum = () => {
         if (GetUnitCurrentOrder(GetEnumUnit()) === 0) {
             udg_monsters[GetUnitUserData(GetEnumUnit())].createUnit()
         }
     }
 
-    const CheckSimplePatrolMobs_Actions = (): void => {
+    const CheckSimplePatrolMobs_Actions = () => {
         ForGroup(simplePatrolMobs, CheckSimplePatrolMobsEnum)
     }
 
-    const Init_MonsterSimplePatrol = (): void => {
+    const Init_MonsterSimplePatrol = () => {
         createTimer(checkSimplePatrolMobsPeriod, true, CheckSimplePatrolMobs_Actions)
     }
 
@@ -66,14 +66,14 @@ export class MonsterSimplePatrol extends Monster {
         }
     }
 
-    killUnit = (): void => {
+    killUnit = () => {
         if (this.u && IsUnitAliveBJ(this.u)) {
             GroupRemoveUnit(simplePatrolMobs, this.u)
             super.killUnit()
         }
     }
 
-    createUnit = (): void => {
+    createUnit = () => {
         super.createUnit(() => (this.mt ? NewPatrolMonster(this.mt, this.x1, this.y1, this.x2, this.y2) : undefined))
 
         this.u && GroupAddUnit(simplePatrolMobs, this.u)

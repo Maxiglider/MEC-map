@@ -1,5 +1,5 @@
+import { Text } from '../../01_libraries/Text'
 import { MakeAction } from './MakeAction'
-import {Text} from "../../01_libraries/Text";
 
 export class MakeTerrainHeightAction extends MakeAction {
     private radius: number
@@ -19,7 +19,7 @@ export class MakeTerrainHeightAction extends MakeAction {
         this.isActionMadeB = true
     }
 
-    apply = (): void => {
+    apply = () => {
         this.terrainDeform = TerrainDeformCrater(this.x, this.y, this.radius, -this.height, 0, true)
     }
 

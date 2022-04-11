@@ -5,7 +5,7 @@ import { getUdgEscapers } from '../../../globals'
 import { udg_doubleHeroesEnabled } from './double_heroes_config'
 
 export const init_forceSelectionWhileSliding = () => {
-    const ForceSelectionWhileSliding_Actions = (): void => {
+    const ForceSelectionWhileSliding_Actions = () => {
         let escaper1
         let escaper2
         let isSelected1: boolean

@@ -1,13 +1,10 @@
 import { LARGEUR_CASE } from 'core/01_libraries/Constants'
-import { getUdgTerrainTypes } from '../../../../globals'
-
+import { getUdgTerrainTypes, globals } from '../../../../globals'
+import { ArrayHandler } from '../../../Utils/ArrayHandler'
+import { Text } from '../../01_libraries/Text'
 import { TerrainType } from '../../04_STRUCTURES/TerrainType/TerrainType'
-import {MakeAction} from "./MakeAction";
-import {ChangeTerrainType} from "../../07_TRIGGERS/Modify_terrain_Functions/Modify_terrain_functions";
-import {Text} from "../../01_libraries/Text";
-import {globals} from "../../../../globals";
-import {ArrayHandler} from "../../../Utils/ArrayHandler";
-
+import { ChangeTerrainType } from '../../07_TRIGGERS/Modify_terrain_Functions/Modify_terrain_functions'
+import { MakeAction } from './MakeAction'
 
 export class MakeTerrainCopyPasteAction extends MakeAction {
     private minX: number
@@ -18,19 +15,10 @@ export class MakeTerrainCopyPasteAction extends MakeAction {
     private terrainTypesBefore: TerrainType[][]
     private terrainTypesAfter: TerrainType[][]
 
-    constructor(
-        x1: number,
-        y1: number,
-        x2: number,
-        y2: number,
-        x3: number,
-        y3: number,
-        x4: number,
-        y4: number
-    ) {
+    constructor(x1: number, y1: number, x2: number, y2: number, x3: number, y3: number, x4: number, y4: number) {
         super()
 
-        const {MAP_MIN_X, MAP_MIN_Y, MAP_MAX_X, MAP_MAX_Y} = globals
+        const { MAP_MIN_X, MAP_MIN_Y, MAP_MAX_X, MAP_MAX_Y } = globals
 
         let xCopy: number
         let yCopy: number
@@ -45,7 +33,7 @@ export class MakeTerrainCopyPasteAction extends MakeAction {
         let diffX = maxXcopy - minXcopy
         let diffY = maxYcopy - minYcopy
 
-        print("diffX " + diffX + " ; diffY " + diffY)
+        print('diffX ' + diffX + ' ; diffY ' + diffY)
 
         let minXpaste: number
         let minYpaste: number
@@ -65,9 +53,28 @@ export class MakeTerrainCopyPasteAction extends MakeAction {
             minYpaste = y3 - diffY
         }
 
-        print("minXpaste : " + minXpaste + " ; minXpaste : " + minXpaste +" ; minYpaste : " + minYpaste +" ; minYpaste : " + minYpaste)
-        print("MAP_MIN_X : " + MAP_MIN_X + " ; MAP_MAX_X : " + MAP_MAX_X + " ; MAP_MIN_Y : " + MAP_MIN_Y + " ; MAP_MAX_Y : " + MAP_MAX_Y + " ; diffX : " + diffX )
-
+        print(
+            'minXpaste : ' +
+                minXpaste +
+                ' ; minXpaste : ' +
+                minXpaste +
+                ' ; minYpaste : ' +
+                minYpaste +
+                ' ; minYpaste : ' +
+                minYpaste
+        )
+        print(
+            'MAP_MIN_X : ' +
+                MAP_MIN_X +
+                ' ; MAP_MAX_X : ' +
+                MAP_MAX_X +
+                ' ; MAP_MIN_Y : ' +
+                MAP_MIN_Y +
+                ' ; MAP_MAX_Y : ' +
+                MAP_MAX_Y +
+                ' ; diffX : ' +
+                diffX
+        )
 
         if (
             minXpaste < MAP_MIN_X ||
@@ -75,7 +82,7 @@ export class MakeTerrainCopyPasteAction extends MakeAction {
             minYpaste < MAP_MIN_Y ||
             minYpaste + diffY > MAP_MAX_Y
         ) {
-            throw "out of bounds"
+            throw 'out of bounds'
         }
 
         this.minX = minXpaste
@@ -94,7 +101,7 @@ export class MakeTerrainCopyPasteAction extends MakeAction {
             while (xCopy <= maxXcopy) {
                 let tt = getUdgTerrainTypes().getTerrainType(xPaste, yPaste)
 
-                if(tt){
+                if (tt) {
                     !this.terrainTypesBefore[xPaste] && (this.terrainTypesBefore[xPaste] = ArrayHandler.getNewArray())
                     this.terrainTypesBefore[xPaste][yPaste] = tt
                 }
@@ -121,12 +128,12 @@ export class MakeTerrainCopyPasteAction extends MakeAction {
         this.isActionMadeB = true
     }
 
-    terrainModificationCancel = (): void => {
+    terrainModificationCancel = () => {
         let x = this.minX
         let y = this.minY
 
-        while (y <= this.maxY){
-            while (x <= this.maxX){
+        while (y <= this.maxY) {
+            while (x <= this.maxX) {
                 const terrainType = this.terrainTypesBefore[x][y]
                 if (terrainType && terrainType.getTerrainTypeId() != 0) {
                     ChangeTerrainType(x, y, terrainType.getTerrainTypeId())
@@ -138,12 +145,12 @@ export class MakeTerrainCopyPasteAction extends MakeAction {
         }
     }
 
-    terrainModificationRedo = (): void => {
+    terrainModificationRedo = () => {
         let x = this.minX
         let y = this.minY
 
-        while (y <= this.maxY){
-            while (x <= this.maxX){
+        while (y <= this.maxY) {
+            while (x <= this.maxX) {
                 const terrainType = this.terrainTypesAfter[x][y]
                 if (terrainType && terrainType.getTerrainTypeId() != 0) {
                     ChangeTerrainType(x, y, terrainType.getTerrainTypeId())

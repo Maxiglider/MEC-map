@@ -1,5 +1,5 @@
-import {CanUseTerrain} from 'core/07_TRIGGERS/Modify_terrain_Functions/Terrain_functions'
-import {Ascii2String} from "../../01_libraries/Ascii";
+import { CanUseTerrain } from 'core/07_TRIGGERS/Modify_terrain_Functions/Terrain_functions'
+import { Ascii2String } from '../../01_libraries/Ascii'
 
 export const DISPLAY_SPACE = '   '
 
@@ -19,8 +19,8 @@ export abstract class TerrainType {
         orderId: number,
         cliffClassId: number
     ) {
-        if(terrainTypeId == 0){
-            throw "Wrong terrain type id"
+        if (terrainTypeId == 0) {
+            throw 'Wrong terrain type id'
         }
 
         if (!CanUseTerrain(terrainTypeId)) {
@@ -99,7 +99,7 @@ export abstract class TerrainType {
         let display =
             this.getColor() +
             this.label +
-            ((this.theAlias && this.theAlias != '') ? ' ' + this.theAlias : '') +
+            (this.theAlias && this.theAlias != '' ? ' ' + this.theAlias : '') +
             order +
             " : '" +
             Ascii2String(this.terrainTypeId) +

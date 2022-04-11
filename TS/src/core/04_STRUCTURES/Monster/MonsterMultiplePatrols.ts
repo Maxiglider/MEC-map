@@ -16,7 +16,7 @@ const NewRegion = (x: number, y: number): region => {
     return R
 }
 
-const MonsterMultiplePatrols_move_Actions = (): void => {
+const MonsterMultiplePatrols_move_Actions = () => {
     let monster: Monster
     let MMP: MonsterMultiplePatrols
     if (IsHero(GetTriggerUnit())) {
@@ -138,7 +138,7 @@ export class MonsterMultiplePatrols extends Monster {
         this.activateMove(this.currentMove)
     }
 
-    createUnit = (): void => {
+    createUnit = () => {
         if (this.x.length < 2) {
             return //need at least 2 locations to create a unit
         }

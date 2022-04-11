@@ -117,7 +117,7 @@ export class MonsterTeleport extends Monster {
         return this.period
     }
 
-    createUnit = (): void => {
+    createUnit = () => {
         if (this.x.length < 1) {
             return //need at least 1 location to create a unit
         }
@@ -183,7 +183,7 @@ export class MonsterTeleport extends Monster {
         return this.y[id]
     }
 
-    addNewLocAt = (id: number, x: number, y: number): void => {
+    addNewLocAt = (id: number, x: number, y: number) => {
         this.x[id] = x
         this.y[id] = y
     }
@@ -217,7 +217,7 @@ export class MonsterTeleport extends Monster {
         return true
     }
 
-    destroy = (): void => {
+    destroy = () => {
         MonsterTeleport.anyMonsterTeleportTimerId2MonsterTeleport.delete(GetHandleId(this.t))
         DestroyTimer(this.t)
         super.destroy()
