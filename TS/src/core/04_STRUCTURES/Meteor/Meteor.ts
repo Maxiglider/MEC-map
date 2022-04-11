@@ -7,15 +7,7 @@ export const METEOR_CHEAT = FourCC('MCD1')
 
 export const udg_meteors: { [x: number]: Meteor } = {}
 
-const udg_meteors_count = () => {
-    let n = 0
-
-    for (const [_k, _v] of pairs(udg_meteors)) {
-        n++
-    }
-
-    return n
-}
+let lastInstanceId = -1
 
 export class Meteor {
     private id: number
@@ -29,7 +21,7 @@ export class Meteor {
         this.x = x
         this.y = y
 
-        this.id = udg_meteors_count()
+        this.id = lastInstanceId++
         udg_meteors[this.id] = this
     }
 
