@@ -10,7 +10,6 @@ import { InitTrig_A_hero_dies_check_if_all_dead_and_sounds } from 'core/08_GAME/
 import { InitTrig_InvisUnit_is_getting_damage } from 'core/08_GAME/Death/InvisUnit_is_getting_damage'
 import { InitTrig_Lose_a_life_and_res } from 'core/08_GAME/Death/Lose_a_life_and_res'
 import { InitTrig_Sound_monster_dies } from 'core/08_GAME/Death/Sound_monster_dies'
-import { InitTrig_Allways_day } from 'core/08_GAME/Init_game/Allways_day'
 import { InitTrig_Camera } from 'core/08_GAME/Init_game/Camera'
 import { InitTrig_Forces_ally } from 'core/08_GAME/Init_game/Forces_ally'
 import { InitTrig_Start_sound } from 'core/08_GAME/Init_game/Start_sound'
@@ -120,7 +119,6 @@ export const initOldTriggers = () => {
     InitTrig_Init_lives()
     InitTrig_Forces_ally()
     InitTrig_Camera()
-    InitTrig_Allways_day()
     InitTrig_Start_sound()
     InitTrig_creation_dialogue()
     InitTrig_Using_shortcut()

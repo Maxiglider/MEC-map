@@ -95,7 +95,11 @@ export const InitTrig_InvisUnit_is_getting_damage = () => {
         ],
     })
 
-    return { TAILLE_UNITE, gg_trg_InvisUnit_is_getting_damage }
+    const setTailleUnite = (newSize: number) => {
+        TAILLE_UNITE = newSize
+    }
+
+    return { TAILLE_UNITE, gg_trg_InvisUnit_is_getting_damage, setTailleUnite }
 }
 
 export const Trig_InvisUnit_is_getting_damage = InitTrig_InvisUnit_is_getting_damage()

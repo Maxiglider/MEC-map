@@ -46,12 +46,18 @@ export abstract class Make {
     }
 
     doBaseActions() {
-        if (!IsIssuedOrder('smart')) {
-            return false
-        }
+        const targetWidget = GetOrderTarget()
+        if(targetWidget){
+            this.orderX = GetWidgetX(targetWidget)
+            this.orderY = GetWidgetX(targetWidget)
+        }else {
+            if (!IsIssuedOrder('smart')) {
+                return false
+            }
 
-        this.orderX = GetOrderPointX()
-        this.orderY = GetOrderPointY()
+            this.orderX = GetOrderPointX()
+            this.orderY = GetOrderPointY()
+        }
 
         StopUnit(this.maker)
         return true
@@ -63,7 +69,10 @@ export abstract class Make {
         if (this.t) DestroyTrigger(this.t)
 
         this.t = createEvent({
-            events: [t => TriggerRegisterUnitEvent(t, this.maker, EVENT_UNIT_ISSUED_POINT_ORDER)],
+            events: [
+                t => TriggerRegisterUnitEvent(t, this.maker, EVENT_UNIT_ISSUED_POINT_ORDER),
+                t => TriggerRegisterUnitEvent(t, this.maker, EVENT_UNIT_ISSUED_TARGET_ORDER)
+            ],
             actions: [TriggerActions],
         })
     }

@@ -1,13 +1,4 @@
-import { createEvent } from 'Utils/mapUtils'
-
-export const InitTrig_Allways_day = () => {
-    createEvent({
-        events: [],
-        actions: [
-            () => {
-                SetTimeOfDay(12)
-                UseTimeOfDayBJ(false)
-            },
-        ],
-    })
+export const init_Trig_Allways_day = () => {
+    SetTimeOfDay(12)
+    UseTimeOfDayBJ(false)
 }

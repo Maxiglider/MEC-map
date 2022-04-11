@@ -1528,7 +1528,7 @@ export const ExecuteCommandMake = (escaper: Escaper, cmd: string): boolean => {
     }
 
     //createKey(crk)   --> create meteors used to kill clickable monsters
-    if (name === 'createKey' || name === 'crk') {
+        if (name === 'createKey' || name === 'crk') {
         if (noParam) {
             escaper.makeCreateMeteor()
             Text.mkP(escaper.getPlayer(), 'meteor making on')
@@ -1627,7 +1627,7 @@ export const ExecuteCommandMake = (escaper: Escaper, cmd: string): boolean => {
             }
         } else {
             if (param1 === 'current' || param1 === 'c') {
-                if (escaper.setMakingLevel(getUdgLevels().getCurrentLevel())) {
+                if (escaper.setMakingLevel(null)) {
                     Text.mkP(
                         escaper.getPlayer(),
                         'you are now making current level (which is at the moment number ' +

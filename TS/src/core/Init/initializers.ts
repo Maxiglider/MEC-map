@@ -17,6 +17,7 @@ import { init_doubleKill } from '../Double_heroes/double_kill'
 import { initArrays } from './initArrays'
 import { initOldTriggers } from './init_old_triggers'
 import {init_TrigMonstersClickableSetLife} from "../04_STRUCTURES/Monster/trig_Monsters_clickable_set_life";
+import {init_Trig_Allways_day} from "../08_GAME/Init_game/Allways_day";
 
 export const initializers = () => {
     init_terrain_limit_variables()
@@ -37,6 +38,7 @@ export const initializers = () => {
     init_doubleKill()
     initTrig_Autorevive()
     init_TrigMonstersClickableSetLife()
+    init_Trig_Allways_day()
 
     //todomax disable this line at end
     init_Test()

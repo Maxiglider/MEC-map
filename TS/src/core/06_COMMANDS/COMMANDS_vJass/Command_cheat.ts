@@ -485,7 +485,7 @@ export const ExecuteCommandCheat = (escaper: Escaper, cmd: string): boolean => {
         if (nbParam !== 1 || (S2R(param1) <= 0 && param1 !== '0')) {
             return true
         }
-        Trig_InvisUnit_is_getting_damage.TAILLE_UNITE = S2R(param1)
+        Trig_InvisUnit_is_getting_damage.setTailleUnite(S2R(param1))
         return true
     }
 

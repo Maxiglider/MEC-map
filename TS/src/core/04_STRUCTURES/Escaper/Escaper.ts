@@ -985,14 +985,15 @@ export class Escaper {
         }
     }
 
-    setMakingLevel(level: Level) {
+    setMakingLevel(level: Level | null) {
         if (this.makingLevel == level) {
             return false
         }
 
         const oldMakingLevel = this.makingLevel
-        this.makingLevel = level
         this.destroyMakeIfForSpecificLevel()
+
+        delete this.makingLevel
 
         if (oldMakingLevel && !IsLevelBeingMade(oldMakingLevel)) {
             oldMakingLevel.activate(false)
@@ -1002,9 +1003,12 @@ export class Escaper {
             }
         }
 
-        Level.earningLivesActivated = false
-        level.activate(true)
-        Level.earningLivesActivated = true
+        if(level) {
+            Level.earningLivesActivated = false
+            level && level.activate(true)
+            Level.earningLivesActivated = true
+            this.makingLevel = level
+        }
 
         return true
     }
