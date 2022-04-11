@@ -56,7 +56,7 @@ export class MonsterType {
         this.label = label
         this.unitTypeId = unitTypeId
         this.scale = scale
-        this.immolationSkill = IMMOLATION_SKILLS[R2I(immolationRadius / 5)]
+        this.immolationSkill = IMMOLATION_SKILLS[R2I(immolationRadius / 5) - 1]
         this.speed = speed
         this.isClickableB = isClickable
         this.maxLife = 10000
