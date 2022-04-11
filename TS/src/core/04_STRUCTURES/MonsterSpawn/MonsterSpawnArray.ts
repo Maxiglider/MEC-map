@@ -26,11 +26,6 @@ export class MonsterSpawnArray {
         return null
     }
 
-    getNextId = () => {
-        this.lastInstanceId++
-        return this.lastInstanceId
-    }
-
     new(monsterSpawn: MonsterSpawn, activate: boolean) {
         const n = monsterSpawn.getId()
         this.monsterSpawns[n] = monsterSpawn

@@ -56,6 +56,11 @@ export class MonsterSpawn {
     static anyTrigId2MonsterSpawn = new Map<number, MonsterSpawn>()
     static anyTimerId2Unit = new Map<number, unit>()
     static anyTimerId2MonsterSpawn = new Map<number, MonsterSpawn>()
+    private static lastInstanceId = -1
+
+    public static getNextId = () => {
+        return ++MonsterSpawn.lastInstanceId
+    }
 
     private label: string
     private mt: MonsterType
@@ -74,7 +79,6 @@ export class MonsterSpawn {
     id: number
 
     constructor(
-        id: number,
         label: string,
         mt: MonsterType,
         sens: string,
@@ -84,7 +88,7 @@ export class MonsterSpawn {
         x2: number,
         y2: number
     ) {
-        this.id = id
+        this.id = MonsterSpawn.getNextId()
         this.label = label
         this.mt = mt
         this.sens = sens

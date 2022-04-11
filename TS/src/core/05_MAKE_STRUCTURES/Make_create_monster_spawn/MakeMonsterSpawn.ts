@@ -24,7 +24,6 @@ export class MakeMonsterSpawn extends MakeOneByOneOrTwoClicks {
                 const level = this.escaper.getMakingLevel()
 
                 const ms = new MonsterSpawn(
-                    level.monsterSpawns.getNextId(),
                     this.label,
                     this.mt,
                     this.sens,
