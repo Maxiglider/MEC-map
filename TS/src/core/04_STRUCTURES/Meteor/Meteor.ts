@@ -21,7 +21,7 @@ export class Meteor {
         this.x = x
         this.y = y
 
-        this.id = lastInstanceId++
+        this.id = ++lastInstanceId
         udg_meteors[this.id] = this
     }
 
