@@ -87,5 +87,35 @@ export const ExecuteCommandTrueMax = (escaper: Escaper, cmd: string): boolean =>
         return true
     }
 
+    //-exec
+    if (name === 'e' || name === 'exec') {
+        const args = GetEventPlayerChatString().substring(name.length + 2)
+
+        const [func, err] = load(`return function() return ${args} end`)
+
+        if (func) {
+            const [ok, f] = pcall(func)
+
+            if (ok) {
+                Text.P(escaper.getPlayer(), `Ran: '${args}'`)
+                const out = f()
+
+                if (out) {
+                    Text.P(escaper.getPlayer(), `Out: '${out}'`)
+                }
+            } else {
+                Text.erP(escaper.getPlayer(), `Execution error: ${f}`)
+            }
+        } else {
+            if (typeof err === 'string') {
+                Text.erP(escaper.getPlayer(), err)
+            } else {
+                Text.erP(escaper.getPlayer(), 'Syntax error')
+            }
+        }
+
+        return true
+    }
+
     return false
 }
