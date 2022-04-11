@@ -1,7 +1,7 @@
 import {createTimer} from 'Utils/mapUtils'
 import {udg_monsters} from '../../../../globals'
 
-const PERIOD = 0.01
+const PERIOD = 0.1
 
 export const monstersClickable = CreateGroup()
 
@@ -15,7 +15,7 @@ const forEachClickableMonster = () => {
         const previousLife = I2R(monster.getLife())
         let diffLife = RMaxBJ(currentLife, previousLife) - RMinBJ(currentLife, previousLife)
         if (diffLife < 100) {
-            SetUnitLifeBJ(GetEnumUnit(), previousLife - 0.5)
+            SetUnitLifeBJ(GetEnumUnit(), previousLife - 0.9)
         } else {
             while (!(diffLife <= 0)) {
                 monster.setLife(R2I(previousLife) - 10000)
