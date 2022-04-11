@@ -1,34 +1,34 @@
-import { createTimer } from 'Utils/mapUtils'
-import { udg_monsters } from '../../../../globals'
+import {createTimer} from 'Utils/mapUtils'
+import {udg_monsters} from '../../../../globals'
 
-const initMonstersClickableSetLife = () => {
-    const monstersClickable = CreateGroup()
-    const PERIOD = 0.1
+const PERIOD = 0.01
 
-    const init_TrigMonstersClickableSetLife = () => {
-        createTimer(PERIOD, true, () => {
-            ForGroup(monstersClickable, () => {
-                const monsterUnit = GetEnumUnit()
-                const currentLife = GetUnitState(monsterUnit, UNIT_STATE_LIFE)
-                const monster = udg_monsters[GetUnitUserData(monsterUnit)]
+export const monstersClickable = CreateGroup()
 
-                if (monster) {
-                    const previousLife = I2R(monster.getLife())
-                    let diffLife = RMaxBJ(currentLife, previousLife) - RMinBJ(currentLife, previousLife)
-                    if (diffLife < 100) {
-                        SetUnitLifeBJ(GetEnumUnit(), previousLife - 0.5)
-                    } else {
-                        while (!(diffLife <= 0)) {
-                            monster.setLife(R2I(previousLife) - 10000)
-                            diffLife = diffLife - 10000
-                        }
-                    }
-                }
-            })
-        })
+
+const forEachClickableMonster = () => {
+    const monsterUnit = GetEnumUnit()
+    const currentLife = GetUnitState(monsterUnit, UNIT_STATE_LIFE)
+    const monster = udg_monsters[GetUnitUserData(monsterUnit)]
+
+    if (monster) {
+        const previousLife = I2R(monster.getLife())
+        let diffLife = RMaxBJ(currentLife, previousLife) - RMinBJ(currentLife, previousLife)
+        if (diffLife < 100) {
+            SetUnitLifeBJ(GetEnumUnit(), previousLife - 0.5)
+        } else {
+            while (!(diffLife <= 0)) {
+                monster.setLife(R2I(previousLife) - 10000)
+                diffLife = diffLife - 10000
+            }
+        }
     }
-
-    return { monstersClickable, init_TrigMonstersClickableSetLife }
 }
 
-export const MonstersClickableSetLife = initMonstersClickableSetLife()
+
+export const init_TrigMonstersClickableSetLife = () => {
+    createTimer(PERIOD, true, () => {
+        ForGroup(monstersClickable, forEachClickableMonster)
+    })
+}
+

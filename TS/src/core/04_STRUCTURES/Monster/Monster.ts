@@ -6,7 +6,7 @@ import { CACHE_SEPARATEUR_PARAM } from '../../07_TRIGGERS/Save_map_in_gamecache/
 import { Level } from '../Level/Level'
 import { ClearMob } from '../Monster_properties/ClearMob'
 import { MonsterType } from './MonsterType'
-import { MonstersClickableSetLife } from './trig_Monsters_clickable_set_life'
+import {monstersClickable} from "./trig_Monsters_clickable_set_life";
 
 export abstract class Monster {
     public static DISABLE_TRANSPARENCY = 80
@@ -65,7 +65,7 @@ export abstract class Monster {
 
     removeUnit() {
         if (this.u) {
-            GroupRemoveUnit(MonstersClickableSetLife.monstersClickable, this.u)
+            GroupRemoveUnit(monstersClickable, this.u)
             RemoveUnit(this.u)
             delete this.u
             delete this.disablingTimer
@@ -98,7 +98,7 @@ export abstract class Monster {
 
         if (this.mt && this.mt.isClickable()) {
             this.life = this.mt.getMaxLife()
-            this.u && GroupAddUnit(MonstersClickableSetLife.monstersClickable, this.u)
+            this.u && GroupAddUnit(monstersClickable, this.u)
         }
 
         if (previouslyEnabled) {
