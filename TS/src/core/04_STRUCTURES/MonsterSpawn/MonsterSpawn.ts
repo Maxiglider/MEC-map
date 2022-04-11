@@ -52,18 +52,6 @@ const UnspawMonster_Actions = () => {
     }
 }
 
-export const udg_monsterSpawns: { [x: number]: MonsterSpawn } = {}
-
-const udg_monsterSpawns_count = () => {
-    let n = 0
-
-    for (const [_k, _v] of pairs(udg_monsterSpawns)) {
-        n++
-    }
-
-    return n
-}
-
 export class MonsterSpawn {
     static anyTrigId2MonsterSpawn = new Map<number, MonsterSpawn>()
     static anyTimerId2Unit = new Map<number, unit>()
@@ -86,6 +74,7 @@ export class MonsterSpawn {
     id: number
 
     constructor(
+        id: number,
         label: string,
         mt: MonsterType,
         sens: string,
@@ -95,6 +84,7 @@ export class MonsterSpawn {
         x2: number,
         y2: number
     ) {
+        this.id = id
         this.label = label
         this.mt = mt
         this.sens = sens
@@ -103,9 +93,6 @@ export class MonsterSpawn {
         this.minY = RMinBJ(y1, y2)
         this.maxX = RMaxBJ(x1, x2)
         this.maxY = RMaxBJ(y1, y2)
-
-        this.id = udg_monsterSpawns_count()
-        udg_monsterSpawns[this.id] = this
     }
 
     getId() {
@@ -198,7 +185,6 @@ export class MonsterSpawn {
     destroy = () => {
         this.deactivate()
         this.level && this.level.monsterSpawns.removeMonsterSpawn(this.id)
-        delete udg_monsterSpawns[this.id]
     }
 
     startMobMovement = (mobUnit: unit, ms: MonsterSpawn) => {
