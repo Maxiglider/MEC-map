@@ -154,8 +154,10 @@ export abstract class Monster {
             this.disablingTimer === disablingTimer ||
             TimerGetRemaining(disablingTimer) > TimerGetRemaining(this.disablingTimer)
         ) {
+            const immoSkill = this.mt?.getImmolationSkill() || 0
+
             this.disablingTimer = disablingTimer
-            this.mt && this.u && UnitRemoveAbility(this.u, this.mt.getImmolationSkill())
+            this.u && immoSkill > 0 && UnitRemoveAbility(this.u, immoSkill)
             this.u && SetUnitVertexColorBJ(this.u, this.vcRed, this.vcGreen, this.vcBlue, Monster.DISABLE_TRANSPARENCY)
             this.vcTransparency = Monster.DISABLE_TRANSPARENCY
         }
@@ -163,7 +165,9 @@ export abstract class Monster {
 
     temporarilyEnable = (disablingTimer: timer) => {
         if (this.disablingTimer === disablingTimer) {
-            this.mt && this.u && UnitAddAbility(this.u, this.mt.getImmolationSkill())
+            const immoSkill = this.mt?.getImmolationSkill() || 0
+
+            this.u && immoSkill > 0 && UnitAddAbility(this.u, immoSkill)
             this.u && SetUnitVertexColorBJ(this.u, this.vcRed, this.vcGreen, this.vcBlue, 0)
             this.vcTransparency = 0
         }

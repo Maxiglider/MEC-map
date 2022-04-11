@@ -1,7 +1,6 @@
 import { B2S } from 'core/01_libraries/Basic_functions'
 import { Text } from 'core/01_libraries/Text'
-import { getUdgLevels } from "../../../../globals"
-
+import { getUdgEscapers, getUdgLevels } from '../../../../globals'
 import { Ascii2String } from '../../01_libraries/Ascii'
 import {
     MAX_MOVE_SPEED,
@@ -12,8 +11,6 @@ import {
 } from '../../01_libraries/Constants'
 import { udg_colorCode } from '../../01_libraries/Init_colorCodes'
 import { CACHE_SEPARATEUR_PARAM } from '../../07_TRIGGERS/Save_map_in_gamecache/struct_StringArrayForCache'
- import { getUdgEscapers } from '../../../../globals'
-
 import { Level } from '../Level/Level'
 import { IMMOLATION_SKILLS } from './Immolation_skills'
 
@@ -22,7 +19,7 @@ export class MonsterType {
     theAlias?: string
     private unitTypeId: number
     private scale: number //influe sur la taille de l'unité ; 1.0 donne une taille normale
-    private immolationSkill: number
+    private immolationSkill: number | null
     private speed: number
     private isClickableB: boolean
     private killingEffectStr?: string
@@ -45,11 +42,7 @@ export class MonsterType {
             throw this.constructor.name + ' : wrong scale value "' + scale + '"'
         }
 
-        if (
-            R2I(immolationRadius) % 5 != 0 ||
-            immolationRadius < 0 ||
-            immolationRadius > 400
-        ) {
+        if (R2I(immolationRadius) % 5 != 0 || immolationRadius < 0 || immolationRadius > 400) {
             throw this.constructor.name + ' : wrong immolation radius "' + immolationRadius + '"'
         }
 
@@ -149,19 +142,15 @@ export class MonsterType {
         return true
     }
 
-    getImmolationSkill = (): number => {
+    getImmolationSkill = () => {
         return this.immolationSkill
     }
 
     setImmolation = (immolationRadius: number): boolean => {
-        if (
-            R2I(immolationRadius) % 5 != 0 ||
-            immolationRadius < 0 ||
-            immolationRadius > 400
-        ) {
+        if (R2I(immolationRadius) % 5 != 0 || immolationRadius < 0 || immolationRadius > 400) {
             return false
         }
-        this.immolationSkill = IMMOLATION_SKILLS[R2I(immolationRadius / 5)]
+        this.immolationSkill = IMMOLATION_SKILLS[R2I(immolationRadius / 5) - 1]
         this.refresh()
         return true
     }
@@ -231,6 +220,10 @@ export class MonsterType {
     }
 
     getImmolationRadiusStr = (): string => {
+        if (!this.immolationSkill) {
+            return '0'
+        }
+
         let immoStr = Ascii2String(this.immolationSkill)
         immoStr = SubStringBJ(immoStr, 2, 4)
         return I2S(S2I(immoStr))
@@ -288,22 +281,8 @@ export class MonsterType {
             heightDisplay = I2S(R2I(this.height))
         }
         display = display + Ascii2String(this.unitTypeId) + "'" + space
-        display =
-            display +
-            space +
-            'speed_' +
-            I2S(R2I(this.speed)) +
-            space +
-            'immo_' +
-            this.getImmolationRadiusStr()
-            space +
-            'scale_' +
-            scaleDisplay +
-            space +
-            'height_' +
-            heightDisplay +
-            space +
-            this.killingEffectStr
+        display = display + space + 'speed_' + I2S(R2I(this.speed)) + space + 'immo_' + this.getImmolationRadiusStr()
+        space + 'scale_' + scaleDisplay + space + 'height_' + heightDisplay + space + this.killingEffectStr
         if (this.isClickableB) {
             display = display + space + 'clickable' + space + I2S(this.maxLife / 10000)
         }

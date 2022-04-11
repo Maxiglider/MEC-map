@@ -70,7 +70,11 @@ export const NewImmobileMonsterForPlayer = (mt: MonsterType, p: player, x: numbe
         UnitAddAbility(monster, FourCC('Aloc'))
         UnitAddAbility(monster, ABILITY_ANNULER_VISION)
     }
-    UnitAddAbility(monster, mt.getImmolationSkill())
+
+    const immoSkill = mt.getImmolationSkill() || 0
+
+    immoSkill > 0 && UnitAddAbility(monster, immoSkill)
+
     scale = mt.getScale()
     if (scale !== -1) {
         SetUnitScale(monster, scale, scale, scale)
@@ -104,5 +108,3 @@ export const NewPatrolMonster = (mt: MonsterType, x1: number, y1: number, x2: nu
     IssuePointOrder(monster, 'patrol', x2, y2)
     return monster
 }
-
-
