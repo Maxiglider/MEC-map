@@ -6,9 +6,19 @@ import { getUdgEscapers } from '../../../../globals'
 
 const cachedPlayerNames: { [x: string]: number } = {}
 
+const removeHash = (name: string) => {
+    const i = name.indexOf('#')
+
+    if (i === -1) {
+        return name
+    }
+
+    return name.substring(0, i)
+}
+
 export const initCachedPlayerNames = () => {
     forRange(24, i => {
-        cachedPlayerNames[stringReplaceAll(' ', '_', GetPlayerName(Player(i)).toLowerCase())] = i
+        cachedPlayerNames[removeHash(stringReplaceAll(' ', '_', GetPlayerName(Player(i)).toLowerCase()))] = i
     })
 }
 
@@ -132,8 +142,8 @@ export const resolvePlayerId = (arg: string) => {
         if (a > 0 && a <= NB_ESCAPERS) {
             targetPlayer = a - 1
         }
-    } else if (cachedPlayerNames[larg]) {
-        return cachedPlayerNames[larg]
+    } else if (cachedPlayerNames[removeHash(larg)]) {
+        return cachedPlayerNames[removeHash(larg)]
     }
 
     if (targetPlayer === -1) {
