@@ -363,6 +363,10 @@ export class Escaper {
 
     //trigger methods
     enableSlide(doEnable: boolean) {
+        if (!!this.slide === doEnable) {
+            return false
+        }
+
         if (doEnable) {
             this.slide = SlideTrigger.CreateSlideTimer(this.escaperId)
 
@@ -371,7 +375,7 @@ export class Escaper {
                 this.setLastZ(BlzGetUnitZ(this.hero) + GetUnitFlyHeight(this.hero))
             }
         } else {
-            this.slide && this.slide.destroy()
+            this.slide?.destroy()
             delete this.slide
             this.slideLastAngleOrder = -1
         }
@@ -1003,7 +1007,7 @@ export class Escaper {
             }
         }
 
-        if(level) {
+        if (level) {
             Level.earningLivesActivated = false
             level && level.activate(true)
             Level.earningLivesActivated = true
@@ -1033,11 +1037,11 @@ export class Escaper {
         this.make && this.make.destroy()
         delete this.make
 
-        if(!this.isEscaperSecondary()) {
+        if (!this.isEscaperSecondary()) {
             createTimer(0, false, () => {
                 //prevent secondary hero from moving at end of make
                 const hero = GetMirrorEscaper(this)?.hero
-                if(hero){
+                if (hero) {
                     StopUnit(hero)
                 }
             })
