@@ -1,10 +1,5 @@
-import {String2Ascii} from 'core/01_libraries/Ascii'
-import {
-    IsBoolString,
-    S2B,
-    StringContainsChar,
-    tileset2tilesetString
-} from 'core/01_libraries/Basic_functions'
+import { String2Ascii } from 'core/01_libraries/Ascii'
+import { IsBoolString, S2B, StringContainsChar, tileset2tilesetString } from 'core/01_libraries/Basic_functions'
 import {
     DEFAULT_MONSTER_SPEED,
     HERO_SLIDE_SPEED,
@@ -13,18 +8,18 @@ import {
     RED,
     TERRAIN_DEATH_TIME_TO_KILL,
 } from 'core/01_libraries/Constants'
-import {udg_colorCode} from 'core/01_libraries/Init_colorCodes'
-import {Text} from 'core/01_libraries/Text'
-import {Escaper} from 'core/04_STRUCTURES/Escaper/Escaper'
-import {Level} from 'core/04_STRUCTURES/Level/Level'
-import {TerrainType} from 'core/04_STRUCTURES/TerrainType/TerrainType'
-import {DEATH_TERRAIN_MAX_TOLERANCE, TerrainTypeDeath} from 'core/04_STRUCTURES/TerrainType/TerrainTypeDeath'
-import {TerrainTypeSlide} from 'core/04_STRUCTURES/TerrainType/TerrainTypeSlide'
-import {TerrainTypeWalk} from 'core/04_STRUCTURES/TerrainType/TerrainTypeWalk'
-import {ExchangeTerrains} from 'core/07_TRIGGERS/Triggers_to_modify_terrains/Exchange_terrains'
-import {RandomizeTerrains} from 'core/07_TRIGGERS/Triggers_to_modify_terrains/Randomize_terrains'
-import {getUdgCasterTypes, getUdgLevels, getUdgMonsterTypes, getUdgTerrainTypes} from '../../../../globals'
-import {IsInteger, IsPositiveInteger} from '../../01_libraries/Functions_on_numbers'
+import { udg_colorCode } from 'core/01_libraries/Init_colorCodes'
+import { Text } from 'core/01_libraries/Text'
+import { Escaper } from 'core/04_STRUCTURES/Escaper/Escaper'
+import { Level } from 'core/04_STRUCTURES/Level/Level'
+import { TerrainType } from 'core/04_STRUCTURES/TerrainType/TerrainType'
+import { DEATH_TERRAIN_MAX_TOLERANCE, TerrainTypeDeath } from 'core/04_STRUCTURES/TerrainType/TerrainTypeDeath'
+import { TerrainTypeSlide } from 'core/04_STRUCTURES/TerrainType/TerrainTypeSlide'
+import { TerrainTypeWalk } from 'core/04_STRUCTURES/TerrainType/TerrainTypeWalk'
+import { ExchangeTerrains } from 'core/07_TRIGGERS/Triggers_to_modify_terrains/Exchange_terrains'
+import { RandomizeTerrains } from 'core/07_TRIGGERS/Triggers_to_modify_terrains/Randomize_terrains'
+import { getUdgCasterTypes, getUdgLevels, getUdgMonsterTypes, getUdgTerrainTypes } from '../../../../globals'
+import { IsInteger, IsPositiveInteger } from '../../01_libraries/Functions_on_numbers'
 import {
     DEFAULT_CASTER_ANIMATION,
     DEFAULT_CASTER_LOAD_TIME,
@@ -33,17 +28,17 @@ import {
     MIN_CASTER_LOAD_TIME,
     MIN_CASTER_PROJECTILE_SPEED,
 } from '../../04_STRUCTURES/Caster/CasterType'
-import {MONSTER_TELEPORT_PERIOD_MAX, MONSTER_TELEPORT_PERIOD_MIN} from '../../04_STRUCTURES/Monster/MonsterTeleport'
-import {CLEAR_MOB_MAX_DURATION, FRONT_MONTANT_DURATION} from '../../04_STRUCTURES/Monster_properties/ClearMob'
-import {MakeMonsterSimplePatrol} from '../../05_MAKE_STRUCTURES/Make_create_monsters/MakeMonsterSimplePatrol'
-import {TerrainTypeFromString} from '../../07_TRIGGERS/Modify_terrain_Functions/Terrain_type_from_string'
+import { MONSTER_TELEPORT_PERIOD_MAX, MONSTER_TELEPORT_PERIOD_MIN } from '../../04_STRUCTURES/Monster/MonsterTeleport'
+import { CLEAR_MOB_MAX_DURATION, FRONT_MONTANT_DURATION } from '../../04_STRUCTURES/Monster_properties/ClearMob'
+import { MakeMonsterSimplePatrol } from '../../05_MAKE_STRUCTURES/Make_create_monsters/MakeMonsterSimplePatrol'
+import { TerrainTypeFromString } from '../../07_TRIGGERS/Modify_terrain_Functions/Terrain_type_from_string'
 import {
     CACHE_SEPARATEUR_ITEM,
     CACHE_SEPARATEUR_PARAM,
 } from '../../07_TRIGGERS/Save_map_in_gamecache/struct_StringArrayForCache'
-import {ChangeAllTerrains} from '../../07_TRIGGERS/Triggers_to_modify_terrains/Change_all_terrains'
-import {ChangeOneTerrain} from '../../07_TRIGGERS/Triggers_to_modify_terrains/Change_one_terrain'
-import {CmdName, CmdParam, NbParam, NoParam} from './Command_functions'
+import { ChangeAllTerrains } from '../../07_TRIGGERS/Triggers_to_modify_terrains/Change_all_terrains'
+import { ChangeOneTerrain } from '../../07_TRIGGERS/Triggers_to_modify_terrains/Change_one_terrain'
+import { CmdName, CmdParam, NbParam, NoParam } from './Command_functions'
 
 export const ExecuteCommandMake = (escaper: Escaper, cmd: string): boolean => {
     let name = CmdName(cmd)
@@ -94,11 +89,7 @@ export const ExecuteCommandMake = (escaper: Escaper, cmd: string): boolean => {
             return true
         }
 
-        getUdgTerrainTypes().newWalk(
-            param1,
-            TerrainTypeFromString.TerrainTypeString2TerrainTypeId(param2),
-            speed
-        )
+        getUdgTerrainTypes().newWalk(param1, TerrainTypeFromString.TerrainTypeString2TerrainTypeId(param2), speed)
 
         Text.mkP(escaper.getPlayer(), 'New terrain type "' + param1 + '" added')
 
@@ -146,13 +137,7 @@ export const ExecuteCommandMake = (escaper: Escaper, cmd: string): boolean => {
             return true
         }
 
-        getUdgTerrainTypes().newDeath(
-            param1,
-            TerrainTypeFromString.TerrainTypeString2TerrainTypeId(param2),
-            str,
-            x,
-            0
-        )
+        getUdgTerrainTypes().newDeath(param1, TerrainTypeFromString.TerrainTypeString2TerrainTypeId(param2), str, x, 0)
 
         Text.mkP(escaper.getPlayer(), 'New terrain type "' + param1 + '" added')
 
@@ -194,12 +179,7 @@ export const ExecuteCommandMake = (escaper: Escaper, cmd: string): boolean => {
             return true
         }
 
-        getUdgTerrainTypes().newSlide(
-            param1,
-            TerrainTypeFromString.TerrainTypeString2TerrainTypeId(param2),
-            speed,
-            b
-        )
+        getUdgTerrainTypes().newSlide(param1, TerrainTypeFromString.TerrainTypeString2TerrainTypeId(param2), speed, b)
 
         Text.mkP(escaper.getPlayer(), 'New terrain type "' + param1 + '" added')
 
@@ -1104,9 +1084,9 @@ export const ExecuteCommandMake = (escaper: Escaper, cmd: string): boolean => {
             Text.erP(
                 escaper.getPlayer(),
                 'the period must be between ' +
-                R2S(MONSTER_TELEPORT_PERIOD_MIN) +
-                ' and ' +
-                R2S(MONSTER_TELEPORT_PERIOD_MAX)
+                    R2S(MONSTER_TELEPORT_PERIOD_MIN) +
+                    ' and ' +
+                    R2S(MONSTER_TELEPORT_PERIOD_MAX)
             )
             return true
         }
@@ -1139,9 +1119,9 @@ export const ExecuteCommandMake = (escaper: Escaper, cmd: string): boolean => {
             Text.erP(
                 escaper.getPlayer(),
                 'the period must be between ' +
-                R2S(MONSTER_TELEPORT_PERIOD_MIN) +
-                ' and ' +
-                R2S(MONSTER_TELEPORT_PERIOD_MAX)
+                    R2S(MONSTER_TELEPORT_PERIOD_MIN) +
+                    ' and ' +
+                    R2S(MONSTER_TELEPORT_PERIOD_MAX)
             )
             return true
         }
@@ -1208,9 +1188,9 @@ export const ExecuteCommandMake = (escaper: Escaper, cmd: string): boolean => {
             Text.erP(
                 escaper.getPlayer(),
                 'the period must be between ' +
-                R2S(MONSTER_TELEPORT_PERIOD_MIN) +
-                ' and ' +
-                R2S(MONSTER_TELEPORT_PERIOD_MAX)
+                    R2S(MONSTER_TELEPORT_PERIOD_MIN) +
+                    ' and ' +
+                    R2S(MONSTER_TELEPORT_PERIOD_MAX)
             )
             return true
         }
@@ -1231,9 +1211,9 @@ export const ExecuteCommandMake = (escaper: Escaper, cmd: string): boolean => {
             Text.erP(
                 escaper.getPlayer(),
                 'the period must be between ' +
-                R2S(MONSTER_TELEPORT_PERIOD_MIN) +
-                ' and ' +
-                R2S(MONSTER_TELEPORT_PERIOD_MAX)
+                    R2S(MONSTER_TELEPORT_PERIOD_MIN) +
+                    ' and ' +
+                    R2S(MONSTER_TELEPORT_PERIOD_MAX)
             )
             return true
         }
@@ -1265,9 +1245,9 @@ export const ExecuteCommandMake = (escaper: Escaper, cmd: string): boolean => {
             Text.erP(
                 escaper.getPlayer(),
                 'the period must be between ' +
-                R2S(MONSTER_TELEPORT_PERIOD_MIN) +
-                ' and ' +
-                R2S(MONSTER_TELEPORT_PERIOD_MAX)
+                    R2S(MONSTER_TELEPORT_PERIOD_MIN) +
+                    ' and ' +
+                    R2S(MONSTER_TELEPORT_PERIOD_MAX)
             )
             return true
         }
@@ -1528,7 +1508,7 @@ export const ExecuteCommandMake = (escaper: Escaper, cmd: string): boolean => {
     }
 
     //createKey(crk)   --> create meteors used to kill clickable monsters
-        if (name === 'createKey' || name === 'crk') {
+    if (name === 'createKey' || name === 'crk') {
         if (noParam) {
             escaper.makeCreateMeteor()
             Text.mkP(escaper.getPlayer(), 'meteor making on')
@@ -1631,8 +1611,8 @@ export const ExecuteCommandMake = (escaper: Escaper, cmd: string): boolean => {
                     Text.mkP(
                         escaper.getPlayer(),
                         'you are now making current level (which is at the moment number ' +
-                        I2S(getUdgLevels().getCurrentLevel().getId()) +
-                        ')'
+                            I2S(getUdgLevels().getCurrentLevel().getId()) +
+                            ')'
                     )
                 } else {
                     Text.erP(escaper.getPlayer(), 'you are already making current level')
@@ -1858,16 +1838,16 @@ export const ExecuteCommandMake = (escaper: Escaper, cmd: string): boolean => {
         const projectileMonsterType = getUdgMonsterTypes().get(param3)
 
         casterMonsterType &&
-        projectileMonsterType &&
-        getUdgCasterTypes().new(
-            param1,
-            casterMonsterType,
-            projectileMonsterType,
-            x,
-            speed,
-            y,
-            DEFAULT_CASTER_ANIMATION
-        )
+            projectileMonsterType &&
+            getUdgCasterTypes().new(
+                param1,
+                casterMonsterType,
+                projectileMonsterType,
+                x,
+                speed,
+                y,
+                DEFAULT_CASTER_ANIMATION
+            )
         Text.mkP(escaper.getPlayer(), 'new caster type "' + param1 + '" created')
         return true
     }
@@ -2134,9 +2114,9 @@ export const ExecuteCommandMake = (escaper: Escaper, cmd: string): boolean => {
             Text.erP(
                 escaper.getPlayer(),
                 'the disable duration must be a real between ' +
-                R2S(FRONT_MONTANT_DURATION) +
-                ' and ' +
-                R2S(CLEAR_MOB_MAX_DURATION)
+                    R2S(FRONT_MONTANT_DURATION) +
+                    ' and ' +
+                    R2S(CLEAR_MOB_MAX_DURATION)
             )
             return true
         }
@@ -2169,7 +2149,7 @@ export const ExecuteCommandMake = (escaper: Escaper, cmd: string): boolean => {
 
         //apply command
         terrainType &&
-        Text.mkP(escaper.getPlayer(), 'cliff class for that terrain is ' + I2S(terrainType.getCliffClassId()))
+            Text.mkP(escaper.getPlayer(), 'cliff class for that terrain is ' + I2S(terrainType.getCliffClassId()))
         return true
     }
 
@@ -2184,11 +2164,24 @@ export const ExecuteCommandMake = (escaper: Escaper, cmd: string): boolean => {
             Text.mkP(
                 escaper.getPlayer(),
                 'main tile: ' +
-                getUdgTerrainTypes().getMainTileset() +
-                ' = ' +
-                tileset2tilesetString(getUdgTerrainTypes().getMainTileset())
+                    getUdgTerrainTypes().getMainTileset() +
+                    ' = ' +
+                    tileset2tilesetString(getUdgTerrainTypes().getMainTileset())
             )
         }
+        return true
+    }
+
+    // -setClickGrid <value>
+    if ((name === 'setClickGrid' || name === 'setcg') && nbParam === 1) {
+        escaper.roundToGrid = S2I(param1) > 1 && S2I(param1) <= 128 ? S2I(param1) : null
+
+        if (escaper.roundToGrid) {
+            Text.mkP(escaper.getPlayer(), `Now rounding clicks to: '${escaper.roundToGrid}'`)
+        } else {
+            Text.erP(escaper.getPlayer(), `Disabled rounding clicks`)
+        }
+
         return true
     }
 

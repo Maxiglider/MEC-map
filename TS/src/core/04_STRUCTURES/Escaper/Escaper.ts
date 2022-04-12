@@ -127,6 +127,8 @@ export class Escaper {
     public discoTrigger?: Timer
     public currentLevelTouchTerrainDeath?: Level //pour le terrain qui tue, vérifie s'il faut bien tuer l'escaper
 
+    public roundToGrid: number | null = null
+
     //coop
     private powerCircle: unit
     private dummyPowerCircle: unit
