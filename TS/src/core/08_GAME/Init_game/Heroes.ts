@@ -44,27 +44,14 @@ const RandomizeStartPositionsAndHeroSpawnOrder = () => {
     //randomize hero spawn order
     i = 0
     while (true) {
-        if (i >= 12) break
+        if (i >= (udg_doubleHeroesEnabled ? NB_ESCAPERS * 2 : NB_ESCAPERS)) break
         while (true) {
-            n = GetRandomInt(0, 11)
+            n = GetRandomInt(0, NB_ESCAPERS - 1)
             if (!alreadyAdded[n]) break
         }
         playerIdsRandomized[i] = n
         alreadyAdded[n] = true
         i = i + 1
-    }
-
-    if (udg_doubleHeroesEnabled) {
-        while (true) {
-            if (i >= NB_ESCAPERS) break
-            while (true) {
-                n = GetRandomInt(12, NB_ESCAPERS - 1)
-                if (!alreadyAdded[n]) break
-            }
-            playerIdsRandomized[i] = n
-            alreadyAdded[n] = true
-            i = i + 1
-        }
     }
 }
 
