@@ -22,6 +22,7 @@ export class TriggerArray {
     destroy = () => {
         for (let i = 0; i <= this.lastInstance; i++) {
             this.triggers[i].destroy()
+            delete this.triggers[i]
         }
         this.lastInstance = -1
     }

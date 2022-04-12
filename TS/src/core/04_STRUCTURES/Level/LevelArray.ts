@@ -143,6 +143,7 @@ export class LevelArray {
             return false
         }
         this.levels[this.lastInstance].destroy()
+        delete this.levels[this.lastInstance]
         this.lastInstance = this.lastInstance - 1
         return true
     }
