@@ -41,10 +41,9 @@ export const initializers = () => {
     initTrig_Autorevive()
     init_TrigMonstersClickableSetLife()
     init_Trig_Allways_day()
+    ReinitTerrains.init_ReinitAtStart()
+    ReinitTerrainsPositions.init_reinitTerrainsPositions()
 
     //todomax disable this line at end
     init_Test()
-
-    ReinitTerrains.init_ReinitAtStart()
-    ReinitTerrainsPositions.init_reinitTerrainsPositions()
 }
