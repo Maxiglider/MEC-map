@@ -1,13 +1,13 @@
 import { Text } from 'core/01_libraries/Text'
 import { StringArrayForCache } from 'core/07_TRIGGERS/Save_map_in_gamecache/struct_StringArrayForCache'
+import { udg_monsters } from '../../../../globals'
 import { MonsterType } from './MonsterType'
-import {udg_monsters} from "../../../../globals";
 
 export class MonsterTypeArray {
     private monsterTypes: MonsterType[] = []
 
     get = (label: string) => {
-        for(let monsterType of this.monsterTypes){
+        for (let monsterType of this.monsterTypes) {
             if (monsterType.label == label || monsterType.theAlias == label) {
                 return monsterType
             }
@@ -39,10 +39,10 @@ export class MonsterTypeArray {
     remove = (label: string): boolean => {
         const len = this.monsterTypes.length
 
-        for(let i = 0; i < len; i++){
+        for (let i = 0; i < len; i++) {
             if (this.monsterTypes[i].label == label || this.monsterTypes[i].theAlias == label) {
                 this.monsterTypes[i].destroy()
-                table.remove(this.monsterTypes, i)
+                delete this.monsterTypes[i]
                 return true
             }
         }
@@ -51,7 +51,7 @@ export class MonsterTypeArray {
     }
 
     displayForPlayer = (p: player) => {
-        for(let monsterType of this.monsterTypes){
+        for (let monsterType of this.monsterTypes) {
             monsterType.displayForPlayer(p)
         }
 
