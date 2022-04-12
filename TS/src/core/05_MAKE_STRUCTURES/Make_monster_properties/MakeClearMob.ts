@@ -29,13 +29,13 @@ export class MakeClearMob extends Make {
         this.indexLastBlockNotCancelledMob = 0
     }
 
-    private createClearMob() {
+    private createClearMob = () => {
         if (this.triggerMob) {
             this.clearMob = this.escaper.getMakingLevel().clearMobs.new(this.triggerMob, this.disableDuration, true)
         }
     }
 
-    private addBlockMob(monster: Monster) {
+    private addBlockMob = (monster: Monster) => {
         //clear entries after the last not cancelled mob
         const nbBlockMobs = this.blockMobs.length
         for (let i = this.indexLastBlockNotCancelledMob + 1; i < nbBlockMobs; i++) {
@@ -48,7 +48,7 @@ export class MakeClearMob extends Make {
         this.indexLastBlockNotCancelledMob++
     }
 
-    private cancelOneBlockMob() {
+    private cancelOneBlockMob = () => {
         if (this.clearMob && this.clearMob.removeLastBlockMob()) {
             if (this.indexLastBlockNotCancelledMob != 0) {
                 this.indexLastBlockNotCancelledMob--
@@ -60,7 +60,7 @@ export class MakeClearMob extends Make {
         return false
     }
 
-    private redoOneBlockMob() {
+    private redoOneBlockMob = () => {
         if (this.clearMob && this.indexLastBlockNotCancelledMob < this.blockMobs.length - 1) {
             this.indexLastBlockNotCancelledMob++
             const monster = this.blockMobs[this.indexLastBlockNotCancelledMob]
@@ -72,7 +72,7 @@ export class MakeClearMob extends Make {
         return false
     }
 
-    clickMade(monster: Monster) {
+    clickMade = (monster: Monster) => {
         if (!this.clearMob) {
             //creation of the clearMob
             this.triggerMob = monster
@@ -80,7 +80,7 @@ export class MakeClearMob extends Make {
             Text.mkP(this.makerOwner, 'trigger mob added for a new clear mob')
         } else {
             //vérification que le clear mob existe toujours
-            if (this.clearMob.getTriggerMob()) {
+            if (!this.clearMob.getTriggerMob()) {
                 Text.erP(this.makerOwner, 'the clear mob you are working on has been removed')
                 this.escaper.destroyMake()
                 return

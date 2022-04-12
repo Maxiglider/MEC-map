@@ -1,7 +1,6 @@
 //évènement ajouté à la création de l'unité invisible
 
 import { DUMMY_POWER_CIRCLE, GM_KILLING_EFFECT } from 'core/01_libraries/Constants'
-import { Monster } from 'core/04_STRUCTURES/Monster/Monster'
 import { ClearMob } from 'core/04_STRUCTURES/Monster_properties/ClearMob'
 import { createEvent } from 'Utils/mapUtils'
 import {
@@ -76,7 +75,7 @@ export const InitTrig_InvisUnit_is_getting_damage = () => {
                             return
                         }
 
-                        if (!escaper.isCoopInvul()) {
+                        if (!escaper.isCoopInvul() && !clearMob) {
                             escaper.kill()
 
                             //effet de tuation du héros par le monstre, suivant le type du monstre

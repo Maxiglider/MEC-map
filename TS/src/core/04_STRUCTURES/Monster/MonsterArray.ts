@@ -169,11 +169,13 @@ export class MonsterArray {
         return last
     }
 
-    removeLast = () => {
+    removeLast = (destroy = true) => {
         const last = this.getLast()
 
         if (last) {
-            last.destroy()
+            if(destroy) {
+                last.destroy()
+            }
             delete this.monsters[last.id]
             return true
         }
@@ -181,7 +183,11 @@ export class MonsterArray {
         return false
     }
 
-    executeForAll(callback: Function) {
+    removeAllWithoutDestroy = () => {
+        while(this.removeLast(false));
+    }
+
+    executeForAll = (callback: (monster: Monster) => void) => {
         for (const [_, monster] of pairs(this.monsters)) {
             callback(monster)
         }
@@ -189,8 +195,9 @@ export class MonsterArray {
 
     //Destroy everything including the monsters
     destroy = () => {
-        for (const [_, monster] of pairs(this.monsters)) {
+        for (const [id, monster] of pairs(this.monsters)) {
             monster.destroy()
+            delete this.monsters[id]
         }
     }
 }

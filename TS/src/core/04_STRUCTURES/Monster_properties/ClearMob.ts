@@ -68,6 +68,7 @@ export class ClearMob {
         }
 
         this.triggerMob = triggerMob
+        triggerMob.setClearMob(this)
 
         this.disableDuration = disableDuration
         this.timerActivated = CreateTimer()
@@ -103,9 +104,14 @@ export class ClearMob {
             return false
         }
 
+        if(this.triggerMob){
+            this.triggerMob.removeClearMob()
+        }
+
         ClearMob.anyTriggerMob2ClearMob.delete(this.triggerMob)
         ClearMob.anyTriggerMob2ClearMob.set(newTriggerMob, this)
         this.triggerMob = newTriggerMob
+        newTriggerMob.setClearMob(this)
 
         return true
     }
@@ -160,16 +166,14 @@ export class ClearMob {
 
     removeLastBlockMob = (): boolean => {
         this.blockMobs.getLast()?.temporarilyEnable(this.timerActivated)
-        return this.blockMobs.removeLast()
+        return this.blockMobs.removeLast(false)
     }
 
     removeAllBlockMobs = () => {
         udp_currentTimer = this.timerActivated
 
-        this.blockMobs
         this.blockMobs.executeForAll(TemporarilyEnableMonster)
-        this.blockMobs.destroy()
-        this.blockMobs = new MonsterArray()
+        this.blockMobs.removeAllWithoutDestroy()
     }
 
     destroy = () => {
@@ -179,13 +183,11 @@ export class ClearMob {
 
         this.close()
         this.triggerMob.reinitColor()
-        this.triggerMob.destroy()
+        this.triggerMob.removeClearMob()
 
-        udp_currentTimer = this.timerActivated
-        this.blockMobs.executeForAll(TemporarilyEnableMonster)
-        this.blockMobs.destroy()
+        this.removeAllBlockMobs()
+
         DestroyTimer(this.timerActivated)
-
         DestroyTimer(this.timerFrontMontant)
 
         this.level && this.level.clearMobs.removeClearMob(this.id)
