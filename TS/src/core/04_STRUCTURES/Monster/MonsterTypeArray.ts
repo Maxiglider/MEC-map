@@ -4,10 +4,11 @@ import { udg_monsters } from '../../../../globals'
 import { MonsterType } from './MonsterType'
 
 export class MonsterTypeArray {
-    private monsterTypes: MonsterType[] = []
+    private monsterTypes: { [x: number]: MonsterType } = {}
+    private lastInstanceId = -1
 
     get = (label: string) => {
-        for (let monsterType of this.monsterTypes) {
+        for (const [_, monsterType] of pairs(this.monsterTypes)) {
             if (monsterType.label == label || monsterType.theAlias == label) {
                 return monsterType
             }
@@ -32,14 +33,18 @@ export class MonsterTypeArray {
             throw 'Label already used'
         }
 
-        const len = this.monsterTypes.length
-        this.monsterTypes[len] = new MonsterType(label, unitTypeId, scale, immolationRadius, speed, isClickable)
+        this.monsterTypes[++this.lastInstanceId] = new MonsterType(
+            label,
+            unitTypeId,
+            scale,
+            immolationRadius,
+            speed,
+            isClickable
+        )
     }
 
     remove = (label: string): boolean => {
-        const len = this.monsterTypes.length
-
-        for (let i = 0; i < len; i++) {
+        for (const [i, _monsterType] of pairs(this.monsterTypes)) {
             if (this.monsterTypes[i].label == label || this.monsterTypes[i].theAlias == label) {
                 this.monsterTypes[i].destroy()
                 delete this.monsterTypes[i]
@@ -51,11 +56,14 @@ export class MonsterTypeArray {
     }
 
     displayForPlayer = (p: player) => {
-        for (let monsterType of this.monsterTypes) {
+        let hasOne = false
+
+        for (const [_, monsterType] of pairs(this.monsterTypes)) {
+            hasOne = true
             monsterType.displayForPlayer(p)
         }
 
-        if (this.monsterTypes.length === 0) {
+        if (!hasOne) {
             Text.erP(p, 'no monster type saved')
         }
     }
@@ -67,14 +75,12 @@ export class MonsterTypeArray {
     }
 
     saveInCache = () => {
-        let i: number
         StringArrayForCache.stringArrayForCache = new StringArrayForCache('monsterTypes', 'monsterTypes', true)
-        i = 0
-        while (true) {
-            if (i >= this.monsterTypes.length) break
-            StringArrayForCache.stringArrayForCache.push(this.monsterTypes[i].toString())
-            i = i + 1
+
+        for (const [_, monsterType] of pairs(this.monsterTypes)) {
+            StringArrayForCache.stringArrayForCache.push(monsterType.toString())
         }
+
         StringArrayForCache.stringArrayForCache.writeInCache()
     }
 }
