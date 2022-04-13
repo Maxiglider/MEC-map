@@ -28,6 +28,8 @@ import { MakeDeleteMeteors } from 'core/05_MAKE_STRUCTURES/Make_delete_meteors/M
 import { MakeDeleteMonsters } from 'core/05_MAKE_STRUCTURES/Make_delete_monsters/MakeDeleteMonsters'
 import { MakeClearMob } from 'core/05_MAKE_STRUCTURES/Make_monster_properties/MakeClearMob'
 import { MakeDeleteClearMob } from 'core/05_MAKE_STRUCTURES/Make_monster_properties/MakeDeleteClearMob'
+import { MakeDeletePortalMob } from 'core/05_MAKE_STRUCTURES/Make_monster_properties/MakeDeletePortalMob'
+import { MakePortalMob } from 'core/05_MAKE_STRUCTURES/Make_monster_properties/MakePortalMob'
 import { MakeGetUnitTeleportPeriod } from 'core/05_MAKE_STRUCTURES/Make_set_unit_properties/MakeGetUnitTeleportPeriod'
 import { MakeSetUnitMonsterType } from 'core/05_MAKE_STRUCTURES/Make_set_unit_properties/MakeSetUnitMonsterType'
 import { MakeSetUnitTeleportPeriod } from 'core/05_MAKE_STRUCTURES/Make_set_unit_properties/MakeSetUnitTeleportPeriod'
@@ -128,6 +130,8 @@ export class Escaper {
     public currentLevelTouchTerrainDeath?: Level //pour le terrain qui tue, vérifie s'il faut bien tuer l'escaper
 
     public roundToGrid: number | null = null
+    private portalCooldown = false
+    private portalCooldownTimer: Timer | null = null
 
     //coop
     private powerCircle: unit
@@ -356,6 +360,9 @@ export class Escaper {
         //coop
         RemoveUnit(this.powerCircle)
         RemoveUnit(this.dummyPowerCircle)
+
+        this.portalCooldownTimer?.destroy()
+        this.portalCooldownTimer = null
     }
 
     //getId method
@@ -1205,6 +1212,16 @@ export class Escaper {
         if (this.hero) this.make = new MakeDeleteClearMob(this.hero)
     }
 
+    makeCreatePortalMobs(freezeDuration: number) {
+        this.destroyMake()
+        if (this.hero) this.make = new MakePortalMob(this.hero, freezeDuration)
+    }
+
+    makeDeletePortalMobs = () => {
+        this.destroyMake()
+        if (this.hero) this.make = new MakeDeletePortalMob(this.hero)
+    }
+
     makeCreateTerrain(terrainType: TerrainType) {
         this.destroyMake()
         if (this.hero) this.make = new MakeTerrainCreate(this.hero, terrainType)
@@ -1378,5 +1395,16 @@ export class Escaper {
 
     isEscaperSecondary = () => {
         return this.escaperId >= NB_PLAYERS_MAX
+    }
+
+    isPortalCooldown = () => this.portalCooldown
+
+    enablePortalCooldown = () => {
+        this.portalCooldown = true
+    }
+
+    disablePortalCooldown = (timeout: number) => {
+        this.portalCooldownTimer?.destroy()
+        this.portalCooldownTimer = createTimer(timeout, false, () => (this.portalCooldown = false))
     }
 }

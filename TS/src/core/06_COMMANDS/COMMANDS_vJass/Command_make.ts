@@ -12,6 +12,7 @@ import { udg_colorCode } from 'core/01_libraries/Init_colorCodes'
 import { Text } from 'core/01_libraries/Text'
 import { Escaper } from 'core/04_STRUCTURES/Escaper/Escaper'
 import { Level } from 'core/04_STRUCTURES/Level/Level'
+import { PORTAL_MOB_MAX_FREEZE_DURATION } from 'core/04_STRUCTURES/Monster_properties/PortalMob'
 import { TerrainType } from 'core/04_STRUCTURES/TerrainType/TerrainType'
 import { DEATH_TERRAIN_MAX_TOLERANCE, TerrainTypeDeath } from 'core/04_STRUCTURES/TerrainType/TerrainTypeDeath'
 import { TerrainTypeSlide } from 'core/04_STRUCTURES/TerrainType/TerrainTypeSlide'
@@ -2132,6 +2133,34 @@ export const ExecuteCommandMake = (escaper: Escaper, cmd: string): boolean => {
         }
         escaper.makeDeleteClearMobs()
         Text.mkP(escaper.getPlayer(), 'clear mobs deleting on')
+        return true
+    }
+
+    //-createPortalMob(crpm) <freezeDuration>
+    if (name === 'createPortalMob' || name === 'crpm') {
+        if (!(nbParam === 1)) {
+            return true
+        }
+        x = S2R(param1)
+        if (x !== 0 && (x > PORTAL_MOB_MAX_FREEZE_DURATION || x < 0)) {
+            Text.erP(
+                escaper.getPlayer(),
+                'the disable duration must be a real between ' + R2S(0) + ' and ' + R2S(PORTAL_MOB_MAX_FREEZE_DURATION)
+            )
+            return true
+        }
+        escaper.makeCreatePortalMobs(x)
+        Text.mkP(escaper.getPlayer(), 'portal mob making on')
+        return true
+    }
+
+    //-deletePortalMob(delpm)
+    if (name === 'deletePortalMob' || name === 'delpm') {
+        if (!noParam) {
+            return true
+        }
+        escaper.makeDeletePortalMobs()
+        Text.mkP(escaper.getPlayer(), 'portal mobs deleting on')
         return true
     }
 

@@ -8,6 +8,7 @@ import { MonsterArray } from '../Monster/MonsterArray'
 import type { MonsterType } from '../Monster/MonsterType'
 import { MonsterSpawnArray } from '../MonsterSpawn/MonsterSpawnArray'
 import { ClearMobArray } from '../Monster_properties/ClearMobArray'
+import { PortalMobArray } from '../Monster_properties/PortalMobArray'
 import { checkPointReviveHeroes } from './checkpointReviveHeroes_function'
 import { End, Start } from './StartAndEnd'
 import { TriggerArray } from './Triggers'
@@ -30,6 +31,7 @@ export class Level {
     monsterSpawns: MonsterSpawnArray
     meteors: MeteorArray
     clearMobs: ClearMobArray
+    portalMobs: PortalMobArray
 
     constructor(id: number) {
         this.visibilities = new VisibilityModifierArray(this)
@@ -38,6 +40,7 @@ export class Level {
         this.monsterSpawns = new MonsterSpawnArray(this)
         this.meteors = new MeteorArray(this)
         this.clearMobs = new ClearMobArray(this)
+        this.portalMobs = new PortalMobArray(this)
         this.livesEarnedAtBeginning = 1
         this.isActivatedB = false
         this.startMessage = ''
@@ -59,6 +62,7 @@ export class Level {
             this.monsterSpawns.activate()
             this.meteors.createMeteorsItems()
             this.clearMobs.initializeClearMobs()
+            this.portalMobs.initializePortalMobs()
             if (Level.earningLivesActivated && this.getId() > 0) {
                 getUdgLives().add(this.livesEarnedAtBeginning)
             }
