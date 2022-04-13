@@ -6,20 +6,15 @@ import { TerrainType } from 'core/04_STRUCTURES/TerrainType/TerrainType'
 import { TerrainTypeDeath } from 'core/04_STRUCTURES/TerrainType/TerrainTypeDeath'
 import { TerrainTypeSlide } from 'core/04_STRUCTURES/TerrainType/TerrainTypeSlide'
 import { TerrainTypeWalk } from 'core/04_STRUCTURES/TerrainType/TerrainTypeWalk'
- import {getUdgEscapers} from '../../../../globals'
 import { createEvent } from 'Utils/mapUtils'
-import { getUdgTerrainTypes } from '../../../../globals'
-
+import { getUdgEscapers, getUdgTerrainTypes } from '../../../../globals'
 import { AutoContinueAfterSliding } from './Auto_continue_after_sliding'
-
 
 const TOLERANCE_ANGLE_DIFF = 5
 const TOLERANCE_RAYON_DIFF = 20
 const INIT_RAYON_TOLERANCE = 20
 
-
 const initCheckTerrainTrigger = () => {
-
     const CheckTerrain_Actions = (playerId: number) => {
         const escaper = getUdgEscapers().get(playerId)
 
@@ -87,7 +82,7 @@ const initCheckTerrainTrigger = () => {
                     }
                 }
             } else {
-                if (currentTerrainType instanceof  TerrainTypeDeath) {
+                if (currentTerrainType instanceof TerrainTypeDeath) {
                     touchedByDeathTerrain = true
                     toleranceDist = currentTerrainType.getToleranceDist()
                     if (toleranceDist != 0) {

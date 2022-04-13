@@ -1,63 +1,42 @@
+import { BaseArray } from '../BaseArray'
 import type { Level } from './Level'
 import { VisibilityModifier } from './VisibilityModifier'
 
-export class VisibilityModifierArray {
-    private lastInstance = -1
+export class VisibilityModifierArray extends BaseArray<VisibilityModifier> {
     private level: Level
-    private vms: { [x: number]: VisibilityModifier } = {}
 
     constructor(level: Level) {
+        super()
         this.level = level
     }
 
     new = (x1: number, y1: number, x2: number, y2: number) => {
-        this.lastInstance++
-        this.vms[this.lastInstance] = new VisibilityModifier(x1, y1, x2, y2)
-        this.vms[this.lastInstance].level = this.level
-        this.vms[this.lastInstance].id = this.lastInstance
-        return this.vms[this.lastInstance]
+        const visibilityModifier = new VisibilityModifier(x1, y1, x2, y2)
+
+        this._new(visibilityModifier)
+
+        visibilityModifier.level = this.level
+        return visibilityModifier
     }
 
     newFromExisting = (vm: VisibilityModifier) => {
-        this.lastInstance++
-        this.vms[this.lastInstance] = vm
+        this._new(vm)
         return vm
     }
 
-    count = () => {
-        let n = 0
-
-        for (const [_k, _v] of pairs(this.vms)) {
-            n++
-        }
-
-        return n
-    }
-
-    get = (visibilityId: number) => {
-        if (visibilityId < 0 || visibilityId > this.lastInstance) {
-            return null
-        }
-        return this.vms[visibilityId]
-    }
-
-    getLastInstanceId = (): number => {
-        return this.lastInstance
-    }
-
     removeVisibility = (arrayId: number) => {
-        delete this.vms[arrayId]
+        delete this.data[arrayId]
     }
 
     removeAllVisibilityModifiers = () => {
-        for (const [_, vm] of pairs(this.vms)) {
+        for (const [_, vm] of pairs(this.data)) {
             vm.destroy()
         }
     }
 
     // Unused
     // removeLasts = (numberOfVMToRemove: number): boolean => {
-    //     const vms = this.vms
+    //     const vms = this.data
     //         .filter(vm => vm !== undefined)
     //         .reverse()
 
@@ -71,14 +50,8 @@ export class VisibilityModifierArray {
     // }
 
     activate = (activ: boolean) => {
-        for (const [_, vm] of pairs(this.vms)) {
+        for (const [_, vm] of pairs(this.data)) {
             vm.activate(activ)
-        }
-    }
-
-    destroy = () => {
-        for (const [_, vm] of pairs(this.vms)) {
-            vm.destroy()
         }
     }
 }

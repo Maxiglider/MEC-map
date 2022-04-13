@@ -1,23 +1,19 @@
 import { Text } from '../../01_libraries/Text'
+import { BaseArray } from '../BaseArray'
 import type { Level } from '../Level/Level'
 import type { MonsterType } from '../Monster/MonsterType'
 import type { MonsterSpawn } from './MonsterSpawn'
 
-export class MonsterSpawnArray {
-    private lastInstanceId = -1
-    private monsterSpawns: { [x: number]: MonsterSpawn } = {}
+export class MonsterSpawnArray extends BaseArray<MonsterSpawn> {
     private level: Level
 
     constructor(level: Level) {
+        super()
         this.level = level
     }
 
-    get = (arrayId: number): MonsterSpawn => {
-        return this.monsterSpawns[arrayId]
-    }
-
     getFromLabel = (label: string) => {
-        for (const [_, ms] of pairs(this.monsterSpawns)) {
+        for (const [_, ms] of pairs(this.data)) {
             if (ms.getLabel() === label) {
                 return ms
             }
@@ -27,39 +23,19 @@ export class MonsterSpawnArray {
     }
 
     new(monsterSpawn: MonsterSpawn, activate: boolean) {
-        const n = monsterSpawn.getId()
-        this.monsterSpawns[n] = monsterSpawn
-
-        if (activate) {
-            monsterSpawn.activate()
-        }
+        this._new(monsterSpawn)
+        activate && monsterSpawn.activate()
         monsterSpawn.level = this.level
     }
 
-    count = () => {
-        let n = 0
-
-        for (const [_k, _v] of pairs(this.monsterSpawns)) {
-            n++
-        }
-
-        return n
-    }
-
-    destroy = () => {
-        for (const [_, ms] of pairs(this.monsterSpawns)) {
-            ms.destroy()
-        }
-    }
-
     removeMonsterSpawn = (monsterSpawnId: number) => {
-        delete this.monsterSpawns[monsterSpawnId]
+        delete this.data[monsterSpawnId]
     }
 
     clearMonsterSpawn = (label: string): boolean => {
         let ms = this.getFromLabel(label)
         if (ms) {
-            delete this.monsterSpawns[ms.getId()]
+            delete this.data[ms.getId()]
             ms.destroy()
             return true
         } else {
@@ -98,13 +74,13 @@ export class MonsterSpawnArray {
     }
 
     activate = () => {
-        for (const [_, ms] of pairs(this.monsterSpawns)) {
+        for (const [_, ms] of pairs(this.data)) {
             ms.activate()
         }
     }
 
     deactivate = () => {
-        for (const [_, ms] of pairs(this.monsterSpawns)) {
+        for (const [_, ms] of pairs(this.data)) {
             ms.deactivate()
         }
     }
@@ -114,7 +90,7 @@ export class MonsterSpawnArray {
         if (nbMs == 0) {
             Text.erP(p, 'no monster spawn for this level')
         } else {
-            for (const [_, ms] of pairs(this.monsterSpawns)) {
+            for (const [_, ms] of pairs(this.data)) {
                 ms.displayForPlayer(p)
             }
         }

@@ -1,66 +1,36 @@
+import { BaseArray } from '../BaseArray'
 import type { Level } from '../Level/Level'
 import type { Monster } from '../Monster/Monster'
 import { MONSTER_NEAR_DIFF_MAX } from '../Monster/MonsterArray'
 import { ClearMob } from './ClearMob'
 
-let lastInstance = -1
-
-export class ClearMobArray {
+export class ClearMobArray extends BaseArray<ClearMob> {
     private level: Level
-    private clearMobs: { [x: number]: ClearMob } = {}
 
     constructor(level: Level) {
+        super()
         this.level = level
     }
 
-    get(arrayId: number) {
-        if (arrayId < 0 || arrayId > lastInstance) {
-            return null
-        }
-        return this.clearMobs[arrayId]
-    }
-
-    getLastInstanceId = (): number => {
-        return lastInstance
-    }
-
     new = (triggerMob: Monster, disableDuration: number, initialize: boolean): ClearMob => {
-        let n = ++lastInstance
+        const clearMob = new ClearMob(triggerMob, disableDuration)
 
-        this.clearMobs[n] = new ClearMob(triggerMob, disableDuration)
-        if (initialize) {
-            this.clearMobs[n].initialize()
-        }
-        this.clearMobs[n].level = this.level
-        this.clearMobs[n].id = n
+        initialize && clearMob.initialize()
+        clearMob.level = this.level
 
-        return this.clearMobs[n]
-    }
+        this._new(clearMob)
 
-    count = () => {
-        let n = 0
-
-        for (const [_k, _v] of pairs(this.clearMobs)) {
-            n++
-        }
-
-        return n
-    }
-
-    destroy = () => {
-        for (const [_, clearMob] of pairs(this.clearMobs)) {
-            clearMob.destroy()
-        }
+        return clearMob
     }
 
     removeClearMob = (clearMobArrayId: number) => {
-        delete this.clearMobs[clearMobArrayId]
+        delete this.data[clearMobArrayId]
     }
 
     clearClearMob = (clearMobId: number): boolean => {
-        if (this.clearMobs[clearMobId]) {
-            this.clearMobs[clearMobId].destroy()
-            delete this.clearMobs[clearMobId]
+        if (this.data[clearMobId]) {
+            this.data[clearMobId].destroy()
+            delete this.data[clearMobId]
             return true
         } else {
             return false
@@ -72,15 +42,15 @@ export class ClearMobArray {
         let yMob: number
         let i = 0
 
-        while (i <= lastInstance) {
-            if (this.clearMobs[i]) {
-                const unit = this.clearMobs[i].getTriggerMob().u
+        while (i <= this.lastInstanceId) {
+            if (this.data[i]) {
+                const unit = this.data[i].getTriggerMob().u
 
                 if (unit) {
                     xMob = GetUnitX(unit)
                     yMob = GetUnitY(unit)
                     if (RAbsBJ(x - xMob) < MONSTER_NEAR_DIFF_MAX && RAbsBJ(y - yMob) < MONSTER_NEAR_DIFF_MAX) {
-                        return this.clearMobs[i]
+                        return this.data[i]
                     }
                 }
             }
@@ -91,13 +61,13 @@ export class ClearMobArray {
     }
 
     initializeClearMobs = () => {
-        for (const [_, clearMob] of pairs(this.clearMobs)) {
+        for (const [_, clearMob] of pairs(this.data)) {
             clearMob.initialize()
         }
     }
 
     closeClearMobs = () => {
-        for (const [_, clearMob] of pairs(this.clearMobs)) {
+        for (const [_, clearMob] of pairs(this.data)) {
             clearMob.close()
         }
     }

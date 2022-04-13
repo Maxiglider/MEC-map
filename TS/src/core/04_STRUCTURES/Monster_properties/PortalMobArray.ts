@@ -1,66 +1,36 @@
+import { BaseArray } from '../BaseArray'
 import type { Level } from '../Level/Level'
 import type { Monster } from '../Monster/Monster'
 import { MONSTER_NEAR_DIFF_MAX } from '../Monster/MonsterArray'
 import { PortalMob } from './PortalMob'
 
-let lastInstance = -1
-
-export class PortalMobArray {
+export class PortalMobArray extends BaseArray<PortalMob> {
     private level: Level
-    private portalMobs: { [x: number]: PortalMob } = {}
 
     constructor(level: Level) {
+        super()
         this.level = level
     }
 
-    get(arrayId: number) {
-        if (arrayId < 0 || arrayId > lastInstance) {
-            return null
-        }
-        return this.portalMobs[arrayId]
-    }
+    new = (triggerMob: Monster, disableDuration: number) => {
+        const portalMob = new PortalMob(triggerMob, disableDuration)
 
-    getLastInstanceId = (): number => {
-        return lastInstance
-    }
+        portalMob.initialize()
+        portalMob.level = this.level
 
-    new = (triggerMob: Monster, disableDuration: number, initialize: boolean): PortalMob => {
-        let n = ++lastInstance
+        this._new(portalMob)
 
-        this.portalMobs[n] = new PortalMob(triggerMob, disableDuration)
-        if (initialize) {
-            this.portalMobs[n].initialize()
-        }
-        this.portalMobs[n].level = this.level
-        this.portalMobs[n].id = n
-
-        return this.portalMobs[n]
-    }
-
-    count = () => {
-        let n = 0
-
-        for (const [_k, _v] of pairs(this.portalMobs)) {
-            n++
-        }
-
-        return n
-    }
-
-    destroy = () => {
-        for (const [_, portalMob] of pairs(this.portalMobs)) {
-            portalMob.destroy()
-        }
+        return portalMob
     }
 
     removePortalMob = (portalMobArrayId: number) => {
-        delete this.portalMobs[portalMobArrayId]
+        delete this.data[portalMobArrayId]
     }
 
     portalPortalMob = (portalMobId: number): boolean => {
-        if (this.portalMobs[portalMobId]) {
-            this.portalMobs[portalMobId].destroy()
-            delete this.portalMobs[portalMobId]
+        if (this.data[portalMobId]) {
+            this.data[portalMobId].destroy()
+            delete this.data[portalMobId]
             return true
         } else {
             return false
@@ -72,15 +42,15 @@ export class PortalMobArray {
         let yMob: number
         let i = 0
 
-        while (i <= lastInstance) {
-            if (this.portalMobs[i]) {
-                const unit = this.portalMobs[i].getTriggerMob()?.u
+        while (i <= this.lastInstanceId) {
+            if (this.data[i]) {
+                const unit = this.data[i].getTriggerMob()?.u
 
                 if (unit) {
                     xMob = GetUnitX(unit)
                     yMob = GetUnitY(unit)
                     if (RAbsBJ(x - xMob) < MONSTER_NEAR_DIFF_MAX && RAbsBJ(y - yMob) < MONSTER_NEAR_DIFF_MAX) {
-                        return this.portalMobs[i]
+                        return this.data[i]
                     }
                 }
             }
@@ -91,13 +61,13 @@ export class PortalMobArray {
     }
 
     initializePortalMobs = () => {
-        for (const [_, portalMob] of pairs(this.portalMobs)) {
+        for (const [_, portalMob] of pairs(this.data)) {
             portalMob.initialize()
         }
     }
 
     closePortalMobs = () => {
-        for (const [_, portalMob] of pairs(this.portalMobs)) {
+        for (const [_, portalMob] of pairs(this.data)) {
             portalMob.close()
         }
     }

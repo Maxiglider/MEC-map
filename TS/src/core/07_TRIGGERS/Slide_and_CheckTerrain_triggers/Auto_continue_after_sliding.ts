@@ -2,7 +2,6 @@ import { NB_ESCAPERS } from 'core/01_libraries/Constants'
 import { forRange } from 'Utils/mapUtils'
 import { getUdgEscapers } from '../../../../globals'
 
-
 const initAutoContinueAfterSliding = () => {
     let lastClickedX: number[] = []
     let lastClickedY: number[] = []

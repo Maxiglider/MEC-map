@@ -18,7 +18,7 @@ const ClearMobTimerExpires = () => {
     if (clearMob) {
         clearMob.initialize() //réinitialise la couleur du trigger mob
         udp_currentTimer = GetExpiredTimer()
-        clearMob.getBlockMobs().executeForAll(TemporarilyEnableMonster)
+        clearMob.getBlockMobs().forAll(TemporarilyEnableMonster)
     }
 }
 
@@ -57,6 +57,8 @@ export class ClearMob {
     private timerFrontMontant: timer //le trigger mob reste en vert pêtant le temps du "front montant"
     enabled: boolean
     private triggerMobPermanentEffect?: effect
+
+    // TODO; This is is never set but is read, error?
     id: number = -1
 
     constructor(triggerMob: Monster, disableDuration: number) {
@@ -104,7 +106,7 @@ export class ClearMob {
             return false
         }
 
-        if(this.triggerMob){
+        if (this.triggerMob) {
             this.triggerMob.removeClearMob()
         }
 
@@ -172,7 +174,7 @@ export class ClearMob {
     removeAllBlockMobs = () => {
         udp_currentTimer = this.timerActivated
 
-        this.blockMobs.executeForAll(TemporarilyEnableMonster)
+        this.blockMobs.forAll(TemporarilyEnableMonster)
         this.blockMobs.removeAllWithoutDestroy()
     }
 
@@ -202,12 +204,12 @@ export class ClearMob {
             return
         }
         if (this.disableDuration === 0) {
-            this.blockMobs.executeForAll(KillMonster)
+            this.blockMobs.forAll(KillMonster)
             this.enabled = false
         } else {
             udp_currentTimer = this.timerActivated
             TimerStart(this.timerActivated, this.disableDuration, false, ClearMobTimerExpires)
-            this.blockMobs.executeForAll(TemporarilyDisableMonster)
+            this.blockMobs.forAll(TemporarilyDisableMonster)
             TimerStart(this.timerFrontMontant, FRONT_MONTANT_DURATION, false, ClearMobFrontMontantTimerExpires)
         }
         //dans tous les cas le trigger mob "s'active"

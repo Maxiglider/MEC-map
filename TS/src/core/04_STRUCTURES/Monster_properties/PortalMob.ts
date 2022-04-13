@@ -13,6 +13,8 @@ export class PortalMob {
     private triggerMob: Monster | null
     private targetMob: Monster | null
     private freezeDuration: number
+
+    // TODO; This is is never set but is read, error?
     id: number = -1
 
     private timers = ArrayHandler.getNewArray<Timer>()

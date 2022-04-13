@@ -1,5 +1,5 @@
 import { IsBoolString, S2B } from 'core/01_libraries/Basic_functions'
-import { NB_ESCAPERS, SLIDE_PERIOD } from 'core/01_libraries/Constants'
+import { NB_ESCAPERS } from 'core/01_libraries/Constants'
 import { IsInteger, IsPositiveInteger } from 'core/01_libraries/Functions_on_numbers'
 import { Text } from 'core/01_libraries/Text'
 import { Escaper } from 'core/04_STRUCTURES/Escaper/Escaper'

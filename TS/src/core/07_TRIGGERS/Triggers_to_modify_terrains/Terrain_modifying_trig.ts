@@ -2,7 +2,6 @@ import { LOW_PERIOD_FOR_WORK, NB_ESCAPERS } from 'core/01_libraries/Constants'
 import { Escaper } from 'core/04_STRUCTURES/Escaper/Escaper'
 import { getUdgEscapers } from '../../../../globals'
 
-
 export let gg_trg_Terrain_modifying_trig: trigger
 
 const initTerrainModifyingTrig = () => {

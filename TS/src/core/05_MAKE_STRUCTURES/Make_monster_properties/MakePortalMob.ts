@@ -22,7 +22,7 @@ export class MakePortalMob extends Make {
 
     private createPortalMob = () => {
         if (this.triggerMob) {
-            this.portalMob = this.escaper.getMakingLevel().portalMobs.new(this.triggerMob, this.freezeDuration, true)
+            this.portalMob = this.escaper.getMakingLevel().portalMobs.new(this.triggerMob, this.freezeDuration)
         }
     }
 

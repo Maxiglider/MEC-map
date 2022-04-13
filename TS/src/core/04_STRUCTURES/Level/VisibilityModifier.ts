@@ -1,6 +1,6 @@
 import { CACHE_SEPARATEUR_PARAM } from 'core/07_TRIGGERS/Save_map_in_gamecache/struct_StringArrayForCache'
+import { RefreshHideAllVM } from '../../03_view_all_hide_all/View_all_hide_all'
 import { Level } from './Level'
-import {RefreshHideAllVM} from "../../03_view_all_hide_all/View_all_hide_all";
 
 export class VisibilityModifier {
     private x1: number
@@ -9,6 +9,8 @@ export class VisibilityModifier {
     private y2: number
     private fm: fogmodifier
     level?: Level
+
+    // TODO; This is is never set but is read, error?
     id?: number
 
     constructor(x1: number, y1: number, x2: number, y2: number) {

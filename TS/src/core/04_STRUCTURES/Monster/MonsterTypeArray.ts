@@ -1,14 +1,12 @@
 import { Text } from 'core/01_libraries/Text'
 import { StringArrayForCache } from 'core/07_TRIGGERS/Save_map_in_gamecache/struct_StringArrayForCache'
 import { udg_monsters } from '../../../../globals'
+import { BaseArray } from '../BaseArray'
 import { MonsterType } from './MonsterType'
 
-export class MonsterTypeArray {
-    private monsterTypes: { [x: number]: MonsterType } = {}
-    private lastInstanceId = -1
-
-    get = (label: string) => {
-        for (const [_, monsterType] of pairs(this.monsterTypes)) {
+export class MonsterTypeArray extends BaseArray<MonsterType> {
+    getByLabel = (label: string) => {
+        for (const [_, monsterType] of pairs(this.data)) {
             if (monsterType.label == label || monsterType.theAlias == label) {
                 return monsterType
             }
@@ -18,7 +16,7 @@ export class MonsterTypeArray {
     }
 
     isLabelAlreadyUsed = (label: string): boolean => {
-        return this.get(label) !== null
+        return this.getByLabel(label) !== null
     }
 
     new(
@@ -33,21 +31,14 @@ export class MonsterTypeArray {
             throw 'Label already used'
         }
 
-        this.monsterTypes[++this.lastInstanceId] = new MonsterType(
-            label,
-            unitTypeId,
-            scale,
-            immolationRadius,
-            speed,
-            isClickable
-        )
+        this._new(new MonsterType(label, unitTypeId, scale, immolationRadius, speed, isClickable))
     }
 
     remove = (label: string): boolean => {
-        for (const [i, _monsterType] of pairs(this.monsterTypes)) {
-            if (this.monsterTypes[i].label == label || this.monsterTypes[i].theAlias == label) {
-                this.monsterTypes[i].destroy()
-                delete this.monsterTypes[i]
+        for (const [i, _monsterType] of pairs(this.data)) {
+            if (this.data[i].label == label || this.data[i].theAlias == label) {
+                this.data[i].destroy()
+                delete this.data[i]
                 return true
             }
         }
@@ -58,7 +49,7 @@ export class MonsterTypeArray {
     displayForPlayer = (p: player) => {
         let hasOne = false
 
-        for (const [_, monsterType] of pairs(this.monsterTypes)) {
+        for (const [_, monsterType] of pairs(this.data)) {
             hasOne = true
             monsterType.displayForPlayer(p)
         }
@@ -77,7 +68,7 @@ export class MonsterTypeArray {
     saveInCache = () => {
         StringArrayForCache.stringArrayForCache = new StringArrayForCache('monsterTypes', 'monsterTypes', true)
 
-        for (const [_, monsterType] of pairs(this.monsterTypes)) {
+        for (const [_, monsterType] of pairs(this.data)) {
             StringArrayForCache.stringArrayForCache.push(monsterType.toString())
         }
 

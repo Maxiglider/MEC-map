@@ -7,7 +7,7 @@ export class CasterTypeArray {
     private casterTypes: CasterType[] = []
     private numberOfCasterTypes = 0
 
-    get = (label: string) => {
+    getByLabel = (label: string) => {
         for (let i = 0; i < this.numberOfCasterTypes; i++) {
             if (this.casterTypes[i].label == label || this.casterTypes[i].theAlias == label) {
                 return this.casterTypes[i]
@@ -17,7 +17,7 @@ export class CasterTypeArray {
     }
 
     isLabelAlreadyUsed = (label: string): boolean => {
-        return this.get(label) !== null
+        return this.getByLabel(label) !== null
     }
 
     new = (
@@ -51,7 +51,7 @@ export class CasterTypeArray {
     remove = (label: string): boolean => {
         let position: number
         let i: number
-        let ct = this.get(label)
+        let ct = this.getByLabel(label)
         if (ct === null) {
             return false
         }
