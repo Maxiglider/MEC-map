@@ -82,4 +82,6 @@ export class EscaperArray {
             escaper.isMakingCurrentLevel() && escaper.destroyMakeIfForSpecificLevel()
         }
     }
+
+    getAll = () => this.escapers
 }

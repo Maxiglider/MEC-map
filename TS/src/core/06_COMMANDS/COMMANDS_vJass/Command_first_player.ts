@@ -41,18 +41,17 @@ export const ExecuteCommandRed = (escaper: Escaper, cmd: string): boolean => {
                 }
                 return true
             }
+
             if (param1 === 'all' || param1 === 'a') {
-                i = 0
-                while (true) {
-                    if (i >= NB_ESCAPERS) break
-                    if (getUdgEscapers().get(i) != escaper && getUdgEscapers().get(i) != null) {
-                        getUdgEscapers().get(i)?.kill()
+                for (const [_, esc] of pairs(getUdgEscapers().getAll())) {
+                    if (escaper !== esc && !esc.isEscaperSecondary()) {
+                        esc.kill()
                     }
-                    i = i + 1
                 }
             }
             return true
         }
+
         if (isPlayerId(param1) && !getUdgEscapers().get(resolvePlayerId(param1))?.canCheat()) {
             if (getUdgEscapers().get(resolvePlayerId(param1)) != null) {
                 getUdgEscapers().get(resolvePlayerId(param1))?.kill()

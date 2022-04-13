@@ -344,7 +344,11 @@ export const ExecuteCommandMax = (escaper: Escaper, cmd: string): boolean => {
         if (param1 === 'all' || param1 === 'a') {
             i = 0
             while (i < NB_ESCAPERS) {
-                if (getUdgEscapers().get(i) != null && getUdgEscapers().get(i) != escaper) {
+                if (
+                    getUdgEscapers().get(i) != null &&
+                    getUdgEscapers().get(i) != escaper &&
+                    !getUdgEscapers().get(i).isEscaperSecondary()
+                ) {
                     if (IsEscaperInGame(i)) {
                         getUdgEscapers().get(i)?.removeHero()
                     } else {
