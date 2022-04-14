@@ -4,6 +4,8 @@ import { createTimer } from 'Utils/mapUtils'
 import { getUdgEscapers, globals } from '../../../../globals'
 import { Gravity } from './Gravity'
 
+const FIRSTPERSON_ANGLE_PER_PERIOD = 0.25
+
 const initSlideTrigger = () => {
     const Slide_Actions = (n: number) => {
         const escaper = getUdgEscapers().get(n)
@@ -19,7 +21,22 @@ const initSlideTrigger = () => {
 
         if (!hero) return
 
-        const angle = Deg2Rad(GetUnitFacing(hero))
+        let angle = Deg2Rad(GetUnitFacing(hero))
+
+        const firstPersonHandle = escaper.getFirstPersonHandle()
+
+        if (firstPersonHandle.isFirstPerson()) {
+            if (!(firstPersonHandle.isKeyDownState('LEFT') && firstPersonHandle.isKeyDownState('RIGHT'))) {
+                if (firstPersonHandle.isKeyDownState('LEFT')) {
+                    angle += FIRSTPERSON_ANGLE_PER_PERIOD
+                    SetUnitFacing(hero, Rad2Deg(angle))
+                } else if (firstPersonHandle.isKeyDownState('RIGHT')) {
+                    angle -= FIRSTPERSON_ANGLE_PER_PERIOD
+                    SetUnitFacing(hero, Rad2Deg(angle))
+                }
+            }
+        }
+
         const newX = GetUnitX(hero) + escaper.getSlideMovePerPeriod() * Cos(angle)
         const newY = GetUnitY(hero) + escaper.getSlideMovePerPeriod() * Sin(angle)
 

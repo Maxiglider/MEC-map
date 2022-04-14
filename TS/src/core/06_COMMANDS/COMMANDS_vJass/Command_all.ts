@@ -717,5 +717,11 @@ export const ExecuteCommandAll = (escaper: Escaper, cmd: string): boolean => {
         return true
     }
 
+    //-firstPersonCam(fpc)
+    if ((name === 'firstPersonCam' || name === 'fpc') && noParam) {
+        escaper.getFirstPersonHandle().toggleFirstPerson()
+        return true
+    }
+
     return false
 }

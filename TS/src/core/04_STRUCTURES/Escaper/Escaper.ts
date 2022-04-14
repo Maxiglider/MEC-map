@@ -68,6 +68,7 @@ import type { TerrainType } from '../TerrainType/TerrainType'
 import { TerrainTypeSlide } from '../TerrainType/TerrainTypeSlide'
 import { TerrainTypeWalk } from '../TerrainType/TerrainTypeWalk'
 import { EscaperEffectArray } from './EscaperEffectArray'
+import { EscaperFirstPerson } from './Escaper_firstPerson'
 import { ColorInfo, GetMirrorEscaper } from './Escaper_functions'
 
 const SHOW_REVIVE_EFFECTS = false
@@ -137,6 +138,8 @@ export class Escaper {
     private powerCircle: unit
     private dummyPowerCircle: unit
     private coopInvul: boolean
+
+    private firstPersonHandle: EscaperFirstPerson = new EscaperFirstPerson(this)
 
     constructor(escaperId: number) {
         this.playerId = escaperId >= NB_PLAYERS_MAX ? escaperId - 12 : escaperId
@@ -1407,4 +1410,6 @@ export class Escaper {
         this.portalCooldownTimer?.destroy()
         this.portalCooldownTimer = createTimer(timeout, false, () => (this.portalCooldown = false))
     }
+
+    getFirstPersonHandle = () => this.firstPersonHandle
 }
