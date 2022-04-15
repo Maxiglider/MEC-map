@@ -1,6 +1,7 @@
 import { NB_ESCAPERS } from 'core/01_libraries/Constants'
 import { udg_colorCode } from 'core/01_libraries/Init_colorCodes'
 import { ServiceManager } from 'Services'
+import { ArrayHandler } from 'Utils/ArrayHandler'
 import { createTimer, forRange } from 'Utils/mapUtils'
 import { getUdgEscapers } from '../../../../globals'
 import { rawPlayerNames } from '../../06_COMMANDS/COMMANDS_vJass/Command_functions'
@@ -31,14 +32,13 @@ export const initMultiboard = () => {
             score: number
             saves: number
             deaths: number
-            rowIndex: number
         }
     } = {}
 
     let amountOfEscapers = 0
 
     forRange(NB_ESCAPERS, i => {
-        playerScores[i] = { score: 0, saves: 0, deaths: 0, rowIndex: -1 }
+        playerScores[i] = { score: 0, saves: 0, deaths: 0 }
     })
 
     const initMultiboard = () => {
@@ -104,29 +104,40 @@ export const initMultiboard = () => {
         MultiboardSetItemValueBJ(board, 1, 2, `|Cfffed312Game time: ${GameTime.getGameTime()}`)
     }
 
-    const updatePlayerStats = (playerId: number) => {
+    const playerSort = (a: Escaper, b: Escaper) => {
+        return playerScores[GetPlayerId(a.getPlayer())].score > playerScores[GetPlayerId(b.getPlayer())].score
+    }
+
+    const updatePlayers = () => {
         if (!board) return
 
-        MultiboardSetItemValueBJ(
-            board,
-            2,
-            playerScores[playerId].rowIndex,
-            udg_colorCode[playerId] + playerScores[playerId].score
-        )
+        let rowIndex = 0
 
-        MultiboardSetItemValueBJ(
-            board,
-            3,
-            playerScores[playerId].rowIndex,
-            udg_colorCode[playerId] + playerScores[playerId].saves
-        )
+        const sortedArray = ArrayHandler.getNewArray<Escaper>()
 
-        MultiboardSetItemValueBJ(
-            board,
-            4,
-            playerScores[playerId].rowIndex,
-            udg_colorCode[playerId] + playerScores[playerId].deaths
-        )
+        for (const [_, escaper] of pairs(getUdgEscapers().getAll())) {
+            sortedArray.push(escaper)
+        }
+
+        table.sort(sortedArray, playerSort)
+
+        for (const escaper of sortedArray) {
+            if (escaper.isEscaperSecondary()) {
+                continue
+            }
+
+            const playerId = escaper.getEscaperId()
+            const playerName = GetPlayerName(escaper.getPlayer())
+
+            MultiboardSetItemValueBJ(board, 1, 4 + rowIndex, udg_colorCode[playerId] + playerName)
+            MultiboardSetItemValueBJ(board, 2, 4 + rowIndex, udg_colorCode[playerId] + playerScores[playerId].score)
+            MultiboardSetItemValueBJ(board, 3, 4 + rowIndex, udg_colorCode[playerId] + playerScores[playerId].saves)
+            MultiboardSetItemValueBJ(board, 4, 4 + rowIndex, udg_colorCode[playerId] + playerScores[playerId].deaths)
+
+            rowIndex++
+        }
+
+        ArrayHandler.clearArray(sortedArray)
     }
 
     const updateMultiboard = () => {
@@ -135,26 +146,7 @@ export const initMultiboard = () => {
         updateGametime(false)
         updateLives(ServiceManager.getService('Lives').get())
 
-        let rowIndex = 0
-        for (const [_, escaper] of pairs(getUdgEscapers().getAll())) {
-            if (escaper.isEscaperSecondary()) {
-                continue
-            }
-
-            const playerId = escaper.getEscaperId()
-
-            playerScores[playerId].rowIndex = 4 + rowIndex
-
-            MultiboardSetItemValueBJ(
-                board,
-                1,
-                playerScores[playerId].rowIndex,
-                udg_colorCode[playerId] + GetPlayerName(escaper.getPlayer())
-            )
-
-            updatePlayerStats(playerId)
-            rowIndex++
-        }
+        updatePlayers()
     }
 
     const setVisibility = (escaper: Escaper, visible: boolean) => {
@@ -169,7 +161,7 @@ export const initMultiboard = () => {
         playerScores[playerId][score]++
         playerScores[playerId].score = playerScores[playerId].saves - playerScores[playerId].deaths
 
-        updatePlayerStats(playerId)
+        updatePlayers()
     }
 
     // Multiboard won't show if its loaded too early

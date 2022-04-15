@@ -40,8 +40,6 @@ export const InitTrig_InvisUnit_is_getting_damage = () => {
 
                 if (RAbsBJ(hauteurHero - hauteurKillingUnit) < TAILLE_UNITE) {
                     if (GetUnitTypeId(killingUnit) === DUMMY_POWER_CIRCLE) {
-                        getUdgEscapers().get(GetUnitUserData(killingUnit))?.coopReviveHero()
-
                         if (!escaper.isEscaperSecondary()) {
                             ServiceManager.getService('Multiboard').increasePlayerScore(
                                 GetPlayerId(escaper.getPlayer()),
@@ -49,6 +47,7 @@ export const InitTrig_InvisUnit_is_getting_damage = () => {
                             )
                         }
 
+                        getUdgEscapers().get(GetUnitUserData(killingUnit))?.coopReviveHero()
                         return
                     } else {
                         const monster = udg_monsters[GetUnitUserData(killingUnit)]
