@@ -3,6 +3,7 @@ import { udg_colorCode } from 'core/01_libraries/Init_colorCodes'
 import { createTimer, forRange } from 'Utils/mapUtils'
 import { getUdgEscapers } from '../../../../globals'
 import { rawPlayerNames } from '../../06_COMMANDS/COMMANDS_vJass/Command_functions'
+import { Escaper } from '../Escaper/Escaper'
 import { GameTime } from './Time_of_game_trigger'
 
 // Column and row start at index 1
@@ -68,8 +69,9 @@ const initMultiboard = () => {
         MultiboardSetItemValueBJ(board, 3, 3, 'Saves')
         MultiboardSetItemValueBJ(board, 4, 3, 'Deaths')
 
-        // TODO; Store visible state on escaper and check if its open to retrigger this, we have to retrigger eitherway or the width doesn't update
-        MultiboardMinimizeBJ(false, board)
+        // Toggle visiblity to update multiboard width
+        getUdgEscapers().forMainEscapers(escaper => setVisibility(escaper, true))
+
         updateMultiboard()
     }
 
@@ -128,7 +130,7 @@ const initMultiboard = () => {
         if (!board) return
 
         updateGametime(false)
-        // Not updating Lives cuz circular dependency
+        // TODO; Not updating Lives cuz circular dependency but we need it when multiboard reinits
 
         let rowIndex = 0
         for (const [_, escaper] of pairs(getUdgEscapers().getAll())) {
@@ -152,10 +154,12 @@ const initMultiboard = () => {
         }
     }
 
-    const setVisibility = (visible: boolean) => {
+    const setVisibility = (escaper: Escaper, visible: boolean) => {
         if (!board) return
 
-        MultiboardMinimizeBJ(!visible, board)
+        if (GetLocalPlayer() === escaper.getPlayer()) {
+            MultiboardMinimizeBJ(escaper.hideLeaderboard || !visible, board)
+        }
     }
 
     const increasePlayerScore = (playerId: number, score: 'saves' | 'deaths') => {

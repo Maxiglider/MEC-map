@@ -143,6 +143,8 @@ export class Escaper {
     private firstPersonHandle: EscaperFirstPerson = new EscaperFirstPerson(this)
     private lockCamTarget: Escaper | null = null
 
+    public hideLeaderboard = false
+
     constructor(escaperId: number) {
         this.playerId = escaperId >= NB_PLAYERS_MAX ? escaperId - 12 : escaperId
 

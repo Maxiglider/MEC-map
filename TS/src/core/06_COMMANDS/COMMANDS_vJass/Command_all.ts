@@ -710,9 +710,8 @@ export const ExecuteCommandAll = (escaper: Escaper, cmd: string): boolean => {
     //-leaderboard
     if (name === 'leaderboard' || name === 'ldb') {
         if (nbParam === 1 && IsBoolString(param1)) {
-            if (GetLocalPlayer() == escaper.getPlayer()) {
-                Multiboard.setVisibility(S2B(param1))
-            }
+            escaper.hideLeaderboard = !S2B(param1)
+            Multiboard.setVisibility(escaper, S2B(param1))
         }
         return true
     }
