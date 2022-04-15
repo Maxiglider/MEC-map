@@ -1,4 +1,3 @@
-import { initGameTime } from 'core/04_STRUCTURES/Lives_and_game_time/Time_of_game_trigger'
 import { InitTrig_Effect_meteor_on_pick_down } from 'core/04_STRUCTURES/Meteor/Effect_meteor_on_pick_down'
 import { InitTrig_Effect_meteor_on_pick_up } from 'core/04_STRUCTURES/Meteor/Effect_meteor_on_pick_up'
 import { InitTrig_Meteor_being_used } from 'core/04_STRUCTURES/Meteor/Meteor_being_used'
@@ -13,7 +12,6 @@ import { InitTrig_Sound_monster_dies } from 'core/08_GAME/Death/Sound_monster_di
 import { InitTrig_Camera } from 'core/08_GAME/Init_game/Camera'
 import { InitTrig_Forces_ally } from 'core/08_GAME/Init_game/Forces_ally'
 import { InitTrig_Start_sound } from 'core/08_GAME/Init_game/Start_sound'
-import { InitTrig_Init_lives } from 'core/08_GAME/Init_structures/Init_lives'
 import { InitTrig_A_player_leaves } from 'core/08_GAME/Leavers/A_player_leaves'
 import { InitTrig_creation_dialogue } from 'core/08_GAME/Mode_coop/creation_dialogue'
 import { InitTrig_Select_hero } from 'core/08_GAME/Select_and_unselect_heroes/Select_hero'
@@ -45,7 +43,6 @@ export const initOldTriggers = () => {
     // InitTrig_TerrainTypeDeath()
     // InitTrig_TerrainTypeSlide()
     // InitTrig_TerrainTypeArray()
-    initGameTime()
     InitTrig_Right_click_on_widget()
     InitTrig_Meteor_being_used()
     InitTrig_Stop_using_normal_meteor()
@@ -116,7 +113,6 @@ export const initOldTriggers = () => {
     // InitTrig_MakeTerrainHeightAction()
     // InitTrig_MakeVisibilityModifierAction()
     // InitTrig_MakeLastActions()
-    InitTrig_Init_lives()
     InitTrig_Forces_ally()
     InitTrig_Camera()
     InitTrig_Start_sound()

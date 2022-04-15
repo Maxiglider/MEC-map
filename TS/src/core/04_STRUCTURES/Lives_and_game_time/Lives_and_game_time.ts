@@ -1,47 +1,26 @@
 import { NB_LIVES_AT_BEGINNING } from 'core/01_libraries/Constants'
 import { udg_colorCode } from 'core/01_libraries/Init_colorCodes'
 import { Text } from 'core/01_libraries/Text'
-import { getUdgLevels } from "../../../../globals"
-
+import { ServiceManager } from 'Services'
+import { createTimer } from 'Utils/mapUtils'
+import { getUdgLevels } from '../../../../globals'
 
 const LIVES_PLAYER = Player(6) //GREEN
 
-export type ILives = ReturnType<typeof Lives>
+export type ILives = ReturnType<typeof initLives>
 
-export const Lives = () => {
-    let nb = getUdgLevels().get(0)?.getNbLives() || NB_LIVES_AT_BEGINNING
-    let lb: leaderboard
+export const initLives = () => {
+    let nb = NB_LIVES_AT_BEGINNING
 
-    const init = () => {
-        lb = CreateLeaderboardBJ(GetPlayersAll(), '')
-        LeaderboardAddItemBJ(Player(0), lb, 'Game time', 0)
-        LeaderboardSetPlayerItemStyleBJ(Player(0), lb, true, false, false)
-        LeaderboardAddItemBJ(LIVES_PLAYER, lb, 'Lives :', nb)
-        display(true)
-    }
-
-    //leaderboard methods
-    const display = (show: boolean) => {
-        LeaderboardDisplay(lb, show)
-    }
-
-    const refresh = () => {
-        LeaderboardSetPlayerItemValueBJ(LIVES_PLAYER, lb, nb)
-    }
-
-    const getLeaderboard = () => {
-        return lb
-    }
-
-    const destroy = () => {
-        DestroyLeaderboard(lb)
-        ;(lb as any) = null
+    const initLives = () => {
+        createTimer(3, false, () => {
+            nb = getUdgLevels().get(0)?.getNbLives()
+            ServiceManager.getService('Multiboard').updateLives(nb)
+        })
     }
 
     //lives methods
-    const get = () => {
-        return nb
-    }
+    const get = () => nb
 
     const setNb = (nbLives: number) => {
         let wordLives: string
@@ -49,7 +28,7 @@ export const Lives = () => {
             return false
         }
         nb = nbLives
-        refresh()
+        ServiceManager.getService('Multiboard').updateLives(nb)
 
         if (nbLives > 1) {
             wordLives = ' lives.'
@@ -70,17 +49,13 @@ export const Lives = () => {
         }
         nb = nb + n
         Text.A(udg_colorCode[1] + 'You have earned ' + I2S(n) + wordLives)
-        refresh()
+        ServiceManager.getService('Multiboard').updateLives(nb)
     }
 
     const loseALife = () => {
         nb = nb - 1
-        if (nb >= 0) {
-            refresh()
-        }
+        ServiceManager.getService('Multiboard').updateLives(nb)
     }
 
-    init()
-
-    return { display, refresh, getLeaderboard, destroy, get, setNb, add, loseALife }
+    return { get, setNb, add, loseALife, initLives }
 }

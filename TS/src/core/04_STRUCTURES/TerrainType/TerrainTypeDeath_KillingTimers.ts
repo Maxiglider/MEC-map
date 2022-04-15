@@ -1,11 +1,6 @@
 import { NB_ESCAPERS } from 'core/01_libraries/Constants'
- import { getUdgEscapers } from '../../../../globals'
-
-import { getUdgLevels } from "../../../../globals"
-
 import { forRange } from 'Utils/mapUtils'
-import { getUdgTerrainTypes } from '../../../../globals'
-
+import { getUdgEscapers, getUdgLevels, getUdgTerrainTypes } from '../../../../globals'
 
 export class KillingTimers {
     private timers: timer[] = []

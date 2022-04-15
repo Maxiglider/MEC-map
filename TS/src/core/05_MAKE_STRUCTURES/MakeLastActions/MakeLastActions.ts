@@ -4,7 +4,7 @@ import { Level } from '../../04_STRUCTURES/Level/Level'
 import { MakeAction } from './MakeAction'
 
 export class MakeLastActions {
-    private lastActions: MakeAction[] = []
+    private lastActions: { [x: number]: MakeAction } = {}
     private lastActionId = -1
     private lastActionEffective = -1 //anciennement appelé "pointeur"
     private owner: Escaper
@@ -77,14 +77,20 @@ export class MakeLastActions {
     deleteSpecificActionsForLevel = (level: Level) => {
         const lastActionEffective = this.lastActions[this.lastActionEffective]
 
-        for (const action of this.lastActions) {
+        let highestId = -1
+
+        for (const [actionId, action] of pairs(this.lastActions)) {
             if (action.getLevel() === level) {
                 action.destroy()
+                delete this.lastActions[actionId]
+            } else {
+                if (actionId > highestId) {
+                    highestId = actionId
+                }
             }
         }
 
-        this.lastActions = this.lastActions.filter(action => action.getLevel() !== level)
-        this.lastActionId = this.lastActions.length - 1
+        this.lastActionId = highestId
 
         if (lastActionEffective) {
             for (let i = 0; i <= this.lastActionId; i++) {

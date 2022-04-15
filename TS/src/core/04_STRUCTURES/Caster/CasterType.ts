@@ -1,21 +1,17 @@
 import { NB_ESCAPERS, TEAL, TERRAIN_DATA_DISPLAY_TIME } from 'core/01_libraries/Constants'
 import { Text } from 'core/01_libraries/Text'
 import { CACHE_SEPARATEUR_PARAM } from 'core/07_TRIGGERS/Save_map_in_gamecache/struct_StringArrayForCache'
-import {getUdgEscapers, getUdgLevels} from '../../../../globals'
+import { getUdgEscapers, getUdgLevels } from '../../../../globals'
 import { udg_colorCode } from '../../01_libraries/Init_colorCodes'
 import { Level } from '../Level/Level'
 import { MonsterType } from '../Monster/MonsterType'
-
-
-
 
 export const DEFAULT_CASTER_PROJECTILE_SPEED = 600
 export const MIN_CASTER_PROJECTILE_SPEED = 100
 export const DEFAULT_CASTER_RANGE = 1000
 export const MIN_CASTER_LOAD_TIME = 0.2
 export const DEFAULT_CASTER_LOAD_TIME = 1.0
-export const DEFAULT_CASTER_ANIMATION = "spell"
-
+export const DEFAULT_CASTER_ANIMATION = 'spell'
 
 export class CasterType {
     label: string

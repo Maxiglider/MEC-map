@@ -18,6 +18,7 @@ import { ColorInfo, GetMirrorEscaper } from 'core/04_STRUCTURES/Escaper/Escaper_
 import { DisplayTerrainDataToPlayer, GetTerrainData } from 'core/07_TRIGGERS/Modify_terrain_Functions/Terrain_functions'
 import { Apm } from 'core/08_GAME/Apm_clics_par_minute/Apm'
 import { Globals } from 'core/09_From_old_Worldedit_triggers/globals_variables_and_triggers'
+import { ServiceManager } from 'Services'
 import { createTimer } from 'Utils/mapUtils'
 import { getUdgEscapers, getUdgLevels } from '../../../../globals'
 import { IsInteger, PercentageStringOrX2Integer } from '../../01_libraries/Functions_on_numbers'
@@ -28,7 +29,6 @@ import { TerrainTypeFromString } from '../../07_TRIGGERS/Modify_terrain_Function
 import { TerrainTypeNamesAndData } from '../../07_TRIGGERS/Modify_terrain_Functions/Terrain_type_names_and_data'
 import { AutoContinueAfterSliding } from '../../07_TRIGGERS/Slide_and_CheckTerrain_triggers/Auto_continue_after_sliding'
 import { TurnOnSlide } from '../../07_TRIGGERS/Slide_and_CheckTerrain_triggers/To_turn_on_slide'
-import { getUdgLives } from '../../08_GAME/Init_structures/Init_lives'
 import { CommandShortcuts } from '../../08_GAME/Shortcuts/Using_shortcut'
 import { CmdName, CmdParam, IsColorString, isPlayerId, NbParam, NoParam, resolvePlayerId } from './Command_functions'
 
@@ -710,10 +710,33 @@ export const ExecuteCommandAll = (escaper: Escaper, cmd: string): boolean => {
     //-leaderboard
     if (name === 'leaderboard' || name === 'ldb') {
         if (nbParam === 1 && IsBoolString(param1)) {
-            if (GetLocalPlayer() == escaper.getPlayer()) {
-                LeaderboardDisplay(getUdgLives().getLeaderboard(), S2B(param1))
-            }
+            escaper.hideLeaderboard = !S2B(param1)
+            ServiceManager.getService('Multiboard').setVisibility(escaper, S2B(param1))
         }
+        return true
+    }
+
+    //-firstPersonCam(fpc)
+    if ((name === 'firstPersonCam' || name === 'fpc') && noParam) {
+        escaper.getFirstPersonHandle().toggleFirstPerson()
+        return true
+    }
+
+    //-lockCam(lc)
+    if (name === 'lockCam' || name === 'lc') {
+        const target = noParam ? escaper : nbParam === 1 ? getUdgEscapers().get(resolvePlayerId(param1)) : null
+
+        escaper.setLockCamTarget(target)
+        escaper.resetCamera()
+
+        return true
+    }
+
+    //-unlockCam(uc)
+    if ((name === 'unlockCam' || name === 'ulc') && noParam) {
+        escaper.setLockCamTarget(null)
+        escaper.resetCamera()
+
         return true
     }
 

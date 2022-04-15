@@ -1,10 +1,5 @@
-import {String2Ascii} from 'core/01_libraries/Ascii'
-import {
-    IsBoolString,
-    S2B,
-    StringContainsChar,
-    tileset2tilesetString
-} from 'core/01_libraries/Basic_functions'
+import { String2Ascii } from 'core/01_libraries/Ascii'
+import { IsBoolString, S2B, StringContainsChar, tileset2tilesetString } from 'core/01_libraries/Basic_functions'
 import {
     DEFAULT_MONSTER_SPEED,
     HERO_SLIDE_SPEED,
@@ -13,18 +8,19 @@ import {
     RED,
     TERRAIN_DEATH_TIME_TO_KILL,
 } from 'core/01_libraries/Constants'
-import {udg_colorCode} from 'core/01_libraries/Init_colorCodes'
-import {Text} from 'core/01_libraries/Text'
-import {Escaper} from 'core/04_STRUCTURES/Escaper/Escaper'
-import {Level} from 'core/04_STRUCTURES/Level/Level'
-import {TerrainType} from 'core/04_STRUCTURES/TerrainType/TerrainType'
-import {DEATH_TERRAIN_MAX_TOLERANCE, TerrainTypeDeath} from 'core/04_STRUCTURES/TerrainType/TerrainTypeDeath'
-import {TerrainTypeSlide} from 'core/04_STRUCTURES/TerrainType/TerrainTypeSlide'
-import {TerrainTypeWalk} from 'core/04_STRUCTURES/TerrainType/TerrainTypeWalk'
-import {ExchangeTerrains} from 'core/07_TRIGGERS/Triggers_to_modify_terrains/Exchange_terrains'
-import {RandomizeTerrains} from 'core/07_TRIGGERS/Triggers_to_modify_terrains/Randomize_terrains'
-import {getUdgCasterTypes, getUdgLevels, getUdgMonsterTypes, getUdgTerrainTypes} from '../../../../globals'
-import {IsInteger, IsPositiveInteger} from '../../01_libraries/Functions_on_numbers'
+import { udg_colorCode } from 'core/01_libraries/Init_colorCodes'
+import { Text } from 'core/01_libraries/Text'
+import { Escaper } from 'core/04_STRUCTURES/Escaper/Escaper'
+import { Level } from 'core/04_STRUCTURES/Level/Level'
+import { PORTAL_MOB_MAX_FREEZE_DURATION } from 'core/04_STRUCTURES/Monster_properties/PortalMob'
+import { TerrainType } from 'core/04_STRUCTURES/TerrainType/TerrainType'
+import { DEATH_TERRAIN_MAX_TOLERANCE, TerrainTypeDeath } from 'core/04_STRUCTURES/TerrainType/TerrainTypeDeath'
+import { TerrainTypeSlide } from 'core/04_STRUCTURES/TerrainType/TerrainTypeSlide'
+import { TerrainTypeWalk } from 'core/04_STRUCTURES/TerrainType/TerrainTypeWalk'
+import { ExchangeTerrains } from 'core/07_TRIGGERS/Triggers_to_modify_terrains/Exchange_terrains'
+import { RandomizeTerrains } from 'core/07_TRIGGERS/Triggers_to_modify_terrains/Randomize_terrains'
+import { getUdgCasterTypes, getUdgLevels, getUdgMonsterTypes, getUdgTerrainTypes } from '../../../../globals'
+import { IsInteger, IsPositiveInteger } from '../../01_libraries/Functions_on_numbers'
 import {
     DEFAULT_CASTER_ANIMATION,
     DEFAULT_CASTER_LOAD_TIME,
@@ -33,17 +29,17 @@ import {
     MIN_CASTER_LOAD_TIME,
     MIN_CASTER_PROJECTILE_SPEED,
 } from '../../04_STRUCTURES/Caster/CasterType'
-import {MONSTER_TELEPORT_PERIOD_MAX, MONSTER_TELEPORT_PERIOD_MIN} from '../../04_STRUCTURES/Monster/MonsterTeleport'
-import {CLEAR_MOB_MAX_DURATION, FRONT_MONTANT_DURATION} from '../../04_STRUCTURES/Monster_properties/ClearMob'
-import {MakeMonsterSimplePatrol} from '../../05_MAKE_STRUCTURES/Make_create_monsters/MakeMonsterSimplePatrol'
-import {TerrainTypeFromString} from '../../07_TRIGGERS/Modify_terrain_Functions/Terrain_type_from_string'
+import { MONSTER_TELEPORT_PERIOD_MAX, MONSTER_TELEPORT_PERIOD_MIN } from '../../04_STRUCTURES/Monster/MonsterTeleport'
+import { CLEAR_MOB_MAX_DURATION, FRONT_MONTANT_DURATION } from '../../04_STRUCTURES/Monster_properties/ClearMob'
+import { MakeMonsterSimplePatrol } from '../../05_MAKE_STRUCTURES/Make_create_monsters/MakeMonsterSimplePatrol'
+import { TerrainTypeFromString } from '../../07_TRIGGERS/Modify_terrain_Functions/Terrain_type_from_string'
 import {
     CACHE_SEPARATEUR_ITEM,
     CACHE_SEPARATEUR_PARAM,
 } from '../../07_TRIGGERS/Save_map_in_gamecache/struct_StringArrayForCache'
-import {ChangeAllTerrains} from '../../07_TRIGGERS/Triggers_to_modify_terrains/Change_all_terrains'
-import {ChangeOneTerrain} from '../../07_TRIGGERS/Triggers_to_modify_terrains/Change_one_terrain'
-import {CmdName, CmdParam, NbParam, NoParam} from './Command_functions'
+import { ChangeAllTerrains } from '../../07_TRIGGERS/Triggers_to_modify_terrains/Change_all_terrains'
+import { ChangeOneTerrain } from '../../07_TRIGGERS/Triggers_to_modify_terrains/Change_one_terrain'
+import { CmdName, CmdParam, NbParam, NoParam } from './Command_functions'
 
 export const ExecuteCommandMake = (escaper: Escaper, cmd: string): boolean => {
     let name = CmdName(cmd)
@@ -94,11 +90,7 @@ export const ExecuteCommandMake = (escaper: Escaper, cmd: string): boolean => {
             return true
         }
 
-        getUdgTerrainTypes().newWalk(
-            param1,
-            TerrainTypeFromString.TerrainTypeString2TerrainTypeId(param2),
-            speed
-        )
+        getUdgTerrainTypes().newWalk(param1, TerrainTypeFromString.TerrainTypeString2TerrainTypeId(param2), speed)
 
         Text.mkP(escaper.getPlayer(), 'New terrain type "' + param1 + '" added')
 
@@ -146,13 +138,7 @@ export const ExecuteCommandMake = (escaper: Escaper, cmd: string): boolean => {
             return true
         }
 
-        getUdgTerrainTypes().newDeath(
-            param1,
-            TerrainTypeFromString.TerrainTypeString2TerrainTypeId(param2),
-            str,
-            x,
-            0
-        )
+        getUdgTerrainTypes().newDeath(param1, TerrainTypeFromString.TerrainTypeString2TerrainTypeId(param2), str, x, 0)
 
         Text.mkP(escaper.getPlayer(), 'New terrain type "' + param1 + '" added')
 
@@ -194,12 +180,7 @@ export const ExecuteCommandMake = (escaper: Escaper, cmd: string): boolean => {
             return true
         }
 
-        getUdgTerrainTypes().newSlide(
-            param1,
-            TerrainTypeFromString.TerrainTypeString2TerrainTypeId(param2),
-            speed,
-            b
-        )
+        getUdgTerrainTypes().newSlide(param1, TerrainTypeFromString.TerrainTypeString2TerrainTypeId(param2), speed, b)
 
         Text.mkP(escaper.getPlayer(), 'New terrain type "' + param1 + '" added')
 
@@ -692,7 +673,7 @@ export const ExecuteCommandMake = (escaper: Escaper, cmd: string): boolean => {
         if (!(nbParam === 2)) {
             return true
         }
-        b = !!getUdgMonsterTypes().get(param1)
+        b = !!getUdgMonsterTypes().getByLabel(param1)
         if (b) {
             b = !getUdgMonsterTypes().isLabelAlreadyUsed(param2)
         }
@@ -708,7 +689,7 @@ export const ExecuteCommandMake = (escaper: Escaper, cmd: string): boolean => {
                 )
                 return true
             }
-            getUdgMonsterTypes().get(param1)?.setLabel(param2)
+            getUdgMonsterTypes().getByLabel(param1)?.setLabel(param2)
             Text.mkP(escaper.getPlayer(), 'label changed to "' + param2 + '"')
         } else {
             Text.erP(escaper.getPlayer(), 'impossible to change label')
@@ -721,7 +702,7 @@ export const ExecuteCommandMake = (escaper: Escaper, cmd: string): boolean => {
         if (!(nbParam === 2)) {
             return true
         }
-        b = !!getUdgMonsterTypes().get(param1)
+        b = !!getUdgMonsterTypes().getByLabel(param1)
         if (b) {
             b = !getUdgMonsterTypes().isLabelAlreadyUsed(param2)
         }
@@ -737,7 +718,7 @@ export const ExecuteCommandMake = (escaper: Escaper, cmd: string): boolean => {
                 )
                 return true
             }
-            getUdgMonsterTypes().get(param1)?.setAlias(param2)
+            getUdgMonsterTypes().getByLabel(param1)?.setAlias(param2)
             Text.mkP(escaper.getPlayer(), 'alias changed to "' + param2 + '"')
         } else {
             Text.erP(escaper.getPlayer(), 'impossible to change alias')
@@ -762,7 +743,7 @@ export const ExecuteCommandMake = (escaper: Escaper, cmd: string): boolean => {
         }
         if (
             getUdgMonsterTypes()
-                .get(param1)
+                .getByLabel(param1)
                 ?.setUnitTypeId(String2Ascii(SubStringBJ(param2, 2, 5)))
         ) {
             Text.mkP(escaper.getPlayer(), 'unit type changed')
@@ -791,7 +772,7 @@ export const ExecuteCommandMake = (escaper: Escaper, cmd: string): boolean => {
             )
             return true
         }
-        if (getUdgMonsterTypes().get(param1)?.setImmolation(x)) {
+        if (getUdgMonsterTypes().getByLabel(param1)?.setImmolation(x)) {
             Text.mkP(escaper.getPlayer(), 'immolation changed')
         } else {
             Text.erP(escaper.getPlayer(), "couldn't change immolation")
@@ -814,7 +795,7 @@ export const ExecuteCommandMake = (escaper: Escaper, cmd: string): boolean => {
             Text.erP(escaper.getPlayer(), 'wrong speed value ; should be a positive integer between 0 and 522')
             return true
         }
-        if (getUdgMonsterTypes().get(param1)?.setUnitMoveSpeed(S2R(param2))) {
+        if (getUdgMonsterTypes().getByLabel(param1)?.setUnitMoveSpeed(S2R(param2))) {
             Text.mkP(escaper.getPlayer(), 'move speed changed')
         } else {
             Text.erP(escaper.getPlayer(), "couldn't change move speed")
@@ -842,7 +823,7 @@ export const ExecuteCommandMake = (escaper: Escaper, cmd: string): boolean => {
         } else {
             x = S2R(param2)
         }
-        if (getUdgMonsterTypes().get(param1)?.setScale(x)) {
+        if (getUdgMonsterTypes().getByLabel(param1)?.setScale(x)) {
             Text.mkP(escaper.getPlayer(), 'scale changed')
         } else {
             Text.erP(escaper.getPlayer(), "couldn't change scale, probably because the old value is the same")
@@ -865,7 +846,7 @@ export const ExecuteCommandMake = (escaper: Escaper, cmd: string): boolean => {
             Text.erP(escaper.getPlayer(), "wrong \"is clickable\" value ; should be 'true', 'false', '0' or '1'")
             return true
         }
-        if (getUdgMonsterTypes().get(param1)?.setIsClickable(S2B(param2))) {
+        if (getUdgMonsterTypes().getByLabel(param1)?.setIsClickable(S2B(param2))) {
             if (S2B(param2)) {
                 Text.mkP(escaper.getPlayer(), 'this monster type is now clickable')
             } else {
@@ -902,7 +883,7 @@ export const ExecuteCommandMake = (escaper: Escaper, cmd: string): boolean => {
             )
             return true
         }
-        getUdgMonsterTypes().get(param1)?.setKillingEffectStr(param2)
+        getUdgMonsterTypes().getByLabel(param1)?.setKillingEffectStr(param2)
         Text.mkP(escaper.getPlayer(), 'kill effect changed for this monster type')
         return true
     }
@@ -922,7 +903,7 @@ export const ExecuteCommandMake = (escaper: Escaper, cmd: string): boolean => {
             Text.erP(escaper.getPlayer(), 'param2 must be an integer between 1 and 9')
             return true
         }
-        getUdgMonsterTypes().get(param1)?.setNbMeteorsToKill(S2I(param2))
+        getUdgMonsterTypes().getByLabel(param1)?.setNbMeteorsToKill(S2I(param2))
         Text.mkP(escaper.getPlayer(), 'number of meteors to kill changed for this monster type')
         return true
     }
@@ -946,7 +927,7 @@ export const ExecuteCommandMake = (escaper: Escaper, cmd: string): boolean => {
             Text.erP(escaper.getPlayer(), 'wrong height ; should be a positive real or "default" or "d"')
             return true
         }
-        if (getUdgMonsterTypes().get(param1)?.setHeight(x)) {
+        if (getUdgMonsterTypes().getByLabel(param1)?.setHeight(x)) {
             Text.mkP(escaper.getPlayer(), 'height changed for this monster type')
         } else {
             Text.erP(escaper.getPlayer(), 'the height is already to this value')
@@ -975,7 +956,7 @@ export const ExecuteCommandMake = (escaper: Escaper, cmd: string): boolean => {
             x = -1
         }
 
-        const monsterType = getUdgMonsterTypes().get(param1)
+        const monsterType = getUdgMonsterTypes().getByLabel(param1)
         monsterType && escaper.makeCreateNoMoveMonsters(monsterType, x)
 
         Text.mkP(escaper.getPlayer(), 'monster making on')
@@ -993,7 +974,7 @@ export const ExecuteCommandMake = (escaper: Escaper, cmd: string): boolean => {
             return true
         }
 
-        const monsterType = getUdgMonsterTypes().get(param1)
+        const monsterType = getUdgMonsterTypes().getByLabel(param1)
         monsterType && escaper.makeCreateSimplePatrolMonsters('normal', monsterType)
 
         Text.mkP(escaper.getPlayer(), 'monster making on')
@@ -1011,7 +992,7 @@ export const ExecuteCommandMake = (escaper: Escaper, cmd: string): boolean => {
             return true
         }
 
-        const monsterType = getUdgMonsterTypes().get(param1)
+        const monsterType = getUdgMonsterTypes().getByLabel(param1)
         monsterType && escaper.makeCreateSimplePatrolMonsters('string', monsterType)
 
         Text.mkP(escaper.getPlayer(), 'monster making on')
@@ -1029,7 +1010,7 @@ export const ExecuteCommandMake = (escaper: Escaper, cmd: string): boolean => {
             return true
         }
 
-        const monsterType = getUdgMonsterTypes().get(param1)
+        const monsterType = getUdgMonsterTypes().getByLabel(param1)
         monsterType && escaper.makeCreateSimplePatrolMonsters('auto', monsterType)
 
         Text.mkP(escaper.getPlayer(), 'monster making on')
@@ -1064,7 +1045,7 @@ export const ExecuteCommandMake = (escaper: Escaper, cmd: string): boolean => {
             return true
         }
 
-        const monsterType = getUdgMonsterTypes().get(param1)
+        const monsterType = getUdgMonsterTypes().getByLabel(param1)
         monsterType && escaper.makeCreateMultiplePatrolsMonsters('normal', monsterType)
 
         Text.mkP(escaper.getPlayer(), 'monster making on')
@@ -1082,7 +1063,7 @@ export const ExecuteCommandMake = (escaper: Escaper, cmd: string): boolean => {
             return true
         }
 
-        const monsterType = getUdgMonsterTypes().get(param1)
+        const monsterType = getUdgMonsterTypes().getByLabel(param1)
         monsterType && escaper.makeCreateMultiplePatrolsMonsters('string', monsterType)
         Text.mkP(escaper.getPlayer(), 'monster making on')
         return true
@@ -1104,9 +1085,9 @@ export const ExecuteCommandMake = (escaper: Escaper, cmd: string): boolean => {
             Text.erP(
                 escaper.getPlayer(),
                 'the period must be between ' +
-                R2S(MONSTER_TELEPORT_PERIOD_MIN) +
-                ' and ' +
-                R2S(MONSTER_TELEPORT_PERIOD_MAX)
+                    R2S(MONSTER_TELEPORT_PERIOD_MIN) +
+                    ' and ' +
+                    R2S(MONSTER_TELEPORT_PERIOD_MAX)
             )
             return true
         }
@@ -1116,7 +1097,7 @@ export const ExecuteCommandMake = (escaper: Escaper, cmd: string): boolean => {
             return true
         }
 
-        const monsterType = getUdgMonsterTypes().get(param1)
+        const monsterType = getUdgMonsterTypes().getByLabel(param1)
         monsterType && escaper.makeCreateTeleportMonsters('normal', monsterType, x, S2R(param3))
 
         Text.mkP(escaper.getPlayer(), 'monster making on')
@@ -1139,9 +1120,9 @@ export const ExecuteCommandMake = (escaper: Escaper, cmd: string): boolean => {
             Text.erP(
                 escaper.getPlayer(),
                 'the period must be between ' +
-                R2S(MONSTER_TELEPORT_PERIOD_MIN) +
-                ' and ' +
-                R2S(MONSTER_TELEPORT_PERIOD_MAX)
+                    R2S(MONSTER_TELEPORT_PERIOD_MIN) +
+                    ' and ' +
+                    R2S(MONSTER_TELEPORT_PERIOD_MAX)
             )
             return true
         }
@@ -1151,7 +1132,7 @@ export const ExecuteCommandMake = (escaper: Escaper, cmd: string): boolean => {
             return true
         }
 
-        const monsterType = getUdgMonsterTypes().get(param1)
+        const monsterType = getUdgMonsterTypes().getByLabel(param1)
         monsterType && escaper.makeCreateTeleportMonsters('string', monsterType, x, S2R(param3))
 
         Text.mkP(escaper.getPlayer(), 'monster making on')
@@ -1208,9 +1189,9 @@ export const ExecuteCommandMake = (escaper: Escaper, cmd: string): boolean => {
             Text.erP(
                 escaper.getPlayer(),
                 'the period must be between ' +
-                R2S(MONSTER_TELEPORT_PERIOD_MIN) +
-                ' and ' +
-                R2S(MONSTER_TELEPORT_PERIOD_MAX)
+                    R2S(MONSTER_TELEPORT_PERIOD_MIN) +
+                    ' and ' +
+                    R2S(MONSTER_TELEPORT_PERIOD_MAX)
             )
             return true
         }
@@ -1231,9 +1212,9 @@ export const ExecuteCommandMake = (escaper: Escaper, cmd: string): boolean => {
             Text.erP(
                 escaper.getPlayer(),
                 'the period must be between ' +
-                R2S(MONSTER_TELEPORT_PERIOD_MIN) +
-                ' and ' +
-                R2S(MONSTER_TELEPORT_PERIOD_MAX)
+                    R2S(MONSTER_TELEPORT_PERIOD_MIN) +
+                    ' and ' +
+                    R2S(MONSTER_TELEPORT_PERIOD_MAX)
             )
             return true
         }
@@ -1265,9 +1246,9 @@ export const ExecuteCommandMake = (escaper: Escaper, cmd: string): boolean => {
             Text.erP(
                 escaper.getPlayer(),
                 'the period must be between ' +
-                R2S(MONSTER_TELEPORT_PERIOD_MIN) +
-                ' and ' +
-                R2S(MONSTER_TELEPORT_PERIOD_MAX)
+                    R2S(MONSTER_TELEPORT_PERIOD_MIN) +
+                    ' and ' +
+                    R2S(MONSTER_TELEPORT_PERIOD_MAX)
             )
             return true
         }
@@ -1288,7 +1269,7 @@ export const ExecuteCommandMake = (escaper: Escaper, cmd: string): boolean => {
             return true
         }
         //apply command
-        const monsterType = getUdgMonsterTypes().get(param1)
+        const monsterType = getUdgMonsterTypes().getByLabel(param1)
         monsterType && escaper.makeSetUnitMonsterType('oneByOne', monsterType)
         Text.mkP(escaper.getPlayer(), 'setting unit monster type on')
         return true
@@ -1305,7 +1286,7 @@ export const ExecuteCommandMake = (escaper: Escaper, cmd: string): boolean => {
             return true
         }
         //apply command
-        const monsterType = getUdgMonsterTypes().get(param1)
+        const monsterType = getUdgMonsterTypes().getByLabel(param1)
         monsterType && escaper.makeSetUnitMonsterType('twoClics', monsterType)
         Text.mkP(escaper.getPlayer(), 'setting unit monster type on')
         return true
@@ -1318,7 +1299,7 @@ export const ExecuteCommandMake = (escaper: Escaper, cmd: string): boolean => {
         }
         if (nbParam === 1) {
             if (getUdgMonsterTypes().isLabelAlreadyUsed(param1)) {
-                getUdgMonsterTypes().get(param1)?.displayTotalForPlayer(escaper.getPlayer())
+                getUdgMonsterTypes().getByLabel(param1)?.displayTotalForPlayer(escaper.getPlayer())
             } else {
                 Text.erP(escaper.getPlayer(), 'unknown monster type')
             }
@@ -1384,7 +1365,7 @@ export const ExecuteCommandMake = (escaper: Escaper, cmd: string): boolean => {
             return true
         }
 
-        const monsterType = getUdgMonsterTypes().get(param2)
+        const monsterType = getUdgMonsterTypes().getByLabel(param2)
         if (!monsterType) {
             Text.erP(escaper.getPlayer(), 'unknown monster type "' + param2 + '"')
             return true
@@ -1443,7 +1424,7 @@ export const ExecuteCommandMake = (escaper: Escaper, cmd: string): boolean => {
             return true
         }
 
-        const monsterType = getUdgMonsterTypes().get(param2)
+        const monsterType = getUdgMonsterTypes().getByLabel(param2)
         if (!monsterType) {
             Text.erP(escaper.getPlayer(), 'unknown monster type "' + param2 + '"')
             return true
@@ -1528,7 +1509,7 @@ export const ExecuteCommandMake = (escaper: Escaper, cmd: string): boolean => {
     }
 
     //createKey(crk)   --> create meteors used to kill clickable monsters
-        if (name === 'createKey' || name === 'crk') {
+    if (name === 'createKey' || name === 'crk') {
         if (noParam) {
             escaper.makeCreateMeteor()
             Text.mkP(escaper.getPlayer(), 'meteor making on')
@@ -1631,8 +1612,8 @@ export const ExecuteCommandMake = (escaper: Escaper, cmd: string): boolean => {
                     Text.mkP(
                         escaper.getPlayer(),
                         'you are now making current level (which is at the moment number ' +
-                        I2S(getUdgLevels().getCurrentLevel().getId()) +
-                        ')'
+                            I2S(getUdgLevels().getCurrentLevel().getId()) +
+                            ')'
                     )
                 } else {
                     Text.erP(escaper.getPlayer(), 'you are already making current level')
@@ -1854,20 +1835,20 @@ export const ExecuteCommandMake = (escaper: Escaper, cmd: string): boolean => {
             return true
         }
 
-        const casterMonsterType = getUdgMonsterTypes().get(param2)
-        const projectileMonsterType = getUdgMonsterTypes().get(param3)
+        const casterMonsterType = getUdgMonsterTypes().getByLabel(param2)
+        const projectileMonsterType = getUdgMonsterTypes().getByLabel(param3)
 
         casterMonsterType &&
-        projectileMonsterType &&
-        getUdgCasterTypes().new(
-            param1,
-            casterMonsterType,
-            projectileMonsterType,
-            x,
-            speed,
-            y,
-            DEFAULT_CASTER_ANIMATION
-        )
+            projectileMonsterType &&
+            getUdgCasterTypes().new(
+                param1,
+                casterMonsterType,
+                projectileMonsterType,
+                x,
+                speed,
+                y,
+                DEFAULT_CASTER_ANIMATION
+            )
         Text.mkP(escaper.getPlayer(), 'new caster type "' + param1 + '" created')
         return true
     }
@@ -1877,7 +1858,7 @@ export const ExecuteCommandMake = (escaper: Escaper, cmd: string): boolean => {
         if (!(nbParam === 2)) {
             return true
         }
-        b = !!getUdgCasterTypes().get(param1)
+        b = !!getUdgCasterTypes().getByLabel(param1)
         if (b) {
             b = !getUdgCasterTypes().isLabelAlreadyUsed(param2)
         }
@@ -1893,7 +1874,7 @@ export const ExecuteCommandMake = (escaper: Escaper, cmd: string): boolean => {
                 )
                 return true
             }
-            getUdgCasterTypes().get(param1)?.setLabel(param2)
+            getUdgCasterTypes().getByLabel(param1)?.setLabel(param2)
             Text.mkP(escaper.getPlayer(), 'label changed to "' + param2 + '"')
         } else {
             Text.erP(escaper.getPlayer(), 'impossible to change label')
@@ -1906,7 +1887,7 @@ export const ExecuteCommandMake = (escaper: Escaper, cmd: string): boolean => {
         if (!(nbParam === 2)) {
             return true
         }
-        b = !!getUdgCasterTypes().get(param1)
+        b = !!getUdgCasterTypes().getByLabel(param1)
         if (b) {
             b = !getUdgCasterTypes().isLabelAlreadyUsed(param2)
         }
@@ -1922,7 +1903,7 @@ export const ExecuteCommandMake = (escaper: Escaper, cmd: string): boolean => {
                 )
                 return true
             }
-            getUdgCasterTypes().get(param1)?.setAlias(param2)
+            getUdgCasterTypes().getByLabel(param1)?.setAlias(param2)
             Text.mkP(escaper.getPlayer(), 'alias changed to "' + param2 + '"')
         } else {
             Text.erP(escaper.getPlayer(), 'impossible to change alias')
@@ -1946,8 +1927,8 @@ export const ExecuteCommandMake = (escaper: Escaper, cmd: string): boolean => {
             return true
         }
         //apply command
-        const monsterType = getUdgMonsterTypes().get(param2)
-        monsterType && getUdgCasterTypes().get(param1)?.setCasterMonsterType(monsterType)
+        const monsterType = getUdgMonsterTypes().getByLabel(param2)
+        monsterType && getUdgCasterTypes().getByLabel(param1)?.setCasterMonsterType(monsterType)
         Text.mkP(escaper.getPlayer(), 'caster monster type changed')
         return true
     }
@@ -1968,8 +1949,8 @@ export const ExecuteCommandMake = (escaper: Escaper, cmd: string): boolean => {
             return true
         }
         //apply command
-        const monsterType = getUdgMonsterTypes().get(param2)
-        monsterType && getUdgCasterTypes().get(param1)?.setProjectileMonsterType(monsterType)
+        const monsterType = getUdgMonsterTypes().getByLabel(param2)
+        monsterType && getUdgCasterTypes().getByLabel(param1)?.setProjectileMonsterType(monsterType)
         Text.mkP(escaper.getPlayer(), 'projectile monster type changed')
         return true
     }
@@ -1990,7 +1971,7 @@ export const ExecuteCommandMake = (escaper: Escaper, cmd: string): boolean => {
             return true
         }
         //apply command
-        getUdgCasterTypes().get(param1)?.setRange(S2R(param2))
+        getUdgCasterTypes().getByLabel(param1)?.setRange(S2R(param2))
         Text.mkP(escaper.getPlayer(), 'range changed')
         return true
     }
@@ -2014,7 +1995,7 @@ export const ExecuteCommandMake = (escaper: Escaper, cmd: string): boolean => {
             return true
         }
         //apply command
-        getUdgCasterTypes().get(param1)?.setProjectileSpeed(S2R(param2))
+        getUdgCasterTypes().getByLabel(param1)?.setProjectileSpeed(S2R(param2))
         Text.mkP(escaper.getPlayer(), 'projectile speed changed')
         return true
     }
@@ -2038,7 +2019,7 @@ export const ExecuteCommandMake = (escaper: Escaper, cmd: string): boolean => {
             return true
         }
         //apply command
-        getUdgCasterTypes().get(param1)?.setLoadTime(S2R(param2))
+        getUdgCasterTypes().getByLabel(param1)?.setLoadTime(S2R(param2))
         Text.mkP(escaper.getPlayer(), 'load time changed')
         return true
     }
@@ -2057,7 +2038,7 @@ export const ExecuteCommandMake = (escaper: Escaper, cmd: string): boolean => {
         n = StringLength(name) + StringLength(param1) + 4
         str = SubStringBJ(cmd, n, StringLength(cmd))
         //apply command
-        getUdgCasterTypes().get(param1)?.setAnimation(str)
+        getUdgCasterTypes().getByLabel(param1)?.setAnimation(str)
         Text.mkP(escaper.getPlayer(), 'caster animation changed')
         return true
     }
@@ -2083,7 +2064,7 @@ export const ExecuteCommandMake = (escaper: Escaper, cmd: string): boolean => {
             x = -1
         }
         //apply command
-        const casterType = getUdgCasterTypes().get(param1)
+        const casterType = getUdgCasterTypes().getByLabel(param1)
         casterType && escaper.makeCreateCaster(casterType, x)
         Text.mkP(escaper.getPlayer(), 'casters making on')
         return true
@@ -2114,7 +2095,7 @@ export const ExecuteCommandMake = (escaper: Escaper, cmd: string): boolean => {
         }
         if (nbParam === 1) {
             if (getUdgCasterTypes().isLabelAlreadyUsed(param1)) {
-                getUdgCasterTypes().get(param1)?.displayForPlayer(escaper.getPlayer())
+                getUdgCasterTypes().getByLabel(param1)?.displayForPlayer(escaper.getPlayer())
             } else {
                 Text.erP(escaper.getPlayer(), 'unknown caster type')
             }
@@ -2134,9 +2115,9 @@ export const ExecuteCommandMake = (escaper: Escaper, cmd: string): boolean => {
             Text.erP(
                 escaper.getPlayer(),
                 'the disable duration must be a real between ' +
-                R2S(FRONT_MONTANT_DURATION) +
-                ' and ' +
-                R2S(CLEAR_MOB_MAX_DURATION)
+                    R2S(FRONT_MONTANT_DURATION) +
+                    ' and ' +
+                    R2S(CLEAR_MOB_MAX_DURATION)
             )
             return true
         }
@@ -2155,6 +2136,34 @@ export const ExecuteCommandMake = (escaper: Escaper, cmd: string): boolean => {
         return true
     }
 
+    //-createPortalMob(crpm) <freezeDuration>
+    if (name === 'createPortalMob' || name === 'crpm') {
+        if (!(nbParam === 1)) {
+            return true
+        }
+        x = S2R(param1)
+        if (x !== 0 && (x > PORTAL_MOB_MAX_FREEZE_DURATION || x < 0)) {
+            Text.erP(
+                escaper.getPlayer(),
+                'the disable duration must be a real between ' + R2S(0) + ' and ' + R2S(PORTAL_MOB_MAX_FREEZE_DURATION)
+            )
+            return true
+        }
+        escaper.makeCreatePortalMobs(x)
+        Text.mkP(escaper.getPlayer(), 'portal mob making on')
+        return true
+    }
+
+    //-deletePortalMob(delpm)
+    if (name === 'deletePortalMob' || name === 'delpm') {
+        if (!noParam) {
+            return true
+        }
+        escaper.makeDeletePortalMobs()
+        Text.mkP(escaper.getPlayer(), 'portal mobs deleting on')
+        return true
+    }
+
     //-getTerrainCliffClass(gettcc) <terrainLabel>
     if (name === 'getTerrainCliffClass' || name === 'gettcc') {
         if (nbParam !== 1) {
@@ -2169,7 +2178,7 @@ export const ExecuteCommandMake = (escaper: Escaper, cmd: string): boolean => {
 
         //apply command
         terrainType &&
-        Text.mkP(escaper.getPlayer(), 'cliff class for that terrain is ' + I2S(terrainType.getCliffClassId()))
+            Text.mkP(escaper.getPlayer(), 'cliff class for that terrain is ' + I2S(terrainType.getCliffClassId()))
         return true
     }
 
@@ -2184,11 +2193,24 @@ export const ExecuteCommandMake = (escaper: Escaper, cmd: string): boolean => {
             Text.mkP(
                 escaper.getPlayer(),
                 'main tile: ' +
-                getUdgTerrainTypes().getMainTileset() +
-                ' = ' +
-                tileset2tilesetString(getUdgTerrainTypes().getMainTileset())
+                    getUdgTerrainTypes().getMainTileset() +
+                    ' = ' +
+                    tileset2tilesetString(getUdgTerrainTypes().getMainTileset())
             )
         }
+        return true
+    }
+
+    // -setClickGrid <value>
+    if ((name === 'setClickGrid' || name === 'setcg') && nbParam === 1) {
+        escaper.roundToGrid = S2I(param1) > 1 && S2I(param1) <= 128 ? S2I(param1) : null
+
+        if (escaper.roundToGrid) {
+            Text.mkP(escaper.getPlayer(), `Now rounding clicks to: '${escaper.roundToGrid}'`)
+        } else {
+            Text.erP(escaper.getPlayer(), `Disabled rounding clicks`)
+        }
+
         return true
     }
 

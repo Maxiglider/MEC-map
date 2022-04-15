@@ -28,10 +28,13 @@ import { MakeDeleteMeteors } from 'core/05_MAKE_STRUCTURES/Make_delete_meteors/M
 import { MakeDeleteMonsters } from 'core/05_MAKE_STRUCTURES/Make_delete_monsters/MakeDeleteMonsters'
 import { MakeClearMob } from 'core/05_MAKE_STRUCTURES/Make_monster_properties/MakeClearMob'
 import { MakeDeleteClearMob } from 'core/05_MAKE_STRUCTURES/Make_monster_properties/MakeDeleteClearMob'
+import { MakeDeletePortalMob } from 'core/05_MAKE_STRUCTURES/Make_monster_properties/MakeDeletePortalMob'
+import { MakePortalMob } from 'core/05_MAKE_STRUCTURES/Make_monster_properties/MakePortalMob'
 import { MakeGetUnitTeleportPeriod } from 'core/05_MAKE_STRUCTURES/Make_set_unit_properties/MakeGetUnitTeleportPeriod'
 import { MakeSetUnitMonsterType } from 'core/05_MAKE_STRUCTURES/Make_set_unit_properties/MakeSetUnitMonsterType'
 import { MakeSetUnitTeleportPeriod } from 'core/05_MAKE_STRUCTURES/Make_set_unit_properties/MakeSetUnitTeleportPeriod'
 import { AfkMode } from 'core/08_GAME/Afk_mode/Afk_mode'
+import { ServiceManager } from 'Services'
 import { Timer } from 'w3ts'
 import { getUdgEscapers, getUdgLevels, getUdgTerrainTypes } from '../../../../globals'
 import { createTimer } from '../../../Utils/mapUtils'
@@ -66,6 +69,7 @@ import type { TerrainType } from '../TerrainType/TerrainType'
 import { TerrainTypeSlide } from '../TerrainType/TerrainTypeSlide'
 import { TerrainTypeWalk } from '../TerrainType/TerrainTypeWalk'
 import { EscaperEffectArray } from './EscaperEffectArray'
+import { EscaperFirstPerson } from './Escaper_firstPerson'
 import { ColorInfo, GetMirrorEscaper } from './Escaper_functions'
 
 const SHOW_REVIVE_EFFECTS = false
@@ -118,7 +122,7 @@ export class Escaper {
 
     private slideLastAngleOrder: number
     private isHeroSelectedB: boolean
-    private selectedPlayerId: number = -1
+    private selectedEscaperId: number = -1
 
     private instantTurnAbsolute: boolean
 
@@ -127,10 +131,19 @@ export class Escaper {
     public discoTrigger?: Timer
     public currentLevelTouchTerrainDeath?: Level //pour le terrain qui tue, vérifie s'il faut bien tuer l'escaper
 
+    public roundToGrid: number | null = null
+    private portalCooldown = false
+    private portalCooldownTimer: Timer | null = null
+
     //coop
     private powerCircle: unit
     private dummyPowerCircle: unit
     private coopInvul: boolean
+
+    private firstPersonHandle: EscaperFirstPerson = new EscaperFirstPerson(this)
+    private lockCamTarget: Escaper | null = null
+
+    public hideLeaderboard = false
 
     constructor(escaperId: number) {
         this.playerId = escaperId >= NB_PLAYERS_MAX ? escaperId - 12 : escaperId
@@ -354,6 +367,9 @@ export class Escaper {
         //coop
         RemoveUnit(this.powerCircle)
         RemoveUnit(this.dummyPowerCircle)
+
+        this.portalCooldownTimer?.destroy()
+        this.portalCooldownTimer = null
     }
 
     //getId method
@@ -449,6 +465,11 @@ export class Escaper {
             AfkMode.StopAfk(this.escaperId)
             MessageHeroDies.DisplayDeathMessagePlayer(this.p)
             this.isHeroSelectedB = false
+
+            if (!this.isEscaperSecondary()) {
+                ServiceManager.getService('Multiboard').increasePlayerScore(GetPlayerId(this.getPlayer()), 'deaths')
+            }
+
             return true
         }
         return false
@@ -593,11 +614,11 @@ export class Escaper {
         }
     }
 
-    setSelectedPlayerId = (playerId: number) => {
-        this.selectedPlayerId = playerId
+    setSelectedEscaperId = (escaperId: number) => {
+        this.selectedEscaperId = escaperId
     }
 
-    getSelectedPlayerId = () => this.selectedPlayerId
+    getSelectedEscaperId = () => this.selectedEscaperId
 
     //effects methods
     newEffect(efStr: string, bodyPart: string) {
@@ -953,6 +974,14 @@ export class Escaper {
     resetCamera = () => {
         ResetToGameCameraForPlayer(this.p, 0)
         SetCameraFieldForPlayer(this.p, CAMERA_FIELD_TARGET_DISTANCE, this.cameraField, 0)
+
+        if (this.lockCamTarget) {
+            const hero = this.lockCamTarget.getHero()
+
+            if (hero) {
+                SetCameraTargetControllerNoZForPlayer(this.getPlayer(), hero, 0, 0, false)
+            }
+        }
     }
 
     kick(kicked: Escaper) {
@@ -1203,6 +1232,16 @@ export class Escaper {
         if (this.hero) this.make = new MakeDeleteClearMob(this.hero)
     }
 
+    makeCreatePortalMobs(freezeDuration: number) {
+        this.destroyMake()
+        if (this.hero) this.make = new MakePortalMob(this.hero, freezeDuration)
+    }
+
+    makeDeletePortalMobs = () => {
+        this.destroyMake()
+        if (this.hero) this.make = new MakeDeletePortalMob(this.hero)
+    }
+
     makeCreateTerrain(terrainType: TerrainType) {
         this.destroyMake()
         if (this.hero) this.make = new MakeTerrainCreate(this.hero, terrainType)
@@ -1376,5 +1415,22 @@ export class Escaper {
 
     isEscaperSecondary = () => {
         return this.escaperId >= NB_PLAYERS_MAX
+    }
+
+    isPortalCooldown = () => this.portalCooldown
+
+    enablePortalCooldown = () => {
+        this.portalCooldown = true
+    }
+
+    disablePortalCooldown = (timeout: number) => {
+        this.portalCooldownTimer?.destroy()
+        this.portalCooldownTimer = createTimer(timeout, false, () => (this.portalCooldown = false))
+    }
+
+    getFirstPersonHandle = () => this.firstPersonHandle
+
+    setLockCamTarget = (lockCamTarget: Escaper | null) => {
+        this.lockCamTarget = lockCamTarget
     }
 }

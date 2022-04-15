@@ -5,14 +5,14 @@ import { IsColorString } from '../../06_COMMANDS/COMMANDS_vJass/Command_function
 import { CACHE_SEPARATEUR_PARAM } from '../../07_TRIGGERS/Save_map_in_gamecache/struct_StringArrayForCache'
 import { Level } from '../Level/Level'
 import { ClearMob } from '../Monster_properties/ClearMob'
+import { PortalMob } from '../Monster_properties/PortalMob'
 import { MonsterType } from './MonsterType'
-import {monstersClickable} from "./trig_Monsters_clickable_set_life";
+import { monstersClickable } from './trig_Monsters_clickable_set_life'
 
 export abstract class Monster {
     public static DISABLE_TRANSPARENCY = 80
 
     private static lastInstanceId = -1
-
 
     id: number
     u?: unit
@@ -33,6 +33,8 @@ export abstract class Monster {
 
     //clear mob that this mob is trigger mob
     protected clearMob?: ClearMob
+
+    protected portalMob?: PortalMob
 
     constructor(monsterType?: MonsterType) {
         this.mt = monsterType
@@ -64,6 +66,18 @@ export abstract class Monster {
 
     removeClearMob = () => {
         delete this.clearMob
+    }
+
+    setPortalMob = (portalMob: PortalMob) => {
+        this.portalMob = portalMob
+    }
+
+    getPortalMob = () => {
+        return this.portalMob
+    }
+
+    removePortalMob() {
+        delete this.portalMob
     }
 
     removeUnit() {
@@ -120,6 +134,7 @@ export abstract class Monster {
             }
             this.u && SetUnitVertexColorBJ(this.u, this.vcRed, this.vcGreen, this.vcBlue, this.vcTransparency)
         }
+
         if (this.clearMob) {
             this.clearMob.redoTriggerMobPermanentEffect()
         }
@@ -234,6 +249,10 @@ export abstract class Monster {
 
         if (this.clearMob) {
             this.clearMob.destroy()
+        }
+
+        if (this.portalMob) {
+            this.portalMob.destroy()
         }
 
         delete udg_monsters[this.id]

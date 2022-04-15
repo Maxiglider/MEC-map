@@ -1,17 +1,9 @@
 //évènement ajouté à la création de l'unité invisible
 
 import { DUMMY_POWER_CIRCLE, GM_KILLING_EFFECT } from 'core/01_libraries/Constants'
-import { ClearMob } from 'core/04_STRUCTURES/Monster_properties/ClearMob'
+import { ServiceManager } from 'Services'
 import { createEvent } from 'Utils/mapUtils'
-import {
-    getUdgEscapers,
-    getUdgMonsterTypes, udg_monsters,
-} from '../../../../globals'
-
-
-
-
-
+import { getUdgEscapers, getUdgMonsterTypes, udg_monsters } from '../../../../globals'
 
 export const InitTrig_InvisUnit_is_getting_damage = () => {
     let TAILLE_UNITE = 100
@@ -29,7 +21,6 @@ export const InitTrig_InvisUnit_is_getting_damage = () => {
                 }
 
                 let killingUnit: unit = GetEventDamageSource()
-                let clearMob: ClearMob | undefined
                 let eff: effect | null
                 let x: number
                 let y: number
@@ -49,13 +40,26 @@ export const InitTrig_InvisUnit_is_getting_damage = () => {
 
                 if (RAbsBJ(hauteurHero - hauteurKillingUnit) < TAILLE_UNITE) {
                     if (GetUnitTypeId(killingUnit) === DUMMY_POWER_CIRCLE) {
+                        if (!escaper.isEscaperSecondary()) {
+                            ServiceManager.getService('Multiboard').increasePlayerScore(
+                                GetPlayerId(escaper.getPlayer()),
+                                'saves'
+                            )
+                        }
+
                         getUdgEscapers().get(GetUnitUserData(killingUnit))?.coopReviveHero()
                         return
                     } else {
                         const monster = udg_monsters[GetUnitUserData(killingUnit)]
-                        clearMob = monster.getClearMob()
+                        const clearMob = monster.getClearMob()
+                        const portalMob = monster.getPortalMob()
+
                         if (clearMob) {
                             clearMob.activate()
+                            return
+                        } else if (portalMob) {
+                            portalMob.activate(monster, escaper, hero)
+                            return
                         } else if (escaper.isGodModeOn()) {
                             //god mode effect
                             x = GetUnitX(killingUnit)
@@ -65,7 +69,7 @@ export const InitTrig_InvisUnit_is_getting_damage = () => {
 
                             //kill monster
                             if (escaper.doesGodModeKills()) {
-                                print("monster killing")
+                                print('monster killing')
                                 if (GetUnitUserData(killingUnit) !== 0) {
                                     monster.killUnit() //on ne tue pas directement le monstre, pour pouvoir exécuter des actions secondaires éventuelles de la méthode killUnit
                                 } else {
@@ -75,7 +79,7 @@ export const InitTrig_InvisUnit_is_getting_damage = () => {
                             return
                         }
 
-                        if (!escaper.isCoopInvul() && !clearMob) {
+                        if (!escaper.isCoopInvul()) {
                             escaper.kill()
 
                             //effet de tuation du héros par le monstre, suivant le type du monstre

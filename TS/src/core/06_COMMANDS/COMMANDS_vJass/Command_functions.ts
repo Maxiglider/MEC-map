@@ -4,11 +4,24 @@ import { ColorString2Id } from 'core/01_libraries/Init_colorCodes'
 import { forRange } from 'Utils/mapUtils'
 import { getUdgEscapers } from '../../../../globals'
 
+export const rawPlayerNames: string[] = []
+
 const cachedPlayerNames: { [x: string]: number } = {}
+
+const removeHash = (name: string) => {
+    const i = name.indexOf('#')
+
+    if (i === -1) {
+        return name
+    }
+
+    return name.substring(0, i)
+}
 
 export const initCachedPlayerNames = () => {
     forRange(24, i => {
-        cachedPlayerNames[stringReplaceAll(' ', '_', GetPlayerName(Player(i)).toLowerCase())] = i
+        cachedPlayerNames[removeHash(stringReplaceAll(' ', '_', GetPlayerName(Player(i)).toLowerCase()))] = i
+        rawPlayerNames.push(GetPlayerName(Player(i)))
     })
 }
 
@@ -119,7 +132,7 @@ export const resolvePlayerId = (arg: string) => {
     let targetPlayer = -1
 
     if (larg === 's' || larg === 'sel' || larg === 'select' || larg === 'selected') {
-        const a = getUdgEscapers().get(GetPlayerId(GetTriggerPlayer()))?.getSelectedPlayerId() + 1
+        const a = getUdgEscapers().get(GetPlayerId(GetTriggerPlayer()))?.getSelectedEscaperId() + 1
 
         if (a > 0 && a <= NB_ESCAPERS) {
             targetPlayer = a - 1
@@ -132,8 +145,8 @@ export const resolvePlayerId = (arg: string) => {
         if (a > 0 && a <= NB_ESCAPERS) {
             targetPlayer = a - 1
         }
-    } else if (cachedPlayerNames[larg]) {
-        return cachedPlayerNames[larg]
+    } else if (cachedPlayerNames[removeHash(larg)]) {
+        return cachedPlayerNames[removeHash(larg)]
     }
 
     if (targetPlayer === -1) {

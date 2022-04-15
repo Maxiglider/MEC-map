@@ -47,16 +47,21 @@ export abstract class Make {
 
     doBaseActions() {
         const targetWidget = GetOrderTarget()
-        if(targetWidget){
+        if (targetWidget) {
             this.orderX = GetWidgetX(targetWidget)
             this.orderY = GetWidgetX(targetWidget)
-        }else {
+        } else {
             if (!IsIssuedOrder('smart')) {
                 return false
             }
 
             this.orderX = GetOrderPointX()
             this.orderY = GetOrderPointY()
+        }
+
+        if (this.escaper.roundToGrid) {
+            this.orderX = Math.round(this.orderX / this.escaper.roundToGrid) * this.escaper.roundToGrid
+            this.orderY = Math.round(this.orderY / this.escaper.roundToGrid) * this.escaper.roundToGrid
         }
 
         StopUnit(this.maker)
@@ -71,7 +76,7 @@ export abstract class Make {
         this.t = createEvent({
             events: [
                 t => TriggerRegisterUnitEvent(t, this.maker, EVENT_UNIT_ISSUED_POINT_ORDER),
-                t => TriggerRegisterUnitEvent(t, this.maker, EVENT_UNIT_ISSUED_TARGET_ORDER)
+                t => TriggerRegisterUnitEvent(t, this.maker, EVENT_UNIT_ISSUED_TARGET_ORDER),
             ],
             actions: [TriggerActions],
         })
