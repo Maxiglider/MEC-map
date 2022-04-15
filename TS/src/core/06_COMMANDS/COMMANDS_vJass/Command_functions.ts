@@ -132,7 +132,7 @@ export const resolvePlayerId = (arg: string) => {
     let targetPlayer = -1
 
     if (larg === 's' || larg === 'sel' || larg === 'select' || larg === 'selected') {
-        const a = getUdgEscapers().get(GetPlayerId(GetTriggerPlayer()))?.getSelectedEscaperId() + 1
+        const a = getUdgEscapers().get(GetPlayerId(GetTriggerPlayer()))?.getSelectedPlayerId() + 1
 
         if (a > 0 && a <= NB_ESCAPERS) {
             targetPlayer = a - 1

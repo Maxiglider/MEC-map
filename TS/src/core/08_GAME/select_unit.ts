@@ -14,7 +14,7 @@ export const initSelectUnit = () => {
                     if (escaper) {
                         getUdgEscapers()
                             .get(GetPlayerId(GetTriggerPlayer()))
-                            ?.setSelectedEscaperId(GetPlayerId(escaper.getPlayer()))
+                            ?.setSelectedPlayerId(GetPlayerId(escaper.getPlayer()))
                     }
                 }
             },
