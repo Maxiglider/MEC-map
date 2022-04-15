@@ -1,19 +1,21 @@
 import { NB_LIVES_AT_BEGINNING } from 'core/01_libraries/Constants'
 import { udg_colorCode } from 'core/01_libraries/Init_colorCodes'
 import { Text } from 'core/01_libraries/Text'
+import { ServiceManager } from 'Services'
 import { createTimer } from 'Utils/mapUtils'
 import { getUdgLevels } from '../../../../globals'
-import { Multiboard } from './Multiboard'
 
 const LIVES_PLAYER = Player(6) //GREEN
 
-const initLives = () => {
+export type ILives = ReturnType<typeof initLives>
+
+export const initLives = () => {
     let nb = NB_LIVES_AT_BEGINNING
 
     const initLives = () => {
         createTimer(3, false, () => {
             nb = getUdgLevels().get(0)?.getNbLives()
-            Multiboard.updateLives(nb)
+            ServiceManager.getService('Multiboard').updateLives(nb)
         })
     }
 
@@ -26,7 +28,7 @@ const initLives = () => {
             return false
         }
         nb = nbLives
-        Multiboard.updateLives(nb)
+        ServiceManager.getService('Multiboard').updateLives(nb)
 
         if (nbLives > 1) {
             wordLives = ' lives.'
@@ -47,15 +49,13 @@ const initLives = () => {
         }
         nb = nb + n
         Text.A(udg_colorCode[1] + 'You have earned ' + I2S(n) + wordLives)
-        Multiboard.updateLives(nb)
+        ServiceManager.getService('Multiboard').updateLives(nb)
     }
 
     const loseALife = () => {
         nb = nb - 1
-        Multiboard.updateLives(nb)
+        ServiceManager.getService('Multiboard').updateLives(nb)
     }
 
     return { get, setNb, add, loseALife, initLives }
 }
-
-export const Lives = initLives()

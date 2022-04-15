@@ -8,6 +8,7 @@ import { ReinitTerrainsPositions } from 'core/07_TRIGGERS/Triggers_to_modify_ter
 import { AfkMode } from 'core/08_GAME/Afk_mode/Afk_mode'
 import { Globals } from 'core/09_From_old_Worldedit_triggers/globals_variables_and_triggers'
 import { udg_doubleHeroesEnabled } from 'core/Double_heroes/double_heroes_config'
+import { ServiceManager } from 'Services'
 import { flushLogs } from '../../../../../core/Log/log'
 import {
     getUdgCasterTypes,
@@ -18,7 +19,6 @@ import {
     globals,
 } from '../../../../globals'
 import { IsPositiveInteger } from '../../01_libraries/Functions_on_numbers'
-import { Lives } from '../../04_STRUCTURES/Lives_and_game_time/Lives_and_game_time'
 import { SaveMapInCache } from '../../07_TRIGGERS/Save_map_in_gamecache/SAVE_MAP_in_cache'
 import { SaveLoadTerrainWithoutName } from '../../07_TRIGGERS/Triggers_to_modify_terrains/Save_load_terrain_without_name'
 import { SaveLoadTerrainWithName } from '../../07_TRIGGERS/Triggers_to_modify_terrains/Save_load_terrain_with_name'
@@ -179,7 +179,7 @@ export const ExecuteCommandMax = (escaper: Escaper, cmd: string): boolean => {
         if (!(nbParam === 1 && IsPositiveInteger(param1))) {
             return true
         }
-        Lives.setNb(S2I(param1))
+        ServiceManager.getService('Lives').setNb(S2I(param1))
         return true
     }
 

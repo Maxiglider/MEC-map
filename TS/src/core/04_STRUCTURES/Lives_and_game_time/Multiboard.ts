@@ -1,5 +1,6 @@
 import { NB_ESCAPERS } from 'core/01_libraries/Constants'
 import { udg_colorCode } from 'core/01_libraries/Init_colorCodes'
+import { ServiceManager } from 'Services'
 import { createTimer, forRange } from 'Utils/mapUtils'
 import { getUdgEscapers } from '../../../../globals'
 import { rawPlayerNames } from '../../06_COMMANDS/COMMANDS_vJass/Command_functions'
@@ -20,7 +21,9 @@ const getLongestNameWidth = () => {
     return nameWidth / 2 + 3
 }
 
-const initMultiboard = () => {
+export type IMultiboard = ReturnType<typeof initMultiboard>
+
+export const initMultiboard = () => {
     let board: multiboard | null
 
     const playerScores: {
@@ -38,7 +41,7 @@ const initMultiboard = () => {
         playerScores[i] = { score: 0, saves: 0, deaths: 0, rowIndex: -1 }
     })
 
-    const initMultiboard = (reinit: boolean) => {
+    const initMultiboard = () => {
         const cols = 4
         const rows = 3 + getUdgEscapers().countMain()
 
@@ -77,7 +80,7 @@ const initMultiboard = () => {
 
     const reinitMultiboard = () => {
         board && DestroyMultiboard(board)
-        initMultiboard(true)
+        initMultiboard()
     }
 
     const updateLives = (lives: number) => {
@@ -130,7 +133,7 @@ const initMultiboard = () => {
         if (!board) return
 
         updateGametime(false)
-        // TODO; Not updating Lives cuz circular dependency but we need it when multiboard reinits
+        updateLives(ServiceManager.getService('Lives').get())
 
         let rowIndex = 0
         for (const [_, escaper] of pairs(getUdgEscapers().getAll())) {
@@ -171,12 +174,10 @@ const initMultiboard = () => {
 
     // Multiboard won't show if its loaded too early
     createTimer(2, false, () => {
-        initMultiboard(false)
+        initMultiboard()
         amountOfEscapers = getUdgEscapers().countMain()
         createTimer(1, true, () => updateGametime(true))
     })
 
     return { setVisibility, increasePlayerScore, updateLives }
 }
-
-export const Multiboard = initMultiboard()

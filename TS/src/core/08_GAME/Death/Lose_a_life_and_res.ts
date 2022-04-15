@@ -1,6 +1,6 @@
 import { NB_ESCAPERS } from 'core/01_libraries/Constants'
 import { Text } from 'core/01_libraries/Text'
-import { Lives } from 'core/04_STRUCTURES/Lives_and_game_time/Lives_and_game_time'
+import { ServiceManager } from 'Services'
 import { createEvent } from 'Utils/mapUtils'
 import { getUdgEscapers, getUdgLevels } from '../../../../globals'
 import { ChangeAllTerrains } from '../../07_TRIGGERS/Triggers_to_modify_terrains/Change_all_terrains'
@@ -14,8 +14,8 @@ export const InitTrig_Lose_a_life_and_res = () => {
         actions: [
             () => {
                 let i: number
-                Lives.loseALife()
-                if (Lives.get() < 0) {
+                ServiceManager.getService('Lives').loseALife()
+                if (ServiceManager.getService('Lives').get() < 0) {
                     if (!udg_gameIsLost) {
                         udg_gameIsLost = true
                         DisplayTextToForce(GetPlayersAll(), 'You have no more lives !')

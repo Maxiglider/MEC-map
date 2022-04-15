@@ -18,13 +18,13 @@ import { ColorInfo, GetMirrorEscaper } from 'core/04_STRUCTURES/Escaper/Escaper_
 import { DisplayTerrainDataToPlayer, GetTerrainData } from 'core/07_TRIGGERS/Modify_terrain_Functions/Terrain_functions'
 import { Apm } from 'core/08_GAME/Apm_clics_par_minute/Apm'
 import { Globals } from 'core/09_From_old_Worldedit_triggers/globals_variables_and_triggers'
+import { ServiceManager } from 'Services'
 import { createTimer } from 'Utils/mapUtils'
 import { getUdgEscapers, getUdgLevels } from '../../../../globals'
 import { IsInteger, PercentageStringOrX2Integer } from '../../01_libraries/Functions_on_numbers'
 import { EscaperEffectFunctions } from '../../04_STRUCTURES/Escaper/EscaperEffect_functions'
 import { execute, newCmd } from '../../04_STRUCTURES/Escaper/EscaperSavedCommands'
 import { Disco } from '../../04_STRUCTURES/Escaper/Escaper_disco'
-import { Multiboard } from '../../04_STRUCTURES/Lives_and_game_time/Multiboard'
 import { TerrainTypeFromString } from '../../07_TRIGGERS/Modify_terrain_Functions/Terrain_type_from_string'
 import { TerrainTypeNamesAndData } from '../../07_TRIGGERS/Modify_terrain_Functions/Terrain_type_names_and_data'
 import { AutoContinueAfterSliding } from '../../07_TRIGGERS/Slide_and_CheckTerrain_triggers/Auto_continue_after_sliding'
@@ -711,7 +711,7 @@ export const ExecuteCommandAll = (escaper: Escaper, cmd: string): boolean => {
     if (name === 'leaderboard' || name === 'ldb') {
         if (nbParam === 1 && IsBoolString(param1)) {
             escaper.hideLeaderboard = !S2B(param1)
-            Multiboard.setVisibility(escaper, S2B(param1))
+            ServiceManager.getService('Multiboard').setVisibility(escaper, S2B(param1))
         }
         return true
     }

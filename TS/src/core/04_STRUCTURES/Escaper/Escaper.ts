@@ -34,6 +34,7 @@ import { MakeGetUnitTeleportPeriod } from 'core/05_MAKE_STRUCTURES/Make_set_unit
 import { MakeSetUnitMonsterType } from 'core/05_MAKE_STRUCTURES/Make_set_unit_properties/MakeSetUnitMonsterType'
 import { MakeSetUnitTeleportPeriod } from 'core/05_MAKE_STRUCTURES/Make_set_unit_properties/MakeSetUnitTeleportPeriod'
 import { AfkMode } from 'core/08_GAME/Afk_mode/Afk_mode'
+import { ServiceManager } from 'Services'
 import { Timer } from 'w3ts'
 import { getUdgEscapers, getUdgLevels, getUdgTerrainTypes } from '../../../../globals'
 import { createTimer } from '../../../Utils/mapUtils'
@@ -62,7 +63,6 @@ import type { CasterType } from '../Caster/CasterType'
 import { Level } from '../Level/Level'
 import { IsLevelBeingMade } from '../Level/Level_functions'
 import { DEPART_PAR_DEFAUT } from '../Level/StartAndEnd'
-import { Multiboard } from '../Lives_and_game_time/Multiboard'
 import { METEOR_NORMAL, udg_meteors } from '../Meteor/Meteor'
 import type { MonsterType } from '../Monster/MonsterType'
 import type { TerrainType } from '../TerrainType/TerrainType'
@@ -467,7 +467,7 @@ export class Escaper {
             this.isHeroSelectedB = false
 
             if (!this.isEscaperSecondary()) {
-                Multiboard.increasePlayerScore(GetPlayerId(this.getPlayer()), 'deaths')
+                ServiceManager.getService('Multiboard').increasePlayerScore(GetPlayerId(this.getPlayer()), 'deaths')
             }
 
             return true

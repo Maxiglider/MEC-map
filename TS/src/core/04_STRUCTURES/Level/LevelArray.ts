@@ -1,13 +1,13 @@
 import { NB_LIVES_AT_BEGINNING } from 'core/01_libraries/Constants'
 import { Text } from 'core/01_libraries/Text'
 import { gg_trg_apparition_dialogue_et_fermeture_automatique } from 'core/08_GAME/Mode_coop/creation_dialogue'
+import { ServiceManager } from 'Services'
 import { getUdgEscapers } from '../../../../globals'
 import { MoveCamExceptForPlayer } from '../../01_libraries/Basic_functions'
 import { udg_colorCode } from '../../01_libraries/Init_colorCodes'
 import { BaseArray } from '../BaseArray'
 import type { CasterType } from '../Caster/CasterType'
 import type { Escaper } from '../Escaper/Escaper'
-import { Lives } from '../Lives_and_game_time/Lives_and_game_time'
 import type { MeteorArray } from '../Meteor/MeteorArray'
 import type { MonsterArray } from '../Monster/MonsterArray'
 import type { MonsterType } from '../Monster/MonsterType'
@@ -33,7 +33,7 @@ export class LevelArray extends BaseArray<Level> {
         this.data[0].setNbLivesEarned(NB_LIVES_AT_BEGINNING)
         this.data[0].activate(true)
 
-        Lives.initLives()
+        ServiceManager.getService('Lives').initLives()
 
         this.currentLevel = 0
         this.lastInstance = 0
@@ -127,7 +127,7 @@ export class LevelArray extends BaseArray<Level> {
             this.data[0].activate(false)
         }
         this.goToLevel(undefined, 0)
-        Lives.setNb(this.data[0].getNbLives())
+        ServiceManager.getService('Lives').setNb(this.data[0].getNbLives())
 
         const start = this.data[0].getStart()
         start && SetCameraPosition(start.getCenterX(), start.getCenterY())
