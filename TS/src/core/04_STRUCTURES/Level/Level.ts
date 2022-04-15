@@ -1,8 +1,8 @@
 import { Text } from 'core/01_libraries/Text'
 import { getUdgEscapers } from '../../../../globals'
-import { getUdgLives } from '../../08_GAME/Init_structures/Init_lives'
 import type { CasterType } from '../Caster/CasterType'
 import type { Escaper } from '../Escaper/Escaper'
+import { Lives } from '../Lives_and_game_time/Lives_and_game_time'
 import { MeteorArray } from '../Meteor/MeteorArray'
 import { MonsterArray } from '../Monster/MonsterArray'
 import type { MonsterType } from '../Monster/MonsterType'
@@ -64,7 +64,7 @@ export class Level {
             this.clearMobs.initializeClearMobs()
             this.portalMobs.initializePortalMobs()
             if (Level.earningLivesActivated && this.getId() > 0) {
-                getUdgLives().add(this.livesEarnedAtBeginning)
+                Lives.add(this.livesEarnedAtBeginning)
             }
         } else {
             this.monsters.removeMonstersUnits()

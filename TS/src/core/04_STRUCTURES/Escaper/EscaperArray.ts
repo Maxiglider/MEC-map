@@ -15,6 +15,18 @@ export class EscaperArray extends BaseArray<Escaper> {
         }
     }
 
+    countMain = () => {
+        let n = 0
+
+        for (const [_k, _v] of pairs(this.data)) {
+            if (!_v.isEscaperSecondary()) {
+                n++
+            }
+        }
+
+        return n
+    }
+
     newAt = (id: number) => {
         if (id < 0 || id >= NB_ESCAPERS) {
             return

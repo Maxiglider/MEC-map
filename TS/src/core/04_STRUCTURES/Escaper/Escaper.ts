@@ -62,6 +62,7 @@ import type { CasterType } from '../Caster/CasterType'
 import { Level } from '../Level/Level'
 import { IsLevelBeingMade } from '../Level/Level_functions'
 import { DEPART_PAR_DEFAUT } from '../Level/StartAndEnd'
+import { Multiboard } from '../Lives_and_game_time/Multiboard'
 import { METEOR_NORMAL, udg_meteors } from '../Meteor/Meteor'
 import type { MonsterType } from '../Monster/MonsterType'
 import type { TerrainType } from '../TerrainType/TerrainType'
@@ -461,6 +462,11 @@ export class Escaper {
             AfkMode.StopAfk(this.escaperId)
             MessageHeroDies.DisplayDeathMessagePlayer(this.p)
             this.isHeroSelectedB = false
+
+            if (!this.isEscaperSecondary()) {
+                Multiboard.increasePlayerScore(GetPlayerId(this.getPlayer()), 'deaths')
+            }
+
             return true
         }
         return false

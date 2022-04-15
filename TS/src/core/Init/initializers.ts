@@ -3,7 +3,6 @@ import { init_terrain_limit_variables } from '../01_libraries/Init_terrain_limit
 import { initViewAllHideAll } from '../03_view_all_hide_all/View_all_hide_all'
 import { initFirstPerson } from '../04_STRUCTURES/Escaper/Escaper_firstPerson'
 import { init_StartAndEnd } from '../04_STRUCTURES/Level/StartAndEnd'
-import { initGameTime } from '../04_STRUCTURES/Lives_and_game_time/Time_of_game_trigger'
 import { init_TrigMonstersClickableSetLife } from '../04_STRUCTURES/Monster/trig_Monsters_clickable_set_life'
 import { initTrig_Autorevive } from '../06_COMMANDS/COMMANDS_vJass/Autorevive'
 import { init_commandExecution } from '../06_COMMANDS/COMMANDS_vJass/Command_execution'
@@ -31,7 +30,6 @@ export const initializers = () => {
     init_Apm()
     init_Heroes()
     initSelectUnit()
-    initGameTime()
     initOldTriggers()
     init_commandExecution()
     init_TerrainTypeNamesAndData()

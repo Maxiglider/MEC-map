@@ -24,11 +24,11 @@ import { IsInteger, PercentageStringOrX2Integer } from '../../01_libraries/Funct
 import { EscaperEffectFunctions } from '../../04_STRUCTURES/Escaper/EscaperEffect_functions'
 import { execute, newCmd } from '../../04_STRUCTURES/Escaper/EscaperSavedCommands'
 import { Disco } from '../../04_STRUCTURES/Escaper/Escaper_disco'
+import { Multiboard } from '../../04_STRUCTURES/Lives_and_game_time/Multiboard'
 import { TerrainTypeFromString } from '../../07_TRIGGERS/Modify_terrain_Functions/Terrain_type_from_string'
 import { TerrainTypeNamesAndData } from '../../07_TRIGGERS/Modify_terrain_Functions/Terrain_type_names_and_data'
 import { AutoContinueAfterSliding } from '../../07_TRIGGERS/Slide_and_CheckTerrain_triggers/Auto_continue_after_sliding'
 import { TurnOnSlide } from '../../07_TRIGGERS/Slide_and_CheckTerrain_triggers/To_turn_on_slide'
-import { getUdgLives } from '../../08_GAME/Init_structures/Init_lives'
 import { CommandShortcuts } from '../../08_GAME/Shortcuts/Using_shortcut'
 import { CmdName, CmdParam, IsColorString, isPlayerId, NbParam, NoParam, resolvePlayerId } from './Command_functions'
 
@@ -711,7 +711,7 @@ export const ExecuteCommandAll = (escaper: Escaper, cmd: string): boolean => {
     if (name === 'leaderboard' || name === 'ldb') {
         if (nbParam === 1 && IsBoolString(param1)) {
             if (GetLocalPlayer() == escaper.getPlayer()) {
-                LeaderboardDisplay(getUdgLives().getLeaderboard(), S2B(param1))
+                Multiboard.setVisibility(S2B(param1))
             }
         }
         return true

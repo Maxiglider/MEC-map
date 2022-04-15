@@ -4,6 +4,8 @@ import { ColorString2Id } from 'core/01_libraries/Init_colorCodes'
 import { forRange } from 'Utils/mapUtils'
 import { getUdgEscapers } from '../../../../globals'
 
+export const rawPlayerNames: string[] = []
+
 const cachedPlayerNames: { [x: string]: number } = {}
 
 const removeHash = (name: string) => {
@@ -19,6 +21,7 @@ const removeHash = (name: string) => {
 export const initCachedPlayerNames = () => {
     forRange(24, i => {
         cachedPlayerNames[removeHash(stringReplaceAll(' ', '_', GetPlayerName(Player(i)).toLowerCase()))] = i
+        rawPlayerNames.push(GetPlayerName(Player(i)))
     })
 }
 

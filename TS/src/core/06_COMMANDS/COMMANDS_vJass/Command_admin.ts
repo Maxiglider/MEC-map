@@ -18,10 +18,10 @@ import {
     globals,
 } from '../../../../globals'
 import { IsPositiveInteger } from '../../01_libraries/Functions_on_numbers'
+import { Lives } from '../../04_STRUCTURES/Lives_and_game_time/Lives_and_game_time'
 import { SaveMapInCache } from '../../07_TRIGGERS/Save_map_in_gamecache/SAVE_MAP_in_cache'
 import { SaveLoadTerrainWithoutName } from '../../07_TRIGGERS/Triggers_to_modify_terrains/Save_load_terrain_without_name'
 import { SaveLoadTerrainWithName } from '../../07_TRIGGERS/Triggers_to_modify_terrains/Save_load_terrain_with_name'
-import { getUdgLives } from '../../08_GAME/Init_structures/Init_lives'
 import { CmdName, CmdParam, isPlayerId, NbParam, NoParam, resolvePlayerId } from './Command_functions'
 import { ActivateTeleport, DisableTeleport } from './Teleport'
 
@@ -179,7 +179,7 @@ export const ExecuteCommandMax = (escaper: Escaper, cmd: string): boolean => {
         if (!(nbParam === 1 && IsPositiveInteger(param1))) {
             return true
         }
-        getUdgLives().setNb(S2I(param1))
+        Lives.setNb(S2I(param1))
         return true
     }
 

@@ -1,6 +1,7 @@
 //évènement ajouté à la création de l'unité invisible
 
 import { DUMMY_POWER_CIRCLE, GM_KILLING_EFFECT } from 'core/01_libraries/Constants'
+import { Multiboard } from 'core/04_STRUCTURES/Lives_and_game_time/Multiboard'
 import { createEvent } from 'Utils/mapUtils'
 import { getUdgEscapers, getUdgMonsterTypes, udg_monsters } from '../../../../globals'
 
@@ -40,6 +41,11 @@ export const InitTrig_InvisUnit_is_getting_damage = () => {
                 if (RAbsBJ(hauteurHero - hauteurKillingUnit) < TAILLE_UNITE) {
                     if (GetUnitTypeId(killingUnit) === DUMMY_POWER_CIRCLE) {
                         getUdgEscapers().get(GetUnitUserData(killingUnit))?.coopReviveHero()
+
+                        if (!escaper.isEscaperSecondary()) {
+                            Multiboard.increasePlayerScore(GetPlayerId(escaper.getPlayer()), 'saves')
+                        }
+
                         return
                     } else {
                         const monster = udg_monsters[GetUnitUserData(killingUnit)]

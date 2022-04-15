@@ -4,10 +4,10 @@ import { gg_trg_apparition_dialogue_et_fermeture_automatique } from 'core/08_GAM
 import { getUdgEscapers } from '../../../../globals'
 import { MoveCamExceptForPlayer } from '../../01_libraries/Basic_functions'
 import { udg_colorCode } from '../../01_libraries/Init_colorCodes'
-import { getUdgLives } from '../../08_GAME/Init_structures/Init_lives'
 import { BaseArray } from '../BaseArray'
 import type { CasterType } from '../Caster/CasterType'
 import type { Escaper } from '../Escaper/Escaper'
+import { Lives } from '../Lives_and_game_time/Lives_and_game_time'
 import type { MeteorArray } from '../Meteor/MeteorArray'
 import type { MonsterArray } from '../Monster/MonsterArray'
 import type { MonsterType } from '../Monster/MonsterType'
@@ -32,6 +32,9 @@ export class LevelArray extends BaseArray<Level> {
         this.data[0].newStart(x1, y1, x2, y2)
         this.data[0].setNbLivesEarned(NB_LIVES_AT_BEGINNING)
         this.data[0].activate(true)
+
+        Lives.initLives()
+
         this.currentLevel = 0
         this.lastInstance = 0
     }
@@ -124,7 +127,7 @@ export class LevelArray extends BaseArray<Level> {
             this.data[0].activate(false)
         }
         this.goToLevel(undefined, 0)
-        getUdgLives().setNb(this.data[0].getNbLives())
+        Lives.setNb(this.data[0].getNbLives())
 
         const start = this.data[0].getStart()
         start && SetCameraPosition(start.getCenterX(), start.getCenterY())
