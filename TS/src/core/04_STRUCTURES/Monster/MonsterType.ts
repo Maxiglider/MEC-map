@@ -267,7 +267,7 @@ export class MonsterType {
 
     displayTotalForPlayer = (p: player) => {
         let space = '   '
-        let display = udg_colorCode[RED] + this.label + ' ' + this.theAlias + " : '"
+        let display = udg_colorCode[RED] + this.label + (this.theAlias ? ' ' + this.theAlias : '') + " : '"
         let scaleDisplay: string
         let heightDisplay: string
         if (this.scale === -1) {
