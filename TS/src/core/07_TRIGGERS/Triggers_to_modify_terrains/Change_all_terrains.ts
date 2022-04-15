@@ -1,5 +1,4 @@
 import { LARGEUR_CASE, NB_MAX_OF_TERRAINS } from 'core/01_libraries/Constants'
-import { Text } from 'core/01_libraries/Text'
 import { TerrainType } from 'core/04_STRUCTURES/TerrainType/TerrainType'
 import { Globals } from 'core/09_From_old_Worldedit_triggers/globals_variables_and_triggers'
 import { getUdgTerrainTypes, globals } from '../../../../globals'
@@ -20,7 +19,6 @@ const initChangeAllTerrains = () => {
     let nbNewTerrains: number
     let nbNewTerrainsAllowed: number
     let udg_changeAllTerrainsAtRevive = false
-    let terrainModifyWorking = false
     let getTerrainNbEach: number[] = []
 
     const ModifyTerrain = () => {
@@ -130,18 +128,12 @@ const initChangeAllTerrains = () => {
         nbNewTerrains = 0
         nbNewTerrainsAllowed = 0
         udg_changeAllTerrainsAtRevive = false
-        terrainModifyWorking = false
         getTerrainNbEach = []
 
         //modes : normal, known, notKnown
         let terrainTypes: TerrainType[] = []
         let n: number
         let i: number
-
-        if (terrainModifyWorking) {
-            Text.erA("can't execute two commands of this type simultaneously !")
-            return false
-        }
 
         n = 0
         const allTT = getUdgTerrainTypes().getAll()

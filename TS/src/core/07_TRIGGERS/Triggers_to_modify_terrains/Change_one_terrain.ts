@@ -8,7 +8,6 @@ import {globals} from "../../../../globals";
 const initChangeOneTerrain = () => {
     let oldTerrain: number
     let newTerrain: number
-    let terrainModifyWorking = false
 
     const ModifyTerrain = () => {
         let y = globals.MAP_MIN_Y
@@ -26,9 +25,6 @@ const initChangeOneTerrain = () => {
     }
 
     const ChangeOneTerrain = (terrainTypeLabel: string, newTerrainType: string) => {
-        if (terrainModifyWorking) {
-            throw "can't execute two commands of this type simultaneously !"
-        }
         const terrainType = getUdgTerrainTypes().get(terrainTypeLabel)
         if (terrainType === null) {
             throw "Wrong terrain label \"" + terrainTypeLabel + "\""

@@ -1,14 +1,10 @@
 import {LARGEUR_CASE} from 'core/01_libraries/Constants'
-import {Text} from 'core/01_libraries/Text'
 import {getUdgTerrainTypes} from '../../../../globals'
-import {errorHandler} from '../../../Utils/mapUtils'
 import {ChangeTerrainType} from '../Modify_terrain_Functions/Modify_terrain_functions'
-import {TerrainModifyingTrig} from './Terrain_modifying_trig'
 import {globals} from "../../../../globals";
 
 let terrainA: number
 let terrainB: number
-let terrainModifyWorking = false
 
 const ModifyTerrain = () => {
     let terrainType: number
@@ -35,10 +31,7 @@ export const ExchangeTerrains = (terrainTypeLabelA: string, terrainTypeLabelB: s
     if (terrainTypeA === terrainTypeB || !terrainTypeA || !terrainTypeB) {
         return false
     }
-    if (terrainModifyWorking) {
-        Text.erA("can't execute two commands of this type simultaneously !")
-        return false
-    }
+
     terrainA = terrainTypeA.getTerrainTypeId()
     terrainB = terrainTypeB.getTerrainTypeId()
 

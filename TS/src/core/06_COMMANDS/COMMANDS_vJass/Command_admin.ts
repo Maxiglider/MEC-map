@@ -20,8 +20,7 @@ import {
 } from '../../../../globals'
 import { IsPositiveInteger } from '../../01_libraries/Functions_on_numbers'
 import { SaveMapInCache } from '../../07_TRIGGERS/Save_map_in_gamecache/SAVE_MAP_in_cache'
-import { SaveLoadTerrainWithoutName } from '../../07_TRIGGERS/Triggers_to_modify_terrains/Save_load_terrain_without_name'
-import { SaveLoadTerrainWithName } from '../../07_TRIGGERS/Triggers_to_modify_terrains/Save_load_terrain_with_name'
+import { SaveLoadTerrain } from '../../07_TRIGGERS/Triggers_to_modify_terrains/Save_load_terrain'
 import { CmdName, CmdParam, isPlayerId, NbParam, NoParam, resolvePlayerId } from './Command_functions'
 import { ActivateTeleport, DisableTeleport } from './Teleport'
 
@@ -74,9 +73,9 @@ export const ExecuteCommandMax = (escaper: Escaper, cmd: string): boolean => {
     //-saveTerrain(st) [<slotName>]   --> spaces allowed for slotName
     if (name === 'saveTerrain' || name === 'st') {
         if (noParam) {
-            SaveLoadTerrainWithoutName.SaveTerrainWithoutName()
+            SaveLoadTerrain.SaveTerrain("")
         } else {
-            SaveLoadTerrainWithName.SaveTerrainWithName(CmdParam(cmd, 0))
+            SaveLoadTerrain.SaveTerrain(CmdParam(cmd, 0))
         }
         return true
     }
@@ -84,9 +83,9 @@ export const ExecuteCommandMax = (escaper: Escaper, cmd: string): boolean => {
     //-loadTerrain(lt) [<slotName>]
     if (name === 'loadTerrain' || name === 'lt') {
         if (noParam) {
-            SaveLoadTerrainWithoutName.LoadTerrainWithoutName()
+            SaveLoadTerrain.LoadTerrain("")
         } else {
-            if (!SaveLoadTerrainWithName.LoadTerrainWithName(CmdParam(cmd, 0))) {
+            if (!SaveLoadTerrain.LoadTerrain(CmdParam(cmd, 0))) {
                 Text.erP(escaper.getPlayer(), "this terrain save doesn't exist")
             }
         }
@@ -98,7 +97,7 @@ export const ExecuteCommandMax = (escaper: Escaper, cmd: string): boolean => {
         if (noParam) {
             return true
         }
-        if (SaveLoadTerrainWithName.DeleteTerrainSaveWithName(CmdParam(cmd, 0))) {
+        if (SaveLoadTerrain.DeleteTerrainSave(CmdParam(cmd, 0))) {
             Text.mkP(escaper.getPlayer(), 'terrain save deleted')
         } else {
             Text.erP(escaper.getPlayer(), "this terrain save doesn't exist")

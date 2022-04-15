@@ -1,17 +1,13 @@
 import {LARGEUR_CASE} from 'core/01_libraries/Constants'
-import {Text} from 'core/01_libraries/Text'
 import {TerrainType} from 'core/04_STRUCTURES/TerrainType/TerrainType'
 import {getUdgTerrainTypes} from '../../../../globals'
-import {errorHandler} from '../../../Utils/mapUtils'
 import {ChangeTerrainType} from '../Modify_terrain_Functions/Modify_terrain_functions'
-import {TerrainModifyingTrig} from './Terrain_modifying_trig'
 import {globals} from "../../../../globals";
 
 const initRandomizeTerrains = () => {
     let oldTerrainTypes: number[] = []
     let newTerrainTypes: number[] = []
     let lastTerrainArrayId: number
-    let terrainModifyWorking = false
 
     const ModifyTerrain = () => {
         let y = globals.MAP_MIN_Y
@@ -43,11 +39,6 @@ const initRandomizeTerrains = () => {
         let n: number
         let isTaken: boolean[] = []
         let terrainTypes: TerrainType[] = []
-
-        if (terrainModifyWorking) {
-            Text.erA("can't execute two commands of this type simultaneously !")
-            return
-        }
 
         n = 0
         i = 0
