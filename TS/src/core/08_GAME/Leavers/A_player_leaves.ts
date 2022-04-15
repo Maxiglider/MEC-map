@@ -1,13 +1,12 @@
-import { NB_PLAYERS_MAX } from 'core/01_libraries/Constants'
+import { NB_ESCAPERS, NB_PLAYERS_MAX } from 'core/01_libraries/Constants'
 import { udg_colorCode } from 'core/01_libraries/Init_colorCodes'
 import { createEvent, forRange } from 'Utils/mapUtils'
-import { AfkMode } from '../Afk_mode/Afk_mode'
 import { getUdgEscapers } from '../../../../globals'
-
+import { AfkMode } from '../Afk_mode/Afk_mode'
 
 export const InitTrig_A_player_leaves = () => {
     createEvent({
-        events: [t => forRange(12, i => TriggerRegisterPlayerEventLeave(t, Player(i)))],
+        events: [t => forRange(NB_ESCAPERS, i => TriggerRegisterPlayerEventLeave(t, Player(i)))],
         actions: [
             () => {
                 let n = GetPlayerId(GetTriggerPlayer())

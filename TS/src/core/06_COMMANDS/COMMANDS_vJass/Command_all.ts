@@ -723,5 +723,23 @@ export const ExecuteCommandAll = (escaper: Escaper, cmd: string): boolean => {
         return true
     }
 
+    //-lockCam(lc)
+    if (name === 'lockCam' || name === 'lc') {
+        const target = noParam ? escaper : nbParam === 1 ? getUdgEscapers().get(resolvePlayerId(param1)) : null
+
+        escaper.setLockCamTarget(target)
+        escaper.resetCamera()
+
+        return true
+    }
+
+    //-unlockCam(uc)
+    if ((name === 'unlockCam' || name === 'ulc') && noParam) {
+        escaper.setLockCamTarget(null)
+        escaper.resetCamera()
+
+        return true
+    }
+
     return false
 }

@@ -141,6 +141,7 @@ export class Escaper {
     private coopInvul: boolean
 
     private firstPersonHandle: EscaperFirstPerson = new EscaperFirstPerson(this)
+    private lockCamTarget: Escaper | null = null
 
     constructor(escaperId: number) {
         this.playerId = escaperId >= NB_PLAYERS_MAX ? escaperId - 12 : escaperId
@@ -971,6 +972,14 @@ export class Escaper {
     resetCamera = () => {
         ResetToGameCameraForPlayer(this.p, 0)
         SetCameraFieldForPlayer(this.p, CAMERA_FIELD_TARGET_DISTANCE, this.cameraField, 0)
+
+        if (this.lockCamTarget) {
+            const hero = this.lockCamTarget.getHero()
+
+            if (hero) {
+                SetCameraTargetControllerNoZForPlayer(this.getPlayer(), hero, 0, 0, false)
+            }
+        }
     }
 
     kick(kicked: Escaper) {
@@ -1418,4 +1427,8 @@ export class Escaper {
     }
 
     getFirstPersonHandle = () => this.firstPersonHandle
+
+    setLockCamTarget = (lockCamTarget: Escaper | null) => {
+        this.lockCamTarget = lockCamTarget
+    }
 }
