@@ -253,4 +253,9 @@ export abstract class Monster {
         }
         return str
     }
+
+    toJson = () => ({
+        monsterTypeLabel: this.mt?.label,
+        id: this.id
+    })
 }

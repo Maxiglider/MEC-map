@@ -68,4 +68,9 @@ export class Meteor {
     toString = (): string => {
         return I2S(R2I(this.x)) + CACHE_SEPARATEUR_PARAM + I2S(R2I(this.y))
     }
+
+    toJson = () => ({
+        x: R2I(this.x),
+        y: R2I(this.y)
+    })
 }

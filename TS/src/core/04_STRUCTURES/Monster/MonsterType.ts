@@ -297,4 +297,17 @@ export class MonsterType {
         str = str + I2S(this.maxLife / 10000) + CACHE_SEPARATEUR_PARAM + R2S(this.height)
         return str
     }
+
+    toJson = () => ({
+        label: this.label,
+        alias: this.theAlias,
+        unitTypeId: Ascii2String(this.unitTypeId),
+        scale: this.scale,
+        immolationRadius: this.getImmolationRadiusStr(),
+        speed: R2I(this.speed),
+        isClickable: this.isClickableB,
+        killingEffect: this.killingEffectStr,
+        nbMeteorsToKill: this.maxLife / 10000,
+        height: R2I(this.height)
+    })
 }

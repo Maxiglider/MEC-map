@@ -39,4 +39,11 @@ export class MonsterNoMove extends Monster {
         str = str + CACHE_SEPARATEUR_PARAM + I2S(R2I(this.angle))
         return str
     }
+
+    toJson = () => ({
+        ...super.toJson(),
+        x: R2I(this.x),
+        y: R2I(this.y),
+        angle: R2I(this.angle)
+    })
 }

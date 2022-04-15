@@ -85,4 +85,12 @@ export class MonsterSimplePatrol extends Monster {
         str += CACHE_SEPARATEUR_PARAM + I2S(R2I(this.x2)) + CACHE_SEPARATEUR_PARAM + I2S(R2I(this.y2))
         return str
     }
+
+    toJson = () => ({
+        ...super.toJson(),
+        x1: R2I(this.x1),
+        y1: R2I(this.y1),
+        x2: R2I(this.x2),
+        y2: R2I(this.y2),
+    })
 }

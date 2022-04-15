@@ -37,26 +37,17 @@ export class TerrainTypeWalk extends TerrainType {
     }
 
     toString = (): string => {
-        let str =
-            this.label +
-            CACHE_SEPARATEUR_PARAM +
-            this.theAlias +
-            CACHE_SEPARATEUR_PARAM +
-            I2S(this.orderId) +
-            CACHE_SEPARATEUR_PARAM
-        str =
-            str +
-            this.kind +
-            CACHE_SEPARATEUR_PARAM +
-            Ascii2String(this.terrainTypeId) +
-            CACHE_SEPARATEUR_PARAM +
-            I2S(this.cliffClassId) +
-            CACHE_SEPARATEUR_PARAM
+        let str = super.toString()
 
         str = str + I2S(R2I(this.getWalkSpeed()))
 
         return str
     }
+
+    toJson = () => ({
+        ...super.toJson(),
+        walkSpeed: R2I(this.getWalkSpeed())
+    })
 
     destroy = () => {
 

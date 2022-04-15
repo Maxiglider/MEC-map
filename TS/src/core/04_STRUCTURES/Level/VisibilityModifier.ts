@@ -47,4 +47,11 @@ export class VisibilityModifier {
         let y2 = I2S(R2I(this.y2))
         return x1 + CACHE_SEPARATEUR_PARAM + y1 + CACHE_SEPARATEUR_PARAM + x2 + CACHE_SEPARATEUR_PARAM + y2
     }
+
+    toJson = () => ({
+        x1: R2I(this.x1),
+        y1: R2I(this.y1),
+        x2: R2I(this.x2),
+        y2: R2I(this.y2),
+    })
 }

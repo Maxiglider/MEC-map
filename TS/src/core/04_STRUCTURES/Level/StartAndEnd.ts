@@ -34,6 +34,13 @@ abstract class RectInterface {
 
         return minX + CACHE_SEPARATEUR_PARAM + minY + CACHE_SEPARATEUR_PARAM + maxX + CACHE_SEPARATEUR_PARAM + maxY
     }
+
+    toJson = () => ({
+        minX: this.minX,
+        minY: this.minY,
+        maxX: this.maxX,
+        maxY: this.maxY,
+    })
 }
 
 export class Start extends RectInterface {

@@ -94,21 +94,7 @@ export class TerrainTypeDeath extends TerrainType {
     }
 
     toString = (): string => {
-        let str =
-            this.label +
-            CACHE_SEPARATEUR_PARAM +
-            this.theAlias +
-            CACHE_SEPARATEUR_PARAM +
-            I2S(this.orderId) +
-            CACHE_SEPARATEUR_PARAM
-        str =
-            str +
-            this.kind +
-            CACHE_SEPARATEUR_PARAM +
-            Ascii2String(this.terrainTypeId) +
-            CACHE_SEPARATEUR_PARAM +
-            I2S(this.cliffClassId) +
-            CACHE_SEPARATEUR_PARAM
+        let str = super.toString()
 
         str = str + this.getKillingEffectStr() + CACHE_SEPARATEUR_PARAM
         str = str + R2S(this.getTimeToKill()) + CACHE_SEPARATEUR_PARAM
@@ -116,6 +102,13 @@ export class TerrainTypeDeath extends TerrainType {
 
         return str
     }
+
+    toJson = () => ({
+        ...super.toJson(),
+        killingEffet: this.getKillingEffectStr(),
+        timeToKill: this.getTimeToKill(),
+        toleranceDist: this.getToleranceDist()
+    })
 
     destroy = () => {
         this.killingTimers.destroy()

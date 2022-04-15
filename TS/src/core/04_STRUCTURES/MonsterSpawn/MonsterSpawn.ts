@@ -301,4 +301,15 @@ export class MonsterSpawn {
             I2S(R2I(this.maxY))
         return str
     }
+
+    toJson = () => ({
+        label: this.label,
+        monsterTypeLabel: this.mt.label,
+        sens: this.sens,
+        frequence: this.frequence,
+        minX: R2I(this.minX),
+        minY: R2I(this.minY),
+        maxX: R2I(this.maxX),
+        maxY: R2I(this.maxY),
+    })
 }

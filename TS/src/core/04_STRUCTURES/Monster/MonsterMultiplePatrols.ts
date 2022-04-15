@@ -242,4 +242,11 @@ export class MonsterMultiplePatrols extends Monster {
 
         return str
     }
+
+    toJson = () => ({
+        ...super.toJson(),
+        sens: this.sens > 0 ? 'string' : 'normal',
+        xArr: this.x,
+        yArr: this.y
+    })
 }

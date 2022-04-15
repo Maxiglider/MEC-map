@@ -200,4 +200,15 @@ export class CasterType {
             this.animation
         return str
     }
+
+    toJson = () => ({
+        label: this.label,
+        alias: this.theAlias,
+        casterMonsterTypeLabel: this.casterMonsterType.label,
+        projectileMonsterTypeLabel: this.projectileMonsterType.label,
+        range: this.range,
+        projectileSpeed: this.projectileSpeed,
+        loadTime: this.loadTime,
+        animation: this.animation
+    })
 }
