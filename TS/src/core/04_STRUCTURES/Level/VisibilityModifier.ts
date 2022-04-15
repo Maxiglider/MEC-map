@@ -10,7 +10,6 @@ export class VisibilityModifier {
     private fm: fogmodifier
     level?: Level
 
-    // TODO; This is is never set but is read, error?
     id?: number
 
     constructor(x1: number, y1: number, x2: number, y2: number) {

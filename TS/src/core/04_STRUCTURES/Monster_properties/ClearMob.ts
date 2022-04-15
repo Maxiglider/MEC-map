@@ -58,7 +58,6 @@ export class ClearMob {
     enabled: boolean
     private triggerMobPermanentEffect?: effect
 
-    // TODO; This is is never set but is read, error?
     id: number = -1
 
     constructor(triggerMob: Monster, disableDuration: number) {

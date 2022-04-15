@@ -12,6 +12,8 @@ export abstract class BaseArray<T extends BaseModel> {
         } else {
             this.data[++this.lastInstanceId] = v
         }
+
+        return this.lastInstanceId
     }
 
     count = () => {

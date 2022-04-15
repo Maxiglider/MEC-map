@@ -18,7 +18,8 @@ export class PortalMobArray extends BaseArray<PortalMob> {
         portalMob.initialize()
         portalMob.level = this.level
 
-        this._new(portalMob)
+        const id = this._new(portalMob)
+        portalMob.id = id
 
         return portalMob
     }

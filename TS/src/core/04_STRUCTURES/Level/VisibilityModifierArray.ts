@@ -13,9 +13,11 @@ export class VisibilityModifierArray extends BaseArray<VisibilityModifier> {
     new = (x1: number, y1: number, x2: number, y2: number) => {
         const visibilityModifier = new VisibilityModifier(x1, y1, x2, y2)
 
-        this._new(visibilityModifier)
+        const id = this._new(visibilityModifier)
 
         visibilityModifier.level = this.level
+        visibilityModifier.id = id
+
         return visibilityModifier
     }
 

@@ -18,7 +18,8 @@ export class ClearMobArray extends BaseArray<ClearMob> {
         initialize && clearMob.initialize()
         clearMob.level = this.level
 
-        this._new(clearMob)
+        const id = this._new(clearMob)
+        clearMob.id = id
 
         return clearMob
     }
