@@ -1,3 +1,4 @@
+import { ServiceManager } from 'Services'
 import { createEvent, createTimer } from 'Utils/mapUtils'
 import { globals } from '../../../../globals'
 
@@ -5,8 +6,6 @@ let dialChoixModeCoop: dialog
 let dialBoutonAppuye: boolean
 const DIAL_TIME_TO_ANSWER = 10
 let dialTimerTempLimite: timer
-
-globals.coopModeActive = true
 
 export const InitTrig_creation_dialogue = () => {
     createTimer(0, false, () => {
@@ -21,6 +20,7 @@ export const InitTrig_creation_dialogue = () => {
             actions: [
                 () => {
                     globals.coopModeActive = GetClickedButton() === btnChoixCoop
+                    ServiceManager.getService('Multiboard').setActive(globals.coopModeActive)
                     dialBoutonAppuye = true
                     if (globals.coopModeActive) {
                         DisplayTextToForce(GetPlayersAll(), 'Coop mode chosen by first player')

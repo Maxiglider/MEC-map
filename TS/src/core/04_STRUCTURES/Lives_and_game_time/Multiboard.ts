@@ -3,6 +3,7 @@ import { udg_colorCode } from 'core/01_libraries/Init_colorCodes'
 import { ServiceManager } from 'Services'
 import { ArrayHandler } from 'Utils/ArrayHandler'
 import { createTimer, forRange } from 'Utils/mapUtils'
+import { Timer } from 'w3ts'
 import { getUdgEscapers } from '../../../../globals'
 import { rawPlayerNames } from '../../06_COMMANDS/COMMANDS_vJass/Command_functions'
 import { Escaper } from '../Escaper/Escaper'
@@ -36,6 +37,8 @@ export const initMultiboard = () => {
     } = {}
 
     let amountOfEscapers = 0
+
+    let gameTimeUpdater: Timer | null = null
 
     forRange(NB_ESCAPERS, i => {
         playerScores[i] = { score: 0, saves: 0, deaths: 0 }
@@ -78,8 +81,12 @@ export const initMultiboard = () => {
         updateMultiboard()
     }
 
-    const reinitMultiboard = () => {
+    const destroyMultiboard = () => {
         board && DestroyMultiboard(board)
+    }
+
+    const reinitMultiboard = () => {
+        destroyMultiboard()
         initMultiboard()
     }
 
@@ -164,12 +171,16 @@ export const initMultiboard = () => {
         updatePlayers()
     }
 
-    // Multiboard won't show if its loaded too early
-    createTimer(2, false, () => {
-        initMultiboard()
-        amountOfEscapers = getUdgEscapers().countMain()
-        createTimer(1, true, () => updateGametime(true))
-    })
+    const setActive = (active: boolean) => {
+        if (active) {
+            initMultiboard()
+            amountOfEscapers = getUdgEscapers().countMain()
+            gameTimeUpdater = createTimer(1, true, () => updateGametime(true))
+        } else {
+            destroyMultiboard()
+            gameTimeUpdater?.destroy()
+        }
+    }
 
-    return { setVisibility, increasePlayerScore, updateLives }
+    return { setVisibility, increasePlayerScore, updateLives, setActive }
 }

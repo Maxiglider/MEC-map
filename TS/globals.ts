@@ -26,6 +26,7 @@ export const globals: {
     MAP_MAX_X: 0,
     MAP_MIN_Y: 0,
     MAP_MAX_Y: 0,
+    coopModeActive: true,
 }
 
 //SETTERS - GETTERS
