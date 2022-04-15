@@ -122,7 +122,7 @@ export class Escaper {
 
     private slideLastAngleOrder: number
     private isHeroSelectedB: boolean
-    private selectedPlayerId: number = -1
+    private selectedEscaperId: number = -1
 
     private instantTurnAbsolute: boolean
 
@@ -614,11 +614,11 @@ export class Escaper {
         }
     }
 
-    setSelectedPlayerId = (playerId: number) => {
-        this.selectedPlayerId = playerId
+    setSelectedEscaperId = (escaperId: number) => {
+        this.selectedEscaperId = escaperId
     }
 
-    getSelectedPlayerId = () => this.selectedPlayerId
+    getSelectedEscaperId = () => this.selectedEscaperId
 
     //effects methods
     newEffect(efStr: string, bodyPart: string) {
