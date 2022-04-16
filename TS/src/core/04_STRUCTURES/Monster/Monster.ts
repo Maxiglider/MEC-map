@@ -2,7 +2,6 @@ import { udg_monsters } from '../../../../globals'
 import { MOBS_VARIOUS_COLORS } from '../../01_libraries/Constants'
 import { ColorString2Id } from '../../01_libraries/Init_colorCodes'
 import { IsColorString } from '../../06_COMMANDS/COMMANDS_vJass/Command_functions'
-import { CACHE_SEPARATEUR_PARAM } from '../../07_TRIGGERS/Save_map_in_gamecache/struct_StringArrayForCache'
 import { Level } from '../Level/Level'
 import { ClearMob } from '../Monster_properties/ClearMob'
 import { PortalMob } from '../Monster_properties/PortalMob'
@@ -258,19 +257,6 @@ export abstract class Monster {
         delete udg_monsters[this.id]
 
         this.level?.monsters.removeMonster(this.id)
-    }
-
-    toString() {
-        let str: string = ''
-        if (this.mt) {
-            if (this.mt.theAlias != null && this.mt.theAlias != '') {
-                str = this.mt.theAlias + CACHE_SEPARATEUR_PARAM
-            } else {
-                str = this.mt.label + CACHE_SEPARATEUR_PARAM
-            }
-            str = str + I2S(this.id)
-        }
-        return str
     }
 
     toJson = () => ({

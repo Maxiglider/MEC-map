@@ -1,6 +1,5 @@
 import { NB_ESCAPERS, TEAL, TERRAIN_DATA_DISPLAY_TIME } from 'core/01_libraries/Constants'
 import { Text } from 'core/01_libraries/Text'
-import { CACHE_SEPARATEUR_PARAM } from 'core/07_TRIGGERS/Save_map_in_gamecache/struct_StringArrayForCache'
 import { getUdgEscapers, getUdgLevels } from '../../../../globals'
 import { udg_colorCode } from '../../01_libraries/Init_colorCodes'
 import { Level } from '../Level/Level'
@@ -175,26 +174,6 @@ export class CasterType {
             space +
             this.animation
         Text.P_timed(p, TERRAIN_DATA_DISPLAY_TIME, display)
-    }
-
-    toString = (): string => {
-        let str = this.label + CACHE_SEPARATEUR_PARAM + this.theAlias + CACHE_SEPARATEUR_PARAM
-        str =
-            str +
-            this.casterMonsterType.label +
-            CACHE_SEPARATEUR_PARAM +
-            this.projectileMonsterType.label +
-            CACHE_SEPARATEUR_PARAM
-        str =
-            str +
-            R2S(this.range) +
-            CACHE_SEPARATEUR_PARAM +
-            R2S(this.projectileSpeed) +
-            CACHE_SEPARATEUR_PARAM +
-            R2S(this.loadTime) +
-            CACHE_SEPARATEUR_PARAM +
-            this.animation
-        return str
     }
 
     toJson = () => ({

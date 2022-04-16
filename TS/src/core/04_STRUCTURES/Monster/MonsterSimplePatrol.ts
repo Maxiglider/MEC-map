@@ -1,7 +1,6 @@
 //todomax execute this at start of the game
 import { createTimer } from 'Utils/mapUtils'
 import { udg_monsters } from '../../../../globals'
-import { CACHE_SEPARATEUR_PARAM } from '../../07_TRIGGERS/Save_map_in_gamecache/struct_StringArrayForCache'
 import { Monster } from './Monster'
 import { MonsterType } from './MonsterType'
 import { NewPatrolMonster } from './Monster_functions'
@@ -77,13 +76,6 @@ export class MonsterSimplePatrol extends Monster {
         super.createUnit(() => (this.mt ? NewPatrolMonster(this.mt, this.x1, this.y1, this.x2, this.y2) : undefined))
 
         this.u && GroupAddUnit(simplePatrolMobs, this.u)
-    }
-
-    toString = (): string => {
-        let str = super.toString()
-        str += CACHE_SEPARATEUR_PARAM + I2S(R2I(this.x1)) + CACHE_SEPARATEUR_PARAM + I2S(R2I(this.y1))
-        str += CACHE_SEPARATEUR_PARAM + I2S(R2I(this.x2)) + CACHE_SEPARATEUR_PARAM + I2S(R2I(this.y2))
-        return str
     }
 
     toJson = () => ({

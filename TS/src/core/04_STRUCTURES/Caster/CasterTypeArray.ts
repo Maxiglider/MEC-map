@@ -1,5 +1,4 @@
 import { Text } from 'core/01_libraries/Text'
-import { StringArrayForCache } from 'core/07_TRIGGERS/Save_map_in_gamecache/struct_StringArrayForCache'
 import { MonsterType } from '../Monster/MonsterType'
 import { CasterType } from './CasterType'
 
@@ -91,15 +90,7 @@ export class CasterTypeArray {
         }
     }
 
-    saveInCache = () => {
-        let i: number
-        StringArrayForCache.stringArrayForCache = new StringArrayForCache('casterTypes', 'casterTypes', true)
-        i = 0
-        while (true) {
-            if (i >= this.numberOfCasterTypes) break
-            StringArrayForCache.stringArrayForCache.push(this.casterTypes[i].toString())
-            i = i + 1
-        }
-        StringArrayForCache.stringArrayForCache.writeInCache()
-    }
+    toJson = () => (
+        this.casterTypes.map(casterType => casterType.toJson())
+    )
 }

@@ -107,4 +107,9 @@ export class PortalMob {
 
         // TODO; SECONDARYHERO?
     }
+
+    //todomax implement toJson
+    toJson = () => ({
+
+    })
 }

@@ -1,4 +1,3 @@
-import { CACHE_SEPARATEUR_PARAM } from 'core/07_TRIGGERS/Save_map_in_gamecache/struct_StringArrayForCache'
 import { udg_monsters } from '../../../../globals'
 import { Monster } from './Monster'
 import { MonsterType } from './MonsterType'
@@ -31,13 +30,6 @@ export class MonsterNoMove extends Monster {
 
     createUnit = () => {
         super.createUnit(() => (this.mt ? NewImmobileMonster(this.mt, this.x, this.y, this.angle) : undefined))
-    }
-
-    toString = () => {
-        let str = super.toString()
-        str += CACHE_SEPARATEUR_PARAM + I2S(R2I(this.x)) + CACHE_SEPARATEUR_PARAM + I2S(R2I(this.y))
-        str = str + CACHE_SEPARATEUR_PARAM + I2S(R2I(this.angle))
-        return str
     }
 
     toJson = () => ({

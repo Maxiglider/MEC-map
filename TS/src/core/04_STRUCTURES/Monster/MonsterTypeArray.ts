@@ -1,5 +1,4 @@
 import { Text } from 'core/01_libraries/Text'
-import { StringArrayForCache } from 'core/07_TRIGGERS/Save_map_in_gamecache/struct_StringArrayForCache'
 import { udg_monsters } from '../../../../globals'
 import { BaseArray } from '../BaseArray'
 import { MonsterType } from './MonsterType'
@@ -63,15 +62,5 @@ export class MonsterTypeArray extends BaseArray<MonsterType> {
         const monster = udg_monsters[GetUnitUserData(monsterUnit)]
         const mt = monster.getMonsterType()
         return mt?.getKillingEffectStr()
-    }
-
-    saveInCache = () => {
-        StringArrayForCache.stringArrayForCache = new StringArrayForCache('monsterTypes', 'monsterTypes', true)
-
-        for (const [_, monsterType] of pairs(this.data)) {
-            StringArrayForCache.stringArrayForCache.push(monsterType.toString())
-        }
-
-        StringArrayForCache.stringArrayForCache.writeInCache()
     }
 }

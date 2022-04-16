@@ -1,4 +1,4 @@
-type BaseModel = { getId?: () => number; destroy: () => void }
+type BaseModel = { getId?: () => number; destroy: () => void, toJson: () => {} }
 
 export abstract class BaseArray<T extends BaseModel> {
     protected lastInstanceId = -1
@@ -35,6 +35,10 @@ export abstract class BaseArray<T extends BaseModel> {
     }
 
     getAll = () => this.data
+
+    toJson = () => (
+        Object.values(this.data).map(item => item.toJson())
+    )
 
     destroy = () => {
         for (const [id, v] of pairs(this.data)) {

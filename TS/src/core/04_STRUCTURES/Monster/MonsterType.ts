@@ -10,7 +10,6 @@ import {
     TERRAIN_DATA_DISPLAY_TIME,
 } from '../../01_libraries/Constants'
 import { udg_colorCode } from '../../01_libraries/Init_colorCodes'
-import { CACHE_SEPARATEUR_PARAM } from '../../07_TRIGGERS/Save_map_in_gamecache/struct_StringArrayForCache'
 import { Level } from '../Level/Level'
 import { IMMOLATION_SKILLS } from './Immolation_skills'
 
@@ -287,15 +286,6 @@ export class MonsterType {
             display = display + space + 'clickable' + space + I2S(this.maxLife / 10000)
         }
         Text.P_timed(p, TERRAIN_DATA_DISPLAY_TIME, display)
-    }
-
-    toString = (): string => {
-        let str = this.label + CACHE_SEPARATEUR_PARAM + this.theAlias + CACHE_SEPARATEUR_PARAM
-        str = str + Ascii2String(this.unitTypeId) + CACHE_SEPARATEUR_PARAM + R2S(this.scale) + CACHE_SEPARATEUR_PARAM
-        str = str + this.getImmolationRadiusStr() + CACHE_SEPARATEUR_PARAM + R2S(this.speed) + CACHE_SEPARATEUR_PARAM
-        str = str + B2S(this.isClickableB) + CACHE_SEPARATEUR_PARAM + this.killingEffectStr + CACHE_SEPARATEUR_PARAM
-        str = str + I2S(this.maxLife / 10000) + CACHE_SEPARATEUR_PARAM + R2S(this.height)
-        return str
     }
 
     toJson = () => ({

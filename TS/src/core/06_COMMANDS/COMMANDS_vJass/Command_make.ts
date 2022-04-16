@@ -33,10 +33,6 @@ import { MONSTER_TELEPORT_PERIOD_MAX, MONSTER_TELEPORT_PERIOD_MIN } from '../../
 import { CLEAR_MOB_MAX_DURATION, FRONT_MONTANT_DURATION } from '../../04_STRUCTURES/Monster_properties/ClearMob'
 import { MakeMonsterSimplePatrol } from '../../05_MAKE_STRUCTURES/Make_create_monsters/MakeMonsterSimplePatrol'
 import { TerrainTypeFromString } from '../../07_TRIGGERS/Modify_terrain_Functions/Terrain_type_from_string'
-import {
-    CACHE_SEPARATEUR_ITEM,
-    CACHE_SEPARATEUR_PARAM,
-} from '../../07_TRIGGERS/Save_map_in_gamecache/struct_StringArrayForCache'
 import { ChangeAllTerrains } from '../../07_TRIGGERS/Triggers_to_modify_terrains/Change_all_terrains'
 import { ChangeOneTerrain } from '../../07_TRIGGERS/Triggers_to_modify_terrains/Change_one_terrain'
 import { CmdName, CmdParam, NbParam, NoParam } from './Command_functions'
@@ -78,17 +74,6 @@ export const ExecuteCommandMake = (escaper: Escaper, cmd: string): boolean => {
         } else {
             speed = HERO_WALK_SPEED
         }
-        if (
-            StringContainsChar(param1, CACHE_SEPARATEUR_ITEM) ||
-            StringContainsChar(param1, CACHE_SEPARATEUR_PARAM) ||
-            StringContainsChar(param1, '"')
-        ) {
-            Text.erP(
-                escaper.getPlayer(),
-                'characters ", ' + CACHE_SEPARATEUR_ITEM + ' and ' + CACHE_SEPARATEUR_PARAM + ' not allowed'
-            )
-            return true
-        }
 
         getUdgTerrainTypes().newWalk(param1, TerrainTypeFromString.TerrainTypeString2TerrainTypeId(param2), speed)
 
@@ -104,17 +89,6 @@ export const ExecuteCommandMake = (escaper: Escaper, cmd: string): boolean => {
         }
         if (nbParam >= 3) {
             str = param3
-            if (
-                StringContainsChar(param3, CACHE_SEPARATEUR_ITEM) ||
-                StringContainsChar(param3, CACHE_SEPARATEUR_PARAM) ||
-                StringContainsChar(param3, '"')
-            ) {
-                Text.erP(
-                    escaper.getPlayer(),
-                    'characters ", ' + CACHE_SEPARATEUR_ITEM + ' and ' + CACHE_SEPARATEUR_PARAM + ' not allowed'
-                )
-                return true
-            }
         } else {
             str = ''
         }
@@ -125,17 +99,6 @@ export const ExecuteCommandMake = (escaper: Escaper, cmd: string): boolean => {
             x = S2R(param4)
         } else {
             x = TERRAIN_DEATH_TIME_TO_KILL
-        }
-        if (
-            StringContainsChar(param1, CACHE_SEPARATEUR_ITEM) ||
-            StringContainsChar(param1, CACHE_SEPARATEUR_PARAM) ||
-            StringContainsChar(param1, '"')
-        ) {
-            Text.erP(
-                escaper.getPlayer(),
-                'characters ", ' + CACHE_SEPARATEUR_ITEM + ' and ' + CACHE_SEPARATEUR_PARAM + ' not allowed'
-            )
-            return true
         }
 
         getUdgTerrainTypes().newDeath(param1, TerrainTypeFromString.TerrainTypeString2TerrainTypeId(param2), str, x, 0)
@@ -168,17 +131,6 @@ export const ExecuteCommandMake = (escaper: Escaper, cmd: string): boolean => {
         } else {
             b = true
         }
-        if (
-            StringContainsChar(param1, CACHE_SEPARATEUR_ITEM) ||
-            StringContainsChar(param1, CACHE_SEPARATEUR_PARAM) ||
-            StringContainsChar(param1, '"')
-        ) {
-            Text.erP(
-                escaper.getPlayer(),
-                'characters ", ' + CACHE_SEPARATEUR_ITEM + ' and ' + CACHE_SEPARATEUR_PARAM + ' not allowed'
-            )
-            return true
-        }
 
         getUdgTerrainTypes().newSlide(param1, TerrainTypeFromString.TerrainTypeString2TerrainTypeId(param2), speed, b)
 
@@ -197,17 +149,6 @@ export const ExecuteCommandMake = (escaper: Escaper, cmd: string): boolean => {
             b = !getUdgTerrainTypes().isLabelAlreadyUsed(param2)
         }
         if (b) {
-            if (
-                StringContainsChar(param2, CACHE_SEPARATEUR_ITEM) ||
-                StringContainsChar(param2, CACHE_SEPARATEUR_PARAM) ||
-                StringContainsChar(param2, '"')
-            ) {
-                Text.erP(
-                    escaper.getPlayer(),
-                    'characters ", ' + CACHE_SEPARATEUR_ITEM + ' and ' + CACHE_SEPARATEUR_PARAM + ' not allowed'
-                )
-                return true
-            }
             getUdgTerrainTypes().get(param1)?.setLabel(param2)
             Text.mkP(escaper.getPlayer(), 'label changed to "' + param2 + '"')
         } else {
@@ -226,17 +167,6 @@ export const ExecuteCommandMake = (escaper: Escaper, cmd: string): boolean => {
             b = !getUdgTerrainTypes().isLabelAlreadyUsed(param2)
         }
         if (b) {
-            if (
-                StringContainsChar(param2, CACHE_SEPARATEUR_ITEM) ||
-                StringContainsChar(param2, CACHE_SEPARATEUR_PARAM) ||
-                StringContainsChar(param2, '"')
-            ) {
-                Text.erP(
-                    escaper.getPlayer(),
-                    'characters ", ' + CACHE_SEPARATEUR_ITEM + ' and ' + CACHE_SEPARATEUR_PARAM + ' not allowed'
-                )
-                return true
-            }
             getUdgTerrainTypes().get(param1)?.setAlias(param2)
             Text.mkP(escaper.getPlayer(), 'Alias changed to "' + param2 + '"')
         } else {
@@ -280,17 +210,6 @@ export const ExecuteCommandMake = (escaper: Escaper, cmd: string): boolean => {
         }
         if (!(terrainType instanceof TerrainTypeDeath)) {
             Text.erP(escaper.getPlayer(), 'The terrain must be of death type')
-            return true
-        }
-        if (
-            StringContainsChar(param2, CACHE_SEPARATEUR_ITEM) ||
-            StringContainsChar(param2, CACHE_SEPARATEUR_PARAM) ||
-            StringContainsChar(param2, '"')
-        ) {
-            Text.erP(
-                escaper.getPlayer(),
-                'Characters ", ' + CACHE_SEPARATEUR_ITEM + ' and ' + CACHE_SEPARATEUR_PARAM + ' not allowed'
-            )
             return true
         }
         terrainType.setKillingEffectStr(param2)
@@ -649,17 +568,6 @@ export const ExecuteCommandMake = (escaper: Escaper, cmd: string): boolean => {
             x = -1
             b = false
         }
-        if (
-            StringContainsChar(param1, CACHE_SEPARATEUR_ITEM) ||
-            StringContainsChar(param1, CACHE_SEPARATEUR_PARAM) ||
-            StringContainsChar(param1, '"')
-        ) {
-            Text.erP(
-                escaper.getPlayer(),
-                'Characters ", ' + CACHE_SEPARATEUR_ITEM + ' and ' + CACHE_SEPARATEUR_PARAM + ' not allowed'
-            )
-            return true
-        }
 
         getUdgMonsterTypes().new(param1, String2Ascii(SubStringBJ(param2, 2, 5)), x, S2R(param3), speed, b)
 
@@ -678,17 +586,6 @@ export const ExecuteCommandMake = (escaper: Escaper, cmd: string): boolean => {
             b = !getUdgMonsterTypes().isLabelAlreadyUsed(param2)
         }
         if (b) {
-            if (
-                StringContainsChar(param2, CACHE_SEPARATEUR_ITEM) ||
-                StringContainsChar(param2, CACHE_SEPARATEUR_PARAM) ||
-                StringContainsChar(param2, '"')
-            ) {
-                Text.erP(
-                    escaper.getPlayer(),
-                    'characters ", ' + CACHE_SEPARATEUR_ITEM + ' and ' + CACHE_SEPARATEUR_PARAM + ' not allowed'
-                )
-                return true
-            }
             getUdgMonsterTypes().getByLabel(param1)?.setLabel(param2)
             Text.mkP(escaper.getPlayer(), 'label changed to "' + param2 + '"')
         } else {
@@ -707,17 +604,6 @@ export const ExecuteCommandMake = (escaper: Escaper, cmd: string): boolean => {
             b = !getUdgMonsterTypes().isLabelAlreadyUsed(param2)
         }
         if (b) {
-            if (
-                StringContainsChar(param2, CACHE_SEPARATEUR_ITEM) ||
-                StringContainsChar(param2, CACHE_SEPARATEUR_PARAM) ||
-                StringContainsChar(param2, '"')
-            ) {
-                Text.erP(
-                    escaper.getPlayer(),
-                    'characters ", ' + CACHE_SEPARATEUR_ITEM + ' and ' + CACHE_SEPARATEUR_PARAM + ' not allowed'
-                )
-                return true
-            }
             getUdgMonsterTypes().getByLabel(param1)?.setAlias(param2)
             Text.mkP(escaper.getPlayer(), 'alias changed to "' + param2 + '"')
         } else {
@@ -870,17 +756,6 @@ export const ExecuteCommandMake = (escaper: Escaper, cmd: string): boolean => {
         //checkParam1
         if (!getUdgMonsterTypes().isLabelAlreadyUsed(param1)) {
             Text.erP(escaper.getPlayer(), 'unknown monster type')
-            return true
-        }
-        if (
-            StringContainsChar(param2, CACHE_SEPARATEUR_ITEM) ||
-            StringContainsChar(param2, CACHE_SEPARATEUR_PARAM) ||
-            StringContainsChar(param2, '"')
-        ) {
-            Text.erP(
-                escaper.getPlayer(),
-                'characters ", ' + CACHE_SEPARATEUR_ITEM + ' and ' + CACHE_SEPARATEUR_PARAM + ' not allowed'
-            )
             return true
         }
         getUdgMonsterTypes().getByLabel(param1)?.setKillingEffectStr(param2)
@@ -1822,19 +1697,8 @@ export const ExecuteCommandMake = (escaper: Escaper, cmd: string): boolean => {
             speed = DEFAULT_CASTER_PROJECTILE_SPEED
             x = DEFAULT_CASTER_RANGE
         }
-        //apply command
-        if (
-            StringContainsChar(param1, CACHE_SEPARATEUR_ITEM) ||
-            StringContainsChar(param1, CACHE_SEPARATEUR_PARAM) ||
-            StringContainsChar(param1, '"')
-        ) {
-            Text.erP(
-                escaper.getPlayer(),
-                'characters ", ' + CACHE_SEPARATEUR_ITEM + ' and ' + CACHE_SEPARATEUR_PARAM + ' not allowed'
-            )
-            return true
-        }
 
+        //apply command
         const casterMonsterType = getUdgMonsterTypes().getByLabel(param2)
         const projectileMonsterType = getUdgMonsterTypes().getByLabel(param3)
 
@@ -1863,17 +1727,6 @@ export const ExecuteCommandMake = (escaper: Escaper, cmd: string): boolean => {
             b = !getUdgCasterTypes().isLabelAlreadyUsed(param2)
         }
         if (b) {
-            if (
-                StringContainsChar(param2, CACHE_SEPARATEUR_ITEM) ||
-                StringContainsChar(param2, CACHE_SEPARATEUR_PARAM) ||
-                StringContainsChar(param2, '"')
-            ) {
-                Text.erP(
-                    escaper.getPlayer(),
-                    'characters ", ' + CACHE_SEPARATEUR_ITEM + ' and ' + CACHE_SEPARATEUR_PARAM + ' not allowed'
-                )
-                return true
-            }
             getUdgCasterTypes().getByLabel(param1)?.setLabel(param2)
             Text.mkP(escaper.getPlayer(), 'label changed to "' + param2 + '"')
         } else {
@@ -1892,17 +1745,6 @@ export const ExecuteCommandMake = (escaper: Escaper, cmd: string): boolean => {
             b = !getUdgCasterTypes().isLabelAlreadyUsed(param2)
         }
         if (b) {
-            if (
-                StringContainsChar(param2, CACHE_SEPARATEUR_ITEM) ||
-                StringContainsChar(param2, CACHE_SEPARATEUR_PARAM) ||
-                StringContainsChar(param2, '"')
-            ) {
-                Text.erP(
-                    escaper.getPlayer(),
-                    'characters ", ' + CACHE_SEPARATEUR_ITEM + ' and ' + CACHE_SEPARATEUR_PARAM + ' not allowed'
-                )
-                return true
-            }
             getUdgCasterTypes().getByLabel(param1)?.setAlias(param2)
             Text.mkP(escaper.getPlayer(), 'alias changed to "' + param2 + '"')
         } else {

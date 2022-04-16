@@ -1433,4 +1433,8 @@ export class Escaper {
     setLockCamTarget = (lockCamTarget: Escaper | null) => {
         this.lockCamTarget = lockCamTarget
     }
+
+    toJson = () => ({
+        //useless but mandatory due to BaseArray implementation
+    })
 }

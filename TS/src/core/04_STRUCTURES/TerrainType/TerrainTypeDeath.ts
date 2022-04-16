@@ -5,7 +5,6 @@ import {COLOR_TERRAIN_DEATH} from "../../01_libraries/Init_colorCodes";
 import {Ascii2String} from "../../01_libraries/Ascii";
 import {Text} from "../../01_libraries/Text";
 import {TERRAIN_DATA_DISPLAY_TIME} from "../../01_libraries/Constants";
-import {CACHE_SEPARATEUR_PARAM} from "../../07_TRIGGERS/Save_map_in_gamecache/struct_StringArrayForCache";
 
 export const DEATH_TERRAIN_MAX_TOLERANCE = 50
 
@@ -91,16 +90,6 @@ export class TerrainTypeDeath extends TerrainType {
         //display cliff class
         display += DISPLAY_SPACE + 'cliff' + I2S(this.cliffClassId)
         Text.P_timed(p, TERRAIN_DATA_DISPLAY_TIME, display)
-    }
-
-    toString = (): string => {
-        let str = super.toString()
-
-        str = str + this.getKillingEffectStr() + CACHE_SEPARATEUR_PARAM
-        str = str + R2S(this.getTimeToKill()) + CACHE_SEPARATEUR_PARAM
-        str = str + R2S(this.getToleranceDist())
-
-        return str
     }
 
     toJson = () => ({

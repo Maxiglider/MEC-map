@@ -1,6 +1,5 @@
 import { tileset2tilesetChar } from 'core/01_libraries/Basic_functions'
 import { Text } from 'core/01_libraries/Text'
-import { StringArrayForCache } from 'core/07_TRIGGERS/Save_map_in_gamecache/struct_StringArrayForCache'
 import { CmdParam, NbParam } from '../../06_COMMANDS/COMMANDS_vJass/Command_functions'
 import { TerrainType } from './TerrainType'
 import { TerrainTypeDeath } from './TerrainTypeDeath'
@@ -252,37 +251,6 @@ export class TerrainTypeArray {
         }
     }
 
-    saveInCache = () => {
-        let i: number
-
-        //main tileset
-        StringArrayForCache.stringArrayForCache = new StringArrayForCache('terrain', 'mainTileset', false)
-        StringArrayForCache.stringArrayForCache.push(this.mainTileset)
-        StringArrayForCache.stringArrayForCache.writeInCache()
-
-        //terrainConfig
-        StringArrayForCache.stringArrayForCache = new StringArrayForCache('terrain', 'terrainConfig', true)
-        i = 0
-        while (true) {
-            if (i >= this.numberOfSlide) break
-            StringArrayForCache.stringArrayForCache.push(this.ttSlide[i].toString())
-            i = i + 1
-        }
-        i = 0
-        while (true) {
-            if (i >= this.numberOfWalk) break
-            StringArrayForCache.stringArrayForCache.push(this.ttWalk[i].toString())
-            i = i + 1
-        }
-        i = 0
-        while (true) {
-            if (i >= this.numberOfDeath) break
-            StringArrayForCache.stringArrayForCache.push(this.ttDeath[i].toString())
-            i = i + 1
-        }
-        StringArrayForCache.stringArrayForCache.writeInCache()
-    }
-
     count = () => this.numberOfWalk + this.numberOfSlide + this.numberOfDeath
 
     //mettre en place l'ordre des terrains au niveau des tilesets
@@ -337,4 +305,9 @@ export class TerrainTypeArray {
     getMainTileset = (): string => {
         return this.mainTileset
     }
+
+    toJson = () => ({
+        mainTileset: this.mainTileset,
+        terrainTypesMec: this.getAll().map(terrainType => terrainType.toJson())
+    })
 }

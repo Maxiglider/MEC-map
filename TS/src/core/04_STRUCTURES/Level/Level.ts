@@ -186,4 +186,42 @@ export class Level {
     getStartMessage = () => {
         return this.startMessage
     }
+
+    toJson = () => {
+        const json: {[x: string]: any} = {}
+
+        //start message
+        if (this.getStartMessage() != null && this.getStartMessage() != '') {
+            json.startMessage = this.getStartMessage()
+        }
+
+        //nb lives earned
+        json.nbLives = this.getNbLives()
+
+        //start
+        json.start = this.getStart()?.toJson()
+
+        //end
+        json.end = this.getEnd()?.toJson()
+
+        //visibilities
+        json.visibilities = this.visibilities.toJson()
+
+        //monsters
+        json.monsters = this.monsters.toJson()
+
+        //monsterSpawns
+        json.monsterSpawns = this.monsterSpawns.toJson()
+
+        //meteors
+        json.meteors = this.meteors.toJson()
+
+        //clearMobs
+        json.clearMobs = this.clearMobs.toJson()
+
+        //portalMobs
+        json.portalMobs = this.portalMobs.toJson()
+
+        return json
+    }
 }

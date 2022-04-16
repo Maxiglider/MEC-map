@@ -1,4 +1,3 @@
-import { CACHE_SEPARATEUR_PARAM } from 'core/07_TRIGGERS/Save_map_in_gamecache/struct_StringArrayForCache'
 import { errorHandler } from '../../../Utils/mapUtils'
 import { IsOnGround } from '../../01_libraries/Basic_functions'
 import { Escaper } from '../Escaper/Escaper'
@@ -427,21 +426,6 @@ export class Caster extends Monster {
             }
             this.nbEscapersInRange = this.nbEscapersInRange - 1
         }
-    }
-
-    toString = (): string => {
-        let str: string
-
-        if (this.casterType.theAlias && this.casterType.theAlias !== '') {
-            str = this.casterType.theAlias + CACHE_SEPARATEUR_PARAM
-        } else {
-            str = this.casterType.label + CACHE_SEPARATEUR_PARAM
-        }
-
-        str += I2S(this.id) + CACHE_SEPARATEUR_PARAM + I2S(R2I(this.x)) + CACHE_SEPARATEUR_PARAM + I2S(R2I(this.y))
-        str += CACHE_SEPARATEUR_PARAM + I2S(R2I(this.angle))
-
-        return str
     }
 
     toJson = () => ({

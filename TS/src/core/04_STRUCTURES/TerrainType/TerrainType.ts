@@ -1,6 +1,5 @@
 import { CanUseTerrain } from 'core/07_TRIGGERS/Modify_terrain_Functions/Terrain_functions'
 import { Ascii2String } from '../../01_libraries/Ascii'
-import {CACHE_SEPARATEUR_PARAM} from "../../07_TRIGGERS/Save_map_in_gamecache/struct_StringArrayForCache";
 
 export const DISPLAY_SPACE = '   '
 
@@ -108,26 +107,6 @@ export abstract class TerrainType {
             DISPLAY_SPACE
 
         return display
-    }
-
-    toString = () => {
-        let str =
-            this.label +
-            CACHE_SEPARATEUR_PARAM +
-            this.theAlias +
-            CACHE_SEPARATEUR_PARAM +
-            I2S(this.orderId) +
-            CACHE_SEPARATEUR_PARAM
-        str =
-            str +
-            this.kind +
-            CACHE_SEPARATEUR_PARAM +
-            Ascii2String(this.terrainTypeId) +
-            CACHE_SEPARATEUR_PARAM +
-            I2S(this.cliffClassId) +
-            CACHE_SEPARATEUR_PARAM
-
-        return str
     }
 
     toJson = () => ({

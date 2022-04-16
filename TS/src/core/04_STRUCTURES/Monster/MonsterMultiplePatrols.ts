@@ -1,6 +1,5 @@
 import { GetLocDist } from 'core/01_libraries/Basic_functions'
 import { PATROL_DISTANCE_MIN } from 'core/01_libraries/Constants'
-import { CACHE_SEPARATEUR_PARAM } from 'core/07_TRIGGERS/Save_map_in_gamecache/struct_StringArrayForCache'
 import { udg_monsters } from '../../../../globals'
 import { errorHandler } from '../../../Utils/mapUtils'
 import { IsHero } from '../Escaper/Escaper_functions'
@@ -224,23 +223,6 @@ export class MonsterMultiplePatrols extends Monster {
     destroy = () => {
         while (this.destroyLastLoc()) {}
         super.destroy()
-    }
-
-    toString = () => {
-        let str = super.toString()
-        str += CACHE_SEPARATEUR_PARAM
-
-        if (this.sens > 0) {
-            str += 'string'
-        } else {
-            str += 'normal'
-        }
-
-        this.x.forEach((x, n) => {
-            str += CACHE_SEPARATEUR_PARAM + I2S(R2I(this.x[n])) + CACHE_SEPARATEUR_PARAM + I2S(R2I(this.y[n]))
-        })
-
-        return str
     }
 
     toJson = () => ({

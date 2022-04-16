@@ -1,11 +1,9 @@
 import { Text } from 'core/01_libraries/Text'
-//import { CACHE_SEPARATEUR_PARAM } from 'core/07_TRIGGERS/Save_map_in_gamecache/struct_StringArrayForCache'
 import { getUdgLevels } from "../../../../globals"
 
 import { createEvent } from 'Utils/mapUtils'
 import { Hero2Escaper } from '../Escaper/Escaper_functions'
 
-const CACHE_SEPARATEUR_PARAM = ''
 
 abstract class RectInterface {
     minX: number
@@ -24,15 +22,6 @@ abstract class RectInterface {
 
     destroy() {
         RemoveRect(this.r)
-    }
-
-    toString = () => {
-        let minX = I2S(R2I(this.minX))
-        let minY = I2S(R2I(this.minY))
-        let maxX = I2S(R2I(this.maxX))
-        let maxY = I2S(R2I(this.maxY))
-
-        return minX + CACHE_SEPARATEUR_PARAM + minY + CACHE_SEPARATEUR_PARAM + maxX + CACHE_SEPARATEUR_PARAM + maxY
     }
 
     toJson = () => ({

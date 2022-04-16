@@ -14,6 +14,10 @@ export class EscaperEffect {
         this.ef = AddSpecialEffectTarget(this.efStr, u, this.bodyPart)
     }
 
+    toJson = () => ({
+        //useless but mandatory due to BaseArray implementation
+    })
+
     destroy = () => {
         DestroyEffect(this.ef)
     }

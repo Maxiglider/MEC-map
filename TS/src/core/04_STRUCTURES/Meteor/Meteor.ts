@@ -1,4 +1,3 @@
-import { CACHE_SEPARATEUR_PARAM } from 'core/07_TRIGGERS/Save_map_in_gamecache/struct_StringArrayForCache'
 import { getUdgTerrainTypes } from '../../../../globals'
 import { Level } from '../Level/Level'
 
@@ -63,10 +62,6 @@ export class Meteor {
 
     replace = () => {
         this.item && SetItemPosition(this.item, this.x, this.y)
-    }
-
-    toString = (): string => {
-        return I2S(R2I(this.x)) + CACHE_SEPARATEUR_PARAM + I2S(R2I(this.y))
     }
 
     toJson = () => ({

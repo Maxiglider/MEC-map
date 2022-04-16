@@ -1,4 +1,3 @@
-import { CACHE_SEPARATEUR_PARAM } from 'core/07_TRIGGERS/Save_map_in_gamecache/struct_StringArrayForCache'
 import { RefreshHideAllVM } from '../../03_view_all_hide_all/View_all_hide_all'
 import { Level } from './Level'
 
@@ -39,14 +38,6 @@ export class VisibilityModifier {
 
     copy = (): VisibilityModifier => {
         return new VisibilityModifier(this.x1, this.y1, this.x2, this.y2)
-    }
-
-    toString = (): string => {
-        let x1 = I2S(R2I(this.x1))
-        let y1 = I2S(R2I(this.y1))
-        let x2 = I2S(R2I(this.x2))
-        let y2 = I2S(R2I(this.y2))
-        return x1 + CACHE_SEPARATEUR_PARAM + y1 + CACHE_SEPARATEUR_PARAM + x2 + CACHE_SEPARATEUR_PARAM + y2
     }
 
     toJson = () => ({

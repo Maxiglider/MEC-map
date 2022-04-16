@@ -1,4 +1,3 @@
-import { CACHE_SEPARATEUR_PARAM } from 'core/07_TRIGGERS/Save_map_in_gamecache/struct_StringArrayForCache'
 import { udg_monsters } from '../../../../globals'
 import { Monster } from './Monster'
 import { MonsterType } from './MonsterType'
@@ -221,25 +220,6 @@ export class MonsterTeleport extends Monster {
         MonsterTeleport.anyMonsterTeleportTimerId2MonsterTeleport.delete(GetHandleId(this.t))
         DestroyTimer(this.t)
         super.destroy()
-    }
-
-    toString = () => {
-        let str = super.toString()
-        str += CACHE_SEPARATEUR_PARAM
-
-        if (this.sens > 0) {
-            str += 'string'
-        } else {
-            str += 'normal'
-        }
-
-        str += CACHE_SEPARATEUR_PARAM + R2S(this.period) + CACHE_SEPARATEUR_PARAM + I2S(R2I(this.angle))
-
-        this.x.forEach((x, n) => {
-            str += CACHE_SEPARATEUR_PARAM + I2S(R2I(this.x[n])) + CACHE_SEPARATEUR_PARAM + I2S(R2I(this.y[n]))
-        })
-
-        return str
     }
 
     toJson = () => ({

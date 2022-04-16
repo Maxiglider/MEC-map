@@ -2,7 +2,6 @@ import { GetCurrentMonsterPlayer } from '../../01_libraries/Basic_functions'
 import { ENNEMY_PLAYER, GREY, MOBS_VARIOUS_COLORS, TERRAIN_DATA_DISPLAY_TIME } from '../../01_libraries/Constants'
 import { udg_colorCode } from '../../01_libraries/Init_colorCodes'
 import { Text } from '../../01_libraries/Text'
-import { CACHE_SEPARATEUR_PARAM } from '../../07_TRIGGERS/Save_map_in_gamecache/struct_StringArrayForCache'
 import { Level } from '../Level/Level'
 import { MonsterType } from '../Monster/MonsterType'
 import { NewImmobileMonsterForPlayer } from '../Monster/Monster_functions'
@@ -280,26 +279,6 @@ export class MonsterSpawn {
         let display =
             udg_colorCode[GREY] + this.label + ' : ' + this.mt.label + '   ' + this.sens + '   ' + R2S(this.frequence)
         Text.P_timed(p, TERRAIN_DATA_DISPLAY_TIME, display)
-    }
-
-    toString = (): string => {
-        let str = this.label + CACHE_SEPARATEUR_PARAM
-        if (this.mt.theAlias != null && this.mt.theAlias != '') {
-            str = str + this.mt.theAlias + CACHE_SEPARATEUR_PARAM
-        } else {
-            str = str + this.mt.label + CACHE_SEPARATEUR_PARAM
-        }
-        str = str + this.sens + CACHE_SEPARATEUR_PARAM + R2S(this.frequence) + CACHE_SEPARATEUR_PARAM
-        str =
-            str +
-            I2S(R2I(this.minX)) +
-            CACHE_SEPARATEUR_PARAM +
-            I2S(R2I(this.minY)) +
-            CACHE_SEPARATEUR_PARAM +
-            I2S(R2I(this.maxX)) +
-            CACHE_SEPARATEUR_PARAM +
-            I2S(R2I(this.maxY))
-        return str
     }
 
     toJson = () => ({

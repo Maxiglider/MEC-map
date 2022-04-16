@@ -1,15 +1,9 @@
 import { IsNearBounds } from 'core/01_libraries/Basic_functions'
 import { LARGEUR_CASE } from 'core/01_libraries/Constants'
 import { Text } from 'core/01_libraries/Text'
-import { errorHandler } from '../../../Utils/mapUtils'
-import { SaveMapInCache } from './SAVE_MAP_in_cache'
-import { SaveWater } from './Save_water'
-import { StringArrayForCache } from './struct_StringArrayForCache'
 import {globals} from "../../../../globals";
 
 const initSaveTerrainRamps = () => {
-    let y: number
-    let ramps: boolean[] = []
     const DECAL_TEST_PATH = 10
 
     /*
@@ -60,7 +54,9 @@ if one of the N tilepoints is at a cliff level different than CL or CL+1, the ra
     }
 
     //save terrain ramps
-    const SaveTerrainRamps_Actions = () => {
+    const SaveTerrainRamps = (json: {[x: string]: any}) => {
+        json.terrainRamps = ""
+
         let x: number
         let currentCliffLevel: number
         let otherCliffLevel: number
@@ -77,10 +73,12 @@ if one of the N tilepoints is at a cliff level different than CL or CL+1, the ra
         let signX: number
         let signY: number
 
-        if (y <= globals.MAP_MAX_Y) {
+        let y = globals.MAP_MIN_Y
+
+        while(y <= globals.MAP_MAX_Y) {
+
             x = globals.MAP_MIN_X
-            while (true) {
-                if (x > globals.MAP_MAX_X) break
+            while (x <= globals.MAP_MAX_X) {
                 ramp = false
 
                 if (!IsNearBounds(x, y)) {
@@ -523,29 +521,20 @@ if one of the N tilepoints is at a cliff level different than CL or CL+1, the ra
                 } else {
                     rampStr = '0'
                 }
-                StringArrayForCache.stringArrayForCache.push(rampStr)
+
+                json.terrainRamps += rampStr
+
                 x = x + LARGEUR_CASE
             }
             y = y + LARGEUR_CASE
             loc1 = null
             loc2 = null
-        } else {
-            DisableTrigger(GetTriggeringTrigger())
-            StringArrayForCache.stringArrayForCache.writeInCache()
-            Text.A('terrain ramps saved')
-            SaveWater.StartSaveWater()
         }
+
+        Text.A('terrain ramps saved')
     }
 
-    const StartSaveTerrainRamps = () => {
-        y = globals.MAP_MIN_Y
-        StringArrayForCache.stringArrayForCache = new StringArrayForCache('terrain', 'terrainRamps', false)
-        TriggerClearActions(SaveMapInCache.trigSaveMapInCache)
-        TriggerAddAction(SaveMapInCache.trigSaveMapInCache, errorHandler(SaveTerrainRamps_Actions))
-        EnableTrigger(SaveMapInCache.trigSaveMapInCache)
-    }
-
-    return { StartSaveTerrainRamps }
+    return { SaveTerrainRamps }
 }
 
 export const SaveTerrainRamps = initSaveTerrainRamps()

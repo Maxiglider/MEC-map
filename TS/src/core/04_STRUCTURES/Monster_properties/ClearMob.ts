@@ -215,4 +215,9 @@ export class ClearMob {
         this.triggerMob.setBaseColor('green')
         this.triggerMob.setVertexColor(40, 100, 40)
     }
+
+    //todomax implement toJson
+    toJson = () => ({
+
+    })
 }

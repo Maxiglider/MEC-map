@@ -1,40 +1,28 @@
 import { LARGEUR_CASE } from 'core/01_libraries/Constants'
 import { Text } from 'core/01_libraries/Text'
 import { ZLibrary } from 'core/02_bibliotheques_externes/ZLibrary'
-import { errorHandler } from '../../../Utils/mapUtils'
-import { SaveMapInCache } from './SAVE_MAP_in_cache'
-import { SaveMonsterTypes } from './Save_monster_types'
-import { StringArrayForCache } from './struct_StringArrayForCache'
 import {globals} from "../../../../globals";
+import {arrayPush} from "../../01_libraries/Basic_functions";
 
 const initSaveWater = () => {
-    let y: number
 
     //save water heights
-    const SaveWaterHeights_Actions = () => {
-        let x: number
-        if (y <= globals.MAP_MAX_Y) {
-            x = globals.MAP_MIN_X
-            while (true) {
-                if (x > globals.MAP_MAX_X) break
-                StringArrayForCache.stringArrayForCache.push(I2S(R2I(ZLibrary.GetSurfaceZ(x, y))))
+    const SaveWaterHeights = (json: {[x: string]: any}) => {
+        json.waterHeights = []
+        let y = globals.MAP_MIN_Y
+
+        while(y <= globals.MAP_MAX_Y) {
+
+            let x = globals.MAP_MIN_X
+            while (x <= globals.MAP_MAX_X) {
+                arrayPush(json.waterHeights, R2I(ZLibrary.GetSurfaceZ(x, y)))
                 x = x + LARGEUR_CASE
             }
-            y = y + LARGEUR_CASE
-        } else {
-            DisableTrigger(GetTriggeringTrigger())
-            StringArrayForCache.stringArrayForCache.writeInCache()
-            Text.A('water heights saved')
-            SaveMonsterTypes.StartSaveMonsterTypes()
-        }
-    }
 
-    const StartSaveWaterHeights = () => {
-        y = globals.MAP_MIN_Y
-        StringArrayForCache.stringArrayForCache = new StringArrayForCache('terrain', 'waterHeights', true)
-        TriggerClearActions(SaveMapInCache.trigSaveMapInCache)
-        TriggerAddAction(SaveMapInCache.trigSaveMapInCache, errorHandler(SaveWaterHeights_Actions))
-        EnableTrigger(SaveMapInCache.trigSaveMapInCache)
+            y = y + LARGEUR_CASE
+        }
+
+        Text.A('water heights saved')
     }
 
     //save water presence
@@ -64,8 +52,8 @@ const initSaveWater = () => {
 endfunction
 */
 
-    const StartSaveWater = () => {
-        StartSaveWaterHeights()
+    const SaveWater = (json: {[x: string]: any}) => {
+        SaveWaterHeights(json)
 
         /*
 	    y = MAP_MIN_Y
@@ -76,7 +64,7 @@ endfunction
 	    */
     }
 
-    return { StartSaveWater }
+    return { SaveWater }
 }
 
 export const SaveWater = initSaveWater()

@@ -19,10 +19,10 @@ import {
     globals,
 } from '../../../../globals'
 import { IsPositiveInteger } from '../../01_libraries/Functions_on_numbers'
-import { SaveMapInCache } from '../../07_TRIGGERS/Save_map_in_gamecache/SAVE_MAP_in_cache'
 import { SaveLoadTerrain } from '../../07_TRIGGERS/Triggers_to_modify_terrains/Save_load_terrain'
 import { CmdName, CmdParam, isPlayerId, NbParam, NoParam, resolvePlayerId } from './Command_functions'
 import { ActivateTeleport, DisableTeleport } from './Teleport'
+import {SaveMapInCache} from "../../07_TRIGGERS/Save_map_in_gamecache/SaveMapInCache";
 
 export const ExecuteCommandMax = (escaper: Escaper, cmd: string): boolean => {
     let name = CmdName(cmd)
@@ -468,7 +468,7 @@ export const ExecuteCommandMax = (escaper: Escaper, cmd: string): boolean => {
     //-saveMapInCache(smic)
     if (name === 'saveMapInCache' || name === 'smic') {
         if (noParam) {
-            SaveMapInCache.StartSaveMapInCache()
+            SaveMapInCache.smic()
         }
         return true
     }

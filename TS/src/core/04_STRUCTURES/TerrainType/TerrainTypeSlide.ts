@@ -1,10 +1,8 @@
-import {SLIDE_PERIOD, TERRAIN_DATA_DISPLAY_TIME} from 'core/01_libraries/Constants'
+import {TERRAIN_DATA_DISPLAY_TIME} from 'core/01_libraries/Constants'
 import {DISPLAY_SPACE, TerrainType} from './TerrainType'
 import {COLOR_TERRAIN_SLIDE} from "../../01_libraries/Init_colorCodes";
 import {B2S} from "../../01_libraries/Basic_functions";
-import {CACHE_SEPARATEUR_PARAM} from "../../07_TRIGGERS/Save_map_in_gamecache/struct_StringArrayForCache";
 import {Text} from "../../01_libraries/Text";
-import {TerrainTypeMax} from "../../07_TRIGGERS/Modify_terrain_Functions/Terrain_type_max";
 
 export class TerrainTypeSlide extends TerrainType {
     private slideSpeed: number
@@ -56,14 +54,6 @@ export class TerrainTypeSlide extends TerrainType {
         //display cliff class
         display += DISPLAY_SPACE + 'cliff' + I2S(this.cliffClassId)
         Text.P_timed(p, TERRAIN_DATA_DISPLAY_TIME, display)
-    }
-
-    toString = (): string => {
-        let str = super.toString()
-
-        str += I2S(R2I(this.getSlideSpeed())) + CACHE_SEPARATEUR_PARAM + B2S(this.getCanTurn())
-
-        return str
     }
 
     toJson = () => ({
