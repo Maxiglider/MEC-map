@@ -546,7 +546,7 @@ export const ExecuteCommandMax = (escaper: Escaper, cmd: string): boolean => {
             return true
         }
         //checkParam 1
-        b = getUdgTerrainTypes().getFromLabel(param1) != null
+        b = getUdgTerrainTypes().getByLabel(param1) != null
         if (!b) {
             return true
         }
@@ -555,7 +555,7 @@ export const ExecuteCommandMax = (escaper: Escaper, cmd: string): boolean => {
             Text.erP(escaper.getPlayer(), 'cliff class must be 1 or 2')
         }
         //apply command
-        getUdgTerrainTypes().getFromLabel(param1)?.setCliffClassId(S2I(param2))
+        getUdgTerrainTypes().getByLabel(param1)?.setCliffClassId(S2I(param2))
         Text.mkP(escaper.getPlayer(), 'cliff class changed to ' + param2)
         return true
     }

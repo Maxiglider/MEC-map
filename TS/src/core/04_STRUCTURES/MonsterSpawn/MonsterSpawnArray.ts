@@ -12,7 +12,7 @@ export class MonsterSpawnArray extends BaseArray<MonsterSpawn> {
         this.level = level
     }
 
-    getFromLabel = (label: string) => {
+    getByLabel = (label: string) => {
         for (const [_, ms] of pairs(this.data)) {
             if (ms.getLabel() === label) {
                 return ms
@@ -33,7 +33,7 @@ export class MonsterSpawnArray extends BaseArray<MonsterSpawn> {
     }
 
     clearMonsterSpawn = (label: string): boolean => {
-        let ms = this.getFromLabel(label)
+        let ms = this.getByLabel(label)
         if (ms) {
             delete this.data[ms.getId()]
             ms.destroy()
@@ -44,7 +44,7 @@ export class MonsterSpawnArray extends BaseArray<MonsterSpawn> {
     }
 
     setMonsterType = (label: string, mt: MonsterType): boolean => {
-        let ms = this.getFromLabel(label)
+        let ms = this.getByLabel(label)
         if (ms) {
             ms.setMonsterType(mt)
             return true
@@ -54,7 +54,7 @@ export class MonsterSpawnArray extends BaseArray<MonsterSpawn> {
     }
 
     setSens = (label: string, sens: string): boolean => {
-        let ms = this.getFromLabel(label)
+        let ms = this.getByLabel(label)
         if (ms) {
             ms.setSens(sens)
             return true
@@ -64,7 +64,7 @@ export class MonsterSpawnArray extends BaseArray<MonsterSpawn> {
     }
 
     setFrequence = (label: string, frequence: number): boolean => {
-        let ms = this.getFromLabel(label)
+        let ms = this.getByLabel(label)
         if (ms) {
             ms.setFrequence(frequence)
             return true
@@ -97,8 +97,8 @@ export class MonsterSpawnArray extends BaseArray<MonsterSpawn> {
     }
 
     changeLabel = (oldLabel: string, newLabel: string): boolean => {
-        const msWithOldLabel = this.getFromLabel(oldLabel)
-        const msWithNewLabel = this.getFromLabel(newLabel)
+        const msWithOldLabel = this.getByLabel(oldLabel)
+        const msWithNewLabel = this.getByLabel(newLabel)
 
         if (!msWithOldLabel || msWithNewLabel) {
             return false

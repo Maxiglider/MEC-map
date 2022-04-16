@@ -25,8 +25,8 @@ const ModifyTerrain = () => {
 }
 
 export const ExchangeTerrains = (terrainTypeLabelA: string, terrainTypeLabelB: string): boolean => {
-    const terrainTypeA = getUdgTerrainTypes().getFromLabel(terrainTypeLabelA)
-    const terrainTypeB = getUdgTerrainTypes().getFromLabel(terrainTypeLabelB)
+    const terrainTypeA = getUdgTerrainTypes().getByLabel(terrainTypeLabelA)
+    const terrainTypeB = getUdgTerrainTypes().getByLabel(terrainTypeLabelB)
     if (terrainTypeA === terrainTypeB || !terrainTypeA || !terrainTypeB) {
         return false
     }
