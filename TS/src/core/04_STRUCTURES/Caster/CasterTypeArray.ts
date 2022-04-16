@@ -1,17 +1,20 @@
 import { Text } from 'core/01_libraries/Text'
+import { BaseArray } from '../BaseArray'
 import { MonsterType } from '../Monster/MonsterType'
 import { CasterType } from './CasterType'
 
-export class CasterTypeArray {
-    private casterTypes: CasterType[] = []
-    private numberOfCasterTypes = 0
+export class CasterTypeArray extends BaseArray<CasterType> {
+    constructor() {
+        super(true)
+    }
 
     getByLabel = (label: string) => {
-        for (let i = 0; i < this.numberOfCasterTypes; i++) {
-            if (this.casterTypes[i].label == label || this.casterTypes[i].theAlias == label) {
-                return this.casterTypes[i]
+        for (const [_, casterType] of pairs(this.data)) {
+            if (casterType.label === label || casterType.theAlias === label) {
+                return casterType
             }
         }
+
         return null
     }
 
@@ -28,11 +31,11 @@ export class CasterTypeArray {
         loadTime: number,
         animation: string
     ) => {
-        let n = this.numberOfCasterTypes
         if (this.isLabelAlreadyUsed(label)) {
             return null
         }
-        this.casterTypes[n] = new CasterType(
+
+        const casterType = new CasterType(
             label,
             casterMonsterType,
             projectileMonsterType,
@@ -42,55 +45,34 @@ export class CasterTypeArray {
             animation
         )
 
-        this.numberOfCasterTypes++
+        this._new(casterType)
 
-        return this.casterTypes[n]
+        return casterType
     }
 
     remove = (label: string): boolean => {
-        let position: number
-        let i: number
-        let ct = this.getByLabel(label)
-        if (ct === null) {
-            return false
-        }
-        i = 0
-        while (true) {
-            if (
-                this.casterTypes[i].label == label ||
-                this.casterTypes[i].theAlias == label ||
-                i >= this.numberOfCasterTypes
-            )
-                break
-            i = i + 1
-        }
-        if (i < this.numberOfCasterTypes) {
-            position = i
-            i = i + 1
-            while (true) {
-                if (i >= this.numberOfCasterTypes) break
-                this.casterTypes[i - 1] = this.casterTypes[i]
-                i = i + 1
+        for (const [casterTypeId, casterType] of pairs(this.data)) {
+            if (casterType.label === label || casterType.theAlias === label) {
+                this.data[casterTypeId].destroy()
+                delete this.data[casterTypeId]
             }
-            this.numberOfCasterTypes = this.numberOfCasterTypes - 1
         }
-        ct.destroy()
+
         return true
     }
 
     displayForPlayer = (p: player) => {
-        let i = 0
-        while (true) {
-            if (i >= this.numberOfCasterTypes) break
-            this.casterTypes[i].displayForPlayer(p)
-            i = i + 1
+        let hadOne = false
+
+        for (const [_, casterType] of pairs(this.data)) {
+            casterType.displayForPlayer(p)
+            hadOne = true
         }
-        if (this.numberOfCasterTypes === 0) {
+
+        if (!hadOne) {
             Text.erP(p, 'no caster type saved')
         }
     }
 
-    toJson = () => (
-        this.casterTypes.map(casterType => casterType.toJson())
-    )
+    toJson = () => Object.values(this.data).map(item => item.toJson())
 }

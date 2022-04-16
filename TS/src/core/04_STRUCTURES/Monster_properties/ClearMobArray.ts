@@ -8,7 +8,7 @@ export class ClearMobArray extends BaseArray<ClearMob> {
     private level: Level
 
     constructor(level: Level) {
-        super()
+        super(true)
         this.level = level
     }
 

@@ -4,6 +4,10 @@ import { EscaperEffect } from './EscaperEffect'
 const NB_EFFECTS_LIMIT = 20
 
 export class EscaperEffectArray extends BaseArray<EscaperEffect> {
+    constructor() {
+        super(true)
+    }
+
     new = (efStr: string, u: unit, bodyPart: string) => {
         if (this.lastInstanceId >= NB_EFFECTS_LIMIT - 1) {
             this.data[0].destroy()

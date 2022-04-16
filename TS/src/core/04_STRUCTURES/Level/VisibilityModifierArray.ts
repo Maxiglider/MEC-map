@@ -6,7 +6,7 @@ export class VisibilityModifierArray extends BaseArray<VisibilityModifier> {
     private level: Level
 
     constructor(level: Level) {
-        super()
+        super(true)
         this.level = level
     }
 

@@ -6,7 +6,7 @@ import { Escaper } from './Escaper'
 
 export class EscaperArray extends BaseArray<Escaper> {
     constructor() {
-        super()
+        super(false)
 
         for (let escaperId = 0; escaperId < NB_ESCAPERS; escaperId++) {
             if (IsEscaperInGame(escaperId)) {

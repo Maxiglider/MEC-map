@@ -4,6 +4,10 @@ import { BaseArray } from '../BaseArray'
 import { MonsterType } from './MonsterType'
 
 export class MonsterTypeArray extends BaseArray<MonsterType> {
+    constructor() {
+        super(true)
+    }
+
     getByLabel = (label: string) => {
         for (const [_, monsterType] of pairs(this.data)) {
             if (monsterType.label == label || monsterType.theAlias == label) {

@@ -1,16 +1,26 @@
 type BaseModel = { getId?: () => number; destroy: () => void; toJson: () => {} }
 
 export abstract class BaseArray<T extends BaseModel> {
+    private manageIds = false
+
     protected lastInstanceId = -1
     protected data: { [x: number]: T } = {}
 
-    protected _new = (v: T) => {
-        const id = v.getId?.()
+    constructor(manageIds: boolean) {
+        this.manageIds = manageIds
+    }
 
-        if (id) {
-            this.data[id] = v
-        } else {
+    protected _new = (v: T) => {
+        if (this.manageIds) {
             this.data[++this.lastInstanceId] = v
+        } else {
+            const id = v.getId?.()
+
+            if (!id) {
+                throw 'BaseArray: _new: v.getId() is null'
+            }
+
+            this.data[id] = v
         }
 
         return this.lastInstanceId

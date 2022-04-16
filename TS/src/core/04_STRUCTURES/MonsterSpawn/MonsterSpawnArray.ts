@@ -8,7 +8,7 @@ export class MonsterSpawnArray extends BaseArray<MonsterSpawn> {
     private level: Level
 
     constructor(level: Level) {
-        super()
+        super(false)
         this.level = level
     }
 

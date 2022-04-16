@@ -9,7 +9,7 @@ export class MeteorArray extends BaseArray<Meteor> {
     private level: Level
 
     constructor(level: Level) {
-        super()
+        super(false)
         this.level = level
     }
 

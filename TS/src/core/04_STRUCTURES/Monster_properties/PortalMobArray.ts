@@ -8,7 +8,7 @@ export class PortalMobArray extends BaseArray<PortalMob> {
     private level: Level
 
     constructor(level: Level) {
-        super()
+        super(true)
         this.level = level
     }
 

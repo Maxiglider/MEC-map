@@ -24,7 +24,7 @@ export class Level {
     private start?: Start
     private end?: End
     private triggers: TriggerArray
-    private id: number
+    public id: number = -1
 
     visibilities: VisibilityModifierArray
     monsters: MonsterArray
@@ -33,7 +33,7 @@ export class Level {
     clearMobs: ClearMobArray
     portalMobs: PortalMobArray
 
-    constructor(id: number) {
+    constructor() {
         this.visibilities = new VisibilityModifierArray(this)
         this.triggers = new TriggerArray()
         this.monsters = new MonsterArray(this)
@@ -44,7 +44,6 @@ export class Level {
         this.livesEarnedAtBeginning = 1
         this.isActivatedB = false
         this.startMessage = ''
-        this.id = id
     }
 
     activate(activ: boolean) {
@@ -188,7 +187,7 @@ export class Level {
     }
 
     toJson = () => {
-        const json: {[x: string]: any} = {}
+        const json: { [x: string]: any } = {}
 
         //start message
         if (this.getStartMessage() != null && this.getStartMessage() != '') {

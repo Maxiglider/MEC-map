@@ -9,6 +9,10 @@ import { TerrainTypeWalk } from './TerrainTypeWalk'
 
 //le nombre de terrains du jeu est de 177
 export class TerrainTypeArray extends BaseArray<TerrainType> {
+    constructor() {
+        super(true)
+    }
+
     mainTileset: string = 'auto'
 
     getFromLabel = (label: string) => {

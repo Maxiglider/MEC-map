@@ -19,16 +19,16 @@ import type { VisibilityModifierArray } from './VisibilityModifierArray'
 
 export class LevelArray extends BaseArray<Level> {
     private currentLevel: number
-    private lastInstance: number
 
     constructor() {
-        super()
+        super(true)
         let x1 = GetRectMinX(gg_rct_departLvl_0)
         let y1 = GetRectMinY(gg_rct_departLvl_0)
         let x2 = GetRectMaxX(gg_rct_departLvl_0)
         let y2 = GetRectMaxY(gg_rct_departLvl_0)
 
-        this.data[0] = new Level(0)
+        this.data[0] = new Level()
+        this.data[0].id = 0
         this.data[0].newStart(x1, y1, x2, y2)
         this.data[0].setNbLivesEarned(NB_LIVES_AT_BEGINNING)
         this.data[0].activate(true)
@@ -36,14 +36,13 @@ export class LevelArray extends BaseArray<Level> {
         ServiceManager.getService('Lives').initLives()
 
         this.currentLevel = 0
-        this.lastInstance = 0
     }
 
     goToLevel = (finisher: Escaper | undefined, levelId: number): boolean => {
         let i: number
         let previousLevelId = this.currentLevel
 
-        if (levelId < 0 || levelId > this.lastInstance || levelId === this.currentLevel) {
+        if (levelId < 0 || levelId > this.lastInstanceId || levelId === this.currentLevel) {
             return false
         }
 
@@ -80,7 +79,7 @@ export class LevelArray extends BaseArray<Level> {
     }
 
     goToNextLevel = (finisher?: Escaper): boolean => {
-        if (this.currentLevel >= this.lastInstance) {
+        if (this.currentLevel >= this.lastInstanceId) {
             return false
         }
         this.currentLevel = this.currentLevel + 1
@@ -137,18 +136,19 @@ export class LevelArray extends BaseArray<Level> {
     }
 
     new = () => {
-        this.lastInstance = this.lastInstance + 1
-        this._new(new Level(this.lastInstance))
+        const lvl = new Level()
+        const id = this._new(lvl)
+        lvl.id = id
         return true
     }
 
     destroyLastLevel = (): boolean => {
-        if (this.lastInstance <= 0) {
+        if (this.lastInstanceId <= 0) {
             return false
         }
-        this.data[this.lastInstance].destroy()
-        delete this.data[this.lastInstance]
-        this.lastInstance = this.lastInstance - 1
+        this.data[this.lastInstanceId].destroy()
+        delete this.data[this.lastInstanceId]
+        this.lastInstanceId = this.lastInstanceId - 1
         return true
     }
 
@@ -163,10 +163,10 @@ export class LevelArray extends BaseArray<Level> {
     getLevelFromMonsterSpawnArray = (msa: MonsterSpawnArray) => {
         let i = 0
         while (true) {
-            if (i > this.lastInstance || this.data[i].monsterSpawns == msa) break
+            if (i > this.lastInstanceId || this.data[i].monsterSpawns == msa) break
             i = i + 1
         }
-        if (i > this.lastInstance) {
+        if (i > this.lastInstanceId) {
             return null
         }
         return this.data[i]
@@ -175,10 +175,10 @@ export class LevelArray extends BaseArray<Level> {
     getLevelFromMeteorArray = (ma: MeteorArray) => {
         let i = 0
         while (true) {
-            if (i > this.lastInstance || this.data[i].meteors == ma) break
+            if (i > this.lastInstanceId || this.data[i].meteors == ma) break
             i = i + 1
         }
-        if (i > this.lastInstance) {
+        if (i > this.lastInstanceId) {
             return null
         }
         return this.data[i]
@@ -187,10 +187,10 @@ export class LevelArray extends BaseArray<Level> {
     getLevelFromVisibilityModifierArray = (vma: VisibilityModifierArray) => {
         let i = 0
         while (true) {
-            if (i > this.lastInstance || this.data[i].visibilities == vma) break
+            if (i > this.lastInstanceId || this.data[i].visibilities == vma) break
             i = i + 1
         }
-        if (i > this.lastInstance) {
+        if (i > this.lastInstanceId) {
             return null
         }
         return this.data[i]
@@ -199,10 +199,10 @@ export class LevelArray extends BaseArray<Level> {
     getLevelFromClearMobArray = (clearMobArray: ClearMobArray) => {
         let i = 0
         while (true) {
-            if (i > this.lastInstance || this.data[i].clearMobs == clearMobArray) break
+            if (i > this.lastInstanceId || this.data[i].clearMobs == clearMobArray) break
             i = i + 1
         }
-        if (i > this.lastInstance) {
+        if (i > this.lastInstanceId) {
             return null
         }
         return this.data[i]
@@ -210,20 +210,20 @@ export class LevelArray extends BaseArray<Level> {
 
     clearMonstersOfType = (mt: MonsterType) => {
         let i = 0
-        while (i <= this.lastInstance) {
+        while (i <= this.lastInstanceId) {
             this.data[i].clearMonstersOfType(mt)
             i = i + 1
         }
     }
 
     removeCastersOfType = (ct: CasterType) => {
-        for (let i = 0; i <= this.lastInstance; i++) {
+        for (let i = 0; i <= this.lastInstanceId; i++) {
             this.data[i].removeCastersOfType(ct)
         }
     }
 
     getLastLevelId = (): number => {
-        return this.lastInstance
+        return this.lastInstanceId
     }
 
     getNbMonsters = (mode: string): number => {
@@ -231,7 +231,7 @@ export class LevelArray extends BaseArray<Level> {
         let nb = 0
         let i = 0
         while (true) {
-            if (i > this.lastInstance) break
+            if (i > this.lastInstanceId) break
             nb = nb + this.data[i].getNbMonsters(mode)
             i = i + 1
         }
@@ -241,7 +241,7 @@ export class LevelArray extends BaseArray<Level> {
     toJson = () => {
         const array: any[] = []
 
-        for(let i = 0; i <= this.lastInstanceId; i++){
+        for (let i = 0; i <= this.lastInstanceId; i++) {
             array[i] = this.get(i).toJson()
         }
 
