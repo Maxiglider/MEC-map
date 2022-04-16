@@ -709,10 +709,21 @@ export const ExecuteCommandAll = (escaper: Escaper, cmd: string): boolean => {
 
     //-leaderboard
     if (name === 'leaderboard' || name === 'ldb') {
-        if (nbParam === 1 && IsBoolString(param1)) {
-            escaper.hideLeaderboard = !S2B(param1)
-            ServiceManager.getService('Multiboard').setVisibility(escaper, S2B(param1))
+        if (nbParam === 1) {
+            if (IsBoolString(param1)) {
+                escaper.hideLeaderboard = !S2B(param1)
+                ServiceManager.getService('Multiboard').setVisibility(escaper, S2B(param1))
+            } else if (param1 === 'classic' || param1 === 'leaderboard' || param1 === 'ldb') {
+                ServiceManager.getService('Multiboard').setMode(escaper, 'leaderboard')
+            } else if (param1 === 'reset' || param1 === 'new' || param1 === 'multiboard' || param1 === 'mb') {
+                ServiceManager.getService('Multiboard').setMode(escaper, 'multiboard')
+            } else if (param1 === 'global') {
+                ServiceManager.getService('Multiboard').setStatsMode(escaper, 'global')
+            } else if (param1 === 'current') {
+                ServiceManager.getService('Multiboard').setStatsMode(escaper, 'current')
+            }
         }
+
         return true
     }
 

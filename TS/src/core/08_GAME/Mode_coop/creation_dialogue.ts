@@ -20,13 +20,14 @@ export const InitTrig_creation_dialogue = () => {
             actions: [
                 () => {
                     globals.coopModeActive = GetClickedButton() === btnChoixCoop
-                    ServiceManager.getService('Multiboard').setActive(globals.coopModeActive)
                     dialBoutonAppuye = true
                     if (globals.coopModeActive) {
                         DisplayTextToForce(GetPlayersAll(), 'Coop mode chosen by first player')
                     } else {
                         DisplayTextToForce(GetPlayersAll(), 'Solo mode chosen by first player')
                     }
+
+                    ServiceManager.getService('Multiboard').resetRoundScores()
                 },
             ],
         })
@@ -62,6 +63,8 @@ export const gg_trg_apparition_dialogue_et_fermeture_automatique = createEvent({
                     } else {
                         DisplayTextToForce(GetPlayersAll(), 'Solo mode automatically chosen')
                     }
+
+                    ServiceManager.getService('Multiboard').resetRoundScores()
                 }
             })
         },

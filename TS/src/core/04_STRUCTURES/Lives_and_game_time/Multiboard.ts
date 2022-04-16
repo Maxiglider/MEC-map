@@ -1,12 +1,14 @@
+import { ucfirst } from 'core/01_libraries/Basic_functions'
 import { NB_ESCAPERS } from 'core/01_libraries/Constants'
 import { udg_colorCode } from 'core/01_libraries/Init_colorCodes'
 import { ServiceManager } from 'Services'
 import { ArrayHandler } from 'Utils/ArrayHandler'
+import { literalArray } from 'Utils/ArrayUtils'
 import { createTimer, forRange } from 'Utils/mapUtils'
-import { Timer } from 'w3ts'
-import { getUdgEscapers } from '../../../../globals'
+import { getUdgEscapers, globals } from '../../../../globals'
 import { rawPlayerNames } from '../../06_COMMANDS/COMMANDS_vJass/Command_functions'
 import { Escaper } from '../Escaper/Escaper'
+import { LIVES_PLAYER } from './Lives_and_game_time'
 import { GameTime } from './Time_of_game_trigger'
 
 // Column and row start at index 1
@@ -23,26 +25,52 @@ const getLongestNameWidth = () => {
     return nameWidth / 2 + 3
 }
 
+type IBoardMode = 'multiboard' | 'leaderboard'
+
+type IStatsMode = typeof statsModes[0]
+const statsModes = literalArray(['global', 'current'])
+
 export type IMultiboard = ReturnType<typeof initMultiboard>
 
 export const initMultiboard = () => {
-    let board: multiboard | null
+    let mb: multiboard | null
+    let lb: leaderboard | null
 
     const playerScores: {
         [x: number]: {
-            score: number
-            saves: number
-            deaths: number
+            stats: {
+                [K in IStatsMode]: {
+                    score: number
+                    saves: number
+                    deaths: number
+                }
+            }
+            mode: IBoardMode
+            statsMode: IStatsMode
         }
     } = {}
 
     let amountOfEscapers = 0
 
-    let gameTimeUpdater: Timer | null = null
+    let gameTimeStr = ''
 
     forRange(NB_ESCAPERS, i => {
-        playerScores[i] = { score: 0, saves: 0, deaths: 0 }
+        playerScores[i] = {
+            stats: { global: { score: 0, saves: 0, deaths: 0 }, current: { score: 0, saves: 0, deaths: 0 } },
+            mode: 'multiboard',
+            statsMode: 'global',
+        }
     })
+
+    const resetRoundScores = () => {
+        forRange(NB_ESCAPERS, i => {
+            playerScores[i].stats.current.score = 0
+            playerScores[i].stats.current.saves = 0
+            playerScores[i].stats.current.deaths = 0
+        })
+
+        reinitBoards()
+    }
 
     const initMultiboard = () => {
         const cols = 4
@@ -50,73 +78,101 @@ export const initMultiboard = () => {
 
         const nameWidth = getLongestNameWidth()
 
-        board = CreateMultiboardBJ(cols, rows, 'Scoreboard')
+        mb = CreateMultiboardBJ(cols, rows, `Scoreboard - Global`)
 
         for (let col = 1; col <= cols; col++) {
             for (let row = 1; row <= rows; row++) {
-                MultiboardSetItemStyleBJ(board, col, row, true, false)
+                MultiboardSetItemStyleBJ(mb, col, row, true, false)
 
                 if (col === 1) {
                     if (row <= 2) {
                         // Header
-                        MultiboardSetItemWidthBJ(board, col, row, 15)
+                        MultiboardSetItemWidthBJ(mb, col, row, 15)
                     } else {
                         // Players
-                        MultiboardSetItemWidthBJ(board, col, row, nameWidth)
+                        MultiboardSetItemWidthBJ(mb, col, row, nameWidth)
                     }
                 } else {
-                    MultiboardSetItemWidthBJ(board, col, row, 4)
+                    MultiboardSetItemWidthBJ(mb, col, row, 4)
                 }
             }
         }
 
-        MultiboardSetItemValueBJ(board, 1, 3, 'Player Name')
-        MultiboardSetItemValueBJ(board, 2, 3, 'Score')
-        MultiboardSetItemValueBJ(board, 3, 3, 'Saves')
-        MultiboardSetItemValueBJ(board, 4, 3, 'Deaths')
+        MultiboardSetItemValueBJ(mb, 1, 3, 'Player Name')
+        MultiboardSetItemValueBJ(mb, 2, 3, 'Score')
+        MultiboardSetItemValueBJ(mb, 3, 3, 'Saves')
+        MultiboardSetItemValueBJ(mb, 4, 3, 'Deaths')
+    }
 
-        // Toggle visiblity to update multiboard width
+    const initLeaderboard = () => {
+        lb = CreateLeaderboardBJ(GetPlayersAll(), '')
+        LeaderboardAddItemBJ(Player(0), lb, 'Game time', 0)
+        LeaderboardSetPlayerItemStyleBJ(Player(0), lb, true, false, false)
+        LeaderboardAddItemBJ(LIVES_PLAYER, lb, 'Lives', 0)
+    }
+
+    const destroyBoards = () => {
+        if (mb) {
+            DestroyMultiboard(mb)
+            mb = null
+        }
+
+        if (lb) {
+            DestroyLeaderboard(lb)
+            lb = null
+        }
+    }
+
+    const reinitBoards = () => {
+        // Hide boards to reset position
+        getUdgEscapers().forMainEscapers(escaper => setVisibility(escaper, false))
+
+        destroyBoards()
+
+        globals.coopModeActive && initMultiboard()
+        initLeaderboard()
+
+        // Toggle visiblity to update board width
         getUdgEscapers().forMainEscapers(escaper => setVisibility(escaper, true))
 
-        updateMultiboard()
-    }
-
-    const destroyMultiboard = () => {
-        board && DestroyMultiboard(board)
-    }
-
-    const reinitMultiboard = () => {
-        destroyMultiboard()
-        initMultiboard()
+        updateBoards()
     }
 
     const updateLives = (lives: number) => {
-        if (!board) return
-
-        MultiboardSetItemValueBJ(board, 1, 1, `|Cfffed312Lives: ${lives}`)
+        mb && MultiboardSetItemValueBJ(mb, 1, 1, `${udg_colorCode[6]}Lives: ${lives}`)
+        lb && LeaderboardSetPlayerItemValueBJ(LIVES_PLAYER, lb, lives)
     }
 
     const updateGametime = (reinitCheck: boolean) => {
-        if (!board) return
-
         if (reinitCheck) {
             const currentCount = getUdgEscapers().countMain()
 
             if (currentCount !== amountOfEscapers) {
-                reinitMultiboard()
+                reinitBoards()
                 amountOfEscapers = currentCount
             }
         }
 
-        MultiboardSetItemValueBJ(board, 1, 2, `|Cfffed312Game time: ${GameTime.getGameTime()}`)
+        mb && MultiboardSetItemValueBJ(mb, 1, 2, `|Cfffed312Game time: ${gameTimeStr}`)
+        lb && LeaderboardSetPlayerItemLabelBJ(Player(0), lb, `|Cfffed312Game time: ${gameTimeStr}`)
     }
 
-    const playerSort = (a: Escaper, b: Escaper) => {
-        return playerScores[GetPlayerId(a.getPlayer())].score > playerScores[GetPlayerId(b.getPlayer())].score
+    const playerSortGlobal = (a: Escaper, b: Escaper) => {
+        return (
+            playerScores[GetPlayerId(a.getPlayer())].stats.global.score >
+            playerScores[GetPlayerId(b.getPlayer())].stats.global.score
+        )
+    }
+
+    const playerSortCurrent = (a: Escaper, b: Escaper) => {
+        return (
+            playerScores[GetPlayerId(a.getPlayer())].stats.current.score >
+            playerScores[GetPlayerId(b.getPlayer())].stats.current.score
+        )
     }
 
     const updatePlayers = () => {
-        if (!board) return
+        if (!mb) return
 
         let rowIndex = 0
 
@@ -126,30 +182,41 @@ export const initMultiboard = () => {
             sortedArray.push(escaper)
         }
 
-        table.sort(sortedArray, playerSort)
+        for (let i = 0; i < NB_ESCAPERS; i++) {
+            // TODO; Hope this doesn't desync
+            if (GetLocalPlayer() === Player(i)) {
+                const statsMode = playerScores[i].statsMode
 
-        for (const escaper of sortedArray) {
-            if (escaper.isEscaperSecondary()) {
-                continue
+                if (statsMode === 'current') {
+                    table.sort(sortedArray, playerSortCurrent)
+                } else if (statsMode === 'global') {
+                    table.sort(sortedArray, playerSortGlobal)
+                }
+
+                for (const escaper of sortedArray) {
+                    if (escaper.isEscaperSecondary()) {
+                        continue
+                    }
+
+                    const playerId = escaper.getEscaperId()
+                    const playerName = GetPlayerName(escaper.getPlayer())
+
+                    const playerScore = playerScores[playerId].stats[statsMode]
+
+                    MultiboardSetItemValueBJ(mb, 1, 4 + rowIndex, udg_colorCode[playerId] + playerName)
+                    MultiboardSetItemValueBJ(mb, 2, 4 + rowIndex, udg_colorCode[playerId] + playerScore.score)
+                    MultiboardSetItemValueBJ(mb, 3, 4 + rowIndex, udg_colorCode[playerId] + playerScore.saves)
+                    MultiboardSetItemValueBJ(mb, 4, 4 + rowIndex, udg_colorCode[playerId] + playerScore.deaths)
+
+                    rowIndex++
+                }
             }
-
-            const playerId = escaper.getEscaperId()
-            const playerName = GetPlayerName(escaper.getPlayer())
-
-            MultiboardSetItemValueBJ(board, 1, 4 + rowIndex, udg_colorCode[playerId] + playerName)
-            MultiboardSetItemValueBJ(board, 2, 4 + rowIndex, udg_colorCode[playerId] + playerScores[playerId].score)
-            MultiboardSetItemValueBJ(board, 3, 4 + rowIndex, udg_colorCode[playerId] + playerScores[playerId].saves)
-            MultiboardSetItemValueBJ(board, 4, 4 + rowIndex, udg_colorCode[playerId] + playerScores[playerId].deaths)
-
-            rowIndex++
         }
 
         ArrayHandler.clearArray(sortedArray)
     }
 
-    const updateMultiboard = () => {
-        if (!board) return
-
+    const updateBoards = () => {
         updateGametime(false)
         updateLives(ServiceManager.getService('Lives').get())
 
@@ -157,30 +224,52 @@ export const initMultiboard = () => {
     }
 
     const setVisibility = (escaper: Escaper, visible: boolean) => {
-        if (!board) return
+        if (!mb || !lb) return
+
+        const playerMode = playerScores[GetPlayerId(escaper.getPlayer())]
 
         if (GetLocalPlayer() === escaper.getPlayer()) {
-            MultiboardMinimizeBJ(escaper.hideLeaderboard || !visible, board)
+            MultiboardSetTitleText(mb, `Scoreboard - ${ucfirst(playerMode.statsMode)}`)
+            MultiboardMinimizeBJ(escaper.hideLeaderboard || playerMode.mode !== 'multiboard' || !visible, mb)
+            LeaderboardDisplay(lb, !escaper.hideLeaderboard && playerMode.mode === 'leaderboard' && visible)
         }
     }
 
+    const setMode = (escaper: Escaper, mode: IBoardMode) => {
+        playerScores[GetPlayerId(escaper.getPlayer())].mode = mode
+
+        setVisibility(escaper, true)
+    }
+
+    const setStatsMode = (escaper: Escaper, statsMode: IStatsMode) => {
+        playerScores[GetPlayerId(escaper.getPlayer())].statsMode = statsMode
+
+        updatePlayers()
+
+        setVisibility(escaper, true)
+    }
+
     const increasePlayerScore = (playerId: number, score: 'saves' | 'deaths') => {
-        playerScores[playerId][score]++
-        playerScores[playerId].score = playerScores[playerId].saves - playerScores[playerId].deaths
+        for (const statsMode of statsModes) {
+            playerScores[playerId].stats[statsMode][score]++
+            playerScores[playerId].stats[statsMode].score =
+                playerScores[playerId].stats[statsMode].saves - playerScores[playerId].stats[statsMode].deaths
+        }
 
         updatePlayers()
     }
 
-    const setActive = (active: boolean) => {
-        if (active) {
-            initMultiboard()
-            amountOfEscapers = getUdgEscapers().countMain()
-            gameTimeUpdater = createTimer(1, true, () => updateGametime(true))
-        } else {
-            destroyMultiboard()
-            gameTimeUpdater?.destroy()
-        }
-    }
+    // If you initialize the boards too early they wont show
+    createTimer(3, false, () => {
+        reinitBoards()
+        amountOfEscapers = getUdgEscapers().countMain()
+    })
 
-    return { setVisibility, increasePlayerScore, updateLives, setActive }
+    createTimer(1, true, () => {
+        gameTimeStr = GameTime.getGameTime()
+
+        updateGametime(true)
+    })
+
+    return { setVisibility, setMode, setStatsMode, increasePlayerScore, updateLives, resetRoundScores }
 }
