@@ -32,6 +32,7 @@ export class LevelArray extends BaseArray<Level> {
         this.data[0].newStart(x1, y1, x2, y2)
         this.data[0].setNbLivesEarned(NB_LIVES_AT_BEGINNING)
         this.data[0].activate(true)
+        this.lastInstanceId++
 
         ServiceManager.getService('Lives').initLives()
 
