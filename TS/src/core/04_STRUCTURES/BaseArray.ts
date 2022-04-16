@@ -19,7 +19,7 @@ export abstract class BaseArray<T extends BaseModel> {
             const id = v.getId?.()
 
             if (!id) {
-                throw 'BaseArray: _new: v.getId() is null'
+                throw `BaseArray: _new: v.getId() is null (${this.constructor.name})`
             }
 
             this.data[id] = v

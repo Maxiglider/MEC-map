@@ -24,7 +24,7 @@ const initChangeOneTerrain = () => {
     }
 
     const ChangeOneTerrain = (terrainTypeLabel: string, newTerrainType: string) => {
-        const terrainType = getUdgTerrainTypes().getFromLabel(terrainTypeLabel)
+        const terrainType = getUdgTerrainTypes().getByLabel(terrainTypeLabel)
         if (terrainType === null) {
             throw 'Wrong terrain label "' + terrainTypeLabel + '"'
         }

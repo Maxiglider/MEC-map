@@ -15,7 +15,7 @@ export class TerrainTypeArray extends BaseArray<TerrainType> {
 
     mainTileset: string = 'auto'
 
-    getFromLabel = (label: string) => {
+    getByLabel = (label: string) => {
         for (const [_, terrainType] of pairs(this.data)) {
             if (terrainType.label === label || terrainType.theAlias === label) {
                 return terrainType
@@ -48,7 +48,7 @@ export class TerrainTypeArray extends BaseArray<TerrainType> {
     }
 
     isLabelAlreadyUsed = (label: string) => {
-        return this.getFromLabel(label) !== null
+        return this.getByLabel(label) !== null
     }
 
     newWalk = (label: string, terrainTypeId: number, walkspeed: number) => {
@@ -123,7 +123,7 @@ export class TerrainTypeArray extends BaseArray<TerrainType> {
         nbTerrainsDone = 0
         while (true) {
             if (nbTerrainsDone === this.count()) break
-            terrainType = this.getFromLabel(CmdParam(cmd, nbTerrainsDone + 1))
+            terrainType = this.getByLabel(CmdParam(cmd, nbTerrainsDone + 1))
             //vérification que le terrain existe
             if (terrainType === null) {
                 return false
