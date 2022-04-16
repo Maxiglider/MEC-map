@@ -9,10 +9,10 @@ export const initSaveLoad = () => {
     const localFileCache: { [x: string]: string } = {}
 
     return {
-        saveFile: (fileName: string, player: player, data: string) => {
-            localFileCache[`${GetPlayerId(player)}_${fileName}`] = data
+        saveFile: (fileName: string, player: player | null, data: string) => {
+            player && (localFileCache[`${GetPlayerId(player)}_${fileName}`] = data)
 
-            if (GetLocalPlayer() === player) {
+            if (!player || GetLocalPlayer() === player) {
                 syncSaveLoad.writeFile(fileName, data)
             }
         },
