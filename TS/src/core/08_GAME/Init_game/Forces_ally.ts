@@ -1,7 +1,5 @@
 import { createEvent } from 'Utils/mapUtils'
 
-// TODO; Trigger has no events and no external calls..?
-
 export const InitTrig_Forces_ally = () => {
     createEvent({
         events: [],
