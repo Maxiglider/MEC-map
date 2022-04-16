@@ -185,7 +185,7 @@ end
 MEC_core = nil
 
 function initMEC_core()
-    MEC_core = get_MEC_core().MEC_core
+    MEC_core = get_MEC_core()().MEC_core
 end
 
 onGlobalInit(initMEC_core)
