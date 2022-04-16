@@ -261,8 +261,8 @@ export abstract class Monster {
 
     toJson() {
         return {
-            monsterTypeLabel: this.mt?.label,
-            id: this.id
+            monsterClassName: this.constructor.name,
+            monsterTypeLabel: this.mt?.label
         }
     }
 }

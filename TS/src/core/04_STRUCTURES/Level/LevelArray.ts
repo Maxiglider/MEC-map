@@ -237,14 +237,4 @@ export class LevelArray extends BaseArray<Level> {
         }
         return nb
     }
-
-    toJson = () => {
-        const array: any[] = []
-
-        for (let i = 0; i <= this.lastInstanceId; i++) {
-            array[i] = this.get(i).toJson()
-        }
-
-        return array
-    }
 }

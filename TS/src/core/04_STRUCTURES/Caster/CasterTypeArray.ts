@@ -73,6 +73,4 @@ export class CasterTypeArray extends BaseArray<CasterType> {
             Text.erP(p, 'no caster type saved')
         }
     }
-
-    toJson = () => Object.values(this.data).map(item => item.toJson())
 }
