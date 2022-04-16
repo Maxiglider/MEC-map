@@ -26,6 +26,12 @@ export class VisibilityModifierArray extends BaseArray<VisibilityModifier> {
         return vm
     }
 
+    newFromJson = (visibilitiesJson: {[x: string]: any}[]) =>{
+        for(let v of visibilitiesJson){
+            this.new(v.x1, v.y1, v.x2, v.y2)
+        }
+    }
+
     removeVisibility = (arrayId: number) => {
         delete this.data[arrayId]
     }

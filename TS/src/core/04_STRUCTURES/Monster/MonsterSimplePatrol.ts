@@ -37,8 +37,8 @@ export class MonsterSimplePatrol extends Monster {
     private x2: number
     private y2: number
 
-    constructor(mt: MonsterType, x1: number, y1: number, x2: number, y2: number) {
-        super(mt)
+    constructor(mt: MonsterType, x1: number, y1: number, x2: number, y2: number, forceId: number | null = null) {
+        super(mt, forceId)
 
         this.x1 = x1
         this.y1 = y1

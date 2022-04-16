@@ -30,8 +30,8 @@ const MonsterMultiplePatrols_move_Actions = () => {
 }
 
 export class MonsterMultiplePatrols extends Monster {
-    static X: number[]
-    static Y: number[]
+    static X: number[] = []
+    static Y: number[] = []
 
     private currentMove: number
     private sens: number //0 : normal toujours positif, 1 : sens normal avec changement, 2 : sens inversé avec changement
@@ -42,8 +42,8 @@ export class MonsterMultiplePatrols extends Monster {
     private t: trigger[] = []
     private currentTrigger?: trigger
 
-    constructor(mt: MonsterType, mode: string) {
-        super(mt)
+    constructor(mt: MonsterType, mode: string, forceId: number | null = null) {
+        super(mt, forceId)
 
         //mode == "normal" (0, 1, 2, 3, 0 , 1...) ou mode == "string" (0, 1, 2, 3, 2, 1...)
         if (mode !== 'normal' && mode !== 'string') {
@@ -228,7 +228,7 @@ export class MonsterMultiplePatrols extends Monster {
     toJson() {
         return {
             ...super.toJson(),
-            sens: this.sens > 0 ? 'string' : 'normal',
+            mode: this.sens > 0 ? 'string' : 'normal',
             xArr: arrayValuesRound(this.x),
             yArr: arrayValuesRound(this.y),
         }

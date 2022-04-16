@@ -34,7 +34,25 @@ export class MonsterTypeArray extends BaseArray<MonsterType> {
             throw 'Label already used'
         }
 
-        this._new(new MonsterType(label, unitTypeId, scale, immolationRadius, speed, isClickable))
+        const monsterType = new MonsterType(label, unitTypeId, scale, immolationRadius, speed, isClickable)
+        this._new(monsterType)
+
+        return monsterType
+    }
+
+    newFromJson = (monsterTypesJson: {[x: string]: any}[]) =>{
+        for(let mt of monsterTypesJson){
+            const unitTypeId = FourCC(mt.unitTypeId)
+            const monsterType = this.new(mt.label, unitTypeId, mt.scale, mt.immolationRadius, mt.speed, mt.isClickable)
+            monsterType.setHeight(mt.height)
+            monsterType.setNbMeteorsToKill(mt.nbMeteorsToKill)
+            if(mt.alias){
+                monsterType.setAlias(mt.alias)
+            }
+            if(mt.killingEffect){
+                monsterType.setKillingEffectStr(mt.killingEffect)
+            }
+        }
     }
 
     remove = (label: string): boolean => {

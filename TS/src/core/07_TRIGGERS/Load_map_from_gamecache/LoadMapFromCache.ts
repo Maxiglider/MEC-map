@@ -1,6 +1,6 @@
 import {jsonDecode} from "../../01_libraries/Basic_functions";
 import {Text} from "../../01_libraries/Text";
-import {getUdgTerrainTypes} from "../../../../globals";
+import {getUdgCasterTypes, getUdgLevels, getUdgMonsterTypes, getUdgTerrainTypes} from "../../../../globals";
 
 
 export class LoadMapFromCache {
@@ -20,7 +20,7 @@ export class LoadMapFromCache {
                 }
 
                 //monster types
-                /*if(gameData.monsterTypes){
+                if(gameData.monsterTypes){
                     getUdgMonsterTypes().newFromJson(gameData.monsterTypes)
                 }
 
@@ -32,7 +32,8 @@ export class LoadMapFromCache {
                 //levels
                 if(gameData.levels){
                     getUdgLevels().newFromJson(gameData.levels)
-                }*/
+                    getUdgLevels().refreshCurrentLevel()
+                }
             }
         }
     }

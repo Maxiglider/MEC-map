@@ -293,7 +293,7 @@ export class MonsterType {
         alias: this.theAlias,
         unitTypeId: Ascii2String(this.unitTypeId),
         scale: this.scale,
-        immolationRadius: this.getImmolationRadiusStr(),
+        immolationRadius: S2I(this.getImmolationRadiusStr()),
         speed: R2I(this.speed),
         isClickable: this.isClickableB,
         killingEffect: this.killingEffectStr,

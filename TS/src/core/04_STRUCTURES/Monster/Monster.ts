@@ -35,9 +35,18 @@ export abstract class Monster {
 
     protected portalMob?: PortalMob
 
-    constructor(monsterType?: MonsterType) {
+    constructor(monsterType?: MonsterType, forceId: number | null = null) {
         this.mt = monsterType
-        this.id = ++Monster.lastInstanceId
+
+        if(forceId !== null){
+            this.id = forceId
+
+            if(Monster.lastInstanceId < forceId){
+                Monster.lastInstanceId = forceId
+            }
+        }else{
+            this.id = ++Monster.lastInstanceId
+        }
 
         udg_monsters[this.id] = this
 
@@ -261,6 +270,7 @@ export abstract class Monster {
 
     toJson() {
         return {
+            id: this.id,
             monsterClassName: this.constructor.name,
             monsterTypeLabel: this.mt?.label
         }

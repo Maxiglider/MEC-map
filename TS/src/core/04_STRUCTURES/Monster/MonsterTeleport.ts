@@ -32,8 +32,8 @@ export class MonsterTeleport extends Monster {
     private y: number[] = []
     private t: timer
 
-    constructor(mt: MonsterType, period: number, angle: number, mode: string) {
-        super(mt)
+    constructor(mt: MonsterType, period: number, angle: number, mode: string, forceId: number | null = null) {
+        super(mt, forceId)
 
         //mode == "normal" (0, 1, 2, 3, 0 , 1...) ou mode == "string" (0, 1, 2, 3, 2, 1...)
         if (mode !== 'normal' && mode !== 'string') {
@@ -226,7 +226,9 @@ export class MonsterTeleport extends Monster {
     toJson() {
         return {
             ...super.toJson(),
-            sens: this.sens > 0 ? 'string' : 'normal',
+            mode: this.sens > 0 ? 'string' : 'normal',
+            period: this.period,
+            angle: R2I(this.angle),
             xArr: arrayValuesRound(this.x),
             yArr: arrayValuesRound(this.y),
         }

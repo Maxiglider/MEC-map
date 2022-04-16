@@ -2,7 +2,7 @@ import { NB_LIVES_AT_BEGINNING } from 'core/01_libraries/Constants'
 import { Text } from 'core/01_libraries/Text'
 import { gg_trg_apparition_dialogue_et_fermeture_automatique } from 'core/08_GAME/Mode_coop/creation_dialogue'
 import { ServiceManager } from 'Services'
-import { getUdgEscapers } from '../../../../globals'
+import {getUdgCasterTypes, getUdgEscapers, getUdgMonsterTypes} from '../../../../globals'
 import { MoveCamExceptForPlayer } from '../../01_libraries/Basic_functions'
 import { udg_colorCode } from '../../01_libraries/Init_colorCodes'
 import { BaseArray } from '../BaseArray'
@@ -16,6 +16,12 @@ import type { ClearMobArray } from '../Monster_properties/ClearMobArray'
 import { Level } from './Level'
 import { IsLevelBeingMade } from './Level_functions'
 import type { VisibilityModifierArray } from './VisibilityModifierArray'
+import {MonsterNoMove} from "../Monster/MonsterNoMove";
+import {MonsterSimplePatrol} from "../Monster/MonsterSimplePatrol";
+import {MonsterMultiplePatrols} from "../Monster/MonsterMultiplePatrols";
+import {Monster} from "../Monster/Monster";
+import {MonsterTeleport} from "../Monster/MonsterTeleport";
+import {Caster} from "../Caster/Caster";
 
 export class LevelArray extends BaseArray<Level> {
     private currentLevel: number
@@ -37,6 +43,11 @@ export class LevelArray extends BaseArray<Level> {
         ServiceManager.getService('Lives').initLives()
 
         this.currentLevel = 0
+    }
+
+    refreshCurrentLevel = () => {
+        this.data[this.currentLevel].activate(false)
+        this.data[this.currentLevel].activate(true)
     }
 
     goToLevel = (finisher: Escaper | undefined, levelId: number): boolean => {
@@ -140,7 +151,109 @@ export class LevelArray extends BaseArray<Level> {
         const lvl = new Level()
         const id = this._new(lvl)
         lvl.id = id
-        return true
+        return lvl
+    }
+
+    newFromJson = (levelsJson: {[x: string]: any}[]) => {
+        for(let levelJson of levelsJson){
+            const level = this.new()
+
+            //start message
+            if(levelJson.startMessage){
+                level.setStartMessage(levelJson.startMessage)
+            }
+
+            //nb lives earned
+            if(levelJson.nbLives) {
+                level.setNbLivesEarned(levelJson.nbLives)
+            }
+
+            //start
+            if(levelJson.start){
+                level.newStartFromJson(levelJson.start)
+            }
+
+            //end
+            if(levelJson.end){
+                level.newEndFromJson(levelJson.end)
+            }
+
+            //visibilities
+            if(levelJson.visibilities){
+                level.visibilities.newFromJson(levelJson.visibilities)
+            }
+
+            //monsters
+            if(levelJson.monsters){
+                for(let m of levelJson.monsters){
+                    let monster: Monster
+
+                    if(m.monsterClassName == "Caster") {
+
+                        const ct = getUdgCasterTypes().getByLabel(m.casterTypeLabel)
+
+                        if(!ct){
+                            Text.erA("Caster type \"" + m.casterTypeLabel + "\" unknwon")
+                        }else {
+                            monster = new Caster(ct, m.x, m.y, m.angle, m.id)
+                        }
+
+                    }else {
+                        const mt = getUdgMonsterTypes().getByLabel(m.monsterTypeLabel)
+
+                        if (!mt) {
+                            Text.erA("Monster label \"" + m.monsterTypeLabel + "\" unknown")
+                        } else {
+                            if (m.monsterClassName == "MonsterNoMove") {
+
+                                monster = new MonsterNoMove(mt, m.x, m.y, m.angle, m.id)
+
+                            } else if (m.monsterClassName == "MonsterSimplePatrol") {
+
+                                monster = new MonsterSimplePatrol(mt, m.x1, m.y1, m.x2, m.y2, m.id)
+
+                            } else if (m.monsterClassName == "MonsterMultiplePatrols") {
+
+                                for (const [n, x] of pairs(m.xArr)) {
+                                    const y = m.yArr[n]
+                                    MonsterMultiplePatrols.storeNewLoc(x, y)
+                                }
+                                monster = new MonsterMultiplePatrols(mt, m.mode, m.id)
+
+                            } else if (m.monsterClassName == "MonsterTeleport") {
+
+                                for (const [n, x] of pairs(m.xArr)) {
+                                    const y = m.yArr[n]
+                                    MonsterTeleport.storeNewLoc(x, y)
+                                }
+                                monster = new MonsterTeleport(mt, m.period, m.angle, m.mode, m.id)
+
+                            }
+                        }
+                    }
+                }
+            }
+
+            /*//monster spawns
+            if(levelJson.monsterSpawns){
+                level.monsterSpawns.newFromJson(levelJson.monsterSpawns)
+            }
+
+            //meteors
+            if(levelJson.meteors){
+                level.meteors.newFromJson(levelJson.meteors)
+            }
+
+            //clearMobs
+            if(levelJson.clearMobs){
+                level.clearMobs.newFromJson(levelJson.clearMobs)
+            }
+
+            //portalMobs
+            if(levelJson.portalMobs){
+                level.portalMobs.newFromJson(levelJson.portalMobs)
+            }*/
+        }
     }
 
     destroyLastLevel = (): boolean => {

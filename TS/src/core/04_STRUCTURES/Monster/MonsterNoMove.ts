@@ -8,8 +8,8 @@ export class MonsterNoMove extends Monster {
     private y: number
     private angle: number
 
-    constructor(mt: MonsterType, x: number, y: number, angle: number) {
-        super(mt)
+    constructor(mt: MonsterType, x: number, y: number, angle: number, forceId: number | null = null) {
+        super(mt, forceId)
 
         this.x = x
         this.y = y

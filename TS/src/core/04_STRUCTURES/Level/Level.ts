@@ -96,12 +96,20 @@ export class Level {
         this.start = new Start(x1, y1, x2, y2)
     }
 
+    newStartFromJson(data: {[x: string]: number}){
+        this.newStart(data.minX, data.minY, data.maxX, data.maxY)
+    }
+
     newEnd(x1: number, y1: number, x2: number, y2: number) {
         this.end && this.end.destroy()
         this.end = new End(x1, y1, x2, y2)
         if (this.isActivatedB) {
             this.end.activate(true)
         }
+    }
+
+    newEndFromJson(data: {[x: string]: number}){
+        this.newEnd(data.minX, data.minY, data.maxX, data.maxY)
     }
 
     getEnd = () => {

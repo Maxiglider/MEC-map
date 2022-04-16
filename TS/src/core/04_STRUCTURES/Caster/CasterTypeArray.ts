@@ -2,6 +2,7 @@ import { Text } from 'core/01_libraries/Text'
 import { BaseArray } from '../BaseArray'
 import { MonsterType } from '../Monster/MonsterType'
 import { CasterType } from './CasterType'
+import {getUdgMonsterTypes} from "../../../../globals";
 
 export class CasterTypeArray extends BaseArray<CasterType> {
     constructor() {
@@ -48,6 +49,22 @@ export class CasterTypeArray extends BaseArray<CasterType> {
         this._new(casterType)
 
         return casterType
+    }
+
+    newFromJson = (casterTypesJson: {[x: string]: any}[]) => {
+        for(let ct of casterTypesJson){
+            const casterMT = getUdgMonsterTypes().getByLabel(ct.casterMonsterTypeLabel)
+            const projectileMT = getUdgMonsterTypes().getByLabel(ct.projectileMonsterTypeLabel)
+
+            if(!casterMT || !projectileMT){
+                Text.erA("Unknown monster type for caster type \"" + ct.label + "\"")
+            }else {
+                const casterType = this.new(ct.label, casterMT, projectileMT, ct.range, ct.projectileSpeed, ct.loadTime, ct.animation)
+                if(ct.alias){
+                    casterType?.setAlias(ct.alias)
+                }
+            }
+        }
     }
 
     remove = (label: string): boolean => {
