@@ -109,14 +109,16 @@ export abstract class TerrainType {
         return display
     }
 
-    toJson = () => ({
-        label: this.label,
-        alias: this.theAlias,
-        orderId: this.orderId,
-        kind: this.kind,
-        terrainTypeId: Ascii2String(this.terrainTypeId),
-        cliffClassId: this.cliffClassId
-    })
+    toJson() {
+        return {
+            label: this.label,
+            alias: this.theAlias,
+            orderId: this.orderId,
+            kind: this.kind,
+            terrainTypeId: Ascii2String(this.terrainTypeId),
+            cliffClassId: this.cliffClassId
+        }
+    }
 
     abstract destroy(): void
 }

@@ -92,12 +92,14 @@ export class TerrainTypeDeath extends TerrainType {
         Text.P_timed(p, TERRAIN_DATA_DISPLAY_TIME, display)
     }
 
-    toJson = () => ({
-        ...super.toJson(),
-        killingEffet: this.getKillingEffectStr(),
-        timeToKill: this.getTimeToKill(),
-        toleranceDist: this.getToleranceDist()
-    })
+    toJson() {
+        return {
+            ...super.toJson(),
+            killingEffet: this.getKillingEffectStr(),
+            timeToKill: this.getTimeToKill(),
+            toleranceDist: this.getToleranceDist()
+        }
+    }
 
     destroy = () => {
         this.killingTimers.destroy()

@@ -34,10 +34,12 @@ export class TerrainTypeWalk extends TerrainType {
         Text.P_timed(p, TERRAIN_DATA_DISPLAY_TIME, display)
     }
 
-    toJson = () => ({
-        ...super.toJson(),
-        walkSpeed: R2I(this.getWalkSpeed())
-    })
+    toJson(){
+        return {
+            ...super.toJson(),
+            walkSpeed: R2I(this.getWalkSpeed())
+        }
+    }
 
     destroy = () => {
 

@@ -56,11 +56,13 @@ export class TerrainTypeSlide extends TerrainType {
         Text.P_timed(p, TERRAIN_DATA_DISPLAY_TIME, display)
     }
 
-    toJson = () => ({
-        ...super.toJson(),
-        slideSpeed: this.getSlideSpeed(),
-        canTurn: this.getCanTurn()
-    })
+    toJson() {
+        return {
+            ...super.toJson(),
+            slideSpeed: this.getSlideSpeed(),
+            canTurn: this.getCanTurn()
+        }
+    }
 
     destroy = () => {
 

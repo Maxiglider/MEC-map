@@ -32,10 +32,12 @@ export class MonsterNoMove extends Monster {
         super.createUnit(() => (this.mt ? NewImmobileMonster(this.mt, this.x, this.y, this.angle) : undefined))
     }
 
-    toJson = () => ({
-        ...super.toJson(),
-        x: R2I(this.x),
-        y: R2I(this.y),
-        angle: R2I(this.angle)
-    })
+    toJson() {
+        return {
+            ...super.toJson(),
+            x: R2I(this.x),
+            y: R2I(this.y),
+            angle: R2I(this.angle)
+        }
+    }
 }

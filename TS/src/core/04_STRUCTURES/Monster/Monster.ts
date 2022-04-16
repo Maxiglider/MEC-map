@@ -259,8 +259,10 @@ export abstract class Monster {
         this.level?.monsters.removeMonster(this.id)
     }
 
-    toJson = () => ({
-        monsterTypeLabel: this.mt?.label,
-        id: this.id
-    })
+    toJson() {
+        return {
+            monsterTypeLabel: this.mt?.label,
+            id: this.id
+        }
+    }
 }
