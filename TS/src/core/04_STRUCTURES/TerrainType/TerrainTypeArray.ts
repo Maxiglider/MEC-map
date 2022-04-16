@@ -6,6 +6,7 @@ import { TerrainType } from './TerrainType'
 import { TerrainTypeDeath } from './TerrainTypeDeath'
 import { TerrainTypeSlide } from './TerrainTypeSlide'
 import { TerrainTypeWalk } from './TerrainTypeWalk'
+import {TerrainTypeMax} from "../../07_TRIGGERS/Modify_terrain_Functions/Terrain_type_max";
 
 //le nombre de terrains du jeu est de 177
 export class TerrainTypeArray extends BaseArray<TerrainType> {
@@ -172,8 +173,38 @@ export class TerrainTypeArray extends BaseArray<TerrainType> {
         }
 
         return {
-            mainTileset: this.mainTileset,
+            mainTileset: this.mainTileset, //todomax put this out of smic "gameData", and put it in "terrain"
             terrainTypesMec: arr.map(terrainType => terrainType.toJson()),
         }
     }
+
+    newFromJson = (terrainTypesJson: {[x: string]: any}[]) =>{
+        for(let terrainTypeJson of terrainTypesJson){
+            const terrainTypeId = TerrainTypeMax.TerrainTypeAsciiString2TerrainTypeId(terrainTypeJson.terrainTypeId)
+
+            let tt: TerrainType | null = null
+
+            switch(terrainTypeJson.kind){
+                case 'walk':
+                    tt = this.newWalk(terrainTypeJson.label, terrainTypeId, terrainTypeJson.walkSpeed)
+
+                    break
+
+                case 'slide':
+                    tt = this.newSlide(terrainTypeJson.label, terrainTypeId, terrainTypeJson.slideSpeed, terrainTypeJson.canTurn)
+
+                    break
+
+                case 'death':
+                    tt = this.newDeath(terrainTypeJson.label, terrainTypeId, terrainTypeJson.killingEffet, terrainTypeJson.timeToKill, terrainTypeJson.toleranceDist)
+
+                    break
+            }
+
+            if(tt && terrainTypeJson.alias) {
+                tt.setAlias(terrainTypeJson.alias)
+            }
+        }
+    }
+
 }
