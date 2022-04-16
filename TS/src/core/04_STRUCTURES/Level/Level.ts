@@ -189,6 +189,9 @@ export class Level {
     toJson = () => {
         const json: { [x: string]: any } = {}
 
+        //level id
+        json.id = this.id
+
         //start message
         if (this.getStartMessage() != null && this.getStartMessage() != '') {
             json.startMessage = this.getStartMessage()

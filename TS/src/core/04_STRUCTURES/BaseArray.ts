@@ -1,3 +1,5 @@
+import {sortArrayOfObjectsByIds} from "../01_libraries/Basic_functions";
+
 type BaseModel = { getId?: () => number; destroy: () => void; toJson: () => {} }
 
 export abstract class BaseArray<T extends BaseModel> {
@@ -46,7 +48,7 @@ export abstract class BaseArray<T extends BaseModel> {
 
     getAll = () => this.data
 
-    toJson: () => any = () => Object.values(this.data).map(item => item.toJson())
+    toJson: () => any = () => sortArrayOfObjectsByIds(Object.values(this.data)).map(item => item.toJson())
 
     destroy = () => {
         for (const [id, v] of pairs(this.data)) {

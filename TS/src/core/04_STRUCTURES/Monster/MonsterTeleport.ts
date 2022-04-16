@@ -2,6 +2,7 @@ import { udg_monsters } from '../../../../globals'
 import { Monster } from './Monster'
 import { MonsterType } from './MonsterType'
 import { NewImmobileMonster } from './Monster_functions'
+import {arrayValuesRound} from "../../01_libraries/Basic_functions";
 
 export const WAIT = 1000000
 export const HIDE = 2000000
@@ -226,8 +227,8 @@ export class MonsterTeleport extends Monster {
         return {
             ...super.toJson(),
             sens: this.sens > 0 ? 'string' : 'normal',
-            xArr: this.x,
-            yArr: this.y
+            xArr: arrayValuesRound(this.x),
+            yArr: arrayValuesRound(this.y),
         }
     }
 }

@@ -1,4 +1,4 @@
-import { GetLocDist } from 'core/01_libraries/Basic_functions'
+import {arrayValuesRound, GetLocDist} from 'core/01_libraries/Basic_functions'
 import { PATROL_DISTANCE_MIN } from 'core/01_libraries/Constants'
 import { udg_monsters } from '../../../../globals'
 import { errorHandler } from '../../../Utils/mapUtils'
@@ -229,8 +229,8 @@ export class MonsterMultiplePatrols extends Monster {
         return {
             ...super.toJson(),
             sens: this.sens > 0 ? 'string' : 'normal',
-            xArr: this.x,
-            yArr: this.y
+            xArr: arrayValuesRound(this.x),
+            yArr: arrayValuesRound(this.y),
         }
     }
 }
