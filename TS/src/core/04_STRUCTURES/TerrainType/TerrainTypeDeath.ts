@@ -1,10 +1,9 @@
+import { TERRAIN_DATA_DISPLAY_TIME } from '../../01_libraries/Constants'
+import { COLOR_TERRAIN_DEATH } from '../../01_libraries/Init_colorCodes'
+import { Text } from '../../01_libraries/Text'
 import type { Escaper } from '../Escaper/Escaper'
-import {DISPLAY_SPACE, TerrainType} from './TerrainType'
+import { DISPLAY_SPACE, TerrainType } from './TerrainType'
 import { KillingTimers } from './TerrainTypeDeath_KillingTimers'
-import {COLOR_TERRAIN_DEATH} from "../../01_libraries/Init_colorCodes";
-import {Ascii2String} from "../../01_libraries/Ascii";
-import {Text} from "../../01_libraries/Text";
-import {TERRAIN_DATA_DISPLAY_TIME} from "../../01_libraries/Constants";
 
 export const DEATH_TERRAIN_MAX_TOLERANCE = 50
 
@@ -97,7 +96,7 @@ export class TerrainTypeDeath extends TerrainType {
             ...super.toJson(),
             killingEffet: this.getKillingEffectStr(),
             timeToKill: this.getTimeToKill(),
-            toleranceDist: this.getToleranceDist()
+            toleranceDist: this.getToleranceDist(),
         }
     }
 

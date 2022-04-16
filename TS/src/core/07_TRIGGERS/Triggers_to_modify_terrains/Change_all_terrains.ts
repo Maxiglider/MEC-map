@@ -138,7 +138,7 @@ const initChangeAllTerrains = () => {
         n = 0
         const allTT = getUdgTerrainTypes().getAll()
 
-        for (const TT of allTT) {
+        for (const [_, TT] of pairs(allTT)) {
             oldTerrainTypes[n] = TT.getTerrainTypeId()
             n++
         }
@@ -177,7 +177,7 @@ const initChangeAllTerrains = () => {
         ModifyTerrain()
 
         n = 0
-        for (const TT of allTT) {
+        for (const [_, TT] of pairs(allTT)) {
             TT.setTerrainTypeId(newTerrainTypes[n])
             AddNewTerrain(newTerrainTypes[n])
             n++

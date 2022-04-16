@@ -144,12 +144,12 @@ export const ExecuteCommandMake = (escaper: Escaper, cmd: string): boolean => {
         if (!(nbParam === 2)) {
             return true
         }
-        b = !!getUdgTerrainTypes().get(param1)
+        b = !!getUdgTerrainTypes().getFromLabel(param1)
         if (b) {
             b = !getUdgTerrainTypes().isLabelAlreadyUsed(param2)
         }
         if (b) {
-            getUdgTerrainTypes().get(param1)?.setLabel(param2)
+            getUdgTerrainTypes().getFromLabel(param1)?.setLabel(param2)
             Text.mkP(escaper.getPlayer(), 'label changed to "' + param2 + '"')
         } else {
             Text.erP(escaper.getPlayer(), 'impossible to change label')
@@ -162,12 +162,12 @@ export const ExecuteCommandMake = (escaper: Escaper, cmd: string): boolean => {
         if (!(nbParam === 2)) {
             return true
         }
-        b = !!getUdgTerrainTypes().get(param1)
+        b = !!getUdgTerrainTypes().getFromLabel(param1)
         if (b) {
             b = !getUdgTerrainTypes().isLabelAlreadyUsed(param2)
         }
         if (b) {
-            getUdgTerrainTypes().get(param1)?.setAlias(param2)
+            getUdgTerrainTypes().getFromLabel(param1)?.setAlias(param2)
             Text.mkP(escaper.getPlayer(), 'Alias changed to "' + param2 + '"')
         } else {
             Text.erP(escaper.getPlayer(), 'Impossible to change alias')
@@ -180,7 +180,7 @@ export const ExecuteCommandMake = (escaper: Escaper, cmd: string): boolean => {
         if (!(nbParam === 2)) {
             return true
         }
-        terrainType = getUdgTerrainTypes().get(param1)
+        terrainType = getUdgTerrainTypes().getFromLabel(param1)
         if (!terrainType) {
             Text.erP(escaper.getPlayer(), 'Unknown terrain')
             return true
@@ -203,7 +203,7 @@ export const ExecuteCommandMake = (escaper: Escaper, cmd: string): boolean => {
         if (!(nbParam === 2)) {
             return true
         }
-        terrainType = getUdgTerrainTypes().get(param1)
+        terrainType = getUdgTerrainTypes().getFromLabel(param1)
         if (!terrainType) {
             Text.erP(escaper.getPlayer(), 'Unknown terrain')
             return true
@@ -222,7 +222,7 @@ export const ExecuteCommandMake = (escaper: Escaper, cmd: string): boolean => {
         if (!(nbParam === 2)) {
             return true
         }
-        terrainType = getUdgTerrainTypes().get(param1)
+        terrainType = getUdgTerrainTypes().getFromLabel(param1)
         if (!terrainType) {
             Text.erP(escaper.getPlayer(), 'unknown terrain')
             return true
@@ -245,7 +245,7 @@ export const ExecuteCommandMake = (escaper: Escaper, cmd: string): boolean => {
         if (!(nbParam === 2)) {
             return true
         }
-        terrainType = getUdgTerrainTypes().get(param1)
+        terrainType = getUdgTerrainTypes().getFromLabel(param1)
         if (!terrainType) {
             Text.erP(escaper.getPlayer(), 'unknown terrain')
             return true
@@ -271,7 +271,7 @@ export const ExecuteCommandMake = (escaper: Escaper, cmd: string): boolean => {
         if (!(nbParam === 2)) {
             return true
         }
-        terrainType = getUdgTerrainTypes().get(param1)
+        terrainType = getUdgTerrainTypes().getFromLabel(param1)
         if (!terrainType) {
             Text.erP(escaper.getPlayer(), 'unknown terrain')
             return true
@@ -294,7 +294,7 @@ export const ExecuteCommandMake = (escaper: Escaper, cmd: string): boolean => {
         if (!(nbParam === 2)) {
             return true
         }
-        terrainType = getUdgTerrainTypes().get(param1)
+        terrainType = getUdgTerrainTypes().getFromLabel(param1)
         if (!terrainType) {
             Text.erP(escaper.getPlayer(), 'unknown terrain')
             return true
@@ -402,7 +402,7 @@ export const ExecuteCommandMake = (escaper: Escaper, cmd: string): boolean => {
             return true
         }
 
-        const terrainType = getUdgTerrainTypes().get(param1)
+        const terrainType = getUdgTerrainTypes().getFromLabel(param1)
         if (!terrainType) {
             Text.erP(escaper.getPlayer(), 'terrain "' + param1 + '" doesn\'t exist')
         } else {
@@ -482,7 +482,7 @@ export const ExecuteCommandMake = (escaper: Escaper, cmd: string): boolean => {
         }
         if (nbParam === 1) {
             if (getUdgTerrainTypes().isLabelAlreadyUsed(param1)) {
-                getUdgTerrainTypes().get(param1)?.displayForPlayer(escaper.getPlayer())
+                getUdgTerrainTypes().getFromLabel(param1)?.displayForPlayer(escaper.getPlayer())
             } else {
                 Text.erP(escaper.getPlayer(), 'unknown terrain')
             }
@@ -2012,7 +2012,7 @@ export const ExecuteCommandMake = (escaper: Escaper, cmd: string): boolean => {
             return true
         }
         //checkParam 1
-        const terrainType = getUdgTerrainTypes().get(param1)
+        const terrainType = getUdgTerrainTypes().getFromLabel(param1)
         b = !!terrainType
         if (!b) {
             return true

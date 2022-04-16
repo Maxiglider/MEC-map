@@ -1,8 +1,7 @@
-import {LARGEUR_CASE} from 'core/01_libraries/Constants'
-import {TerrainType} from 'core/04_STRUCTURES/TerrainType/TerrainType'
-import {getUdgTerrainTypes} from '../../../../globals'
-import {ChangeTerrainType} from '../Modify_terrain_Functions/Modify_terrain_functions'
-import {globals} from "../../../../globals";
+import { LARGEUR_CASE } from 'core/01_libraries/Constants'
+import { TerrainType } from 'core/04_STRUCTURES/TerrainType/TerrainType'
+import { getUdgTerrainTypes, globals } from '../../../../globals'
+import { ChangeTerrainType } from '../Modify_terrain_Functions/Modify_terrain_functions'
 
 const initRandomizeTerrains = () => {
     let oldTerrainTypes: number[] = []
@@ -35,35 +34,16 @@ const initRandomizeTerrains = () => {
     }
 
     const RandomizeTerrains = () => {
-        let i: number
-        let n: number
         let isTaken: boolean[] = []
         let terrainTypes: TerrainType[] = []
 
-        n = 0
-        i = 0
-        while (true) {
-            terrainTypes[n] = getUdgTerrainTypes().getWalk(i)
-            if (terrainTypes[n] === null) break
-            oldTerrainTypes[n] = terrainTypes[n].getTerrainTypeId()
-            n = n + 1
-            i = i + 1
-        }
-        i = 0
-        while (true) {
-            terrainTypes[n] = getUdgTerrainTypes().getDeath(i)
-            if (terrainTypes[n] === null) break
-            oldTerrainTypes[n] = terrainTypes[n].getTerrainTypeId()
-            n = n + 1
-            i = i + 1
-        }
-        i = 0
-        while (true) {
-            terrainTypes[n] = getUdgTerrainTypes().getSlide(i)
-            if (terrainTypes[n] === null) break
-            oldTerrainTypes[n] = terrainTypes[n].getTerrainTypeId()
-            n = n + 1
-            i = i + 1
+        let i = 0
+        let n = 0
+
+        for (const [_, terrainType] of pairs(getUdgTerrainTypes().getAll())) {
+            terrainTypes[n] = terrainType
+            oldTerrainTypes[n] = terrainType.getTerrainTypeId()
+            n++
         }
 
         lastTerrainArrayId = n - 1
@@ -97,7 +77,7 @@ const initRandomizeTerrains = () => {
         }
     }
 
-    return {RandomizeTerrains}
+    return { RandomizeTerrains }
 }
 
 export const RandomizeTerrains = initRandomizeTerrains()

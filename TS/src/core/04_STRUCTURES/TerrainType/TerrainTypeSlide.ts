@@ -1,8 +1,7 @@
-import {TERRAIN_DATA_DISPLAY_TIME} from 'core/01_libraries/Constants'
-import {DISPLAY_SPACE, TerrainType} from './TerrainType'
-import {COLOR_TERRAIN_SLIDE} from "../../01_libraries/Init_colorCodes";
-import {B2S} from "../../01_libraries/Basic_functions";
-import {Text} from "../../01_libraries/Text";
+import { TERRAIN_DATA_DISPLAY_TIME } from 'core/01_libraries/Constants'
+import { COLOR_TERRAIN_SLIDE } from '../../01_libraries/Init_colorCodes'
+import { Text } from '../../01_libraries/Text'
+import { DISPLAY_SPACE, TerrainType } from './TerrainType'
 
 export class TerrainTypeSlide extends TerrainType {
     private slideSpeed: number
@@ -60,11 +59,9 @@ export class TerrainTypeSlide extends TerrainType {
         return {
             ...super.toJson(),
             slideSpeed: this.getSlideSpeed(),
-            canTurn: this.getCanTurn()
+            canTurn: this.getCanTurn(),
         }
     }
 
-    destroy = () => {
-
-    }
+    destroy = () => {}
 }

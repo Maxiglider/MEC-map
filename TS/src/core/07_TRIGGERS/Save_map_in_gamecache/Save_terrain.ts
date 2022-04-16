@@ -1,13 +1,13 @@
-import {Ascii2String} from 'core/01_libraries/Ascii'
-import {LARGEUR_CASE} from 'core/01_libraries/Constants'
-import {Text} from 'core/01_libraries/Text'
-import {TerrainType} from 'core/04_STRUCTURES/TerrainType/TerrainType'
-import {getUdgTerrainTypes, globals} from '../../../../globals'
-import {I2HexaString} from '../../01_libraries/Functions_on_numbers'
-import {SaveTerrainHeights} from './Save_terrain_heights_and_cliffs'
-import {arrayPush} from "../../01_libraries/Basic_functions";
-import {SaveTerrainRamps} from "./Save_terrain_ramps";
-import {SaveWater} from "./Save_water";
+import { Ascii2String } from 'core/01_libraries/Ascii'
+import { LARGEUR_CASE } from 'core/01_libraries/Constants'
+import { Text } from 'core/01_libraries/Text'
+import { TerrainType } from 'core/04_STRUCTURES/TerrainType/TerrainType'
+import { getUdgTerrainTypes, globals } from '../../../../globals'
+import { arrayPush } from '../../01_libraries/Basic_functions'
+import { I2HexaString } from '../../01_libraries/Functions_on_numbers'
+import { SaveTerrainHeights } from './Save_terrain_heights_and_cliffs'
+import { SaveTerrainRamps } from './Save_terrain_ramps'
+import { SaveWater } from './Save_water'
 
 let terrainTypeIds: number[] = []
 let nbTerrainTypesUsed: number
@@ -64,7 +64,7 @@ const GererOrdreTerrains = () => {
     const terrainTypesWithOrder: TerrainType[] = []
 
     //suppression des terrains non ordonnés du tableau
-    for (let i = 0; i < terrainTypes.length; i++) {
+    for (const [i] of pairs(terrainTypes)) {
         if (terrainTypes[i].getOrderId() != 0) {
             arrayPush(terrainTypesWithOrder, terrainTypes[i])
             nbOrderedTerrains = nbOrderedTerrains + 1
@@ -99,7 +99,7 @@ const GererOrdreTerrains = () => {
 }
 
 const SaveTerrain = (json: { [x: string]: any }) => {
-    json.terrainTypes = ""
+    json.terrainTypes = ''
 
     let y = globals.MAP_MIN_Y
     while (y <= globals.MAP_MAX_Y) {
@@ -111,7 +111,7 @@ const SaveTerrain = (json: { [x: string]: any }) => {
         y = y + LARGEUR_CASE
     }
 
-    Text.A("terrain saved")
+    Text.A('terrain saved')
 }
 
 export const PushTerrainDataIntoJson = (json: { [x: string]: any }) => {
@@ -124,4 +124,3 @@ export const PushTerrainDataIntoJson = (json: { [x: string]: any }) => {
     SaveTerrainRamps.SaveTerrainRamps(json)
     SaveWater.SaveWater(json)
 }
-

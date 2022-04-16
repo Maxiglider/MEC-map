@@ -1,9 +1,8 @@
-import {LARGEUR_CASE} from 'core/01_libraries/Constants'
-import {getUdgTerrainTypes} from '../../../../globals'
-import {ChangeTerrainType} from '../Modify_terrain_Functions/Modify_terrain_functions'
-import {GetTerrainData} from '../Modify_terrain_Functions/Terrain_functions'
-import {TerrainTypeFromString} from '../Modify_terrain_Functions/Terrain_type_from_string'
-import {globals} from "../../../../globals";
+import { LARGEUR_CASE } from 'core/01_libraries/Constants'
+import { getUdgTerrainTypes, globals } from '../../../../globals'
+import { ChangeTerrainType } from '../Modify_terrain_Functions/Modify_terrain_functions'
+import { GetTerrainData } from '../Modify_terrain_Functions/Terrain_functions'
+import { TerrainTypeFromString } from '../Modify_terrain_Functions/Terrain_type_from_string'
 
 const initChangeOneTerrain = () => {
     let oldTerrain: number
@@ -25,27 +24,27 @@ const initChangeOneTerrain = () => {
     }
 
     const ChangeOneTerrain = (terrainTypeLabel: string, newTerrainType: string) => {
-        const terrainType = getUdgTerrainTypes().get(terrainTypeLabel)
+        const terrainType = getUdgTerrainTypes().getFromLabel(terrainTypeLabel)
         if (terrainType === null) {
-            throw "Wrong terrain label \"" + terrainTypeLabel + "\""
+            throw 'Wrong terrain label "' + terrainTypeLabel + '"'
         }
         oldTerrain = terrainType.getTerrainTypeId()
         newTerrain = TerrainTypeFromString.TerrainTypeString2TerrainTypeId(newTerrainType)
         if (newTerrain === 0) {
-            throw "New terrain \"" + newTerrainType + "\" unknown"
+            throw 'New terrain "' + newTerrainType + '" unknown'
         }
         if (getUdgTerrainTypes().isTerrainTypeIdAlreadyUsed(newTerrain)) {
-            throw "Terrain \"" + newTerrainType + "\" already in use"
+            throw 'Terrain "' + newTerrainType + '" already in use'
         }
         if (!terrainType.setTerrainTypeId(newTerrain)) {
-            throw "Terrain tiles number limit reached"
+            throw 'Terrain tiles number limit reached'
         }
 
         ModifyTerrain()
         return GetTerrainData(newTerrain)
     }
 
-    return {ChangeOneTerrain}
+    return { ChangeOneTerrain }
 }
 
 export const ChangeOneTerrain = initChangeOneTerrain()

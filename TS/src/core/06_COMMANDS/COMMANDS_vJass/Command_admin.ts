@@ -22,7 +22,7 @@ import { IsPositiveInteger } from '../../01_libraries/Functions_on_numbers'
 import { SaveLoadTerrain } from '../../07_TRIGGERS/Triggers_to_modify_terrains/Save_load_terrain'
 import { CmdName, CmdParam, isPlayerId, NbParam, NoParam, resolvePlayerId } from './Command_functions'
 import { ActivateTeleport, DisableTeleport } from './Teleport'
-import {SaveMapInCache} from "../../07_TRIGGERS/Save_map_in_gamecache/SaveMapInCache";
+import { SaveMapInCache } from '../../07_TRIGGERS/Save_map_in_gamecache/SaveMapInCache'
 
 export const ExecuteCommandMax = (escaper: Escaper, cmd: string): boolean => {
     let name = CmdName(cmd)
@@ -73,7 +73,7 @@ export const ExecuteCommandMax = (escaper: Escaper, cmd: string): boolean => {
     //-saveTerrain(st) [<slotName>]   --> spaces allowed for slotName
     if (name === 'saveTerrain' || name === 'st') {
         if (noParam) {
-            SaveLoadTerrain.SaveTerrain("")
+            SaveLoadTerrain.SaveTerrain('')
         } else {
             SaveLoadTerrain.SaveTerrain(CmdParam(cmd, 0))
         }
@@ -83,7 +83,7 @@ export const ExecuteCommandMax = (escaper: Escaper, cmd: string): boolean => {
     //-loadTerrain(lt) [<slotName>]
     if (name === 'loadTerrain' || name === 'lt') {
         if (noParam) {
-            SaveLoadTerrain.LoadTerrain("")
+            SaveLoadTerrain.LoadTerrain('')
         } else {
             if (!SaveLoadTerrain.LoadTerrain(CmdParam(cmd, 0))) {
                 Text.erP(escaper.getPlayer(), "this terrain save doesn't exist")
@@ -546,7 +546,7 @@ export const ExecuteCommandMax = (escaper: Escaper, cmd: string): boolean => {
             return true
         }
         //checkParam 1
-        b = getUdgTerrainTypes().get(param1) != null
+        b = getUdgTerrainTypes().getFromLabel(param1) != null
         if (!b) {
             return true
         }
@@ -555,7 +555,7 @@ export const ExecuteCommandMax = (escaper: Escaper, cmd: string): boolean => {
             Text.erP(escaper.getPlayer(), 'cliff class must be 1 or 2')
         }
         //apply command
-        getUdgTerrainTypes().get(param1)?.setCliffClassId(S2I(param2))
+        getUdgTerrainTypes().getFromLabel(param1)?.setCliffClassId(S2I(param2))
         Text.mkP(escaper.getPlayer(), 'cliff class changed to ' + param2)
         return true
     }

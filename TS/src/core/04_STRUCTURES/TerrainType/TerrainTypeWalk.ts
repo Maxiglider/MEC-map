@@ -1,7 +1,7 @@
-import {DISPLAY_SPACE, TerrainType} from './TerrainType'
-import {TERRAIN_DATA_DISPLAY_TIME} from "../../01_libraries/Constants";
-import {COLOR_TERRAIN_WALK} from "../../01_libraries/Init_colorCodes";
-import {Text} from "../../01_libraries/Text";
+import { TERRAIN_DATA_DISPLAY_TIME } from '../../01_libraries/Constants'
+import { COLOR_TERRAIN_WALK } from '../../01_libraries/Init_colorCodes'
+import { Text } from '../../01_libraries/Text'
+import { DISPLAY_SPACE, TerrainType } from './TerrainType'
 
 export class TerrainTypeWalk extends TerrainType {
     private walkSpeed: number
@@ -34,14 +34,12 @@ export class TerrainTypeWalk extends TerrainType {
         Text.P_timed(p, TERRAIN_DATA_DISPLAY_TIME, display)
     }
 
-    toJson(){
+    toJson() {
         return {
             ...super.toJson(),
-            walkSpeed: R2I(this.getWalkSpeed())
+            walkSpeed: R2I(this.getWalkSpeed()),
         }
     }
 
-    destroy = () => {
-
-    }
+    destroy = () => {}
 }

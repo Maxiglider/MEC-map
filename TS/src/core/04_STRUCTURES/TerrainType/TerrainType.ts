@@ -1,12 +1,19 @@
 import { CanUseTerrain } from 'core/07_TRIGGERS/Modify_terrain_Functions/Terrain_functions'
 import { Ascii2String } from '../../01_libraries/Ascii'
+import { TerrainTypeDeath } from './TerrainTypeDeath'
+import { TerrainTypeSlide } from './TerrainTypeSlide'
+import { TerrainTypeWalk } from './TerrainTypeWalk'
 
 export const DISPLAY_SPACE = '   '
+
+export const isWalkTerrain = (tt: TerrainType): tt is TerrainTypeWalk => tt.kind === 'walk'
+export const isSlideTerrain = (tt: TerrainType): tt is TerrainTypeSlide => tt.kind === 'slide'
+export const isDeathTerrain = (tt: TerrainType): tt is TerrainTypeDeath => tt.kind === 'death'
 
 export abstract class TerrainType {
     label: string
     theAlias: string | null
-    kind: string
+    kind: 'walk' | 'slide' | 'death'
     terrainTypeId: number
     orderId: number //numéro du terrain (ordre des tilesets), de 1 à 16
     cliffClassId: number //cliff class 1 or 2, depending of the main tileset
@@ -15,7 +22,7 @@ export abstract class TerrainType {
         label: string,
         terrainTypeId: number,
         theAlias: string | null,
-        kind: string,
+        kind: 'walk' | 'slide' | 'death',
         orderId: number,
         cliffClassId: number
     ) {
@@ -116,7 +123,7 @@ export abstract class TerrainType {
             orderId: this.orderId,
             kind: this.kind,
             terrainTypeId: Ascii2String(this.terrainTypeId),
-            cliffClassId: this.cliffClassId
+            cliffClassId: this.cliffClassId,
         }
     }
 

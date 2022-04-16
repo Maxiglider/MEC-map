@@ -1,97 +1,41 @@
-import { tileset2tilesetChar } from 'core/01_libraries/Basic_functions'
+import { arrayPush, tileset2tilesetChar } from 'core/01_libraries/Basic_functions'
 import { Text } from 'core/01_libraries/Text'
 import { CmdParam, NbParam } from '../../06_COMMANDS/COMMANDS_vJass/Command_functions'
+import { BaseArray } from '../BaseArray'
 import { TerrainType } from './TerrainType'
 import { TerrainTypeDeath } from './TerrainTypeDeath'
 import { TerrainTypeSlide } from './TerrainTypeSlide'
 import { TerrainTypeWalk } from './TerrainTypeWalk'
 
-export class TerrainTypeArray {
-    private ttWalk: TerrainTypeWalk[] = [] //le nombre de terrains du jeu est de 177
-    private ttDeath: TerrainTypeDeath[] = []
-    private ttSlide: TerrainTypeSlide[] = []
-    numberOfWalk = 0
-    numberOfDeath = 0
-    numberOfSlide = 0
+//le nombre de terrains du jeu est de 177
+export class TerrainTypeArray extends BaseArray<TerrainType> {
     mainTileset: string = 'auto'
 
-    get = (label: string) => {
-        let i = 0
-        while (true) {
-            if (i >= this.numberOfWalk) break
-            if (this.ttWalk[i].label == label || this.ttWalk[i].theAlias == label) {
-                return this.ttWalk[i]
+    getFromLabel = (label: string) => {
+        for (const [_, terrainType] of pairs(this.data)) {
+            if (terrainType.label === label || terrainType.theAlias === label) {
+                return terrainType
             }
-            i = i + 1
         }
-        i = 0
-        while (true) {
-            if (i >= this.numberOfDeath) break
-            if (this.ttDeath[i].label == label || this.ttDeath[i].theAlias == label) {
-                return this.ttDeath[i]
-            }
-            i = i + 1
-        }
-        i = 0
-        while (true) {
-            if (i >= this.numberOfSlide) break
-            if (this.ttSlide[i].label == label || this.ttSlide[i].theAlias == label) {
-                return this.ttSlide[i]
-            }
-            i = i + 1
-        }
+
         return null
     }
 
-    getAll() {
-        const all: TerrainType[] = [...this.ttWalk, ...this.ttSlide, ...this.ttDeath]
-        return all
-    }
-
-    getTerrainType = (x: number, y: number): TerrainType | null => {
+    getTerrainType = (x: number, y: number) => {
         let terrainTypeId = GetTerrainType(x, y)
-        let i = 0
-        while (true) {
-            if (i >= this.numberOfWalk) break
-            if (this.ttWalk[i].getTerrainTypeId() == terrainTypeId) {
-                return this.ttWalk[i]
+
+        for (const [_, terrainType] of pairs(this.data)) {
+            if (terrainType.getTerrainTypeId() === terrainTypeId) {
+                return terrainType
             }
-            i = i + 1
         }
-        i = 0
-        while (true) {
-            if (i >= this.numberOfDeath) break
-            if (this.ttDeath[i].getTerrainTypeId() == terrainTypeId) {
-                return this.ttDeath[i]
-            }
-            i = i + 1
-        }
-        i = 0
-        while (true) {
-            if (i >= this.numberOfSlide) break
-            if (this.ttSlide[i].getTerrainTypeId() == terrainTypeId) {
-                return this.ttSlide[i]
-            }
-            i = i + 1
-        }
+
         return null
     }
 
-    isTerrainTypeIdAlreadyUsed = (terrainTypeId: number): boolean => {
-        for (let i = 0; i < this.numberOfWalk; i++) {
-            if (terrainTypeId == this.ttWalk[i].getTerrainTypeId()) {
-                return true
-            }
-        }
-
-        for (let i = 0; i < this.numberOfDeath; i++) {
-            if (terrainTypeId == this.ttDeath[i].getTerrainTypeId()) {
-                return true
-            }
-        }
-
-        for (let i = 0; i < this.numberOfSlide; i++) {
-            if (terrainTypeId == this.ttSlide[i].getTerrainTypeId()) {
+    isTerrainTypeIdAlreadyUsed = (terrainTypeId: number) => {
+        for (const [_, terrainType] of pairs(this.data)) {
+            if (terrainType.getTerrainTypeId() === terrainTypeId) {
                 return true
             }
         }
@@ -100,21 +44,17 @@ export class TerrainTypeArray {
     }
 
     isLabelAlreadyUsed = (label: string) => {
-        return this.get(label) !== null
+        return this.getFromLabel(label) !== null
     }
 
     newWalk = (label: string, terrainTypeId: number, walkspeed: number) => {
-        let n = this.numberOfWalk
-
         if (this.isLabelAlreadyUsed(label)) throw 'Label already used'
         if (this.isTerrainTypeIdAlreadyUsed(terrainTypeId)) throw 'Terrain type already used'
         if (terrainTypeId === 0) throw 'Wrong terrain type'
 
-        this.ttWalk[n] = new TerrainTypeWalk(label, terrainTypeId, walkspeed)
-        if (this.ttWalk[n] !== null) {
-            this.numberOfWalk = this.numberOfWalk + 1
-        }
-        return this.ttWalk[n]
+        const tt = new TerrainTypeWalk(label, terrainTypeId, walkspeed)
+        this._new(tt)
+        return tt
     }
 
     newDeath = (
@@ -124,134 +64,48 @@ export class TerrainTypeArray {
         timeToKill: number,
         toleranceDist: number
     ) => {
-        let n = this.numberOfDeath
-
         if (this.isLabelAlreadyUsed(label)) throw 'Label already used'
         if (this.isTerrainTypeIdAlreadyUsed(terrainTypeId)) throw 'Terrain type already used'
         if (terrainTypeId === 0) throw 'Wrong terrain type'
 
-        this.ttDeath[n] = new TerrainTypeDeath(label, terrainTypeId, killingEffectStr, timeToKill, toleranceDist)
-        if (this.ttDeath[n] !== null) {
-            this.numberOfDeath = this.numberOfDeath + 1
-        }
-        return this.ttDeath[n]
+        const tt = new TerrainTypeDeath(label, terrainTypeId, killingEffectStr, timeToKill, toleranceDist)
+        this._new(tt)
+        return tt
     }
 
     newSlide = (label: string, terrainTypeId: number, slideSpeed: number, canTurn: boolean) => {
-        let n = this.numberOfSlide
-
         if (this.isLabelAlreadyUsed(label)) throw 'Label already used'
         if (this.isTerrainTypeIdAlreadyUsed(terrainTypeId)) throw 'Terrain type already used'
         if (terrainTypeId === 0) throw 'Wrong terrain type'
 
-        this.ttSlide[n] = new TerrainTypeSlide(label, terrainTypeId, slideSpeed, canTurn)
-        if (this.ttSlide[n] !== null) {
-            this.numberOfSlide = this.numberOfSlide + 1
-        }
-
-        return this.ttSlide[n]
+        const tt = new TerrainTypeSlide(label, terrainTypeId, slideSpeed, canTurn)
+        this._new(tt)
+        return tt
     }
 
     remove = (label: string): boolean => {
-        let position: number
-        let i: number
-        let tt = this.get(label)
-        if (tt === null) {
-            return false
-        }
-        if (tt.kind == 'walk') {
-            i = 0
-            while (true) {
-                if (this.ttWalk[i].label == label || this.ttWalk[i].theAlias == label || i >= this.numberOfWalk) break
-                i = i + 1
-            }
-            if (i < this.numberOfWalk) {
-                i = i + 1
-                while (true) {
-                    if (i >= this.numberOfWalk) break
-                    this.ttWalk[i - 1] = this.ttWalk[i]
-                    i = i + 1
-                }
-                this.numberOfWalk = this.numberOfWalk - 1
+        for (const [terrainTypeId, terrainType] of pairs(this.data)) {
+            if (terrainType.label === label || terrainType.theAlias === label) {
+                this.data[terrainTypeId].destroy()
+                delete this.data[terrainTypeId]
             }
         }
-        if (tt.kind == 'death') {
-            i = 0
-            while (true) {
-                if (this.ttDeath[i].label == label || this.ttDeath[i].theAlias == label || i >= this.numberOfDeath)
-                    break
-                i = i + 1
-            }
-            if (i < this.numberOfDeath) {
-                i = i + 1
-                while (true) {
-                    if (i >= this.numberOfDeath) break
-                    this.ttDeath[i - 1] = this.ttDeath[i]
-                    i = i + 1
-                }
-                this.numberOfDeath = this.numberOfDeath - 1
-            }
-        }
-        if (tt.kind == 'slide') {
-            i = 0
-            while (true) {
-                if (this.ttSlide[i].label == label || this.ttSlide[i].theAlias == label || i >= this.numberOfSlide)
-                    break
-                i = i + 1
-            }
-            if (i < this.numberOfSlide) {
-                i = i + 1
-                while (true) {
-                    if (i >= this.numberOfSlide) break
-                    this.ttSlide[i - 1] = this.ttSlide[i]
-                    i = i + 1
-                }
-                this.numberOfSlide = this.numberOfSlide - 1
-            }
-        }
-
-        tt.destroy()
 
         return true
     }
 
-    getWalk = (id: number): TerrainTypeWalk => {
-        return this.ttWalk[id]
-    }
-
-    getDeath = (id: number): TerrainTypeDeath => {
-        return this.ttDeath[id]
-    }
-
-    getSlide = (id: number): TerrainTypeSlide => {
-        return this.ttSlide[id]
-    }
-
     displayForPlayer = (p: player) => {
-        let i = 0
-        while (true) {
-            if (i >= this.numberOfSlide) break
-            this.ttSlide[i].displayForPlayer(p)
-            i = i + 1
+        let hadOne = false
+
+        for (const [_, terrainType] of pairs(this.data)) {
+            terrainType.displayForPlayer(p)
+            hadOne = true
         }
-        i = 0
-        while (true) {
-            if (i >= this.numberOfWalk) break
-            this.ttWalk[i].displayForPlayer(p)
-            i = i + 1
-        }
-        i = 0
-        while (true) {
-            if (i >= this.numberOfDeath) break
-            this.ttDeath[i].displayForPlayer(p)
-            i = i + 1
-        }
-        if (this.numberOfSlide + this.numberOfWalk + this.numberOfDeath === 0) {
+
+        if (!hadOne) {
             Text.erP(p, 'no terrain saved')
         }
     }
-
-    count = () => this.numberOfWalk + this.numberOfSlide + this.numberOfDeath
 
     //mettre en place l'ordre des terrains au niveau des tilesets
     setOrder = (cmd: string): boolean => {
@@ -265,7 +119,7 @@ export class TerrainTypeArray {
         nbTerrainsDone = 0
         while (true) {
             if (nbTerrainsDone === this.count()) break
-            terrainType = this.get(CmdParam(cmd, nbTerrainsDone + 1))
+            terrainType = this.getFromLabel(CmdParam(cmd, nbTerrainsDone + 1))
             //vérification que le terrain existe
             if (terrainType === null) {
                 return false
@@ -306,8 +160,16 @@ export class TerrainTypeArray {
         return this.mainTileset
     }
 
-    toJson = () => ({
-        mainTileset: this.mainTileset,
-        terrainTypesMec: this.getAll().map(terrainType => terrainType.toJson())
-    })
+    toJson = () => {
+        const arr: TerrainType[] = []
+
+        for (const [_, terrainType] of pairs(this.data)) {
+            arrayPush(arr, terrainType)
+        }
+
+        return {
+            mainTileset: this.mainTileset,
+            terrainTypesMec: arr.map(terrainType => terrainType.toJson()),
+        }
+    }
 }
