@@ -114,10 +114,8 @@ export class MakeLastActions {
     }
 
     destroyAllActions = () => {
-        let i = 0
-        while (i <= this.lastActionId) {
-            this.lastActions[i].destroy()
-            i = i + 1
+        for (const [_, makeAction] of pairs(this.lastActions)) {
+            makeAction.destroy()
         }
         this.lastActionId = -1
         this.lastActionEffective = -1
