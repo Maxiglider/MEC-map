@@ -117,6 +117,7 @@ export function compileMap(config: IProjectConfig) {
     }
 
     const tsLua = './dist/tstl_output.lua'
+    const tsLuaExtended = './dist/tstl_output_extended.lua'
 
     if (fs.existsSync(tsLua)) {
         fs.unlinkSync(tsLua)
@@ -145,29 +146,30 @@ export function compileMap(config: IProjectConfig) {
     }
 
     try {
-        let contents =
-            fs
-                .readdirSync('./src/lualibs')
-                .filter(s => s.endsWith('.lua'))
-                .map(s =>
-                    [
-                        `${s.replace('.lua', '')} = function()`,
-                        fs
-                            .readFileSync(`./src/lualibs/${s}`)
-                            .toString()
-                            .replace(new RegExp('(^function.*?\\()', 'gm'), '$1dis, '),
-                        'end',
-                        EOL,
-                    ].join(EOL)
-                )
-                .join(EOL) +
-            fs.readFileSync(mapLua).toString() +
-            fs.readFileSync(tsLua).toString()
-        contents = processScriptIncludes(contents)
+        const processContents = (ignoreMapLua: boolean) => {
+            let contents =
+                fs
+                    .readdirSync('./src/lualibs')
+                    .filter(s => s.endsWith('.lua'))
+                    .map(s =>
+                        [
+                            `${s.replace('.lua', '')} = function()`,
+                            fs
+                                .readFileSync(`./src/lualibs/${s}`)
+                                .toString()
+                                .replace(new RegExp('(^function.*?\\()', 'gm'), '$1dis, '),
+                            'end',
+                            EOL,
+                        ].join(EOL)
+                    )
+                    .join(EOL) +
+                (ignoreMapLua ? '' : fs.readFileSync(mapLua).toString()) +
+                fs.readFileSync(tsLua).toString()
+            contents = processScriptIncludes(contents)
 
-        // Replace require functionality to support circular dependency detection
-        contents = contents.replace(
-            `local ____modules = {}
+            // Replace require functionality to support circular dependency detection
+            contents = contents.replace(
+                `local ____modules = {}
 local ____moduleCache = {}
 local ____originalRequire = require
 local function require(file, ...)
@@ -186,7 +188,7 @@ local function require(file, ...)
         end
     end
 end`,
-            `local ____modules = {}
+                `local ____modules = {}
 local ____moduleCache = {}
 
 local ____moduleCache2 = {}
@@ -229,14 +231,18 @@ local function require(file, ...)
         end
     end
 end`
-        )
+            )
 
-        if (config.minifyScript) {
-            logger.info(`Minifying script...`)
-            contents = luamin.minify(contents.toString())
+            if (config.minifyScript) {
+                logger.info(`Minifying script...`)
+                contents = luamin.minify(contents.toString())
+            }
+
+            return contents
         }
-        //contents = luamin.minify(contents);
-        fs.writeFileSync(mapLua, contents)
+
+        fs.writeFileSync(mapLua, processContents(false))
+        fs.writeFileSync(tsLuaExtended, processContents(true))
     } catch (err: any) {
         logger.error(err.toString())
         return false
