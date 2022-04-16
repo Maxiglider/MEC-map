@@ -7,7 +7,7 @@
  */
 
 
-const LUA_FILE = __DIR__."/../TS/dist/tstl_output.lua";
+const LUA_FILE = __DIR__."/../TS/dist/tstl_output_extended.lua";
 const WRAP_OUTPUT_FILE = __DIR__."/final-we.lua";
 
 
@@ -196,5 +196,9 @@ $template = ob_get_clean();
 $luaFileContent = str_replace('%', '%%', file_get_contents(LUA_FILE));
 $content = str_replace('[LUA_FILE]', $luaFileContent, $template);
 $content = str_replace('return require("TS.src.main", ...)', 'return ____modules["TS.src.main"]', $content);
+$content = str_replace("addScriptHook(
+    W3TS_HOOK.MAIN_AFTER,
+    errorHandler(tsMain)
+)", "errorHandler(tsMain)()", $content);
 
 file_put_contents(WRAP_OUTPUT_FILE, $content);

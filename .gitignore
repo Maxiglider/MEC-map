@@ -3,3 +3,6 @@
 /bin/commandsList.html
 node_modules
 /bin/mec_data.txt
+bin/*.lua
+bin/*.txt
+bin/mec_data.json.js

@@ -5,7 +5,6 @@ import { createTimer, errorHandler } from 'Utils/mapUtils'
 import { addScriptHook, W3TS_HOOK } from 'w3ts/hooks'
 import { initializers } from './core/Init/initializers'
 import { PROD } from './env'
-import {LoadMapFromCache} from "./core/07_TRIGGERS/Load_map_from_gamecache/LoadMapFromCache";
 import {MEC_core_API} from "./core/API/MEC_core_API";
 
 const tsMain = () => {
@@ -16,9 +15,6 @@ const tsMain = () => {
 
     //initializers
     initializers()
-
-    //apply game data from Worleditor
-    LoadMapFromCache.initializeGameData()
 
     //triggers
     // initOldTriggers()
