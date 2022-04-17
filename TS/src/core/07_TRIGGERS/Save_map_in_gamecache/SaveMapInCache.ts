@@ -10,6 +10,7 @@ import {PushTerrainDataIntoJson} from "./Save_terrain";
 import {SyncSaveLoad} from "../../../Utils/SaveLoad/TreeLib/SyncSaveLoad";
 import {initSaveLoad} from "../../../Utils/SaveLoad/SaveLoad";
 import {jsonEncode} from "../../01_libraries/Basic_functions";
+import {MEC_SMIC_DATA_FILE} from "../../01_libraries/Constants";
 
 export class SaveMapInCache {
 
@@ -56,7 +57,7 @@ export class SaveMapInCache {
         const json = SaveMapInCache.gameAsJson()
 
         const SaveLoad = initSaveLoad()
-        SaveLoad.saveFile('mec_data.txt', null, jsonEncode(json))
+        SaveLoad.saveFile(MEC_SMIC_DATA_FILE, null, jsonEncode(json))
 
         Text.A('saving game data to file "mec_data.txt" done')
     }
