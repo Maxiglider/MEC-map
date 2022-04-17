@@ -155,8 +155,13 @@ export class LevelArray extends BaseArray<Level> {
     }
 
     newFromJson = (levelsJson: {[x: string]: any}[]) => {
+        if(levelsJson.length > 0){
+            this.destroyLastLevel(true)
+        }
+
         for(let levelJson of levelsJson){
             const level = this.new()
+            print("Level " + level.getId())
 
             //start message
             if(levelJson.startMessage){
@@ -185,8 +190,12 @@ export class LevelArray extends BaseArray<Level> {
 
             //monsters
             if(levelJson.monsters){
+                print("levelJson.monsters")
+
                 for(let m of levelJson.monsters){
-                    let monster: Monster
+                    let monster: Monster | null = null
+
+                    print("one monster")
 
                     if(m.monsterClassName == "Caster") {
 
@@ -231,6 +240,10 @@ export class LevelArray extends BaseArray<Level> {
                             }
                         }
                     }
+
+                    if(monster){
+                        level.monsters.new(monster, false)
+                    }
                 }
             }
 
@@ -256,8 +269,9 @@ export class LevelArray extends BaseArray<Level> {
         }
     }
 
-    destroyLastLevel = (): boolean => {
-        if (this.lastInstanceId <= 0) {
+    destroyLastLevel = (forceDelete0: boolean = false): boolean => {
+        const maxLevelIdToDelete = forceDelete0 ? 0 : 1
+        if (this.lastInstanceId < maxLevelIdToDelete) {
             return false
         }
         this.data[this.lastInstanceId].destroy()

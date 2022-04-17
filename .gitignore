@@ -6,3 +6,4 @@ node_modules
 bin/*.lua
 bin/*.txt
 bin/mec_data.json.js
+map-worldeditor.w3x
