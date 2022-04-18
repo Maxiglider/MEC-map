@@ -110,8 +110,8 @@ export class PortalMob {
 
     toJson = () => ({
         id: this.id,
-        triggerMob: this.triggerMob?.id,
-        targetMob: this.targetMob?.id,
+        triggerMobId: this.triggerMob?.id,
+        targetMobId: this.targetMob?.id,
         freezeDuration: this.freezeDuration,
     })
 }

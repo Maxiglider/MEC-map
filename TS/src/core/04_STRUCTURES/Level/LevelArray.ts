@@ -232,20 +232,20 @@ export class LevelArray extends BaseArray<Level> {
                 }
             }
 
-            // //monster spawns
-            // if (levelJson.monsterSpawns) {
-            //     level.monsterSpawns.newFromJson(levelJson.monsterSpawns)
-            // }
+            //monster spawns
+            if (levelJson.monsterSpawns) {
+                level.monsterSpawns.newFromJson(levelJson.monsterSpawns)
+            }
 
-            // //meteors
-            // if (levelJson.meteors) {
-            //     level.meteors.newFromJson(levelJson.meteors)
-            // }
+            //meteors
+            if (levelJson.meteors) {
+                level.meteors.newFromJson(levelJson.meteors)
+            }
 
             //clearMobs
-            // if (levelJson.clearMobs) {
-            //     level.clearMobs.newFromJson(levelJson.clearMobs)
-            // }
+            if (levelJson.clearMobs) {
+                level.clearMobs.newFromJson(levelJson.clearMobs)
+            }
 
             //portalMobs
             if (levelJson.portalMobs) {

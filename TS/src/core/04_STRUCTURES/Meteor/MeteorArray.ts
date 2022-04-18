@@ -19,8 +19,14 @@ export class MeteorArray extends BaseArray<Meteor> {
         meteor.level = this.level
     }
 
+    newFromJson = (meteorsJson: { [x: string]: any }[]) => {
+        for(let m of meteorsJson){
+            const meteor = new Meteor(m.x, m.y)
+            this.new(meteor, false)
+        }
+    }
+
     removeMeteor = (meteorId: number) => {
-        //todomax former name : setMeteorNull
         delete this.data[meteorId]
     }
 

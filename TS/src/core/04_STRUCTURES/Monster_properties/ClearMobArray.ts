@@ -24,6 +24,16 @@ export class ClearMobArray extends BaseArray<ClearMob> {
         return clearMob
     }
 
+    newFromJson = (clearMobsJson: { [x: string]: any }[]) => {
+        for(let cm of clearMobsJson){
+            const clearMob = this.new(this.level.monsters.get(cm.triggerMobId), cm.disableDuration, false)
+
+            for (const [_, blockMobId] of pairs(cm.blockMobsIds)) {
+                clearMob.addBlockMob(this.level.monsters.get(blockMobId))
+            }
+        }
+    }
+
     removeClearMob = (clearMobArrayId: number) => {
         delete this.data[clearMobArrayId]
     }

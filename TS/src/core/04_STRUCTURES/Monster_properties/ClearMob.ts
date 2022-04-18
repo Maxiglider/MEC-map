@@ -226,10 +226,9 @@ export class ClearMob {
 
         return {
             id: this.id,
-            triggerMob: this.triggerMob.id,
+            triggerMobId: this.triggerMob.id,
             disableDuration: this.disableDuration,
-            blockMobs: blockMobIds,
-            enabled: this.enabled,
+            blockMobsIds: blockMobIds
         }
     }
 }

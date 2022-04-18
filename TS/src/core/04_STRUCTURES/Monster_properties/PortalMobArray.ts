@@ -24,6 +24,13 @@ export class PortalMobArray extends BaseArray<PortalMob> {
         return portalMob
     }
 
+    newFromJson = (portalMobsJson: { [x: string]: any }[]) => {
+        for (let v of portalMobsJson) {
+            const portalMob = this.new(this.level.monsters.get(v.triggerMobId), v.freezeDuration)
+            portalMob.setTargetMob(this.level.monsters.get(v.targetMobId))
+        }
+    }
+
     removePortalMob = (portalMobArrayId: number) => {
         delete this.data[portalMobArrayId]
     }
@@ -70,13 +77,6 @@ export class PortalMobArray extends BaseArray<PortalMob> {
     closePortalMobs = () => {
         for (const [_, portalMob] of pairs(this.data)) {
             portalMob.close()
-        }
-    }
-
-    newFromJson = (portalMobsJson: { [x: string]: any }[]) => {
-        for (let v of portalMobsJson) {
-            const portalMob = this.new(this.level.monsters.get(v.triggerMob), v.freezeDuration)
-            portalMob.setTargetMob(this.level.monsters.get(v.targetMob))
         }
     }
 }
