@@ -20,6 +20,7 @@ import { init_doubleKill } from '../Double_heroes/double_kill'
 import { init_Test } from '../Test/test'
 import { initArrays } from './initArrays'
 import { initOldTriggers } from './init_old_triggers'
+import {initMonsterSimplePatrol} from "../04_STRUCTURES/Monster/MonsterSimplePatrol";
 
 export const initializers = () => {
     init_terrain_limit_variables()
@@ -43,6 +44,7 @@ export const initializers = () => {
     ReinitTerrains.init_ReinitAtStart()
     ReinitTerrainsPositions.init_reinitTerrainsPositions()
     initFirstPerson()
+    initMonsterSimplePatrol()
 
     //todomax disable this line at end
     init_Test()

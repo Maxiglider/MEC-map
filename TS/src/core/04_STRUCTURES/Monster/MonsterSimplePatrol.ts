@@ -1,11 +1,10 @@
-//todomax execute this at start of the game
 import { createTimer } from 'Utils/mapUtils'
 import { udg_monsters } from '../../../../globals'
 import { Monster } from './Monster'
 import { MonsterType } from './MonsterType'
 import { NewPatrolMonster } from './Monster_functions'
 
-const initMonsterSimplePatrol = () => {
+export const initMonsterSimplePatrol = () => {
     //vérification que les monstres multi-patrouilles patrouillent bien
     simplePatrolMobs = CreateGroup()
 
