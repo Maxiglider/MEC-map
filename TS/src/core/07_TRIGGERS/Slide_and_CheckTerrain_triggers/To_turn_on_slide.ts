@@ -44,30 +44,10 @@ const initTurnOnSlide = () => {
     let trg_turnToPoint: trigger
     let trg_turnToWidget: trigger
 
-    const HandleTurn = (triggerIsToLocation: boolean) => {
-        const escaper = Hero2Escaper(GetTriggerUnit())
 
-        if (!escaper) {
-            return
-        }
-
-        //init variables
-        slider = GetTriggerUnit()
-        n = GetUnitUserData(slider)
-        sliderX = GetUnitX(slider)
-        sliderY = GetUnitY(slider)
-
-        if (triggerIsToLocation) {
-            orderX = GetOrderPointX()
-            orderY = GetOrderPointY()
-        } else {
-            orderWidget = GetOrderTarget()
-            orderX = GetWidgetX(orderWidget)
-            orderY = GetWidgetY(orderWidget)
-        }
-
-        //stop hero
-        StopUnit(slider)
+    const turnSliderToDirection = (escaper: Escaper, angle: number, triggerIsToLocation: boolean | null = null) => {
+        const slider = escaper.getHero()
+        if(!slider) return
 
         if (isSecondaryHero(slider)) {
             return
@@ -75,12 +55,7 @@ const initTurnOnSlide = () => {
 
         escaperSecond = MainEscaperToSecondaryOne(escaper)
 
-        //angle
-        //if (udg_isMirrorModeOn_j[n]) then
-        //    angle = Atan2( sliderY - orderY, sliderX - orderX) * bj_RADTODEG
-        //else
-        angle = Atan2(orderY - sliderY, orderX - sliderX) * bj_RADTODEG
-        //endif
+        const n = escaper.getId()
 
         //drunk mode
         if (udg_isDrunk[n]) {
@@ -124,11 +99,48 @@ const initTurnOnSlide = () => {
         }
 
         //save click
-        AutoContinueAfterSliding.lastClickedX[n] = orderX
-        AutoContinueAfterSliding.lastClickedY[n] = orderY
-        AutoContinueAfterSliding.isLastTargetALocation[n] = triggerIsToLocation
+        if(triggerIsToLocation !== null) {
+            AutoContinueAfterSliding.lastClickedX[n] = orderX
+            AutoContinueAfterSliding.lastClickedY[n] = orderY
+            AutoContinueAfterSliding.isLastTargetALocation[n] = triggerIsToLocation
 
-        Apm.nbClicsOnSlide[n] = Apm.nbClicsOnSlide[n] + 1
+            Apm.nbClicsOnSlide[n] = Apm.nbClicsOnSlide[n] + 1
+        }
+    }
+
+    const HandleTurn = (triggerIsToLocation: boolean) => {
+        const escaper = Hero2Escaper(GetTriggerUnit())
+
+        if (!escaper) {
+            return
+        }
+
+        //init variables
+        slider = GetTriggerUnit()
+        n = GetUnitUserData(slider)
+        sliderX = GetUnitX(slider)
+        sliderY = GetUnitY(slider)
+
+        if (triggerIsToLocation) {
+            orderX = GetOrderPointX()
+            orderY = GetOrderPointY()
+        } else {
+            orderWidget = GetOrderTarget()
+            orderX = GetWidgetX(orderWidget)
+            orderY = GetWidgetY(orderWidget)
+        }
+
+        //stop hero
+        StopUnit(slider)
+
+        //angle
+        //if (udg_isMirrorModeOn_j[n]) then
+        //    angle = Atan2( sliderY - orderY, sliderX - orderX) * bj_RADTODEG
+        //else
+        angle = Atan2(orderY - sliderY, orderX - sliderX) * bj_RADTODEG
+        //endif
+
+        turnSliderToDirection(escaper, angle, triggerIsToLocation)
     }
 
     const init_ToTurnOnSlide = () => {
@@ -164,7 +176,7 @@ const initTurnOnSlide = () => {
         DRUNK_EFFECTS[3] = DRUNK_EFFECT_GROS
     }
 
-    return { udg_isDrunk, udg_drunk, udg_drunkLevel, udg_drunkEffect, DRUNK_EFFECTS, init_ToTurnOnSlide }
+    return { udg_isDrunk, udg_drunk, udg_drunkLevel, udg_drunkEffect, DRUNK_EFFECTS, init_ToTurnOnSlide, turnSliderToDirection }
 }
 
 export const TurnOnSlide = initTurnOnSlide()

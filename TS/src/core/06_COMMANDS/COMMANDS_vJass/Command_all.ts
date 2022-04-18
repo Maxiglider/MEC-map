@@ -751,5 +751,21 @@ export const ExecuteCommandAll = (escaper: Escaper, cmd: string): boolean => {
         return true
     }
 
+    //-followMouse <boolean>
+    if (name == 'followMouse' || name == 'fm'){
+        if(nbParam != 1){
+            return true
+        }
+
+        escaper.enableFollowMouseMode(S2B(param1))
+        if(S2B(param1)){
+            Text.mkP(escaper.getPlayer(), "Follow mouse mode enabled : maintain right click a little while sliding to activate it. Do a normal click to disable it")
+        }else{
+            Text.mkP(escaper.getPlayer(), "Follow mouse mode disabled")
+        }
+
+        return true
+    }
+
     return false
 }

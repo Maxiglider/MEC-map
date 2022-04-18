@@ -58,7 +58,7 @@ export abstract class MakeMaintainClick extends Make{
             actions: [onPressActions]
         })
 
-        this.tPress = createEvent({
+        this.tUnpress = createEvent({
             events: [t => TriggerRegisterPlayerEvent(t, this.makerOwner, EVENT_PLAYER_MOUSE_UP)],
             actions: [onUnpressActions]
         })

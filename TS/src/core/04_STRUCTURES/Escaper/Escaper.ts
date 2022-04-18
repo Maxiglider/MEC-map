@@ -72,6 +72,7 @@ import { EscaperEffectArray } from './EscaperEffectArray'
 import { EscaperFirstPerson } from './Escaper_firstPerson'
 import { ColorInfo, GetMirrorEscaper } from './Escaper_functions'
 import {MakeTerrainCreateBrush} from "../../05_MAKE_STRUCTURES/Make_terrain/MakeTerrainCreateBrush";
+import {FollowMouse} from "../../Follow_mouse/Follow_mouse";
 
 const SHOW_REVIVE_EFFECTS = false
 
@@ -145,6 +146,9 @@ export class Escaper {
     private lockCamTarget: Escaper | null = null
 
     public hideLeaderboard = false
+
+    //follow mode
+    private followMouse?: FollowMouse
 
     //make
     private gumTerrain?: TerrainType
@@ -1462,6 +1466,18 @@ export class Escaper {
 
     getGumBrushSize = () => {
         return this.gumBrushSize
+    }
+
+    enableFollowMouseMode = (flag: boolean) => {
+        if(flag){
+            this.followMouse = new FollowMouse(this)
+        }else{
+            this.followMouse?.destroy()
+        }
+    }
+
+    getFollowMouse = () => {
+        return this.followMouse
     }
 
     toJson = () => ({
