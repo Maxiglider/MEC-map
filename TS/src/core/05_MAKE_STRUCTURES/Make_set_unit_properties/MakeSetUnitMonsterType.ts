@@ -34,7 +34,6 @@ export class MakeSetUnitMonsterType extends MakeOneByOneOrTwoClicks {
                     return
                 }
 
-                //todomax getMonsters method in Level class to union all types of Monsters in an array of Monster
                 const monsters = this.escaper
                     .getMakingLevel()
                     .monsters.getMonstersBetweenLocs(this.lastX, this.lastY, this.orderX, this.orderY)

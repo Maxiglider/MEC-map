@@ -213,7 +213,7 @@ export const ExecuteCommandMax = (escaper: Escaper, cmd: string): boolean => {
         if (!(nbParam === 1 && IsBoolString(param1))) {
             return true
         }
-        Globals.udg_areRedRightsOn = S2B(param1) //todomax will the value actually be changed ?
+        Globals.udg_areRedRightsOn = S2B(param1)
         if (S2B(param1)) {
             Text.P(escaper.getPlayer(), 'red rights on')
         } else {

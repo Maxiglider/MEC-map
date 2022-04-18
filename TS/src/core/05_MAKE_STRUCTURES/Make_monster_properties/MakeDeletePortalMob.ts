@@ -14,9 +14,7 @@ export class MakeDeletePortalMob extends Make {
 
     doActions = () => {
         if (super.doBaseActions()) {
-            //todomax make Caster extend Monster
-
-            //recherche du monsterOrCaster cliqué
+            //recherche du portalMob cliqué
             const monster = this.escaper.getMakingLevel().monsters.getMonsterNear(this.orderX, this.orderY)
             const portalMob = monster?.getPortalMob()
             if (portalMob) {

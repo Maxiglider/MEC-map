@@ -117,7 +117,6 @@ export class MonsterType {
     setUnitTypeId = (unitTypeId: number): boolean => {
         let testMonster = CreateUnit(NEUTRAL_PLAYER, unitTypeId, 0, 0, 0)
         if (!testMonster) {
-            //todomax check if this condition works
             return false
         }
 

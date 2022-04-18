@@ -15,7 +15,7 @@ const RemoveEnumMonster = () => {
 
 const MonsterStartMovement = () => {
     let mobTimer = GetExpiredTimer()
-    let ms = MonsterSpawn.anyTimerId2MonsterSpawn.get(GetHandleId(mobTimer)) //todomax check that it works
+    let ms = MonsterSpawn.anyTimerId2MonsterSpawn.get(GetHandleId(mobTimer))
     MonsterSpawn.anyTimerId2MonsterSpawn.delete(GetHandleId(mobTimer))
     if (ms) {
         let mobUnit = MonsterSpawn.anyTimerId2Unit.get(GetHandleId(mobTimer))
@@ -111,7 +111,6 @@ export class MonsterSpawn {
     }
 
     deactivate = () => {
-        //todomax former name : desactivate
         if (this.unspawnReg) {
             RemoveRegion(this.unspawnReg)
             delete this.unspawnReg
