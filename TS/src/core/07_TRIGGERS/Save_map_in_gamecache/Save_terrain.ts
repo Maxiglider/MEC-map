@@ -115,6 +115,7 @@ const SaveTerrain = (json: { [x: string]: any }) => {
 }
 
 export const PushTerrainDataIntoJson = (json: { [x: string]: any }) => {
+    json.mainTileset = getUdgTerrainTypes().getMainTileset()
     GererOrdreTerrains()
     SaveTerrain(json)
     SaveTerrainsUsed(json)

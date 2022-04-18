@@ -5,7 +5,6 @@ import { TerrainTypeId2TerrainType } from 'core/04_STRUCTURES/TerrainType/Terrai
 import { globals } from '../../../../globals'
 import { ChangeTerrainType } from '../Modify_terrain_Functions/Modify_terrain_functions'
 import { AddNewTerrain } from '../Modify_terrain_Functions/Terrain_functions'
-import { TerrainModifyingTrig } from './Terrain_modifying_trig'
 import {createTimer} from "../../../Utils/mapUtils";
 
 

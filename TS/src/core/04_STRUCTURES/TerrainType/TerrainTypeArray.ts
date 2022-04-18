@@ -173,7 +173,6 @@ export class TerrainTypeArray extends BaseArray<TerrainType> {
         }
 
         return {
-            mainTileset: this.mainTileset, //todomax put this out of smic "gameData", and put it in "terrain"
             terrainTypesMec: arr.map(terrainType => terrainType.toJson()),
         }
     }

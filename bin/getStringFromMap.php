@@ -11,7 +11,7 @@
 //const DATA_FILE = __DIR__."/mec_data.txt";
 //const DATA_FILE = "C:\SaveSurDrive\OneDrive\Documents\Warcraft III\CustomMapData\MEC_log.txt";
 //const OUT_FILE = __DIR__."/MEC_outLog.txt";
-const DATA_FILE = "C:\SaveSurDrive\OneDrive\Documents\Warcraft III\CustomMapData\mec_data.txt";
+const DATA_FILE = "C:\SaveSurDrive\OneDrive\Documents\Warcraft III\CustomMapData\mec-smic-data.txt";
 const OUT_FILE = __DIR__."/mec_data.json.js";
 const GAME_DATA_OUT_FILE = __DIR__."/mec_game_data.txt";
 

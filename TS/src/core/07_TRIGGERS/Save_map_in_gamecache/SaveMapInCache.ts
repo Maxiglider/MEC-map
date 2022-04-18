@@ -59,6 +59,6 @@ export class SaveMapInCache {
         const SaveLoad = initSaveLoad()
         SaveLoad.saveFile(MEC_SMIC_DATA_FILE, null, jsonEncode(json))
 
-        Text.A('saving game data to file "mec_data.txt" done')
+        Text.A('saving game data to file "' + MEC_SMIC_DATA_FILE + '" done')
     }
 }

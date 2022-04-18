@@ -13,6 +13,8 @@ const WRAP_OUTPUT_FILE = __DIR__."/final-we.lua";
 
 ob_start();
 ?>
+-- FILE GENERATED ON <?= date("Y-m-d H:i:s") ?>
+
 
 function get_MEC_core()
 

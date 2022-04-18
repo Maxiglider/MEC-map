@@ -161,7 +161,6 @@ export class LevelArray extends BaseArray<Level> {
 
         for(let levelJson of levelsJson){
             const level = this.new()
-            print("Level " + level.getId())
 
             //start message
             if(levelJson.startMessage){
@@ -190,12 +189,9 @@ export class LevelArray extends BaseArray<Level> {
 
             //monsters
             if(levelJson.monsters){
-                print("levelJson.monsters")
 
                 for(let m of levelJson.monsters){
                     let monster: Monster | null = null
-
-                    print("one monster")
 
                     if(m.monsterClassName == "Caster") {
 
