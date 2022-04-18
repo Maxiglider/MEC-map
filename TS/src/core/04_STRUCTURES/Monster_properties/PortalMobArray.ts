@@ -12,8 +12,8 @@ export class PortalMobArray extends BaseArray<PortalMob> {
         this.level = level
     }
 
-    new = (triggerMob: Monster, disableDuration: number) => {
-        const portalMob = new PortalMob(triggerMob, disableDuration)
+    new = (triggerMob: Monster, freezeDuration: number) => {
+        const portalMob = new PortalMob(triggerMob, freezeDuration)
 
         portalMob.initialize()
         portalMob.level = this.level
@@ -70,6 +70,13 @@ export class PortalMobArray extends BaseArray<PortalMob> {
     closePortalMobs = () => {
         for (const [_, portalMob] of pairs(this.data)) {
             portalMob.close()
+        }
+    }
+
+    newFromJson = (portalMobsJson: { [x: string]: any }[]) => {
+        for (let v of portalMobsJson) {
+            const portalMob = this.new(this.level.monsters.get(v.triggerMob), v.freezeDuration)
+            portalMob.setTargetMob(this.level.monsters.get(v.targetMob))
         }
     }
 }

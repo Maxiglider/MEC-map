@@ -108,8 +108,10 @@ export class PortalMob {
         // TODO; SECONDARYHERO?
     }
 
-    //todomax implement toJson
     toJson = () => ({
-
+        id: this.id,
+        triggerMob: this.triggerMob?.id,
+        targetMob: this.targetMob?.id,
+        freezeDuration: this.freezeDuration,
     })
 }

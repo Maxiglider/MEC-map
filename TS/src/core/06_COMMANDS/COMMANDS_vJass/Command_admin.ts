@@ -18,11 +18,14 @@ import {
     getUdgTerrainTypes,
     globals,
 } from '../../../../globals'
+import { initSaveLoad } from '../../../Utils/SaveLoad/SaveLoad'
+import { MEC_SMIC_DATA_FILE } from '../../01_libraries/Constants'
 import { IsPositiveInteger } from '../../01_libraries/Functions_on_numbers'
+import { SaveMapInCache } from '../../07_TRIGGERS/Save_map_in_gamecache/SaveMapInCache'
 import { SaveLoadTerrain } from '../../07_TRIGGERS/Triggers_to_modify_terrains/Save_load_terrain'
+import { MEC_core_API } from '../../API/MEC_core_API'
 import { CmdName, CmdParam, isPlayerId, NbParam, NoParam, resolvePlayerId } from './Command_functions'
 import { ActivateTeleport, DisableTeleport } from './Teleport'
-import { SaveMapInCache } from '../../07_TRIGGERS/Save_map_in_gamecache/SaveMapInCache'
 
 export const ExecuteCommandMax = (escaper: Escaper, cmd: string): boolean => {
     let name = CmdName(cmd)
@@ -469,6 +472,21 @@ export const ExecuteCommandMax = (escaper: Escaper, cmd: string): boolean => {
     if (name === 'saveMapInCache' || name === 'smic') {
         if (noParam) {
             SaveMapInCache.smic()
+        }
+        return true
+    }
+
+    //-loadMapFromCache(lmfc)
+    if (name === 'loadMapFromCache' || name === 'lfmc' || name === 'load') {
+        if (noParam) {
+            const SaveLoad = initSaveLoad()
+
+            Text.A('Loading')
+            SaveLoad.readFile(MEC_SMIC_DATA_FILE, GetTriggerPlayer(), data => {
+                Text.A('Loaded')
+                MEC_core_API.setGameData(data)
+                Text.A('Done')
+            })
         }
         return true
     }

@@ -2,26 +2,26 @@ import { NB_LIVES_AT_BEGINNING } from 'core/01_libraries/Constants'
 import { Text } from 'core/01_libraries/Text'
 import { gg_trg_apparition_dialogue_et_fermeture_automatique } from 'core/08_GAME/Mode_coop/creation_dialogue'
 import { ServiceManager } from 'Services'
-import {getUdgCasterTypes, getUdgEscapers, getUdgMonsterTypes} from '../../../../globals'
+import { getUdgCasterTypes, getUdgEscapers, getUdgMonsterTypes } from '../../../../globals'
 import { MoveCamExceptForPlayer } from '../../01_libraries/Basic_functions'
 import { udg_colorCode } from '../../01_libraries/Init_colorCodes'
 import { BaseArray } from '../BaseArray'
+import { Caster } from '../Caster/Caster'
 import type { CasterType } from '../Caster/CasterType'
 import type { Escaper } from '../Escaper/Escaper'
 import type { MeteorArray } from '../Meteor/MeteorArray'
+import { Monster } from '../Monster/Monster'
 import type { MonsterArray } from '../Monster/MonsterArray'
+import { MonsterMultiplePatrols } from '../Monster/MonsterMultiplePatrols'
+import { MonsterNoMove } from '../Monster/MonsterNoMove'
+import { MonsterSimplePatrol } from '../Monster/MonsterSimplePatrol'
+import { MonsterTeleport } from '../Monster/MonsterTeleport'
 import type { MonsterType } from '../Monster/MonsterType'
 import type { MonsterSpawnArray } from '../MonsterSpawn/MonsterSpawnArray'
 import type { ClearMobArray } from '../Monster_properties/ClearMobArray'
 import { Level } from './Level'
 import { IsLevelBeingMade } from './Level_functions'
 import type { VisibilityModifierArray } from './VisibilityModifierArray'
-import {MonsterNoMove} from "../Monster/MonsterNoMove";
-import {MonsterSimplePatrol} from "../Monster/MonsterSimplePatrol";
-import {MonsterMultiplePatrols} from "../Monster/MonsterMultiplePatrols";
-import {Monster} from "../Monster/Monster";
-import {MonsterTeleport} from "../Monster/MonsterTeleport";
-import {Caster} from "../Caster/Caster";
 
 export class LevelArray extends BaseArray<Level> {
     private currentLevel: number
@@ -154,114 +154,103 @@ export class LevelArray extends BaseArray<Level> {
         return lvl
     }
 
-    newFromJson = (levelsJson: {[x: string]: any}[]) => {
-        if(levelsJson.length > 0){
+    newFromJson = (levelsJson: { [x: string]: any }[]) => {
+        if (levelsJson.length > 0) {
             this.destroyLastLevel(true)
         }
 
-        for(let levelJson of levelsJson){
+        for (let levelJson of levelsJson) {
             const level = this.new()
 
             //start message
-            if(levelJson.startMessage){
+            if (levelJson.startMessage) {
                 level.setStartMessage(levelJson.startMessage)
             }
 
             //nb lives earned
-            if(levelJson.nbLives) {
+            if (levelJson.nbLives) {
                 level.setNbLivesEarned(levelJson.nbLives)
             }
 
             //start
-            if(levelJson.start){
+            if (levelJson.start) {
                 level.newStartFromJson(levelJson.start)
             }
 
             //end
-            if(levelJson.end){
+            if (levelJson.end) {
                 level.newEndFromJson(levelJson.end)
             }
 
             //visibilities
-            if(levelJson.visibilities){
+            if (levelJson.visibilities) {
                 level.visibilities.newFromJson(levelJson.visibilities)
             }
 
             //monsters
-            if(levelJson.monsters){
-
-                for(let m of levelJson.monsters){
+            if (levelJson.monsters) {
+                for (let m of levelJson.monsters) {
                     let monster: Monster | null = null
 
-                    if(m.monsterClassName == "Caster") {
-
+                    if (m.monsterClassName == 'Caster') {
                         const ct = getUdgCasterTypes().getByLabel(m.casterTypeLabel)
 
-                        if(!ct){
-                            Text.erA("Caster type \"" + m.casterTypeLabel + "\" unknwon")
-                        }else {
+                        if (!ct) {
+                            Text.erA('Caster type "' + m.casterTypeLabel + '" unknwon')
+                        } else {
                             monster = new Caster(ct, m.x, m.y, m.angle, m.id)
                         }
-
-                    }else {
+                    } else {
                         const mt = getUdgMonsterTypes().getByLabel(m.monsterTypeLabel)
 
                         if (!mt) {
-                            Text.erA("Monster label \"" + m.monsterTypeLabel + "\" unknown")
+                            Text.erA('Monster label "' + m.monsterTypeLabel + '" unknown')
                         } else {
-                            if (m.monsterClassName == "MonsterNoMove") {
-
+                            if (m.monsterClassName == 'MonsterNoMove') {
                                 monster = new MonsterNoMove(mt, m.x, m.y, m.angle, m.id)
-
-                            } else if (m.monsterClassName == "MonsterSimplePatrol") {
-
+                            } else if (m.monsterClassName == 'MonsterSimplePatrol') {
                                 monster = new MonsterSimplePatrol(mt, m.x1, m.y1, m.x2, m.y2, m.id)
-
-                            } else if (m.monsterClassName == "MonsterMultiplePatrols") {
-
+                            } else if (m.monsterClassName == 'MonsterMultiplePatrols') {
                                 for (const [n, x] of pairs(m.xArr)) {
                                     const y = m.yArr[n]
                                     MonsterMultiplePatrols.storeNewLoc(x, y)
                                 }
                                 monster = new MonsterMultiplePatrols(mt, m.mode, m.id)
-
-                            } else if (m.monsterClassName == "MonsterTeleport") {
-
+                            } else if (m.monsterClassName == 'MonsterTeleport') {
                                 for (const [n, x] of pairs(m.xArr)) {
                                     const y = m.yArr[n]
                                     MonsterTeleport.storeNewLoc(x, y)
                                 }
                                 monster = new MonsterTeleport(mt, m.period, m.angle, m.mode, m.id)
-
                             }
                         }
                     }
 
-                    if(monster){
+                    if (monster) {
                         level.monsters.new(monster, false)
                     }
                 }
             }
 
-            /*//monster spawns
-            if(levelJson.monsterSpawns){
-                level.monsterSpawns.newFromJson(levelJson.monsterSpawns)
-            }
+            // //monster spawns
+            // if (levelJson.monsterSpawns) {
+            //     level.monsterSpawns.newFromJson(levelJson.monsterSpawns)
+            // }
 
-            //meteors
-            if(levelJson.meteors){
-                level.meteors.newFromJson(levelJson.meteors)
-            }
+            // //meteors
+            // if (levelJson.meteors) {
+            //     level.meteors.newFromJson(levelJson.meteors)
+            // }
 
             //clearMobs
-            if(levelJson.clearMobs){
-                level.clearMobs.newFromJson(levelJson.clearMobs)
-            }
+            // if (levelJson.clearMobs) {
+            //     level.clearMobs.newFromJson(levelJson.clearMobs)
+            // }
 
             //portalMobs
-            if(levelJson.portalMobs){
+            if (levelJson.portalMobs) {
                 level.portalMobs.newFromJson(levelJson.portalMobs)
-            }*/
+            }
         }
     }
 

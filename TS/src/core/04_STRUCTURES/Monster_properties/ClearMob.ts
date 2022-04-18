@@ -1,3 +1,4 @@
+import { arrayPush } from 'core/01_libraries/Basic_functions'
 import { Level } from '../Level/Level'
 import { Monster } from '../Monster/Monster'
 import { MonsterArray } from '../Monster/MonsterArray'
@@ -216,8 +217,19 @@ export class ClearMob {
         this.triggerMob.setVertexColor(40, 100, 40)
     }
 
-    //todomax implement toJson
-    toJson = () => ({
+    toJson = () => {
+        const blockMobIds: number[] = []
 
-    })
+        for (const [_, monster] of pairs(this.blockMobs.getAll())) {
+            arrayPush(blockMobIds, monster.id)
+        }
+
+        return {
+            id: this.id,
+            triggerMob: this.triggerMob.id,
+            disableDuration: this.disableDuration,
+            blockMobs: blockMobIds,
+            enabled: this.enabled,
+        }
+    }
 }
