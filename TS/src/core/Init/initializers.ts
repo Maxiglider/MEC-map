@@ -1,4 +1,3 @@
-import { init_Test } from '../../../../core/Test/test'
 import { init_terrain_limit_variables } from '../01_libraries/Init_terrain_limit_variables'
 import { initViewAllHideAll } from '../03_view_all_hide_all/View_all_hide_all'
 import { initFirstPerson } from '../04_STRUCTURES/Escaper/Escaper_firstPerson'
@@ -18,6 +17,7 @@ import { init_Heroes } from '../08_GAME/Init_game/Heroes'
 import { initNoSelectionCircle } from '../08_GAME/Init_game/No_selection_circle'
 import { initSelectUnit } from '../08_GAME/select_unit'
 import { init_doubleKill } from '../Double_heroes/double_kill'
+import { init_Test } from '../Test/test'
 import { initArrays } from './initArrays'
 import { initOldTriggers } from './init_old_triggers'
 

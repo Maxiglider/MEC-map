@@ -3,9 +3,9 @@ import { initMultiboard } from 'core/04_STRUCTURES/Lives_and_game_time/Multiboar
 import { ServiceManager } from 'Services'
 import { createTimer, errorHandler } from 'Utils/mapUtils'
 import { addScriptHook, W3TS_HOOK } from 'w3ts/hooks'
+import { MEC_core_API } from './core/API/MEC_core_API'
 import { initializers } from './core/Init/initializers'
 import { PROD } from './env'
-import {MEC_core_API} from "./core/API/MEC_core_API";
 
 const tsMain = () => {
     ServiceManager.registerServices({
@@ -45,6 +45,5 @@ const tsMain = () => {
 }
 
 addScriptHook(W3TS_HOOK.MAIN_AFTER, errorHandler(tsMain))
-
 
 export const MEC_core = MEC_core_API
