@@ -1,4 +1,4 @@
-import { IsBoolString, IsEscaperInGame, S2B } from 'core/01_libraries/Basic_functions'
+import {IsBoolString, IsEscaperInGame, jsonDecode, jsonEncode, S2B} from 'core/01_libraries/Basic_functions'
 import { NB_ESCAPERS, NB_PLAYERS_MAX } from 'core/01_libraries/Constants'
 import { Text } from 'core/01_libraries/Text'
 import { Escaper } from 'core/04_STRUCTURES/Escaper/Escaper'
@@ -477,14 +477,17 @@ export const ExecuteCommandMax = (escaper: Escaper, cmd: string): boolean => {
     }
 
     //-loadMapFromCache(lmfc)
-    if (name === 'loadMapFromCache' || name === 'lfmc' || name === 'load') {
+    if (name === 'loadMapFromCache' || name === 'lmfc') {
         if (noParam) {
             const SaveLoad = initSaveLoad()
 
             Text.A('Loading')
             SaveLoad.readFile(MEC_SMIC_DATA_FILE, GetTriggerPlayer(), data => {
                 Text.A('Loaded')
-                MEC_core_API.setGameData(data)
+
+                const gameData = (jsonDecode(data) as any).gameData
+
+                MEC_core_API.setGameData(jsonEncode(gameData))
                 Text.A('Done')
             })
         }
