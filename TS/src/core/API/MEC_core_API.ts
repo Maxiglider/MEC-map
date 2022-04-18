@@ -1,5 +1,6 @@
 import {LoadMapFromCache} from "../07_TRIGGERS/Load_map_from_gamecache/LoadMapFromCache";
 import {errorHandler} from "../../Utils/mapUtils";
+import {makingRightsToAll} from "../06_COMMANDS/Rights/manage_rights";
 
 
 export const MEC_core_API = {
@@ -8,5 +9,9 @@ export const MEC_core_API = {
             LoadMapFromCache.gameDataJsonString = jsonString
             LoadMapFromCache.initializeGameData()
         })()
+    },
+
+    makingRightsToAll: () => {
+        makingRightsToAll()
     }
 }
