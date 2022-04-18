@@ -71,6 +71,7 @@ import { TerrainTypeWalk } from '../TerrainType/TerrainTypeWalk'
 import { EscaperEffectArray } from './EscaperEffectArray'
 import { EscaperFirstPerson } from './Escaper_firstPerson'
 import { ColorInfo, GetMirrorEscaper } from './Escaper_functions'
+import {MakeTerrainCreateBrush} from "../../05_MAKE_STRUCTURES/Make_terrain/MakeTerrainCreateBrush";
 
 const SHOW_REVIVE_EFFECTS = false
 
@@ -145,6 +146,14 @@ export class Escaper {
 
     public hideLeaderboard = false
 
+    //make
+    private gumTerrain?: TerrainType
+    private gumBrushSize = 1
+
+
+    /*
+     * Constructor
+     */
     constructor(escaperId: number) {
         this.playerId = escaperId >= NB_PLAYERS_MAX ? escaperId - 12 : escaperId
 
@@ -1247,6 +1256,11 @@ export class Escaper {
         if (this.hero) this.make = new MakeTerrainCreate(this.hero, terrainType)
     }
 
+    makeCreateTerrainBrush(terrainType: TerrainType, brushSize: number, shape: 'square' | 'circle' = 'square') {
+        this.destroyMake()
+        this.make = new MakeTerrainCreateBrush(this.p, terrainType, brushSize, shape)
+    }
+
     makeTerrainCopyPaste = () => {
         this.destroyMake()
         if (this.hero) this.make = new MakeTerrainCopyPaste(this.hero)
@@ -1432,6 +1446,22 @@ export class Escaper {
 
     setLockCamTarget = (lockCamTarget: Escaper | null) => {
         this.lockCamTarget = lockCamTarget
+    }
+
+    setGumTerrain = (terrainType: TerrainType) => {
+        this.gumTerrain = terrainType
+    }
+
+    getGumTerrain = () => {
+        return this.gumTerrain
+    }
+
+    setGumBrushSize = (size: number) => {
+        this.gumBrushSize = size
+    }
+
+    getGumBrushSize = () => {
+        return this.gumBrushSize
     }
 
     toJson = () => ({

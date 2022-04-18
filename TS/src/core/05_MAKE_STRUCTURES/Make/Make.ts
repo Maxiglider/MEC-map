@@ -2,6 +2,7 @@ import { IsIssuedOrder, StopUnit } from 'core/01_libraries/Basic_functions'
 import { Hero2Escaper } from 'core/04_STRUCTURES/Escaper/Escaper_functions'
 import { createEvent } from '../../../Utils/mapUtils'
 import { Escaper } from '../../04_STRUCTURES/Escaper/Escaper'
+import {getUdgEscapers} from "../../../../globals";
 
 export const MAKE_LAST_CLIC_UNIT_ID = FourCC('e001') //à remplacer par l'id de l'unité choisie (need couleur variable)
 export const MAKE_CANT_CANCEL_MORE = 'Nothing else to cancel !'
@@ -15,18 +16,30 @@ export abstract class Make {
     makerOwner: player
     kind: string //monsterMaking, monsterDeleting...
     t: trigger | null
-    maker: unit
+    maker: unit | undefined
     escaper: Escaper
     orderX: number = 0
     orderY: number = 0
     forSpecificLevel: boolean
 
-    constructor(maker: unit, kind: string, forSpecificLevel = true) {
+    constructor(maker: unit | undefined, kind: string, forSpecificLevel = true, player: player | null = null) {
         this.maker = maker
-        this.makerOwner = GetOwningPlayer(maker)
         this.kind = kind
 
-        const escaper = Hero2Escaper(maker)
+        let escaper: Escaper | null = null
+        if(maker) {
+            escaper = Hero2Escaper(maker)
+            this.makerOwner = GetOwningPlayer(maker)
+        }else if(player){
+            this.makerOwner = player
+            escaper = getUdgEscapers().get(GetPlayerId(player))
+            if(escaper && escaper.getHero()){
+                this.maker = escaper.getHero()
+            }
+        }else{
+            throw 'Wrong Make init'
+        }
+
         if (!escaper) {
             throw 'Make : escaper not found'
         }
@@ -64,7 +77,7 @@ export abstract class Make {
             this.orderY = Math.round(this.orderY / this.escaper.roundToGrid) * this.escaper.roundToGrid
         }
 
-        StopUnit(this.maker)
+        this.maker && StopUnit(this.maker)
         return true
     }
 
@@ -73,13 +86,15 @@ export abstract class Make {
     enableTrigger = () => {
         if (this.t) DestroyTrigger(this.t)
 
-        this.t = createEvent({
-            events: [
-                t => TriggerRegisterUnitEvent(t, this.maker, EVENT_UNIT_ISSUED_POINT_ORDER),
-                t => TriggerRegisterUnitEvent(t, this.maker, EVENT_UNIT_ISSUED_TARGET_ORDER),
-            ],
-            actions: [TriggerActions],
-        })
+        if(this.maker) {
+            this.t = createEvent({
+                events: [
+                    t => this.maker && TriggerRegisterUnitEvent(t, this.maker, EVENT_UNIT_ISSUED_POINT_ORDER),
+                    t => this.maker && TriggerRegisterUnitEvent(t, this.maker, EVENT_UNIT_ISSUED_TARGET_ORDER),
+                ],
+                actions: [TriggerActions],
+            })
+        }
     }
 
     cancelLastAction = () => {

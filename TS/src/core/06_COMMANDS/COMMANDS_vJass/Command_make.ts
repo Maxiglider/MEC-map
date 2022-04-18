@@ -396,9 +396,9 @@ export const ExecuteCommandMake = (escaper: Escaper, cmd: string): boolean => {
         return true
     }
 
-    //-createTerrain(crt) <terrainLabel>   --> create the terrain on the map, by clicking
+    //-createTerrain(crt) <terrainLabel> [<brushSize> [<shape>]]  --> create the terrain on the map, by clicking
     if (name === 'createTerrain' || name === 'crt') {
-        if (!(nbParam === 1)) {
+        if (nbParam < 1 || nbParam > 3) {
             return true
         }
 
@@ -406,9 +406,59 @@ export const ExecuteCommandMake = (escaper: Escaper, cmd: string): boolean => {
         if (!terrainType) {
             Text.erP(escaper.getPlayer(), 'terrain "' + param1 + '" doesn\'t exist')
         } else {
-            escaper.makeCreateTerrain(terrainType)
+            if(nbParam > 1){
+                //brush mode
+                //param2 : brush size
+                const brushSize = S2I(param2)
+                if(brushSize < 1 || brushSize > 8){
+                    Text.erP(escaper.getPlayer(), 'brush size has to be between 1 and 8')
+                }else{
+                    let shape: 'circle' | 'square' = 'square'
+                    if(param3 == 'circle' || param3 == 'c'){
+                        shape = 'circle'
+                    }
+                    escaper.makeCreateTerrainBrush(terrainType, brushSize, shape)
+                }
+            }else{
+                //classic two clicks mode
+                escaper.makeCreateTerrain(terrainType)
+            }
             Text.mkP(escaper.getPlayer(), 'creating terrain on')
         }
+        return true
+    }
+
+    //-setGumTerrain
+    if(name == 'setGumTerrain' || name == 'setgt'){
+        if(nbParam != 1){
+            return true
+        }
+
+        const terrainType = getUdgTerrainTypes().getByLabel(param1)
+        if (!terrainType) {
+            Text.erP(escaper.getPlayer(), 'terrain "' + param1 + '" doesn\'t exist')
+        } else {
+            escaper.setGumTerrain(terrainType)
+            Text.mkP(escaper.getPlayer(), 'gum terrain set')
+        }
+
+        return true
+    }
+
+    //-setGumBrushSize
+    if(name == 'setGumBrushSize' || name == 'setgbs'){
+        if(nbParam != 1){
+            return true
+        }
+
+        const brushSize = S2I(param1)
+        if(brushSize < 1 || brushSize > 8){
+            Text.erP(escaper.getPlayer(), 'brush size has to be between 1 and 8')
+        }else{
+            escaper.setGumBrushSize(brushSize)
+            Text.mkP(escaper.getPlayer(), 'gum brush size set')
+        }
+
         return true
     }
 
