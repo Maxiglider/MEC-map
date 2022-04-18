@@ -26,9 +26,11 @@ export class MakeTerrainCreateBrush extends MakeMaintainClick{
                 shapeToApply = this.shape
                 sizeToApply = this.brushSize
             } else {
-                const gumTerrainType = getUdgEscapers().get(GetPlayerId(this.makerOwner)).getGumTerrain()
+                const escaper = getUdgEscapers().get(GetPlayerId(this.makerOwner))
+                const gumTerrainType = escaper.getGumTerrain()
                 if(gumTerrainType) {
                     terrainTypeToApply = gumTerrainType
+                    sizeToApply = escaper.getGumBrushSize()
                 }
             }
 
