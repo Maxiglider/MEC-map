@@ -12,7 +12,6 @@ export class MakeTerrainCreateBrush extends MakeMaintainClick{
         this.terrainType = terrainType
         this.brushSize = brushSize
         this.shape = shape
-        print('MakeTerrainCreateBrush')
     }
 
     doMouseMoveActions() {

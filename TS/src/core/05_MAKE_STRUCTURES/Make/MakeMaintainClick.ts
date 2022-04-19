@@ -3,6 +3,9 @@ import {getUdgEscapers} from "../../../../globals";
 import {createEvent} from "../../../Utils/mapUtils";
 
 
+const MIN_TIME_BETWEEN_ACTIONS = 0.05
+
+
 const onPressActions = () => {
     const escaper = getUdgEscapers().get(GetPlayerId(GetTriggerPlayer()))
     const make = escaper.getMake()
@@ -39,6 +42,9 @@ export abstract class MakeMaintainClick extends Make{
     private tPress: trigger | null = null
     private tUnpress: trigger | null = null
     private tMouseMove : trigger | null = null
+
+    private tTimeSinceLastMouseMove?: timer
+    private timeSinceLastMouseMove: number = 1000 //high time
 
     protected mouseX: number = 0
     protected mouseY: number = 0
@@ -90,7 +96,14 @@ export abstract class MakeMaintainClick extends Make{
             this.mouseX = BlzGetTriggerPlayerMouseX()
             this.mouseY = BlzGetTriggerPlayerMouseY()
 
-            return true
+            if(this.tTimeSinceLastMouseMove){
+                this.timeSinceLastMouseMove = TimerGetElapsed(this.tTimeSinceLastMouseMove)
+            }
+            this.tTimeSinceLastMouseMove && DestroyTimer(this.tTimeSinceLastMouseMove)
+            this.tTimeSinceLastMouseMove = CreateTimer()
+            TimerStart(this.tTimeSinceLastMouseMove, 10, false, DoNothing)
+
+            return this.timeSinceLastMouseMove >= MIN_TIME_BETWEEN_ACTIONS
         }
 
         return false
