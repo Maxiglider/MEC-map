@@ -1469,12 +1469,14 @@ export class Escaper {
     }
 
     enableFollowMouseMode = (flag: boolean) => {
+        this.followMouse?.destroy()
         if(flag){
             this.followMouse = new FollowMouse(this)
         }else{
-            this.followMouse?.destroy()
+            delete this.followMouse
         }
     }
+
 
     getFollowMouse = () => {
         return this.followMouse

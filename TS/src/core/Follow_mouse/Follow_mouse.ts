@@ -4,7 +4,7 @@ import {getUdgEscapers} from "../../../globals";
 import {TurnOnSlide} from "../07_TRIGGERS/Slide_and_CheckTerrain_triggers/To_turn_on_slide";
 
 
-const PRESS_TIME_TO_ENABLE_FOLLOW_MOUSE = 0.2
+export const PRESS_TIME_TO_ENABLE_FOLLOW_MOUSE = 0.2
 const FOLLOW_MOUSE_PERIOD = 0.1
 
 const onPressActions = () => {

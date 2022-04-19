@@ -25,13 +25,13 @@ import { IsInteger, PercentageStringOrX2Integer } from '../../01_libraries/Funct
 import { EscaperEffectFunctions } from '../../04_STRUCTURES/Escaper/EscaperEffect_functions'
 import { execute, newCmd } from '../../04_STRUCTURES/Escaper/EscaperSavedCommands'
 import { Disco } from '../../04_STRUCTURES/Escaper/Escaper_disco'
-import { MIN_TIME_BETWEEN_ACTIONS } from '../../05_MAKE_STRUCTURES/Make/MakeHoldClick'
 import { TerrainTypeFromString } from '../../07_TRIGGERS/Modify_terrain_Functions/Terrain_type_from_string'
 import { TerrainTypeNamesAndData } from '../../07_TRIGGERS/Modify_terrain_Functions/Terrain_type_names_and_data'
 import { AutoContinueAfterSliding } from '../../07_TRIGGERS/Slide_and_CheckTerrain_triggers/Auto_continue_after_sliding'
 import { TurnOnSlide } from '../../07_TRIGGERS/Slide_and_CheckTerrain_triggers/To_turn_on_slide'
 import { CommandShortcuts } from '../../08_GAME/Shortcuts/Using_shortcut'
 import { CmdName, CmdParam, IsColorString, isPlayerId, NbParam, NoParam, resolvePlayerId } from './Command_functions'
+import {PRESS_TIME_TO_ENABLE_FOLLOW_MOUSE} from "../../Follow_mouse/Follow_mouse";
 
 export const ExecuteCommandAll = (escaper: Escaper, cmd: string): boolean => {
     let name = CmdName(cmd)
@@ -774,11 +774,12 @@ export const ExecuteCommandAll = (escaper: Escaper, cmd: string): boolean => {
         }
 
         escaper.enableFollowMouseMode(S2B(param1))
+
         if (S2B(param1)) {
             Text.mkP(
                 escaper.getPlayer(),
                 'Follow mouse mode enabled : hold right click during ' +
-                    MIN_TIME_BETWEEN_ACTIONS +
+                    PRESS_TIME_TO_ENABLE_FOLLOW_MOUSE +
                     's while sliding to activate it. Do a normal click to disable it'
             )
         } else {
