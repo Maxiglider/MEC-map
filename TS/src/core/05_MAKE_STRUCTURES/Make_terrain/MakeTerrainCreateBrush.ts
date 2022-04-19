@@ -1,20 +1,28 @@
 import {MakeHoldClick} from "../Make/MakeHoldClick";
 import {TerrainType} from "../../04_STRUCTURES/TerrainType/TerrainType";
-import {getUdgEscapers, getUdgTerrainTypes, globals} from "../../../../globals";
+import {getUdgTerrainTypes} from "../../../../globals";
 import {LARGEUR_CASE} from "../../01_libraries/Constants";
-import {saveTerrainType2Dims} from "../../07_TRIGGERS/Save_map_in_gamecache/Save_terrain";
 import {ArrayHandler} from "../../../Utils/ArrayHandler";
 import {MakeTerrainCreateBrushAction} from "../MakeLastActions/MakeTerrainCreateBrushAction";
-import {roundCoordinateToCenterOfTile} from "../../01_libraries/Basic_functions";
+import {arrayPush, outOfBounds, roundCoordinateToCenterOfTile} from "../../01_libraries/Basic_functions";
+import {ChangeTerrainType} from "../../07_TRIGGERS/Modify_terrain_Functions/Modify_terrain_functions";
+import {Escaper} from "../../04_STRUCTURES/Escaper/Escaper";
+
+export interface ChangingTile {
+    x: number,
+    y: number,
+    terrainTypeBefore: TerrainType,
+    terrainTypeAfter: TerrainType
+}
 
 export class MakeTerrainCreateBrush extends MakeHoldClick{
     private terrainType: TerrainType
     private brushSize: number
     private shape: 'square' | 'circle'
-    private mapTerrainTypesSave?: (TerrainType | null)[][]
+    private changingTiles?: ChangingTile[]
 
-    constructor(player: player, terrainType: TerrainType, brushSize: number, shape: 'square' | 'circle' = 'square') {
-        super(player, 'terrainCreateBrush', false)
+    constructor(escaper: Escaper, terrainType: TerrainType, brushSize: number, shape: 'square' | 'circle' = 'square') {
+        super(escaper, 'terrainCreateBrush', false)
         this.terrainType = terrainType
         this.brushSize = brushSize
         this.shape = shape
@@ -31,19 +39,75 @@ export class MakeTerrainCreateBrush extends MakeHoldClick{
                 shapeToApply = this.shape
                 sizeToApply = this.brushSize
             } else {
-                const escaper = getUdgEscapers().get(GetPlayerId(this.makerOwner))
-                const gumTerrainType = escaper.getGumTerrain()
+                const gumTerrainType = this.escaper.getGumTerrain()
                 if(gumTerrainType) {
                     terrainTypeToApply = gumTerrainType
-                    sizeToApply = escaper.getGumBrushSize()
+                    sizeToApply = this.escaper.getGumBrushSize()
                 }
             }
 
             if(terrainTypeToApply){
-                const shapeInt = shapeToApply == 'square' ? 1 : 0
-                SetTerrainType(this.mouseX, this.mouseY, terrainTypeToApply.getTerrainTypeId(), -1, sizeToApply, shapeInt)
-            }else{
+                const centerX = roundCoordinateToCenterOfTile(this.mouseX)
+                const centerY = roundCoordinateToCenterOfTile(this.mouseY)
+                const offset = (sizeToApply - 1) * LARGEUR_CASE
 
+                for(let x = centerX - offset; x <= centerX + offset; x += LARGEUR_CASE){
+                    for(let y = centerY - offset; y <= centerY + offset; y += LARGEUR_CASE) {
+                        if(!outOfBounds(x, y)){
+                            const terrainType = getUdgTerrainTypes().getTerrainType(x, y)
+                            if(terrainType && terrainType != terrainTypeToApply){
+
+                                //remove some tile changes in circle mode
+                                if(shapeToApply == 'circle'){
+                                    const diffXcenter = RAbsBJ(centerX - x)
+                                    const diffYcenter = RAbsBJ(centerY - y)
+
+                                    //remove edges except middles
+                                    if(sizeToApply != 1){
+                                        if(x != centerX && y != centerY && (x == centerX - offset || x == centerX + offset || y == centerY - offset || y == centerY + offset)){
+                                            continue
+                                        }
+                                    }
+
+                                    //remove 2nd line interior corners, leaving middle and tiles near
+                                    if(sizeToApply >= 4){
+                                        //up or down
+                                        if(y == centerY + offset - LARGEUR_CASE || y == centerY - offset + LARGEUR_CASE){
+                                            if(diffXcenter > LARGEUR_CASE * 2){
+                                                continue
+                                            }
+                                        }
+
+                                        //left or right
+                                        if(x == centerX + offset - LARGEUR_CASE || x == centerX - offset + LARGEUR_CASE){
+                                            if(diffYcenter > LARGEUR_CASE * 2){
+                                                continue
+                                            }
+                                        }
+                                    }
+
+                                    //a little more corner for size 8
+                                    if(sizeToApply == 8){
+                                        if(diffXcenter == LARGEUR_CASE * 5 && diffYcenter == LARGEUR_CASE * 5){
+                                            continue
+                                        }
+                                    }
+                                }
+
+                                //change tile
+                                ChangeTerrainType(x, y, terrainTypeToApply.getTerrainTypeId())
+
+                                //memorize for cancel/redo
+                                this.changingTiles && arrayPush(this.changingTiles, {
+                                    x: x,
+                                    y: y,
+                                    terrainTypeBefore: terrainType,
+                                    terrainTypeAfter: terrainTypeToApply
+                                })
+                            }
+                        }
+                    }
+                }
             }
 
             return true
@@ -53,8 +117,7 @@ export class MakeTerrainCreateBrush extends MakeHoldClick{
     }
 
     doPressActions() {
-        this.mapTerrainTypesSave && ArrayHandler.clearArrayOfArray(this.mapTerrainTypesSave)
-        this.mapTerrainTypesSave = saveTerrainType2Dims()
+        this.changingTiles = ArrayHandler.getNewArray()
 
         super.doPressActions()
     }
@@ -62,49 +125,14 @@ export class MakeTerrainCreateBrush extends MakeHoldClick{
     doUnpressActions() {
         super.doUnpressActions()
 
-        if(!this.mapTerrainTypesSave){
-            return
-        }
-
         //create a make action
-        const brushSize = this.activeBtn == MOUSE_BUTTON_TYPE_LEFT ? this.escaper.getGumBrushSize() : this.brushSize
-        const offset = (brushSize - 1) * LARGEUR_CASE
-
-        const minX = RMaxBJ(roundCoordinateToCenterOfTile(this.currentClickMinX - offset), globals.MAP_MIN_X)
-        const minY = RMaxBJ(roundCoordinateToCenterOfTile(this.currentClickMinY - offset), globals.MAP_MIN_Y)
-        const maxX = RMinBJ(roundCoordinateToCenterOfTile(this.currentClickMaxX + offset), globals.MAP_MAX_X)
-        const maxY = RMinBJ(roundCoordinateToCenterOfTile(this.currentClickMaxY + offset), globals.MAP_MAX_Y)
-
-        const mapStartX = Math.floor((minX - globals.MAP_MIN_X) / LARGEUR_CASE)
-        const mapStartY = Math.floor((minY - globals.MAP_MIN_Y) / LARGEUR_CASE)
-
-        //get terrain before and after
-        const terrainBefore: (TerrainType | null)[][] = ArrayHandler.getNewArray()
-        const terrainAfter: (TerrainType | null)[][] = ArrayHandler.getNewArray()
-
-        let xInd = 0
-        for(let x = minX; x <= maxX; x += LARGEUR_CASE){
-            let yInd = 0
-            for(let y = minY; y <= maxY; y += LARGEUR_CASE){
-                !terrainBefore[xInd] && (terrainBefore[xInd] = ArrayHandler.getNewArray())
-                terrainBefore[xInd][yInd] = this.mapTerrainTypesSave[xInd + mapStartX][yInd + mapStartY]
-
-                !terrainAfter[xInd] && (terrainAfter[xInd] = ArrayHandler.getNewArray())
-                terrainAfter[xInd][yInd] = getUdgTerrainTypes().getTerrainType(x, y)
-
-                yInd++
-            }
-
-            xInd++
+        if(this.changingTiles) {
+            const action = new MakeTerrainCreateBrushAction(this.changingTiles)
+            this.escaper.newAction(action)
         }
-
-        //creating the action
-        const action = new MakeTerrainCreateBrushAction(terrainBefore, terrainAfter, minX, minY, maxX, maxY)
-        this.escaper.newAction(action)
     }
 
     destroy() {
         super.destroy()
-        this.mapTerrainTypesSave && ArrayHandler.clearArrayOfArray(this.mapTerrainTypesSave)
     }
 }

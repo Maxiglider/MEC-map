@@ -22,22 +22,13 @@ export abstract class Make {
     orderY: number = 0
     forSpecificLevel: boolean
 
-    constructor(maker: unit | undefined, kind: string, forSpecificLevel = true, player: player | null = null) {
+    constructor(maker: unit | undefined, kind: string, forSpecificLevel = true, escaper: Escaper | null = null) {
         this.maker = maker
         this.kind = kind
 
-        let escaper: Escaper | null = null
         if(maker) {
             escaper = Hero2Escaper(maker)
             this.makerOwner = GetOwningPlayer(maker)
-        }else if(player){
-            this.makerOwner = player
-            escaper = getUdgEscapers().get(GetPlayerId(player))
-            if(escaper && escaper.getHero()){
-                this.maker = escaper.getHero()
-            }
-        }else{
-            throw 'Wrong Make init'
         }
 
         if (!escaper) {
@@ -45,6 +36,7 @@ export abstract class Make {
         }
 
         this.escaper = escaper
+        this.makerOwner = escaper.getPlayer()
 
         this.t = null
         this.enableTrigger()

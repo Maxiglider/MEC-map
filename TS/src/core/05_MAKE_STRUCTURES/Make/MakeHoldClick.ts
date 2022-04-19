@@ -1,9 +1,10 @@
 import {Make} from "./Make";
 import {getUdgEscapers} from "../../../../globals";
 import {createEvent} from "../../../Utils/mapUtils";
+import {Escaper} from "../../04_STRUCTURES/Escaper/Escaper";
 
 
-export const MIN_TIME_BETWEEN_ACTIONS = 0.05
+export const MIN_TIME_BETWEEN_ACTIONS = null
 
 
 const onPressActions = () => {
@@ -56,8 +57,8 @@ export abstract class MakeHoldClick extends Make{
     protected currentClickMaxX = 0
     protected currentClickMaxY = 0
 
-    constructor(player: player, kind: string, forSpecificLevel: boolean) {
-        super(getUdgEscapers().get(GetPlayerId(player)).getHero(), kind, forSpecificLevel, player)
+    constructor(escaper: Escaper, kind: string, forSpecificLevel: boolean) {
+        super(escaper.getHero(), kind, forSpecificLevel, escaper)
         this.enableTriggersMouse()
     }
 
@@ -135,7 +136,7 @@ export abstract class MakeHoldClick extends Make{
             this.tTimeSinceLastMouseMove = CreateTimer()
             TimerStart(this.tTimeSinceLastMouseMove, 10, false, DoNothing)
 
-            return this.timeSinceLastMouseMove >= MIN_TIME_BETWEEN_ACTIONS
+            return MIN_TIME_BETWEEN_ACTIONS === null || this.timeSinceLastMouseMove >= MIN_TIME_BETWEEN_ACTIONS
         }
 
         return false

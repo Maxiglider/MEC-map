@@ -1262,7 +1262,7 @@ export class Escaper {
 
     makeCreateTerrainBrush(terrainType: TerrainType, brushSize: number, shape: 'square' | 'circle' = 'square') {
         this.destroyMake()
-        this.make = new MakeTerrainCreateBrush(this.p, terrainType, brushSize, shape)
+        this.make = new MakeTerrainCreateBrush(this, terrainType, brushSize, shape)
     }
 
     makeTerrainCopyPaste = () => {
