@@ -8,6 +8,7 @@ import { I2HexaString } from '../../01_libraries/Functions_on_numbers'
 import { SaveTerrainHeights } from './Save_terrain_heights_and_cliffs'
 import { SaveTerrainRamps } from './Save_terrain_ramps'
 import { SaveWater } from './Save_water'
+import {ArrayHandler} from "../../../Utils/ArrayHandler";
 
 let terrainTypeIds: number[] = []
 let nbTerrainTypesUsed: number
@@ -124,4 +125,29 @@ export const PushTerrainDataIntoJson = (json: { [x: string]: any }) => {
     SaveTerrainHeights.SaveTerrainCliffs(json)
     SaveTerrainRamps.SaveTerrainRamps(json)
     SaveWater.SaveWater(json)
+}
+
+
+//function to save whole terrain in an array of array
+export function saveTerrainType2Dims() {
+    const terrainsTypes: (TerrainType | null)[][] = ArrayHandler.getNewArray()
+
+    let yInd = 0
+    let y = globals.MAP_MIN_Y
+    while (y <= globals.MAP_MAX_Y) {
+        let xInd = 0
+        let x = globals.MAP_MIN_X
+        while (x <= globals.MAP_MAX_X) {
+            !terrainsTypes[xInd] && (terrainsTypes[xInd] = ArrayHandler.getNewArray())
+            terrainsTypes[xInd][yInd] = getUdgTerrainTypes().getTerrainType(x, y)
+
+            xInd++
+            x = x + LARGEUR_CASE
+        }
+
+        yInd++
+        y = y + LARGEUR_CASE
+    }
+
+    return terrainsTypes
 }

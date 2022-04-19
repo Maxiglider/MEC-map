@@ -3,14 +3,14 @@ import {getUdgEscapers} from "../../../../globals";
 import {createEvent} from "../../../Utils/mapUtils";
 
 
-const MIN_TIME_BETWEEN_ACTIONS = 0.05
+export const MIN_TIME_BETWEEN_ACTIONS = 0.05
 
 
 const onPressActions = () => {
     const escaper = getUdgEscapers().get(GetPlayerId(GetTriggerPlayer()))
     const make = escaper.getMake()
 
-    if(make instanceof MakeMaintainClick){
+    if(make instanceof MakeHoldClick){
         make.doPressActions()
     }
 }
@@ -19,7 +19,7 @@ const onUnpressActions = () => {
     const escaper = getUdgEscapers().get(GetPlayerId(GetTriggerPlayer()))
     const make = escaper.getMake()
 
-    if(make instanceof MakeMaintainClick){
+    if(make instanceof MakeHoldClick){
         make.doUnpressActions()
     }
 }
@@ -28,13 +28,15 @@ const onMouseMoveActions = () => {
     const escaper = getUdgEscapers().get(GetPlayerId(GetTriggerPlayer()))
     const make = escaper.getMake()
 
-    if(make instanceof MakeMaintainClick){
+    if(make instanceof MakeHoldClick){
         make.doMouseMoveActions()
     }
 }
 
-
-export abstract class MakeMaintainClick extends Make{
+/**
+ * Class MakeHoldClick
+ */
+export abstract class MakeHoldClick extends Make{
     protected activeBtn: mousebuttontype | null = null
     private activeBtnStr = ""
     private isPressed = false
@@ -49,9 +51,36 @@ export abstract class MakeMaintainClick extends Make{
     protected mouseX: number = 0
     protected mouseY: number = 0
 
+    protected currentClickMinX = 0
+    protected currentClickMinY = 0
+    protected currentClickMaxX = 0
+    protected currentClickMaxY = 0
+
     constructor(player: player, kind: string, forSpecificLevel: boolean) {
         super(getUdgEscapers().get(GetPlayerId(player)).getHero(), kind, forSpecificLevel, player)
         this.enableTriggersMouse()
+    }
+
+    updateCurrentClickMinMaxLocations = () => {
+        if(this.currentClickMinX == 0 || this.mouseX < this.currentClickMinX){
+            this.currentClickMinX = this.mouseX
+        }
+        if(this.currentClickMinY == 0 || this.mouseY < this.currentClickMinY){
+            this.currentClickMinY = this.mouseY
+        }
+        if(this.currentClickMaxX == 0 || this.mouseX > this.currentClickMaxX){
+            this.currentClickMaxX = this.mouseX
+        }
+        if(this.currentClickMaxY == 0 || this.mouseY > this.currentClickMaxY){
+            this.currentClickMaxY = this.mouseY
+        }
+    }
+
+    resetCurrentClickMinMaxLocations = () => {
+        this.currentClickMinX = 0
+        this.currentClickMinY = 0
+        this.currentClickMaxX = 0
+        this.currentClickMaxY = 0
     }
 
     enableTriggersMouse = () => {
@@ -79,15 +108,17 @@ export abstract class MakeMaintainClick extends Make{
         super.doBaseActions() //stop the hero if he's controlled, the actions aren't actually done here
     }
 
-    doPressActions = () => {
+    doPressActions() {
         this.activeBtn = BlzGetTriggerPlayerMouseButton()
         this.activeBtnStr = this.activeBtn == MOUSE_BUTTON_TYPE_LEFT ? "left" : "right"
         this.isPressed = true
 
+        this.resetCurrentClickMinMaxLocations()
+
         this.doMouseMoveActions()
     }
 
-    doUnpressActions = () => {
+    doUnpressActions() {
         this.isPressed = false
     }
 
@@ -95,6 +126,7 @@ export abstract class MakeMaintainClick extends Make{
         if(this.isPressed) {
             this.mouseX = BlzGetTriggerPlayerMouseX()
             this.mouseY = BlzGetTriggerPlayerMouseY()
+            this.updateCurrentClickMinMaxLocations()
 
             if(this.tTimeSinceLastMouseMove){
                 this.timeSinceLastMouseMove = TimerGetElapsed(this.tTimeSinceLastMouseMove)

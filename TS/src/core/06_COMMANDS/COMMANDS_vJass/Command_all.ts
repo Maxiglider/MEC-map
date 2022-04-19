@@ -31,6 +31,7 @@ import { AutoContinueAfterSliding } from '../../07_TRIGGERS/Slide_and_CheckTerra
 import { TurnOnSlide } from '../../07_TRIGGERS/Slide_and_CheckTerrain_triggers/To_turn_on_slide'
 import { CommandShortcuts } from '../../08_GAME/Shortcuts/Using_shortcut'
 import { CmdName, CmdParam, IsColorString, isPlayerId, NbParam, NoParam, resolvePlayerId } from './Command_functions'
+import {MIN_TIME_BETWEEN_ACTIONS} from "../../05_MAKE_STRUCTURES/Make/MakeHoldClick";
 
 export const ExecuteCommandAll = (escaper: Escaper, cmd: string): boolean => {
     let name = CmdName(cmd)
@@ -759,7 +760,7 @@ export const ExecuteCommandAll = (escaper: Escaper, cmd: string): boolean => {
 
         escaper.enableFollowMouseMode(S2B(param1))
         if(S2B(param1)){
-            Text.mkP(escaper.getPlayer(), "Follow mouse mode enabled : maintain right click a little while sliding to activate it. Do a normal click to disable it")
+            Text.mkP(escaper.getPlayer(), "Follow mouse mode enabled : hold right click during " + MIN_TIME_BETWEEN_ACTIONS + "s while sliding to activate it. Do a normal click to disable it")
         }else{
             Text.mkP(escaper.getPlayer(), "Follow mouse mode disabled")
         }
