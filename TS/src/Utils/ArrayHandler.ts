@@ -1,4 +1,5 @@
 export class ArrayHandler {
+    private static nextIndex = 0
     private static tArrays = new Map<number, any>()
     private static freedArrays: any[] = []
 
@@ -10,7 +11,8 @@ export class ArrayHandler {
             index = (getmetatable(arr) as any).__id
         } else {
             arr = []
-            index = ArrayHandler.tArrays.size
+            index = ArrayHandler.nextIndex
+            ArrayHandler.nextIndex++
             const meta: any = { __id: index }
             setmetatable(arr, meta)
         }
