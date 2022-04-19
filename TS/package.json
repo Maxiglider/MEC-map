@@ -26,7 +26,7 @@
         "tsconfig-paths": "^3.14.1",
         "tsutils": "^3.21.0",
         "typescript": "4.4.4",
-        "typescript-to-lua": "1.1.0",
+        "typescript-to-lua": "^1.4.3",
         "w3ts": "^2.3.1",
         "war3-transformer": "2.0.0",
         "war3-types": "^1.0.4",

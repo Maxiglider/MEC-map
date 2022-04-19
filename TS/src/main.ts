@@ -1,5 +1,6 @@
 import { initLives } from 'core/04_STRUCTURES/Lives_and_game_time/Lives_and_game_time'
 import { initMultiboard } from 'core/04_STRUCTURES/Lives_and_game_time/Multiboard'
+import { initCommandExecution } from 'core/06_COMMANDS/COMMANDS_vJass/Command_execution'
 import { ServiceManager } from 'Services'
 import { createTimer, errorHandler } from 'Utils/mapUtils'
 import { addScriptHook, W3TS_HOOK } from 'w3ts/hooks'
@@ -11,6 +12,7 @@ const tsMain = () => {
     ServiceManager.registerServices({
         Lives: initLives,
         Multiboard: initMultiboard,
+        Cmd: initCommandExecution,
     })
 
     //initializers

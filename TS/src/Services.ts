@@ -1,5 +1,6 @@
 import { ILives } from 'core/04_STRUCTURES/Lives_and_game_time/Lives_and_game_time'
 import { IMultiboard } from 'core/04_STRUCTURES/Lives_and_game_time/Multiboard'
+import { ICommandExecution } from './core/06_COMMANDS/COMMANDS_vJass/Command_execution'
 
 const initServiceManager = <TServices extends { [K in string]: TServices[K] }>() => {
     const services: TServices = {} as any
@@ -28,4 +29,5 @@ const initServiceManager = <TServices extends { [K in string]: TServices[K] }>()
 export const ServiceManager = initServiceManager<{
     Lives: ILives
     Multiboard: IMultiboard
+    Cmd: ICommandExecution
 }>()

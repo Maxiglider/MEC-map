@@ -158,17 +158,25 @@ export const initMultiboard = () => {
     }
 
     const playerSortGlobal = (a: Escaper, b: Escaper) => {
-        return (
-            playerScores[GetPlayerId(a.getPlayer())].stats.global.score >
-            playerScores[GetPlayerId(b.getPlayer())].stats.global.score
-        )
+        const scoreA = playerScores[GetPlayerId(a.getPlayer())].stats.global.score
+        const scoreB = playerScores[GetPlayerId(b.getPlayer())].stats.global.score
+
+        if (scoreA === scoreB) {
+            return GetPlayerId(a.getPlayer()) < GetPlayerId(b.getPlayer())
+        } else {
+            return scoreA > scoreB
+        }
     }
 
     const playerSortCurrent = (a: Escaper, b: Escaper) => {
-        return (
-            playerScores[GetPlayerId(a.getPlayer())].stats.current.score >
-            playerScores[GetPlayerId(b.getPlayer())].stats.current.score
-        )
+        const scoreA = playerScores[GetPlayerId(a.getPlayer())].stats.current.score
+        const scoreB = playerScores[GetPlayerId(b.getPlayer())].stats.current.score
+
+        if (scoreA === scoreB) {
+            return GetPlayerId(a.getPlayer()) < GetPlayerId(b.getPlayer())
+        } else {
+            return scoreA > scoreB
+        }
     }
 
     const updatePlayers = () => {
