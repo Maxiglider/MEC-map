@@ -1,5 +1,5 @@
 import { udg_monsters } from '../../../../globals'
-import { MOBS_VARIOUS_COLORS } from '../../01_libraries/Constants'
+import { MOBS_VARIOUS_COLORS, NB_PLAYERS_MAX } from '../../01_libraries/Constants'
 import { ColorString2Id } from '../../01_libraries/Init_colorCodes'
 import { IsColorString } from '../../06_COMMANDS/COMMANDS_vJass/Command_functions'
 import { Level } from '../Level/Level'
@@ -38,13 +38,13 @@ export abstract class Monster {
     constructor(monsterType?: MonsterType, forceId: number | null = null) {
         this.mt = monsterType
 
-        if(forceId !== null){
+        if (forceId !== null) {
             this.id = forceId
 
-            if(Monster.lastInstanceId < forceId){
+            if (Monster.lastInstanceId < forceId) {
                 Monster.lastInstanceId = forceId
             }
-        }else{
+        } else {
             this.id = ++Monster.lastInstanceId
         }
 
@@ -203,7 +203,7 @@ export abstract class Monster {
         let baseColorId: number
         if (IsColorString(colorString)) {
             baseColorId = ColorString2Id(colorString)
-            if (baseColorId < 0 || baseColorId > 12) {
+            if (baseColorId < 0 || baseColorId > NB_PLAYERS_MAX) {
                 return
             }
             this.baseColorId = baseColorId
@@ -272,7 +272,7 @@ export abstract class Monster {
         return {
             id: this.id,
             monsterClassName: this.constructor.name,
-            monsterTypeLabel: this.mt?.label
+            monsterTypeLabel: this.mt?.label,
         }
     }
 }

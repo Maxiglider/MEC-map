@@ -1,4 +1,4 @@
-import { NB_ESCAPERS } from 'core/01_libraries/Constants'
+import { NB_ESCAPERS, NB_PLAYERS_MAX } from 'core/01_libraries/Constants'
 import { udg_doubleHeroesEnabled } from 'core/Double_heroes/double_heroes_config'
 import { createEvent } from 'Utils/mapUtils'
 import { getUdgEscapers } from '../../../../globals'
@@ -12,8 +12,8 @@ export const HERO_START_ANGLE = 90
 const TIME_BEFORE_HERO_SPAWN = 3
 const TIME_BETWEEN_EACH_HERO_SPAWN = 0.3
 const EFFECT_FOR_MISSING_HEROES = 'Abilities\\Spells\\Undead\\DeathPact\\DeathPactTarget.mdl'
-const NB_COLUMNS = 4
-const NB_ROWS = 3
+const NB_COLUMNS = 6
+const NB_ROWS = 4
 
 const RandomizeStartPositionsAndHeroSpawnOrder = () => {
     let alreadyAdded: boolean[] = []
@@ -44,9 +44,9 @@ const RandomizeStartPositionsAndHeroSpawnOrder = () => {
     //randomize hero spawn order
     i = 0
     while (true) {
-        if (i >= 12) break
+        if (i >= NB_PLAYERS_MAX) break
         while (true) {
-            n = GetRandomInt(0, 11)
+            n = GetRandomInt(0, NB_PLAYERS_MAX - 1)
             if (!alreadyAdded[n]) break
         }
         playerIdsRandomized[i] = n
@@ -58,7 +58,7 @@ const RandomizeStartPositionsAndHeroSpawnOrder = () => {
         while (true) {
             if (i >= NB_ESCAPERS) break
             while (true) {
-                n = GetRandomInt(12, NB_ESCAPERS - 1)
+                n = GetRandomInt(NB_PLAYERS_MAX, NB_ESCAPERS - 1)
                 if (!alreadyAdded[n]) break
             }
             playerIdsRandomized[i] = n

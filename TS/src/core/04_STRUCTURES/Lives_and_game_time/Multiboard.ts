@@ -191,7 +191,6 @@ export const initMultiboard = () => {
         }
 
         for (let i = 0; i < NB_ESCAPERS; i++) {
-            // TODO; Hope this doesn't desync
             if (GetLocalPlayer() === Player(i)) {
                 const statsMode = playerScores[i].statsMode
 

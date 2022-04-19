@@ -1,64 +1,4 @@
-﻿STRING 4
-{
-Joueur 1
-}
-
-STRING 5
-{
-Joueur 2
-}
-
-STRING 6
-{
-Joueur 3
-}
-
-STRING 7
-{
-Joueur 4
-}
-
-STRING 8
-{
-Joueur 5
-}
-
-STRING 9
-{
-Joueur 6
-}
-
-STRING 10
-{
-Joueur 7
-}
-
-STRING 11
-{
-Joueur 8
-}
-
-STRING 12
-{
-Joueur 9
-}
-
-STRING 13
-{
-Joueur 10
-}
-
-STRING 14
-{
-Joueur 11
-}
-
-STRING 15
-{
-Joueur 12
-}
-
-STRING 18
+﻿STRING 18
 {
 MaxEscapeCreation -devMax
 }
@@ -1077,5 +1017,125 @@ STRING 199
 // Units: D001 (Slider mirror), Name (Name)
 {
 Slider mirror
+}
+
+STRING 200
+{
+Player 1
+}
+
+STRING 201
+{
+Player 2
+}
+
+STRING 202
+{
+Player 3
+}
+
+STRING 203
+{
+Player 4
+}
+
+STRING 204
+{
+Player 5
+}
+
+STRING 205
+{
+Player 6
+}
+
+STRING 206
+{
+Player 7
+}
+
+STRING 207
+{
+Player 8
+}
+
+STRING 208
+{
+Player 9
+}
+
+STRING 209
+{
+Player 10
+}
+
+STRING 210
+{
+Player 11
+}
+
+STRING 211
+{
+Player 12
+}
+
+STRING 212
+{
+Player 13
+}
+
+STRING 213
+{
+Player 14
+}
+
+STRING 214
+{
+Player 15
+}
+
+STRING 215
+{
+Player 16
+}
+
+STRING 216
+{
+Player 17
+}
+
+STRING 217
+{
+Player 18
+}
+
+STRING 218
+{
+Player 19
+}
+
+STRING 219
+{
+Player 20
+}
+
+STRING 220
+{
+Player 21
+}
+
+STRING 221
+{
+Player 22
+}
+
+STRING 222
+{
+Player 23
+}
+
+STRING 223
+{
+Player 24
 }
 

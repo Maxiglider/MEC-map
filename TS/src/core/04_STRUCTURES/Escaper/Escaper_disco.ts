@@ -1,3 +1,4 @@
+import { NB_PLAYERS_MAX } from 'core/01_libraries/Constants'
 import { getUdgEscapers } from '../../../../globals'
 
 const initDisco = () => {
@@ -8,7 +9,7 @@ const initDisco = () => {
             return
         }
 
-        esc.setBaseColorDisco(GetRandomInt(0, 12))
+        esc.setBaseColorDisco(GetRandomInt(0, NB_PLAYERS_MAX))
         esc.setVcRed(GetRandomPercentageBJ())
         esc.setVcGreen(GetRandomPercentageBJ())
         esc.setVcBlue(GetRandomPercentageBJ())
