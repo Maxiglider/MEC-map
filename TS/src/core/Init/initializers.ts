@@ -2,9 +2,9 @@ import { init_terrain_limit_variables } from '../01_libraries/Init_terrain_limit
 import { initViewAllHideAll } from '../03_view_all_hide_all/View_all_hide_all'
 import { initFirstPerson } from '../04_STRUCTURES/Escaper/Escaper_firstPerson'
 import { init_StartAndEnd } from '../04_STRUCTURES/Level/StartAndEnd'
+import { initMonsterSimplePatrol } from '../04_STRUCTURES/Monster/MonsterSimplePatrol'
 import { init_TrigMonstersClickableSetLife } from '../04_STRUCTURES/Monster/trig_Monsters_clickable_set_life'
 import { initTrig_Autorevive } from '../06_COMMANDS/COMMANDS_vJass/Autorevive'
-import { init_commandExecution } from '../06_COMMANDS/COMMANDS_vJass/Command_execution'
 import { initCachedPlayerNames } from '../06_COMMANDS/COMMANDS_vJass/Command_functions'
 import { init_StopSecondIfMake } from '../07_TRIGGERS/Handling_secondary_hero/Stop_second_if_make'
 import { init_TerrainTypeNamesAndData } from '../07_TRIGGERS/Modify_terrain_Functions/Terrain_type_names_and_data'
@@ -20,7 +20,6 @@ import { init_doubleKill } from '../Double_heroes/double_kill'
 import { init_Test } from '../Test/test'
 import { initArrays } from './initArrays'
 import { initOldTriggers } from './init_old_triggers'
-import {initMonsterSimplePatrol} from "../04_STRUCTURES/Monster/MonsterSimplePatrol";
 
 export const initializers = () => {
     init_terrain_limit_variables()
@@ -32,7 +31,6 @@ export const initializers = () => {
     init_Heroes()
     initSelectUnit()
     initOldTriggers()
-    init_commandExecution()
     init_TerrainTypeNamesAndData()
     init_ToTurnOnSlide()
     init_StopSecondIfMake()
