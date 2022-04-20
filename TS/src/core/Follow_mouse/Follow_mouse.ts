@@ -35,14 +35,7 @@ const followMouseActions = () => {
         if(followMouse) {
             if (escaper.isSliding()) {
                 //let's face mouse
-                const sliderX = GetUnitX(slider)
-                const sliderY = GetUnitY(slider)
-                const orderX = followMouse.mouseX
-                const orderY = followMouse.mouseY
-
-                const angle = Atan2(orderY - sliderY, orderX - sliderX) * bj_RADTODEG
-
-                TurnOnSlide.turnSliderToDirection(escaper, angle)
+                TurnOnSlide.turnSliderToDirection(escaper, followMouse.angle)
             } else {
                 followMouse.onStopSliding()
             }
@@ -68,6 +61,7 @@ export class FollowMouse{
 
     public mouseX = 0
     public mouseY = 0
+    public angle = 0
 
 
     constructor(escaper: Escaper) {
@@ -117,6 +111,15 @@ export class FollowMouse{
     doMouseMoveActions() {
         this.mouseX = BlzGetTriggerPlayerMouseX()
         this.mouseY = BlzGetTriggerPlayerMouseY()
+
+        const slider = this.escaper.getHero()
+        if(slider) {
+            const sliderX = GetUnitX(slider)
+            const sliderY = GetUnitY(slider)
+            const orderX = this.mouseX
+            const orderY = this.mouseY
+            this.angle = Atan2(orderY - sliderY, orderX - sliderX) * bj_RADTODEG
+        }
     }
 
     stopFollowingMouse = () => {
