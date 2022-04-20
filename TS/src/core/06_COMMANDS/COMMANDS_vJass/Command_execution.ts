@@ -2,53 +2,146 @@ import { catchAndDisplay, Text } from 'core/01_libraries/Text'
 import { Escaper } from 'core/04_STRUCTURES/Escaper/Escaper'
 import { Globals } from 'core/09_From_old_Worldedit_triggers/globals_variables_and_triggers'
 import { createEvent, forRange } from 'Utils/mapUtils'
+import { ObjectHandler } from 'Utils/ObjectHandler'
 import { getUdgEscapers } from '../../../../globals'
 import { NB_PLAYERS_MAX } from '../../01_libraries/Constants'
-import { ExecuteCommandMax } from './Command_admin'
-import { ExecuteCommandAll } from './Command_all'
-import { ExecuteCommandCheat } from './Command_cheat'
-import { ExecuteCommandRed } from './Command_first_player'
-import { IsCmd } from './Command_functions'
-import { ExecuteCommandMake } from './Command_make'
-import { ExecuteCommandTrueMax } from './Command_superadmin'
-
-const ExecuteCommandSingle = (escaper: Escaper, cmd: string) => {
-    catchAndDisplay(() => {
-        if (!ExecuteCommandAll(escaper, cmd)) {
-            if (!((escaper.getPlayer() == Player(0) && Globals.udg_areRedRightsOn) || escaper.canCheat())) {
-                Text.erP(escaper.getPlayer(), 'unknown command or not enough rights')
-                return
-            }
-            if (!ExecuteCommandRed(escaper, cmd)) {
-                if (!escaper.canCheat()) {
-                    Text.erP(escaper.getPlayer(), 'unknown command or not enough rights')
-                    return
-                }
-                if (!ExecuteCommandCheat(escaper, cmd)) {
-                    if (!ExecuteCommandMake(escaper, cmd)) {
-                        if (!escaper.isMaximaxou()) {
-                            Text.erP(escaper.getPlayer(), 'unknown command or not enough rights')
-                            return
-                        }
-                        if (!ExecuteCommandMax(escaper, cmd)) {
-                            if (!escaper.isTrueMaximaxou()) {
-                                Text.erP(escaper.getPlayer(), 'unknown command or not enough rights')
-                                return
-                            }
-                            if (!ExecuteCommandTrueMax(escaper, cmd)) {
-                                Text.erP(escaper.getPlayer(), 'unknown command')
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }, escaper.getPlayer())
-}
+import { initExecuteCommandMax } from './Command_admin'
+import { initCommandAll } from './Command_all'
+import { initExecuteCommandCheat } from './Command_cheat'
+import { initExecuteCommandRed } from './Command_first_player'
+import { CmdName, CmdParam, IsCmd, NbParam, NoParam } from './Command_functions'
+import { initExecuteCommandMake } from './Command_make'
+import { initExecuteCommandTrueMax } from './Command_superadmin'
 
 export type ICommandExecution = ReturnType<typeof initCommandExecution>
 
+type ICommand = {
+    name: string
+    alias: string[]
+    group: 'all' | 'red' | 'cheat' | 'make' | 'max' | 'truemax'
+    enabled?: (cmd: IParsedCmdContext, escaper: Escaper) => boolean
+    cb: (cmd: IParsedCmdContext, escaper: Escaper) => true
+}
+
+type IParsedCmdContext = ReturnType<typeof parseCmdContext>
+
+const parseCmdContext = (cmd: string) => {
+    const obj = ObjectHandler.getNewObject<{
+        cmd: string
+        name: string
+        noParam: boolean
+        nbParam: number
+        param1: string
+        param2: string
+        param3: string
+        param4: string
+    }>()
+
+    obj.cmd = cmd
+    obj.name = CmdName(cmd)
+    obj.noParam = NoParam(cmd)
+    obj.nbParam = NbParam(cmd)
+
+    obj.param1 = CmdParam(cmd, 1)
+    obj.param2 = CmdParam(cmd, 2)
+    obj.param3 = CmdParam(cmd, 3)
+    obj.param4 = CmdParam(cmd, 4)
+
+    return obj
+}
+
 export const initCommandExecution = () => {
+    const commands: ICommand[] = []
+
+    const registerCommand = (cmd: ICommand) => {
+        commands.push(cmd)
+    }
+
+    const accessCheck = (escaper: Escaper, cmd: ICommand) => {
+        switch (cmd.group) {
+            case 'truemax': {
+                if (!escaper.isTrueMaximaxou()) {
+                    Text.erP(escaper.getPlayer(), 'unknown command or not enough rights')
+                    return false
+                }
+            }
+
+            case 'max': {
+                if (!escaper.isMaximaxou()) {
+                    Text.erP(escaper.getPlayer(), 'unknown command or not enough rights')
+                    return false
+                }
+            }
+
+            case 'make':
+            case 'cheat': {
+                if (!escaper.canCheat()) {
+                    Text.erP(escaper.getPlayer(), 'unknown command or not enough rights')
+                    return false
+                }
+            }
+
+            case 'red': {
+                if (!((escaper.getPlayer() === Player(0) && Globals.udg_areRedRightsOn) || escaper.canCheat())) {
+                    Text.erP(escaper.getPlayer(), 'unknown command or not enough rights')
+                    return false
+                }
+            }
+
+            case 'all':
+            default:
+                return true
+        }
+    }
+
+    const ExecuteCommandSingle = (escaper: Escaper, cmd: string) => {
+        catchAndDisplay(() => {
+            const parsedContext = parseCmdContext(cmd)
+
+            const targetCmd = commands.find(
+                cmd =>
+                    (cmd.name.toLowerCase() === parsedContext.name.toLowerCase() ||
+                        cmd.alias.find(a => a.toLowerCase() === parsedContext.name.toLowerCase())) &&
+                    (cmd.enabled ? cmd.enabled(parsedContext, escaper) : true) &&
+                    accessCheck(escaper, cmd)
+            )
+
+            targetCmd?.cb(parsedContext, escaper)
+
+            ObjectHandler.clearObject(parsedContext)
+
+            // if (!ExecuteCommandAll(escaper, cmd)) {
+            //     if (!((escaper.getPlayer() == Player(0) && Globals.udg_areRedRightsOn) || escaper.canCheat())) {
+            //         Text.erP(escaper.getPlayer(), 'unknown command or not enough rights')
+            //         return
+            //     }
+            //     if (!ExecuteCommandRed(escaper, cmd)) {
+            //         if (!escaper.canCheat()) {
+            //             Text.erP(escaper.getPlayer(), 'unknown command or not enough rights')
+            //             return
+            //         }
+            //         if (!ExecuteCommandCheat(escaper, cmd)) {
+            //             if (!ExecuteCommandMake(escaper, cmd)) {
+            //                 if (!escaper.isMaximaxou()) {
+            //                     Text.erP(escaper.getPlayer(), 'unknown command or not enough rights')
+            //                     return
+            //                 }
+            //                 if (!ExecuteCommandMax(escaper, cmd)) {
+            //                     if (!escaper.isTrueMaximaxou()) {
+            //                         Text.erP(escaper.getPlayer(), 'unknown command or not enough rights')
+            //                         return
+            //                     }
+            //                     if (!ExecuteCommandTrueMax(escaper, cmd)) {
+            //                         Text.erP(escaper.getPlayer(), 'unknown command')
+            //                     }
+            //                 }
+            //             }
+            //         }
+            //     }
+            // }
+        }, escaper.getPlayer())
+    }
+
     const ExecuteCommand = (escaper: Escaper, cmd: string) => {
         let singleCommands: string[] = []
         let char: string
@@ -114,5 +207,55 @@ export const initCommandExecution = () => {
         ],
     })
 
-    return { ExecuteCommand }
+    const initCommands = () => {
+        initCommandAll()
+        initExecuteCommandRed()
+        initExecuteCommandCheat()
+        initExecuteCommandMake()
+        initExecuteCommandMax()
+        initExecuteCommandTrueMax()
+
+        registerCommand({
+            name: 'help',
+            alias: ['h', '?'],
+            group: 'all',
+            cb: ({ param1 }) => {
+                const filtered = commands.filter(cmd => {
+                    return param1
+                        ? cmd.name.indexOf(param1) >= 0 ||
+                              (cmd.alias && cmd.alias.find(alias => alias.indexOf(param1) >= 0))
+                        : true
+                })
+
+                const s =
+                    'Commands:\n' +
+                    filtered
+                        .map(
+                            cmd => '-' + cmd.name + (cmd.alias.length > 0 ? `(${cmd.alias.join(' | ')})` : '')
+                            // (Object.keys(cmd.args).length
+                            //     ? ' ' +
+                            //       Object.keys(cmd.args)
+                            //           .map(argKey => {
+                            //               const c = cmd.args![argKey]
+                            //               let argValue = argKey
+
+                            //               if (c.type === 'enum') {
+                            //                   argValue = c.enum.join(' | ')
+                            //               }
+
+                            //               return c.optional ? `[${argValue}]` : `<${argValue}>`
+                            //           })
+                            //           .join(' ')
+                            //     : '')
+                        )
+                        .join('\n')
+
+                Text.A(s)
+
+                return true
+            },
+        })
+    }
+
+    return { registerCommand, ExecuteCommand, initCommands }
 }

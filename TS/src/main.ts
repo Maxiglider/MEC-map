@@ -15,6 +15,8 @@ const tsMain = () => {
         Cmd: initCommandExecution,
     })
 
+    ServiceManager.getService('Cmd').initCommands()
+
     //initializers
     initializers()
 
