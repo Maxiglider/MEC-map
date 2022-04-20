@@ -51,8 +51,8 @@ export const initMultiboard = () => {
     } = {}
 
     let amountOfEscapers = 0
-
     let gameTimeStr = ''
+    let allowReinitCheck = false
 
     forRange(NB_ESCAPERS, i => {
         playerScores[i] = {
@@ -63,6 +63,8 @@ export const initMultiboard = () => {
     })
 
     const resetRoundScores = () => {
+        allowReinitCheck = true
+
         forRange(NB_ESCAPERS, i => {
             playerScores[i].stats.current.score = 0
             playerScores[i].stats.current.saves = 0
@@ -266,16 +268,10 @@ export const initMultiboard = () => {
         updatePlayers()
     }
 
-    // If you initialize the boards too early they wont show
-    createTimer(3, false, () => {
-        reinitBoards()
-        amountOfEscapers = getUdgEscapers().countMain()
-    })
-
     createTimer(1, true, () => {
         gameTimeStr = GameTime.getGameTime()
 
-        updateGametime(true)
+        updateGametime(allowReinitCheck)
     })
 
     return { setVisibility, setMode, setStatsMode, increasePlayerScore, updateLives, resetRoundScores }
