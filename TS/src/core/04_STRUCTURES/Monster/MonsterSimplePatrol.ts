@@ -31,10 +31,10 @@ export const initMonsterSimplePatrol = () => {
 let simplePatrolMobs: group
 
 export class MonsterSimplePatrol extends Monster {
-    private x1: number
-    private y1: number
-    private x2: number
-    private y2: number
+    x1: number
+    y1: number
+    x2: number
+    y2: number
 
     constructor(mt: MonsterType, x1: number, y1: number, x2: number, y2: number, forceId: number | null = null) {
         super(mt, forceId)

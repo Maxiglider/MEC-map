@@ -58,9 +58,20 @@ export const SetUnitMaxLife = (u: unit, newMaxLife: number): boolean => {
 
 export const NewImmobileMonsterForPlayer = (mt: MonsterType, p: player, x: number, y: number, angle: number): unit => {
     let unitTypeId = mt.getUnitTypeId()
+
     if(Monster.forceUnitTypeIdForNextMonster > 0){
         unitTypeId = Monster.forceUnitTypeIdForNextMonster
         Monster.forceUnitTypeIdForNextMonster = 0
+    }
+
+    if(Monster.forceXforNextMonster != 0){
+        x = Monster.forceXforNextMonster
+        Monster.forceXforNextMonster = 0
+    }
+
+    if(Monster.forceYforNextMonster != 0){
+        y = Monster.forceYforNextMonster
+        Monster.forceYforNextMonster = 0
     }
 
     let scale: number
@@ -110,6 +121,16 @@ export const NewImmobileMonster = (mt: MonsterType, x: number, y: number, angle:
 }
 
 export const NewPatrolMonster = (mt: MonsterType, x1: number, y1: number, x2: number, y2: number): unit => {
+    x1 = Monster.forceX1forNextMonster != 0 ? Monster.forceX1forNextMonster : x1
+    x2 = Monster.forceX2forNextMonster != 0 ? Monster.forceX2forNextMonster : x2
+    y1 = Monster.forceY1forNextMonster != 0 ? Monster.forceY1forNextMonster : y1
+    y2 = Monster.forceY2forNextMonster != 0 ? Monster.forceY2forNextMonster : y2
+
+    Monster.forceX1forNextMonster = 0
+    Monster.forceX2forNextMonster = 0
+    Monster.forceY1forNextMonster = 0
+    Monster.forceY2forNextMonster = 0
+
     let angle = bj_RADTODEG * Atan2(y1 - y2, x1 - x2)
     monster = NewImmobileMonster(mt, x1, y1, angle)
     IssuePointOrder(monster, 'patrol', x2, y2)

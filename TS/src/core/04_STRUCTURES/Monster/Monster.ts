@@ -12,6 +12,14 @@ import {hooks} from "../../API/GeneralHooks";
 
 export abstract class Monster {
     public static forceUnitTypeIdForNextMonster = 0
+
+    public static forceXforNextMonster = 0
+    public static forceYforNextMonster = 0
+    public static forceX1forNextMonster = 0
+    public static forceY1forNextMonster = 0
+    public static forceX2forNextMonster = 0
+    public static forceY2forNextMonster = 0
+
     public static DISABLE_TRANSPARENCY = 80
 
     private static lastInstanceId = -1
@@ -119,13 +127,25 @@ export abstract class Monster {
         const hookArray = CombineHooks(this.level?.monsters.hooks_onBeforeCreateMonsterUnit, hooks.hooks_onBeforeCreateMonsterUnit)
         if(hookArray){
             let forceUnitTypeId = 0
+            let forceX = 0
+            let forceY = 0
+            let forceX1 = 0
+            let forceY1 = 0
+            let forceX2 = 0
+            let forceY2 = 0
             let quit = false
             for(const hook of hookArray.values()){
                 const output = hook.execute(this)
                 if(output === false){
                     quit = true
-                }else if(output && output.unitTypeId){
-                    forceUnitTypeId = output.unitTypeId
+                }else if(output){
+                    output.unitTypeId && (forceUnitTypeId = output.unitTypeId)
+                    output.x && (forceX = output.x)
+                    output.y && (forceY = output.y)
+                    output.x1 && (forceX1 = output.x1)
+                    output.y1 && (forceY1 = output.y1)
+                    output.x2 && (forceX2 = output.x2)
+                    output.y2 && (forceY2 = output.y2)
                 }
             }
 
@@ -133,9 +153,13 @@ export abstract class Monster {
                 return
             }
 
-            if(forceUnitTypeId > 0){
-                Monster.forceUnitTypeIdForNextMonster = forceUnitTypeId
-            }
+            forceUnitTypeId > 0 && (Monster.forceUnitTypeIdForNextMonster = forceUnitTypeId)
+            forceX != 0 && (Monster.forceXforNextMonster = forceX)
+            forceY != 0 && (Monster.forceYforNextMonster = forceY)
+            forceX1 != 0 && (Monster.forceX1forNextMonster = forceX1)
+            forceY1 != 0 && (Monster.forceY1forNextMonster = forceY1)
+            forceX2 != 0 && (Monster.forceX2forNextMonster = forceX2)
+            forceY2 != 0 && (Monster.forceY2forNextMonster = forceY2)
         }
 
         let previouslyEnabled = !!this.u
