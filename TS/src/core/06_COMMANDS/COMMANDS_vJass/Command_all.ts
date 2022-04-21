@@ -66,7 +66,14 @@ export const initCommandAll = () => {
                     if (!(isPlayerId(param1) && escaper.isTrueMaximaxou())) {
                         return true
                     }
-                    escaper = getUdgEscapers().get(resolvePlayerId(param1))
+
+                    const targetEscaper = getUdgEscapers().get(resolvePlayerId(param1))
+
+                    if (!targetEscaper) {
+                        return true
+                    }
+
+                    escaper = targetEscaper
                 }
                 escaper.setVcRed(GetRandomPercentageBJ())
                 escaper.setVcGreen(GetRandomPercentageBJ())
@@ -212,7 +219,14 @@ export const initCommandAll = () => {
                 if (!(escaper.isTrueMaximaxou() && isPlayerId(param1))) {
                     return true
                 }
-                escaper = getUdgEscapers().get(resolvePlayerId(param1))
+
+                const targetEscaper = getUdgEscapers().get(resolvePlayerId(param1))
+
+                if (!targetEscaper) {
+                    return true
+                }
+
+                escaper = targetEscaper
             }
             escaper.setVcRed(100)
             escaper.setVcGreen(100)
@@ -234,7 +248,8 @@ export const initCommandAll = () => {
                 return true
             }
             if (nbParam === 1 && isPlayerId(param1)) {
-                ColorInfo(getUdgEscapers().get(resolvePlayerId(param1)), escaper.getPlayer())
+                const targetEscaper = getUdgEscapers().get(resolvePlayerId(param1))
+                targetEscaper && ColorInfo(targetEscaper, escaper.getPlayer())
                 return true
             }
             return true
@@ -251,7 +266,13 @@ export const initCommandAll = () => {
                 return true
             }
             if (nbParam == 2 && escaper.isTrueMaximaxou() && isPlayerId(param2)) {
-                escaper = getUdgEscapers().get(resolvePlayerId(param2))
+                const targetEscaper = getUdgEscapers().get(resolvePlayerId(param2))
+
+                if (!targetEscaper) {
+                    return true
+                }
+
+                escaper = targetEscaper
             } else {
                 if (nbParam !== 1) {
                     return true
@@ -304,7 +325,13 @@ export const initCommandAll = () => {
                 return true
             }
             if (nbParam == 2 && escaper.isTrueMaximaxou() && isPlayerId(param2)) {
-                escaper = getUdgEscapers().get(resolvePlayerId(param2))
+                const targetEscaper = getUdgEscapers().get(resolvePlayerId(param2))
+
+                if (!targetEscaper) {
+                    return true
+                }
+
+                escaper = targetEscaper
             } else {
                 if (nbParam !== 1) {
                     return true
@@ -348,7 +375,14 @@ export const initCommandAll = () => {
                     if (!escaper.isTrueMaximaxou()) {
                         return true
                     }
-                    escaper = getUdgEscapers().get(resolvePlayerId(param1))
+
+                    const targetEscaper = getUdgEscapers().get(resolvePlayerId(param1))
+
+                    if (!targetEscaper) {
+                        return true
+                    }
+
+                    escaper = targetEscaper
                     n = LIMIT_NB_HERO_EFFECTS
                 } else {
                     n = 0

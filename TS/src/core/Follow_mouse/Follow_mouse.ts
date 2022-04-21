@@ -1,28 +1,27 @@
-import {Escaper} from "../04_STRUCTURES/Escaper/Escaper";
-import {createEvent} from "../../Utils/mapUtils";
-import {getUdgEscapers} from "../../../globals";
-import {TurnOnSlide} from "../07_TRIGGERS/Slide_and_CheckTerrain_triggers/To_turn_on_slide";
-import {AutoContinueAfterSliding} from "../07_TRIGGERS/Slide_and_CheckTerrain_triggers/Auto_continue_after_sliding";
-
+import { getUdgEscapers } from '../../../globals'
+import { createEvent } from '../../Utils/mapUtils'
+import { Escaper } from '../04_STRUCTURES/Escaper/Escaper'
+import { AutoContinueAfterSliding } from '../07_TRIGGERS/Slide_and_CheckTerrain_triggers/Auto_continue_after_sliding'
+import { TurnOnSlide } from '../07_TRIGGERS/Slide_and_CheckTerrain_triggers/To_turn_on_slide'
 
 export const PRESS_TIME_TO_ENABLE_FOLLOW_MOUSE = 0.2
 const FOLLOW_MOUSE_PERIOD = 0.1
 
 const onPressActions = () => {
     const escaper = getUdgEscapers().get(GetPlayerId(GetTriggerPlayer()))
-    const followMouse = escaper.getFollowMouse()
+    const followMouse = escaper?.getFollowMouse()
     followMouse && followMouse.doPressActions()
 }
 
 const onUnpressActions = () => {
     const escaper = getUdgEscapers().get(GetPlayerId(GetTriggerPlayer()))
-    const followMouse = escaper.getFollowMouse()
+    const followMouse = escaper?.getFollowMouse()
     followMouse && followMouse.doUnpressActions()
 }
 
 const onMouseMoveActions = () => {
     const escaper = getUdgEscapers().get(GetPlayerId(GetTriggerPlayer()))
-    const followMouse = escaper.getFollowMouse()
+    const followMouse = escaper?.getFollowMouse()
     followMouse && followMouse.doMouseMoveActions()
 }
 
@@ -30,10 +29,10 @@ const followMouseActions = () => {
     const escaper = FollowMouse.anyTimer2escaper.get(GetExpiredTimer())
     const slider = escaper?.getHero()
 
-    if(escaper && slider){
+    if (escaper && slider) {
         const followMouse = escaper.getFollowMouse()
 
-        if(followMouse) {
+        if (followMouse) {
             if (escaper.isSliding()) {
                 //let's face mouse
                 TurnOnSlide.turnSliderToDirection(escaper, followMouse.angle)
@@ -44,11 +43,10 @@ const followMouseActions = () => {
     }
 }
 
-
 /**
  * Class FollowMouse
  */
-export class FollowMouse{
+export class FollowMouse {
     private escaper: Escaper
 
     private tPress: trigger
@@ -64,30 +62,29 @@ export class FollowMouse{
     public mouseY = 0
     public angle = 0
 
-
     constructor(escaper: Escaper) {
         this.escaper = escaper
         const player = escaper.getPlayer()
 
         this.tPress = createEvent({
             events: [t => TriggerRegisterPlayerEvent(t, player, EVENT_PLAYER_MOUSE_DOWN)],
-            actions: [onPressActions]
+            actions: [onPressActions],
         })
 
         this.tUnpress = createEvent({
             events: [t => TriggerRegisterPlayerEvent(t, player, EVENT_PLAYER_MOUSE_UP)],
-            actions: [onUnpressActions]
+            actions: [onUnpressActions],
         })
 
         this.tMouseMove = createEvent({
             events: [t => TriggerRegisterPlayerEvent(t, player, EVENT_PLAYER_MOUSE_MOVE)],
-            actions: [onMouseMoveActions]
+            actions: [onMouseMoveActions],
         })
     }
 
     doPressActions = () => {
         const activeBtn = BlzGetTriggerPlayerMouseButton()
-        if(activeBtn == MOUSE_BUTTON_TYPE_RIGHT){
+        if (activeBtn == MOUSE_BUTTON_TYPE_RIGHT) {
             this.tClickingTime = CreateTimer()
             TimerStart(this.tClickingTime, 60, false, DoNothing)
             this.stopFollowingMouse()
@@ -96,11 +93,11 @@ export class FollowMouse{
 
     doUnpressActions = () => {
         const activeBtn = BlzGetTriggerPlayerMouseButton()
-        if(activeBtn == MOUSE_BUTTON_TYPE_RIGHT && this.tClickingTime){
+        if (activeBtn == MOUSE_BUTTON_TYPE_RIGHT && this.tClickingTime) {
             const elapsedTime = TimerGetElapsed(this.tClickingTime)
             DestroyTimer(this.tClickingTime)
 
-            if(elapsedTime >= PRESS_TIME_TO_ENABLE_FOLLOW_MOUSE){
+            if (elapsedTime >= PRESS_TIME_TO_ENABLE_FOLLOW_MOUSE) {
                 //enabling
                 this.startFollowingMouse()
             }
@@ -112,14 +109,14 @@ export class FollowMouse{
         this.mouseY = BlzGetTriggerPlayerMouseY()
 
         const slider = this.escaper.getHero()
-        if(slider) {
+        if (slider) {
             const sliderX = GetUnitX(slider)
             const sliderY = GetUnitY(slider)
             const orderX = this.mouseX
             const orderY = this.mouseY
             this.angle = Atan2(orderY - sliderY, orderX - sliderX) * bj_RADTODEG
 
-            if(this.tFollowMouse){
+            if (this.tFollowMouse) {
                 AutoContinueAfterSliding.lastClickedX[this.escaper.getId()] = orderX
                 AutoContinueAfterSliding.lastClickedY[this.escaper.getId()] = orderY
                 AutoContinueAfterSliding.isLastTargetALocation[this.escaper.getId()] = true
@@ -134,7 +131,7 @@ export class FollowMouse{
     }
 
     stopFollowingMouse = () => {
-        if(this.tFollowMouse){
+        if (this.tFollowMouse) {
             FollowMouse.anyTimer2escaper.delete(this.tFollowMouse)
             DestroyTimer(this.tFollowMouse)
             delete this.tFollowMouse

@@ -1,35 +1,33 @@
-import {Make} from "./Make";
-import {getUdgEscapers} from "../../../../globals";
-import {createEvent} from "../../../Utils/mapUtils";
-import {Escaper} from "../../04_STRUCTURES/Escaper/Escaper";
-
+import { getUdgEscapers } from '../../../../globals'
+import { createEvent } from '../../../Utils/mapUtils'
+import { Escaper } from '../../04_STRUCTURES/Escaper/Escaper'
+import { Make } from './Make'
 
 export const MIN_TIME_BETWEEN_ACTIONS = null
 
-
 const onPressActions = () => {
     const escaper = getUdgEscapers().get(GetPlayerId(GetTriggerPlayer()))
-    const make = escaper.getMake()
+    const make = escaper?.getMake()
 
-    if(make instanceof MakeHoldClick){
+    if (make instanceof MakeHoldClick) {
         make.doPressActions()
     }
 }
 
 const onUnpressActions = () => {
     const escaper = getUdgEscapers().get(GetPlayerId(GetTriggerPlayer()))
-    const make = escaper.getMake()
+    const make = escaper?.getMake()
 
-    if(make instanceof MakeHoldClick){
+    if (make instanceof MakeHoldClick) {
         make.doUnpressActions()
     }
 }
 
 const onMouseMoveActions = () => {
     const escaper = getUdgEscapers().get(GetPlayerId(GetTriggerPlayer()))
-    const make = escaper.getMake()
+    const make = escaper?.getMake()
 
-    if(make instanceof MakeHoldClick){
+    if (make instanceof MakeHoldClick) {
         make.doMouseMoveActions()
     }
 }
@@ -37,14 +35,14 @@ const onMouseMoveActions = () => {
 /**
  * Class MakeHoldClick
  */
-export abstract class MakeHoldClick extends Make{
+export abstract class MakeHoldClick extends Make {
     protected activeBtn: mousebuttontype | null = null
-    private activeBtnStr = ""
+    private activeBtnStr = ''
     private isPressed = false
 
     private tPress: trigger | null = null
     private tUnpress: trigger | null = null
-    private tMouseMove : trigger | null = null
+    private tMouseMove: trigger | null = null
 
     private tTimeSinceLastMouseMove?: timer
     private timeSinceLastMouseMove: number = 1000 //high time
@@ -63,16 +61,16 @@ export abstract class MakeHoldClick extends Make{
     }
 
     updateCurrentClickMinMaxLocations = () => {
-        if(this.currentClickMinX == 0 || this.mouseX < this.currentClickMinX){
+        if (this.currentClickMinX == 0 || this.mouseX < this.currentClickMinX) {
             this.currentClickMinX = this.mouseX
         }
-        if(this.currentClickMinY == 0 || this.mouseY < this.currentClickMinY){
+        if (this.currentClickMinY == 0 || this.mouseY < this.currentClickMinY) {
             this.currentClickMinY = this.mouseY
         }
-        if(this.currentClickMaxX == 0 || this.mouseX > this.currentClickMaxX){
+        if (this.currentClickMaxX == 0 || this.mouseX > this.currentClickMaxX) {
             this.currentClickMaxX = this.mouseX
         }
-        if(this.currentClickMaxY == 0 || this.mouseY > this.currentClickMaxY){
+        if (this.currentClickMaxY == 0 || this.mouseY > this.currentClickMaxY) {
             this.currentClickMaxY = this.mouseY
         }
     }
@@ -91,17 +89,17 @@ export abstract class MakeHoldClick extends Make{
 
         this.tPress = createEvent({
             events: [t => TriggerRegisterPlayerEvent(t, this.makerOwner, EVENT_PLAYER_MOUSE_DOWN)],
-            actions: [onPressActions]
+            actions: [onPressActions],
         })
 
         this.tUnpress = createEvent({
             events: [t => TriggerRegisterPlayerEvent(t, this.makerOwner, EVENT_PLAYER_MOUSE_UP)],
-            actions: [onUnpressActions]
+            actions: [onUnpressActions],
         })
 
         this.tMouseMove = createEvent({
             events: [t => TriggerRegisterPlayerEvent(t, this.makerOwner, EVENT_PLAYER_MOUSE_MOVE)],
-            actions: [onMouseMoveActions]
+            actions: [onMouseMoveActions],
         })
     }
 
@@ -111,7 +109,7 @@ export abstract class MakeHoldClick extends Make{
 
     doPressActions() {
         this.activeBtn = BlzGetTriggerPlayerMouseButton()
-        this.activeBtnStr = this.activeBtn == MOUSE_BUTTON_TYPE_LEFT ? "left" : "right"
+        this.activeBtnStr = this.activeBtn == MOUSE_BUTTON_TYPE_LEFT ? 'left' : 'right'
         this.isPressed = true
 
         this.resetCurrentClickMinMaxLocations()
@@ -124,12 +122,12 @@ export abstract class MakeHoldClick extends Make{
     }
 
     doMouseMoveActions() {
-        if(this.isPressed) {
+        if (this.isPressed) {
             this.mouseX = BlzGetTriggerPlayerMouseX()
             this.mouseY = BlzGetTriggerPlayerMouseY()
             this.updateCurrentClickMinMaxLocations()
 
-            if(this.tTimeSinceLastMouseMove){
+            if (this.tTimeSinceLastMouseMove) {
                 this.timeSinceLastMouseMove = TimerGetElapsed(this.tTimeSinceLastMouseMove)
             }
             this.tTimeSinceLastMouseMove && DestroyTimer(this.tTimeSinceLastMouseMove)

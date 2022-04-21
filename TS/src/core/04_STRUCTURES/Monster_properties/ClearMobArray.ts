@@ -1,3 +1,4 @@
+import { Text } from 'core/01_libraries/Text'
 import { BaseArray } from '../BaseArray'
 import type { Level } from '../Level/Level'
 import type { Monster } from '../Monster/Monster'
@@ -25,11 +26,23 @@ export class ClearMobArray extends BaseArray<ClearMob> {
     }
 
     newFromJson = (clearMobsJson: { [x: string]: any }[]) => {
-        for(let cm of clearMobsJson){
-            const clearMob = this.new(this.level.monsters.get(cm.triggerMobId), cm.disableDuration, false)
+        for (let cm of clearMobsJson) {
+            const mt = this.level.monsters.get(cm.triggerMobId)
 
-            for (const [_, blockMobId] of pairs(cm.blockMobsIds)) {
-                clearMob.addBlockMob(this.level.monsters.get(blockMobId))
+            if (!mt) {
+                Text.erA(`Monster label "${cm.triggerMobId}" unknown`)
+            } else {
+                const clearMob = this.new(mt, cm.disableDuration, false)
+
+                for (const [_, blockMobId] of pairs(cm.blockMobsIds)) {
+                    const mt = this.level.monsters.get(blockMobId)
+
+                    if (!mt) {
+                        Text.erA(`Monster label "${cm.blockMobsIds}" unknown`)
+                    } else {
+                        clearMob.addBlockMob(mt)
+                    }
+                }
             }
         }
     }

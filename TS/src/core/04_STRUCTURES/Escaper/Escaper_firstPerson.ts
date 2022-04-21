@@ -76,7 +76,7 @@ export const initFirstPerson = () => {
                     () => {
                         getUdgEscapers()
                             .get(GetPlayerId(GetTriggerPlayer()))
-                            .getFirstPersonHandle()
+                            ?.getFirstPersonHandle()
                             .setKeyDownState(key, keyDown)
                     },
                 ],
