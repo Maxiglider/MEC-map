@@ -9,12 +9,16 @@ export const init_Test = () => {
 
         const { ExecuteCommand } = ServiceManager.getService('Cmd')
 
-        ExecuteCommand(
-            getUdgEscapers().get(0),
-            "-va, news slide 'Nsnw', setta slide s, news reverse 5 -400, setta reverse rev, newd death 1 Abilities\\Spells\\NightElf\\EntanglingRoots\\EntanglingRootsTarget.mdl, setta death d, neww walk 97, setta walk w"
-        )
+        const escaper = getUdgEscapers().get(0)
 
-        ExecuteCommand(getUdgEscapers().get(0), "-newm caisse 'cais' 40, newm naga 'nnsw' 60, newm peon 'opeo' 40")
-        ExecuteCommand(getUdgEscapers().get(0), '-newCaster c naga peon')
+        if (escaper) {
+            ExecuteCommand(
+                escaper,
+                "-va, news slide 'Nsnw', setta slide s, news reverse 5 -400, setta reverse rev, newd death 1 Abilities\\Spells\\NightElf\\EntanglingRoots\\EntanglingRootsTarget.mdl, setta death d, neww walk 97, setta walk w"
+            )
+
+            ExecuteCommand(escaper, "-newm caisse 'cais' 40, newm naga 'nnsw' 60, newm peon 'opeo' 40")
+            ExecuteCommand(escaper, '-newCaster c naga peon')
+        }
     }
 }

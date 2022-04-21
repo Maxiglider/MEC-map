@@ -1,4 +1,4 @@
-import {sortArrayOfObjectsByIds} from "../01_libraries/Basic_functions";
+import { sortArrayOfObjectsByIds } from '../01_libraries/Basic_functions'
 
 type BaseModel = { getId?: () => number; destroy: () => void; toJson: () => {} }
 
@@ -38,7 +38,7 @@ export abstract class BaseArray<T extends BaseModel> {
         return n
     }
 
-    get = (id: number) => this.data[id]
+    get = (id: number): T | null => this.data[id] || null
 
     forAll(cb: (v: T) => void) {
         for (const [_, element] of pairs(this.data)) {

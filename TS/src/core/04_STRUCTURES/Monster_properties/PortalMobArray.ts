@@ -1,3 +1,4 @@
+import { Text } from 'core/01_libraries/Text'
 import { BaseArray } from '../BaseArray'
 import type { Level } from '../Level/Level'
 import type { Monster } from '../Monster/Monster'
@@ -26,8 +27,14 @@ export class PortalMobArray extends BaseArray<PortalMob> {
 
     newFromJson = (portalMobsJson: { [x: string]: any }[]) => {
         for (let v of portalMobsJson) {
-            const portalMob = this.new(this.level.monsters.get(v.triggerMobId), v.freezeDuration)
-            portalMob.setTargetMob(this.level.monsters.get(v.targetMobId))
+            const mt = this.level.monsters.get(v.triggerMobId)
+
+            if (!mt) {
+                Text.erA(`Monster label "${v.triggerMobId}" unknown`)
+            } else {
+                const portalMob = this.new(mt, v.freezeDuration)
+                portalMob.setTargetMob(this.level.monsters.get(v.targetMobId))
+            }
         }
     }
 

@@ -116,7 +116,7 @@ export const initExecuteCommandMax = () => {
                 return true
             }
 
-            let escaper2: Escaper
+            let escaper2: Escaper | null
 
             if (nbParam === 2) {
                 if (!isPlayerId(param2)) {
@@ -389,7 +389,7 @@ export const initExecuteCommandMax = () => {
                     if (
                         getUdgEscapers().get(i) != null &&
                         getUdgEscapers().get(i) != escaper &&
-                        !getUdgEscapers().get(i).isEscaperSecondary()
+                        !getUdgEscapers().get(i)?.isEscaperSecondary()
                     ) {
                         if (IsEscaperInGame(i)) {
                             getUdgEscapers().get(i)?.removeHero()

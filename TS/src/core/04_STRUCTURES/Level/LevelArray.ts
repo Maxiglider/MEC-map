@@ -195,7 +195,7 @@ export class LevelArray extends BaseArray<Level> {
                         const ct = getUdgCasterTypes().getByLabel(m.casterTypeLabel)
 
                         if (!ct) {
-                            Text.erA('Caster type "' + m.casterTypeLabel + '" unknwon')
+                            Text.erA(`Caster type "${m.casterTypeLabel}" unknown`)
                         } else {
                             monster = new Caster(ct, m.x, m.y, m.angle, m.id)
                         }
@@ -203,7 +203,7 @@ export class LevelArray extends BaseArray<Level> {
                         const mt = getUdgMonsterTypes().getByLabel(m.monsterTypeLabel)
 
                         if (!mt) {
-                            Text.erA('Monster label "' + m.monsterTypeLabel + '" unknown')
+                            Text.erA(`Monster label "${m.monsterTypeLabel}" unknown`)
                         } else {
                             if (m.monsterClassName == 'MonsterNoMove') {
                                 monster = new MonsterNoMove(mt, m.x, m.y, m.angle, m.id)

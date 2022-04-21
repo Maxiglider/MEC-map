@@ -1,23 +1,21 @@
-import {NB_PLAYERS_MAX} from "../01_libraries/Constants";
-import {ServiceManager} from "../../Services";
-import {getUdgEscapers} from "../../../globals";
+import { getUdgEscapers } from '../../../globals'
+import { ServiceManager } from '../../Services'
+import { NB_PLAYERS_MAX } from '../01_libraries/Constants'
 
 export const init_shortcurt_cancelRedo = () => {
-
     const { ExecuteCommand } = ServiceManager.getService('Cmd')
 
     function Cancel_Actions() {
         const escaper = getUdgEscapers().get(GetPlayerId(GetTriggerPlayer()))
-        ExecuteCommand(escaper, '-z')
+        escaper && ExecuteCommand(escaper, '-z')
     }
 
     function Redo_Actions() {
         const escaper = getUdgEscapers().get(GetPlayerId(GetTriggerPlayer()))
-        ExecuteCommand(escaper, '-y')
+        escaper && ExecuteCommand(escaper, '-y')
     }
 
-    for(let i = 0; i < NB_PLAYERS_MAX; i++){
-
+    for (let i = 0; i < NB_PLAYERS_MAX; i++) {
         //cancel
         const trgCancel = CreateTrigger()
 
