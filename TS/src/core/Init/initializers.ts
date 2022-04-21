@@ -20,6 +20,7 @@ import { init_doubleKill } from '../Double_heroes/double_kill'
 import { init_Test } from '../Test/test'
 import { initArrays } from './initArrays'
 import { initOldTriggers } from './init_old_triggers'
+import {init_shortcurt_cancelRedo} from "../Keyboard_shortcuts/Cancel_redo";
 
 export const initializers = () => {
     init_terrain_limit_variables()
@@ -43,6 +44,9 @@ export const initializers = () => {
     ReinitTerrainsPositions.init_reinitTerrainsPositions()
     initFirstPerson()
     initMonsterSimplePatrol()
+
+    //keyboard shortcuts
+    init_shortcurt_cancelRedo()
 
     //todomax disable this line at end
     init_Test()
