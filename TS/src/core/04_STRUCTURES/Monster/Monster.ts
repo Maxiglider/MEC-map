@@ -1,4 +1,4 @@
-import { udg_monsters } from '../../../../globals'
+import {udg_monsters} from '../../../../globals'
 import { MOBS_VARIOUS_COLORS, NB_PLAYERS_MAX } from '../../01_libraries/Constants'
 import { ColorString2Id } from '../../01_libraries/Init_colorCodes'
 import { IsColorString } from '../../06_COMMANDS/COMMANDS_vJass/Command_functions'
@@ -9,6 +9,7 @@ import { MonsterType } from './MonsterType'
 import { monstersClickable } from './trig_Monsters_clickable_set_life'
 
 export abstract class Monster {
+    public static forceUnitTypeIdForNextMonster = 0
     public static DISABLE_TRANSPARENCY = 80
 
     private static lastInstanceId = -1
@@ -110,6 +111,29 @@ export abstract class Monster {
 
         if (!this.createUnitFunc) {
             return
+        }
+
+        //hook onBeforeCreateMonsterUnit
+        const hookArray = this.level?.monsters.hooks_onBeforeCreateMonsterUnit
+        if(hookArray){
+            let forceUnitTypeId = 0
+            let quit = false
+            for(const hook of hookArray.values()){
+                const output = hook.execute(this)
+                if(output === false){
+                    quit = true
+                }else if(output && output.unitTypeId){
+                    forceUnitTypeId = output.unitTypeId
+                }
+            }
+
+            if(quit){
+                return
+            }
+
+            if(forceUnitTypeId > 0){
+                Monster.forceUnitTypeIdForNextMonster = forceUnitTypeId
+            }
         }
 
         let previouslyEnabled = !!this.u

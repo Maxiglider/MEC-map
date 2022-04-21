@@ -21,6 +21,7 @@ import { init_Test } from '../Test/test'
 import { initArrays } from './initArrays'
 import { initOldTriggers } from './init_old_triggers'
 import {init_shortcurt_cancelRedo} from "../Keyboard_shortcuts/Cancel_redo";
+import {init_startFirstLevel} from "../07_TRIGGERS/Start_of_the_game/start_first_level";
 
 export const initializers = () => {
     init_terrain_limit_variables()
@@ -44,6 +45,7 @@ export const initializers = () => {
     ReinitTerrainsPositions.init_reinitTerrainsPositions()
     initFirstPerson()
     initMonsterSimplePatrol()
+    init_startFirstLevel()
 
     //keyboard shortcuts
     init_shortcurt_cancelRedo()

@@ -41,8 +41,8 @@ export abstract class BaseArray<T extends BaseModel> {
     get = (id: number) => this.data[id]
 
     forAll(cb: (v: T) => void) {
-        for (const [_, escaper] of pairs(this.data)) {
-            cb(escaper)
+        for (const [_, element] of pairs(this.data)) {
+            cb(element)
         }
     }
 

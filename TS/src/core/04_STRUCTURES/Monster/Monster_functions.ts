@@ -1,6 +1,7 @@
 import { GetCurrentMonsterPlayer } from 'core/01_libraries/Basic_functions'
 import { ENNEMY_PLAYER, MOBS_VARIOUS_COLORS } from 'core/01_libraries/Constants'
 import { MonsterType } from './MonsterType'
+import {Monster} from "./Monster";
 
 let monster: unit
 let ATTACK_SKILL = FourCC('Aatk')
@@ -56,11 +57,17 @@ export const SetUnitMaxLife = (u: unit, newMaxLife: number): boolean => {
 }
 
 export const NewImmobileMonsterForPlayer = (mt: MonsterType, p: player, x: number, y: number, angle: number): unit => {
+    let unitTypeId = mt.getUnitTypeId()
+    if(Monster.forceUnitTypeIdForNextMonster > 0){
+        unitTypeId = Monster.forceUnitTypeIdForNextMonster
+        Monster.forceUnitTypeIdForNextMonster = 0
+    }
+
     let scale: number
     if (angle === -1) {
-        monster = CreateUnit(p, mt.getUnitTypeId(), x, y, GetRandomDirectionDeg())
+        monster = CreateUnit(p, unitTypeId, x, y, GetRandomDirectionDeg())
     } else {
-        monster = CreateUnit(p, mt.getUnitTypeId(), x, y, angle)
+        monster = CreateUnit(p, unitTypeId, x, y, angle)
     }
 
     SetUnitUseFood(monster, false)

@@ -7,6 +7,7 @@ import type { Level } from '../Level/Level'
 import type { Monster } from './Monster'
 import type { MonsterType } from './MonsterType'
 import { countMonstersAccordingToMode } from './Monster_count'
+import {MecHookArray} from "../../API/MecHookArray";
 
 export const MONSTER_NEAR_DIFF_MAX = 64
 
@@ -14,6 +15,9 @@ export const MONSTER_NEAR_DIFF_MAX = 64
 export class MonsterArray extends BaseArray<Monster> {
     // private monsters: { [x: number]: Monster } = {} //same ids as in udg_monsters
     private level?: Level
+
+    //hooks
+    public hooks_onBeforeCreateMonsterUnit = new MecHookArray()
 
     constructor(level?: Level) {
         super(false)
@@ -183,5 +187,9 @@ export class MonsterArray extends BaseArray<Monster> {
 
     removeAllWithoutDestroy = () => {
         while (this.removeLast(false));
+    }
+
+    onBeforeCreateMonsterUnit = (cb: () => any) => {
+        return this.hooks_onBeforeCreateMonsterUnit.new(cb)
     }
 }

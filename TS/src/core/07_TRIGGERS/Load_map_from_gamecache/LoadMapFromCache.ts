@@ -30,7 +30,6 @@ export class LoadMapFromCache {
                 //levels
                 if (gameData.levels) {
                     getUdgLevels().newFromJson(gameData.levels)
-                    getUdgLevels().refreshCurrentLevel()
                 }
             }
         }
