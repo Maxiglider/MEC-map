@@ -134,6 +134,31 @@ foreach($rects as $name => $coords){
 }
 
 
+//spawns level 3
+$levels[3]->monsterSpawns[] = [
+    "label" => "murlocs_utd",
+    "monsterTypeLabel" => "murloc",
+    "sens" => "upToDown",
+    "frequence" => 3.33,
+    "minX" => $rects['lvl3_disparition_murloc_bas']->minX,
+    "minY" => $rects['lvl3_disparition_murloc_bas']->centerY,
+    "maxX" => $rects['lvl3_apparition_murloc_haut']->maxX,
+    "maxY" => $rects['lvl3_apparition_murloc_haut']->centerY,
+];
+
+$levels[3]->monsterSpawns[] = [
+    "label" => "murlocs_dtu",
+    "monsterTypeLabel" => "murloc",
+    "sens" => "downToUp",
+    "frequence" => 3.33,
+    "minX" => $rects['lvl3_apparition_murloc_bas']->minX,
+    "minY" => $rects['lvl3_apparition_murloc_bas']->centerY,
+    "maxX" => $rects['lvl3_disparition_murloc_haut']->maxX,
+    "maxY" => $rects['lvl3_disparition_murloc_haut']->centerY,
+];
+
+
+
 $output = json_encode($levels);
 
 file_put_contents(__DIR__."/output.js", "test = ".$output);
@@ -155,14 +180,14 @@ file_put_contents(__DIR__."/output.json", json_encode($output));
 //gg_rct_visionLvl_0_a
 //gg_rct_visionLvl_0_b
 
+//gg_rct_lvl3_apparition_murloc_bas
+//gg_rct_lvl3_apparition_murloc_haut
+//gg_rct_lvl3_disparition_murloc_bas
+//gg_rct_lvl3_disparition_murloc_haut
+
 /**
  * Todomax still need to handle these
  *
-    gg_rct_lvl3_apparition_murloc_bas
-    gg_rct_lvl3_apparition_murloc_haut
-    gg_rct_lvl3_disparition_murloc_bas
-    gg_rct_lvl3_disparition_murloc_haut
-
     gg_rct_lvl7_random_murlocs_droite_0
     gg_rct_lvl7_random_murlocs_droite_1
     gg_rct_lvl7_random_murlocs_droite_2
