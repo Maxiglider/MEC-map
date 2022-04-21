@@ -29,5 +29,6 @@ export const init_shortcurt_cancelRedo = () => {
 
         TriggerAddAction(trgRedo, Redo_Actions)
         BlzTriggerRegisterPlayerKeyEvent(trgRedo, Player(i), OSKEY_Z, 3, false) //CTRL SHIFT Z
+        BlzTriggerRegisterPlayerKeyEvent(trgRedo, Player(i), OSKEY_Y, 2, false) //CTRL Y
     }
 }
