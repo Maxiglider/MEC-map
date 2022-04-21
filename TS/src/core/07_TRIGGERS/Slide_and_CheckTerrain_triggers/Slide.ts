@@ -4,7 +4,7 @@ import { createTimer } from 'Utils/mapUtils'
 import { getUdgEscapers, globals } from '../../../../globals'
 import { Gravity } from './Gravity'
 
-const FIRSTPERSON_ANGLE_PER_PERIOD = 0.25
+const FIRSTPERSON_ANGLE_PER_PERIOD = 0.4
 
 const initSlideTrigger = () => {
     const Slide_Actions = (n: number) => {

@@ -15,6 +15,7 @@ import { ColorString2Id, udg_colorCode, udg_colorStrings } from 'core/01_librari
 import { Text } from 'core/01_libraries/Text'
 import { Escaper } from 'core/04_STRUCTURES/Escaper/Escaper'
 import { ColorInfo, GetMirrorEscaper } from 'core/04_STRUCTURES/Escaper/Escaper_functions'
+import { TerrainTypeWalk } from 'core/04_STRUCTURES/TerrainType/TerrainTypeWalk'
 import { DisplayTerrainDataToPlayer, GetTerrainData } from 'core/07_TRIGGERS/Modify_terrain_Functions/Terrain_functions'
 import { Apm } from 'core/08_GAME/Apm_clics_par_minute/Apm'
 import { Globals } from 'core/09_From_old_Worldedit_triggers/globals_variables_and_triggers'
@@ -42,7 +43,9 @@ export const initCommandAll = () => {
             name,
             alias,
             group: 'all',
-            cb: ({ noParam, nbParam, param1, param2, param3, param4 }, escaper) => {
+            argDescription: '',
+            description: '',
+            cb: ({ noParam, nbParam, param1 }, escaper) => {
                 if (noParam) {
                     escaper.setBaseColor(ColorString2Id(name))
                     return true
@@ -60,6 +63,8 @@ export const initCommandAll = () => {
         name: 'vertexColor',
         alias: ['vc'],
         group: 'all',
+        argDescription: '[ <red> <green> <blue> [<transparency>] ]',
+        description: 'without parameter takes a random vertex color without changing transparency',
         cb: ({ noParam, nbParam, param1, param2, param3, param4 }, escaper) => {
             if (noParam || nbParam === 1) {
                 if (nbParam === 1) {
@@ -116,6 +121,8 @@ export const initCommandAll = () => {
         name: 'vertexColorRed',
         alias: ['vcr'],
         group: 'all',
+        argDescription: '[<red>]',
+        description: 'changes the red part of the vertex color only',
         cb: ({ noParam, nbParam, param1 }, escaper) => {
             if (noParam) {
                 escaper.setVcRed(GetRandomPercentageBJ())
@@ -139,6 +146,8 @@ export const initCommandAll = () => {
         name: 'vertexColorGreen',
         alias: ['vcg'],
         group: 'all',
+        argDescription: '[<Green>]',
+        description: 'changes the green part of the vertex color only',
         cb: ({ noParam, nbParam, param1 }, escaper) => {
             if (noParam) {
                 escaper.setVcGreen(GetRandomPercentageBJ())
@@ -162,6 +171,8 @@ export const initCommandAll = () => {
         name: 'vertexColorBlue',
         alias: ['vcb'],
         group: 'all',
+        argDescription: '[<Blue>]',
+        description: 'changes the blue part of the vertex color only',
         cb: ({ noParam, nbParam, param1 }, escaper) => {
             if (noParam) {
                 escaper.setVcBlue(GetRandomPercentageBJ())
@@ -185,7 +196,9 @@ export const initCommandAll = () => {
         name: 'vertexColorTransparency',
         alias: ['vct'],
         group: 'all',
-        cb: ({ noParam, nbParam, param1, param2, param3, param4 }, escaper) => {
+        argDescription: '[<transparency>]',
+        description: 'changes the transparency of the hero',
+        cb: ({ noParam, nbParam, param1 }, escaper) => {
             if (noParam) {
                 escaper.setVcTransparency(GetRandomPercentageBJ())
                 escaper.refreshVertexColor()
@@ -211,7 +224,9 @@ export const initCommandAll = () => {
         name: 'noVertex',
         alias: ['nv'],
         group: 'all',
-        cb: ({ noParam, nbParam, param1, param2, param3, param4 }, escaper) => {
+        argDescription: '',
+        description: 'put normal vertex color : RGB(100, 100, 100) with 0 transparency',
+        cb: ({ noParam, nbParam, param1 }, escaper) => {
             if (!(noParam || nbParam === 1)) {
                 return true
             }
@@ -242,7 +257,9 @@ export const initCommandAll = () => {
         name: 'colorInfo',
         alias: ['ci'],
         group: 'all',
-        cb: ({ noParam, nbParam, param1, param2, param3, param4 }, escaper) => {
+        argDescription: '[<Pcolor>]',
+        description: 'displays base color and vertex color of a hero',
+        cb: ({ noParam, nbParam, param1 }, escaper) => {
             if (noParam) {
                 ColorInfo(escaper, escaper.getPlayer())
                 return true
@@ -261,7 +278,9 @@ export const initCommandAll = () => {
         name: 'effect',
         alias: ['ef'],
         group: 'all',
-        cb: ({ noParam, nbParam, param1, param2, param3, param4 }, escaper) => {
+        argDescription: '<effect>',
+        description: 'adds an effect on each hand of the hero',
+        cb: ({ nbParam, param1, param2 }, escaper) => {
             if (!EscaperEffectFunctions.IsEffectStr(param1)) {
                 return true
             }
@@ -294,7 +313,9 @@ export const initCommandAll = () => {
         name: 'customEffect',
         alias: ['ce'],
         group: 'all',
-        cb: ({ noParam, nbParam, param1, param2, param3, param4 }, escaper) => {
+        argDescription: '<effect> <body_part>',
+        description: 'adds an effect on a body part of the hero',
+        cb: ({ nbParam, param1, param2 }, escaper) => {
             if (nbParam !== 2) {
                 return true
             }
@@ -320,7 +341,9 @@ export const initCommandAll = () => {
         name: 'effectsEverywhere',
         alias: ['efe'],
         group: 'all',
-        cb: ({ noParam, nbParam, param1, param2, param3, param4 }, escaper) => {
+        argDescription: '<effect>',
+        description: 'adds the same effect to each body part of the hero',
+        cb: ({ nbParam, param1, param2 }, escaper) => {
             if (!EscaperEffectFunctions.IsEffectStr(param1)) {
                 return true
             }
@@ -358,7 +381,9 @@ export const initCommandAll = () => {
         name: 'deleteEffects',
         alias: ['de'],
         group: 'all',
-        cb: ({ noParam, nbParam, param1, param2, param3, param4 }, escaper) => {
+        argDescription: '[<numberOfEffectsToRemove>]',
+        description: 'delete a specified effect of the hero or all effects if not specified',
+        cb: ({ noParam, nbParam, param1 }, escaper) => {
             if (!(noParam || nbParam === 1)) {
                 return true
             }
@@ -400,7 +425,9 @@ export const initCommandAll = () => {
         name: 'cameraField',
         alias: ['cf'],
         group: 'all',
-        cb: ({ noParam, nbParam, param1, param2, param3, param4 }, escaper) => {
+        argDescription: 'x',
+        description: 'changes the camera field (height), default is 2500',
+        cb: ({ nbParam, param1 }, escaper) => {
             if (!(nbParam === 1 && IsInteger(param1))) {
                 return true
             }
@@ -414,7 +441,9 @@ export const initCommandAll = () => {
         name: 'resetCamera',
         alias: ['rc'],
         group: 'all',
-        cb: ({ noParam, nbParam, param1, param2, param3, param4 }, escaper) => {
+        argDescription: '',
+        description: 'put the camera back like chosen field',
+        cb: ({ noParam }, escaper) => {
             if (!noParam) {
                 return true
             }
@@ -428,7 +457,9 @@ export const initCommandAll = () => {
         name: 'resetCameraInit',
         alias: ['rci'],
         group: 'all',
-        cb: ({ noParam, nbParam, param1, param2, param3, param4 }, escaper) => {
+        argDescription: '',
+        description: 'changes the camera field back to its default value (2500)',
+        cb: ({ noParam }, escaper) => {
             if (!noParam) {
                 return true
             }
@@ -442,7 +473,9 @@ export const initCommandAll = () => {
         name: 'animation',
         alias: ['an'],
         group: 'all',
-        cb: ({ cmd, noParam, nbParam, param1, param2, param3, param4 }, escaper) => {
+        argDescription: '<string>',
+        description: 'makes your hero doing an animation',
+        cb: ({ cmd, noParam }, escaper) => {
             if (noParam || !escaper.isAlive()) {
                 return true
             }
@@ -470,7 +503,9 @@ export const initCommandAll = () => {
         name: 'mapNbMonsters',
         alias: ['mnbm'],
         group: 'all',
-        cb: ({ noParam, nbParam, param1, param2, param3, param4 }, escaper) => {
+        argDescription: '[moving(m)|all(a)|notMoving(nm)]',
+        description: '"moving" is the default value',
+        cb: ({ noParam, nbParam, param1 }, escaper) => {
             if (!(noParam || nbParam === 1)) {
                 return true
             }
@@ -501,7 +536,9 @@ export const initCommandAll = () => {
         name: 'levelNbMonsters',
         alias: ['lnbm'],
         group: 'all',
-        cb: ({ noParam, nbParam, param1, param2, param3, param4 }, escaper) => {
+        argDescription: '[moving(m)|all(a)|notMoving(nm)]',
+        description: '"moving" is the default value',
+        cb: ({ noParam, nbParam, param1 }, escaper) => {
             if (!(noParam || nbParam === 1)) {
                 return true
             }
@@ -532,8 +569,10 @@ export const initCommandAll = () => {
         name: 'kill',
         alias: ['kl'],
         group: 'all',
+        argDescription: '',
+        description: 'kills your hero',
         enabled: ({ noParam }) => noParam,
-        cb: ({ noParam, nbParam, param1, param2, param3, param4 }, escaper) => {
+        cb: ({}, escaper) => {
             if (!escaper.kill()) {
                 Text.erP(escaper.getPlayer(), 'You are already dead.')
             }
@@ -546,8 +585,10 @@ export const initCommandAll = () => {
         name: 'kick',
         alias: ['kc'],
         group: 'all',
+        argDescription: '',
+        description: 'kicks yourself',
         enabled: ({ noParam }) => noParam,
-        cb: ({ noParam, nbParam, param1, param2, param3, param4 }, escaper) => {
+        cb: ({}, escaper) => {
             CustomDefeatBJ(escaper.getPlayer(), 'You have kicked... yourself.')
             Text.A(
                 udg_colorCode[GetPlayerId(escaper.getPlayer())] +
@@ -565,7 +606,9 @@ export const initCommandAll = () => {
         name: 'getTerrainInfo',
         alias: ['gti'],
         group: 'all',
-        cb: ({ noParam, nbParam, param1, param2, param3, param4 }, escaper) => {
+        argDescription: '[ <terrain> | <lowInteger> <upInteger> ]',
+        description: '',
+        cb: ({ noParam, nbParam, param1, param2 }, escaper) => {
             if (noParam) {
                 escaper.makeGetTerrainType()
                 Text.mkP(escaper.getPlayer(), 'Get terrain info mode enabled')
@@ -617,7 +660,9 @@ export const initCommandAll = () => {
         name: 'stop',
         alias: ['s'],
         group: 'all',
-        cb: ({ noParam, nbParam, param1, param2, param3, param4 }, escaper) => {
+        argDescription: '',
+        description: 'stop creating monsters or terrain or stop getTerrainInfoMode',
+        cb: ({ noParam }, escaper) => {
             if (!noParam) {
                 return true
             }
@@ -635,7 +680,10 @@ export const initCommandAll = () => {
         name: 'disco',
         alias: ['d'],
         group: 'all',
-        cb: ({ noParam, nbParam, param1, param2, param3, param4 }, escaper) => {
+        argDescription: '[off|1~30]',
+        description:
+            'choose the number of color changes in ten seconds, or stop color changing (without parameter once a second)',
+        cb: ({ noParam, nbParam, param1 }, escaper) => {
             let n = 0
 
             if (noParam) {
@@ -683,7 +731,9 @@ export const initCommandAll = () => {
         name: 'clearText',
         alias: ['clr'],
         group: 'all',
-        cb: ({ noParam, nbParam, param1, param2, param3, param4 }, escaper) => {
+        argDescription: '',
+        description: 'remove the text on the screen',
+        cb: ({ noParam }, escaper) => {
             if (noParam) {
                 ClearTextForPlayer(escaper.getPlayer())
             }
@@ -696,7 +746,9 @@ export const initCommandAll = () => {
         name: 'usedTerrains',
         alias: ['ut'],
         group: 'all',
-        cb: ({ noParam, nbParam, param1, param2, param3, param4 }, escaper) => {
+        argDescription: '',
+        description: 'display the terrains already used (onto the map) during this game (16 is the maximum possible !)',
+        cb: ({ noParam }, escaper) => {
             if (noParam) {
                 Text.DisplayLineToPlayer(escaper.getPlayer())
                 Text.P_timed(
@@ -725,7 +777,9 @@ export const initCommandAll = () => {
         name: 'drunk',
         alias: [],
         group: 'all',
-        cb: ({ noParam, nbParam, param1, param2, param3, param4 }, escaper) => {
+        argDescription: '<real drunkValue>',
+        description: 'value between 5 and 60',
+        cb: ({ noParam, nbParam, param1 }, escaper) => {
             const k = GetPlayerId(escaper.getPlayer())
             let x = 0
             let n = 0
@@ -783,7 +837,9 @@ export const initCommandAll = () => {
         name: 'noDrunk',
         alias: ['vc'],
         group: 'all',
-        cb: ({ noParam, nbParam, param1, param2, param3, param4 }, escaper) => {
+        argDescription: '',
+        description: 'stop drunk mode',
+        cb: ({ noParam }, escaper) => {
             const k = GetPlayerId(escaper.getPlayer())
             if (noParam && TurnOnSlide.udg_isDrunk[k]) {
                 TurnOnSlide.udg_isDrunk[k] = false
@@ -800,7 +856,9 @@ export const initCommandAll = () => {
         name: 'autoContinueAfterSliding',
         alias: ['acas'],
         group: 'all',
-        cb: ({ noParam, nbParam, param1, param2, param3, param4 }, escaper) => {
+        argDescription: '<boolean status>',
+        description: '',
+        cb: ({ nbParam, param1 }, escaper) => {
             const k = GetPlayerId(escaper.getPlayer())
             if (nbParam === 1 && IsBoolString(param1)) {
                 if (AutoContinueAfterSliding.udg_autoContinueAfterSliding[k] !== S2B(param1)) {
@@ -825,7 +883,9 @@ export const initCommandAll = () => {
         name: 'apm',
         alias: [],
         group: 'all',
-        cb: ({ noParam, nbParam, param1, param2, param3, param4 }, escaper) => {
+        argDescription: '[all|a]',
+        description: 'displays apm on slide of everybody or just yourself',
+        cb: ({ noParam, nbParam, param1 }, escaper) => {
             const k = GetPlayerId(escaper.getPlayer())
             if (noParam) {
                 Apm.DisplayApm(k)
@@ -843,7 +903,9 @@ export const initCommandAll = () => {
         name: 'assign',
         alias: ['as'],
         group: 'all',
-        cb: ({ cmd, noParam, nbParam, param1, param2, param3, param4 }, escaper) => {
+        argDescription: '<shortcut> <command>',
+        description: 'puts a command into a key (A Z E R Q S D or F)',
+        cb: ({ cmd, nbParam, param1 }, escaper) => {
             if (!(nbParam > 1 && CommandShortcuts.IsShortcut(param1))) {
                 return true
             }
@@ -863,7 +925,9 @@ export const initCommandAll = () => {
         name: 'unassign',
         alias: ['uas'],
         group: 'all',
-        cb: ({ noParam, nbParam, param1, param2, param3, param4 }, escaper) => {
+        argDescription: '<shortcut>',
+        description: 'removes the command put into a key',
+        cb: ({ nbParam, param1 }, escaper) => {
             if (!(nbParam === 1 && CommandShortcuts.IsShortcut(param1))) {
                 return true
             }
@@ -877,7 +941,9 @@ export const initCommandAll = () => {
         name: 'displayShortcuts',
         alias: ['ds'],
         group: 'all',
-        cb: ({ noParam, nbParam, param1, param2, param3, param4 }, escaper) => {
+        argDescription: '',
+        description: 'displays the commands associated to your shortcuts',
+        cb: ({ noParam }, escaper) => {
             if (noParam) {
                 CommandShortcuts.DisplayShortcuts(GetPlayerId(escaper.getPlayer()))
             }
@@ -890,7 +956,9 @@ export const initCommandAll = () => {
         name: 'saveCommand',
         alias: ['sc'],
         group: 'all',
-        cb: ({ cmd, noParam, nbParam, param1, param2, param3, param4 }, escaper) => {
+        argDescription: '<commandLabel> <command>',
+        description: 'save a command into a name of your choice',
+        cb: ({ cmd, nbParam, param1 }, escaper) => {
             if (!(nbParam > 1)) {
                 return true
             }
@@ -905,7 +973,9 @@ export const initCommandAll = () => {
         name: 'executeCommand',
         alias: ['ec'],
         group: 'all',
-        cb: ({ noParam, nbParam, param1, param2, param3, param4 }, escaper) => {
+        argDescription: '<commandLabel>',
+        description: 'execute a command you saved with "saveCommand"',
+        cb: ({ nbParam, param1 }, escaper) => {
             if (!(nbParam === 1)) {
                 return true
             }
@@ -921,7 +991,9 @@ export const initCommandAll = () => {
         name: 'getCurrentLevel',
         alias: ['getcl'],
         group: 'all',
-        cb: ({ noParam, nbParam, param1, param2, param3, param4 }, escaper) => {
+        argDescription: '',
+        description: 'displays the number of the current level (first one is number 0)',
+        cb: ({ noParam }, escaper) => {
             if (!noParam) {
                 return true
             }
@@ -935,7 +1007,9 @@ export const initCommandAll = () => {
         name: 'leaderboard',
         alias: ['ldb'],
         group: 'all',
-        cb: ({ noParam, nbParam, param1, param2, param3, param4 }, escaper) => {
+        argDescription: '',
+        description: 'displays the leaderboard',
+        cb: ({ nbParam, param1 }, escaper) => {
             if (nbParam === 1) {
                 if (IsBoolString(param1)) {
                     escaper.hideLeaderboard = !S2B(param1)
@@ -960,7 +1034,9 @@ export const initCommandAll = () => {
         name: 'firstPersonCam',
         alias: ['fpc'],
         group: 'all',
-        cb: ({ noParam, nbParam, param1, param2, param3, param4 }, escaper) => {
+        argDescription: '',
+        description: 'displays the first person camera',
+        cb: ({ nbParam, param1 }, escaper) => {
             if (nbParam === 1 && IsBoolString(param1)) {
                 escaper.getFirstPersonHandle().toggleFirstPerson(S2B(param1))
                 Text.mkP(escaper.getPlayer(), `First person cam ${S2B(param1) ? 'enabled' : 'disabled'}`)
@@ -975,7 +1051,9 @@ export const initCommandAll = () => {
         name: 'lockCam',
         alias: ['lc'],
         group: 'all',
-        cb: ({ noParam, nbParam, param1, param2, param3, param4 }, escaper) => {
+        argDescription: '',
+        description: 'locks the camera',
+        cb: ({ noParam, nbParam, param1 }, escaper) => {
             let target: Escaper | null = null
 
             if (IsBoolString(param1) && S2B(param1) === false) {
@@ -1002,7 +1080,9 @@ export const initCommandAll = () => {
         name: 'unlockCam',
         alias: ['ulc'],
         group: 'all',
-        cb: ({ noParam, nbParam, param1, param2, param3, param4 }, escaper) => {
+        argDescription: '',
+        description: 'unlocks the camera',
+        cb: ({ noParam }, escaper) => {
             if (noParam) {
                 escaper.setLockCamTarget(null)
                 escaper.resetCamera()
@@ -1019,7 +1099,9 @@ export const initCommandAll = () => {
         name: 'followMouse',
         alias: ['fm'],
         group: 'all',
-        cb: ({ noParam, nbParam, param1, param2, param3, param4 }, escaper) => {
+        argDescription: '<boolean>',
+        description: 'follows the mouse',
+        cb: ({ nbParam, param1 }, escaper) => {
             if (nbParam != 1) {
                 return true
             }
@@ -1035,6 +1117,39 @@ export const initCommandAll = () => {
                 )
             } else {
                 Text.mkP(escaper.getPlayer(), 'Follow mouse mode disabled')
+            }
+
+            return true
+        },
+    })
+
+    //-mirror <boolean>
+    registerCommand({
+        name: 'mirror',
+        alias: [''],
+        group: 'all',
+        argDescription: '<boolean>',
+        description: 'mirrors the camera',
+        cb: ({ nbParam, param1 }, escaper) => {
+            if (nbParam != 1) {
+                return true
+            }
+
+            if (!IsBoolString(param1)) {
+                return true
+            }
+
+            if (!(escaper.getLastTerrainType() instanceof TerrainTypeWalk)) {
+                Text.erP(escaper.getPlayer(), 'You must be on a walkable terrain to use this command')
+                return true
+            }
+
+            escaper.setSlideMirror(S2B(param1))
+
+            if (S2B(param1)) {
+                Text.mkP(escaper.getPlayer(), 'Mirror mode enabled')
+            } else {
+                Text.mkP(escaper.getPlayer(), 'Mirror mode disabled')
             }
 
             return true

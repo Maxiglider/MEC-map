@@ -13,7 +13,9 @@ export const initExecuteCommandTrueMax = () => {
         name: 'beAdmin',
         alias: [],
         group: 'truemax',
-        cb: ({ cmd, noParam, nbParam, param1, param2, param3, param4 }, escaper) => {
+        argDescription: '<Pcolor>|all(a) [<boolean status>]',
+        description: 'Makes a player an admin',
+        cb: ({ nbParam, param1, param2 }, escaper) => {
             if (!(nbParam === 1 || nbParam === 2)) {
                 Text.erP(escaper.getPlayer(), 'one or two params for this command')
                 return true
@@ -75,6 +77,8 @@ export const initExecuteCommandTrueMax = () => {
         name: 'exec',
         alias: ['e'],
         group: 'truemax',
+        argDescription: '<string>',
+        description: 'Execute raw lua code',
         cb: ({ name }, escaper) => {
             const args = GetEventPlayerChatString().substring(name.length + 2)
 

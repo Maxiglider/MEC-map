@@ -11,7 +11,9 @@ export const initExecuteCommandRed = () => {
         name: 'kill',
         alias: ['kl'],
         group: 'red',
-        cb: ({ cmd, noParam, nbParam, param1, param2, param3, param4 }, escaper) => {
+        argDescription: '<Pcolor>',
+        description: 'Kills a hero',
+        cb: ({ nbParam, param1 }, escaper) => {
             if (nbParam !== 1) {
                 return true
             }
@@ -47,7 +49,9 @@ export const initExecuteCommandRed = () => {
         name: 'kick',
         alias: ['kc'],
         group: 'red',
-        cb: ({ cmd, noParam, nbParam, param1, param2, param3, param4 }, escaper) => {
+        argDescription: '<Pcolor>',
+        description: 'Kicks a player',
+        cb: ({ nbParam, param1 }, escaper) => {
             if (nbParam !== 1) {
                 return true
             }
@@ -94,7 +98,9 @@ export const initExecuteCommandRed = () => {
         name: 'restart',
         alias: [],
         group: 'red',
-        cb: ({ cmd, noParam, nbParam, param1, param2, param3, param4 }, escaper) => {
+        argDescription: '',
+        description: 'Restarts the game',
+        cb: ({ noParam }) => {
             if (noParam) {
                 getUdgLevels().restartTheGame()
             }

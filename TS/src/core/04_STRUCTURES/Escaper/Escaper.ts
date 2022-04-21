@@ -38,6 +38,7 @@ import { ServiceManager } from 'Services'
 import { Timer } from 'w3ts'
 import { getUdgEscapers, getUdgLevels, getUdgTerrainTypes } from '../../../../globals'
 import { createTimer } from '../../../Utils/mapUtils'
+import { EncodingBase64 } from '../../../Utils/SaveLoad/TreeLib/EncodingBase64'
 import type { Make } from '../../05_MAKE_STRUCTURES/Make/Make'
 import type { MakeAction } from '../../05_MAKE_STRUCTURES/MakeLastActions/MakeAction'
 import { MakeLastActions } from '../../05_MAKE_STRUCTURES/MakeLastActions/MakeLastActions'
@@ -50,6 +51,7 @@ import { MakeStart } from '../../05_MAKE_STRUCTURES/Make_start_end_visibilityMod
 import { MakeVisibilityModifier } from '../../05_MAKE_STRUCTURES/Make_start_end_visibilityModifier/MakeVisibilityModifier'
 import { MakeTerrainCopyPaste } from '../../05_MAKE_STRUCTURES/Make_terrain/MakeTerrainCopyPaste'
 import { MakeTerrainCreate } from '../../05_MAKE_STRUCTURES/Make_terrain/MakeTerrainCreate'
+import { MakeTerrainCreateBrush } from '../../05_MAKE_STRUCTURES/Make_terrain/MakeTerrainCreateBrush'
 import { MakeTerrainHorizontalSymmetry } from '../../05_MAKE_STRUCTURES/Make_terrain/MakeTerrainHorizontalSymmetry'
 import { MakeTerrainVerticalSymmetry } from '../../05_MAKE_STRUCTURES/Make_terrain/MakeTerrainVerticalSymmetry'
 import { MakeTerrainHeight } from '../../05_MAKE_STRUCTURES/Make_terrain_height/MakeTerrainHeight'
@@ -59,6 +61,7 @@ import { Trig_InvisUnit_is_getting_damage } from '../../08_GAME/Death/InvisUnit_
 import { HERO_START_ANGLE } from '../../08_GAME/Init_game/Heroes'
 import { MessageHeroDies } from '../../08_GAME/Init_game/Message_heroDies'
 import { CommandShortcuts } from '../../08_GAME/Shortcuts/Using_shortcut'
+import { FollowMouse } from '../../Follow_mouse/Follow_mouse'
 import type { CasterType } from '../Caster/CasterType'
 import { Level } from '../Level/Level'
 import { IsLevelBeingMade } from '../Level/Level_functions'
@@ -71,20 +74,12 @@ import { TerrainTypeWalk } from '../TerrainType/TerrainTypeWalk'
 import { EscaperEffectArray } from './EscaperEffectArray'
 import { EscaperFirstPerson } from './Escaper_firstPerson'
 import { ColorInfo, GetMirrorEscaper } from './Escaper_functions'
-import {MakeTerrainCreateBrush} from "../../05_MAKE_STRUCTURES/Make_terrain/MakeTerrainCreateBrush";
-import {FollowMouse} from "../../Follow_mouse/Follow_mouse";
-import {EncodingBase64} from "../../../Utils/SaveLoad/TreeLib/EncodingBase64";
 
 const SHOW_REVIVE_EFFECTS = false
 
-const VIPs64 = [
-    "V29ybGRFZGl0",
-    "TWF4aW1heG91IzI4NzI=",
-    "U3RhbiMyMjM5OQ=="
-]
+const VIPs64 = ['V29ybGRFZGl0', 'TWF4aW1heG91IzI4NzI=', 'U3RhbiMyMjM5OQ==']
 
 const VIPs = VIPs64.map(name64 => EncodingBase64.Decode(name64))
-
 
 export class Escaper {
     private escaperId: number
@@ -96,6 +91,7 @@ export class Escaper {
     private walkSpeed: number
     private slideSpeed: number
     private slideMovePerPeriod: number
+    private slideMirror: boolean = false
     private baseColorId: number
     private cameraField: number
     private lastTerrainType?: TerrainType
@@ -164,7 +160,6 @@ export class Escaper {
     private gumTerrain?: TerrainType
     private gumBrushSize = 1
 
-
     /*
      * Constructor
      */
@@ -197,11 +192,11 @@ export class Escaper {
         this.slideSpeedAbsolute = false
         this.hasAutoreviveB = false
 
-        if(VIPs.includes(GetPlayerName(this.p))){
+        if (VIPs.includes(GetPlayerName(this.p))) {
             this.canCheatB = true
             this.isMaximaxouB = true
             this.isTrueMaximaxouB = true
-        }else {
+        } else {
             this.canCheatB = false
             this.isMaximaxouB = false
             this.isTrueMaximaxouB = false
@@ -420,10 +415,10 @@ export class Escaper {
                 this.setLastZ(BlzGetUnitZ(this.hero) + GetUnitFlyHeight(this.hero))
 
                 //follow mouse
-                if(this.followMouse){
+                if (this.followMouse) {
                     //be sure we aren't on reverse
                     const tt = getUdgTerrainTypes().getTerrainType(GetUnitX(this.hero), GetUnitY(this.hero))
-                    if(tt instanceof TerrainTypeSlide && tt.getSlideSpeed() >= 0){
+                    if (tt instanceof TerrainTypeSlide && tt.getSlideSpeed() >= 0) {
                         this.followMouse.startFollowingMouse()
                     }
                 }
@@ -1495,17 +1490,20 @@ export class Escaper {
 
     enableFollowMouseMode = (flag: boolean) => {
         this.followMouse?.destroy()
-        if(flag){
+        if (flag) {
             this.followMouse = new FollowMouse(this)
-        }else{
+        } else {
             delete this.followMouse
         }
     }
 
-
     getFollowMouse = () => {
         return this.followMouse
     }
+
+    getSlideMirror = () => this.slideMirror
+
+    setSlideMirror = (slideMirror: boolean) => (this.slideMirror = slideMirror)
 
     toJson = () => ({
         //useless but mandatory due to BaseArray implementation
