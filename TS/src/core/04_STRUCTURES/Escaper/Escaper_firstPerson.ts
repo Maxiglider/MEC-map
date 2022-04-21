@@ -43,6 +43,7 @@ export class EscaperFirstPerson {
         } else {
             this.forceCamTimer?.destroy()
             this.forceCamTimer = null
+            this.escaper.resetCamera()
         }
     }
 
