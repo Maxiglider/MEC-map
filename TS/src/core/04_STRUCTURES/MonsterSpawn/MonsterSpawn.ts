@@ -249,12 +249,16 @@ export class MonsterSpawn {
         }
 
         //hook onBeforeCreateMonsterUnit
+        const unitData = {
+            mt: this.mt,
+        }
+
         const hookArray = CombineHooks(this.level?.monsters.hooks_onBeforeCreateMonsterUnit, hooks.hooks_onBeforeCreateMonsterUnit)
         if(hookArray){
             let forceUnitTypeId = 0
             let quit = false
             for(const hook of hookArray.values()){
-                const output = hook.execute(this)
+                const output = hook.execute(unitData)
                 if(output === false){
                     quit = true
                 }else if(output && output.unitTypeId){
