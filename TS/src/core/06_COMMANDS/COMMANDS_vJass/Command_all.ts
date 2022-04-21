@@ -15,6 +15,7 @@ import { ColorString2Id, udg_colorCode, udg_colorStrings } from 'core/01_librari
 import { Text } from 'core/01_libraries/Text'
 import { Escaper } from 'core/04_STRUCTURES/Escaper/Escaper'
 import { ColorInfo, GetMirrorEscaper } from 'core/04_STRUCTURES/Escaper/Escaper_functions'
+import { TerrainTypeWalk } from 'core/04_STRUCTURES/TerrainType/TerrainTypeWalk'
 import { DisplayTerrainDataToPlayer, GetTerrainData } from 'core/07_TRIGGERS/Modify_terrain_Functions/Terrain_functions'
 import { Apm } from 'core/08_GAME/Apm_clics_par_minute/Apm'
 import { Globals } from 'core/09_From_old_Worldedit_triggers/globals_variables_and_triggers'
@@ -1052,6 +1053,11 @@ export const initCommandAll = () => {
             }
 
             if (!IsBoolString(param1)) {
+                return true
+            }
+
+            if (!(escaper.getLastTerrainType() instanceof TerrainTypeWalk)) {
+                Text.erP(escaper.getPlayer(), 'You must be on a walkable terrain to use this command')
                 return true
             }
 
