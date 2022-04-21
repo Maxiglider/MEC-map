@@ -2,6 +2,7 @@ import {Escaper} from "../04_STRUCTURES/Escaper/Escaper";
 import {createEvent} from "../../Utils/mapUtils";
 import {getUdgEscapers} from "../../../globals";
 import {TurnOnSlide} from "../07_TRIGGERS/Slide_and_CheckTerrain_triggers/To_turn_on_slide";
+import {AutoContinueAfterSliding} from "../07_TRIGGERS/Slide_and_CheckTerrain_triggers/Auto_continue_after_sliding";
 
 
 export const PRESS_TIME_TO_ENABLE_FOLLOW_MOUSE = 0.2
@@ -117,6 +118,12 @@ export class FollowMouse{
             const orderX = this.mouseX
             const orderY = this.mouseY
             this.angle = Atan2(orderY - sliderY, orderX - sliderX) * bj_RADTODEG
+
+            if(this.tFollowMouse){
+                AutoContinueAfterSliding.lastClickedX[this.escaper.getId()] = orderX
+                AutoContinueAfterSliding.lastClickedY[this.escaper.getId()] = orderY
+                AutoContinueAfterSliding.isLastTargetALocation[this.escaper.getId()] = true
+            }
         }
     }
 
@@ -130,6 +137,7 @@ export class FollowMouse{
         if(this.tFollowMouse){
             FollowMouse.anyTimer2escaper.delete(this.tFollowMouse)
             DestroyTimer(this.tFollowMouse)
+            delete this.tFollowMouse
         }
     }
 
