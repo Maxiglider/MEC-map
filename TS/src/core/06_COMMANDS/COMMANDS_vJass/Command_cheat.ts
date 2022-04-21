@@ -21,7 +21,9 @@ export const initExecuteCommandCheat = () => {
         name: 'setSlideSpeed',
         alias: ['ss'],
         group: 'cheat',
-        cb: ({ cmd, noParam, nbParam, param1, param2, param3, param4 }, escaper) => {
+        argDescription: '<speed>',
+        description: 'Changes the slide speed of your hero, ignoring terrains',
+        cb: ({ nbParam, param1, param2 }, escaper) => {
             if (!IsInteger(param1)) {
                 return true
             }
@@ -61,7 +63,9 @@ export const initExecuteCommandCheat = () => {
         name: 'normalSlideSpeed',
         alias: ['nss'],
         group: 'cheat',
-        cb: ({ cmd, noParam, nbParam, param1, param2, param3, param4 }, escaper) => {
+        argDescription: '',
+        description: 'Puts the slide speed back to normal (respecting terrains)',
+        cb: ({ noParam, nbParam, param1 }, escaper) => {
             if (noParam) {
                 escaper.stopAbsoluteSlideSpeed()
                 Text.P(escaper.getPlayer(), 'your slide speed depends now on terrains')
@@ -97,7 +101,9 @@ export const initExecuteCommandCheat = () => {
         name: 'setWalkSpeed',
         alias: ['ws'],
         group: 'cheat',
-        cb: ({ cmd, noParam, nbParam, param1, param2, param3, param4 }, escaper) => {
+        argDescription: '<speed>',
+        description: 'Changes the walk speed of your hero, ignoring terrains',
+        cb: ({ nbParam, param1, param2 }, escaper) => {
             if (!IsInteger(param1)) {
                 return true
             }
@@ -137,7 +143,9 @@ export const initExecuteCommandCheat = () => {
         name: 'normalWalkSpeed',
         alias: ['nws'],
         group: 'cheat',
-        cb: ({ cmd, noParam, nbParam, param1, param2, param3, param4 }, escaper) => {
+        argDescription: '',
+        description: 'Puts the walk speed back to normal (respecting terrains)',
+        cb: ({ noParam, nbParam, param1 }, escaper) => {
             if (noParam) {
                 escaper.stopAbsoluteWalkSpeed()
                 Text.P(escaper.getPlayer(), 'walk speed depends now on terrains')
@@ -173,10 +181,12 @@ export const initExecuteCommandCheat = () => {
         name: 'teleport',
         alias: ['t'],
         group: 'cheat',
-        enabled: ({ cmd, noParam, nbParam, param1, param2, param3, param4 }, escaper) => {
+        argDescription: '',
+        description: 'Teleports your hero at the next clic',
+        enabled: ({ noParam, nbParam, param1 }) => {
             return noParam || (nbParam === 1 && (param1 === '0' || S2R(param1) !== 0))
         },
-        cb: ({ cmd, noParam, nbParam, param1, param2, param3, param4 }, escaper) => {
+        cb: ({ nbParam, param1 }, escaper) => {
             const h1 = escaper.getHero()
             const h2 = GetMirrorEscaper(escaper)?.getHero()
 
@@ -197,7 +207,9 @@ export const initExecuteCommandCheat = () => {
         name: 'revive',
         alias: ['r'],
         group: 'cheat',
-        cb: ({ cmd, noParam, nbParam, param1, param2, param3, param4 }, escaper) => {
+        argDescription: '',
+        description: 'Revives your hero',
+        cb: ({ noParam, nbParam, param1 }, escaper) => {
             if (noParam) {
                 escaper.reviveAtStart()
                 return true
@@ -230,7 +242,9 @@ export const initExecuteCommandCheat = () => {
         name: 'reviveTo',
         alias: ['rto'],
         group: 'cheat',
-        cb: ({ cmd, noParam, nbParam, param1, param2, param3, param4 }, escaper) => {
+        argDescription: '<Pcolor>',
+        description: 'Revives your hero to an other hero, with the same facing angle',
+        cb: ({ nbParam, param1 }, escaper) => {
             if (!(nbParam === 1 && isPlayerId(param1))) {
                 return true
             }
@@ -259,7 +273,9 @@ export const initExecuteCommandCheat = () => {
         name: 'getInfiniteMeteors',
         alias: ['gim'],
         group: 'cheat',
-        cb: ({ cmd, noParam, nbParam, param1, param2, param3, param4 }, escaper) => {
+        argDescription: '',
+        description: "Puts in your inventory a meteor that doesn't disapear after being used",
+        cb: ({ noParam }, escaper) => {
             if (noParam) {
                 const hero = escaper.getHero()
 
@@ -281,7 +297,9 @@ export const initExecuteCommandCheat = () => {
         name: 'deleteInfiniteMeteors',
         alias: ['dim'],
         group: 'cheat',
-        cb: ({ cmd, noParam, nbParam, param1, param2, param3, param4 }, escaper) => {
+        argDescription: '',
+        description: 'Remove the infinite meteor from your inventory if you have one',
+        cb: ({ noParam }, escaper) => {
             if (noParam) {
                 const hero = escaper.getHero()
 
@@ -303,7 +321,9 @@ export const initExecuteCommandCheat = () => {
         name: 'endLevel',
         alias: ['el'],
         group: 'cheat',
-        cb: ({ cmd, noParam, nbParam, param1, param2, param3, param4 }, escaper) => {
+        argDescription: '',
+        description: 'Go to the end of the current level',
+        cb: ({ noParam }) => {
             if (noParam) {
                 getUdgLevels().goToNextLevel()
             }
@@ -316,7 +336,9 @@ export const initExecuteCommandCheat = () => {
         name: 'goToLevel',
         alias: ['gotl'],
         group: 'cheat',
-        cb: ({ cmd, noParam, nbParam, param1, param2, param3, param4 }, escaper) => {
+        argDescription: '<levelId>',
+        description: 'Go to the specified level',
+        cb: ({ nbParam, param1 }, escaper) => {
             if (nbParam !== 1) {
                 return true
             }
@@ -348,7 +370,9 @@ export const initExecuteCommandCheat = () => {
         name: 'viewAll',
         alias: ['va'],
         group: 'cheat',
-        cb: ({ cmd, noParam, nbParam, param1, param2, param3, param4 }, escaper) => {
+        argDescription: '',
+        description: 'Displays the whole map',
+        cb: ({ noParam }) => {
             if (noParam) {
                 FogModifierStart(getUdgViewAll())
             }
@@ -361,7 +385,9 @@ export const initExecuteCommandCheat = () => {
         name: 'hideAll',
         alias: ['ha'],
         group: 'cheat',
-        cb: ({ cmd, noParam, nbParam, param1, param2, param3, param4 }, escaper) => {
+        argDescription: '',
+        description: 'Puts the map view back to normal',
+        cb: ({ noParam }) => {
             if (noParam) {
                 FogModifierStop(getUdgViewAll())
             }
@@ -374,7 +400,9 @@ export const initExecuteCommandCheat = () => {
         name: 'setGodMode',
         alias: ['setgm'],
         group: 'cheat',
-        cb: ({ cmd, noParam, nbParam, param1, param2, param3, param4 }, escaper) => {
+        argDescription: '<boolean status>',
+        description: 'Activate or desactivate god mode for your hero',
+        cb: ({ nbParam, param1, param2 }, escaper) => {
             if (!(nbParam === 1 || nbParam === 2)) {
                 Text.erP(escaper.getPlayer(), 'one or two params for this command')
                 return true
@@ -441,7 +469,9 @@ export const initExecuteCommandCheat = () => {
         name: 'setGodModeKills',
         alias: ['setgmk'],
         group: 'cheat',
-        cb: ({ cmd, noParam, nbParam, param1, param2, param3, param4 }, escaper) => {
+        argDescription: '<boolean status>',
+        description: 'if activated, monsters will be killed by your hero',
+        cb: ({ nbParam, param1, param2 }, escaper) => {
             if (!(nbParam === 1 || nbParam === 2)) {
                 Text.erP(escaper.getPlayer(), 'one or two params for this command')
                 return true
@@ -511,7 +541,9 @@ export const initExecuteCommandCheat = () => {
         name: 'setGravity',
         alias: ['setg'],
         group: 'cheat',
-        cb: ({ cmd, noParam, nbParam, param1, param2, param3, param4 }, escaper) => {
+        argDescription: 'x',
+        description: 'set the gravity of the game',
+        cb: ({ nbParam, param1 }, escaper) => {
             if (!(nbParam === 1) || (S2R(param1) === 0 && param1 !== '0')) {
                 return true
             }
@@ -526,7 +558,9 @@ export const initExecuteCommandCheat = () => {
         name: 'getGravity',
         alias: ['getg'],
         group: 'cheat',
-        cb: ({ cmd, noParam, nbParam, param1, param2, param3, param4 }, escaper) => {
+        argDescription: '',
+        description: 'get the gravity of the game',
+        cb: ({ noParam }, escaper) => {
             if (noParam) {
                 Text.P(escaper.getPlayer(), 'current gravity is ' + R2S(Gravity.GetRealGravity()))
             }
@@ -539,7 +573,9 @@ export const initExecuteCommandCheat = () => {
         name: 'setHeight',
         alias: ['seth'],
         group: 'cheat',
-        cb: ({ cmd, noParam, nbParam, param1, param2, param3, param4 }, escaper) => {
+        argDescription: '',
+        description: 'set the height of the game',
+        cb: ({ nbParam, param1 }, escaper) => {
             if (nbParam !== 1 || (S2R(param1) <= 0 && param1 !== '0')) {
                 return true
             }
@@ -559,7 +595,9 @@ export const initExecuteCommandCheat = () => {
         name: 'setTailleUnit',
         alias: ['settu'],
         group: 'cheat',
-        cb: ({ cmd, noParam, nbParam, param1, param2, param3, param4 }, escaper) => {
+        argDescription: '',
+        description: 'set the size of the units',
+        cb: ({ nbParam, param1 }) => {
             if (nbParam !== 1 || (S2R(param1) <= 0 && param1 !== '0')) {
                 return true
             }
@@ -573,7 +611,9 @@ export const initExecuteCommandCheat = () => {
         name: 'instantTurn',
         alias: ['it'],
         group: 'cheat',
-        cb: ({ cmd, noParam, nbParam, param1, param2, param3, param4 }, escaper) => {
+        argDescription: '',
+        description: 'instant turn',
+        cb: ({ nbParam, param1 }, escaper) => {
             if (nbParam === 1 && IsBoolString(param1)) {
                 if (escaper.isAbsoluteInstantTurn() != S2B(param1)) {
                     escaper.setAbsoluteInstantTurn(S2B(param1))

@@ -19,6 +19,8 @@ type ICommand = {
     name: string
     alias: string[]
     group: 'all' | 'red' | 'cheat' | 'make' | 'max' | 'truemax'
+    argDescription: string
+    description: string
     enabled?: (cmd: IParsedCmdContext, escaper: Escaper) => boolean
     cb: (cmd: IParsedCmdContext, escaper: Escaper) => true
 }
@@ -219,6 +221,8 @@ export const initCommandExecution = () => {
             name: 'help',
             alias: ['h', '?'],
             group: 'all',
+            argDescription: '',
+            description: '',
             cb: ({ param1 }) => {
                 const filtered = commands.filter(cmd => {
                     return param1
@@ -231,26 +235,16 @@ export const initCommandExecution = () => {
                     'Commands:\n' +
                     filtered
                         .map(
-                            cmd => '-' + cmd.name + (cmd.alias.length > 0 ? `(${cmd.alias.join(' | ')})` : '')
-                            // (Object.keys(cmd.args).length
-                            //     ? ' ' +
-                            //       Object.keys(cmd.args)
-                            //           .map(argKey => {
-                            //               const c = cmd.args![argKey]
-                            //               let argValue = argKey
-
-                            //               if (c.type === 'enum') {
-                            //                   argValue = c.enum.join(' | ')
-                            //               }
-
-                            //               return c.optional ? `[${argValue}]` : `<${argValue}>`
-                            //           })
-                            //           .join(' ')
-                            //     : '')
+                            cmd =>
+                                '-' +
+                                cmd.name +
+                                (cmd.alias.length > 0 ? `(${cmd.alias.join(' | ')})` : '') +
+                                (cmd.argDescription.length > 0 ? ' ' + cmd.argDescription : '') +
+                                (cmd.description.length > 0 ? ' --> ' + cmd.description : '')
                         )
                         .join('\n')
 
-                Text.A(s)
+                Text.P(GetTriggerPlayer(), s)
 
                 return true
             },
