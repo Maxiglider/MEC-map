@@ -1040,4 +1040,30 @@ export const initCommandAll = () => {
             return true
         },
     })
+
+    //-mirror <boolean>
+    registerCommand({
+        name: 'mirror',
+        alias: [''],
+        group: 'all',
+        cb: ({ nbParam, param1 }, escaper) => {
+            if (nbParam != 1) {
+                return true
+            }
+
+            if (!IsBoolString(param1)) {
+                return true
+            }
+
+            escaper.setSlideMirror(S2B(param1))
+
+            if (S2B(param1)) {
+                Text.mkP(escaper.getPlayer(), 'Mirror mode enabled')
+            } else {
+                Text.mkP(escaper.getPlayer(), 'Mirror mode disabled')
+            }
+
+            return true
+        },
+    })
 }
