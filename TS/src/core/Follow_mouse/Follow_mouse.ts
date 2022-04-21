@@ -101,9 +101,7 @@ export class FollowMouse{
 
             if(elapsedTime >= PRESS_TIME_TO_ENABLE_FOLLOW_MOUSE){
                 //enabling
-                this.tFollowMouse = CreateTimer()
-                TimerStart(this.tFollowMouse, FOLLOW_MOUSE_PERIOD, true, followMouseActions)
-                FollowMouse.anyTimer2escaper.set(this.tFollowMouse, this.escaper)
+                this.startFollowingMouse()
             }
         }
     }
@@ -120,6 +118,12 @@ export class FollowMouse{
             const orderY = this.mouseY
             this.angle = Atan2(orderY - sliderY, orderX - sliderX) * bj_RADTODEG
         }
+    }
+
+    startFollowingMouse = () => {
+        this.tFollowMouse = CreateTimer()
+        TimerStart(this.tFollowMouse, FOLLOW_MOUSE_PERIOD, true, followMouseActions)
+        FollowMouse.anyTimer2escaper.set(this.tFollowMouse, this.escaper)
     }
 
     stopFollowingMouse = () => {

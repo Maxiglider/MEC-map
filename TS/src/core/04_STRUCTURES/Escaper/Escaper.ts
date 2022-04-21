@@ -402,6 +402,15 @@ export class Escaper {
             if (this.hero) {
                 StopUnit(this.hero)
                 this.setLastZ(BlzGetUnitZ(this.hero) + GetUnitFlyHeight(this.hero))
+
+                //follow mouse
+                if(this.followMouse){
+                    //be sure we aren't on reverse
+                    const tt = getUdgTerrainTypes().getTerrainType(GetUnitX(this.hero), GetUnitY(this.hero))
+                    if(tt instanceof TerrainTypeSlide && tt.getSlideSpeed() >= 0){
+                        this.followMouse.startFollowingMouse()
+                    }
+                }
             }
         } else {
             this.slide?.destroy()
