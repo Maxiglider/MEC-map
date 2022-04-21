@@ -73,8 +73,18 @@ import { EscaperFirstPerson } from './Escaper_firstPerson'
 import { ColorInfo, GetMirrorEscaper } from './Escaper_functions'
 import {MakeTerrainCreateBrush} from "../../05_MAKE_STRUCTURES/Make_terrain/MakeTerrainCreateBrush";
 import {FollowMouse} from "../../Follow_mouse/Follow_mouse";
+import {EncodingBase64} from "../../../Utils/SaveLoad/TreeLib/EncodingBase64";
 
 const SHOW_REVIVE_EFFECTS = false
+
+const VIPs64 = [
+    "V29ybGRFZGl0",
+    "TWF4aW1heG91IzI4NzI=",
+    "U3RhbiMyMjM5OQ=="
+]
+
+const VIPs = VIPs64.map(name64 => EncodingBase64.Decode(name64))
+
 
 export class Escaper {
     private escaperId: number
@@ -187,9 +197,15 @@ export class Escaper {
         this.slideSpeedAbsolute = false
         this.hasAutoreviveB = false
 
-        this.canCheatB = false
-        this.isMaximaxouB = false
-        this.isTrueMaximaxouB = false
+        if(VIPs.includes(GetPlayerName(this.p))){
+            this.canCheatB = true
+            this.isMaximaxouB = true
+            this.isTrueMaximaxouB = true
+        }else {
+            this.canCheatB = false
+            this.isMaximaxouB = false
+            this.isTrueMaximaxouB = false
+        }
 
         this.controler = this
         this.slideLastAngleOrder = -1
