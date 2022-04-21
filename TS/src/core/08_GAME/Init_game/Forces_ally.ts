@@ -1,17 +1,13 @@
-import { createEvent, forRange } from 'Utils/mapUtils'
+import { forRange } from 'Utils/mapUtils'
+import {NB_PLAYERS_MAX} from "../../01_libraries/Constants";
 
 export const InitTrig_Forces_ally = () => {
-    createEvent({
-        events: [],
-        actions: [
-            () => {
-                forRange(12, i => {
-                    forRange(12, j => {
-                        SetPlayerAllianceStateBJ(Player(12 + j), ConvertedPlayer(i), bj_ALLIANCE_ALLIED_VISION)
-                        SetPlayerAllianceStateBJ(ConvertedPlayer(i), Player(12 + j), bj_ALLIANCE_ALLIED_VISION)
-                    })
-                })
-            },
-        ],
+    forRange(NB_PLAYERS_MAX, i => {
+        forRange(NB_PLAYERS_MAX, j => {
+            if(i != j) {
+                SetPlayerAllianceStateBJ(Player(i), Player(j), bj_ALLIANCE_ALLIED_VISION)
+            }
+        })
     })
 }
+
