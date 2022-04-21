@@ -5,6 +5,9 @@ import { Text } from '../../01_libraries/Text'
 import { Level } from '../Level/Level'
 import { MonsterType } from '../Monster/MonsterType'
 import { NewImmobileMonsterForPlayer } from '../Monster/Monster_functions'
+import {CombineHooks} from "../../API/MecHookArray";
+import {hooks} from "../../API/GeneralHooks";
+import {Monster} from "../Monster/Monster";
 
 const DECALAGE_UNSPAWN = 200
 const DELAY_BETWEEN_SPAWN_AND_MOVEMENT = 0.5
@@ -32,14 +35,16 @@ const MonsterSpawn_Actions = () => {
     let ms = MonsterSpawn.anyTrigId2MonsterSpawn.get(GetHandleId(GetTriggeringTrigger()))
     if (ms) {
         let mobUnit = ms.createMob()
-        let mobTimer = CreateTimer()
-        MonsterSpawn.anyTimerId2MonsterSpawn.set(GetHandleId(mobTimer), ms)
-        MonsterSpawn.anyTimerId2Unit.set(GetHandleId(mobTimer), mobUnit)
-        TimerStart(mobTimer, DELAY_BETWEEN_SPAWN_AND_MOVEMENT, false, MonsterStartMovement)
-        SetUnitOwner(mobUnit, ENNEMY_PLAYER, false)
-        ShowUnit(mobUnit, false)
-        UnitRemoveAbility(mobUnit, FourCC('Aloc'))
-        ms.monsters && GroupAddUnit(ms.monsters, mobUnit)
+        if(mobUnit) {
+            let mobTimer = CreateTimer()
+            MonsterSpawn.anyTimerId2MonsterSpawn.set(GetHandleId(mobTimer), ms)
+            MonsterSpawn.anyTimerId2Unit.set(GetHandleId(mobTimer), mobUnit)
+            TimerStart(mobTimer, DELAY_BETWEEN_SPAWN_AND_MOVEMENT, false, MonsterStartMovement)
+            SetUnitOwner(mobUnit, ENNEMY_PLAYER, false)
+            ShowUnit(mobUnit, false)
+            UnitRemoveAbility(mobUnit, FourCC('Aloc'))
+            ms.monsters && GroupAddUnit(ms.monsters, mobUnit)
+        }
     }
 }
 
@@ -229,7 +234,7 @@ export class MonsterSpawn {
         IssuePointOrder(mobUnit, 'move', x2, y2)
     }
 
-    createMob = (): unit => {
+    createMob = () => {
         let angle: number
 
         //leftToRight, upToDown, rightToLeft, downToUp
@@ -242,6 +247,30 @@ export class MonsterSpawn {
         } else {
             angle = -90
         }
+
+        //hook onBeforeCreateMonsterUnit
+        const hookArray = CombineHooks(this.level?.monsters.hooks_onBeforeCreateMonsterUnit, hooks.hooks_onBeforeCreateMonsterUnit)
+        if(hookArray){
+            let forceUnitTypeId = 0
+            let quit = false
+            for(const hook of hookArray.values()){
+                const output = hook.execute(this)
+                if(output === false){
+                    quit = true
+                }else if(output && output.unitTypeId){
+                    forceUnitTypeId = output.unitTypeId
+                }
+            }
+
+            if(quit){
+                return
+            }
+
+            if(forceUnitTypeId > 0){
+                Monster.forceUnitTypeIdForNextMonster = forceUnitTypeId
+            }
+        }
+
         return NewImmobileMonsterForPlayer(
             this.mt,
             ENNEMY_PLAYER,

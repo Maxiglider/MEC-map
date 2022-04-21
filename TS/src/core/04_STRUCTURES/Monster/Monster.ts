@@ -7,6 +7,8 @@ import { ClearMob } from '../Monster_properties/ClearMob'
 import { PortalMob } from '../Monster_properties/PortalMob'
 import { MonsterType } from './MonsterType'
 import { monstersClickable } from './trig_Monsters_clickable_set_life'
+import {CombineHooks} from "../../API/MecHookArray";
+import {hooks} from "../../API/GeneralHooks";
 
 export abstract class Monster {
     public static forceUnitTypeIdForNextMonster = 0
@@ -114,7 +116,7 @@ export abstract class Monster {
         }
 
         //hook onBeforeCreateMonsterUnit
-        const hookArray = this.level?.monsters.hooks_onBeforeCreateMonsterUnit
+        const hookArray = CombineHooks(this.level?.monsters.hooks_onBeforeCreateMonsterUnit, hooks.hooks_onBeforeCreateMonsterUnit)
         if(hookArray){
             let forceUnitTypeId = 0
             let quit = false
