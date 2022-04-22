@@ -69,7 +69,6 @@ export const InitTrig_InvisUnit_is_getting_damage = () => {
 
                             //kill monster
                             if (escaper.doesGodModeKills()) {
-                                print('monster killing')
                                 if (GetUnitUserData(killingUnit) !== 0) {
                                     monster.killUnit() //on ne tue pas directement le monstre, pour pouvoir exécuter des actions secondaires éventuelles de la méthode killUnit
                                 } else {
