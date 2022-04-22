@@ -44,10 +44,9 @@ const initTurnOnSlide = () => {
     let trg_turnToPoint: trigger
     let trg_turnToWidget: trigger
 
-
     const turnSliderToDirection = (escaper: Escaper, angle: number, triggerIsToLocation: boolean | null = null) => {
         const slider = escaper.getHero()
-        if(!slider) return
+        if (!slider) return
 
         if (isSecondaryHero(slider)) {
             return
@@ -99,7 +98,7 @@ const initTurnOnSlide = () => {
         }
 
         //save click
-        if(triggerIsToLocation !== null) {
+        if (triggerIsToLocation !== null) {
             AutoContinueAfterSliding.lastClickedX[n] = orderX
             AutoContinueAfterSliding.lastClickedY[n] = orderY
             AutoContinueAfterSliding.isLastTargetALocation[n] = triggerIsToLocation
@@ -132,6 +131,10 @@ const initTurnOnSlide = () => {
 
         //stop hero
         StopUnit(slider)
+
+        if (escaper.getFirstPersonHandle().isFirstPerson()) {
+            return
+        }
 
         //angle
         //if (udg_isMirrorModeOn_j[n]) then
@@ -176,7 +179,15 @@ const initTurnOnSlide = () => {
         DRUNK_EFFECTS[3] = DRUNK_EFFECT_GROS
     }
 
-    return { udg_isDrunk, udg_drunk, udg_drunkLevel, udg_drunkEffect, DRUNK_EFFECTS, init_ToTurnOnSlide, turnSliderToDirection }
+    return {
+        udg_isDrunk,
+        udg_drunk,
+        udg_drunkLevel,
+        udg_drunkEffect,
+        DRUNK_EFFECTS,
+        init_ToTurnOnSlide,
+        turnSliderToDirection,
+    }
 }
 
 export const TurnOnSlide = initTurnOnSlide()
