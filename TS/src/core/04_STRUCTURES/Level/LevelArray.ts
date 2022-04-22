@@ -23,8 +23,11 @@ import { Level } from './Level'
 import { IsLevelBeingMade } from './Level_functions'
 import type { VisibilityModifierArray } from './VisibilityModifierArray'
 
+const MIN_TIME_BETWEEN_GOTNL = 0.05
+
 export class LevelArray extends BaseArray<Level> {
     private currentLevel: number
+    private tLastGoToNextLevel?: timer
 
     constructor() {
         super(true)
@@ -93,6 +96,15 @@ export class LevelArray extends BaseArray<Level> {
         if (this.currentLevel >= this.lastInstanceId) {
             return false
         }
+
+        //check a goToNextLevel wasn't just made
+        if(this.tLastGoToNextLevel && TimerGetElapsed(this.tLastGoToNextLevel) < MIN_TIME_BETWEEN_GOTNL){
+            return false
+        }
+
+        if(!this.tLastGoToNextLevel) this.tLastGoToNextLevel = CreateTimer()
+        TimerStart(this.tLastGoToNextLevel, 10, false, DoNothing)
+
         this.currentLevel = this.currentLevel + 1
         if (!IsLevelBeingMade(this.data[this.currentLevel - 1])) {
             getUdgEscapers().destroyMakesIfForSpecificLevel_currentLevel()
