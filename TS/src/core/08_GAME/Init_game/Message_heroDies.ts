@@ -54,20 +54,22 @@ const initMessageHeroDies = () => {
     }
 
     const DisplayDeathMessagePlayer = (p: player) => {
-        let n = GetPlayerId(p)
+        const n = GetPlayerId(p)
 
-        forRange(NB_ESCAPERS, i => {
-            if (n === i) {
-                TimerStart(CreateTimer(), TIME_BETWEEN_DEATH_AND_MESSAGE, false, () => {
-                    PlaySoundHeroDies(Player(i))
+        TimerStart(CreateTimer(), TIME_BETWEEN_DEATH_AND_MESSAGE, false, () => {
+            PlaySoundHeroDies(Player(n))
 
-                    if (!getUdgEscapers().get(i)?.isIgnoringDeathMessages()) {
-                        Text.A_timed(MESSAGE_DURATION, udg_colorCode[i] + GetPlayerName(Player(i)) + '|r has fallen.')
-                    }
+            forRange(NB_ESCAPERS, i => {
+                if (!getUdgEscapers().get(i)?.isIgnoringDeathMessages()) {
+                    Text.P_timed(
+                        Player(i),
+                        MESSAGE_DURATION,
+                        udg_colorCode[n] + GetPlayerName(Player(n)) + '|r has fallen.'
+                    )
+                }
+            })
 
-                    DestroyTimer(GetExpiredTimer())
-                })
-            }
+            DestroyTimer(GetExpiredTimer())
         })
     }
 
