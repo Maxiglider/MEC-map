@@ -73,6 +73,7 @@ import { TerrainTypeWalk } from '../TerrainType/TerrainTypeWalk'
 import { EscaperEffectArray } from './EscaperEffectArray'
 import { EscaperFirstPerson } from './Escaper_firstPerson'
 import { ColorInfo, GetMirrorEscaper } from './Escaper_functions'
+import {RunCoopSoundOnHero} from "../../08_GAME/Mode_coop/coop_init_sounds";
 
 const SHOW_REVIVE_EFFECTS = false
 
@@ -120,8 +121,6 @@ export class Escaper {
     private make?: Make
     private makeLastActions: MakeLastActions
     private makingLevel?: Level
-
-    private itemInInventory?: item
 
     private lastZ: number = 0
     private oldDiffZ: number = 0
@@ -1400,7 +1399,7 @@ export class Escaper {
 
         if (this.hero) {
             this.revive(GetUnitX(this.hero), GetUnitY(this.hero))
-            //RunSoundOnUnit(udg_coop_index_son, this.hero) //todomax make sound work
+            RunCoopSoundOnHero(this.hero)
             SetUnitAnimation(this.hero, 'channel')
             this.absoluteSlideSpeed(0)
             this.setCoopInvul(true)
@@ -1408,7 +1407,7 @@ export class Escaper {
 
         if (mirrorHero && mirrorEscaper) {
             mirrorEscaper.revive(GetUnitX(mirrorHero), GetUnitY(mirrorHero))
-            //RunSoundOnUnit(udg_coop_index_son, mirrorHero)
+            RunCoopSoundOnHero(mirrorHero)
             SetUnitAnimation(mirrorHero, 'channel')
             mirrorEscaper.absoluteSlideSpeed(0)
             mirrorEscaper.setCoopInvul(true)
