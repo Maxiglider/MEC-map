@@ -9,7 +9,8 @@ import {
     INVIS_UNIT_TYPE_ID,
     NB_PLAYERS_MAX,
     NB_PLAYERS_MAX_REFORGED,
-    PLAYER_DUMMY_CIRCLE, PLAYER_INVIS_UNIT,
+    PLAYER_DUMMY_CIRCLE,
+    PLAYER_INVIS_UNIT,
     POWER_CIRCLE,
     SLIDE_PERIOD,
     TERRAIN_KILL_EFFECT_BODY_PART,
@@ -158,6 +159,8 @@ export class Escaper {
     private gumTerrain?: TerrainType
     private gumBrushSize = 1
 
+    private ignoreDeathMessages = false
+
     //mouse position updated when a trigger dependant of mouse movement is being used
     mouseX = 0
     mouseY = 0
@@ -280,6 +283,8 @@ export class Escaper {
         if (this.escaperId >= NB_PLAYERS_MAX) {
             SetUnitTimeScale(this.hero, this.animSpeedSecondaryHero)
         }
+
+        BlzSetUnitBooleanField(this.hero, UNIT_BF_HERO_HIDE_HERO_DEATH_MESSAGE, true)
 
         SetUnitFlyHeight(this.hero, 1, 0)
         SetUnitFlyHeight(this.hero, 0, 0)
@@ -1506,6 +1511,10 @@ export class Escaper {
     getSlideMirror = () => this.slideMirror
 
     setSlideMirror = (slideMirror: boolean) => (this.slideMirror = slideMirror)
+
+    isIgnoringDeathMessages = () => this.ignoreDeathMessages
+
+    setIgnoreDeathMessages = (ignoreDeathMessages: boolean) => (this.ignoreDeathMessages = ignoreDeathMessages)
 
     toJson = () => ({
         //useless but mandatory due to BaseArray implementation

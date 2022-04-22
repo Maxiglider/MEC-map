@@ -20,6 +20,10 @@ const initAutoContinueAfterSliding = () => {
             return
         }
 
+        if (!lastClickedY[n] || !lastClickedX[n]) {
+            return
+        }
+
         //vérification de l'angle
         let angleHero2Target = Atan2(lastClickedY[n] - GetUnitY(hero), lastClickedX[n] - GetUnitX(hero)) * bj_RADTODEG
         let diffAngle = RAbsBJ(angleHero2Target - GetUnitFacing(hero))

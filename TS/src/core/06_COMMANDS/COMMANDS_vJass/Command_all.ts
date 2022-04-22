@@ -1155,4 +1155,32 @@ export const initCommandAll = () => {
             return true
         },
     })
+
+    //-ignoreDeathMessages(idm) <boolean>
+    registerCommand({
+        name: 'ignoreDeathMessages',
+        alias: ['idm'],
+        group: 'all',
+        argDescription: '<boolean>',
+        description: 'ignores death messages',
+        cb: ({ nbParam, param1 }, escaper) => {
+            if (nbParam != 1) {
+                return true
+            }
+
+            if (!IsBoolString(param1)) {
+                return true
+            }
+
+            escaper.setIgnoreDeathMessages(S2B(param1))
+
+            if (S2B(param1)) {
+                Text.mkP(escaper.getPlayer(), 'Ignoring death messages')
+            } else {
+                Text.mkP(escaper.getPlayer(), 'Not ignoring death messages')
+            }
+
+            return true
+        },
+    })
 }
