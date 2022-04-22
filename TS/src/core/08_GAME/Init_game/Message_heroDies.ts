@@ -5,7 +5,7 @@ import { forRange } from 'Utils/mapUtils'
 import { getUdgEscapers } from '../../../../globals'
 
 const initMessageHeroDies = () => {
-    const MESSAGE_DURATION = 10
+    const MESSAGE_DURATION = 6
     const TIME_BETWEEN_DEATH_AND_MESSAGE = 5
     let timerSonJoue = CreateTimer()
     let isSoundPlaying = false
