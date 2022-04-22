@@ -1183,4 +1183,38 @@ export const initCommandAll = () => {
             return true
         },
     })
+
+    //-showNames <boolean>
+    registerCommand({
+        name: 'showNames',
+        alias: [],
+        group: 'all',
+        argDescription: '<boolean>',
+        description: '',
+        cb: ({ nbParam, param1 }, escaper) => {
+            if (nbParam != 1) {
+                return true
+            }
+
+            if (!IsBoolString(param1)) {
+                return true
+            }
+
+            if (S2B(param1)) {
+                Text.mkP(escaper.getPlayer(), 'Showing player names')
+            } else {
+                Text.mkP(escaper.getPlayer(), 'Hiding player names')
+            }
+
+            for (const [_, player] of pairs(getUdgEscapers().getAll())) {
+                const textTag = player.getTextTag()
+
+                if (GetTriggerPlayer() === GetLocalPlayer()) {
+                    textTag && SetTextTagVisibility(textTag, S2B(param1))
+                }
+            }
+
+            return true
+        },
+    })
 }

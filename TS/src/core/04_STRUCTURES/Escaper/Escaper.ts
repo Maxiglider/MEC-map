@@ -161,6 +161,8 @@ export class Escaper {
     private gumBrushSize = 1
 
     private ignoreDeathMessages = false
+    private textTag: texttag | null = null
+    private textTagTimer: Timer | null = null
 
     //mouse position updated when a trigger dependant of mouse movement is being used
     mouseX = 0
@@ -321,6 +323,13 @@ export class Escaper {
         )
         CommandShortcuts.InitShortcutSkills(GetPlayerId(this.p))
         EnableTrigger(this.checkTerrain)
+
+        this.textTag = CreateTextTag()
+        SetTextTagTextBJ(this.textTag, udg_colorCode[this.getEscaperId()] + GetPlayerName(this.getPlayer()), 10)
+        SetTextTagPermanent(this.textTag, true)
+        SetTextTagVisibility(this.textTag, false)
+        this.textTagTimer = createTimer(0.01, true, this.updateTextTagPos)
+
         return true
     }
 
@@ -377,6 +386,11 @@ export class Escaper {
         if (!this.isEscaperSecondary()) {
             GetMirrorEscaper(this)?.removeHero()
         }
+
+        this.textTag && DestroyTextTag(this.textTag)
+        this.textTag = null
+        this.textTagTimer?.destroy()
+        this.textTagTimer = null
     }
 
     destroy = () => {
@@ -1516,6 +1530,16 @@ export class Escaper {
     isIgnoringDeathMessages = () => this.ignoreDeathMessages
 
     setIgnoreDeathMessages = (ignoreDeathMessages: boolean) => (this.ignoreDeathMessages = ignoreDeathMessages)
+
+    updateTextTagPos: (this: void) => void = () => {
+        if (!this.hero || !this.textTag) {
+            return
+        }
+
+        SetTextTagPos(this.textTag, GetUnitX(this.hero) - 64, GetUnitY(this.hero) + 192, 0)
+    }
+
+    getTextTag = () => this.textTag
 
     toJson = () => ({
         //useless but mandatory due to BaseArray implementation
