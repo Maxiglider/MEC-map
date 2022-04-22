@@ -2,7 +2,6 @@ import { StopUnit } from 'core/01_libraries/Basic_functions'
 import {
     DEFAULT_CAMERA_FIELD,
     DUMMY_POWER_CIRCLE,
-    ENNEMY_PLAYER,
     HERO_SECONDARY_TYPE_ID,
     HERO_SLIDE_SPEED,
     HERO_TYPE_ID,
@@ -10,7 +9,7 @@ import {
     INVIS_UNIT_TYPE_ID,
     NB_PLAYERS_MAX,
     NB_PLAYERS_MAX_REFORGED,
-    NEUTRAL_PLAYER,
+    PLAYER_DUMMY_CIRCLE, PLAYER_INVIS_UNIT,
     POWER_CIRCLE,
     SLIDE_PERIOD,
     TERRAIN_KILL_EFFECT_BODY_PART,
@@ -216,7 +215,7 @@ export class Escaper {
         SetUnitUserData(this.powerCircle, escaperId)
         ShowUnit(this.powerCircle, false)
 
-        this.dummyPowerCircle = CreateUnit(ENNEMY_PLAYER, DUMMY_POWER_CIRCLE, 0, 0, 0)
+        this.dummyPowerCircle = CreateUnit(PLAYER_DUMMY_CIRCLE, DUMMY_POWER_CIRCLE, 0, 0, 0)
         SetUnitUserData(this.dummyPowerCircle, escaperId)
         ShowUnit(this.dummyPowerCircle, false)
     }
@@ -296,7 +295,7 @@ export class Escaper {
 
         SetUnitVertexColorBJ(this.hero, this.vcRed, this.vcGreen, this.vcBlue, this.vcTransparency)
         this.SpecialIllidan()
-        this.invisUnit = CreateUnit(NEUTRAL_PLAYER, INVIS_UNIT_TYPE_ID, x, y, angle)
+        this.invisUnit = CreateUnit(PLAYER_INVIS_UNIT, INVIS_UNIT_TYPE_ID, x, y, angle)
         SetUnitUserData(this.invisUnit, GetPlayerId(this.p))
         TriggerRegisterUnitEvent(
             Trig_InvisUnit_is_getting_damage.gg_trg_InvisUnit_is_getting_damage,
