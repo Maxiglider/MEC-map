@@ -51,7 +51,7 @@ export class FollowMouse {
 
     private tPress: trigger
     private tUnpress: trigger
-    private tMouseMove: trigger
+    private tMouseMove?: trigger
 
     private tClickingTime?: timer
     private tFollowMouse?: timer
@@ -74,11 +74,6 @@ export class FollowMouse {
         this.tUnpress = createEvent({
             events: [t => TriggerRegisterPlayerEvent(t, player, EVENT_PLAYER_MOUSE_UP)],
             actions: [onUnpressActions],
-        })
-
-        this.tMouseMove = createEvent({
-            events: [t => TriggerRegisterPlayerEvent(t, player, EVENT_PLAYER_MOUSE_MOVE)],
-            actions: [onMouseMoveActions],
         })
     }
 
@@ -105,15 +100,15 @@ export class FollowMouse {
     }
 
     doMouseMoveActions() {
-        this.mouseX = BlzGetTriggerPlayerMouseX()
-        this.mouseY = BlzGetTriggerPlayerMouseY()
+        this.escaper.mouseX = BlzGetTriggerPlayerMouseX()
+        this.escaper.mouseY = BlzGetTriggerPlayerMouseY()
 
         const slider = this.escaper.getHero()
         if (slider) {
             const sliderX = GetUnitX(slider)
             const sliderY = GetUnitY(slider)
-            const orderX = this.mouseX
-            const orderY = this.mouseY
+            const orderX = this.escaper.mouseX
+            const orderY = this.escaper.mouseY
             this.angle = Atan2(orderY - sliderY, orderX - sliderX) * bj_RADTODEG
 
             if (this.tFollowMouse) {
@@ -128,6 +123,13 @@ export class FollowMouse {
         this.tFollowMouse = CreateTimer()
         TimerStart(this.tFollowMouse, FOLLOW_MOUSE_PERIOD, true, followMouseActions)
         FollowMouse.anyTimer2escaper.set(this.tFollowMouse, this.escaper)
+
+        this.tMouseMove && DestroyTrigger(this.tMouseMove)
+
+        this.tMouseMove = createEvent({
+            events: [t => TriggerRegisterPlayerEvent(t, this.escaper.getPlayer(), EVENT_PLAYER_MOUSE_MOVE)],
+            actions: [onMouseMoveActions],
+        })
     }
 
     stopFollowingMouse = () => {
@@ -135,6 +137,8 @@ export class FollowMouse {
             FollowMouse.anyTimer2escaper.delete(this.tFollowMouse)
             DestroyTimer(this.tFollowMouse)
             delete this.tFollowMouse
+
+            this.tMouseMove && DestroyTrigger(this.tMouseMove)
         }
     }
 
@@ -146,7 +150,6 @@ export class FollowMouse {
         this.stopFollowingMouse()
         this.tPress && DestroyTrigger(this.tPress)
         this.tUnpress && DestroyTrigger(this.tUnpress)
-        this.tMouseMove && DestroyTrigger(this.tMouseMove)
         this.tClickingTime && DestroyTimer(this.tClickingTime)
     }
 }

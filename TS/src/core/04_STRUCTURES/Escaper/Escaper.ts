@@ -159,6 +159,10 @@ export class Escaper {
     private gumTerrain?: TerrainType
     private gumBrushSize = 1
 
+    //mouse position updated when a trigger dependant of mouse movement is being used
+    mouseX = 0
+    mouseY = 0
+
     /*
      * Constructor
      */

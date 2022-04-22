@@ -47,8 +47,8 @@ export class MakeTerrainCreateBrush extends MakeHoldClick{
             }
 
             if(terrainTypeToApply){
-                const centerX = roundCoordinateToCenterOfTile(this.mouseX)
-                const centerY = roundCoordinateToCenterOfTile(this.mouseY)
+                const centerX = roundCoordinateToCenterOfTile(this.escaper.mouseX)
+                const centerY = roundCoordinateToCenterOfTile(this.escaper.mouseY)
                 const offset = (sizeToApply - 1) * LARGEUR_CASE
 
                 for(let x = centerX - offset; x <= centerX + offset; x += LARGEUR_CASE){

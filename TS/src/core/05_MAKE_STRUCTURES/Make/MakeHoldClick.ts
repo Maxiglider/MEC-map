@@ -61,17 +61,17 @@ export abstract class MakeHoldClick extends Make {
     }
 
     updateCurrentClickMinMaxLocations = () => {
-        if (this.currentClickMinX == 0 || this.mouseX < this.currentClickMinX) {
-            this.currentClickMinX = this.mouseX
+        if (this.currentClickMinX == 0 || this.escaper.mouseX < this.currentClickMinX) {
+            this.currentClickMinX = this.escaper.mouseX
         }
-        if (this.currentClickMinY == 0 || this.mouseY < this.currentClickMinY) {
-            this.currentClickMinY = this.mouseY
+        if (this.currentClickMinY == 0 || this.escaper.mouseY < this.currentClickMinY) {
+            this.currentClickMinY = this.escaper.mouseY
         }
-        if (this.currentClickMaxX == 0 || this.mouseX > this.currentClickMaxX) {
-            this.currentClickMaxX = this.mouseX
+        if (this.currentClickMaxX == 0 || this.escaper.mouseX > this.currentClickMaxX) {
+            this.currentClickMaxX = this.escaper.mouseX
         }
-        if (this.currentClickMaxY == 0 || this.mouseY > this.currentClickMaxY) {
-            this.currentClickMaxY = this.mouseY
+        if (this.currentClickMaxY == 0 || this.escaper.mouseY > this.currentClickMaxY) {
+            this.currentClickMaxY = this.escaper.mouseY
         }
     }
 
@@ -123,8 +123,8 @@ export abstract class MakeHoldClick extends Make {
 
     doMouseMoveActions() {
         if (this.isPressed) {
-            this.mouseX = BlzGetTriggerPlayerMouseX()
-            this.mouseY = BlzGetTriggerPlayerMouseY()
+            this.escaper.mouseX = BlzGetTriggerPlayerMouseX()
+            this.escaper.mouseY = BlzGetTriggerPlayerMouseY()
             this.updateCurrentClickMinMaxLocations()
 
             if (this.tTimeSinceLastMouseMove) {
