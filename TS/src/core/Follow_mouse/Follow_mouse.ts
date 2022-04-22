@@ -35,7 +35,7 @@ const followMouseActions = () => {
         if (followMouse) {
             if (escaper.isSliding()) {
                 //let's face mouse
-                TurnOnSlide.turnSliderToDirection(escaper, followMouse.angle)
+                followMouse.angle && TurnOnSlide.turnSliderToDirection(escaper, followMouse.angle)
             } else {
                 followMouse.onStopSliding()
             }
@@ -58,9 +58,7 @@ export class FollowMouse {
 
     static anyTimer2escaper = new Map<timer, Escaper>()
 
-    public mouseX = 0
-    public mouseY = 0
-    public angle = 0
+    public angle?: number
 
     constructor(escaper: Escaper) {
         this.escaper = escaper
@@ -139,6 +137,7 @@ export class FollowMouse {
             delete this.tFollowMouse
 
             this.tMouseMove && DestroyTrigger(this.tMouseMove)
+            delete this.angle
         }
     }
 
