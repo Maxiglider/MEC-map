@@ -2,6 +2,7 @@ import { NB_ESCAPERS } from 'core/01_libraries/Constants'
 import { udg_colorCode } from 'core/01_libraries/Init_colorCodes'
 import { Text } from 'core/01_libraries/Text'
 import { forRange } from 'Utils/mapUtils'
+import { getUdgEscapers } from '../../../../globals'
 
 const initMessageHeroDies = () => {
     const MESSAGE_DURATION = 10
@@ -59,7 +60,11 @@ const initMessageHeroDies = () => {
             if (n === i) {
                 TimerStart(CreateTimer(), TIME_BETWEEN_DEATH_AND_MESSAGE, false, () => {
                     PlaySoundHeroDies(Player(i))
-                    Text.A_timed(MESSAGE_DURATION, udg_colorCode[i] + GetPlayerName(Player(i)) + '|r has fallen.')
+
+                    if (!getUdgEscapers().get(i)?.isIgnoringDeathMessages()) {
+                        Text.A_timed(MESSAGE_DURATION, udg_colorCode[i] + GetPlayerName(Player(i)) + '|r has fallen.')
+                    }
+
                     DestroyTimer(GetExpiredTimer())
                 })
             }
