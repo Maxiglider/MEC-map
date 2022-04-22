@@ -63,21 +63,23 @@ const initCheckTerrainTrigger = () => {
                     MeteorFunctions.HeroComingToSlide_CheckItem(hero)
                     AutoContinueAfterSliding.ClearLastClickSave(playerId)
                 }
+
                 if (!escaper.isAbsoluteSlideSpeed()) {
                     escaper.setSlideSpeed(currentTerrainType.getSlideSpeed())
-                    if (currentTerrainType.getSlideSpeed() < 0) {
-                        if (wasSliding) {
-                            if (oldSlideSpeed >= 0) {
-                                escaper.reverse()
-                            }
-                        } else {
+                }
+
+                if (escaper.getSlideSpeed() < 0) {
+                    if (wasSliding) {
+                        if (oldSlideSpeed >= 0) {
                             escaper.reverse()
                         }
                     } else {
-                        if (wasSliding) {
-                            if (oldSlideSpeed < 0) {
-                                escaper.reverse()
-                            }
+                        escaper.reverse()
+                    }
+                } else {
+                    if (wasSliding) {
+                        if (oldSlideSpeed < 0) {
+                            escaper.reverse()
                         }
                     }
                 }
@@ -132,21 +134,23 @@ const initCheckTerrainTrigger = () => {
                                 MeteorFunctions.HeroComingToSlide_CheckItem(hero)
                                 AutoContinueAfterSliding.ClearLastClickSave(playerId)
                             }
+
                             if (!escaper.isAbsoluteSlideSpeed()) {
                                 escaper.setSlideSpeed(terrainTypeTolerance.getSlideSpeed())
-                                if (terrainTypeTolerance.getSlideSpeed() < 0) {
-                                    if (wasSliding) {
-                                        if (oldSlideSpeed >= 0) {
-                                            escaper.reverse()
-                                        }
-                                    } else {
+                            }
+
+                            if (escaper.getSlideSpeed() < 0) {
+                                if (wasSliding) {
+                                    if (oldSlideSpeed >= 0) {
                                         escaper.reverse()
                                     }
                                 } else {
-                                    if (wasSliding) {
-                                        if (oldSlideSpeed < 0) {
-                                            escaper.reverse()
-                                        }
+                                    escaper.reverse()
+                                }
+                            } else {
+                                if (wasSliding) {
+                                    if (oldSlideSpeed < 0) {
+                                        escaper.reverse()
                                     }
                                 }
                             }
