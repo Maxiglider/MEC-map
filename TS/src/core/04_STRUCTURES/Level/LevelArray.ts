@@ -186,6 +186,12 @@ export class LevelArray extends BaseArray<Level> {
             //start
             if (levelJson.start) {
                 level.newStartFromJson(levelJson.start)
+            }else if(levelJson.id == 0){
+                const x1 = GetRectMinX(gg_rct_departLvl_0)
+                const y1 = GetRectMinY(gg_rct_departLvl_0)
+                const x2 = GetRectMaxX(gg_rct_departLvl_0)
+                const y2 = GetRectMaxY(gg_rct_departLvl_0)
+                level.newStart(x1, y1, x2, y2)
             }
 
             //end
