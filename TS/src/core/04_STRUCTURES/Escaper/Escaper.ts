@@ -1422,6 +1422,7 @@ export class Escaper {
             SetUnitAnimation(this.hero, 'channel')
             this.absoluteSlideSpeed(0)
             this.setCoopInvul(true)
+            SetCameraPositionForPlayer(this.p, GetUnitX(this.hero), GetUnitY(this.hero))
         }
 
         if (mirrorHero && mirrorEscaper) {
