@@ -18,6 +18,7 @@ export class MonsterArray extends BaseArray<Monster> {
 
     //hooks
     public hooks_onBeforeCreateMonsterUnit = new MecHookArray()
+    public hooks_onAfterCreateMonsterUnit = new MecHookArray()
 
     constructor(level?: Level) {
         super(false)
@@ -191,5 +192,9 @@ export class MonsterArray extends BaseArray<Monster> {
 
     onBeforeCreateMonsterUnit = (cb: () => any) => {
         return this.hooks_onBeforeCreateMonsterUnit.new(cb)
+    }
+
+    onAfterCreateMonsterUnit = (cb: () => any) => {
+        return this.hooks_onAfterCreateMonsterUnit.new(cb)
     }
 }

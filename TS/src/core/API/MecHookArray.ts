@@ -6,6 +6,7 @@ export class MecHookArray {
     public new = (cb: () => any) => {
         const hook = new MecHook(cb)
         this.map.set(hook.getId(), hook)
+        hook.mecHookArray = this
         return hook.getId()
     }
 

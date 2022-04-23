@@ -56,6 +56,10 @@ const UnspawMonster_Actions = () => {
     }
 }
 
+
+/**
+ * class MonsterSpawn
+ */
 export class MonsterSpawn {
     static anyTrigId2MonsterSpawn = new Map<number, MonsterSpawn>()
     static anyTimerId2Unit = new Map<number, unit>()
@@ -253,7 +257,7 @@ export class MonsterSpawn {
             mt: this.mt,
         }
 
-        const hookArray = CombineHooks(this.level?.monsters.hooks_onBeforeCreateMonsterUnit, hooks.hooks_onBeforeCreateMonsterUnit)
+        let hookArray = CombineHooks(this.level?.monsters.hooks_onBeforeCreateMonsterUnit, hooks.hooks_onBeforeCreateMonsterUnit)
         if(hookArray){
             let forceUnitTypeId = 0
             let quit = false
@@ -275,13 +279,27 @@ export class MonsterSpawn {
             }
         }
 
-        return NewImmobileMonsterForPlayer(
+        const monster = NewImmobileMonsterForPlayer(
             this.mt,
             ENNEMY_PLAYER,
             (this.minX + this.maxX) / 2,
             (this.minY + this.maxY) / 2,
             angle
         )
+
+        //hook after create unit
+        hookArray = CombineHooks(this.level?.monsters.hooks_onAfterCreateMonsterUnit, hooks.hooks_onAfterCreateMonsterUnit)
+        if(hookArray) {
+            const unitData = {
+                mt: this.mt,
+                u: monster
+            }
+            for (const hook of hookArray.values()) {
+                hook.execute(unitData)
+            }
+        }
+
+        return monster
     }
 
     setLabel = (newLabel: string) => {

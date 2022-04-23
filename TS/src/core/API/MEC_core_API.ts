@@ -4,6 +4,7 @@ import { MonsterSimplePatrol } from '../04_STRUCTURES/Monster/MonsterSimplePatro
 import { makingRightsToAll } from '../06_COMMANDS/Rights/manage_rights'
 import { LoadMapFromCache } from '../07_TRIGGERS/Load_map_from_gamecache/LoadMapFromCache'
 import { hooks } from './GeneralHooks'
+import {MecHook} from "./MecHook";
 
 export const MEC_core_API = {
     setGameData: (jsonString: string) => {
@@ -17,17 +18,45 @@ export const MEC_core_API = {
         makingRightsToAll()
     },
 
+    //globals getters
     getEscapers: getUdgEscapers,
     getTerrainTypes: getUdgTerrainTypes,
     getLevels: getUdgLevels,
     getMonsterTypes: getUdgMonsterTypes,
 
+    //constructors
+    newMonsterSimplePatrol: (...args: ConstructorParameters<typeof MonsterSimplePatrol>) => {
+        return new MonsterSimplePatrol(...args)
+    },
+
     //hooks
+    destroyHook: (hookId: number) => {
+        return MecHook.destroy(hookId)
+    },
+
     onBeforeCreateMonsterUnit: (cb: () => any) => {
         return hooks.hooks_onBeforeCreateMonsterUnit.new(cb)
     },
 
-    newMonsterSimplePatrol: (...args: ConstructorParameters<typeof MonsterSimplePatrol>) => {
-        return new MonsterSimplePatrol(...args)
+    onAfterCreateMonsterUnit: (cb: () => any) => {
+        return hooks.hooks_onAfterCreateMonsterUnit.new(cb)
+    },
+
+    onStartLevel: (levelNum: number, cb: () => any) => {
+        const level = getUdgLevels().get(levelNum)
+        if(level){
+            return level.hooks_onStart.new(cb)
+        }
+
+        return null
+    },
+
+    onEndLevel: (levelNum: number, cb: () => any) => {
+        const level = getUdgLevels().get(levelNum)
+        if(level){
+            return level.hooks_onEnd.new(cb)
+        }
+
+        return null
     },
 }

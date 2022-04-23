@@ -14,6 +14,7 @@ import { End, Start } from './StartAndEnd'
 import { TriggerArray } from './Triggers'
 import type { VisibilityModifier } from './VisibilityModifier'
 import { VisibilityModifierArray } from './VisibilityModifierArray'
+import {MecHookArray} from "../../API/MecHookArray";
 
 export class Level {
     public static earningLivesActivated = true
@@ -32,6 +33,10 @@ export class Level {
     meteors: MeteorArray
     clearMobs: ClearMobArray
     portalMobs: PortalMobArray
+
+    //hooks
+    public hooks_onStart = new MecHookArray()
+    public hooks_onEnd = new MecHookArray()
 
     constructor() {
         this.visibilities = new VisibilityModifierArray(this)
@@ -65,11 +70,23 @@ export class Level {
             if (Level.earningLivesActivated && this.getId() > 0) {
                 ServiceManager.getService('Lives').add(this.livesEarnedAtBeginning)
             }
+
+            if(this.hooks_onStart){
+                for(const hook of this.hooks_onStart.values()){
+                    hook.execute(this)
+                }
+            }
         } else {
             this.monsters.removeMonstersUnits()
             this.monsterSpawns.deactivate()
             this.meteors.removeMeteorsItems()
             getUdgEscapers().deleteSpecificActionsForLevel(this)
+
+            if(this.hooks_onEnd){
+                for(const hook of this.hooks_onEnd.values()){
+                    hook.execute(this)
+                }
+            }
         }
 
         this.isActivatedB = activ

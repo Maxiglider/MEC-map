@@ -124,7 +124,7 @@ export abstract class Monster {
         }
 
         //hook onBeforeCreateMonsterUnit
-        const hookArray = CombineHooks(this.level?.monsters.hooks_onBeforeCreateMonsterUnit, hooks.hooks_onBeforeCreateMonsterUnit)
+        let hookArray = CombineHooks(this.level?.monsters.hooks_onBeforeCreateMonsterUnit, hooks.hooks_onBeforeCreateMonsterUnit)
         if(hookArray){
             let forceUnitTypeId = 0
             let forceX = 0
@@ -195,6 +195,14 @@ export abstract class Monster {
 
         if (this.clearMob) {
             this.clearMob.redoTriggerMobPermanentEffect()
+        }
+
+        //hook onAfterCreateMonsterUnit
+        hookArray = CombineHooks(this.level?.monsters.hooks_onAfterCreateMonsterUnit, hooks.hooks_onAfterCreateMonsterUnit)
+        if(hookArray){
+            for(const hook of hookArray.values()) {
+                hook.execute(this)
+            }
         }
     }
 
