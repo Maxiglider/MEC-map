@@ -1,3 +1,5 @@
+import { Text } from 'core/01_libraries/Text'
+
 export class ObjectHandler {
     private static nextIndex = 0
     private static tObjects = new Map<number, any>()
@@ -28,11 +30,13 @@ export class ObjectHandler {
         const objectInMap = ObjectHandler.tObjects.get(index)
 
         if (!objectInMap) {
-            throw 'Index "' + index + '" not known in ObjectHandler'
+            Text.erA(`Index: '${index}' not known in ObjectHandler. '${obj?.constructor?.name}'`)
+            return
         }
 
         if (objectInMap !== obj) {
-            throw 'Objects different in ObjectHandler'
+            Text.erA('Objects different in ObjectHandler')
+            return
         }
 
         //delete content of the object

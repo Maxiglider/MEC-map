@@ -208,7 +208,7 @@ export const initMultiboard = () => {
                     }
 
                     const playerId = escaper.getEscaperId()
-                    const playerName = GetPlayerName(escaper.getPlayer())
+                    const playerName = escaper.getDisplayName()
 
                     const playerScore = playerScores[playerId].stats[statsMode]
 

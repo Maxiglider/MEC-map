@@ -98,11 +98,11 @@ export class LevelArray extends BaseArray<Level> {
         }
 
         //check a goToNextLevel wasn't just made
-        if(this.tLastGoToNextLevel && TimerGetElapsed(this.tLastGoToNextLevel) < MIN_TIME_BETWEEN_GOTNL){
+        if (this.tLastGoToNextLevel && TimerGetElapsed(this.tLastGoToNextLevel) < MIN_TIME_BETWEEN_GOTNL) {
             return false
         }
 
-        if(!this.tLastGoToNextLevel) this.tLastGoToNextLevel = CreateTimer()
+        if (!this.tLastGoToNextLevel) this.tLastGoToNextLevel = CreateTimer()
         TimerStart(this.tLastGoToNextLevel, 10, false, DoNothing)
 
         this.currentLevel = this.currentLevel + 1
@@ -114,12 +114,7 @@ export class LevelArray extends BaseArray<Level> {
         this.data[this.currentLevel].checkpointReviveHeroes(finisher)
 
         if (this.moveCamToStart(this.data[this.currentLevel], finisher) && finisher) {
-            Text.A(
-                udg_colorCode[GetPlayerId(finisher.getPlayer())] +
-                    'Good job ' +
-                    GetPlayerName(finisher.getPlayer()) +
-                    ' !'
-            )
+            Text.A(udg_colorCode[GetPlayerId(finisher.getPlayer())] + 'Good job ' + finisher.getDisplayName() + ' !')
         }
 
         return true
@@ -186,7 +181,7 @@ export class LevelArray extends BaseArray<Level> {
             //start
             if (levelJson.start) {
                 level.newStartFromJson(levelJson.start)
-            }else if(levelJson.id == 0){
+            } else if (levelJson.id == 0) {
                 const x1 = GetRectMinX(gg_rct_departLvl_0)
                 const y1 = GetRectMinY(gg_rct_departLvl_0)
                 const x2 = GetRectMaxX(gg_rct_departLvl_0)
