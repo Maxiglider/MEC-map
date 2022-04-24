@@ -10,10 +10,15 @@
 const LUA_FILE = __DIR__."/../TS/dist/tstl_output_extended.lua";
 const WRAP_OUTPUT_FILE = __DIR__."/final-we.lua";
 
+$v = file_get_contents(__DIR__."/../TS/src/MEC_core_version");
+
+$MEC_VERSION = "Max Escape Creation v.$v - ".date("Y-m-d H:i:s");
+
+$MEC_VERSION_quest_title = "MEC core v.$v";
 
 ob_start();
 ?>
--- Max Escape Creation v.<?= file_get_contents(__DIR__."/../TS/src/MEC_core_version") ?> - <?= date("Y-m-d H:i:s") ?>
+-- <?= $MEC_VERSION ?>
 
 
 function get_MEC_core()
@@ -188,6 +193,20 @@ MEC_core = nil
 
 function initMEC_core()
     MEC_core = get_MEC_core()().MEC_core
+
+    -- "quest" to tell the MEC core version
+    local function QuestVersion_Actions()
+        local q = CreateQuest()
+        QuestSetIconPath(q, "ReplaceableTextures\\CommandButtons\\DISBTNEvilIllidan.blp")
+        QuestSetTitle(q, "<?= $MEC_VERSION_quest_title ?>")
+        QuestSetDescription(q, "<?= addslashes($MEC_VERSION) ?>\ncreated by Maximaxou, joined by Stan since 2022\nhttps://mec.maxslid.com")
+        QuestSetDiscovered(q, true)
+        QuestSetRequired(q, false)
+    end
+
+    local trg = CreateTrigger()
+    TriggerRegisterTimerEvent(trg, 0.01, false)
+    TriggerAddAction(trg, QuestVersion_Actions)
 end
 
 onGlobalInit(initMEC_core)
