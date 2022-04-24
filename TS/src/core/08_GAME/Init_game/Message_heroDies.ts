@@ -64,7 +64,7 @@ const initMessageHeroDies = () => {
                     Text.P_timed(
                         Player(i),
                         MESSAGE_DURATION,
-                        udg_colorCode[n] + GetPlayerName(Player(n)) + '|r has fallen.'
+                        udg_colorCode[n] + getUdgEscapers().get(i)?.getDisplayName() + '|r has fallen.'
                     )
                 }
             })

@@ -8,7 +8,7 @@ export const rawPlayerNames: string[] = []
 
 const cachedPlayerNames: { [x: string]: number } = {}
 
-const removeHash = (name: string) => {
+export const removeHash = (name: string) => {
     const i = name.indexOf('#')
 
     if (i === -1) {

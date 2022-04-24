@@ -55,6 +55,7 @@ import { MakeTerrainCreateBrush } from '../../05_MAKE_STRUCTURES/Make_terrain/Ma
 import { MakeTerrainHorizontalSymmetry } from '../../05_MAKE_STRUCTURES/Make_terrain/MakeTerrainHorizontalSymmetry'
 import { MakeTerrainVerticalSymmetry } from '../../05_MAKE_STRUCTURES/Make_terrain/MakeTerrainVerticalSymmetry'
 import { MakeTerrainHeight } from '../../05_MAKE_STRUCTURES/Make_terrain_height/MakeTerrainHeight'
+import { removeHash } from '../../06_COMMANDS/COMMANDS_vJass/Command_functions'
 import { CheckTerrainTrigger } from '../../07_TRIGGERS/Slide_and_CheckTerrain_triggers/CheckTerrain'
 import { SlideTrigger } from '../../07_TRIGGERS/Slide_and_CheckTerrain_triggers/Slide'
 import { Trig_InvisUnit_is_getting_damage } from '../../08_GAME/Death/InvisUnit_is_getting_damage'
@@ -167,6 +168,8 @@ export class Escaper {
     private textTag: texttag | null = null
     private textTagTimer: Timer | null = null
 
+    private displayName: string
+
     //mouse position updated when a trigger dependant of mouse movement is being used
     mouseX = 0
     mouseY = 0
@@ -230,6 +233,8 @@ export class Escaper {
         this.dummyPowerCircle = CreateUnit(PLAYER_DUMMY_CIRCLE, DUMMY_POWER_CIRCLE, 0, 0, 0)
         SetUnitUserData(this.dummyPowerCircle, escaperId)
         ShowUnit(this.dummyPowerCircle, false)
+
+        this.displayName = removeHash(GetPlayerName(this.p))
     }
 
     getEscaperId = () => {
@@ -328,7 +333,7 @@ export class Escaper {
         EnableTrigger(this.checkTerrain)
 
         this.textTag = CreateTextTag()
-        SetTextTagTextBJ(this.textTag, udg_colorCode[this.getEscaperId()] + GetPlayerName(this.getPlayer()), 10)
+        SetTextTagTextBJ(this.textTag, udg_colorCode[this.getEscaperId()] + this.getDisplayName(), 10)
         SetTextTagPermanent(this.textTag, true)
         SetTextTagVisibility(this.textTag, false)
         this.textTagTimer = createTimer(0.01, true, this.updateTextTagPos)
@@ -1054,13 +1059,13 @@ export class Escaper {
     }
 
     kick(kicked: Escaper) {
-        CustomDefeatBJ(kicked.getPlayer(), 'You have been kicked by ' + GetPlayerName(this.p) + ' !')
+        CustomDefeatBJ(kicked.getPlayer(), 'You have been kicked by ' + this.displayName + ' !')
         Text.A(
             udg_colorCode[GetPlayerId(kicked.getPlayer())] +
-                GetPlayerName(kicked.getPlayer()) +
+                kicked.displayName +
                 ' has been kicked by ' +
                 udg_colorCode[GetPlayerId(this.p)] +
-                GetPlayerName(this.p) +
+                this.displayName +
                 ' !'
         )
         kicked.destroy()
@@ -1441,14 +1446,14 @@ export class Escaper {
             this.setCoopInvul(true)
 
             //move camera if needed
-            if(GetLocalPlayer() == this.p) {
+            if (GetLocalPlayer() == this.p) {
                 const FIELD = 1500
                 const minX = GetCameraTargetPositionX() - FIELD / 2
                 const minY = GetCameraTargetPositionY() - FIELD / 2
                 const maxX = GetCameraTargetPositionX() + FIELD / 2
                 const maxY = GetCameraTargetPositionY() + FIELD / 2
 
-                if(xHero < minX || xHero > maxX || yHero < minY || yHero > maxY){
+                if (xHero < minX || xHero > maxX || yHero < minY || yHero > maxY) {
                     SetCameraPositionForPlayer(this.p, xHero, yHero)
                 }
             }
@@ -1570,6 +1575,8 @@ export class Escaper {
     }
 
     getTextTag = () => this.textTag
+
+    getDisplayName = () => this.displayName
 
     toJson = () => ({
         //useless but mandatory due to BaseArray implementation

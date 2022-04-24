@@ -72,6 +72,22 @@ export class PortalMob {
         return true
     }
 
+    setFreezeDuration = (freezeDuration: number) => {
+        if (freezeDuration < 0 || freezeDuration > PORTAL_MOB_MAX_FREEZE_DURATION) {
+            throw this.constructor.name + ' : invalid freeze duration'
+        }
+
+        this.freezeDuration = freezeDuration
+    }
+
+    setPortalEffect = (portalEffect: string | null) => {
+        this.portalEffect = portalEffect
+    }
+
+    setPortalEffectDuration = (portalEffectDuration: number | null) => {
+        this.portalEffectDuration = portalEffectDuration || this.freezeDuration || 1
+    }
+
     destroy = () => {
         this.triggerMob?.removePortalMob()
         this.targetMob?.removePortalMob()

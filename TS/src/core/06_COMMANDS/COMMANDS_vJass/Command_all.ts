@@ -9,7 +9,7 @@ import {
     NB_PLAYERS_MAX,
     RED,
     TEAL,
-    TERRAIN_DATA_DISPLAY_TIME
+    TERRAIN_DATA_DISPLAY_TIME,
 } from 'core/01_libraries/Constants'
 import { ColorString2Id, udg_colorCode, udg_colorStrings } from 'core/01_libraries/Init_colorCodes'
 import { Text } from 'core/01_libraries/Text'
@@ -590,11 +590,7 @@ export const initCommandAll = () => {
         enabled: ({ noParam }) => noParam,
         cb: ({}, escaper) => {
             CustomDefeatBJ(escaper.getPlayer(), 'You have kicked... yourself.')
-            Text.A(
-                udg_colorCode[GetPlayerId(escaper.getPlayer())] +
-                    GetPlayerName(escaper.getPlayer()) +
-                    ' has kicked himself !'
-            )
+            Text.A(udg_colorCode[GetPlayerId(escaper.getPlayer())] + escaper.getDisplayName() + ' has kicked himself !')
             escaper.destroy()
             GetMirrorEscaper(escaper)?.destroy()
             return true
@@ -1210,7 +1206,13 @@ export const initCommandAll = () => {
                 const textTag = player.getTextTag()
 
                 if (GetTriggerPlayer() === GetLocalPlayer()) {
-                    textTag && SetTextTagVisibility(textTag, S2B(param1))
+                    if (textTag) {
+                        if (GetLocalPlayer() === player.getPlayer()) {
+                            SetTextTagVisibility(textTag, false)
+                        } else {
+                            SetTextTagVisibility(textTag, S2B(param1))
+                        }
+                    }
                 }
             }
 

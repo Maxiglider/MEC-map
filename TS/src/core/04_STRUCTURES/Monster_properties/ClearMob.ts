@@ -228,7 +228,7 @@ export class ClearMob {
             id: this.id,
             triggerMobId: this.triggerMob.id,
             disableDuration: this.disableDuration,
-            blockMobsIds: blockMobIds
+            blockMobsIds: blockMobIds,
         }
     }
 }

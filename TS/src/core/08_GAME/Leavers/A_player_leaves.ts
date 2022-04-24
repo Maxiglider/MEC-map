@@ -17,7 +17,7 @@ export const InitTrig_A_player_leaves = () => {
                     GetPlayersAll(),
                     udg_colorCode[n] +
                         'This is too difficult for ' +
-                        GetPlayerName(GetTriggerPlayer()) +
+                        getUdgEscapers().get(n)?.getDisplayName() +
                         ', (s)he has left the game.'
                 )
                 StartSound(gg_snd_noob)
