@@ -1432,12 +1432,26 @@ export class Escaper {
         const mirrorHero = mirrorEscaper?.getHero()
 
         if (this.hero) {
-            this.revive(GetUnitX(this.hero), GetUnitY(this.hero))
+            const xHero = GetUnitX(this.hero)
+            const yHero = GetUnitY(this.hero)
+            this.revive(xHero, yHero)
             RunCoopSoundOnHero(this.hero)
             SetUnitAnimation(this.hero, 'channel')
             this.absoluteSlideSpeed(0)
             this.setCoopInvul(true)
-            SetCameraPositionForPlayer(this.p, GetUnitX(this.hero), GetUnitY(this.hero))
+
+            //move camera if needed
+            if(GetLocalPlayer() == this.p) {
+                const FIELD = 1500
+                const minX = GetCameraTargetPositionX() - FIELD / 2
+                const minY = GetCameraTargetPositionY() - FIELD / 2
+                const maxX = GetCameraTargetPositionX() + FIELD / 2
+                const maxY = GetCameraTargetPositionY() + FIELD / 2
+
+                if(xHero < minX || xHero > maxX || yHero < minY || yHero > maxY){
+                    SetCameraPositionForPlayer(this.p, xHero, yHero)
+                }
+            }
         }
 
         if (mirrorHero && mirrorEscaper) {
