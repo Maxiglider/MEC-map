@@ -1218,12 +1218,12 @@ export const initCommandAll = () => {
         },
     })
 
-    //-myStartCommands(msc) [list][add x]|[del x]
+    //-myStartCommands(msc) [list]|[add x]|[del x]
     registerCommand({
         name: 'myStartCommands',
         alias: ['msc'],
         group: 'all',
-        argDescription: '[list][add x]|[del x]',
+        argDescription: '[list]|[add x]|[del x]',
         description: 'Run commands on start of the game',
         cb: ({ cmd, nbParam, param1, param2 }, escaper) => {
             if (!escaper.getStartCommandsHandle().isLoaded()) {
