@@ -10,6 +10,7 @@ import {
     ReinitTerrainsPositions
 } from "../07_TRIGGERS/Triggers_to_modify_terrains/Reinit_terrains_position_Change_variations_and_ut_at_beginning";
 import {heroes} from "../08_GAME/Init_game/Heroes";
+import {Hero2Escaper, IsHero} from "../04_STRUCTURES/Escaper/Escaper_functions";
 
 export const MEC_core_API = {
     setGameData: (jsonString: string) => {
@@ -73,4 +74,8 @@ export const MEC_core_API = {
 
     //various settings
     setEffectForMissingHeroes: heroes.setEffectForMissingHeroes,
+
+    //helpers
+    isHero: IsHero,
+    hero2Escaper: Hero2Escaper
 }
