@@ -12,7 +12,7 @@ $content = file_get_contents(__DIR__."/scriptMumu.j");
 
 $levels = [];
 
-for($levelNum = 0; $levelNum <= 7; $levelNum++){
+for($levelNum = 0; $levelNum <= 8; $levelNum++){ //the 8 is the hidden
     //init
     $level = (object) [
         "id" => $levelNum,
@@ -158,40 +158,77 @@ $levels[3]->monsterSpawns[] = [
 ];
 
 
+//hidden
+$levelNum = 8;
+$hiddenContent = file_get_contents(__DIR__."/hidden.j");
+$lines = preg_split('/[\r\n]+/', $hiddenContent);
+
+foreach($lines as $line){
+
+    //lives
+    $levels[$levelNum]->nbLives = 20;
+
+    //murlocs
+    if(preg_match('/GetRandomMurloc\(\), (.+?), (.+?), (.+?), (.+?),/', $line, $match)){
+        $levels[$levelNum]->monsters[] = [
+            "monsterClassName" => "MonsterSimplePatrol",
+            "monsterTypeLabel" => "murloc",
+            "x1" => intval($match[1]),
+            "y1" => intval($match[2]),
+            "x2" => intval($match[3]),
+            "y2" => intval($match[4]),
+        ];
+    }
+
+    //bushes
+    if(preg_match('/GetRandomVigne\(\), (.+?), (.+?)\)/', $line, $match)){
+        $levels[$levelNum]->monsters[] = [
+            "monsterClassName" => "MonsterNoMove",
+            "monsterTypeLabel" => "bush",
+            "x" => intval($match[1]),
+            "y" => intval($match[2]),
+            "angle" => -1
+        ];
+    }
+
+    //start
+    if(preg_match('/hiddenLevelStartRect = Rect\((.+?), (.+?), (.+?), (.+?)\)/', $line, $match)){
+        $levels[$levelNum]->start = [
+            "minX" => intval($match[1]),
+            "minY" => intval($match[2]),
+            "maxX" => intval($match[3]),
+            "maxY" => intval($match[4])
+        ];
+    }
+
+    //end
+    if(preg_match('/hiddenLevelEndRect = Rect\((.+?), (.+?), (.+?), (.+?)\)/', $line, $match)){
+        $levels[$levelNum]->end = [
+            "minX" => intval($match[1]),
+            "minY" => intval($match[2]),
+            "maxX" => intval($match[3]),
+            "maxY" => intval($match[4])
+        ];
+    }
+}
+
+
 
 $output = json_encode($levels);
 
 file_put_contents(__DIR__."/output.js", "test = ".$output);
 file_put_contents(__DIR__."/output.json", json_encode($output));
 
+$contentLevelJson = substr(json_encode($output), 1, strlen(json_encode($output)) - 2);
 
-//gg_rct_departLvl_0
-//gg_rct_finLvl_0
+//set game data lua
+ob_start();
+?>
+function setGameData()
+MEC_core.setGameData("{\"levels\":<?= $contentLevelJson ?>,\"casterTypes\":[],\"monsterTypes\":[{\"unitTypeId\":\"h006\",\"label\":\"bush\",\"isClickable\":false,\"height\":-1,\"alias\":\"b\",\"immolationRadius\":80,\"scale\":-1,\"speed\":400,\"nbMeteorsToKill\":1},{\"unitTypeId\":\"n100\",\"label\":\"naga\",\"isClickable\":true,\"height\":-1,\"alias\":\"n\",\"immolationRadius\":200,\"scale\":-1,\"speed\":400,\"nbMeteorsToKill\":1},{\"unitTypeId\":\"h000\",\"label\":\"murloc\",\"isClickable\":false,\"height\":-1,\"alias\":\"m\",\"immolationRadius\":65,\"scale\":-1,\"speed\":400,\"nbMeteorsToKill\":1}],\"terrainTypesMec\":[{\"terrainTypeId\":\"Avin\",\"label\":\"death\",\"orderId\":0,\"kind\":\"death\",\"killingEffet\":\"Abilities\\\\Spells\\\\NightElf\\\\EntanglingRoots\\\\EntanglingRootsTarget.mdl\",\"alias\":\"d\",\"toleranceDist\":0,\"timeToKill\":2,\"cliffClassId\":1},{\"alias\":\"w2\",\"cliffClassId\":1,\"terrainTypeId\":\"Ngrs\",\"label\":\"walk2\",\"orderId\":0,\"walkSpeed\":522,\"kind\":\"walk\"},{\"canTurn\":true,\"alias\":\"s\",\"cliffClassId\":1,\"slideSpeed\":550,\"label\":\"slide\",\"orderId\":0,\"terrainTypeId\":\"Nsnw\",\"kind\":\"slide\"},{\"alias\":\"w\",\"cliffClassId\":1,\"terrainTypeId\":\"Yblm\",\"label\":\"walk\",\"orderId\":0,\"walkSpeed\":522,\"kind\":\"walk\"}]}")
+end
 
-//gg_rct_lvl0_murloc_01_a
-//gg_rct_lvl0_murloc_01_b
+onGlobalInit(setGameData)
 
-//gg_rct_lvl0_vigneEpineuse_00
-
-//gg_rct_lvl6_gardeRoyalNaga_00
-
-//gg_rct_lvl2_meteor_0
-
-//gg_rct_visionLvl_0_a
-//gg_rct_visionLvl_0_b
-
-//gg_rct_lvl3_apparition_murloc_bas
-//gg_rct_lvl3_apparition_murloc_haut
-//gg_rct_lvl3_disparition_murloc_bas
-//gg_rct_lvl3_disparition_murloc_haut
-
-/**
- * Todomax still need to handle these
- *
-    gg_rct_lvl7_random_murlocs_droite_0
-    gg_rct_lvl7_random_murlocs_droite_1
-    gg_rct_lvl7_random_murlocs_droite_2
-    gg_rct_lvl7_random_murlocs_gauche_0
-    gg_rct_lvl7_random_murlocs_gauche_1
-    gg_rct_lvl7_random_murlocs_gauche_2
- */
+<?php
+file_put_contents(__DIR__."/Set_game_data.lua", ob_get_clean());
