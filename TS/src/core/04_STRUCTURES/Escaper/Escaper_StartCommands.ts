@@ -25,6 +25,7 @@ export class EscaperStartCommands {
 
         SaveLoad.readFile(MEC_MSC_DATA_FILE, this.escaper.getPlayer(), data => {
             if (data.length === 0) {
+                this.loaded = true
                 return
             }
 
