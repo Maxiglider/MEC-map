@@ -11,9 +11,15 @@ export const HERO_START_ANGLE = 90
 
 const TIME_BEFORE_HERO_SPAWN = 3
 const TIME_BETWEEN_EACH_HERO_SPAWN = 0.1
-const EFFECT_FOR_MISSING_HEROES = 'Abilities\\Spells\\Undead\\DeathPact\\DeathPactTarget.mdl'
+let EFFECT_FOR_MISSING_HEROES = 'Abilities\\Spells\\Undead\\DeathPact\\DeathPactTarget.mdl'
 const NB_COLUMNS = Math.random() > 0.5 ? 6 : 4
 const NB_ROWS = NB_COLUMNS == 4 ? 6 : 4
+
+export const heroes = {
+    setEffectForMissingHeroes: (effectStr: string) => {
+        EFFECT_FOR_MISSING_HEROES = effectStr
+    }
+}
 
 const RandomizeStartPositionsAndHeroSpawnOrder = () => {
     let alreadyAdded: boolean[] = []
