@@ -55,9 +55,18 @@ export class EscaperStartCommands {
     }
 
     removeStartCommand = (index: number) => {
+        if (index < 0 || index >= this.startCommands.length) {
+            return null
+        }
+
         const removedElement = this.startCommands.splice(index, 1)
         this.saveStartCommands()
         return removedElement
+    }
+
+    removeStartCommands = () => {
+        this.startCommands.length = 0
+        this.saveStartCommands()
     }
 
     saveStartCommands = () => {

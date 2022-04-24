@@ -9,7 +9,7 @@ import {
     NB_PLAYERS_MAX,
     RED,
     TEAL,
-    TERRAIN_DATA_DISPLAY_TIME,
+    TERRAIN_DATA_DISPLAY_TIME
 } from 'core/01_libraries/Constants'
 import { ColorString2Id, udg_colorCode, udg_colorStrings } from 'core/01_libraries/Init_colorCodes'
 import { Text } from 'core/01_libraries/Text'
@@ -1218,12 +1218,12 @@ export const initCommandAll = () => {
         },
     })
 
-    //-myStartCommands(msc) [list]|[add x]|[del x]
+    //-myStartCommands(msc) [list]|[add x]|[del x]|[delall]
     registerCommand({
         name: 'myStartCommands',
         alias: ['msc'],
         group: 'all',
-        argDescription: '[list]|[add x]|[del x]',
+        argDescription: '[list]|[add x]|[del x]|[delall]',
         description: 'Run commands on start of the game',
         cb: ({ cmd, nbParam, param1, param2 }, escaper) => {
             if (!escaper.getStartCommandsHandle().isLoaded()) {
@@ -1246,7 +1246,13 @@ export const initCommandAll = () => {
                     }
 
                     const deletedCmd = escaper.getStartCommandsHandle().removeStartCommand(S2I(param2) - 1)
-                    Text.P(escaper.getPlayer(), `Deleted command: '${deletedCmd[0]}'`)
+
+                    if (deletedCmd) {
+                        Text.P(escaper.getPlayer(), `Deleted command: '${deletedCmd[0]}'`)
+                    }
+                } else if (param1 === 'delall' && nbParam === 1) {
+                    escaper.getStartCommandsHandle().removeStartCommands()
+                    Text.P(escaper.getPlayer(), `Deleted all commands`)
                 } else if (param1 === 'add') {
                     const targetCmd = cmd.substring(cmd.indexOf(' add ') + 5)
 
