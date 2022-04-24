@@ -835,7 +835,7 @@ export const initCommandAll = () => {
     //-noDrunk(-)   --> stop drunk mode
     registerCommand({
         name: 'noDrunk',
-        alias: ['vc'],
+        alias: [''],
         group: 'all',
         argDescription: '',
         description: 'stop drunk mode',
