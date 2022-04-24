@@ -197,7 +197,7 @@ function initMEC_core()
     -- "quest" to tell the MEC core version
     local function QuestVersion_Actions()
         local q = CreateQuest()
-        QuestSetIconPath(q, "ReplaceableTextures\\CommandButtons\\DISBTNEvilIllidan.blp")
+        QuestSetIconPath(q, "ReplaceableTextures\\CommandButtonsDisabled\\DISBTNEvilIllidan.blp")
         QuestSetTitle(q, "<?= $MEC_VERSION_quest_title ?>")
         QuestSetDescription(q, "<?= addslashes($MEC_VERSION) ?>\ncreated by Maximaxou, joined by Stan since 2022\nhttps://mec.maxslid.com")
         QuestSetDiscovered(q, true)
