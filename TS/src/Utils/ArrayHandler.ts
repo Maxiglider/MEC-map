@@ -1,3 +1,5 @@
+import { Text } from 'core/01_libraries/Text'
+
 export class ArrayHandler {
     private static nextIndex = 0
     private static tArrays = new Map<number, any>()
@@ -28,11 +30,18 @@ export class ArrayHandler {
         const arrayInMap = ArrayHandler.tArrays.get(index)
 
         if (!arrayInMap) {
-            throw 'Index "' + index + '" not known in ArrayHandler'
+            Text.erA(
+                `Index: '${index}' not known in ArrayHandler. '${arr?.constructor?.name}' '${
+                    (arr?.[0] as any)?.constructor?.name
+                }'`
+            )
+
+            return
         }
 
         if (arrayInMap !== arr) {
-            throw 'Arrays different in ArrayHandler'
+            Text.erA('Arrays different in ArrayHandler')
+            return
         }
 
         //delete content of the array
