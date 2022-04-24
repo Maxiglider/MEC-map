@@ -13,8 +13,13 @@ export class PortalMobArray extends BaseArray<PortalMob> {
         this.level = level
     }
 
-    new = (triggerMob: Monster, freezeDuration: number) => {
-        const portalMob = new PortalMob(triggerMob, freezeDuration)
+    new = (
+        triggerMob: Monster,
+        freezeDuration: number,
+        portalEffect: string | null,
+        portalEffectDuration: number | null
+    ) => {
+        const portalMob = new PortalMob(triggerMob, freezeDuration, portalEffect, portalEffectDuration)
 
         portalMob.initialize()
         portalMob.level = this.level
@@ -32,7 +37,7 @@ export class PortalMobArray extends BaseArray<PortalMob> {
             if (!mt) {
                 Text.erA(`Monster label "${v.triggerMobId}" unknown`)
             } else {
-                const portalMob = this.new(mt, v.freezeDuration)
+                const portalMob = this.new(mt, v.freezeDuration, v.portalEffect, v.portalEffectDuration)
                 portalMob.setTargetMob(this.level.monsters.get(v.targetMobId))
             }
         }

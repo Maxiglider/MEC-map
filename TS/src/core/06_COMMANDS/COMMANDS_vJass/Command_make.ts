@@ -2768,15 +2768,15 @@ export const initExecuteCommandMake = () => {
         },
     })
 
-    //-createPortalMob(crpm) <freezeDuration>
+    //-createPortalMob(crpm) <freezeDuration> [<portalEffect> [<portalEffectDuration>]]
     registerCommand({
         name: 'createPortalMob',
         alias: ['crpm'],
         group: 'make',
-        argDescription: '<freezeDuration>',
+        argDescription: '<freezeDuration> [<portalEffect> [<portalEffectDuration>]]',
         description: 'create a portal mob',
-        cb: ({ nbParam, param1 }, escaper) => {
-            if (!(nbParam === 1)) {
+        cb: ({ nbParam, param1, param2, param3 }, escaper) => {
+            if (!(nbParam === 1 || nbParam === 2 || nbParam === 3)) {
                 return true
             }
             const x = S2R(param1)
@@ -2790,7 +2790,13 @@ export const initExecuteCommandMake = () => {
                 )
                 return true
             }
-            escaper.makeCreatePortalMobs(x)
+
+            if (!(S2R(param3) > 0)) {
+                Text.erP(escaper.getPlayer(), 'the portal effect must be > 0')
+                return true
+            }
+
+            escaper.makeCreatePortalMobs(x, param2, S2R(param3))
             Text.mkP(escaper.getPlayer(), 'portal mob making on')
             return true
         },

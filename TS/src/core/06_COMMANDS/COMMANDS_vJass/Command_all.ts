@@ -1007,7 +1007,7 @@ export const initCommandAll = () => {
         name: 'leaderboard',
         alias: ['ldb'],
         group: 'all',
-        argDescription: '',
+        argDescription: '[on|off|ldb|mb|global|current]',
         description: 'displays the leaderboard',
         cb: ({ nbParam, param1 }, escaper) => {
             if (nbParam === 1) {

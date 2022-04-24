@@ -9,8 +9,10 @@ export class MakePortalMob extends Make {
     private portalMob?: PortalMob
     private triggerMob?: Monster
     private targetMob: Monster | null = null
+    private portalEffect: string | null
+    private portalEffectDuration: number | null = null
 
-    constructor(maker: unit, freezeDuration: number) {
+    constructor(maker: unit, freezeDuration: number, portalEffect: string | null, portalEffectDuration: number | null) {
         super(maker, 'createPortalMob')
 
         if (freezeDuration !== 0 && (freezeDuration > PORTAL_MOB_MAX_FREEZE_DURATION || freezeDuration < 0)) {
@@ -18,11 +20,15 @@ export class MakePortalMob extends Make {
         }
 
         this.freezeDuration = freezeDuration
+        this.portalEffect = portalEffect
+        this.portalEffectDuration = portalEffectDuration
     }
 
     private createPortalMob = () => {
         if (this.triggerMob) {
-            this.portalMob = this.escaper.getMakingLevel().portalMobs.new(this.triggerMob, this.freezeDuration)
+            this.portalMob = this.escaper
+                .getMakingLevel()
+                .portalMobs.new(this.triggerMob, this.freezeDuration, this.portalEffect, this.portalEffectDuration)
         }
     }
 
