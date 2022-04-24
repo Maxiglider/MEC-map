@@ -226,8 +226,9 @@ export const initCommandExecution = () => {
             cb: ({ param1 }) => {
                 const filtered = commands.filter(cmd => {
                     return param1
-                        ? cmd.name.indexOf(param1) >= 0 ||
-                              (cmd.alias && cmd.alias.find(alias => alias.indexOf(param1) >= 0))
+                        ? cmd.name.toLowerCase().indexOf(param1.toLowerCase()) >= 0 ||
+                              (cmd.alias &&
+                                  cmd.alias.find(alias => alias.toLowerCase().indexOf(param1.toLowerCase()) >= 0))
                         : true
                 })
 

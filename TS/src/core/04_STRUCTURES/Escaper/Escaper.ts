@@ -60,6 +60,7 @@ import { SlideTrigger } from '../../07_TRIGGERS/Slide_and_CheckTerrain_triggers/
 import { Trig_InvisUnit_is_getting_damage } from '../../08_GAME/Death/InvisUnit_is_getting_damage'
 import { HERO_START_ANGLE } from '../../08_GAME/Init_game/Heroes'
 import { MessageHeroDies } from '../../08_GAME/Init_game/Message_heroDies'
+import { RunCoopSoundOnHero } from '../../08_GAME/Mode_coop/coop_init_sounds'
 import { CommandShortcuts } from '../../08_GAME/Shortcuts/Using_shortcut'
 import { FollowMouse } from '../../Follow_mouse/Follow_mouse'
 import type { CasterType } from '../Caster/CasterType'
@@ -74,7 +75,7 @@ import { TerrainTypeWalk } from '../TerrainType/TerrainTypeWalk'
 import { EscaperEffectArray } from './EscaperEffectArray'
 import { EscaperFirstPerson } from './Escaper_firstPerson'
 import { ColorInfo, GetMirrorEscaper } from './Escaper_functions'
-import {RunCoopSoundOnHero} from "../../08_GAME/Mode_coop/coop_init_sounds";
+import { EscaperStartCommands } from './Escaper_StartCommands'
 
 const SHOW_REVIVE_EFFECTS = false
 
@@ -107,6 +108,7 @@ export class Escaper {
     private vcTransparency: number
     private effects: EscaperEffectArray
     private terrainKillEffect?: effect
+    private portalEffect?: effect
     private meteorEffect?: effect
 
     private godMode: boolean
@@ -148,6 +150,8 @@ export class Escaper {
     private coopInvul: boolean
 
     private firstPersonHandle: EscaperFirstPerson = new EscaperFirstPerson(this)
+    private startCommandsHandle: EscaperStartCommands = new EscaperStartCommands(this)
+
     private lockCamTarget: Escaper | null = null
 
     public hideLeaderboard = false
@@ -328,6 +332,8 @@ export class Escaper {
         SetTextTagPermanent(this.textTag, true)
         SetTextTagVisibility(this.textTag, false)
         this.textTagTimer = createTimer(0.01, true, this.updateTextTagPos)
+
+        this.startCommandsHandle.loadStartCommands()
 
         return true
     }
@@ -716,6 +722,15 @@ export class Escaper {
         this.destroyTerrainKillEffect()
         this.hero &&
             (this.terrainKillEffect = AddSpecialEffectTarget(killEffectStr, this.hero, TERRAIN_KILL_EFFECT_BODY_PART))
+    }
+
+    destroyPortalEffect = () => {
+        this.portalEffect && DestroyEffect(this.portalEffect)
+    }
+
+    createPortalEffect(effectStr: string) {
+        this.destroyPortalEffect()
+        this.hero && (this.portalEffect = AddSpecialEffectTarget(effectStr, this.hero, TERRAIN_KILL_EFFECT_BODY_PART))
     }
 
     //lastTerrainType methods
@@ -1286,9 +1301,9 @@ export class Escaper {
         if (this.hero) this.make = new MakeDeleteClearMob(this.hero)
     }
 
-    makeCreatePortalMobs(freezeDuration: number) {
+    makeCreatePortalMobs(freezeDuration: number, portalEffect: string | null, portalEffectDuration: number | null) {
         this.destroyMake()
-        if (this.hero) this.make = new MakePortalMob(this.hero, freezeDuration)
+        if (this.hero) this.make = new MakePortalMob(this.hero, freezeDuration, portalEffect, portalEffectDuration)
     }
 
     makeDeletePortalMobs = () => {
@@ -1489,6 +1504,7 @@ export class Escaper {
     }
 
     getFirstPersonHandle = () => this.firstPersonHandle
+    getStartCommandsHandle = () => this.startCommandsHandle
 
     setLockCamTarget = (lockCamTarget: Escaper | null) => {
         this.lockCamTarget = lockCamTarget

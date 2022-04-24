@@ -13,12 +13,19 @@ export class PortalMob {
     private triggerMob: Monster | null
     private targetMob: Monster | null
     private freezeDuration: number
+    private portalEffect: string | null
+    private portalEffectDuration: number
 
     id: number = -1
 
     private timers = ArrayHandler.getNewArray<Timer>()
 
-    constructor(triggerMob: Monster, freezeDuration: number) {
+    constructor(
+        triggerMob: Monster,
+        freezeDuration: number,
+        portalEffect: string | null,
+        portalEffectDuration: number | null
+    ) {
         if (freezeDuration < 0 || freezeDuration > PORTAL_MOB_MAX_FREEZE_DURATION) {
             throw this.constructor.name + ' : invalid freeze duration'
         }
@@ -29,6 +36,8 @@ export class PortalMob {
         triggerMob.setPortalMob(this)
 
         this.freezeDuration = freezeDuration
+        this.portalEffect = portalEffect
+        this.portalEffectDuration = portalEffectDuration || freezeDuration || 1
     }
 
     getTriggerMob = () => this.triggerMob
@@ -88,6 +97,7 @@ export class PortalMob {
         SetUnitY(hero, GetUnitY(targetMob.u))
 
         escaper.enablePortalCooldown()
+        this.portalEffect && escaper.createPortalEffect(this.portalEffect)
 
         if (this.freezeDuration > 0) {
             SetUnitAnimation(hero, 'channel')
@@ -105,6 +115,13 @@ export class PortalMob {
             escaper.disablePortalCooldown(0.5)
         }
 
+        this.portalEffect &&
+            this.timers.push(
+                createTimer(this.portalEffectDuration, false, () => {
+                    escaper.destroyPortalEffect()
+                })
+            )
+
         // TODO; SECONDARYHERO?
     }
 
@@ -113,5 +130,7 @@ export class PortalMob {
         triggerMobId: this.triggerMob?.id,
         targetMobId: this.targetMob?.id,
         freezeDuration: this.freezeDuration,
+        portalEffect: this.portalEffect,
+        portalEffectDuration: this.portalEffectDuration,
     })
 }

@@ -1,4 +1,3 @@
-import { B2S } from 'core/01_libraries/Basic_functions'
 import { Text } from 'core/01_libraries/Text'
 import { getUdgEscapers, getUdgLevels } from '../../../../globals'
 import { Ascii2String } from '../../01_libraries/Ascii'
@@ -229,7 +228,7 @@ export class MonsterType {
 
     displayForPlayer = (p: player) => {
         let space = '   '
-        let display = udg_colorCode[RED] + this.label + ' ' + this.theAlias + " : '"
+        let display = udg_colorCode[RED] + this.label + (this.theAlias ? ' ' + this.theAlias : '') + " : '"
         let scaleDisplay: string
         let heightDisplay: string
         if (this.scale === -1) {
@@ -297,6 +296,6 @@ export class MonsterType {
         isClickable: this.isClickableB,
         killingEffect: this.killingEffectStr,
         nbMeteorsToKill: this.maxLife / 10000,
-        height: R2I(this.height)
+        height: R2I(this.height),
     })
 }
