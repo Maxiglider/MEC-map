@@ -51,16 +51,21 @@ export const InitTrig_InvisUnit_is_getting_damage = () => {
                         return
                     } else {
                         const monster = udg_monsters[GetUnitUserData(killingUnit)]
-                        const clearMob = monster.getClearMob()
-                        const portalMob = monster.getPortalMob()
 
-                        if (clearMob) {
-                            clearMob.activate()
-                            return
-                        } else if (portalMob) {
-                            portalMob.activate(monster, escaper, hero)
-                            return
-                        } else if (escaper.isGodModeOn()) {
+                        if(monster) {
+                            const clearMob = monster.getClearMob()
+                            const portalMob = monster.getPortalMob()
+
+                            if (clearMob) {
+                                clearMob.activate()
+                                return
+                            } else if (portalMob) {
+                                portalMob.activate(monster, escaper, hero)
+                                return
+                            }
+                        }
+
+                        if (escaper.isGodModeOn()) {
                             //god mode effect
                             x = GetUnitX(killingUnit)
                             y = GetUnitY(killingUnit)
@@ -69,7 +74,7 @@ export const InitTrig_InvisUnit_is_getting_damage = () => {
 
                             //kill monster
                             if (escaper.doesGodModeKills()) {
-                                if (GetUnitUserData(killingUnit) !== 0) {
+                                if (monster) {
                                     monster.killUnit() //on ne tue pas directement le monstre, pour pouvoir exécuter des actions secondaires éventuelles de la méthode killUnit
                                 } else {
                                     KillUnit(killingUnit)
@@ -82,13 +87,15 @@ export const InitTrig_InvisUnit_is_getting_damage = () => {
                             escaper.kill()
 
                             //effet de tuation du héros par le monstre, suivant le type du monstre
-                            const effectStr = getUdgMonsterTypes().monsterUnit2KillEffectStr(killingUnit)
-                            if (effectStr) {
-                                x = GetUnitX(invisUnit)
-                                y = GetUnitY(invisUnit)
-                                eff = AddSpecialEffect(effectStr, x, y)
-                                TriggerSleepAction(3)
-                                DestroyEffect(eff)
+                            if(monster) {
+                                const effectStr = getUdgMonsterTypes().monsterUnit2KillEffectStr(killingUnit)
+                                if (effectStr) {
+                                    x = GetUnitX(invisUnit)
+                                    y = GetUnitY(invisUnit)
+                                    eff = AddSpecialEffect(effectStr, x, y)
+                                    TriggerSleepAction(3)
+                                    DestroyEffect(eff)
+                                }
                             }
                         }
                     }
