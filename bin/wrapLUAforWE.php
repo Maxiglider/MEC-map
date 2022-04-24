@@ -13,7 +13,7 @@ const WRAP_OUTPUT_FILE = __DIR__."/final-we.lua";
 
 ob_start();
 ?>
--- FILE GENERATED ON <?= date("Y-m-d H:i:s") ?>
+-- Max Escape Creation v.<?= file_get_contents(__DIR__."/../TS/src/MEC_core_version") ?> - <?= date("Y-m-d H:i:s") ?>
 
 
 function get_MEC_core()
