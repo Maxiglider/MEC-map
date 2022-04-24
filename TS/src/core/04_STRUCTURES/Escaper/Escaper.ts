@@ -83,6 +83,12 @@ const VIPs64 = ['V29ybGRFZGl0', 'TWF4aW1heG91IzI4NzI=', 'U3RhbiMyMjM5OQ==']
 
 const VIPs = VIPs64.map(name64 => EncodingBase64.Decode(name64))
 
+let METEOR_EFFECT = 'Abilities\\Weapons\\DemonHunterMissile\\DemonHunterMissile.mdl'
+
+export const SetMeteorEffect = (newEffect: string) => {
+    METEOR_EFFECT = newEffect
+}
+
 export class Escaper {
     private escaperId: number
     private playerId: number
@@ -251,7 +257,7 @@ export class Escaper {
     addEffectMeteor = () => {
         if (!this.meteorEffect && this.hero) {
             this.meteorEffect = AddSpecialEffectTarget(
-                'Abilities\\Weapons\\DemonHunterMissile\\DemonHunterMissile.mdl',
+                METEOR_EFFECT,
                 this.hero,
                 'hand right'
             )
