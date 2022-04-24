@@ -1217,4 +1217,45 @@ export const initCommandAll = () => {
             return true
         },
     })
+
+    //-myStartCommands(msc) [list][add x]|[del x]
+    registerCommand({
+        name: 'myStartCommands',
+        alias: ['msc'],
+        group: 'all',
+        argDescription: '[list][add x]|[del x]',
+        description: 'Run commands on start of the game',
+        cb: ({ cmd, nbParam, param1, param2 }, escaper) => {
+            if (!escaper.getStartCommandsHandle().isLoaded()) {
+                Text.erP(escaper.getPlayer(), 'Start commands not yet loaded')
+                return true
+            }
+
+            if (nbParam === 0 || (nbParam === 1 && param1 === 'list')) {
+                Text.P(escaper.getPlayer(), 'My start commands: ')
+
+                let i = 0
+                for (const startCmd of escaper.getStartCommandsHandle().getStartCommands()) {
+                    Text.P(escaper.getPlayer(), `${++i}: ${startCmd}`)
+                }
+            } else {
+                if (param1 === 'del' && nbParam === 2) {
+                    if (S2I(param2) === 0) {
+                        Text.erP(escaper.getPlayer(), 'You must specify a command to delete')
+                        return true
+                    }
+
+                    const deletedCmd = escaper.getStartCommandsHandle().removeStartCommand(S2I(param2) - 1)
+                    Text.P(escaper.getPlayer(), `Deleted command: '${deletedCmd[0]}'`)
+                } else if (param1 === 'add') {
+                    const targetCmd = cmd.substring(cmd.indexOf(' add ') + 5)
+
+                    escaper.getStartCommandsHandle().addStartCommand(targetCmd)
+                    Text.P(escaper.getPlayer(), `Added command: '${targetCmd}'`)
+                }
+            }
+
+            return true
+        },
+    })
 }

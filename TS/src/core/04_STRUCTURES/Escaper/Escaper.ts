@@ -75,6 +75,7 @@ import { TerrainTypeWalk } from '../TerrainType/TerrainTypeWalk'
 import { EscaperEffectArray } from './EscaperEffectArray'
 import { EscaperFirstPerson } from './Escaper_firstPerson'
 import { ColorInfo, GetMirrorEscaper } from './Escaper_functions'
+import { EscaperStartCommands } from './Escaper_StartCommands'
 
 const SHOW_REVIVE_EFFECTS = false
 
@@ -149,6 +150,8 @@ export class Escaper {
     private coopInvul: boolean
 
     private firstPersonHandle: EscaperFirstPerson = new EscaperFirstPerson(this)
+    private startCommandsHandle: EscaperStartCommands = new EscaperStartCommands(this)
+
     private lockCamTarget: Escaper | null = null
 
     public hideLeaderboard = false
@@ -329,6 +332,8 @@ export class Escaper {
         SetTextTagPermanent(this.textTag, true)
         SetTextTagVisibility(this.textTag, false)
         this.textTagTimer = createTimer(0.01, true, this.updateTextTagPos)
+
+        this.startCommandsHandle.loadStartCommands()
 
         return true
     }
@@ -1499,6 +1504,7 @@ export class Escaper {
     }
 
     getFirstPersonHandle = () => this.firstPersonHandle
+    getStartCommandsHandle = () => this.startCommandsHandle
 
     setLockCamTarget = (lockCamTarget: Escaper | null) => {
         this.lockCamTarget = lockCamTarget
