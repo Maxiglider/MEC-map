@@ -2791,7 +2791,7 @@ export const initExecuteCommandMake = () => {
                 return true
             }
 
-            if (!(S2R(param3) > 0)) {
+            if (param3 !== null && !(S2R(param3) > 0)) {
                 Text.erP(escaper.getPlayer(), 'the portal effect must be > 0')
                 return true
             }
