@@ -6,7 +6,7 @@ import {
     HERO_WALK_SPEED,
     MAX_MOVE_SPEED,
     RED,
-    TERRAIN_DEATH_TIME_TO_KILL,
+    TERRAIN_DEATH_TIME_TO_KILL
 } from 'core/01_libraries/Constants'
 import { udg_colorCode } from 'core/01_libraries/Init_colorCodes'
 import { Text } from 'core/01_libraries/Text'
@@ -26,7 +26,7 @@ import {
     DEFAULT_CASTER_PROJECTILE_SPEED,
     DEFAULT_CASTER_RANGE,
     MIN_CASTER_LOAD_TIME,
-    MIN_CASTER_PROJECTILE_SPEED,
+    MIN_CASTER_PROJECTILE_SPEED
 } from '../../04_STRUCTURES/Caster/CasterType'
 import { MONSTER_TELEPORT_PERIOD_MAX, MONSTER_TELEPORT_PERIOD_MIN } from '../../04_STRUCTURES/Monster/MonsterTeleport'
 import { CLEAR_MOB_MAX_DURATION, FRONT_MONTANT_DURATION } from '../../04_STRUCTURES/Monster_properties/ClearMob'
@@ -2791,12 +2791,14 @@ export const initExecuteCommandMake = () => {
                 return true
             }
 
-            if (param3 !== null && !(S2R(param3) > 0)) {
-                Text.erP(escaper.getPlayer(), 'the portal effect must be > 0')
-                return true
+            if (param3 !== '') {
+                if (!(S2R(param3) > 0)) {
+                    Text.erP(escaper.getPlayer(), 'the portal effect must be > 0')
+                    return true
+                }
             }
 
-            escaper.makeCreatePortalMobs(x, param2, S2R(param3))
+            escaper.makeCreatePortalMobs(x, param2, param3 === '' ? null : S2R(param3))
             Text.mkP(escaper.getPlayer(), 'portal mob making on')
             return true
         },
