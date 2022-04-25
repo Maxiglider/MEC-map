@@ -1202,19 +1202,35 @@ export const initCommandAll = () => {
                 Text.mkP(escaper.getPlayer(), 'Hiding player names')
             }
 
-            for (const [_, player] of pairs(getUdgEscapers().getAll())) {
-                const textTag = player.getTextTag()
+            escaper.setShowNames(S2B(param1))
 
-                if (GetTriggerPlayer() === GetLocalPlayer()) {
-                    if (textTag) {
-                        if (GetLocalPlayer() === player.getPlayer()) {
-                            SetTextTagVisibility(textTag, false)
-                        } else {
-                            SetTextTagVisibility(textTag, S2B(param1))
-                        }
-                    }
-                }
+            return true
+        },
+    })
+
+    //-othersTransparency <number>|off|reset
+    registerCommand({
+        name: 'othersTransparency',
+        alias: ['ot'],
+        group: 'all',
+        argDescription: '<number>|off|reset',
+        description: '',
+        cb: ({ nbParam, param1 }, escaper) => {
+            if (nbParam != 1) {
+                return true
             }
+
+            if (param1 === 'off' || param1 === 'reset') {
+                param1 = '0'
+            }
+
+            if (!(S2I(param1) >= 0 && S2I(param1) <= 100)) {
+                return true
+            }
+
+            Text.mkP(escaper.getPlayer(), `Showing other heroes with transparency: ${S2I(param1)}`)
+
+            escaper.setShowOthersTransparency(S2I(param1))
 
             return true
         },

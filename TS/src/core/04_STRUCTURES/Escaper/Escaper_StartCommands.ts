@@ -1,4 +1,4 @@
-import { arrayPush, jsonDecode, jsonEncode } from 'core/01_libraries/Basic_functions'
+import { arrayPush, IsEscaperInGame, jsonDecode, jsonEncode } from 'core/01_libraries/Basic_functions'
 import { MEC_MSC_DATA_FILE } from 'core/01_libraries/Constants'
 import { ServiceManager } from 'Services'
 import { initSaveLoad } from '../../../Utils/SaveLoad/SaveLoad'
@@ -22,6 +22,10 @@ export class EscaperStartCommands {
         }
 
         this.executed = true
+
+        if (!IsEscaperInGame(this.escaper.getEscaperId())) {
+            return
+        }
 
         SaveLoad.readFile(MEC_MSC_DATA_FILE, this.escaper.getPlayer(), data => {
             if (data.length === 0) {

@@ -15,11 +15,7 @@ const initDisco = () => {
         esc.setVcBlue(GetRandomPercentageBJ())
         esc.setVcTransparency(GetRandomReal(0, 25))
 
-        const hero = esc.getHero()
-
-        if (hero) {
-            SetUnitVertexColorBJ(hero, esc.getVcRed(), esc.getVcGreen(), esc.getVcBlue(), esc.getVcTransparency())
-        }
+        esc.getHero() && esc.updateUnitVertexColor(false)
     }
 
     const Disco_Actions = (n: number) => {

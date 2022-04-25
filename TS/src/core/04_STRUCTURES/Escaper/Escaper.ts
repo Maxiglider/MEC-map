@@ -176,6 +176,9 @@ export class Escaper {
 
     private displayName: string
 
+    private showNames = false
+    private showOthersTransparency = 0
+
     //mouse position updated when a trigger dependant of mouse movement is being used
     mouseX = 0
     mouseY = 0
@@ -261,11 +264,7 @@ export class Escaper {
 
     addEffectMeteor = () => {
         if (!this.meteorEffect && this.hero) {
-            this.meteorEffect = AddSpecialEffectTarget(
-                METEOR_EFFECT,
-                this.hero,
-                'hand right'
-            )
+            this.meteorEffect = AddSpecialEffectTarget(METEOR_EFFECT, this.hero, 'hand right')
         }
     }
 
@@ -318,7 +317,7 @@ export class Escaper {
             SetUnitColor(this.hero, ConvertPlayerColor(this.baseColorId))
         }
 
-        SetUnitVertexColorBJ(this.hero, this.vcRed, this.vcGreen, this.vcBlue, this.vcTransparency)
+        this.updateUnitVertexColor(false)
         this.SpecialIllidan()
         this.invisUnit = CreateUnit(PLAYER_INVIS_UNIT, INVIS_UNIT_TYPE_ID, x, y, angle)
         SetUnitUserData(this.invisUnit, GetPlayerId(this.p))
@@ -343,6 +342,9 @@ export class Escaper {
         SetTextTagPermanent(this.textTag, true)
         SetTextTagVisibility(this.textTag, false)
         this.textTagTimer = createTimer(0.01, true, this.updateTextTagPos)
+
+        this.updateShowNames(false)
+        this.updateUnitVertexColor(false)
 
         this.startCommandsHandle.loadStartCommands()
 
@@ -572,7 +574,7 @@ export class Escaper {
         this.selectHero()
 
         if (this.vcTransparency != 0) {
-            SetUnitVertexColorBJ(this.hero, this.vcRed, this.vcGreen, this.vcBlue, this.vcTransparency)
+            this.updateUnitVertexColor(false)
         }
 
         TimerStart(
@@ -644,7 +646,7 @@ export class Escaper {
         } else {
             SetUnitColor(this.hero, ConvertPlayerColor(this.baseColorId))
         }
-        SetUnitVertexColorBJ(this.hero, this.vcRed, this.vcGreen, this.vcBlue, this.vcTransparency)
+        this.updateUnitVertexColor(false)
         this.effects.showEffects(this.hero)
         if (this.make) {
             this.make.maker = this.hero
@@ -988,7 +990,7 @@ export class Escaper {
     }
 
     refreshVertexColor = () => {
-        this.hero && SetUnitVertexColorBJ(this.hero, this.vcRed, this.vcGreen, this.vcBlue, this.vcTransparency)
+        this.hero && this.updateUnitVertexColor(false)
 
         if (!this.isEscaperSecondary()) {
             ColorInfo(this, this.p)
@@ -1583,6 +1585,52 @@ export class Escaper {
     getTextTag = () => this.textTag
 
     getDisplayName = () => this.displayName
+
+    setShowNames = (showNames: boolean) => {
+        this.showNames = showNames
+        this.updateShowNames(true)
+    }
+
+    setShowOthersTransparency = (showOthersTransparency: number) => {
+        this.showOthersTransparency = showOthersTransparency
+        this.updateUnitVertexColor(true)
+    }
+
+    updateShowNames = (localOnly: boolean) => {
+        for (const [_, player] of pairs(getUdgEscapers().getAll())) {
+            if (!localOnly || player.getPlayer() === GetLocalPlayer()) {
+                for (const [_, escaper] of pairs(getUdgEscapers().getAll())) {
+                    const textTag = escaper.getTextTag()
+
+                    if (textTag && GetLocalPlayer() !== escaper.getPlayer()) {
+                        SetTextTagVisibility(textTag, player.showNames)
+                    }
+                }
+            }
+        }
+    }
+
+    updateUnitVertexColor = (localOnly: boolean) => {
+        for (const [_, player] of pairs(getUdgEscapers().getAll())) {
+            if (!localOnly || player.getPlayer() === GetLocalPlayer()) {
+                for (const [_, escaper] of pairs(getUdgEscapers().getAll())) {
+                    const hero = escaper.getHero()
+
+                    if (hero) {
+                        SetUnitVertexColorBJ(
+                            hero,
+                            escaper.vcRed,
+                            escaper.vcGreen,
+                            escaper.vcBlue,
+                            GetLocalPlayer() === escaper.getPlayer() || player.showOthersTransparency === 0
+                                ? escaper.vcTransparency
+                                : player.showOthersTransparency
+                        )
+                    }
+                }
+            }
+        }
+    }
 
     toJson = () => ({
         //useless but mandatory due to BaseArray implementation
