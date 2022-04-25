@@ -114,7 +114,7 @@ export class LevelArray extends BaseArray<Level> {
         this.data[this.currentLevel].checkpointReviveHeroes(finisher)
 
         if (this.moveCamToStart(this.data[this.currentLevel], finisher) && finisher) {
-            Text.A(udg_colorCode[GetPlayerId(finisher.getPlayer())] + 'Good job ' + finisher.getDisplayName() + ' !')
+            Text.A(udg_colorCode[finisher.getColorId()] + 'Good job ' + finisher.getDisplayName() + ' !')
         }
 
         return true

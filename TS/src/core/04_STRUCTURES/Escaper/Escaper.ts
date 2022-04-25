@@ -55,7 +55,7 @@ import { MakeTerrainCreateBrush } from '../../05_MAKE_STRUCTURES/Make_terrain/Ma
 import { MakeTerrainHorizontalSymmetry } from '../../05_MAKE_STRUCTURES/Make_terrain/MakeTerrainHorizontalSymmetry'
 import { MakeTerrainVerticalSymmetry } from '../../05_MAKE_STRUCTURES/Make_terrain/MakeTerrainVerticalSymmetry'
 import { MakeTerrainHeight } from '../../05_MAKE_STRUCTURES/Make_terrain_height/MakeTerrainHeight'
-import { removeHash } from '../../06_COMMANDS/COMMANDS_vJass/Command_functions'
+import {BlzColor2Id, removeHash} from '../../06_COMMANDS/COMMANDS_vJass/Command_functions'
 import { CheckTerrainTrigger } from '../../07_TRIGGERS/Slide_and_CheckTerrain_triggers/CheckTerrain'
 import { SlideTrigger } from '../../07_TRIGGERS/Slide_and_CheckTerrain_triggers/Slide'
 import { Trig_InvisUnit_is_getting_damage } from '../../08_GAME/Death/InvisUnit_is_getting_damage'
@@ -194,7 +194,7 @@ export class Escaper {
         this.walkSpeed = HERO_WALK_SPEED
         this.slideSpeed = HERO_SLIDE_SPEED
         this.slideMovePerPeriod = HERO_SLIDE_SPEED * SLIDE_PERIOD
-        this.baseColorId = this.playerId
+        this.baseColorId = BlzColor2Id(GetPlayerColor(this.p)) || -1
 
         this.checkTerrain = CheckTerrainTrigger.CreateCheckTerrainTrigger(escaperId)
 
@@ -244,6 +244,10 @@ export class Escaper {
         ShowUnit(this.dummyPowerCircle, false)
 
         this.displayName = removeHash(GetPlayerName(this.p))
+    }
+
+    getColorId = () => {
+        return BlzColor2Id(GetPlayerColor(this.p)) || -1
     }
 
     getEscaperId = () => {
@@ -342,7 +346,7 @@ export class Escaper {
         EnableTrigger(this.checkTerrain)
 
         this.textTag = CreateTextTag()
-        SetTextTagTextBJ(this.textTag, udg_colorCode[this.getEscaperId()] + this.getDisplayName(), 10)
+        SetTextTagTextBJ(this.textTag, udg_colorCode[this.getColorId()] + this.getDisplayName(), 10)
         SetTextTagPermanent(this.textTag, true)
         SetTextTagVisibility(this.textTag, false)
         this.textTagTimer = createTimer(0.01, true, this.updateTextTagPos)
@@ -1084,10 +1088,10 @@ export class Escaper {
     kick(kicked: Escaper) {
         CustomDefeatBJ(kicked.getPlayer(), 'You have been kicked by ' + this.displayName + ' !')
         Text.A(
-            udg_colorCode[GetPlayerId(kicked.getPlayer())] +
+            udg_colorCode[kicked.getColorId()] +
                 kicked.displayName +
                 ' has been kicked by ' +
-                udg_colorCode[GetPlayerId(this.p)] +
+                udg_colorCode[this.getColorId()] +
                 this.displayName +
                 ' !'
         )

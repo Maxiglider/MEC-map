@@ -6,7 +6,7 @@ import { ArrayHandler } from 'Utils/ArrayHandler'
 import { literalArray } from 'Utils/ArrayUtils'
 import { createTimer, forRange } from 'Utils/mapUtils'
 import { getUdgEscapers, globals } from '../../../../globals'
-import { rawPlayerNames } from '../../06_COMMANDS/COMMANDS_vJass/Command_functions'
+import {playerId2colorId, rawPlayerNames} from '../../06_COMMANDS/COMMANDS_vJass/Command_functions'
 import { Escaper } from '../Escaper/Escaper'
 import { LIVES_PLAYER } from './Lives_and_game_time'
 import { GameTime } from './Time_of_game_trigger'
@@ -212,10 +212,10 @@ export const initMultiboard = () => {
 
                     const playerScore = playerScores[playerId].stats[statsMode]
 
-                    MultiboardSetItemValueBJ(mb, 1, 4 + rowIndex, udg_colorCode[playerId] + playerName)
-                    MultiboardSetItemValueBJ(mb, 2, 4 + rowIndex, udg_colorCode[playerId] + playerScore.score)
-                    MultiboardSetItemValueBJ(mb, 3, 4 + rowIndex, udg_colorCode[playerId] + playerScore.saves)
-                    MultiboardSetItemValueBJ(mb, 4, 4 + rowIndex, udg_colorCode[playerId] + playerScore.deaths)
+                    MultiboardSetItemValueBJ(mb, 1, 4 + rowIndex, udg_colorCode[playerId2colorId(playerId)] + playerName)
+                    MultiboardSetItemValueBJ(mb, 2, 4 + rowIndex, udg_colorCode[playerId2colorId(playerId)] + playerScore.score)
+                    MultiboardSetItemValueBJ(mb, 3, 4 + rowIndex, udg_colorCode[playerId2colorId(playerId)] + playerScore.saves)
+                    MultiboardSetItemValueBJ(mb, 4, 4 + rowIndex, udg_colorCode[playerId2colorId(playerId)] + playerScore.deaths)
 
                     rowIndex++
                 }
