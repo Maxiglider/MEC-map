@@ -37,7 +37,7 @@ import { AfkMode } from 'core/08_GAME/Afk_mode/Afk_mode'
 import { ServiceManager } from 'Services'
 import { Timer } from 'w3ts'
 import { getUdgEscapers, getUdgLevels, getUdgTerrainTypes } from '../../../../globals'
-import { createTimer } from '../../../Utils/mapUtils'
+import {createEvent, createTimer} from '../../../Utils/mapUtils'
 import { EncodingBase64 } from '../../../Utils/SaveLoad/TreeLib/EncodingBase64'
 import type { Make } from '../../05_MAKE_STRUCTURES/Make/Make'
 import type { MakeAction } from '../../05_MAKE_STRUCTURES/MakeLastActions/MakeAction'
@@ -75,7 +75,7 @@ import { TerrainTypeSlide } from '../TerrainType/TerrainTypeSlide'
 import { TerrainTypeWalk } from '../TerrainType/TerrainTypeWalk'
 import { EscaperEffectArray } from './EscaperEffectArray'
 import { EscaperFirstPerson } from './Escaper_firstPerson'
-import { ColorInfo, GetMirrorEscaper } from './Escaper_functions'
+import {ColorInfo, GetMirrorEscaper, IsHero} from './Escaper_functions'
 import { EscaperStartCommands } from './Escaper_StartCommands'
 
 const SHOW_REVIVE_EFFECTS = false
@@ -296,6 +296,10 @@ export class Escaper {
 
         this.hero = CreateUnit(this.p, heroTypeId, x, y, angle)
 
+        if(!this.hero){
+            return
+        }
+
         if (this.escaperId >= NB_PLAYERS_MAX) {
             SetUnitTimeScale(this.hero, this.animSpeedSecondaryHero)
         }
@@ -347,6 +351,15 @@ export class Escaper {
         this.updateUnitVertexColor(false)
 
         this.startCommandsHandle.loadStartCommands()
+
+        //what to do on hero death
+        const hero = this.hero
+        createEvent({
+            events: [t => TriggerRegisterUnitEvent(t, hero, EVENT_UNIT_DEATH)],
+            actions: [() => {
+                this.onEscaperDeath()
+            }]
+        })
 
         return true
     }
@@ -528,21 +541,23 @@ export class Escaper {
         return this.hero && IsUnitPaused(this.hero)
     }
 
+    private onEscaperDeath = () => {
+        this.resetItem()
+        delete this.lastTerrainType
+        this.invisUnit && ShowUnit(this.invisUnit, false)
+        this.enableCheckTerrain(false)
+        AfkMode.StopAfk(this.escaperId)
+        MessageHeroDies.DisplayDeathMessagePlayer(this.p)
+        this.isHeroSelectedB = false
+
+        if (!this.isEscaperSecondary()) {
+            ServiceManager.getService('Multiboard').increasePlayerScore(GetPlayerId(this.getPlayer()), 'deaths')
+        }
+    }
+
     kill = () => {
         if (this.isAlive()) {
-            this.resetItem()
             this.hero && KillUnit(this.hero)
-            delete this.lastTerrainType
-            this.invisUnit && ShowUnit(this.invisUnit, false)
-            this.enableCheckTerrain(false)
-            AfkMode.StopAfk(this.escaperId)
-            MessageHeroDies.DisplayDeathMessagePlayer(this.p)
-            this.isHeroSelectedB = false
-
-            if (!this.isEscaperSecondary()) {
-                ServiceManager.getService('Multiboard').increasePlayerScore(GetPlayerId(this.getPlayer()), 'deaths')
-            }
-
             return true
         }
         return false
