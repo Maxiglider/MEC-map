@@ -6,6 +6,8 @@ import { Escaper } from './Escaper'
 
 type IKeys = 'UP' | 'DOWN' | 'LEFT' | 'RIGHT'
 
+const FIRSTPERSON_ANGLE_PER_PERIOD = 2
+
 export class EscaperFirstPerson {
     private forceCamTimer: Timer | null = null
 
@@ -32,6 +34,20 @@ export class EscaperFirstPerson {
                     const hero = this.escaper.getHero()
 
                     if (hero) {
+                        let angle = GetUnitFacing(hero)
+
+                        if (this.isFirstPerson()) {
+                            if (!(this.isKeyDownState('LEFT') && this.isKeyDownState('RIGHT'))) {
+                                if (this.isKeyDownState('LEFT')) {
+                                    angle += FIRSTPERSON_ANGLE_PER_PERIOD
+                                } else if (this.isKeyDownState('RIGHT')) {
+                                    angle -= FIRSTPERSON_ANGLE_PER_PERIOD
+                                }
+
+                                BlzSetUnitFacingEx(hero, angle)
+                            }
+                        }
+
                         SetCameraTargetControllerNoZForPlayer(player, hero, 0, 0, true)
                         SetCameraFieldForPlayer(player, CAMERA_FIELD_ANGLE_OF_ATTACK, 310, 0)
                         SetCameraFieldForPlayer(player, CAMERA_FIELD_FIELD_OF_VIEW, 1500, 0)
