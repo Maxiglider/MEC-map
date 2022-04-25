@@ -17,6 +17,7 @@ import {
 } from 'core/01_libraries/Constants'
 import { udg_colorCode } from 'core/01_libraries/Init_colorCodes'
 import { Text } from 'core/01_libraries/Text'
+import { MakeMonsterPropertyChange } from 'core/05_MAKE_STRUCTURES/Make/MakePropertyChange'
 import { MakeCaster } from 'core/05_MAKE_STRUCTURES/Make_create_casters/MakeCaster'
 import { MakeMeteor } from 'core/05_MAKE_STRUCTURES/Make_create_meteors/MakeMeteor'
 import { MakeMonsterMultiplePatrols } from 'core/05_MAKE_STRUCTURES/Make_create_monsters/MakeMonsterMultiplePatrols'
@@ -37,7 +38,7 @@ import { AfkMode } from 'core/08_GAME/Afk_mode/Afk_mode'
 import { ServiceManager } from 'Services'
 import { Timer } from 'w3ts'
 import { getUdgEscapers, getUdgLevels, getUdgTerrainTypes } from '../../../../globals'
-import {createEvent, createTimer} from '../../../Utils/mapUtils'
+import { createEvent, createTimer } from '../../../Utils/mapUtils'
 import { EncodingBase64 } from '../../../Utils/SaveLoad/TreeLib/EncodingBase64'
 import type { Make } from '../../05_MAKE_STRUCTURES/Make/Make'
 import type { MakeAction } from '../../05_MAKE_STRUCTURES/MakeLastActions/MakeAction'
@@ -75,7 +76,7 @@ import { TerrainTypeSlide } from '../TerrainType/TerrainTypeSlide'
 import { TerrainTypeWalk } from '../TerrainType/TerrainTypeWalk'
 import { EscaperEffectArray } from './EscaperEffectArray'
 import { EscaperFirstPerson } from './Escaper_firstPerson'
-import {ColorInfo, GetMirrorEscaper, IsHero} from './Escaper_functions'
+import { ColorInfo, GetMirrorEscaper } from './Escaper_functions'
 import { EscaperStartCommands } from './Escaper_StartCommands'
 
 const SHOW_REVIVE_EFFECTS = false
@@ -296,7 +297,7 @@ export class Escaper {
 
         this.hero = CreateUnit(this.p, heroTypeId, x, y, angle)
 
-        if(!this.hero){
+        if (!this.hero) {
             return
         }
 
@@ -356,9 +357,11 @@ export class Escaper {
         const hero = this.hero
         createEvent({
             events: [t => TriggerRegisterUnitEvent(t, hero, EVENT_UNIT_DEATH)],
-            actions: [() => {
-                this.onEscaperDeath()
-            }]
+            actions: [
+                () => {
+                    this.onEscaperDeath()
+                },
+            ],
         })
 
         return true
@@ -1337,6 +1340,49 @@ export class Escaper {
     makeDeletePortalMobs = () => {
         this.destroyMake()
         if (this.hero) this.make = new MakeDeletePortalMob(this.hero)
+    }
+
+    makeSetPortalMobFreezeDuration(freezeDuration: number) {
+        this.destroyMake()
+        if (this.hero) {
+            this.make = new MakeMonsterPropertyChange(
+                this.hero,
+                'freezeDuration',
+                freezeDuration,
+                monster => !!monster.getPortalMob(),
+                monster => monster.getPortalMob()?.getFreezeDuration(),
+                (monster, freezeDuration) => monster.getPortalMob()?.setFreezeDuration(freezeDuration!)
+            )
+        }
+    }
+
+    makeSetPortalMobPortalEffect(portalEffect: string | null) {
+        this.destroyMake()
+        if (this.hero) {
+            this.make = new MakeMonsterPropertyChange(
+                this.hero,
+                'portalEffect',
+                portalEffect,
+                monster => !!monster.getPortalMob(),
+                monster => monster.getPortalMob()?.getPortalEffect(),
+                (monster, portalEffect) => monster.getPortalMob()?.setPortalEffect(portalEffect!)
+            )
+        }
+    }
+
+    makeSetPortalMobPortalEffectDuration(portalEffectDuration: number | null) {
+        this.destroyMake()
+        if (this.hero) {
+            this.make = new MakeMonsterPropertyChange(
+                this.hero,
+                'portalEffectDuration',
+                portalEffectDuration,
+                monster => !!monster.getPortalMob(),
+                monster => monster.getPortalMob()?.getPortalEffectDuration(),
+                (monster, portalEffectDuration) =>
+                    monster.getPortalMob()?.setPortalEffectDuration(portalEffectDuration!)
+            )
+        }
     }
 
     makeCreateTerrain(terrainType: TerrainType) {

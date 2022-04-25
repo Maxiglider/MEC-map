@@ -6,7 +6,7 @@ import {
     HERO_WALK_SPEED,
     MAX_MOVE_SPEED,
     RED,
-    TERRAIN_DEATH_TIME_TO_KILL
+    TERRAIN_DEATH_TIME_TO_KILL,
 } from 'core/01_libraries/Constants'
 import { udg_colorCode } from 'core/01_libraries/Init_colorCodes'
 import { Text } from 'core/01_libraries/Text'
@@ -26,7 +26,7 @@ import {
     DEFAULT_CASTER_PROJECTILE_SPEED,
     DEFAULT_CASTER_RANGE,
     MIN_CASTER_LOAD_TIME,
-    MIN_CASTER_PROJECTILE_SPEED
+    MIN_CASTER_PROJECTILE_SPEED,
 } from '../../04_STRUCTURES/Caster/CasterType'
 import { MONSTER_TELEPORT_PERIOD_MAX, MONSTER_TELEPORT_PERIOD_MIN } from '../../04_STRUCTURES/Monster/MonsterTeleport'
 import { CLEAR_MOB_MAX_DURATION, FRONT_MONTANT_DURATION } from '../../04_STRUCTURES/Monster_properties/ClearMob'
@@ -2793,7 +2793,7 @@ export const initExecuteCommandMake = () => {
 
             if (param3 !== '') {
                 if (!(S2R(param3) > 0)) {
-                    Text.erP(escaper.getPlayer(), 'the portal effect must be > 0')
+                    Text.erP(escaper.getPlayer(), 'the portal effect duration must be > 0')
                     return true
                 }
             }
@@ -2817,6 +2817,76 @@ export const initExecuteCommandMake = () => {
             }
             escaper.makeDeletePortalMobs()
             Text.mkP(escaper.getPlayer(), 'portal mobs deleting on')
+            return true
+        },
+    })
+
+    //-setPortalMobFreezeDuration(spmfd) <freezeDuration>
+    registerCommand({
+        name: 'setPortalMobFreezeDuration',
+        alias: ['spmfd'],
+        group: 'make',
+        argDescription: '<freezeDuration>',
+        description: 'set the freeze duration of the portal mob',
+        cb: ({ nbParam, param1 }, escaper) => {
+            if (!(nbParam === 1)) {
+                return true
+            }
+            const x = S2R(param1)
+            if (x !== 0 && (x > PORTAL_MOB_MAX_FREEZE_DURATION || x < 0)) {
+                Text.erP(
+                    escaper.getPlayer(),
+                    'the disable duration must be a real between ' +
+                        R2S(0) +
+                        ' and ' +
+                        R2S(PORTAL_MOB_MAX_FREEZE_DURATION)
+                )
+                return true
+            }
+            escaper.makeSetPortalMobFreezeDuration(x)
+            Text.mkP(escaper.getPlayer(), 'portal mob freeze duration setting on')
+            return true
+        },
+    })
+
+    //-setPortalMobEffect(spme) <portalEffect>
+    registerCommand({
+        name: 'setPortalMobEffect',
+        alias: ['spme'],
+        group: 'make',
+        argDescription: '<portalEffect>',
+        description: 'set the portal effect of the portal mob',
+        cb: ({ nbParam, param1 }, escaper) => {
+            if (!(nbParam === 1)) {
+                return true
+            }
+            if (!(S2R(param1) > 0)) {
+                Text.erP(escaper.getPlayer(), 'the portal effect must be > 0')
+                return true
+            }
+            escaper.makeSetPortalMobPortalEffect(param1)
+            Text.mkP(escaper.getPlayer(), 'portal mob portal effect setting on')
+            return true
+        },
+    })
+
+    //-setPortalMobEffectDuration(spmed) <portalEffectDuration>
+    registerCommand({
+        name: 'setPortalMobEffectDuration',
+        alias: ['spmed'],
+        group: 'make',
+        argDescription: '<portalEffectDuration>',
+        description: 'set the portal effect duration of the portal mob',
+        cb: ({ param1 }, escaper) => {
+            if (param1 !== '') {
+                if (!(S2R(param1) > 0)) {
+                    Text.erP(escaper.getPlayer(), 'the portal effect duration must be > 0')
+                    return true
+                }
+            }
+
+            escaper.makeSetPortalMobPortalEffectDuration(param1 === '' ? null : S2R(param1))
+            Text.mkP(escaper.getPlayer(), 'portal mob portal effect duration setting on')
             return true
         },
     })
