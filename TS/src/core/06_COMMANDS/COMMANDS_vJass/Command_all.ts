@@ -1208,12 +1208,12 @@ export const initCommandAll = () => {
         },
     })
 
-    //-othersTransparency <number>|off|reset
+    //-othersTransparency <number> | off | reset
     registerCommand({
         name: 'othersTransparency',
         alias: ['ot'],
         group: 'all',
-        argDescription: '<number>|off|reset',
+        argDescription: '<number> | off | reset',
         description: '',
         cb: ({ nbParam, param1 }, escaper) => {
             if (nbParam != 1) {
