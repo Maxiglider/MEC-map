@@ -9,7 +9,7 @@ import { AfkMode } from 'core/08_GAME/Afk_mode/Afk_mode'
 import { Globals } from 'core/09_From_old_Worldedit_triggers/globals_variables_and_triggers'
 import { udg_doubleHeroesEnabled } from 'core/Double_heroes/double_heroes_config'
 import { ServiceManager } from 'Services'
-import { flushLogs } from '../../../../../core/Log/log'
+import { flushLogs } from '../../Log/log'
 import {
     getUdgCasterTypes,
     getUdgEscapers,
