@@ -1221,7 +1221,9 @@ export const initCommandAll = () => {
             }
 
             if (param1 === 'off' || param1 === 'reset') {
-                param1 = '0'
+                escaper.setShowOthersTransparency(null)
+                Text.mkP(escaper.getPlayer(), `Showing other heroes as normal`)
+                return true
             }
 
             if (!(S2I(param1) >= 0 && S2I(param1) <= 100)) {

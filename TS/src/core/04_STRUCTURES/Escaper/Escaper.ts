@@ -177,7 +177,7 @@ export class Escaper {
     private displayName: string
 
     private showNames = false
-    private showOthersTransparency = 0
+    private showOthersTransparency: number | null = null
 
     //mouse position updated when a trigger dependant of mouse movement is being used
     mouseX = 0
@@ -1591,7 +1591,7 @@ export class Escaper {
         this.updateShowNames(true)
     }
 
-    setShowOthersTransparency = (showOthersTransparency: number) => {
+    setShowOthersTransparency = (showOthersTransparency: number | null) => {
         this.showOthersTransparency = showOthersTransparency
         this.updateUnitVertexColor(true)
     }
@@ -1622,7 +1622,7 @@ export class Escaper {
                             escaper.vcRed,
                             escaper.vcGreen,
                             escaper.vcBlue,
-                            GetLocalPlayer() === escaper.getPlayer() || player.showOthersTransparency === 0
+                            GetLocalPlayer() === escaper.getPlayer() || player.showOthersTransparency === null
                                 ? escaper.vcTransparency
                                 : player.showOthersTransparency
                         )

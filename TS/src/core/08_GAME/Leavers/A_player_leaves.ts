@@ -10,15 +10,14 @@ export const InitTrig_A_player_leaves = () => {
         actions: [
             () => {
                 let n = GetPlayerId(GetTriggerPlayer())
+                const displayName = getUdgEscapers().get(n)?.getDisplayName()
+
                 getUdgEscapers().destroyEscaper(n)
                 AfkMode.StopAfk(n)
                 AfkMode.StopAfk(n + NB_PLAYERS_MAX)
                 DisplayTextToForce(
                     GetPlayersAll(),
-                    udg_colorCode[n] +
-                        'This is too difficult for ' +
-                        getUdgEscapers().get(n)?.getDisplayName() +
-                        ', (s)he has left the game.'
+                    `${udg_colorCode[n]}This is too difficult for ${displayName}, (s)he has left the game.`
                 )
                 StartSound(gg_snd_noob)
                 //NbPlayersMinimumThree_nbPlayers = NbPlayersMinimumThree_nbPlayers - 1
