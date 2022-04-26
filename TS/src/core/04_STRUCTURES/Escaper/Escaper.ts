@@ -319,11 +319,8 @@ export class Escaper {
         SetUnitMoveSpeed(this.hero, this.walkSpeed) //voir pour le nom de la fonction
         this.selectHero()
 
-        if (this.baseColorId == 0) {
-            SetUnitColor(this.hero, PLAYER_COLOR_RED)
-        } else {
-            SetUnitColor(this.hero, ConvertPlayerColor(this.baseColorId))
-        }
+        SetUnitColor(this.hero, ConvertPlayerColor(this.baseColorId))
+        BlzSetHeroProperName(this.hero, this.getDisplayName())
 
         this.updateUnitVertexColor(false)
         this.SpecialIllidan()
@@ -625,59 +622,7 @@ export class Escaper {
     }
 
     turnInstantly(angle: number) {
-        if (!this.hero) return
-
-        let heroTypeId = HERO_TYPE_ID
-        let lastTerrainType = this.lastTerrainType
-        let x = GetUnitX(this.hero)
-        let y = GetUnitY(this.hero)
-        let meteor = UnitItemInSlot(this.hero, 0)
-
-        RemoveUnit(this.hero)
-
-        //recreate this.hero
-        if (this.escaperId >= NB_PLAYERS_MAX) {
-            heroTypeId = HERO_SECONDARY_TYPE_ID
-        }
-
-        this.hero = CreateUnit(this.p, heroTypeId, x, y, angle)
-
-        if (this.escaperId >= NB_PLAYERS_MAX) {
-            SetUnitTimeScale(this.hero, this.animSpeedSecondaryHero)
-        }
-
-        SetUnitFlyHeight(this.hero, 1, 0)
-        SetUnitFlyHeight(this.hero, 0, 0)
-        SetUnitUserData(this.hero, GetPlayerId(this.p))
-        ShowUnit(this.hero, false)
-        ShowUnit(this.hero, true)
-        UnitRemoveAbility(this.hero, FourCC('Aloc'))
-        SetUnitMoveSpeed(this.hero, this.walkSpeed) //voir pour le nom de la fonction
-        if (this.controler != this) {
-            SetUnitOwner(this.hero, this.controler.getPlayer(), false)
-        }
-
-        if (this.isHeroSelectedB) {
-            SelectUnit(this.hero, true)
-        }
-        if (this.baseColorId == 0) {
-            SetUnitColor(this.hero, PLAYER_COLOR_RED)
-        } else {
-            SetUnitColor(this.hero, ConvertPlayerColor(this.baseColorId))
-        }
-        this.updateUnitVertexColor(false)
-        this.effects.showEffects(this.hero)
-        if (this.make) {
-            this.make.maker = this.hero
-            this.make.t && TriggerRegisterUnitEvent(this.make.t, this.hero, EVENT_UNIT_ISSUED_POINT_ORDER)
-        }
-        ///////////////////////
-        this.lastTerrainType = lastTerrainType
-        SetUnitAnimation(this.hero, 'stand')
-        if (meteor) {
-            UnitAddItem(this.hero, meteor)
-        }
-        CommandShortcuts.InitShortcutSkills(GetPlayerId(this.p))
+        this.hero && BlzSetUnitFacingEx(this.hero, angle)
     }
 
     reverse = () => {
