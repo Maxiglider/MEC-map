@@ -2860,10 +2860,7 @@ export const initExecuteCommandMake = () => {
             if (!(nbParam === 1)) {
                 return true
             }
-            if (!(S2R(param1) > 0)) {
-                Text.erP(escaper.getPlayer(), 'the portal effect must be > 0')
-                return true
-            }
+
             escaper.makeSetPortalMobPortalEffect(param1)
             Text.mkP(escaper.getPlayer(), 'portal mob portal effect setting on')
             return true
