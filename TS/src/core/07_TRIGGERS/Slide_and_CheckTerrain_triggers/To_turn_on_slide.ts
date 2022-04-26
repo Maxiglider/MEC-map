@@ -1,4 +1,4 @@
-import { ApplyAngleSymmetry, IsLastOrderPause, IsOnGround, StopUnit } from 'core/01_libraries/Basic_functions'
+import {AnglesDiff, ApplyAngleSymmetry, IsLastOrderPause, IsOnGround, StopUnit} from 'core/01_libraries/Basic_functions'
 import { CAN_TURN_IN_AIR, NB_ESCAPERS } from 'core/01_libraries/Constants'
 import { Escaper } from 'core/04_STRUCTURES/Escaper/Escaper'
 import {
@@ -79,16 +79,19 @@ const initTurnOnSlide = () => {
 
         if (canTurn) {
             if (escaper.isAbsoluteInstantTurn()) {
+                //turn instantly
                 escaper.turnInstantly(angle)
                 if (escaperSecond?.isSliding()) {
                     escaperSecond.turnInstantly(angleSecond)
                 }
             } else {
-                SetUnitFacing(slider, angle)
-                const h1 = escaperSecond?.getHero()
+                //turn normally
+                const currentAngle = GetUnitFacing(slider)
+                escaper.setRemainingDegreesToTurn(AnglesDiff(angle, currentAngle))
 
+                const h1 = escaperSecond?.getHero()
                 if (escaperSecond?.isSliding() && h1) {
-                    SetUnitFacing(h1, angleSecond)
+                    escaperSecond.setRemainingDegreesToTurn(AnglesDiff(angleSecond, GetUnitFacing(h1)))
                 }
             }
             escaper.setSlideLastAngleOrder(angle)

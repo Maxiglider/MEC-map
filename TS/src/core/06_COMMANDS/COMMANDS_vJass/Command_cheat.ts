@@ -30,7 +30,7 @@ export const initExecuteCommandCheat = () => {
             const speed = S2R(param1)
             if (nbParam === 1) {
                 escaper.absoluteSlideSpeed(speed)
-                Text.P(escaper.getPlayer(), 'your slide speed is to ' + param1)
+                Text.P(escaper.getPlayer(), 'your slide speed is set to ' + param1)
                 return true
             }
             if (!(nbParam == 2 && escaper.isMaximaxou())) {
@@ -45,13 +45,13 @@ export const initExecuteCommandCheat = () => {
                     }
                     i = i + 1
                 }
-                Text.P(escaper.getPlayer(), 'slide speed for all is to ' + param1)
+                Text.P(escaper.getPlayer(), 'slide speed for all is set to ' + param1)
                 return true
             }
             if (isPlayerId(param2)) {
                 if (getUdgEscapers().get(resolvePlayerId(param2)) != null) {
                     getUdgEscapers().get(resolvePlayerId(param2))?.absoluteSlideSpeed(speed)
-                    Text.P(escaper.getPlayer(), 'slide speed for player ' + param2 + ' is to ' + param1)
+                    Text.P(escaper.getPlayer(), 'slide speed for player ' + param2 + ' is set to ' + param1)
                 }
             }
             return true
@@ -90,6 +90,87 @@ export const initExecuteCommandCheat = () => {
                 if (getUdgEscapers().get(resolvePlayerId(param1)) != null) {
                     getUdgEscapers().get(resolvePlayerId(param1))?.stopAbsoluteSlideSpeed()
                     Text.P(escaper.getPlayer(), 'slide speed for player ' + param1 + ' depends now on terrains')
+                }
+            }
+            return true
+        },
+    })
+
+    //-slideSpeed(ss) <speed>   --> changes the slide speed of your hero, ignoring terrains
+    registerCommand({
+        name: 'rotationSpeed',
+        alias: ['rs'],
+        group: 'cheat',
+        argDescription: '<roundsPerSecond>',
+        description: 'Changes the rotation speed of your hero, ignoring terrains',
+        cb: ({ nbParam, param1, param2 }, escaper) => {
+            if (S2R(param1) <= 0) {
+                Text.erP(escaper.getPlayer(), "The rotation speed has to be positive")
+                return true
+            }
+            const speed = S2R(param1)
+            if (nbParam === 1) {
+                escaper.absoluteRotationSpeed(speed)
+                Text.P(escaper.getPlayer(), 'your rotation speed is set to ' + param1)
+                return true
+            }
+            if (!(nbParam == 2 && escaper.isMaximaxou())) {
+                return true
+            }
+            if (param2 === 'all' || param2 === 'a') {
+                let i = 0
+                while (true) {
+                    if (i >= NB_ESCAPERS) break
+                    if (getUdgEscapers().get(i) != null) {
+                        getUdgEscapers().get(i)?.absoluteRotationSpeed(speed)
+                    }
+                    i = i + 1
+                }
+                Text.P(escaper.getPlayer(), 'rotation speed for all is set to ' + param1)
+                return true
+            }
+            if (isPlayerId(param2)) {
+                if (getUdgEscapers().get(resolvePlayerId(param2)) != null) {
+                    getUdgEscapers().get(resolvePlayerId(param2))?.absoluteRotationSpeed(speed)
+                    Text.P(escaper.getPlayer(), 'rotation speed for player ' + param2 + ' is set to ' + param1)
+                }
+            }
+            return true
+        },
+    })
+
+    //-normalSlideSpeed(nss)   --> puts the slide speed back to normal (respecting terrains)
+    registerCommand({
+        name: 'normalRotationSpeed',
+        alias: ['nrs'],
+        group: 'cheat',
+        argDescription: '',
+        description: 'Puts the rotation speed back to normal (respecting terrains)',
+        cb: ({ noParam, nbParam, param1 }, escaper) => {
+            if (noParam) {
+                escaper.stopAbsoluteRotationSpeed()
+                Text.P(escaper.getPlayer(), 'your rotation speed depends now on terrains')
+                return true
+            }
+            if (!(nbParam == 1 && escaper.isMaximaxou())) {
+                return true
+            }
+            if (param1 === 'all' || param1 === 'a') {
+                let i = 0
+                while (true) {
+                    if (i >= NB_ESCAPERS) break
+                    if (getUdgEscapers().get(i) != null) {
+                        getUdgEscapers().get(i)?.stopAbsoluteRotationSpeed()
+                    }
+                    i = i + 1
+                }
+                Text.P(escaper.getPlayer(), 'rotation speed for all depends now on terrains')
+                return true
+            }
+            if (isPlayerId(param1)) {
+                if (getUdgEscapers().get(resolvePlayerId(param1)) != null) {
+                    getUdgEscapers().get(resolvePlayerId(param1))?.stopAbsoluteRotationSpeed()
+                    Text.P(escaper.getPlayer(), 'rotation speed for player ' + param1 + ' depends now on terrains')
                 }
             }
             return true

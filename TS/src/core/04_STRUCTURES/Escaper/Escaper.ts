@@ -4,6 +4,7 @@ import {
     DUMMY_POWER_CIRCLE,
     HERO_SECONDARY_TYPE_ID,
     HERO_SLIDE_SPEED,
+    HERO_ROTATION_SPEED,
     HERO_TYPE_ID,
     HERO_WALK_SPEED,
     INVIS_UNIT_TYPE_ID,
@@ -99,7 +100,10 @@ export class Escaper {
     private invisUnit?: unit
     private walkSpeed: number
     private slideSpeed: number
+    private rotationSpeed: number
+    private remainingDegreesToTurn: number = 0
     private slideMovePerPeriod: number
+    private slideTurnPerPeriod: number
     private slideMirror: boolean = false
     private baseColorId: number
     private cameraField: number
@@ -122,6 +126,7 @@ export class Escaper {
     private godModeKills: boolean
     private walkSpeedAbsolute: boolean
     private slideSpeedAbsolute: boolean
+    private rotationSpeedAbsolute: boolean
     private hasAutoreviveB: boolean
 
     private canCheatB: boolean
@@ -193,7 +198,9 @@ export class Escaper {
         this.p = Player(this.playerId)
         this.walkSpeed = HERO_WALK_SPEED
         this.slideSpeed = HERO_SLIDE_SPEED
+        this.rotationSpeed = HERO_ROTATION_SPEED
         this.slideMovePerPeriod = HERO_SLIDE_SPEED * SLIDE_PERIOD
+        this.slideTurnPerPeriod = HERO_ROTATION_SPEED * SLIDE_PERIOD
         this.baseColorId = BlzColor2Id(GetPlayerColor(this.p)) || -1
 
         this.checkTerrain = CheckTerrainTrigger.CreateCheckTerrainTrigger(escaperId)
@@ -213,6 +220,7 @@ export class Escaper {
         this.godModeKills = false
         this.walkSpeedAbsolute = false
         this.slideSpeedAbsolute = false
+        this.rotationSpeedAbsolute = false
         this.hasAutoreviveB = false
 
         if (VIPs.includes(GetPlayerName(this.p))) {
@@ -725,8 +733,26 @@ export class Escaper {
         this.slideMovePerPeriod = ss * SLIDE_PERIOD
     }
 
+    //speed methods
+    setRotationSpeed(rs: number) {
+        this.rotationSpeed = rs //rounds
+        this.slideTurnPerPeriod = rs * SLIDE_PERIOD * 360 //degrees
+    }
+
+    getRemainingDegreesToTurn() {
+        return this.remainingDegreesToTurn
+    }
+
+    setRemainingDegreesToTurn(remainingDegreesToTurn: number) {
+        this.remainingDegreesToTurn = remainingDegreesToTurn
+    }
+
     getSlideMovePerPeriod = () => {
         return this.slideMovePerPeriod
+    }
+
+    getSlideTurnPerPeriod = () => {
+        return this.slideTurnPerPeriod
     }
 
     setWalkSpeed(ws: number) {
@@ -736,6 +762,10 @@ export class Escaper {
 
     getSlideSpeed = () => {
         return this.slideSpeed
+    }
+
+    getRotationSpeed = () => {
+        return this.rotationSpeed
     }
 
     getWalkSpeed = () => {
@@ -769,6 +799,36 @@ export class Escaper {
 
             if (!this.isEscaperSecondary()) {
                 GetMirrorEscaper(this)?.stopAbsoluteSlideSpeed()
+            }
+        }
+    }
+
+    isAbsoluteRotationSpeed = () => {
+        return this.rotationSpeedAbsolute
+    }
+
+    absoluteRotationSpeed(rotationSpeed: number) {
+        this.rotationSpeedAbsolute = true
+        this.setRotationSpeed(rotationSpeed)
+
+        if (!this.isEscaperSecondary()) {
+            GetMirrorEscaper(this)?.absoluteRotationSpeed(rotationSpeed)
+        }
+    }
+
+    stopAbsoluteRotationSpeed = () => {
+        if (this.rotationSpeedAbsolute) {
+            this.rotationSpeedAbsolute = false
+
+            if (this.hero && this.isAlive()) {
+                const currentTerrainType = getUdgTerrainTypes().getTerrainType(GetUnitX(this.hero), GetUnitY(this.hero))
+                if (currentTerrainType instanceof TerrainTypeSlide) {
+                    this.setRotationSpeed(currentTerrainType.getRotationSpeed())
+                }
+            }
+
+            if (!this.isEscaperSecondary()) {
+                GetMirrorEscaper(this)?.stopAbsoluteRotationSpeed()
             }
         }
     }

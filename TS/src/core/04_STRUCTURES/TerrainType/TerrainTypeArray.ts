@@ -78,12 +78,12 @@ export class TerrainTypeArray extends BaseArray<TerrainType> {
         return tt
     }
 
-    newSlide = (label: string, terrainTypeId: number, slideSpeed: number, canTurn: boolean) => {
+    newSlide = (label: string, terrainTypeId: number, slideSpeed: number, canTurn: boolean, rotationSpeed: number | null = null) => {
         if (this.isLabelAlreadyUsed(label)) throw 'Label already used'
         if (this.isTerrainTypeIdAlreadyUsed(terrainTypeId)) throw 'Terrain type already used'
         if (terrainTypeId === 0) throw 'Wrong terrain type'
 
-        const tt = new TerrainTypeSlide(label, terrainTypeId, slideSpeed, canTurn)
+        const tt = new TerrainTypeSlide(label, terrainTypeId, slideSpeed, canTurn, rotationSpeed)
         this._new(tt)
         return tt
     }
@@ -190,7 +190,7 @@ export class TerrainTypeArray extends BaseArray<TerrainType> {
                     break
 
                 case 'slide':
-                    tt = this.newSlide(terrainTypeJson.label, terrainTypeId, terrainTypeJson.slideSpeed, terrainTypeJson.canTurn)
+                    tt = this.newSlide(terrainTypeJson.label, terrainTypeId, terrainTypeJson.slideSpeed, terrainTypeJson.canTurn, terrainTypeJson.rotationSpeed)
 
                     break
 

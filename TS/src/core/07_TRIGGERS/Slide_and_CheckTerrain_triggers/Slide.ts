@@ -3,6 +3,35 @@ import { Apm } from 'core/08_GAME/Apm_clics_par_minute/Apm'
 import { createTimer } from 'Utils/mapUtils'
 import { getUdgEscapers, globals } from '../../../../globals'
 import { Gravity } from './Gravity'
+import {Escaper} from "../../04_STRUCTURES/Escaper/Escaper";
+import {GetMirrorEscaper} from "../../04_STRUCTURES/Escaper/Escaper_functions";
+
+const escaperTurnForOnePeriod = (escaper: Escaper | null) => {
+    if(!escaper) return;
+
+    const hero = escaper.getHero()
+    if(!hero) return
+
+    const remainingDegrees = escaper.getRemainingDegreesToTurn()
+    if(remainingDegrees != 0){
+        const currentAngle = GetUnitFacing(hero)
+
+        let diffToApplyAbs = RMinBJ(RAbsBJ(remainingDegrees), RAbsBJ(escaper.getSlideTurnPerPeriod()))
+
+        if(diffToApplyAbs != 0) {
+            //sens
+            const sens = (remainingDegrees * escaper.getSlideTurnPerPeriod()) > 1 ? 1 : -1
+
+            //diffToApply
+            const diffToApply = diffToApplyAbs * sens
+            escaper.setRemainingDegreesToTurn(remainingDegrees - diffToApply)
+
+            //turn
+            const newAngle = currentAngle + diffToApply
+            BlzSetUnitFacingEx(hero, newAngle)
+        }
+    }
+}
 
 const initSlideTrigger = () => {
     const Slide_Actions = (n: number) => {
@@ -19,6 +48,7 @@ const initSlideTrigger = () => {
 
         if (!hero) return
 
+        //offset of the hero position
         const angle = Deg2Rad(GetUnitFacing(hero))
 
         const newX = GetUnitX(hero) + escaper.getSlideMovePerPeriod() * Cos(angle)
@@ -38,7 +68,10 @@ const initSlideTrigger = () => {
             escaper.moveHero(newX, newY)
         }
 
+        //update apm
         Apm.timeOnSlide[n] = Apm.timeOnSlide[n] + SLIDE_PERIOD
+
+        let allowTurning = escaper.getRotationSpeed() != 0
 
         //gestion de la hauteur du héros
         if (height > 1) {
@@ -48,13 +81,17 @@ const initSlideTrigger = () => {
                 height = 0
             }
             SetUnitFlyHeight(hero, height, 0)
+
             //coop
             escaper.refreshCerclePosition()
+
+            allowTurning = allowTurning && CAN_TURN_IN_AIR
         } else {
             delta = diffZ - oldDiffZ
             if (delta < Gravity.GetGravity()) {
                 escaper.setSpeedZ(oldDiffZ + Gravity.GetGravity())
                 SetUnitFlyHeight(hero, -diffZ + speedZ, 0)
+
                 //arrêter de tourner si un clic a été fait juste avant
                 if (!CAN_TURN_IN_AIR) {
                     SetUnitFacing(hero, GetUnitFacing(hero))
@@ -66,6 +103,12 @@ const initSlideTrigger = () => {
         }
         escaper.setLastZ(z)
         escaper.setOldDiffZ(diffZ)
+
+        //turning
+        if(allowTurning){
+            escaperTurnForOnePeriod(escaper)
+            escaperTurnForOnePeriod(GetMirrorEscaper(escaper))
+        }
     }
 
     const CreateSlideTimer = (escaperId: number) => {
