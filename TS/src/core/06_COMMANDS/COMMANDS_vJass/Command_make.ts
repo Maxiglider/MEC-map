@@ -360,6 +360,36 @@ export const initExecuteCommandMake = () => {
         },
     })
 
+    //-setTerrainRotationSpeed(settrs) <slideTerrainLabel> <rotationSpeed>
+    registerCommand({
+        name: 'setTerrainRotationSpeed',
+        alias: ['settrs'],
+        group: 'make',
+        argDescription: '<slideTerrainLabel> <rotationSpeed>',
+        description: 'You have to specify rounds per second. Example : 1.3. Normal speed is 1',
+        cb: ({ nbParam, param1, param2 }, escaper) => {
+            if (!(nbParam === 2)) {
+                return true
+            }
+            const terrainType = getUdgTerrainTypes().getByLabel(param1)
+            if (!terrainType) {
+                Text.erP(escaper.getPlayer(), 'unknown terrain')
+                return true
+            }
+            if (!(terrainType instanceof TerrainTypeSlide)) {
+                Text.erP(escaper.getPlayer(), 'the terrain must be of slide type')
+                return true
+            }
+            if (S2R(param2) <= 0) {
+                Text.erP(escaper.getPlayer(), 'the rotation speed must be positive')
+                return true
+            }
+            terrainType.setRotationSpeed(S2R(param2))
+            Text.mkP(escaper.getPlayer(), 'terrain rotation speed changed')
+            return true
+        },
+    })
+
     //-setTerrainCanTurn(settct) <slideTerrainLabel> <canTurn>
     registerCommand({
         name: 'setTerrainCanTurn',
