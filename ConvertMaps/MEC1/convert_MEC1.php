@@ -87,9 +87,9 @@ foreach ($lines as $line) {
         $args = getArgs($match[1]);
 
         $gameData->terrainTypesMec[] = [
-            "canTurn" => $args[3] == "true",
+            "canTurn" => !isset($args[3]) || $args[3] == "true",
             "alias" => "",
-            "cliffClassId" => intval($match[3]) ?? 1,
+            "cliffClassId" => isset($match[3]) ? intval($match[3]) : 1,
             "slideSpeed" => intval($args[2]),
             "label" => removeQuotes($args[0]),
             "orderId" => 0,
@@ -104,7 +104,7 @@ foreach ($lines as $line) {
 
         $gameData->terrainTypesMec[] = [
             "alias" => "",
-            "cliffClassId" => intval($match[3]) ?? 1,
+            "cliffClassId" => isset($match[3]) ? intval($match[3]) : 1,
             "walkSpeed" => intval($args[2]),
             "label" => removeQuotes($args[0]),
             "orderId" => 0,
@@ -119,7 +119,7 @@ foreach ($lines as $line) {
 
         $gameData->terrainTypesMec[] = [
             "alias" => "",
-            "cliffClassId" => intval($match[3]) ?? 1,
+            "cliffClassId" => isset($match[3]) ? intval($match[3]) : 1,
             "label" => removeQuotes($args[0]),
             "orderId" => 0,
             "terrainTypeId" => removeQuotes($args[1]),
