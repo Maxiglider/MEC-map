@@ -489,6 +489,7 @@ export class Escaper {
             this.slide?.destroy()
             delete this.slide
             this.slideLastAngleOrder = -1
+            this.setRemainingDegreesToTurn(0)
         }
 
         return true
