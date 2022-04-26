@@ -1517,10 +1517,10 @@ export class Escaper {
         return this.gumBrushSize
     }
 
-    enableFollowMouseMode = (flag: boolean) => {
+    enableFollowMouseMode = (flag: boolean, neverDisable: boolean) => {
         this.followMouse?.destroy()
         if (flag) {
-            this.followMouse = new FollowMouse(this)
+            this.followMouse = new FollowMouse(this, neverDisable)
         } else {
             delete this.followMouse
         }

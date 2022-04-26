@@ -1095,14 +1095,16 @@ export const initCommandAll = () => {
         name: 'followMouse',
         alias: ['fm'],
         group: 'all',
-        argDescription: '<boolean>',
+        argDescription: '<boolean> [neverDisable | nd]',
         description: 'follows the mouse',
-        cb: ({ nbParam, param1 }, escaper) => {
-            if (nbParam != 1) {
+        cb: ({ nbParam, param1, param2 }, escaper) => {
+            if (nbParam != 1 && nbParam != 2) {
                 return true
             }
 
-            escaper.enableFollowMouseMode(S2B(param1))
+            const neverDisable = param2 == 'neverDisable' || param2 == 'nd'
+
+            escaper.enableFollowMouseMode(S2B(param1), neverDisable)
 
             if (S2B(param1)) {
                 Text.mkP(

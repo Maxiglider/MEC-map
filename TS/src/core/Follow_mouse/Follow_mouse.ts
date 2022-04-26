@@ -59,9 +59,12 @@ export class FollowMouse {
     static anyTimer2escaper = new Map<timer, Escaper>()
 
     public angle?: number
+    private neverDisable: boolean
 
-    constructor(escaper: Escaper) {
+    constructor(escaper: Escaper, neverDisable: boolean) {
         this.escaper = escaper
+        this.neverDisable = neverDisable
+
         const player = escaper.getPlayer()
 
         this.tPress = createEvent({
@@ -80,7 +83,8 @@ export class FollowMouse {
         if (activeBtn == MOUSE_BUTTON_TYPE_RIGHT) {
             this.tClickingTime = CreateTimer()
             TimerStart(this.tClickingTime, 60, false, DoNothing)
-            this.stopFollowingMouse()
+
+            !this.neverDisable && this.stopFollowingMouse()
         }
     }
 
