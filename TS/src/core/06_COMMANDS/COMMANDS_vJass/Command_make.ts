@@ -1,7 +1,7 @@
 import { String2Ascii } from 'core/01_libraries/Ascii'
 import { IsBoolString, S2B, tileset2tilesetString } from 'core/01_libraries/Basic_functions'
 import {
-    DEFAULT_MONSTER_SPEED,
+    DEFAULT_MONSTER_SPEED, HERO_ROTATION_SPEED,
     HERO_SLIDE_SPEED,
     HERO_WALK_SPEED,
     MAX_MOVE_SPEED,
@@ -366,7 +366,7 @@ export const initExecuteCommandMake = () => {
         alias: ['settrs'],
         group: 'make',
         argDescription: '<slideTerrainLabel> <rotationSpeed>',
-        description: 'You have to specify rounds per second. Example : 1.3. Normal speed is 1',
+        description: 'You have to specify rounds per second. Example : 1.3. Normal speed is 1; You can specify "default" | "d".',
         cb: ({ nbParam, param1, param2 }, escaper) => {
             if (!(nbParam === 2)) {
                 return true
@@ -380,11 +380,18 @@ export const initExecuteCommandMake = () => {
                 Text.erP(escaper.getPlayer(), 'the terrain must be of slide type')
                 return true
             }
-            if (S2R(param2) <= 0) {
+
+            let speed: number
+            if(param2 == "d" || param2 == "default"){
+                speed = HERO_ROTATION_SPEED
+            }else if (S2R(param2) <= 0) {
                 Text.erP(escaper.getPlayer(), 'the rotation speed must be positive')
                 return true
+            }else{
+                speed = S2R(param2)
             }
-            terrainType.setRotationSpeed(S2R(param2))
+
+            terrainType.setRotationSpeed(speed)
             Text.mkP(escaper.getPlayer(), 'terrain rotation speed changed')
             return true
         },

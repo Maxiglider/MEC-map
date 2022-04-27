@@ -48,32 +48,14 @@ const initSlideTrigger = () => {
 
         if (!hero) return
 
-        //offset of the hero position
-        const angle = Deg2Rad(GetUnitFacing(hero))
+        let allowTurning = escaper.getRotationSpeed() != 0
 
-        const newX = GetUnitX(hero) + escaper.getSlideMovePerPeriod() * Cos(angle)
-        const newY = GetUnitY(hero) + escaper.getSlideMovePerPeriod() * Sin(angle)
-
+        //gestion de la hauteur du héros
         const z = BlzGetUnitZ(hero)
         const diffZ = z - lastZ //différence de hauteur au niveau du terrain
         let height = GetUnitFlyHeight(hero)
         let delta: number
 
-        if (
-            newX >= globals.MAP_MIN_X &&
-            newX <= globals.MAP_MAX_X &&
-            newY >= globals.MAP_MIN_Y &&
-            newY <= globals.MAP_MAX_Y
-        ) {
-            escaper.moveHero(newX, newY)
-        }
-
-        //update apm
-        Apm.timeOnSlide[n] = Apm.timeOnSlide[n] + SLIDE_PERIOD
-
-        let allowTurning = escaper.getRotationSpeed() != 0
-
-        //gestion de la hauteur du héros
         if (height > 1) {
             escaper.setSpeedZ(speedZ + Gravity.GetGravity())
             height = height + speedZ - diffZ
@@ -109,6 +91,24 @@ const initSlideTrigger = () => {
             escaperTurnForOnePeriod(escaper)
             escaperTurnForOnePeriod(GetMirrorEscaper(escaper))
         }
+
+        //offset of the hero position
+        const angle = Deg2Rad(GetUnitFacing(hero))
+
+        const newX = GetUnitX(hero) + escaper.getSlideMovePerPeriod() * Cos(angle)
+        const newY = GetUnitY(hero) + escaper.getSlideMovePerPeriod() * Sin(angle)
+
+        if (
+            newX >= globals.MAP_MIN_X &&
+            newX <= globals.MAP_MAX_X &&
+            newY >= globals.MAP_MIN_Y &&
+            newY <= globals.MAP_MAX_Y
+        ) {
+            escaper.moveHero(newX, newY)
+        }
+
+        //update apm
+        Apm.timeOnSlide[n] = Apm.timeOnSlide[n] + SLIDE_PERIOD
     }
 
     const CreateSlideTimer = (escaperId: number) => {
