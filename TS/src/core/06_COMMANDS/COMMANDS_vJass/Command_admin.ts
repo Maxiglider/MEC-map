@@ -795,7 +795,7 @@ export const initExecuteCommandMax = () => {
     //-logs
     registerCommand({
         name: 'logs',
-        alias: ['vc'],
+        alias: [],
         group: 'max',
         argDescription: '',
         description: '',
