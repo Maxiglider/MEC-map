@@ -1,4 +1,4 @@
-import { CAN_TURN_IN_AIR, SLIDE_PERIOD } from 'core/01_libraries/Constants'
+import {CAN_TURN_IN_AIR, HERO_ROTATION_TIME_FOR_MAXIMUM_SPEED, SLIDE_PERIOD} from 'core/01_libraries/Constants'
 import { Apm } from 'core/08_GAME/Apm_clics_par_minute/Apm'
 import { createTimer } from 'Utils/mapUtils'
 import { getUdgEscapers, globals } from '../../../../globals'
@@ -22,14 +22,30 @@ const escaperTurnForOnePeriod = (escaper: Escaper | null) => {
             //sens
             const sens = (remainingDegrees * escaper.getSlideTurnPerPeriod()) > 1 ? 1 : -1
 
+            const curSlideTurn = escaper.getSlideCurrentTurnPerPeriod()
+
+            const increaseRotationSpeedPerPeriod = RAbsBJ(escaper.getSlideTurnPerPeriod() * SLIDE_PERIOD / HERO_ROTATION_TIME_FOR_MAXIMUM_SPEED)
+
+            let newSlideTurn: number
+            let diffToApply
+            if(sens > 0){
+                newSlideTurn = RMinBJ(curSlideTurn + increaseRotationSpeedPerPeriod, escaper.getSlideTurnPerPeriod())
+                diffToApply = RMinBJ(newSlideTurn, diffToApplyAbs)
+            }else{
+                newSlideTurn = RMaxBJ(curSlideTurn - increaseRotationSpeedPerPeriod, -escaper.getSlideTurnPerPeriod())
+                diffToApply = RMaxBJ(newSlideTurn, -diffToApplyAbs)
+            }
+            escaper.setSlideCurrentTurnPerPeriod(newSlideTurn)
+
             //diffToApply
-            const diffToApply = diffToApplyAbs * sens
             escaper.setRemainingDegreesToTurn(remainingDegrees - diffToApply)
 
             //turn
             const newAngle = currentAngle + diffToApply
             BlzSetUnitFacingEx(hero, newAngle)
         }
+    }else{
+        escaper.setSlideCurrentTurnPerPeriod(0) //reset acceleration
     }
 }
 

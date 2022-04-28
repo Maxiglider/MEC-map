@@ -104,6 +104,7 @@ export class Escaper {
     private remainingDegreesToTurn: number = 0
     private slideMovePerPeriod: number
     private slideTurnPerPeriod: number
+    private slideCurrentTurnPerPeriod: number //about turn acceleration
     private slideMirror: boolean = false
     private baseColorId: number
     private cameraField: number
@@ -201,6 +202,7 @@ export class Escaper {
         this.rotationSpeed = HERO_ROTATION_SPEED
         this.slideMovePerPeriod = HERO_SLIDE_SPEED * SLIDE_PERIOD
         this.slideTurnPerPeriod = HERO_ROTATION_SPEED * SLIDE_PERIOD
+        this.slideCurrentTurnPerPeriod = 0
         this.baseColorId = BlzColor2Id(GetPlayerColor(this.p)) || -1
 
         this.checkTerrain = CheckTerrainTrigger.CreateCheckTerrainTrigger(escaperId)
@@ -490,6 +492,7 @@ export class Escaper {
             delete this.slide
             this.slideLastAngleOrder = -1
             this.setRemainingDegreesToTurn(0)
+            this.setSlideCurrentTurnPerPeriod(0)
         }
 
         return true
@@ -754,6 +757,14 @@ export class Escaper {
 
     getSlideTurnPerPeriod = () => {
         return this.slideTurnPerPeriod
+    }
+
+    setSlideCurrentTurnPerPeriod = (n: number) => {
+        this.slideCurrentTurnPerPeriod = n
+    }
+
+    getSlideCurrentTurnPerPeriod = () => {
+        return this.slideCurrentTurnPerPeriod
     }
 
     setWalkSpeed(ws: number) {

@@ -23,7 +23,7 @@ export const init_measureSpeed = () => {
             let sens = 1
 
             let currentRotationSpeed = 0
-            let increaseRotationSpeedPerPeriod = slideTurnPerPeriod * HERO_ROTATION_TIME_FOR_MAXIMUM_SPEED
+            let increaseRotationSpeedPerPeriod = slideTurnPerPeriod * SLIDE_PERIOD / HERO_ROTATION_TIME_FOR_MAXIMUM_SPEED
 
             const startBlueHero = () => {
                 createTimer(SLIDE_PERIOD, true, () => {

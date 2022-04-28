@@ -22,6 +22,7 @@ import { init_shortcurt_cancelRedo } from '../Keyboard_shortcuts/Cancel_redo'
 import { init_Test } from '../Test/test'
 import { initArrays } from './initArrays'
 import { initOldTriggers } from './init_old_triggers'
+import {init_measureSpeed} from "../Test/measure_hero_rotation_speed";
 
 export const initializers = () => {
     init_terrain_limit_variables()
@@ -52,4 +53,5 @@ export const initializers = () => {
 
     //todomax disable this line at end
     init_Test()
+    // init_measureSpeed()
 }
