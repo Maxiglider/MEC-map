@@ -86,8 +86,12 @@ const initTurnOnSlide = () => {
                 }
             } else {
                 //turn normally
-                const currentAngle = GetUnitFacing(slider)
-                escaper.setRemainingDegreesToTurn(AnglesDiff(angle, currentAngle))
+                if(escaper.slidingMode == 'max') {
+                    const currentAngle = GetUnitFacing(slider)
+                    escaper.setRemainingDegreesToTurn(AnglesDiff(angle, currentAngle))
+                }else{
+                    SetUnitFacing(slider, angle)
+                }
 
                 const h1 = escaperSecond?.getHero()
                 if (escaperSecond?.isSliding() && h1) {

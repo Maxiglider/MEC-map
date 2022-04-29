@@ -807,4 +807,62 @@ export const initExecuteCommandMax = () => {
             return true
         },
     })
+
+    //-clickWhereYouAre
+    registerCommand({
+        name: 'clickWhereYouAre',
+        alias: ['cwya'],
+        group: 'max',
+        argDescription: '',
+        description: '',
+        cb: ({ nbParam, param1, param2 }, escaper) => {
+            if (!(nbParam === 1 || nbParam === 2)) {
+                Text.erP(escaper.getPlayer(), 'one or two params for this command')
+                return true
+            }
+
+            let b = false
+
+            if (nbParam === 2) {
+                if (IsBoolString(param2)) {
+                    b = S2B(param2)
+                } else {
+                    Text.erP(escaper.getPlayer(), 'param2 must be a boolean')
+                    return true
+                }
+            } else {
+                b = true
+            }
+            if (param1 === 'all' || param1 === 'a') {
+                let i = 0
+                while (true) {
+                    if (i >= NB_ESCAPERS) break
+                        getUdgEscapers().get(i)?.enableClickWhereYouAre(b)
+                    i = i + 1
+                }
+                if (b) {
+                    Text.P(escaper.getPlayer(), 'all players now turn')
+                } else {
+                    Text.P(escaper.getPlayer(), "all players stop turn")
+                }
+                return true
+            }
+            if (isPlayerId(param1)) {
+                let n = resolvePlayerId(param1)
+                if (getUdgEscapers().get(n) != null) {
+                    getUdgEscapers().get(n)?.enableClickWhereYouAre(b)
+                    if (b) {
+                        Text.P(escaper.getPlayer(), 'player ' + param1 + ' now turn')
+                    } else {
+                        Text.P(escaper.getPlayer(), 'player ' + param1 + ' no longer turn')
+                    }
+                } else {
+                    Text.erP(escaper.getPlayer(), 'escaper ' + param1 + " doesn't exist")
+                }
+            } else {
+                Text.erP(escaper.getPlayer(), 'param1 must be a player color or "all"')
+            }
+            return true
+        },
+    })
 }

@@ -1,4 +1,4 @@
-import { StopUnit } from 'core/01_libraries/Basic_functions'
+import {S2B, StopUnit} from 'core/01_libraries/Basic_functions'
 import {
     DEFAULT_CAMERA_FIELD,
     DUMMY_POWER_CIRCLE,
@@ -14,7 +14,7 @@ import {
     PLAYER_INVIS_UNIT,
     POWER_CIRCLE,
     SLIDE_PERIOD,
-    TERRAIN_KILL_EFFECT_BODY_PART,
+    TERRAIN_KILL_EFFECT_BODY_PART, HERO_ROTATION_TIME_FOR_MAXIMUM_SPEED,
 } from 'core/01_libraries/Constants'
 import { udg_colorCode } from 'core/01_libraries/Init_colorCodes'
 import { Text } from 'core/01_libraries/Text'
@@ -105,11 +105,16 @@ export class Escaper {
     private slideMovePerPeriod: number
     private slideTurnPerPeriod: number
     private slideCurrentTurnPerPeriod: number //about turn acceleration
+    public tProgressivelyTurnAccelerationToZero: Timer | null = null
     private slideMirror: boolean = false
     private baseColorId: number
     private cameraField: number
     private lastTerrainType?: TerrainType
     private controler: Escaper
+
+    public slidingMode: 'normal'|'max' = 'normal'
+    public rotationTimeForMaximumSpeed = HERO_ROTATION_TIME_FOR_MAXIMUM_SPEED
+    private tClickWhereYouAre: Timer | null = null
 
     private slide?: Timer
     private checkTerrain: trigger
@@ -748,6 +753,7 @@ export class Escaper {
     }
 
     setRemainingDegreesToTurn(remainingDegreesToTurn: number) {
+        if(RAbsBJ(remainingDegreesToTurn) < 0.01) remainingDegreesToTurn = 0
         this.remainingDegreesToTurn = remainingDegreesToTurn
     }
 
@@ -1665,6 +1671,20 @@ export class Escaper {
                     }
                 }
             }
+        }
+    }
+
+    enableClickWhereYouAre = (b: boolean) => {
+        if(this.tClickWhereYouAre){
+            this.tClickWhereYouAre.destroy()
+        }
+
+        if(b && this.hero){
+            const x = GetUnitX(this.hero)
+            const y = GetUnitY(this.hero)
+            this.tClickWhereYouAre = createTimer(0.1, true, () => {
+                this.hero && IssuePointOrder(this.hero, 'smart', x, y)
+            })
         }
     }
 

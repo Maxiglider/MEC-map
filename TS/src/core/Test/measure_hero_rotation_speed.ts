@@ -21,12 +21,18 @@ export const init_measureSpeed = () => {
             let heroBlueStarted = false
 
             let sens = 1
+            let lastSens = sens
 
             let currentRotationSpeed = 0
             let increaseRotationSpeedPerPeriod = slideTurnPerPeriod * SLIDE_PERIOD / HERO_ROTATION_TIME_FOR_MAXIMUM_SPEED
 
             const startBlueHero = () => {
                 createTimer(SLIDE_PERIOD, true, () => {
+                    if(lastSens != sens){
+                        //currentRotationSpeed = 0
+                        lastSens = sens
+                    }
+
                     const currentAngle = GetUnitFacing(hero2)
 
                     const aimedDiffAngle = slideTurnPerPeriod * sens
@@ -78,7 +84,7 @@ export const init_measureSpeed = () => {
             })
 
             //change sens
-            createTimer(0.7, true, () => {
+            createTimer(0.2, true, () => {
                 sens = -sens
             })
 

@@ -1285,5 +1285,54 @@ export const initCommandAll = () => {
 
             return true
         },
+    }),
+
+
+    registerCommand({
+        name: 'slidingMode',
+        alias: [],
+        group: 'all',
+        argDescription: '[normal] | [max] | []',
+        description: 'Run commands on start of the game',
+        cb: ({ cmd, nbParam, param1}, escaper) => {
+            if(nbParam == 0){
+                Text.mkP(escaper.getPlayer(), "your sliding mode is " + escaper.slidingMode)
+            }
+
+            if(nbParam == 1){
+                if(param1 == 'max' || param1 == 'normal'){
+                    escaper.slidingMode = param1
+                    Text.mkP(escaper.getPlayer(), "changed sliding mode")
+                }else{
+                    Text.erP(escaper.getPlayer(), "wrong sliding mode")
+                }
+            }
+
+            return true
+        }
+    })
+
+
+    registerCommand({
+        name: 'rotationTimeMaxSpeed',
+        alias: ['rtms'],
+        group: 'all',
+        argDescription: '[real (default 0.15)',
+        description: 'Run commands on start of the game',
+        cb: ({ cmd, nbParam, param1}, escaper) => {
+            if(nbParam == 0){
+                Text.mkP(escaper.getPlayer(), "your rotation time for maximaxum speed is " + escaper.rotationTimeForMaximumSpeed)
+                return true
+            }
+
+            if(nbParam != 1){
+                Text.erP(escaper.getPlayer(), "wrong command")
+            }
+
+            escaper.rotationTimeForMaximumSpeed = S2R(param1)
+            Text.mkP(escaper.getPlayer(), "your rotation time for maximaxum speed is changed")
+
+            return true
+        }
     })
 }
