@@ -175,17 +175,20 @@ foreach ($lines as $line) {
      */
 
     //level init
-    if (preg_match('/^function Init_level(\d+)_Actions/', $line, $match)) {
+    if (preg_match('/^function Init_level(\d+)/', $line, $match)) {
         $levelNum = intval($match[1]);
-        $level = $gameData->levels[$levelNum] = (object)[
-            "id" => $levelNum,
-            "start" => null,
-            "end" => null,
-            "visibilities" => [],
-            "meteors" => [],
-            "monsters" => [],
-            "monsterSpawns" => [],
-        ];
+        if(!isset($gameData->levels[$levelNum])){
+            $gameData->levels[$levelNum] = (object)[
+                "id" => $levelNum,
+                "start" => null,
+                "end" => null,
+                "visibilities" => [],
+                "meteors" => [],
+                "monsters" => [],
+                "monsterSpawns" => [],
+            ];
+        }
+        $level = $gameData->levels[$levelNum];
     }
 
     //lives earned
