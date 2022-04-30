@@ -51,7 +51,6 @@ export const initializers = () => {
     //keyboard shortcuts
     init_shortcurt_cancelRedo()
 
-    //todomax disable this line at end
+    //test trigger for developement
     init_Test()
-    // init_measureSpeed()
 }

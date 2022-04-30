@@ -1,7 +1,7 @@
 import { String2Ascii } from 'core/01_libraries/Ascii'
 import { IsBoolString, S2B, tileset2tilesetString } from 'core/01_libraries/Basic_functions'
 import {
-    DEFAULT_MONSTER_SPEED, HERO_ROTATION_SPEED,
+    DEFAULT_MONSTER_SPEED,
     HERO_SLIDE_SPEED,
     HERO_WALK_SPEED,
     MAX_MOVE_SPEED,
@@ -35,6 +35,7 @@ import { TerrainTypeFromString } from '../../07_TRIGGERS/Modify_terrain_Function
 import { ChangeAllTerrains } from '../../07_TRIGGERS/Triggers_to_modify_terrains/Change_all_terrains'
 import { ChangeOneTerrain } from '../../07_TRIGGERS/Triggers_to_modify_terrains/Change_one_terrain'
 import { CmdParam } from './Command_functions'
+import {HERO_ROTATION_SPEED} from "../../07_TRIGGERS/Slide_and_CheckTerrain_triggers/SlidingMax";
 
 export const initExecuteCommandMake = () => {
     const { registerCommand } = ServiceManager.getService('Cmd')

@@ -1,10 +1,9 @@
-import {S2B, StopUnit} from 'core/01_libraries/Basic_functions'
+import {StopUnit} from 'core/01_libraries/Basic_functions'
 import {
     DEFAULT_CAMERA_FIELD,
     DUMMY_POWER_CIRCLE,
     HERO_SECONDARY_TYPE_ID,
     HERO_SLIDE_SPEED,
-    HERO_ROTATION_SPEED,
     HERO_TYPE_ID,
     HERO_WALK_SPEED,
     INVIS_UNIT_TYPE_ID,
@@ -14,7 +13,7 @@ import {
     PLAYER_INVIS_UNIT,
     POWER_CIRCLE,
     SLIDE_PERIOD,
-    TERRAIN_KILL_EFFECT_BODY_PART, HERO_ROTATION_TIME_FOR_MAXIMUM_SPEED,
+    TERRAIN_KILL_EFFECT_BODY_PART,
 } from 'core/01_libraries/Constants'
 import { udg_colorCode } from 'core/01_libraries/Init_colorCodes'
 import { Text } from 'core/01_libraries/Text'
@@ -78,6 +77,10 @@ import { EscaperEffectArray } from './EscaperEffectArray'
 import { EscaperFirstPerson } from './Escaper_firstPerson'
 import {ColorInfo, GetMirrorEscaper, IsHero} from './Escaper_functions'
 import { EscaperStartCommands } from './Escaper_StartCommands'
+import {
+    HERO_ROTATION_SPEED,
+    HERO_ROTATION_TIME_FOR_MAXIMUM_SPEED
+} from "../../07_TRIGGERS/Slide_and_CheckTerrain_triggers/SlidingMax";
 
 const SHOW_REVIVE_EFFECTS = false
 
@@ -103,7 +106,7 @@ export class Escaper {
     private rotationSpeed: number
     private remainingDegreesToTurn: number = 0
     private slideMovePerPeriod: number
-    private slideTurnPerPeriod: number
+    private maxSlideTurnPerPeriod: number
     private slideCurrentTurnPerPeriod: number //about turn acceleration
     public tProgressivelyTurnAccelerationToZero: Timer | null = null
     private slideMirror: boolean = false
@@ -206,7 +209,7 @@ export class Escaper {
         this.slideSpeed = HERO_SLIDE_SPEED
         this.rotationSpeed = HERO_ROTATION_SPEED
         this.slideMovePerPeriod = HERO_SLIDE_SPEED * SLIDE_PERIOD
-        this.slideTurnPerPeriod = HERO_ROTATION_SPEED * SLIDE_PERIOD
+        this.maxSlideTurnPerPeriod = HERO_ROTATION_SPEED * SLIDE_PERIOD
         this.slideCurrentTurnPerPeriod = 0
         this.baseColorId = BlzColor2Id(GetPlayerColor(this.p)) || -1
 
@@ -745,7 +748,7 @@ export class Escaper {
     //speed methods
     setRotationSpeed(rs: number) {
         this.rotationSpeed = rs //rounds
-        this.slideTurnPerPeriod = rs * SLIDE_PERIOD * 360 //degrees
+        this.maxSlideTurnPerPeriod = rs * SLIDE_PERIOD * 360 //degrees
     }
 
     getRemainingDegreesToTurn() {
@@ -761,8 +764,8 @@ export class Escaper {
         return this.slideMovePerPeriod
     }
 
-    getSlideTurnPerPeriod = () => {
-        return this.slideTurnPerPeriod
+    getMaxSlideTurnPerPeriod = () => {
+        return this.maxSlideTurnPerPeriod
     }
 
     setSlideCurrentTurnPerPeriod = (n: number) => {
