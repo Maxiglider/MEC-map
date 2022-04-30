@@ -80,6 +80,8 @@ $level = null;
 $nextMMPxArr = [];
 $nextMMPyArr = [];
 
+$nbMonstersWithId0 = 0; //id more than one, we remove ids
+
 foreach ($lines as $line) {
 
     //terrain type slide
@@ -233,9 +235,11 @@ foreach ($lines as $line) {
 
         if (preg_match('/level\.monstersNoMove\.new\((.+?)\)(\.setId\((\d+)\))?/', $line, $match)) {
             $args = getArgs($match[1]);
+            $id = isset($match[3]) ? intval($match[3]) : 0;
+            if($id == 0) $nbMonstersWithId0++;
 
             $level->monsters[] = [
-                "id" => isset($match[3]) ? intval($match[3]) : 0,
+                "id" => $id,
                 "monsterClassName" => "MonsterNoMove",
                 "monsterTypeLabel" => removeQuotes($args[0]),
                 "x" => intval($args[1]),
@@ -251,9 +255,11 @@ foreach ($lines as $line) {
 
         if (preg_match('/level\.monstersSimplePatrol\.new\((.+?)\)(\.setId\((\d+)\))?/', $line, $match)) {
             $args = getArgs($match[1]);
+            $id = isset($match[3]) ? intval($match[3]) : 0;
+            if($id == 0) $nbMonstersWithId0++;
 
             $level->monsters[] = [
-                "id" => isset($match[3]) ? intval($match[3]) : 0,
+                "id" => $id,
                 "monsterClassName" => "MonsterSimplePatrol",
                 "monsterTypeLabel" => removeQuotes($args[0]),
                 "x1" => intval($args[1]),
@@ -278,9 +284,11 @@ foreach ($lines as $line) {
 
         if (preg_match('/level\.monstersMultiplePatrols\.new\((.+?)\)(\.setId\((\d+)\))?/', $line, $match)) {
             $args = getArgs($match[1]);
+            $id = isset($match[3]) ? intval($match[3]) : 0;
+            if($id == 0) $nbMonstersWithId0++;
 
             $level->monsters[] = [
-                "id" => isset($match[3]) ? intval($match[3]) : 0,
+                "id" => $id,
                 "monsterClassName" => "MonsterMultiplePatrols",
                 "monsterTypeLabel" => removeQuotes($args[0]),
                 "mode" => removeQuotes($args[1]),
@@ -329,9 +337,11 @@ foreach ($lines as $line) {
 
         if (preg_match('/level\.casters\.new\((.+?)\)(\.setId\((\d+)\))?/', $line, $match)) {
             $args = getArgs($match[1]);
+            $id = isset($match[3]) ? intval($match[3]) : 0;
+            if($id == 0) $nbMonstersWithId0++;
 
             $level->monsters[] = [
-                "id" => isset($match[3]) ? intval($match[3]) : 0,
+                "id" => $id,
                 "monsterClassName" => "Caster",
                 "casterTypeLabel" => removeQuotes($args[0]),
                 "x" => intval($args[1]),
@@ -341,6 +351,16 @@ foreach ($lines as $line) {
         }
     }
 
+}
+
+
+//remove monster ids if they all got id 0
+if($nbMonstersWithId0 > 1){
+    foreach($gameData->levels as $level){
+        foreach($level->monsters as $numMonster => $monster){
+            unset($level->monsters[$numMonster]['id']);
+        }
+    }
 }
 
 
