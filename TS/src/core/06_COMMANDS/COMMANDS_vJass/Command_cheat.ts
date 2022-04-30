@@ -708,4 +708,29 @@ export const initExecuteCommandCheat = () => {
             return true
         },
     })
+
+
+    registerCommand({
+        name: 'slidingMode',
+        alias: [],
+        group: 'all',
+        argDescription: '[normal] | [max] | []',
+        description: 'Run commands on start of the game',
+        cb: ({ cmd, nbParam, param1}, escaper) => {
+            if(nbParam == 0){
+                Text.mkP(escaper.getPlayer(), "your sliding mode is " + escaper.slidingMode)
+            }
+
+            if(nbParam == 1){
+                if(param1 == 'max' || param1 == 'normal'){
+                    escaper.slidingMode = param1
+                    Text.mkP(escaper.getPlayer(), "changed sliding mode")
+                }else{
+                    Text.erP(escaper.getPlayer(), "wrong sliding mode")
+                }
+            }
+
+            return true
+        }
+    })
 }

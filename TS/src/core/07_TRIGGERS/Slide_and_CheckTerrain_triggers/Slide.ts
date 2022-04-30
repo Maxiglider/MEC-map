@@ -23,8 +23,6 @@ const progressivelyTurnAccelerationToZero = (escaper: Escaper) => {
         newSlideTurn = 0
     }
 
-    escaper.getId() == 0 && print("newSlideTurn : " + newSlideTurn)
-
     escaper.setSlideCurrentTurnPerPeriod(newSlideTurn)
 
     if(newSlideTurn == 0){

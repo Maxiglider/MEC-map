@@ -115,7 +115,7 @@ export class Escaper {
     private lastTerrainType?: TerrainType
     private controler: Escaper
 
-    public slidingMode: 'normal'|'max' = 'normal'
+    public slidingMode: 'normal'|'max' = 'max'
     public rotationTimeForMaximumSpeed = HERO_ROTATION_TIME_FOR_MAXIMUM_SPEED
     private tClickWhereYouAre: Timer | null = null
 

@@ -33,8 +33,6 @@ export class MakeTerrainCopyPasteAction extends MakeAction {
         let diffX = maxXcopy - minXcopy
         let diffY = maxYcopy - minYcopy
 
-        print('diffX ' + diffX + ' ; diffY ' + diffY)
-
         let minXpaste: number
         let minYpaste: number
 
@@ -52,29 +50,6 @@ export class MakeTerrainCopyPasteAction extends MakeAction {
             //direction bas
             minYpaste = y3 - diffY
         }
-
-        print(
-            'minXpaste : ' +
-                minXpaste +
-                ' ; minXpaste : ' +
-                minXpaste +
-                ' ; minYpaste : ' +
-                minYpaste +
-                ' ; minYpaste : ' +
-                minYpaste
-        )
-        print(
-            'MAP_MIN_X : ' +
-                MAP_MIN_X +
-                ' ; MAP_MAX_X : ' +
-                MAP_MAX_X +
-                ' ; MAP_MIN_Y : ' +
-                MAP_MIN_Y +
-                ' ; MAP_MAX_Y : ' +
-                MAP_MAX_Y +
-                ' ; diffX : ' +
-                diffX
-        )
 
         if (
             minXpaste < MAP_MIN_X ||
