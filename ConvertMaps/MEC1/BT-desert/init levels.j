@@ -6,7 +6,7 @@ function Init_level0_Actions takes nothing returns nothing
 //start message
 
 //lives earned
-	call level.setNbLivesEarned(0)
+	call level.setNbLivesEarned(10000)
 
 //start location
 	call level.newStart(GetRectMinX(gg_rct_departLvl_0), GetRectMinY(gg_rct_departLvl_0), GetRectMaxX(gg_rct_departLvl_0), GetRectMaxY(gg_rct_departLvl_0))
