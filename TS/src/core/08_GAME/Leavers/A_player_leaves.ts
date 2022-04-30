@@ -3,6 +3,7 @@ import { udg_colorCode } from 'core/01_libraries/Init_colorCodes'
 import { createEvent, forRange } from 'Utils/mapUtils'
 import { getUdgEscapers } from '../../../../globals'
 import { AfkMode } from '../Afk_mode/Afk_mode'
+import {playerId2colorId} from "../../06_COMMANDS/COMMANDS_vJass/Command_functions";
 
 export const InitTrig_A_player_leaves = () => {
     createEvent({
@@ -17,7 +18,7 @@ export const InitTrig_A_player_leaves = () => {
                 AfkMode.StopAfk(n + NB_PLAYERS_MAX)
                 DisplayTextToForce(
                     GetPlayersAll(),
-                    `${udg_colorCode[n]}This is too difficult for ${displayName}, (s)he has left the game.`
+                    `${udg_colorCode[playerId2colorId(n)]}This is too difficult for ${displayName}, (s)he has left the game.`
                 )
                 StartSound(gg_snd_noob)
                 //NbPlayersMinimumThree_nbPlayers = NbPlayersMinimumThree_nbPlayers - 1

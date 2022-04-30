@@ -148,7 +148,7 @@ export class Level {
         this.visibilities.destroy()
         this.triggers.destroy()
         this.monsters.destroy()
-        //todomax destroy spawns missing ?
+        this.monsterSpawns.destroy()
     }
 
     recreateMonstersUnitsOfType(mt: MonsterType) {

@@ -35,6 +35,7 @@ import { TerrainTypeFromString } from '../../07_TRIGGERS/Modify_terrain_Function
 import { ChangeAllTerrains } from '../../07_TRIGGERS/Triggers_to_modify_terrains/Change_all_terrains'
 import { ChangeOneTerrain } from '../../07_TRIGGERS/Triggers_to_modify_terrains/Change_one_terrain'
 import { CmdParam } from './Command_functions'
+import {HERO_ROTATION_SPEED} from "../../07_TRIGGERS/Slide_and_CheckTerrain_triggers/SlidingMax";
 
 export const initExecuteCommandMake = () => {
     const { registerCommand } = ServiceManager.getService('Cmd')
@@ -356,6 +357,43 @@ export const initExecuteCommandMake = () => {
             }
             terrainType.setSlideSpeed(S2R(param2))
             Text.mkP(escaper.getPlayer(), 'terrain slide speed changed')
+            return true
+        },
+    })
+
+    //-setTerrainRotationSpeed(settrs) <slideTerrainLabel> <rotationSpeed>
+    registerCommand({
+        name: 'setTerrainRotationSpeed',
+        alias: ['settrs'],
+        group: 'make',
+        argDescription: '<slideTerrainLabel> <rotationSpeed>',
+        description: 'You have to specify rounds per second. Example : 1.3. Normal speed is 1; You can specify "default" | "d".',
+        cb: ({ nbParam, param1, param2 }, escaper) => {
+            if (!(nbParam === 2)) {
+                return true
+            }
+            const terrainType = getUdgTerrainTypes().getByLabel(param1)
+            if (!terrainType) {
+                Text.erP(escaper.getPlayer(), 'unknown terrain')
+                return true
+            }
+            if (!(terrainType instanceof TerrainTypeSlide)) {
+                Text.erP(escaper.getPlayer(), 'the terrain must be of slide type')
+                return true
+            }
+
+            let speed: number
+            if(param2 == "d" || param2 == "default"){
+                speed = HERO_ROTATION_SPEED
+            }else if (S2R(param2) <= 0) {
+                Text.erP(escaper.getPlayer(), 'the rotation speed must be positive')
+                return true
+            }else{
+                speed = S2R(param2)
+            }
+
+            terrainType.setRotationSpeed(speed)
+            Text.mkP(escaper.getPlayer(), 'terrain rotation speed changed')
             return true
         },
     })

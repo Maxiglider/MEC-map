@@ -1,4 +1,4 @@
-import { StopUnit } from 'core/01_libraries/Basic_functions'
+import {StopUnit} from 'core/01_libraries/Basic_functions'
 import {
     DEFAULT_CAMERA_FIELD,
     DUMMY_POWER_CIRCLE,
@@ -58,7 +58,7 @@ import { MakeTerrainCreateBrush } from '../../05_MAKE_STRUCTURES/Make_terrain/Ma
 import { MakeTerrainHorizontalSymmetry } from '../../05_MAKE_STRUCTURES/Make_terrain/MakeTerrainHorizontalSymmetry'
 import { MakeTerrainVerticalSymmetry } from '../../05_MAKE_STRUCTURES/Make_terrain/MakeTerrainVerticalSymmetry'
 import { MakeTerrainHeight } from '../../05_MAKE_STRUCTURES/Make_terrain_height/MakeTerrainHeight'
-import { removeHash } from '../../06_COMMANDS/COMMANDS_vJass/Command_functions'
+import {BlzColor2Id, removeHash} from '../../06_COMMANDS/COMMANDS_vJass/Command_functions'
 import { CheckTerrainTrigger } from '../../07_TRIGGERS/Slide_and_CheckTerrain_triggers/CheckTerrain'
 import { SlideTrigger } from '../../07_TRIGGERS/Slide_and_CheckTerrain_triggers/Slide'
 import { Trig_InvisUnit_is_getting_damage } from '../../08_GAME/Death/InvisUnit_is_getting_damage'
@@ -80,6 +80,10 @@ import { EscaperEffectArray } from './EscaperEffectArray'
 import { EscaperFirstPerson } from './Escaper_firstPerson'
 import { ColorInfo, GetMirrorEscaper } from './Escaper_functions'
 import { EscaperStartCommands } from './Escaper_StartCommands'
+import {
+    HERO_ROTATION_SPEED,
+    HERO_ROTATION_TIME_FOR_MAXIMUM_SPEED
+} from "../../07_TRIGGERS/Slide_and_CheckTerrain_triggers/SlidingMax";
 
 const SHOW_REVIVE_EFFECTS = false
 
@@ -102,12 +106,21 @@ export class Escaper {
     private invisUnit?: unit
     private walkSpeed: number
     private slideSpeed: number
+    private rotationSpeed: number
+    private remainingDegreesToTurn: number = 0
     private slideMovePerPeriod: number
+    private maxSlideTurnPerPeriod: number
+    private slideCurrentTurnPerPeriod: number //about turn acceleration
+    public tProgressivelyTurnAccelerationToZero: Timer | null = null
     private slideMirror: boolean = false
     private baseColorId: number
     private cameraField: number
     private lastTerrainType?: TerrainType
     private controler: Escaper
+
+    public slidingMode: 'normal'|'max' = 'max'
+    public rotationTimeForMaximumSpeed = HERO_ROTATION_TIME_FOR_MAXIMUM_SPEED
+    private tClickWhereYouAre: Timer | null = null
 
     private slide?: Timer
     private checkTerrain: trigger
@@ -125,6 +138,7 @@ export class Escaper {
     private godModeKills: boolean
     private walkSpeedAbsolute: boolean
     private slideSpeedAbsolute: boolean
+    private rotationSpeedAbsolute: boolean
     private hasAutoreviveB: boolean
 
     private canCheatB: boolean
@@ -196,8 +210,11 @@ export class Escaper {
         this.p = Player(this.playerId)
         this.walkSpeed = HERO_WALK_SPEED
         this.slideSpeed = HERO_SLIDE_SPEED
+        this.rotationSpeed = HERO_ROTATION_SPEED
         this.slideMovePerPeriod = HERO_SLIDE_SPEED * SLIDE_PERIOD
-        this.baseColorId = this.playerId
+        this.maxSlideTurnPerPeriod = HERO_ROTATION_SPEED * SLIDE_PERIOD
+        this.slideCurrentTurnPerPeriod = 0
+        this.baseColorId = BlzColor2Id(GetPlayerColor(this.p)) || -1
 
         this.checkTerrain = CheckTerrainTrigger.CreateCheckTerrainTrigger(escaperId)
 
@@ -216,6 +233,7 @@ export class Escaper {
         this.godModeKills = false
         this.walkSpeedAbsolute = false
         this.slideSpeedAbsolute = false
+        this.rotationSpeedAbsolute = false
         this.hasAutoreviveB = false
 
         if (VIPs.includes(GetPlayerName(this.p))) {
@@ -247,6 +265,10 @@ export class Escaper {
         ShowUnit(this.dummyPowerCircle, false)
 
         this.displayName = removeHash(GetPlayerName(this.p))
+    }
+
+    getColorId = () => {
+        return BlzColor2Id(GetPlayerColor(this.p)) || -1
     }
 
     getEscaperId = () => {
@@ -318,11 +340,8 @@ export class Escaper {
         SetUnitMoveSpeed(this.hero, this.walkSpeed) //voir pour le nom de la fonction
         this.selectHero()
 
-        if (this.baseColorId == 0) {
-            SetUnitColor(this.hero, PLAYER_COLOR_RED)
-        } else {
-            SetUnitColor(this.hero, ConvertPlayerColor(this.baseColorId))
-        }
+        SetUnitColor(this.hero, ConvertPlayerColor(this.baseColorId))
+        BlzSetHeroProperName(this.hero, this.getDisplayName())
 
         this.updateUnitVertexColor(false)
         this.SpecialIllidan()
@@ -345,7 +364,7 @@ export class Escaper {
         EnableTrigger(this.checkTerrain)
 
         this.textTag = CreateTextTag()
-        SetTextTagTextBJ(this.textTag, udg_colorCode[this.getEscaperId()] + this.getDisplayName(), 10)
+        SetTextTagTextBJ(this.textTag, udg_colorCode[this.getColorId()] + this.getDisplayName(), 10)
         SetTextTagPermanent(this.textTag, true)
         SetTextTagVisibility(this.textTag, false)
         this.textTagTimer = createTimer(0.01, true, this.updateTextTagPos)
@@ -485,6 +504,8 @@ export class Escaper {
             this.slide?.destroy()
             delete this.slide
             this.slideLastAngleOrder = -1
+            this.setRemainingDegreesToTurn(0)
+            this.setSlideCurrentTurnPerPeriod(0)
         }
 
         return true
@@ -623,59 +644,7 @@ export class Escaper {
     }
 
     turnInstantly(angle: number) {
-        if (!this.hero) return
-
-        let heroTypeId = HERO_TYPE_ID
-        let lastTerrainType = this.lastTerrainType
-        let x = GetUnitX(this.hero)
-        let y = GetUnitY(this.hero)
-        let meteor = UnitItemInSlot(this.hero, 0)
-
-        RemoveUnit(this.hero)
-
-        //recreate this.hero
-        if (this.escaperId >= NB_PLAYERS_MAX) {
-            heroTypeId = HERO_SECONDARY_TYPE_ID
-        }
-
-        this.hero = CreateUnit(this.p, heroTypeId, x, y, angle)
-
-        if (this.escaperId >= NB_PLAYERS_MAX) {
-            SetUnitTimeScale(this.hero, this.animSpeedSecondaryHero)
-        }
-
-        SetUnitFlyHeight(this.hero, 1, 0)
-        SetUnitFlyHeight(this.hero, 0, 0)
-        SetUnitUserData(this.hero, GetPlayerId(this.p))
-        ShowUnit(this.hero, false)
-        ShowUnit(this.hero, true)
-        UnitRemoveAbility(this.hero, FourCC('Aloc'))
-        SetUnitMoveSpeed(this.hero, this.walkSpeed) //voir pour le nom de la fonction
-        if (this.controler != this) {
-            SetUnitOwner(this.hero, this.controler.getPlayer(), false)
-        }
-
-        if (this.isHeroSelectedB) {
-            SelectUnit(this.hero, true)
-        }
-        if (this.baseColorId == 0) {
-            SetUnitColor(this.hero, PLAYER_COLOR_RED)
-        } else {
-            SetUnitColor(this.hero, ConvertPlayerColor(this.baseColorId))
-        }
-        this.updateUnitVertexColor(false)
-        this.effects.showEffects(this.hero)
-        if (this.make) {
-            this.make.maker = this.hero
-            this.make.t && TriggerRegisterUnitEvent(this.make.t, this.hero, EVENT_UNIT_ISSUED_POINT_ORDER)
-        }
-        ///////////////////////
-        this.lastTerrainType = lastTerrainType
-        SetUnitAnimation(this.hero, 'stand')
-        if (meteor) {
-            UnitAddItem(this.hero, meteor)
-        }
-        CommandShortcuts.InitShortcutSkills(GetPlayerId(this.p))
+        this.hero && BlzSetUnitFacingEx(this.hero, angle)
     }
 
     reverse = () => {
@@ -778,8 +747,35 @@ export class Escaper {
         this.slideMovePerPeriod = ss * SLIDE_PERIOD
     }
 
+    //speed methods
+    setRotationSpeed(rs: number) {
+        this.rotationSpeed = rs //rounds
+        this.maxSlideTurnPerPeriod = rs * SLIDE_PERIOD * 360 //degrees
+    }
+
+    getRemainingDegreesToTurn() {
+        return this.remainingDegreesToTurn
+    }
+
+    setRemainingDegreesToTurn(remainingDegreesToTurn: number) {
+        if(RAbsBJ(remainingDegreesToTurn) < 0.01) remainingDegreesToTurn = 0
+        this.remainingDegreesToTurn = remainingDegreesToTurn
+    }
+
     getSlideMovePerPeriod = () => {
         return this.slideMovePerPeriod
+    }
+
+    getMaxSlideTurnPerPeriod = () => {
+        return this.maxSlideTurnPerPeriod
+    }
+
+    setSlideCurrentTurnPerPeriod = (n: number) => {
+        this.slideCurrentTurnPerPeriod = n
+    }
+
+    getSlideCurrentTurnPerPeriod = () => {
+        return this.slideCurrentTurnPerPeriod
     }
 
     setWalkSpeed(ws: number) {
@@ -789,6 +785,10 @@ export class Escaper {
 
     getSlideSpeed = () => {
         return this.slideSpeed
+    }
+
+    getRotationSpeed = () => {
+        return this.rotationSpeed
     }
 
     getWalkSpeed = () => {
@@ -822,6 +822,36 @@ export class Escaper {
 
             if (!this.isEscaperSecondary()) {
                 GetMirrorEscaper(this)?.stopAbsoluteSlideSpeed()
+            }
+        }
+    }
+
+    isAbsoluteRotationSpeed = () => {
+        return this.rotationSpeedAbsolute
+    }
+
+    absoluteRotationSpeed(rotationSpeed: number) {
+        this.rotationSpeedAbsolute = true
+        this.setRotationSpeed(rotationSpeed)
+
+        if (!this.isEscaperSecondary()) {
+            GetMirrorEscaper(this)?.absoluteRotationSpeed(rotationSpeed)
+        }
+    }
+
+    stopAbsoluteRotationSpeed = () => {
+        if (this.rotationSpeedAbsolute) {
+            this.rotationSpeedAbsolute = false
+
+            if (this.hero && this.isAlive()) {
+                const currentTerrainType = getUdgTerrainTypes().getTerrainType(GetUnitX(this.hero), GetUnitY(this.hero))
+                if (currentTerrainType instanceof TerrainTypeSlide) {
+                    this.setRotationSpeed(currentTerrainType.getRotationSpeed())
+                }
+            }
+
+            if (!this.isEscaperSecondary()) {
+                GetMirrorEscaper(this)?.stopAbsoluteRotationSpeed()
             }
         }
     }
@@ -1086,10 +1116,10 @@ export class Escaper {
     kick(kicked: Escaper) {
         CustomDefeatBJ(kicked.getPlayer(), 'You have been kicked by ' + this.displayName + ' !')
         Text.A(
-            udg_colorCode[GetPlayerId(kicked.getPlayer())] +
+            udg_colorCode[kicked.getColorId()] +
                 kicked.displayName +
                 ' has been kicked by ' +
-                udg_colorCode[GetPlayerId(this.p)] +
+                udg_colorCode[this.getColorId()] +
                 this.displayName +
                 ' !'
         )
@@ -1665,10 +1695,10 @@ export class Escaper {
         return this.gumBrushSize
     }
 
-    enableFollowMouseMode = (flag: boolean) => {
+    enableFollowMouseMode = (flag: boolean, neverDisable: boolean) => {
         this.followMouse?.destroy()
         if (flag) {
-            this.followMouse = new FollowMouse(this)
+            this.followMouse = new FollowMouse(this, neverDisable)
         } else {
             delete this.followMouse
         }
@@ -1741,6 +1771,20 @@ export class Escaper {
                     }
                 }
             }
+        }
+    }
+
+    enableClickWhereYouAre = (b: boolean) => {
+        if(this.tClickWhereYouAre){
+            this.tClickWhereYouAre.destroy()
+        }
+
+        if(b && this.hero){
+            const x = GetUnitX(this.hero)
+            const y = GetUnitY(this.hero)
+            this.tClickWhereYouAre = createTimer(0.1, true, () => {
+                this.hero && IssuePointOrder(this.hero, 'smart', x, y)
+            })
         }
     }
 

@@ -1,8 +1,107 @@
-import { CAN_TURN_IN_AIR, SLIDE_PERIOD } from 'core/01_libraries/Constants'
+import {CAN_TURN_IN_AIR, SLIDE_PERIOD} from 'core/01_libraries/Constants'
 import { Apm } from 'core/08_GAME/Apm_clics_par_minute/Apm'
 import { createTimer } from 'Utils/mapUtils'
 import { getUdgEscapers, globals } from '../../../../globals'
 import { Gravity } from './Gravity'
+import {Escaper} from "../../04_STRUCTURES/Escaper/Escaper";
+import {GetMirrorEscaper} from "../../04_STRUCTURES/Escaper/Escaper_functions";
+import {MAX_DEGREE_ON_WHICH_SPEED_TABLE_TAKES_CONTROL, SPEED_AT_LEAST_THAN_50_DEGREES} from "./SlidingMax";
+
+const progressivelyTurnAccelerationToZero = (escaper: Escaper) => {
+    const increaseRotationSpeedPerPeriod = RAbsBJ(escaper.getMaxSlideTurnPerPeriod() * SLIDE_PERIOD / escaper.rotationTimeForMaximumSpeed)
+    const curSlideTurn = escaper.getSlideCurrentTurnPerPeriod()
+    const sens = curSlideTurn > 1 ? 1 : -1
+
+    let newSlideTurn: number
+    if(sens > 0){
+        newSlideTurn = RMaxBJ(curSlideTurn - increaseRotationSpeedPerPeriod, 0)
+    }else{
+        newSlideTurn = RMinBJ(curSlideTurn + increaseRotationSpeedPerPeriod, 0)
+    }
+
+    if(RAbsBJ(newSlideTurn) < 0.05) {
+        newSlideTurn = 0
+    }
+
+    escaper.setSlideCurrentTurnPerPeriod(newSlideTurn)
+
+    if(newSlideTurn == 0){
+        escaper.tProgressivelyTurnAccelerationToZero?.destroy()
+        escaper.tProgressivelyTurnAccelerationToZero = null
+    }
+}
+
+const escaperTurnForOnePeriod = (escaper: Escaper | null) => {
+    if(!escaper) return;
+
+    const hero = escaper.getHero()
+    if(!hero) return
+
+    const remainingDegrees = escaper.getRemainingDegreesToTurn()
+    if(remainingDegrees != 0){
+        const currentAngle = GetUnitFacing(hero)
+
+        let diffToApplyAbs = RMinBJ(RAbsBJ(remainingDegrees), RAbsBJ(escaper.getMaxSlideTurnPerPeriod()))
+
+        if(diffToApplyAbs > 0.05) {
+            if(escaper.tProgressivelyTurnAccelerationToZero){
+                escaper.tProgressivelyTurnAccelerationToZero.destroy()
+            }
+
+            //sens
+            const sens = (remainingDegrees * escaper.getMaxSlideTurnPerPeriod()) > 0 ? 1 : -1
+            const maxIncreaseRotationSpeedPerPeriod = RAbsBJ(escaper.getMaxSlideTurnPerPeriod() * SLIDE_PERIOD / escaper.rotationTimeForMaximumSpeed)
+
+            let newSlideTurn: number
+
+            const curSlideTurn = escaper.getSlideCurrentTurnPerPeriod()
+
+            let increaseRotationSpeedPerPeriod = maxIncreaseRotationSpeedPerPeriod
+
+            let diffToApply
+
+            if(RAbsBJ(remainingDegrees) <= MAX_DEGREE_ON_WHICH_SPEED_TABLE_TAKES_CONTROL){
+                const tableInd = Math.round(RAbsBJ(remainingDegrees))
+                const aimedSpeedPercentage = SPEED_AT_LEAST_THAN_50_DEGREES[tableInd]
+                const aimedNewSpeedPerPeriod = escaper.getMaxSlideTurnPerPeriod() * aimedSpeedPercentage * sens / 100
+                const diffSpeed = aimedNewSpeedPerPeriod - curSlideTurn
+                if (RAbsBJ(diffSpeed) < maxIncreaseRotationSpeedPerPeriod) {
+                    diffToApply = aimedNewSpeedPerPeriod
+                }else{
+                    const sensDiffToApply = diffSpeed > 0 ? 1 : -1
+                    diffToApply = curSlideTurn + sensDiffToApply * maxIncreaseRotationSpeedPerPeriod
+                }
+                escaper.setSlideCurrentTurnPerPeriod(diffToApply)
+            }else {
+                if (sens > 0) {
+                    newSlideTurn = RMinBJ(curSlideTurn + increaseRotationSpeedPerPeriod, escaper.getMaxSlideTurnPerPeriod())
+                    diffToApply = RMinBJ(newSlideTurn, diffToApplyAbs)
+                    diffToApply = RMinBJ(remainingDegrees, diffToApply)
+                } else {
+                    newSlideTurn = RMaxBJ(curSlideTurn - increaseRotationSpeedPerPeriod, -escaper.getMaxSlideTurnPerPeriod())
+                    diffToApply = RMaxBJ(newSlideTurn, -diffToApplyAbs)
+                    diffToApply = RMaxBJ(remainingDegrees, diffToApply)
+                }
+                escaper.setSlideCurrentTurnPerPeriod(newSlideTurn)
+            }
+
+            //diffToApply
+            escaper.setRemainingDegreesToTurn(remainingDegrees - diffToApply)
+
+            //turn
+            const newAngle = currentAngle + diffToApply
+            BlzSetUnitFacingEx(hero, newAngle)
+        }
+    }else{
+        if(escaper.tProgressivelyTurnAccelerationToZero){
+            escaper.tProgressivelyTurnAccelerationToZero.destroy()
+        }
+
+        escaper.tProgressivelyTurnAccelerationToZero = createTimer(SLIDE_PERIOD, true, () => {
+            progressivelyTurnAccelerationToZero(escaper)
+        })
+    }
+}
 
 const initSlideTrigger = () => {
     const Slide_Actions = (n: number) => {
@@ -19,28 +118,14 @@ const initSlideTrigger = () => {
 
         if (!hero) return
 
-        const angle = Deg2Rad(GetUnitFacing(hero))
+        let allowTurning = escaper.getRotationSpeed() != 0
 
-        const newX = GetUnitX(hero) + escaper.getSlideMovePerPeriod() * Cos(angle)
-        const newY = GetUnitY(hero) + escaper.getSlideMovePerPeriod() * Sin(angle)
-
+        //gestion de la hauteur du héros
         const z = BlzGetUnitZ(hero)
         const diffZ = z - lastZ //différence de hauteur au niveau du terrain
         let height = GetUnitFlyHeight(hero)
         let delta: number
 
-        if (
-            newX >= globals.MAP_MIN_X &&
-            newX <= globals.MAP_MAX_X &&
-            newY >= globals.MAP_MIN_Y &&
-            newY <= globals.MAP_MAX_Y
-        ) {
-            escaper.moveHero(newX, newY)
-        }
-
-        Apm.timeOnSlide[n] = Apm.timeOnSlide[n] + SLIDE_PERIOD
-
-        //gestion de la hauteur du héros
         if (height > 1) {
             escaper.setSpeedZ(speedZ + Gravity.GetGravity())
             height = height + speedZ - diffZ
@@ -48,13 +133,17 @@ const initSlideTrigger = () => {
                 height = 0
             }
             SetUnitFlyHeight(hero, height, 0)
+
             //coop
             escaper.refreshCerclePosition()
+
+            allowTurning = allowTurning && CAN_TURN_IN_AIR
         } else {
             delta = diffZ - oldDiffZ
             if (delta < Gravity.GetGravity()) {
                 escaper.setSpeedZ(oldDiffZ + Gravity.GetGravity())
                 SetUnitFlyHeight(hero, -diffZ + speedZ, 0)
+
                 //arrêter de tourner si un clic a été fait juste avant
                 if (!CAN_TURN_IN_AIR) {
                     SetUnitFacing(hero, GetUnitFacing(hero))
@@ -66,6 +155,30 @@ const initSlideTrigger = () => {
         }
         escaper.setLastZ(z)
         escaper.setOldDiffZ(diffZ)
+
+        //turning
+        if(allowTurning && escaper.slidingMode == "max"){
+            escaperTurnForOnePeriod(escaper)
+            escaperTurnForOnePeriod(GetMirrorEscaper(escaper))
+        }
+
+        //offset of the hero position
+        const angle = Deg2Rad(GetUnitFacing(hero))
+
+        const newX = GetUnitX(hero) + escaper.getSlideMovePerPeriod() * Cos(angle)
+        const newY = GetUnitY(hero) + escaper.getSlideMovePerPeriod() * Sin(angle)
+
+        if (
+            newX >= globals.MAP_MIN_X &&
+            newX <= globals.MAP_MAX_X &&
+            newY >= globals.MAP_MIN_Y &&
+            newY <= globals.MAP_MAX_Y
+        ) {
+            escaper.moveHero(newX, newY)
+        }
+
+        //update apm
+        Apm.timeOnSlide[n] = Apm.timeOnSlide[n] + SLIDE_PERIOD
     }
 
     const CreateSlideTimer = (escaperId: number) => {

@@ -22,6 +22,8 @@ import { init_shortcurt_cancelRedo } from '../Keyboard_shortcuts/Cancel_redo'
 import { init_Test } from '../Test/test'
 import { initArrays } from './initArrays'
 import { initOldTriggers } from './init_old_triggers'
+import {init_measureSpeed} from "../Test/measure_hero_rotation_speed";
+import {init_cameraPositionAtStart} from "../08_GAME/Camera_reset/Camera_position_at_start";
 
 export const initializers = () => {
     init_terrain_limit_variables()
@@ -46,10 +48,11 @@ export const initializers = () => {
     initFirstPerson()
     initMonsterSimplePatrol()
     init_startFirstLevel()
+    init_cameraPositionAtStart()
 
     //keyboard shortcuts
     init_shortcurt_cancelRedo()
 
-    //todomax disable this line at end
+    //test trigger for developement
     init_Test()
 }

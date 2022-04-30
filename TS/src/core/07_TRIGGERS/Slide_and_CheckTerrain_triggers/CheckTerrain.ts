@@ -68,6 +68,10 @@ const initCheckTerrainTrigger = () => {
                     escaper.setSlideSpeed(currentTerrainType.getSlideSpeed())
                 }
 
+                if (!escaper.isAbsoluteRotationSpeed()) {
+                    escaper.setRotationSpeed(currentTerrainType.getRotationSpeed())
+                }
+
                 if (escaper.getSlideSpeed() < 0) {
                     if (wasSliding) {
                         if (oldSlideSpeed >= 0) {
@@ -129,7 +133,7 @@ const initCheckTerrainTrigger = () => {
                         if (terrainTypeTolerance instanceof TerrainTypeSlide) {
                             oldSlideSpeed = escaper.getSlideSpeed()
                             escaper.enableSlide(true)
-                            escaper.setSlideSpeed(terrainTypeTolerance.getSlideSpeed())
+
                             if (!wasSliding) {
                                 MeteorFunctions.HeroComingToSlide_CheckItem(hero)
                                 AutoContinueAfterSliding.ClearLastClickSave(playerId)
@@ -137,6 +141,10 @@ const initCheckTerrainTrigger = () => {
 
                             if (!escaper.isAbsoluteSlideSpeed()) {
                                 escaper.setSlideSpeed(terrainTypeTolerance.getSlideSpeed())
+                            }
+
+                            if (!escaper.isAbsoluteRotationSpeed()) {
+                                escaper.setRotationSpeed(terrainTypeTolerance.getRotationSpeed())
                             }
 
                             if (escaper.getSlideSpeed() < 0) {

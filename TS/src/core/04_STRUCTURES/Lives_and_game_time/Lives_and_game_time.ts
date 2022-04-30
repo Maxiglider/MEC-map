@@ -13,7 +13,7 @@ export const initLives = () => {
     let nb = NB_LIVES_AT_BEGINNING
 
     const initLives = () => {
-        createTimer(3, false, () => {
+        createTimer(0, false, () => {
             nb = getUdgLevels().get(0)?.getNbLives() || NB_LIVES_AT_BEGINNING
             ServiceManager.getService('Multiboard').updateLives(nb)
         })

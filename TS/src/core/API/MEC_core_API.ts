@@ -12,6 +12,7 @@ import {
 import {heroes} from "../08_GAME/Init_game/Heroes";
 import {Hero2Escaper, IsHero} from "../04_STRUCTURES/Escaper/Escaper_functions";
 import {SetMeteorEffect} from "../04_STRUCTURES/Escaper/Escaper";
+import {Gravity} from "../07_TRIGGERS/Slide_and_CheckTerrain_triggers/Gravity";
 
 export const MEC_core_API = {
     setGameData: (jsonString: string) => {
@@ -76,6 +77,7 @@ export const MEC_core_API = {
     //various settings
     setEffectForMissingHeroes: heroes.setEffectForMissingHeroes,
     setMeteorEffect: SetMeteorEffect,
+    setGravity: Gravity.SetGravity,
 
     //helpers
     isHero: IsHero,

@@ -1,5 +1,5 @@
 import { stringReplaceAll } from 'core/01_libraries/Basic_functions'
-import { NB_ESCAPERS, NB_PLAYERS_MAX } from 'core/01_libraries/Constants'
+import {NB_ESCAPERS, NB_PLAYERS_MAX, NB_PLAYERS_MAX_REFORGED} from 'core/01_libraries/Constants'
 import { ColorString2Id } from 'core/01_libraries/Init_colorCodes'
 import { forRange } from 'Utils/mapUtils'
 import { getUdgEscapers } from '../../../../globals'
@@ -127,6 +127,32 @@ export const isPlayerId = (arg: string) => {
     }
 }
 
+export function BlzColor2Id(color: playercolor){
+    const blzColors2ids = new Map<playercolor, number>()
+
+    for(let i = 0; i < NB_PLAYERS_MAX_REFORGED; i++){
+        blzColors2ids.set(ConvertPlayerColor(i), i)
+    }
+
+    return blzColors2ids.get(color)
+}
+
+
+export function colorId2playerId(colorId: number){
+    for(let i = 0; i < NB_PLAYERS_MAX; i++){
+        if(BlzColor2Id(GetPlayerColor(Player(i))) == colorId){
+            return i
+        }
+    }
+
+    return -1
+}
+
+export function playerId2colorId(playerId: number){
+    return BlzColor2Id(GetPlayerColor(Player(playerId))) || -1
+}
+
+
 export const resolvePlayerId = (arg: string) => {
     const larg = arg.toLowerCase()
     let targetPlayer = -1
@@ -138,12 +164,12 @@ export const resolvePlayerId = (arg: string) => {
             targetPlayer = a - 1
         }
     } else if (IsPlayerColorString(larg)) {
-        targetPlayer = ColorString2Id(larg)
+        targetPlayer = colorId2playerId(ColorString2Id(larg))
     } else if (S2I(larg) !== 0) {
         const a = S2I(larg)
 
         if (a > 0 && a <= NB_ESCAPERS) {
-            targetPlayer = a - 1
+            targetPlayer = colorId2playerId(a - 1)
         }
     } else if (cachedPlayerNames[removeHash(larg)]) {
         return cachedPlayerNames[removeHash(larg)]

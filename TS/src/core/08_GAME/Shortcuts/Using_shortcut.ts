@@ -6,6 +6,7 @@ import { createEvent } from 'Utils/mapUtils'
 import { getUdgEscapers } from '../../../../globals'
 import { GREY } from '../../01_libraries/Constants'
 import { execute } from '../../04_STRUCTURES/Escaper/EscaperSavedCommands'
+import {playerId2colorId} from "../../06_COMMANDS/COMMANDS_vJass/Command_functions";
 
 const initCommandShortcuts = () => {
     const shortcutCommands: { [K in typeof shortcuts[0]]: (string | null)[] } = {
@@ -113,13 +114,13 @@ const initCommandShortcuts = () => {
 
     const DisplayShortcuts = (playerId: number) => {
         Text.P(Player(playerId), ' ')
-        Text.P(Player(playerId), udg_colorCode[playerId] + 'Your shortcuts:')
+        Text.P(Player(playerId), udg_colorCode[playerId2colorId(playerId)] + 'Your shortcuts:')
 
         for (const sc of shortcuts) {
             if (shortcutCommands[sc][playerId] == null) {
-                Text.P(Player(playerId), udg_colorCode[playerId] + sc + ': |r' + udg_colorCode[GREY] + 'none')
+                Text.P(Player(playerId), udg_colorCode[playerId2colorId(playerId)] + sc + ': |r' + udg_colorCode[GREY] + 'none')
             } else {
-                Text.P(Player(playerId), udg_colorCode[playerId] + sc + ': |r' + shortcutCommands[sc][playerId])
+                Text.P(Player(playerId), udg_colorCode[playerId2colorId(playerId)] + sc + ': |r' + shortcutCommands[sc][playerId])
             }
         }
     }
@@ -161,7 +162,7 @@ export const InitTrig_Using_shortcut = () => {
                     if (GetSpellAbilityId() === FourCC(`SC${sc}o`)) {
                         Text.P(
                             p,
-                            udg_colorCode[GetPlayerId(p)] +
+                            udg_colorCode[playerId2colorId(GetPlayerId(p))] +
                                 GetPlayerName(p) +
                                 ':|r ' +
                                 CommandShortcuts.shortcutCommands[sc][GetPlayerId(p)]

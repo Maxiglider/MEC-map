@@ -590,7 +590,7 @@ export const initCommandAll = () => {
         enabled: ({ noParam }) => noParam,
         cb: ({}, escaper) => {
             CustomDefeatBJ(escaper.getPlayer(), 'You have kicked... yourself.')
-            Text.A(udg_colorCode[GetPlayerId(escaper.getPlayer())] + escaper.getDisplayName() + ' has kicked himself !')
+            Text.A(udg_colorCode[escaper.getColorId()] + escaper.getDisplayName() + ' has kicked himself !')
             escaper.destroy()
             GetMirrorEscaper(escaper)?.destroy()
             return true
@@ -1003,14 +1003,14 @@ export const initCommandAll = () => {
         name: 'leaderboard',
         alias: ['ldb'],
         group: 'all',
-        argDescription: '[on|off|ldb|mb|global|current]',
+        argDescription: '[on|off|mb|global|current|classic]',
         description: 'displays the leaderboard',
         cb: ({ nbParam, param1 }, escaper) => {
             if (nbParam === 1) {
                 if (IsBoolString(param1)) {
                     escaper.hideLeaderboard = !S2B(param1)
                     ServiceManager.getService('Multiboard').setVisibility(escaper, S2B(param1))
-                } else if (param1 === 'classic' || param1 === 'leaderboard' || param1 === 'ldb') {
+                } else if (param1 === 'classic') {
                     ServiceManager.getService('Multiboard').setMode(escaper, 'leaderboard')
                 } else if (param1 === 'reset' || param1 === 'new' || param1 === 'multiboard' || param1 === 'mb') {
                     ServiceManager.getService('Multiboard').setMode(escaper, 'multiboard')
@@ -1095,14 +1095,16 @@ export const initCommandAll = () => {
         name: 'followMouse',
         alias: ['fm'],
         group: 'all',
-        argDescription: '<boolean>',
+        argDescription: '<boolean> [neverDisable | nd]',
         description: 'follows the mouse',
-        cb: ({ nbParam, param1 }, escaper) => {
-            if (nbParam != 1) {
+        cb: ({ nbParam, param1, param2 }, escaper) => {
+            if (nbParam != 1 && nbParam != 2) {
                 return true
             }
 
-            escaper.enableFollowMouseMode(S2B(param1))
+            const neverDisable = param2 == 'neverDisable' || param2 == 'nd'
+
+            escaper.enableFollowMouseMode(S2B(param1), neverDisable)
 
             if (S2B(param1)) {
                 Text.mkP(
