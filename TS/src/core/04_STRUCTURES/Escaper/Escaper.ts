@@ -590,10 +590,7 @@ export class Escaper {
         this.enableCheckTerrain(true)
         this.SpecialIllidan()
         this.selectHero()
-
-        if (this.vcTransparency != 0) {
-            this.updateUnitVertexColor(false)
-        }
+        this.updateUnitVertexColor(false)
 
         TimerStart(
             AfkMode.afkModeTimers[this.escaperId],
