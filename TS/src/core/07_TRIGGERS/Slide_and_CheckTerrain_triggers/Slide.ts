@@ -1,4 +1,4 @@
-import {CAN_TURN_IN_AIR, SLIDE_PERIOD} from 'core/01_libraries/Constants'
+import {SLIDE_PERIOD} from 'core/01_libraries/Constants'
 import { Apm } from 'core/08_GAME/Apm_clics_par_minute/Apm'
 import { createTimer } from 'Utils/mapUtils'
 import { getUdgEscapers, globals } from '../../../../globals'
@@ -137,7 +137,7 @@ const initSlideTrigger = () => {
             //coop
             escaper.refreshCerclePosition()
 
-            allowTurning = allowTurning && CAN_TURN_IN_AIR
+            allowTurning = allowTurning && globals.CAN_TURN_IN_AIR
         } else {
             delta = diffZ - oldDiffZ
             if (delta < Gravity.GetGravity()) {
@@ -145,7 +145,7 @@ const initSlideTrigger = () => {
                 SetUnitFlyHeight(hero, -diffZ + speedZ, 0)
 
                 //arrêter de tourner si un clic a été fait juste avant
-                if (!CAN_TURN_IN_AIR) {
+                if (!globals.CAN_TURN_IN_AIR) {
                     SetUnitFacing(hero, GetUnitFacing(hero))
                 }
             } else if (!escaper.isAlive()) {

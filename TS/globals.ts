@@ -19,7 +19,8 @@ export const globals: {
     MAP_MIN_X: number
     MAP_MAX_X: number
     MAP_MIN_Y: number
-    MAP_MAX_Y: number
+    MAP_MAX_Y: number,
+    CAN_TURN_IN_AIR: boolean
 } = {
     logStrings: [],
     MAP_MIN_X: 0,
@@ -27,6 +28,7 @@ export const globals: {
     MAP_MIN_Y: 0,
     MAP_MAX_Y: 0,
     coopModeActive: true,
+    CAN_TURN_IN_AIR: false
 }
 
 //SETTERS - GETTERS

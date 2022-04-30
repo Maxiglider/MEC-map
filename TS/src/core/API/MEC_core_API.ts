@@ -1,4 +1,4 @@
-import { getUdgEscapers, getUdgLevels, getUdgMonsterTypes, getUdgTerrainTypes } from '../../../globals'
+import {getUdgEscapers, getUdgLevels, getUdgMonsterTypes, getUdgTerrainTypes, globals} from '../../../globals'
 import { errorHandler } from '../../Utils/mapUtils'
 import { MonsterSimplePatrol } from '../04_STRUCTURES/Monster/MonsterSimplePatrol'
 import { makingRightsToAll } from '../06_COMMANDS/Rights/manage_rights'
@@ -78,6 +78,9 @@ export const MEC_core_API = {
     setEffectForMissingHeroes: heroes.setEffectForMissingHeroes,
     setMeteorEffect: SetMeteorEffect,
     setGravity: Gravity.SetGravity,
+    setCanTurnInTheAir: (b: boolean) => {
+        globals.CAN_TURN_IN_AIR = b
+    },
 
     //helpers
     isHero: IsHero,

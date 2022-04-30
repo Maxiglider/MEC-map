@@ -1,5 +1,5 @@
 import {AnglesDiff, ApplyAngleSymmetry, IsLastOrderPause, IsOnGround, StopUnit} from 'core/01_libraries/Basic_functions'
-import { CAN_TURN_IN_AIR, NB_ESCAPERS } from 'core/01_libraries/Constants'
+import { NB_ESCAPERS } from 'core/01_libraries/Constants'
 import { Escaper } from 'core/04_STRUCTURES/Escaper/Escaper'
 import {
     Hero2Escaper,
@@ -12,6 +12,7 @@ import { Apm } from 'core/08_GAME/Apm_clics_par_minute/Apm'
 import { udg_symmetryAngle } from 'core/Double_heroes/double_heroes_config'
 import { createEvent, forRange } from 'Utils/mapUtils'
 import { AutoContinueAfterSliding } from './Auto_continue_after_sliding'
+import {globals} from "../../../../globals";
 
 const initTurnOnSlide = () => {
     //turn variables
@@ -70,7 +71,7 @@ const initTurnOnSlide = () => {
                 canTurn = terrainType.getCanTurn()
             }
         } else {
-            canTurn = CAN_TURN_IN_AIR
+            canTurn = globals.CAN_TURN_IN_AIR
         }
 
         angleSecond = ApplyAngleSymmetry(angle, udg_symmetryAngle)
