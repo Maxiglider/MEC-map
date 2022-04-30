@@ -72,6 +72,8 @@ export class PortalMob {
         return true
     }
 
+    getFreezeDuration = () => this.freezeDuration
+
     setFreezeDuration = (freezeDuration: number) => {
         if (freezeDuration < 0 || freezeDuration > PORTAL_MOB_MAX_FREEZE_DURATION) {
             throw this.constructor.name + ' : invalid freeze duration'
@@ -80,9 +82,13 @@ export class PortalMob {
         this.freezeDuration = freezeDuration
     }
 
+    getPortalEffect = () => this.portalEffect
+
     setPortalEffect = (portalEffect: string | null) => {
         this.portalEffect = portalEffect
     }
+
+    getPortalEffectDuration = () => this.portalEffectDuration
 
     setPortalEffectDuration = (portalEffectDuration: number | null) => {
         this.portalEffectDuration = portalEffectDuration || this.freezeDuration || 1
