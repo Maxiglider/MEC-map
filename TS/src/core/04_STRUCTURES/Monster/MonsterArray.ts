@@ -54,7 +54,6 @@ export class MonsterArray extends BaseArray<Monster> {
 
                 if (!filterMonsterClassName || monster.constructor.name === filterMonsterClassName) {
                     if (RAbsBJ(x - xMob) < MONSTER_NEAR_DIFF_MAX && RAbsBJ(y - yMob) < MONSTER_NEAR_DIFF_MAX) {
-                        //todomax check that the filter like that works
                         return monster
                     }
                 }
@@ -83,7 +82,6 @@ export class MonsterArray extends BaseArray<Monster> {
         for (const [_, monster] of pairs(this.data)) {
             if (monster.u) {
                 if (!filterMonsterClassNameArr || filterMonsterClassNameArr.includes(monster.constructor.name)) {
-                    //todomax check that the filter like that works
                     if (IsUnitBetweenLocs(monster.u, x1, y1, x2, y2)) {
                         arrayPush(filteredMonsters, monster)
                     }

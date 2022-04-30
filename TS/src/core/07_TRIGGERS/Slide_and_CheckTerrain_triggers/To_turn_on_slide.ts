@@ -28,8 +28,6 @@ const initTurnOnSlide = () => {
     let canTurn: boolean
 
     //drunk variables
-
-    //todomax put udg_isDrunk in globals.ts
     let udg_isDrunk: boolean[] = []
     let udg_drunk: number[] = []
     let udg_drunkLevel: number[] = []
