@@ -831,7 +831,7 @@ export const initCommandAll = () => {
     //-noDrunk(-)   --> stop drunk mode
     registerCommand({
         name: 'noDrunk',
-        alias: [''],
+        alias: [],
         group: 'all',
         argDescription: '',
         description: 'stop drunk mode',
@@ -1122,7 +1122,7 @@ export const initCommandAll = () => {
     //-mirror <boolean>
     registerCommand({
         name: 'mirror',
-        alias: [''],
+        alias: [],
         group: 'all',
         argDescription: '<boolean>',
         description: 'mirrors the camera',

@@ -52,15 +52,18 @@ export const InitTrig_InvisUnit_is_getting_damage = () => {
                     } else {
                         const monster = udg_monsters[GetUnitUserData(killingUnit)]
 
-                        if(monster) {
+                        if (monster) {
                             const clearMob = monster.getClearMob()
                             const portalMob = monster.getPortalMob()
+                            const circleMob = monster.getCircleMob()
 
                             if (clearMob) {
                                 clearMob.activate()
                                 return
                             } else if (portalMob) {
                                 portalMob.activate(monster, escaper, hero)
+                                return
+                            } else if (circleMob) {
                                 return
                             }
                         }
@@ -87,7 +90,7 @@ export const InitTrig_InvisUnit_is_getting_damage = () => {
                             escaper.kill()
 
                             //effet de tuation du héros par le monstre, suivant le type du monstre
-                            if(monster) {
+                            if (monster) {
                                 const effectStr = getUdgMonsterTypes().monsterUnit2KillEffectStr(killingUnit)
                                 if (effectStr) {
                                     x = GetUnitX(invisUnit)

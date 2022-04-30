@@ -1,12 +1,14 @@
 import { Text } from 'core/01_libraries/Text'
 import { ServiceManager } from 'Services'
 import { getUdgEscapers } from '../../../../globals'
+import { MecHookArray } from '../../API/MecHookArray'
 import type { CasterType } from '../Caster/CasterType'
 import type { Escaper } from '../Escaper/Escaper'
 import { MeteorArray } from '../Meteor/MeteorArray'
 import { MonsterArray } from '../Monster/MonsterArray'
 import type { MonsterType } from '../Monster/MonsterType'
 import { MonsterSpawnArray } from '../MonsterSpawn/MonsterSpawnArray'
+import { CircleMobArray } from '../Monster_properties/CircleMobArray'
 import { ClearMobArray } from '../Monster_properties/ClearMobArray'
 import { PortalMobArray } from '../Monster_properties/PortalMobArray'
 import { checkPointReviveHeroes } from './checkpointReviveHeroes_function'
@@ -14,7 +16,6 @@ import { End, Start } from './StartAndEnd'
 import { TriggerArray } from './Triggers'
 import type { VisibilityModifier } from './VisibilityModifier'
 import { VisibilityModifierArray } from './VisibilityModifierArray'
-import {MecHookArray} from "../../API/MecHookArray";
 
 export class Level {
     public static earningLivesActivated = true
@@ -33,6 +34,7 @@ export class Level {
     meteors: MeteorArray
     clearMobs: ClearMobArray
     portalMobs: PortalMobArray
+    circleMobs: CircleMobArray
 
     //hooks
     public hooks_onStart = new MecHookArray()
@@ -46,6 +48,7 @@ export class Level {
         this.meteors = new MeteorArray(this)
         this.clearMobs = new ClearMobArray(this)
         this.portalMobs = new PortalMobArray(this)
+        this.circleMobs = new CircleMobArray(this)
         this.livesEarnedAtBeginning = 1
         this.isActivatedB = false
         this.startMessage = ''
@@ -67,12 +70,13 @@ export class Level {
             this.meteors.createMeteorsItems()
             this.clearMobs.initializeClearMobs()
             this.portalMobs.initializePortalMobs()
+            this.circleMobs.initializeCircleMobs()
             if (Level.earningLivesActivated && this.getId() > 0) {
                 ServiceManager.getService('Lives').add(this.livesEarnedAtBeginning)
             }
 
-            if(this.hooks_onStart){
-                for(const hook of this.hooks_onStart.values()){
+            if (this.hooks_onStart) {
+                for (const hook of this.hooks_onStart.values()) {
                     hook.execute(this)
                 }
             }
@@ -82,8 +86,8 @@ export class Level {
             this.meteors.removeMeteorsItems()
             getUdgEscapers().deleteSpecificActionsForLevel(this)
 
-            if(this.hooks_onEnd){
-                for(const hook of this.hooks_onEnd.values()){
+            if (this.hooks_onEnd) {
+                for (const hook of this.hooks_onEnd.values()) {
                     hook.execute(this)
                 }
             }
@@ -113,7 +117,7 @@ export class Level {
         this.start = new Start(x1, y1, x2, y2)
     }
 
-    newStartFromJson(data: {[x: string]: number}){
+    newStartFromJson(data: { [x: string]: number }) {
         this.newStart(data.minX, data.minY, data.maxX, data.maxY)
     }
 
@@ -125,7 +129,7 @@ export class Level {
         }
     }
 
-    newEndFromJson(data: {[x: string]: number}){
+    newEndFromJson(data: { [x: string]: number }) {
         this.newEnd(data.minX, data.minY, data.maxX, data.maxY)
     }
 
@@ -248,6 +252,9 @@ export class Level {
 
         //portalMobs
         json.portalMobs = this.portalMobs.toJson()
+
+        //circleMobs
+        json.circleMobs = this.circleMobs.toJson()
 
         return json
     }

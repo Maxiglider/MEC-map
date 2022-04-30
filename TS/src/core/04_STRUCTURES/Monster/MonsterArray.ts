@@ -1,5 +1,6 @@
 import { ArrayHandler } from '../../../Utils/ArrayHandler'
 import { arrayPush, IsUnitBetweenLocs } from '../../01_libraries/Basic_functions'
+import { MecHookArray } from '../../API/MecHookArray'
 import { BaseArray } from '../BaseArray'
 import { Caster } from '../Caster/Caster'
 import type { CasterType } from '../Caster/CasterType'
@@ -7,7 +8,6 @@ import type { Level } from '../Level/Level'
 import type { Monster } from './Monster'
 import type { MonsterType } from './MonsterType'
 import { countMonstersAccordingToMode } from './Monster_count'
-import {MecHookArray} from "../../API/MecHookArray";
 
 export const MONSTER_NEAR_DIFF_MAX = 64
 

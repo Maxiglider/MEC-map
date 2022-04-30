@@ -2768,6 +2768,119 @@ export const initExecuteCommandMake = () => {
         },
     })
 
+    //-createCircleMob [<speed> [<direction> [<radius>]]]
+    registerCommand({
+        name: 'createCircleMob',
+        alias: [],
+        group: 'make',
+        argDescription: '[<speed> [<direction> [<radius>]]]',
+        description: '',
+        cb: ({ param1, param2, param3 }, escaper) => {
+            if (param1 !== '' && S2I(param1) === 0) {
+                Text.erP(escaper.getPlayer(), 'Speed must be > 0')
+                return true
+            }
+
+            if (param2 !== '' && param2.toLowerCase() !== 'cw' && param2.toLowerCase() !== 'ccw') {
+                Text.erP(escaper.getPlayer(), 'Direction must be "cw" or "ccw"')
+                return true
+            }
+
+            if (param3 !== '' && S2I(param3) === 0) {
+                Text.erP(escaper.getPlayer(), 'Radius must be > 0')
+                return true
+            }
+
+            Text.mkP(escaper.getPlayer(), 'Circle creation on')
+
+            if (param3 === '') {
+                Text.mkP(escaper.getPlayer(), 'First click is the radius, others are monsters to add')
+            }
+
+            escaper.makeCreateCircleMob(
+                param1 === '' ? null : S2I(param1),
+                param2 === '' ? 'cw' : param2,
+                param3 === '' ? null : S2I(param3)
+            )
+
+            return true
+        },
+    })
+
+    //-deleteCircleMob
+    registerCommand({
+        name: 'deleteCircleMob',
+        alias: [],
+        group: 'make',
+        argDescription: '',
+        description: '',
+        cb: ({ noParam }, escaper) => {
+            if (!noParam) {
+                return true
+            }
+            escaper.makeDeleteCircleMob()
+            Text.mkP(escaper.getPlayer(), 'circles deleting on')
+            return true
+        },
+    })
+
+    //-setCircleMobSpeed(scms) <speed>
+    registerCommand({
+        name: 'setCircleMobSpeed',
+        alias: ['setcms'],
+        group: 'make',
+        argDescription: '<speed>',
+        description: '',
+        cb: ({ param1 }, escaper) => {
+            if (param1 !== '' && S2R(param1) <= 0) {
+                Text.erP(escaper.getPlayer(), 'Speed must be > 0')
+                return true
+            }
+
+            escaper.makeSetCircleMobSpeed(param1 === '' ? null : S2R(param1))
+            Text.mkP(escaper.getPlayer(), 'Click on the circle to apply')
+            return true
+        },
+    })
+
+    //-setCircleMobDirection(scmd) <direction>
+    registerCommand({
+        name: 'setCircleMobDirection',
+        alias: ['setcmd'],
+        group: 'make',
+        argDescription: '<direction>',
+        description: '',
+        cb: ({ param1 }, escaper) => {
+            if (param1 !== '' && param1.toLowerCase() !== 'cw' && param1.toLowerCase() !== 'ccw') {
+                Text.erP(escaper.getPlayer(), 'Direction must be "cw" or "ccw"')
+                return true
+            }
+
+            escaper.makeSetCircleMobDirection(param1 === '' ? 'cw' : param1)
+            Text.mkP(escaper.getPlayer(), 'Click on the circle to apply')
+            return true
+        },
+    })
+
+    //-setCircleMobRadius(scmr) <radius>
+    registerCommand({
+        name: 'setCircleMobRadius',
+        alias: ['setcmr'],
+        group: 'make',
+        argDescription: '<radius>',
+        description: '',
+        cb: ({ param1 }, escaper) => {
+            if (param1 !== '' && S2I(param1) <= 0) {
+                Text.erP(escaper.getPlayer(), 'Radius must be > 0')
+                return true
+            }
+
+            escaper.makeSetCircleMobRadius(param1 === '' ? null : S2I(param1))
+            Text.mkP(escaper.getPlayer(), 'Click on the circle to apply')
+            return true
+        },
+    })
+
     //-createPortalMob(crpm) <freezeDuration> [<portalEffect> [<portalEffectDuration>]]
     registerCommand({
         name: 'createPortalMob',
@@ -2824,7 +2937,7 @@ export const initExecuteCommandMake = () => {
     //-setPortalMobFreezeDuration(spmfd) <freezeDuration>
     registerCommand({
         name: 'setPortalMobFreezeDuration',
-        alias: ['spmfd'],
+        alias: ['setpmfd'],
         group: 'make',
         argDescription: '<freezeDuration>',
         description: 'set the freeze duration of the portal mob',
@@ -2852,7 +2965,7 @@ export const initExecuteCommandMake = () => {
     //-setPortalMobEffect(spme) <portalEffect>
     registerCommand({
         name: 'setPortalMobEffect',
-        alias: ['spme'],
+        alias: ['setpme'],
         group: 'make',
         argDescription: '<portalEffect>',
         description: 'set the portal effect of the portal mob',
@@ -2870,7 +2983,7 @@ export const initExecuteCommandMake = () => {
     //-setPortalMobEffectDuration(spmed) <portalEffectDuration>
     registerCommand({
         name: 'setPortalMobEffectDuration',
-        alias: ['spmed'],
+        alias: ['setpmed'],
         group: 'make',
         argDescription: '<portalEffectDuration>',
         description: 'set the portal effect duration of the portal mob',
