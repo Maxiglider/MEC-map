@@ -27,7 +27,9 @@ import { MakeMonsterSpawn } from 'core/05_MAKE_STRUCTURES/Make_create_monster_sp
 import { MakeDeleteCasters } from 'core/05_MAKE_STRUCTURES/Make_delete_casters/MakeDeleteCasters'
 import { MakeDeleteMeteors } from 'core/05_MAKE_STRUCTURES/Make_delete_meteors/MakeDeleteMeteors'
 import { MakeDeleteMonsters } from 'core/05_MAKE_STRUCTURES/Make_delete_monsters/MakeDeleteMonsters'
+import { MakeCircleMob } from 'core/05_MAKE_STRUCTURES/Make_monster_properties/MakeCircleMob'
 import { MakeClearMob } from 'core/05_MAKE_STRUCTURES/Make_monster_properties/MakeClearMob'
+import { MakeDeleteCircleMob } from 'core/05_MAKE_STRUCTURES/Make_monster_properties/MakeDeleteCircleMob'
 import { MakeDeleteClearMob } from 'core/05_MAKE_STRUCTURES/Make_monster_properties/MakeDeleteClearMob'
 import { MakeDeletePortalMob } from 'core/05_MAKE_STRUCTURES/Make_monster_properties/MakeDeletePortalMob'
 import { MakePortalMob } from 'core/05_MAKE_STRUCTURES/Make_monster_properties/MakePortalMob'
@@ -1369,6 +1371,16 @@ export class Escaper {
         if (this.hero) this.make = new MakeDeletePortalMob(this.hero)
     }
 
+    makeCreateCircleMob(speed: number | null, direction: string, radius: number | null) {
+        this.destroyMake()
+        if (this.hero) this.make = new MakeCircleMob(this.hero, speed, direction, radius)
+    }
+
+    makeDeleteCircleMob = () => {
+        this.destroyMake()
+        if (this.hero) this.make = new MakeDeleteCircleMob(this.hero)
+    }
+
     makeSetPortalMobFreezeDuration(freezeDuration: number) {
         this.destroyMake()
         if (this.hero) {
@@ -1408,6 +1420,48 @@ export class Escaper {
                 monster => monster.getPortalMob()?.getPortalEffectDuration(),
                 (monster, portalEffectDuration) =>
                     monster.getPortalMob()?.setPortalEffectDuration(portalEffectDuration!)
+            )
+        }
+    }
+
+    makeSetCircleMobSpeed(speed: number | null) {
+        this.destroyMake()
+        if (this.hero) {
+            this.make = new MakeMonsterPropertyChange(
+                this.hero,
+                'speed',
+                speed,
+                monster => !!monster.getCircleMob(),
+                monster => monster.getCircleMob()?.getSpeed(),
+                (monster, speed) => monster.getCircleMob()?.setSpeed(speed!)
+            )
+        }
+    }
+
+    makeSetCircleMobDirection(direction: string | null) {
+        this.destroyMake()
+        if (this.hero) {
+            this.make = new MakeMonsterPropertyChange(
+                this.hero,
+                'direction',
+                direction,
+                monster => !!monster.getCircleMob(),
+                monster => monster.getCircleMob()?.getDirection(),
+                (monster, direction) => monster.getCircleMob()?.setDirection(direction!)
+            )
+        }
+    }
+
+    makeSetCircleMobRadius(radius: number | null) {
+        this.destroyMake()
+        if (this.hero) {
+            this.make = new MakeMonsterPropertyChange(
+                this.hero,
+                'radius',
+                radius,
+                monster => !!monster.getCircleMob(),
+                monster => monster.getCircleMob()?.getRadius(),
+                (monster, radius) => monster.getCircleMob()?.setRadius(radius!)
             )
         }
     }

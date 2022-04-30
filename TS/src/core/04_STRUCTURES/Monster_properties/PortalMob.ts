@@ -100,6 +100,7 @@ export class PortalMob {
 
         this.level && this.level.portalMobs.removePortalMob(this.id)
 
+        this.timers.forEach(t => t.destroy())
         ArrayHandler.clearArray(this.timers)
     }
 

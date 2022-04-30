@@ -1,14 +1,15 @@
-import {udg_monsters} from '../../../../globals'
+import { udg_monsters } from '../../../../globals'
 import { MOBS_VARIOUS_COLORS, NB_PLAYERS_MAX } from '../../01_libraries/Constants'
 import { ColorString2Id } from '../../01_libraries/Init_colorCodes'
 import { IsColorString } from '../../06_COMMANDS/COMMANDS_vJass/Command_functions'
+import { hooks } from '../../API/GeneralHooks'
+import { CombineHooks } from '../../API/MecHookArray'
 import { Level } from '../Level/Level'
+import { CircleMob } from '../Monster_properties/CircleMob'
 import { ClearMob } from '../Monster_properties/ClearMob'
 import { PortalMob } from '../Monster_properties/PortalMob'
 import { MonsterType } from './MonsterType'
 import { monstersClickable } from './trig_Monsters_clickable_set_life'
-import {CombineHooks} from "../../API/MecHookArray";
-import {hooks} from "../../API/GeneralHooks";
 
 export abstract class Monster {
     public static forceUnitTypeIdForNextMonster = 0
@@ -43,8 +44,8 @@ export abstract class Monster {
 
     //clear mob that this mob is trigger mob
     protected clearMob?: ClearMob
-
     protected portalMob?: PortalMob
+    protected circleMob?: CircleMob
 
     constructor(monsterType?: MonsterType, forceId: number | null = null) {
         this.mt = monsterType
@@ -99,6 +100,18 @@ export abstract class Monster {
         delete this.portalMob
     }
 
+    setCircleMob(circleMob: CircleMob) {
+        this.circleMob = circleMob
+    }
+
+    getCircleMob = () => {
+        return this.circleMob
+    }
+
+    removeCircleMob() {
+        delete this.circleMob
+    }
+
     removeUnit() {
         if (this.u) {
             GroupRemoveUnit(monstersClickable, this.u)
@@ -124,8 +137,11 @@ export abstract class Monster {
         }
 
         //hook onBeforeCreateMonsterUnit
-        let hookArray = CombineHooks(this.level?.monsters.hooks_onBeforeCreateMonsterUnit, hooks.hooks_onBeforeCreateMonsterUnit)
-        if(hookArray){
+        let hookArray = CombineHooks(
+            this.level?.monsters.hooks_onBeforeCreateMonsterUnit,
+            hooks.hooks_onBeforeCreateMonsterUnit
+        )
+        if (hookArray) {
             let forceUnitTypeId = 0
             let forceX = 0
             let forceY = 0
@@ -134,11 +150,11 @@ export abstract class Monster {
             let forceX2 = 0
             let forceY2 = 0
             let quit = false
-            for(const hook of hookArray.values()){
+            for (const hook of hookArray.values()) {
                 const output = hook.execute(this)
-                if(output === false){
+                if (output === false) {
                     quit = true
-                }else if(output){
+                } else if (output) {
                     output.unitTypeId && (forceUnitTypeId = output.unitTypeId)
                     output.x && (forceX = output.x)
                     output.y && (forceY = output.y)
@@ -149,7 +165,7 @@ export abstract class Monster {
                 }
             }
 
-            if(quit){
+            if (quit) {
                 return
             }
 
@@ -198,9 +214,12 @@ export abstract class Monster {
         }
 
         //hook onAfterCreateMonsterUnit
-        hookArray = CombineHooks(this.level?.monsters.hooks_onAfterCreateMonsterUnit, hooks.hooks_onAfterCreateMonsterUnit)
-        if(hookArray){
-            for(const hook of hookArray.values()) {
+        hookArray = CombineHooks(
+            this.level?.monsters.hooks_onAfterCreateMonsterUnit,
+            hooks.hooks_onAfterCreateMonsterUnit
+        )
+        if (hookArray) {
+            for (const hook of hookArray.values()) {
                 hook.execute(this)
             }
         }
