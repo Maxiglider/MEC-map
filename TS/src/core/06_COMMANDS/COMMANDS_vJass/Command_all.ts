@@ -1223,7 +1223,9 @@ export const initCommandAll = () => {
             }
 
             if (param1 === 'off' || param1 === 'reset') {
-                escaper.setShowOthersTransparency(null)
+                if(GetLocalPlayer() == escaper.getPlayer()) {
+                    Escaper.setOthersTransparency(null)
+                }
                 Text.mkP(escaper.getPlayer(), `Showing other heroes as normal`)
                 return true
             }
@@ -1234,7 +1236,9 @@ export const initCommandAll = () => {
 
             Text.mkP(escaper.getPlayer(), `Showing other heroes with transparency: ${S2I(param1)}`)
 
-            escaper.setShowOthersTransparency(S2I(param1))
+            if(GetLocalPlayer() == escaper.getPlayer()) {
+                Escaper.setOthersTransparency(S2I(param1))
+            }
 
             return true
         },

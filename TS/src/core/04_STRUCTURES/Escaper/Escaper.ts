@@ -97,6 +97,7 @@ export const SetMeteorEffect = (newEffect: string) => {
     METEOR_EFFECT = newEffect
 }
 
+
 export class Escaper {
     private escaperId: number
     private playerId: number
@@ -194,11 +195,23 @@ export class Escaper {
     private displayName: string
 
     private showNames = false
-    private showOthersTransparency: number | null = null
 
     //mouse position updated when a trigger dependant of mouse movement is being used
     mouseX = 0
     mouseY = 0
+    
+    //others transparency
+    private static othersTransparency: number | null = null
+
+    public static getOthersTransparency = () => Escaper.othersTransparency
+
+    public static setOthersTransparency = (ot: number | null) => {
+        Escaper.othersTransparency = ot
+
+        getUdgEscapers().forMainEscapers((escaper: Escaper) => {
+            escaper.updateUnitVertexColor()
+        })
+    }
 
     /*
      * Constructor
@@ -343,7 +356,7 @@ export class Escaper {
         SetUnitColor(this.hero, ConvertPlayerColor(this.baseColorId))
         BlzSetHeroProperName(this.hero, this.getDisplayName())
 
-        this.updateUnitVertexColor(false)
+        this.updateUnitVertexColor()
         this.SpecialIllidan()
         this.invisUnit = CreateUnit(PLAYER_INVIS_UNIT, INVIS_UNIT_TYPE_ID, x, y, angle)
         SetUnitUserData(this.invisUnit, GetPlayerId(this.p))
@@ -370,7 +383,7 @@ export class Escaper {
         this.textTagTimer = createTimer(0.01, true, this.updateTextTagPos)
 
         this.updateShowNames(false)
-        this.updateUnitVertexColor(false)
+        this.updateUnitVertexColor()
 
         this.startCommandsHandle.loadStartCommands()
 
@@ -613,7 +626,7 @@ export class Escaper {
         this.enableCheckTerrain(true)
         this.SpecialIllidan()
         this.selectHero()
-        this.updateUnitVertexColor(false)
+        this.updateUnitVertexColor()
 
         TimerStart(
             AfkMode.afkModeTimers[this.escaperId],
@@ -1037,7 +1050,7 @@ export class Escaper {
     }
 
     refreshVertexColor = () => {
-        this.hero && this.updateUnitVertexColor(false)
+        this.hero && this.updateUnitVertexColor()
 
         if (!this.isEscaperSecondary()) {
             ColorInfo(this, this.p)
@@ -1733,11 +1746,6 @@ export class Escaper {
         this.updateShowNames(true)
     }
 
-    setShowOthersTransparency = (showOthersTransparency: number | null) => {
-        this.showOthersTransparency = showOthersTransparency
-        this.updateUnitVertexColor(true)
-    }
-
     updateShowNames = (localOnly: boolean) => {
         for (const [_, player] of pairs(getUdgEscapers().getAll())) {
             if (!localOnly || player.getPlayer() === GetLocalPlayer()) {
@@ -1752,25 +1760,17 @@ export class Escaper {
         }
     }
 
-    updateUnitVertexColor = (localOnly: boolean) => {
-        for (const [_, player] of pairs(getUdgEscapers().getAll())) {
-            if (!localOnly || player.getPlayer() === GetLocalPlayer()) {
-                for (const [_, escaper] of pairs(getUdgEscapers().getAll())) {
-                    const hero = escaper.getHero()
-
-                    if (hero) {
-                        SetUnitVertexColorBJ(
-                            hero,
-                            escaper.vcRed,
-                            escaper.vcGreen,
-                            escaper.vcBlue,
-                            GetLocalPlayer() === escaper.getPlayer() || player.showOthersTransparency === null
-                                ? escaper.vcTransparency
-                                : player.showOthersTransparency
-                        )
-                    }
-                }
-            }
+    updateUnitVertexColor = () => {
+        if (this.hero) {
+            SetUnitVertexColorBJ(
+                this.hero,
+                this.vcRed,
+                this.vcGreen,
+                this.vcBlue,
+                GetLocalPlayer() === this.getPlayer() || Escaper.othersTransparency === null || this.isEscaperSecondary()
+                    ? this.vcTransparency
+                    : Escaper.othersTransparency
+            )
         }
     }
 
