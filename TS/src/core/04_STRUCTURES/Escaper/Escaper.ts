@@ -112,7 +112,6 @@ export class Escaper {
     private slideMovePerPeriod: number
     private maxSlideTurnPerPeriod: number
     private slideCurrentTurnPerPeriod: number //about turn acceleration
-    public tProgressivelyTurnAccelerationToZero: Timer | null = null
     private slideMirror: boolean = false
     private baseColorId: number
     private cameraField: number

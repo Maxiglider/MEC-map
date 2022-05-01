@@ -7,29 +7,6 @@ import {Escaper} from "../../04_STRUCTURES/Escaper/Escaper";
 import {GetMirrorEscaper} from "../../04_STRUCTURES/Escaper/Escaper_functions";
 import {MAX_DEGREE_ON_WHICH_SPEED_TABLE_TAKES_CONTROL, SPEED_AT_LEAST_THAN_50_DEGREES} from "./SlidingMax";
 
-const progressivelyTurnAccelerationToZero = (escaper: Escaper) => {
-    const increaseRotationSpeedPerPeriod = RAbsBJ(escaper.getMaxSlideTurnPerPeriod() * SLIDE_PERIOD / escaper.rotationTimeForMaximumSpeed)
-    const curSlideTurn = escaper.getSlideCurrentTurnPerPeriod()
-    const sens = curSlideTurn > 1 ? 1 : -1
-
-    let newSlideTurn: number
-    if(sens > 0){
-        newSlideTurn = RMaxBJ(curSlideTurn - increaseRotationSpeedPerPeriod, 0)
-    }else{
-        newSlideTurn = RMinBJ(curSlideTurn + increaseRotationSpeedPerPeriod, 0)
-    }
-
-    if(RAbsBJ(newSlideTurn) < 0.05) {
-        newSlideTurn = 0
-    }
-
-    escaper.setSlideCurrentTurnPerPeriod(newSlideTurn)
-
-    if(newSlideTurn == 0){
-        escaper.tProgressivelyTurnAccelerationToZero?.destroy()
-        escaper.tProgressivelyTurnAccelerationToZero = null
-    }
-}
 
 const escaperTurnForOnePeriod = (escaper: Escaper | null) => {
     if(!escaper) return;
@@ -44,10 +21,6 @@ const escaperTurnForOnePeriod = (escaper: Escaper | null) => {
         let diffToApplyAbs = RMinBJ(RAbsBJ(remainingDegrees), RAbsBJ(escaper.getMaxSlideTurnPerPeriod()))
 
         if(diffToApplyAbs > 0.05) {
-            if(escaper.tProgressivelyTurnAccelerationToZero){
-                escaper.tProgressivelyTurnAccelerationToZero.destroy()
-            }
-
             //sens
             const sens = (remainingDegrees * escaper.getMaxSlideTurnPerPeriod()) > 0 ? 1 : -1
             const maxIncreaseRotationSpeedPerPeriod = RAbsBJ(escaper.getMaxSlideTurnPerPeriod() * SLIDE_PERIOD / escaper.rotationTimeForMaximumSpeed)
@@ -92,14 +65,6 @@ const escaperTurnForOnePeriod = (escaper: Escaper | null) => {
             const newAngle = currentAngle + diffToApply
             BlzSetUnitFacingEx(hero, newAngle)
         }
-    }else{
-        if(escaper.tProgressivelyTurnAccelerationToZero){
-            escaper.tProgressivelyTurnAccelerationToZero.destroy()
-        }
-
-        escaper.tProgressivelyTurnAccelerationToZero = createTimer(SLIDE_PERIOD, true, () => {
-            progressivelyTurnAccelerationToZero(escaper)
-        })
     }
 }
 
