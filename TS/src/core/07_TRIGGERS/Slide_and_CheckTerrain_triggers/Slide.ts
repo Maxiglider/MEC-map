@@ -1,4 +1,4 @@
-import {SLIDE_PERIOD} from 'core/01_libraries/Constants'
+import {NB_ESCAPERS, SLIDE_PERIOD} from 'core/01_libraries/Constants'
 import { Apm } from 'core/08_GAME/Apm_clics_par_minute/Apm'
 import { createTimer } from 'Utils/mapUtils'
 import { getUdgEscapers, globals } from '../../../../globals'
@@ -7,6 +7,7 @@ import {Escaper} from "../../04_STRUCTURES/Escaper/Escaper";
 import {GetMirrorEscaper} from "../../04_STRUCTURES/Escaper/Escaper_functions";
 import {MAX_DEGREE_ON_WHICH_SPEED_TABLE_TAKES_CONTROL, SPEED_AT_LEAST_THAN_50_DEGREES} from "./SlidingMax";
 
+const tmpLoc = Location(0, 0)
 
 const escaperTurnForOnePeriod = (escaper: Escaper | null) => {
     if(!escaper) return;
@@ -69,6 +70,12 @@ const escaperTurnForOnePeriod = (escaper: Escaper | null) => {
 }
 
 const initSlideTrigger = () => {
+    //counter for height which has to execute at 0.01s period
+    const counters: number[] = []
+    for(let i = 0; i < NB_ESCAPERS; i++){
+        counters[i] = 0
+    }
+
     const Slide_Actions = (n: number) => {
         const escaper = getUdgEscapers().get(n)
 
@@ -86,40 +93,47 @@ const initSlideTrigger = () => {
         let allowTurning = escaper.getRotationSpeed() != 0
 
         //gestion de la hauteur du héros
-        const z = BlzGetUnitZ(hero)
-        const diffZ = z - lastZ //différence de hauteur au niveau du terrain
-        let height = GetUnitFlyHeight(hero)
-        let delta: number
+        counters[n]++
+        if(counters[n] == 10) {
+            counters[n] = 0
 
-        if (height > 1) {
-            escaper.setSpeedZ(speedZ + Gravity.GetGravity())
-            height = height + speedZ - diffZ
-            if (height < 0) {
-                height = 0
-            }
-            SetUnitFlyHeight(hero, height, 0)
+            MoveLocation(tmpLoc, GetUnitX(hero), GetUnitY(hero))
+            const z = GetLocationZ(tmpLoc)
 
-            //coop
-            escaper.refreshCerclePosition()
+            const diffZ = z - lastZ //différence de hauteur au niveau du terrain
+            let height = GetUnitFlyHeight(hero)
+            let delta: number
 
-            allowTurning = allowTurning && globals.CAN_TURN_IN_AIR
-        } else {
-            delta = diffZ - oldDiffZ
-            if (delta < Gravity.GetGravity()) {
-                escaper.setSpeedZ(oldDiffZ + Gravity.GetGravity())
-                SetUnitFlyHeight(hero, -diffZ + speedZ, 0)
-
-                //arrêter de tourner si un clic a été fait juste avant
-                if (!globals.CAN_TURN_IN_AIR) {
-                    SetUnitFacing(hero, GetUnitFacing(hero))
+            if (height > 1) {
+                escaper.setSpeedZ(speedZ + Gravity.GetGravity())
+                height = height + speedZ - diffZ
+                if (height < 0) {
+                    height = 0
                 }
-            } else if (!escaper.isAlive()) {
-                //le héros mort touche le sol, on désactive le slide
-                escaper.enableSlide(false)
+                SetUnitFlyHeight(hero, height, 0)
+
+                //coop
+                escaper.refreshCerclePosition()
+
+                allowTurning = allowTurning && globals.CAN_TURN_IN_AIR
+            } else {
+                delta = diffZ - oldDiffZ
+                if (delta < Gravity.GetGravity()) {
+                    escaper.setSpeedZ(oldDiffZ + Gravity.GetGravity())
+                    SetUnitFlyHeight(hero, -diffZ + speedZ, 0)
+
+                    //arrêter de tourner si un clic a été fait juste avant
+                    if (!globals.CAN_TURN_IN_AIR) {
+                        SetUnitFacing(hero, GetUnitFacing(hero))
+                    }
+                } else if (!escaper.isAlive()) {
+                    //le héros mort touche le sol, on désactive le slide
+                    escaper.enableSlide(false)
+                }
             }
+            escaper.setLastZ(z)
+            escaper.setOldDiffZ(diffZ)
         }
-        escaper.setLastZ(z)
-        escaper.setOldDiffZ(diffZ)
 
         //turning
         if(allowTurning && escaper.slidingMode == "max"){

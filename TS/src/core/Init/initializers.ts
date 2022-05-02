@@ -55,4 +55,5 @@ export const initializers = () => {
 
     //test trigger for developement
     init_Test()
+    init_measureSpeed()
 }

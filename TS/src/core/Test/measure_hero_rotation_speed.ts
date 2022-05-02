@@ -14,6 +14,7 @@ export const init_measureSpeed = () => {
     createTimer(10, false, () => {
         const hero = getUdgEscapers().get(0)?.getHero()
         const hero2 = getUdgEscapers().get(1)?.getHero()
+               
 
         if (hero && hero2) {
 
