@@ -352,7 +352,6 @@ export class Escaper {
         this.selectHero()
 
         SetUnitColor(this.hero, ConvertPlayerColor(this.baseColorId))
-        BlzSetHeroProperName(this.hero, this.getDisplayName())
 
         this.updateUnitVertexColor()
         this.SpecialIllidan()
