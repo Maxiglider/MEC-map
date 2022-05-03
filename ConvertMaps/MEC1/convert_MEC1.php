@@ -133,19 +133,20 @@ foreach ($lines as $line) {
     }
 
     //monster types
-    if (preg_match('/udg_monsterTypes\.new\((.+?)\)(\.setKillingEffectStr\((.+?)\))?/', $line, $match)) {
+    if (preg_match('/udg_monsterTypes\.new\((.+?)\)(\.setAlias\((.+?)\))?(\.setKillingEffectStr\((.+?)\))?/', $line, $match)) {
         $args = getArgs($match[1]);
 
         $gameData->monsterTypes[] = [
             "unitTypeId" => removeQuotes($args[1]),
             "label" => removeQuotes($args[0]),
+            "alias" => isset($match[3]) ? removeQuotes($match[3]) : '',
             "isClickable" => $args[5] == "true",
             "height" => -1,
             "immolationRadius" => intval($args[3]),
             "scale" => floatval($args[2]),
             "speed" => floatval($args[4]),
             "nbMeteorsToKill" => 1,
-            "killingEffect" => isset($match[3]) ? stripslashes(stripslashes(removeQuotes($match[3]))) : ''
+            "killingEffect" => isset($match[5]) ? stripslashes(removeQuotes($match[5])) : ''
         ];
     }
 
@@ -153,12 +154,12 @@ foreach ($lines as $line) {
     if (preg_match('/udg_casterTypes\.new/', $line)) {
         $line = delGetTypes($line);
 
-        if (preg_match('/udg_casterTypes\.new\((.+?)\)/', $line, $match)) {
+        if (preg_match('/udg_casterTypes\.new\((.+?)\)(\.setAlias\((.+?)\))?/', $line, $match)) {
             $args = getArgs($match[1]);
 
             $gameData->casterTypes[] = [
-                "alias" => "",
                 "label" => removeQuotes($args[0]),
+                "alias" => isset($match[3]) ? removeQuotes($match[3]) : '',
                 "casterMonsterTypeLabel" => removeQuotes($args[1]),
                 "projectileMonsterTypeLabel" => removeQuotes($args[2]),
                 "range" => floatval($args[3]),
