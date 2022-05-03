@@ -214,7 +214,7 @@ export class Escaper {
     }
 
     //user interface
-    private interfaceEnabled = true
+    private uiMode = "on"
 
     //keyboard shortcuts
     private keyboardShortcutsArray = new KeyboardShortcutArray(this)
@@ -1793,20 +1793,29 @@ export class Escaper {
         }
     }
 
-    enableInterface = (b: boolean) => {
-        if(this.interfaceEnabled == b){
+    enableInterface = (b: boolean, showMinimap: boolean) => {
+        let mode: string
+        if(b){
+            mode = 'on'
+        }else if(showMinimap){
+            mode = 'map'
+        }else{
+            mode = 'off'
+        }
+
+        if(this.uiMode == mode){
             return false
         }
 
         if(GetLocalPlayer() == this.p) {
             if (!b) {
-                DisableInterface()
+                DisableInterface(showMinimap)
             }else{
                 EnableInterface()
             }
         }
 
-        this.interfaceEnabled = b
+        this.uiMode = mode
 
         return true
     }
