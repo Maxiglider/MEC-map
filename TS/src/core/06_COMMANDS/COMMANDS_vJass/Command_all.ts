@@ -33,6 +33,7 @@ import { AutoContinueAfterSliding } from '../../07_TRIGGERS/Slide_and_CheckTerra
 import { TurnOnSlide } from '../../07_TRIGGERS/Slide_and_CheckTerrain_triggers/To_turn_on_slide'
 import { CommandShortcuts } from '../../08_GAME/Shortcuts/Using_shortcut'
 import { CmdParam, isPlayerId, resolvePlayerId } from './Command_functions'
+import {KeyboardShortcut} from "../../Keyboard_shortcuts/KeyboardShortcut";
 
 export const initCommandAll = () => {
     const { registerCommand } = ServiceManager.getService('Cmd')
@@ -899,17 +900,19 @@ export const initCommandAll = () => {
         name: 'assign',
         alias: ['as'],
         group: 'all',
-        argDescription: '<shortcut> <command>',
-        description: 'puts a command into a key (A Z E R Q S D or F)',
+        argDescription: '[modifier][key] [command]',
+        description: 'puts a command into any alphanumeric key with of without modifiers ctrl (C) or shift (S) or both (CS)',
         cb: ({ cmd, nbParam, param1 }, escaper) => {
-            if (!(nbParam > 1 && CommandShortcuts.IsShortcut(param1))) {
+            if (nbParam <= 1) {
                 return true
             }
 
             const stringAssignedFromCommand = CommandShortcuts.GetStringAssignedFromCommand(cmd)
 
             if (stringAssignedFromCommand) {
-                CommandShortcuts.AssignShortcut(GetPlayerId(escaper.getPlayer()), param1, stringAssignedFromCommand)
+                const keyboardShortcut = new KeyboardShortcut(escaper, param1, stringAssignedFromCommand)
+                escaper.getKeyboardShortcutsArray().new(keyboardShortcut, true)
+                Text.mkP(escaper.getPlayer(), "command assigned")
             }
 
             return true
@@ -924,10 +927,16 @@ export const initCommandAll = () => {
         argDescription: '<shortcut>',
         description: 'removes the command put into a key',
         cb: ({ nbParam, param1 }, escaper) => {
-            if (!(nbParam === 1 && CommandShortcuts.IsShortcut(param1))) {
+            if (!(nbParam === 1)) {
                 return true
             }
-            CommandShortcuts.UnassignShortcut(GetPlayerId(escaper.getPlayer()), param1)
+
+            if(escaper.getKeyboardShortcutsArray().destroyOne(S2I(param1))){
+                Text.mkP(escaper.getPlayer(), "shortcut removed")
+            }else{
+                Text.erP(escaper.getPlayer(), "you have no shortcut with that number")
+            }
+
             return true
         },
     })
@@ -941,7 +950,7 @@ export const initCommandAll = () => {
         description: 'displays the commands associated to your shortcuts',
         cb: ({ noParam }, escaper) => {
             if (noParam) {
-                CommandShortcuts.DisplayShortcuts(GetPlayerId(escaper.getPlayer()))
+                escaper.getKeyboardShortcutsArray().displayAll()
             }
             return true
         },

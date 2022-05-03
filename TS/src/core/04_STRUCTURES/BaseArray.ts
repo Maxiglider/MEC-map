@@ -40,15 +40,25 @@ export abstract class BaseArray<T extends BaseModel> {
 
     get = (id: number): T | null => this.data[id] || null
 
-    forAll(cb: (v: T) => void) {
-        for (const [_, element] of pairs(this.data)) {
-            cb(element)
+    forAll(cb: (v: T, id: number) => void) {
+        for (const [id, element] of pairs(this.data)) {
+            cb(element, id)
         }
     }
 
     getAll = () => this.data
 
     toJson: () => any = () => sortArrayOfObjectsByIds(Object.values(this.data)).map(item => item.toJson())
+
+    destroyOne = (id: number) => {
+        if(this.data[id]){
+            this.data[id].destroy()
+            delete this.data[id]
+            return true
+        }else{
+            return false
+        }
+    }
 
     destroy = () => {
         for (const [id, v] of pairs(this.data)) {

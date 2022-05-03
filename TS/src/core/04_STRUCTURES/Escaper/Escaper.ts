@@ -84,6 +84,7 @@ import {
     HERO_ROTATION_TIME_FOR_MAXIMUM_SPEED
 } from "../../07_TRIGGERS/Slide_and_CheckTerrain_triggers/SlidingMax";
 import {DisableInterface, EnableInterface} from "../../DisablingInterface/EnableDisableInterface";
+import {KeyboardShortcutArray} from "../../Keyboard_shortcuts/KeyboardShortcutArray";
 
 const SHOW_REVIVE_EFFECTS = false
 
@@ -214,6 +215,9 @@ export class Escaper {
 
     //user interface
     private interfaceEnabled = true
+
+    //keyboard shortcuts
+    private keyboardShortcutsArray = new KeyboardShortcutArray(this)
 
     /*
      * Constructor
@@ -1805,6 +1809,10 @@ export class Escaper {
         this.interfaceEnabled = b
 
         return true
+    }
+
+    getKeyboardShortcutsArray = () => {
+        return this.keyboardShortcutsArray
     }
 
     toJson = () => ({
