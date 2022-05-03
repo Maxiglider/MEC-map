@@ -102,6 +102,10 @@ export class FollowMouse {
     }
 
     doMouseMoveActions() {
+        if(BlzGetTriggerPlayerMouseX() == 0 && BlzGetTriggerPlayerMouseY() == 0){
+            return
+        }
+
         this.escaper.mouseX = BlzGetTriggerPlayerMouseX()
         this.escaper.mouseY = BlzGetTriggerPlayerMouseY()
 

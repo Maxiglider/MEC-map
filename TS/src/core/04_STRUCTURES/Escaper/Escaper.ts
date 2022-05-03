@@ -83,6 +83,7 @@ import {
     HERO_ROTATION_SPEED,
     HERO_ROTATION_TIME_FOR_MAXIMUM_SPEED
 } from "../../07_TRIGGERS/Slide_and_CheckTerrain_triggers/SlidingMax";
+import {DisableInterface, EnableInterface} from "../../DisablingInterface/EnableDisableInterface";
 
 const SHOW_REVIVE_EFFECTS = false
 
@@ -197,7 +198,7 @@ export class Escaper {
     //mouse position updated when a trigger dependant of mouse movement is being used
     mouseX = 0
     mouseY = 0
-    
+
     //others transparency
     private static othersTransparency: number | null = null
 
@@ -210,6 +211,9 @@ export class Escaper {
             escaper.updateUnitVertexColor()
         })
     }
+
+    //user interface
+    private interfaceEnabled = true
 
     /*
      * Constructor
@@ -730,7 +734,7 @@ export class Escaper {
     createTerrainKillEffect(killEffectStr: string) {
         this.destroyTerrainKillEffect()
         this.hero &&
-            (this.terrainKillEffect = AddSpecialEffectTarget(killEffectStr, this.hero, TERRAIN_KILL_EFFECT_BODY_PART))
+        (this.terrainKillEffect = AddSpecialEffectTarget(killEffectStr, this.hero, TERRAIN_KILL_EFFECT_BODY_PART))
     }
 
     destroyPortalEffect = () => {
@@ -1127,11 +1131,11 @@ export class Escaper {
         CustomDefeatBJ(kicked.getPlayer(), 'You have been kicked by ' + this.displayName + ' !')
         Text.A(
             udg_colorCode[kicked.getColorId()] +
-                kicked.displayName +
-                ' has been kicked by ' +
-                udg_colorCode[this.getColorId()] +
-                this.displayName +
-                ' !'
+            kicked.displayName +
+            ' has been kicked by ' +
+            udg_colorCode[this.getColorId()] +
+            this.displayName +
+            ' !'
         )
         kicked.destroy()
         GetMirrorEscaper(kicked)?.destroy()
@@ -1783,6 +1787,24 @@ export class Escaper {
                 this.hero && IssuePointOrder(this.hero, 'smart', x, y)
             })
         }
+    }
+
+    enableInterface = (b: boolean) => {
+        if(this.interfaceEnabled == b){
+            return false
+        }
+
+        if(GetLocalPlayer() == this.p) {
+            if (!b) {
+                DisableInterface()
+            }else{
+                EnableInterface()
+            }
+        }
+
+        this.interfaceEnabled = b
+
+        return true
     }
 
     toJson = () => ({

@@ -1289,5 +1289,26 @@ export const initCommandAll = () => {
 
             return true
         },
-    })
+    }),
+
+        //-myStartCommands(msc) [list]|[add x]|[del x]|[delall]
+        registerCommand({
+            name: 'userInterface',
+            alias: ['ui'],
+            group: 'all',
+            argDescription: '[off] | [on]',
+            description: 'Run commands on start of the game',
+            cb: ({nbParam, param1}, escaper) => {
+                if (nbParam != 1 || !IsBoolString(param1)) {
+                    Text.erP(escaper.getPlayer(), "wrong command parameters")
+                    return true
+                }
+
+                if(!escaper.enableInterface(S2B(param1))){
+                    Text.erP(escaper.getPlayer(), "nothing to change")
+                }
+
+                return true
+            }
+        })
 }
