@@ -9,7 +9,6 @@ import {
     INVIS_UNIT_TYPE_ID,
     NB_PLAYERS_MAX,
     NB_PLAYERS_MAX_REFORGED,
-    PLAYER_DUMMY_CIRCLE,
     PLAYER_INVIS_UNIT,
     POWER_CIRCLE,
     SLIDE_PERIOD,
@@ -272,7 +271,7 @@ export class Escaper {
         SetUnitUserData(this.powerCircle, escaperId)
         ShowUnit(this.powerCircle, false)
 
-        this.dummyPowerCircle = CreateUnit(PLAYER_DUMMY_CIRCLE, DUMMY_POWER_CIRCLE, 0, 0, 0)
+        this.dummyPowerCircle = CreateUnit(this.p, DUMMY_POWER_CIRCLE, 0, 0, 0)
         SetUnitUserData(this.dummyPowerCircle, escaperId)
         ShowUnit(this.dummyPowerCircle, false)
 
