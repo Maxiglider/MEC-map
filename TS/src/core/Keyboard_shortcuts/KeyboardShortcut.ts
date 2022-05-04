@@ -134,6 +134,10 @@ export class KeyboardShortcut{
         return keyModifier2String[this.shortcutKeyModifier] + this.shortcutKeyStr + " : " + this.command
     }
 
+    getShortcutString = () => {
+        return this.shortcutString
+    }
+
     toJson = () => ({
         //useless but mandatory due to BaseArray implementation
     })

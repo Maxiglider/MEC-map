@@ -16,7 +16,24 @@ export class KeyboardShortcutArray extends BaseArray<KeyboardShortcut> {
         })
     }
 
+    searchByShortcutString(shortcutString: string){
+        let output: number | null = null
+
+        this.forAll((ks, ksId) => {
+            if(ks.getShortcutString() == shortcutString){
+                output = ksId
+            }
+        })
+
+        return output
+    }
+
     new = (ks: KeyboardShortcut, enable: boolean) => {
+        const oldId = this.searchByShortcutString(ks.getShortcutString())
+        if(oldId){
+            this.destroyOne(oldId)
+        }
+
         this._new(ks)
 
         if (enable) {
