@@ -1305,8 +1305,8 @@ export const initCommandAll = () => {
             name: 'userInterface',
             alias: ['ui'],
             group: 'all',
-            argDescription: '[off] | [on] | [minimap]',
-            description: 'Run commands on start of the game',
+            argDescription: 'off | on | map',
+            description: 'Disable partly or totally the graphical user interface',
             cb: ({nbParam, param1}, escaper) => {
                 if (nbParam != 1) {
                     Text.erP(escaper.getPlayer(), "wrong command parameters")
