@@ -23,6 +23,7 @@ import { init_Test } from '../Test/test'
 import { initArrays } from './initArrays'
 import { initOldTriggers } from './init_old_triggers'
 import {init_cameraPositionAtStart} from "../08_GAME/Camera_reset/Camera_position_at_start";
+import {init_customUI} from "../DisablingInterface/EnableDisableInterface";
 
 export const initializers = () => {
     init_terrain_limit_variables()
@@ -51,6 +52,9 @@ export const initializers = () => {
 
     //keyboard shortcuts
     init_shortcurt_cancelRedo()
+
+    //custom UI
+    init_customUI()
 
     //test trigger for developement
     init_Test()
