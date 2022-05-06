@@ -96,7 +96,7 @@ export const initExecuteCommandCheat = () => {
         },
     })
 
-    //-slideSpeed(ss) <speed>   --> changes the slide speed of your hero, ignoring terrains
+    //-rotationSpeed(rs) <speed>   --> changes the rotation speed of your hero, ignoring terrains
     registerCommand({
         name: 'rotationSpeed',
         alias: ['rs'],
@@ -139,7 +139,7 @@ export const initExecuteCommandCheat = () => {
         },
     })
 
-    //-normalSlideSpeed(nss)   --> puts the slide speed back to normal (respecting terrains)
+    //-normalRotationSpeed(nrs)   --> puts the rotation speed back to normal (respecting terrains)
     registerCommand({
         name: 'normalRotationSpeed',
         alias: ['nrs'],
@@ -334,16 +334,36 @@ export const initExecuteCommandCheat = () => {
                 return true
             }
 
-            const hero = getUdgEscapers().get(n)?.getHero()
+            const targetHero = getUdgEscapers().get(n)?.getHero()
+            const hero = escaper.getHero()
 
-            if (!hero) {
+            if (!targetHero || !hero) {
                 return true
             }
 
-            escaper.revive(GetUnitX(hero), GetUnitY(hero))
-            escaper.turnInstantly(GetUnitFacing(hero))
-            GetMirrorEscaper(escaper)?.revive(GetUnitX(hero), GetUnitY(hero))
-            GetMirrorEscaper(escaper)?.turnInstantly(GetUnitFacing(hero))
+            const x = GetUnitX(targetHero)
+            const y = GetUnitY(targetHero)
+
+            if(escaper.isAlive()){
+                SetUnitX(hero, x)
+                SetUnitY(hero, y)
+            }else{
+                escaper.revive(x, y)
+            }
+            escaper.turnInstantly(GetUnitFacing(targetHero))
+
+            const escaperSecond = GetMirrorEscaper(escaper)
+            if(escaperSecond) {
+                const heroSecond = escaperSecond.getHero()
+                if(heroSecond) {
+                    if (escaperSecond.isAlive()) {
+                        SetUnitX(heroSecond, x)
+                        SetUnitY(heroSecond, y)
+                    } else {
+                        escaperSecond.revive(x, y)
+                    }
+                }
+            }
 
             return true
         },
