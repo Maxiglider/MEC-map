@@ -450,7 +450,7 @@ export class Escaper {
         this.effects.hideEffects()
 
         DisableTrigger(this.checkTerrain)
-        this.slide && this.slide.destroy()
+        this.slide && this.slide.pause().destroy()
 
         //coop
         ShowUnit(this.powerCircle, false)
@@ -519,7 +519,7 @@ export class Escaper {
                 }
             }
         } else {
-            this.slide?.destroy()
+            this.slide?.pause().destroy()
             delete this.slide
             this.slideLastAngleOrder = -1
             this.setRemainingDegreesToTurn(0)
