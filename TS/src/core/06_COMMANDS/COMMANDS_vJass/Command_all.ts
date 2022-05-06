@@ -1041,7 +1041,7 @@ export const initCommandAll = () => {
         name: 'firstPersonCam',
         alias: ['fpc'],
         group: 'all',
-        argDescription: '',
+        argDescription: 'on | off',
         description: 'displays the first person camera',
         cb: ({ nbParam, param1 }, escaper) => {
             if (nbParam === 1 && IsBoolString(param1)) {
@@ -1058,13 +1058,21 @@ export const initCommandAll = () => {
         name: 'lockCam',
         alias: ['lc'],
         group: 'all',
-        argDescription: '',
+        argDescription: '[<player> | on | off]',
         description: 'locks the camera',
         cb: ({ noParam, nbParam, param1 }, escaper) => {
             let target: Escaper | null = null
 
-            if (IsBoolString(param1) && S2B(param1) === false) {
-                target = null
+            if(nbParam > 1){
+                throw "Wrong command parameters"
+            }
+
+            if (IsBoolString(param1)){
+                if(S2B(param1)){
+                    target = escaper
+                }else{
+                    target = null
+                }
             } else {
                 target = noParam ? escaper : nbParam === 1 ? getUdgEscapers().get(resolvePlayerId(param1)) : null
             }
@@ -1075,25 +1083,6 @@ export const initCommandAll = () => {
             if (target) {
                 Text.mkP(escaper.getPlayer(), 'Camera locked')
             } else {
-                Text.mkP(escaper.getPlayer(), 'Camera unlocked')
-            }
-
-            return true
-        },
-    })
-
-    //-unlockCam(uc)
-    registerCommand({
-        name: 'unlockCam',
-        alias: ['ulc'],
-        group: 'all',
-        argDescription: '',
-        description: 'unlocks the camera',
-        cb: ({ noParam }, escaper) => {
-            if (noParam) {
-                escaper.setLockCamTarget(null)
-                escaper.resetCamera()
-
                 Text.mkP(escaper.getPlayer(), 'Camera unlocked')
             }
 
