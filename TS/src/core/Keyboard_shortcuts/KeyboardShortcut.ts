@@ -40,6 +40,16 @@ const string2AcceptedOsKey: {[x: string]: oskeytype} = {
     "x": OSKEY_X,
     "y": OSKEY_Y,
     "z": OSKEY_Z,
+    "n0": OSKEY_NUMPAD0,
+    "n1": OSKEY_NUMPAD1,
+    "n2": OSKEY_NUMPAD2,
+    "n3": OSKEY_NUMPAD3,
+    "n4": OSKEY_NUMPAD4,
+    "n5": OSKEY_NUMPAD5,
+    "n6": OSKEY_NUMPAD6,
+    "n7": OSKEY_NUMPAD7,
+    "n8": OSKEY_NUMPAD8,
+    "n9": OSKEY_NUMPAD9,
 }
 
 const string2AllowedKeyModifier: {[x: string]: number} = {
@@ -76,22 +86,31 @@ export class KeyboardShortcut{
         let charKey: string = ""
         let modifier: number = 0
 
-        if(len == 1){
-            charKey = shortcutString
-        }else if(len == 2 || len == 3){
+        //first find the charKey
+        if(len >= 1){
+            let lastModifierCharPos = len - 2
             charKey = shortcutString[len - 1]
-
-            const modifiersStr = shortcutString.substring(0,  len - 1).split('')
-            for(let modifierStr of modifiersStr){
-                if(!string2AllowedKeyModifier[modifierStr]){
-                    throw shortcutKeyDefinitionErrorMsg
+            if(len >= 2){
+                const prevChar = shortcutString[len - 2]
+                if(prevChar == 'n'){
+                    charKey = prevChar + charKey
+                    lastModifierCharPos = len - 3
                 }
+            }
 
-                modifier += string2AllowedKeyModifier[modifierStr]
+            if(lastModifierCharPos >= 0){
+                const modifiersStr = shortcutString.substring(0,  lastModifierCharPos + 1).split('')
+                for(let modifierStr of modifiersStr){
+                    if(!string2AllowedKeyModifier[modifierStr]){
+                        throw shortcutKeyDefinitionErrorMsg
+                    }
+
+                    modifier += string2AllowedKeyModifier[modifierStr]
+                }
             }
         }
 
-        if(!string2AcceptedOsKey[charKey]){
+        if(!string2AcceptedOsKey[charKey] || !keyModifier2String[modifier]){
             throw shortcutKeyDefinitionErrorMsg
         }
 

@@ -900,7 +900,7 @@ export const initCommandAll = () => {
         name: 'assign',
         alias: ['as'],
         group: 'all',
-        argDescription: '[modifier][key] [command]',
+        argDescription: '[<modifier>]<key> <command>',
         description: 'puts a command into any alphanumeric key with of without modifiers ctrl (C) or shift (S) or both (CS)',
         cb: ({ cmd, nbParam, param1 }, escaper) => {
             if (nbParam <= 1) {
