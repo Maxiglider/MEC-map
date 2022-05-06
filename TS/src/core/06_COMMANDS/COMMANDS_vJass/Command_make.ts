@@ -2809,7 +2809,7 @@ export const initExecuteCommandMake = () => {
     //-createCircleMob [<speed> [<direction> [<radius>]]]
     registerCommand({
         name: 'createCircleMob',
-        alias: [],
+        alias: ['crcim'],
         group: 'make',
         argDescription: '[<speed> [<direction> [<radius>]]]',
         description: '',
@@ -2848,7 +2848,7 @@ export const initExecuteCommandMake = () => {
     //-deleteCircleMob
     registerCommand({
         name: 'deleteCircleMob',
-        alias: [],
+        alias: ['delcim'],
         group: 'make',
         argDescription: '',
         description: '',
@@ -2865,7 +2865,7 @@ export const initExecuteCommandMake = () => {
     //-setCircleMobSpeed(scms) <speed>
     registerCommand({
         name: 'setCircleMobSpeed',
-        alias: ['setcms'],
+        alias: ['setcims'],
         group: 'make',
         argDescription: '<speed>',
         description: '',
@@ -2884,10 +2884,10 @@ export const initExecuteCommandMake = () => {
     //-setCircleMobDirection(scmd) <direction>
     registerCommand({
         name: 'setCircleMobDirection',
-        alias: ['setcmd'],
+        alias: ['setcimd'],
         group: 'make',
-        argDescription: '<direction>',
-        description: '',
+        argDescription: 'cw | ccw',
+        description: 'Clockwise of counter-clockwise',
         cb: ({ param1 }, escaper) => {
             if (param1 !== '' && param1.toLowerCase() !== 'cw' && param1.toLowerCase() !== 'ccw') {
                 Text.erP(escaper.getPlayer(), 'Direction must be "cw" or "ccw"')
@@ -2903,7 +2903,7 @@ export const initExecuteCommandMake = () => {
     //-setCircleMobRadius(scmr) <radius>
     registerCommand({
         name: 'setCircleMobRadius',
-        alias: ['setcmr'],
+        alias: ['setcimr'],
         group: 'make',
         argDescription: '<radius>',
         description: '',
