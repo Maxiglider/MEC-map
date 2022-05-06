@@ -263,6 +263,11 @@ export class LevelArray extends BaseArray<Level> {
             if (levelJson.portalMobs) {
                 level.portalMobs.newFromJson(levelJson.portalMobs)
             }
+
+            //circles
+            if(levelJson.circleMobs){
+                level.circleMobs.newFromJson(levelJson.circleMobs)
+            }
         }
     }
 

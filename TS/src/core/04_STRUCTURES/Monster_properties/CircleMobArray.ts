@@ -30,20 +30,20 @@ export class CircleMobArray extends BaseArray<CircleMob> {
 
     newFromJson = (circleMobsJson: { [x: string]: any }[]) => {
         for (let cm of circleMobsJson) {
-            const mt = this.level.monsters.get(cm.triggerMobId)
+            const mainMob = this.level.monsters.get(cm.mainMobId)
 
-            if (!mt) {
-                Text.erA(`Monster label "${cm.triggerMobId}" unknown`)
+            if (!mainMob) {
+                Text.erA(`Monster id "${cm.mainMobId}" unknown`)
             } else {
-                const circleMob = this.new(mt, cm.speed, cm.direction, cm.radius)
+                const circleMob = this.new(mainMob, cm.speed, cm.direction, cm.radius)
 
                 for (const [_, blockMobId] of pairs(cm.blockMobsIds)) {
-                    const mt = this.level.monsters.get(blockMobId)
+                    const mob = this.level.monsters.get(blockMobId)
 
-                    if (!mt) {
-                        Text.erA(`Monster label "${cm.blockMobsIds}" unknown`)
+                    if (!mob) {
+                        Text.erA(`Monster id "${blockMobId}" unknown`)
                     } else {
-                        circleMob.addBlockMob(mt)
+                        circleMob.addBlockMob(mob)
                     }
                 }
             }
