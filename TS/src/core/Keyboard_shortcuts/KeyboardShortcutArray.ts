@@ -12,7 +12,7 @@ export class KeyboardShortcutArray extends BaseArray<KeyboardShortcut> {
     }
     public displayAll = () => {
         this.forAll((ks, ksId) => {
-            Text.mkP(this.escaper.getPlayer(), ksId + " : " + ks.toDisplayString())
+            Text.mkP(this.escaper.getPlayer(), ks.toDisplayString())
         })
     }
 
@@ -38,6 +38,16 @@ export class KeyboardShortcutArray extends BaseArray<KeyboardShortcut> {
 
         if (enable) {
             ks.enableEvent()
+        }
+    }
+
+    destroyOneByKey = (shortcutString: string) => {
+        const keyboardShortcutId = this.searchByShortcutString(shortcutString)
+        if(keyboardShortcutId){
+            this.destroyOne(keyboardShortcutId)
+            return true
+        }else{
+            return false
         }
     }
 }

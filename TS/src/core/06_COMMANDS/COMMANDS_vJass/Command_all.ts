@@ -924,17 +924,17 @@ export const initCommandAll = () => {
         name: 'unassign',
         alias: ['uas'],
         group: 'all',
-        argDescription: '<shortcut>',
+        argDescription: '[<modifier>]<key>',
         description: 'removes the command put into a key',
         cb: ({ nbParam, param1 }, escaper) => {
             if (!(nbParam === 1)) {
                 return true
             }
 
-            if(escaper.getKeyboardShortcutsArray().destroyOne(S2I(param1))){
+            if(escaper.getKeyboardShortcutsArray().destroyOneByKey(param1)){
                 Text.mkP(escaper.getPlayer(), "shortcut removed")
             }else{
-                Text.erP(escaper.getPlayer(), "you have no shortcut with that number")
+                Text.erP(escaper.getPlayer(), "you have no such shortcut")
             }
 
             return true
