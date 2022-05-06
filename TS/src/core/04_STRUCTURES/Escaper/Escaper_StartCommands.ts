@@ -58,6 +58,15 @@ export class EscaperStartCommands {
         this.saveStartCommands()
     }
 
+    executeStartCommand = (index: number) => {
+        if (index < 0 || index >= this.startCommands.length) {
+            return false
+        }
+
+        ServiceManager.getService('Cmd').ExecuteCommand(this.escaper, '-' + this.startCommands[index])
+        return true
+    }
+
     removeStartCommand = (index: number) => {
         if (index < 0 || index >= this.startCommands.length) {
             return null
