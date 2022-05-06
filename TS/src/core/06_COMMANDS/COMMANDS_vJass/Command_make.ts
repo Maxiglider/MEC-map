@@ -592,12 +592,12 @@ export const initExecuteCommandMake = () => {
         },
     })
 
-    //-setGumTerrain
+    //-setGumTerrain <terrainLabel>
     registerCommand({
         name: 'setGumTerrain',
         alias: ['setgt'],
         group: 'make',
-        argDescription: '',
+        argDescription: '<terrainLabel>',
         description: 'set the gum terrain',
         cb: ({ nbParam, param1 }, escaper) => {
             if (nbParam != 1) {
@@ -1573,7 +1573,7 @@ export const initExecuteCommandMake = () => {
         alias: ['getutp'],
         group: 'make',
         argDescription: '',
-        description: 'get the period for the unit teleport being created',
+        description: 'displays the period of any teleporting unit you click',
         cb: ({ noParam }, escaper) => {
             if (!noParam) {
                 return true
@@ -1581,36 +1581,6 @@ export const initExecuteCommandMake = () => {
             //apply command
             escaper.makeGetUnitTeleportPeriod()
             Text.mkP(escaper.getPlayer(), 'getting unit teleport period on')
-            return true
-        },
-    })
-
-    //-setUnitTeleportPeriod(setutp) <period>
-    registerCommand({
-        name: 'setUnitTeleportPeriod',
-        alias: ['setutp'],
-        group: 'make',
-        argDescription: '<period>',
-        description: 'set the period for the unit teleport being created',
-        cb: ({ nbParam, param1 }, escaper) => {
-            if (nbParam !== 1) {
-                return true
-            }
-            //checkParam1
-            const x = S2R(param1)
-            if (x < MONSTER_TELEPORT_PERIOD_MIN || x > MONSTER_TELEPORT_PERIOD_MAX) {
-                Text.erP(
-                    escaper.getPlayer(),
-                    'the period must be between ' +
-                        R2S(MONSTER_TELEPORT_PERIOD_MIN) +
-                        ' and ' +
-                        R2S(MONSTER_TELEPORT_PERIOD_MAX)
-                )
-                return true
-            }
-            //apply command
-            escaper.makeSetUnitTeleportPeriod('oneByOne', x)
-            Text.mkP(escaper.getPlayer(), 'setting unit teleport period on')
             return true
         },
     })
