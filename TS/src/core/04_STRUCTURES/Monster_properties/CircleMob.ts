@@ -107,7 +107,6 @@ export class CircleMob {
     }
 
     activate = () => {
-        print("circle activate")
         this.circleTimer?.destroy()
 
         this.initialize()
