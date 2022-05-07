@@ -238,6 +238,9 @@ end`
                 contents = luamin.minify(contents.toString())
             }
 
+            // Fix a React bug from TSTL
+            contents = contents.replace(new RegExp('React:createElement', 'gmi'), 'React.createElement')
+
             return contents
         }
 

@@ -1,3 +1,5 @@
+import { renderInterface } from 'App/renderInterface'
+import { IsBoolString, S2B } from 'core/01_libraries/Basic_functions'
 import { initLives } from 'core/04_STRUCTURES/Lives_and_game_time/Lives_and_game_time'
 import { initMultiboard } from 'core/04_STRUCTURES/Lives_and_game_time/Multiboard'
 import { initCommandExecution } from 'core/06_COMMANDS/COMMANDS_vJass/Command_execution'
@@ -25,6 +27,32 @@ const tsMain = () => {
 
     //escapers
     // initEscapers()
+
+    if (!PROD) {
+        renderInterface({
+            cb: ({ setVisible }) => {
+                ServiceManager.getService('Cmd').registerCommand({
+                    name: 'palette',
+                    alias: [],
+                    group: 'make',
+                    argDescription: '',
+                    description: '',
+                    cb: ({ nbParam, param1 }) => {
+                        if (nbParam !== 1) {
+                            throw 'Wrong command parameters'
+                        }
+
+                        if (!IsBoolString(param1)) {
+                            return true
+                        }
+
+                        setVisible({ visible: S2B(param1), playerId: GetPlayerId(GetTriggerPlayer()) })
+                        return true
+                    },
+                })
+            },
+        })
+    }
 
     if (!PROD) {
         const gcState = { lastRun: os.clock(), waitingForGc: false }
