@@ -8,6 +8,7 @@ import {globals} from "../../../../globals";
 
 const TIMER_PERIOD = 0.02
 const DEFAULT_ROTATION_SPEED = 90
+const DEFAULT_DIRECTION = 'cw'
 
 
 export class CircleMob {
@@ -30,10 +31,8 @@ export class CircleMob {
         triggerMob.setCircleMob(this)
 
         this.rotationSpeed = rotationSpeed || DEFAULT_ROTATION_SPEED
-        this.direction = direction || 'cw'
+        this.direction = direction || DEFAULT_DIRECTION
         this.radius = radius
-
-        this.activate()
     }
 
     getTriggerMob = () => this.triggerMob
@@ -78,6 +77,8 @@ export class CircleMob {
         }
 
         this.mobs.new(monster, false)
+
+        if(!this.circleTimer) this.activate()
 
         return true
     }
