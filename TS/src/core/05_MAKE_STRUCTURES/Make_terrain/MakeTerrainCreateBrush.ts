@@ -17,14 +17,13 @@ export interface ChangingTile {
 
 export class MakeTerrainCreateBrush extends MakeHoldClick {
     private terrainType: TerrainType
-    private brushSize: number
     private shape: 'square' | 'circle'
     private changingTiles?: ChangingTile[]
 
     constructor(escaper: Escaper, terrainType: TerrainType, brushSize: number, shape: 'square' | 'circle' = 'square') {
         super(escaper, 'terrainCreateBrush', false)
         this.terrainType = terrainType
-        this.brushSize = brushSize
+        escaper.setBrushSize(brushSize)
         this.shape = shape
     }
 
@@ -37,7 +36,7 @@ export class MakeTerrainCreateBrush extends MakeHoldClick {
             if (this.activeBtn == MOUSE_BUTTON_TYPE_RIGHT) {
                 terrainTypeToApply = this.terrainType
                 shapeToApply = this.shape
-                sizeToApply = this.brushSize
+                sizeToApply = this.escaper.getBrushSize()
             } else if (this.activeBtn == MOUSE_BUTTON_TYPE_LEFT) {
                 const gumTerrainType = this.escaper.getGumTerrain()
                 if (gumTerrainType) {

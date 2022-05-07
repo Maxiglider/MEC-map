@@ -4,10 +4,10 @@ import { getUdgEscapers } from '../../../globals'
 import { makingRightsToAll } from '../06_COMMANDS/Rights/manage_rights'
 
 export const init_Test = () => {
+    const { ExecuteCommand } = ServiceManager.getService('Cmd')
+
     if (!PROD) {
         makingRightsToAll()
-
-        const { ExecuteCommand } = ServiceManager.getService('Cmd')
 
         const escaper = getUdgEscapers().get(0)
 

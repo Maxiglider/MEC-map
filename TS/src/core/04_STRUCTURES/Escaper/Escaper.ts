@@ -186,6 +186,7 @@ export class Escaper {
     //make
     private gumTerrain?: TerrainType
     private gumBrushSize = 1
+    private brushSize = 1
 
     private ignoreDeathMessages = false
     private textTag: texttag | null = null
@@ -1702,6 +1703,14 @@ export class Escaper {
 
     getGumTerrain = () => {
         return this.gumTerrain
+    }
+
+    setBrushSize = (size: number) => {
+        this.brushSize = size
+    }
+
+    getBrushSize = () => {
+        return this.brushSize
     }
 
     setGumBrushSize = (size: number) => {
