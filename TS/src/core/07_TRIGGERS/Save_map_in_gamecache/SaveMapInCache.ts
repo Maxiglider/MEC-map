@@ -53,11 +53,11 @@ export class SaveMapInCache {
         }
     }
 
-    public static smic = () => {
+    public static smic = (p: player | null = null) => {
         const json = SaveMapInCache.gameAsJson()
 
         const SaveLoad = initSaveLoad()
-        SaveLoad.saveFile(MEC_SMIC_DATA_FILE, null, jsonEncode(json))
+        SaveLoad.saveFile(MEC_SMIC_DATA_FILE, p, jsonEncode(json))
 
         Text.A('saving game data to file "' + MEC_SMIC_DATA_FILE + '" done')
     }

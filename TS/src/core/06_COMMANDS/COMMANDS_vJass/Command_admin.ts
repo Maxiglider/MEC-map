@@ -566,9 +566,9 @@ export const initExecuteCommandMax = () => {
         group: 'max',
         argDescription: '',
         description: 'save the map in cache',
-        cb: ({ noParam }) => {
+        cb: ({ noParam }, escaper) => {
             if (noParam) {
-                SaveMapInCache.smic()
+                SaveMapInCache.smic(escaper.getPlayer())
             }
             return true
         },

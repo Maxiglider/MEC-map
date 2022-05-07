@@ -47,7 +47,11 @@
         "forceConsistentCasingInFileNames": true,
         "jsx": "react"
     },
-    "include": ["src", "node_modules/w3ts-jsx/dist", "node_modules/w3ts-jsx/dist/node_modules/basic-pragma"],
+    "include": [
+        "src",
+        "node_modules/w3ts-jsx/dist",
+        "node_modules/w3ts-jsx/dist/node_modules/basic-pragma"
+    ],
     "exclude": [],
     "tstl": {
         "luaTarget": "5.3",
