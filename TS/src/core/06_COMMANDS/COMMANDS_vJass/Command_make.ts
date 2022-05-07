@@ -592,13 +592,37 @@ export const initExecuteCommandMake = () => {
         },
     })
 
+    //-setBrushSize <brushSize>
+    registerCommand({
+        name: 'setBrushSize',
+        alias: ['setbs'],
+        group: 'make',
+        argDescription: '<brushSize>',
+        description: 'sets the brush size',
+        cb: ({ nbParam, param1 }, escaper) => {
+            if (nbParam != 1) {
+                return true
+            }
+
+            const brushSize = S2I(param1)
+            if (brushSize < 1 || brushSize > 8) {
+                Text.erP(escaper.getPlayer(), 'brush size has to be between 1 and 8')
+            } else {
+                escaper.setBrushSize(brushSize)
+                Text.mkP(escaper.getPlayer(), 'brush size set')
+            }
+
+            return true
+        },
+    })
+
     //-setGumTerrain <terrainLabel>
     registerCommand({
         name: 'setGumTerrain',
         alias: ['setgt'],
         group: 'make',
         argDescription: '<terrainLabel>',
-        description: 'set the gum terrain',
+        description: 'sets the gum terrain',
         cb: ({ nbParam, param1 }, escaper) => {
             if (nbParam != 1) {
                 return true
