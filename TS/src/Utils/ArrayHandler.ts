@@ -1,4 +1,5 @@
 import { Text } from 'core/01_libraries/Text'
+import {PROD} from "../env";
 
 export class ArrayHandler {
     private static nextIndex = 0
@@ -30,11 +31,19 @@ export class ArrayHandler {
         const arrayInMap = ArrayHandler.tArrays.get(index)
 
         if (!arrayInMap) {
-            Text.erA(
-                `Index: '${index}' not known in ArrayHandler. '${arr?.constructor?.name}' '${
-                    (arr?.[0] as any)?.constructor?.name
-                }'`
-            )
+            if(!PROD) {
+                try {
+                    Text.erA(
+                        `Index: '${index}' not known in ArrayHandler. '${arr?.constructor?.name}' '${
+                            (arr?.[0] as any)?.constructor?.name
+                        }'`
+                    )
+                }catch{
+                    Text.erA(
+                        `clearArray : element not known in ArrayHandler.`
+                    )
+                }
+            }
 
             return
         }
