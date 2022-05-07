@@ -3,7 +3,7 @@ import { udg_colorCode } from 'core/01_libraries/Init_colorCodes'
 import { Text } from 'core/01_libraries/Text'
 import { forRange } from 'Utils/mapUtils'
 import { getUdgEscapers } from '../../../../globals'
-import {playerId2colorId} from "../../06_COMMANDS/COMMANDS_vJass/Command_functions";
+import { playerId2colorId } from '../../06_COMMANDS/COMMANDS_vJass/Command_functions'
 
 const initMessageHeroDies = () => {
     const MESSAGE_DURATION = 6
@@ -62,11 +62,16 @@ const initMessageHeroDies = () => {
 
             forRange(NB_ESCAPERS, i => {
                 if (!getUdgEscapers().get(i)?.isIgnoringDeathMessages()) {
-                    Text.P_timed(
-                        Player(i),
-                        MESSAGE_DURATION,
-                        udg_colorCode[playerId2colorId(n)] + getUdgEscapers().get(n)?.getDisplayName() + '|r has fallen.'
-                    )
+                    const targetEscaper = getUdgEscapers().get(n)
+
+                    // When players leave their escaper gets removed so we dont show a death message
+                    if (targetEscaper) {
+                        Text.P_timed(
+                            Player(i),
+                            MESSAGE_DURATION,
+                            udg_colorCode[playerId2colorId(n)] + targetEscaper.getDisplayName() + '|r has fallen.'
+                        )
+                    }
                 }
             })
 
