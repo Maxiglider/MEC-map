@@ -15,7 +15,6 @@ import { InitTrig_A_player_leaves } from 'core/08_GAME/Leavers/A_player_leaves'
 import { InitTrig_creation_dialogue } from 'core/08_GAME/Mode_coop/creation_dialogue'
 import { InitTrig_Select_hero } from 'core/08_GAME/Select_and_unselect_heroes/Select_hero'
 import { InitTrig_Unselect_hero } from 'core/08_GAME/Select_and_unselect_heroes/Unselect_hero'
-import { InitTrig_Using_shortcut } from 'core/08_GAME/Shortcuts/Using_shortcut'
 
 export const initOldTriggers = () => {
     InitTrig_Right_click_on_widget()
@@ -26,7 +25,6 @@ export const initOldTriggers = () => {
     InitTrig_Forces_ally()
     InitTrig_Start_sound()
     InitTrig_creation_dialogue()
-    InitTrig_Using_shortcut()
     InitTrig_Camera_reset()
     InitTrig_Afk_mode_ordre_recu()
     InitTrig_A_player_leaves()

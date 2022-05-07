@@ -64,7 +64,6 @@ import { Trig_InvisUnit_is_getting_damage } from '../../08_GAME/Death/InvisUnit_
 import { HERO_START_ANGLE } from '../../08_GAME/Init_game/Heroes'
 import { MessageHeroDies } from '../../08_GAME/Init_game/Message_heroDies'
 import { RunCoopSoundOnHero } from '../../08_GAME/Mode_coop/coop_init_sounds'
-import { CommandShortcuts } from '../../08_GAME/Shortcuts/Using_shortcut'
 import { FollowMouse } from '../../Follow_mouse/Follow_mouse'
 import type { CasterType } from '../Caster/CasterType'
 import { Level } from '../Level/Level'
@@ -378,7 +377,7 @@ export class Escaper {
             false,
             AfkMode.GetAfkModeTimeExpiresCodeFromId(this.escaperId)
         )
-        CommandShortcuts.InitShortcutSkills(GetPlayerId(this.p))
+
         EnableTrigger(this.checkTerrain)
 
         this.textTag = CreateTextTag()

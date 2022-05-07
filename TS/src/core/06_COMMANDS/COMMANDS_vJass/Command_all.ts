@@ -31,9 +31,8 @@ import {TerrainTypeFromString} from '../../07_TRIGGERS/Modify_terrain_Functions/
 import {TerrainTypeNamesAndData} from '../../07_TRIGGERS/Modify_terrain_Functions/Terrain_type_names_and_data'
 import {AutoContinueAfterSliding} from '../../07_TRIGGERS/Slide_and_CheckTerrain_triggers/Auto_continue_after_sliding'
 import {TurnOnSlide} from '../../07_TRIGGERS/Slide_and_CheckTerrain_triggers/To_turn_on_slide'
-import {CommandShortcuts} from '../../08_GAME/Shortcuts/Using_shortcut'
 import {CmdParam, isPlayerId, resolvePlayerId} from './Command_functions'
-import {KeyboardShortcut} from "../../Keyboard_shortcuts/KeyboardShortcut";
+import {GetStringAssignedFromCommand, KeyboardShortcut} from "../../Keyboard_shortcuts/KeyboardShortcut";
 
 export const initCommandAll = () => {
     const {registerCommand} = ServiceManager.getService('Cmd')
@@ -907,7 +906,7 @@ export const initCommandAll = () => {
                 return true
             }
 
-            const stringAssignedFromCommand = CommandShortcuts.GetStringAssignedFromCommand(cmd)
+            const stringAssignedFromCommand = GetStringAssignedFromCommand(cmd)
 
             if (stringAssignedFromCommand) {
                 const keyboardShortcut = new KeyboardShortcut(escaper, param1, stringAssignedFromCommand)
@@ -967,7 +966,7 @@ export const initCommandAll = () => {
             if (!(nbParam > 1)) {
                 return true
             }
-            newCmd(escaper, param1, '-' + CommandShortcuts.GetStringAssignedFromCommand(cmd))
+            newCmd(escaper, param1, '-' + GetStringAssignedFromCommand(cmd))
             Text.P(escaper.getPlayer(), 'new command "' + param1 + '" added')
             return true
         },

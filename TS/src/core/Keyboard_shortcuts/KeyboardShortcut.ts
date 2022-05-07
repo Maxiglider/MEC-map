@@ -3,6 +3,32 @@ import {ServiceManager} from "../../Services";
 import {Escaper} from "../04_STRUCTURES/Escaper/Escaper";
 
 
+export const GetStringAssignedFromCommand = (command: string) => {
+    let outputStr: string
+    let spaceFound = false
+    let cmdLength = StringLength(command)
+    let charId = 3
+    while (true) {
+        if (charId >= cmdLength) break
+        if (SubStringBJ(command, charId, charId) === ' ') {
+            if (!spaceFound) {
+                spaceFound = true
+            } else {
+                outputStr = SubStringBJ(command, charId + 1, cmdLength)
+                if (
+                    SubStringBJ(outputStr, 1, 1) === '(' &&
+                    SubStringBJ(outputStr, StringLength(outputStr), StringLength(outputStr)) === ')'
+                ) {
+                    outputStr = SubStringBJ(outputStr, 2, StringLength(outputStr) - 1)
+                }
+                return outputStr
+            }
+        }
+        charId = charId + 1
+    }
+    return null
+}
+
 const string2AcceptedOsKey: {[x: string]: oskeytype} = {
     "0": OSKEY_0,
     "1": OSKEY_1,
