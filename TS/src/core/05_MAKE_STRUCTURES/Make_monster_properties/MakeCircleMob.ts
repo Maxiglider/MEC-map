@@ -80,7 +80,15 @@ export class MakeCircleMob extends Make {
         if (!this.circleMob) {
             this.triggerMob = monster
             this.createCircleMob()
-            Text.mkP(this.makerOwner, 'trigger mob added for a new circle mob')
+
+            let msg = 'Center mob selected. '
+            if(this.firstClickRadius) {
+                msg += "Now click to at a chosen distance from the center mob to define the radius"
+            }else{
+                msg += "Now click on monsters to form the circle"
+            }
+
+            Text.mkP(this.makerOwner, msg)
         } else {
             //vérification que le circle mob existe toujours
             if (!this.circleMob.getTriggerMob()) {
@@ -93,7 +101,7 @@ export class MakeCircleMob extends Make {
                 return
             } else {
                 this.addBlockMob(monster)
-                Text.mkP(this.makerOwner, 'block mob added')
+                Text.mkP(this.makerOwner, 'circle mob added')
             }
         }
     }
@@ -112,7 +120,7 @@ export class MakeCircleMob extends Make {
                 this.radius = Math.sqrt(Math.pow(x1 - x2, 2) + Math.pow(y1 - y2, 2))
                 this.circleMob?.setRadius(this.radius)
 
-                Text.mkP(this.makerOwner, `Set radius to: '${this.radius}'`)
+                Text.mkP(this.makerOwner, `Set radius to: '${this.radius}'. Now click on monsters to form the circle`)
                 return
             }
 

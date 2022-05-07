@@ -2801,11 +2801,7 @@ export const initExecuteCommandMake = () => {
                 return true
             }
 
-            Text.mkP(escaper.getPlayer(), 'Circle creation on')
-
-            if (param3 === '') {
-                Text.mkP(escaper.getPlayer(), 'First click is the radius, others are monsters to add')
-            }
+            Text.mkP(escaper.getPlayer(), 'Circle creation on. First click on the center mob')
 
             escaper.makeCreateCircleMob(
                 param1 === '' ? null : S2I(param1),
