@@ -1,5 +1,4 @@
 import { Text } from 'core/01_libraries/Text'
-import {PROD} from "../env";
 
 export class ArrayHandler {
     private static nextIndex = 0
@@ -24,6 +23,16 @@ export class ArrayHandler {
         return arr
     }
 
+    public static getNewArrayFrom<T>(arr: T[]) {
+        const newArray = ArrayHandler.getNewArray<T>()
+
+        for (let i = 0; i < arr.length; i++) {
+            newArray[i] = arr[i]
+        }
+
+        return newArray
+    }
+
     public static clearArray<T>(arr: T[]) {
         //remove from tArrays
         const index = (getmetatable(arr) as any).__id
@@ -31,20 +40,11 @@ export class ArrayHandler {
         const arrayInMap = ArrayHandler.tArrays.get(index)
 
         if (!arrayInMap) {
-            if(!PROD) {
-                try {
-                    Text.erA(
-                        `Index: '${index}' not known in ArrayHandler. '${arr?.constructor?.name}' '${
-                            (arr?.[0] as any)?.constructor?.name
-                        }'`
-                    )
-                }catch{
-                    Text.erA(
-                        `clearArray : element not known in ArrayHandler.`
-                    )
-                }
-            }
-
+            Text.erA(
+                `Index: '${index}' not known in ArrayHandler. '${arr?.constructor?.name || ''} '${
+                    (arr as any)?.[0]?.constructor?.name || ''
+                }`
+            )
             return
         }
 

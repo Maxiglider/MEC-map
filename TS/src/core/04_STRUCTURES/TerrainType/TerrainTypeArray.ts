@@ -1,12 +1,13 @@
+import { Ascii2String } from 'core/01_libraries/Ascii'
 import { arrayPush, tileset2tilesetChar } from 'core/01_libraries/Basic_functions'
 import { Text } from 'core/01_libraries/Text'
 import { CmdParam, NbParam } from '../../06_COMMANDS/COMMANDS_vJass/Command_functions'
+import { TerrainTypeMax } from '../../07_TRIGGERS/Modify_terrain_Functions/Terrain_type_max'
 import { BaseArray } from '../BaseArray'
 import { TerrainType } from './TerrainType'
 import { TerrainTypeDeath } from './TerrainTypeDeath'
 import { TerrainTypeSlide } from './TerrainTypeSlide'
 import { TerrainTypeWalk } from './TerrainTypeWalk'
-import {TerrainTypeMax} from "../../07_TRIGGERS/Modify_terrain_Functions/Terrain_type_max";
 
 //le nombre de terrains du jeu est de 177
 export class TerrainTypeArray extends BaseArray<TerrainType> {
@@ -19,6 +20,16 @@ export class TerrainTypeArray extends BaseArray<TerrainType> {
     getByLabel = (label: string) => {
         for (const [_, terrainType] of pairs(this.data)) {
             if (terrainType.label === label || terrainType.theAlias === label) {
+                return terrainType
+            }
+        }
+
+        return null
+    }
+
+    getByCode = (code: string) => {
+        for (const [_, terrainType] of pairs(this.data)) {
+            if (Ascii2String(terrainType.terrainTypeId) === code) {
                 return terrainType
             }
         }
@@ -78,7 +89,13 @@ export class TerrainTypeArray extends BaseArray<TerrainType> {
         return tt
     }
 
-    newSlide = (label: string, terrainTypeId: number, slideSpeed: number, canTurn: boolean, rotationSpeed: number | null = null) => {
+    newSlide = (
+        label: string,
+        terrainTypeId: number,
+        slideSpeed: number,
+        canTurn: boolean,
+        rotationSpeed: number | null = null
+    ) => {
         if (this.isLabelAlreadyUsed(label)) throw 'Label already used'
         if (this.isTerrainTypeIdAlreadyUsed(terrainTypeId)) throw 'Terrain type already used'
         if (terrainTypeId === 0) throw 'Wrong terrain type'
@@ -177,33 +194,44 @@ export class TerrainTypeArray extends BaseArray<TerrainType> {
         }
     }
 
-    newFromJson = (terrainTypesJson: {[x: string]: any}[]) =>{
-        for(let terrainTypeJson of terrainTypesJson){
+    newFromJson = (terrainTypesJson: { [x: string]: any }[]) => {
+        for (let terrainTypeJson of terrainTypesJson) {
             const terrainTypeId = TerrainTypeMax.TerrainTypeAsciiString2TerrainTypeId(terrainTypeJson.terrainTypeId)
 
             let tt: TerrainType | null = null
 
-            switch(terrainTypeJson.kind){
+            switch (terrainTypeJson.kind) {
                 case 'walk':
                     tt = this.newWalk(terrainTypeJson.label, terrainTypeId, terrainTypeJson.walkSpeed)
 
                     break
 
                 case 'slide':
-                    tt = this.newSlide(terrainTypeJson.label, terrainTypeId, terrainTypeJson.slideSpeed, terrainTypeJson.canTurn, terrainTypeJson.rotationSpeed)
+                    tt = this.newSlide(
+                        terrainTypeJson.label,
+                        terrainTypeId,
+                        terrainTypeJson.slideSpeed,
+                        terrainTypeJson.canTurn,
+                        terrainTypeJson.rotationSpeed
+                    )
 
                     break
 
                 case 'death':
-                    tt = this.newDeath(terrainTypeJson.label, terrainTypeId, terrainTypeJson.killingEffet, terrainTypeJson.timeToKill, terrainTypeJson.toleranceDist)
+                    tt = this.newDeath(
+                        terrainTypeJson.label,
+                        terrainTypeId,
+                        terrainTypeJson.killingEffet,
+                        terrainTypeJson.timeToKill,
+                        terrainTypeJson.toleranceDist
+                    )
 
                     break
             }
 
-            if(tt && terrainTypeJson.alias) {
+            if (tt && terrainTypeJson.alias) {
                 tt.setAlias(terrainTypeJson.alias)
             }
         }
     }
-
 }

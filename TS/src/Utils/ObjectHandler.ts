@@ -30,7 +30,7 @@ export class ObjectHandler {
         const objectInMap = ObjectHandler.tObjects.get(index)
 
         if (!objectInMap) {
-            Text.erA(`Index: '${index}' not known in ObjectHandler. '${obj?.constructor?.name}'`)
+            Text.erA(`Index: '${index}' not known in ObjectHandler. '${obj?.constructor?.name || ''}'`)
             return
         }
 

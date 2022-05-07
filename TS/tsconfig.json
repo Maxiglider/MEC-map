@@ -40,14 +40,14 @@
             "war3-types/core/blizzard",
             "war3-types/core/commonai",
             "war3-types/core/polyfill",
-            "war3-types/special/w3ts"
+            "war3-types/special/w3ts",
+            "w3ts-jsx/dist/src/types"
         ],
         "skipLibCheck": true,
-        "forceConsistentCasingInFileNames": true
+        "forceConsistentCasingInFileNames": true,
+        "jsx": "react"
     },
-    "include": [
-        "src"
-    ],
+    "include": ["src", "node_modules/w3ts-jsx/dist", "node_modules/w3ts-jsx/dist/node_modules/basic-pragma"],
     "exclude": [],
     "tstl": {
         "luaTarget": "5.3",
@@ -55,6 +55,12 @@
         "luaLibImport": "require",
         "noImplicitSelf": true,
         "luaBundle": "dist/tstl_output.lua",
-        "luaBundleEntry": "./src/main.ts"
+        "luaBundleEntry": "./src/main.ts",
+        "luaPlugins": [
+            {
+                "name": "tstl-jsx",
+                "import": "JsxTransformer"
+            }
+        ]
     }
 }
