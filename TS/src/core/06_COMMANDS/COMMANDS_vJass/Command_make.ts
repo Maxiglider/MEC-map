@@ -783,21 +783,24 @@ export const initExecuteCommandMake = () => {
                 return true
             }
 
-            let x = 0
             let str = ''
-            let speed = 0
-            let b = false
+
+            let immoRadius = 0
+            let speed = DEFAULT_MONSTER_SPEED
+            let scale = -1
+            let clickable = false
 
             //checkParam3
             if (nbParam >= 3) {
-                x = S2I(param3)
-                if (x % 5 != 0 || x < 0 || x > 400) {
+                immoRadius = S2I(param3)
+                if (immoRadius % 5 != 0 || immoRadius < 0 || immoRadius > 400) {
                     Text.erP(
                         escaper.getPlayer(),
                         'Wrong immolation radius ; should be an integer divisible by 5 and between 0 and 400'
                     )
                     return true
                 }
+
                 //checkParam4
                 if (nbParam >= 4) {
                     str = CmdParam(cmd, 4)
@@ -809,6 +812,7 @@ export const initExecuteCommandMake = () => {
                         return true
                     }
                     speed = S2R(str)
+
                     //checkParam5
                     if (nbParam >= 5) {
                         str = CmdParam(cmd, 5)
@@ -819,8 +823,8 @@ export const initExecuteCommandMake = () => {
                             )
                             return true
                         }
-                        if (str === 'default' || str === 'd') {
-                            x = -1
+                        if (str !== 'default' && str !== 'd') {
+                            scale = S2R(str)
                         }
 
                         //checkParam6
@@ -833,27 +837,13 @@ export const initExecuteCommandMake = () => {
                                 )
                                 return true
                             }
-                            b = S2B(str)
-                        } else {
-                            b = false
+                            clickable = S2B(str)
                         }
-                    } else {
-                        x = -1
-                        b = false
                     }
-                } else {
-                    speed = DEFAULT_MONSTER_SPEED
-                    x = -1
-                    b = false
                 }
-            } else {
-                param3 = '0'
-                speed = DEFAULT_MONSTER_SPEED
-                x = -1
-                b = false
             }
 
-            getUdgMonsterTypes().new(param1, String2Ascii(SubStringBJ(param2, 2, 5)), x, S2R(param3), speed, b)
+            getUdgMonsterTypes().new(param1, String2Ascii(SubStringBJ(param2, 2, 5)), scale, immoRadius, speed, clickable)
 
             Text.mkP(escaper.getPlayer(), 'Monster type "' + param1 + '" created')
 
