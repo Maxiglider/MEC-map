@@ -1,9 +1,14 @@
-import { arrayPush } from 'core/01_libraries/Basic_functions'
+import {arrayPush, ForceAngleBetween0And360} from 'core/01_libraries/Basic_functions'
 import { createTimer } from 'Utils/mapUtils'
 import { Timer } from 'w3ts'
 import { Level } from '../Level/Level'
 import { Monster } from '../Monster/Monster'
 import { MonsterArray } from '../Monster/MonsterArray'
+import {globals} from "../../../../globals";
+
+const TIMER_PERIOD = 0.02
+const DEFAULT_ROTATION_SPEED = 90
+
 
 export class CircleMob {
     level?: Level
@@ -11,20 +16,21 @@ export class CircleMob {
     private triggerMob: Monster
     private mobs = new MonsterArray()
 
-    private speed: number | null
-    private direction: string | null
-    private radius: number | null
+    private rotationSpeed: number
+    private direction: 'cw' | 'ccw'
+    private radius: number
+    private currentBaseAngle = 0
 
     id: number = -1
 
     private circleTimer: Timer | null = null
 
-    constructor(triggerMob: Monster, speed: number | null, direction: string | null, radius: number | null) {
+    constructor(triggerMob: Monster, rotationSpeed: number | null, direction: 'cw' | 'ccw' | null, radius: number) {
         this.triggerMob = triggerMob
         triggerMob.setCircleMob(this)
 
-        this.speed = speed
-        this.direction = direction
+        this.rotationSpeed = rotationSpeed || DEFAULT_ROTATION_SPEED
+        this.direction = direction || 'cw'
         this.radius = radius
 
         this.activate()
@@ -32,21 +38,21 @@ export class CircleMob {
 
     getTriggerMob = () => this.triggerMob
 
-    getSpeed = () => this.speed
+    getSpeed = () => this.rotationSpeed
 
-    setSpeed = (speed: number | null) => {
-        this.speed = speed
+    setSpeed = (rotationSpeed: number) => {
+        this.rotationSpeed = rotationSpeed
     }
 
     getDirection = () => this.direction
 
-    setDirection = (direction: string | null) => {
+    setDirection = (direction: 'cw' | 'ccw') => {
         this.direction = direction
     }
 
     getRadius = () => this.radius
 
-    setRadius = (radius: number | null) => {
+    setRadius = (radius: number) => {
         this.radius = radius
     }
 
@@ -88,6 +94,10 @@ export class CircleMob {
         this.close()
         this.triggerMob.removeCircleMob()
 
+        this.getBlockMobs().forAll(monster => {
+            monster.createUnit()
+        })
+
         this.removeAllBlockMobs()
 
         this.circleTimer?.destroy()
@@ -97,55 +107,50 @@ export class CircleMob {
     }
 
     activate = () => {
+        print("circle activate")
         this.circleTimer?.destroy()
-
-        let circleCounter = 0
 
         this.initialize()
 
-        this.circleTimer = createTimer(0.02, true, () => {
+        const directionReal = this.direction === 'ccw' ? 1 : -1
+
+        this.circleTimer = createTimer(TIMER_PERIOD, true, () => {
             if (!this.triggerMob.u) {
                 return
             }
 
-            const triggerMobPoint = GetUnitLoc(this.triggerMob.u)
+            const centerX = GetUnitX(this.triggerMob.u)
+            const centerY = GetUnitY(this.triggerMob.u)
+            // const triggerMobPoint = GetUnitLoc(this.triggerMob.u)
 
             const mobCount = this.mobs.count()
+            const angleDiff = 360.0 / I2R(mobCount)
 
-            const direction = this.direction || 'cw'
-            const radius = this.radius || R2I((300 * mobCount) / (Math.PI * 2))
-            const distance = R2I(radius * Math.PI * 2)
-            const speed = this.speed || (distance / mobCount / radius) * 2
+            let angle = this.currentBaseAngle
 
             let i = 0
             for (const [_, mob] of pairs(this.mobs.getAll())) {
-                const targetPoint = PolarProjectionBJ(
-                    triggerMobPoint,
-                    radius,
-                    (direction === 'ccw' ? 1 : -1) * ((360.0 / I2R(mobCount)) * I2R(i) + I2R(circleCounter) * speed)
-                )
+                if (mob.u) {
+                    const unitX = centerX + this.radius * CosBJ(angle)
+                    const unitY = centerY + this.radius * SinBJ(angle)
 
-                const facingPoint = PolarProjectionBJ(
-                    triggerMobPoint,
-                    radius,
-                    (direction === 'ccw' ? 1 : -1) *
-                        ((360.0 / I2R(mobCount)) * I2R(i) + (I2R(circleCounter) * speed + 0.01))
-                )
+                    const facingAngle = angle + 90 * directionReal
 
-                mob.u && SetUnitPositionLocFacingLocBJ(mob.u, targetPoint, facingPoint)
-                i++
+                    if(globals.MAP_MIN_X <= unitX && globals.MAP_MAX_X >= unitX){
+                        SetUnitX(mob.u, unitX)
+                    }
 
-                RemoveLocation(targetPoint)
-                RemoveLocation(facingPoint)
+                    if(globals.MAP_MIN_Y <= unitY && globals.MAP_MAX_Y >= unitY){
+                        SetUnitY(mob.u, unitY)
+                    }
+
+                    BlzSetUnitFacingEx(mob.u, facingAngle)
+                }
+
+                angle += angleDiff
             }
 
-            RemoveLocation(triggerMobPoint)
-
-            circleCounter++
-
-            if (circleCounter > 360 / speed) {
-                circleCounter = 0
-            }
+            this.currentBaseAngle = ForceAngleBetween0And360(this.currentBaseAngle + directionReal * this.rotationSpeed * TIMER_PERIOD)
         })
     }
 
@@ -160,7 +165,7 @@ export class CircleMob {
             id: this.id,
             mainMobId: this.triggerMob.id,
             blockMobsIds: blockMobIds,
-            speed: this.speed,
+            rotationSpeed: this.rotationSpeed,
             direction: this.direction,
             radius: this.radius,
         }

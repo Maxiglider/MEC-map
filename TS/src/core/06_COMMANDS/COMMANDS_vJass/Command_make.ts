@@ -2789,7 +2789,9 @@ export const initExecuteCommandMake = () => {
                 return true
             }
 
-            if (param2 !== '' && param2.toLowerCase() !== 'cw' && param2.toLowerCase() !== 'ccw') {
+            param2 = param2.toLowerCase()
+
+            if (param2 !== '' && param2 !== 'cw' && param2 !== 'ccw') {
                 Text.erP(escaper.getPlayer(), 'Direction must be "cw" or "ccw"')
                 return true
             }
@@ -2807,7 +2809,7 @@ export const initExecuteCommandMake = () => {
 
             escaper.makeCreateCircleMob(
                 param1 === '' ? null : S2I(param1),
-                param2 === '' ? 'cw' : param2,
+                param2 === '' ? null : param2,
                 param3 === '' ? null : S2I(param3)
             )
 
@@ -2840,12 +2842,12 @@ export const initExecuteCommandMake = () => {
         argDescription: '<speed>',
         description: '',
         cb: ({ param1 }, escaper) => {
-            if (param1 !== '' && S2R(param1) <= 0) {
+            if (S2R(param1) == 0) {
                 Text.erP(escaper.getPlayer(), 'Speed must be > 0')
                 return true
             }
 
-            escaper.makeSetCircleMobSpeed(param1 === '' ? null : S2R(param1))
+            escaper.makeSetCircleMobSpeed(S2R(param1))
             Text.mkP(escaper.getPlayer(), 'Click on the circle to apply')
             return true
         },
@@ -2859,12 +2861,13 @@ export const initExecuteCommandMake = () => {
         argDescription: 'cw | ccw',
         description: 'Clockwise of counter-clockwise',
         cb: ({ param1 }, escaper) => {
-            if (param1 !== '' && param1.toLowerCase() !== 'cw' && param1.toLowerCase() !== 'ccw') {
+            param1 = param1.toLowerCase()
+            if (param1 !== 'cw' && param1 !== 'ccw') {
                 Text.erP(escaper.getPlayer(), 'Direction must be "cw" or "ccw"')
                 return true
             }
 
-            escaper.makeSetCircleMobDirection(param1 === '' ? 'cw' : param1)
+            escaper.makeSetCircleMobDirection(param1)
             Text.mkP(escaper.getPlayer(), 'Click on the circle to apply')
             return true
         },
@@ -2878,12 +2881,12 @@ export const initExecuteCommandMake = () => {
         argDescription: '<radius>',
         description: '',
         cb: ({ param1 }, escaper) => {
-            if (param1 !== '' && S2I(param1) <= 0) {
+            if (S2I(param1) <= 0) {
                 Text.erP(escaper.getPlayer(), 'Radius must be > 0')
                 return true
             }
 
-            escaper.makeSetCircleMobRadius(param1 === '' ? null : S2I(param1))
+            escaper.makeSetCircleMobRadius(S2I(param1))
             Text.mkP(escaper.getPlayer(), 'Click on the circle to apply')
             return true
         },

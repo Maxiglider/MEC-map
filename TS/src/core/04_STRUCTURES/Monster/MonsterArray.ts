@@ -176,6 +176,8 @@ export class MonsterArray extends BaseArray<Monster> {
         if (last) {
             if (destroy) {
                 last.destroy()
+            }else{
+                last.createUnit()
             }
             delete this.data[last.id]
             return true

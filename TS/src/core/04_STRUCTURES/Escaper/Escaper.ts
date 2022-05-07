@@ -1389,7 +1389,7 @@ export class Escaper {
         if (this.hero) this.make = new MakeDeletePortalMob(this.hero)
     }
 
-    makeCreateCircleMob(speed: number | null, direction: string, radius: number | null) {
+    makeCreateCircleMob(speed: number | null, direction: 'cw' | 'ccw' | null, radius: number | null) {
         this.destroyMake()
         if (this.hero) this.make = new MakeCircleMob(this.hero, speed, direction, radius)
     }
@@ -1442,7 +1442,7 @@ export class Escaper {
         }
     }
 
-    makeSetCircleMobSpeed(speed: number | null) {
+    makeSetCircleMobSpeed(speed: number) {
         this.destroyMake()
         if (this.hero) {
             this.make = new MakeMonsterPropertyChange(
@@ -1456,7 +1456,7 @@ export class Escaper {
         }
     }
 
-    makeSetCircleMobDirection(direction: string | null) {
+    makeSetCircleMobDirection(direction: 'cw' | 'ccw') {
         this.destroyMake()
         if (this.hero) {
             this.make = new MakeMonsterPropertyChange(
@@ -1470,7 +1470,7 @@ export class Escaper {
         }
     }
 
-    makeSetCircleMobRadius(radius: number | null) {
+    makeSetCircleMobRadius(radius: number) {
         this.destroyMake()
         if (this.hero) {
             this.make = new MakeMonsterPropertyChange(

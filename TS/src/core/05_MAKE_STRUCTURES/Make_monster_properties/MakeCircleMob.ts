@@ -10,14 +10,14 @@ export class MakeCircleMob extends Make {
     private mobs: Monster[] = []
 
     private speed: number | null
-    private direction: string | null
+    private direction: 'cw' | 'ccw' | null
     private radius: number | null
 
     private indexLastBlockNotCancelledMob = 0
 
     private firstClickRadius = false
 
-    constructor(maker: unit, speed: number | null, direction: string | null, radius: number | null) {
+    constructor(maker: unit, speed: number | null, direction: 'cw' | 'ccw' | null, radius: number | null) {
         super(maker, 'createCircleMob')
 
         this.speed = speed
@@ -28,6 +28,10 @@ export class MakeCircleMob extends Make {
     }
 
     private createCircleMob = () => {
+        if(!this.radius) {
+            this.radius = 400
+        }
+
         if (this.triggerMob) {
             this.circleMob = this.escaper
                 .getMakingLevel()
@@ -108,7 +112,7 @@ export class MakeCircleMob extends Make {
                 this.radius = Math.sqrt(Math.pow(x1 - x2, 2) + Math.pow(y1 - y2, 2))
                 this.circleMob?.setRadius(this.radius)
 
-                Text.erP(this.makerOwner, `Set radius to: '${this.radius}'`)
+                Text.mkP(this.makerOwner, `Set radius to: '${this.radius}'`)
                 return
             }
 
