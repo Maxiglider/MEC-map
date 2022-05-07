@@ -1,10 +1,8 @@
+import { ArrayHandler } from '../../../Utils/ArrayHandler'
 import { Text } from '../../01_libraries/Text'
-import {
-    ChangeTerrainType,
-} from '../../07_TRIGGERS/Modify_terrain_Functions/Modify_terrain_functions'
+import { ChangeTerrainType } from '../../07_TRIGGERS/Modify_terrain_Functions/Modify_terrain_functions'
+import { ChangingTile } from '../Make_terrain/MakeTerrainCreateBrush'
 import { MakeAction } from './MakeAction'
-import {ArrayHandler} from "../../../Utils/ArrayHandler";
-import {ChangingTile} from "../Make_terrain/MakeTerrainCreateBrush";
 
 export class MakeTerrainCreateBrushAction extends MakeAction {
     private changingTiles: ChangingTile[]
@@ -12,7 +10,7 @@ export class MakeTerrainCreateBrushAction extends MakeAction {
     constructor(changingTiles: ChangingTile[]) {
         super()
 
-        this.changingTiles = changingTiles
+        this.changingTiles = ArrayHandler.getNewArrayFrom(changingTiles)
     }
 
     destroy = () => {
@@ -20,13 +18,13 @@ export class MakeTerrainCreateBrushAction extends MakeAction {
     }
 
     terrainModificationCancel = () => {
-        for(let changingTile of this.changingTiles){
+        for (let changingTile of this.changingTiles) {
             ChangeTerrainType(changingTile.x, changingTile.y, changingTile.terrainTypeBefore.getTerrainTypeId())
         }
     }
 
     terrainModificationRedo = () => {
-        for(let changingTile of this.changingTiles){
+        for (let changingTile of this.changingTiles) {
             ChangeTerrainType(changingTile.x, changingTile.y, changingTile.terrainTypeAfter.getTerrainTypeId())
         }
     }

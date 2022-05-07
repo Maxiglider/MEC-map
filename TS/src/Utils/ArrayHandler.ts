@@ -23,6 +23,16 @@ export class ArrayHandler {
         return arr
     }
 
+    public static getNewArrayFrom<T>(arr: T[]) {
+        const newArray = ArrayHandler.getNewArray<T>()
+
+        for (let i = 0; i < arr.length; i++) {
+            newArray[i] = arr[i]
+        }
+
+        return newArray
+    }
+
     public static clearArray<T>(arr: T[]) {
         //remove from tArrays
         const index = (getmetatable(arr) as any).__id
