@@ -2,7 +2,7 @@ import {NB_ESCAPERS, SLIDE_PERIOD} from 'core/01_libraries/Constants'
 import { Apm } from 'core/08_GAME/Apm_clics_par_minute/Apm'
 import { createTimer } from 'Utils/mapUtils'
 import { getUdgEscapers, globals } from '../../../../globals'
-import { Gravity } from './Gravity'
+import {EVERY_N_PERIOD, Gravity} from './Gravity'
 import {Escaper} from "../../04_STRUCTURES/Escaper/Escaper";
 import {GetMirrorEscaper} from "../../04_STRUCTURES/Escaper/Escaper_functions";
 import {MAX_DEGREE_ON_WHICH_SPEED_TABLE_TAKES_CONTROL, SPEED_AT_LEAST_THAN_50_DEGREES} from "./SlidingMax";
@@ -94,7 +94,7 @@ const initSlideTrigger = () => {
 
         //gestion de la hauteur du héros
         counters[n]++
-        if(counters[n] == 10) {
+        if(counters[n] == EVERY_N_PERIOD) {
             counters[n] = 0
 
             MoveLocation(tmpLoc, GetUnitX(hero), GetUnitY(hero))
