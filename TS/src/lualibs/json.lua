@@ -55,10 +55,31 @@ local function encode_nil(val)
   return "null"
 end
 
+local resCounter = 0
+local resTable = {}
+
+local function emptyTable(t)
+    for k in pairs (t) do
+        t [k] = nil
+    end
+end
+
+local function getNewTable()
+    resCounter = resCounter + 1
+    if (not resTable[resCounter]) then
+      resTable[resCounter] = {}
+    else
+      emptyTable(resTable[resCounter])
+    end
+    return resTable[resCounter]
+end
 
 local function encode_table(val, stack)
-  local res = {}
-  stack = stack or {}
+  local res = getNewTable()
+
+  if(not stack)then
+    stack = getNewTable()
+  end
 
   -- Circular reference?
   if stack[val] then error("circular reference") end
@@ -132,6 +153,7 @@ end
 
 
 function json.encode(val)
+  resCounter = 0
   return ( encode(val) )
 end
 
