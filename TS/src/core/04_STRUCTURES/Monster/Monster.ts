@@ -41,6 +41,7 @@ export abstract class Monster {
 
     //disabling
     protected disablingTimer?: timer
+    private deleted = false
 
     //clear mob that this mob is trigger mob
     protected clearMob?: ClearMob
@@ -225,6 +226,23 @@ export abstract class Monster {
         }
     }
 
+    delete = () => {
+        if (this.u){
+            this.removeUnit()
+        }
+
+        this.deleted = true
+    }
+
+    undelete = () => {
+        this.createUnit()
+        this.deleted = false
+    }
+
+    isDeleted = () => {
+        return this.deleted
+    }
+
     getLife = (): number => {
         return this.life
     }
@@ -345,11 +363,15 @@ export abstract class Monster {
         this.level?.monsters.removeMonster(this.id)
     }
 
-    toJson() {
-        return {
-            id: this.id,
-            monsterClassName: this.constructor.name,
-            monsterTypeLabel: this.mt?.label,
+    toJson(): false | {} {
+        if(this.isDeleted()){
+            return false
+        }else {
+            return {
+                id: this.id,
+                monsterClassName: this.constructor.name,
+                monsterTypeLabel: this.mt?.label,
+            }
         }
     }
 }

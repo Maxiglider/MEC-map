@@ -7,10 +7,9 @@ import {
 } from "../../../../globals";
 import {Text} from "../../01_libraries/Text";
 import {PushTerrainDataIntoJson} from "./Save_terrain";
-import {SyncSaveLoad} from "../../../Utils/SaveLoad/TreeLib/SyncSaveLoad";
 import {initSaveLoad} from "../../../Utils/SaveLoad/SaveLoad";
 import {jsonEncode} from "../../01_libraries/Basic_functions";
-import {MEC_SMIC_DATA_FILE} from "../../01_libraries/Constants";
+import {MEC_SMIC_DATA_FILE_DATE_TPL} from "../../01_libraries/Constants";
 
 export class SaveMapInCache {
 
@@ -36,12 +35,6 @@ export class SaveMapInCache {
         jsonGameData.casterTypes = getUdgCasterTypes().toJson()
         Text.A('caster types saved')
 
-        //destroy makes and saved actions to avoid deleted monsters to recreate
-        getUdgEscapers().forMainEscapers(escaper => {
-            escaper.destroyMake()
-            escaper.destroyAllSavedActions()
-        })
-
         //save levels
         jsonGameData.levels = getUdgLevels().toJson()
         Text.A("levels saved")
@@ -54,11 +47,16 @@ export class SaveMapInCache {
     }
 
     public static smic = (p: player | null = null) => {
-        const json = SaveMapInCache.gameAsJson()
-
         const SaveLoad = initSaveLoad()
-        SaveLoad.saveFile(MEC_SMIC_DATA_FILE, p, jsonEncode(json))
 
-        Text.A('saving game data to file "' + MEC_SMIC_DATA_FILE + '" done')
+        if(p === null || GetLocalPlayer() == p) {
+            const filename = MEC_SMIC_DATA_FILE_DATE_TPL.replace('[date]', os.date("%Y-%m-%d_%H-%M-%S"))
+
+            const json = SaveMapInCache.gameAsJson()
+
+            SaveLoad.saveFile(filename, p, jsonEncode(json))
+
+            Text.A('saving game data to file "' + filename + '" done')
+        }
     }
 }

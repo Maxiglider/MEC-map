@@ -21,7 +21,7 @@ export class MakeMonsterAction extends MakeAction {
         if (!this.isActionMadeB) {
             return false
         }
-        this.monster.removeUnit()
+        this.monster.delete()
         this.isActionMadeB = false
         this.owner && Text.mkP(this.owner.getPlayer(), 'monster creation cancelled')
         return true
@@ -31,7 +31,7 @@ export class MakeMonsterAction extends MakeAction {
         if (this.isActionMadeB) {
             return false
         }
-        this.monster.createUnit()
+        this.monster.undelete()
         this.isActionMadeB = true
         this.owner && Text.mkP(this.owner.getPlayer(), 'monster creation redone')
         return true

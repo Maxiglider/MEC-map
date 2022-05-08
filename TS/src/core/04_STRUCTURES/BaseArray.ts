@@ -48,7 +48,7 @@ export abstract class BaseArray<T extends BaseModel> {
 
     getAll = () => this.data
 
-    toJson: () => any = () => sortArrayOfObjectsByIds(Object.values(this.data)).map(item => item.toJson())
+    toJson: () => any = () => sortArrayOfObjectsByIds(Object.values(this.data)).map(item => item.toJson()).filter(item => item !== false)
 
     destroyOne = (id: number) => {
         if(this.data[id]){

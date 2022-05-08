@@ -32,7 +32,7 @@ export class MakeDeleteMeteorsAction extends MakeAction {
 
         //création des météores supprimées
         for (const meteor of this.suppressedMeteors) {
-            meteor.createMeteorItem()
+            meteor.undelete()
         }
 
         this.isActionMadeB = false
@@ -48,7 +48,7 @@ export class MakeDeleteMeteorsAction extends MakeAction {
 
         //suppression des météores recréés
         for (const meteor of this.suppressedMeteors) {
-            meteor.removeMeteorItem()
+            meteor.delete()
         }
 
         this.isActionMadeB = true

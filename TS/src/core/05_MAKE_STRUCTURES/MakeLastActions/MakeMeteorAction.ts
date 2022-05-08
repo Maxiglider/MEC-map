@@ -21,7 +21,7 @@ export class MakeMeteorAction extends MakeAction {
         if (!this.isActionMadeB) {
             return false
         }
-        this.meteor.removeMeteorItem()
+        this.meteor.delete()
         this.isActionMadeB = false
         this.owner && Text.mkP(this.owner.getPlayer(), 'meteor creation cancelled')
         return true
@@ -31,7 +31,7 @@ export class MakeMeteorAction extends MakeAction {
         if (this.isActionMadeB) {
             return false
         }
-        this.meteor.createMeteorItem()
+        this.meteor.undelete()
         this.isActionMadeB = true
         this.owner && Text.mkP(this.owner.getPlayer(), 'meteor creation redone')
         return true

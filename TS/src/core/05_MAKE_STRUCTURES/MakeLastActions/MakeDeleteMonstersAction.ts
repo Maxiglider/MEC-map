@@ -32,7 +32,7 @@ export class MakeDeleteMonstersAction extends MakeAction {
 
         //création des monstres supprimés
         for (const monster of this.suppressedMonsters) {
-            monster.createUnit()
+            monster.undelete()
         }
 
         this.isActionMadeB = false
@@ -48,7 +48,7 @@ export class MakeDeleteMonstersAction extends MakeAction {
 
         //suppression des monstres recréés
         for (const monster of this.suppressedMonsters) {
-            monster.removeUnit()
+            monster.delete()
         }
 
         this.isActionMadeB = true

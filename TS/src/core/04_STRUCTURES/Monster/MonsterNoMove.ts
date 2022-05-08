@@ -33,11 +33,15 @@ export class MonsterNoMove extends Monster {
     }
 
     toJson() {
-        return {
-            ...super.toJson(),
-            x: R2I(this.x),
-            y: R2I(this.y),
-            angle: R2I(this.angle)
+        if (super.toJson()) {
+            return {
+                ...super.toJson(),
+                x: R2I(this.x),
+                y: R2I(this.y),
+                angle: R2I(this.angle)
+            }
+        } else {
+            return false
         }
     }
 }

@@ -15,6 +15,7 @@ export class Meteor {
     private item?: item
     level?: Level
     arrayId?: number
+    private deleted: boolean = false
 
     constructor(x: number, y: number) {
         this.x = x
@@ -50,6 +51,23 @@ export class Meteor {
         SetItemUserData(this.item, this.id)
     }
 
+    delete = () => {
+        if (this.item){
+            this.removeMeteorItem()
+        }
+
+        this.deleted = true
+    }
+
+    undelete = () => {
+        this.createMeteorItem()
+        this.deleted = false
+    }
+
+    isDeleted = () => {
+        return this.deleted
+    }
+
     destroy = () => {
         if (this.item !== null) {
             this.removeMeteorItem()
@@ -64,8 +82,14 @@ export class Meteor {
         this.item && SetItemPosition(this.item, this.x, this.y)
     }
 
-    toJson = () => ({
-        x: R2I(this.x),
-        y: R2I(this.y)
-    })
+    toJson = () => {
+        if(this.isDeleted()) {
+            return false
+        }else {
+            return {
+                x: R2I(this.x),
+                y: R2I(this.y)
+            }
+        }
+    }
 }
