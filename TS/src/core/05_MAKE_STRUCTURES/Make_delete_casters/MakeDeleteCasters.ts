@@ -24,7 +24,7 @@ export class MakeDeleteCasters extends MakeOneByOneOrTwoClicks {
                     .monsters.getMonsterNear(this.orderX, this.orderY, 'Caster')
                 caster = monster instanceof Caster ? monster : null
                 if (caster && caster.u) {
-                    caster.removeUnit()
+                    caster.delete()
                     arrayPush(suppressedCasters, caster)
                     nbCastersRemoved = 1
                 }
@@ -40,7 +40,7 @@ export class MakeDeleteCasters extends MakeOneByOneOrTwoClicks {
                     .monsters.getMonstersBetweenLocs(this.lastX, this.lastY, this.orderX, this.orderY, 'Caster')
 
                 for (const caster of casters) {
-                    caster.removeUnit()
+                    caster.delete()
                     caster instanceof Caster && arrayPush(suppressedCasters, caster)
                     nbCastersRemoved++
                 }

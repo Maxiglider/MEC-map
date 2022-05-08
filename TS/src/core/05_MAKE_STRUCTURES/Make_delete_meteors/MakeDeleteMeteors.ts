@@ -26,7 +26,7 @@ export class MakeDeleteMeteors extends MakeOneByOneOrTwoClicks {
                 meteor = udg_meteors[GetItemUserData(GetOrderTargetItem())]
 
                 if (meteor && meteor.getItem()) {
-                    meteor.removeMeteorItem()
+                    meteor.delete()
                     arrayPush(suppressedMeteors, meteor)
                     nbMeteorsRemoved = 1
                 }
@@ -42,7 +42,7 @@ export class MakeDeleteMeteors extends MakeOneByOneOrTwoClicks {
                     .meteors.getMeteorsBetweenLocs(this.lastX, this.lastY, this.orderX, this.orderY)
 
                 for (const meteor of meteors) {
-                    meteor.removeMeteorItem()
+                    meteor.delete()
                     arrayPush(suppressedMeteors, meteor)
                     nbMeteorsRemoved = nbMeteorsRemoved + 1
                 }

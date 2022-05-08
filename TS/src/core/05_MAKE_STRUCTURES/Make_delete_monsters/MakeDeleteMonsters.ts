@@ -20,7 +20,7 @@ export class MakeDeleteMonsters extends MakeOneByOneOrTwoClicks {
                 //mode oneClick
                 let monster = this.escaper.getMakingLevel().monsters.getMonsterNear(this.orderX, this.orderY)
                 if (monster) {
-                    monster.removeUnit()
+                    monster.delete()
                     arrayPush(suppressedMonsters, monster)
                     nbMonstersRemoved = 1
                 }
@@ -63,7 +63,7 @@ export class MakeDeleteMonsters extends MakeOneByOneOrTwoClicks {
                 }
 
                 for (const monster of monsters) {
-                    monster.removeUnit()
+                    monster.delete()
                     arrayPush(suppressedMonsters, monster)
                 }
 
