@@ -129,6 +129,8 @@ export abstract class Monster {
     }
 
     createUnit(createUnitFunc?: () => unit | undefined) {
+        if(this.isDeleted()) return
+
         if (createUnitFunc) {
             this.createUnitFunc = createUnitFunc
         }
