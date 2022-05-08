@@ -16,6 +16,7 @@ import { End, Start } from './StartAndEnd'
 import { TriggerArray } from './Triggers'
 import type { VisibilityModifier } from './VisibilityModifier'
 import { VisibilityModifierArray } from './VisibilityModifierArray'
+import {ObjectHandler} from "../../../Utils/ObjectHandler";
 
 export class Level {
     public static earningLivesActivated = true
@@ -216,7 +217,7 @@ export class Level {
     }
 
     toJson = () => {
-        const json: { [x: string]: any } = {}
+        const json = ObjectHandler.getNewObject<any>()
 
         //level id
         json.id = this.id

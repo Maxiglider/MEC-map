@@ -4,6 +4,7 @@ import { Text } from 'core/01_libraries/Text'
 import { ZLibrary } from 'core/02_bibliotheques_externes/ZLibrary'
 import { I2HexaString } from '../../01_libraries/Functions_on_numbers'
 import {globals} from "../../../../globals";
+import {ArrayHandler} from "../../../Utils/ArrayHandler";
 
 const initSaveTerrainHeights = () => {
 
@@ -38,7 +39,7 @@ const initSaveTerrainHeights = () => {
 
     //save terrain heights
     const SaveTerrainHeights = (json: {[x: string]: any}) => {
-        json.terrainHeights = []
+        json.terrainHeights = ArrayHandler.getNewArray()
 
         let height: number
         let isWater: boolean

@@ -10,6 +10,7 @@ import { ClearMob } from '../Monster_properties/ClearMob'
 import { PortalMob } from '../Monster_properties/PortalMob'
 import { MonsterType } from './MonsterType'
 import { monstersClickable } from './trig_Monsters_clickable_set_life'
+import {ObjectHandler} from "../../../Utils/ObjectHandler";
 
 export abstract class Monster {
     public static forceUnitTypeIdForNextMonster = 0
@@ -363,15 +364,15 @@ export abstract class Monster {
         this.level?.monsters.removeMonster(this.id)
     }
 
-    toJson(): false | {} {
+    toJson(): false | {[x: string] : any} {
         if(this.isDeleted()){
             return false
         }else {
-            return {
-                id: this.id,
-                monsterClassName: this.constructor.name,
-                monsterTypeLabel: this.mt?.label,
-            }
+            const output = ObjectHandler.getNewObject<any>()
+            output['id'] = this.id
+            output['monsterClassName'] = this.constructor.name
+            output['monsterTypeLabel'] = this.mt?.label
+            return output
         }
     }
 }

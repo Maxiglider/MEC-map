@@ -2,6 +2,7 @@ import { arrayPush } from 'core/01_libraries/Basic_functions'
 import { Level } from '../Level/Level'
 import { Monster } from '../Monster/Monster'
 import { MonsterArray } from '../Monster/MonsterArray'
+import {ObjectHandler} from "../../../Utils/ObjectHandler";
 
 export const CLEAR_MOB_MAX_DURATION = 300
 export const FRONT_MONTANT_DURATION = 0.03
@@ -224,11 +225,13 @@ export class ClearMob {
             arrayPush(blockMobIds, monster.id)
         }
 
-        return {
-            id: this.id,
-            triggerMobId: this.triggerMob.id,
-            disableDuration: this.disableDuration,
-            blockMobsIds: blockMobIds,
-        }
+        const output = ObjectHandler.getNewObject<any>()
+
+        output['id'] = this.id
+        output['triggerMobId'] = this.triggerMob.id
+        output['disableDuration'] = this.disableDuration
+        output['blockMobsIds'] = blockMobIds
+
+        return output
     }
 }

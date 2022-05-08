@@ -224,17 +224,14 @@ export class MonsterTeleport extends Monster {
     }
 
     toJson() {
-        if(super.toJson()) {
-            return {
-                ...super.toJson(),
-                mode: this.sens > 0 ? 'string' : 'normal',
-                period: this.period,
-                angle: R2I(this.angle),
-                xArr: arrayValuesRound(this.x),
-                yArr: arrayValuesRound(this.y),
-            }
-        } else {
-            return false
+        const output = super.toJson()
+        if(output){
+            output['mode'] = this.sens > 0 ? 'string' : 'normal'
+            output['period'] = this.period
+            output['angle'] = R2I(this.angle)
+            output['xArr'] = arrayValuesRound(this.x)
+            output['yArr'] = arrayValuesRound(this.y)
         }
+        return output
     }
 }

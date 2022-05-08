@@ -5,6 +5,7 @@ import { Timer } from 'w3ts'
 import { Escaper } from '../Escaper/Escaper'
 import { Level } from '../Level/Level'
 import { Monster } from '../Monster/Monster'
+import {ObjectHandler} from "../../../Utils/ObjectHandler";
 
 export const PORTAL_MOB_MAX_FREEZE_DURATION = 10
 
@@ -148,12 +149,16 @@ export class PortalMob {
         // TODO; SECONDARYHERO?
     }
 
-    toJson = () => ({
-        id: this.id,
-        triggerMobId: this.triggerMob?.id,
-        targetMobId: this.targetMob?.id,
-        freezeDuration: this.freezeDuration,
-        portalEffect: this.portalEffect,
-        portalEffectDuration: this.portalEffectDuration,
-    })
+    toJson = () => {
+        const output = ObjectHandler.getNewObject<any>()
+
+        output['id'] = this.id
+        output['triggerMobId'] = this.triggerMob?.id
+        output['targetMobId'] = this.targetMob?.id
+        output['freezeDuration'] = this.freezeDuration
+        output['portalEffect'] = this.portalEffect
+        output['portalEffectDuration'] = this.portalEffectDuration
+
+        return output
+    }
 }

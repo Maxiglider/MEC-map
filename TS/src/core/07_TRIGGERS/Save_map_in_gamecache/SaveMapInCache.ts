@@ -10,12 +10,18 @@ import {PushTerrainDataIntoJson} from "./Save_terrain";
 import {initSaveLoad} from "../../../Utils/SaveLoad/SaveLoad";
 import {jsonEncode} from "../../01_libraries/Basic_functions";
 import {MEC_SMIC_DATA_FILE_DATE_TPL} from "../../01_libraries/Constants";
+import {ObjectHandler} from "../../../Utils/ObjectHandler";
+import {
+    clearArrayOrObject,
+    getNbArraysObjectsCleared,
+    resetNbArraysObjectsCleared
+} from "../../../Utils/clearArrayOrObject";
 
 export class SaveMapInCache {
 
     private static gameAsJson = () => {
-        const jsonTerrain: {[x: string]: any} = {}
-        const jsonGameData: {[x: string]: any} = {}
+        const jsonTerrain = ObjectHandler.getNewObject<any>()
+        const jsonGameData = ObjectHandler.getNewObject<any>()
 
         //FOR TERRAIN FILE W3E
         //terrain types, order, height
@@ -24,7 +30,7 @@ export class SaveMapInCache {
         //FOR GAME DATA
 
         //terrain config
-        Object.assign(jsonGameData, getUdgTerrainTypes().toJson())
+        jsonGameData.terrainTypesMec = getUdgTerrainTypes().toJson()
         Text.A('terrain configuration saved')
 
         //monster types
@@ -40,10 +46,10 @@ export class SaveMapInCache {
         Text.A("levels saved")
 
         //output
-        return {
-            terrain: jsonTerrain,
-            gameData: jsonGameData
-        }
+        const output = ObjectHandler.getNewObject<{[x: string] : any}>()
+        output['terrain'] = jsonTerrain
+        output['gameData'] = jsonGameData
+        return output
     }
 
     public static smic = (p: player | null = null) => {
@@ -56,7 +62,12 @@ export class SaveMapInCache {
 
             SaveLoad.saveFile(filename, p, jsonEncode(json))
 
+            clearArrayOrObject(json)
+
             Text.A('saving game data to file "' + filename + '" done')
+
+            print(getNbArraysObjectsCleared() + " arrays or objects cleared")
+            resetNbArraysObjectsCleared()
         }
     }
 }

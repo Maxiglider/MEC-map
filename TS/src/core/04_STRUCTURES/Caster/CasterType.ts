@@ -4,6 +4,7 @@ import { getUdgEscapers, getUdgLevels } from '../../../../globals'
 import { udg_colorCode } from '../../01_libraries/Init_colorCodes'
 import { Level } from '../Level/Level'
 import { MonsterType } from '../Monster/MonsterType'
+import {ObjectHandler} from "../../../Utils/ObjectHandler";
 
 export const DEFAULT_CASTER_PROJECTILE_SPEED = 600
 export const MIN_CASTER_PROJECTILE_SPEED = 100
@@ -176,14 +177,18 @@ export class CasterType {
         Text.P_timed(p, TERRAIN_DATA_DISPLAY_TIME, display)
     }
 
-    toJson = () => ({
-        label: this.label,
-        alias: this.theAlias,
-        casterMonsterTypeLabel: this.casterMonsterType.label,
-        projectileMonsterTypeLabel: this.projectileMonsterType.label,
-        range: this.range,
-        projectileSpeed: this.projectileSpeed,
-        loadTime: this.loadTime,
-        animation: this.animation
-    })
+    toJson = () => {
+        const output = ObjectHandler.getNewObject<any>()
+
+        output['label'] = this.label
+        output['alias'] = this.theAlias
+        output['casterMonsterTypeLabel'] = this.casterMonsterType.label
+        output['projectileMonsterTypeLabel'] = this.projectileMonsterType.label
+        output['range'] = this.range
+        output['projectileSpeed'] = this.projectileSpeed
+        output['loadTime'] = this.loadTime
+        output['animation'] = this.animation
+
+        return output
+    }
 }

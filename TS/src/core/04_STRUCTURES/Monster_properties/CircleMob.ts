@@ -5,6 +5,7 @@ import { Level } from '../Level/Level'
 import { Monster } from '../Monster/Monster'
 import { MonsterArray } from '../Monster/MonsterArray'
 import {globals} from "../../../../globals";
+import {ObjectHandler} from "../../../Utils/ObjectHandler";
 
 const TIMER_PERIOD = 0.02
 const DEFAULT_ROTATION_SPEED = 90
@@ -161,13 +162,15 @@ export class CircleMob {
             arrayPush(blockMobIds, monster.id)
         }
 
-        return {
-            id: this.id,
-            mainMobId: this.triggerMob.id,
-            blockMobsIds: blockMobIds,
-            rotationSpeed: this.rotationSpeed,
-            direction: this.direction,
-            radius: this.radius,
-        }
+        const output = ObjectHandler.getNewObject<any>()
+
+        output['id'] = this.id
+        output['mainMobId'] = this.triggerMob.id
+        output['blockMobsIds'] = blockMobIds
+        output['rotationSpeed'] = this.rotationSpeed
+        output['direction'] = this.direction
+        output['radius'] = this.radius
+
+        return output
     }
 }

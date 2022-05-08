@@ -1,5 +1,6 @@
 import { RefreshHideAllVM } from '../../03_view_all_hide_all/View_all_hide_all'
 import { Level } from './Level'
+import {ObjectHandler} from "../../../Utils/ObjectHandler";
 
 export class VisibilityModifier {
     private x1: number
@@ -40,10 +41,14 @@ export class VisibilityModifier {
         return new VisibilityModifier(this.x1, this.y1, this.x2, this.y2)
     }
 
-    toJson = () => ({
-        x1: R2I(this.x1),
-        y1: R2I(this.y1),
-        x2: R2I(this.x2),
-        y2: R2I(this.y2),
-    })
+    toJson = () => {
+        const output = ObjectHandler.getNewObject<any>()
+
+        output['x1'] = R2I(this.x1)
+        output['y1'] = R2I(this.y1)
+        output['x2'] = R2I(this.x2)
+        output['y2'] = R2I(this.y2)
+
+        return output
+    }
 }

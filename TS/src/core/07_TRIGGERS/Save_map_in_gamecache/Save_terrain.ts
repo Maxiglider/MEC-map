@@ -9,12 +9,13 @@ import { SaveTerrainHeights } from './Save_terrain_heights_and_cliffs'
 import { SaveTerrainRamps } from './Save_terrain_ramps'
 import { SaveWater } from './Save_water'
 import {ArrayHandler} from "../../../Utils/ArrayHandler";
+import {ObjectHandler} from "../../../Utils/ObjectHandler";
 
 let terrainTypeIds: number[] = []
 let nbTerrainTypesUsed: number
 
 const SaveTerrainsUsed = (json: { [x: string]: any }) => {
-    json.terrainsUsed = []
+    json.terrainsUsed = ArrayHandler.getNewArray()
 
     for (let i = 0; i < nbTerrainTypesUsed; i++) {
         arrayPush(json.terrainsUsed, Ascii2String(terrainTypeIds[i]))
@@ -29,7 +30,7 @@ const SaveMapDimensionsAndCenterOffset = (json: { [x: string]: any }) => {
     let offsetX = R2I(globals.MAP_MIN_X)
     let offsetY = R2I(globals.MAP_MIN_Y)
 
-    json.terrain = {}
+    json.terrain = ObjectHandler.getNewObject()
     json.terrain.largeur = largeurMap
     json.terrain.hauteur = hauteurMap
     json.terrain.centerOffsetX = offsetX
@@ -62,12 +63,12 @@ const GererOrdreTerrains = () => {
 
     //récupération de tous les terrains
     const terrainTypes = getUdgTerrainTypes().getAll()
-    const terrainTypesWithOrder: TerrainType[] = []
+    // const terrainTypesWithOrder: TerrainType[] = [] //todomax is this variable terrainTypesWithOrder really useless ?
 
     //suppression des terrains non ordonnés du tableau
     for (const [i] of pairs(terrainTypes)) {
         if (terrainTypes[i].getOrderId() != 0) {
-            arrayPush(terrainTypesWithOrder, terrainTypes[i])
+            // arrayPush(terrainTypesWithOrder, terrainTypes[i])
             nbOrderedTerrains = nbOrderedTerrains + 1
         }
     }

@@ -226,15 +226,12 @@ export class MonsterMultiplePatrols extends Monster {
     }
 
     toJson() {
-        if(super.toJson()) {
-            return {
-                ...super.toJson(),
-                mode: this.sens > 0 ? 'string' : 'normal',
-                xArr: arrayValuesRound(this.x),
-                yArr: arrayValuesRound(this.y),
-            }
-        }else{
-            return false
+        const output = super.toJson()
+        if(output){
+            output['mode'] = this.sens > 0 ? 'string' : 'normal'
+            output['xArr'] = arrayValuesRound(this.x)
+            output['yArr'] = arrayValuesRound(this.y)
         }
+        return output
     }
 }

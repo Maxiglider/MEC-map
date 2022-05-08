@@ -429,12 +429,13 @@ export class Caster extends Monster {
     }
 
     toJson() {
-        return {
-            ...super.toJson(),
-            casterTypeLabel: this.casterType.label,
-            x: R2I(this.x),
-            y: R2I(this.y),
-            angle: R2I(this.angle)
+        const output = super.toJson()
+        if(output){
+            output['casterTypeLabel'] = this.casterType.label,
+            output['x'] = R2I(this.x),
+            output['y'] = R2I(this.y),
+            output['angle'] = R2I(this.angle)
         }
+        return output
     }
 }

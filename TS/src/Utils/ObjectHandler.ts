@@ -2,8 +2,8 @@ import { Text } from 'core/01_libraries/Text'
 
 export class ObjectHandler {
     private static nextIndex = 0
-    private static tObjects = new Map<number, any>()
-    private static freedObjects: any[] = []
+    public static tObjects = new Map<number, any>()
+    public static freedObjects: any[] = []
 
     public static getNewObject<T extends {}>() {
         let obj: T = ObjectHandler.freedObjects.shift()
@@ -15,7 +15,7 @@ export class ObjectHandler {
             obj = {} as T
             index = ObjectHandler.nextIndex
             ObjectHandler.nextIndex++
-            const meta: any = { __id: index }
+            const meta: any = { __id: index, __type: 'obj' }
             setmetatable(obj, meta)
         }
 

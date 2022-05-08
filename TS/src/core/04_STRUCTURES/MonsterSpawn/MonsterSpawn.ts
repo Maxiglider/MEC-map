@@ -8,6 +8,7 @@ import { NewImmobileMonsterForPlayer } from '../Monster/Monster_functions'
 import {CombineHooks} from "../../API/MecHookArray";
 import {hooks} from "../../API/GeneralHooks";
 import {Monster} from "../Monster/Monster";
+import {ObjectHandler} from "../../../Utils/ObjectHandler";
 
 const DECALAGE_UNSPAWN = 200
 const DELAY_BETWEEN_SPAWN_AND_MOVEMENT = 0.5
@@ -331,14 +332,18 @@ export class MonsterSpawn {
         Text.P_timed(p, TERRAIN_DATA_DISPLAY_TIME, display)
     }
 
-    toJson = () => ({
-        label: this.label,
-        monsterTypeLabel: this.mt.label,
-        sens: this.sens,
-        frequence: this.frequence,
-        minX: R2I(this.minX),
-        minY: R2I(this.minY),
-        maxX: R2I(this.maxX),
-        maxY: R2I(this.maxY),
-    })
+    toJson = () => {
+        const output = ObjectHandler.getNewObject<any>()
+
+        output['label'] = this.label
+        output['monsterTypeLabel'] = this.mt.label
+        output['sens'] = this.sens
+        output['frequence'] = this.frequence
+        output['minX'] = R2I(this.minX)
+        output['minY'] = R2I(this.minY)
+        output['maxX'] = R2I(this.maxX)
+        output['maxY'] = R2I(this.maxY)
+
+        return output
+    }
 }

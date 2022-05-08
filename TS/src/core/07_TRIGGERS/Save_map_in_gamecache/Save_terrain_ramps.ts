@@ -18,6 +18,9 @@ the middle R is at cliff level CL
 if one of the N tilepoints is at a cliff level different than CL or CL+1, the ramp middle isn't raised
 */
 
+    const loc1 = Location(0 ,0)
+    const loc2 = Location(0 ,0)
+
     const isRampMiddleRaised = (x: number, y: number, isRampDirectionX: boolean): boolean => {
         let middleRampcliffLevel = GetTerrainCliffLevel(x, y)
         let diffCliffLevel: number
@@ -68,8 +71,6 @@ if one of the N tilepoints is at a cliff level different than CL or CL+1, the ra
         let rampStr: string
         let walkable: boolean
         let walkable2: boolean
-        let loc1: location | null
-        let loc2: location | null
         let signX: number
         let signY: number
 
@@ -119,11 +120,11 @@ if one of the N tilepoints is at a cliff level different than CL or CL+1, the ra
                                     if (!walkable2) {
                                         //il y a une rampe à condition que les deux points en bas de la falaise soient au même niveau de falaise et pas à la même hauteur
                                         if (currentCliffLevel < otherCliffLevel) {
-                                            loc1 = Location(x, y)
-                                            loc2 = Location(x - LARGEUR_CASE, y)
+                                            MoveLocation(loc1, x, y)
+                                            MoveLocation(loc2,x - LARGEUR_CASE, y)
                                         } else {
-                                            loc1 = Location(otherX, y)
-                                            loc2 = Location(otherX + LARGEUR_CASE, y)
+                                            MoveLocation(loc1, otherX, y)
+                                            MoveLocation(loc2, otherX + LARGEUR_CASE, y)
                                         }
                                         if (
                                             GetLocationZ(loc1) !== GetLocationZ(loc2) && //todomax remove leak locations
@@ -131,8 +132,6 @@ if one of the N tilepoints is at a cliff level different than CL or CL+1, the ra
                                         ) {
                                             ramp = true
                                         }
-                                        RemoveLocation(loc1)
-                                        RemoveLocation(loc2)
                                     }
                                 }
                                 //s'il y a une rampe, on détermine si on est au milieu de la rampe
@@ -148,13 +147,11 @@ if one of the N tilepoints is at a cliff level different than CL or CL+1, the ra
                                     otherCliffLevel2 = GetTerrainCliffLevel(otherX, otherY)
                                     if (otherCliffLevel2 - currentCliffLevel === 1) {
                                         //il y a une rampe sauf si les deux points en bas de la falaise sont à la même hauteur
-                                        loc1 = Location(x, y)
-                                        loc2 = Location(x + LARGEUR_CASE, y)
+                                        MoveLocation(loc1, x, y)
+                                        MoveLocation(loc2, x + LARGEUR_CASE, y)
                                         if (GetLocationZ(loc1) !== GetLocationZ(loc2)) {
                                             ramp = true
                                         }
-                                        RemoveLocation(loc1)
-                                        RemoveLocation(loc2)
                                     }
                                 } else {
                                     //il peut y avoir une rampe s'il y a une falaise juste après, vers le haut et walkable
@@ -218,11 +215,11 @@ if one of the N tilepoints is at a cliff level different than CL or CL+1, the ra
                                     if (!walkable2) {
                                         //il y a une rampe à condition que les deux points en bas de la falaise soient au même niveau de falaise et pas à la même hauteur
                                         if (currentCliffLevel < otherCliffLevel) {
-                                            loc1 = Location(x, y)
-                                            loc2 = Location(x + LARGEUR_CASE, y)
+                                            MoveLocation(loc1, x, y)
+                                            MoveLocation(loc2, x + LARGEUR_CASE, y)
                                         } else {
-                                            loc1 = Location(otherX, y)
-                                            loc2 = Location(otherX - LARGEUR_CASE, y)
+                                            MoveLocation(loc1, otherX, y)
+                                            MoveLocation(loc2, otherX - LARGEUR_CASE, y)
                                         }
                                         if (
                                             GetLocationZ(loc1) !== GetLocationZ(loc2) &&
@@ -230,8 +227,6 @@ if one of the N tilepoints is at a cliff level different than CL or CL+1, the ra
                                         ) {
                                             ramp = true
                                         }
-                                        RemoveLocation(loc1)
-                                        RemoveLocation(loc2)
                                     }
                                 }
                                 //s'il y a une rampe, on détermine si on est au milieu de la rampe
@@ -247,13 +242,11 @@ if one of the N tilepoints is at a cliff level different than CL or CL+1, the ra
                                     otherCliffLevel2 = GetTerrainCliffLevel(otherX, otherY)
                                     if (otherCliffLevel2 - currentCliffLevel === 1) {
                                         //il y a une rampe sauf si les deux points en bas de la falaise sont à la même hauteur
-                                        loc1 = Location(x, y)
-                                        loc2 = Location(x - LARGEUR_CASE, y)
+                                        MoveLocation(loc1, x, y)
+                                        MoveLocation(loc2, x - LARGEUR_CASE, y)
                                         if (GetLocationZ(loc1) !== GetLocationZ(loc2)) {
                                             ramp = true
                                         }
-                                        RemoveLocation(loc1)
-                                        RemoveLocation(loc2)
                                     }
                                 } else {
                                     //il peut y avoir une rampe s'il y a une falaise juste après, vers le haut et walkable
@@ -317,11 +310,11 @@ if one of the N tilepoints is at a cliff level different than CL or CL+1, the ra
                                     if (!walkable2) {
                                         //il y a une rampe à condition que les deux points en bas de la falaise soient au même niveau de falaise et pas à la même hauteur
                                         if (currentCliffLevel < otherCliffLevel) {
-                                            loc1 = Location(x, y)
-                                            loc2 = Location(x, y - LARGEUR_CASE)
+                                            MoveLocation(loc1, x, y)
+                                            MoveLocation(loc2, x, y - LARGEUR_CASE)
                                         } else {
-                                            loc1 = Location(x, otherY)
-                                            loc2 = Location(x, otherY + LARGEUR_CASE)
+                                            MoveLocation(loc1, x, otherY)
+                                            MoveLocation(loc2, x, otherY + LARGEUR_CASE)
                                         }
                                         if (
                                             GetLocationZ(loc1) !== GetLocationZ(loc2) &&
@@ -329,8 +322,6 @@ if one of the N tilepoints is at a cliff level different than CL or CL+1, the ra
                                         ) {
                                             ramp = true
                                         }
-                                        RemoveLocation(loc1)
-                                        RemoveLocation(loc2)
                                     }
                                 }
                                 //s'il y a une rampe, on détermine si on est au milieu de la rampe
@@ -346,13 +337,11 @@ if one of the N tilepoints is at a cliff level different than CL or CL+1, the ra
                                     otherCliffLevel2 = GetTerrainCliffLevel(otherX, otherY)
                                     if (otherCliffLevel2 - currentCliffLevel === 1) {
                                         //il y a une rampe sauf si les deux points en bas de la falaise sont à la même hauteur
-                                        loc1 = Location(x, y)
-                                        loc2 = Location(x, y + LARGEUR_CASE)
+                                        MoveLocation(loc1, x, y)
+                                        MoveLocation(loc2, x, y + LARGEUR_CASE)
                                         if (GetLocationZ(loc1) !== GetLocationZ(loc2)) {
                                             ramp = true
                                         }
-                                        RemoveLocation(loc1)
-                                        RemoveLocation(loc2)
                                     }
                                 } else {
                                     //il peut y avoir une rampe s'il y a une falaise juste après, vers le haut et walkable
@@ -416,11 +405,11 @@ if one of the N tilepoints is at a cliff level different than CL or CL+1, the ra
                                     if (!walkable2) {
                                         //il y a une rampe à condition que les deux points en bas de la falaise soient au même niveau de falaise et pas à la même hauteur
                                         if (currentCliffLevel < otherCliffLevel) {
-                                            loc1 = Location(x, y)
-                                            loc2 = Location(x, y + LARGEUR_CASE)
+                                            MoveLocation(loc1, x, y)
+                                            MoveLocation(loc2, x, y + LARGEUR_CASE)
                                         } else {
-                                            loc1 = Location(x, otherY)
-                                            loc2 = Location(x, otherY - LARGEUR_CASE)
+                                            MoveLocation(loc1, x, otherY)
+                                            MoveLocation(loc2, x, otherY - LARGEUR_CASE)
                                         }
                                         if (
                                             GetLocationZ(loc1) !== GetLocationZ(loc2) &&
@@ -428,8 +417,6 @@ if one of the N tilepoints is at a cliff level different than CL or CL+1, the ra
                                         ) {
                                             ramp = true
                                         }
-                                        RemoveLocation(loc1)
-                                        RemoveLocation(loc2)
                                     }
                                 }
                                 //s'il y a une rampe, on détermine si on est au milieu de la rampe
@@ -445,13 +432,11 @@ if one of the N tilepoints is at a cliff level different than CL or CL+1, the ra
                                     otherCliffLevel2 = GetTerrainCliffLevel(otherX, otherY)
                                     if (otherCliffLevel2 - currentCliffLevel === 1) {
                                         //il y a une rampe sauf si les deux points en bas de la falaise sont à la même hauteur
-                                        loc1 = Location(x, y)
-                                        loc2 = Location(x, y - LARGEUR_CASE)
+                                        MoveLocation(loc1, x, y)
+                                        MoveLocation(loc2, x, y - LARGEUR_CASE)
                                         if (GetLocationZ(loc1) !== GetLocationZ(loc2)) {
                                             ramp = true
                                         }
-                                        RemoveLocation(loc1)
-                                        RemoveLocation(loc2)
                                     }
                                 } else {
                                     //il peut y avoir une rampe s'il y a une falaise juste après, vers le haut et walkable
@@ -527,8 +512,6 @@ if one of the N tilepoints is at a cliff level different than CL or CL+1, the ra
                 x = x + LARGEUR_CASE
             }
             y = y + LARGEUR_CASE
-            loc1 = null
-            loc2 = null
         }
 
         Text.A('terrain ramps saved')

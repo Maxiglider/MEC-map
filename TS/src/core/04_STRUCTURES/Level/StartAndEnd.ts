@@ -3,6 +3,7 @@ import { getUdgLevels } from "../../../../globals"
 
 import { createEvent } from 'Utils/mapUtils'
 import { Hero2Escaper } from '../Escaper/Escaper_functions'
+import {ObjectHandler} from "../../../Utils/ObjectHandler";
 
 
 abstract class RectInterface {
@@ -24,12 +25,16 @@ abstract class RectInterface {
         RemoveRect(this.r)
     }
 
-    toJson = () => ({
-        minX: this.minX,
-        minY: this.minY,
-        maxX: this.maxX,
-        maxY: this.maxY,
-    })
+    toJson = () => {
+        const output = ObjectHandler.getNewObject<any>()
+
+        output['minX'] = this.minX
+        output['minY'] = this.minY
+        output['maxX'] = this.maxX
+        output['maxY'] = this.maxY
+
+        return output
+    }
 }
 
 export class Start extends RectInterface {

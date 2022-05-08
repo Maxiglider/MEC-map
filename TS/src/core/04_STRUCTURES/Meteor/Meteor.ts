@@ -1,5 +1,6 @@
 import { getUdgTerrainTypes } from '../../../../globals'
 import { Level } from '../Level/Level'
+import {ObjectHandler} from "../../../Utils/ObjectHandler";
 
 export const METEOR_NORMAL = FourCC('MND1')
 export const METEOR_CHEAT = FourCC('MCD1')
@@ -86,10 +87,12 @@ export class Meteor {
         if(this.isDeleted()) {
             return false
         }else {
-            return {
-                x: R2I(this.x),
-                y: R2I(this.y)
-            }
+            const output = ObjectHandler.getNewObject<any>()
+
+            output['x'] = R2I(this.x)
+            output['y'] = R2I(this.y)
+
+            return output
         }
     }
 }

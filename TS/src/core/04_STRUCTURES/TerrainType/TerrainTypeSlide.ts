@@ -3,6 +3,7 @@ import { COLOR_TERRAIN_SLIDE } from '../../01_libraries/Init_colorCodes'
 import { Text } from '../../01_libraries/Text'
 import { DISPLAY_SPACE, TerrainType } from './TerrainType'
 import {HERO_ROTATION_SPEED} from "../../07_TRIGGERS/Slide_and_CheckTerrain_triggers/SlidingMax";
+import {ObjectHandler} from "../../../Utils/ObjectHandler";
 
 export class TerrainTypeSlide extends TerrainType {
     private slideSpeed: number
@@ -67,12 +68,13 @@ export class TerrainTypeSlide extends TerrainType {
     }
 
     toJson() {
-        return {
-            ...super.toJson(),
-            slideSpeed: this.getSlideSpeed(),
-            canTurn: this.getCanTurn(),
-            rotationSpeed: this.rotationSpeed
-        }
+        const output = super.toJson()
+
+        output['slideSpeed'] = this.getSlideSpeed()
+        output['canTurn'] = this.getCanTurn()
+        output['rotationSpeed'] = this.rotationSpeed
+
+        return output
     }
 
     destroy = () => {}

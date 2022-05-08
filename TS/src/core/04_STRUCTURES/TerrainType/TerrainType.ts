@@ -3,6 +3,7 @@ import { Ascii2String } from '../../01_libraries/Ascii'
 import { TerrainTypeDeath } from './TerrainTypeDeath'
 import { TerrainTypeSlide } from './TerrainTypeSlide'
 import { TerrainTypeWalk } from './TerrainTypeWalk'
+import {ObjectHandler} from "../../../Utils/ObjectHandler";
 
 export const DISPLAY_SPACE = '   '
 
@@ -117,14 +118,16 @@ export abstract class TerrainType {
     }
 
     toJson() {
-        return {
-            label: this.label,
-            alias: this.theAlias,
-            orderId: this.orderId,
-            kind: this.kind,
-            terrainTypeId: Ascii2String(this.terrainTypeId),
-            cliffClassId: this.cliffClassId,
-        }
+        const output = ObjectHandler.getNewObject<any>()
+
+        output['label'] = this.label
+        output['alias'] = this.theAlias
+        output['orderId'] = this.orderId
+        output['kind'] = this.kind
+        output['terrainTypeId'] = Ascii2String(this.terrainTypeId)
+        output['cliffClassId'] = this.cliffClassId
+
+        return output
     }
 
     abstract destroy(): void

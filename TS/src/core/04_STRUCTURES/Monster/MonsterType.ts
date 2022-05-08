@@ -11,6 +11,7 @@ import {
 import { udg_colorCode } from '../../01_libraries/Init_colorCodes'
 import { Level } from '../Level/Level'
 import { IMMOLATION_SKILLS } from './Immolation_skills'
+import {ObjectHandler} from "../../../Utils/ObjectHandler";
 
 export class MonsterType {
     label: string
@@ -286,16 +287,20 @@ export class MonsterType {
         Text.P_timed(p, TERRAIN_DATA_DISPLAY_TIME, display)
     }
 
-    toJson = () => ({
-        label: this.label,
-        alias: this.theAlias,
-        unitTypeId: Ascii2String(this.unitTypeId),
-        scale: this.scale,
-        immolationRadius: S2I(this.getImmolationRadiusStr()),
-        speed: R2I(this.speed),
-        isClickable: this.isClickableB,
-        killingEffect: this.killingEffectStr,
-        nbMeteorsToKill: this.maxLife / 10000,
-        height: R2I(this.height),
-    })
+    toJson = () => {
+        const output = ObjectHandler.getNewObject<any>()
+
+        output['label'] = this.label
+        output['alias'] = this.theAlias
+        output['unitTypeId'] = Ascii2String(this.unitTypeId)
+        output['scale'] = this.scale
+        output['immolationRadius'] = S2I(this.getImmolationRadiusStr())
+        output['speed'] = R2I(this.speed)
+        output['isClickable'] = this.isClickableB
+        output['killingEffect'] = this.killingEffectStr
+        output['nbMeteorsToKill'] = this.maxLife / 10000
+        output['height'] = R2I(this.height)
+
+        return output
+    }
 }

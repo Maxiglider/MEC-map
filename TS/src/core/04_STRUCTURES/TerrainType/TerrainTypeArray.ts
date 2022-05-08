@@ -8,6 +8,7 @@ import { TerrainType } from './TerrainType'
 import { TerrainTypeDeath } from './TerrainTypeDeath'
 import { TerrainTypeSlide } from './TerrainTypeSlide'
 import { TerrainTypeWalk } from './TerrainTypeWalk'
+import {ArrayHandler} from "../../../Utils/ArrayHandler";
 
 //le nombre de terrains du jeu est de 177
 export class TerrainTypeArray extends BaseArray<TerrainType> {
@@ -183,15 +184,13 @@ export class TerrainTypeArray extends BaseArray<TerrainType> {
     }
 
     toJson = () => {
-        const arr: TerrainType[] = []
+        const arr = ArrayHandler.getNewArray()
 
         for (const [_, terrainType] of pairs(this.data)) {
-            arrayPush(arr, terrainType)
+            arrayPush(arr, terrainType.toJson())
         }
 
-        return {
-            terrainTypesMec: arr.map(terrainType => terrainType.toJson()),
-        }
+        return arr
     }
 
     newFromJson = (terrainTypesJson: { [x: string]: any }[]) => {

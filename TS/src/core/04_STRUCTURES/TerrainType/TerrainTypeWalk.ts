@@ -35,10 +35,11 @@ export class TerrainTypeWalk extends TerrainType {
     }
 
     toJson() {
-        return {
-            ...super.toJson(),
-            walkSpeed: R2I(this.getWalkSpeed()),
-        }
+        const output = super.toJson()
+
+        output['walkSpeed'] = R2I(this.getWalkSpeed())
+
+        return output
     }
 
     destroy = () => {}

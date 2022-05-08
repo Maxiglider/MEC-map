@@ -2,8 +2,8 @@ import { Text } from 'core/01_libraries/Text'
 
 export class ArrayHandler {
     private static nextIndex = 0
-    private static tArrays = new Map<number, any>()
-    private static freedArrays: any[] = []
+    public static tArrays = new Map<number, any>()
+    public static freedArrays: any[] = []
 
     public static getNewArray<T>() {
         let arr: T[] = ArrayHandler.freedArrays.shift()
@@ -15,7 +15,7 @@ export class ArrayHandler {
             arr = []
             index = ArrayHandler.nextIndex
             ArrayHandler.nextIndex++
-            const meta: any = { __id: index }
+            const meta: any = { __id: index, __type: 'arr' }
             setmetatable(arr, meta)
         }
 

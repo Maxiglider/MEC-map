@@ -3,12 +3,13 @@ import { Text } from 'core/01_libraries/Text'
 import { ZLibrary } from 'core/02_bibliotheques_externes/ZLibrary'
 import {globals} from "../../../../globals";
 import {arrayPush} from "../../01_libraries/Basic_functions";
+import {ArrayHandler} from "../../../Utils/ArrayHandler";
 
 const initSaveWater = () => {
 
     //save water heights
     const SaveWaterHeights = (json: {[x: string]: any}) => {
-        json.waterHeights = []
+        json.waterHeights = ArrayHandler.getNewArray()
         let y = globals.MAP_MIN_Y
 
         while(y <= globals.MAP_MAX_Y) {

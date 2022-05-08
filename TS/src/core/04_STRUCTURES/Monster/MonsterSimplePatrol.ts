@@ -78,16 +78,13 @@ export class MonsterSimplePatrol extends Monster {
     }
 
     toJson() {
-        if(super.toJson()) {
-            return {
-                ...super.toJson(),
-                x1: R2I(this.x1),
-                y1: R2I(this.y1),
-                x2: R2I(this.x2),
-                y2: R2I(this.y2),
-            }
-        } else {
-            return false
+        const output = super.toJson()
+        if(output){
+            output['x1'] = R2I(this.x1)
+            output['y1'] = R2I(this.y1)
+            output['x2'] = R2I(this.x2)
+            output['y2'] = R2I(this.y2)
         }
+        return output
     }
 }

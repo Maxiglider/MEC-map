@@ -1,4 +1,5 @@
-import { sortArrayOfObjectsByIds } from '../01_libraries/Basic_functions'
+import {arrayPush, sortArrayOfObjectsByIds} from '../01_libraries/Basic_functions'
+import {ArrayHandler} from "../../Utils/ArrayHandler";
 
 type BaseModel = { getId?: () => number; destroy: () => void; toJson: () => {} }
 
@@ -48,7 +49,18 @@ export abstract class BaseArray<T extends BaseModel> {
 
     getAll = () => this.data
 
-    toJson: () => any = () => sortArrayOfObjectsByIds(Object.values(this.data)).map(item => item.toJson()).filter(item => item !== false)
+    toJson: () => any = () => { //todomax did i actually do it ?
+        const outputArray = ArrayHandler.getNewArray<{ [x: string | number]: any }[]>()
+
+        for (const [_, element] of pairs(this.data)) {
+            const json = element.toJson()
+            if(json){
+                arrayPush(outputArray, json)
+            }
+        }
+
+        return sortArrayOfObjectsByIds(outputArray)
+    }
 
     destroyOne = (id: number) => {
         if(this.data[id]){

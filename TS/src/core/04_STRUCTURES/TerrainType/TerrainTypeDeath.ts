@@ -92,12 +92,13 @@ export class TerrainTypeDeath extends TerrainType {
     }
 
     toJson() {
-        return {
-            ...super.toJson(),
-            killingEffet: this.getKillingEffectStr(),
-            timeToKill: this.getTimeToKill(),
-            toleranceDist: this.getToleranceDist(),
-        }
+        const output = super.toJson()
+
+        output['killingEffet'] = this.getKillingEffectStr()
+        output['timeToKill'] = this.getTimeToKill()
+        output['toleranceDist'] = this.getToleranceDist()
+
+        return output
     }
 
     destroy = () => {
