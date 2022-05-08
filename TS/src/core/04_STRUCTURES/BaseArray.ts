@@ -49,7 +49,7 @@ export abstract class BaseArray<T extends BaseModel> {
 
     getAll = () => this.data
 
-    toJson: () => any = () => { //todomax did i actually do it ?
+    toJson: () => any = () => {
         const outputArray = ArrayHandler.getNewArray<{ [x: string | number]: any }[]>()
 
         for (const [_, element] of pairs(this.data)) {
