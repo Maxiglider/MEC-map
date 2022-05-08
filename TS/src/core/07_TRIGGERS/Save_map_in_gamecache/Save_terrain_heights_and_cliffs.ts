@@ -5,12 +5,13 @@ import { ZLibrary } from 'core/02_bibliotheques_externes/ZLibrary'
 import { I2HexaString } from '../../01_libraries/Functions_on_numbers'
 import {globals} from "../../../../globals";
 import {ArrayHandler} from "../../../Utils/ArrayHandler";
+import {clearArrayOrObject} from "../../../Utils/clearArrayOrObject";
 
 const initSaveTerrainHeights = () => {
 
     //save terrain cliff levels
     const SaveTerrainCliffs = (json: {[x: string]: any}) => {
-        json.terrainCliffs = ""
+        const terrainCliffsArr = ArrayHandler.getNewArray()
 
         let x: number
         let cliffLevel: number
@@ -27,12 +28,15 @@ const initSaveTerrainHeights = () => {
                     cliffLevel = GetTerrainCliffLevel(x, y)
                 }
 
-                json.terrainCliffs += I2HexaString(cliffLevel)
+                arrayPush(terrainCliffsArr, I2HexaString(cliffLevel))
 
                 x = x + LARGEUR_CASE
             }
             y = y + LARGEUR_CASE
         }
+
+        json.terrainCliffs = terrainCliffsArr.join('')
+        clearArrayOrObject(terrainCliffsArr)
 
         Text.A('terrain cliffs saved')
     }

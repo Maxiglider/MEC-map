@@ -12,7 +12,7 @@ import {jsonEncode} from "../../01_libraries/Basic_functions";
 import {MEC_SMIC_DATA_FILE_DATE_TPL} from "../../01_libraries/Constants";
 import {ObjectHandler} from "../../../Utils/ObjectHandler";
 import {
-    clearArrayOrObject,
+    clearArrayOrObject, getHighestClearedId,
     getNbArraysObjectsCleared,
     resetNbArraysObjectsCleared
 } from "../../../Utils/clearArrayOrObject";
@@ -52,6 +52,8 @@ export class SaveMapInCache {
         return output
     }
 
+    private static smicStringObj = {str : ''}
+
     public static smic = (p: player | null = null) => {
         const SaveLoad = initSaveLoad()
 
@@ -60,13 +62,15 @@ export class SaveMapInCache {
 
             const json = SaveMapInCache.gameAsJson()
 
-            SaveLoad.saveFile(filename, p, jsonEncode(json))
+            SaveMapInCache.smicStringObj.str = jsonEncode(json)
+
+            SaveLoad.saveFile(filename, p, SaveMapInCache.smicStringObj.str)
 
             clearArrayOrObject(json)
 
             Text.A('saving game data to file "' + filename + '" done')
 
-            print(getNbArraysObjectsCleared() + " arrays or objects cleared")
+            print(getNbArraysObjectsCleared() + " arrays or objects cleared ; highest : " + getHighestClearedId())
             resetNbArraysObjectsCleared()
         }
     }

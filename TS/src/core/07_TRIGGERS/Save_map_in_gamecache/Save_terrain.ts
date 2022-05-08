@@ -10,6 +10,7 @@ import { SaveTerrainRamps } from './Save_terrain_ramps'
 import { SaveWater } from './Save_water'
 import {ArrayHandler} from "../../../Utils/ArrayHandler";
 import {ObjectHandler} from "../../../Utils/ObjectHandler";
+import {clearArrayOrObject} from "../../../Utils/clearArrayOrObject";
 
 let terrainTypeIds: number[] = []
 let nbTerrainTypesUsed: number
@@ -101,17 +102,20 @@ const GererOrdreTerrains = () => {
 }
 
 const SaveTerrain = (json: { [x: string]: any }) => {
-    json.terrainTypes = ''
+    const terrainTypesArr = ArrayHandler.getNewArray()
 
     let y = globals.MAP_MIN_Y
     while (y <= globals.MAP_MAX_Y) {
         let x = globals.MAP_MIN_X
         while (x <= globals.MAP_MAX_X) {
-            json.terrainTypes += GetTerrainId(x, y)
+            arrayPush(terrainTypesArr, GetTerrainId(x, y))
             x = x + LARGEUR_CASE
         }
         y = y + LARGEUR_CASE
     }
+
+    json.terrainTypes = terrainTypesArr.join('')
+    clearArrayOrObject(terrainTypesArr)
 
     Text.A('terrain saved')
 }

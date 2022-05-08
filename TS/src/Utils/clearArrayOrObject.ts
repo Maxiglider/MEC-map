@@ -3,6 +3,7 @@ import {ArrayHandler} from "./ArrayHandler";
 import {ObjectHandler} from "./ObjectHandler";
 
 let nbArraysObjectsCleared = 0
+let highestIdCleared = -1
 
 export const getNbArraysObjectsCleared = function(){
     return nbArraysObjectsCleared
@@ -10,6 +11,10 @@ export const getNbArraysObjectsCleared = function(){
 
 export const resetNbArraysObjectsCleared = function(){
     nbArraysObjectsCleared = 0
+}
+
+export const getHighestClearedId = function(){
+    return highestIdCleared
 }
 
 export const clearArrayOrObject = (item: {} | []) => {
@@ -20,6 +25,8 @@ export const clearArrayOrObject = (item: {} | []) => {
     const type = meta.__type
 
     if(!index || !type) return
+
+    if(index > highestIdCleared) highestIdCleared = index
     
     if(type == 'arr'){
         const arrayInMap = ArrayHandler.tArrays.get(index)

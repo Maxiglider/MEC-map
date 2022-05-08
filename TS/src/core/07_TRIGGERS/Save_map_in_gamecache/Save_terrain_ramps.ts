@@ -1,7 +1,9 @@
-import { IsNearBounds } from 'core/01_libraries/Basic_functions'
+import {arrayPush, IsNearBounds} from 'core/01_libraries/Basic_functions'
 import { LARGEUR_CASE } from 'core/01_libraries/Constants'
 import { Text } from 'core/01_libraries/Text'
 import {globals} from "../../../../globals";
+import {ArrayHandler} from "../../../Utils/ArrayHandler";
+import {clearArrayOrObject} from "../../../Utils/clearArrayOrObject";
 
 const initSaveTerrainRamps = () => {
     const DECAL_TEST_PATH = 10
@@ -58,7 +60,7 @@ if one of the N tilepoints is at a cliff level different than CL or CL+1, the ra
 
     //save terrain ramps
     const SaveTerrainRamps = (json: {[x: string]: any}) => {
-        json.terrainRamps = ""
+        const terrainRampsArr = ArrayHandler.getNewArray()
 
         let x: number
         let currentCliffLevel: number
@@ -507,12 +509,15 @@ if one of the N tilepoints is at a cliff level different than CL or CL+1, the ra
                     rampStr = '0'
                 }
 
-                json.terrainRamps += rampStr
+                arrayPush(terrainRampsArr, rampStr)
 
                 x = x + LARGEUR_CASE
             }
             y = y + LARGEUR_CASE
         }
+
+        json.terrainRamps = terrainRampsArr.join('')
+        clearArrayOrObject(terrainRampsArr)
 
         Text.A('terrain ramps saved')
     }
