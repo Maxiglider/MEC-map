@@ -61,8 +61,8 @@ export class Meteor {
     }
 
     undelete = () => {
-        this.createMeteorItem()
         this.deleted = false
+        this.createMeteorItem()
     }
 
     isDeleted = () => {

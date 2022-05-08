@@ -238,8 +238,8 @@ export abstract class Monster {
     }
 
     undelete = () => {
-        this.createUnit()
         this.deleted = false
+        this.createUnit()
     }
 
     isDeleted = () => {
