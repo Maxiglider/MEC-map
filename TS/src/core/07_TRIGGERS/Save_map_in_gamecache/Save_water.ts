@@ -9,6 +9,11 @@ const initSaveWater = () => {
 
     //save water heights
     const SaveWaterHeights = (json: {[x: string]: any}) => {
+        if(json.terrainHeights){
+            json.waterHeights = json.terrainHeights
+            return
+        }
+
         json.waterHeights = ArrayHandler.getNewArray()
         let y = globals.MAP_MIN_Y
 
