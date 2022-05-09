@@ -1,20 +1,43 @@
 import { IItem } from 'App/Interface'
 import * as React from 'w3ts-jsx/dist/src/index'
+import { IAbsPos } from '../Utils'
 
 export const Item = ({
     v,
     absPosition,
+    size,
     visible,
     onClick,
 }: {
     v: IItem
-    absPosition: [AbsPos, AbsPos]
+    absPosition: IAbsPos
+    size: { width: number; height: number }
     visible: boolean
     onClick?: () => void
-}) => (
-    <container visible={visible}>
-        <backdrop texture={{ texFile: v.texFile }} absPosition={absPosition} />
+}) => {
+    const ref = React.useRef<framehandle | null>(null)
 
-        <text text={v.title} absPosition={absPosition} onClick={onClick} />
-    </container>
-)
+    const r = (
+        <container visible={visible} ref={ref}>
+            <backdrop
+                name={'TerrainPreview'}
+                isSimple={true}
+                texture={{ texFile: v.texFile }}
+                absPosition={absPosition}
+                size={size}
+            />
+
+            <text
+                text={v.title}
+                absPosition={absPosition}
+                onClick={onClick}
+                size={size}
+                parentFrame={BlzGetOriginFrame(ORIGIN_FRAME_GAME_UI, 0)}
+            />
+        </container>
+    )
+
+    BlzFrameSetTexture(BlzGetFrameByName('TerrainPreviewValue', 0), v.texFile, 0, false)
+
+    return r
+}

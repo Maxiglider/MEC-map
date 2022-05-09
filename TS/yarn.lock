@@ -1306,10 +1306,9 @@ v8-compile-cache-lib@^3.0.0:
   resolved "https://registry.yarnpkg.com/v8-compile-cache-lib/-/v8-compile-cache-lib-3.0.1.tgz#6336e8d71965cb3d35a1bbb7868445a7c05264bf"
   integrity sha512-wa7YjyUGfNZngI/vtK0UHAN+lgDCxBPCylVXGp0zu59Fz5aiGtNXaq3DhIov063MorB+VfufLh3JlF2KdTK3xg==
 
-w3ts-jsx@^2.5.2:
+"w3ts-jsx@https://github.com/Stannnnn/w3ts-jsx":
   version "2.5.2"
-  resolved "https://registry.yarnpkg.com/w3ts-jsx/-/w3ts-jsx-2.5.2.tgz#14ad2a8416ddf86f399644a9654b7e71659a09f3"
-  integrity sha512-/rOOAimpir8Y9FOUspvMfX+R7tFSOoroe6/MK7cgh5r6U6jdL7szLB9ldtFrAxgZRUzLqeMARAZ1LtqrvPni/A==
+  resolved "https://github.com/Stannnnn/w3ts-jsx#53f0fc9c39633812ff0893d245280df90d03f9b0"
   dependencies:
     tstl-jsx "^2.0.0"
 
