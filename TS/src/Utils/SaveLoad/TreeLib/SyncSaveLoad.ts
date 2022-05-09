@@ -3,7 +3,9 @@ import { EncodingBase64 } from './EncodingBase64'
 import { EncodingHex } from './EncodingHex'
 import { Logger } from './Logger'
 
-export const SyncSaveLoad = (base64Encode: boolean) => {
+const BASE_64_DEFAULT = true
+
+export const SyncSaveLoad = () => {
     const syncPrefix = 'S_TIO'
     const syncPrefixFinish = 'S_TIOF'
     const syncEvent: trigger = CreateTrigger()
@@ -49,7 +51,7 @@ export const SyncSaveLoad = (base64Encode: boolean) => {
         )
     )
 
-    const writeFile = (fileName: string, data: string) => {
+    const writeFile = (fileName: string, data: string, base64Encode = BASE_64_DEFAULT) => {
         PreloadGenClear()
         PreloadGenStart()
 
@@ -84,10 +86,35 @@ export const SyncSaveLoad = (base64Encode: boolean) => {
         PreloadGenEnd(fileName)
     }
 
+    const writeFileWithoutPossibleLoading = (fileName: string, data: string, base64Encode = BASE_64_DEFAULT) => {
+        PreloadGenClear()
+        PreloadGenStart()
+
+        const rawData = data
+        const toCompile = base64Encode ? EncodingBase64.Encode(rawData) : rawData
+        const chunkSize = 180
+        let assemble = ''
+        const noOfChunks = math.ceil(toCompile.length / chunkSize)
+
+        Logger.verbose('rawData.length: ', rawData.length)
+        Logger.verbose('toCompile.length: ', toCompile.length)
+
+        xpcall(() => {
+            for(let i = 0; i < noOfChunks; i++){
+                const start = i * chunkSize
+                const end = i < noOfChunks - 1 ? start + chunkSize : undefined
+                assemble = toCompile.substring(start, end)
+                Preload(assemble)
+            }
+        }, Logger.critical)
+        PreloadGenEnd(fileName)
+    }
+
     const read = (
         fileName: string,
         reader: player,
-        onFinish: (promise: IFinishedFilePromise) => void
+        onFinish: (promise: IFinishedFilePromise) => void,
+        base64Encode = BASE_64_DEFAULT
     ): IFilePromise => {
         if (allPromises[GetPlayerId(reader)] === null) {
             allPromises[GetPlayerId(reader)] = FilePromise(reader, onFinish, base64Encode)
@@ -109,6 +136,7 @@ export const SyncSaveLoad = (base64Encode: boolean) => {
     return {
         read,
         writeFile,
+        writeFileWithoutPossibleLoading
     }
 }
 
@@ -116,7 +144,7 @@ type IFinishedFilePromise = string
 
 type IFilePromise = ReturnType<typeof FilePromise>
 
-const FilePromise = (syncOwner: player, onFinish: (promise: IFinishedFilePromise) => void, base64Encode: boolean) => {
+const FilePromise = (syncOwner: player, onFinish: (promise: IFinishedFilePromise) => void, base64Encode = BASE_64_DEFAULT) => {
     const buffer: string[] = []
 
     const finish = () => {

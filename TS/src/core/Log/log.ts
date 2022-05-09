@@ -8,7 +8,7 @@ export const log = (str: string) => {
 
 export const flushLogs = () => {
   const logFile = "MEC/MEC_log.txt";
-  const syncSaveLoad = SyncSaveLoad(true);
-  syncSaveLoad.writeFile(logFile, globals.logStrings.join("\n"));
+  const syncSaveLoad = SyncSaveLoad();
+  syncSaveLoad.writeFileWithoutPossibleLoading(logFile, globals.logStrings.join("\n"), false);
   print("Logs written in file " + logFile)
 }
