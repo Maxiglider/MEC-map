@@ -52,4 +52,8 @@ export class ObjectHandler {
         const freedLen = ObjectHandler.freedObjects.length
         ObjectHandler.freedObjects[freedLen] = obj
     }
+
+    public static getNextIndex(){
+        return ObjectHandler.nextIndex
+    }
 }

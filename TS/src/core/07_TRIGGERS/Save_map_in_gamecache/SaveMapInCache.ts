@@ -16,6 +16,7 @@ import {
     getNbArraysObjectsCleared,
     resetNbArraysObjectsCleared
 } from "../../../Utils/clearArrayOrObject";
+import {ArrayHandler} from "../../../Utils/ArrayHandler";
 
 export class SaveMapInCache {
 
@@ -69,11 +70,12 @@ export class SaveMapInCache {
 
             SaveMapInCache.smicStringObj.str = SaveMapInCache.gameAsJsonString()
 
-            SaveLoad.saveFile(filename, p, SaveMapInCache.smicStringObj.str)
+            SaveLoad.saveFileWithoutPossibleLoading(filename, p, SaveMapInCache.smicStringObj.str, false)
 
             Text.A('saving game data to file "' + filename + '" done')
 
             print(getNbArraysObjectsCleared() + " arrays or objects cleared ; highest : " + getHighestClearedId())
+            print("Highest Array index : " + ArrayHandler.getNextIndex() + " ; Highest Object index : " + ObjectHandler.getNextIndex())
             resetNbArraysObjectsCleared()
 
             const time = os.clock() - startTime

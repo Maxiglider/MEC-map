@@ -10,7 +10,14 @@ import {clearArrayOrObject} from "../../../Utils/clearArrayOrObject";
 const initSaveTerrainHeights = () => {
 
     //save terrain cliff levels
+    let cachedTerrainCliffs = ""
+
     const SaveTerrainCliffs = (json: {[x: string]: any}) => {
+        if(cachedTerrainCliffs !== ""){
+            json.terrainCliffs = cachedTerrainCliffs
+            return
+        }
+
         const terrainCliffsArr = ArrayHandler.getNewArray()
 
         let x: number
@@ -35,7 +42,7 @@ const initSaveTerrainHeights = () => {
             y = y + LARGEUR_CASE
         }
 
-        json.terrainCliffs = terrainCliffsArr.join('')
+        json.terrainCliffs = cachedTerrainCliffs = terrainCliffsArr.join('')
         clearArrayOrObject(terrainCliffsArr)
 
         Text.A('terrain cliffs saved')

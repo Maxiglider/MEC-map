@@ -77,4 +77,8 @@ export class ArrayHandler {
 
         ArrayHandler.clearArray(arr)
     }
+
+    public static getNextIndex(){
+        return ArrayHandler.nextIndex
+    }
 }

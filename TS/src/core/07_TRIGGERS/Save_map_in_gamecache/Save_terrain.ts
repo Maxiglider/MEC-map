@@ -37,7 +37,7 @@ const SaveMapDimensionsAndCenterOffset = (json: { [x: string]: any }) => {
     json.terrain.centerOffsetX = offsetX
     json.terrain.centerOffsetY = offsetY
 
-    Text.A('map dimensions and center offsaved')
+    //Text.A('map dimensions and center offset saved')
 }
 
 //crée si besoin une nouvelle instance dans le tableau et retourne l'id de cet élément de tableau
@@ -123,7 +123,7 @@ const SaveTerrain = (json: { [x: string]: any }) => {
 export const PushTerrainDataIntoJson = (json: { [x: string]: any }) => {
     json.mainTileset = getUdgTerrainTypes().getMainTileset()
     GererOrdreTerrains()
-    SaveTerrain(json)
+    SaveTerrain(json) //2 MB leak
     SaveTerrainsUsed(json)
     SaveMapDimensionsAndCenterOffset(json)
     SaveTerrainHeights.SaveTerrainHeights(json)

@@ -59,7 +59,14 @@ if one of the N tilepoints is at a cliff level different than CL or CL+1, the ra
     }
 
     //save terrain ramps
+    let cachedTerrainRamps = ""
+
     const SaveTerrainRamps = (json: {[x: string]: any}) => {
+        if(cachedTerrainRamps !== ""){
+            json.terrainRamps = cachedTerrainRamps
+            return
+        }
+
         const terrainRampsArr = ArrayHandler.getNewArray()
 
         let x: number
@@ -516,7 +523,7 @@ if one of the N tilepoints is at a cliff level different than CL or CL+1, the ra
             y = y + LARGEUR_CASE
         }
 
-        json.terrainRamps = terrainRampsArr.join('')
+        json.terrainRamps = cachedTerrainRamps = terrainRampsArr.join('')
         clearArrayOrObject(terrainRampsArr)
 
         Text.A('terrain ramps saved')
