@@ -129,7 +129,7 @@ export const PushTerrainDataIntoJson = (json: { [x: string]: any }) => {
     SaveTerrainHeights.SaveTerrainHeights(json)
     SaveTerrainHeights.SaveTerrainCliffs(json)
     SaveTerrainRamps.SaveTerrainRamps(json)
-    SaveWater.SaveWater(json) //copie from TerrainHeights for the moment
+    // SaveWater.SaveWater(json) //copie from TerrainHeights for the moment ; disabled because i didn't succeed to handle water yet
 }
 
 
