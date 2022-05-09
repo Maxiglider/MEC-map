@@ -1,13 +1,11 @@
-import { arrayPush } from 'core/01_libraries/Basic_functions'
 import { Text } from 'core/01_libraries/Text'
 import * as React from 'w3ts-jsx/dist/src/index'
 import { getUdgEscapers, getUdgTerrainTypes } from '../../globals'
-import { Ascii2String } from '../core/01_libraries/Ascii'
 import { Button } from './Components/Button'
 import { Item } from './Components/Item'
-import { useDrag } from './Hooks/useDrag'
 import { usePlayerVariable } from './Hooks/usePlayerVisible'
 import { terrainItems } from './Media/Terrains'
+import { IAbsPos } from './Utils'
 
 export type IItem = { texFile: string; title: string }
 
@@ -20,18 +18,23 @@ export const Interface = ({ cb }: InterfaceProps) => {
 
     const { get: getPos, set: setPos } = usePlayerVariable<{ x: number; y: number }>()
 
-    useDrag({
-        onDrag: (playerId, x, y) => {
-            // TODO; Leaks
-            setPos({
-                playerId,
-                value: {
-                    x: ((x - GetCameraTargetPositionX()) / (128 * 20) + 1) / 2,
-                    y: ((y - GetCameraTargetPositionY()) / (128 * 20) + 1) / 2,
-                },
-            })
-        },
-    })
+    const mainPos = {
+        x: 0.0070428,
+        y: 0.47109,
+    }
+
+    // useDrag({
+    //     onDrag: (playerId, x, y) => {
+    //         // TODO; Leaks
+    //         setPos({
+    //             playerId,
+    //             value: {
+    //                 x: ((x - GetCameraTargetPositionX()) / (128 * 20) + 1) / 2,
+    //                 y: ((y - GetCameraTargetPositionY()) / (128 * 20) + 1) / 2,
+    //             },
+    //         })
+    //     },
+    // })
 
     React.useEffect(() => {
         cb({
@@ -39,50 +42,58 @@ export const Interface = ({ cb }: InterfaceProps) => {
                 setVisible({ playerId, value: visible })
             },
         })
+
+        // Always on
+        // setVisible({ playerId: 0, value: true })
     }, [])
 
-    // TODO; Update this when someone does -news etc
-    const usedTerrains: IItem[] = []
-    for (const [_, terrain] of pairs(getUdgTerrainTypes().getAll())) {
-        arrayPush(
-            usedTerrains,
-            terrainItems.find(i => i.title === Ascii2String(terrain.terrainTypeId))
-        )
-    }
+    // // TODO; Update this when someone does -news etc
+    // const usedTerrains: IItem[] = []
+    // for (const [_, terrain] of pairs(getUdgTerrainTypes().getAll())) {
+    //     arrayPush(
+    //         usedTerrains,
+    //         terrainItems.find(i => i.title === Ascii2String(terrain.terrainTypeId))
+    //     )
+    // }
 
-    const getItemPosition = ({ item }: { item: IItem }): { visible: boolean; absPos: [AbsPos, AbsPos] } => {
-        const i = usedTerrains.findIndex(d => d.title === item.title)
+    const usedTerrains = terrainItems
+
+    const getItemPosition = ({ item }: { item: IItem }): { visible: boolean; absPos: IAbsPos } => {
+        const i = usedTerrains.findIndex(d => d === item)
+
+        const nbCols = 16
+        const margin = 0.0075
+
+        const row = Math.floor(i / nbCols)
+        const col = i % nbCols
 
         return {
             visible: true,
-            absPos: [
-                { point: FRAMEPOINT_TOPLEFT, x: 0.1501 + i * 0.05177, y: 0.51048 },
-                { point: FRAMEPOINT_BOTTOMRIGHT, x: 0.18987 + i * 0.05177, y: 0.4707 },
-            ],
+            absPos: {
+                point: FRAMEPOINT_TOPLEFT,
+                x: mainPos.x + margin + col * 0.03 + col * margin,
+                y: mainPos.y - (margin * row + 0.03 * row),
+            },
         }
     }
-
-    // TSTL fails if this is placed inline
-    const absPos = [
-        {
-            point: FRAMEPOINT_TOPLEFT,
-            x: getPos({ playerId: GetPlayerId(GetLocalPlayer()) })?.x || 0.1,
-            y: (getPos({ playerId: GetPlayerId(GetLocalPlayer()) })?.y || 0.3) + 0.25,
-        },
-        {
-            point: FRAMEPOINT_BOTTOMRIGHT,
-            x: (getPos({ playerId: GetPlayerId(GetLocalPlayer()) })?.x || 0.1) + 0.3,
-            y: getPos({ playerId: GetPlayerId(GetLocalPlayer()) })?.y || 0.3,
-        },
-    ]
 
     return (
         <container>
             <container visible={getVisible({ playerId: GetPlayerId(GetLocalPlayer()) }) || false}>
                 <container>
                     <backdrop
-                        texture={{ texFile: 'ui\\glues\\singleplayer\\orc_exp\\scrolltexture1' }}
-                        absPosition={absPos}
+                        inherits="EscMenuBackdrop"
+                        absPosition={[
+                            {
+                                point: FRAMEPOINT_TOPLEFT,
+                                x: mainPos.x, // getPos({ playerId: GetPlayerId(GetLocalPlayer()) })?.x || 0.1,
+                                y: mainPos.y, //(getPos({ playerId: GetPlayerId(GetLocalPlayer()) })?.y || 0.3) + 0.25,
+                            },
+                        ]}
+                        size={{
+                            width: mainPos.x + 0.0075 + 16 * 0.03 + 16 * 0.0075,
+                            height: mainPos.y + 0.0075 + 8 * 0.03 + 8 * 0.0075,
+                        }}
                     />
 
                     {usedTerrains.map(item => {
@@ -92,6 +103,7 @@ export const Interface = ({ cb }: InterfaceProps) => {
                             <Item
                                 v={item}
                                 absPosition={absPos}
+                                size={{ width: 0.03, height: 0.03 }}
                                 visible={visible}
                                 onClick={() => {
                                     const escaper = getUdgEscapers().get(GetPlayerId(GetTriggerPlayer()))
