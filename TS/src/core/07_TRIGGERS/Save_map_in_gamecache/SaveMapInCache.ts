@@ -19,19 +19,20 @@ import {
 
 export class SaveMapInCache {
 
-    private static gameAsJson = () => {
+    private static gameAsJsonString = () => { //old
         const jsonTerrain = ObjectHandler.getNewObject<any>()
         const jsonGameData = ObjectHandler.getNewObject<any>()
 
         //FOR TERRAIN FILE W3E
         //terrain types, order, height
         PushTerrainDataIntoJson(jsonTerrain)
+        Text.A('map terrain saved')
 
         //FOR GAME DATA
 
         //terrain config
         jsonGameData.terrainTypesMec = getUdgTerrainTypes().toJson()
-        Text.A('terrain configuration saved')
+        Text.A('MEC terrain configuration saved')
 
         //monster types
         jsonGameData.monsterTypes = getUdgMonsterTypes().toJson()
@@ -46,9 +47,13 @@ export class SaveMapInCache {
         Text.A("levels saved")
 
         //output
-        const output = ObjectHandler.getNewObject<{[x: string] : any}>()
-        output['terrain'] = jsonTerrain
-        output['gameData'] = jsonGameData
+        const objData = ObjectHandler.getNewObject<{[x: string] : any}>()
+        objData['terrain'] = jsonTerrain
+        objData['gameData'] = jsonGameData
+
+        const output = jsonEncode(objData)
+        clearArrayOrObject(objData)
+
         return output
     }
 
@@ -58,20 +63,22 @@ export class SaveMapInCache {
         const SaveLoad = initSaveLoad()
 
         if(p === null || GetLocalPlayer() == p) {
+            const startTime = os.clock()
+
             const filename = MEC_SMIC_DATA_FILE_DATE_TPL.replace('[date]', os.date("%Y-%m-%d_%H-%M-%S"))
 
-            const json = SaveMapInCache.gameAsJson()
-
-            SaveMapInCache.smicStringObj.str = jsonEncode(json)
+            SaveMapInCache.smicStringObj.str = SaveMapInCache.gameAsJsonString()
 
             SaveLoad.saveFile(filename, p, SaveMapInCache.smicStringObj.str)
-
-            clearArrayOrObject(json)
 
             Text.A('saving game data to file "' + filename + '" done')
 
             print(getNbArraysObjectsCleared() + " arrays or objects cleared ; highest : " + getHighestClearedId())
             resetNbArraysObjectsCleared()
+
+            const time = os.clock() - startTime
+
+            Text.mkA("SMIC done in " + time + ' s')
         }
     }
 }
