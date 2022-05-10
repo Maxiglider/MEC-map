@@ -28,31 +28,29 @@ const tsMain = () => {
     //escapers
     // initEscapers()
 
-    if (!PROD) {
-        renderInterface({
-            cb: ({ setVisible }) => {
-                ServiceManager.getService('Cmd').registerCommand({
-                    name: 'palette',
-                    alias: ['p'],
-                    group: 'make',
-                    argDescription: '',
-                    description: '',
-                    cb: ({ nbParam, param1 }) => {
-                        if (nbParam !== 1) {
-                            throw 'Wrong command parameters'
-                        }
+    renderInterface({
+        cb: ({ setVisible }) => {
+            ServiceManager.getService('Cmd').registerCommand({
+                name: 'palette',
+                alias: ['p'],
+                group: 'make',
+                argDescription: '',
+                description: '',
+                cb: ({ nbParam, param1 }) => {
+                    if (nbParam !== 1) {
+                        throw 'Wrong command parameters'
+                    }
 
-                        if (!IsBoolString(param1)) {
-                            return true
-                        }
-
-                        setVisible({ visible: S2B(param1), playerId: GetPlayerId(GetTriggerPlayer()) })
+                    if (!IsBoolString(param1)) {
                         return true
-                    },
-                })
-            },
-        })
-    }
+                    }
+
+                    setVisible({ visible: S2B(param1), playerId: GetPlayerId(GetTriggerPlayer()) })
+                    return true
+                },
+            })
+        },
+    })
 
     if (!PROD) {
         const gcState = { lastRun: os.clock(), waitingForGc: false }
