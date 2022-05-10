@@ -1308,7 +1308,7 @@ v8-compile-cache-lib@^3.0.0:
 
 "w3ts-jsx@https://github.com/Stannnnn/w3ts-jsx":
   version "2.5.2"
-  resolved "https://github.com/Stannnnn/w3ts-jsx#53f0fc9c39633812ff0893d245280df90d03f9b0"
+  resolved "https://github.com/Stannnnn/w3ts-jsx#85eb702a15be0927c1b180a514c4a33d8a3ac882"
   dependencies:
     tstl-jsx "^2.0.0"
 

@@ -1,3 +1,5 @@
+import { Ascii2String } from 'core/01_libraries/Ascii'
+import { arrayPush } from 'core/01_libraries/Basic_functions'
 import { Text } from 'core/01_libraries/Text'
 import * as React from 'w3ts-jsx/dist/src/index'
 import { getUdgEscapers, getUdgTerrainTypes } from '../../globals'
@@ -7,7 +9,7 @@ import { usePlayerVariable } from './Hooks/usePlayerVisible'
 import { terrainItems } from './Media/Terrains'
 import { IAbsPos } from './Utils'
 
-export type IItem = { texFile: string; title: string }
+export type IItem = { texFile: string; title: string; scale: '1:1' | '2:1' }
 
 export type InterfaceProps = {
     cb: (props: { setVisible: ({ visible, playerId }: { visible: boolean; playerId: number }) => void }) => void
@@ -47,35 +49,50 @@ export const Interface = ({ cb }: InterfaceProps) => {
         // setVisible({ playerId: 0, value: true })
     }, [])
 
-    // // TODO; Update this when someone does -news etc
-    // const usedTerrains: IItem[] = []
-    // for (const [_, terrain] of pairs(getUdgTerrainTypes().getAll())) {
-    //     arrayPush(
-    //         usedTerrains,
-    //         terrainItems.find(i => i.title === Ascii2String(terrain.terrainTypeId))
-    //     )
-    // }
-
-    const usedTerrains = terrainItems
-
-    const getItemPosition = ({ item }: { item: IItem }): { visible: boolean; absPos: IAbsPos } => {
-        const i = usedTerrains.findIndex(d => d === item)
-
-        const nbCols = 16
-        const margin = 0.0075
-
-        const row = Math.floor(i / nbCols)
-        const col = i % nbCols
-
-        return {
-            visible: true,
-            absPos: {
-                point: FRAMEPOINT_TOPLEFT,
-                x: mainPos.x + margin + col * 0.03 + col * margin,
-                y: mainPos.y - (margin * row + 0.03 * row),
-            },
-        }
+    // TODO; Update this when someone does -news etc
+    const usedTerrains: IItem[] = []
+    for (const [_, terrain] of pairs(getUdgTerrainTypes().getAll())) {
+        arrayPush(
+            usedTerrains,
+            terrainItems.find(i => i.title === Ascii2String(terrain.terrainTypeId))
+        )
     }
+
+    const useItemGroup = <T, _ = any>({ maxNbCols, items }: { maxNbCols: number; items: T[] }) => {
+        const margin = 0.0075
+        const containerMargin = margin * 4
+        const itemSize = 0.03
+
+        const nbRows = Math.ceil(items.length / maxNbCols)
+        const nbCols = Math.min(maxNbCols, items.length)
+
+        const container = {
+            x: mainPos.x - containerMargin,
+            y: mainPos.y + containerMargin,
+            width: margin + nbCols * itemSize + nbCols * margin + containerMargin * 2,
+            height: margin + nbRows * itemSize + nbRows * margin + containerMargin * 2,
+        }
+
+        const getItemPosition = ({ item }: { item: T }): { visible: boolean; absPos: IAbsPos } => {
+            const i = items.findIndex(d => d === item)
+
+            const row = Math.floor(i / nbCols)
+            const col = i % nbCols
+
+            return {
+                visible: true,
+                absPos: {
+                    point: FRAMEPOINT_TOPLEFT,
+                    x: mainPos.x + margin + col * itemSize + col * margin,
+                    y: mainPos.y - margin - row * itemSize - row * margin,
+                },
+            }
+        }
+
+        return { container, getItemPosition }
+    }
+
+    const terrainGroup = useItemGroup<IItem>({ maxNbCols: 16, items: usedTerrains })
 
     return (
         <container>
@@ -83,28 +100,23 @@ export const Interface = ({ cb }: InterfaceProps) => {
                 <container>
                     <backdrop
                         inherits="EscMenuBackdrop"
-                        absPosition={[
-                            {
-                                point: FRAMEPOINT_TOPLEFT,
-                                x: mainPos.x, // getPos({ playerId: GetPlayerId(GetLocalPlayer()) })?.x || 0.1,
-                                y: mainPos.y, //(getPos({ playerId: GetPlayerId(GetLocalPlayer()) })?.y || 0.3) + 0.25,
-                            },
-                        ]}
-                        size={{
-                            width: mainPos.x + 0.0075 + 16 * 0.03 + 16 * 0.0075,
-                            height: mainPos.y + 0.0075 + 8 * 0.03 + 8 * 0.0075,
+                        absPosition={{
+                            point: FRAMEPOINT_TOPLEFT,
+                            x: terrainGroup.container.x, // getPos({ playerId: GetPlayerId(GetLocalPlayer()) })?.x || 0.1,
+                            y: terrainGroup.container.y, //(getPos({ playerId: GetPlayerId(GetLocalPlayer()) })?.y || 0.3) + 0.25,
                         }}
+                        size={{ width: terrainGroup.container.width, height: terrainGroup.container.height }}
                     />
 
                     {usedTerrains.map(item => {
-                        const { visible, absPos } = getItemPosition({ item })
+                        const { visible, absPos } = terrainGroup.getItemPosition({ item })
 
                         return (
                             <Item
                                 v={item}
                                 absPosition={absPos}
                                 size={{ width: 0.03, height: 0.03 }}
-                                visible={visible}
+                                visible={(getVisible({ playerId: GetPlayerId(GetLocalPlayer()) }) || false) && visible}
                                 onClick={() => {
                                     const escaper = getUdgEscapers().get(GetPlayerId(GetTriggerPlayer()))
                                     const terrainType = getUdgTerrainTypes().getByCode(item.title)

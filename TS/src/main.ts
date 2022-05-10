@@ -33,7 +33,7 @@ const tsMain = () => {
             cb: ({ setVisible }) => {
                 ServiceManager.getService('Cmd').registerCommand({
                     name: 'palette',
-                    alias: [],
+                    alias: ['p'],
                     group: 'make',
                     argDescription: '',
                     description: '',

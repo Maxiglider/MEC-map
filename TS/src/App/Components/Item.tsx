@@ -14,30 +14,26 @@ export const Item = ({
     size: { width: number; height: number }
     visible: boolean
     onClick?: () => void
-}) => {
-    const ref = React.useRef<framehandle | null>(null)
+}) => (
+    <container visible={visible}>
+        <backdrop
+            name={`TerrainPreview_${v.scale}`}
+            isSimple={true}
+            absPosition={absPosition}
+            size={size}
+            visible={visible}
+            onLoad={() =>
+                BlzFrameSetTexture(BlzGetFrameByName(`TerrainPreviewValue_${v.scale}`, 0), v.texFile, 0, false)
+            }
+        />
 
-    const r = (
-        <container visible={visible} ref={ref}>
-            <backdrop
-                name={'TerrainPreview'}
-                isSimple={true}
-                texture={{ texFile: v.texFile }}
-                absPosition={absPosition}
-                size={size}
-            />
-
-            <text
-                text={v.title}
-                absPosition={absPosition}
-                onClick={onClick}
-                size={size}
-                parentFrame={BlzGetOriginFrame(ORIGIN_FRAME_GAME_UI, 0)}
-            />
-        </container>
-    )
-
-    BlzFrameSetTexture(BlzGetFrameByName('TerrainPreviewValue', 0), v.texFile, 0, false)
-
-    return r
-}
+        <text
+            text={v.title}
+            absPosition={absPosition}
+            onClick={onClick}
+            size={size}
+            parentFrame={BlzGetOriginFrame(ORIGIN_FRAME_GAME_UI, 0)}
+            visible={visible}
+        />
+    </container>
+)
