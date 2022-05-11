@@ -2,7 +2,6 @@ import { Ascii2String } from 'core/01_libraries/Ascii'
 import { arrayPush } from 'core/01_libraries/Basic_functions'
 import { Text } from 'core/01_libraries/Text'
 import { ServiceManager } from 'Services'
-import { createTimer } from 'Utils/mapUtils'
 import * as React from 'w3ts-jsx/dist/src/index'
 import { getUdgEscapers, getUdgTerrainTypes } from '../../globals'
 import { Button } from './Components/Button'
@@ -74,12 +73,13 @@ export const Interface = ({ cb }: InterfaceProps) => {
         }
     }
 
-    if (terrainState.oldState !== usedTerrains.join('_')) {
-        setTerrainState({ oldState: usedTerrains.join('_') })
-        createTimer(0, false, () => forceUpdate())
+    React.useEffect(() => {
+        if (terrainState.oldState !== usedTerrains.join('_')) {
+            setTerrainState({ oldState: usedTerrains.join('_') })
 
-        usedTerrains = []
-    }
+            usedTerrains = []
+        }
+    })
 
     const useItemGroup = <T, _ = any>({ maxNbCols, items }: { maxNbCols: number; items: T[] }) => {
         const margin = 0.0075
