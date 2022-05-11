@@ -1,6 +1,8 @@
 import { Ascii2String } from 'core/01_libraries/Ascii'
 import { arrayPush } from 'core/01_libraries/Basic_functions'
 import { Text } from 'core/01_libraries/Text'
+import { ServiceManager } from 'Services'
+import { createTimer } from 'Utils/mapUtils'
 import * as React from 'w3ts-jsx/dist/src/index'
 import { getUdgEscapers, getUdgTerrainTypes } from '../../globals'
 import { Button } from './Components/Button'
@@ -19,6 +21,13 @@ export const Interface = ({ cb }: InterfaceProps) => {
     const { get: getVisible, set: setVisible } = usePlayerVariable<boolean>()
 
     const { get: getPos, set: setPos } = usePlayerVariable<{ x: number; y: number }>()
+
+    const forceUpdate = React.useForceUpdate()
+
+    React.useEffect(() => {
+        ServiceManager.getService('React').setForceUpdate(forceUpdate)
+        return () => ServiceManager.getService('React').setForceUpdate(null)
+    }, [])
 
     const mainPos = {
         x: 0.0070428,
@@ -49,13 +58,27 @@ export const Interface = ({ cb }: InterfaceProps) => {
         // setVisible({ playerId: 0, value: true })
     }, [])
 
-    // TODO; Update this when someone does -news etc
-    const usedTerrains: IItem[] = []
-    for (const [_, terrain] of pairs(getUdgTerrainTypes().getAll())) {
-        arrayPush(
-            usedTerrains,
-            terrainItems.find(i => i.title === Ascii2String(terrain.terrainTypeId))
-        )
+    const [terrainState, setTerrainState] = React.useState<{ oldState: string }>({ oldState: '' })
+
+    let usedTerrains: IItem[] = []
+
+    const udgTerrainTypes = getUdgTerrainTypes().getAll()
+    for (let i = 0; i < getUdgTerrainTypes().getLastInstanceId(); i++) {
+        const terrain = udgTerrainTypes[i]
+
+        if (terrain) {
+            arrayPush(
+                usedTerrains,
+                terrainItems.find(i => i.title === Ascii2String(terrain.terrainTypeId))
+            )
+        }
+    }
+
+    if (terrainState.oldState !== usedTerrains.join('_')) {
+        setTerrainState({ oldState: usedTerrains.join('_') })
+        createTimer(0, false, () => forceUpdate())
+
+        usedTerrains = []
     }
 
     const useItemGroup = <T, _ = any>({ maxNbCols, items }: { maxNbCols: number; items: T[] }) => {

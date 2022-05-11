@@ -1,6 +1,8 @@
 import { Ascii2String } from 'core/01_libraries/Ascii'
 import { arrayPush, tileset2tilesetChar } from 'core/01_libraries/Basic_functions'
 import { Text } from 'core/01_libraries/Text'
+import { ServiceManager } from 'Services'
+import { ArrayHandler } from '../../../Utils/ArrayHandler'
 import { CmdParam, NbParam } from '../../06_COMMANDS/COMMANDS_vJass/Command_functions'
 import { TerrainTypeMax } from '../../07_TRIGGERS/Modify_terrain_Functions/Terrain_type_max'
 import { BaseArray } from '../BaseArray'
@@ -8,7 +10,6 @@ import { TerrainType } from './TerrainType'
 import { TerrainTypeDeath } from './TerrainTypeDeath'
 import { TerrainTypeSlide } from './TerrainTypeSlide'
 import { TerrainTypeWalk } from './TerrainTypeWalk'
-import {ArrayHandler} from "../../../Utils/ArrayHandler";
 
 //le nombre de terrains du jeu est de 177
 export class TerrainTypeArray extends BaseArray<TerrainType> {
@@ -71,6 +72,7 @@ export class TerrainTypeArray extends BaseArray<TerrainType> {
 
         const tt = new TerrainTypeWalk(label, terrainTypeId, walkspeed)
         this._new(tt)
+        ServiceManager.getService('React').forceUpdate()
         return tt
     }
 
@@ -87,6 +89,7 @@ export class TerrainTypeArray extends BaseArray<TerrainType> {
 
         const tt = new TerrainTypeDeath(label, terrainTypeId, killingEffectStr, timeToKill, toleranceDist)
         this._new(tt)
+        ServiceManager.getService('React').forceUpdate()
         return tt
     }
 
@@ -103,6 +106,7 @@ export class TerrainTypeArray extends BaseArray<TerrainType> {
 
         const tt = new TerrainTypeSlide(label, terrainTypeId, slideSpeed, canTurn, rotationSpeed)
         this._new(tt)
+        ServiceManager.getService('React').forceUpdate()
         return tt
     }
 
@@ -111,6 +115,7 @@ export class TerrainTypeArray extends BaseArray<TerrainType> {
             if (terrainType.label === label || terrainType.theAlias === label) {
                 this.data[terrainTypeId].destroy()
                 delete this.data[terrainTypeId]
+                ServiceManager.getService('React').forceUpdate()
             }
         }
 
