@@ -84,29 +84,55 @@ const initSlideTrigger = () => {
         }
 
         const hero = escaper.getHero()
-        const lastZ = escaper.getLastZ()
-        const speedZ = escaper.getSpeedZ()
-        const oldDiffZ = escaper.getOldDiffZ()
 
         if (!hero) return
 
-        let allowTurning = escaper.getRotationSpeed() != 0
+
+        //offset of the hero position
+        const oldX = GetUnitX(hero)
+        const oldY = GetUnitY(hero)
+
+        const lastZ = escaper.getLastZ()
+        const speedZ = escaper.getSpeedZ()
+        const oldDiffZ = escaper.getOldDiffZ()
+        let height = GetUnitFlyHeight(hero)
+        MoveLocation(tmpLoc, oldX, oldY)
+        const z = GetLocationZ(tmpLoc)
+
+
+        //turning
+        const allowTurning = escaper.getRotationSpeed() != 0 && (height < 1 || globals.CAN_TURN_IN_AIR)
+
+        if(allowTurning && escaper.slidingMode == "max"){
+            escaperTurnForOnePeriod(escaper)
+            escaperTurnForOnePeriod(GetMirrorEscaper(escaper))
+        }
+
+        const angle = Deg2Rad(GetUnitFacing(hero))
+        const newX = oldX + escaper.getSlideMovePerPeriod() * Cos(angle)
+        const newY = oldY + escaper.getSlideMovePerPeriod() * Sin(angle)
+
+        if (
+            newX >= globals.MAP_MIN_X &&
+            newX <= globals.MAP_MAX_X &&
+            newY >= globals.MAP_MIN_Y &&
+            newY <= globals.MAP_MAX_Y
+        ) {
+            escaper.moveHero(newX, newY)
+        }
+
 
         //gestion de la hauteur du héros
         counters[n]++
         if(counters[n] == GRAVITY_EVERY_N_PERIOD) {
             counters[n] = 0
 
-            MoveLocation(tmpLoc, GetUnitX(hero), GetUnitY(hero))
-            const z = GetLocationZ(tmpLoc)
-
             const diffZ = z - lastZ //différence de hauteur au niveau du terrain
-            let height = GetUnitFlyHeight(hero)
             let delta: number
 
             if (height > 1) {
                 escaper.setSpeedZ(speedZ + Gravity.GetGravity())
-                height = height + speedZ - diffZ
+                height += speedZ - diffZ
                 if (height < 0) {
                     height = 0
                 }
@@ -114,13 +140,11 @@ const initSlideTrigger = () => {
 
                 //coop
                 escaper.refreshCerclePosition()
-
-                allowTurning = allowTurning && globals.CAN_TURN_IN_AIR
             } else {
                 delta = diffZ - oldDiffZ
                 if (delta < Gravity.GetGravity()) {
                     escaper.setSpeedZ(oldDiffZ + Gravity.GetGravity())
-                    SetUnitFlyHeight(hero, -diffZ + speedZ, 0)
+                    SetUnitFlyHeight(hero, -diffZ + escaper.getSpeedZ(), 0)
 
                     //arrêter de tourner si un clic a été fait juste avant
                     if (!globals.CAN_TURN_IN_AIR) {
@@ -133,27 +157,6 @@ const initSlideTrigger = () => {
             }
             escaper.setLastZ(z)
             escaper.setOldDiffZ(diffZ)
-        }
-
-        //turning
-        if(allowTurning && escaper.slidingMode == "max"){
-            escaperTurnForOnePeriod(escaper)
-            escaperTurnForOnePeriod(GetMirrorEscaper(escaper))
-        }
-
-        //offset of the hero position
-        const angle = Deg2Rad(GetUnitFacing(hero))
-
-        const newX = GetUnitX(hero) + escaper.getSlideMovePerPeriod() * Cos(angle)
-        const newY = GetUnitY(hero) + escaper.getSlideMovePerPeriod() * Sin(angle)
-
-        if (
-            newX >= globals.MAP_MIN_X &&
-            newX <= globals.MAP_MAX_X &&
-            newY >= globals.MAP_MIN_Y &&
-            newY <= globals.MAP_MAX_Y
-        ) {
-            escaper.moveHero(newX, newY)
         }
 
         //update apm
