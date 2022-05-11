@@ -144,6 +144,15 @@ local type_func_map = {
 
 encode = function(val, stack)
   local t = type(val)
+  
+  if t == "userdata" then 
+    return "@userdata"
+  end
+
+  if t == "function" then 
+    return "@function"
+  end
+
   local f = type_func_map[t]
   if f then
     return f(val, stack)

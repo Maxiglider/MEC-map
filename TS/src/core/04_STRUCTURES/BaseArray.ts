@@ -1,5 +1,5 @@
-import {arrayPush, sortArrayOfObjectsByIds} from '../01_libraries/Basic_functions'
-import {ArrayHandler} from "../../Utils/ArrayHandler";
+import { ArrayHandler } from '../../Utils/ArrayHandler'
+import { arrayPush, sortArrayOfObjectsByIds } from '../01_libraries/Basic_functions'
 
 type BaseModel = { getId?: () => number; destroy: () => void; toJson: () => {} }
 
@@ -54,7 +54,7 @@ export abstract class BaseArray<T extends BaseModel> {
 
         for (const [_, element] of pairs(this.data)) {
             const json = element.toJson()
-            if(json){
+            if (json) {
                 arrayPush(outputArray, json)
             }
         }
@@ -63,11 +63,11 @@ export abstract class BaseArray<T extends BaseModel> {
     }
 
     destroyOne = (id: number) => {
-        if(this.data[id]){
+        if (this.data[id]) {
             this.data[id].destroy()
             delete this.data[id]
             return true
-        }else{
+        } else {
             return false
         }
     }
@@ -78,4 +78,7 @@ export abstract class BaseArray<T extends BaseModel> {
             delete this.data[id]
         }
     }
+
+    // First index is 0
+    getLastInstanceId = () => this.lastInstanceId + 1
 }
