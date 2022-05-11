@@ -15,6 +15,31 @@ const tsMain = () => {
         Lives: initLives,
         Multiboard: initMultiboard,
         Cmd: initCommandExecution,
+        React: () => {
+            return renderInterface({
+                cb: ({ setVisible }) => {
+                    ServiceManager.getService('Cmd').registerCommand({
+                        name: 'palette',
+                        alias: ['p'],
+                        group: 'make',
+                        argDescription: '',
+                        description: '',
+                        cb: ({ nbParam, param1 }) => {
+                            if (nbParam !== 1) {
+                                throw 'Wrong command parameters'
+                            }
+
+                            if (!IsBoolString(param1)) {
+                                return true
+                            }
+
+                            setVisible({ visible: S2B(param1), playerId: GetPlayerId(GetTriggerPlayer()) })
+                            return true
+                        },
+                    })
+                },
+            })
+        },
     })
 
     ServiceManager.getService('Cmd').initCommands()
@@ -28,29 +53,7 @@ const tsMain = () => {
     //escapers
     // initEscapers()
 
-    renderInterface({
-        cb: ({ setVisible }) => {
-            ServiceManager.getService('Cmd').registerCommand({
-                name: 'palette',
-                alias: ['p'],
-                group: 'make',
-                argDescription: '',
-                description: '',
-                cb: ({ nbParam, param1 }) => {
-                    if (nbParam !== 1) {
-                        throw 'Wrong command parameters'
-                    }
-
-                    if (!IsBoolString(param1)) {
-                        return true
-                    }
-
-                    setVisible({ visible: S2B(param1), playerId: GetPlayerId(GetTriggerPlayer()) })
-                    return true
-                },
-            })
-        },
-    })
+    ServiceManager.getService('React').init()
 
     if (!PROD) {
         const gcState = { lastRun: os.clock(), waitingForGc: false }
