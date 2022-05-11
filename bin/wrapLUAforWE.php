@@ -216,10 +216,11 @@ $template = ob_get_clean();
 
 $luaFileContent = str_replace('%', '%%', file_get_contents(LUA_FILE));
 $content = str_replace('[LUA_FILE]', $luaFileContent, $template);
-$content = str_replace('return require("src.main", ...)', 'return ____modules["src.main"]', $content);
-$content = str_replace("addScriptHook(
-    W3TS_HOOK.MAIN_AFTER,
-    errorHandler(tsMain)
-)", "errorHandler(tsMain)()", $content);
+$oldContent = $content = str_replace('return require("src.main", ...)', 'return ____modules["src.main"]', $content);
+$content = preg_replace("/addScriptHook\(\s*W3TS_HOOK.MAIN_AFTER,\s*errorHandler\(tsMain\)\s*\)/", "errorHandler(tsMain)()", $content);
+
+if($content === $oldContent){
+    echo "addScriptHook replacement failed !";
+}
 
 file_put_contents(WRAP_OUTPUT_FILE, $content);
