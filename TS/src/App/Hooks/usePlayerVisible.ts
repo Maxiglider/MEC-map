@@ -4,7 +4,7 @@ export const usePlayerVariable = <T>() => {
     const [state, setState] = React.useState<{ [playerId: number]: T | undefined }>({})
 
     return {
-        get: ({ playerId }: { playerId: number }) => state[playerId],
-        set: ({ playerId, value }: { playerId: number; value: T }) => setState(s => ({ ...s, [playerId]: value })),
+        get: (playerId: number) => state[playerId],
+        set: (playerId: number, value: T) => setState(s => ({ ...s, [playerId]: value })),
     }
 }

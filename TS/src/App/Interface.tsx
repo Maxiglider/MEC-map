@@ -4,7 +4,6 @@ import { Text } from 'core/01_libraries/Text'
 import { ServiceManager } from 'Services'
 import * as React from 'w3ts-jsx/dist/src/index'
 import { getUdgEscapers, getUdgTerrainTypes } from '../../globals'
-import { Button } from './Components/Button'
 import { Item } from './Components/Item'
 import { usePlayerVariable } from './Hooks/usePlayerVisible'
 import { terrainItems } from './Media/Terrains'
@@ -13,7 +12,14 @@ import { IAbsPos } from './Utils'
 export type IItem = { texFile: string; title: string; scale: '1:1' | '2:1' }
 
 export type InterfaceProps = {
-    cb: (props: { setVisible: ({ visible, playerId }: { visible: boolean; playerId: number }) => void }) => void
+    cb: (props: {
+        setVisible: ({ visible, playerId }: { visible: boolean; playerId: number }) => void
+        resetUI: (playerId: number) => void
+    }) => void
+}
+
+const convertToReal = (s: string) => {
+    return Math.round(S2R(s) * 1000) / 1000
 }
 
 export const Interface = ({ cb }: InterfaceProps) => {
@@ -21,17 +27,15 @@ export const Interface = ({ cb }: InterfaceProps) => {
 
     const { get: getPos, set: setPos } = usePlayerVariable<{ x: number; y: number }>()
 
+    const defaultPos = { x: 0.007, y: 0.471 }
+    const mainPos = getPos(GetPlayerId(GetLocalPlayer())) || defaultPos
+
     const forceUpdate = React.useForceUpdate()
 
     React.useEffect(() => {
         ServiceManager.getService('React').setForceUpdate(forceUpdate)
         return () => ServiceManager.getService('React').setForceUpdate(null)
     }, [])
-
-    const mainPos = {
-        x: 0.0070428,
-        y: 0.47109,
-    }
 
     // useDrag({
     //     onDrag: (playerId, x, y) => {
@@ -49,12 +53,15 @@ export const Interface = ({ cb }: InterfaceProps) => {
     React.useEffect(() => {
         cb({
             setVisible: ({ playerId, visible }) => {
-                setVisible({ playerId, value: visible })
+                setVisible(playerId, visible)
+            },
+            resetUI: playerId => {
+                setPos(playerId, defaultPos)
             },
         })
 
         // Always on
-        // setVisible({ playerId: 0, value: true })
+        // setVisible(0, true)
     }, [])
 
     const [terrainState, setTerrainState] = React.useState<{ oldState: string }>({ oldState: '' })
@@ -119,14 +126,14 @@ export const Interface = ({ cb }: InterfaceProps) => {
 
     return (
         <container>
-            <container visible={getVisible({ playerId: GetPlayerId(GetLocalPlayer()) }) || false}>
+            <container visible={getVisible(GetPlayerId(GetLocalPlayer())) || false}>
                 <container>
                     <backdrop
                         inherits="EscMenuBackdrop"
                         absPosition={{
                             point: FRAMEPOINT_TOPLEFT,
-                            x: terrainGroup.container.x, // getPos({ playerId: GetPlayerId(GetLocalPlayer()) })?.x || 0.1,
-                            y: terrainGroup.container.y, //(getPos({ playerId: GetPlayerId(GetLocalPlayer()) })?.y || 0.3) + 0.25,
+                            x: terrainGroup.container.x,
+                            y: terrainGroup.container.y,
                         }}
                         size={{ width: terrainGroup.container.width, height: terrainGroup.container.height }}
                     />
@@ -139,7 +146,7 @@ export const Interface = ({ cb }: InterfaceProps) => {
                                 v={item}
                                 absPosition={absPos}
                                 size={{ width: 0.03, height: 0.03 }}
-                                visible={(getVisible({ playerId: GetPlayerId(GetLocalPlayer()) }) || false) && visible}
+                                visible={(getVisible(GetPlayerId(GetLocalPlayer())) || false) && visible}
                                 onClick={() => {
                                     const escaper = getUdgEscapers().get(GetPlayerId(GetTriggerPlayer()))
                                     const terrainType = getUdgTerrainTypes().getByCode(item.title)
@@ -154,16 +161,83 @@ export const Interface = ({ cb }: InterfaceProps) => {
                     })}
                 </container>
 
-                <container>
-                    <Button
-                        text={''}
-                        absPosition={[
-                            { point: FRAMEPOINT_TOPLEFT, x: 0.7728, y: 0.54222 },
-                            { point: FRAMEPOINT_BOTTOMRIGHT, x: 0.79236, y: 0.522 },
-                        ]}
-                        onClick={() => setVisible({ playerId: GetPlayerId(GetTriggerPlayer()), value: false })}
+                {/* {(() => {
+                    const x = terrainGroup.container.x + terrainGroup.container.width
+                    const y = terrainGroup.container.y
+
+                    return (
+                        <container>
+                            <backdrop
+                                inherits="EscMenuBackdrop"
+                                absPosition={{ point: FRAMEPOINT_TOPLEFT, x: terrainGroup.container.x, y }}
+                                size={{ width: 0.1, height: 0.1 }}
+                            />
+
+                            <glueeditbox
+                                inherits={'EscMenuEditBoxTemplate'}
+                                absPosition={{ point: FRAMEPOINT_TOPLEFT, x, y }}
+                                size={{ width: 0.1, height: 0.01 }}
+                                text={`${mainPos.x}`}
+                                onEditboxTextChanged={() => {
+                                    setPos(GetPlayerId(GetLocalPlayer()), {
+                                        x: convertToReal(BlzGetTriggerFrameText()),
+                                        y: mainPos.y,
+                                    })
+                                }}
+                            />
+
+                            <glueeditbox
+                                inherits={'EscMenuEditBoxTemplate'}
+                                absPosition={{ point: FRAMEPOINT_TOPLEFT, x, y: y - 0.02 }}
+                                size={{ width: 0.1, height: 0.01 }}
+                                text={`${mainPos.y}`}
+                                onEditboxTextChanged={() => {
+                                    setPos(GetPlayerId(GetLocalPlayer()), {
+                                        x: mainPos.x,
+                                        y: convertToReal(BlzGetTriggerFrameText()),
+                                    })
+                                }}
+                            />
+                        </container>
+                    )
+                })()} */}
+
+                {/* <container>
+                    <text
+                        text={'|cffFCD20Dx|r'}
+                        absPosition={{
+                            point: FRAMEPOINT_TOPLEFT,
+                            x: terrainGroup.container.x + terrainGroup.container.width - 0.02,
+                            y: terrainGroup.container.y - 0.02,
+                        }}
+                        onClick={() => setVisible(GetPlayerId(GetTriggerPlayer()), false)}
                     />
-                </container>
+
+                    <gluetextbutton
+                        inherits="ScriptDialogButton"
+                        text={'|cffFCD20Dx|r'}
+                        scale={0.8}
+                        absPosition={{
+                            point: FRAMEPOINT_TOPLEFT,
+                            x: terrainGroup.container.x + terrainGroup.container.width - 0.04,
+                            y: terrainGroup.container.y - 0.008,
+                        }}
+                        size={{ width: 0.025, height: 0.025 }}
+                        onClick={() => setVisible(GetPlayerId(GetTriggerPlayer()), false)}
+                    />
+
+                    <gluetextbutton
+                        inherits="ScriptDialogButton"
+                        text={'|cffFCD20Dx|r'}
+                        scale={0.286}
+                        absPosition={{
+                            point: FRAMEPOINT_TOPLEFT,
+                            x: terrainGroup.container.x + terrainGroup.container.width,
+                            y: terrainGroup.container.y,
+                        }}
+                        onClick={() => setVisible(GetPlayerId(GetTriggerPlayer()), false)}
+                    />
+                </container> */}
             </container>
         </container>
     )

@@ -17,7 +17,7 @@ const tsMain = () => {
         Cmd: initCommandExecution,
         React: () => {
             return renderInterface({
-                cb: ({ setVisible }) => {
+                cb: ({ setVisible, resetUI }) => {
                     ServiceManager.getService('Cmd').registerCommand({
                         name: 'palette',
                         alias: ['p'],
@@ -27,6 +27,11 @@ const tsMain = () => {
                         cb: ({ nbParam, param1 }) => {
                             if (nbParam !== 1) {
                                 throw 'Wrong command parameters'
+                            }
+
+                            if (param1 === 'reset') {
+                                resetUI(GetPlayerId(GetTriggerPlayer()))
+                                return true
                             }
 
                             if (!IsBoolString(param1)) {
