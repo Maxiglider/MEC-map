@@ -1,4 +1,4 @@
-import {StopUnit} from 'core/01_libraries/Basic_functions'
+import { StopUnit } from 'core/01_libraries/Basic_functions'
 import {
     DEFAULT_CAMERA_FIELD,
     DUMMY_POWER_CIRCLE,
@@ -57,14 +57,20 @@ import { MakeTerrainCreateBrush } from '../../05_MAKE_STRUCTURES/Make_terrain/Ma
 import { MakeTerrainHorizontalSymmetry } from '../../05_MAKE_STRUCTURES/Make_terrain/MakeTerrainHorizontalSymmetry'
 import { MakeTerrainVerticalSymmetry } from '../../05_MAKE_STRUCTURES/Make_terrain/MakeTerrainVerticalSymmetry'
 import { MakeTerrainHeight } from '../../05_MAKE_STRUCTURES/Make_terrain_height/MakeTerrainHeight'
-import {BlzColor2Id, removeHash} from '../../06_COMMANDS/COMMANDS_vJass/Command_functions'
+import { BlzColor2Id, removeHash } from '../../06_COMMANDS/COMMANDS_vJass/Command_functions'
 import { CheckTerrainTrigger } from '../../07_TRIGGERS/Slide_and_CheckTerrain_triggers/CheckTerrain'
 import { SlideTrigger } from '../../07_TRIGGERS/Slide_and_CheckTerrain_triggers/Slide'
+import {
+    HERO_ROTATION_SPEED,
+    HERO_ROTATION_TIME_FOR_MAXIMUM_SPEED,
+} from '../../07_TRIGGERS/Slide_and_CheckTerrain_triggers/SlidingMax'
 import { Trig_InvisUnit_is_getting_damage } from '../../08_GAME/Death/InvisUnit_is_getting_damage'
 import { HERO_START_ANGLE } from '../../08_GAME/Init_game/Heroes'
 import { MessageHeroDies } from '../../08_GAME/Init_game/Message_heroDies'
 import { RunCoopSoundOnHero } from '../../08_GAME/Mode_coop/coop_init_sounds'
+import { DisableInterface, EnableInterface } from '../../DisablingInterface/EnableDisableInterface'
 import { FollowMouse } from '../../Follow_mouse/Follow_mouse'
+import { KeyboardShortcutArray } from '../../Keyboard_shortcuts/KeyboardShortcutArray'
 import type { CasterType } from '../Caster/CasterType'
 import { Level } from '../Level/Level'
 import { IsLevelBeingMade } from '../Level/Level_functions'
@@ -78,12 +84,6 @@ import { EscaperEffectArray } from './EscaperEffectArray'
 import { EscaperFirstPerson } from './Escaper_firstPerson'
 import { ColorInfo, GetMirrorEscaper } from './Escaper_functions'
 import { EscaperStartCommands } from './Escaper_StartCommands'
-import {
-    HERO_ROTATION_SPEED,
-    HERO_ROTATION_TIME_FOR_MAXIMUM_SPEED
-} from "../../07_TRIGGERS/Slide_and_CheckTerrain_triggers/SlidingMax";
-import {DisableInterface, EnableInterface} from "../../DisablingInterface/EnableDisableInterface";
-import {KeyboardShortcutArray} from "../../Keyboard_shortcuts/KeyboardShortcutArray";
 
 const SHOW_REVIVE_EFFECTS = false
 
@@ -96,7 +96,6 @@ let METEOR_EFFECT = 'Abilities\\Weapons\\DemonHunterMissile\\DemonHunterMissile.
 export const SetMeteorEffect = (newEffect: string) => {
     METEOR_EFFECT = newEffect
 }
-
 
 export class Escaper {
     private escaperId: number
@@ -118,7 +117,7 @@ export class Escaper {
     private lastTerrainType?: TerrainType
     private controler: Escaper
 
-    public slidingMode: 'normal'|'max' = 'max'
+    public slidingMode: 'normal' | 'max' = 'max'
     public rotationTimeForMaximumSpeed = HERO_ROTATION_TIME_FOR_MAXIMUM_SPEED
     private tClickWhereYouAre: Timer | null = null
 
@@ -177,6 +176,7 @@ export class Escaper {
     private startCommandsHandle: EscaperStartCommands = new EscaperStartCommands(this)
 
     private lockCamTarget: Escaper | null = null
+    private lockCamRotation: Timer | null = null
 
     public hideLeaderboard = false
 
@@ -214,7 +214,7 @@ export class Escaper {
     }
 
     //user interface
-    private uiMode = "on"
+    private uiMode = 'on'
 
     //keyboard shortcuts
     private keyboardShortcutsArray = new KeyboardShortcutArray(this)
@@ -738,7 +738,7 @@ export class Escaper {
     createTerrainKillEffect(killEffectStr: string) {
         this.destroyTerrainKillEffect()
         this.hero &&
-        (this.terrainKillEffect = AddSpecialEffectTarget(killEffectStr, this.hero, TERRAIN_KILL_EFFECT_BODY_PART))
+            (this.terrainKillEffect = AddSpecialEffectTarget(killEffectStr, this.hero, TERRAIN_KILL_EFFECT_BODY_PART))
     }
 
     destroyPortalEffect = () => {
@@ -776,7 +776,7 @@ export class Escaper {
     }
 
     setRemainingDegreesToTurn(remainingDegreesToTurn: number) {
-        if(RAbsBJ(remainingDegreesToTurn) < 0.01) remainingDegreesToTurn = 0
+        if (RAbsBJ(remainingDegreesToTurn) < 0.01) remainingDegreesToTurn = 0
         this.remainingDegreesToTurn = remainingDegreesToTurn
     }
 
@@ -1135,11 +1135,11 @@ export class Escaper {
         CustomDefeatBJ(kicked.getPlayer(), 'You have been kicked by ' + this.displayName + ' !')
         Text.A(
             udg_colorCode[kicked.getColorId()] +
-            kicked.displayName +
-            ' has been kicked by ' +
-            udg_colorCode[this.getColorId()] +
-            this.displayName +
-            ' !'
+                kicked.displayName +
+                ' has been kicked by ' +
+                udg_colorCode[this.getColorId()] +
+                this.displayName +
+                ' !'
         )
         kicked.destroy()
         GetMirrorEscaper(kicked)?.destroy()
@@ -1697,6 +1697,17 @@ export class Escaper {
         this.lockCamTarget = lockCamTarget
     }
 
+    toggleLockCamRotation = (lockCamRotation: boolean) => {
+        this.lockCamRotation?.destroy()
+
+        if (lockCamRotation) {
+            this.lockCamRotation = createTimer(0.01, true, () => {
+                this.hero &&
+                    SetCameraFieldForPlayer(this.getPlayer(), CAMERA_FIELD_ROTATION, GetUnitFacing(this.hero), 0)
+            })
+        }
+    }
+
     setGumTerrain = (terrainType: TerrainType) => {
         this.gumTerrain = terrainType
     }
@@ -1780,7 +1791,9 @@ export class Escaper {
                 this.vcRed,
                 this.vcGreen,
                 this.vcBlue,
-                GetLocalPlayer() === this.getPlayer() || Escaper.othersTransparency === null || this.isEscaperSecondary()
+                GetLocalPlayer() === this.getPlayer() ||
+                    Escaper.othersTransparency === null ||
+                    this.isEscaperSecondary()
                     ? this.vcTransparency
                     : Escaper.othersTransparency
             )
@@ -1788,11 +1801,11 @@ export class Escaper {
     }
 
     enableClickWhereYouAre = (b: boolean) => {
-        if(this.tClickWhereYouAre){
+        if (this.tClickWhereYouAre) {
             this.tClickWhereYouAre.destroy()
         }
 
-        if(b && this.hero){
+        if (b && this.hero) {
             const x = GetUnitX(this.hero)
             const y = GetUnitY(this.hero)
             this.tClickWhereYouAre = createTimer(0.1, true, () => {
@@ -1803,22 +1816,22 @@ export class Escaper {
 
     enableInterface = (b: boolean, showMinimap: boolean) => {
         let mode: string
-        if(b){
+        if (b) {
             mode = 'on'
-        }else if(showMinimap){
+        } else if (showMinimap) {
             mode = 'map'
-        }else{
+        } else {
             mode = 'off'
         }
 
-        if(this.uiMode == mode){
+        if (this.uiMode == mode) {
             return false
         }
 
-        if(GetLocalPlayer() == this.p) {
+        if (GetLocalPlayer() == this.p) {
             if (!b) {
                 DisableInterface(showMinimap)
-            }else{
+            } else {
                 EnableInterface()
             }
         }
