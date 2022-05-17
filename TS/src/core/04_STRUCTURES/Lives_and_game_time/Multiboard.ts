@@ -6,7 +6,7 @@ import { ArrayHandler } from 'Utils/ArrayHandler'
 import { literalArray } from 'Utils/ArrayUtils'
 import { createTimer, forRange } from 'Utils/mapUtils'
 import { getUdgEscapers, globals } from '../../../../globals'
-import {playerId2colorId, rawPlayerNames} from '../../06_COMMANDS/COMMANDS_vJass/Command_functions'
+import { playerId2colorId, rawPlayerNames } from '../../06_COMMANDS/COMMANDS_vJass/Command_functions'
 import { Escaper } from '../Escaper/Escaper'
 import { LIVES_PLAYER } from './Lives_and_game_time'
 import { GameTime } from './Time_of_game_trigger'
@@ -45,19 +45,18 @@ export const initMultiboard = () => {
                     deaths: number
                 }
             }
-            mode: IBoardMode
+            mode: IBoardMode | 'default'
             statsMode: IStatsMode
         }
     } = {}
 
     let amountOfEscapers = 0
     let gameTimeStr = ''
-    let allowReinitCheck = false
 
     forRange(NB_ESCAPERS, i => {
         playerScores[i] = {
             stats: { global: { score: 0, saves: 0, deaths: 0 }, current: { score: 0, saves: 0, deaths: 0 } },
-            mode: 'multiboard',
+            mode: 'default',
             statsMode: 'global',
         }
     })
@@ -72,6 +71,7 @@ export const initMultiboard = () => {
         })
 
         reinitBoards()
+        amountOfEscapers = getUdgEscapers().countMain()
     }
 
     const initMultiboard = () => {
@@ -233,14 +233,26 @@ export const initMultiboard = () => {
     }
 
     const setVisibility = (escaper: Escaper, visible: boolean) => {
-        if (!mb || !lb) return
-
         const playerMode = playerScores[GetPlayerId(escaper.getPlayer())]
 
         if (GetLocalPlayer() === escaper.getPlayer()) {
-            MultiboardSetTitleText(mb, `Scoreboard - ${ucfirst(playerMode.statsMode)}`)
-            MultiboardMinimizeBJ(escaper.hideLeaderboard || playerMode.mode !== 'multiboard' || !visible, mb)
-            LeaderboardDisplay(lb, !escaper.hideLeaderboard && playerMode.mode === 'leaderboard' && visible)
+            mb && MultiboardSetTitleText(mb, `Scoreboard - ${ucfirst(playerMode.statsMode)}`)
+            mb &&
+                MultiboardMinimizeBJ(
+                    escaper.hideLeaderboard ||
+                        (playerMode.mode !== 'default' && playerMode.mode !== 'multiboard') ||
+                        !visible,
+                    mb
+                )
+
+            lb &&
+                LeaderboardDisplay(
+                    lb,
+                    !escaper.hideLeaderboard &&
+                        ((playerMode.mode === 'default' && !globals.coopModeActive) ||
+                            playerMode.mode === 'leaderboard') &&
+                        visible
+                )
         }
     }
 
@@ -271,7 +283,7 @@ export const initMultiboard = () => {
     createTimer(1, true, () => {
         gameTimeStr = GameTime.getGameTime()
 
-        updateGametime(allowReinitCheck)
+        updateGametime(true)
     })
 
     return { setVisibility, setMode, setStatsMode, increasePlayerScore, updateLives, resetRoundScores }
