@@ -62,8 +62,6 @@ export const initMultiboard = () => {
     })
 
     const resetRoundScores = () => {
-        allowReinitCheck = true
-
         forRange(NB_ESCAPERS, i => {
             playerScores[i].stats.current.score = 0
             playerScores[i].stats.current.saves = 0
