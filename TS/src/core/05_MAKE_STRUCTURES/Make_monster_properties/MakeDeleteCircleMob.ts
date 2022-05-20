@@ -15,7 +15,7 @@ export class MakeDeleteCircleMob extends Make {
     doActions = () => {
         if (super.doBaseActions()) {
             const monster = this.escaper.getMakingLevel().monsters.getMonsterNear(this.orderX, this.orderY)
-            const circleMob = monster?.getCircleMob()
+            const circleMob = monster?.getCircleMobs()
 
             if (circleMob) {
                 this.clickMade(circleMob)

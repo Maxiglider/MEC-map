@@ -11,31 +11,39 @@ export class MakeCircleMob extends Make {
 
     private speed: number | null
     private direction: 'cw' | 'ccw' | null
+    private facing: 'cw' | 'ccw' | 'in' | 'out' | null
     private radius: number | null
 
     private indexLastBlockNotCancelledMob = 0
 
     private firstClickRadius = false
 
-    constructor(maker: unit, speed: number | null, direction: 'cw' | 'ccw' | null, radius: number | null) {
+    constructor(
+        maker: unit,
+        speed: number | null,
+        direction: 'cw' | 'ccw' | null,
+        facing: 'cw' | 'ccw' | 'in' | 'out' | null,
+        radius: number | null
+    ) {
         super(maker, 'createCircleMob')
 
         this.speed = speed
         this.direction = direction
+        this.facing = facing
         this.radius = radius
 
         this.firstClickRadius = !radius
     }
 
     private createCircleMob = () => {
-        if(!this.radius) {
+        if (!this.radius) {
             this.radius = 400
         }
 
         if (this.triggerMob) {
             this.circleMob = this.escaper
                 .getMakingLevel()
-                .circleMobs.new(this.triggerMob, this.speed, this.direction, this.radius)
+                .circleMobs.new(this.triggerMob, this.speed, this.direction, this.facing, this.radius)
         }
     }
 
@@ -82,10 +90,10 @@ export class MakeCircleMob extends Make {
             this.createCircleMob()
 
             let msg = 'Center mob selected. '
-            if(this.firstClickRadius) {
-                msg += "Now click to at a chosen distance from the center mob to define the radius"
-            }else{
-                msg += "Now click on monsters to form the circle"
+            if (this.firstClickRadius) {
+                msg += 'Now click to at a chosen distance from the center mob to define the radius'
+            } else {
+                msg += 'Now click on monsters to form the circle'
             }
 
             Text.mkP(this.makerOwner, msg)

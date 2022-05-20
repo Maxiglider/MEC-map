@@ -13,12 +13,18 @@ export class CircleMobArray extends BaseArray<CircleMob> {
         this.level = level
     }
 
-    new = (triggerMob: Monster, rotationSpeed: number | null, direction: 'cw' | 'ccw' | null, radius: number): CircleMob => {
+    new = (
+        triggerMob: Monster,
+        rotationSpeed: number | null,
+        direction: 'cw' | 'ccw' | null,
+        facing: 'cw' | 'ccw' | 'in' | 'out' | null,
+        radius: number
+    ): CircleMob => {
         if (triggerMob.getCircleMob()) {
             throw 'Monster is already a circle'
         }
 
-        const circleMob = new CircleMob(triggerMob, rotationSpeed, direction, radius)
+        const circleMob = new CircleMob(triggerMob, rotationSpeed, direction, facing, radius)
 
         circleMob.level = this.level
 
@@ -35,7 +41,7 @@ export class CircleMobArray extends BaseArray<CircleMob> {
             if (!mainMob) {
                 Text.erA(`Monster id "${cm.mainMobId}" unknown`)
             } else {
-                const circleMob = this.new(mainMob, cm.rotationSpeed, cm.direction, cm.radius)
+                const circleMob = this.new(mainMob, cm.rotationSpeed, cm.direction, cm.facing, cm.radius)
 
                 for (const [_, blockMobId] of pairs(cm.blockMobsIds)) {
                     const mob = this.level.monsters.get(blockMobId)

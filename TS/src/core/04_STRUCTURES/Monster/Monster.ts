@@ -1,4 +1,5 @@
 import { udg_monsters } from '../../../../globals'
+import { ObjectHandler } from '../../../Utils/ObjectHandler'
 import { MOBS_VARIOUS_COLORS, NB_PLAYERS_MAX } from '../../01_libraries/Constants'
 import { ColorString2Id } from '../../01_libraries/Init_colorCodes'
 import { IsColorString } from '../../06_COMMANDS/COMMANDS_vJass/Command_functions'
@@ -10,7 +11,6 @@ import { ClearMob } from '../Monster_properties/ClearMob'
 import { PortalMob } from '../Monster_properties/PortalMob'
 import { MonsterType } from './MonsterType'
 import { monstersClickable } from './trig_Monsters_clickable_set_life'
-import {ObjectHandler} from "../../../Utils/ObjectHandler";
 
 export abstract class Monster {
     public static forceUnitTypeIdForNextMonster = 0
@@ -48,6 +48,7 @@ export abstract class Monster {
     protected clearMob?: ClearMob
     protected portalMob?: PortalMob
     protected circleMob?: CircleMob
+    protected circleMobParent?: CircleMob
 
     constructor(monsterType?: MonsterType, forceId: number | null = null) {
         this.mt = monsterType
@@ -114,6 +115,22 @@ export abstract class Monster {
         delete this.circleMob
     }
 
+    setCircleMobParent(circleMobParent: CircleMob) {
+        this.circleMobParent = circleMobParent
+    }
+
+    getCircleMobParent = () => {
+        return this.circleMobParent
+    }
+
+    removeCircleMobParent() {
+        delete this.circleMobParent
+    }
+
+    getCircleMobs() {
+        return this.circleMob || this.circleMobParent
+    }
+
     removeUnit() {
         if (this.u) {
             GroupRemoveUnit(monstersClickable, this.u)
@@ -130,7 +147,7 @@ export abstract class Monster {
     }
 
     createUnit(createUnitFunc?: () => unit | undefined) {
-        if(this.isDeleted()) return
+        if (this.isDeleted()) return
 
         if (createUnitFunc) {
             this.createUnitFunc = createUnitFunc
@@ -230,7 +247,7 @@ export abstract class Monster {
     }
 
     delete = () => {
-        if (this.u){
+        if (this.u) {
             this.removeUnit()
         }
 
@@ -361,15 +378,23 @@ export abstract class Monster {
             this.portalMob.destroy()
         }
 
+        if (this.circleMob) {
+            this.circleMob.destroy()
+        }
+
+        if (this.circleMobParent) {
+            this.circleMobParent.removeMob(this.id)
+        }
+
         delete udg_monsters[this.id]
 
         this.level?.monsters.removeMonster(this.id)
     }
 
-    toJson(): false | {[x: string] : any} {
-        if(this.isDeleted()){
+    toJson(): false | { [x: string]: any } {
+        if (this.isDeleted()) {
             return false
-        }else {
+        } else {
             const output = ObjectHandler.getNewObject<any>()
             output['id'] = this.id
             output['monsterClassName'] = this.constructor.name

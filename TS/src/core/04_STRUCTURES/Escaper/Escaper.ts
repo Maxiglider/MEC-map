@@ -12,7 +12,7 @@ import {
     PLAYER_INVIS_UNIT,
     POWER_CIRCLE,
     SLIDE_PERIOD,
-    TERRAIN_KILL_EFFECT_BODY_PART,
+    TERRAIN_KILL_EFFECT_BODY_PART
 } from 'core/01_libraries/Constants'
 import { udg_colorCode } from 'core/01_libraries/Init_colorCodes'
 import { Text } from 'core/01_libraries/Text'
@@ -62,7 +62,7 @@ import { CheckTerrainTrigger } from '../../07_TRIGGERS/Slide_and_CheckTerrain_tr
 import { SlideTrigger } from '../../07_TRIGGERS/Slide_and_CheckTerrain_triggers/Slide'
 import {
     HERO_ROTATION_SPEED,
-    HERO_ROTATION_TIME_FOR_MAXIMUM_SPEED,
+    HERO_ROTATION_TIME_FOR_MAXIMUM_SPEED
 } from '../../07_TRIGGERS/Slide_and_CheckTerrain_triggers/SlidingMax'
 import { Trig_InvisUnit_is_getting_damage } from '../../08_GAME/Death/InvisUnit_is_getting_damage'
 import { HERO_START_ANGLE } from '../../08_GAME/Init_game/Heroes'
@@ -1389,9 +1389,9 @@ export class Escaper {
         if (this.hero) this.make = new MakeDeletePortalMob(this.hero)
     }
 
-    makeCreateCircleMob(speed: number | null, direction: 'cw' | 'ccw' | null, radius: number | null) {
+    makeCreateCircleMob(speed: number | null, direction: 'cw' | 'ccw' | null, facing: 'cw' | 'ccw' | 'in' | 'out'|null, radius: number | null) {
         this.destroyMake()
-        if (this.hero) this.make = new MakeCircleMob(this.hero, speed, direction, radius)
+        if (this.hero) this.make = new MakeCircleMob(this.hero, speed, direction, facing, radius)
     }
 
     makeDeleteCircleMob = () => {
@@ -1449,9 +1449,9 @@ export class Escaper {
                 this.hero,
                 'speed',
                 speed,
-                monster => !!monster.getCircleMob(),
-                monster => monster.getCircleMob()?.getSpeed(),
-                (monster, speed) => monster.getCircleMob()?.setSpeed(speed!)
+                monster => !!monster.getCircleMobs(),
+                monster => monster.getCircleMobs()?.getSpeed(),
+                (monster, speed) => monster.getCircleMobs()?.setSpeed(speed!)
             )
         }
     }
@@ -1463,9 +1463,23 @@ export class Escaper {
                 this.hero,
                 'direction',
                 direction,
-                monster => !!monster.getCircleMob(),
-                monster => monster.getCircleMob()?.getDirection(),
-                (monster, direction) => monster.getCircleMob()?.setDirection(direction!)
+                monster => !!monster.getCircleMobs(),
+                monster => monster.getCircleMobs()?.getDirection(),
+                (monster, direction) => monster.getCircleMobs()?.setDirection(direction!)
+            )
+        }
+    }
+
+    makeSetCircleMobFacing(facing: 'cw' | 'ccw' | 'in' | 'out') {
+        this.destroyMake()
+        if (this.hero) {
+            this.make = new MakeMonsterPropertyChange(
+                this.hero,
+                'facing',
+                facing,
+                monster => !!monster.getCircleMobs(),
+                monster => monster.getCircleMobs()?.getFacing(),
+                (monster, facing) => monster.getCircleMobs()?.setFacing(facing!)
             )
         }
     }
@@ -1477,9 +1491,9 @@ export class Escaper {
                 this.hero,
                 'radius',
                 radius,
-                monster => !!monster.getCircleMob(),
-                monster => monster.getCircleMob()?.getRadius(),
-                (monster, radius) => monster.getCircleMob()?.setRadius(radius!)
+                monster => !!monster.getCircleMobs(),
+                monster => monster.getCircleMobs()?.getRadius(),
+                (monster, radius) => monster.getCircleMobs()?.setRadius(radius!)
             )
         }
     }

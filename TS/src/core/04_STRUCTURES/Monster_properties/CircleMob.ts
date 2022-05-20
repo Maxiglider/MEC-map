@@ -1,16 +1,16 @@
-import {arrayPush, ForceAngleBetween0And360} from 'core/01_libraries/Basic_functions'
+import { arrayPush, ForceAngleBetween0And360 } from 'core/01_libraries/Basic_functions'
 import { createTimer } from 'Utils/mapUtils'
 import { Timer } from 'w3ts'
+import { globals } from '../../../../globals'
+import { ObjectHandler } from '../../../Utils/ObjectHandler'
 import { Level } from '../Level/Level'
 import { Monster } from '../Monster/Monster'
 import { MonsterArray } from '../Monster/MonsterArray'
-import {globals} from "../../../../globals";
-import {ObjectHandler} from "../../../Utils/ObjectHandler";
 
 const TIMER_PERIOD = 0.02
 const DEFAULT_ROTATION_SPEED = 90
 const DEFAULT_DIRECTION = 'cw'
-
+const DEFAULT_FACING = 'cw'
 
 export class CircleMob {
     level?: Level
@@ -20,6 +20,7 @@ export class CircleMob {
 
     private rotationSpeed: number
     private direction: 'cw' | 'ccw'
+    private facing: 'cw' | 'ccw' | 'in' | 'out'
     private radius: number
     private currentBaseAngle = 0
 
@@ -27,12 +28,19 @@ export class CircleMob {
 
     private circleTimer: Timer | null = null
 
-    constructor(triggerMob: Monster, rotationSpeed: number | null, direction: 'cw' | 'ccw' | null, radius: number) {
+    constructor(
+        triggerMob: Monster,
+        rotationSpeed: number | null,
+        direction: 'cw' | 'ccw' | null,
+        facing: 'cw' | 'ccw' | 'in' | 'out' | null,
+        radius: number
+    ) {
         this.triggerMob = triggerMob
         triggerMob.setCircleMob(this)
 
         this.rotationSpeed = rotationSpeed || DEFAULT_ROTATION_SPEED
         this.direction = direction || DEFAULT_DIRECTION
+        this.facing = facing || DEFAULT_FACING
         this.radius = radius
     }
 
@@ -48,6 +56,12 @@ export class CircleMob {
 
     setDirection = (direction: 'cw' | 'ccw') => {
         this.direction = direction
+    }
+
+    getFacing = () => this.facing
+
+    setFacing = (facing: 'cw' | 'ccw' | 'in' | 'out') => {
+        this.facing = facing
     }
 
     getRadius = () => this.radius
@@ -78,8 +92,9 @@ export class CircleMob {
         }
 
         this.mobs.new(monster, false)
+        monster.setCircleMobParent(this)
 
-        if(!this.circleTimer) this.activate()
+        if (!this.circleTimer) this.activate()
 
         return true
     }
@@ -90,6 +105,10 @@ export class CircleMob {
 
     removeAllBlockMobs = () => {
         this.mobs.removeAllWithoutDestroy()
+    }
+
+    removeMob = (monsterId: number) => {
+        this.mobs.removeMonster(monsterId)
     }
 
     destroy = () => {
@@ -129,7 +148,6 @@ export class CircleMob {
 
             let angle = this.currentBaseAngle
 
-            let i = 0
             for (const [_, mob] of pairs(this.mobs.getAll())) {
                 if (mob.u) {
                     const unitX = centerX + this.radius * CosBJ(angle)
@@ -137,11 +155,11 @@ export class CircleMob {
 
                     const facingAngle = angle + 90 * directionReal
 
-                    if(globals.MAP_MIN_X <= unitX && globals.MAP_MAX_X >= unitX){
+                    if (globals.MAP_MIN_X <= unitX && globals.MAP_MAX_X >= unitX) {
                         SetUnitX(mob.u, unitX)
                     }
 
-                    if(globals.MAP_MIN_Y <= unitY && globals.MAP_MAX_Y >= unitY){
+                    if (globals.MAP_MIN_Y <= unitY && globals.MAP_MAX_Y >= unitY) {
                         SetUnitY(mob.u, unitY)
                     }
 
@@ -151,7 +169,9 @@ export class CircleMob {
                 angle += angleDiff
             }
 
-            this.currentBaseAngle = ForceAngleBetween0And360(this.currentBaseAngle + directionReal * this.rotationSpeed * TIMER_PERIOD)
+            this.currentBaseAngle = ForceAngleBetween0And360(
+                this.currentBaseAngle + directionReal * this.rotationSpeed * TIMER_PERIOD
+            )
         })
     }
 
@@ -159,7 +179,9 @@ export class CircleMob {
         const blockMobIds: number[] = []
 
         for (const [_, monster] of pairs(this.mobs.getAll())) {
-            arrayPush(blockMobIds, monster.id)
+            if (!monster.isDeleted()) {
+                arrayPush(blockMobIds, monster.id)
+            }
         }
 
         const output = ObjectHandler.getNewObject<any>()
@@ -169,6 +191,7 @@ export class CircleMob {
         output['blockMobsIds'] = blockMobIds
         output['rotationSpeed'] = this.rotationSpeed
         output['direction'] = this.direction
+        output['facing'] = this.facing
         output['radius'] = this.radius
 
         return output

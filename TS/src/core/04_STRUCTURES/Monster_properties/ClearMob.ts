@@ -1,8 +1,8 @@
 import { arrayPush } from 'core/01_libraries/Basic_functions'
+import { ObjectHandler } from '../../../Utils/ObjectHandler'
 import { Level } from '../Level/Level'
 import { Monster } from '../Monster/Monster'
 import { MonsterArray } from '../Monster/MonsterArray'
-import {ObjectHandler} from "../../../Utils/ObjectHandler";
 
 export const CLEAR_MOB_MAX_DURATION = 300
 export const FRONT_MONTANT_DURATION = 0.03
@@ -222,7 +222,9 @@ export class ClearMob {
         const blockMobIds: number[] = []
 
         for (const [_, monster] of pairs(this.blockMobs.getAll())) {
-            arrayPush(blockMobIds, monster.id)
+            if (!monster.isDeleted()) {
+                arrayPush(blockMobIds, monster.id)
+            }
         }
 
         const output = ObjectHandler.getNewObject<any>()

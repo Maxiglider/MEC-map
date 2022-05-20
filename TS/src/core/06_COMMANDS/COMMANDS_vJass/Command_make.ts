@@ -32,10 +32,10 @@ import { MONSTER_TELEPORT_PERIOD_MAX, MONSTER_TELEPORT_PERIOD_MIN } from '../../
 import { CLEAR_MOB_MAX_DURATION, FRONT_MONTANT_DURATION } from '../../04_STRUCTURES/Monster_properties/ClearMob'
 import { MakeMonsterSimplePatrol } from '../../05_MAKE_STRUCTURES/Make_create_monsters/MakeMonsterSimplePatrol'
 import { TerrainTypeFromString } from '../../07_TRIGGERS/Modify_terrain_Functions/Terrain_type_from_string'
+import { HERO_ROTATION_SPEED } from '../../07_TRIGGERS/Slide_and_CheckTerrain_triggers/SlidingMax'
 import { ChangeAllTerrains } from '../../07_TRIGGERS/Triggers_to_modify_terrains/Change_all_terrains'
 import { ChangeOneTerrain } from '../../07_TRIGGERS/Triggers_to_modify_terrains/Change_one_terrain'
 import { CmdParam } from './Command_functions'
-import {HERO_ROTATION_SPEED} from "../../07_TRIGGERS/Slide_and_CheckTerrain_triggers/SlidingMax";
 
 export const initExecuteCommandMake = () => {
     const { registerCommand } = ServiceManager.getService('Cmd')
@@ -367,7 +367,8 @@ export const initExecuteCommandMake = () => {
         alias: ['settrs'],
         group: 'make',
         argDescription: '<slideTerrainLabel> <rotationSpeed>',
-        description: 'You have to specify rounds per second. Example : 1.3. Normal speed is 1; You can specify "default" | "d".',
+        description:
+            'You have to specify rounds per second. Example : 1.3. Normal speed is 1; You can specify "default" | "d".',
         cb: ({ nbParam, param1, param2 }, escaper) => {
             if (!(nbParam === 2)) {
                 return true
@@ -383,12 +384,12 @@ export const initExecuteCommandMake = () => {
             }
 
             let speed: number
-            if(param2 == "d" || param2 == "default"){
+            if (param2 == 'd' || param2 == 'default') {
                 speed = HERO_ROTATION_SPEED
-            }else if (S2R(param2) <= 0) {
+            } else if (S2R(param2) <= 0) {
                 Text.erP(escaper.getPlayer(), 'the rotation speed must be positive')
                 return true
-            }else{
+            } else {
                 speed = S2R(param2)
             }
 
@@ -867,7 +868,14 @@ export const initExecuteCommandMake = () => {
                 }
             }
 
-            getUdgMonsterTypes().new(param1, String2Ascii(SubStringBJ(param2, 2, 5)), scale, immoRadius, speed, clickable)
+            getUdgMonsterTypes().new(
+                param1,
+                String2Ascii(SubStringBJ(param2, 2, 5)),
+                scale,
+                immoRadius,
+                speed,
+                clickable
+            )
 
             Text.mkP(escaper.getPlayer(), 'Monster type "' + param1 + '" created')
 
@@ -2795,9 +2803,9 @@ export const initExecuteCommandMake = () => {
         name: 'createCircleMob',
         alias: ['crcim'],
         group: 'make',
-        argDescription: '[<speed> [<direction> [<radius>]]]',
+        argDescription: '[<speed> [<direction> [<facing [<radius>]]]]',
         description: '',
-        cb: ({ param1, param2, param3 }, escaper) => {
+        cb: ({ param1, param2, param3, param4 }, escaper) => {
             if (param1 !== '' && S2I(param1) === 0) {
                 Text.erP(escaper.getPlayer(), 'Speed must be > 0')
                 return true
@@ -2810,7 +2818,12 @@ export const initExecuteCommandMake = () => {
                 return true
             }
 
-            if (param3 !== '' && S2I(param3) === 0) {
+            if (param3 !== '' && param3 !== 'cw' && param3 !== 'ccw' && param3 !== 'in' && param3 !== 'out') {
+                Text.erP(escaper.getPlayer(), 'Facing must be "cw", "ccw", "in" or "out"')
+                return true
+            }
+
+            if (param4 !== '' && S2I(param4) === 0) {
                 Text.erP(escaper.getPlayer(), 'Radius must be > 0')
                 return true
             }
@@ -2820,7 +2833,8 @@ export const initExecuteCommandMake = () => {
             escaper.makeCreateCircleMob(
                 param1 === '' ? null : S2I(param1),
                 param2 === '' ? null : param2,
-                param3 === '' ? null : S2I(param3)
+                param3 === '' ? null : param3,
+                param4 === '' ? null : S2I(param4)
             )
 
             return true
@@ -2878,6 +2892,26 @@ export const initExecuteCommandMake = () => {
             }
 
             escaper.makeSetCircleMobDirection(param1)
+            Text.mkP(escaper.getPlayer(), 'Click on the circle to apply')
+            return true
+        },
+    })
+
+    //-setCircleMobFacing(scmf) <facing>
+    registerCommand({
+        name: 'setCircleMobFacing',
+        alias: ['setcimf'],
+        group: 'make',
+        argDescription: 'cw | ccw | in | out',
+        description: 'In or out of the circle',
+        cb: ({ param1 }, escaper) => {
+            param1 = param1.toLowerCase()
+            if (param1 !== 'cw' && param1 !== 'ccw' && param1 !== 'in' && param1 !== 'out') {
+                Text.erP(escaper.getPlayer(), 'Facing must be "cw", "ccw", "in" or "out"')
+                return true
+            }
+
+            escaper.makeSetCircleMobFacing(param1)
             Text.mkP(escaper.getPlayer(), 'Click on the circle to apply')
             return true
         },
