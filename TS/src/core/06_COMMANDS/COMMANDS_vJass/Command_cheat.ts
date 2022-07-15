@@ -105,7 +105,7 @@ export const initExecuteCommandCheat = () => {
         description: 'Changes the rotation speed of your hero, ignoring terrains',
         cb: ({ nbParam, param1, param2 }, escaper) => {
             if (S2R(param1) <= 0) {
-                Text.erP(escaper.getPlayer(), "The rotation speed has to be positive")
+                Text.erP(escaper.getPlayer(), 'The rotation speed has to be positive')
                 return true
             }
             const speed = S2R(param1)
@@ -318,6 +318,59 @@ export const initExecuteCommandCheat = () => {
         },
     })
 
+    //-revivePosition(rpos)   --> revives your hero
+    registerCommand({
+        name: 'revivePosition',
+        alias: ['rpos'],
+        group: 'cheat',
+        argDescription: '',
+        description: 'Revives your hero',
+        cb: ({ noParam, nbParam, param1 }, escaper) => {
+            if (noParam) {
+                const hero = escaper.getHero()
+
+                if (!hero) {
+                    return true
+                }
+
+                escaper.revive(GetUnitX(hero), GetUnitY(hero))
+                return true
+            }
+            if (!(nbParam == 1 && escaper.isMaximaxou())) {
+                return true
+            }
+            if (param1 === 'all' || param1 === 'a') {
+                let i = 0
+                while (true) {
+                    if (i >= NB_ESCAPERS) break
+                    if (getUdgEscapers().get(i) != null) {
+                        const hero = getUdgEscapers().get(i)?.getHero()
+
+                        if (!hero) {
+                            return true
+                        }
+
+                        getUdgEscapers().get(i)?.revive(GetUnitX(hero), GetUnitY(hero))
+                    }
+                    i = i + 1
+                }
+                return true
+            }
+            if (isPlayerId(param1)) {
+                if (getUdgEscapers().get(resolvePlayerId(param1)) != null) {
+                    const hero = getUdgEscapers().get(resolvePlayerId(param1))?.getHero()
+
+                    if (!hero) {
+                        return true
+                    }
+
+                    getUdgEscapers().get(resolvePlayerId(param1))?.revive(GetUnitX(hero), GetUnitY(hero))
+                }
+            }
+            return true
+        },
+    })
+
     //-reviveTo(rto) <Pcolor>   --> revives your hero to an other hero, with the same facing angle
     registerCommand({
         name: 'reviveTo',
@@ -344,18 +397,18 @@ export const initExecuteCommandCheat = () => {
             const x = GetUnitX(targetHero)
             const y = GetUnitY(targetHero)
 
-            if(escaper.isAlive()){
+            if (escaper.isAlive()) {
                 SetUnitX(hero, x)
                 SetUnitY(hero, y)
-            }else{
+            } else {
                 escaper.revive(x, y)
             }
             escaper.turnInstantly(GetUnitFacing(targetHero))
 
             const escaperSecond = GetMirrorEscaper(escaper)
-            if(escaperSecond) {
+            if (escaperSecond) {
                 const heroSecond = escaperSecond.getHero()
-                if(heroSecond) {
+                if (heroSecond) {
                     if (escaperSecond.isAlive()) {
                         SetUnitX(heroSecond, x)
                         SetUnitY(heroSecond, y)
@@ -729,28 +782,27 @@ export const initExecuteCommandCheat = () => {
         },
     })
 
-
     registerCommand({
         name: 'slidingMode',
         alias: [],
         group: 'all',
         argDescription: '[normal] | [max] | []',
         description: 'Run commands on start of the game',
-        cb: ({ cmd, nbParam, param1}, escaper) => {
-            if(nbParam == 0){
-                Text.mkP(escaper.getPlayer(), "your sliding mode is " + escaper.slidingMode)
+        cb: ({ cmd, nbParam, param1 }, escaper) => {
+            if (nbParam == 0) {
+                Text.mkP(escaper.getPlayer(), 'your sliding mode is ' + escaper.slidingMode)
             }
 
-            if(nbParam == 1){
-                if(param1 == 'max' || param1 == 'normal'){
+            if (nbParam == 1) {
+                if (param1 == 'max' || param1 == 'normal') {
                     escaper.slidingMode = param1
-                    Text.mkP(escaper.getPlayer(), "changed sliding mode")
-                }else{
-                    Text.erP(escaper.getPlayer(), "wrong sliding mode")
+                    Text.mkP(escaper.getPlayer(), 'changed sliding mode')
+                } else {
+                    Text.erP(escaper.getPlayer(), 'wrong sliding mode')
                 }
             }
 
             return true
-        }
+        },
     })
 }
