@@ -36,7 +36,9 @@ export class MonsterArray extends BaseArray<Monster> {
             monster.createUnit()
         }
 
-        monster.level = this.level
+        if (this.level) {
+            monster.level = this.level
+        }
     }
 
     count = (mode?: string) => countMonstersAccordingToMode(this.data, mode)

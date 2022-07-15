@@ -5,7 +5,6 @@ import { globals } from '../../../../globals'
 import { ObjectHandler } from '../../../Utils/ObjectHandler'
 import { Level } from '../Level/Level'
 import { Monster } from '../Monster/Monster'
-import { MonsterArray } from '../Monster/MonsterArray'
 
 const TIMER_PERIOD = 0.02
 const DEFAULT_ROTATION_SPEED = 90
@@ -16,7 +15,7 @@ export class CircleMob {
     level?: Level
 
     private triggerMob: Monster
-    private mobs = new MonsterArray()
+    private mobs: number[] = []
 
     private rotationSpeed: number
     private direction: 'cw' | 'ccw'
@@ -83,7 +82,7 @@ export class CircleMob {
     redoMainMobPermanentEffect = () => {}
 
     addBlockMob = (monster: Monster): boolean => {
-        if (this.mobs.containsMonster(monster)) {
+        if (this.mobs.includes(monster.getId())) {
             return false
         }
 
@@ -91,7 +90,7 @@ export class CircleMob {
             return false
         }
 
-        this.mobs.new(monster, false)
+        arrayPush(this.mobs, monster.getId())
         monster.setCircleMobParent(this)
 
         if (!this.circleTimer) this.activate()
@@ -100,23 +99,23 @@ export class CircleMob {
     }
 
     removeLastBlockMob = (): boolean => {
-        return this.mobs.removeLast(false)
+        return !!this.mobs.splice(-1, 1)
     }
 
     removeAllBlockMobs = () => {
-        this.mobs.removeAllWithoutDestroy()
+        this.mobs.length = 0
     }
 
     removeMob = (monsterId: number) => {
-        this.mobs.removeMonster(monsterId)
+        this.mobs.splice(this.mobs.indexOf(monsterId), 1)
     }
 
     destroy = () => {
         this.close()
         this.triggerMob.removeCircleMob()
 
-        this.getBlockMobs().forAll(monster => {
-            monster.createUnit()
+        this.getBlockMobs().forEach(monsterId => {
+            this.level?.monsters.get(monsterId)?.createUnit()
         })
 
         this.removeAllBlockMobs()
@@ -141,15 +140,16 @@ export class CircleMob {
 
             const centerX = GetUnitX(this.triggerMob.u)
             const centerY = GetUnitY(this.triggerMob.u)
-            // const triggerMobPoint = GetUnitLoc(this.triggerMob.u)
 
-            const mobCount = this.mobs.count()
+            const mobCount = this.mobs.length
             const angleDiff = 360.0 / I2R(mobCount)
 
             let angle = this.currentBaseAngle
 
-            for (const [_, mob] of pairs(this.mobs.getAll())) {
-                if (mob.u) {
+            for (const monsterId of this.mobs) {
+                const mob = this.level?.monsters.get(monsterId)
+
+                if (mob?.u) {
                     const unitX = centerX + this.radius * CosBJ(angle)
                     const unitY = centerY + this.radius * SinBJ(angle)
 
@@ -178,9 +178,9 @@ export class CircleMob {
     toJson = () => {
         const blockMobIds: number[] = []
 
-        for (const [_, monster] of pairs(this.mobs.getAll())) {
-            if (!monster.isDeleted()) {
-                arrayPush(blockMobIds, monster.id)
+        for (const monsterId of this.mobs) {
+            if (!this.level?.monsters.get(monsterId)?.isDeleted()) {
+                arrayPush(blockMobIds, monsterId)
             }
         }
 

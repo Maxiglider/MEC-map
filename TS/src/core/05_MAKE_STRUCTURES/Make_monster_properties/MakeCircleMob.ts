@@ -104,7 +104,10 @@ export class MakeCircleMob extends Make {
                 this.escaper.destroyMake()
                 return
             }
-            if (this.circleMob.getBlockMobs().containsMonster(monster)) {
+            if (
+                monster.getId() === this.circleMob.getTriggerMob().getId() ||
+                this.circleMob.getBlockMobs().includes(monster.getId())
+            ) {
                 Text.erP(this.makerOwner, 'this monster is already a block mob of this circle mob')
                 return
             } else {
