@@ -1,26 +1,23 @@
+import { getUdgCasterTypes, getUdgLevels, getUdgMonsterTypes, getUdgTerrainTypes } from '../../../../globals'
+import { ArrayHandler } from '../../../Utils/ArrayHandler'
 import {
-    getUdgCasterTypes,
-    getUdgEscapers,
-    getUdgLevels,
-    getUdgMonsterTypes,
-    getUdgTerrainTypes
-} from "../../../../globals";
-import {Text} from "../../01_libraries/Text";
-import {PushTerrainDataIntoJson} from "./Save_terrain";
-import {initSaveLoad} from "../../../Utils/SaveLoad/SaveLoad";
-import {jsonEncode} from "../../01_libraries/Basic_functions";
-import {MEC_SMIC_DATA_FILE_DATE_TPL} from "../../01_libraries/Constants";
-import {ObjectHandler} from "../../../Utils/ObjectHandler";
-import {
-    clearArrayOrObject, getHighestClearedId,
+    clearArrayOrObject,
+    getHighestClearedId,
     getNbArraysObjectsCleared,
-    resetNbArraysObjectsCleared
-} from "../../../Utils/clearArrayOrObject";
-import {ArrayHandler} from "../../../Utils/ArrayHandler";
+    resetNbArraysObjectsCleared,
+} from '../../../Utils/clearArrayOrObject'
+import { ObjectHandler } from '../../../Utils/ObjectHandler'
+import { initSaveLoad } from '../../../Utils/SaveLoad/SaveLoad'
+import { jsonEncode } from '../../01_libraries/Basic_functions'
+import { MEC_SMIC_DATA_FILE_DATE_TPL } from '../../01_libraries/Constants'
+import { Text } from '../../01_libraries/Text'
+import { PushTerrainDataIntoJson } from './Save_terrain'
 
 export class SaveMapInCache {
+    public static lastSaveFile = ''
 
-    private static gameAsJsonString = () => { //old
+    private static gameAsJsonString = () => {
+        //old
         const jsonTerrain = ObjectHandler.getNewObject<any>()
         const jsonGameData = ObjectHandler.getNewObject<any>()
 
@@ -45,10 +42,10 @@ export class SaveMapInCache {
 
         //save levels
         jsonGameData.levels = getUdgLevels().toJson()
-        Text.A("levels saved")
+        Text.A('levels saved')
 
         //output
-        const objData = ObjectHandler.getNewObject<{[x: string] : any}>()
+        const objData = ObjectHandler.getNewObject<{ [x: string]: any }>()
         objData['terrain'] = jsonTerrain
         objData['gameData'] = jsonGameData
 
@@ -58,29 +55,35 @@ export class SaveMapInCache {
         return output
     }
 
-    private static smicStringObj = {str : ''}
+    private static smicStringObj = { str: '' }
 
     public static smic = (p: player | null = null) => {
         const SaveLoad = initSaveLoad()
 
-        if(p === null || GetLocalPlayer() == p) {
+        if (p === null || GetLocalPlayer() == p) {
             const startTime = os.clock()
 
-            const filename = MEC_SMIC_DATA_FILE_DATE_TPL.replace('[date]', os.date("%Y-%m-%d_%H-%M-%S"))
+            const filename = MEC_SMIC_DATA_FILE_DATE_TPL.replace('[date]', os.date('%Y-%m-%d_%H-%M-%S'))
 
             SaveMapInCache.smicStringObj.str = SaveMapInCache.gameAsJsonString()
 
+            SaveMapInCache.lastSaveFile = filename
             SaveLoad.saveFileWithoutPossibleLoading(filename, p, SaveMapInCache.smicStringObj.str, false)
 
             Text.A('saving game data to file "' + filename + '" done')
 
-            print(getNbArraysObjectsCleared() + " arrays or objects cleared ; highest : " + getHighestClearedId())
-            print("Highest Array index : " + ArrayHandler.getNextIndex() + " ; Highest Object index : " + ObjectHandler.getNextIndex())
+            print(getNbArraysObjectsCleared() + ' arrays or objects cleared ; highest : ' + getHighestClearedId())
+            print(
+                'Highest Array index : ' +
+                    ArrayHandler.getNextIndex() +
+                    ' ; Highest Object index : ' +
+                    ObjectHandler.getNextIndex()
+            )
             resetNbArraysObjectsCleared()
 
             const time = os.clock() - startTime
 
-            Text.mkA("SMIC done in " + time + ' s')
+            Text.mkA('SMIC done in ' + time + ' s')
         }
     }
 }

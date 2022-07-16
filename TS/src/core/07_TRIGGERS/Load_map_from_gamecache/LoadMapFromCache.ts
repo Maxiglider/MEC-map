@@ -1,3 +1,5 @@
+import { PROD } from 'env'
+import { errorHandler } from 'Utils/mapUtils'
 import { getUdgCasterTypes, getUdgLevels, getUdgMonsterTypes, getUdgTerrainTypes } from '../../../../globals'
 import { jsonDecode } from '../../01_libraries/Basic_functions'
 import { Text } from '../../01_libraries/Text'
@@ -14,7 +16,14 @@ export class LoadMapFromCache {
             } else {
                 //terrain types MEC
                 if (gameData.terrainTypesMec) {
-                    getUdgTerrainTypes().newFromJson(gameData.terrainTypesMec)
+                    if (PROD) {
+                        getUdgTerrainTypes().newFromJson(gameData.terrainTypesMec)
+                    } else {
+                        // Dont care for terrains during development
+                        errorHandler(() => {
+                            getUdgTerrainTypes().newFromJson(gameData.terrainTypesMec)
+                        })
+                    }
                 }
 
                 //monster types

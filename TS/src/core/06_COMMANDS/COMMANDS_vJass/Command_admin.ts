@@ -18,7 +18,6 @@ import {
     globals,
 } from '../../../../globals'
 import { initSaveLoad } from '../../../Utils/SaveLoad/SaveLoad'
-import { MEC_SMIC_DATA_FILE } from '../../01_libraries/Constants'
 import { IsPositiveInteger } from '../../01_libraries/Functions_on_numbers'
 import { SaveMapInCache } from '../../07_TRIGGERS/Save_map_in_gamecache/SaveMapInCache'
 import { SaveLoadTerrain } from '../../07_TRIGGERS/Triggers_to_modify_terrains/Save_load_terrain'
@@ -581,12 +580,17 @@ export const initExecuteCommandMax = () => {
         group: 'max',
         argDescription: '',
         description: 'load the map from cache',
-        cb: ({ noParam }) => {
+        cb: ({ noParam }, escaper) => {
             if (noParam) {
+                if (SaveMapInCache.lastSaveFile === '') {
+                    Text.mkP(escaper.getPlayer(), 'Failed to load, use -smic first')
+                    return true
+                }
+
                 const SaveLoad = initSaveLoad()
 
                 Text.A('Loading')
-                SaveLoad.readFile(MEC_SMIC_DATA_FILE, GetTriggerPlayer(), data => {
+                SaveLoad.readFile(SaveMapInCache.lastSaveFile, GetTriggerPlayer(), data => {
                     Text.A('Loaded')
 
                     const gameData = (jsonDecode(data) as any).gameData
