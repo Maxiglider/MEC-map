@@ -9,7 +9,7 @@ import { usePlayerVariable } from './Hooks/usePlayerVisible'
 import { terrainItems } from './Media/Terrains'
 import { IAbsPos } from './Utils'
 
-export type IItem = { texFile: string; title: string; scale: '1:1' | '2:1' }
+export type IItem = { texFile?: string; title: string; scale?: '1:1' | '2:1' }
 
 export type InterfaceProps = {
     cb: (props: {
@@ -75,7 +75,8 @@ export const Interface = ({ cb }: InterfaceProps) => {
         if (terrain) {
             arrayPush(
                 usedTerrains,
-                terrainItems.find(i => i.title === Ascii2String(terrain.terrainTypeId))
+                terrainItems.find(i => i.title === Ascii2String(terrain.terrainTypeId)) ||
+                    ({ title: Ascii2String(terrain.terrainTypeId) } as IItem)
             )
         }
     }

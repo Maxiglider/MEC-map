@@ -23,6 +23,7 @@ export const Item = ({
             size={size}
             visible={visible}
             onLoad={() =>
+                v.texFile &&
                 BlzFrameSetTexture(BlzGetFrameByName(`TerrainPreviewValue_${v.scale}`, 0), v.texFile, 0, false)
             }
         />
