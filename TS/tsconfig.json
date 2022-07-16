@@ -3,7 +3,10 @@
         "baseUrl": "./src",
         "allowJs": true,
         "target": "ES6",
-        "lib": ["ES6", "ES2020"],
+        "lib": [
+            "ES6",
+            "ES2020"
+        ],
         "noImplicitAny": true,
         "strict": true,
         "moduleResolution": "classic",
