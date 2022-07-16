@@ -1,6 +1,7 @@
 import { stringReplaceAll } from 'core/01_libraries/Basic_functions'
-import {NB_ESCAPERS, NB_PLAYERS_MAX, NB_PLAYERS_MAX_REFORGED} from 'core/01_libraries/Constants'
+import { NB_ESCAPERS, NB_PLAYERS_MAX, NB_PLAYERS_MAX_REFORGED } from 'core/01_libraries/Constants'
 import { ColorString2Id } from 'core/01_libraries/Init_colorCodes'
+import { ArrayHandler } from 'Utils/ArrayHandler'
 import { forRange } from 'Utils/mapUtils'
 import { getUdgEscapers } from '../../../../globals'
 
@@ -127,20 +128,19 @@ export const isPlayerId = (arg: string) => {
     }
 }
 
-export function BlzColor2Id(color: playercolor){
+export function BlzColor2Id(color: playercolor) {
     const blzColors2ids = new Map<playercolor, number>()
 
-    for(let i = 0; i < NB_PLAYERS_MAX_REFORGED; i++){
+    for (let i = 0; i < NB_PLAYERS_MAX_REFORGED; i++) {
         blzColors2ids.set(ConvertPlayerColor(i), i)
     }
 
     return blzColors2ids.get(color)
 }
 
-
-export function colorId2playerId(colorId: number){
-    for(let i = 0; i < NB_PLAYERS_MAX; i++){
-        if(BlzColor2Id(GetPlayerColor(Player(i))) == colorId){
+export function colorId2playerId(colorId: number) {
+    for (let i = 0; i < NB_PLAYERS_MAX; i++) {
+        if (BlzColor2Id(GetPlayerColor(Player(i))) == colorId) {
             return i
         }
     }
@@ -148,10 +148,9 @@ export function colorId2playerId(colorId: number){
     return -1
 }
 
-export function playerId2colorId(playerId: number){
+export function playerId2colorId(playerId: number) {
     return BlzColor2Id(GetPlayerColor(Player(playerId))) || -1
 }
-
 
 export const resolvePlayerId = (arg: string) => {
     const larg = arg.toLowerCase()
@@ -173,6 +172,22 @@ export const resolvePlayerId = (arg: string) => {
         }
     } else if (cachedPlayerNames[removeHash(larg)]) {
         return cachedPlayerNames[removeHash(larg)]
+    } else if (removeHash(larg).length > 3) {
+        const m = ArrayHandler.getNewArray<number>()
+
+        for (const [playerName, playerId] of pairs(cachedPlayerNames)) {
+            if (playerName.toString().includes(removeHash(larg))) {
+                m.push(playerId)
+            }
+        }
+
+        if (m.length === 1) {
+            const playerId = m[0]
+            ArrayHandler.clearArray(m)
+            return playerId
+        }
+
+        ArrayHandler.clearArray(m)
     }
 
     if (targetPlayer === -1) {
