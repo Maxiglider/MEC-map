@@ -265,8 +265,13 @@ export class LevelArray extends BaseArray<Level> {
             }
 
             //circles
-            if(levelJson.circleMobs){
+            if (levelJson.circleMobs) {
                 level.circleMobs.newFromJson(levelJson.circleMobs)
+            }
+
+            //staticSlides
+            if (levelJson.staticSlides) {
+                level.staticSlides.newFromJson(levelJson.staticSlides)
             }
         }
     }

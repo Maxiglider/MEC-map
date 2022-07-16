@@ -2936,6 +2936,49 @@ export const initExecuteCommandMake = () => {
         },
     })
 
+    //-createStaticSlide(crss) <angle> <speed>
+    registerCommand({
+        name: 'createStaticSlide',
+        alias: ['crss'],
+        group: 'make',
+        argDescription: '<angle> <speed>',
+        description: '',
+        cb: ({ param1, param2 }, escaper) => {
+            if (!(S2I(param1) > 0 && S2I(param1) <= 360)) {
+                Text.erP(escaper.getPlayer(), 'Angle must be > 0 and <= 360')
+                return true
+            }
+
+            if (!(S2I(param2) > 0 && S2I(param2) <= 1000)) {
+                Text.erP(escaper.getPlayer(), 'Speed must be > 0 and <= 1000')
+                return true
+            }
+
+            Text.mkP(escaper.getPlayer(), 'Static slide creation on. Click for regions')
+
+            escaper.makeCreateStaticSlide(S2I(param1), S2I(param2))
+
+            return true
+        },
+    })
+
+    //-deleteStaticSlide
+    registerCommand({
+        name: 'deleteStaticSlide',
+        alias: ['delss'],
+        group: 'make',
+        argDescription: '',
+        description: '',
+        cb: ({ noParam }, escaper) => {
+            if (!noParam) {
+                return true
+            }
+            escaper.makeDeleteStaticSlide()
+            Text.mkP(escaper.getPlayer(), 'static slide deletion on')
+            return true
+        },
+    })
+
     //-createPortalMob(crpm) <freezeDuration> [<portalEffect> [<portalEffectDuration>]]
     registerCommand({
         name: 'createPortalMob',

@@ -1,6 +1,7 @@
 import { Text } from 'core/01_libraries/Text'
 import { ServiceManager } from 'Services'
 import { getUdgEscapers } from '../../../../globals'
+import { ObjectHandler } from '../../../Utils/ObjectHandler'
 import { MecHookArray } from '../../API/MecHookArray'
 import type { CasterType } from '../Caster/CasterType'
 import type { Escaper } from '../Escaper/Escaper'
@@ -13,10 +14,10 @@ import { ClearMobArray } from '../Monster_properties/ClearMobArray'
 import { PortalMobArray } from '../Monster_properties/PortalMobArray'
 import { checkPointReviveHeroes } from './checkpointReviveHeroes_function'
 import { End, Start } from './StartAndEnd'
+import { StaticSlideArray } from './StaticSlideArray'
 import { TriggerArray } from './Triggers'
 import type { VisibilityModifier } from './VisibilityModifier'
 import { VisibilityModifierArray } from './VisibilityModifierArray'
-import {ObjectHandler} from "../../../Utils/ObjectHandler";
 
 export class Level {
     public static earningLivesActivated = true
@@ -36,6 +37,7 @@ export class Level {
     clearMobs: ClearMobArray
     portalMobs: PortalMobArray
     circleMobs: CircleMobArray
+    staticSlides: StaticSlideArray
 
     //hooks
     public hooks_onStart = new MecHookArray()
@@ -50,6 +52,7 @@ export class Level {
         this.clearMobs = new ClearMobArray(this)
         this.portalMobs = new PortalMobArray(this)
         this.circleMobs = new CircleMobArray(this)
+        this.staticSlides = new StaticSlideArray(this)
         this.livesEarnedAtBeginning = 1
         this.isActivatedB = false
         this.startMessage = ''
@@ -72,6 +75,7 @@ export class Level {
             this.clearMobs.initializeClearMobs()
             this.portalMobs.initializePortalMobs()
             this.circleMobs.initializeCircleMobs()
+            this.staticSlides.activate(true)
             if (Level.earningLivesActivated && this.getId() > 0) {
                 ServiceManager.getService('Lives').add(this.livesEarnedAtBeginning)
             }
@@ -256,6 +260,9 @@ export class Level {
 
         //circleMobs
         json.circleMobs = this.circleMobs.toJson()
+
+        //staticSlides
+        json.staticSlides = this.staticSlides.toJson()
 
         return json
     }

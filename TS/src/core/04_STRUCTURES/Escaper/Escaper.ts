@@ -23,6 +23,8 @@ import { MakeMonsterMultiplePatrols } from 'core/05_MAKE_STRUCTURES/Make_create_
 import { MakeMonsterSimplePatrol } from 'core/05_MAKE_STRUCTURES/Make_create_monsters/MakeMonsterSimplePatrol'
 import { MakeMonsterTeleport } from 'core/05_MAKE_STRUCTURES/Make_create_monsters/MakeMonsterTeleport'
 import { MakeMonsterSpawn } from 'core/05_MAKE_STRUCTURES/Make_create_monster_spawn/MakeMonsterSpawn'
+import { MakeDeleteStaticSlide } from 'core/05_MAKE_STRUCTURES/Make_create_static_slide/MakeDeleteStaticSlide'
+import { MakeStaticSlide } from 'core/05_MAKE_STRUCTURES/Make_create_static_slide/MakeStaticSlide'
 import { MakeDeleteCasters } from 'core/05_MAKE_STRUCTURES/Make_delete_casters/MakeDeleteCasters'
 import { MakeDeleteMeteors } from 'core/05_MAKE_STRUCTURES/Make_delete_meteors/MakeDeleteMeteors'
 import { MakeDeleteMonsters } from 'core/05_MAKE_STRUCTURES/Make_delete_monsters/MakeDeleteMonsters'
@@ -195,6 +197,7 @@ export class Escaper {
     private displayName: string
 
     private showNames = false
+    private staticSliding = false
 
     //mouse position updated when a trigger dependant of mouse movement is being used
     mouseX = 0
@@ -432,9 +435,7 @@ export class Escaper {
 
         this.resetItem()
 
-        if (IsUnitAliveBJ(this.hero)) {
-            KillUnit(this.hero)
-        }
+        this.kill()
 
         RemoveUnit(this.hero)
         delete this.hero
@@ -601,7 +602,13 @@ export class Escaper {
 
     kill = () => {
         if (this.isAlive()) {
-            this.hero && KillUnit(this.hero)
+            if (this.hero) {
+                KillUnit(this.hero)
+
+                for (const [_, staticSlide] of pairs(getUdgLevels().getCurrentLevel().staticSlides.getAll())) {
+                    staticSlide.removePlayer(this.escaperId)
+                }
+            }
             return true
         }
         return false
@@ -755,7 +762,7 @@ export class Escaper {
         return this.lastTerrainType
     }
 
-    setLastTerrainType(terrainType: TerrainType) {
+    setLastTerrainType(terrainType: TerrainType | undefined) {
         this.lastTerrainType = terrainType
     }
 
@@ -1404,6 +1411,16 @@ export class Escaper {
         if (this.hero) this.make = new MakeDeleteCircleMob(this.hero)
     }
 
+    makeCreateStaticSlide(angle: number, speed: number) {
+        this.destroyMake()
+        if (this.hero) this.make = new MakeStaticSlide(this.hero, angle, speed)
+    }
+
+    makeDeleteStaticSlide = () => {
+        this.destroyMake()
+        if (this.hero) this.make = new MakeDeleteStaticSlide(this.hero)
+    }
+
     makeSetPortalMobFreezeDuration(freezeDuration: number) {
         this.destroyMake()
         if (this.hero) {
@@ -1787,6 +1804,12 @@ export class Escaper {
     setShowNames = (showNames: boolean) => {
         this.showNames = showNames
         this.updateShowNames(true)
+    }
+
+    isStaticSliding = () => this.staticSliding
+
+    setStaticSliding = (staticSliding: boolean) => {
+        this.staticSliding = staticSliding
     }
 
     updateShowNames = (localOnly: boolean) => {
