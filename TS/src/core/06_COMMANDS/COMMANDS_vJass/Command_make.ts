@@ -2979,6 +2979,25 @@ export const initExecuteCommandMake = () => {
         },
     })
 
+    //-debugRegions <active>
+    registerCommand({
+        name: 'debugRegions',
+        alias: [],
+        group: 'make',
+        argDescription: '<active>',
+        description: '',
+        cb: ({ param1 }, escaper) => {
+            if (!IsBoolString(param1)) {
+                Text.erP(escaper.getPlayer(), 'the property "active" must be a boolean (true or false)')
+                return true
+            }
+
+            escaper.getMakingLevel().debugRegions(S2B(param1))
+            Text.mkP(escaper.getPlayer(), `debugRegions ${S2B(param1) ? 'on' : 'off'}`)
+            return true
+        },
+    })
+
     //-createPortalMob(crpm) <freezeDuration> [<portalEffect> [<portalEffectDuration>]]
     registerCommand({
         name: 'createPortalMob',

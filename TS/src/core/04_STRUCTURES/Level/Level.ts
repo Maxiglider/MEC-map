@@ -1,3 +1,4 @@
+import { arrayPush } from 'core/01_libraries/Basic_functions'
 import { Text } from 'core/01_libraries/Text'
 import { ServiceManager } from 'Services'
 import { getUdgEscapers } from '../../../../globals'
@@ -29,6 +30,7 @@ export class Level {
     private end?: End
     private triggers: TriggerArray
     public id: number = -1
+    private lights: lightning[] = []
 
     visibilities: VisibilityModifierArray
     monsters: MonsterArray
@@ -89,6 +91,7 @@ export class Level {
             this.monsters.removeMonstersUnits()
             this.monsterSpawns.deactivate()
             this.meteors.removeMeteorsItems()
+            this.staticSlides.activate(false)
             getUdgEscapers().deleteSpecificActionsForLevel(this)
 
             if (this.hooks_onEnd) {
@@ -218,6 +221,32 @@ export class Level {
 
     getStartMessage = () => {
         return this.startMessage
+    }
+
+    debugRegions = (active: boolean) => {
+        for (const light of this.lights) {
+            DestroyLightning(light)
+        }
+
+        if (active) {
+            for (const [_, staticSlide] of pairs(this.staticSlides.getAll())) {
+                this.drawRegion(staticSlide.getX1(), staticSlide.getY1(), staticSlide.getX2(), staticSlide.getY2())
+                this.drawRegion(staticSlide.getX3(), staticSlide.getY3(), staticSlide.getX4(), staticSlide.getY4())
+            }
+        }
+    }
+
+    drawRegion = (x1: number, y1: number, x2: number, y2: number) => {
+        this.drawLine(x1, y1, x1, y2)
+        this.drawLine(x1, y1, x2, y1)
+        this.drawLine(x2, y2, x1, y2)
+        this.drawLine(x2, y2, x2, y1)
+    }
+
+    drawLine = (x1: number, y1: number, x2: number, y2: number) => {
+        const light = AddLightning('CLPB', false, x1, y1, x2, y2)
+        arrayPush(this.lights, light)
+        SetLightningColor(light, 140, 20, 252, 1)
     }
 
     toJson = () => {

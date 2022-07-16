@@ -50,6 +50,7 @@ export class StaticSlide {
     }
 
     destroy = () => {
+        this.activate(false)
         this.level && this.id && this.level.staticSlides.removeStaticSlide(this.id)
     }
 
@@ -172,6 +173,10 @@ export class StaticSlide {
                 })
             )
         } else {
+            for (const playerId of this.slidingPlayers) {
+                this.removePlayer(playerId)
+            }
+
             for (const trigger of this.triggers) {
                 DestroyTrigger(trigger)
             }
@@ -190,6 +195,15 @@ export class StaticSlide {
 
         return (x >= x1 && x <= x2 && y >= y1 && y <= y2) || (x >= x3 && x <= x4 && y >= y3 && y <= y4)
     }
+
+    getX1 = () => this.x1
+    getX2 = () => this.x2
+    getX3 = () => this.x3
+    getX4 = () => this.x4
+    getY1 = () => this.y1
+    getY2 = () => this.y2
+    getY3 = () => this.y3
+    getY4 = () => this.y4
 
     toJson = () => {
         const output = ObjectHandler.getNewObject<any>()
