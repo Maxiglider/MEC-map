@@ -8,22 +8,20 @@ import { getUdgEscapers, getUdgMonsterTypes, udg_monsters } from '../../../../gl
 export const InitTrig_InvisUnit_is_getting_damage = () => {
     let TAILLE_UNITE = 100
 
-    let gg_trg_InvisUnit_is_getting_damage = createEvent({
+    const gg_trg_InvisUnit_is_getting_damage = createEvent({
         events: [],
         actions: [
             () => {
-                let invisUnit: unit = GetTriggerUnit()
-                let n = GetUnitUserData(invisUnit)
+                const invisUnit = GetTriggerUnit()
+                const n = GetUnitUserData(invisUnit)
                 const escaper = getUdgEscapers().get(n)
 
                 if (!escaper) {
                     return
                 }
 
-                let killingUnit: unit = GetEventDamageSource()
+                const killingUnit = GetEventDamageSource()
                 let eff: effect | null
-                let x: number
-                let y: number
 
                 const hero = escaper.getHero()
 
@@ -32,7 +30,7 @@ export const InitTrig_InvisUnit_is_getting_damage = () => {
                 }
 
                 const hauteurHero = BlzGetUnitZ(hero) + GetUnitFlyHeight(hero)
-                let hauteurKillingUnit = BlzGetUnitZ(killingUnit) + GetUnitFlyHeight(killingUnit)
+                const hauteurKillingUnit = BlzGetUnitZ(killingUnit) + GetUnitFlyHeight(killingUnit)
 
                 if (!escaper.isAlive()) {
                     return
@@ -70,9 +68,7 @@ export const InitTrig_InvisUnit_is_getting_damage = () => {
 
                         if (escaper.isGodModeOn()) {
                             //god mode effect
-                            x = GetUnitX(killingUnit)
-                            y = GetUnitY(killingUnit)
-                            eff = AddSpecialEffect(GM_KILLING_EFFECT, x, y)
+                            eff = AddSpecialEffect(GM_KILLING_EFFECT, GetUnitX(killingUnit), GetUnitY(killingUnit))
                             DestroyEffect(eff)
 
                             //kill monster
@@ -83,6 +79,7 @@ export const InitTrig_InvisUnit_is_getting_damage = () => {
                                     KillUnit(killingUnit)
                                 }
                             }
+
                             return
                         }
 
@@ -92,10 +89,9 @@ export const InitTrig_InvisUnit_is_getting_damage = () => {
                             //effet de tuation du héros par le monstre, suivant le type du monstre
                             if (monster) {
                                 const effectStr = getUdgMonsterTypes().monsterUnit2KillEffectStr(killingUnit)
+
                                 if (effectStr) {
-                                    x = GetUnitX(invisUnit)
-                                    y = GetUnitY(invisUnit)
-                                    eff = AddSpecialEffect(effectStr, x, y)
+                                    eff = AddSpecialEffect(effectStr, GetUnitX(invisUnit), GetUnitY(invisUnit))
                                     TriggerSleepAction(3)
                                     DestroyEffect(eff)
                                 }

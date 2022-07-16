@@ -9,7 +9,6 @@ import { AfkMode } from 'core/08_GAME/Afk_mode/Afk_mode'
 import { Globals } from 'core/09_From_old_Worldedit_triggers/globals_variables_and_triggers'
 import { udg_doubleHeroesEnabled } from 'core/Double_heroes/double_heroes_config'
 import { ServiceManager } from 'Services'
-import { flushLogs } from '../../Log/log'
 import {
     getUdgCasterTypes,
     getUdgEscapers,
@@ -24,6 +23,7 @@ import { IsPositiveInteger } from '../../01_libraries/Functions_on_numbers'
 import { SaveMapInCache } from '../../07_TRIGGERS/Save_map_in_gamecache/SaveMapInCache'
 import { SaveLoadTerrain } from '../../07_TRIGGERS/Triggers_to_modify_terrains/Save_load_terrain'
 import { MEC_core_API } from '../../API/MEC_core_API'
+import { flushLogs } from '../../Log/log'
 import { CmdParam, isPlayerId, resolvePlayerId } from './Command_functions'
 import { ActivateTeleport, DisableTeleport } from './Teleport'
 
@@ -837,13 +837,13 @@ export const initExecuteCommandMax = () => {
                 let i = 0
                 while (true) {
                     if (i >= NB_ESCAPERS) break
-                        getUdgEscapers().get(i)?.enableClickWhereYouAre(b)
+                    getUdgEscapers().get(i)?.enableClickWhereYouAre(b)
                     i = i + 1
                 }
                 if (b) {
                     Text.P(escaper.getPlayer(), 'all players now turn')
                 } else {
-                    Text.P(escaper.getPlayer(), "all players stop turn")
+                    Text.P(escaper.getPlayer(), 'all players stop turn')
                 }
                 return true
             }
