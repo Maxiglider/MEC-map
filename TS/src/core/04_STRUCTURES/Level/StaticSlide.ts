@@ -57,7 +57,7 @@ export class StaticSlide {
     removePlayer = (playerId: number) => {
         const itemIndex = this.slidingPlayers.indexOf(playerId)
 
-        if (itemIndex) {
+        if (itemIndex !== -1) {
             getUdgEscapers().get(playerId)?.enableCheckTerrain(true)
             getUdgEscapers().get(playerId)?.setStaticSliding(false)
             this.slidingPlayers.splice(itemIndex, 1)

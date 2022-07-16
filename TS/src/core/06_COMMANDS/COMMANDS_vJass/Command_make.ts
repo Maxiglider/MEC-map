@@ -2982,7 +2982,7 @@ export const initExecuteCommandMake = () => {
     //-debugRegions <active>
     registerCommand({
         name: 'debugRegions',
-        alias: [],
+        alias: ['dr'],
         group: 'make',
         argDescription: '<active>',
         description: '',
