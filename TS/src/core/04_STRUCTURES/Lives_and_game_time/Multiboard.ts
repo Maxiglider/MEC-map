@@ -111,6 +111,13 @@ export const initMultiboard = () => {
         LeaderboardAddItemBJ(LIVES_PLAYER, lb, 'Lives', 0)
     }
 
+    const getOrCreateLeaderboard = () => {
+        if (lb) return lb
+
+        initLeaderboard()
+        return lb!
+    }
+
     const destroyBoards = () => {
         if (mb) {
             DestroyMultiboard(mb)
@@ -208,12 +215,13 @@ export const initMultiboard = () => {
                     const playerId = escaper.getEscaperId()
                     const playerName = escaper.getDisplayName()
 
+                    const colorCode = udg_colorCode[playerId2colorId(playerId)]
                     const playerScore = playerScores[playerId].stats[statsMode]
 
-                    MultiboardSetItemValueBJ(mb, 1, 4 + rowIndex, udg_colorCode[playerId2colorId(playerId)] + playerName)
-                    MultiboardSetItemValueBJ(mb, 2, 4 + rowIndex, udg_colorCode[playerId2colorId(playerId)] + playerScore.score)
-                    MultiboardSetItemValueBJ(mb, 3, 4 + rowIndex, udg_colorCode[playerId2colorId(playerId)] + playerScore.saves)
-                    MultiboardSetItemValueBJ(mb, 4, 4 + rowIndex, udg_colorCode[playerId2colorId(playerId)] + playerScore.deaths)
+                    MultiboardSetItemValueBJ(mb, 1, 4 + rowIndex, colorCode + playerName)
+                    MultiboardSetItemValueBJ(mb, 2, 4 + rowIndex, colorCode + playerScore.score)
+                    MultiboardSetItemValueBJ(mb, 3, 4 + rowIndex, colorCode + playerScore.saves)
+                    MultiboardSetItemValueBJ(mb, 4, 4 + rowIndex, colorCode + playerScore.deaths)
 
                     rowIndex++
                 }
@@ -284,5 +292,13 @@ export const initMultiboard = () => {
         updateGametime(true)
     })
 
-    return { setVisibility, setMode, setStatsMode, increasePlayerScore, updateLives, resetRoundScores }
+    return {
+        setVisibility,
+        setMode,
+        setStatsMode,
+        increasePlayerScore,
+        updateLives,
+        resetRoundScores,
+        getOrCreateLeaderboard,
+    }
 }
