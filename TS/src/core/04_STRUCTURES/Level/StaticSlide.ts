@@ -217,6 +217,7 @@ export class StaticSlide {
         output['x4'] = R2I(this.x4)
         output['y4'] = R2I(this.y4)
         output['angle'] = R2I(this.angle)
+        output['speed'] = R2I(this.speed)
 
         return output
     }
