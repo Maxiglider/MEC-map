@@ -2,7 +2,7 @@ import { Text } from 'core/01_libraries/Text'
 import { Make } from 'core/05_MAKE_STRUCTURES/Make/Make'
 import { MakePropertyChangeAction } from '../MakeLastActions/MakePropertyChangeAction'
 
-type IValidCb<A> = (x: number, y: number) => A
+type IValidCb<A> = (x: number, y: number) => NonNullable<A> | null | undefined
 type IGetCb<A, T> = (targetObject: NonNullable<A>) => T
 type ISetCb<A, T> = (targetObject: NonNullable<A>, propertyValue: T) => void
 
@@ -34,7 +34,7 @@ export class MakePropertyChange<A, T> extends Make {
 
     doActions = () => {
         if (super.doBaseActions()) {
-            const targetObject = this.validCb(this.orderX, this.orderY) as NonNullable<A> // Not the best way to handle this but certainly the easiest
+            const targetObject = this.validCb(this.orderX, this.orderY)
 
             if (!targetObject) {
                 Text.erP(this.makerOwner, 'invalid object clicked for your making level')
