@@ -16,7 +16,8 @@ import {
 } from 'core/01_libraries/Constants'
 import { udg_colorCode } from 'core/01_libraries/Init_colorCodes'
 import { Text } from 'core/01_libraries/Text'
-import { MakeMonsterPropertyChange } from 'core/05_MAKE_STRUCTURES/Make/MakePropertyChange'
+import { MakeMonsterPropertyChange } from 'core/05_MAKE_STRUCTURES/Make/MakeMonsterPropertyChange'
+import { MakeStaticSlidePropertyChange } from 'core/05_MAKE_STRUCTURES/Make/MakeStaticSlidePropertyChange'
 import { MakeCaster } from 'core/05_MAKE_STRUCTURES/Make_create_casters/MakeCaster'
 import { MakeMeteor } from 'core/05_MAKE_STRUCTURES/Make_create_meteors/MakeMeteor'
 import { MakeMonsterMultiplePatrols } from 'core/05_MAKE_STRUCTURES/Make_create_monsters/MakeMonsterMultiplePatrols'
@@ -1516,6 +1517,34 @@ export class Escaper {
                 monster => !!monster.getCircleMobs(),
                 monster => monster.getCircleMobs()?.getRadius(),
                 (monster, radius) => monster.getCircleMobs()?.setRadius(radius!)
+            )
+        }
+    }
+
+    makeSetStaticSlideSpeed(speed: number) {
+        this.destroyMake()
+        if (this.hero) {
+            this.make = new MakeStaticSlidePropertyChange(
+                this.hero,
+                'speed',
+                speed,
+                staticSlide => !!staticSlide,
+                staticSlide => staticSlide.getSpeed(),
+                (staticSlide, speed) => staticSlide.setSpeed(speed)
+            )
+        }
+    }
+
+    makeSetStaticSlideAngle(angle: number) {
+        this.destroyMake()
+        if (this.hero) {
+            this.make = new MakeStaticSlidePropertyChange(
+                this.hero,
+                'angle',
+                angle,
+                staticSlide => !!staticSlide,
+                staticSlide => staticSlide.getAngle(),
+                (staticSlide, angle) => staticSlide.setAngle(angle)
             )
         }
     }

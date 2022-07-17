@@ -205,6 +205,17 @@ export class StaticSlide {
     getY3 = () => this.y3
     getY4 = () => this.y4
 
+    getSpeed = () => this.speed
+    getAngle = () => this.angle
+
+    setSpeed = (speed: number) => {
+        this.speed = speed
+    }
+
+    setAngle = (angle: number) => {
+        this.angle = angle
+    }
+
     toJson = () => {
         const output = ObjectHandler.getNewObject<any>()
 

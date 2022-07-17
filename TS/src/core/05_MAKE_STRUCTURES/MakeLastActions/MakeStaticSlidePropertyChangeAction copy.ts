@@ -1,12 +1,12 @@
 import { Text } from 'core/01_libraries/Text'
+import { StaticSlide } from 'core/04_STRUCTURES/Level/StaticSlide'
 import { Level } from '../../04_STRUCTURES/Level/Level'
-import { Monster } from '../../04_STRUCTURES/Monster/Monster'
 import { MakeAction } from './MakeAction'
 
-type ISetCb<T> = (monster: Monster, propertyValue: T) => void
+type ISetCb<T> = (staticSlide: StaticSlide, propertyValue: T) => void
 
-export class MakePropertyChangeAction<T> extends MakeAction {
-    private monster: Monster
+export class MakeStaticSlidePropertyChangeAction<T> extends MakeAction {
+    private staticSlide: StaticSlide
 
     private propertyName: string
     private propertyValue: T
@@ -17,14 +17,14 @@ export class MakePropertyChangeAction<T> extends MakeAction {
 
     constructor(
         level: Level,
-        monster: Monster,
+        staticSlide: StaticSlide,
         propertyName: string,
         propertyValue: T,
         setCb: ISetCb<T>,
         oldPropertyValue: T
     ) {
         super(level)
-        this.monster = monster
+        this.staticSlide = staticSlide
 
         this.propertyName = propertyName
         this.propertyValue = propertyValue
@@ -43,7 +43,7 @@ export class MakePropertyChangeAction<T> extends MakeAction {
 
         this.isActionMadeB = false
 
-        this.setCb(this.monster, this.oldPropertyValue)
+        this.setCb(this.staticSlide, this.oldPropertyValue)
         this.owner && Text.P(this.owner.getPlayer(), `Undo '${this.propertyName}' to '${this.oldPropertyValue}'`)
         return true
     }
@@ -55,7 +55,7 @@ export class MakePropertyChangeAction<T> extends MakeAction {
 
         this.isActionMadeB = true
 
-        this.setCb(this.monster, this.propertyValue)
+        this.setCb(this.staticSlide, this.propertyValue)
         this.owner && Text.P(this.owner.getPlayer(), `Redo '${this.propertyName}' to '${this.propertyValue}'`)
         return true
     }

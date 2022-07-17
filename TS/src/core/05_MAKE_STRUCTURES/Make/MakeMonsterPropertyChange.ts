@@ -1,7 +1,7 @@
 import { Text } from 'core/01_libraries/Text'
 import { Monster } from 'core/04_STRUCTURES/Monster/Monster'
 import { Make } from 'core/05_MAKE_STRUCTURES/Make/Make'
-import { MakePropertyChangeAction } from '../MakeLastActions/MakePropertyChangeAction'
+import { MakeMonsterPropertyChangeAction } from '../MakeLastActions/MakeMonsterPropertyChangeAction'
 
 type IValidCb = (monster: Monster) => boolean
 type IGetCb<T> = (monster: Monster) => T
@@ -53,7 +53,7 @@ export class MakeMonsterPropertyChange<T> extends Make {
             this.escaper.destroyMake()
 
             this.escaper.newAction(
-                new MakePropertyChangeAction(
+                new MakeMonsterPropertyChangeAction(
                     this.escaper.getMakingLevel(),
                     monster,
                     this.propertyName,

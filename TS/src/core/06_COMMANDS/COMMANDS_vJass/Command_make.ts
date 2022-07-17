@@ -2979,6 +2979,44 @@ export const initExecuteCommandMake = () => {
         },
     })
 
+    //-setStaticSlideSpeed(setsss) <speed>
+    registerCommand({
+        name: 'setStaticSlideSpeed',
+        alias: ['setsss'],
+        group: 'make',
+        argDescription: '<speed>',
+        description: '',
+        cb: ({ param1 }, escaper) => {
+            if (!(S2I(param1) > 0 && S2I(param1) <= 1000)) {
+                Text.erP(escaper.getPlayer(), 'Speed must be > 0 and <= 1000')
+                return true
+            }
+
+            escaper.makeSetStaticSlideSpeed(S2R(param1))
+            Text.mkP(escaper.getPlayer(), 'Click on the staticSlide to apply')
+            return true
+        },
+    })
+
+    //-setStaticSlideAngle(setssa) <angle>
+    registerCommand({
+        name: 'setStaticSlideAngle',
+        alias: ['setssa'],
+        group: 'make',
+        argDescription: '<angle>',
+        description: '',
+        cb: ({ param1 }, escaper) => {
+            if (!(S2I(param1) > 0 && S2I(param1) <= 360)) {
+                Text.erP(escaper.getPlayer(), 'Angle must be > 0 and <= 360')
+                return true
+            }
+
+            escaper.makeSetStaticSlideAngle(S2R(param1))
+            Text.mkP(escaper.getPlayer(), 'Click on the staticSlide to apply')
+            return true
+        },
+    })
+
     //-debugRegions <active>
     registerCommand({
         name: 'debugRegions',
