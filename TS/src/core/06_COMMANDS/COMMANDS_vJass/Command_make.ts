@@ -2992,7 +2992,7 @@ export const initExecuteCommandMake = () => {
                 return true
             }
 
-            escaper.getMakingLevel().debugRegions(S2B(param1))
+            escaper.getMakingLevel().setDebugRegionsVisible(S2B(param1))
             Text.mkP(escaper.getPlayer(), `debugRegions ${S2B(param1) ? 'on' : 'off'}`)
             return true
         },

@@ -27,6 +27,8 @@ export class StaticSlideArray extends BaseArray<StaticSlide> {
         staticSlide.id = this._new(staticSlide)
         staticSlide.level = this.level
 
+        this.level.updateDebugRegions()
+
         return staticSlide
     }
 
@@ -38,12 +40,16 @@ export class StaticSlideArray extends BaseArray<StaticSlide> {
 
     removeStaticSlide = (itemId: number) => {
         delete this.data[itemId]
+
+        this.level.updateDebugRegions()
     }
 
     removeAllStaticSlides = () => {
         for (const [_, staticSlide] of pairs(this.data)) {
             staticSlide.destroy()
         }
+
+        this.level.updateDebugRegions()
     }
 
     activate = (activ: boolean) => {

@@ -31,6 +31,7 @@ export class Level {
     private triggers: TriggerArray
     public id: number = -1
     private lights: lightning[] = []
+    debugRegionsVisible = false
 
     visibilities: VisibilityModifierArray
     monsters: MonsterArray
@@ -123,6 +124,8 @@ export class Level {
     newStart(x1: number, y1: number, x2: number, y2: number) {
         this.start && this.start.destroy()
         this.start = new Start(x1, y1, x2, y2)
+
+        this.updateDebugRegions()
     }
 
     newStartFromJson(data: { [x: string]: number }) {
@@ -135,6 +138,8 @@ export class Level {
         if (this.isActivatedB) {
             this.end.activate(true)
         }
+
+        this.updateDebugRegions()
     }
 
     newEndFromJson(data: { [x: string]: number }) {
@@ -157,6 +162,7 @@ export class Level {
         this.triggers.destroy()
         this.monsters.destroy()
         this.monsterSpawns.destroy()
+        this.destroyDebugRegions()
     }
 
     recreateMonstersUnitsOfType(mt: MonsterType) {
@@ -223,17 +229,23 @@ export class Level {
         return this.startMessage
     }
 
-    debugRegions = (active: boolean) => {
-        for (const light of this.lights) {
-            DestroyLightning(light)
-        }
+    updateDebugRegions = () => {
+        this.destroyDebugRegions()
 
-        if (active) {
+        if (this.debugRegionsVisible) {
+            this.start && this.drawRegion(this.start.minX, this.start.minY, this.start.maxX, this.start.maxY)
+            this.end && this.drawRegion(this.end.minX, this.end.minY, this.end.maxX, this.end.maxY)
+
             for (const [_, staticSlide] of pairs(this.staticSlides.getAll())) {
                 this.drawRegion(staticSlide.getX1(), staticSlide.getY1(), staticSlide.getX2(), staticSlide.getY2())
                 this.drawRegion(staticSlide.getX3(), staticSlide.getY3(), staticSlide.getX4(), staticSlide.getY4())
             }
         }
+    }
+
+    setDebugRegionsVisible = (active: boolean) => {
+        this.debugRegionsVisible = active
+        this.updateDebugRegions()
     }
 
     drawRegion = (x1: number, y1: number, x2: number, y2: number) => {
@@ -244,9 +256,16 @@ export class Level {
     }
 
     drawLine = (x1: number, y1: number, x2: number, y2: number) => {
-        const light = AddLightning('CLPB', false, x1, y1, x2, y2)
+        const light = AddLightning('DRAM', false, x1, y1, x2, y2)
         arrayPush(this.lights, light)
-        SetLightningColor(light, 140, 20, 252, 1)
+    }
+
+    destroyDebugRegions = () => {
+        for (const light of this.lights) {
+            DestroyLightning(light)
+        }
+
+        this.lights.length = 0
     }
 
     toJson = () => {

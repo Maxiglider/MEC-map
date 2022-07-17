@@ -14,7 +14,7 @@ export const init_Test = () => {
         if (escaper) {
             ExecuteCommand(
                 escaper,
-                "-va, news slide 'Nsnw', setta slide s, news reverse 5 -400, setta reverse rev, newd death 1 Abilities\\Spells\\NightElf\\EntanglingRoots\\EntanglingRootsTarget.mdl, setta death d, neww walk 97, setta walk w"
+                "-va, news slide 'Nsnw', setta slide s, news reverse 5 -400, setta reverse rev, newd death 1 Abilities\\Spells\\NightElf\\EntanglingRoots\\EntanglingRootsTarget.mdl, setta death d, neww walk 97, setta walk w, crh"
             )
 
             ExecuteCommand(escaper, "-newm caisse 'cais' 40, newm naga 'nnsw' 60, newm peon 'opeo' 40")
