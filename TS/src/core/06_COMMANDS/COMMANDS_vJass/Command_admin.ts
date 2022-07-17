@@ -3,6 +3,7 @@ import { NB_ESCAPERS, NB_PLAYERS_MAX } from 'core/01_libraries/Constants'
 import { Text } from 'core/01_libraries/Text'
 import { Escaper } from 'core/04_STRUCTURES/Escaper/Escaper'
 import { GetMirrorEscaper } from 'core/04_STRUCTURES/Escaper/Escaper_functions'
+import { SaveLoad } from 'core/04_STRUCTURES/Escaper/Escaper_StartCommands'
 import { ReinitTerrains } from 'core/07_TRIGGERS/Triggers_to_modify_terrains/Reinit_terrains'
 import { ReinitTerrainsPositions } from 'core/07_TRIGGERS/Triggers_to_modify_terrains/Reinit_terrains_position_Change_variations_and_ut_at_beginning'
 import { AfkMode } from 'core/08_GAME/Afk_mode/Afk_mode'
@@ -17,7 +18,6 @@ import {
     getUdgTerrainTypes,
     globals,
 } from '../../../../globals'
-import { initSaveLoad } from '../../../Utils/SaveLoad/SaveLoad'
 import { IsPositiveInteger } from '../../01_libraries/Functions_on_numbers'
 import { SaveMapInCache } from '../../07_TRIGGERS/Save_map_in_gamecache/SaveMapInCache'
 import { SaveLoadTerrain } from '../../07_TRIGGERS/Triggers_to_modify_terrains/Save_load_terrain'
@@ -586,8 +586,6 @@ export const initExecuteCommandMax = () => {
                     Text.mkP(escaper.getPlayer(), 'Failed to load, use -smic first')
                     return true
                 }
-
-                const SaveLoad = initSaveLoad()
 
                 Text.A('Loading')
                 SaveLoad.readFile(SaveMapInCache.lastSaveFile, GetTriggerPlayer(), data => {

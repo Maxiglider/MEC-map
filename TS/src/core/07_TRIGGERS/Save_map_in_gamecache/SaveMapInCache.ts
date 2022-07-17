@@ -1,3 +1,4 @@
+import { SaveLoad } from 'core/04_STRUCTURES/Escaper/Escaper_StartCommands'
 import { getUdgCasterTypes, getUdgLevels, getUdgMonsterTypes, getUdgTerrainTypes } from '../../../../globals'
 import { ArrayHandler } from '../../../Utils/ArrayHandler'
 import {
@@ -7,7 +8,6 @@ import {
     resetNbArraysObjectsCleared,
 } from '../../../Utils/clearArrayOrObject'
 import { ObjectHandler } from '../../../Utils/ObjectHandler'
-import { initSaveLoad } from '../../../Utils/SaveLoad/SaveLoad'
 import { jsonEncode } from '../../01_libraries/Basic_functions'
 import { MEC_SMIC_DATA_FILE_DATE_TPL } from '../../01_libraries/Constants'
 import { Text } from '../../01_libraries/Text'
@@ -58,8 +58,6 @@ export class SaveMapInCache {
     private static smicStringObj = { str: '' }
 
     public static smic = (p: player | null = null) => {
-        const SaveLoad = initSaveLoad()
-
         if (p === null || GetLocalPlayer() == p) {
             const startTime = os.clock()
 

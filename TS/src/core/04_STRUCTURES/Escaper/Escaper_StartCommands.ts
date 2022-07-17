@@ -4,7 +4,7 @@ import { ServiceManager } from 'Services'
 import { initSaveLoad } from '../../../Utils/SaveLoad/SaveLoad'
 import { Escaper } from './Escaper'
 
-const SaveLoad = initSaveLoad()
+export const SaveLoad = initSaveLoad()
 
 export class EscaperStartCommands {
     private startCommands: string[] = []
