@@ -18,7 +18,7 @@ const initServiceManager = <TServices extends { [K in string]: TServices[K] }>()
         const targetService = services[serviceName]
 
         if (!targetService) {
-            throw `Service: '${serviceName}' not found`
+            throw `Service: '${String(serviceName)}' not found`
         }
 
         return targetService
