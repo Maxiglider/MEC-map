@@ -16,8 +16,7 @@ import {
 } from 'core/01_libraries/Constants'
 import { udg_colorCode } from 'core/01_libraries/Init_colorCodes'
 import { Text } from 'core/01_libraries/Text'
-import { MakeMonsterPropertyChange } from 'core/05_MAKE_STRUCTURES/Make/MakeMonsterPropertyChange'
-import { MakeStaticSlidePropertyChange } from 'core/05_MAKE_STRUCTURES/Make/MakeStaticSlidePropertyChange'
+import { MakePropertyChange } from 'core/05_MAKE_STRUCTURES/Make/MakePropertyChange'
 import { MakeCaster } from 'core/05_MAKE_STRUCTURES/Make_create_casters/MakeCaster'
 import { MakeMeteor } from 'core/05_MAKE_STRUCTURES/Make_create_meteors/MakeMeteor'
 import { MakeMonsterMultiplePatrols } from 'core/05_MAKE_STRUCTURES/Make_create_monsters/MakeMonsterMultiplePatrols'
@@ -1425,13 +1424,13 @@ export class Escaper {
     makeSetPortalMobFreezeDuration(freezeDuration: number) {
         this.destroyMake()
         if (this.hero) {
-            this.make = new MakeMonsterPropertyChange(
+            this.make = new MakePropertyChange(
                 this.hero,
                 'freezeDuration',
                 freezeDuration,
-                monster => !!monster.getPortalMob(),
-                monster => monster.getPortalMob()?.getFreezeDuration(),
-                (monster, freezeDuration) => monster.getPortalMob()?.setFreezeDuration(freezeDuration!)
+                (x, y) => this.getMakingLevel().monsters.getMonsterNear(x, y)?.getPortalMob(),
+                monster => monster.getFreezeDuration(),
+                (monster, freezeDuration) => monster.setFreezeDuration(freezeDuration)
             )
         }
     }
@@ -1439,13 +1438,13 @@ export class Escaper {
     makeSetPortalMobPortalEffect(portalEffect: string | null) {
         this.destroyMake()
         if (this.hero) {
-            this.make = new MakeMonsterPropertyChange(
+            this.make = new MakePropertyChange(
                 this.hero,
                 'portalEffect',
                 portalEffect,
-                monster => !!monster.getPortalMob(),
-                monster => monster.getPortalMob()?.getPortalEffect(),
-                (monster, portalEffect) => monster.getPortalMob()?.setPortalEffect(portalEffect!)
+                (x, y) => this.getMakingLevel().monsters.getMonsterNear(x, y)?.getPortalMob(),
+                monster => monster.getPortalEffect(),
+                (monster, portalEffect) => monster.setPortalEffect(portalEffect)
             )
         }
     }
@@ -1453,14 +1452,13 @@ export class Escaper {
     makeSetPortalMobPortalEffectDuration(portalEffectDuration: number | null) {
         this.destroyMake()
         if (this.hero) {
-            this.make = new MakeMonsterPropertyChange(
+            this.make = new MakePropertyChange(
                 this.hero,
                 'portalEffectDuration',
                 portalEffectDuration,
-                monster => !!monster.getPortalMob(),
-                monster => monster.getPortalMob()?.getPortalEffectDuration(),
-                (monster, portalEffectDuration) =>
-                    monster.getPortalMob()?.setPortalEffectDuration(portalEffectDuration!)
+                (x, y) => this.getMakingLevel().monsters.getMonsterNear(x, y)?.getPortalMob(),
+                monster => monster.getPortalEffectDuration(),
+                (monster, portalEffectDuration) => monster.setPortalEffectDuration(portalEffectDuration)
             )
         }
     }
@@ -1468,13 +1466,13 @@ export class Escaper {
     makeSetCircleMobSpeed(speed: number) {
         this.destroyMake()
         if (this.hero) {
-            this.make = new MakeMonsterPropertyChange(
+            this.make = new MakePropertyChange(
                 this.hero,
                 'speed',
                 speed,
-                monster => !!monster.getCircleMobs(),
-                monster => monster.getCircleMobs()?.getSpeed(),
-                (monster, speed) => monster.getCircleMobs()?.setSpeed(speed!)
+                (x, y) => this.getMakingLevel().monsters.getMonsterNear(x, y)?.getCircleMob(),
+                monster => monster.getSpeed(),
+                (monster, speed) => monster.setSpeed(speed)
             )
         }
     }
@@ -1482,13 +1480,13 @@ export class Escaper {
     makeSetCircleMobDirection(direction: 'cw' | 'ccw') {
         this.destroyMake()
         if (this.hero) {
-            this.make = new MakeMonsterPropertyChange(
+            this.make = new MakePropertyChange(
                 this.hero,
                 'direction',
                 direction,
-                monster => !!monster.getCircleMobs(),
-                monster => monster.getCircleMobs()?.getDirection(),
-                (monster, direction) => monster.getCircleMobs()?.setDirection(direction!)
+                (x, y) => this.getMakingLevel().monsters.getMonsterNear(x, y)?.getCircleMob(),
+                monster => monster.getDirection(),
+                (monster, direction) => monster.setDirection(direction)
             )
         }
     }
@@ -1496,13 +1494,13 @@ export class Escaper {
     makeSetCircleMobFacing(facing: 'cw' | 'ccw' | 'in' | 'out') {
         this.destroyMake()
         if (this.hero) {
-            this.make = new MakeMonsterPropertyChange(
+            this.make = new MakePropertyChange(
                 this.hero,
                 'facing',
                 facing,
-                monster => !!monster.getCircleMobs(),
-                monster => monster.getCircleMobs()?.getFacing(),
-                (monster, facing) => monster.getCircleMobs()?.setFacing(facing!)
+                (x, y) => this.getMakingLevel().monsters.getMonsterNear(x, y)?.getCircleMob(),
+                monster => monster.getFacing(),
+                (monster, facing) => monster.setFacing(facing)
             )
         }
     }
@@ -1510,13 +1508,13 @@ export class Escaper {
     makeSetCircleMobRadius(radius: number) {
         this.destroyMake()
         if (this.hero) {
-            this.make = new MakeMonsterPropertyChange(
+            this.make = new MakePropertyChange(
                 this.hero,
                 'radius',
                 radius,
-                monster => !!monster.getCircleMobs(),
-                monster => monster.getCircleMobs()?.getRadius(),
-                (monster, radius) => monster.getCircleMobs()?.setRadius(radius!)
+                (x, y) => this.getMakingLevel().monsters.getMonsterNear(x, y)?.getCircleMob(),
+                monster => monster.getRadius(),
+                (monster, radius) => monster.setRadius(radius)
             )
         }
     }
@@ -1524,11 +1522,11 @@ export class Escaper {
     makeSetStaticSlideSpeed(speed: number) {
         this.destroyMake()
         if (this.hero) {
-            this.make = new MakeStaticSlidePropertyChange(
+            this.make = new MakePropertyChange(
                 this.hero,
                 'speed',
                 speed,
-                staticSlide => !!staticSlide,
+                (x, y) => this.getMakingLevel().staticSlides.getStaticSlideFromPoint(x, y),
                 staticSlide => staticSlide.getSpeed(),
                 (staticSlide, speed) => staticSlide.setSpeed(speed)
             )
@@ -1538,11 +1536,11 @@ export class Escaper {
     makeSetStaticSlideAngle(angle: number) {
         this.destroyMake()
         if (this.hero) {
-            this.make = new MakeStaticSlidePropertyChange(
+            this.make = new MakePropertyChange(
                 this.hero,
                 'angle',
                 angle,
-                staticSlide => !!staticSlide,
+                (x, y) => this.getMakingLevel().staticSlides.getStaticSlideFromPoint(x, y),
                 staticSlide => staticSlide.getAngle(),
                 (staticSlide, angle) => staticSlide.setAngle(angle)
             )
