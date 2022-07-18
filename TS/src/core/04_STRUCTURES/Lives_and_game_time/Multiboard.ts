@@ -1,11 +1,11 @@
 import { ucfirst } from 'core/01_libraries/Basic_functions'
-import { NB_ESCAPERS } from 'core/01_libraries/Constants'
+import { NB_ESCAPERS, PURPLE, RED } from 'core/01_libraries/Constants'
 import { udg_colorCode } from 'core/01_libraries/Init_colorCodes'
 import { ServiceManager } from 'Services'
 import { ArrayHandler } from 'Utils/ArrayHandler'
 import { literalArray } from 'Utils/ArrayUtils'
 import { createTimer, forRange } from 'Utils/mapUtils'
-import { getUdgEscapers, globals } from '../../../../globals'
+import { getUdgEscapers, getUdgLevels, globals } from '../../../../globals'
 import { playerId2colorId, rawPlayerNames } from '../../06_COMMANDS/COMMANDS_vJass/Command_functions'
 import { Escaper } from '../Escaper/Escaper'
 import { LIVES_PLAYER } from './Lives_and_game_time'
@@ -242,7 +242,14 @@ export const initMultiboard = () => {
         const playerMode = playerScores[GetPlayerId(escaper.getPlayer())]
 
         if (GetLocalPlayer() === escaper.getPlayer()) {
-            mb && MultiboardSetTitleText(mb, `Scoreboard - ${ucfirst(playerMode.statsMode)}`)
+            mb &&
+                MultiboardSetTitleText(
+                    mb,
+                    `Scoreboard - ${ucfirst(playerMode.statsMode)}` +
+                        (getUdgLevels().isNoobEdit() ? ' - ' + udg_colorCode[RED] + 'Noobedit' + '|r' : '') +
+                        (getUdgLevels().isSpeedEdit() ? ' - ' + udg_colorCode[PURPLE] + 'SPEED' + '|r' : '')
+                )
+
             mb &&
                 MultiboardMinimizeBJ(
                     escaper.hideLeaderboard ||
@@ -300,5 +307,6 @@ export const initMultiboard = () => {
         updateLives,
         resetRoundScores,
         getOrCreateLeaderboard,
+        reinitBoards,
     }
 }

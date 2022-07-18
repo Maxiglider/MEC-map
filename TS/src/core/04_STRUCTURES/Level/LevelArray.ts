@@ -1,8 +1,8 @@
-import { NB_LIVES_AT_BEGINNING } from 'core/01_libraries/Constants'
+import { NB_ESCAPERS, NB_LIVES_AT_BEGINNING } from 'core/01_libraries/Constants'
 import { Text } from 'core/01_libraries/Text'
 import { gg_trg_apparition_dialogue_et_fermeture_automatique } from 'core/08_GAME/Mode_coop/creation_dialogue'
 import { ServiceManager } from 'Services'
-import { getUdgCasterTypes, getUdgEscapers, getUdgMonsterTypes } from '../../../../globals'
+import { getUdgCasterTypes, getUdgEscapers, getUdgMonsterTypes, getUdgTerrainTypes, globals } from '../../../../globals'
 import { MoveCamExceptForPlayer } from '../../01_libraries/Basic_functions'
 import { udg_colorCode } from '../../01_libraries/Init_colorCodes'
 import { BaseArray } from '../BaseArray'
@@ -19,6 +19,7 @@ import { MonsterTeleport } from '../Monster/MonsterTeleport'
 import type { MonsterType } from '../Monster/MonsterType'
 import type { MonsterSpawnArray } from '../MonsterSpawn/MonsterSpawnArray'
 import type { ClearMobArray } from '../Monster_properties/ClearMobArray'
+import { isDeathTerrain, isSlideTerrain } from '../TerrainType/TerrainType'
 import { Level } from './Level'
 import { IsLevelBeingMade } from './Level_functions'
 import type { VisibilityModifierArray } from './VisibilityModifierArray'
@@ -28,6 +29,22 @@ const MIN_TIME_BETWEEN_GOTNL = 0.05
 export class LevelArray extends BaseArray<Level> {
     private currentLevel: number
     private tLastGoToNextLevel?: timer
+
+    private noobEdit = false
+    private speedEdit = false
+
+    private modeState: {
+        noobEdit: {
+            active: boolean
+            lives: number
+            autoreviveDelay: number | undefined
+            terrains: { [label: string]: { timeToKill: number } }
+        }
+        speedEdit: { active: boolean; terrains: { [label: string]: { slideSpeed: number; rotationSpeed: number } } }
+    } = {
+        noobEdit: { active: false, lives: 0, autoreviveDelay: undefined, terrains: {} },
+        speedEdit: { active: false, terrains: {} },
+    }
 
     constructor() {
         super(true)
@@ -371,5 +388,88 @@ export class LevelArray extends BaseArray<Level> {
             i = i + 1
         }
         return nb
+    }
+
+    isNoobEdit = () => this.noobEdit
+    setIsNoobEdit = (isNoobEdit: boolean) => {
+        if (this.modeState.noobEdit.active === isNoobEdit) {
+            return
+        }
+
+        this.modeState.noobEdit.active = isNoobEdit
+
+        if (isNoobEdit) {
+            this.modeState.noobEdit.lives = ServiceManager.getService('Lives').get()
+            this.modeState.noobEdit.autoreviveDelay = globals.autoreviveDelay
+
+            ServiceManager.getService('Lives').setNb(9999)
+            globals.autoreviveDelay = 0.3
+
+            for (let i = 0; i < NB_ESCAPERS; i++) {
+                getUdgEscapers().get(i)?.setHasAutorevive(true)
+            }
+
+            for (const [_, terrain] of pairs(getUdgTerrainTypes().getAll())) {
+                if (isDeathTerrain(terrain)) {
+                    this.modeState.noobEdit.terrains[terrain.label] = { timeToKill: terrain.getTimeToKill() }
+                    terrain.setTimeToKill(0.3)
+                }
+            }
+        } else {
+            ServiceManager.getService('Lives').setNb(this.modeState.noobEdit.lives)
+            globals.autoreviveDelay = this.modeState.noobEdit.autoreviveDelay
+
+            for (let i = 0; i < NB_ESCAPERS; i++) {
+                getUdgEscapers().get(i)?.setHasAutorevive(false)
+            }
+
+            for (const [_, terrain] of pairs(getUdgTerrainTypes().getAll())) {
+                if (isDeathTerrain(terrain)) {
+                    terrain.setTimeToKill(this.modeState.noobEdit.terrains[terrain.label].timeToKill)
+                }
+            }
+        }
+
+        // If noobedit gets disabled we'll still show the noobedit tag on the leaderboard.
+        if (!this.noobEdit) {
+            this.noobEdit = true
+            ServiceManager.getService('Multiboard').reinitBoards()
+        }
+    }
+
+    isSpeedEdit = () => this.speedEdit
+    setIsSpeedEdit = (isSpeedEdit: boolean) => {
+        if (this.modeState.speedEdit.active === isSpeedEdit) {
+            return
+        }
+
+        this.modeState.speedEdit.active = isSpeedEdit
+
+        if (isSpeedEdit) {
+            for (const [_, terrain] of pairs(getUdgTerrainTypes().getAll())) {
+                if (isSlideTerrain(terrain)) {
+                    this.modeState.speedEdit.terrains[terrain.label] = {
+                        slideSpeed: terrain.getSlideSpeed(),
+                        rotationSpeed: terrain.getRotationSpeed(),
+                    }
+
+                    terrain.setSlideSpeed(Math.max(800, terrain.getSlideSpeed()))
+                    terrain.setRotationSpeed(Math.max(1.2, terrain.getRotationSpeed()))
+                }
+            }
+        } else {
+            for (const [_, terrain] of pairs(getUdgTerrainTypes().getAll())) {
+                if (isSlideTerrain(terrain)) {
+                    terrain.setSlideSpeed(this.modeState.speedEdit.terrains[terrain.label].slideSpeed)
+                    terrain.setRotationSpeed(this.modeState.speedEdit.terrains[terrain.label].rotationSpeed)
+                }
+            }
+        }
+
+        // If speedEdit gets disabled we'll still show the speedEdit tag on the leaderboard.
+        if (!this.speedEdit) {
+            this.speedEdit = true
+            ServiceManager.getService('Multiboard').reinitBoards()
+        }
     }
 }

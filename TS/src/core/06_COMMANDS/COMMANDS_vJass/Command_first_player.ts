@@ -1,4 +1,6 @@
+import { IsBoolString, S2B } from 'core/01_libraries/Basic_functions'
 import { NB_ESCAPERS } from 'core/01_libraries/Constants'
+import { Text } from 'core/01_libraries/Text'
 import { ServiceManager } from 'Services'
 import { getUdgEscapers, getUdgLevels } from '../../../../globals'
 import { isPlayerId, resolvePlayerId } from './Command_functions'
@@ -104,6 +106,52 @@ export const initExecuteCommandRed = () => {
             if (noParam) {
                 getUdgLevels().restartTheGame()
             }
+            return true
+        },
+    })
+
+    //-noobedit
+    registerCommand({
+        name: 'noobedit',
+        alias: [],
+        group: 'red',
+        argDescription: '<active>',
+        description: '',
+        cb: ({ nbParam, param1 }) => {
+            if (nbParam === 1 && IsBoolString(param1)) {
+                if (S2B(param1)) {
+                    Text.A('Really? Noobs!')
+                } else {
+                    if (getUdgLevels().isNoobEdit()) {
+                        Text.A("That's better, but you're still Noobs!")
+                    }
+                }
+
+                getUdgLevels().setIsNoobEdit(S2B(param1))
+            }
+
+            return true
+        },
+    })
+
+    //-speededit
+    registerCommand({
+        name: 'speededit',
+        alias: [],
+        group: 'red',
+        argDescription: '<active>',
+        description: '',
+        cb: ({ nbParam, param1 }) => {
+            if (nbParam === 1 && IsBoolString(param1)) {
+                if (S2B(param1)) {
+                    Text.A('Letsgoooooo!')
+                } else {
+                    Text.A('Speed disabled')
+                }
+
+                getUdgLevels().setIsSpeedEdit(S2B(param1))
+            }
+
             return true
         },
     })

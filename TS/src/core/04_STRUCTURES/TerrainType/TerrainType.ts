@@ -1,9 +1,9 @@
 import { CanUseTerrain } from 'core/07_TRIGGERS/Modify_terrain_Functions/Terrain_functions'
+import { ObjectHandler } from '../../../Utils/ObjectHandler'
 import { Ascii2String } from '../../01_libraries/Ascii'
 import { TerrainTypeDeath } from './TerrainTypeDeath'
 import { TerrainTypeSlide } from './TerrainTypeSlide'
 import { TerrainTypeWalk } from './TerrainTypeWalk'
-import {ObjectHandler} from "../../../Utils/ObjectHandler";
 
 export const DISPLAY_SPACE = '   '
 
@@ -88,7 +88,7 @@ export abstract class TerrainType {
         return true
     }
 
-    getKind = (): string => {
+    getKind = () => {
         return this.kind
     }
 
