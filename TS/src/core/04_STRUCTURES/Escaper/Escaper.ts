@@ -1663,7 +1663,7 @@ export class Escaper {
     }
 
     //coop reviving
-    coopReviveHero = () => {
+    coopReviveHero: (this: void) => void = () => {
         const mirrorEscaper = GetMirrorEscaper(this)
         const mirrorHero = mirrorEscaper?.getHero()
 

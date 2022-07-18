@@ -34,14 +34,20 @@ export const createTimer = (timeout: number, periodic: boolean, handlerFunc: () 
 
 export const errorHandler = (cb: () => void, errorCb?: (e: any) => void) => {
     return () => {
-        const [a, b] = pcall(cb);
+        const [a, b] = pcall(cb)
 
-        if(!a){
-            if(typeof b == 'string') {
-                print("Error caught: " + b)
+        if (!a) {
+            if (typeof b == 'string') {
+                print('Error caught: ' + b)
             }
 
             errorCb && errorCb(b)
         }
     }
+}
+
+export const runInTrigger = (action: () => void) => {
+    const t = CreateTrigger()
+    TriggerAddAction(t, errorHandler(action))
+    TriggerExecute(t)
 }

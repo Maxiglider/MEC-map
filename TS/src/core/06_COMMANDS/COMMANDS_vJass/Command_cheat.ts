@@ -2,11 +2,13 @@ import { IsBoolString, S2B } from 'core/01_libraries/Basic_functions'
 import { NB_ESCAPERS } from 'core/01_libraries/Constants'
 import { IsInteger, IsPositiveInteger } from 'core/01_libraries/Functions_on_numbers'
 import { Text } from 'core/01_libraries/Text'
+import { Escaper } from 'core/04_STRUCTURES/Escaper/Escaper'
 import { GetMirrorEscaper } from 'core/04_STRUCTURES/Escaper/Escaper_functions'
 import { METEOR_CHEAT } from 'core/04_STRUCTURES/Meteor/Meteor'
 import { Gravity } from 'core/07_TRIGGERS/Slide_and_CheckTerrain_triggers/Gravity'
 import { ServiceManager } from 'Services'
 import { getUdgEscapers, getUdgLevels } from '../../../../globals'
+import { runInTrigger } from '../../../Utils/mapUtils'
 import { getUdgViewAll } from '../../03_view_all_hide_all/View_all_hide_all'
 import { MeteorFunctions } from '../../04_STRUCTURES/Meteor/Meteor_functions'
 import { Trig_InvisUnit_is_getting_damage } from '../../08_GAME/Death/InvisUnit_is_getting_damage'
@@ -318,6 +320,18 @@ export const initExecuteCommandCheat = () => {
         },
     })
 
+    const revivePositionCb = (escaper: Escaper) => {
+        const hero = escaper.getHero()
+
+        if (!hero) {
+            return
+        }
+
+        if (!escaper.isAlive()) {
+            runInTrigger(escaper.coopReviveHero)
+        }
+    }
+
     //-revivePosition(rpos)   --> revives your hero
     registerCommand({
         name: 'revivePosition',
@@ -327,46 +341,34 @@ export const initExecuteCommandCheat = () => {
         description: 'Revives your hero',
         cb: ({ noParam, nbParam, param1 }, escaper) => {
             if (noParam) {
-                const hero = escaper.getHero()
-
-                if (!hero) {
-                    return true
-                }
-
-                escaper.coopReviveHero()
+                revivePositionCb(escaper)
                 return true
             }
+
             if (!(nbParam == 1 && escaper.isMaximaxou())) {
                 return true
             }
+
             if (param1 === 'all' || param1 === 'a') {
-                let i = 0
-                while (true) {
-                    if (i >= NB_ESCAPERS) break
-                    if (getUdgEscapers().get(i) != null) {
-                        const hero = getUdgEscapers().get(i)?.getHero()
+                for (let i = 0; i < NB_ESCAPERS; i++) {
+                    const escaper = getUdgEscapers().get(i)
 
-                        if (!hero) {
-                            return true
-                        }
-
-                        getUdgEscapers().get(i)?.coopReviveHero()
+                    if (escaper) {
+                        revivePositionCb(escaper)
                     }
-                    i = i + 1
                 }
+
                 return true
             }
+
             if (isPlayerId(param1)) {
-                if (getUdgEscapers().get(resolvePlayerId(param1)) != null) {
-                    const hero = getUdgEscapers().get(resolvePlayerId(param1))?.getHero()
+                const escaper = getUdgEscapers().get(resolvePlayerId(param1))
 
-                    if (!hero) {
-                        return true
-                    }
-
-                    getUdgEscapers().get(resolvePlayerId(param1))?.coopReviveHero()
+                if (escaper) {
+                    revivePositionCb(escaper)
                 }
             }
+
             return true
         },
     })
