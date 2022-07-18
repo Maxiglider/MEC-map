@@ -46,6 +46,10 @@ const initCheckTerrainTrigger = () => {
 
         escaper.moveInvisUnit(x, y)
 
+        if (escaper.isStaticSliding()) {
+            return
+        }
+
         if (IsOnGround(hero)) {
             if (
                 !currentTerrainType ||

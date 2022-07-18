@@ -58,7 +58,7 @@ export class StaticSlide {
         const itemIndex = this.slidingPlayers.indexOf(playerId)
 
         if (itemIndex !== -1) {
-            getUdgEscapers().get(playerId)?.enableCheckTerrain(true)
+            getUdgEscapers().get(playerId)?.enableSlide(true)
             getUdgEscapers().get(playerId)?.setStaticSliding(false)
             this.slidingPlayers.splice(itemIndex, 1)
         }
@@ -88,7 +88,6 @@ export class StaticSlide {
                                 escaper.setStaticSliding(true)
                                 SetUnitFacing(hero, this.angle)
                                 Hero2Escaper(hero)?.enableSlide(false)
-                                Hero2Escaper(hero)?.enableCheckTerrain(false)
                                 Hero2Escaper(hero)?.setLastTerrainType(undefined)
                             }
                         },
