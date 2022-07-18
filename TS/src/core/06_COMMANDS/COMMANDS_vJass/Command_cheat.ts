@@ -333,7 +333,7 @@ export const initExecuteCommandCheat = () => {
                     return true
                 }
 
-                escaper.revive(GetUnitX(hero), GetUnitY(hero))
+                escaper.coopReviveHero()
                 return true
             }
             if (!(nbParam == 1 && escaper.isMaximaxou())) {
@@ -350,7 +350,7 @@ export const initExecuteCommandCheat = () => {
                             return true
                         }
 
-                        getUdgEscapers().get(i)?.revive(GetUnitX(hero), GetUnitY(hero))
+                        getUdgEscapers().get(i)?.coopReviveHero()
                     }
                     i = i + 1
                 }
@@ -364,7 +364,7 @@ export const initExecuteCommandCheat = () => {
                         return true
                     }
 
-                    getUdgEscapers().get(resolvePlayerId(param1))?.revive(GetUnitX(hero), GetUnitY(hero))
+                    getUdgEscapers().get(resolvePlayerId(param1))?.coopReviveHero()
                 }
             }
             return true
