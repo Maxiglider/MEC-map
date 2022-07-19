@@ -1920,6 +1920,58 @@ export const initExecuteCommandMake = () => {
         },
     })
 
+    //-setMonsterSpawnSpawnAmount(setmssa) <label> <amount>
+    registerCommand({
+        name: 'setMonsterSpawnSpawnAmount',
+        alias: ['setmssa'],
+        group: 'make',
+        argDescription: '<label> <amount>',
+        description: '',
+        cb: ({ param1, param2 }, escaper) => {
+            const monsterSpawn = escaper.getMakingLevel().monsterSpawns.getByLabel(param1)
+
+            if (!monsterSpawn) {
+                Text.erP(escaper.getPlayer(), 'unknown monster spawn "' + param1 + '" in this level')
+                return true
+            }
+
+            if (!(S2I(param2) > 0 && S2I(param2) <= 10)) {
+                Text.erP(escaper.getPlayer(), 'Speed must be > 0 and <= 10')
+                return true
+            }
+
+            monsterSpawn.setSpawnAmount(S2I(param2))
+            Text.mkP(escaper.getPlayer(), 'spawnAmount changed')
+            return true
+        },
+    })
+
+    //-setMonsterSpawnFixedSpawnOffset(setmsfso) <label> <offset>
+    registerCommand({
+        name: 'setMonsterSpawnFixedSpawnOffset',
+        alias: ['setmsfso'],
+        group: 'make',
+        argDescription: '<label> <offset>',
+        description: '',
+        cb: ({ param1, param2 }, escaper) => {
+            const monsterSpawn = escaper.getMakingLevel().monsterSpawns.getByLabel(param1)
+
+            if (!monsterSpawn) {
+                Text.erP(escaper.getPlayer(), 'unknown monster spawn "' + param1 + '" in this level')
+                return true
+            }
+
+            if (S2I(param2) !== 0 && !(S2I(param2) > 0 && S2I(param2) <= 16384)) {
+                Text.erP(escaper.getPlayer(), 'Speed must be > 0 and <= 16384')
+                return true
+            }
+
+            monsterSpawn.setFixedSpawnOffset(S2I(param2) === 0 ? undefined : S2I(param2))
+            Text.mkP(escaper.getPlayer(), 'fixedSpawnOffset changed')
+            return true
+        },
+    })
+
     //-displayMonsterSpawns(dms)
     registerCommand({
         name: 'displayMonsterSpawns',

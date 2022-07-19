@@ -35,16 +35,18 @@ const MonsterStartMovement = () => {
 const MonsterSpawn_Actions = () => {
     let ms = MonsterSpawn.anyTrigId2MonsterSpawn.get(GetHandleId(GetTriggeringTrigger()))
     if (ms) {
-        let mobUnit = ms.createMob()
-        if (mobUnit) {
-            let mobTimer = CreateTimer()
-            MonsterSpawn.anyTimerId2MonsterSpawn.set(GetHandleId(mobTimer), ms)
-            MonsterSpawn.anyTimerId2Unit.set(GetHandleId(mobTimer), mobUnit)
-            TimerStart(mobTimer, DELAY_BETWEEN_SPAWN_AND_MOVEMENT, false, MonsterStartMovement)
-            SetUnitOwner(mobUnit, ENNEMY_PLAYER, false)
-            ShowUnit(mobUnit, false)
-            UnitRemoveAbility(mobUnit, FourCC('Aloc'))
-            ms.monsters && GroupAddUnit(ms.monsters, mobUnit)
+        for (let i = 0; i < ms.getSpawnAmount(); i++) {
+            let mobUnit = ms.createMob()
+            if (mobUnit) {
+                let mobTimer = CreateTimer()
+                MonsterSpawn.anyTimerId2MonsterSpawn.set(GetHandleId(mobTimer), ms)
+                MonsterSpawn.anyTimerId2Unit.set(GetHandleId(mobTimer), mobUnit)
+                TimerStart(mobTimer, DELAY_BETWEEN_SPAWN_AND_MOVEMENT, false, MonsterStartMovement)
+                SetUnitOwner(mobUnit, ENNEMY_PLAYER, false)
+                ShowUnit(mobUnit, false)
+                UnitRemoveAbility(mobUnit, FourCC('Aloc'))
+                ms.monsters && GroupAddUnit(ms.monsters, mobUnit)
+            }
         }
     }
 }
@@ -74,6 +76,7 @@ export class MonsterSpawn {
     private mt: MonsterType
     private sens: string //leftToRight, upToDown, rightToLeft, downToUp
     private frequence: number
+    private spawnAmount = 1
     private minX: number
     private minY: number
     private maxX: number
@@ -82,6 +85,9 @@ export class MonsterSpawn {
     private tUnspawn?: trigger
     private unspawnReg?: region
     monsters?: group
+
+    private fixedSpawnOffset: number | undefined
+    private lastSpawnVal: number | undefined
 
     level?: Level
     id: number
@@ -203,41 +209,65 @@ export class MonsterSpawn {
         this.level && this.level.monsterSpawns.removeMonsterSpawn(this.id)
     }
 
+    calcValOffset = (a: number, b: number) => {
+        let valOffset = GetRandomReal(a, b)
+
+        if (this.fixedSpawnOffset !== undefined) {
+            if (this.lastSpawnVal === undefined) {
+                this.lastSpawnVal = a
+            }
+
+            this.lastSpawnVal += this.fixedSpawnOffset
+
+            if (this.lastSpawnVal >= b) {
+                this.lastSpawnVal = a
+            }
+
+            valOffset = this.lastSpawnVal
+        }
+
+        return valOffset
+    }
+
     startMobMovement = (mobUnit: unit, ms: MonsterSpawn) => {
         let p: player
         let x1: number
         let y1: number
         let x2: number
         let y2: number
+
         //leftToRight, upToDown, rightToLeft, downToUp
         if (this.sens === 'leftToRight') {
             x1 = this.minX
             x2 = this.maxX + DECALAGE_UNSPAWN
-            y1 = GetRandomReal(this.minY, this.maxY)
+            y1 = this.calcValOffset(this.minY, this.maxY)
             y2 = y1
         } else if (this.sens === 'upToDown') {
-            x1 = GetRandomReal(this.minX, this.maxX)
+            x1 = this.calcValOffset(this.minX, this.maxX)
             x2 = x1
             y1 = this.maxY
             y2 = this.minY - DECALAGE_UNSPAWN
         } else if (this.sens === 'rightToLeft') {
             x1 = this.maxX
             x2 = this.minX - DECALAGE_UNSPAWN
-            y1 = GetRandomReal(this.minY, this.maxY)
+            y1 = this.calcValOffset(this.minY, this.maxY)
             y2 = y1
         } else {
-            x1 = GetRandomReal(this.minX, this.maxX)
+            x1 = this.calcValOffset(this.minX, this.maxX)
             x2 = x1
             y1 = this.minY
             y2 = this.maxY + DECALAGE_UNSPAWN
         }
+
         SetUnitX(mobUnit, x1)
         SetUnitY(mobUnit, y1)
+
         if (ms.getMonsterType().isClickable()) {
             p = ENNEMY_PLAYER
         } else {
             p = GetCurrentMonsterPlayer()
         }
+
         SetUnitOwner(mobUnit, p, MOBS_VARIOUS_COLORS)
         ShowUnit(mobUnit, true)
         IssuePointOrder(mobUnit, 'move', x2, y2)
@@ -258,19 +288,22 @@ export class MonsterSpawn {
         }
 
         //hook onBeforeCreateMonsterUnit
-        const unitData = {
-            mt: this.mt,
-        }
 
         let hookArray = CombineHooks(
             this.level?.monsters.hooks_onBeforeCreateMonsterUnit,
             hooks.hooks_onBeforeCreateMonsterUnit
         )
+
         if (hookArray) {
             let forceUnitTypeId = 0
             let quit = false
+
             for (const hook of hookArray.values()) {
+                const unitData = ObjectHandler.getNewObject<{ mt: MonsterType }>()
+                unitData.mt = this.mt
                 const output = hook.execute(unitData)
+                ObjectHandler.clearObject(unitData)
+
                 if (output === false) {
                     quit = true
                 } else if (output && output.unitTypeId) {
@@ -300,13 +333,14 @@ export class MonsterSpawn {
             this.level?.monsters.hooks_onAfterCreateMonsterUnit,
             hooks.hooks_onAfterCreateMonsterUnit
         )
+
         if (hookArray) {
-            const unitData = {
-                mt: this.mt,
-                u: monster,
-            }
             for (const hook of hookArray.values()) {
+                const unitData = ObjectHandler.getNewObject<{ mt: MonsterType; u: unit }>()
+                unitData.mt = this.mt
+                unitData.u = monster
                 hook.execute(unitData)
+                ObjectHandler.clearObject(unitData)
             }
         }
 
@@ -342,6 +376,16 @@ export class MonsterSpawn {
         Text.P_timed(p, TERRAIN_DATA_DISPLAY_TIME, display)
     }
 
+    getSpawnAmount = () => this.spawnAmount
+    setSpawnAmount = (spawnAmount: number) => {
+        this.spawnAmount = spawnAmount
+    }
+
+    getFixedSpawnOffset = () => this.fixedSpawnOffset
+    setFixedSpawnOffset = (fixedSpawnOffset: number | undefined) => {
+        this.fixedSpawnOffset = fixedSpawnOffset
+    }
+
     toJson = () => {
         const output = ObjectHandler.getNewObject<any>()
 
@@ -349,6 +393,7 @@ export class MonsterSpawn {
         output['monsterTypeLabel'] = this.mt.label
         output['sens'] = this.sens
         output['frequence'] = this.frequence
+        output['spawnAmount'] = this.spawnAmount
         output['minX'] = R2I(this.minX)
         output['minY'] = R2I(this.minY)
         output['maxX'] = R2I(this.maxX)
