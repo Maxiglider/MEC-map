@@ -12,11 +12,25 @@ import { runInTrigger } from '../../../Utils/mapUtils'
 import { getUdgViewAll } from '../../03_view_all_hide_all/View_all_hide_all'
 import { MeteorFunctions } from '../../04_STRUCTURES/Meteor/Meteor_functions'
 import { Trig_InvisUnit_is_getting_damage } from '../../08_GAME/Death/InvisUnit_is_getting_damage'
-import { isPlayerId, resolvePlayerId } from './Command_functions'
+import { isPlayerId, resolvePlayerId, resolvePlayerIds } from './Command_functions'
 import { ActivateTeleport } from './Teleport'
 
 export const initExecuteCommandCheat = () => {
     const { registerCommand } = ServiceManager.getService('Cmd')
+
+    const reviveCb = (escaper: Escaper) => escaper.reviveAtStart()
+
+    const revivePositionCb = (escaper: Escaper) => {
+        const hero = escaper.getHero()
+
+        if (!hero) {
+            return
+        }
+
+        if (!escaper.isAlive()) {
+            runInTrigger(escaper.coopReviveHero)
+        }
+    }
 
     //-slideSpeed(ss) <speed>   --> changes the slide speed of your hero, ignoring terrains
     registerCommand({
@@ -294,43 +308,18 @@ export const initExecuteCommandCheat = () => {
         description: 'Revives your hero',
         cb: ({ noParam, nbParam, param1 }, escaper) => {
             if (noParam) {
-                escaper.reviveAtStart()
+                reviveCb(escaper)
                 return true
             }
+
             if (!(nbParam == 1 && escaper.isMaximaxou())) {
                 return true
             }
-            if (param1 === 'all' || param1 === 'a') {
-                let i = 0
-                while (true) {
-                    if (i >= NB_ESCAPERS) break
-                    if (getUdgEscapers().get(i) != null) {
-                        getUdgEscapers().get(i)?.reviveAtStart()
-                    }
-                    i = i + 1
-                }
-                return true
-            }
-            if (isPlayerId(param1)) {
-                if (getUdgEscapers().get(resolvePlayerId(param1)) != null) {
-                    getUdgEscapers().get(resolvePlayerId(param1))?.reviveAtStart()
-                }
-            }
+
+            resolvePlayerIds(param1, reviveCb)
             return true
         },
     })
-
-    const revivePositionCb = (escaper: Escaper) => {
-        const hero = escaper.getHero()
-
-        if (!hero) {
-            return
-        }
-
-        if (!escaper.isAlive()) {
-            runInTrigger(escaper.coopReviveHero)
-        }
-    }
 
     //-revivePosition(rpos)   --> revives your hero
     registerCommand({
@@ -349,26 +338,7 @@ export const initExecuteCommandCheat = () => {
                 return true
             }
 
-            if (param1 === 'all' || param1 === 'a') {
-                for (let i = 0; i < NB_ESCAPERS; i++) {
-                    const escaper = getUdgEscapers().get(i)
-
-                    if (escaper) {
-                        revivePositionCb(escaper)
-                    }
-                }
-
-                return true
-            }
-
-            if (isPlayerId(param1)) {
-                const escaper = getUdgEscapers().get(resolvePlayerId(param1))
-
-                if (escaper) {
-                    revivePositionCb(escaper)
-                }
-            }
-
+            resolvePlayerIds(param1, revivePositionCb)
             return true
         },
     })
