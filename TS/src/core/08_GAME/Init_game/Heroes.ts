@@ -18,7 +18,7 @@ const NB_ROWS = NB_COLUMNS == 4 ? 6 : 4
 export const heroes = {
     setEffectForMissingHeroes: (effectStr: string) => {
         EFFECT_FOR_MISSING_HEROES = effectStr
-    }
+    },
 }
 
 const RandomizeStartPositionsAndHeroSpawnOrder = () => {
@@ -84,10 +84,15 @@ const Trig_heroes_Actions = () => {
     RandomizeStartPositionsAndHeroSpawnOrder()
 
     //create heroes
-    ClearSelection()
-    i = 0
-    while (true) {
-        if (i >= NB_ESCAPERS) break
+    for (let i = 0; i < NB_ESCAPERS; i++) {
+        if (!getUdgEscapers().get(i)?.getHero()) {
+            if (GetPlayerId(GetLocalPlayer()) === i) {
+                ClearSelection()
+            }
+        }
+    }
+
+    for (let i = 0; i < NB_ESCAPERS; i++) {
         n = playerIdsRandomized[i]
         if (getUdgEscapers().get(n)) {
             getUdgEscapers()
@@ -103,8 +108,8 @@ const Trig_heroes_Actions = () => {
         }
         ;(startPositionsRandomized[n] as any) = null
         TriggerSleepAction(TIME_BETWEEN_EACH_HERO_SPAWN)
-        i = i + 1
     }
+
     //call EnableTrigger(gg_trg_anticheat_teleport_and_revive)
     //AnticheatTeleport_justRevived = true
     anEffect = null
