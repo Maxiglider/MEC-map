@@ -240,6 +240,15 @@ export class Level {
                 this.drawRegion(staticSlide.getX1(), staticSlide.getY1(), staticSlide.getX2(), staticSlide.getY2())
                 this.drawRegion(staticSlide.getX3(), staticSlide.getY3(), staticSlide.getX4(), staticSlide.getY4())
             }
+
+            for (const [_, monsterSpawn] of pairs(this.monsterSpawns.getAll())) {
+                this.drawRegion(
+                    monsterSpawn.getMinX(),
+                    monsterSpawn.getMinY(),
+                    monsterSpawn.getMaxX(),
+                    monsterSpawn.getMaxY()
+                )
+            }
         }
     }
 

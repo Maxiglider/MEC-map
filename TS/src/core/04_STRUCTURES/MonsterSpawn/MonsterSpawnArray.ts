@@ -1,9 +1,9 @@
+import { getUdgMonsterTypes } from '../../../../globals'
 import { Text } from '../../01_libraries/Text'
 import { BaseArray } from '../BaseArray'
 import type { Level } from '../Level/Level'
 import type { MonsterType } from '../Monster/MonsterType'
 import { MonsterSpawn } from './MonsterSpawn'
-import {getUdgMonsterTypes} from "../../../../globals";
 
 export class MonsterSpawnArray extends BaseArray<MonsterSpawn> {
     private level: Level
@@ -27,15 +27,26 @@ export class MonsterSpawnArray extends BaseArray<MonsterSpawn> {
         this._new(monsterSpawn)
         activate && monsterSpawn.activate()
         monsterSpawn.level = this.level
+
+        this.level.updateDebugRegions()
     }
 
     newFromJson = (monsterSpawnsJson: { [x: string]: any }[]) => {
-        for(let ms of monsterSpawnsJson){
+        for (let ms of monsterSpawnsJson) {
             const mt = getUdgMonsterTypes().getByLabel(ms.monsterTypeLabel)
-            if(!mt){
+            if (!mt) {
                 Text.erA('Monster type "' + ms.monsterTypeLabel + '" unknown')
-            }else {
-                const monsterSpawn = new MonsterSpawn(ms.label, mt, ms.sens, ms.frequence, ms.minX, ms.minY, ms.maxX, ms.maxY)
+            } else {
+                const monsterSpawn = new MonsterSpawn(
+                    ms.label,
+                    mt,
+                    ms.sens,
+                    ms.frequence,
+                    ms.minX,
+                    ms.minY,
+                    ms.maxX,
+                    ms.maxY
+                )
                 this.new(monsterSpawn, false)
             }
         }
@@ -43,6 +54,8 @@ export class MonsterSpawnArray extends BaseArray<MonsterSpawn> {
 
     removeMonsterSpawn = (monsterSpawnId: number) => {
         delete this.data[monsterSpawnId]
+
+        this.level.updateDebugRegions()
     }
 
     clearMonsterSpawn = (label: string): boolean => {
