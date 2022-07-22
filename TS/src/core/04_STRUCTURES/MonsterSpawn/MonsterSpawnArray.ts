@@ -48,6 +48,7 @@ export class MonsterSpawnArray extends BaseArray<MonsterSpawn> {
                     ms.maxY
                 )
                 monsterSpawn.setSpawnAmount(ms.spawnAmount || 1)
+                monsterSpawn.setInitialDelay(ms.initialDelay || 0)
                 this.new(monsterSpawn, false)
             }
         }

@@ -1,3 +1,5 @@
+import { createTimer } from 'Utils/mapUtils'
+import { Timer } from 'w3ts'
 import { ObjectHandler } from '../../../Utils/ObjectHandler'
 import { GetCurrentMonsterPlayer } from '../../01_libraries/Basic_functions'
 import { ENNEMY_PLAYER, GREY, MOBS_VARIOUS_COLORS, TERRAIN_DATA_DISPLAY_TIME } from '../../01_libraries/Constants'
@@ -77,6 +79,7 @@ export class MonsterSpawn {
     private sens: string //leftToRight, upToDown, rightToLeft, downToUp
     private frequence: number
     private spawnAmount = 1
+    private initialDelay = 0
     private minX: number
     private minY: number
     private maxX: number
@@ -91,6 +94,8 @@ export class MonsterSpawn {
 
     level?: Level
     id: number
+
+    private initialDelayTimer: Timer | undefined
 
     constructor(
         label: string,
@@ -131,6 +136,8 @@ export class MonsterSpawn {
     getMaxY = () => this.maxY
 
     deactivate = () => {
+        this.initialDelayTimer?.pause().destroy()
+
         if (this.unspawnReg) {
             RemoveRegion(this.unspawnReg)
             delete this.unspawnReg
@@ -192,10 +199,19 @@ export class MonsterSpawn {
     activate = () => {
         this.monsters = CreateGroup()
 
-        this.tSpawn = CreateTrigger()
-        MonsterSpawn.anyTrigId2MonsterSpawn.set(GetHandleId(this.tSpawn), this)
-        TriggerRegisterTimerEvent(this.tSpawn, 1 / this.frequence, true)
-        TriggerAddAction(this.tSpawn, MonsterSpawn_Actions)
+        if (this.initialDelay === 0) {
+            this.tSpawn = CreateTrigger()
+            MonsterSpawn.anyTrigId2MonsterSpawn.set(GetHandleId(this.tSpawn), this)
+            TriggerRegisterTimerEvent(this.tSpawn, 1 / this.frequence, true)
+            TriggerAddAction(this.tSpawn, MonsterSpawn_Actions)
+        } else {
+            this.initialDelayTimer = createTimer(this.initialDelay, false, () => {
+                this.tSpawn = CreateTrigger()
+                MonsterSpawn.anyTrigId2MonsterSpawn.set(GetHandleId(this.tSpawn), this)
+                TriggerRegisterTimerEvent(this.tSpawn, 1 / this.frequence, true)
+                TriggerAddAction(this.tSpawn, MonsterSpawn_Actions)
+            })
+        }
 
         this.createUnspawnReg()
         this.tUnspawn = CreateTrigger()
@@ -381,6 +397,11 @@ export class MonsterSpawn {
         this.spawnAmount = spawnAmount
     }
 
+    getInitialDelay = () => this.initialDelay
+    setInitialDelay = (initialDelay: number) => {
+        this.initialDelay = initialDelay
+    }
+
     getFixedSpawnOffset = () => this.fixedSpawnOffset
     setFixedSpawnOffset = (fixedSpawnOffset: number | undefined) => {
         this.fixedSpawnOffset = fixedSpawnOffset
@@ -394,6 +415,7 @@ export class MonsterSpawn {
         output['sens'] = this.sens
         output['frequence'] = this.frequence
         output['spawnAmount'] = this.spawnAmount
+        output['initialDelay'] = this.initialDelay
         output['minX'] = R2I(this.minX)
         output['minY'] = R2I(this.minY)
         output['maxX'] = R2I(this.maxX)

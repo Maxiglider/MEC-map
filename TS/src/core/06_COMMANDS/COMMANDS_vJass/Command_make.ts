@@ -1972,6 +1972,32 @@ export const initExecuteCommandMake = () => {
         },
     })
 
+    //-setMonsterSpawnInitialDelay(setmsid) <label> <delay>
+    registerCommand({
+        name: 'setMonsterSpawnInitialDelay',
+        alias: ['setmsid'],
+        group: 'make',
+        argDescription: '<label> <delay>',
+        description: '',
+        cb: ({ param1, param2 }, escaper) => {
+            const monsterSpawn = escaper.getMakingLevel().monsterSpawns.getByLabel(param1)
+
+            if (!monsterSpawn) {
+                Text.erP(escaper.getPlayer(), 'unknown monster spawn "' + param1 + '" in this level')
+                return true
+            }
+
+            if (!(S2I(param2) > 0 && S2I(param2) <= 10)) {
+                Text.erP(escaper.getPlayer(), 'Delay must be > 0 and <= 10')
+                return true
+            }
+
+            monsterSpawn.setInitialDelay(S2I(param2))
+            Text.mkP(escaper.getPlayer(), 'Delay changed')
+            return true
+        },
+    })
+
     //-displayMonsterSpawns(dms)
     registerCommand({
         name: 'displayMonsterSpawns',
