@@ -1547,6 +1547,20 @@ export class Escaper {
         }
     }
 
+    makeSetMonsterJumpPad(jumpPad: number | undefined) {
+        this.destroyMake()
+        if (this.hero) {
+            this.make = new MakePropertyChange(
+                this.hero,
+                'jumpPad',
+                jumpPad,
+                (x, y) => this.getMakingLevel().monsters.getMonsterNear(x, y),
+                monster => monster.getJumpPad(),
+                (monster, jumpPad) => monster.setJumpPad(jumpPad)
+            )
+        }
+    }
+
     makeCreateTerrain(terrainType: TerrainType) {
         this.destroyMake()
         if (this.hero) this.make = new MakeTerrainCreate(this.hero, terrainType)

@@ -54,6 +54,7 @@ export const InitTrig_InvisUnit_is_getting_damage = () => {
                             const clearMob = monster.getClearMob()
                             const portalMob = monster.getPortalMob()
                             const circleMob = monster.getCircleMob()
+                            const jumpPad = monster.getJumpPad()
 
                             if (clearMob) {
                                 clearMob.activate()
@@ -62,6 +63,9 @@ export const InitTrig_InvisUnit_is_getting_damage = () => {
                                 portalMob.activate(monster, escaper, hero)
                                 return
                             } else if (circleMob) {
+                                return
+                            } else if (jumpPad !== undefined) {
+                                escaper.setOldDiffZ(jumpPad)
                                 return
                             }
                         }

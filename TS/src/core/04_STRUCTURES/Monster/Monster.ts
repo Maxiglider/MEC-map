@@ -49,6 +49,7 @@ export abstract class Monster {
     protected portalMob?: PortalMob
     protected circleMob?: CircleMob
     protected circleMobParent?: CircleMob
+    private jumpPad?: number
 
     constructor(monsterType?: MonsterType, forceId: number | null = null) {
         this.mt = monsterType
@@ -129,6 +130,11 @@ export abstract class Monster {
 
     getCircleMobs() {
         return this.circleMob || this.circleMobParent
+    }
+
+    getJumpPad = () => this.jumpPad
+    setJumpPad = (jumpPad: number | undefined) => {
+        this.jumpPad = jumpPad
     }
 
     removeUnit() {
@@ -399,6 +405,7 @@ export abstract class Monster {
             output['id'] = this.id
             output['monsterClassName'] = this.constructor.name
             output['monsterTypeLabel'] = this.mt?.label
+            output['jumpPad'] = this.jumpPad
             return output
         }
     }

@@ -3095,6 +3095,25 @@ export const initExecuteCommandMake = () => {
         },
     })
 
+    //-setMonsterJumpPad(setmjp) <jumpPadZ>
+    registerCommand({
+        name: 'setMonsterJumpPad',
+        alias: ['setmjp'],
+        group: 'make',
+        argDescription: '<jumpPadZ>',
+        description: '',
+        cb: ({ param1 }, escaper) => {
+            if (!(S2I(param1) > 0 && S2I(param1) <= 100)) {
+                Text.erP(escaper.getPlayer(), 'JumpPad must be > 0 and <= 100')
+                return true
+            }
+
+            escaper.makeSetMonsterJumpPad(S2I(param1) === 0 ? undefined : S2I(param1))
+            Text.mkP(escaper.getPlayer(), 'Click on a monster to apply')
+            return true
+        },
+    })
+
     //-debugRegions <active>
     registerCommand({
         name: 'debugRegions',

@@ -237,6 +237,7 @@ export class LevelArray extends BaseArray<Level> {
                         } else {
                             if (m.monsterClassName == 'MonsterNoMove') {
                                 monster = new MonsterNoMove(mt, m.x, m.y, m.angle, m.id)
+                                m.jumpPad && monster.setJumpPad(m.jumpPad)
                             } else if (m.monsterClassName == 'MonsterSimplePatrol') {
                                 monster = new MonsterSimplePatrol(mt, m.x1, m.y1, m.x2, m.y2, m.id)
                             } else if (m.monsterClassName == 'MonsterMultiplePatrols') {

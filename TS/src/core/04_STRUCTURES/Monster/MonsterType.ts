@@ -1,5 +1,6 @@
 import { Text } from 'core/01_libraries/Text'
 import { getUdgEscapers, getUdgLevels } from '../../../../globals'
+import { ObjectHandler } from '../../../Utils/ObjectHandler'
 import { Ascii2String } from '../../01_libraries/Ascii'
 import {
     MAX_MOVE_SPEED,
@@ -11,7 +12,6 @@ import {
 import { udg_colorCode } from '../../01_libraries/Init_colorCodes'
 import { Level } from '../Level/Level'
 import { IMMOLATION_SKILLS } from './Immolation_skills'
-import {ObjectHandler} from "../../../Utils/ObjectHandler";
 
 export class MonsterType {
     label: string
