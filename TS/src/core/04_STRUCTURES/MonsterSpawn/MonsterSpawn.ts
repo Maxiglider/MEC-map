@@ -416,6 +416,7 @@ export class MonsterSpawn {
         output['frequence'] = this.frequence
         output['spawnAmount'] = this.spawnAmount
         output['initialDelay'] = this.initialDelay
+        output['fixedSpawnOffset'] = this.fixedSpawnOffset
         output['minX'] = R2I(this.minX)
         output['minY'] = R2I(this.minY)
         output['maxX'] = R2I(this.maxX)
