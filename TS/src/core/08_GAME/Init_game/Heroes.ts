@@ -1,23 +1,42 @@
 import { NB_ESCAPERS, NB_PLAYERS_MAX } from 'core/01_libraries/Constants'
 import { udg_doubleHeroesEnabled } from 'core/Double_heroes/double_heroes_config'
 import { createEvent } from 'Utils/mapUtils'
+import { createPoint, IPoint } from 'Utils/Point'
 import { getUdgEscapers } from '../../../../globals'
 
-let startPositions: location[] = []
-let startPositionsRandomized: location[] = []
-let playerIdsRandomized: number[] = []
+const startPositions: location[] = []
+const startPositionsRandomized: location[] = []
+const playerIdsRandomized: number[] = []
 
 export const HERO_START_ANGLE = 90
 
 const TIME_BEFORE_HERO_SPAWN = 3
 const TIME_BETWEEN_EACH_HERO_SPAWN = 0.1
 let EFFECT_FOR_MISSING_HEROES = 'Abilities\\Spells\\Undead\\DeathPact\\DeathPactTarget.mdl'
-const NB_COLUMNS = Math.random() > 0.5 ? 6 : 4
-const NB_ROWS = NB_COLUMNS == 4 ? 6 : 4
+
+let staticSpawns: IPoint[] = []
 
 export const heroes = {
     setEffectForMissingHeroes: (effectStr: string) => {
         EFFECT_FOR_MISSING_HEROES = effectStr
+    },
+    setStaticSpawnPositions: (spawns: rect[]) => {
+        for (const spawn of spawns) {
+            staticSpawns.push(createPoint(GetRectCenterX(spawn), GetRectCenterY(spawn)))
+        }
+
+        if (spawns.length > 0) {
+            let i = 0
+
+            while (staticSpawns.length < NB_ESCAPERS) {
+                const spawn = spawns[i++]
+                staticSpawns.push(createPoint(GetRectCenterX(spawn), GetRectCenterY(spawn)))
+
+                if (i >= spawns.length) {
+                    i = 0
+                }
+            }
+        }
     },
 }
 
@@ -34,7 +53,8 @@ const RandomizeStartPositionsAndHeroSpawnOrder = () => {
             n = GetRandomInt(0, NB_ESCAPERS - 1)
             if (!alreadyAdded[n]) break
         }
-        startPositionsRandomized[i] = startPositions[n]
+        startPositionsRandomized[i] =
+            staticSpawns.length > 0 ? Location(staticSpawns[n][0], staticSpawns[n][1]) : startPositions[n]
         alreadyAdded[n] = true
         i = i + 1
     }
@@ -74,54 +94,16 @@ const RandomizeStartPositionsAndHeroSpawnOrder = () => {
     }
 }
 
-const Trig_heroes_Actions = () => {
-    let alreadyAdded: boolean[] = []
-    let anEffect: effect | null
-    let i: number
-    let n: number
-
-    //randomize start positions
-    RandomizeStartPositionsAndHeroSpawnOrder()
-
-    //create heroes
-    for (let i = 0; i < NB_ESCAPERS; i++) {
-        if (!getUdgEscapers().get(i)?.getHero()) {
-            if (GetPlayerId(GetLocalPlayer()) === i) {
-                ClearSelection()
-            }
-        }
-    }
-
-    for (let i = 0; i < NB_ESCAPERS; i++) {
-        n = playerIdsRandomized[i]
-        if (getUdgEscapers().get(n)) {
-            getUdgEscapers()
-                .get(n)
-                ?.createHero(
-                    GetLocationX(startPositionsRandomized[n]),
-                    GetLocationY(startPositionsRandomized[n]),
-                    HERO_START_ANGLE
-                )
-        } else {
-            anEffect = AddSpecialEffectLoc(EFFECT_FOR_MISSING_HEROES, startPositionsRandomized[n])
-            DestroyEffect(anEffect)
-        }
-        ;(startPositionsRandomized[n] as any) = null
-        TriggerSleepAction(TIME_BETWEEN_EACH_HERO_SPAWN)
-    }
-
-    //call EnableTrigger(gg_trg_anticheat_teleport_and_revive)
-    //AnticheatTeleport_justRevived = true
-    anEffect = null
-}
-
 //===========================================================================
 export const init_Heroes = () => {
+    const NB_COLUMNS = Math.random() > 0.5 ? 6 : 4
+    const NB_ROWS = NB_COLUMNS == 4 ? 6 : 4
+
     //define start positions
-    let minX = GetRectMinX(gg_rct_departLvl_0)
-    let minY = GetRectMinY(gg_rct_departLvl_0)
-    let diffX = (GetRectMaxX(gg_rct_departLvl_0) - minX) / (NB_COLUMNS - 1)
-    let diffY = (GetRectMaxY(gg_rct_departLvl_0) - minY) / (NB_ROWS - 1)
+    const minX = GetRectMinX(gg_rct_departLvl_0)
+    const minY = GetRectMinY(gg_rct_departLvl_0)
+    const diffX = (GetRectMaxX(gg_rct_departLvl_0) - minX) / (NB_COLUMNS - 1)
+    const diffY = (GetRectMaxY(gg_rct_departLvl_0) - minY) / (NB_ROWS - 1)
     let x = 0
     let y = 0
     let n = 0
@@ -161,6 +143,41 @@ export const init_Heroes = () => {
 
     createEvent({
         events: [t => TriggerRegisterTimerEvent(t, spawnPeriod, false)],
-        actions: [() => Trig_heroes_Actions()],
+        actions: [
+            () => {
+                //randomize start positions
+                RandomizeStartPositionsAndHeroSpawnOrder()
+
+                //create heroes
+                for (let i = 0; i < NB_ESCAPERS; i++) {
+                    if (!getUdgEscapers().get(i)?.getHero()) {
+                        if (GetPlayerId(GetLocalPlayer()) === i) {
+                            ClearSelection()
+                        }
+                    }
+                }
+
+                for (let i = 0; i < NB_ESCAPERS; i++) {
+                    const n = playerIdsRandomized[i]
+                    if (getUdgEscapers().get(n)) {
+                        getUdgEscapers()
+                            .get(n)
+                            ?.createHero(
+                                GetLocationX(startPositionsRandomized[n]),
+                                GetLocationY(startPositionsRandomized[n]),
+                                HERO_START_ANGLE
+                            )
+                    } else {
+                        const anEffect = AddSpecialEffectLoc(EFFECT_FOR_MISSING_HEROES, startPositionsRandomized[n])
+                        DestroyEffect(anEffect)
+                    }
+                    ;(startPositionsRandomized[n] as any) = null
+                    TriggerSleepAction(TIME_BETWEEN_EACH_HERO_SPAWN)
+                }
+
+                //call EnableTrigger(gg_trg_anticheat_teleport_and_revive)
+                //AnticheatTeleport_justRevived = true
+            },
+        ],
     })
 }
