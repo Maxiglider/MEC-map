@@ -7,7 +7,7 @@ import { GetMirrorEscaper } from 'core/04_STRUCTURES/Escaper/Escaper_functions'
 import { METEOR_CHEAT } from 'core/04_STRUCTURES/Meteor/Meteor'
 import { Gravity } from 'core/07_TRIGGERS/Slide_and_CheckTerrain_triggers/Gravity'
 import { ServiceManager } from 'Services'
-import { getUdgEscapers, getUdgLevels } from '../../../../globals'
+import { getUdgEscapers, getUdgLevels, globals } from '../../../../globals'
 import { runInTrigger } from '../../../Utils/mapUtils'
 import { getUdgViewAll } from '../../03_view_all_hide_all/View_all_hide_all'
 import { MeteorFunctions } from '../../04_STRUCTURES/Meteor/Meteor_functions'
@@ -690,6 +690,30 @@ export const initExecuteCommandCheat = () => {
             if (noParam) {
                 Text.P(escaper.getPlayer(), 'current gravity is ' + R2S(Gravity.GetRealGravity()))
             }
+            return true
+        },
+    })
+
+    //-setVTOTODiagonalSlideLogic <boolean status>
+    registerCommand({
+        name: 'setVTOTODiagonalSlideLogic',
+        alias: [],
+        group: 'cheat',
+        argDescription: '<boolean status>',
+        description: 'Allows you to slide diagonally',
+        cb: ({ nbParam, param1 }, escaper) => {
+            if (!(nbParam === 1)) {
+                Text.erP(escaper.getPlayer(), 'one param for this command')
+                return true
+            }
+
+            if (!IsBoolString(param1)) {
+                Text.erP(escaper.getPlayer(), 'invalid boolean')
+                return true
+            }
+
+            globals.USE_VTOTO_SLIDE_LOGIC = S2B(param1)
+            Text.A((S2B(param1) ? 'Enabled' : 'Disabled') + ' vToto diagonal slide logic')
             return true
         },
     })

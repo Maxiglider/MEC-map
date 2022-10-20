@@ -2,11 +2,13 @@ import { Ascii2String } from 'core/01_libraries/Ascii'
 import { arrayPush, tileset2tilesetChar } from 'core/01_libraries/Basic_functions'
 import { Text } from 'core/01_libraries/Text'
 import { ServiceManager } from 'Services'
+import { MazeUtils } from 'Utils/vToto'
+import { globals } from '../../../../globals'
 import { ArrayHandler } from '../../../Utils/ArrayHandler'
 import { CmdParam, NbParam } from '../../06_COMMANDS/COMMANDS_vJass/Command_functions'
 import { TerrainTypeMax } from '../../07_TRIGGERS/Modify_terrain_Functions/Terrain_type_max'
 import { BaseArray } from '../BaseArray'
-import { TerrainType } from './TerrainType'
+import { isDeathTerrain, TerrainType } from './TerrainType'
 import { TerrainTypeDeath } from './TerrainTypeDeath'
 import { TerrainTypeSlide } from './TerrainTypeSlide'
 import { TerrainTypeWalk } from './TerrainTypeWalk'
@@ -41,6 +43,28 @@ export class TerrainTypeArray extends BaseArray<TerrainType> {
 
     getTerrainType = (x: number, y: number) => {
         let terrainTypeId = GetTerrainType(x, y)
+
+        if (globals.USE_VTOTO_SLIDE_LOGIC && terrainTypeId === 0) {
+            const upward = MazeUtils.getDiagonalTileAt(x, y, true)
+            const downward = MazeUtils.getDiagonalTileAt(x, y, false)
+
+            if (upward && downward) {
+                const d = this.get(downward)
+                const u = this.get(upward)
+
+                if (upward === downward) {
+                    terrainTypeId = upward
+                } else if (upward === 0) {
+                    terrainTypeId = downward
+                } else if (downward === 0) {
+                    terrainTypeId = upward
+                } else if (d && isDeathTerrain(d)) {
+                    terrainTypeId = upward
+                } else if (u && isDeathTerrain(u)) {
+                    terrainTypeId = downward
+                }
+            }
+        }
 
         for (const [_, terrainType] of pairs(this.data)) {
             if (terrainType.getTerrainTypeId() === terrainTypeId) {

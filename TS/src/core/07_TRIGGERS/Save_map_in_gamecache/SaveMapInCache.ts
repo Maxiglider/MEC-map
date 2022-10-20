@@ -1,5 +1,5 @@
 import { SaveLoad } from 'core/04_STRUCTURES/Escaper/Escaper_StartCommands'
-import { getUdgCasterTypes, getUdgLevels, getUdgMonsterTypes, getUdgTerrainTypes } from '../../../../globals'
+import { getUdgCasterTypes, getUdgLevels, getUdgMonsterTypes, getUdgTerrainTypes, globals } from '../../../../globals'
 import { ArrayHandler } from '../../../Utils/ArrayHandler'
 import {
     clearArrayOrObject,
@@ -27,6 +27,8 @@ export class SaveMapInCache {
         Text.A('map terrain saved')
 
         //FOR GAME DATA
+        jsonGameData.gameData = ObjectHandler.getNewObject<any>()
+        jsonGameData.gameData.USE_VTOTO_SLIDE_LOGIC = globals.USE_VTOTO_SLIDE_LOGIC
 
         //terrain config
         jsonGameData.terrainTypesMec = getUdgTerrainTypes().toJson()

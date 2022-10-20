@@ -1,6 +1,6 @@
 import { PROD } from 'env'
 import { errorHandler } from 'Utils/mapUtils'
-import { getUdgCasterTypes, getUdgLevels, getUdgMonsterTypes, getUdgTerrainTypes } from '../../../../globals'
+import { getUdgCasterTypes, getUdgLevels, getUdgMonsterTypes, getUdgTerrainTypes, globals } from '../../../../globals'
 import { jsonDecode } from '../../01_libraries/Basic_functions'
 import { Text } from '../../01_libraries/Text'
 
@@ -14,6 +14,12 @@ export class LoadMapFromCache {
             if (!gameData || typeof gameData !== 'object') {
                 Text.erA('invalid game data string')
             } else {
+                if (gameData.gameData) {
+                    if (gameData.gameData.USE_VTOTO_SLIDE_LOGIC) {
+                        globals.USE_VTOTO_SLIDE_LOGIC = gameData.gameData.USE_VTOTO_SLIDE_LOGIC
+                    }
+                }
+
                 //terrain types MEC
                 if (gameData.terrainTypesMec) {
                     if (PROD) {
