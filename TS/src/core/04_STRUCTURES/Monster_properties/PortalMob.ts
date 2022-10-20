@@ -2,10 +2,10 @@ import { StopUnit } from 'core/01_libraries/Basic_functions'
 import { ArrayHandler } from 'Utils/ArrayHandler'
 import { createTimer } from 'Utils/mapUtils'
 import { Timer } from 'w3ts'
+import { ObjectHandler } from '../../../Utils/ObjectHandler'
 import { Escaper } from '../Escaper/Escaper'
 import { Level } from '../Level/Level'
 import { Monster } from '../Monster/Monster'
-import {ObjectHandler} from "../../../Utils/ObjectHandler";
 
 export const PORTAL_MOB_MAX_FREEZE_DURATION = 10
 
@@ -119,6 +119,11 @@ export class PortalMob {
         StopUnit(hero)
         SetUnitX(hero, GetUnitX(targetMob.u))
         SetUnitY(hero, GetUnitY(targetMob.u))
+        SetUnitFlyHeight(hero, GetUnitFlyHeight(targetMob.u), 0)
+
+        escaper.setLastZ(BlzGetUnitZ(hero))
+        escaper.setOldDiffZ(0)
+        escaper.setSpeedZ(0)
 
         escaper.enablePortalCooldown()
         this.portalEffect && escaper.createPortalEffect(this.portalEffect)
