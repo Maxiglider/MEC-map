@@ -40,16 +40,16 @@ export class MonsterTypeArray extends BaseArray<MonsterType> {
         return monsterType
     }
 
-    newFromJson = (monsterTypesJson: {[x: string]: any}[]) =>{
-        for(let mt of monsterTypesJson){
+    newFromJson = (monsterTypesJson: { [x: string]: any }[]) => {
+        for (let mt of monsterTypesJson) {
             const unitTypeId = FourCC(mt.unitTypeId)
             const monsterType = this.new(mt.label, unitTypeId, mt.scale, mt.immolationRadius, mt.speed, mt.isClickable)
             monsterType.setHeight(mt.height)
             monsterType.setNbMeteorsToKill(mt.nbMeteorsToKill)
-            if(mt.alias){
+            if (mt.alias) {
                 monsterType.setAlias(mt.alias)
             }
-            if(mt.killingEffect){
+            if (mt.killingEffect) {
                 monsterType.setKillingEffectStr(mt.killingEffect)
             }
         }
