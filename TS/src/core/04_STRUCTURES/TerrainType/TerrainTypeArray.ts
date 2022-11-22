@@ -48,21 +48,19 @@ export class TerrainTypeArray extends BaseArray<TerrainType> {
             const upward = MazeUtils.getDiagonalTileAt(x, y, true)
             const downward = MazeUtils.getDiagonalTileAt(x, y, false)
 
-            if (upward && downward) {
-                const d = this.get(downward)
-                const u = this.get(upward)
+            const d = downward ? this.get(downward) : null
+            const u = upward ? this.get(upward) : null
 
-                if (upward === downward) {
-                    terrainTypeId = upward
-                } else if (upward === 0) {
-                    terrainTypeId = downward
-                } else if (downward === 0) {
-                    terrainTypeId = upward
-                } else if (d && isDeathTerrain(d)) {
-                    terrainTypeId = upward
-                } else if (u && isDeathTerrain(u)) {
-                    terrainTypeId = downward
-                }
+            if (upward === downward) {
+                terrainTypeId = upward
+            } else if (upward === null) {
+                terrainTypeId = downward
+            } else if (downward === null) {
+                terrainTypeId = upward
+            } else if (d && isDeathTerrain(d)) {
+                terrainTypeId = upward
+            } else if (u && isDeathTerrain(u)) {
+                terrainTypeId = downward
             }
         }
 
