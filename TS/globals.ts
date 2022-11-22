@@ -22,6 +22,7 @@ export const globals: {
     MAP_MAX_Y: number
     CAN_TURN_IN_AIR: boolean
     USE_VTOTO_SLIDE_LOGIC: boolean
+    coopCircles: boolean
 } = {
     logStrings: [],
     MAP_MIN_X: 0,
@@ -31,6 +32,7 @@ export const globals: {
     coopModeActive: true,
     CAN_TURN_IN_AIR: false,
     USE_VTOTO_SLIDE_LOGIC: false,
+    coopCircles: true,
 }
 
 //SETTERS - GETTERS

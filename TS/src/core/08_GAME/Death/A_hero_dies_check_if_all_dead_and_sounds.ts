@@ -80,28 +80,31 @@ export const InitTrig_A_hero_dies_check_if_all_dead_and_sounds = () => {
                             DeplacementHeroHorsDeathPath.DeplacementHeroHorsDeathPath(hero2)
                         }
 
-                        //revive si autre héros (vivant) au même endroit
-                        for (let i = 0; i < NB_ESCAPERS; i++) {
-                            if (i !== n && getUdgEscapers().get(i)?.isAlive()) {
-                                const h1 = getUdgEscapers().get(i)?.getHero()
+                        if (globals.coopCircles) {
+                            //revive si autre héros (vivant) au même endroit
+                            for (let i = 0; i < NB_ESCAPERS; i++) {
+                                if (i !== n && getUdgEscapers().get(i)?.isAlive()) {
+                                    const h1 = getUdgEscapers().get(i)?.getHero()
 
-                                if (!h1) {
-                                    continue
-                                }
+                                    if (!h1) {
+                                        continue
+                                    }
 
-                                const diffX = GetUnitX(h1) - GetUnitX(hero2)
-                                const diffY = GetUnitY(h1) - GetUnitY(hero2)
+                                    const diffX = GetUnitX(h1) - GetUnitX(hero2)
+                                    const diffY = GetUnitY(h1) - GetUnitY(hero2)
 
-                                if (SquareRoot(diffX * diffX + diffY * diffY) < COOP_REVIVE_DIST) {
-                                    getUdgEscapers().get(n)?.coopReviveHero()
-                                    TriggerSleepAction(3.7)
-                                    udg_nbKilled = udg_nbKilled - 1
-                                    return
+                                    if (SquareRoot(diffX * diffX + diffY * diffY) < COOP_REVIVE_DIST) {
+                                        getUdgEscapers().get(n)?.coopReviveHero()
+                                        TriggerSleepAction(3.7)
+                                        udg_nbKilled = udg_nbKilled - 1
+                                        return
+                                    }
                                 }
                             }
+
+                            getUdgEscapers().get(n)?.enableTrigCoopRevive()
                         }
 
-                        getUdgEscapers().get(n)?.enableTrigCoopRevive()
                         TriggerSleepAction(3.7)
                     } else {
                         TriggerSleepAction(5)

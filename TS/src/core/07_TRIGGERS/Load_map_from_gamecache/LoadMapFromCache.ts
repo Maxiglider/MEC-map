@@ -18,6 +18,10 @@ export class LoadMapFromCache {
                     if (gameData.gameData.USE_VTOTO_SLIDE_LOGIC) {
                         globals.USE_VTOTO_SLIDE_LOGIC = gameData.gameData.USE_VTOTO_SLIDE_LOGIC
                     }
+
+                    if (gameData.gameData.coopCircles) {
+                        globals.coopCircles = gameData.gameData.coopCircles
+                    }
                 }
 
                 //terrain types MEC

@@ -718,6 +718,30 @@ export const initExecuteCommandCheat = () => {
         },
     })
 
+    //-setCoopCircles <boolean status>
+    registerCommand({
+        name: 'setCoopCircles',
+        alias: [],
+        group: 'cheat',
+        argDescription: '<boolean status>',
+        description: 'Disables coop circles',
+        cb: ({ nbParam, param1 }, escaper) => {
+            if (!(nbParam === 1)) {
+                Text.erP(escaper.getPlayer(), 'one param for this command')
+                return true
+            }
+
+            if (!IsBoolString(param1)) {
+                Text.erP(escaper.getPlayer(), 'invalid boolean')
+                return true
+            }
+
+            globals.coopCircles = S2B(param1)
+            Text.A((S2B(param1) ? 'Enabled' : 'Disabled') + ' coopCircles')
+            return true
+        },
+    })
+
     //-setHeight(seth)
     registerCommand({
         name: 'setHeight',

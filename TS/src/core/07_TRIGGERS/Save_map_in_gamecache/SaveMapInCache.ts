@@ -29,6 +29,7 @@ export class SaveMapInCache {
         //FOR GAME DATA
         jsonGameData.gameData = ObjectHandler.getNewObject<any>()
         jsonGameData.gameData.USE_VTOTO_SLIDE_LOGIC = globals.USE_VTOTO_SLIDE_LOGIC
+        jsonGameData.gameData.coopCircles = globals.coopCircles
 
         //terrain config
         jsonGameData.terrainTypesMec = getUdgTerrainTypes().toJson()
