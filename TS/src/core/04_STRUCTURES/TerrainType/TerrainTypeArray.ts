@@ -42,9 +42,9 @@ export class TerrainTypeArray extends BaseArray<TerrainType> {
     }
 
     getTerrainType = (x: number, y: number) => {
-        let terrainTypeId = GetTerrainType(x, y)
+        let terrainTypeId = globals.USE_VTOTO_SLIDE_LOGIC ? MazeUtils.getHVTileAt(x, y) : GetTerrainType(x, y)
 
-        if (globals.USE_VTOTO_SLIDE_LOGIC && terrainTypeId === 0) {
+        if (globals.USE_VTOTO_SLIDE_LOGIC && terrainTypeId === null) {
             const upward = MazeUtils.getDiagonalTileAt(x, y, true)
             const downward = MazeUtils.getDiagonalTileAt(x, y, false)
 

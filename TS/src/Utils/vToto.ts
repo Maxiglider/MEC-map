@@ -9,7 +9,7 @@
 //
 const getMazeUtils = () => {
     const DEB = (str: string) => {
-        DisplayTimedTextToForce(GetPlayersAll(), 1.0, str)
+        // DisplayTimedTextToForce(GetPlayersAll(), 1.0, str)
     }
 
     // Get the terrain type that's at (x,y), adjusted to account for wacky graphics
@@ -290,7 +290,7 @@ const getMazeUtils = () => {
         return all
     }
 
-    return { getDiagonalTileAt }
+    return { getDiagonalTileAt, getHVTileAt }
 }
 
 export const MazeUtils = getMazeUtils()
