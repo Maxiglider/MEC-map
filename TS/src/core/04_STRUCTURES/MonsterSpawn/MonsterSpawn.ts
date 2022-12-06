@@ -1,4 +1,6 @@
-import { createTimer } from 'Utils/mapUtils'
+import { CombineHooks } from 'core/API/MecHookArray'
+import { ArrayHandler } from 'Utils/ArrayHandler'
+import { createTimer, errorHandler } from 'Utils/mapUtils'
 import { Timer } from 'w3ts'
 import { ObjectHandler } from '../../../Utils/ObjectHandler'
 import { GetCurrentMonsterPlayer } from '../../01_libraries/Basic_functions'
@@ -6,25 +8,21 @@ import { ENNEMY_PLAYER, GREY, MOBS_VARIOUS_COLORS, TERRAIN_DATA_DISPLAY_TIME } f
 import { udg_colorCode } from '../../01_libraries/Init_colorCodes'
 import { Text } from '../../01_libraries/Text'
 import { hooks } from '../../API/GeneralHooks'
-import { CombineHooks } from '../../API/MecHookArray'
 import { Level } from '../Level/Level'
 import { Monster } from '../Monster/Monster'
 import { MonsterType } from '../Monster/MonsterType'
 import { NewImmobileMonsterForPlayer } from '../Monster/Monster_functions'
+import { initSimpleUnitRecycler } from './SimpleUnitRecycler'
 
 const DECALAGE_UNSPAWN = 200
 const DELAY_BETWEEN_SPAWN_AND_MOVEMENT = 0.5
 
-const RemoveEnumMonster = () => {
-    RemoveUnit(GetEnumUnit())
-}
-
 const MonsterStartMovement = () => {
-    let mobTimer = GetExpiredTimer()
-    let ms = MonsterSpawn.anyTimerId2MonsterSpawn.get(GetHandleId(mobTimer))
+    const mobTimer = GetExpiredTimer()
+    const ms = MonsterSpawn.anyTimerId2MonsterSpawn.get(GetHandleId(mobTimer))
     MonsterSpawn.anyTimerId2MonsterSpawn.delete(GetHandleId(mobTimer))
     if (ms) {
-        let mobUnit = MonsterSpawn.anyTimerId2Unit.get(GetHandleId(mobTimer))
+        const mobUnit = MonsterSpawn.anyTimerId2Unit.get(GetHandleId(mobTimer))
         MonsterSpawn.anyTimerId2Unit.delete(GetHandleId(mobTimer))
         if (mobUnit) {
             ms.startMobMovement(mobUnit, ms)
@@ -34,13 +32,13 @@ const MonsterStartMovement = () => {
     }
 }
 
-const MonsterSpawn_Actions = () => {
-    let ms = MonsterSpawn.anyTrigId2MonsterSpawn.get(GetHandleId(GetTriggeringTrigger()))
+const MonsterSpawn_Actions = errorHandler(() => {
+    const ms = MonsterSpawn.anyTrigId2MonsterSpawn.get(GetHandleId(GetTriggeringTrigger()))
     if (ms) {
         for (let i = 0; i < ms.getSpawnAmount(); i++) {
-            let mobUnit = ms.createMob()
+            const mobUnit = ms.createMob()
             if (mobUnit) {
-                let mobTimer = CreateTimer()
+                const mobTimer = CreateTimer()
                 MonsterSpawn.anyTimerId2MonsterSpawn.set(GetHandleId(mobTimer), ms)
                 MonsterSpawn.anyTimerId2Unit.set(GetHandleId(mobTimer), mobUnit)
                 TimerStart(mobTimer, DELAY_BETWEEN_SPAWN_AND_MOVEMENT, false, MonsterStartMovement)
@@ -51,15 +49,7 @@ const MonsterSpawn_Actions = () => {
             }
         }
     }
-}
-
-const UnspawMonster_Actions = () => {
-    let ms = MonsterSpawn.anyTrigId2MonsterSpawn.get(GetHandleId(GetTriggeringTrigger()))
-    if (ms && ms.monsters && IsUnitInGroup(GetTriggerUnit(), ms.monsters)) {
-        GroupRemoveUnit(ms.monsters, GetTriggerUnit())
-        RemoveUnit(GetTriggerUnit())
-    }
-}
+})
 
 /**
  * class MonsterSpawn
@@ -96,6 +86,8 @@ export class MonsterSpawn {
     id: number
 
     private initialDelayTimer: Timer | undefined
+
+    private simpleUnitRecycler = initSimpleUnitRecycler()
 
     constructor(
         label: string,
@@ -154,7 +146,7 @@ export class MonsterSpawn {
         }
 
         if (this.monsters) {
-            ForGroup(this.monsters, RemoveEnumMonster)
+            ForGroup(this.monsters, () => this.simpleUnitRecycler.removeUnit(GetEnumUnit()))
             DestroyGroup(this.monsters)
             delete this.monsters
         }
@@ -213,6 +205,14 @@ export class MonsterSpawn {
             })
         }
 
+        const UnspawMonster_Actions = () => {
+            const ms = MonsterSpawn.anyTrigId2MonsterSpawn.get(GetHandleId(GetTriggeringTrigger()))
+            if (ms && ms.monsters && IsUnitInGroup(GetTriggerUnit(), ms.monsters)) {
+                GroupRemoveUnit(ms.monsters, GetTriggerUnit())
+                this.simpleUnitRecycler.removeUnit(GetTriggerUnit())
+            }
+        }
+
         this.createUnspawnReg()
         this.tUnspawn = CreateTrigger()
         MonsterSpawn.anyTrigId2MonsterSpawn.set(GetHandleId(this.tUnspawn), this)
@@ -223,6 +223,7 @@ export class MonsterSpawn {
     destroy = () => {
         this.deactivate()
         this.level && this.level.monsterSpawns.removeMonsterSpawn(this.id)
+        this.simpleUnitRecycler.destroy()
     }
 
     calcValOffset = (a: number, b: number) => {
@@ -305,7 +306,7 @@ export class MonsterSpawn {
 
         //hook onBeforeCreateMonsterUnit
 
-        let hookArray = CombineHooks(
+        const hookArray = CombineHooks(
             this.level?.monsters.hooks_onBeforeCreateMonsterUnit,
             hooks.hooks_onBeforeCreateMonsterUnit
         )
@@ -314,7 +315,7 @@ export class MonsterSpawn {
             let forceUnitTypeId = 0
             let quit = false
 
-            for (const hook of hookArray.values()) {
+            for (const hook of hookArray) {
                 const unitData = ObjectHandler.getNewObject<{ mt: MonsterType }>()
                 unitData.mt = this.mt
                 const output = hook.execute(unitData)
@@ -328,6 +329,7 @@ export class MonsterSpawn {
             }
 
             if (quit) {
+                ArrayHandler.clearArray(hookArray)
                 return
             }
 
@@ -335,23 +337,26 @@ export class MonsterSpawn {
                 Monster.forceUnitTypeIdForNextMonster = forceUnitTypeId
             }
         }
+        ArrayHandler.clearArray(hookArray)
 
-        const monster = NewImmobileMonsterForPlayer(
-            this.mt,
-            ENNEMY_PLAYER,
-            (this.minX + this.maxX) / 2,
-            (this.minY + this.maxY) / 2,
-            angle
-        )
+        const monster =
+            this.simpleUnitRecycler.getUnit() ||
+            NewImmobileMonsterForPlayer(
+                this.mt,
+                ENNEMY_PLAYER,
+                (this.minX + this.maxX) / 2,
+                (this.minY + this.maxY) / 2,
+                angle
+            )
 
         //hook after create unit
-        hookArray = CombineHooks(
+        const hookArray2 = CombineHooks(
             this.level?.monsters.hooks_onAfterCreateMonsterUnit,
             hooks.hooks_onAfterCreateMonsterUnit
         )
 
-        if (hookArray) {
-            for (const hook of hookArray.values()) {
+        if (hookArray2) {
+            for (const hook of hookArray2) {
                 const unitData = ObjectHandler.getNewObject<{ mt: MonsterType; u: unit }>()
                 unitData.mt = this.mt
                 unitData.u = monster
@@ -359,6 +364,8 @@ export class MonsterSpawn {
                 ObjectHandler.clearObject(unitData)
             }
         }
+
+        ArrayHandler.clearArray(hookArray2)
 
         return monster
     }
@@ -387,7 +394,7 @@ export class MonsterSpawn {
     }
 
     displayForPlayer = (p: player) => {
-        let display =
+        const display =
             udg_colorCode[GREY] + this.label + ' : ' + this.mt.label + '   ' + this.sens + '   ' + R2S(this.frequence)
         Text.P_timed(p, TERRAIN_DATA_DISPLAY_TIME, display)
     }

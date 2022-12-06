@@ -84,7 +84,7 @@ export class Level {
             }
 
             if (this.hooks_onStart) {
-                for (const hook of this.hooks_onStart.values()) {
+                for (const hook of this.hooks_onStart.getHooks()) {
                     hook.execute(this)
                 }
             }
@@ -96,7 +96,7 @@ export class Level {
             getUdgEscapers().deleteSpecificActionsForLevel(this)
 
             if (this.hooks_onEnd) {
-                for (const hook of this.hooks_onEnd.values()) {
+                for (const hook of this.hooks_onEnd.getHooks()) {
                     hook.execute(this)
                 }
             }

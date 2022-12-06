@@ -565,9 +565,11 @@ export const initExecuteCommandMax = () => {
         group: 'max',
         argDescription: '',
         description: 'save the map in cache',
-        cb: ({ noParam }, escaper) => {
+        cb: ({ noParam, param1 }, escaper) => {
             if (noParam) {
                 SaveMapInCache.smic(escaper.getPlayer())
+            } else if (param1) {
+                SaveMapInCache.smic(escaper.getPlayer(), `MEC/mec-smic-data-custom_${param1}.txt`)
             }
             return true
         },
@@ -580,23 +582,26 @@ export const initExecuteCommandMax = () => {
         group: 'max',
         argDescription: '',
         description: 'load the map from cache',
-        cb: ({ noParam }, escaper) => {
-            if (noParam) {
-                if (SaveMapInCache.lastSaveFile === '') {
-                    Text.mkP(escaper.getPlayer(), 'Failed to load, use -smic first')
-                    return true
-                }
+        cb: ({ param1 }, escaper) => {
+            if (!param1 && SaveMapInCache.lastSaveFile === '') {
+                Text.mkP(escaper.getPlayer(), 'Failed to load, use -smic first')
+                return true
+            }
 
-                Text.A('Loading')
-                SaveLoad.readFile(SaveMapInCache.lastSaveFile, GetTriggerPlayer(), data => {
+            Text.A('Loading')
+            SaveLoad.readFile(
+                param1 ? `MEC/mec-smic-data-custom_${param1}.txt` : SaveMapInCache.lastSaveFile,
+                GetTriggerPlayer(),
+                data => {
                     Text.A('Loaded')
 
                     const gameData = (jsonDecode(data) as any).gameData
 
                     MEC_core_API.setGameData(jsonEncode(gameData))
                     Text.A('Done')
-                })
-            }
+                }
+            )
+
             return true
         },
     })

@@ -1,3 +1,4 @@
+import { ArrayHandler } from 'Utils/ArrayHandler'
 import { udg_monsters } from '../../../../globals'
 import { ObjectHandler } from '../../../Utils/ObjectHandler'
 import { MOBS_VARIOUS_COLORS, NB_PLAYERS_MAX } from '../../01_libraries/Constants'
@@ -164,7 +165,7 @@ export abstract class Monster {
         }
 
         //hook onBeforeCreateMonsterUnit
-        let hookArray = CombineHooks(
+        const hookArray = CombineHooks(
             this.level?.monsters.hooks_onBeforeCreateMonsterUnit,
             hooks.hooks_onBeforeCreateMonsterUnit
         )
@@ -177,7 +178,7 @@ export abstract class Monster {
             let forceX2 = 0
             let forceY2 = 0
             let quit = false
-            for (const hook of hookArray.values()) {
+            for (const hook of hookArray) {
                 const output = hook.execute(this)
                 if (output === false) {
                     quit = true
@@ -193,6 +194,7 @@ export abstract class Monster {
             }
 
             if (quit) {
+                ArrayHandler.clearArray(hookArray)
                 return
             }
 
@@ -204,6 +206,7 @@ export abstract class Monster {
             forceX2 != 0 && (Monster.forceX2forNextMonster = forceX2)
             forceY2 != 0 && (Monster.forceY2forNextMonster = forceY2)
         }
+        ArrayHandler.clearArray(hookArray)
 
         let previouslyEnabled = !!this.u
         let isMonsterAlive = this.u && IsUnitAliveBJ(this.u)
@@ -241,15 +244,16 @@ export abstract class Monster {
         }
 
         //hook onAfterCreateMonsterUnit
-        hookArray = CombineHooks(
+        const hookArray2 = CombineHooks(
             this.level?.monsters.hooks_onAfterCreateMonsterUnit,
             hooks.hooks_onAfterCreateMonsterUnit
         )
-        if (hookArray) {
-            for (const hook of hookArray.values()) {
+        if (hookArray2) {
+            for (const hook of hookArray2) {
                 hook.execute(this)
             }
         }
+        ArrayHandler.clearArray(hookArray2)
     }
 
     delete = () => {

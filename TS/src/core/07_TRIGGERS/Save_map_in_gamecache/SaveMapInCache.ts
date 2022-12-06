@@ -1,5 +1,6 @@
 import { SaveLoad } from 'core/04_STRUCTURES/Escaper/Escaper_StartCommands'
 import { getUdgCasterTypes, getUdgLevels, getUdgMonsterTypes, getUdgTerrainTypes, globals } from '../../../../globals'
+import { PROD } from '../../../env'
 import { ArrayHandler } from '../../../Utils/ArrayHandler'
 import {
     clearArrayOrObject,
@@ -60,16 +61,21 @@ export class SaveMapInCache {
 
     private static smicStringObj = { str: '' }
 
-    public static smic = (p: player | null = null) => {
+    public static smic = (p: player | null = null, fileName?: string) => {
         if (p === null || GetLocalPlayer() == p) {
             const startTime = os.clock()
 
-            const filename = MEC_SMIC_DATA_FILE_DATE_TPL.replace('[date]', os.date('%Y-%m-%d_%H-%M-%S'))
+            const filename = fileName || MEC_SMIC_DATA_FILE_DATE_TPL.replace('[date]', os.date('%Y-%m-%d_%H-%M-%S'))
 
             SaveMapInCache.smicStringObj.str = SaveMapInCache.gameAsJsonString()
 
             SaveMapInCache.lastSaveFile = filename
-            SaveLoad.saveFileWithoutPossibleLoading(filename, p, SaveMapInCache.smicStringObj.str, false)
+
+            if (PROD) {
+                SaveLoad.saveFileWithoutPossibleLoading(filename, p, SaveMapInCache.smicStringObj.str, false)
+            } else {
+                SaveLoad.saveFile(filename, p, SaveMapInCache.smicStringObj.str, true)
+            }
 
             Text.A('saving game data to file "' + filename + '" done')
 

@@ -29,21 +29,31 @@ export class LoadMapFromCache {
                     if (PROD) {
                         getUdgTerrainTypes().newFromJson(gameData.terrainTypesMec)
                     } else {
-                        // Dont care for terrains during development
-                        errorHandler(() => {
-                            getUdgTerrainTypes().newFromJson(gameData.terrainTypesMec)
-                        })
+                        // Dont care during development
+                        errorHandler(() => getUdgTerrainTypes().newFromJson(gameData.terrainTypesMec))
                     }
                 }
 
                 //monster types
                 if (gameData.monsterTypes) {
-                    getUdgMonsterTypes().newFromJson(gameData.monsterTypes)
+                    if (PROD) {
+                        getUdgMonsterTypes().newFromJson(gameData.monsterTypes)
+                    } else {
+                        // Dont care during development
+                        errorHandler(() => getUdgMonsterTypes().newFromJson(gameData.monsterTypes))
+                    }
                 }
 
                 //caster types
                 if (gameData.casterTypes) {
-                    getUdgCasterTypes().newFromJson(gameData.casterTypes)
+                    if (gameData.monsterTypes) {
+                        if (PROD) {
+                            getUdgCasterTypes().newFromJson(gameData.casterTypes)
+                        } else {
+                            // Dont care during development
+                            errorHandler(() => getUdgCasterTypes().newFromJson(gameData.casterTypes))
+                        }
+                    }
                 }
 
                 //levels

@@ -548,6 +548,19 @@ export const initCommandAll = () => {
             if (noParam || param1 === 'all' || param1 === 'a') {
                 n = getUdgLevels().getCurrentLevel().getNbMonsters('all')
                 Text.P(escaper.getPlayer(), 'There are ' + I2S(n) + ' monsters in this level.')
+
+                let p = 0
+
+                for (const [_, ms] of pairs(getUdgLevels().getCurrentLevel().monsterSpawns.getAll())) {
+                    if (ms.monsters) {
+                        p += BlzGroupGetSize(ms.monsters)
+                    }
+                }
+
+                if (p > 0) {
+                    Text.P(escaper.getPlayer(), 'There are ' + I2S(p) + ' spawned monsters in this level.')
+                }
+
                 return true
             }
             if (param1 === 'moving' || param1 === 'm') {
@@ -560,6 +573,7 @@ export const initCommandAll = () => {
                 Text.P(escaper.getPlayer(), 'There are ' + I2S(n) + ' non moving monsters in this level.')
                 return true
             }
+
             return true
         },
     })

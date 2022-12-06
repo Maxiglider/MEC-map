@@ -1,51 +1,44 @@
-import {MecHook} from "./MecHook";
+import { arrayPush } from 'core/01_libraries/Basic_functions'
+import { ArrayHandler } from 'Utils/ArrayHandler'
+import { MecHook } from './MecHook'
 
 export class MecHookArray {
-    private map = new Map<number, MecHook>()
+    private hooks = ArrayHandler.getNewArray<MecHook>()
 
     public new = (cb: () => any) => {
         const hook = new MecHook(cb)
-        this.map.set(hook.getId(), hook)
+        arrayPush(this.hooks, hook)
         hook.mecHookArray = this
         return hook.getId()
     }
 
     public destroy = (id: number) => {
-        const hook = this.map.get(id)
-        if(hook){
-            this.map.delete(id)
+        const hook = this.hooks[id]
+        if (hook) {
+            ;(this.hooks as any)[id] = null
             return true
-        }else{
+        } else {
             return false
         }
     }
 
-    public getMap = () => {
-        return this.map
-    }
-
-    public values = () => {
-        return this.map.values()
-    }
-
-    public applyMapFromBoth(ha1: MecHookArray | undefined, ha2: MecHookArray | undefined){
-        if(ha1) {
-            for (const [key, value] of ha1.getMap()) {
-                this.map.set(key, value)
-            }
-        }
-
-        if(ha2) {
-            for (const [key, value] of ha2.getMap()) {
-                this.map.set(key, value)
-            }
-        }
-    }
+    public getHooks = () => this.hooks
 }
 
+export function CombineHooks(ha1: MecHookArray | undefined, ha2: MecHookArray | undefined) {
+    const outHookArray = ArrayHandler.getNewArray<MecHook>()
 
-export function CombineHooks(ha1: MecHookArray | undefined, ha2: MecHookArray | undefined){
-    const outHookArray = new MecHookArray()
-    outHookArray.applyMapFromBoth(ha1, ha2)
+    if (ha1) {
+        for (const value of ha1.getHooks()) {
+            arrayPush(outHookArray, value)
+        }
+    }
+
+    if (ha2) {
+        for (const value of ha2.getHooks()) {
+            arrayPush(outHookArray, value)
+        }
+    }
+
     return outHookArray
 }
