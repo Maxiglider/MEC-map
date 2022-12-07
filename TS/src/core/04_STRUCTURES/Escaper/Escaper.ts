@@ -375,10 +375,7 @@ export class Escaper {
         )
         this.effects.showEffects(this.hero)
         delete this.lastTerrainType
-        TimerStart(
-            AfkMode.afkModeTimers[this.escaperId],
-            AfkMode.timeMinAfk,
-            false,
+        TimerStart(AfkMode.afkModeTimers[this.escaperId], AfkMode.timeMinAfk, false, () =>
             AfkMode.GetAfkModeTimeExpiresCodeFromId(this.escaperId)
         )
 
@@ -640,10 +637,7 @@ export class Escaper {
         this.selectHero()
         this.updateUnitVertexColor()
 
-        TimerStart(
-            AfkMode.afkModeTimers[this.escaperId],
-            AfkMode.timeMinAfk,
-            false,
+        TimerStart(AfkMode.afkModeTimers[this.escaperId], AfkMode.timeMinAfk, false, () =>
             AfkMode.GetAfkModeTimeExpiresCodeFromId(this.escaperId)
         )
         this.lastZ = 0
