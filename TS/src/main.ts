@@ -58,6 +58,13 @@ const tsMain = () => {
     //escapers
     // initEscapers()
 
+    // Some stuff to only show units that are visible on cam
+    // const renderInfo = ObjectHandler.getNewObject<IRenderInfo>()
+
+    // createTimer(0.2, true, () => {
+    //     renderWorld(renderInfo)
+    // })
+
     ServiceManager.getService('React').init()
 
     if (!PROD) {
