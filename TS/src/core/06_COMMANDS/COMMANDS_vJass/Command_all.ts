@@ -1215,6 +1215,30 @@ export const initCommandAll = () => {
         },
     })
 
+    //-panCameraOnRevive(pcor) <coop | all | none>
+    registerCommand({
+        name: 'panCameraOnRevive',
+        alias: ['pcor'],
+        group: 'all',
+        argDescription: '<coop | all | none>',
+        description: 'pan camera on revive',
+        cb: ({ nbParam, param1 }, escaper) => {
+            if (nbParam != 1) {
+                return true
+            }
+
+            if (param1 !== 'coop' && param1 !== 'all' && param1 !== 'none') {
+                Text.mkP(escaper.getPlayer(), `param1 must be: coop | all | none`)
+                return true
+            }
+
+            escaper.setPanCameraOnRevive(param1)
+            Text.mkP(escaper.getPlayer(), `Pan camera on revive set to: ${param1}`)
+
+            return true
+        },
+    })
+
     //-showNames <boolean>
     registerCommand({
         name: 'showNames',
@@ -1277,12 +1301,12 @@ export const initCommandAll = () => {
         },
     })
 
-    //-myStartCommands(msc) [ list | add <command> | del <commandNumber> | ec <commandNumber> | delall ]
+    //-myStartCommands(msc) [ list [player] | add <command> | del <commandNumber> | ec <commandNumber> | delall ]
     registerCommand({
         name: 'myStartCommands',
         alias: ['msc'],
         group: 'all',
-        argDescription: '[ list | add <command> | del <commandNumber> | ec <commandNumber> | delall ]',
+        argDescription: '[ list [player] | add <command> | del <commandNumber> | ec <commandNumber> | delall ]',
         description: 'Run commands on start of the game',
         cb: ({ cmd, nbParam, param1, param2 }, escaper) => {
             if (!escaper.getStartCommandsHandle().isLoaded()) {
@@ -1290,7 +1314,20 @@ export const initCommandAll = () => {
                 return true
             }
 
-            if (nbParam === 0 || (nbParam === 1 && param1 === 'list')) {
+            if (nbParam === 2 && param1 === 'list') {
+                const resolvedPlayer = getUdgEscapers().get(resolvePlayerId(param2))
+
+                if (!resolvedPlayer) {
+                    return true
+                }
+
+                Text.P(escaper.getPlayer(), `${resolvedPlayer.getDisplayName()}'s start commands: `)
+
+                let i = 0
+                for (const startCmd of resolvedPlayer.getStartCommandsHandle().getStartCommands()) {
+                    Text.P(escaper.getPlayer(), `${++i}: ${startCmd}`)
+                }
+            } else if (nbParam === 0 || (nbParam === 1 && param1 === 'list')) {
                 Text.P(escaper.getPlayer(), 'My start commands: ')
 
                 let i = 0

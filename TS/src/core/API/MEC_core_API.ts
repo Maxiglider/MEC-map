@@ -1,3 +1,4 @@
+import { ServiceManager } from 'Services'
 import { getUdgEscapers, getUdgLevels, getUdgMonsterTypes, getUdgTerrainTypes, globals } from '../../../globals'
 import { errorHandler } from '../../Utils/mapUtils'
 import { SetMeteorEffect } from '../04_STRUCTURES/Escaper/Escaper'
@@ -84,4 +85,16 @@ export const MEC_core_API = {
     //helpers
     isHero: IsHero,
     hero2Escaper: Hero2Escaper,
+
+    setPointsEnabled: (enabled: boolean) => {
+        ServiceManager.getService('Multiboard').setPointsEnabled(enabled)
+    },
+
+    adjustPlayerPoints: (playerId: number, points: number) => {
+        ServiceManager.getService('Multiboard').adjustPlayerPoints(playerId, points)
+    },
+
+    setPlayerPoints: (playerId: number, points: number) => {
+        ServiceManager.getService('Multiboard').setPlayerPoints(playerId, points)
+    },
 }

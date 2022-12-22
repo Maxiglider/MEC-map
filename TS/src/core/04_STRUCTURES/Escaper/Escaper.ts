@@ -193,6 +193,7 @@ export class Escaper {
     private ignoreDeathMessages = false
     private textTag: texttag | null = null
     private textTagTimer: Timer | null = null
+    private panCameraOnRevive: 'coop' | 'all' | 'none' = 'coop'
 
     private displayName: string
 
@@ -623,7 +624,7 @@ export class Escaper {
         this.hero && SetUnitAnimation(this.hero, 'Morph Alternate')
     }
 
-    revive(x: number, y: number) {
+    revive(x: number, y: number, type: 'coop' | 'other' = 'other') {
         if (!this.hero || !this.invisUnit || this.isAlive()) {
             return false
         }
@@ -647,6 +648,24 @@ export class Escaper {
         //coop
         ShowUnit(this.powerCircle, false)
         ShowUnit(this.dummyPowerCircle, false)
+
+        if (this.hero && (this.panCameraOnRevive === 'all' || this.panCameraOnRevive === type)) {
+            const xHero = GetUnitX(this.hero)
+            const yHero = GetUnitY(this.hero)
+
+            //move camera if needed
+            if (GetLocalPlayer() == this.p) {
+                const FIELD = 1500
+                const minX = GetCameraTargetPositionX() - FIELD / 2
+                const minY = GetCameraTargetPositionY() - FIELD / 2
+                const maxX = GetCameraTargetPositionX() + FIELD / 2
+                const maxY = GetCameraTargetPositionY() + FIELD / 2
+
+                if (xHero < minX || xHero > maxX || yHero < minY || yHero > maxY) {
+                    SetCameraPositionForPlayer(this.p, xHero, yHero)
+                }
+            }
+        }
 
         return true
     }
@@ -1678,24 +1697,11 @@ export class Escaper {
         if (this.hero) {
             const xHero = GetUnitX(this.hero)
             const yHero = GetUnitY(this.hero)
-            this.revive(xHero, yHero)
+            this.revive(xHero, yHero, 'coop')
             RunCoopSoundOnHero(this.hero)
             SetUnitAnimation(this.hero, 'channel')
             this.absoluteSlideSpeed(0)
             this.setCoopInvul(true)
-
-            //move camera if needed
-            if (GetLocalPlayer() == this.p) {
-                const FIELD = 1500
-                const minX = GetCameraTargetPositionX() - FIELD / 2
-                const minY = GetCameraTargetPositionY() - FIELD / 2
-                const maxX = GetCameraTargetPositionX() + FIELD / 2
-                const maxY = GetCameraTargetPositionY() + FIELD / 2
-
-                if (xHero < minX || xHero > maxX || yHero < minY || yHero > maxY) {
-                    SetCameraPositionForPlayer(this.p, xHero, yHero)
-                }
-            }
         }
 
         if (mirrorHero && mirrorEscaper) {
@@ -1823,6 +1829,8 @@ export class Escaper {
     isIgnoringDeathMessages = () => this.ignoreDeathMessages
 
     setIgnoreDeathMessages = (ignoreDeathMessages: boolean) => (this.ignoreDeathMessages = ignoreDeathMessages)
+
+    setPanCameraOnRevive = (panCameraOnRevive: 'coop' | 'all' | 'none') => (this.panCameraOnRevive = panCameraOnRevive)
 
     updateTextTagPos: (this: void) => void = () => {
         if (!this.hero || !this.textTag) {

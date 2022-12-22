@@ -52,6 +52,12 @@ const tsMain = () => {
     //initializers
     initializers()
 
+    // use with `yarn test-memory-handler`
+    // createTimer(10, false, () => {
+    //     print('ok')
+    //     ;(_G as any)['printCreation'] = true
+    // })
+
     //triggers
     // initOldTriggers()
 

@@ -43,6 +43,7 @@ export const initMultiboard = () => {
                     score: number
                     saves: number
                     deaths: number
+                    points: number
                 }
             }
             mode: IBoardMode | 'default'
@@ -52,10 +53,14 @@ export const initMultiboard = () => {
 
     let amountOfEscapers = 0
     let gameTimeStr = ''
+    let pointsEnabled = false
 
     forRange(NB_ESCAPERS, i => {
         playerScores[i] = {
-            stats: { global: { score: 0, saves: 0, deaths: 0 }, current: { score: 0, saves: 0, deaths: 0 } },
+            stats: {
+                global: { score: 0, saves: 0, deaths: 0, points: 0 },
+                current: { score: 0, saves: 0, deaths: 0, points: 0 },
+            },
             mode: 'default',
             statsMode: 'global',
         }
@@ -66,6 +71,7 @@ export const initMultiboard = () => {
             playerScores[i].stats.current.score = 0
             playerScores[i].stats.current.saves = 0
             playerScores[i].stats.current.deaths = 0
+            playerScores[i].stats.current.points = 0
         })
 
         reinitBoards()
@@ -73,7 +79,7 @@ export const initMultiboard = () => {
     }
 
     const initMultiboard = () => {
-        const cols = 4
+        const cols = 4 + (pointsEnabled ? 1 : 0)
         const rows = 3 + getUdgEscapers().countMain()
 
         const nameWidth = getLongestNameWidth()
@@ -102,6 +108,7 @@ export const initMultiboard = () => {
         MultiboardSetItemValueBJ(mb, 2, 3, 'Score')
         MultiboardSetItemValueBJ(mb, 3, 3, 'Saves')
         MultiboardSetItemValueBJ(mb, 4, 3, 'Deaths')
+        pointsEnabled && MultiboardSetItemValueBJ(mb, 5, 3, 'Points')
     }
 
     const initLeaderboard = () => {
@@ -222,6 +229,7 @@ export const initMultiboard = () => {
                     MultiboardSetItemValueBJ(mb, 2, 4 + rowIndex, colorCode + playerScore.score)
                     MultiboardSetItemValueBJ(mb, 3, 4 + rowIndex, colorCode + playerScore.saves)
                     MultiboardSetItemValueBJ(mb, 4, 4 + rowIndex, colorCode + playerScore.deaths)
+                    pointsEnabled && MultiboardSetItemValueBJ(mb, 5, 4 + rowIndex, colorCode + playerScore.points)
 
                     rowIndex++
                 }
@@ -293,6 +301,28 @@ export const initMultiboard = () => {
         updatePlayers()
     }
 
+    const setPointsEnabled = (enabled: boolean) => {
+        pointsEnabled = enabled
+
+        updatePlayers()
+    }
+
+    const adjustPlayerPoints = (playerId: number, points: number) => {
+        for (const statsMode of statsModes) {
+            playerScores[playerId].stats[statsMode].points += points
+        }
+
+        updatePlayers()
+    }
+
+    const setPlayerPoints = (playerId: number, points: number) => {
+        for (const statsMode of statsModes) {
+            playerScores[playerId].stats[statsMode].points = points
+        }
+
+        updatePlayers()
+    }
+
     createTimer(1, true, () => {
         gameTimeStr = GameTime.getGameTime()
 
@@ -308,5 +338,8 @@ export const initMultiboard = () => {
         resetRoundScores,
         getOrCreateLeaderboard,
         reinitBoards,
+        setPointsEnabled,
+        adjustPlayerPoints,
+        setPlayerPoints,
     }
 }
