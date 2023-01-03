@@ -17,40 +17,6 @@ import { initSimpleUnitRecycler } from './SimpleUnitRecycler'
 const DECALAGE_UNSPAWN = 200
 const DELAY_BETWEEN_SPAWN_AND_MOVEMENT = 0.5
 
-const MonsterStartMovement = () => {
-    const mobTimer = GetExpiredTimer()
-    const ms = MonsterSpawn.anyTimerId2MonsterSpawn.get(GetHandleId(mobTimer))
-    MonsterSpawn.anyTimerId2MonsterSpawn.delete(GetHandleId(mobTimer))
-    if (ms) {
-        const mobUnit = MonsterSpawn.anyTimerId2Unit.get(GetHandleId(mobTimer))
-        MonsterSpawn.anyTimerId2Unit.delete(GetHandleId(mobTimer))
-        if (mobUnit) {
-            ms.startMobMovement(mobUnit, ms)
-            UnitAddAbility(mobUnit, FourCC('Aloc'))
-            DestroyTimer(mobTimer)
-        }
-    }
-}
-
-const MonsterSpawn_Actions = errorHandler(() => {
-    const ms = MonsterSpawn.anyTrigId2MonsterSpawn.get(GetHandleId(GetTriggeringTrigger()))
-    if (ms) {
-        for (let i = 0; i < ms.getSpawnAmount(); i++) {
-            const mobUnit = ms.createMob()
-            if (mobUnit) {
-                const mobTimer = CreateTimer()
-                MonsterSpawn.anyTimerId2MonsterSpawn.set(GetHandleId(mobTimer), ms)
-                MonsterSpawn.anyTimerId2Unit.set(GetHandleId(mobTimer), mobUnit)
-                TimerStart(mobTimer, DELAY_BETWEEN_SPAWN_AND_MOVEMENT, false, MonsterStartMovement)
-                SetUnitOwner(mobUnit, ENNEMY_PLAYER, false)
-                ShowUnit(mobUnit, false)
-                UnitRemoveAbility(mobUnit, FourCC('Aloc'))
-                ms.monsters && GroupAddUnit(ms.monsters, mobUnit)
-            }
-        }
-    }
-})
-
 /**
  * class MonsterSpawn
  */
@@ -88,6 +54,7 @@ export class MonsterSpawn {
     private initialDelayTimer: Timer | undefined
 
     private simpleUnitRecycler = initSimpleUnitRecycler()
+    private _active = false
 
     constructor(
         label: string,
@@ -128,6 +95,7 @@ export class MonsterSpawn {
     getMaxY = () => this.maxY
 
     deactivate = () => {
+        this._active = false
         this.initialDelayTimer?.pause().destroy()
 
         if (this.unspawnReg) {
@@ -188,20 +156,59 @@ export class MonsterSpawn {
         RemoveRect(r)
     }
 
+    private MonsterStartMovement: (this: void) => void = () => {
+        if (!this._active) {
+            return
+        }
+
+        const mobTimer = GetExpiredTimer()
+        const ms = MonsterSpawn.anyTimerId2MonsterSpawn.get(GetHandleId(mobTimer))
+        MonsterSpawn.anyTimerId2MonsterSpawn.delete(GetHandleId(mobTimer))
+        if (ms) {
+            const mobUnit = MonsterSpawn.anyTimerId2Unit.get(GetHandleId(mobTimer))
+            MonsterSpawn.anyTimerId2Unit.delete(GetHandleId(mobTimer))
+            if (mobUnit) {
+                ms.startMobMovement(mobUnit, ms)
+                UnitAddAbility(mobUnit, FourCC('Aloc'))
+                DestroyTimer(mobTimer)
+            }
+        }
+    }
+
+    private MonsterSpawn_Actions = errorHandler(() => {
+        const ms = MonsterSpawn.anyTrigId2MonsterSpawn.get(GetHandleId(GetTriggeringTrigger()))
+        if (ms) {
+            for (let i = 0; i < ms.getSpawnAmount(); i++) {
+                const mobUnit = ms.createMob()
+                if (mobUnit) {
+                    const mobTimer = CreateTimer()
+                    MonsterSpawn.anyTimerId2MonsterSpawn.set(GetHandleId(mobTimer), ms)
+                    MonsterSpawn.anyTimerId2Unit.set(GetHandleId(mobTimer), mobUnit)
+                    TimerStart(mobTimer, DELAY_BETWEEN_SPAWN_AND_MOVEMENT, false, this.MonsterStartMovement)
+                    SetUnitOwner(mobUnit, ENNEMY_PLAYER, false)
+                    ShowUnit(mobUnit, false)
+                    UnitRemoveAbility(mobUnit, FourCC('Aloc'))
+                    ms.monsters && GroupAddUnit(ms.monsters, mobUnit)
+                }
+            }
+        }
+    })
+
     activate = () => {
+        this._active = true
         this.monsters = CreateGroup()
 
         if (this.initialDelay === 0) {
             this.tSpawn = CreateTrigger()
             MonsterSpawn.anyTrigId2MonsterSpawn.set(GetHandleId(this.tSpawn), this)
             TriggerRegisterTimerEvent(this.tSpawn, 1 / this.frequence, true)
-            TriggerAddAction(this.tSpawn, MonsterSpawn_Actions)
+            TriggerAddAction(this.tSpawn, this.MonsterSpawn_Actions)
         } else {
             this.initialDelayTimer = createTimer(this.initialDelay, false, () => {
                 this.tSpawn = CreateTrigger()
                 MonsterSpawn.anyTrigId2MonsterSpawn.set(GetHandleId(this.tSpawn), this)
                 TriggerRegisterTimerEvent(this.tSpawn, 1 / this.frequence, true)
-                TriggerAddAction(this.tSpawn, MonsterSpawn_Actions)
+                TriggerAddAction(this.tSpawn, this.MonsterSpawn_Actions)
             })
         }
 
@@ -390,7 +397,7 @@ export class MonsterSpawn {
         this.tSpawn = CreateTrigger()
         MonsterSpawn.anyTrigId2MonsterSpawn.set(GetHandleId(this.tSpawn), this)
         TriggerRegisterTimerEvent(this.tSpawn, 1 / this.frequence, true)
-        TriggerAddAction(this.tSpawn, MonsterSpawn_Actions)
+        TriggerAddAction(this.tSpawn, this.MonsterSpawn_Actions)
     }
 
     displayForPlayer = (p: player) => {
