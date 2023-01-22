@@ -546,12 +546,12 @@ export const initCommandAll = () => {
             let n = 0
 
             if (noParam || param1 === 'all' || param1 === 'a') {
-                n = getUdgLevels().getCurrentLevel().getNbMonsters('all')
+                n = getUdgLevels().getCurrentLevel(escaper).getNbMonsters('all')
                 Text.P(escaper.getPlayer(), 'There are ' + I2S(n) + ' monsters in this level.')
 
                 let p = 0
 
-                for (const [_, ms] of pairs(getUdgLevels().getCurrentLevel().monsterSpawns.getAll())) {
+                for (const [_, ms] of pairs(getUdgLevels().getCurrentLevel(escaper).monsterSpawns.getAll())) {
                     if (ms.monsters) {
                         p += BlzGroupGetSize(ms.monsters)
                     }
@@ -564,12 +564,12 @@ export const initCommandAll = () => {
                 return true
             }
             if (param1 === 'moving' || param1 === 'm') {
-                n = getUdgLevels().getCurrentLevel().getNbMonsters('moving')
+                n = getUdgLevels().getCurrentLevel(escaper).getNbMonsters('moving')
                 Text.P(escaper.getPlayer(), 'There are ' + I2S(n) + ' moving monsters in this level.')
                 return true
             }
             if (param1 === 'notMoving' || param1 === 'nm') {
-                n = getUdgLevels().getCurrentLevel().getNbMonsters('not moving')
+                n = getUdgLevels().getCurrentLevel(escaper).getNbMonsters('not moving')
                 Text.P(escaper.getPlayer(), 'There are ' + I2S(n) + ' non moving monsters in this level.')
                 return true
             }
@@ -1016,7 +1016,10 @@ export const initCommandAll = () => {
             if (!noParam) {
                 return true
             }
-            Text.P(escaper.getPlayer(), 'the current level is number ' + I2S(getUdgLevels().getCurrentLevel().getId()))
+            Text.P(
+                escaper.getPlayer(),
+                'the current level is number ' + I2S(getUdgLevels().getCurrentLevel(escaper).getId())
+            )
             return true
         },
     })

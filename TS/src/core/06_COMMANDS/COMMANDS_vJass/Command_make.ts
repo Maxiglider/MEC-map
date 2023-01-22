@@ -2144,7 +2144,7 @@ export const initExecuteCommandMake = () => {
 
             let str = ''
 
-            if (getUdgLevels().getCurrentLevel() == escaper.getMakingLevel()) {
+            if (getUdgLevels().getCurrentLevel(escaper) == escaper.getMakingLevel()) {
                 str = ' (same as current level)'
             } else {
                 str = ''
@@ -2196,7 +2196,7 @@ export const initExecuteCommandMake = () => {
                         Text.mkP(
                             escaper.getPlayer(),
                             'you are now making current level (which is at the moment number ' +
-                                I2S(getUdgLevels().getCurrentLevel().getId()) +
+                                I2S(getUdgLevels().getCurrentLevel(escaper).getId()) +
                                 ')'
                         )
                     } else {

@@ -155,4 +155,23 @@ export const initExecuteCommandRed = () => {
             return true
         },
     })
+
+    //-setLevelProgression all|allied|solo
+    registerCommand({
+        name: 'setLevelProgression',
+        alias: [],
+        group: 'red',
+        argDescription: '<all|allied|solo>',
+        description: '',
+        cb: ({ param1 }, escaper) => {
+            if (param1 !== 'all' && param1 !== 'allied' && param1 !== 'solo') {
+                Text.erP(escaper.getPlayer(), 'Invalid mode')
+                return true
+            }
+
+            Text.A(`Level progression changed to: ${param1}`)
+            getUdgLevels().setLevelProgression(param1)
+            return true
+        },
+    })
 }

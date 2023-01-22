@@ -1,10 +1,9 @@
 import { Text } from 'core/01_libraries/Text'
-import { getUdgLevels } from "../../../../globals"
+import { getUdgLevels } from '../../../../globals'
 
 import { createEvent } from 'Utils/mapUtils'
+import { ObjectHandler } from '../../../Utils/ObjectHandler'
 import { Hero2Escaper } from '../Escaper/Escaper_functions'
-import {ObjectHandler} from "../../../Utils/ObjectHandler";
-
 
 abstract class RectInterface {
     minX: number
@@ -62,7 +61,7 @@ export class Start extends RectInterface {
 export class End extends RectInterface {
     private endReaching: trigger
 
-    constructor(x1: number, y1: number, x2: number, y2: number) {
+    constructor(levelId: number, x1: number, y1: number, x2: number, y2: number) {
         super(RMinBJ(x1, x2), RMinBJ(y1, y2), RMaxBJ(x1, x2), RMaxBJ(y1, y2))
 
         this.endReaching = createEvent({
@@ -72,6 +71,10 @@ export class End extends RectInterface {
                     const finisher = Hero2Escaper(GetTriggerUnit())
 
                     if (!finisher) {
+                        return
+                    }
+
+                    if (getUdgLevels().levelProgressionState[finisher.getId()] !== levelId) {
                         return
                     }
 

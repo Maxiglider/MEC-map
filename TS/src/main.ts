@@ -20,13 +20,12 @@ import { PROD } from './env'
 // Ally system, -(un)ally; Allows you to only coop revive specific players
 // Changed -pcor none to also include portals. Its not really 'onRevive' but w/e, nobody plays like this anyway.. except Andy..
 // Solo mode option at start no longer crashes, old leaderboard does not work because of -ui command
+// [EXPERIMENTAL] -setLevelProgression all|allied|solo. Makes only you/allied team/all go to the next lvl, can cause lag when levels are too big so use with caution
 
 // TODO;
 // The player revive timer should be cancelled when someone gets revived (when everyone is dead after x seconds it revives you but if you -r urself and then die u dont still wanna be instantly teleported back to start cuz of the initial revive timer)
 // new cmd: summon, makes someone teleport to you
 // make speededit/noobedit support targetplayer -speededit 1 red/all/etc
-
-// -setLevelProgression all|allied|solo (like setmkl, makes only you go to the next lvl, can cause lag but who cares, should just use it with care like any other mec cmd)
 
 const tsMain = () => {
     ServiceManager.registerServices({

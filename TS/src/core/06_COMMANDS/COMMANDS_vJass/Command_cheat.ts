@@ -478,7 +478,7 @@ export const initExecuteCommandCheat = () => {
             }
 
             const n = S2I(param1)
-            if (getUdgLevels().getCurrentLevel().getId() == n) {
+            if (getUdgLevels().getCurrentLevel(escaper).getId() == n) {
                 Text.erP(escaper.getPlayer(), 'you already are in this level')
                 return true
             }

@@ -134,7 +134,7 @@ export class Level {
 
     newEnd(x1: number, y1: number, x2: number, y2: number) {
         this.end && this.end.destroy()
-        this.end = new End(x1, y1, x2, y2)
+        this.end = new End(this.id, x1, y1, x2, y2)
         if (this.isActivatedB) {
             this.end.activate(true)
         }

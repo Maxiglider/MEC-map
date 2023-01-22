@@ -416,7 +416,7 @@ export class Escaper {
     createHeroAtStart = () => {
         let x: number
         let y: number
-        let start = getUdgLevels().getCurrentLevel()?.getStart()
+        let start = getUdgLevels().getCurrentLevel(this)?.getStart()
         let angle: number
 
         if (!start) {
@@ -609,7 +609,7 @@ export class Escaper {
             if (this.hero) {
                 KillUnit(this.hero)
 
-                for (const [_, staticSlide] of pairs(getUdgLevels().getCurrentLevel().staticSlides.getAll())) {
+                for (const [_, staticSlide] of pairs(getUdgLevels().getCurrentLevel(this).staticSlides.getAll())) {
                     staticSlide.removePlayer(this.escaperId)
                 }
             }
@@ -690,8 +690,8 @@ export class Escaper {
     }
 
     reviveAtStart = () => {
-        const x: number = getUdgLevels().getCurrentLevel().getStartRandomX()
-        const y: number = getUdgLevels().getCurrentLevel().getStartRandomY()
+        const x: number = getUdgLevels().getCurrentLevel(this).getStartRandomX()
+        const y: number = getUdgLevels().getCurrentLevel(this).getStartRandomY()
 
         if (!this.isEscaperSecondary()) {
             GetMirrorEscaper(this)?.reviveAtStart()
@@ -1217,7 +1217,7 @@ export class Escaper {
         if (oldMakingLevel && !IsLevelBeingMade(oldMakingLevel)) {
             oldMakingLevel.activate(false)
 
-            if (getUdgLevels().getCurrentLevel().getId() < oldMakingLevel.getId()) {
+            if (getUdgLevels().getCurrentLevel(this).getId() < oldMakingLevel.getId()) {
                 oldMakingLevel.activateVisibilities(false)
             }
         }
@@ -1236,7 +1236,7 @@ export class Escaper {
         if (this.makingLevel) {
             return this.makingLevel
         } else {
-            return getUdgLevels().getCurrentLevel()
+            return getUdgLevels().getCurrentLevel(this)
         }
     }
 

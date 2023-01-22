@@ -1,4 +1,4 @@
-import { NB_ESCAPERS, NB_LIVES_AT_BEGINNING } from 'core/01_libraries/Constants'
+import { NB_ESCAPERS, NB_LIVES_AT_BEGINNING, NB_PLAYERS_MAX } from 'core/01_libraries/Constants'
 import { Text } from 'core/01_libraries/Text'
 import { gg_trg_apparition_dialogue_et_fermeture_automatique } from 'core/08_GAME/Mode_coop/creation_dialogue'
 import { ServiceManager } from 'Services'
@@ -8,7 +8,7 @@ import { udg_colorCode } from '../../01_libraries/Init_colorCodes'
 import { BaseArray } from '../BaseArray'
 import { Caster } from '../Caster/Caster'
 import type { CasterType } from '../Caster/CasterType'
-import type { Escaper } from '../Escaper/Escaper'
+import { Escaper } from '../Escaper/Escaper'
 import type { MeteorArray } from '../Meteor/MeteorArray'
 import { Monster } from '../Monster/Monster'
 import type { MonsterArray } from '../Monster/MonsterArray'
@@ -21,10 +21,13 @@ import type { MonsterSpawnArray } from '../MonsterSpawn/MonsterSpawnArray'
 import type { ClearMobArray } from '../Monster_properties/ClearMobArray'
 import { isDeathTerrain, isSlideTerrain } from '../TerrainType/TerrainType'
 import { Level } from './Level'
+import { sameLevelProgression } from './LevelProgression'
 import { IsLevelBeingMade } from './Level_functions'
 import type { VisibilityModifierArray } from './VisibilityModifierArray'
 
 const MIN_TIME_BETWEEN_GOTNL = 0.05
+
+type ILevelProgression = 'all' | 'allied' | 'solo'
 
 export class LevelArray extends BaseArray<Level> {
     private currentLevel: number
@@ -46,6 +49,10 @@ export class LevelArray extends BaseArray<Level> {
         speedEdit: { active: false, terrains: {} },
     }
 
+    private levelProgression: ILevelProgression = 'all'
+
+    levelProgressionState: { [escaperId: number]: number } = {}
+
     constructor() {
         super(true)
         let x1 = GetRectMinX(gg_rct_departLvl_0)
@@ -62,6 +69,21 @@ export class LevelArray extends BaseArray<Level> {
         ServiceManager.getService('Lives').initLives()
 
         this.currentLevel = 0
+
+        for (let i = 0; i < NB_PLAYERS_MAX; i++) {
+            this.levelProgressionState[i] = 0
+        }
+    }
+
+    hasPlayersInLevel = (lvlId: number) => {
+        let j = 0
+        for (let i = 0; i < NB_PLAYERS_MAX; i++) {
+            if (this.levelProgressionState[i] === lvlId) {
+                j++
+            }
+        }
+
+        return j > 0
     }
 
     refreshCurrentLevel = () => {
@@ -78,7 +100,18 @@ export class LevelArray extends BaseArray<Level> {
         }
 
         this.currentLevel = levelId
-        if (previousLevelId > -1 && !IsLevelBeingMade(this.data[previousLevelId])) {
+
+        for (let i = 0; i < NB_PLAYERS_MAX; i++) {
+            if (!finisher || (getUdgEscapers().get(i) && sameLevelProgression(finisher, getUdgEscapers().get(i)!))) {
+                this.levelProgressionState[i] = levelId
+            }
+        }
+
+        if (
+            previousLevelId > -1 &&
+            !IsLevelBeingMade(this.data[previousLevelId]) &&
+            !this.hasPlayersInLevel(previousLevelId)
+        ) {
             getUdgEscapers().destroyMakesIfForSpecificLevel_currentLevel()
             this.data[previousLevelId].activate(false)
         }
@@ -123,7 +156,14 @@ export class LevelArray extends BaseArray<Level> {
         TimerStart(this.tLastGoToNextLevel, 10, false, DoNothing)
 
         this.currentLevel = this.currentLevel + 1
-        if (!IsLevelBeingMade(this.data[this.currentLevel - 1])) {
+
+        for (let i = 0; i < NB_PLAYERS_MAX; i++) {
+            if (!finisher || (getUdgEscapers().get(i) && sameLevelProgression(finisher, getUdgEscapers().get(i)!))) {
+                this.levelProgressionState[i] = this.currentLevel
+            }
+        }
+
+        if (!IsLevelBeingMade(this.data[this.currentLevel - 1]) && !this.hasPlayersInLevel(this.currentLevel - 1)) {
             getUdgEscapers().destroyMakesIfForSpecificLevel_currentLevel()
             this.data[this.currentLevel - 1].activate(false)
         }
@@ -318,8 +358,12 @@ export class LevelArray extends BaseArray<Level> {
         return true
     }
 
-    getCurrentLevel = (): Level => {
-        return this.data[this.currentLevel]
+    getCurrentLevel = (escaper?: Escaper): Level => {
+        if (this.levelProgression === 'all' || !escaper) {
+            return this.data[this.currentLevel]
+        } else {
+            return this.data[this.levelProgressionState[escaper.getId()]]
+        }
     }
 
     getLevelFromMonsterArray = (ma: MonsterArray) => {
@@ -486,4 +530,7 @@ export class LevelArray extends BaseArray<Level> {
             ServiceManager.getService('Multiboard').reinitBoards()
         }
     }
+
+    getLevelProgression = () => this.levelProgression
+    setLevelProgression = (levelProgression: ILevelProgression) => (this.levelProgression = levelProgression)
 }

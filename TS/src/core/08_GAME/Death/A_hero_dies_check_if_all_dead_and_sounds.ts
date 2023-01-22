@@ -1,11 +1,13 @@
+import { arrayPush } from 'core/01_libraries/Basic_functions'
 import { COOP_REVIVE_DIST, NB_ESCAPERS } from 'core/01_libraries/Constants'
 import { IsHero } from 'core/04_STRUCTURES/Escaper/Escaper_functions'
-import { createEvent } from 'Utils/mapUtils'
+import { sameLevelProgression } from 'core/04_STRUCTURES/Level/LevelProgression'
+import { createEvent, runInTrigger } from 'Utils/mapUtils'
 import { getUdgEscapers, getUdgTerrainTypes, globals } from '../../../../globals'
 import { Globals } from '../../09_From_old_Worldedit_triggers/globals_variables_and_triggers'
 import { AfkMode } from '../Afk_mode/Afk_mode'
 import { DeplacementHeroHorsDeathPath } from '../Mode_coop/deplacement_heros_hors_death_path'
-import { gg_trg_Lose_a_life_and_res } from './Lose_a_life_and_res'
+import { loseALifeAndRes } from './Lose_a_life_and_res'
 
 export const InitTrig_A_hero_dies_check_if_all_dead_and_sounds = () => {
     let udg_nbKilled = 0
@@ -26,17 +28,30 @@ export const InitTrig_A_hero_dies_check_if_all_dead_and_sounds = () => {
                     udg_nbKilled = 0
                 }
 
+                const escaperIds: number[] = []
+
                 for (let i = 0; i < NB_ESCAPERS; i++) {
-                    if (getUdgEscapers().get(i)?.isAlive() && !getUdgEscapers().get(i)?.hasAutorevive()) {
+                    if (
+                        getUdgEscapers().get(i)?.isAlive() &&
+                        !getUdgEscapers().get(i)?.hasAutorevive() &&
+                        !(
+                            getUdgEscapers().get(n) &&
+                            !sameLevelProgression(getUdgEscapers().get(n)!, getUdgEscapers().get(i)!)
+                        )
+                    ) {
                         nbAlive = nbAlive + 1
+                    } else {
+                        arrayPush(escaperIds, i)
                     }
                 }
 
                 if (nbAlive === 0) {
-                    TriggerExecute(gg_trg_Lose_a_life_and_res.trigger)
-                    TriggerSleepAction(2)
-                    StartSound(gg_snd_questFailed)
-                    last = true
+                    runInTrigger(() => {
+                        loseALifeAndRes(escaperIds)
+                        TriggerSleepAction(2)
+                        StartSound(gg_snd_questFailed)
+                        last = true
+                    })
                 } else {
                     if (nbAlive === 1) {
                         StartSound(gg_snd_warning)
