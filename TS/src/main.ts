@@ -10,6 +10,24 @@ import { MEC_core_API } from './core/API/MEC_core_API'
 import { initializers } from './core/Init/initializers'
 import { PROD } from './env'
 
+// Changelog:
+// Added new cmd: hideChat
+// The all dead trigger now ignores players with autorevive turned on
+// unit recycler now resets after -setmsm has been used
+// -lc now remains active when triggering a new level or restart
+// -rto now allows you to tp to dead people
+// [TEST] fpc faster rotation
+// Ally system, -(un)ally; Allows you to only coop revive specific players
+// Changed -pcor none to also include portals. Its not really 'onRevive' but w/e, nobody plays like this anyway.. except Andy..
+// Solo mode option at start no longer crashes, old leaderboard does not work because of -ui command
+
+// TODO;
+// The player revive timer should be cancelled when someone gets revived (when everyone is dead after x seconds it revives you but if you -r urself and then die u dont still wanna be instantly teleported back to start cuz of the initial revive timer)
+// new cmd: summon, makes someone teleport to you
+// make speededit/noobedit support targetplayer -speededit 1 red/all/etc
+
+// -setLevelProgression all|allied|solo (like setmkl, makes only you go to the next lvl, can cause lag but who cares, should just use it with care like any other mec cmd)
+
 const tsMain = () => {
     ServiceManager.registerServices({
         Lives: initLives,

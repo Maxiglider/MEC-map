@@ -346,7 +346,7 @@ export const initExecuteCommandCheat = () => {
     //-reviveTo(rto) <Pcolor>   --> revives your hero to an other hero, with the same facing angle
     registerCommand({
         name: 'reviveTo',
-        alias: ['rto'],
+        alias: ['rto', 'rposto'],
         group: 'cheat',
         argDescription: '<Pcolor>',
         description: 'Revives your hero to an other hero, with the same facing angle',
@@ -354,8 +354,10 @@ export const initExecuteCommandCheat = () => {
             if (!(nbParam === 1 && isPlayerId(param1))) {
                 return true
             }
+
             const n = resolvePlayerId(param1)
-            if (!getUdgEscapers().get(n)?.isAlive() || getUdgEscapers().get(n) == null) {
+
+            if (getUdgEscapers().get(n) == null) {
                 return true
             }
 
@@ -369,12 +371,13 @@ export const initExecuteCommandCheat = () => {
             const x = GetUnitX(targetHero)
             const y = GetUnitY(targetHero)
 
-            if (escaper.isAlive()) {
-                SetUnitX(hero, x)
-                SetUnitY(hero, y)
-            } else {
-                escaper.revive(x, y)
+            SetUnitX(hero, x)
+            SetUnitY(hero, y)
+
+            if (!escaper.isAlive()) {
+                escaper.coopReviveHero()
             }
+
             escaper.turnInstantly(GetUnitFacing(targetHero))
 
             const escaperSecond = GetMirrorEscaper(escaper)

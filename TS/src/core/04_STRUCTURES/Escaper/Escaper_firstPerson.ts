@@ -6,7 +6,7 @@ import { Escaper } from './Escaper'
 
 type IKeys = 'UP' | 'DOWN' | 'LEFT' | 'RIGHT'
 
-const FIRSTPERSON_ANGLE_PER_PERIOD = 2
+const FIRSTPERSON_ANGLE_PER_PERIOD = 3
 
 export class EscaperFirstPerson {
     private forceCamTimer: Timer | null = null

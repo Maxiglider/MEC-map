@@ -200,6 +200,8 @@ export class Escaper {
     private showNames = false
     private staticSliding = false
 
+    alliedState: { [escaperId: number]: boolean } = {}
+
     //mouse position updated when a trigger dependant of mouse movement is being used
     mouseX = 0
     mouseY = 0
@@ -288,6 +290,10 @@ export class Escaper {
         ShowUnit(this.dummyPowerCircle, false)
 
         this.displayName = removeHash(GetPlayerName(this.p))
+
+        for (let i = 0; i < NB_PLAYERS_MAX; i++) {
+            this.alliedState[i] = true
+        }
     }
 
     getColorId = () => {
@@ -650,24 +656,37 @@ export class Escaper {
         ShowUnit(this.dummyPowerCircle, false)
 
         if (this.hero && (this.panCameraOnRevive === 'all' || this.panCameraOnRevive === type)) {
-            const xHero = GetUnitX(this.hero)
-            const yHero = GetUnitY(this.hero)
-
             //move camera if needed
             if (GetLocalPlayer() == this.p) {
-                const FIELD = 1500
-                const minX = GetCameraTargetPositionX() - FIELD / 2
-                const minY = GetCameraTargetPositionY() - FIELD / 2
-                const maxX = GetCameraTargetPositionX() + FIELD / 2
-                const maxY = GetCameraTargetPositionY() + FIELD / 2
-
-                if (xHero < minX || xHero > maxX || yHero < minY || yHero > maxY) {
-                    SetCameraPositionForPlayer(this.p, xHero, yHero)
-                }
+                this.moveCameraToHeroIfNecessary()
             }
         }
 
         return true
+    }
+
+    moveCameraToHeroIfNecessary = () => {
+        if (!this.hero) {
+            return
+        }
+
+        // Used in portalMob so not really on revive but close enough
+        if (this.panCameraOnRevive === 'none') {
+            return
+        }
+
+        const xHero = GetUnitX(this.hero)
+        const yHero = GetUnitY(this.hero)
+
+        const FIELD = 1500
+        const minX = GetCameraTargetPositionX() - FIELD / 2
+        const minY = GetCameraTargetPositionY() - FIELD / 2
+        const maxX = GetCameraTargetPositionX() + FIELD / 2
+        const maxY = GetCameraTargetPositionY() + FIELD / 2
+
+        if (xHero < minX || xHero > maxX || yHero < minY || yHero > maxY) {
+            SetCameraPositionForPlayer(this.p, xHero, yHero)
+        }
     }
 
     reviveAtStart = () => {
@@ -1769,6 +1788,8 @@ export class Escaper {
 
     getFirstPersonHandle = () => this.firstPersonHandle
     getStartCommandsHandle = () => this.startCommandsHandle
+
+    isLockCamTarget = () => !!this.lockCamTarget
 
     setLockCamTarget = (lockCamTarget: Escaper | null) => {
         this.lockCamTarget = lockCamTarget

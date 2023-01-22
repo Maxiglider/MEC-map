@@ -149,6 +149,12 @@ export class LevelArray extends BaseArray<Level> {
                 SetCameraPosition(xCam, yCam)
             }
 
+            for (const [_, escaper] of pairs(getUdgEscapers().getAll())) {
+                if (escaper.isLockCamTarget()) {
+                    escaper.resetCamera()
+                }
+            }
+
             return true
         } else {
             return false
@@ -165,6 +171,12 @@ export class LevelArray extends BaseArray<Level> {
 
         const start = this.data[0].getStart()
         start && SetCameraPosition(start.getCenterX(), start.getCenterY())
+
+        for (const [_, escaper] of pairs(getUdgEscapers().getAll())) {
+            if (escaper.isLockCamTarget()) {
+                escaper.resetCamera()
+            }
+        }
 
         //coop
         TriggerExecute(gg_trg_apparition_dialogue_et_fermeture_automatique)

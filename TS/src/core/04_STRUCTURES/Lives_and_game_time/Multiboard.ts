@@ -5,7 +5,7 @@ import { ServiceManager } from 'Services'
 import { ArrayHandler } from 'Utils/ArrayHandler'
 import { literalArray } from 'Utils/ArrayUtils'
 import { createTimer, forRange } from 'Utils/mapUtils'
-import { getUdgEscapers, getUdgLevels, globals } from '../../../../globals'
+import { getUdgEscapers, getUdgLevels } from '../../../../globals'
 import { playerId2colorId, rawPlayerNames } from '../../06_COMMANDS/COMMANDS_vJass/Command_functions'
 import { Escaper } from '../Escaper/Escaper'
 import { LIVES_PLAYER } from './Lives_and_game_time'
@@ -46,7 +46,7 @@ export const initMultiboard = () => {
                     points: number
                 }
             }
-            mode: IBoardMode | 'default'
+            mode: IBoardMode
             statsMode: IStatsMode
         }
     } = {}
@@ -61,7 +61,7 @@ export const initMultiboard = () => {
                 global: { score: 0, saves: 0, deaths: 0, points: 0 },
                 current: { score: 0, saves: 0, deaths: 0, points: 0 },
             },
-            mode: 'default',
+            mode: 'multiboard',
             statsMode: 'global',
         }
     })
@@ -143,7 +143,7 @@ export const initMultiboard = () => {
 
         destroyBoards()
 
-        globals.coopModeActive && initMultiboard()
+        initMultiboard()
         initLeaderboard()
 
         // Toggle visiblity to update board width
@@ -258,22 +258,8 @@ export const initMultiboard = () => {
                         (getUdgLevels().isSpeedEdit() ? ' - ' + udg_colorCode[PURPLE] + 'SPEED' + '|r' : '')
                 )
 
-            mb &&
-                MultiboardMinimizeBJ(
-                    escaper.hideLeaderboard ||
-                        (playerMode.mode !== 'default' && playerMode.mode !== 'multiboard') ||
-                        !visible,
-                    mb
-                )
-
-            lb &&
-                LeaderboardDisplay(
-                    lb,
-                    !escaper.hideLeaderboard &&
-                        ((playerMode.mode === 'default' && !globals.coopModeActive) ||
-                            playerMode.mode === 'leaderboard') &&
-                        visible
-                )
+            mb && MultiboardMinimizeBJ(escaper.hideLeaderboard || playerMode.mode !== 'multiboard' || !visible, mb)
+            lb && LeaderboardDisplay(lb, !escaper.hideLeaderboard && playerMode.mode === 'leaderboard' && visible)
         }
     }
 

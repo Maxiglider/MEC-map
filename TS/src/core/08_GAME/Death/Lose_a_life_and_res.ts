@@ -27,11 +27,11 @@ export const InitTrig_Lose_a_life_and_res = () => {
                     }
                 } else {
                     if (ChangeAllTerrains.udg_changeAllTerrainsAtRevive) {
-                        TriggerSleepAction(6.0)
+                        TriggerSleepAction(2.0)
                         ChangeAllTerrains.ChangeAllTerrains('normal')
                         TriggerSleepAction(2.0)
                     } else {
-                        TriggerSleepAction(8.0)
+                        TriggerSleepAction(4.0)
                     }
                     i = 0
                     while (true) {

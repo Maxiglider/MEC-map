@@ -152,21 +152,7 @@ export class PortalMob {
             )
 
         // Move cam
-        {
-            const FIELD = 1500
-
-            const xHero = GetUnitX(hero)
-            const yHero = GetUnitY(hero)
-
-            const minX = GetCameraTargetPositionX() - FIELD / 2
-            const minY = GetCameraTargetPositionY() - FIELD / 2
-            const maxX = GetCameraTargetPositionX() + FIELD / 2
-            const maxY = GetCameraTargetPositionY() + FIELD / 2
-
-            if (xHero < minX || xHero > maxX || yHero < minY || yHero > maxY) {
-                SetCameraPositionForPlayer(escaper.getPlayer(), xHero, yHero)
-            }
-        }
+        escaper.moveCameraToHeroIfNecessary()
 
         // TODO; SECONDARYHERO?
     }

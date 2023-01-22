@@ -32,7 +32,7 @@ import { TerrainTypeNamesAndData } from '../../07_TRIGGERS/Modify_terrain_Functi
 import { AutoContinueAfterSliding } from '../../07_TRIGGERS/Slide_and_CheckTerrain_triggers/Auto_continue_after_sliding'
 import { TurnOnSlide } from '../../07_TRIGGERS/Slide_and_CheckTerrain_triggers/To_turn_on_slide'
 import { GetStringAssignedFromCommand, KeyboardShortcut } from '../../Keyboard_shortcuts/KeyboardShortcut'
-import { CmdParam, isPlayerId, resolvePlayerId } from './Command_functions'
+import { CmdParam, isPlayerId, resolvePlayerId, resolvePlayerIds } from './Command_functions'
 
 export const initCommandAll = () => {
     const { registerCommand } = ServiceManager.getService('Cmd')
@@ -1026,7 +1026,7 @@ export const initCommandAll = () => {
         name: 'leaderboard',
         alias: ['ldb'],
         group: 'all',
-        argDescription: 'on | off | mb|multiboard | global | current | classic',
+        argDescription: 'on | off | mb|multiboard|reset | classic | global | current',
         description: 'displays the leaderboard',
         cb: ({ nbParam, param1 }, escaper) => {
             if (nbParam === 1) {
@@ -1035,7 +1035,7 @@ export const initCommandAll = () => {
                     ServiceManager.getService('Multiboard').setVisibility(escaper, S2B(param1))
                 } else if (param1 === 'classic') {
                     ServiceManager.getService('Multiboard').setMode(escaper, 'leaderboard')
-                } else if (param1 === 'reset' || param1 === 'new' || param1 === 'multiboard' || param1 === 'mb') {
+                } else if (param1 === 'reset' || param1 === 'multiboard' || param1 === 'mb') {
                     ServiceManager.getService('Multiboard').setMode(escaper, 'multiboard')
                 } else if (param1 === 'global') {
                     ServiceManager.getService('Multiboard').setMode(escaper, 'multiboard')
@@ -1368,36 +1368,103 @@ export const initCommandAll = () => {
 
             return true
         },
-    }),
-        //-myStartCommands(msc) [list]|[add x]|[del x]|[delall]
-        registerCommand({
-            name: 'userInterface',
-            alias: ['ui'],
-            group: 'all',
-            argDescription: 'off | on | map',
-            description: 'Disable partly or totally the graphical user interface',
-            cb: ({ nbParam, param1 }, escaper) => {
-                if (nbParam != 1) {
-                    Text.erP(escaper.getPlayer(), 'wrong command parameters')
-                    return true
-                }
+    })
 
-                let enable = false
-                let showMinimap = false
-
-                if (param1 == 'map') {
-                    showMinimap = true
-                } else if (IsBoolString(param1)) {
-                    enable = S2B(param1)
-                } else {
-                    Text.erP(escaper.getPlayer(), 'wrong command parameters')
-                }
-
-                if (!escaper.enableInterface(enable, showMinimap)) {
-                    Text.erP(escaper.getPlayer(), 'nothing to change')
-                }
-
+    //-userInterface(ui) [off|on|map]
+    registerCommand({
+        name: 'userInterface',
+        alias: ['ui'],
+        group: 'all',
+        argDescription: 'off | on | map',
+        description: 'Disable partly or totally the graphical user interface',
+        cb: ({ nbParam, param1 }, escaper) => {
+            if (nbParam != 1) {
+                Text.erP(escaper.getPlayer(), 'wrong command parameters')
                 return true
-            },
-        })
+            }
+
+            let enable = false
+            let showMinimap = false
+
+            if (param1 == 'map') {
+                showMinimap = true
+            } else if (IsBoolString(param1)) {
+                enable = S2B(param1)
+            } else {
+                Text.erP(escaper.getPlayer(), 'wrong command parameters')
+            }
+
+            if (!escaper.enableInterface(enable, showMinimap)) {
+                Text.erP(escaper.getPlayer(), 'nothing to change')
+            }
+
+            return true
+        },
+    })
+
+    //-hideChat(hc)
+    registerCommand({
+        name: 'hideChat',
+        alias: ['hc', 'monk'],
+        group: 'all',
+        argDescription: 'on | off',
+        description: 'hides the chat',
+        cb: ({ param1 }, escaper) => {
+            if (!param1) param1 = 'true'
+
+            if (IsBoolString(param1)) {
+                BlzFrameSetVisible(BlzGetOriginFrame(ORIGIN_FRAME_CHAT_MSG, 0), !S2B(param1))
+                Text.mkP(escaper.getPlayer(), `Chat ${!S2B(param1) ? 'shown' : 'hidden'}`)
+            }
+
+            return true
+        },
+    })
+
+    const setAlliedState = (escaper: Escaper, target: Escaper, state: boolean) => {
+        if (escaper.getId() === target.getId()) {
+            return
+        }
+
+        escaper.alliedState[target.getId()] = state
+
+        Text.P(
+            escaper.getPlayer(),
+            `${udg_colorCode[escaper.getId()]}You|r ${state ? '' : 'un'}allied ${
+                udg_colorCode[target.getId()]
+            }${target.getDisplayName()}`
+        )
+        Text.P(
+            target.getPlayer(),
+            `${udg_colorCode[target.getId()]}${target.getDisplayName()}|r ${state ? '' : 'un'}allied ${
+                udg_colorCode[escaper.getId()]
+            }you`
+        )
+    }
+
+    //-ally [player]
+    registerCommand({
+        name: 'ally',
+        alias: [],
+        group: 'all',
+        argDescription: 'player',
+        description: 'Ally people, lets you revive them',
+        cb: ({ param1 }, escaper) => {
+            resolvePlayerIds(param1, target => setAlliedState(escaper, target, true))
+            return true
+        },
+    })
+
+    //-unally [player]
+    registerCommand({
+        name: 'unally',
+        alias: [],
+        group: 'all',
+        argDescription: 'player',
+        description: 'Unally people, prevents you from reviving them',
+        cb: ({ param1 }, escaper) => {
+            resolvePlayerIds(param1, target => setAlliedState(escaper, target, false))
+            return true
+        },
+    })
 }

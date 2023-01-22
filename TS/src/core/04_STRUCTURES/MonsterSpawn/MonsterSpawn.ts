@@ -383,6 +383,9 @@ export class MonsterSpawn {
 
     setMonsterType = (mt: MonsterType) => {
         this.mt = mt
+        this.deactivate()
+        this.simpleUnitRecycler.reinit()
+        this.activate()
     }
 
     setSens = (sens: string) => {

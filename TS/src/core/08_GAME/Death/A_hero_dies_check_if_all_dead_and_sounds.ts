@@ -27,7 +27,7 @@ export const InitTrig_A_hero_dies_check_if_all_dead_and_sounds = () => {
                 }
 
                 for (let i = 0; i < NB_ESCAPERS; i++) {
-                    if (getUdgEscapers().get(i)?.isAlive()) {
+                    if (getUdgEscapers().get(i)?.isAlive() && !getUdgEscapers().get(i)?.hasAutorevive()) {
                         nbAlive = nbAlive + 1
                     }
                 }
