@@ -2,6 +2,7 @@ import { arrayPush } from 'core/01_libraries/Basic_functions'
 import { COOP_REVIVE_DIST, NB_ESCAPERS } from 'core/01_libraries/Constants'
 import { IsHero } from 'core/04_STRUCTURES/Escaper/Escaper_functions'
 import { sameLevelProgression } from 'core/04_STRUCTURES/Level/LevelProgression'
+import { ArrayHandler } from 'Utils/ArrayHandler'
 import { createEvent, runInTrigger } from 'Utils/mapUtils'
 import { getUdgEscapers, getUdgTerrainTypes, globals } from '../../../../globals'
 import { Globals } from '../../09_From_old_Worldedit_triggers/globals_variables_and_triggers'
@@ -20,6 +21,7 @@ export const InitTrig_A_hero_dies_check_if_all_dead_and_sounds = () => {
                 const hero = GetTriggerUnit()
                 const n = GetUnitUserData(hero)
                 let nbAlive = 0
+                let nbAliveWithoutAr = 0
                 let last = false
 
                 udg_nbKilled = udg_nbKilled + 1
@@ -28,7 +30,7 @@ export const InitTrig_A_hero_dies_check_if_all_dead_and_sounds = () => {
                     udg_nbKilled = 0
                 }
 
-                const escaperIds: number[] = []
+                const escaperIds = ArrayHandler.getNewArray<number>()
 
                 for (let i = 0; i < NB_ESCAPERS; i++) {
                     if (
@@ -43,11 +45,26 @@ export const InitTrig_A_hero_dies_check_if_all_dead_and_sounds = () => {
                     } else {
                         arrayPush(escaperIds, i)
                     }
+
+                    if (
+                        !getUdgEscapers().get(i)?.hasAutorevive() &&
+                        GetPlayerController(Player(i)) === MAP_CONTROL_USER &&
+                        GetPlayerSlotState(Player(i)) === PLAYER_SLOT_STATE_PLAYING
+                    ) {
+                        nbAliveWithoutAr++
+                    }
+                }
+
+                // No need to continue when everyone has autorevive
+                if (nbAliveWithoutAr === 0) {
+                    ArrayHandler.clearArray(escaperIds)
+                    return
                 }
 
                 if (nbAlive === 0) {
                     runInTrigger(() => {
                         loseALifeAndRes(escaperIds)
+                        ArrayHandler.clearArray(escaperIds)
                         TriggerSleepAction(2)
                         StartSound(gg_snd_questFailed)
                         last = true

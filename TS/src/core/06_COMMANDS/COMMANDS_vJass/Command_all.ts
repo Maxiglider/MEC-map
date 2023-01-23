@@ -1405,25 +1405,6 @@ export const initCommandAll = () => {
         },
     })
 
-    //-hideChat(hc)
-    registerCommand({
-        name: 'hideChat',
-        alias: ['hc', 'monk'],
-        group: 'all',
-        argDescription: 'on | off',
-        description: 'hides the chat',
-        cb: ({ param1 }, escaper) => {
-            if (!param1) param1 = 'true'
-
-            if (IsBoolString(param1)) {
-                BlzFrameSetVisible(BlzGetOriginFrame(ORIGIN_FRAME_CHAT_MSG, 0), !S2B(param1))
-                Text.mkP(escaper.getPlayer(), `Chat ${!S2B(param1) ? 'shown' : 'hidden'}`)
-            }
-
-            return true
-        },
-    })
-
     const setAlliedState = (escaper: Escaper, target: Escaper, state: boolean) => {
         if (escaper.getId() === target.getId()) {
             return

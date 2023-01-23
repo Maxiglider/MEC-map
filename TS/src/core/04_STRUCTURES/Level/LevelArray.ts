@@ -3,7 +3,6 @@ import { Text } from 'core/01_libraries/Text'
 import { gg_trg_apparition_dialogue_et_fermeture_automatique } from 'core/08_GAME/Mode_coop/creation_dialogue'
 import { ServiceManager } from 'Services'
 import { getUdgCasterTypes, getUdgEscapers, getUdgMonsterTypes, getUdgTerrainTypes, globals } from '../../../../globals'
-import { MoveCamExceptForPlayer } from '../../01_libraries/Basic_functions'
 import { udg_colorCode } from '../../01_libraries/Init_colorCodes'
 import { BaseArray } from '../BaseArray'
 import { Caster } from '../Caster/Caster'
@@ -77,8 +76,15 @@ export class LevelArray extends BaseArray<Level> {
 
     hasPlayersInLevel = (lvlId: number) => {
         let j = 0
+
         for (let i = 0; i < NB_PLAYERS_MAX; i++) {
-            if (this.levelProgressionState[i] === lvlId) {
+            const p = Player(i)
+
+            if (
+                this.levelProgressionState[i] === lvlId &&
+                GetPlayerController(p) === MAP_CONTROL_USER &&
+                GetPlayerSlotState(p) === PLAYER_SLOT_STATE_PLAYING
+            ) {
                 j++
             }
         }
@@ -93,7 +99,7 @@ export class LevelArray extends BaseArray<Level> {
 
     goToLevel = (finisher: Escaper | undefined, levelId: number): boolean => {
         let i: number
-        let previousLevelId = this.currentLevel
+        let previousLevelId = this.getCurrentLevel(finisher).id
 
         if (levelId < 0 || levelId > this.lastInstanceId || levelId === this.currentLevel) {
             return false
@@ -113,6 +119,7 @@ export class LevelArray extends BaseArray<Level> {
             !this.hasPlayersInLevel(previousLevelId)
         ) {
             getUdgEscapers().destroyMakesIfForSpecificLevel_currentLevel()
+            // TODO; deactivate all loaded lvls
             this.data[previousLevelId].activate(false)
         }
 
@@ -143,7 +150,7 @@ export class LevelArray extends BaseArray<Level> {
     }
 
     goToNextLevel = (finisher?: Escaper): boolean => {
-        if (this.currentLevel >= this.lastInstanceId) {
+        if (this.getCurrentLevel(finisher).id >= this.lastInstanceId) {
             return false
         }
 
@@ -155,7 +162,7 @@ export class LevelArray extends BaseArray<Level> {
         if (!this.tLastGoToNextLevel) this.tLastGoToNextLevel = CreateTimer()
         TimerStart(this.tLastGoToNextLevel, 10, false, DoNothing)
 
-        this.currentLevel = this.currentLevel + 1
+        this.currentLevel = this.getCurrentLevel(finisher).id + 1
 
         for (let i = 0; i < NB_PLAYERS_MAX; i++) {
             if (!finisher || (getUdgEscapers().get(i) && sameLevelProgression(finisher, getUdgEscapers().get(i)!))) {
@@ -165,6 +172,7 @@ export class LevelArray extends BaseArray<Level> {
 
         if (!IsLevelBeingMade(this.data[this.currentLevel - 1]) && !this.hasPlayersInLevel(this.currentLevel - 1)) {
             getUdgEscapers().destroyMakesIfForSpecificLevel_currentLevel()
+            // TODO; deactivate all loaded lvls
             this.data[this.currentLevel - 1].activate(false)
         }
         this.data[this.currentLevel].activate(true)
@@ -183,15 +191,34 @@ export class LevelArray extends BaseArray<Level> {
         if (start) {
             const xCam = start.getCenterX()
             const yCam = start.getCenterY()
+
             if (finisher) {
-                MoveCamExceptForPlayer(finisher.getPlayer(), xCam, yCam)
+                let x = xCam
+                let y = yCam
+
+                if (GetLocalPlayer() === finisher.getPlayer()) {
+                    x = GetCameraTargetPositionX()
+                    y = GetCameraTargetPositionY()
+                }
+
+                for (const [_, escaper] of pairs(getUdgEscapers().getAll())) {
+                    if (!finisher || sameLevelProgression(finisher, escaper)) {
+                        SetCameraPositionForPlayer(escaper.getPlayer(), x, y)
+                    }
+                }
             } else {
-                SetCameraPosition(xCam, yCam)
+                for (const [_, escaper] of pairs(getUdgEscapers().getAll())) {
+                    if (!finisher || sameLevelProgression(finisher, escaper)) {
+                        SetCameraPositionForPlayer(escaper.getPlayer(), xCam, yCam)
+                    }
+                }
             }
 
             for (const [_, escaper] of pairs(getUdgEscapers().getAll())) {
-                if (escaper.isLockCamTarget()) {
-                    escaper.resetCamera()
+                if (!finisher || sameLevelProgression(finisher, escaper)) {
+                    if (escaper.isLockCamTarget()) {
+                        escaper.resetCamera()
+                    }
                 }
             }
 

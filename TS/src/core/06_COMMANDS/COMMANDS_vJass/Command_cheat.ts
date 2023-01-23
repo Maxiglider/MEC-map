@@ -374,11 +374,11 @@ export const initExecuteCommandCheat = () => {
             SetUnitX(hero, x)
             SetUnitY(hero, y)
 
-            if (!escaper.isAlive()) {
-                escaper.coopReviveHero()
-            }
+            escaper.coopReviveHero()
 
-            escaper.turnInstantly(GetUnitFacing(targetHero))
+            if (!escaper.isAlive()) {
+                escaper.turnInstantly(GetUnitFacing(targetHero))
+            }
 
             const escaperSecond = GetMirrorEscaper(escaper)
             if (escaperSecond) {

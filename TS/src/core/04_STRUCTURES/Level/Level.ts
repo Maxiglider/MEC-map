@@ -1,7 +1,7 @@
 import { arrayPush } from 'core/01_libraries/Basic_functions'
 import { Text } from 'core/01_libraries/Text'
 import { ServiceManager } from 'Services'
-import { getUdgEscapers } from '../../../../globals'
+import { getUdgEscapers, getUdgLevels } from '../../../../globals'
 import { ObjectHandler } from '../../../Utils/ObjectHandler'
 import { MecHookArray } from '../../API/MecHookArray'
 import type { CasterType } from '../Caster/CasterType'
@@ -71,6 +71,7 @@ export class Level {
             if (this.startMessage && Level.earningLivesActivated) {
                 Text.A(this.startMessage)
             }
+
             this.visibilities.activate(true)
             this.monsters.createMonstersUnits()
             this.monsterSpawns.activate()
@@ -79,8 +80,11 @@ export class Level {
             this.portalMobs.initializePortalMobs()
             this.circleMobs.initializeCircleMobs()
             this.staticSlides.activate(true)
-            if (Level.earningLivesActivated && this.getId() > 0) {
-                ServiceManager.getService('Lives').add(this.livesEarnedAtBeginning)
+
+            if (getUdgLevels().getLevelProgression() === 'all') {
+                if (Level.earningLivesActivated && this.getId() > 0) {
+                    ServiceManager.getService('Lives').add(this.livesEarnedAtBeginning)
+                }
             }
 
             if (this.hooks_onStart) {
