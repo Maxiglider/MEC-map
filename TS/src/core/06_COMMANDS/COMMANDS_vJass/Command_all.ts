@@ -1420,8 +1420,8 @@ export const initCommandAll = () => {
         )
         Text.P(
             target.getPlayer(),
-            `${udg_colorCode[target.getId()]}${target.getDisplayName()}|r ${state ? '' : 'un'}allied ${
-                udg_colorCode[escaper.getId()]
+            `${udg_colorCode[escaper.getId()]}${escaper.getDisplayName()}|r ${state ? '' : 'un'}allied ${
+                udg_colorCode[target.getId()]
             }you`
         )
     }
@@ -1448,6 +1448,30 @@ export const initCommandAll = () => {
         description: 'Unally people, prevents you from reviving them',
         cb: ({ param1 }, escaper) => {
             resolvePlayerIds(param1, target => setAlliedState(escaper, target, false))
+            return true
+        },
+    })
+
+    //-hideChat(hc)
+    registerCommand({
+        name: 'hideChat',
+        alias: ['hc', 'monk'],
+        group: 'red',
+        argDescription: 'on | off',
+        description: 'hides the chat',
+        cb: ({ param1 }, escaper) => {
+            if (!param1) param1 = 'true'
+
+            if (IsBoolString(param1)) {
+                const frame = BlzGetOriginFrame(ORIGIN_FRAME_CHAT_MSG, 0)
+
+                if (GetLocalPlayer() === escaper.getPlayer()) {
+                    BlzFrameSetVisible(frame, !S2B(param1))
+                }
+
+                Text.mkP(escaper.getPlayer(), `Chat ${!S2B(param1) ? 'shown' : 'hidden'}`)
+            }
+
             return true
         },
     })

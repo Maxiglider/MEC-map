@@ -2144,7 +2144,7 @@ export const initExecuteCommandMake = () => {
 
             let str = ''
 
-            if (getUdgLevels().getCurrentLevel(escaper) == escaper.getMakingLevel()) {
+            if (getUdgLevels().getCurrentLevel() == escaper.getMakingLevel()) {
                 str = ' (same as current level)'
             } else {
                 str = ''
@@ -2196,7 +2196,7 @@ export const initExecuteCommandMake = () => {
                         Text.mkP(
                             escaper.getPlayer(),
                             'you are now making current level (which is at the moment number ' +
-                                I2S(getUdgLevels().getCurrentLevel(escaper).getId()) +
+                                I2S(getUdgLevels().getCurrentLevel().getId()) +
                                 ')'
                         )
                     } else {
@@ -3109,6 +3109,26 @@ export const initExecuteCommandMake = () => {
             }
 
             escaper.makeSetMonsterJumpPad(S2I(param1) === 0 ? undefined : S2I(param1))
+
+            Text.mkP(escaper.getPlayer(), 'Click on a monster to apply')
+            return true
+        },
+    })
+
+    //-setMonsterJumpPadEffect(setmjpe) <jumpPadEffect>
+    registerCommand({
+        name: 'setMonsterJumpPadEffect',
+        alias: ['setmjpe'],
+        group: 'make',
+        argDescription: '[jumpPadEffect]',
+        description: '',
+        cb: ({ param1 }, escaper) => {
+            if (!param1.length) {
+                return true
+            }
+
+            escaper.makeSetMonsterJumpPadEffect(param1)
+
             Text.mkP(escaper.getPlayer(), 'Click on a monster to apply')
             return true
         },

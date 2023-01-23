@@ -21,7 +21,6 @@ export const InitTrig_InvisUnit_is_getting_damage = () => {
                 }
 
                 const killingUnit = GetEventDamageSource()
-                let eff: effect | null
 
                 const hero = escaper.getHero()
 
@@ -71,14 +70,23 @@ export const InitTrig_InvisUnit_is_getting_damage = () => {
                                 return
                             } else if (jumpPad !== undefined) {
                                 escaper.setOldDiffZ(jumpPad)
+                                const effect = monster.getJumpPadEffect()
+
+                                if (effect) {
+                                    DestroyEffect(
+                                        AddSpecialEffect(effect, GetUnitX(killingUnit), GetUnitY(killingUnit))
+                                    )
+                                }
+
                                 return
                             }
                         }
 
                         if (escaper.isGodModeOn()) {
                             //god mode effect
-                            eff = AddSpecialEffect(GM_KILLING_EFFECT, GetUnitX(killingUnit), GetUnitY(killingUnit))
-                            DestroyEffect(eff)
+                            DestroyEffect(
+                                AddSpecialEffect(GM_KILLING_EFFECT, GetUnitX(killingUnit), GetUnitY(killingUnit))
+                            )
 
                             //kill monster
                             if (escaper.doesGodModeKills()) {
@@ -100,7 +108,7 @@ export const InitTrig_InvisUnit_is_getting_damage = () => {
                                 const effectStr = getUdgMonsterTypes().monsterUnit2KillEffectStr(killingUnit)
 
                                 if (effectStr) {
-                                    eff = AddSpecialEffect(effectStr, GetUnitX(invisUnit), GetUnitY(invisUnit))
+                                    const eff = AddSpecialEffect(effectStr, GetUnitX(invisUnit), GetUnitY(invisUnit))
                                     TriggerSleepAction(3)
                                     DestroyEffect(eff)
                                 }

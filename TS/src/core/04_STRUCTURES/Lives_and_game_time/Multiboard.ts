@@ -48,6 +48,7 @@ export const initMultiboard = () => {
             }
             mode: IBoardMode
             statsMode: IStatsMode
+            visible: boolean
         }
     } = {}
 
@@ -63,6 +64,7 @@ export const initMultiboard = () => {
             },
             mode: 'multiboard',
             statsMode: 'global',
+            visible: true,
         }
     })
 
@@ -112,10 +114,12 @@ export const initMultiboard = () => {
     }
 
     const initLeaderboard = () => {
-        lb = CreateLeaderboardBJ(GetPlayersAll(), '')
-        LeaderboardAddItemBJ(Player(0), lb, 'Game time', 0)
-        LeaderboardSetPlayerItemStyleBJ(Player(0), lb, true, false, false)
-        LeaderboardAddItemBJ(LIVES_PLAYER, lb, 'Lives', 0)
+        // Disabled leaderboard for full -ui support; causes desyncs when used together since they're bound to the same frame and they're both overwriting eachother
+        //
+        // lb = CreateLeaderboardBJ(GetPlayersAll(), '')
+        // LeaderboardAddItemBJ(Player(0), lb, 'Game time', 0)
+        // LeaderboardSetPlayerItemStyleBJ(Player(0), lb, true, false, false)
+        // LeaderboardAddItemBJ(LIVES_PLAYER, lb, 'Lives', 0)
     }
 
     const getOrCreateLeaderboard = () => {
@@ -139,15 +143,20 @@ export const initMultiboard = () => {
 
     const reinitBoards = () => {
         // Hide boards to reset position
-        getUdgEscapers().forMainEscapers(escaper => setVisibility(escaper, false))
+        getUdgEscapers().forMainEscapers(escaper => updateVisibility(escaper, false))
 
         destroyBoards()
 
         initMultiboard()
         initLeaderboard()
 
-        // Toggle visiblity to update board width
-        getUdgEscapers().forMainEscapers(escaper => setVisibility(escaper, true))
+        // Toggle visibility to update board width
+        getUdgEscapers().forMainEscapers(escaper => updateVisibility(escaper, true))
+
+        // Restore player visibility state
+        getUdgEscapers().forMainEscapers(escaper => {
+            updateVisibility(escaper, playerScores[GetPlayerId(escaper.getPlayer())].visible)
+        })
 
         updateBoards()
     }
@@ -247,6 +256,11 @@ export const initMultiboard = () => {
     }
 
     const setVisibility = (escaper: Escaper, visible: boolean) => {
+        playerScores[GetPlayerId(escaper.getPlayer())].visible = visible
+        updateVisibility(escaper, visible)
+    }
+
+    const updateVisibility = (escaper: Escaper, visible: boolean) => {
         const playerMode = playerScores[GetPlayerId(escaper.getPlayer())]
 
         if (GetLocalPlayer() === escaper.getPlayer()) {

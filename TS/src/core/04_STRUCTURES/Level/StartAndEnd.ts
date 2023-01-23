@@ -79,6 +79,7 @@ export class End extends RectInterface {
                     }
 
                     if (!getUdgLevels().goToNextLevel(finisher)) {
+                        DisableTrigger(this.endReaching)
                         Text.A('Good job ! You have finished the game.')
                         TriggerSleepAction(2)
                         Text.A('restart in 10 seconds')

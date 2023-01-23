@@ -1,5 +1,5 @@
 import * as fs from 'fs-extra'
-import War3Map from "mdx-m3-viewer/dist/cjs/parsers/w3x/map"
+import War3Map from 'mdx-m3-viewer/dist/cjs/parsers/w3x/map'
 import * as path from 'path'
 import { compileMap, getFilesInDirectory, IProjectConfig, loadJsonFile, logger, toArrayBuffer } from './utils'
 

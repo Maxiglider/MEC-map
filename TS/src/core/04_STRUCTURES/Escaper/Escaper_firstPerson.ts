@@ -6,7 +6,8 @@ import { Escaper } from './Escaper'
 
 type IKeys = 'UP' | 'DOWN' | 'LEFT' | 'RIGHT'
 
-const FIRSTPERSON_ANGLE_PER_PERIOD = 3
+const FIRSTPERSON_SPEED_PER_PERIOD = 0.4
+const FIRSTPERSON_ANGLE_PER_PERIOD = 0.3
 
 export class EscaperFirstPerson {
     private forceCamTimer: Timer | null = null
@@ -29,15 +30,18 @@ export class EscaperFirstPerson {
     toggleFirstPerson = (active: boolean) => {
         if (active) {
             if (!this.forceCamTimer) {
-                this.forceCamTimer = createTimer(0.01, true, () => {
+                this.forceCamTimer = createTimer(0.001, true, () => {
                     const player = this.escaper.getPlayer()
                     const hero = this.escaper.getHero()
 
                     if (hero) {
-                        let angle = GetUnitFacing(hero)
-
                         if (this.isFirstPerson()) {
-                            if (!(this.isKeyDownState('LEFT') && this.isKeyDownState('RIGHT'))) {
+                            if (
+                                !(this.isKeyDownState('LEFT') && this.isKeyDownState('RIGHT')) &&
+                                (this.isKeyDownState('LEFT') || this.isKeyDownState('RIGHT'))
+                            ) {
+                                let angle = GetUnitFacing(hero)
+
                                 if (this.isKeyDownState('LEFT')) {
                                     angle += FIRSTPERSON_ANGLE_PER_PERIOD
                                 } else if (this.isKeyDownState('RIGHT')) {
@@ -45,6 +49,26 @@ export class EscaperFirstPerson {
                                 }
 
                                 BlzSetUnitFacingEx(hero, angle)
+                            }
+
+                            if (
+                                !(this.isKeyDownState('UP') && this.isKeyDownState('DOWN')) &&
+                                (this.isKeyDownState('UP') || this.isKeyDownState('DOWN'))
+                            ) {
+                                const angle = math.rad(GetUnitFacing(hero))
+                                let fwd = 0
+
+                                if (this.isKeyDownState('UP')) {
+                                    fwd += FIRSTPERSON_SPEED_PER_PERIOD
+                                } else if (this.isKeyDownState('DOWN')) {
+                                    fwd -= FIRSTPERSON_SPEED_PER_PERIOD
+                                }
+
+                                const newX = GetUnitX(hero) + fwd * Cos(angle)
+                                const newY = GetUnitY(hero) + fwd * Sin(angle)
+
+                                SetUnitX(hero, newX)
+                                SetUnitY(hero, newY)
                             }
                         }
 

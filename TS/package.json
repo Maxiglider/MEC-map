@@ -12,6 +12,7 @@
         "build": "ts-node --transpile-only scripts/build.ts",
         "deploy": "yarn build && powershell cp './dist/bin/map.w3x' '~/Documents/Warcraft III/Maps/Maps/Ts/Mec.w3x'",
         "release": "yarn build && php ../bin/wrapLUAforWE.php",
+        "release-test": "yarn release && ts-node scripts/releaseTest.ts",
         "dev": "npm-watch",
         "build:defs": "ts-node scripts/dev",
         "postinstall": "ts-node --transpile-only scripts/patch.ts"

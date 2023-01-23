@@ -11,19 +11,21 @@ import { initializers } from './core/Init/initializers'
 import { PROD } from './env'
 
 // Changelog:
-// Added new cmd: hideChat (For everyone, per player caused desync :c)
+// Added new cmd: hideChat
 // The all dead trigger now ignores players with autorevive turned on
 // unit recycler now resets after -setmsm has been used
 // -lc now remains active when triggering a new level or restart
 // -rto now allows you to tp to dead people and revives you like rpos
-// fpc faster rotation
+// fpc faster rotation and a little more smooth
+// fpc now supports walking on terrain. Special thanks to Wrda <3
 // Ally system, -(un)ally; Allows you to only coop revive specific players
 // Changed -pcor none to also include portals. Its not really 'onRevive' but w/e, nobody plays like this anyway.. except Andy..
 // Solo mode option at start no longer crashes, old leaderboard does not work because of -ui command
-
-// [TEST] [EXPERIMENTAL] -setLevelProgression all|allied|solo. Makes only you/allied team/all go to the next lvl, can cause lag when levels are too big so use with caution
-// ^ when currentLevel gets deactivated it should check all active lvls and deactivate them if empty
-// ^ when someone else does -unally all I (stan) get a message 'Stan unallied you'
+// Added -setMonsterJumpPadEffect
+// Scoreboard now maintains visibility state when someone leaves
+// Disabled the classic leaderboard for now since it conflicts with -ui and everyone prefers -ui
+// You can no longer finish the game multiple times by patrolling over the end region
+// [EXPERIMENTAL] -setLevelProgression all|allied|solo. Makes only you/allied team/all go to the next lvl, can cause lag when levels are too big so use with caution
 
 // TODO;
 // The player revive timer should be cancelled when someone gets revived (when everyone is dead after x seconds it revives you but if you -r urself and then die u dont still wanna be instantly teleported back to start cuz of the initial revive timer)

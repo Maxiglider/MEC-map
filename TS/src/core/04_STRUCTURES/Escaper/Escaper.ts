@@ -1217,7 +1217,7 @@ export class Escaper {
         if (oldMakingLevel && !IsLevelBeingMade(oldMakingLevel)) {
             oldMakingLevel.activate(false)
 
-            if (getUdgLevels().getCurrentLevel(this).getId() < oldMakingLevel.getId()) {
+            if (getUdgLevels().getCurrentLevel().getId() < oldMakingLevel.getId()) {
                 oldMakingLevel.activateVisibilities(false)
             }
         }
@@ -1236,7 +1236,7 @@ export class Escaper {
         if (this.makingLevel) {
             return this.makingLevel
         } else {
-            return getUdgLevels().getCurrentLevel(this)
+            return getUdgLevels().getCurrentLevel()
         }
     }
 
@@ -1593,6 +1593,20 @@ export class Escaper {
         }
     }
 
+    makeSetMonsterJumpPadEffect(jumpPadEffect: string | undefined) {
+        this.destroyMake()
+        if (this.hero) {
+            this.make = new MakePropertyChange(
+                this.hero,
+                'jumpPadEffect',
+                jumpPadEffect,
+                (x, y) => this.getMakingLevel().monsters.getMonsterNear(x, y),
+                monster => monster.getJumpPadEffect(),
+                (monster, jumpPadEffect) => monster.setJumpPadEffect(jumpPadEffect)
+            )
+        }
+    }
+
     makeCreateTerrain(terrainType: TerrainType) {
         this.destroyMake()
         if (this.hero) this.make = new MakeTerrainCreate(this.hero, terrainType)
@@ -1799,7 +1813,7 @@ export class Escaper {
         this.lockCamRotation?.destroy()
 
         if (lockCamRotation) {
-            this.lockCamRotation = createTimer(0.01, true, () => {
+            this.lockCamRotation = createTimer(0.001, true, () => {
                 this.hero &&
                     SetCameraFieldForPlayer(this.getPlayer(), CAMERA_FIELD_ROTATION, GetUnitFacing(this.hero), 0)
             })

@@ -51,6 +51,7 @@ export abstract class Monster {
     protected circleMob?: CircleMob
     protected circleMobParent?: CircleMob
     private jumpPad?: number
+    private jumpPadEffect?: string
 
     constructor(monsterType?: MonsterType, forceId: number | null = null) {
         this.mt = monsterType
@@ -136,6 +137,11 @@ export abstract class Monster {
     getJumpPad = () => this.jumpPad
     setJumpPad = (jumpPad: number | undefined) => {
         this.jumpPad = jumpPad
+    }
+
+    getJumpPadEffect = () => this.jumpPadEffect
+    setJumpPadEffect = (jumpPadEffect: string | undefined) => {
+        this.jumpPadEffect = jumpPadEffect
     }
 
     removeUnit() {
@@ -410,6 +416,7 @@ export abstract class Monster {
             output['monsterClassName'] = this.constructor.name
             output['monsterTypeLabel'] = this.mt?.label
             output['jumpPad'] = this.jumpPad
+            output['jumpPadEffect'] = this.jumpPadEffect
             return output
         }
     }

@@ -97,6 +97,14 @@ export class LevelArray extends BaseArray<Level> {
         this.data[this.currentLevel].activate(true)
     }
 
+    deactivateEmptyLevels = () => {
+        for (const [levelId] of pairs(this.data)) {
+            if (!IsLevelBeingMade(this.data[levelId]) && !this.hasPlayersInLevel(levelId)) {
+                this.data[levelId].activate(false)
+            }
+        }
+    }
+
     goToLevel = (finisher: Escaper | undefined, levelId: number): boolean => {
         let i: number
         let previousLevelId = this.getCurrentLevel(finisher).id
@@ -119,8 +127,8 @@ export class LevelArray extends BaseArray<Level> {
             !this.hasPlayersInLevel(previousLevelId)
         ) {
             getUdgEscapers().destroyMakesIfForSpecificLevel_currentLevel()
-            // TODO; deactivate all loaded lvls
             this.data[previousLevelId].activate(false)
+            this.deactivateEmptyLevels()
         }
 
         this.data[this.currentLevel].activate(true)
@@ -172,9 +180,10 @@ export class LevelArray extends BaseArray<Level> {
 
         if (!IsLevelBeingMade(this.data[this.currentLevel - 1]) && !this.hasPlayersInLevel(this.currentLevel - 1)) {
             getUdgEscapers().destroyMakesIfForSpecificLevel_currentLevel()
-            // TODO; deactivate all loaded lvls
             this.data[this.currentLevel - 1].activate(false)
+            this.deactivateEmptyLevels()
         }
+
         this.data[this.currentLevel].activate(true)
         this.data[this.currentLevel].checkpointReviveHeroes(finisher)
 
@@ -336,6 +345,7 @@ export class LevelArray extends BaseArray<Level> {
 
                     if (monster) {
                         m.jumpPad && monster.setJumpPad(m.jumpPad)
+                        m.jumpPadEffect && monster.setJumpPadEffect(m.jumpPadEffect)
 
                         level.monsters.new(monster, false)
                     }
