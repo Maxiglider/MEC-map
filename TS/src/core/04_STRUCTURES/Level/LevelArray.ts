@@ -107,7 +107,7 @@ export class LevelArray extends BaseArray<Level> {
 
     goToLevel = (finisher: Escaper | undefined, levelId: number): boolean => {
         let i: number
-        let previousLevelId = this.getCurrentLevel(finisher).id
+        let previousLevelId = this.getCurrentLevel(finisher)?.id || -1
 
         if (levelId < 0 || levelId > this.lastInstanceId || levelId === this.currentLevel) {
             return false

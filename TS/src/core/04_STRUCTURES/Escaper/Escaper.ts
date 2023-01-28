@@ -609,9 +609,10 @@ export class Escaper {
             if (this.hero) {
                 KillUnit(this.hero)
 
-                for (const [_, staticSlide] of pairs(getUdgLevels().getCurrentLevel(this).staticSlides.getAll())) {
-                    staticSlide.removePlayer(this.escaperId)
-                }
+                // We want players to die at the end of the slide so that they can be revived
+                // for (const [_, staticSlide] of pairs(getUdgLevels().getCurrentLevel(this).staticSlides.getAll())) {
+                //     staticSlide.removePlayer(this.escaperId)
+                // }
             }
             return true
         }

@@ -123,9 +123,17 @@ export class StaticSlide {
                     actions: [
                         () => {
                             for (const playerId of this.slidingPlayers) {
-                                const hero = getUdgEscapers().get(playerId)?.getHero()
+                                const targetPlayer = getUdgEscapers().get(playerId)
+
+                                if (!targetPlayer) {
+                                    this.removePlayer(playerId)
+                                    continue
+                                }
+
+                                const hero = targetPlayer.getHero()
 
                                 if (!hero) {
+                                    this.removePlayer(playerId)
                                     continue
                                 }
 
@@ -144,6 +152,8 @@ export class StaticSlide {
                                 if (newY >= globals.MAP_MIN_Y && newY <= globals.MAP_MAX_Y) {
                                     SetUnitY(hero, newY)
                                 }
+
+                                targetPlayer.refreshCerclePosition()
                             }
                         },
                     ],

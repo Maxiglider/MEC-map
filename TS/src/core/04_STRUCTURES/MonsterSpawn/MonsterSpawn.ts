@@ -23,6 +23,8 @@ const DELAY_BETWEEN_SPAWN_AND_MOVEMENT = 0.5
 export class MonsterSpawn {
     static anyTrigId2MonsterSpawn = new Map<number, MonsterSpawn>()
     static anyTimerId2Unit = new Map<number, unit>()
+    static anyTimerId2SpawnIndex = new Map<number, number>()
+    static anyTimerId2SpawnAmount = new Map<number, number>()
     static anyTimerId2MonsterSpawn = new Map<number, MonsterSpawn>()
     private static lastInstanceId = -1
 
@@ -35,6 +37,7 @@ export class MonsterSpawn {
     private sens: string //leftToRight, upToDown, rightToLeft, downToUp
     private frequence: number
     private spawnAmount = 1
+    private spawnOffset = 0
     private initialDelay = 0
     private minX: number
     private minY: number
@@ -46,7 +49,15 @@ export class MonsterSpawn {
     monsters?: group
 
     private fixedSpawnOffset: number | undefined
+    private fixedSpawnOffsetBounce = false
+    private fixedSpawnOffsetMirrored = false
     private lastSpawnVal: number | undefined
+    private lastSpawnValMirrored: number | undefined
+
+    private bouncing = false
+    private mirrored = false
+
+    private _futureBouncing: boolean | undefined = undefined
 
     level?: Level
     id: number
@@ -164,32 +175,54 @@ export class MonsterSpawn {
         const mobTimer = GetExpiredTimer()
         const ms = MonsterSpawn.anyTimerId2MonsterSpawn.get(GetHandleId(mobTimer))
         MonsterSpawn.anyTimerId2MonsterSpawn.delete(GetHandleId(mobTimer))
+
         if (ms) {
             const mobUnit = MonsterSpawn.anyTimerId2Unit.get(GetHandleId(mobTimer))
             MonsterSpawn.anyTimerId2Unit.delete(GetHandleId(mobTimer))
+
             if (mobUnit) {
-                ms.startMobMovement(mobUnit, ms)
-                UnitAddAbility(mobUnit, FourCC('Aloc'))
-                DestroyTimer(mobTimer)
+                const spawnIndex = MonsterSpawn.anyTimerId2SpawnIndex.get(GetHandleId(mobTimer))
+                MonsterSpawn.anyTimerId2SpawnIndex.delete(GetHandleId(mobTimer))
+
+                if (spawnIndex !== undefined) {
+                    const spawnAmount = MonsterSpawn.anyTimerId2SpawnAmount.get(GetHandleId(mobTimer))
+                    MonsterSpawn.anyTimerId2SpawnAmount.delete(GetHandleId(mobTimer))
+
+                    if (spawnAmount !== undefined) {
+                        ms.startMobMovement(mobUnit, ms, spawnIndex, spawnAmount)
+                        UnitAddAbility(mobUnit, FourCC('Aloc'))
+                        DestroyTimer(mobTimer)
+                    }
+                }
             }
         }
     }
 
     private MonsterSpawn_Actions = errorHandler(() => {
         const ms = MonsterSpawn.anyTrigId2MonsterSpawn.get(GetHandleId(GetTriggeringTrigger()))
+
         if (ms) {
-            for (let i = 0; i < ms.getSpawnAmount(); i++) {
+            for (let spawnIndex = 0; spawnIndex < ms.getSpawnAmount(); spawnIndex++) {
                 const mobUnit = ms.createMob()
+
                 if (mobUnit) {
                     const mobTimer = CreateTimer()
                     MonsterSpawn.anyTimerId2MonsterSpawn.set(GetHandleId(mobTimer), ms)
                     MonsterSpawn.anyTimerId2Unit.set(GetHandleId(mobTimer), mobUnit)
+                    MonsterSpawn.anyTimerId2SpawnIndex.set(GetHandleId(mobTimer), spawnIndex)
+                    MonsterSpawn.anyTimerId2SpawnAmount.set(GetHandleId(mobTimer), ms.getSpawnAmount())
+
                     TimerStart(mobTimer, DELAY_BETWEEN_SPAWN_AND_MOVEMENT, false, this.MonsterStartMovement)
                     SetUnitOwner(mobUnit, ENNEMY_PLAYER, false)
                     ShowUnit(mobUnit, false)
                     UnitRemoveAbility(mobUnit, FourCC('Aloc'))
                     ms.monsters && GroupAddUnit(ms.monsters, mobUnit)
                 }
+            }
+
+            if (this._futureBouncing !== undefined) {
+                this.bouncing = this._futureBouncing
+                this._futureBouncing = undefined
             }
         }
     })
@@ -233,56 +266,110 @@ export class MonsterSpawn {
         this.simpleUnitRecycler.destroy()
     }
 
-    calcValOffset = (a: number, b: number) => {
-        let valOffset = GetRandomReal(a, b)
-
+    calcValOffset = (a: number, b: number, spawnIndex: number, spawnAmount: number) => {
         if (this.fixedSpawnOffset !== undefined) {
             if (this.lastSpawnVal === undefined) {
                 this.lastSpawnVal = a
             }
 
-            this.lastSpawnVal += this.fixedSpawnOffset
-
-            if (this.lastSpawnVal >= b) {
-                this.lastSpawnVal = a
+            if (this.lastSpawnValMirrored === undefined) {
+                this.lastSpawnValMirrored = b
             }
 
-            valOffset = this.lastSpawnVal
-        }
+            if (this.spawnOffset !== 0) {
+                if (spawnIndex === 0) {
+                    this.lastSpawnVal += (this.bouncing ? -1 : 1) * this.fixedSpawnOffset
+                    this.lastSpawnValMirrored -= (this.bouncing ? -1 : 1) * this.fixedSpawnOffset
+                }
+            } else {
+                this.lastSpawnVal += (this.bouncing ? -1 : 1) * this.fixedSpawnOffset
+                this.lastSpawnValMirrored -= (this.bouncing ? -1 : 1) * this.fixedSpawnOffset
+            }
 
-        return valOffset
+            let minX = this.lastSpawnVal
+            let maxX = this.lastSpawnVal
+
+            if (this.spawnOffset !== 0) {
+                minX = this.lastSpawnVal
+                maxX = this.lastSpawnVal + this.spawnOffset * (spawnAmount - 1)
+            }
+
+            if (maxX + this.fixedSpawnOffset > b) {
+                if (this.fixedSpawnOffsetBounce) {
+                    this._futureBouncing = true
+                } else {
+                    this.lastSpawnVal = a
+                    this.lastSpawnValMirrored = b
+                }
+            } else if (minX - this.fixedSpawnOffset < a) {
+                if (this.fixedSpawnOffsetBounce) {
+                    this._futureBouncing = false
+                } else {
+                    this.lastSpawnVal = b
+                    this.lastSpawnValMirrored = a
+                }
+            }
+
+            let spawnVal = this.lastSpawnVal
+            let spawnValMirrored = this.lastSpawnValMirrored
+
+            if (this.spawnOffset !== 0) {
+                spawnVal += this.spawnOffset * spawnIndex
+                spawnValMirrored -= this.spawnOffset * spawnIndex
+            }
+
+            if (this.fixedSpawnOffsetMirrored) {
+                if (this.mirrored) {
+                    this.mirrored = false
+                    return spawnValMirrored
+                } else {
+                    this.mirrored = true
+                    return spawnVal
+                }
+            } else {
+                return spawnVal
+            }
+        } else {
+            return GetRandomReal(a, b)
+        }
     }
 
-    startMobMovement = (mobUnit: unit, ms: MonsterSpawn) => {
+    startMobMovement = (mobUnit: unit, ms: MonsterSpawn, spawnIndex: number, spawnAmount: number) => {
         let p: player
         let x1: number
         let y1: number
         let x2: number
         let y2: number
+        let facing: number
 
         //leftToRight, upToDown, rightToLeft, downToUp
         if (this.sens === 'leftToRight') {
             x1 = this.minX
             x2 = this.maxX + DECALAGE_UNSPAWN
-            y1 = this.calcValOffset(this.minY, this.maxY)
+            y1 = this.calcValOffset(this.minY, this.maxY, spawnIndex, spawnAmount)
             y2 = y1
+            facing = 0
         } else if (this.sens === 'upToDown') {
-            x1 = this.calcValOffset(this.minX, this.maxX)
+            x1 = this.calcValOffset(this.minX, this.maxX, spawnIndex, spawnAmount)
             x2 = x1
             y1 = this.maxY
             y2 = this.minY - DECALAGE_UNSPAWN
+            facing = 270
         } else if (this.sens === 'rightToLeft') {
             x1 = this.maxX
             x2 = this.minX - DECALAGE_UNSPAWN
-            y1 = this.calcValOffset(this.minY, this.maxY)
+            y1 = this.calcValOffset(this.minY, this.maxY, spawnIndex, spawnAmount)
             y2 = y1
+            facing = 180
         } else {
-            x1 = this.calcValOffset(this.minX, this.maxX)
+            x1 = this.calcValOffset(this.minX, this.maxX, spawnIndex, spawnAmount)
             x2 = x1
             y1 = this.minY
             y2 = this.maxY + DECALAGE_UNSPAWN
+            facing = 90
         }
 
+        BlzSetUnitFacingEx(mobUnit, facing)
         SetUnitX(mobUnit, x1)
         SetUnitY(mobUnit, y1)
 
@@ -414,6 +501,11 @@ export class MonsterSpawn {
         this.spawnAmount = spawnAmount
     }
 
+    getSpawnOffset = () => this.spawnOffset
+    setSpawnOffset = (spawnOffset: number | undefined) => {
+        this.spawnOffset = spawnOffset || 0
+    }
+
     getInitialDelay = () => this.initialDelay
     setInitialDelay = (initialDelay: number) => {
         this.initialDelay = initialDelay
@@ -424,6 +516,16 @@ export class MonsterSpawn {
         this.fixedSpawnOffset = fixedSpawnOffset
     }
 
+    getFixedSpawnOffsetBounce = () => this.fixedSpawnOffsetBounce
+    setFixedSpawnOffsetBounce = (fixedSpawnOffsetBounce: boolean | undefined) => {
+        this.fixedSpawnOffsetBounce = fixedSpawnOffsetBounce || false
+    }
+
+    getFixedSpawnOffsetMirrored = () => this.fixedSpawnOffsetMirrored
+    setFixedSpawnOffsetMirrored = (fixedSpawnOffsetMirrored: boolean | undefined) => {
+        this.fixedSpawnOffsetMirrored = fixedSpawnOffsetMirrored || false
+    }
+
     toJson = () => {
         const output = ObjectHandler.getNewObject<any>()
 
@@ -432,8 +534,11 @@ export class MonsterSpawn {
         output['sens'] = this.sens
         output['frequence'] = this.frequence
         output['spawnAmount'] = this.spawnAmount
+        output['spawnOffset'] = this.spawnOffset
         output['initialDelay'] = this.initialDelay
         output['fixedSpawnOffset'] = this.fixedSpawnOffset
+        output['fixedSpawnOffsetBounce'] = this.fixedSpawnOffsetBounce
+        output['fixedSpawnOffsetMirrored'] = this.fixedSpawnOffsetMirrored
         output['minX'] = R2I(this.minX)
         output['minY'] = R2I(this.minY)
         output['maxX'] = R2I(this.maxX)

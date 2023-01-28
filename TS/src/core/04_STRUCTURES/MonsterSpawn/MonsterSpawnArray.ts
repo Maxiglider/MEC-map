@@ -48,8 +48,11 @@ export class MonsterSpawnArray extends BaseArray<MonsterSpawn> {
                     ms.maxY
                 )
                 monsterSpawn.setSpawnAmount(ms.spawnAmount || 1)
+                monsterSpawn.setSpawnOffset(ms.spawnOffset || 0)
                 monsterSpawn.setInitialDelay(ms.initialDelay || 0)
                 monsterSpawn.setFixedSpawnOffset(ms.fixedSpawnOffset)
+                monsterSpawn.setFixedSpawnOffsetBounce(ms.fixedSpawnOffsetBounce)
+                monsterSpawn.setFixedSpawnOffsetMirrored(ms.fixedSpawnOffsetMirrored)
                 this.new(monsterSpawn, false)
             }
         }

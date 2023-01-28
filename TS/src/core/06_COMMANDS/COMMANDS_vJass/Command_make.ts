@@ -1936,12 +1936,38 @@ export const initExecuteCommandMake = () => {
             }
 
             if (!(S2I(param2) > 0 && S2I(param2) <= 10)) {
-                Text.erP(escaper.getPlayer(), 'Speed must be > 0 and <= 10')
+                Text.erP(escaper.getPlayer(), 'Amount must be > 0 and <= 10')
                 return true
             }
 
             monsterSpawn.setSpawnAmount(S2I(param2))
             Text.mkP(escaper.getPlayer(), 'spawnAmount changed')
+            return true
+        },
+    })
+
+    //-setMonsterSpawnSpawnOffset(setmsso) <label> <offset>
+    registerCommand({
+        name: 'setMonsterSpawnSpawnOffset',
+        alias: ['setmsso'],
+        group: 'make',
+        argDescription: '<label> <offset>',
+        description: '',
+        cb: ({ param1, param2 }, escaper) => {
+            const monsterSpawn = escaper.getMakingLevel().monsterSpawns.getByLabel(param1)
+
+            if (!monsterSpawn) {
+                Text.erP(escaper.getPlayer(), 'unknown monster spawn "' + param1 + '" in this level')
+                return true
+            }
+
+            if (S2I(param2) !== 0 && !(S2I(param2) > 0 && S2I(param2) <= 16384)) {
+                Text.erP(escaper.getPlayer(), 'Offset must be > 0 and <= 16384')
+                return true
+            }
+
+            monsterSpawn.setSpawnOffset(S2I(param2) === 0 ? undefined : S2I(param2))
+            Text.mkP(escaper.getPlayer(), 'spawnOffset changed')
             return true
         },
     })
@@ -1962,12 +1988,64 @@ export const initExecuteCommandMake = () => {
             }
 
             if (S2I(param2) !== 0 && !(S2I(param2) > 0 && S2I(param2) <= 16384)) {
-                Text.erP(escaper.getPlayer(), 'Speed must be > 0 and <= 16384')
+                Text.erP(escaper.getPlayer(), 'Offset must be > 0 and <= 16384')
                 return true
             }
 
             monsterSpawn.setFixedSpawnOffset(S2I(param2) === 0 ? undefined : S2I(param2))
             Text.mkP(escaper.getPlayer(), 'fixedSpawnOffset changed')
+            return true
+        },
+    })
+
+    //-setMonsterSpawnFixedSpawnOffsetBounce(setmsfsob) <label> <bounce>
+    registerCommand({
+        name: 'setMonsterSpawnFixedSpawnOffsetBounce',
+        alias: ['setmsfsob'],
+        group: 'make',
+        argDescription: '<label> <bounce>',
+        description: '',
+        cb: ({ param1, param2 }, escaper) => {
+            const monsterSpawn = escaper.getMakingLevel().monsterSpawns.getByLabel(param1)
+
+            if (!monsterSpawn) {
+                Text.erP(escaper.getPlayer(), 'unknown monster spawn "' + param1 + '" in this level')
+                return true
+            }
+
+            if (!IsBoolString(param2)) {
+                Text.erP(escaper.getPlayer(), 'Bounce must be a boolean')
+                return true
+            }
+
+            monsterSpawn.setFixedSpawnOffsetBounce(S2B(param2))
+            Text.mkP(escaper.getPlayer(), 'fixedSpawnOffsetBounce changed')
+            return true
+        },
+    })
+
+    //-setMonsterSpawnFixedSpawnOffsetMirrored(setmsfsom) <label> <mirrored>
+    registerCommand({
+        name: 'setMonsterSpawnFixedSpawnOffsetMirrored',
+        alias: ['setmsfsom'],
+        group: 'make',
+        argDescription: '<label> <mirrored>',
+        description: '',
+        cb: ({ param1, param2 }, escaper) => {
+            const monsterSpawn = escaper.getMakingLevel().monsterSpawns.getByLabel(param1)
+
+            if (!monsterSpawn) {
+                Text.erP(escaper.getPlayer(), 'unknown monster spawn "' + param1 + '" in this level')
+                return true
+            }
+
+            if (!IsBoolString(param2)) {
+                Text.erP(escaper.getPlayer(), 'Bounce must be a boolean')
+                return true
+            }
+
+            monsterSpawn.setFixedSpawnOffsetMirrored(S2B(param2))
+            Text.mkP(escaper.getPlayer(), 'fixedSpawnOffsetMirrored changed')
             return true
         },
     })
