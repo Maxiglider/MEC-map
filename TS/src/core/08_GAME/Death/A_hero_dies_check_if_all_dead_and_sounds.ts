@@ -42,7 +42,15 @@ export const InitTrig_A_hero_dies_check_if_all_dead_and_sounds = () => {
                         )
                     ) {
                         nbAlive = nbAlive + 1
-                    } else {
+                    }
+
+                    if (
+                        !getUdgEscapers().get(i)?.isAlive() &&
+                        !getUdgEscapers().get(i)?.hasAutorevive() &&
+                        getUdgEscapers().get(i) &&
+                        getUdgEscapers().get(n) &&
+                        sameLevelProgression(getUdgEscapers().get(n)!, getUdgEscapers().get(i)!)
+                    ) {
                         arrayPush(escaperIds, i)
                     }
 

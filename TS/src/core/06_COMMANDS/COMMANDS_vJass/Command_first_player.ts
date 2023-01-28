@@ -2,8 +2,8 @@ import { IsBoolString, S2B } from 'core/01_libraries/Basic_functions'
 import { NB_ESCAPERS } from 'core/01_libraries/Constants'
 import { Text } from 'core/01_libraries/Text'
 import { ServiceManager } from 'Services'
-import { getUdgEscapers, getUdgLevels } from '../../../../globals'
-import { isPlayerId, resolvePlayerId } from './Command_functions'
+import { getUdgEscapers, getUdgLevels, globals } from '../../../../globals'
+import { isPlayerId, resolvePlayerId, resolvePlayerIds } from './Command_functions'
 
 export const initExecuteCommandRed = () => {
     const { registerCommand } = ServiceManager.getService('Cmd')
@@ -113,11 +113,29 @@ export const initExecuteCommandRed = () => {
     //-noobedit
     registerCommand({
         name: 'noobedit',
-        alias: [],
+        alias: ['ne'],
         group: 'red',
         argDescription: '<active>',
         description: '',
-        cb: ({ nbParam, param1 }) => {
+        cb: ({ nbParam, param1, param2 }, escaper) => {
+            if (nbParam === 2 && IsBoolString(param1)) {
+                globals.autoreviveDelay = 0.3
+
+                resolvePlayerIds(param2, e => {
+                    if (e.isNoobedit) {
+                        Text.P(escaper.getPlayer(), "That's better, but you're still Noobs!")
+                        Text.P(e.getPlayer(), "That's better, but you're still Noobs!")
+                        e.isNoobedit = false
+                        e.setHasAutorevive(false)
+                    } else {
+                        Text.P(escaper.getPlayer(), 'Really? Noobs!')
+                        Text.P(e.getPlayer(), 'Really? Noobs!')
+                        e.isNoobedit = true
+                        e.setHasAutorevive(true)
+                    }
+                })
+            }
+
             if (nbParam === 1 && IsBoolString(param1)) {
                 if (S2B(param1)) {
                     Text.A('Really? Noobs!')
@@ -137,11 +155,29 @@ export const initExecuteCommandRed = () => {
     //-speededit
     registerCommand({
         name: 'speededit',
-        alias: [],
+        alias: ['se'],
         group: 'red',
-        argDescription: '<active>',
+        argDescription: '<active> [player]',
         description: '',
-        cb: ({ nbParam, param1 }) => {
+        cb: ({ nbParam, param1, param2 }, escaper) => {
+            if (nbParam === 2 && IsBoolString(param1)) {
+                resolvePlayerIds(param2, e => {
+                    if (e.isSpeedEdit) {
+                        Text.P(escaper.getPlayer(), 'Speed disabled')
+                        Text.P(e.getPlayer(), 'Speed disabled')
+                        e.isSpeedEdit = false
+                        e.stopAbsoluteSlideSpeed()
+                        e.stopAbsoluteRotationSpeed()
+                    } else {
+                        Text.P(escaper.getPlayer(), 'Letsgoooooo!')
+                        Text.P(e.getPlayer(), 'Letsgoooooo!')
+                        e.isSpeedEdit = true
+                        e.absoluteSlideSpeed(800)
+                        e.absoluteRotationSpeed(1.2)
+                    }
+                })
+            }
+
             if (nbParam === 1 && IsBoolString(param1)) {
                 if (S2B(param1)) {
                     Text.A('Letsgoooooo!')
@@ -156,12 +192,12 @@ export const initExecuteCommandRed = () => {
         },
     })
 
-    //-setLevelProgression all|allied|solo
+    //-setLevelProgression(setlp) all|allied|solo
     registerCommand({
         name: 'setLevelProgression',
-        alias: [],
+        alias: ['setlp'],
         group: 'red',
-        argDescription: '<all|allied|solo>',
+        argDescription: '<all|allied|solo> [player]',
         description: '',
         cb: ({ param1 }, escaper) => {
             if (param1 !== 'all' && param1 !== 'allied' && param1 !== 'solo') {

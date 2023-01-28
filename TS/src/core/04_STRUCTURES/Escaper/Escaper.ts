@@ -108,6 +108,7 @@ export class Escaper {
     private invisUnit?: unit
     private walkSpeed: number
     private slideSpeed: number
+    private slideSpeedCmd: number | undefined
     private rotationSpeed: number
     private remainingDegreesToTurn: number = 0
     private slideMovePerPeriod: number
@@ -199,6 +200,9 @@ export class Escaper {
 
     private showNames = false
     private staticSliding = false
+
+    public isNoobedit = false
+    public isSpeedEdit = false
 
     alliedState: { [escaperId: number]: boolean } = {}
 
@@ -857,17 +861,17 @@ export class Escaper {
         return this.slideSpeedAbsolute
     }
 
-    absoluteSlideSpeed(slideSpeed: number) {
+    absoluteSlideSpeed(slideSpeed: number, isCommand = false) {
         this.slideSpeedAbsolute = true
-        this.slideSpeed = slideSpeed
-        this.slideMovePerPeriod = slideSpeed * SLIDE_PERIOD
+        this.setSlideSpeed(slideSpeed)
+        isCommand && (this.slideSpeedCmd = slideSpeed)
 
         if (!this.isEscaperSecondary()) {
-            GetMirrorEscaper(this)?.absoluteSlideSpeed(slideSpeed)
+            GetMirrorEscaper(this)?.absoluteSlideSpeed(slideSpeed, isCommand)
         }
     }
 
-    stopAbsoluteSlideSpeed = () => {
+    stopAbsoluteSlideSpeed = (isCommand = false) => {
         if (this.slideSpeedAbsolute) {
             this.slideSpeedAbsolute = false
 
@@ -878,8 +882,17 @@ export class Escaper {
                 }
             }
 
+            if (isCommand) {
+                this.slideSpeedCmd = undefined
+            } else {
+                if (this.slideSpeedCmd !== undefined) {
+                    this.slideSpeedAbsolute = true
+                    this.setSlideSpeed(this.slideSpeedCmd)
+                }
+            }
+
             if (!this.isEscaperSecondary()) {
-                GetMirrorEscaper(this)?.stopAbsoluteSlideSpeed()
+                GetMirrorEscaper(this)?.stopAbsoluteSlideSpeed(isCommand)
             }
         }
     }

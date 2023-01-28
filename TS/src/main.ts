@@ -10,11 +10,6 @@ import { MEC_core_API } from './core/API/MEC_core_API'
 import { initializers } from './core/Init/initializers'
 import { PROD } from './env'
 
-// TODO;
-// The player revive timer should be cancelled when someone gets revived (when everyone is dead after x seconds it revives you but if you -r urself and then die u dont still wanna be instantly teleported back to start cuz of the initial revive timer)
-// new cmd: summon, makes someone teleport to you
-// make speededit/noobedit support targetplayer -speededit 1 red/all/etc
-
 const tsMain = () => {
     ServiceManager.registerServices({
         Lives: initLives,

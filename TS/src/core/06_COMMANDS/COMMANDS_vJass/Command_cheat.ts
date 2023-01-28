@@ -45,7 +45,7 @@ export const initExecuteCommandCheat = () => {
             }
             const speed = S2R(param1)
             if (nbParam === 1) {
-                escaper.absoluteSlideSpeed(speed)
+                escaper.absoluteSlideSpeed(speed, true)
                 Text.P(escaper.getPlayer(), 'your slide speed is set to ' + param1)
                 return true
             }
@@ -57,7 +57,7 @@ export const initExecuteCommandCheat = () => {
                 while (true) {
                     if (i >= NB_ESCAPERS) break
                     if (getUdgEscapers().get(i) != null) {
-                        getUdgEscapers().get(i)?.absoluteSlideSpeed(speed)
+                        getUdgEscapers().get(i)?.absoluteSlideSpeed(speed, true)
                     }
                     i = i + 1
                 }
@@ -66,7 +66,7 @@ export const initExecuteCommandCheat = () => {
             }
             if (isPlayerId(param2)) {
                 if (getUdgEscapers().get(resolvePlayerId(param2)) != null) {
-                    getUdgEscapers().get(resolvePlayerId(param2))?.absoluteSlideSpeed(speed)
+                    getUdgEscapers().get(resolvePlayerId(param2))?.absoluteSlideSpeed(speed, true)
                     Text.P(escaper.getPlayer(), 'slide speed for player ' + param2 + ' is set to ' + param1)
                 }
             }
@@ -83,7 +83,7 @@ export const initExecuteCommandCheat = () => {
         description: 'Puts the slide speed back to normal (respecting terrains)',
         cb: ({ noParam, nbParam, param1 }, escaper) => {
             if (noParam) {
-                escaper.stopAbsoluteSlideSpeed()
+                escaper.stopAbsoluteSlideSpeed(true)
                 Text.P(escaper.getPlayer(), 'your slide speed depends now on terrains')
                 return true
             }
@@ -95,7 +95,7 @@ export const initExecuteCommandCheat = () => {
                 while (true) {
                     if (i >= NB_ESCAPERS) break
                     if (getUdgEscapers().get(i) != null) {
-                        getUdgEscapers().get(i)?.stopAbsoluteSlideSpeed()
+                        getUdgEscapers().get(i)?.stopAbsoluteSlideSpeed(true)
                     }
                     i = i + 1
                 }
@@ -104,7 +104,7 @@ export const initExecuteCommandCheat = () => {
             }
             if (isPlayerId(param1)) {
                 if (getUdgEscapers().get(resolvePlayerId(param1)) != null) {
-                    getUdgEscapers().get(resolvePlayerId(param1))?.stopAbsoluteSlideSpeed()
+                    getUdgEscapers().get(resolvePlayerId(param1))?.stopAbsoluteSlideSpeed(true)
                     Text.P(escaper.getPlayer(), 'slide speed for player ' + param1 + ' depends now on terrains')
                 }
             }
@@ -374,13 +374,62 @@ export const initExecuteCommandCheat = () => {
             SetUnitX(hero, x)
             SetUnitY(hero, y)
 
+            escaper.turnInstantly(GetUnitFacing(targetHero))
             escaper.coopReviveHero()
 
-            if (!escaper.isAlive()) {
-                escaper.turnInstantly(GetUnitFacing(targetHero))
+            const escaperSecond = GetMirrorEscaper(escaper)
+            if (escaperSecond) {
+                const heroSecond = escaperSecond.getHero()
+                if (heroSecond) {
+                    if (escaperSecond.isAlive()) {
+                        SetUnitX(heroSecond, x)
+                        SetUnitY(heroSecond, y)
+                    } else {
+                        escaperSecond.revive(x, y)
+                    }
+                }
             }
 
-            const escaperSecond = GetMirrorEscaper(escaper)
+            return true
+        },
+    })
+
+    //-summon(smn) <Pcolor>   --> revives other hero to your hero, with the same facing angle
+    registerCommand({
+        name: 'summon',
+        alias: ['smn'],
+        group: 'cheat',
+        argDescription: '<Pcolor>',
+        description: 'Revives another hero to yours, with the same facing angle',
+        cb: ({ nbParam, param1 }, escaper) => {
+            if (!(nbParam === 1 && isPlayerId(param1))) {
+                return true
+            }
+
+            const n = resolvePlayerId(param1)
+
+            if (getUdgEscapers().get(n) == null) {
+                return true
+            }
+
+            const targetEscaper = getUdgEscapers().get(n)
+            const targetHero = targetEscaper?.getHero()
+            const hero = escaper.getHero()
+
+            if (!targetEscaper || !targetHero || !hero) {
+                return true
+            }
+
+            const x = GetUnitX(hero)
+            const y = GetUnitY(hero)
+
+            SetUnitX(targetHero, x)
+            SetUnitY(targetHero, y)
+
+            targetEscaper.turnInstantly(GetUnitFacing(hero))
+            targetEscaper.coopReviveHero()
+
+            const escaperSecond = GetMirrorEscaper(targetEscaper)
             if (escaperSecond) {
                 const heroSecond = escaperSecond.getHero()
                 if (heroSecond) {
