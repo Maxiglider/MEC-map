@@ -47,7 +47,7 @@ export class MonsterType {
 
         const testMonster = CreateUnit(NEUTRAL_PLAYER, unitTypeId, 0, 0, 0)
         if (!testMonster) {
-            throw 'Unit type unknown'
+            throw `Unit type unknown: ${label}`
         } else {
             RemoveUnit(testMonster)
         }

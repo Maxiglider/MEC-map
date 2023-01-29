@@ -136,8 +136,15 @@ foreach ($lines as $line) {
     if (preg_match('/udg_monsterTypes\.new\((.+?)\)(\.setAlias\((.+?)\))?(\.setKillingEffectStr\((.+?)\))?/', $line, $match)) {
         $args = getArgs($match[1]);
 
+        $unitTypeId = removeQuotes($args[1]);
+
+        // Custom imported objects need to be reimported manually, falling back to hpea
+        if (removeQuotes($args[1])[0] === 't' || removeQuotes($args[1])[0] === 'r' || preg_match('/n[0-9]{3}/', removeQuotes($args[1]))){
+            $unitTypeId = 'hpea';
+        }
+
         $gameData->monsterTypes[] = [
-            "unitTypeId" => removeQuotes($args[1]),
+            "unitTypeId" => $unitTypeId,
             "label" => removeQuotes($args[0]),
             "alias" => isset($match[3]) ? removeQuotes($match[3]) : '',
             "isClickable" => $args[5] == "true",
