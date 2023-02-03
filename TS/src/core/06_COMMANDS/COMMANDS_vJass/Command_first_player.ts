@@ -162,17 +162,7 @@ export const initExecuteCommandRed = () => {
         cb: ({ nbParam, param1, param2 }, escaper) => {
             if (nbParam === 2 && IsBoolString(param1)) {
                 resolvePlayerIds(param2, e => {
-                    if (e.isSpeedEdit) {
-                        Text.P(escaper.getPlayer(), 'Speed disabled')
-
-                        if (e.getId() !== escaper.getId()) {
-                            Text.P(e.getPlayer(), 'Speed disabled')
-                        }
-
-                        e.isSpeedEdit = false
-                        e.stopAbsoluteSlideSpeed(true)
-                        e.stopAbsoluteRotationSpeed()
-                    } else {
+                    if (S2B(param1)) {
                         Text.P(escaper.getPlayer(), 'Letsgoooooo!')
 
                         if (e.getId() !== escaper.getId()) {
@@ -182,6 +172,16 @@ export const initExecuteCommandRed = () => {
                         e.isSpeedEdit = true
                         e.absoluteSlideSpeed(800, true)
                         e.absoluteRotationSpeed(1.2)
+                    } else {
+                        Text.P(escaper.getPlayer(), 'Speed disabled')
+
+                        if (e.getId() !== escaper.getId()) {
+                            Text.P(e.getPlayer(), 'Speed disabled')
+                        }
+
+                        e.isSpeedEdit = false
+                        e.stopAbsoluteSlideSpeed(true)
+                        e.stopAbsoluteRotationSpeed()
                     }
                 })
             }
