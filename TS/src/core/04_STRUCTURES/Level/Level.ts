@@ -253,6 +253,12 @@ export class Level {
                     monsterSpawn.getMaxY()
                 )
             }
+
+            // for (const [_, monster] of pairs(this.monsters.getAll())) {
+            //     if (monster instanceof MonsterSimplePatrol) {
+            //         this.drawLine(monster.x1, monster.y1, monster.x2, monster.y2)
+            //     }
+            // }
         }
     }
 

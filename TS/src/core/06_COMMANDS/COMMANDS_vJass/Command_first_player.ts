@@ -164,15 +164,23 @@ export const initExecuteCommandRed = () => {
                 resolvePlayerIds(param2, e => {
                     if (e.isSpeedEdit) {
                         Text.P(escaper.getPlayer(), 'Speed disabled')
-                        Text.P(e.getPlayer(), 'Speed disabled')
+
+                        if (e.getId() !== escaper.getId()) {
+                            Text.P(e.getPlayer(), 'Speed disabled')
+                        }
+
                         e.isSpeedEdit = false
-                        e.stopAbsoluteSlideSpeed()
+                        e.stopAbsoluteSlideSpeed(true)
                         e.stopAbsoluteRotationSpeed()
                     } else {
                         Text.P(escaper.getPlayer(), 'Letsgoooooo!')
-                        Text.P(e.getPlayer(), 'Letsgoooooo!')
+
+                        if (e.getId() !== escaper.getId()) {
+                            Text.P(e.getPlayer(), 'Letsgoooooo!')
+                        }
+
                         e.isSpeedEdit = true
-                        e.absoluteSlideSpeed(800)
+                        e.absoluteSlideSpeed(800, true)
                         e.absoluteRotationSpeed(1.2)
                     }
                 })
