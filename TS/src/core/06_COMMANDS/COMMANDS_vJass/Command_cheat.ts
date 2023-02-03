@@ -794,6 +794,30 @@ export const initExecuteCommandCheat = () => {
         },
     })
 
+    //-setCanTurnInAir <boolean status>
+    registerCommand({
+        name: 'setCanTurnInAir',
+        alias: [],
+        group: 'cheat',
+        argDescription: '<boolean status>',
+        description: 'Allows you to turn in air',
+        cb: ({ nbParam, param1 }, escaper) => {
+            if (!(nbParam === 1)) {
+                Text.erP(escaper.getPlayer(), 'one param for this command')
+                return true
+            }
+
+            if (!IsBoolString(param1)) {
+                Text.erP(escaper.getPlayer(), 'invalid boolean')
+                return true
+            }
+
+            globals.CAN_TURN_IN_AIR = S2B(param1)
+            Text.A((S2B(param1) ? 'Enabled' : 'Disabled') + ' canTurnInAir')
+            return true
+        },
+    })
+
     //-setHeight(seth)
     registerCommand({
         name: 'setHeight',

@@ -22,6 +22,10 @@ export class LoadMapFromCache {
                     if (gameData.gameData.coopCircles) {
                         globals.coopCircles = gameData.gameData.coopCircles
                     }
+
+                    if (gameData.gameData.CAN_TURN_IN_AIR) {
+                        globals.CAN_TURN_IN_AIR = gameData.gameData.CAN_TURN_IN_AIR
+                    }
                 }
 
                 //terrain types MEC
