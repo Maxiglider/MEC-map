@@ -122,16 +122,24 @@ export const initExecuteCommandRed = () => {
                 globals.autoreviveDelay = 0.3
 
                 resolvePlayerIds(param2, e => {
-                    if (e.isNoobedit) {
-                        Text.P(escaper.getPlayer(), "That's better, but you're still Noobs!")
-                        Text.P(e.getPlayer(), "That's better, but you're still Noobs!")
-                        e.isNoobedit = false
-                        e.setHasAutorevive(false)
-                    } else {
+                    if (S2B(param1)) {
                         Text.P(escaper.getPlayer(), 'Really? Noobs!')
-                        Text.P(e.getPlayer(), 'Really? Noobs!')
+
+                        if (e.getId() !== escaper.getId()) {
+                            Text.P(e.getPlayer(), 'Really? Noobs!')
+                        }
+
                         e.isNoobedit = true
                         e.setHasAutorevive(true)
+                    } else {
+                        Text.P(escaper.getPlayer(), "That's better, but you're still Noobs!")
+
+                        if (e.getId() !== escaper.getId()) {
+                            Text.P(e.getPlayer(), "That's better, but you're still Noobs!")
+                        }
+
+                        e.isNoobedit = false
+                        e.setHasAutorevive(false)
                     }
                 })
             }
