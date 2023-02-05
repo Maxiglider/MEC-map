@@ -612,11 +612,6 @@ export class Escaper {
         if (this.isAlive()) {
             if (this.hero) {
                 KillUnit(this.hero)
-
-                // We want players to die at the end of the slide so that they can be revived
-                // for (const [_, staticSlide] of pairs(getUdgLevels().getCurrentLevel(this).staticSlides.getAll())) {
-                //     staticSlide.removePlayer(this.escaperId)
-                // }
             }
             return true
         }
@@ -664,6 +659,12 @@ export class Escaper {
             //move camera if needed
             if (GetLocalPlayer() == this.p) {
                 this.moveCameraToHeroIfNecessary()
+            }
+        }
+
+        if (type !== 'coop') {
+            for (const [_, staticSlide] of pairs(getUdgLevels().getCurrentLevel(this).staticSlides.getAll())) {
+                staticSlide.removePlayer(this.escaperId)
             }
         }
 
@@ -1752,7 +1753,7 @@ export class Escaper {
         }
 
         if (mirrorHero && mirrorEscaper) {
-            mirrorEscaper.revive(GetUnitX(mirrorHero), GetUnitY(mirrorHero))
+            mirrorEscaper.revive(GetUnitX(mirrorHero), GetUnitY(mirrorHero), 'coop')
             RunCoopSoundOnHero(mirrorHero)
             SetUnitAnimation(mirrorHero, 'channel')
             mirrorEscaper.absoluteSlideSpeed(0)

@@ -385,7 +385,7 @@ export const initExecuteCommandCheat = () => {
                         SetUnitX(heroSecond, x)
                         SetUnitY(heroSecond, y)
                     } else {
-                        escaperSecond.revive(x, y)
+                        escaperSecond.revive(x, y, 'coop')
                     }
                 }
             }
@@ -437,7 +437,7 @@ export const initExecuteCommandCheat = () => {
                         SetUnitX(heroSecond, x)
                         SetUnitY(heroSecond, y)
                     } else {
-                        escaperSecond.revive(x, y)
+                        escaperSecond.revive(x, y, 'coop')
                     }
                 }
             }
