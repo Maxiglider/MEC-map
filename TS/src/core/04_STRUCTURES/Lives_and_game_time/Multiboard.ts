@@ -272,7 +272,7 @@ export const initMultiboard = () => {
                         (getUdgLevels().isSpeedEdit() ? ' - ' + udg_colorCode[PURPLE] + 'SPEED' + '|r' : '')
                 )
 
-            mb && MultiboardMinimizeBJ(escaper.hideLeaderboard || playerMode.mode !== 'multiboard' || !visible, mb)
+            mb && MultiboardDisplay(mb, !escaper.hideLeaderboard && playerMode.mode === 'multiboard' && visible)
             lb && LeaderboardDisplay(lb, !escaper.hideLeaderboard && playerMode.mode === 'leaderboard' && visible)
         }
     }
