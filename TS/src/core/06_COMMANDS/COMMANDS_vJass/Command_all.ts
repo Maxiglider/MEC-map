@@ -1456,7 +1456,7 @@ export const initCommandAll = () => {
     registerCommand({
         name: 'hideChat',
         alias: ['hc', 'monk'],
-        group: 'red',
+        group: 'all',
         argDescription: 'on | off',
         description: 'hides the chat',
         cb: ({ param1 }, escaper) => {
