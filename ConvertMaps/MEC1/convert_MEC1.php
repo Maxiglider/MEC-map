@@ -139,7 +139,7 @@ foreach ($lines as $line) {
         $unitTypeId = removeQuotes($args[1]);
 
         // Custom imported objects need to be reimported manually, falling back to hpea
-        if (removeQuotes($args[1])[0] === 't' || removeQuotes($args[1])[0] === 'r' || preg_match('/n[0-9]{3}/', removeQuotes($args[1]))){
+        if (removeQuotes($args[1])[0] === 't' || removeQuotes($args[1])[0] === 'r' || preg_match('/(n|e)[0-9]{3}/', removeQuotes($args[1]))){
             $unitTypeId = 'hpea';
         }
 

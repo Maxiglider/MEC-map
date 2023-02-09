@@ -4,65 +4,81 @@ import War3Map from 'mdx-m3-viewer/dist/cjs/parsers/w3x/map'
 const targetDir = 'C:/Users/Stan/Documents/Warcraft III/Maps/Maps/Ts/MecTest'
 const coreStart = '-- Max Escape Creation'
 const coreEnd = 'onGlobalInit(initMEC_core)'
+const renameTargets = true
 
-const main = () => {
+const main = async () => {
+    console.time('Modified test maps')
     const files = fs.readdirSync(targetDir)
-    const targetFile = files?.[0]
 
-    if (!targetFile) {
-        console.warn('No target file found')
-        return
-    }
-
-    const war3Map = new War3Map()
-    war3Map.load(fs.readFileSync(`${targetDir}/${targetFile}`).buffer)
-
-    const luaFile = war3Map.archive.files.find(f => f.name === 'war3map.lua')
-
-    if (!luaFile) {
-        console.warn('war3map.lua not found')
-        return
-    }
-
-    const oldLua = luaFile.text()
     const newLua = fs
         .readFileSync(__dirname + '/../../bin/final-we.lua')
         .toString()
         // For some reason the final-we.lua contains double %%
         .replace(new RegExp('%%', 'g'), '%')
 
-    if (oldLua.indexOf(coreStart) === -1) {
-        console.warn('coreStart not found')
-        return
-    }
+    await Promise.all(
+        files.map(async targetFile => {
+            if (!targetFile.endsWith('.w3x') && !targetFile.endsWith('.w3m')) {
+                console.info(`[${targetFile}] wrong file extension, ignoring`)
+                return
+            }
 
-    if (oldLua.indexOf(coreEnd) === -1) {
-        console.warn('coreEnd not found')
-        return
-    }
+            const war3Map = new War3Map()
+            war3Map.load(fs.readFileSync(`${targetDir}/${targetFile}`).buffer)
 
-    const mergedLua =
-        oldLua.substring(0, oldLua.indexOf(coreStart)) +
-        newLua +
-        oldLua.substring(oldLua.indexOf(coreEnd) + coreEnd.length)
+            const luaFile = war3Map.archive.files.find(f => f.name === 'war3map.lua')
 
-    const setFile = luaFile.set(Buffer.from(mergedLua, 'utf-8'))
+            if (!luaFile) {
+                console.info(`[${targetFile}] war3map.lua not found, ignoring`)
+                return
+            }
 
-    if (!setFile) {
-        console.log(`Failed to modify war3map.lua`)
-        return
-    }
+            const oldLua = luaFile.text()
 
-    const out = war3Map.save()
-    fs.writeFileSync(`${targetDir}/${targetFile}`, out)
+            if (oldLua.indexOf(coreStart) === -1) {
+                console.info(`[${targetFile}] coreStart not found, ignoring`)
+                return
+            }
 
-    const newFile =
-        targetFile.substring(0, targetFile.lastIndexOf('_') + 1) +
-        new Date().getTime() +
-        targetFile.substring(targetFile.indexOf('.', targetFile.lastIndexOf('_') + 1))
+            if (oldLua.indexOf(coreEnd) === -1) {
+                console.info(`[${targetFile}] coreEnd not found, ignoring`)
+                return
+            }
 
-    fs.renameSync(`${targetDir}/${targetFile}`, `${targetDir}/${newFile}`)
-    console.log(`Updated: ${targetDir}/${newFile}`)
+            const mergedLua =
+                oldLua.substring(0, oldLua.indexOf(coreStart)) +
+                newLua +
+                oldLua.substring(oldLua.indexOf(coreEnd) + coreEnd.length)
+
+            const setFile = luaFile.set(Buffer.from(mergedLua, 'utf-8'))
+
+            if (!setFile) {
+                console.info(`[${targetFile}] Failed to modify war3map.lua, ignoring`)
+                return
+            }
+
+            const out = war3Map.save()
+            fs.writeFileSync(`${targetDir}/${targetFile}`, out)
+
+            if (renameTargets) {
+                if (targetFile.lastIndexOf('_') === -1) {
+                    console.info(`[${targetFile}] Mapname does not contain _, ignoring`)
+                    return
+                }
+
+                const newFile =
+                    targetFile.substring(0, targetFile.lastIndexOf('_') + 1) +
+                    new Date().getTime() +
+                    targetFile.substring(targetFile.indexOf('.', targetFile.lastIndexOf('_') + 1))
+
+                fs.renameSync(`${targetDir}/${targetFile}`, `${targetDir}/${newFile}`)
+            }
+
+            console.info(`[${targetFile}] Updated`)
+        })
+    )
+
+    console.timeEnd('Modified test maps')
 }
 
 main()
