@@ -12,6 +12,7 @@ import { ObjectHandler } from '../../../Utils/ObjectHandler'
 import { jsonEncode } from '../../01_libraries/Basic_functions'
 import { MEC_SMIC_DATA_FILE_DATE_TPL } from '../../01_libraries/Constants'
 import { Text } from '../../01_libraries/Text'
+import { Gravity } from '../Slide_and_CheckTerrain_triggers/Gravity'
 import { PushTerrainDataIntoJson } from './Save_terrain'
 
 export class SaveMapInCache {
@@ -32,6 +33,7 @@ export class SaveMapInCache {
         jsonGameData.gameData.USE_VTOTO_SLIDE_LOGIC = globals.USE_VTOTO_SLIDE_LOGIC
         jsonGameData.gameData.coopCircles = globals.coopCircles
         jsonGameData.gameData.CAN_TURN_IN_AIR = globals.CAN_TURN_IN_AIR
+        jsonGameData.gameData.gravity = Gravity.GetRealGravity()
 
         //terrain config
         jsonGameData.terrainTypesMec = getUdgTerrainTypes().toJson()

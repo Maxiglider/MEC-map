@@ -34,6 +34,20 @@ import { TurnOnSlide } from '../../07_TRIGGERS/Slide_and_CheckTerrain_triggers/T
 import { GetStringAssignedFromCommand, KeyboardShortcut } from '../../Keyboard_shortcuts/KeyboardShortcut'
 import { CmdParam, isPlayerId, resolvePlayerId, resolvePlayerIds } from './Command_functions'
 
+const cameraFieldMap: { [x: string]: camerafield } = {
+    TARGET_DISTANCE: CAMERA_FIELD_TARGET_DISTANCE,
+    FARZ: CAMERA_FIELD_FARZ,
+    ANGLE_OF_ATTACK: CAMERA_FIELD_ANGLE_OF_ATTACK,
+    FIELD_OF_VIEW: CAMERA_FIELD_FIELD_OF_VIEW,
+    ROLL: CAMERA_FIELD_ROLL,
+    ROTATION: CAMERA_FIELD_ROTATION,
+    ZOFFSET: CAMERA_FIELD_ZOFFSET,
+    NEARZ: CAMERA_FIELD_NEARZ,
+    LOCAL_PITCH: CAMERA_FIELD_LOCAL_PITCH,
+    LOCAL_YAW: CAMERA_FIELD_LOCAL_YAW,
+    LOCAL_ROLL: CAMERA_FIELD_LOCAL_ROLL,
+}
+
 export const initCommandAll = () => {
     const { registerCommand } = ServiceManager.getService('Cmd')
 
@@ -61,7 +75,7 @@ export const initCommandAll = () => {
     //-vertexColor(vc) [ <red> <green> <blue> [<transparency>] ]   --> without parameter takes a random vertex color without changing transparency
     registerCommand({
         name: 'vertexColor',
-        alias: ['vc'],
+        alias: ['vc', 'wild'],
         group: 'all',
         argDescription: '[ <red> <green> <blue> [<transparency>] ]',
         description: 'without parameter takes a random vertex color without changing transparency',
@@ -427,14 +441,44 @@ export const initCommandAll = () => {
         group: 'all',
         argDescription: 'x',
         description: 'changes the camera field (height), default is 2500',
-        cb: ({ nbParam, param1 }, escaper) => {
-            if (!(nbParam === 1 && IsInteger(param1))) {
+        cb: ({ nbParam, param1, param2 }, escaper) => {
+            if (!((nbParam === 1 || nbParam === 2) && IsInteger(param1))) {
                 return true
             }
-            escaper.setCameraField(S2I(param1))
+
+            if (nbParam === 2) {
+                if (param2.toUpperCase() in cameraFieldMap) {
+                    SetCameraFieldForPlayer(escaper.getPlayer(), cameraFieldMap[param2.toUpperCase()], S2I(param1), 0)
+                    Text.P(escaper.getPlayer(), `Set: ${param2.toUpperCase()} to ${S2I(param1)}`)
+                }
+
+                return true
+            }
+
+            if (nbParam === 1) {
+                escaper.setCameraField(S2I(param1))
+            }
+
             return true
         },
     })
+
+    //     // DEBUG ONLY
+    //     createTimer(1, true, () => {
+    //         print(`
+    // TARGET_DISTANCE: ${GetCameraField(CAMERA_FIELD_TARGET_DISTANCE)}
+    // FARZ: ${GetCameraField(CAMERA_FIELD_FARZ)}
+    // ANGLE_OF_ATTACK: ${Rad2Deg(GetCameraField(CAMERA_FIELD_ANGLE_OF_ATTACK))}
+    // FIELD_OF_VIEW: ${Rad2Deg(GetCameraField(CAMERA_FIELD_FIELD_OF_VIEW))}
+    // ROLL: ${Rad2Deg(GetCameraField(CAMERA_FIELD_ROLL))}
+    // ROTATION: ${Rad2Deg(GetCameraField(CAMERA_FIELD_ROTATION))}
+    // ZOFFSET: ${GetCameraField(CAMERA_FIELD_ZOFFSET)}
+    // NEARZ: ${GetCameraField(CAMERA_FIELD_NEARZ)}
+    // LOCAL_PITCH: ${Rad2Deg(GetCameraField(CAMERA_FIELD_LOCAL_PITCH))}
+    // LOCAL_YAW: ${Rad2Deg(GetCameraField(CAMERA_FIELD_LOCAL_YAW))}
+    // LOCAL_ROLL: ${Rad2Deg(GetCameraField(CAMERA_FIELD_LOCAL_ROLL))}
+    //         `)
+    //     })
 
     //-resetCamera(rc)   --> put the camera back like chosen field
     registerCommand({

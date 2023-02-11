@@ -41,6 +41,7 @@ export class MonsterType {
             throw this.constructor.name + ' : wrong scale value "' + scale + '"'
         }
 
+        // CHANGE THIS FOR THE IMMOLATION PROJECT
         if (R2I(immolationRadius) % 5 != 0 || immolationRadius < 0 || immolationRadius > 400) {
             throw this.constructor.name + ' : wrong immolation radius "' + immolationRadius + '"'
         }
@@ -55,6 +56,7 @@ export class MonsterType {
         this.label = label
         this.unitTypeId = unitTypeId
         this.scale = scale
+        // CHANGE THIS FOR THE IMMOLATION PROJECT
         this.immolationSkill = IMMOLATION_SKILLS[R2I(immolationRadius / 5) - 1]
         this.speed = speed
         this.isClickableB = isClickable
@@ -145,6 +147,7 @@ export class MonsterType {
     }
 
     setImmolation = (immolationRadius: number): boolean => {
+        // CHANGE THIS FOR THE IMMOLATION PROJECT
         if (R2I(immolationRadius) % 5 != 0 || immolationRadius < 0 || immolationRadius > 400) {
             return false
         }
@@ -218,6 +221,7 @@ export class MonsterType {
     }
 
     getImmolationRadiusStr = (): string => {
+        // CHANGE THIS FOR THE IMMOLATION PROJECT
         if (!this.immolationSkill) {
             return '0'
         }

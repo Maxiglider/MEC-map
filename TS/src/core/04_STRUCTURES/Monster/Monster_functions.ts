@@ -1,7 +1,7 @@
 import { GetCurrentMonsterPlayer } from 'core/01_libraries/Basic_functions'
 import { ENNEMY_PLAYER, MOBS_VARIOUS_COLORS } from 'core/01_libraries/Constants'
+import { Monster } from './Monster'
 import { MonsterType } from './MonsterType'
-import {Monster} from "./Monster";
 
 let monster: unit
 let ATTACK_SKILL = FourCC('Aatk')
@@ -59,17 +59,17 @@ export const SetUnitMaxLife = (u: unit, newMaxLife: number): boolean => {
 export const NewImmobileMonsterForPlayer = (mt: MonsterType, p: player, x: number, y: number, angle: number): unit => {
     let unitTypeId = mt.getUnitTypeId()
 
-    if(Monster.forceUnitTypeIdForNextMonster > 0){
+    if (Monster.forceUnitTypeIdForNextMonster > 0) {
         unitTypeId = Monster.forceUnitTypeIdForNextMonster
         Monster.forceUnitTypeIdForNextMonster = 0
     }
 
-    if(Monster.forceXforNextMonster != 0){
+    if (Monster.forceXforNextMonster != 0) {
         x = Monster.forceXforNextMonster
         Monster.forceXforNextMonster = 0
     }
 
-    if(Monster.forceYforNextMonster != 0){
+    if (Monster.forceYforNextMonster != 0) {
         y = Monster.forceYforNextMonster
         Monster.forceYforNextMonster = 0
     }
@@ -89,6 +89,7 @@ export const NewImmobileMonsterForPlayer = (mt: MonsterType, p: player, x: numbe
         UnitAddAbility(monster, ABILITY_ANNULER_VISION)
     }
 
+    // CHANGE THIS FOR THE IMMOLATION PROJECT
     const immoSkill = mt.getImmolationSkill() || 0
 
     immoSkill > 0 && UnitAddAbility(monster, immoSkill)

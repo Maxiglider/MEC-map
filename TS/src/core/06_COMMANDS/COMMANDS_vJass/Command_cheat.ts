@@ -749,7 +749,7 @@ export const initExecuteCommandCheat = () => {
     //-setVTOTODiagonalSlideLogic <boolean status>
     registerCommand({
         name: 'setVTOTODiagonalSlideLogic',
-        alias: [],
+        alias: ['setvtoto'],
         group: 'cheat',
         argDescription: '<boolean status>',
         description: 'Allows you to slide diagonally',
@@ -766,6 +766,21 @@ export const initExecuteCommandCheat = () => {
 
             globals.USE_VTOTO_SLIDE_LOGIC = S2B(param1)
             Text.A((S2B(param1) ? 'Enabled' : 'Disabled') + ' vToto diagonal slide logic')
+            return true
+        },
+    })
+
+    //-getVTOTODiagonalSlideLogic(getvtoto)
+    registerCommand({
+        name: 'getVTOTODiagonalSlideLogic',
+        alias: ['getvtoto'],
+        group: 'cheat',
+        argDescription: '',
+        description: '',
+        cb: ({ noParam }, escaper) => {
+            if (noParam) {
+                Text.P(escaper.getPlayer(), 'vToto is ' + (globals.USE_VTOTO_SLIDE_LOGIC ? 'enabled' : 'disabled'))
+            }
             return true
         },
     })
@@ -794,6 +809,21 @@ export const initExecuteCommandCheat = () => {
         },
     })
 
+    //-getCoopCircles
+    registerCommand({
+        name: 'getCoopCircles',
+        alias: [],
+        group: 'cheat',
+        argDescription: '',
+        description: '',
+        cb: ({ noParam }, escaper) => {
+            if (noParam) {
+                Text.P(escaper.getPlayer(), 'Coop circles are ' + (globals.coopCircles ? 'enabled' : 'disabled'))
+            }
+            return true
+        },
+    })
+
     //-setCanTurnInAir <boolean status>
     registerCommand({
         name: 'setCanTurnInAir',
@@ -814,6 +844,21 @@ export const initExecuteCommandCheat = () => {
 
             globals.CAN_TURN_IN_AIR = S2B(param1)
             Text.A((S2B(param1) ? 'Enabled' : 'Disabled') + ' canTurnInAir')
+            return true
+        },
+    })
+
+    //-getCanTurnInAir
+    registerCommand({
+        name: 'getCanTurnInAir',
+        alias: [],
+        group: 'cheat',
+        argDescription: '',
+        description: '',
+        cb: ({ noParam }, escaper) => {
+            if (noParam) {
+                Text.P(escaper.getPlayer(), 'Can turn in air is ' + (globals.CAN_TURN_IN_AIR ? 'enabled' : 'disabled'))
+            }
             return true
         },
     })

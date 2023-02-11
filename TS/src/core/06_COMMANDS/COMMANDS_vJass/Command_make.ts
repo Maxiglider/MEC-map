@@ -818,6 +818,7 @@ export const initExecuteCommandMake = () => {
             //checkParam3
             if (nbParam >= 3) {
                 immoRadius = S2I(param3)
+                // CHANGE THIS FOR THE IMMOLATION PROJECT
                 if (immoRadius % 5 != 0 || immoRadius < 0 || immoRadius > 400) {
                     Text.erP(
                         escaper.getPlayer(),
@@ -988,6 +989,7 @@ export const initExecuteCommandMake = () => {
             //checkParam2
             const x = S2I(param2)
             if (x % 5 != 0 || x < 0 || x > 400) {
+                // CHANGE THIS FOR THE IMMOLATION PROJECT
                 Text.erP(
                     escaper.getPlayer(),
                     'wrong immolation radius ; should be an integer divisible by 5 and between 0 and 400'

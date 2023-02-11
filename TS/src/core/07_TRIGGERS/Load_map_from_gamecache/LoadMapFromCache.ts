@@ -3,6 +3,7 @@ import { errorHandler } from 'Utils/mapUtils'
 import { getUdgCasterTypes, getUdgLevels, getUdgMonsterTypes, getUdgTerrainTypes, globals } from '../../../../globals'
 import { jsonDecode } from '../../01_libraries/Basic_functions'
 import { Text } from '../../01_libraries/Text'
+import { Gravity } from '../Slide_and_CheckTerrain_triggers/Gravity'
 
 export class LoadMapFromCache {
     public static gameDataJsonString: string | null = null
@@ -25,6 +26,10 @@ export class LoadMapFromCache {
 
                     if (gameData.gameData.CAN_TURN_IN_AIR) {
                         globals.CAN_TURN_IN_AIR = gameData.gameData.CAN_TURN_IN_AIR
+                    }
+
+                    if (gameData.gameData.gravity) {
+                        Gravity.SetGravity(gameData.gameData.gravity)
                     }
                 }
 

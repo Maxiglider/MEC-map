@@ -20,7 +20,7 @@ export const Globals: {
     udg_used_terrain_types: [],
     udg_nb_used_terrains: 0,
     udg_cheatsUsed: false,
-    udg_areRedRightsOn: false,
+    udg_areRedRightsOn: true,
     udg_is_circleing_j: [],
     udg_loc_x: [],
     udg_loc_y: [],

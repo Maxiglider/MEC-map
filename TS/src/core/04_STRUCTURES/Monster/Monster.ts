@@ -311,6 +311,7 @@ export abstract class Monster {
             this.disablingTimer === disablingTimer ||
             TimerGetRemaining(disablingTimer) > TimerGetRemaining(this.disablingTimer)
         ) {
+            // CHANGE THIS FOR THE IMMOLATION PROJECT
             const immoSkill = this.mt?.getImmolationSkill() || 0
 
             this.disablingTimer = disablingTimer
@@ -322,6 +323,7 @@ export abstract class Monster {
 
     temporarilyEnable = (disablingTimer: timer) => {
         if (this.disablingTimer === disablingTimer) {
+            // CHANGE THIS FOR THE IMMOLATION PROJECT
             const immoSkill = this.mt?.getImmolationSkill() || 0
 
             this.u && immoSkill > 0 && UnitAddAbility(this.u, immoSkill)

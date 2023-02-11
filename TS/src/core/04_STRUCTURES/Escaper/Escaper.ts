@@ -1,4 +1,4 @@
-import { StopUnit } from 'core/01_libraries/Basic_functions'
+import { IsIssuedOrder, StopUnit } from 'core/01_libraries/Basic_functions'
 import {
     DEFAULT_CAMERA_FIELD,
     DUMMY_POWER_CIRCLE,
@@ -77,7 +77,7 @@ import type { CasterType } from '../Caster/CasterType'
 import { Level } from '../Level/Level'
 import { IsLevelBeingMade } from '../Level/Level_functions'
 import { DEPART_PAR_DEFAUT } from '../Level/StartAndEnd'
-import { METEOR_NORMAL, udg_meteors } from '../Meteor/Meteor'
+import { METEOR_CHEAT, METEOR_NORMAL, udg_meteors } from '../Meteor/Meteor'
 import type { MonsterType } from '../Monster/MonsterType'
 import type { TerrainType } from '../TerrainType/TerrainType'
 import { TerrainTypeSlide } from '../TerrainType/TerrainTypeSlide'
@@ -206,6 +206,9 @@ export class Escaper {
 
     alliedState: { [escaperId: number]: boolean } = {}
 
+    private canClick: boolean
+    private canClickTrigger: trigger
+
     //mouse position updated when a trigger dependant of mouse movement is being used
     mouseX = 0
     mouseY = 0
@@ -298,6 +301,10 @@ export class Escaper {
         for (let i = 0; i < NB_PLAYERS_MAX; i++) {
             this.alliedState[i] = true
         }
+
+        this.canClick = true
+        this.canClickTrigger = this.createCanClickTrigger()
+        this.setCanClick(true)
     }
 
     getColorId = () => {
@@ -498,6 +505,8 @@ export class Escaper {
 
         this.portalCooldownTimer?.destroy()
         this.portalCooldownTimer = null
+
+        DestroyTrigger(this.canClickTrigger)
     }
 
     //getId method
@@ -643,6 +652,10 @@ export class Escaper {
         this.SpecialIllidan()
         this.selectHero()
         this.updateUnitVertexColor()
+
+        if (!this.firstPersonHandle.isFirstPerson()) {
+            this.setCanClick(true)
+        }
 
         TimerStart(AfkMode.afkModeTimers[this.escaperId], AfkMode.timeMinAfk, false, () =>
             AfkMode.GetAfkModeTimeExpiresCodeFromId(this.escaperId)
@@ -1978,6 +1991,41 @@ export class Escaper {
 
     getKeyboardShortcutsArray = () => {
         return this.keyboardShortcutsArray
+    }
+
+    // Prevent clicks
+    createCanClickTrigger = () => {
+        return createEvent({
+            events: [
+                t => TriggerRegisterAnyUnitEventBJ(t, EVENT_PLAYER_UNIT_ISSUED_POINT_ORDER),
+                t => TriggerRegisterAnyUnitEventBJ(t, EVENT_PLAYER_UNIT_ISSUED_TARGET_ORDER),
+            ],
+            actions: [
+                () => {
+                    if (this.getPlayer() === GetTriggerPlayer() && !this.canClick) {
+                        if (
+                            !IsIssuedOrder('smart') ||
+                            GetItemTypeId(GetOrderTargetItem()) === METEOR_NORMAL ||
+                            GetItemTypeId(GetOrderTargetItem()) === METEOR_CHEAT
+                        ) {
+                            return
+                        }
+
+                        StopUnit(GetTriggerUnit())
+                    }
+                },
+            ],
+        })
+    }
+
+    setCanClick = (canClick: boolean) => {
+        this.canClick = canClick
+
+        if (canClick) {
+            DisableTrigger(this.canClickTrigger)
+        } else {
+            EnableTrigger(this.canClickTrigger)
+        }
     }
 
     toJson = () => ({

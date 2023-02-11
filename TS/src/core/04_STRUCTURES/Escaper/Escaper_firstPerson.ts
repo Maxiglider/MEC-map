@@ -6,7 +6,7 @@ import { Escaper } from './Escaper'
 
 type IKeys = 'UP' | 'DOWN' | 'LEFT' | 'RIGHT'
 
-const FIRSTPERSON_SPEED_PER_PERIOD = 0.4
+const FIRSTPERSON_SPEED_PER_PERIOD = 0.2
 const FIRSTPERSON_ANGLE_PER_PERIOD = 0.3
 
 export class EscaperFirstPerson {
@@ -28,6 +28,8 @@ export class EscaperFirstPerson {
     isFirstPerson = () => !!this.forceCamTimer
 
     toggleFirstPerson = (active: boolean) => {
+        this.escaper.setCanClick(!active)
+
         if (active) {
             if (!this.forceCamTimer) {
                 this.forceCamTimer = createTimer(0.001, true, () => {
@@ -59,9 +61,9 @@ export class EscaperFirstPerson {
                                 let fwd = 0
 
                                 if (this.isKeyDownState('UP')) {
-                                    fwd += FIRSTPERSON_SPEED_PER_PERIOD
+                                    fwd += FIRSTPERSON_SPEED_PER_PERIOD * (this.escaper.isSliding() ? 1 : 3)
                                 } else if (this.isKeyDownState('DOWN')) {
-                                    fwd -= FIRSTPERSON_SPEED_PER_PERIOD
+                                    fwd -= FIRSTPERSON_SPEED_PER_PERIOD * (this.escaper.isSliding() ? 1 : 3)
                                 }
 
                                 const newX = GetUnitX(hero) + fwd * Cos(angle)
@@ -72,11 +74,22 @@ export class EscaperFirstPerson {
                             }
                         }
 
-                        SetCameraTargetControllerNoZForPlayer(player, hero, 0, 0, true)
-                        SetCameraFieldForPlayer(player, CAMERA_FIELD_ANGLE_OF_ATTACK, 310, 0)
-                        SetCameraFieldForPlayer(player, CAMERA_FIELD_FIELD_OF_VIEW, 1500, 0)
-                        SetCameraFieldForPlayer(player, CAMERA_FIELD_ROTATION, GetUnitFacing(hero), 0) // Using the duration argument can bug out the camera and gets it stuck to keep turning..
-                        SetCameraFieldForPlayer(player, CAMERA_FIELD_ZOFFSET, BlzGetUnitZ(hero) + 100, 0)
+                        if (this.escaper.isAlive()) {
+                            const isNormal = !this.escaper.isSliding() || this.escaper.getSlideMovePerPeriod() > 0
+
+                            SetCameraTargetControllerNoZForPlayer(player, hero, 0, 0, true)
+                            SetCameraFieldForPlayer(player, CAMERA_FIELD_ANGLE_OF_ATTACK, 310, 0)
+                            SetCameraFieldForPlayer(player, CAMERA_FIELD_FIELD_OF_VIEW, 1500, 0)
+                            SetCameraFieldForPlayer(player, CAMERA_FIELD_ROTATION, GetUnitFacing(hero), 0) // Using the duration argument can bug out the camera and gets it stuck to keep turning..
+                            SetCameraFieldForPlayer(
+                                player,
+                                CAMERA_FIELD_ZOFFSET,
+                                BlzGetUnitZ(hero) + (isNormal ? 100 : -200),
+                                0
+                            )
+                        } else {
+                            this.escaper.resetCamera()
+                        }
                     }
                 })
             }

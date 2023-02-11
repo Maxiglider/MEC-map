@@ -131,10 +131,12 @@ export class PortalMob {
         if (this.freezeDuration > 0) {
             SetUnitAnimation(hero, 'channel')
             escaper.absoluteSlideSpeed(0)
+            escaper.setCanClick(false)
 
             this.timers.push(
                 createTimer(this.freezeDuration, false, () => {
                     escaper.stopAbsoluteSlideSpeed()
+                    escaper.setCanClick(true)
                     SetUnitAnimation(hero, 'stand')
 
                     escaper.disablePortalCooldown(0.5)
