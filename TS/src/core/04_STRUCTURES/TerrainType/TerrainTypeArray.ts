@@ -44,7 +44,7 @@ export class TerrainTypeArray extends BaseArray<TerrainType> {
     getTerrainType = (x: number, y: number) => {
         let terrainTypeId = globals.USE_VTOTO_SLIDE_LOGIC ? MazeUtils.getHVTileAt(x, y) : GetTerrainType(x, y)
 
-        if (globals.USE_VTOTO_SLIDE_LOGIC && terrainTypeId === null) {
+        if (globals.USE_VTOTO_SLIDE_LOGIC && !terrainTypeId) {
             const upward = MazeUtils.getDiagonalTileAt(x, y, true)
             const downward = MazeUtils.getDiagonalTileAt(x, y, false)
 
@@ -62,6 +62,10 @@ export class TerrainTypeArray extends BaseArray<TerrainType> {
             } else if (u && isDeathTerrain(u)) {
                 terrainTypeId = downward
             }
+        }
+
+        if (!terrainTypeId) {
+            terrainTypeId = GetTerrainType(x, y)
         }
 
         for (const [_, terrainType] of pairs(this.data)) {
@@ -255,8 +259,14 @@ export class TerrainTypeArray extends BaseArray<TerrainType> {
                     break
             }
 
-            if (tt && terrainTypeJson.alias) {
-                tt.setAlias(terrainTypeJson.alias)
+            if (tt) {
+                if (terrainTypeJson.alias) {
+                    tt.setAlias(terrainTypeJson.alias)
+                }
+
+                if (terrainTypeJson.gravity) {
+                    tt.setGravity(terrainTypeJson.gravity)
+                }
             }
         }
     }

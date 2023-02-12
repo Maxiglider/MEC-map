@@ -127,6 +127,8 @@ const initSlideTrigger = () => {
             escaper.moveHero(newX, newY)
         }
 
+        const gravity = escaper.getLastTerrainType()?.getGravity() || Gravity.GetGravity()
+
         //gestion de la hauteur du héros
         counters[n]++
         if (counters[n] == GRAVITY_EVERY_N_PERIOD) {
@@ -136,7 +138,7 @@ const initSlideTrigger = () => {
             let delta: number
 
             if (height > 1) {
-                escaper.setSpeedZ(speedZ + Gravity.GetGravity())
+                escaper.setSpeedZ(speedZ + gravity)
                 height += speedZ - diffZ
                 if (height < 0) {
                     height = 0
@@ -147,8 +149,8 @@ const initSlideTrigger = () => {
                 escaper.refreshCerclePosition()
             } else {
                 delta = diffZ - oldDiffZ
-                if (delta < Gravity.GetGravity()) {
-                    escaper.setSpeedZ(oldDiffZ + Gravity.GetGravity())
+                if (delta < gravity) {
+                    escaper.setSpeedZ(oldDiffZ + gravity)
                     SetUnitFlyHeight(hero, -diffZ + escaper.getSpeedZ(), 0)
 
                     //arrêter de tourner si un clic a été fait juste avant

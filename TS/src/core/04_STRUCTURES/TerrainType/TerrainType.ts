@@ -18,6 +18,7 @@ export abstract class TerrainType {
     terrainTypeId: number
     orderId: number //numéro du terrain (ordre des tilesets), de 1 à 16
     cliffClassId: number //cliff class 1 or 2, depending of the main tileset
+    gravity: number | undefined = undefined
 
     constructor(
         label: string,
@@ -92,6 +93,9 @@ export abstract class TerrainType {
         return this.kind
     }
 
+    getGravity = () => this.gravity
+    setGravity = (gravity: number) => (this.gravity = gravity)
+
     abstract getColor(): string
 
     abstract displayForPlayer(p: player): void
@@ -111,8 +115,13 @@ export abstract class TerrainType {
             order +
             " : '" +
             Ascii2String(this.terrainTypeId) +
-            "'" +
-            DISPLAY_SPACE
+            "'"
+
+        if (this.gravity) {
+            display += ` g:${this.gravity}`
+        }
+
+        display += DISPLAY_SPACE
 
         return display
     }
@@ -126,6 +135,7 @@ export abstract class TerrainType {
         output['kind'] = this.kind
         output['terrainTypeId'] = Ascii2String(this.terrainTypeId)
         output['cliffClassId'] = this.cliffClassId
+        output['gravity'] = this.gravity
 
         return output
     }

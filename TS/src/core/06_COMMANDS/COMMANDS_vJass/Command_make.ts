@@ -399,6 +399,31 @@ export const initExecuteCommandMake = () => {
         },
     })
 
+    //-setTerrainGravity(settg) <terrainLabel> <gravity>
+    registerCommand({
+        name: 'setTerrainGravity',
+        alias: ['settg'],
+        group: 'make',
+        argDescription: '<terrainLabel> <gravity>',
+        description: '',
+        cb: ({ nbParam, param1, param2 }, escaper) => {
+            if (!(nbParam === 2) || (S2R(param2) === 0 && param2 !== '0')) {
+                return true
+            }
+
+            const terrainType = getUdgTerrainTypes().getByLabel(param1)
+
+            if (!terrainType) {
+                Text.erP(escaper.getPlayer(), 'unknown terrain')
+                return true
+            }
+
+            terrainType.setGravity(S2R(param2))
+            Text.mkP(escaper.getPlayer(), 'terrain gravity changed')
+            return true
+        },
+    })
+
     //-setTerrainCanTurn(settct) <slideTerrainLabel> <canTurn>
     registerCommand({
         name: 'setTerrainCanTurn',
