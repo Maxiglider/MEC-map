@@ -1,4 +1,6 @@
 import { NB_ESCAPERS } from 'core/01_libraries/Constants'
+import { AfkMode } from 'core/08_GAME/Afk_mode/Afk_mode'
+import { GetUnitZEx } from 'Utils/LocationUtils'
 import { Timer } from 'w3ts'
 import { getUdgEscapers } from '../../../../globals'
 import { createEvent, createTimer, forRange } from '../../../Utils/mapUtils'
@@ -28,7 +30,9 @@ export class EscaperFirstPerson {
     isFirstPerson = () => !!this.forceCamTimer
 
     toggleFirstPerson = (active: boolean) => {
-        this.escaper.setCanClick(!active)
+        if (this.escaper.isAlive()) {
+            this.escaper.setCanClick(!active)
+        }
 
         if (active) {
             if (!this.forceCamTimer) {
@@ -37,7 +41,7 @@ export class EscaperFirstPerson {
                     const hero = this.escaper.getHero()
 
                     if (hero) {
-                        if (this.isFirstPerson()) {
+                        if (this.escaper.isAlive() && this.isFirstPerson()) {
                             if (
                                 !(this.isKeyDownState('LEFT') && this.isKeyDownState('RIGHT')) &&
                                 (this.isKeyDownState('LEFT') || this.isKeyDownState('RIGHT'))
@@ -75,7 +79,7 @@ export class EscaperFirstPerson {
                         }
 
                         if (this.escaper.isAlive()) {
-                            const isNormal = !this.escaper.isSliding() || this.escaper.getSlideMovePerPeriod() > 0
+                            const isNormal = !this.escaper.isSliding() || this.escaper.getSlideMovePerPeriod() >= 0
 
                             SetCameraTargetControllerNoZForPlayer(player, hero, 0, 0, true)
                             SetCameraFieldForPlayer(player, CAMERA_FIELD_ANGLE_OF_ATTACK, 310, 0)
@@ -84,11 +88,9 @@ export class EscaperFirstPerson {
                             SetCameraFieldForPlayer(
                                 player,
                                 CAMERA_FIELD_ZOFFSET,
-                                BlzGetUnitZ(hero) + (isNormal ? 100 : -200),
+                                GetUnitZEx(hero) + (isNormal ? 100 : -200),
                                 0
                             )
-                        } else {
-                            this.escaper.resetCamera()
                         }
                     }
                 })
@@ -132,6 +134,8 @@ export const initFirstPerson = () => {
                             .get(GetPlayerId(GetTriggerPlayer()))
                             ?.getFirstPersonHandle()
                             .setKeyDownState(key, keyDown)
+
+                        AfkMode.resetAfk(GetPlayerId(GetTriggerPlayer()))
                     },
                 ],
             })

@@ -612,6 +612,10 @@ export class Escaper {
         MessageHeroDies.DisplayDeathMessagePlayer(this.p)
         this.isHeroSelectedB = false
 
+        if (this.firstPersonHandle.isFirstPerson()) {
+            this.resetCamera()
+        }
+
         if (!this.isEscaperSecondary()) {
             ServiceManager.getService('Multiboard').increasePlayerScore(GetPlayerId(this.getPlayer()), 'deaths')
         }

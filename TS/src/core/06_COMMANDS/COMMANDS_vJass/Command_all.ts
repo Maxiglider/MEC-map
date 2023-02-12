@@ -463,22 +463,34 @@ export const initCommandAll = () => {
         },
     })
 
-    //     // DEBUG ONLY
-    //     createTimer(1, true, () => {
-    //         print(`
-    // TARGET_DISTANCE: ${GetCameraField(CAMERA_FIELD_TARGET_DISTANCE)}
-    // FARZ: ${GetCameraField(CAMERA_FIELD_FARZ)}
-    // ANGLE_OF_ATTACK: ${Rad2Deg(GetCameraField(CAMERA_FIELD_ANGLE_OF_ATTACK))}
-    // FIELD_OF_VIEW: ${Rad2Deg(GetCameraField(CAMERA_FIELD_FIELD_OF_VIEW))}
-    // ROLL: ${Rad2Deg(GetCameraField(CAMERA_FIELD_ROLL))}
-    // ROTATION: ${Rad2Deg(GetCameraField(CAMERA_FIELD_ROTATION))}
-    // ZOFFSET: ${GetCameraField(CAMERA_FIELD_ZOFFSET)}
-    // NEARZ: ${GetCameraField(CAMERA_FIELD_NEARZ)}
-    // LOCAL_PITCH: ${Rad2Deg(GetCameraField(CAMERA_FIELD_LOCAL_PITCH))}
-    // LOCAL_YAW: ${Rad2Deg(GetCameraField(CAMERA_FIELD_LOCAL_YAW))}
-    // LOCAL_ROLL: ${Rad2Deg(GetCameraField(CAMERA_FIELD_LOCAL_ROLL))}
-    //         `)
-    //     })
+    //-debugCameraField
+    registerCommand({
+        name: 'debugCameraField',
+        alias: ['dcf'],
+        group: 'all',
+        argDescription: '',
+        description: '',
+        cb: (_, escaper) => {
+            Text.P(
+                escaper.getPlayer(),
+                `
+            TARGET_DISTANCE: ${GetCameraField(CAMERA_FIELD_TARGET_DISTANCE)}
+            FARZ: ${GetCameraField(CAMERA_FIELD_FARZ)}
+            ANGLE_OF_ATTACK: ${Rad2Deg(GetCameraField(CAMERA_FIELD_ANGLE_OF_ATTACK))}
+            FIELD_OF_VIEW: ${Rad2Deg(GetCameraField(CAMERA_FIELD_FIELD_OF_VIEW))}
+            ROLL: ${Rad2Deg(GetCameraField(CAMERA_FIELD_ROLL))}
+            ROTATION: ${Rad2Deg(GetCameraField(CAMERA_FIELD_ROTATION))}
+            ZOFFSET: ${GetCameraField(CAMERA_FIELD_ZOFFSET)}
+            NEARZ: ${GetCameraField(CAMERA_FIELD_NEARZ)}
+            LOCAL_PITCH: ${Rad2Deg(GetCameraField(CAMERA_FIELD_LOCAL_PITCH))}
+            LOCAL_YAW: ${Rad2Deg(GetCameraField(CAMERA_FIELD_LOCAL_YAW))}
+            LOCAL_ROLL: ${Rad2Deg(GetCameraField(CAMERA_FIELD_LOCAL_ROLL))}
+                    `
+            )
+
+            return true
+        },
+    })
 
     //-resetCamera(rc)   --> put the camera back like chosen field
     registerCommand({
