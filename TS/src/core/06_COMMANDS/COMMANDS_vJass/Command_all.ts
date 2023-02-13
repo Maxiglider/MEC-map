@@ -1182,6 +1182,24 @@ export const initCommandAll = () => {
         },
     })
 
+    //-lockCamHeight(lch)
+    registerCommand({
+        name: 'lockCamHeight',
+        alias: ['lch'],
+        group: 'all',
+        argDescription: 'on | off',
+        description: '',
+        cb: ({ nbParam, param1 }, escaper) => {
+            if (nbParam === 1 && IsBoolString(param1)) {
+                escaper.resetCamera()
+                escaper.toggleLockCamHeight(S2B(param1))
+                Text.mkP(escaper.getPlayer(), `Camera height ${S2B(param1) ? 'locked' : 'unlocked'}`)
+            }
+
+            return true
+        },
+    })
+
     //-followMouse <boolean>
     registerCommand({
         name: 'followMouse',
@@ -1301,7 +1319,7 @@ export const initCommandAll = () => {
     //-showNames <boolean>
     registerCommand({
         name: 'showNames',
-        alias: [],
+        alias: ['sn'],
         group: 'all',
         argDescription: '<boolean>',
         description: '',

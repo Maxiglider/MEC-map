@@ -39,6 +39,7 @@ import { MakeSetUnitMonsterType } from 'core/05_MAKE_STRUCTURES/Make_set_unit_pr
 import { MakeSetUnitTeleportPeriod } from 'core/05_MAKE_STRUCTURES/Make_set_unit_properties/MakeSetUnitTeleportPeriod'
 import { AfkMode } from 'core/08_GAME/Afk_mode/Afk_mode'
 import { ServiceManager } from 'Services'
+import { GetUnitZEx } from 'Utils/LocationUtils'
 import { Timer } from 'w3ts'
 import { getUdgEscapers, getUdgLevels, getUdgTerrainTypes } from '../../../../globals'
 import { createEvent, createTimer } from '../../../Utils/mapUtils'
@@ -180,6 +181,7 @@ export class Escaper {
 
     private lockCamTarget: Escaper | null = null
     private lockCamRotation: Timer | null = null
+    private lockCamHeight: Timer | null = null
 
     public hideLeaderboard = false
 
@@ -1843,6 +1845,7 @@ export class Escaper {
 
     toggleLockCamRotation = (lockCamRotation: boolean) => {
         this.lockCamRotation?.destroy()
+        this.lockCamRotation = null
 
         if (lockCamRotation) {
             this.lockCamRotation = createTimer(0.001, true, () => {
@@ -1851,6 +1854,21 @@ export class Escaper {
             })
         }
     }
+
+    toggleLockCamHeight = (lockCamHeight: boolean) => {
+        this.lockCamHeight?.destroy()
+        this.lockCamHeight = null
+
+        if (lockCamHeight) {
+            this.lockCamHeight = createTimer(0.001, true, () => {
+                if (this.hero && !this.firstPersonHandle.isFirstPerson()) {
+                    SetCameraFieldForPlayer(this.getPlayer(), CAMERA_FIELD_ZOFFSET, GetUnitZEx(this.hero), 0)
+                }
+            })
+        }
+    }
+
+    isLockCamHeight = () => !!this.lockCamHeight
 
     setGumTerrain = (terrainType: TerrainType) => {
         this.gumTerrain = terrainType

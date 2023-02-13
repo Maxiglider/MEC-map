@@ -80,17 +80,13 @@ export class EscaperFirstPerson {
 
                         if (this.escaper.isAlive()) {
                             const isNormal = !this.escaper.isSliding() || this.escaper.getSlideMovePerPeriod() >= 0
+                            const offsetZ = this.escaper.isLockCamHeight() ? GetUnitZEx(hero) : 0
 
                             SetCameraTargetControllerNoZForPlayer(player, hero, 0, 0, true)
                             SetCameraFieldForPlayer(player, CAMERA_FIELD_ANGLE_OF_ATTACK, 310, 0)
                             SetCameraFieldForPlayer(player, CAMERA_FIELD_FIELD_OF_VIEW, 1500, 0)
                             SetCameraFieldForPlayer(player, CAMERA_FIELD_ROTATION, GetUnitFacing(hero), 0) // Using the duration argument can bug out the camera and gets it stuck to keep turning..
-                            SetCameraFieldForPlayer(
-                                player,
-                                CAMERA_FIELD_ZOFFSET,
-                                GetUnitZEx(hero) + (isNormal ? 100 : -200),
-                                0
-                            )
+                            SetCameraFieldForPlayer(player, CAMERA_FIELD_ZOFFSET, offsetZ + (isNormal ? 100 : -200), 0)
                         }
                     }
                 })

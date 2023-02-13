@@ -10,6 +10,9 @@ import { MEC_core_API } from './core/API/MEC_core_API'
 import { initializers } from './core/Init/initializers'
 import { PROD } from './env'
 
+// Changelog
+// New cmd: lockCamHeight
+
 const tsMain = () => {
     ServiceManager.registerServices({
         Lives: initLives,
