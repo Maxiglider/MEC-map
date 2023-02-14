@@ -695,6 +695,10 @@ export class Escaper {
             return
         }
 
+        if (this.isLockCamTarget()) {
+            return
+        }
+
         // Used in portalMob so not really on revive but close enough
         if (this.panCameraOnRevive === 'none') {
             return
