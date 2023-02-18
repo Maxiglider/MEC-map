@@ -40,6 +40,7 @@ import { MakeSetUnitTeleportPeriod } from 'core/05_MAKE_STRUCTURES/Make_set_unit
 import { AfkMode } from 'core/08_GAME/Afk_mode/Afk_mode'
 import { ServiceManager } from 'Services'
 import { GetUnitZEx } from 'Utils/LocationUtils'
+import { createPoint, IPoint } from 'Utils/Point'
 import { Timer } from 'w3ts'
 import { getUdgEscapers, getUdgLevels, getUdgTerrainTypes } from '../../../../globals'
 import { createEvent, createTimer } from '../../../Utils/mapUtils'
@@ -214,6 +215,8 @@ export class Escaper {
     //mouse position updated when a trigger dependant of mouse movement is being used
     mouseX = 0
     mouseY = 0
+
+    lastPos: IPoint | undefined
 
     //others transparency
     private static othersTransparency: number | null = null
@@ -577,9 +580,24 @@ export class Escaper {
         return IsTriggerEnabled(this.checkTerrain)
     }
 
+    setLastPos = () => {
+        if (!this.hero) return
+
+        const lastX = GetUnitX(this.hero)
+        const lastY = GetUnitY(this.hero)
+
+        if (!this.lastPos || (this.lastPos[0] !== lastX && this.lastPos[1] !== lastY)) {
+            this.lastPos = createPoint(lastX, lastY)
+        }
+    }
+
     //move methods
-    moveHero(x: number, y: number) {
+    moveHero(x: number, y: number, updateLast = true) {
         if (this.hero) {
+            if (updateLast) {
+                this.setLastPos()
+            }
+
             SetUnitX(this.hero, x)
             SetUnitY(this.hero, y)
         }
@@ -650,6 +668,7 @@ export class Escaper {
             return false
         }
 
+        this.setLastPos()
         ReviveHero(this.hero, x, y, SHOW_REVIVE_EFFECTS)
         SetUnitX(this.invisUnit, x)
         SetUnitY(this.invisUnit, y)
@@ -901,8 +920,9 @@ export class Escaper {
 
             if (this.hero && this.isAlive()) {
                 const currentTerrainType = getUdgTerrainTypes().getTerrainType(GetUnitX(this.hero), GetUnitY(this.hero))
+
                 if (currentTerrainType instanceof TerrainTypeSlide) {
-                    this.setSlideSpeed(currentTerrainType.getSlideSpeed())
+                    this.setSlideSpeed((this.getSlideMirror() ? -1 : 1) * currentTerrainType.getSlideSpeed())
                 }
             }
 

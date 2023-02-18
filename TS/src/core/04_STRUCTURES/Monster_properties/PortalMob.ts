@@ -117,8 +117,8 @@ export class PortalMob {
         }
 
         StopUnit(hero)
-        SetUnitX(hero, GetUnitX(targetMob.u))
-        SetUnitY(hero, GetUnitY(targetMob.u))
+        escaper.moveHero(GetUnitX(targetMob.u), GetUnitY(targetMob.u))
+
         SetUnitFlyHeight(hero, GetUnitFlyHeight(targetMob.u), 0)
 
         escaper.setLastZ(BlzGetUnitZ(hero))

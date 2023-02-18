@@ -343,6 +343,27 @@ export const initExecuteCommandCheat = () => {
         },
     })
 
+    //-back
+    registerCommand({
+        name: 'back',
+        alias: ['b'],
+        group: 'cheat',
+        argDescription: '',
+        description: 'Teleports you to your previous location',
+        cb: ({ noParam }, escaper) => {
+            if (noParam) {
+                if (escaper.lastPos) {
+                    escaper.moveHero(escaper.lastPos[0], escaper.lastPos[1])
+                    escaper.coopReviveHero()
+                }
+
+                return true
+            }
+
+            return true
+        },
+    })
+
     //-reviveTo(rto) <Pcolor>   --> revives your hero to an other hero, with the same facing angle
     registerCommand({
         name: 'reviveTo',
@@ -371,22 +392,16 @@ export const initExecuteCommandCheat = () => {
             const x = GetUnitX(targetHero)
             const y = GetUnitY(targetHero)
 
-            SetUnitX(hero, x)
-            SetUnitY(hero, y)
-
+            escaper.moveHero(x, y)
             escaper.turnInstantly(GetUnitFacing(targetHero))
             escaper.coopReviveHero()
 
             const escaperSecond = GetMirrorEscaper(escaper)
             if (escaperSecond) {
-                const heroSecond = escaperSecond.getHero()
-                if (heroSecond) {
-                    if (escaperSecond.isAlive()) {
-                        SetUnitX(heroSecond, x)
-                        SetUnitY(heroSecond, y)
-                    } else {
-                        escaperSecond.revive(x, y, 'coop')
-                    }
+                if (escaperSecond.isAlive()) {
+                    escaperSecond.moveHero(x, y)
+                } else {
+                    escaperSecond.revive(x, y, 'coop')
                 }
             }
 
@@ -423,22 +438,16 @@ export const initExecuteCommandCheat = () => {
             const x = GetUnitX(hero)
             const y = GetUnitY(hero)
 
-            SetUnitX(targetHero, x)
-            SetUnitY(targetHero, y)
-
+            targetEscaper.moveHero(x, y)
             targetEscaper.turnInstantly(GetUnitFacing(hero))
             targetEscaper.coopReviveHero()
 
             const escaperSecond = GetMirrorEscaper(targetEscaper)
             if (escaperSecond) {
-                const heroSecond = escaperSecond.getHero()
-                if (heroSecond) {
-                    if (escaperSecond.isAlive()) {
-                        SetUnitX(heroSecond, x)
-                        SetUnitY(heroSecond, y)
-                    } else {
-                        escaperSecond.revive(x, y, 'coop')
-                    }
+                if (escaperSecond.isAlive()) {
+                    escaperSecond.moveHero(x, y)
+                } else {
+                    escaperSecond.revive(x, y, 'coop')
                 }
             }
 

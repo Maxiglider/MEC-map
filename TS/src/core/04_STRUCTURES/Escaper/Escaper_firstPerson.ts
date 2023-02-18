@@ -73,8 +73,7 @@ export class EscaperFirstPerson {
                                 const newX = GetUnitX(hero) + fwd * Cos(angle)
                                 const newY = GetUnitY(hero) + fwd * Sin(angle)
 
-                                SetUnitX(hero, newX)
-                                SetUnitY(hero, newY)
+                                this.escaper.moveHero(newX, newY, false)
                             }
                         }
 

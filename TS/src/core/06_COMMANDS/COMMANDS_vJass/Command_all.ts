@@ -1234,7 +1234,7 @@ export const initCommandAll = () => {
     //-mirror <boolean>
     registerCommand({
         name: 'mirror',
-        alias: [],
+        alias: ['m', 'reverse'],
         group: 'all',
         argDescription: '<boolean>',
         description: 'mirrors the camera',

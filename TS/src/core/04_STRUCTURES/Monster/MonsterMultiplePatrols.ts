@@ -1,4 +1,4 @@
-import {arrayValuesRound, GetLocDist} from 'core/01_libraries/Basic_functions'
+import { arrayValuesRound, GetLocDist } from 'core/01_libraries/Basic_functions'
 import { PATROL_DISTANCE_MIN } from 'core/01_libraries/Constants'
 import { udg_monsters } from '../../../../globals'
 import { errorHandler } from '../../../Utils/mapUtils'
@@ -227,7 +227,7 @@ export class MonsterMultiplePatrols extends Monster {
 
     toJson() {
         const output = super.toJson()
-        if(output){
+        if (output) {
             output['mode'] = this.sens > 0 ? 'string' : 'normal'
             output['xArr'] = arrayValuesRound(this.x)
             output['yArr'] = arrayValuesRound(this.y)
