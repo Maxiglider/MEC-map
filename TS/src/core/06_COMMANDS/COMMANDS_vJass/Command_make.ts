@@ -1,5 +1,5 @@
 import { String2Ascii } from 'core/01_libraries/Ascii'
-import { IsBoolString, S2B, tileset2tilesetString } from 'core/01_libraries/Basic_functions'
+import { convertTextToAngle, IsBoolString, S2B, tileset2tilesetString } from 'core/01_libraries/Basic_functions'
 import {
     DEFAULT_MONSTER_SPEED,
     HERO_SLIDE_SPEED,
@@ -2192,27 +2192,27 @@ export const initExecuteCommandMake = () => {
         name: 'createStart',
         alias: ['crs'],
         group: 'make',
-        argDescription: '[next(n)]',
+        argDescription: '[current(c)|next(n)] [facing]',
         description:
             'create the start (a rectangle formed with two clicks) of the current level or the next one if specified',
-        cb: ({ nbParam, param1 }, escaper) => {
-            if (!(nbParam <= 1)) {
-                return true
-            }
-
-            let b = false
+        cb: ({ nbParam, param1, param2 }, escaper) => {
+            let forNext = false
+            let facing = (param2 ? convertTextToAngle(param2) : undefined) || undefined
 
             //checkParam1
-            if (nbParam === 1) {
-                if (!(param1 === 'next' || param1 === 'n')) {
-                    Text.erP(escaper.getPlayer(), 'param1 should be "next" or "n"')
+            if (nbParam === 1 || nbParam === 2) {
+                if (!(param1 === 'next' || param1 === 'n' || param1 === 'current' || param1 === 'c')) {
+                    Text.erP(escaper.getPlayer(), 'param1 should be "next" or "n" or "current" or "c"')
                     return true
                 }
-                b = true
+
+                if (param1 === 'next' || param1 === 'n') {
+                    forNext = true
+                }
             } else {
-                b = false
+                forNext = false
             }
-            escaper.makeCreateStart(b) //b signifie si le "Start" est créé pour le niveau suivant (sinon pour le niveau en cours de mapping pour l'escaper)
+            escaper.makeCreateStart(forNext, facing) //b signifie si le "Start" est créé pour le niveau suivant (sinon pour le niveau en cours de mapping pour l'escaper)
             Text.mkP(escaper.getPlayer(), 'start making on')
             return true
         },
@@ -3127,7 +3127,9 @@ export const initExecuteCommandMake = () => {
         argDescription: '<angle> <speed>',
         description: '',
         cb: ({ param1, param2 }, escaper) => {
-            if (!(S2I(param1) > 0 && S2I(param1) <= 360)) {
+            const angle = convertTextToAngle(param1)
+
+            if (!angle) {
                 Text.erP(escaper.getPlayer(), 'Angle must be > 0 and <= 360')
                 return true
             }
@@ -3139,7 +3141,7 @@ export const initExecuteCommandMake = () => {
 
             Text.mkP(escaper.getPlayer(), 'Static slide creation on. Click for regions')
 
-            escaper.makeCreateStaticSlide(S2I(param1), S2I(param2))
+            escaper.makeCreateStaticSlide(angle, S2I(param2))
 
             return true
         },
@@ -3189,12 +3191,14 @@ export const initExecuteCommandMake = () => {
         argDescription: '<angle>',
         description: '',
         cb: ({ param1 }, escaper) => {
-            if (!(S2I(param1) > 0 && S2I(param1) <= 360)) {
+            const angle = convertTextToAngle(param1)
+
+            if (!angle) {
                 Text.erP(escaper.getPlayer(), 'Angle must be > 0 and <= 360')
                 return true
             }
 
-            escaper.makeSetStaticSlideAngle(S2R(param1))
+            escaper.makeSetStaticSlideAngle(angle)
             Text.mkP(escaper.getPlayer(), 'Click on the staticSlide to apply')
             return true
         },

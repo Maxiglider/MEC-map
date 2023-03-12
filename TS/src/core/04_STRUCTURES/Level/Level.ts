@@ -125,15 +125,15 @@ export class Level {
         return this.start ? this.start.getRandomY() : 0
     }
 
-    newStart(x1: number, y1: number, x2: number, y2: number) {
+    newStart(x1: number, y1: number, x2: number, y2: number, facing?: number) {
         this.start && this.start.destroy()
-        this.start = new Start(x1, y1, x2, y2)
+        this.start = new Start(x1, y1, x2, y2, facing)
 
         this.updateDebugRegions()
     }
 
     newStartFromJson(data: { [x: string]: number }) {
-        this.newStart(data.minX, data.minY, data.maxX, data.maxY)
+        this.newStart(data.minX, data.minY, data.maxX, data.maxY, data.facing)
     }
 
     newEnd(x1: number, y1: number, x2: number, y2: number) {
@@ -252,6 +252,12 @@ export class Level {
                     monsterSpawn.getMaxX(),
                     monsterSpawn.getMaxY()
                 )
+
+                // if (monsterSpawn.multiRegionPatrols) {
+                //     for (let i = 0; i < monsterSpawn.x1.length; i++) {
+                //         this.drawRegion(monsterSpawn.x1[i], monsterSpawn.y1[i], monsterSpawn.x2[i], monsterSpawn.y2[i])
+                //     }
+                // }
             }
 
             // for (const [_, monster] of pairs(this.monsters.getAll())) {

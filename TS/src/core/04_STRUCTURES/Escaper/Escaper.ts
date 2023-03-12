@@ -198,6 +198,7 @@ export class Escaper {
     private textTag: texttag | null = null
     private textTagTimer: Timer | null = null
     private panCameraOnRevive: 'coop' | 'all' | 'none' = 'coop'
+    public panCameraOnPortal = true
 
     private displayName: string
 
@@ -211,6 +212,8 @@ export class Escaper {
 
     private canClick: boolean
     private canClickTrigger: trigger
+
+    public moveCamDistance = 2048
 
     //mouse position updated when a trigger dependant of mouse movement is being used
     mouseX = 0
@@ -718,7 +721,6 @@ export class Escaper {
             return
         }
 
-        // Used in portalMob so not really on revive but close enough
         if (this.panCameraOnRevive === 'none') {
             return
         }
@@ -726,7 +728,7 @@ export class Escaper {
         const xHero = GetUnitX(this.hero)
         const yHero = GetUnitY(this.hero)
 
-        const FIELD = 1500
+        const FIELD = this.moveCamDistance
         const minX = GetCameraTargetPositionX() - FIELD / 2
         const minY = GetCameraTargetPositionY() - FIELD / 2
         const maxX = GetCameraTargetPositionX() + FIELD / 2
@@ -744,6 +746,9 @@ export class Escaper {
         if (!this.isEscaperSecondary()) {
             GetMirrorEscaper(this)?.reviveAtStart()
         }
+
+        const startFacing = getUdgLevels().getCurrentLevel(this).getStart()?.getFacing()
+        startFacing && this.turnInstantly(startFacing)
 
         return this.revive(x, y)
     }
@@ -1705,9 +1710,9 @@ export class Escaper {
         if (this.hero) this.make = new MakeExchangeTerrains(this.hero)
     }
 
-    makeCreateStart(forNext: boolean) {
+    makeCreateStart(forNext: boolean, facing?: number) {
         this.destroyMake()
-        if (this.hero) this.make = new MakeStart(this.hero, forNext)
+        if (this.hero) this.make = new MakeStart(this.hero, forNext, facing)
     }
 
     makeCreateEnd = () => {
@@ -1939,7 +1944,9 @@ export class Escaper {
 
     setIgnoreDeathMessages = (ignoreDeathMessages: boolean) => (this.ignoreDeathMessages = ignoreDeathMessages)
 
-    setPanCameraOnRevive = (panCameraOnRevive: 'coop' | 'all' | 'none') => (this.panCameraOnRevive = panCameraOnRevive)
+    setPanCameraOnRevive = (panCameraOnRevive: 'coop' | 'all' | 'none') => {
+        this.panCameraOnRevive = panCameraOnRevive
+    }
 
     updateTextTagPos: (this: void) => void = () => {
         if (!this.hero || !this.textTag) {

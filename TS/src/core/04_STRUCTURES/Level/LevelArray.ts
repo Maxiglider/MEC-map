@@ -13,7 +13,7 @@ import { Monster } from '../Monster/Monster'
 import type { MonsterArray } from '../Monster/MonsterArray'
 import { MonsterMultiplePatrols } from '../Monster/MonsterMultiplePatrols'
 import { MonsterNoMove } from '../Monster/MonsterNoMove'
-import { MonsterSimplePatrol } from '../Monster/MonsterSimplePatrol'
+import { createMonsterSmartPatrol } from '../Monster/MonsterSimplePatrol'
 import { MonsterTeleport } from '../Monster/MonsterTeleport'
 import type { MonsterType } from '../Monster/MonsterType'
 import type { MonsterSpawnArray } from '../MonsterSpawn/MonsterSpawnArray'
@@ -326,7 +326,7 @@ export class LevelArray extends BaseArray<Level> {
                             if (m.monsterClassName == 'MonsterNoMove') {
                                 monster = new MonsterNoMove(mt, m.x, m.y, m.angle, m.id)
                             } else if (m.monsterClassName == 'MonsterSimplePatrol') {
-                                monster = new MonsterSimplePatrol(mt, m.x1, m.y1, m.x2, m.y2, m.id)
+                                monster = createMonsterSmartPatrol(mt, m.x1, m.y1, m.x2, m.y2, m.id)
                             } else if (m.monsterClassName == 'MonsterMultiplePatrols') {
                                 for (const [n, x] of pairs(m.xArr)) {
                                     const y = m.yArr[n]
@@ -549,7 +549,7 @@ export class LevelArray extends BaseArray<Level> {
                     }
 
                     terrain.setSlideSpeed(Math.max(800, terrain.getSlideSpeed()))
-                    terrain.setRotationSpeed(Math.max(1.2, terrain.getRotationSpeed()))
+                    terrain.setRotationSpeed(Math.max(1.34, terrain.getRotationSpeed()))
                 }
             }
         } else {

@@ -3,7 +3,7 @@ import { getUdgEscapers, getUdgLevels, getUdgMonsterTypes, getUdgTerrainTypes, g
 import { errorHandler } from '../../Utils/mapUtils'
 import { SetMeteorEffect } from '../04_STRUCTURES/Escaper/Escaper'
 import { Hero2Escaper, IsHero } from '../04_STRUCTURES/Escaper/Escaper_functions'
-import { MonsterSimplePatrol } from '../04_STRUCTURES/Monster/MonsterSimplePatrol'
+import { createMonsterSmartPatrol, MonsterSimplePatrol } from '../04_STRUCTURES/Monster/MonsterSimplePatrol'
 import { makingRightsToAll } from '../06_COMMANDS/Rights/manage_rights'
 import { LoadMapFromCache } from '../07_TRIGGERS/Load_map_from_gamecache/LoadMapFromCache'
 import { Gravity } from '../07_TRIGGERS/Slide_and_CheckTerrain_triggers/Gravity'
@@ -33,7 +33,7 @@ export const MEC_core_API = {
 
     //constructors
     newMonsterSimplePatrol: (...args: ConstructorParameters<typeof MonsterSimplePatrol>) => {
-        return new MonsterSimplePatrol(...args)
+        return createMonsterSmartPatrol(...args)
     },
 
     //hooks

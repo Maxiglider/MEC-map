@@ -24,7 +24,7 @@ abstract class RectInterface {
         RemoveRect(this.r)
     }
 
-    toJson = () => {
+    toJson(): false | { [x: string]: any } {
         const output = ObjectHandler.getNewObject<any>()
 
         output['minX'] = this.minX
@@ -37,8 +37,12 @@ abstract class RectInterface {
 }
 
 export class Start extends RectInterface {
-    constructor(x1: number, y1: number, x2: number, y2: number) {
+    facing?: number
+
+    constructor(x1: number, y1: number, x2: number, y2: number, facing?: number) {
         super(RMinBJ(x1, x2), RMinBJ(y1, y2), RMaxBJ(x1, x2), RMaxBJ(y1, y2))
+
+        this.facing = facing
     }
 
     getRandomX = () => {
@@ -55,6 +59,20 @@ export class Start extends RectInterface {
 
     getCenterY = () => {
         return GetRectCenterY(this.r)
+    }
+
+    getFacing = () => this.facing
+
+    toJson = () => {
+        const output = super.toJson()
+
+        if (output) {
+            if (this.facing) {
+                output['facing'] = this.facing
+            }
+        }
+
+        return output
     }
 }
 

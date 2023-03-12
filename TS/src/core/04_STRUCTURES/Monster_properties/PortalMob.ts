@@ -154,9 +154,11 @@ export class PortalMob {
             )
 
         // Move cam
-        escaper.moveCameraToHeroIfNecessary()
+        if (escaper.panCameraOnPortal) {
+            escaper.moveCameraToHeroIfNecessary()
 
-        // TODO; SECONDARYHERO?
+            // TODO; SECONDARYHERO?
+        }
     }
 
     toJson = () => {

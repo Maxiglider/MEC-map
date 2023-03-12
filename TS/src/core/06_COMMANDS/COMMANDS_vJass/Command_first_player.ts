@@ -179,7 +179,7 @@ export const initExecuteCommandRed = () => {
 
                         e.isSpeedEdit = true
                         e.absoluteSlideSpeed(800, true)
-                        e.absoluteRotationSpeed(1.244)
+                        e.absoluteRotationSpeed(1.34)
                     } else {
                         Text.P(escaper.getPlayer(), 'Speed disabled')
 

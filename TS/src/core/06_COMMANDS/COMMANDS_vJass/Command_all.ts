@@ -1297,19 +1297,39 @@ export const initCommandAll = () => {
         name: 'panCameraOnRevive',
         alias: ['pcor'],
         group: 'all',
-        argDescription: '<coop | all | none>',
-        description: 'pan camera on revive',
-        cb: ({ nbParam, param1 }, escaper) => {
-            if (nbParam != 1) {
-                return true
-            }
-
+        argDescription: '<coop | all | none> [distance]',
+        description: 'pan camera on revive, default distance = 2048',
+        cb: ({ param1, param2 }, escaper) => {
             if (param1 !== 'coop' && param1 !== 'all' && param1 !== 'none') {
                 Text.mkP(escaper.getPlayer(), `param1 must be: coop | all | none`)
                 return true
             }
 
+            if (S2I(param2) !== 0) {
+                escaper.moveCamDistance = S2I(param2)
+            }
+
             escaper.setPanCameraOnRevive(param1)
+            Text.mkP(escaper.getPlayer(), `Pan camera on revive set to: ${param1} at ${escaper.moveCamDistance} `)
+
+            return true
+        },
+    })
+
+    //-panCameraOnPortal(pcop) <boolean>
+    registerCommand({
+        name: 'panCameraOnPortal',
+        alias: ['pcop'],
+        group: 'all',
+        argDescription: '<boolean>',
+        description: 'pan camera on portal',
+        cb: ({ param1 }, escaper) => {
+            if (!IsBoolString(param1)) {
+                Text.mkP(escaper.getPlayer(), 'Invalid boolean')
+                return true
+            }
+
+            escaper.panCameraOnPortal = S2B(param1)
             Text.mkP(escaper.getPlayer(), `Pan camera on revive set to: ${param1}`)
 
             return true

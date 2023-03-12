@@ -1,7 +1,8 @@
 import { GetLocDist } from 'core/01_libraries/Basic_functions'
 import { Text } from 'core/01_libraries/Text'
 import { PATROL_DISTANCE_MIN } from '../../01_libraries/Constants'
-import { MonsterSimplePatrol } from '../../04_STRUCTURES/Monster/MonsterSimplePatrol'
+import { Monster } from '../../04_STRUCTURES/Monster/Monster'
+import { createMonsterSmartPatrol } from '../../04_STRUCTURES/Monster/MonsterSimplePatrol'
 import { MonsterType } from '../../04_STRUCTURES/Monster/MonsterType'
 import { IsTerrainTypeOfKind } from '../../04_STRUCTURES/TerrainType/Terrain_type_functions'
 import { MakeOneByOneOrTwoClicks } from '../Make/MakeOneByOneOrTwoClicks'
@@ -49,7 +50,7 @@ export class MakeMonsterSimplePatrol extends MakeOneByOneOrTwoClicks {
 
     doActions = () => {
         if (super.doBaseActions()) {
-            let monster: MonsterSimplePatrol | null = null
+            let monster: Monster | null = null
             let x1: number = 0
             let y1: number = 0
             let x2: number = 0
@@ -65,7 +66,7 @@ export class MakeMonsterSimplePatrol extends MakeOneByOneOrTwoClicks {
                         Text.erP(this.makerOwner, 'Too close to the start location !')
                         return
                     } else {
-                        monster = new MonsterSimplePatrol(
+                        monster = createMonsterSmartPatrol(
                             this.getMonsterType(),
                             this.lastX,
                             this.lastY,
@@ -187,7 +188,7 @@ export class MakeMonsterSimplePatrol extends MakeOneByOneOrTwoClicks {
                 y2 = this.orderY + dist * SinBJ(angle)
 
                 //the two locations were found, creating monster
-                monster = new MonsterSimplePatrol(this.getMonsterType(), x1, y1, x2, y2)
+                monster = createMonsterSmartPatrol(this.getMonsterType(), x1, y1, x2, y2)
             }
 
             if (monster) {

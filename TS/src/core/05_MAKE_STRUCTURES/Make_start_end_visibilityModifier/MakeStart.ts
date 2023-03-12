@@ -1,24 +1,24 @@
-import {MakeOneByOneOrTwoClicks} from "../Make/MakeOneByOneOrTwoClicks";
-import {Level} from "../../04_STRUCTURES/Level/Level";
-import { getUdgLevels } from "../../../../globals"
-
-import {Text} from "../../01_libraries/Text";
-
+import { getUdgLevels } from '../../../../globals'
+import { Text } from '../../01_libraries/Text'
+import { Level } from '../../04_STRUCTURES/Level/Level'
+import { MakeOneByOneOrTwoClicks } from '../Make/MakeOneByOneOrTwoClicks'
 
 export class MakeStart extends MakeOneByOneOrTwoClicks {
     private forNextB: boolean //à true si on veut créer le start du niveau suivant
+    private facing?: number
 
-    constructor(maker: unit, forNext: boolean) {
-        super(maker, 'startCreate', "", [""])
+    constructor(maker: unit, forNext: boolean, facing?: number) {
+        super(maker, 'startCreate', '', [''])
         this.forNextB = forNext
+        this.facing = facing
     }
 
     forNext = (): boolean => {
         return this.forNextB
     }
-    
+
     doActions = () => {
-        if(super.doBaseActions()){
+        if (super.doBaseActions()) {
             let level: Level | null
 
             if (this.isLastLocSavedUsed()) {
@@ -36,7 +36,7 @@ export class MakeStart extends MakeOneByOneOrTwoClicks {
                     }
                 }
 
-                level.newStart(this.lastX, this.lastY, this.orderX, this.orderY)
+                level.newStart(this.lastX, this.lastY, this.orderX, this.orderY, this.facing)
                 Text.mkP(this.makerOwner, 'start made for level ' + I2S(level.getId()))
 
                 this.escaper.destroyMake()

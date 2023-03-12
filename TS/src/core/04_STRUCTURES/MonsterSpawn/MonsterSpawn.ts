@@ -48,6 +48,16 @@ export class MonsterSpawn {
     private unspawnReg?: region
     monsters?: group
 
+    public multiRegionPatrols = false
+    private multiRegionDx: number = 0
+    private multiRegionDy: number = 0
+    public x1: number[] = []
+    public y1: number[] = []
+    public x2: number[] = []
+    public y2: number[] = []
+    private r: region[] = []
+    private t: trigger[] = []
+
     private fixedSpawnOffset: number | undefined
     private fixedSpawnOffsetBounce = false
     private fixedSpawnOffsetMirrored = false
@@ -82,10 +92,10 @@ export class MonsterSpawn {
         this.mt = mt
         this.sens = sens
         this.frequence = frequence
-        this.minX = RMinBJ(x1, x2)
-        this.minY = RMinBJ(y1, y2)
-        this.maxX = RMaxBJ(x1, x2)
-        this.maxY = RMaxBJ(y1, y2)
+        this.minX = Math.round(RMinBJ(x1, x2))
+        this.minY = Math.round(RMinBJ(y1, y2))
+        this.maxX = Math.round(RMaxBJ(x1, x2))
+        this.maxY = Math.round(RMaxBJ(y1, y2))
     }
 
     getId() {
@@ -109,9 +119,18 @@ export class MonsterSpawn {
         this._active = false
         this.initialDelayTimer?.pause().destroy()
 
-        if (this.unspawnReg) {
-            RemoveRegion(this.unspawnReg)
-            delete this.unspawnReg
+        if (this.multiRegionPatrols) {
+            for (let i = 0; i < this.x1.length; i++) {
+                DestroyTrigger(this.t[i])
+                RemoveRegion(this.r[i])
+
+                delete this.t[i]
+                delete this.r[i]
+                delete this.x1[i]
+                delete this.y1[i]
+                delete this.x2[i]
+                delete this.y2[i]
+            }
         }
 
         if (this.tSpawn) {
@@ -132,7 +151,6 @@ export class MonsterSpawn {
     }
 
     private createUnspawnReg = () => {
-        let r: rect
         let x1: number
         let y1: number
         let x2: number
@@ -160,11 +178,80 @@ export class MonsterSpawn {
             y1 = this.maxY
             y2 = this.maxY
         }
-        r = Rect(x1, y1, x2, y2)
 
+        const r = Rect(x1, y1, x2, y2)
         this.unspawnReg = CreateRegion()
         RegionAddRect(this.unspawnReg, r)
         RemoveRect(r)
+
+        const maxDistance = Math.sqrt(
+            Math.pow(Math.abs(this.minX - this.maxX), 2) + Math.pow(Math.abs(this.minY - this.maxY), 2)
+        )
+        const maxTiles = 6 * 128
+        this.multiRegionPatrols = maxDistance >= maxTiles
+
+        if (this.multiRegionPatrols) {
+            const amountOfPatrols = Math.ceil(maxDistance / maxTiles)
+            const dx = Math.round((this.minX - this.maxX) / amountOfPatrols)
+            const dy = Math.round((this.minY - this.maxY) / amountOfPatrols)
+
+            this.multiRegionDx = dx
+            this.multiRegionDy = dy
+
+            // Ignore first and last
+            for (let n = 0; n < amountOfPatrols - 1; n++) {
+                const ddx = (n + 1) * dx
+                const ddy = (n + 1) * dy
+
+                const calcX = x1 === x2
+                const calcY = y1 === y2
+
+                const nx1 = this.minX - (calcX ? ddx : 0)
+                const ny1 = this.minY - (calcY ? ddy : 0)
+                const nx2 = calcX ? nx1 - 16 : this.maxX
+                const ny2 = calcY ? ny1 - 16 : this.maxY
+
+                const r = Rect(nx1, ny1, nx2, ny2)
+                const reg = CreateRegion()
+                RegionAddRect(reg, r)
+                RemoveRect(r)
+
+                const t = CreateTrigger()
+                MonsterSpawn.anyTrigId2MonsterSpawn.set(GetHandleId(t), this)
+                TriggerRegisterEnterRegion(t, reg, null)
+                TriggerAddAction(t, () => {
+                    const ms = MonsterSpawn.anyTrigId2MonsterSpawn.get(GetHandleId(GetTriggeringTrigger()))
+                    if (ms && ms.monsters && IsUnitInGroup(GetTriggerUnit(), ms.monsters)) {
+                        const u = GetTriggerUnit()
+
+                        let x = Math.round(GetUnitX(u))
+                        let y = Math.round(GetUnitY(u))
+
+                        const nddx = (n + 2) * dx
+                        const nddy = (n + 2) * dy
+
+                        if (this.sens === 'leftToRight') {
+                            x = this.minX - nddx
+                        } else if (this.sens === 'upToDown') {
+                            y = this.maxY + nddy
+                        } else if (this.sens === 'rightToLeft') {
+                            x = this.maxX + nddx
+                        } else {
+                            y = this.minY - nddy
+                        }
+
+                        IssuePointOrder(u, 'move', x, y)
+                    }
+                })
+
+                this.x1[n] = nx1
+                this.y1[n] = ny1
+                this.x2[n] = nx2
+                this.y2[n] = ny2
+                this.r[n] = reg
+                this.t[n] = t
+            }
+        }
     }
 
     private MonsterStartMovement: (this: void) => void = () => {
@@ -330,7 +417,7 @@ export class MonsterSpawn {
                 return spawnVal
             }
         } else {
-            return GetRandomReal(a, b)
+            return GetRandomInt(a, b)
         }
     }
 
@@ -349,24 +436,40 @@ export class MonsterSpawn {
             y1 = this.calcValOffset(this.minY, this.maxY, spawnIndex, spawnAmount)
             y2 = y1
             facing = 0
+
+            if (this.multiRegionPatrols) {
+                x2 = this.minX - this.multiRegionDx + 16
+            }
         } else if (this.sens === 'upToDown') {
             x1 = this.calcValOffset(this.minX, this.maxX, spawnIndex, spawnAmount)
             x2 = x1
             y1 = this.maxY
             y2 = this.minY - DECALAGE_UNSPAWN
             facing = 270
+
+            if (this.multiRegionPatrols) {
+                y2 = this.maxY + this.multiRegionDy - 16
+            }
         } else if (this.sens === 'rightToLeft') {
             x1 = this.maxX
             x2 = this.minX - DECALAGE_UNSPAWN
             y1 = this.calcValOffset(this.minY, this.maxY, spawnIndex, spawnAmount)
             y2 = y1
             facing = 180
+
+            if (this.multiRegionPatrols) {
+                x2 = this.maxX + this.multiRegionDx - 16
+            }
         } else {
             x1 = this.calcValOffset(this.minX, this.maxX, spawnIndex, spawnAmount)
             x2 = x1
             y1 = this.minY
             y2 = this.maxY + DECALAGE_UNSPAWN
             facing = 90
+
+            if (this.multiRegionPatrols) {
+                y2 = this.minY - this.multiRegionDy + 16
+            }
         }
 
         BlzSetUnitFacingEx(mobUnit, facing)

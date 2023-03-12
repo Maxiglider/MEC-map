@@ -1,6 +1,7 @@
 import { createTimer } from 'Utils/mapUtils'
 import { udg_monsters } from '../../../../globals'
 import { Monster } from './Monster'
+import { MonsterMultiplePatrols } from './MonsterMultiplePatrols'
 import { MonsterType } from './MonsterType'
 import { NewPatrolMonster } from './Monster_functions'
 
@@ -79,12 +80,43 @@ export class MonsterSimplePatrol extends Monster {
 
     toJson() {
         const output = super.toJson()
-        if(output){
+        if (output) {
             output['x1'] = R2I(this.x1)
             output['y1'] = R2I(this.y1)
             output['x2'] = R2I(this.x2)
             output['y2'] = R2I(this.y2)
         }
         return output
+    }
+}
+
+export const createMonsterSmartPatrol = (
+    mt: MonsterType,
+    x1: number,
+    y1: number,
+    x2: number,
+    y2: number,
+    forceId: number | null = null
+) => {
+    const maxDistance = Math.sqrt(Math.pow(Math.abs(x1 - x2), 2) + Math.pow(Math.abs(y1 - y2), 2))
+    const maxTiles = 6 * 128
+
+    if (maxDistance < maxTiles) {
+        return new MonsterSimplePatrol(mt, x1, y1, x2, y2, forceId)
+    } else {
+        const amountOfPatrols = Math.ceil(maxDistance / maxTiles)
+        const dx = (x1 - x2) / amountOfPatrols
+        const dy = (y1 - y2) / amountOfPatrols
+
+        MonsterMultiplePatrols.destroyLocs()
+
+        for (let i = 0; i <= amountOfPatrols; i++) {
+            const ddx = i * dx
+            const ddy = i * dy
+
+            MonsterMultiplePatrols.storeNewLoc(x1 - ddx, y1 - ddy)
+        }
+
+        return new MonsterMultiplePatrols(mt, 'string', forceId)
     }
 }
