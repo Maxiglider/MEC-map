@@ -184,8 +184,8 @@ export class MonsterSpawn {
         RegionAddRect(this.unspawnReg, r)
         RemoveRect(r)
 
-        const maxDistance = Math.sqrt(
-            Math.pow(Math.abs(this.minX - this.maxX), 2) + Math.pow(Math.abs(this.minY - this.maxY), 2)
+        const maxDistance = Math.abs(
+            this.sens === 'leftToRight' || this.sens === 'rightToLeft' ? this.minX - this.maxX : this.minY - this.maxY
         )
         const maxTiles = 6 * 128
         this.multiRegionPatrols = maxDistance >= maxTiles
