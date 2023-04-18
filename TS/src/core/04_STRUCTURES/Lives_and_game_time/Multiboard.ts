@@ -1,10 +1,10 @@
-import { ucfirst } from 'core/01_libraries/Basic_functions'
-import { NB_ESCAPERS, PURPLE, RED } from 'core/01_libraries/Constants'
-import { udg_colorCode } from 'core/01_libraries/Init_colorCodes'
 import { ServiceManager } from 'Services'
 import { ArrayHandler } from 'Utils/ArrayHandler'
 import { literalArray } from 'Utils/ArrayUtils'
 import { createTimer, forRange } from 'Utils/mapUtils'
+import { ucfirst } from 'core/01_libraries/Basic_functions'
+import { NB_ESCAPERS, PURPLE, RED } from 'core/01_libraries/Constants'
+import { udg_colorCode } from 'core/01_libraries/Init_colorCodes'
 import { getUdgEscapers, getUdgLevels } from '../../../../globals'
 import { playerId2colorId, rawPlayerNames } from '../../06_COMMANDS/COMMANDS_vJass/Command_functions'
 import { Escaper } from '../Escaper/Escaper'
@@ -53,7 +53,6 @@ export const initMultiboard = () => {
     } = {}
 
     let amountOfEscapers = 0
-    let gameTimeStr = ''
     let pointsEnabled = false
 
     forRange(NB_ESCAPERS, i => {
@@ -75,6 +74,8 @@ export const initMultiboard = () => {
             playerScores[i].stats.current.deaths = 0
             playerScores[i].stats.current.points = 0
         })
+
+        GameTime.current.resetGameTime()
 
         reinitBoards()
         amountOfEscapers = getUdgEscapers().countMain()
@@ -176,8 +177,22 @@ export const initMultiboard = () => {
             }
         }
 
-        mb && MultiboardSetItemValueBJ(mb, 1, 2, `|Cfffed312Game time: ${gameTimeStr}`)
-        lb && LeaderboardSetPlayerItemLabelBJ(Player(0), lb, `|Cfffed312Game time: ${gameTimeStr}`)
+        const globalGameTimeStr = GameTime.global.getGameTime()
+        const currentGameTimeStr = GameTime.current.getGameTime()
+
+        for (let i = 0; i < NB_ESCAPERS; i++) {
+            if (GetLocalPlayer() === Player(i)) {
+                const statsMode = playerScores[i].statsMode
+
+                if (statsMode === 'current') {
+                    mb && MultiboardSetItemValueBJ(mb, 1, 2, `|Cfffed312Game time: ${currentGameTimeStr}`)
+                    lb && LeaderboardSetPlayerItemLabelBJ(Player(0), lb, `|Cfffed312Game time: ${currentGameTimeStr}`)
+                } else if (statsMode === 'global') {
+                    mb && MultiboardSetItemValueBJ(mb, 1, 2, `|Cfffed312Game time: ${globalGameTimeStr}`)
+                    lb && LeaderboardSetPlayerItemLabelBJ(Player(0), lb, `|Cfffed312Game time: ${globalGameTimeStr}`)
+                }
+            }
+        }
     }
 
     const playerSortGlobal = (a: Escaper, b: Escaper) => {
@@ -324,7 +339,8 @@ export const initMultiboard = () => {
     }
 
     createTimer(1, true, () => {
-        gameTimeStr = GameTime.getGameTime()
+        GameTime.global.updateGameTime()
+        GameTime.current.updateGameTime()
 
         updateGametime(true)
     })

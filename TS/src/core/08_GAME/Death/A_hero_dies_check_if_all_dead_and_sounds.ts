@@ -10,6 +10,35 @@ import { AfkMode } from '../Afk_mode/Afk_mode'
 import { DeplacementHeroHorsDeathPath } from '../Mode_coop/deplacement_heros_hors_death_path'
 import { loseALifeAndRes } from './Lose_a_life_and_res'
 
+const initReviveTrigManager = () => {
+    const groups: number[][] = []
+
+    return {
+        createGroup: () => {
+            const group = ArrayHandler.getNewArray<number>()
+            arrayPush(groups, group)
+            return group
+        },
+        clearGroup: (group: number[]) => {
+            ArrayHandler.clearArray(group)
+
+            const index = groups.findIndex(item => item === group)
+            groups.splice(index, 1)
+        },
+        removeEscaper: (escaperId: number) => {
+            for (const group of groups) {
+                const index = group.indexOf(escaperId)
+
+                if (index !== -1) {
+                    group.splice(index, 1)
+                }
+            }
+        },
+    }
+}
+
+export const reviveTrigManager = initReviveTrigManager()
+
 export const InitTrig_A_hero_dies_check_if_all_dead_and_sounds = () => {
     let udg_nbKilled = 0
 
@@ -30,7 +59,7 @@ export const InitTrig_A_hero_dies_check_if_all_dead_and_sounds = () => {
                     udg_nbKilled = 0
                 }
 
-                const escaperIds = ArrayHandler.getNewArray<number>()
+                const escaperIds = reviveTrigManager.createGroup()
 
                 for (let i = 0; i < NB_ESCAPERS; i++) {
                     if (
@@ -65,14 +94,14 @@ export const InitTrig_A_hero_dies_check_if_all_dead_and_sounds = () => {
 
                 // No need to continue when everyone has autorevive
                 if (nbAliveWithoutAr === 0) {
-                    ArrayHandler.clearArray(escaperIds)
+                    reviveTrigManager.clearGroup(escaperIds)
                     return
                 }
 
                 if (nbAlive === 0) {
                     runInTrigger(() => {
                         loseALifeAndRes(escaperIds)
-                        ArrayHandler.clearArray(escaperIds)
+                        reviveTrigManager.clearGroup(escaperIds)
                         TriggerSleepAction(2)
                         StartSound(gg_snd_questFailed)
                         last = true

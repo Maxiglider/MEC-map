@@ -41,9 +41,8 @@ export class MonsterType {
             throw this.constructor.name + ' : wrong scale value "' + scale + '"'
         }
 
-        // CHANGE THIS FOR THE IMMOLATION PROJECT
-        if (R2I(immolationRadius) % 5 != 0 || immolationRadius < 0 || immolationRadius > 400) {
-            throw this.constructor.name + ' : wrong immolation radius "' + immolationRadius + '"'
+        if (immolationRadius !== 0 && !IMMOLATION_SKILLS[immolationRadius]) {
+            throw `${this.constructor.name} - '${label}' - '${unitTypeId}' - wrong immolation radius - '${immolationRadius}'`
         }
 
         const testMonster = CreateUnit(NEUTRAL_PLAYER, unitTypeId, 0, 0, 0)
@@ -56,8 +55,7 @@ export class MonsterType {
         this.label = label
         this.unitTypeId = unitTypeId
         this.scale = scale
-        // CHANGE THIS FOR THE IMMOLATION PROJECT
-        this.immolationSkill = IMMOLATION_SKILLS[R2I(immolationRadius / 5) - 1]
+        this.immolationSkill = IMMOLATION_SKILLS[immolationRadius]
         this.speed = speed
         this.isClickableB = isClickable
         this.maxLife = 10000
@@ -147,11 +145,10 @@ export class MonsterType {
     }
 
     setImmolation = (immolationRadius: number): boolean => {
-        // CHANGE THIS FOR THE IMMOLATION PROJECT
-        if (R2I(immolationRadius) % 5 != 0 || immolationRadius < 0 || immolationRadius > 400) {
+        if (immolationRadius !== 0 && !IMMOLATION_SKILLS[immolationRadius]) {
             return false
         }
-        this.immolationSkill = IMMOLATION_SKILLS[R2I(immolationRadius / 5) - 1]
+        this.immolationSkill = IMMOLATION_SKILLS[immolationRadius]
         this.refresh()
         return true
     }
@@ -221,7 +218,6 @@ export class MonsterType {
     }
 
     getImmolationRadiusStr = (): string => {
-        // CHANGE THIS FOR THE IMMOLATION PROJECT
         if (!this.immolationSkill) {
             return '0'
         }

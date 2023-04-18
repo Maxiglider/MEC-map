@@ -1,3 +1,5 @@
+import { ServiceManager } from 'Services'
+import { createTimer } from 'Utils/mapUtils'
 import { ClearTextForPlayer, IsBoolString, S2B } from 'core/01_libraries/Basic_functions'
 import {
     BLUE,
@@ -20,8 +22,6 @@ import { DisplayTerrainDataToPlayer, GetTerrainData } from 'core/07_TRIGGERS/Mod
 import { Apm } from 'core/08_GAME/Apm_clics_par_minute/Apm'
 import { Globals } from 'core/09_From_old_Worldedit_triggers/globals_variables_and_triggers'
 import { PRESS_TIME_TO_ENABLE_FOLLOW_MOUSE } from 'core/Follow_mouse/Follow_mouse'
-import { ServiceManager } from 'Services'
-import { createTimer } from 'Utils/mapUtils'
 import { getUdgEscapers, getUdgLevels } from '../../../../globals'
 import { IsInteger, PercentageStringOrX2Integer } from '../../01_libraries/Functions_on_numbers'
 import { EscaperEffectFunctions } from '../../04_STRUCTURES/Escaper/EscaperEffect_functions'
@@ -1297,20 +1297,29 @@ export const initCommandAll = () => {
         name: 'panCameraOnRevive',
         alias: ['pcor'],
         group: 'all',
-        argDescription: '<coop | all | none> [distance]',
-        description: 'pan camera on revive, default distance = 2048',
-        cb: ({ param1, param2 }, escaper) => {
+        argDescription: '<coop | all | none> [width] [height]',
+        description: 'pan camera on revive, default width = 2048; height = 1536',
+        cb: ({ param1, param2, param3 }, escaper) => {
             if (param1 !== 'coop' && param1 !== 'all' && param1 !== 'none') {
                 Text.mkP(escaper.getPlayer(), `param1 must be: coop | all | none`)
                 return true
             }
 
             if (S2I(param2) !== 0) {
-                escaper.moveCamDistance = S2I(param2)
+                escaper.moveCamDistanceWidth = S2I(param2)
+            }
+
+            if (S2I(param3) !== 0) {
+                escaper.moveCamDistanceHeight = S2I(param3)
+            } else if (S2I(param2) !== 0) {
+                escaper.moveCamDistanceHeight = S2I(param2)
             }
 
             escaper.setPanCameraOnRevive(param1)
-            Text.mkP(escaper.getPlayer(), `Pan camera on revive set to: ${param1} at ${escaper.moveCamDistance} `)
+            Text.mkP(
+                escaper.getPlayer(),
+                `Pan camera on revive set to: ${param1} at ${escaper.moveCamDistanceWidth}x${escaper.moveCamDistanceHeight} `
+            )
 
             return true
         },
@@ -1364,34 +1373,82 @@ export const initCommandAll = () => {
         },
     })
 
-    //-othersTransparency <number> | off | reset
+    //-othersTransparency <number | off | reset> [all | unallied | allied | player]
     registerCommand({
         name: 'othersTransparency',
         alias: ['ot'],
         group: 'all',
-        argDescription: '<number> | off|reset',
+        argDescription: '<number | off | reset> [all | unallied | allied | player]',
         description: '',
-        cb: ({ nbParam, param1 }, escaper) => {
-            if (nbParam != 1) {
+        cb: ({ nbParam, param1, param2 }, escaper) => {
+            if (nbParam < 1 || nbParam > 2) {
                 return true
             }
 
-            if (param1 === 'off' || param1 === 'reset') {
-                if (GetLocalPlayer() == escaper.getPlayer()) {
-                    Escaper.setOthersTransparency(null)
-                }
-                Text.mkP(escaper.getPlayer(), `Showing other heroes as normal`)
-                return true
-            }
+            if (param1 === 'off' || param1 === 'reset') param1 = '0'
+            if (param2 === '') param2 = 'all'
 
             if (!(S2I(param1) >= 0 && S2I(param1) <= 100)) {
                 return true
             }
 
-            Text.mkP(escaper.getPlayer(), `Showing other heroes with transparency: ${S2I(param1)}`)
+            if (param2 === 'all') {
+                for (const [_, esc] of pairs(getUdgEscapers().getAll())) {
+                    escaper.setOthersTransparency(esc, S2I(param1))
+                }
 
-            if (GetLocalPlayer() == escaper.getPlayer()) {
-                Escaper.setOthersTransparency(S2I(param1))
+                if (param1 === '0') {
+                    Text.mkP(escaper.getPlayer(), `Showing other heroes as normal`)
+                } else {
+                    Text.mkP(escaper.getPlayer(), `Showing other heroes with transparency: ${S2I(param1)}`)
+                }
+
+                return true
+            } else if (param2 === 'allied') {
+                for (const [_, esc] of pairs(getUdgEscapers().getAll())) {
+                    if (escaper.alliedState[esc.getId()]) {
+                        escaper.setOthersTransparency(esc, S2I(param1))
+                    }
+                }
+
+                if (param1 === '0') {
+                    Text.mkP(escaper.getPlayer(), `Showing allied heroes as normal`)
+                } else {
+                    Text.mkP(escaper.getPlayer(), `Showing allied heroes with transparency: ${S2I(param1)}`)
+                }
+
+                return true
+            } else if (param2 === 'unallied') {
+                for (const [_, esc] of pairs(getUdgEscapers().getAll())) {
+                    if (!escaper.alliedState[esc.getId()]) {
+                        escaper.setOthersTransparency(esc, S2I(param1))
+                    }
+                }
+
+                if (param1 === '0') {
+                    Text.mkP(escaper.getPlayer(), `Showing unallied heroes as normal`)
+                } else {
+                    Text.mkP(escaper.getPlayer(), `Showing unallied heroes with transparency: ${S2I(param1)}`)
+                }
+
+                return true
+            } else if (isPlayerId(param2)) {
+                const esc = getUdgEscapers().get(resolvePlayerId(param2))
+
+                if (esc) {
+                    escaper.setOthersTransparency(esc, S2I(param1))
+
+                    if (param1 === '0') {
+                        Text.mkP(escaper.getPlayer(), `Showing ${esc.getDisplayName()} hero as normal`)
+                    } else {
+                        Text.mkP(
+                            escaper.getPlayer(),
+                            `Showing ${esc.getDisplayName()} hero with transparency: ${S2I(param1)}`
+                        )
+                    }
+                }
+
+                return true
             }
 
             return true

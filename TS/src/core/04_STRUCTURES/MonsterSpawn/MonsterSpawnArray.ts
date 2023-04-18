@@ -1,8 +1,8 @@
+import { convertTextToAngle } from 'core/01_libraries/Basic_functions'
 import { getUdgMonsterTypes } from '../../../../globals'
 import { Text } from '../../01_libraries/Text'
 import { BaseArray } from '../BaseArray'
 import type { Level } from '../Level/Level'
-import type { MonsterType } from '../Monster/MonsterType'
 import { MonsterSpawn } from './MonsterSpawn'
 
 export class MonsterSpawnArray extends BaseArray<MonsterSpawn> {
@@ -40,7 +40,7 @@ export class MonsterSpawnArray extends BaseArray<MonsterSpawn> {
                 const monsterSpawn = new MonsterSpawn(
                     ms.label,
                     mt,
-                    ms.sens,
+                    typeof ms.sens === 'string' ? convertTextToAngle(ms.sens) : ms.sens,
                     ms.frequence,
                     ms.minX,
                     ms.minY,
@@ -69,36 +69,6 @@ export class MonsterSpawnArray extends BaseArray<MonsterSpawn> {
         if (ms) {
             delete this.data[ms.getId()]
             ms.destroy()
-            return true
-        } else {
-            return false
-        }
-    }
-
-    setMonsterType = (label: string, mt: MonsterType): boolean => {
-        let ms = this.getByLabel(label)
-        if (ms) {
-            ms.setMonsterType(mt)
-            return true
-        } else {
-            return false
-        }
-    }
-
-    setSens = (label: string, sens: string): boolean => {
-        let ms = this.getByLabel(label)
-        if (ms) {
-            ms.setSens(sens)
-            return true
-        } else {
-            return false
-        }
-    }
-
-    setFrequence = (label: string, frequence: number): boolean => {
-        let ms = this.getByLabel(label)
-        if (ms) {
-            ms.setFrequence(frequence)
             return true
         } else {
             return false

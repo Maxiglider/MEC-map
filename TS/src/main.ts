@@ -1,14 +1,23 @@
 import { renderInterface } from 'App/renderInterface'
+import { ServiceManager } from 'Services'
+import { createTimer, errorHandler } from 'Utils/mapUtils'
 import { IsBoolString, S2B } from 'core/01_libraries/Basic_functions'
 import { initLives } from 'core/04_STRUCTURES/Lives_and_game_time/Lives_and_game_time'
 import { initMultiboard } from 'core/04_STRUCTURES/Lives_and_game_time/Multiboard'
 import { initCommandExecution } from 'core/06_COMMANDS/COMMANDS_vJass/Command_execution'
-import { ServiceManager } from 'Services'
-import { createTimer, errorHandler } from 'Utils/mapUtils'
-import { addScriptHook, W3TS_HOOK } from 'w3ts/hooks'
+import { W3TS_HOOK, addScriptHook } from 'w3ts/hooks'
 import { MEC_core_API } from './core/API/MEC_core_API'
 import { initializers } from './core/Init/initializers'
-import { PROD } from './env'
+import { PROD, SCRIPT_VAR } from './env'
+
+// todo;
+// hide shadows on units when ot 100
+
+// Changelog
+// -pcor now also supports different height param
+// MonsterSpawners can now be diagonal! (Does currently not support the long patrol fix)
+// Gametime now depends on the selected leaderboard mode, -ldb current shows you the current gametime since the last -restart
+// You can now change the transparency of specific people or groups: -othersTransparency <number | off | reset> [all | unallied | allied | player]
 
 const tsMain = () => {
     ServiceManager.registerServices({
@@ -52,11 +61,12 @@ const tsMain = () => {
     //initializers
     initializers()
 
-    // use with `yarn test-memory-handler`
-    // createTimer(10, false, () => {
-    //     print('ok')
-    //     ;(_G as any)['printCreation'] = true
-    // })
+    if (SCRIPT_VAR === 'test-memory-handler') {
+        createTimer(4, false, () => {
+            print('Memory handler initialized')
+            ;(_G as any)['printCreation'] = true
+        })
+    }
 
     //triggers
     // initOldTriggers()

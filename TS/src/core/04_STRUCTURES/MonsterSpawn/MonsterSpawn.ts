@@ -1,9 +1,10 @@
-import { CombineHooks } from 'core/API/MecHookArray'
 import { ArrayHandler } from 'Utils/ArrayHandler'
+import { IPoint, createPoint } from 'Utils/Point'
 import { createTimer, errorHandler } from 'Utils/mapUtils'
+import { CombineHooks } from 'core/API/MecHookArray'
 import { Timer } from 'w3ts'
 import { ObjectHandler } from '../../../Utils/ObjectHandler'
-import { GetCurrentMonsterPlayer } from '../../01_libraries/Basic_functions'
+import { GetCurrentMonsterPlayer, arrayPush, convertAngleToDirection } from '../../01_libraries/Basic_functions'
 import { ENNEMY_PLAYER, GREY, MOBS_VARIOUS_COLORS, TERRAIN_DATA_DISPLAY_TIME } from '../../01_libraries/Constants'
 import { udg_colorCode } from '../../01_libraries/Init_colorCodes'
 import { Text } from '../../01_libraries/Text'
@@ -16,6 +17,25 @@ import { initSimpleUnitRecycler } from './SimpleUnitRecycler'
 
 const DECALAGE_UNSPAWN = 200
 const DELAY_BETWEEN_SPAWN_AND_MOVEMENT = 0.5
+
+const createDiagonalRegions = (startX: number, startY: number, endX: number, endY: number, size: number) => {
+    const regions: { topLeft: IPoint; bottomRight: IPoint }[] = []
+    const distance = Math.sqrt(Math.pow(endX - startX, 2) + Math.pow(endY - startY, 2))
+    const numRegions = Math.floor(distance / size)
+    const xStep = (endX - startX) / numRegions
+    const yStep = (endY - startY) / numRegions
+
+    for (let i = 0; i < numRegions; i++) {
+        const topLeft = createPoint(startX + i * xStep, startY + i * yStep)
+        const bottomRight = createPoint(topLeft[0] + size, topLeft[1] + size)
+
+        regions.push({ topLeft, bottomRight })
+    }
+
+    return regions
+}
+
+const expand = (v: number, d: number) => v + d * Math.sign(v)
 
 /**
  * class MonsterSpawn
@@ -34,19 +54,25 @@ export class MonsterSpawn {
 
     private label: string
     private mt: MonsterType
-    private sens: string //leftToRight, upToDown, rightToLeft, downToUp
     private frequence: number
     private spawnAmount = 1
     private spawnOffset = 0
     private initialDelay = 0
+
     private minX: number
     private minY: number
     private maxX: number
     private maxY: number
+
     private tSpawn?: trigger
     private tUnspawn?: trigger
     private unspawnReg?: region
+    public unspawnregpoints: number[][] = []
     monsters?: group
+
+    private rotation: number
+    public points: IPoint[] = []
+    private anchor: { x: number; y: number }
 
     public multiRegionPatrols = false
     private multiRegionDx: number = 0
@@ -80,22 +106,32 @@ export class MonsterSpawn {
     constructor(
         label: string,
         mt: MonsterType,
-        sens: string,
+        rotation: number,
         frequence: number,
         x1: number,
         y1: number,
         x2: number,
         y2: number
     ) {
+        this.rotation = rotation
+
         this.id = MonsterSpawn.getNextId()
         this.label = label
         this.mt = mt
-        this.sens = sens
         this.frequence = frequence
         this.minX = Math.round(RMinBJ(x1, x2))
         this.minY = Math.round(RMinBJ(y1, y2))
         this.maxX = Math.round(RMaxBJ(x1, x2))
         this.maxY = Math.round(RMaxBJ(y1, y2))
+
+        this.points = [
+            createPoint(Math.round(RMinBJ(x1, x2)), Math.round(RMinBJ(y1, y2))),
+            createPoint(Math.round(RMaxBJ(x1, x2)), Math.round(RMinBJ(y1, y2))),
+            createPoint(Math.round(RMaxBJ(x1, x2)), Math.round(RMaxBJ(y1, y2))),
+            createPoint(Math.round(RMinBJ(x1, x2)), Math.round(RMaxBJ(y1, y2))),
+        ]
+
+        this.anchor = this.calculateCenterPoint(this.minX, this.minY, this.maxX, this.maxY)
     }
 
     getId() {
@@ -114,6 +150,23 @@ export class MonsterSpawn {
     getMaxX = () => this.maxX
     getMinY = () => this.minY
     getMaxY = () => this.maxY
+
+    getRotatedPoints = () => {
+        const rotatedPoints = ArrayHandler.getNewArray<IPoint>()
+
+        for (const point of this.points) {
+            arrayPush(
+                rotatedPoints,
+                this.baseApplyRotation(
+                    point[0],
+                    point[1],
+                    this.rotation === 90 || this.rotation === 270 ? this.rotation + 90 : this.rotation
+                )
+            )
+        }
+
+        return rotatedPoints
+    }
 
     deactivate = () => {
         this._active = false
@@ -156,39 +209,70 @@ export class MonsterSpawn {
         let x2: number
         let y2: number
 
-        //leftToRight, upToDown, rightToLeft, downToUp
-        if (this.sens === 'leftToRight') {
-            x1 = this.maxX
-            x2 = this.maxX
-            y1 = this.minY - DECALAGE_UNSPAWN
-            y2 = this.maxY + DECALAGE_UNSPAWN
-        } else if (this.sens === 'upToDown') {
+        x1 = this.maxX
+        x2 = this.maxX
+        y1 = this.minY - DECALAGE_UNSPAWN
+        y2 = this.maxY + DECALAGE_UNSPAWN
+
+        if (this.rotation !== 90 && this.rotation !== 270) {
+            const [nx1, ny1] = this.applyRotation(x1, y1)
+            const [nx2, ny2] = this.applyRotation(x2, y2)
+
+            x1 = nx1
+            y1 = ny1
+            x2 = nx2
+            y2 = ny2
+        } else {
             x1 = this.minX - DECALAGE_UNSPAWN
             x2 = this.maxX + DECALAGE_UNSPAWN
             y1 = this.minY
             y2 = this.minY
-        } else if (this.sens === 'rightToLeft') {
-            x1 = this.minX
-            x2 = this.minX
-            y1 = this.minY - DECALAGE_UNSPAWN
-            y2 = this.maxY + DECALAGE_UNSPAWN
-        } else {
-            x1 = this.minX - DECALAGE_UNSPAWN
-            x2 = this.maxX + DECALAGE_UNSPAWN
-            y1 = this.maxY
-            y2 = this.maxY
+
+            const [nx1, ny1] = this.baseApplyRotation(x1, y1, this.rotation + 90)
+            const [nx2, ny2] = this.baseApplyRotation(x2, y2, this.rotation + 90)
+
+            x1 = nx1
+            y1 = ny1
+            x2 = nx2
+            y2 = ny2
         }
 
-        const r = Rect(x1, y1, x2, y2)
         this.unspawnReg = CreateRegion()
-        RegionAddRect(this.unspawnReg, r)
-        RemoveRect(r)
+
+        const isDiagonal = this.rotation % 90 !== 0
+
+        if (isDiagonal) {
+            this.unspawnregpoints = []
+
+            const regions = createDiagonalRegions(x1, y1, x2, y2, 32)
+
+            for (const region of regions) {
+                const r = Rect(region.topLeft[0], region.topLeft[1], region.bottomRight[0], region.bottomRight[1])
+                RegionAddRect(this.unspawnReg, r)
+                RemoveRect(r)
+
+                this.unspawnregpoints.push([
+                    region.topLeft[0],
+                    region.topLeft[1],
+                    region.bottomRight[0],
+                    region.bottomRight[1],
+                ])
+            }
+        } else {
+            const r = Rect(x1, y1, x2, y2)
+            RegionAddRect(this.unspawnReg, r)
+            RemoveRect(r)
+
+            this.unspawnregpoints = [[x1, y1, x2, y2]]
+        }
 
         const maxDistance = Math.abs(
-            this.sens === 'leftToRight' || this.sens === 'rightToLeft' ? this.minX - this.maxX : this.minY - this.maxY
+            this.rotation === 0 || this.rotation === 180 ? this.minX - this.maxX : this.minY - this.maxY
         )
+
+        // Multi region patrols does not work with rotation yet
         const maxTiles = 6 * 128
-        this.multiRegionPatrols = maxDistance >= maxTiles
+        this.multiRegionPatrols = !isDiagonal && maxDistance >= maxTiles
 
         if (this.multiRegionPatrols) {
             const amountOfPatrols = Math.ceil(maxDistance / maxTiles)
@@ -200,6 +284,8 @@ export class MonsterSpawn {
 
             // Ignore first and last
             for (let n = 0; n < amountOfPatrols - 1; n++) {
+                const reg = CreateRegion()
+
                 const ddx = (n + 1) * dx
                 const ddy = (n + 1) * dy
 
@@ -212,9 +298,10 @@ export class MonsterSpawn {
                 const ny2 = calcY ? ny1 - 16 : this.maxY
 
                 const r = Rect(nx1, ny1, nx2, ny2)
-                const reg = CreateRegion()
                 RegionAddRect(reg, r)
                 RemoveRect(r)
+
+                this.unspawnregpoints.push([nx1, ny1, nx2, ny2])
 
                 const t = CreateTrigger()
                 MonsterSpawn.anyTrigId2MonsterSpawn.set(GetHandleId(t), this)
@@ -227,14 +314,17 @@ export class MonsterSpawn {
                         let x = Math.round(GetUnitX(u))
                         let y = Math.round(GetUnitY(u))
 
-                        const nddx = (n + 2) * dx
-                        const nddy = (n + 2) * dy
+                        let nddx = (n + 1) * dx
+                        let nddy = (n + 1) * dy
 
-                        if (this.sens === 'leftToRight') {
+                        nddx = expand(nddx, DECALAGE_UNSPAWN)
+                        nddy = expand(nddy, DECALAGE_UNSPAWN)
+
+                        if (this.rotation === 0) {
                             x = this.minX - nddx
-                        } else if (this.sens === 'upToDown') {
+                        } else if (this.rotation === 270) {
                             y = this.maxY + nddy
-                        } else if (this.sens === 'rightToLeft') {
+                        } else if (this.rotation === 180) {
                             x = this.maxX + nddx
                         } else {
                             y = this.minY - nddy
@@ -429,52 +519,50 @@ export class MonsterSpawn {
         let y2: number
         let facing: number
 
-        //leftToRight, upToDown, rightToLeft, downToUp
-        if (this.sens === 'leftToRight') {
-            x1 = this.minX
-            x2 = this.maxX + DECALAGE_UNSPAWN
-            y1 = this.calcValOffset(this.minY, this.maxY, spawnIndex, spawnAmount)
-            y2 = y1
-            facing = 0
+        x1 = this.minX
+        x2 = this.maxX + DECALAGE_UNSPAWN
+        y1 = this.calcValOffset(this.getMinY(), this.getMaxY(), spawnIndex, spawnAmount)
+        y2 = y1
 
-            if (this.multiRegionPatrols) {
-                x2 = this.minX - this.multiRegionDx + 16
-            }
-        } else if (this.sens === 'upToDown') {
+        if (this.multiRegionPatrols) {
+            x2 = this.minX - this.multiRegionDx + 16
+        }
+
+        if (this.rotation === 90 || this.rotation === 270) {
             x1 = this.calcValOffset(this.minX, this.maxX, spawnIndex, spawnAmount)
             x2 = x1
             y1 = this.maxY
             y2 = this.minY - DECALAGE_UNSPAWN
-            facing = 270
 
             if (this.multiRegionPatrols) {
                 y2 = this.maxY + this.multiRegionDy - 16
             }
-        } else if (this.sens === 'rightToLeft') {
-            x1 = this.maxX
-            x2 = this.minX - DECALAGE_UNSPAWN
-            y1 = this.calcValOffset(this.minY, this.maxY, spawnIndex, spawnAmount)
-            y2 = y1
+        }
+
+        if (this.rotation === 0) {
+            facing = 0
+        } else if (this.rotation === 270) {
+            facing = 270
+        } else if (this.rotation === 180) {
             facing = 180
-
-            if (this.multiRegionPatrols) {
-                x2 = this.maxX + this.multiRegionDx - 16
-            }
         } else {
-            x1 = this.calcValOffset(this.minX, this.maxX, spawnIndex, spawnAmount)
-            x2 = x1
-            y1 = this.minY
-            y2 = this.maxY + DECALAGE_UNSPAWN
             facing = 90
+        }
 
-            if (this.multiRegionPatrols) {
-                y2 = this.minY - this.multiRegionDy + 16
-            }
+        let nx1, ny1
+        let nx2, ny2
+
+        if (this.rotation === 90 || this.rotation === 270) {
+            ;[nx1, ny1] = this.baseApplyRotation(x1, y1, this.rotation + 90)
+            ;[nx2, ny2] = this.baseApplyRotation(x2, y2, this.rotation + 90)
+        } else {
+            ;[nx1, ny1] = this.applyRotation(x1, y1)
+            ;[nx2, ny2] = this.applyRotation(x2, y2)
         }
 
         BlzSetUnitFacingEx(mobUnit, facing)
-        SetUnitX(mobUnit, x1)
-        SetUnitY(mobUnit, y1)
+        SetUnitX(mobUnit, nx1)
+        SetUnitY(mobUnit, ny1)
 
         if (ms.getMonsterType().isClickable()) {
             p = ENNEMY_PLAYER
@@ -484,67 +572,68 @@ export class MonsterSpawn {
 
         SetUnitOwner(mobUnit, p, MOBS_VARIOUS_COLORS)
         ShowUnit(mobUnit, true)
-        IssuePointOrder(mobUnit, 'move', x2, y2)
+        IssuePointOrder(mobUnit, 'move', nx2, ny2)
     }
 
     createMob = () => {
         let angle: number
 
-        //leftToRight, upToDown, rightToLeft, downToUp
-        if (this.sens === 'leftToRight') {
+        if (this.rotation === 0) {
             angle = 180
-        } else if (this.sens === 'upToDown') {
+        } else if (this.rotation === 270) {
             angle = 90
-        } else if (this.sens === 'rightToLeft') {
+        } else if (this.rotation === 180) {
             angle = 0
         } else {
             angle = -90
         }
 
-        //hook onBeforeCreateMonsterUnit
+        let monster = this.simpleUnitRecycler.getUnit()
 
-        const hookArray = CombineHooks(
-            this.level?.monsters.hooks_onBeforeCreateMonsterUnit,
-            hooks.hooks_onBeforeCreateMonsterUnit
-        )
+        if (!monster) {
+            //hook onBeforeCreateMonsterUnit
 
-        if (hookArray) {
-            let forceUnitTypeId = 0
-            let quit = false
+            const hookArray = CombineHooks(
+                this.level?.monsters.hooks_onBeforeCreateMonsterUnit,
+                hooks.hooks_onBeforeCreateMonsterUnit
+            )
 
-            for (const hook of hookArray) {
-                const unitData = ObjectHandler.getNewObject<{ mt: MonsterType }>()
-                unitData.mt = this.mt
-                const output = hook.execute(unitData)
-                ObjectHandler.clearObject(unitData)
+            if (hookArray) {
+                let forceUnitTypeId = 0
+                let quit = false
 
-                if (output === false) {
-                    quit = true
-                } else if (output && output.unitTypeId) {
-                    forceUnitTypeId = output.unitTypeId
+                for (const hook of hookArray) {
+                    const unitData = ObjectHandler.getNewObject<{ mt: MonsterType }>()
+                    unitData.mt = this.mt
+                    const output = hook.execute(unitData)
+                    ObjectHandler.clearObject(unitData)
+
+                    if (output === false) {
+                        quit = true
+                    } else if (output && output.unitTypeId) {
+                        forceUnitTypeId = output.unitTypeId
+                    }
+                }
+
+                if (quit) {
+                    ArrayHandler.clearArray(hookArray)
+                    return
+                }
+
+                if (forceUnitTypeId > 0) {
+                    Monster.forceUnitTypeIdForNextMonster = forceUnitTypeId
                 }
             }
+            ArrayHandler.clearArray(hookArray)
 
-            if (quit) {
-                ArrayHandler.clearArray(hookArray)
-                return
-            }
-
-            if (forceUnitTypeId > 0) {
-                Monster.forceUnitTypeIdForNextMonster = forceUnitTypeId
-            }
-        }
-        ArrayHandler.clearArray(hookArray)
-
-        const monster =
-            this.simpleUnitRecycler.getUnit() ||
-            NewImmobileMonsterForPlayer(
+            monster = NewImmobileMonsterForPlayer(
                 this.mt,
                 ENNEMY_PLAYER,
                 (this.minX + this.maxX) / 2,
                 (this.minY + this.maxY) / 2,
                 angle
             )
+        }
 
         //hook after create unit
         const hookArray2 = CombineHooks(
@@ -573,15 +662,24 @@ export class MonsterSpawn {
 
     setMonsterType = (mt: MonsterType) => {
         this.mt = mt
-        this.deactivate()
-        this.simpleUnitRecycler.reinit()
-        this.activate()
+
+        if (this._active) {
+            this.deactivate()
+            this.simpleUnitRecycler.reinit()
+            this.activate()
+        }
     }
 
-    setSens = (sens: string) => {
-        this.sens = sens
-        this.deactivate()
-        this.activate()
+    setRotation = (rotation: number) => {
+        this.rotation = rotation
+
+        if (this._active) {
+            this.deactivate()
+            this.simpleUnitRecycler.reinit()
+            this.activate()
+        }
+
+        this.level?.updateDebugRegions()
     }
 
     setFrequence = (frequence: number) => {
@@ -595,7 +693,14 @@ export class MonsterSpawn {
 
     displayForPlayer = (p: player) => {
         const display =
-            udg_colorCode[GREY] + this.label + ' : ' + this.mt.label + '   ' + this.sens + '   ' + R2S(this.frequence)
+            udg_colorCode[GREY] +
+            this.label +
+            ' : ' +
+            this.mt.label +
+            '   ' +
+            convertAngleToDirection(this.rotation) +
+            '   ' +
+            R2S(this.frequence)
         Text.P_timed(p, TERRAIN_DATA_DISPLAY_TIME, display)
     }
 
@@ -629,12 +734,40 @@ export class MonsterSpawn {
         this.fixedSpawnOffsetMirrored = fixedSpawnOffsetMirrored || false
     }
 
+    baseApplyRotation = (x: number, y: number, rotation: number) => {
+        const theta = Deg2Rad(rotation)
+
+        const c = math.cos(theta)
+        const s = math.sin(theta)
+
+        const newX = (x - this.anchor.x) * c - (y - this.anchor.y) * s + this.anchor.x
+        const newY = (x - this.anchor.x) * s + (y - this.anchor.y) * c + this.anchor.y
+
+        return createPoint(newX, newY)
+    }
+
+    applyRotation = (x: number, y: number) => {
+        return this.baseApplyRotation(x, y, this.rotation)
+    }
+
+    calculateCenterPoint = (
+        topLeftX: number,
+        topLeftY: number,
+        bottomRightX: number,
+        bottomRightY: number
+    ): { x: number; y: number } => {
+        const centerX = (topLeftX + bottomRightX) / 2
+        const centerY = (topLeftY + bottomRightY) / 2
+
+        return { x: centerX, y: centerY }
+    }
+
     toJson = () => {
         const output = ObjectHandler.getNewObject<any>()
 
         output['label'] = this.label
         output['monsterTypeLabel'] = this.mt.label
-        output['sens'] = this.sens
+        output['sens'] = this.rotation
         output['frequence'] = this.frequence
         output['spawnAmount'] = this.spawnAmount
         output['spawnOffset'] = this.spawnOffset

@@ -11,6 +11,7 @@ import {
 import { udg_colorCode } from 'core/01_libraries/Init_colorCodes'
 import { Text } from 'core/01_libraries/Text'
 import { Level } from 'core/04_STRUCTURES/Level/Level'
+import { IMMOLATION_SKILLS } from 'core/04_STRUCTURES/Monster/Immolation_skills'
 import { PORTAL_MOB_MAX_FREEZE_DURATION } from 'core/04_STRUCTURES/Monster_properties/PortalMob'
 import { DEATH_TERRAIN_MAX_TOLERANCE, TerrainTypeDeath } from 'core/04_STRUCTURES/TerrainType/TerrainTypeDeath'
 import { TerrainTypeSlide } from 'core/04_STRUCTURES/TerrainType/TerrainTypeSlide'
@@ -843,8 +844,7 @@ export const initExecuteCommandMake = () => {
             //checkParam3
             if (nbParam >= 3) {
                 immoRadius = S2I(param3)
-                // CHANGE THIS FOR THE IMMOLATION PROJECT
-                if (immoRadius % 5 != 0 || immoRadius < 0 || immoRadius > 400) {
+                if (immoRadius !== 0 && !IMMOLATION_SKILLS[immoRadius]) {
                     Text.erP(
                         escaper.getPlayer(),
                         'Wrong immolation radius ; should be an integer divisible by 5 and between 0 and 400'
@@ -1013,8 +1013,7 @@ export const initExecuteCommandMake = () => {
             }
             //checkParam2
             const x = S2I(param2)
-            if (x % 5 != 0 || x < 0 || x > 400) {
-                // CHANGE THIS FOR THE IMMOLATION PROJECT
+            if (x !== 0 && !IMMOLATION_SKILLS[x]) {
                 Text.erP(
                     escaper.getPlayer(),
                     'wrong immolation radius ; should be an integer divisible by 5 and between 0 and 400'
@@ -1794,17 +1793,9 @@ export const initExecuteCommandMake = () => {
                 return true
             }
 
-            let str = ''
+            const str = convertTextToAngle(param3)
 
-            if (param3 === 'leftToRight' || param3 === 'ltr') {
-                str = 'leftToRight'
-            } else if (param3 === 'upToDown' || param3 === 'utd') {
-                str = 'upToDown'
-            } else if (param3 === 'rightToLeft' || param3 === 'rtl') {
-                str = 'rightToLeft'
-            } else if (param3 === 'downToUp' || param3 === 'dtu') {
-                str = 'downToUp'
-            } else {
+            if (!str) {
                 Text.erP(
                     escaper.getPlayer(),
                     'param 3 should be direction : leftToRight, upToDown, rightToLeft or downToUp'
@@ -1882,38 +1873,34 @@ export const initExecuteCommandMake = () => {
     //-setMonsterSpawnDirection(setmsd) <monsterSpawnLabel> <direction>   --> leftToRight(ltr), upToDown(utd), rightToLeft(rtl), downToUp(dtu)
     registerCommand({
         name: 'setMonsterSpawnDirection',
-        alias: ['setmsd'],
+        alias: ['setmsd', 'setMonsterSpawnRotation', 'setmsr'],
         group: 'make',
         argDescription: '<monsterSpawnLabel> <direction>',
         description: 'leftToRight(ltr), upToDown(utd), rightToLeft(rtl), downToUp(dtu)',
-        cb: ({ nbParam, param1, param2 }, escaper) => {
-            if (!(nbParam === 2)) {
-                return true
-            }
-
+        cb: ({ param1, param2 }, escaper) => {
             const monsterSpawn = escaper.getMakingLevel().monsterSpawns.getByLabel(param1)
+
             if (!monsterSpawn) {
                 Text.erP(escaper.getPlayer(), 'unknown monster spawn "' + param1 + '" in this level')
                 return true
             }
 
-            let str = ''
+            let angle: number | undefined = undefined
 
-            if (param2 === 'leftToRight' || param2 === 'ltr') {
-                str = 'leftToRight'
-            } else if (param2 === 'upToDown' || param2 === 'utd') {
-                str = 'upToDown'
-            } else if (param2 === 'rightToLeft' || param2 === 'rtl') {
-                str = 'rightToLeft'
-            } else if (param2 === 'downToUp' || param2 === 'dtu') {
-                str = 'downToUp'
+            if (param2 !== '' && param2 !== '0') {
+                angle = convertTextToAngle(param2)
+
+                if (!angle) {
+                    Text.erP(escaper.getPlayer(), 'Invalid angle')
+                    return true
+                }
+
+                monsterSpawn.setRotation(angle)
+                Text.mkP(escaper.getPlayer(), `Rotation changed to: ${angle}`)
             } else {
-                Text.erP(escaper.getPlayer(), 'direction should be leftToRight, upToDown, rightToLeft or downToUp')
-                return true
+                Text.mkP(escaper.getPlayer(), 'Invalid rotation')
             }
 
-            monsterSpawn.setSens(str)
-            Text.mkP(escaper.getPlayer(), 'direction changed')
             return true
         },
     })
@@ -2197,7 +2184,7 @@ export const initExecuteCommandMake = () => {
             'create the start (a rectangle formed with two clicks) of the current level or the next one if specified',
         cb: ({ nbParam, param1, param2 }, escaper) => {
             let forNext = false
-            let facing = (param2 ? convertTextToAngle(param2) : undefined) || undefined
+            let facing = param2 ? convertTextToAngle(param2) : undefined
 
             //checkParam1
             if (nbParam === 1 || nbParam === 2) {

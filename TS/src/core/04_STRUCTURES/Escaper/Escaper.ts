@@ -1,3 +1,6 @@
+import { ServiceManager } from 'Services'
+import { GetUnitZEx } from 'Utils/LocationUtils'
+import { IPoint, createPoint } from 'Utils/Point'
 import { IsIssuedOrder, StopUnit } from 'core/01_libraries/Basic_functions'
 import {
     DEFAULT_CAMERA_FIELD,
@@ -19,10 +22,10 @@ import { Text } from 'core/01_libraries/Text'
 import { MakePropertyChange } from 'core/05_MAKE_STRUCTURES/Make/MakePropertyChange'
 import { MakeCaster } from 'core/05_MAKE_STRUCTURES/Make_create_casters/MakeCaster'
 import { MakeMeteor } from 'core/05_MAKE_STRUCTURES/Make_create_meteors/MakeMeteor'
+import { MakeMonsterSpawn } from 'core/05_MAKE_STRUCTURES/Make_create_monster_spawn/MakeMonsterSpawn'
 import { MakeMonsterMultiplePatrols } from 'core/05_MAKE_STRUCTURES/Make_create_monsters/MakeMonsterMultiplePatrols'
 import { MakeMonsterSimplePatrol } from 'core/05_MAKE_STRUCTURES/Make_create_monsters/MakeMonsterSimplePatrol'
 import { MakeMonsterTeleport } from 'core/05_MAKE_STRUCTURES/Make_create_monsters/MakeMonsterTeleport'
-import { MakeMonsterSpawn } from 'core/05_MAKE_STRUCTURES/Make_create_monster_spawn/MakeMonsterSpawn'
 import { MakeDeleteStaticSlide } from 'core/05_MAKE_STRUCTURES/Make_create_static_slide/MakeDeleteStaticSlide'
 import { MakeStaticSlide } from 'core/05_MAKE_STRUCTURES/Make_create_static_slide/MakeStaticSlide'
 import { MakeDeleteCasters } from 'core/05_MAKE_STRUCTURES/Make_delete_casters/MakeDeleteCasters'
@@ -38,13 +41,10 @@ import { MakeGetUnitTeleportPeriod } from 'core/05_MAKE_STRUCTURES/Make_set_unit
 import { MakeSetUnitMonsterType } from 'core/05_MAKE_STRUCTURES/Make_set_unit_properties/MakeSetUnitMonsterType'
 import { MakeSetUnitTeleportPeriod } from 'core/05_MAKE_STRUCTURES/Make_set_unit_properties/MakeSetUnitTeleportPeriod'
 import { AfkMode } from 'core/08_GAME/Afk_mode/Afk_mode'
-import { ServiceManager } from 'Services'
-import { GetUnitZEx } from 'Utils/LocationUtils'
-import { createPoint, IPoint } from 'Utils/Point'
 import { Timer } from 'w3ts'
 import { getUdgEscapers, getUdgLevels, getUdgTerrainTypes } from '../../../../globals'
-import { createEvent, createTimer } from '../../../Utils/mapUtils'
 import { EncodingBase64 } from '../../../Utils/SaveLoad/TreeLib/EncodingBase64'
+import { createEvent, createTimer } from '../../../Utils/mapUtils'
 import type { Make } from '../../05_MAKE_STRUCTURES/Make/Make'
 import type { MakeAction } from '../../05_MAKE_STRUCTURES/MakeLastActions/MakeAction'
 import { MakeLastActions } from '../../05_MAKE_STRUCTURES/MakeLastActions/MakeLastActions'
@@ -68,6 +68,7 @@ import {
     HERO_ROTATION_SPEED,
     HERO_ROTATION_TIME_FOR_MAXIMUM_SPEED,
 } from '../../07_TRIGGERS/Slide_and_CheckTerrain_triggers/SlidingMax'
+import { reviveTrigManager } from '../../08_GAME/Death/A_hero_dies_check_if_all_dead_and_sounds'
 import { Trig_InvisUnit_is_getting_damage } from '../../08_GAME/Death/InvisUnit_is_getting_damage'
 import { HERO_START_ANGLE } from '../../08_GAME/Init_game/Heroes'
 import { MessageHeroDies } from '../../08_GAME/Init_game/Message_heroDies'
@@ -85,13 +86,13 @@ import type { TerrainType } from '../TerrainType/TerrainType'
 import { TerrainTypeSlide } from '../TerrainType/TerrainTypeSlide'
 import { TerrainTypeWalk } from '../TerrainType/TerrainTypeWalk'
 import { EscaperEffectArray } from './EscaperEffectArray'
+import { EscaperStartCommands } from './Escaper_StartCommands'
 import { EscaperFirstPerson } from './Escaper_firstPerson'
 import { ColorInfo, GetMirrorEscaper } from './Escaper_functions'
-import { EscaperStartCommands } from './Escaper_StartCommands'
 
 const SHOW_REVIVE_EFFECTS = false
 
-const VIPs64 = ['V29ybGRFZGl0', 'TWF4aW1heG91IzI4NzI=', 'U3RhbiMyMjM5OQ==']
+const VIPs64 = ['V29ybGRFZGl0', 'TWF4aW1heG91IzI4NzI=', 'U3RhbiMyMjM5OQ==', 'c3Blcm1rYWdlbiMyMzQ3']
 
 const VIPs = VIPs64.map(name64 => EncodingBase64.Decode(name64))
 
@@ -213,7 +214,8 @@ export class Escaper {
     private canClick: boolean
     private canClickTrigger: trigger
 
-    public moveCamDistance = 2048
+    public moveCamDistanceWidth = 2048
+    public moveCamDistanceHeight = 1536
 
     //mouse position updated when a trigger dependant of mouse movement is being used
     mouseX = 0
@@ -222,16 +224,12 @@ export class Escaper {
     lastPos: IPoint | undefined
 
     //others transparency
-    private static othersTransparency: number | null = null
+    private othersTransparencyState: { [escaperId: number]: number } = {}
 
-    public static getOthersTransparency = () => Escaper.othersTransparency
+    public setOthersTransparency = (escaper: Escaper, ot: number) => {
+        this.othersTransparencyState[escaper.getId()] = ot
 
-    public static setOthersTransparency = (ot: number | null) => {
-        Escaper.othersTransparency = ot
-
-        getUdgEscapers().forMainEscapers((escaper: Escaper) => {
-            escaper.updateUnitVertexColor()
-        })
+        escaper.updateUnitVertexColor()
     }
 
     //user interface
@@ -709,6 +707,8 @@ export class Escaper {
             }
         }
 
+        reviveTrigManager.removeEscaper(this.escaperId)
+
         return true
     }
 
@@ -728,11 +728,10 @@ export class Escaper {
         const xHero = GetUnitX(this.hero)
         const yHero = GetUnitY(this.hero)
 
-        const FIELD = this.moveCamDistance
-        const minX = GetCameraTargetPositionX() - FIELD / 2
-        const minY = GetCameraTargetPositionY() - FIELD / 2
-        const maxX = GetCameraTargetPositionX() + FIELD / 2
-        const maxY = GetCameraTargetPositionY() + FIELD / 2
+        const minX = GetCameraTargetPositionX() - this.moveCamDistanceWidth / 2
+        const minY = GetCameraTargetPositionY() - this.moveCamDistanceHeight / 2
+        const maxX = GetCameraTargetPositionX() + this.moveCamDistanceWidth / 2
+        const maxY = GetCameraTargetPositionY() + this.moveCamDistanceHeight / 2
 
         if (xHero < minX || xHero > maxX || yHero < minY || yHero > maxY) {
             SetCameraPositionForPlayer(this.p, xHero, yHero)
@@ -1391,7 +1390,7 @@ export class Escaper {
         return this.make.addHidePeriod()
     }
 
-    makeCreateMonsterSpawn(label: string, mt: MonsterType, sens: string, frequence: number) {
+    makeCreateMonsterSpawn(label: string, mt: MonsterType, sens: number, frequence: number) {
         this.destroyMake()
         if (this.hero) this.make = new MakeMonsterSpawn(this.hero, label, mt, sens, frequence)
     }
@@ -1987,16 +1986,17 @@ export class Escaper {
 
     updateUnitVertexColor = () => {
         if (this.hero) {
+            const otherTransparency =
+                getUdgEscapers().get(GetPlayerId(GetLocalPlayer()))?.othersTransparencyState[this.escaperId] || null
+
             SetUnitVertexColorBJ(
                 this.hero,
                 this.vcRed,
                 this.vcGreen,
                 this.vcBlue,
-                GetLocalPlayer() === this.getPlayer() ||
-                    Escaper.othersTransparency === null ||
-                    this.isEscaperSecondary()
+                GetLocalPlayer() === this.getPlayer() || otherTransparency === null || this.isEscaperSecondary()
                     ? this.vcTransparency
-                    : Escaper.othersTransparency
+                    : otherTransparency
             )
         }
     }

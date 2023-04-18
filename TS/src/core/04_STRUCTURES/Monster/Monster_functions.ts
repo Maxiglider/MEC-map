@@ -89,7 +89,6 @@ export const NewImmobileMonsterForPlayer = (mt: MonsterType, p: player, x: numbe
         UnitAddAbility(monster, ABILITY_ANNULER_VISION)
     }
 
-    // CHANGE THIS FOR THE IMMOLATION PROJECT
     const immoSkill = mt.getImmolationSkill() || 0
 
     immoSkill > 0 && UnitAddAbility(monster, immoSkill)

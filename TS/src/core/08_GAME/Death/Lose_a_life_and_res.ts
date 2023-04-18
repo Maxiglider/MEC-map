@@ -1,5 +1,7 @@
+import { arrayPush } from 'core/01_libraries/Basic_functions'
 import { Text } from 'core/01_libraries/Text'
 import { ServiceManager } from 'Services'
+import { ArrayHandler } from 'Utils/ArrayHandler'
 import { getUdgEscapers, getUdgLevels } from '../../../../globals'
 import { ChangeAllTerrains } from '../../07_TRIGGERS/Triggers_to_modify_terrains/Change_all_terrains'
 
@@ -29,9 +31,17 @@ export const loseALifeAndRes = (escaperIds: number[]) => {
             TriggerSleepAction(4.0)
         }
 
+        const clonedEscaperIds = ArrayHandler.getNewArray<number>()
+
         for (const i of escaperIds) {
+            arrayPush(clonedEscaperIds, i)
+        }
+
+        for (const i of clonedEscaperIds) {
             getUdgEscapers().get(i)?.reviveAtStart()
         }
+
+        ArrayHandler.clearArray(clonedEscaperIds)
 
         if (getUdgLevels().getLevelProgression() === 'all') {
             Text.A('|cff5c2e2eYou have lost a life !')

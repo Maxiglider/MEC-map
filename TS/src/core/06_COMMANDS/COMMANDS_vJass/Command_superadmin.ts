@@ -1,7 +1,7 @@
+import { ServiceManager } from 'Services'
 import { IsBoolString, S2B } from 'core/01_libraries/Basic_functions'
 import { NB_ESCAPERS } from 'core/01_libraries/Constants'
 import { Text } from 'core/01_libraries/Text'
-import { ServiceManager } from 'Services'
 import { getUdgEscapers } from '../../../../globals'
 import { isPlayerId, resolvePlayerId } from './Command_functions'
 
@@ -108,4 +108,64 @@ export const initExecuteCommandTrueMax = () => {
             return true
         },
     })
+
+    // // NOTE; WILL DESYNC
+
+    // // DESYNCS
+    // // showing units after hide = desync
+    // // if u touch immolation of a unit that other player doesn't have = desync
+
+    // //-hideUnits(hu)
+    // registerCommand({
+    //     name: 'hideUnits',
+    //     alias: ['hu'],
+    //     group: 'truemax',
+    //     argDescription: 'on | off',
+    //     description: 'hides units in other levels',
+    //     cb: ({ param1 }, escaper) => {
+    //         if (!param1) param1 = 'true'
+
+    //         if (IsBoolString(param1)) {
+    //             for (const [_, esc] of pairs(getUdgEscapers().getAll())) {
+    //                 if (getUdgLevels().getCurrentLevel(esc) !== getUdgLevels().getCurrentLevel(escaper)) {
+    //                     if (GetLocalPlayer() === escaper.getPlayer()) {
+    //                         ShowUnit(esc.getHero()!, !S2B(param1))
+    //                         ShowUnit(esc.invisUnit!, !S2B(param1))
+    //                     }
+    //                 }
+    //             }
+
+    //             for (const [_, level] of pairs(getUdgLevels().getAll())) {
+    //                 if (getUdgLevels().getCurrentLevel(escaper) !== level) {
+    //                     for (const [_, monster] of pairs(level.monsters.getAll())) {
+    //                         if (monster.u) {
+    //                             const immoSkill = monster.getMonsterType()?.getImmolationSkill()
+
+    //                             if (immoSkill) {
+    //                                 // UnitRemoveAbility(monster.u, immoSkill)
+
+    //                                 if (GetLocalPlayer() === escaper.getPlayer()) {
+    //                                     ShowUnit(monster.u, !S2B(param1))
+
+    //                                     if (S2B(param1)) {
+    //                                         UnitAddAbility(monster.u, immoSkill)
+    //                                     } else {
+    //                                         UnitRemoveAbility(monster.u, immoSkill)
+    //                                     }
+
+    //                                     // UnitRemoveAbility(monster.u, FourCC('Aloc'))
+    //                                     // UnitAddAbility(monster.u, FourCC('Aloc'))
+    //                                 }
+    //                             }
+    //                         }
+    //                     }
+    //                 }
+    //             }
+
+    //             Text.mkP(escaper.getPlayer(), `Units ${!S2B(param1) ? 'shown' : 'hidden'}`)
+    //         }
+
+    //         return true
+    //     },
+    // })
 }

@@ -6,10 +6,10 @@ import { MonsterSpawn } from '../../04_STRUCTURES/MonsterSpawn/MonsterSpawn'
 export class MakeMonsterSpawn extends MakeOneByOneOrTwoClicks {
     label: string
     mt: MonsterType
-    sens: string
+    sens: number
     frequence: number
 
-    constructor(maker: unit, label: string, mt: MonsterType, sens: string, frequence: number) {
+    constructor(maker: unit, label: string, mt: MonsterType, sens: number, frequence: number) {
         super(maker, 'monsterSpawnCreate', '', [''])
 
         this.label = label

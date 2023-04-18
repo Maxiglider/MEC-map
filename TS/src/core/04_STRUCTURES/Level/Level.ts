@@ -1,6 +1,7 @@
 import { arrayPush } from 'core/01_libraries/Basic_functions'
 import { Text } from 'core/01_libraries/Text'
 import { ServiceManager } from 'Services'
+import { ArrayHandler } from 'Utils/ArrayHandler'
 import { getUdgEscapers, getUdgLevels } from '../../../../globals'
 import { ObjectHandler } from '../../../Utils/ObjectHandler'
 import { MecHookArray } from '../../API/MecHookArray'
@@ -246,18 +247,32 @@ export class Level {
             }
 
             for (const [_, monsterSpawn] of pairs(this.monsterSpawns.getAll())) {
-                this.drawRegion(
-                    monsterSpawn.getMinX(),
-                    monsterSpawn.getMinY(),
-                    monsterSpawn.getMaxX(),
-                    monsterSpawn.getMaxY()
+                const rotatedPoints = monsterSpawn.getRotatedPoints()
+
+                this.drawRectangle(
+                    rotatedPoints[0][0],
+                    rotatedPoints[0][1],
+                    rotatedPoints[1][0],
+                    rotatedPoints[1][1],
+                    rotatedPoints[2][0],
+                    rotatedPoints[2][1],
+                    rotatedPoints[3][0],
+                    rotatedPoints[3][1]
                 )
 
-                // if (monsterSpawn.multiRegionPatrols) {
-                //     for (let i = 0; i < monsterSpawn.x1.length; i++) {
-                //         this.drawRegion(monsterSpawn.x1[i], monsterSpawn.y1[i], monsterSpawn.x2[i], monsterSpawn.y2[i])
-                //     }
-                // }
+                ArrayHandler.clearArray(rotatedPoints)
+
+                if (monsterSpawn.unspawnregpoints.length > 0) {
+                    for (const reg of monsterSpawn.unspawnregpoints) {
+                        this.drawRegion(reg[0], reg[1], reg[2], reg[3])
+                    }
+                }
+
+                if (monsterSpawn.multiRegionPatrols) {
+                    for (let i = 0; i < monsterSpawn.x1.length; i++) {
+                        this.drawRegion(monsterSpawn.x1[i], monsterSpawn.y1[i], monsterSpawn.x2[i], monsterSpawn.y2[i])
+                    }
+                }
             }
 
             // for (const [_, monster] of pairs(this.monsters.getAll())) {
@@ -271,6 +286,22 @@ export class Level {
     setDebugRegionsVisible = (active: boolean) => {
         this.debugRegionsVisible = active
         this.updateDebugRegions()
+    }
+
+    drawRectangle = (
+        x1: number,
+        y1: number,
+        x2: number,
+        y2: number,
+        x3: number,
+        y3: number,
+        x4: number,
+        y4: number
+    ) => {
+        this.drawLine(x1, y1, x2, y2)
+        this.drawLine(x2, y2, x3, y3)
+        this.drawLine(x3, y3, x4, y4)
+        this.drawLine(x4, y4, x1, y1)
     }
 
     drawRegion = (x1: number, y1: number, x2: number, y2: number) => {
