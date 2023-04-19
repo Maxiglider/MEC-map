@@ -1,14 +1,14 @@
+import { ServiceManager } from 'Services'
+import { MemoryHandler } from 'Utils/MemoryHandler'
+import { MazeUtils } from 'Utils/vToto'
 import { Ascii2String } from 'core/01_libraries/Ascii'
 import { arrayPush, tileset2tilesetChar } from 'core/01_libraries/Basic_functions'
 import { Text } from 'core/01_libraries/Text'
-import { ServiceManager } from 'Services'
-import { MazeUtils } from 'Utils/vToto'
 import { globals } from '../../../../globals'
-import { ArrayHandler } from '../../../Utils/ArrayHandler'
 import { CmdParam, NbParam } from '../../06_COMMANDS/COMMANDS_vJass/Command_functions'
 import { TerrainTypeMax } from '../../07_TRIGGERS/Modify_terrain_Functions/Terrain_type_max'
 import { BaseArray } from '../BaseArray'
-import { isDeathTerrain, TerrainType } from './TerrainType'
+import { TerrainType, isDeathTerrain } from './TerrainType'
 import { TerrainTypeDeath } from './TerrainTypeDeath'
 import { TerrainTypeSlide } from './TerrainTypeSlide'
 import { TerrainTypeWalk } from './TerrainTypeWalk'
@@ -215,7 +215,7 @@ export class TerrainTypeArray extends BaseArray<TerrainType> {
     }
 
     toJson = () => {
-        const arr = ArrayHandler.getNewArray()
+        const arr = MemoryHandler.getEmptyArray()
 
         for (const [_, terrainType] of pairs(this.data)) {
             arrayPush(arr, terrainType.toJson())

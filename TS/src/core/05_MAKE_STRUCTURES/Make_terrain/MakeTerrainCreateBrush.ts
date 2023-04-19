@@ -1,5 +1,5 @@
+import { MemoryHandler } from 'Utils/MemoryHandler'
 import { getUdgTerrainTypes } from '../../../../globals'
-import { ArrayHandler } from '../../../Utils/ArrayHandler'
 import { arrayPush, outOfBounds, roundCoordinateToCenterOfTile } from '../../01_libraries/Basic_functions'
 import { LARGEUR_CASE } from '../../01_libraries/Constants'
 import { Escaper } from '../../04_STRUCTURES/Escaper/Escaper'
@@ -129,7 +129,7 @@ export class MakeTerrainCreateBrush extends MakeHoldClick {
     }
 
     doPressActions() {
-        this.changingTiles = ArrayHandler.getNewArray()
+        this.changingTiles = MemoryHandler.getEmptyArray()
 
         super.doPressActions()
     }
@@ -141,7 +141,7 @@ export class MakeTerrainCreateBrush extends MakeHoldClick {
         if (this.changingTiles && this.changingTiles.length > 0) {
             const action = new MakeTerrainCreateBrushAction(this.changingTiles)
             this.escaper.newAction(action)
-            this.changingTiles && ArrayHandler.clearArray(this.changingTiles)
+            this.changingTiles && MemoryHandler.destroyArray(this.changingTiles)
         }
     }
 

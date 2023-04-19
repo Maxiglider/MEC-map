@@ -1,7 +1,7 @@
+import { forRange } from 'Utils/mapUtils'
 import { NB_ESCAPERS } from 'core/01_libraries/Constants'
 import { udg_colorCode } from 'core/01_libraries/Init_colorCodes'
 import { Text } from 'core/01_libraries/Text'
-import { forRange } from 'Utils/mapUtils'
 import { getUdgEscapers } from '../../../../globals'
 import { playerId2colorId } from '../../06_COMMANDS/COMMANDS_vJass/Command_functions'
 

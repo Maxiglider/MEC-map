@@ -1,9 +1,9 @@
+import { MemoryHandler } from 'Utils/MemoryHandler'
 import { arrayPush } from 'core/01_libraries/Basic_functions'
-import { ArrayHandler } from 'Utils/ArrayHandler'
 import { MecHook } from './MecHook'
 
 export class MecHookArray {
-    private hooks = ArrayHandler.getNewArray<MecHook>()
+    private hooks = MemoryHandler.getEmptyArray<MecHook>()
 
     public new = (cb: () => any) => {
         const hook = new MecHook(cb)
@@ -26,7 +26,7 @@ export class MecHookArray {
 }
 
 export function CombineHooks(ha1: MecHookArray | undefined, ha2: MecHookArray | undefined) {
-    const outHookArray = ArrayHandler.getNewArray<MecHook>()
+    const outHookArray = MemoryHandler.getEmptyArray<MecHook>()
 
     if (ha1) {
         for (const value of ha1.getHooks()) {

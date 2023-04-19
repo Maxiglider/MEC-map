@@ -1,7 +1,7 @@
+import { IPoint, createPoint } from 'Utils/Point'
+import { createEvent } from 'Utils/mapUtils'
 import { NB_ESCAPERS, NB_PLAYERS_MAX } from 'core/01_libraries/Constants'
 import { udg_doubleHeroesEnabled } from 'core/Double_heroes/double_heroes_config'
-import { createEvent } from 'Utils/mapUtils'
-import { createPoint, IPoint } from 'Utils/Point'
 import { getUdgEscapers } from '../../../../globals'
 
 const startPositions: location[] = []
@@ -14,7 +14,7 @@ const TIME_BEFORE_HERO_SPAWN = 3
 const TIME_BETWEEN_EACH_HERO_SPAWN = 0.1
 let EFFECT_FOR_MISSING_HEROES = 'Abilities\\Spells\\Undead\\DeathPact\\DeathPactTarget.mdl'
 
-let staticSpawns: IPoint[] = []
+const staticSpawns: IPoint[] = []
 
 export const heroes = {
     setEffectForMissingHeroes: (effectStr: string) => {
@@ -54,7 +54,7 @@ const RandomizeStartPositionsAndHeroSpawnOrder = () => {
             if (!alreadyAdded[n]) break
         }
         startPositionsRandomized[i] =
-            staticSpawns.length > 0 ? Location(staticSpawns[n][0], staticSpawns[n][1]) : startPositions[n]
+            staticSpawns.length > 0 ? Location(staticSpawns[n].x, staticSpawns[n].y) : startPositions[n]
         alreadyAdded[n] = true
         i = i + 1
     }

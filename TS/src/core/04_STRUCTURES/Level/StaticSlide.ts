@@ -1,7 +1,7 @@
 import { arrayPush, IsIssuedOrder, StopUnit } from 'core/01_libraries/Basic_functions'
 import { createEvent } from 'Utils/mapUtils'
+import { MemoryHandler } from 'Utils/MemoryHandler'
 import { getUdgEscapers, globals } from '../../../../globals'
-import { ObjectHandler } from '../../../Utils/ObjectHandler'
 import { Hero2Escaper, IsHero } from '../Escaper/Escaper_functions'
 import { Level } from './Level'
 
@@ -226,7 +226,7 @@ export class StaticSlide {
     }
 
     toJson = () => {
-        const output = ObjectHandler.getNewObject<any>()
+        const output = MemoryHandler.getEmptyObject<any>()
 
         output['x1'] = R2I(this.x1)
         output['y1'] = R2I(this.y1)

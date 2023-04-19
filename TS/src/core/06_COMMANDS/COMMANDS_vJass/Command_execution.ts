@@ -1,8 +1,8 @@
-import { catchAndDisplay, Text } from 'core/01_libraries/Text'
+import { MemoryHandler } from 'Utils/MemoryHandler'
+import { createEvent, forRange } from 'Utils/mapUtils'
+import { Text } from 'core/01_libraries/Text'
 import { Escaper } from 'core/04_STRUCTURES/Escaper/Escaper'
 import { Globals } from 'core/09_From_old_Worldedit_triggers/globals_variables_and_triggers'
-import { createEvent, forRange } from 'Utils/mapUtils'
-import { ObjectHandler } from 'Utils/ObjectHandler'
 import { getUdgEscapers } from '../../../../globals'
 import { NB_PLAYERS_MAX } from '../../01_libraries/Constants'
 import { initExecuteCommandMax } from './Command_admin'
@@ -28,7 +28,7 @@ type ICommand = {
 type IParsedCmdContext = ReturnType<typeof parseCmdContext>
 
 const parseCmdContext = (cmd: string) => {
-    const obj = ObjectHandler.getNewObject<{
+    const obj = MemoryHandler.getEmptyObject<{
         cmd: string
         name: string
         noParam: boolean
@@ -96,21 +96,35 @@ export const initCommandExecution = () => {
         }
     }
 
-    const ExecuteCommandSingle = (escaper: Escaper, cmd: string) => {
-        catchAndDisplay(() => {
-            const parsedContext = parseCmdContext(cmd)
+    const findTargetCommand = (commands: ICommand[], parsedContext: IParsedCmdContext, escaper: Escaper) => {
+        for (const cmd of commands) {
+            const isMatchedName = cmd.name.toLowerCase() === parsedContext.name.toLowerCase()
+            let isMatchedAlias = false
 
-            const targetCmd = commands.find(
-                cmd =>
-                    (cmd.name.toLowerCase() === parsedContext.name.toLowerCase() ||
-                        cmd.alias.find(a => a.toLowerCase() === parsedContext.name.toLowerCase())) &&
-                    (cmd.enabled ? cmd.enabled(parsedContext, escaper) : true) &&
-                    accessCheck(escaper, cmd)
-            )
+            for (const alias of cmd.alias) {
+                if (alias.toLowerCase() === parsedContext.name.toLowerCase()) {
+                    isMatchedAlias = true
+                    break
+                }
+            }
+
+            const isEnabled = cmd.enabled ? cmd.enabled(parsedContext, escaper) : true
+            const hasAccess = accessCheck(escaper, cmd)
+
+            if ((isMatchedName || isMatchedAlias) && isEnabled && hasAccess) {
+                return cmd
+            }
+        }
+    }
+
+    const ExecuteCommandSingle = (escaper: Escaper, cmd: string) => {
+        try {
+            const parsedContext = parseCmdContext(cmd)
+            const targetCmd = findTargetCommand(commands, parsedContext, escaper)
 
             targetCmd?.cb(parsedContext, escaper)
 
-            ObjectHandler.clearObject(parsedContext)
+            MemoryHandler.destroyObject(parsedContext)
 
             // if (!ExecuteCommandAll(escaper, cmd)) {
             //     if (!((escaper.getPlayer() == Player(0) && Globals.udg_areRedRightsOn) || escaper.canCheat())) {
@@ -141,11 +155,19 @@ export const initCommandExecution = () => {
             //         }
             //     }
             // }
-        }, escaper.getPlayer())
+        } catch (error) {
+            if (typeof error == 'string') {
+                if (escaper.getPlayer()) {
+                    Text.erP(escaper.getPlayer(), error)
+                } else {
+                    Text.erA(error)
+                }
+            }
+        }
     }
 
     const ExecuteCommand = (escaper: Escaper, cmd: string) => {
-        let singleCommands: string[] = []
+        const singleCommands = MemoryHandler.getEmptyArray<string>()
         let char: string
         let i: number
         let nbParenthesesNonFermees = 0
@@ -188,6 +210,8 @@ export const initCommandExecution = () => {
             }
             i = i + 1
         }
+
+        MemoryHandler.destroyArray(singleCommands)
     }
 
     createEvent({

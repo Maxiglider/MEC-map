@@ -1,4 +1,4 @@
-import { ArrayHandler } from '../../Utils/ArrayHandler'
+import { MemoryHandler } from 'Utils/MemoryHandler'
 import { arrayPush, sortArrayOfObjectsByIds } from '../01_libraries/Basic_functions'
 
 type BaseModel = { getId?: () => number; destroy: () => void; toJson: () => {} }
@@ -50,7 +50,7 @@ export abstract class BaseArray<T extends BaseModel> {
     getAll = () => this.data
 
     toJson: () => any = () => {
-        const outputArray = ArrayHandler.getNewArray<{ [x: string | number]: any }[]>()
+        const outputArray = MemoryHandler.getEmptyArray<{ [x: string | number]: any }[]>()
 
         for (const [_, element] of pairs(this.data)) {
             const json = element.toJson()

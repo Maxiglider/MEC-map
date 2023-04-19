@@ -1,5 +1,5 @@
+import { MemoryHandler } from 'Utils/MemoryHandler'
 import { CanUseTerrain } from 'core/07_TRIGGERS/Modify_terrain_Functions/Terrain_functions'
-import { ObjectHandler } from '../../../Utils/ObjectHandler'
 import { Ascii2String } from '../../01_libraries/Ascii'
 import { TerrainTypeDeath } from './TerrainTypeDeath'
 import { TerrainTypeSlide } from './TerrainTypeSlide'
@@ -127,7 +127,7 @@ export abstract class TerrainType {
     }
 
     toJson() {
-        const output = ObjectHandler.getNewObject<any>()
+        const output = MemoryHandler.getEmptyObject<any>()
 
         output['label'] = this.label
         output['alias'] = this.theAlias

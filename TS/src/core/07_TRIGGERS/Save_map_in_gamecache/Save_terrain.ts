@@ -1,3 +1,4 @@
+import { MemoryHandler } from 'Utils/MemoryHandler'
 import { Ascii2String } from 'core/01_libraries/Ascii'
 import { LARGEUR_CASE } from 'core/01_libraries/Constants'
 import { Text } from 'core/01_libraries/Text'
@@ -7,16 +8,12 @@ import { arrayPush } from '../../01_libraries/Basic_functions'
 import { I2HexaString } from '../../01_libraries/Functions_on_numbers'
 import { SaveTerrainHeights } from './Save_terrain_heights_and_cliffs'
 import { SaveTerrainRamps } from './Save_terrain_ramps'
-import { SaveWater } from './Save_water'
-import {ArrayHandler} from "../../../Utils/ArrayHandler";
-import {ObjectHandler} from "../../../Utils/ObjectHandler";
-import {clearArrayOrObject} from "../../../Utils/clearArrayOrObject";
 
 let terrainTypeIds: number[] = []
 let nbTerrainTypesUsed: number
 
 const SaveTerrainsUsed = (json: { [x: string]: any }) => {
-    json.terrainsUsed = ArrayHandler.getNewArray()
+    json.terrainsUsed = MemoryHandler.getEmptyArray()
 
     for (let i = 0; i < nbTerrainTypesUsed; i++) {
         arrayPush(json.terrainsUsed, Ascii2String(terrainTypeIds[i]))
@@ -31,7 +28,7 @@ const SaveMapDimensionsAndCenterOffset = (json: { [x: string]: any }) => {
     let offsetX = R2I(globals.MAP_MIN_X)
     let offsetY = R2I(globals.MAP_MIN_Y)
 
-    json.terrain = ObjectHandler.getNewObject()
+    json.terrain = MemoryHandler.getEmptyObject()
     json.terrain.largeur = largeurMap
     json.terrain.hauteur = hauteurMap
     json.terrain.centerOffsetX = offsetX
@@ -102,7 +99,7 @@ const GererOrdreTerrains = () => {
 }
 
 const SaveTerrain = (json: { [x: string]: any }) => {
-    const terrainTypesArr = ArrayHandler.getNewArray()
+    const terrainTypesArr = MemoryHandler.getEmptyArray()
 
     let y = globals.MAP_MIN_Y
     while (y <= globals.MAP_MAX_Y) {
@@ -115,7 +112,7 @@ const SaveTerrain = (json: { [x: string]: any }) => {
     }
 
     json.terrainTypes = terrainTypesArr.join('')
-    clearArrayOrObject(terrainTypesArr)
+    MemoryHandler.destroyArray(terrainTypesArr)
 
     Text.A('terrain saved')
 }
@@ -132,10 +129,9 @@ export const PushTerrainDataIntoJson = (json: { [x: string]: any }) => {
     // SaveWater.SaveWater(json) //copie from TerrainHeights for the moment ; disabled because i didn't succeed to handle water yet
 }
 
-
 //function to save whole terrain in an array of array
 export function saveTerrainType2Dims() {
-    const terrainsTypes: (TerrainType | null)[][] = ArrayHandler.getNewArray()
+    const terrainsTypes: (TerrainType | null)[][] = MemoryHandler.getEmptyArray()
 
     let yInd = 0
     let y = globals.MAP_MIN_Y
@@ -143,7 +139,7 @@ export function saveTerrainType2Dims() {
         let xInd = 0
         let x = globals.MAP_MIN_X
         while (x <= globals.MAP_MAX_X) {
-            !terrainsTypes[xInd] && (terrainsTypes[xInd] = ArrayHandler.getNewArray())
+            !terrainsTypes[xInd] && (terrainsTypes[xInd] = MemoryHandler.getEmptyArray())
             terrainsTypes[xInd][yInd] = getUdgTerrainTypes().getTerrainType(x, y)
 
             xInd++

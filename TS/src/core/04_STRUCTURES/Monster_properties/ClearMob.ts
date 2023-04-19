@@ -1,5 +1,5 @@
+import { MemoryHandler } from 'Utils/MemoryHandler'
 import { arrayPush } from 'core/01_libraries/Basic_functions'
-import { ObjectHandler } from '../../../Utils/ObjectHandler'
 import { Level } from '../Level/Level'
 import { Monster } from '../Monster/Monster'
 import { MonsterArray } from '../Monster/MonsterArray'
@@ -227,7 +227,7 @@ export class ClearMob {
             }
         }
 
-        const output = ObjectHandler.getNewObject<any>()
+        const output = MemoryHandler.getEmptyObject<any>()
 
         output['id'] = this.id
         output['triggerMobId'] = this.triggerMob.id

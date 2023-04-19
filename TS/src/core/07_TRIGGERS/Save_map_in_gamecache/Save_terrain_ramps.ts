@@ -1,9 +1,8 @@
-import {arrayPush, IsNearBounds} from 'core/01_libraries/Basic_functions'
+import { arrayPush, IsNearBounds } from 'core/01_libraries/Basic_functions'
 import { LARGEUR_CASE } from 'core/01_libraries/Constants'
 import { Text } from 'core/01_libraries/Text'
-import {globals} from "../../../../globals";
-import {ArrayHandler} from "../../../Utils/ArrayHandler";
-import {clearArrayOrObject} from "../../../Utils/clearArrayOrObject";
+import { MemoryHandler } from 'Utils/MemoryHandler'
+import { globals } from '../../../../globals'
 
 const initSaveTerrainRamps = () => {
     const DECAL_TEST_PATH = 10
@@ -20,8 +19,8 @@ the middle R is at cliff level CL
 if one of the N tilepoints is at a cliff level different than CL or CL+1, the ramp middle isn't raised
 */
 
-    const loc1 = Location(0 ,0)
-    const loc2 = Location(0 ,0)
+    const loc1 = Location(0, 0)
+    const loc2 = Location(0, 0)
 
     const isRampMiddleRaised = (x: number, y: number, isRampDirectionX: boolean): boolean => {
         let middleRampcliffLevel = GetTerrainCliffLevel(x, y)
@@ -59,15 +58,15 @@ if one of the N tilepoints is at a cliff level different than CL or CL+1, the ra
     }
 
     //save terrain ramps
-    let cachedTerrainRamps = ""
+    let cachedTerrainRamps = ''
 
-    const SaveTerrainRamps = (json: {[x: string]: any}) => {
-        if(cachedTerrainRamps !== ""){
+    const SaveTerrainRamps = (json: { [x: string]: any }) => {
+        if (cachedTerrainRamps !== '') {
             json.terrainRamps = cachedTerrainRamps
             return
         }
 
-        const terrainRampsArr = ArrayHandler.getNewArray()
+        const terrainRampsArr = MemoryHandler.getEmptyArray()
 
         let x: number
         let currentCliffLevel: number
@@ -85,8 +84,7 @@ if one of the N tilepoints is at a cliff level different than CL or CL+1, the ra
 
         let y = globals.MAP_MIN_Y
 
-        while(y <= globals.MAP_MAX_Y) {
-
+        while (y <= globals.MAP_MAX_Y) {
             x = globals.MAP_MIN_X
             while (x <= globals.MAP_MAX_X) {
                 ramp = false
@@ -130,7 +128,7 @@ if one of the N tilepoints is at a cliff level different than CL or CL+1, the ra
                                         //il y a une rampe à condition que les deux points en bas de la falaise soient au même niveau de falaise et pas à la même hauteur
                                         if (currentCliffLevel < otherCliffLevel) {
                                             MoveLocation(loc1, x, y)
-                                            MoveLocation(loc2,x - LARGEUR_CASE, y)
+                                            MoveLocation(loc2, x - LARGEUR_CASE, y)
                                         } else {
                                             MoveLocation(loc1, otherX, y)
                                             MoveLocation(loc2, otherX + LARGEUR_CASE, y)
@@ -524,7 +522,7 @@ if one of the N tilepoints is at a cliff level different than CL or CL+1, the ra
         }
 
         json.terrainRamps = cachedTerrainRamps = terrainRampsArr.join('')
-        clearArrayOrObject(terrainRampsArr)
+        MemoryHandler.destroyArray(terrainRampsArr)
 
         Text.A('terrain ramps saved')
     }

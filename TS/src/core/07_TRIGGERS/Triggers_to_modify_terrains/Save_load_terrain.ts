@@ -1,9 +1,8 @@
-import {LARGEUR_CASE} from 'core/01_libraries/Constants'
-import {Text} from 'core/01_libraries/Text'
-import {TerrainType} from 'core/04_STRUCTURES/TerrainType/TerrainType'
-import {getUdgTerrainTypes} from '../../../../globals'
-import {ChangeTerrainType} from '../Modify_terrain_Functions/Modify_terrain_functions'
-import {globals} from "../../../../globals";
+import { LARGEUR_CASE } from 'core/01_libraries/Constants'
+import { Text } from 'core/01_libraries/Text'
+import { TerrainType } from 'core/04_STRUCTURES/TerrainType/TerrainType'
+import { getUdgTerrainTypes, globals } from '../../../../globals'
+import { ChangeTerrainType } from '../Modify_terrain_Functions/Modify_terrain_functions'
 
 const initSaveLoadTerrain = () => {
     let terrainSaves = new Map<string, (TerrainType | null)[][]>()
@@ -15,7 +14,6 @@ const initSaveLoadTerrain = () => {
         let y = globals.MAP_MIN_Y
 
         while (y <= globals.MAP_MAX_Y) {
-
             let x = globals.MAP_MIN_X
             while (x <= globals.MAP_MAX_X) {
                 if (!terrainSave[x]) terrainSave[x] = []
@@ -48,7 +46,6 @@ const initSaveLoadTerrain = () => {
         let y = globals.MAP_MIN_Y
 
         while (y <= globals.MAP_MAX_Y) {
-
             let x = globals.MAP_MIN_X
             while (x <= globals.MAP_MAX_X) {
                 terrainType = terrainSave[x][y]
@@ -66,7 +63,7 @@ const initSaveLoadTerrain = () => {
         return true
     }
 
-    return {SaveTerrain, DeleteTerrainSave, LoadTerrain}
+    return { SaveTerrain, DeleteTerrainSave, LoadTerrain }
 }
 
 export const SaveLoadTerrain = initSaveLoadTerrain()

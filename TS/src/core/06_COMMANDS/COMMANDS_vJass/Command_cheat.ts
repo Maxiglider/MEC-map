@@ -1,3 +1,4 @@
+import { ServiceManager } from 'Services'
 import { IsBoolString, S2B } from 'core/01_libraries/Basic_functions'
 import { NB_ESCAPERS } from 'core/01_libraries/Constants'
 import { IsInteger, IsPositiveInteger } from 'core/01_libraries/Functions_on_numbers'
@@ -6,7 +7,6 @@ import { Escaper } from 'core/04_STRUCTURES/Escaper/Escaper'
 import { GetMirrorEscaper } from 'core/04_STRUCTURES/Escaper/Escaper_functions'
 import { METEOR_CHEAT } from 'core/04_STRUCTURES/Meteor/Meteor'
 import { Gravity } from 'core/07_TRIGGERS/Slide_and_CheckTerrain_triggers/Gravity'
-import { ServiceManager } from 'Services'
 import { getUdgEscapers, getUdgLevels, globals } from '../../../../globals'
 import { runInTrigger } from '../../../Utils/mapUtils'
 import { getUdgViewAll } from '../../03_view_all_hide_all/View_all_hide_all'
@@ -353,7 +353,7 @@ export const initExecuteCommandCheat = () => {
         cb: ({ noParam }, escaper) => {
             if (noParam) {
                 if (escaper.lastPos) {
-                    escaper.moveHero(escaper.lastPos[0], escaper.lastPos[1])
+                    escaper.moveHero(escaper.lastPos.x, escaper.lastPos.y)
                     escaper.coopReviveHero()
                 }
 

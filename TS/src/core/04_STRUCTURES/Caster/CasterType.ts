@@ -1,10 +1,10 @@
+import { MemoryHandler } from 'Utils/MemoryHandler'
 import { NB_ESCAPERS, TEAL, TERRAIN_DATA_DISPLAY_TIME } from 'core/01_libraries/Constants'
 import { Text } from 'core/01_libraries/Text'
 import { getUdgEscapers, getUdgLevels } from '../../../../globals'
 import { udg_colorCode } from '../../01_libraries/Init_colorCodes'
 import { Level } from '../Level/Level'
 import { MonsterType } from '../Monster/MonsterType'
-import {ObjectHandler} from "../../../Utils/ObjectHandler";
 
 export const DEFAULT_CASTER_PROJECTILE_SPEED = 600
 export const MIN_CASTER_PROJECTILE_SPEED = 100
@@ -178,7 +178,7 @@ export class CasterType {
     }
 
     toJson = () => {
-        const output = ObjectHandler.getNewObject<any>()
+        const output = MemoryHandler.getEmptyObject<any>()
 
         output['label'] = this.label
         output['alias'] = this.theAlias

@@ -1,24 +1,22 @@
+import { MemoryHandler } from 'Utils/MemoryHandler'
 import { LARGEUR_CASE } from 'core/01_libraries/Constants'
 import { Text } from 'core/01_libraries/Text'
 import { ZLibrary } from 'core/02_bibliotheques_externes/ZLibrary'
-import {globals} from "../../../../globals";
-import {arrayPush} from "../../01_libraries/Basic_functions";
-import {ArrayHandler} from "../../../Utils/ArrayHandler";
+import { globals } from '../../../../globals'
+import { arrayPush } from '../../01_libraries/Basic_functions'
 
 const initSaveWater = () => {
-
     //save water heights
-    const SaveWaterHeights = (json: {[x: string]: any}) => {
-        if(json.terrainHeights){
+    const SaveWaterHeights = (json: { [x: string]: any }) => {
+        if (json.terrainHeights) {
             json.waterHeights = json.terrainHeights
             return
         }
 
-        json.waterHeights = ArrayHandler.getNewArray()
+        json.waterHeights = MemoryHandler.getEmptyArray()
         let y = globals.MAP_MIN_Y
 
-        while(y <= globals.MAP_MAX_Y) {
-
+        while (y <= globals.MAP_MAX_Y) {
             let x = globals.MAP_MIN_X
             while (x <= globals.MAP_MAX_X) {
                 arrayPush(json.waterHeights, R2I(ZLibrary.GetSurfaceZ(x, y)))
@@ -58,7 +56,7 @@ const initSaveWater = () => {
 endfunction
 */
 
-    const SaveWater = (json: {[x: string]: any}) => {
+    const SaveWater = (json: { [x: string]: any }) => {
         SaveWaterHeights(json)
 
         /*

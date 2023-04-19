@@ -1,5 +1,5 @@
 import { MakeOneByOneOrTwoClicks } from 'core/05_MAKE_STRUCTURES/Make/MakeOneByOneOrTwoClicks'
-import { ArrayHandler } from 'Utils/ArrayHandler'
+import { MemoryHandler } from 'Utils/MemoryHandler'
 import { arrayPush } from '../../01_libraries/Basic_functions'
 import { Text } from '../../01_libraries/Text'
 import { Meteor, METEOR_NORMAL, udg_meteors } from '../../04_STRUCTURES/Meteor/Meteor'
@@ -47,7 +47,7 @@ export class MakeDeleteMeteors extends MakeOneByOneOrTwoClicks {
                     nbMeteorsRemoved = nbMeteorsRemoved + 1
                 }
 
-                ArrayHandler.clearArray(meteors)
+                MemoryHandler.destroyArray(meteors)
             }
 
             if (nbMeteorsRemoved <= 1) {

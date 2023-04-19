@@ -1,6 +1,6 @@
+import { MemoryHandler } from 'Utils/MemoryHandler'
 import { getUdgTerrainTypes } from '../../../../globals'
 import { Level } from '../Level/Level'
-import {ObjectHandler} from "../../../Utils/ObjectHandler";
 
 export const METEOR_NORMAL = FourCC('MND1')
 export const METEOR_CHEAT = FourCC('MCD1')
@@ -53,7 +53,7 @@ export class Meteor {
     }
 
     delete = () => {
-        if (this.item){
+        if (this.item) {
             this.removeMeteorItem()
         }
 
@@ -84,10 +84,10 @@ export class Meteor {
     }
 
     toJson = () => {
-        if(this.isDeleted()) {
+        if (this.isDeleted()) {
             return false
-        }else {
-            const output = ObjectHandler.getNewObject<any>()
+        } else {
+            const output = MemoryHandler.getEmptyObject<any>()
 
             output['x'] = R2I(this.x)
             output['y'] = R2I(this.y)

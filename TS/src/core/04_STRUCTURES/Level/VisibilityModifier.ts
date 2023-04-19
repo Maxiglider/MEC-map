@@ -1,6 +1,6 @@
+import { MemoryHandler } from 'Utils/MemoryHandler'
 import { RefreshHideAllVM } from '../../03_view_all_hide_all/View_all_hide_all'
 import { Level } from './Level'
-import {ObjectHandler} from "../../../Utils/ObjectHandler";
 
 export class VisibilityModifier {
     private x1: number
@@ -42,7 +42,7 @@ export class VisibilityModifier {
     }
 
     toJson = () => {
-        const output = ObjectHandler.getNewObject<any>()
+        const output = MemoryHandler.getEmptyObject<any>()
 
         output['x1'] = R2I(this.x1)
         output['y1'] = R2I(this.y1)

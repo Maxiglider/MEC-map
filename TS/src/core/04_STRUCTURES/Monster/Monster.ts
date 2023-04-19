@@ -1,6 +1,5 @@
-import { ArrayHandler } from 'Utils/ArrayHandler'
+import { MemoryHandler } from 'Utils/MemoryHandler'
 import { udg_monsters } from '../../../../globals'
-import { ObjectHandler } from '../../../Utils/ObjectHandler'
 import { MOBS_VARIOUS_COLORS, NB_PLAYERS_MAX } from '../../01_libraries/Constants'
 import { ColorString2Id } from '../../01_libraries/Init_colorCodes'
 import { IsColorString } from '../../06_COMMANDS/COMMANDS_vJass/Command_functions'
@@ -200,7 +199,7 @@ export abstract class Monster {
             }
 
             if (quit) {
-                ArrayHandler.clearArray(hookArray)
+                MemoryHandler.destroyArray(hookArray)
                 return
             }
 
@@ -212,7 +211,7 @@ export abstract class Monster {
             forceX2 != 0 && (Monster.forceX2forNextMonster = forceX2)
             forceY2 != 0 && (Monster.forceY2forNextMonster = forceY2)
         }
-        ArrayHandler.clearArray(hookArray)
+        MemoryHandler.destroyArray(hookArray)
 
         let previouslyEnabled = !!this.u
         let isMonsterAlive = this.u && IsUnitAliveBJ(this.u)
@@ -259,7 +258,7 @@ export abstract class Monster {
                 hook.execute(this)
             }
         }
-        ArrayHandler.clearArray(hookArray2)
+        MemoryHandler.destroyArray(hookArray2)
     }
 
     delete = () => {
@@ -411,7 +410,7 @@ export abstract class Monster {
         if (this.isDeleted()) {
             return false
         } else {
-            const output = ObjectHandler.getNewObject<any>()
+            const output = MemoryHandler.getEmptyObject<any>()
             output['id'] = this.id
             output['monsterClassName'] = this.constructor.name
             output['monsterTypeLabel'] = this.mt?.label

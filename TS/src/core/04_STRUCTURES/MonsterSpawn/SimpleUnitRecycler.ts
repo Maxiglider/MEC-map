@@ -1,15 +1,15 @@
+import { MemoryHandler } from 'Utils/MemoryHandler'
 import { arrayPush } from 'core/01_libraries/Basic_functions'
-import { ArrayHandler } from 'Utils/ArrayHandler'
 
 export const initSimpleUnitRecycler = () => {
-    let units = ArrayHandler.getNewArray<unit>()
+    let units = MemoryHandler.getEmptyArray<unit>()
 
     const destroy = () => {
         for (const u of units) {
             RemoveUnit(u)
         }
 
-        ArrayHandler.clearArray(units)
+        MemoryHandler.destroyArray(units)
     }
 
     return {
@@ -29,7 +29,7 @@ export const initSimpleUnitRecycler = () => {
         destroy,
         reinit: () => {
             destroy()
-            units = ArrayHandler.getNewArray<unit>()
+            units = MemoryHandler.getEmptyArray<unit>()
         },
     }
 }

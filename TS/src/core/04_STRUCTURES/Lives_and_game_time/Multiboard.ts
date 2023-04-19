@@ -1,6 +1,6 @@
 import { ServiceManager } from 'Services'
-import { ArrayHandler } from 'Utils/ArrayHandler'
 import { literalArray } from 'Utils/ArrayUtils'
+import { MemoryHandler } from 'Utils/MemoryHandler'
 import { createTimer, forRange } from 'Utils/mapUtils'
 import { ucfirst } from 'core/01_libraries/Basic_functions'
 import { NB_ESCAPERS, PURPLE, RED } from 'core/01_libraries/Constants'
@@ -222,7 +222,7 @@ export const initMultiboard = () => {
 
         let rowIndex = 0
 
-        const sortedArray = ArrayHandler.getNewArray<Escaper>()
+        const sortedArray = MemoryHandler.getEmptyArray<Escaper>()
 
         for (const [_, escaper] of pairs(getUdgEscapers().getAll())) {
             sortedArray.push(escaper)
@@ -260,7 +260,7 @@ export const initMultiboard = () => {
             }
         }
 
-        ArrayHandler.clearArray(sortedArray)
+        MemoryHandler.destroyArray(sortedArray)
     }
 
     const updateBoards = () => {

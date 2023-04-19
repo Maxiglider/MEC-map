@@ -1,8 +1,8 @@
 import { arrayPush, ForceAngleBetween0And360 } from 'core/01_libraries/Basic_functions'
 import { createTimer } from 'Utils/mapUtils'
+import { MemoryHandler } from 'Utils/MemoryHandler'
 import { Timer } from 'w3ts'
 import { globals } from '../../../../globals'
-import { ObjectHandler } from '../../../Utils/ObjectHandler'
 import { Level } from '../Level/Level'
 import { Monster } from '../Monster/Monster'
 
@@ -184,7 +184,7 @@ export class CircleMob {
             }
         }
 
-        const output = ObjectHandler.getNewObject<any>()
+        const output = MemoryHandler.getEmptyObject<any>()
 
         output['id'] = this.id
         output['mainMobId'] = this.triggerMob.id

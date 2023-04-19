@@ -1,4 +1,4 @@
-import { ArrayHandler } from 'Utils/ArrayHandler'
+import { MemoryHandler } from 'Utils/MemoryHandler'
 import { arrayPush, IsItemBetweenLocs } from '../../01_libraries/Basic_functions'
 import { BaseArray } from '../BaseArray'
 import type { Level } from '../Level/Level'
@@ -20,7 +20,7 @@ export class MeteorArray extends BaseArray<Meteor> {
     }
 
     newFromJson = (meteorsJson: { [x: string]: any }[]) => {
-        for(let m of meteorsJson){
+        for (let m of meteorsJson) {
             const meteor = new Meteor(m.x, m.y)
             this.new(meteor, false)
         }
@@ -68,7 +68,7 @@ export class MeteorArray extends BaseArray<Meteor> {
     }
 
     getMeteorsBetweenLocs(x1: number, y1: number, x2: number, y2: number) {
-        const arr = ArrayHandler.getNewArray<Meteor>()
+        const arr = MemoryHandler.getEmptyArray<Meteor>()
 
         for (const [_, meteor] of pairs(this.data)) {
             const item = meteor.getItem()

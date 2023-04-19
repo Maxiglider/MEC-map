@@ -1,6 +1,6 @@
+import { MemoryHandler } from 'Utils/MemoryHandler'
 import { Text } from 'core/01_libraries/Text'
 import { getUdgEscapers, getUdgLevels } from '../../../../globals'
-import { ObjectHandler } from '../../../Utils/ObjectHandler'
 import { Ascii2String } from '../../01_libraries/Ascii'
 import {
     MAX_MOVE_SPEED,
@@ -288,7 +288,7 @@ export class MonsterType {
     }
 
     toJson = () => {
-        const output = ObjectHandler.getNewObject<any>()
+        const output = MemoryHandler.getEmptyObject<any>()
 
         output['label'] = this.label
         output['alias'] = this.theAlias

@@ -1,6 +1,5 @@
+import { MemoryHandler } from 'Utils/MemoryHandler'
 import { arrayPush } from 'core/01_libraries/Basic_functions'
-import { ArrayHandler } from 'Utils/ArrayHandler'
-import { ObjectHandler } from 'Utils/ObjectHandler'
 import { getUdgLevels } from '../globals'
 
 export type IRenderInfo = {
@@ -17,7 +16,7 @@ export const renderWorldSingle = (renderInfo: IRenderInfo, playerIndex: number, 
         const camX = getTileCenter(x)
         const camY = getTileCenter(y)
 
-        const monstersMap = ObjectHandler.getNewObject<{
+        const monstersMap = MemoryHandler.getEmptyObject<{
             [x_y: string]: unit[]
         }>()
 
@@ -25,7 +24,7 @@ export const renderWorldSingle = (renderInfo: IRenderInfo, playerIndex: number, 
             if (m.u && m.mt && m.mt?.getUnitMoveSpeed()) {
                 if (!monstersMap[`${getTileCenter(GetUnitX(m.u))}_${getTileCenter(GetUnitY(m.u))}`]) {
                     monstersMap[`${getTileCenter(GetUnitX(m.u))}_${getTileCenter(GetUnitY(m.u))}`] =
-                        ArrayHandler.getNewArray()
+                        MemoryHandler.getEmptyArray()
                 }
 
                 arrayPush(monstersMap[`${getTileCenter(GetUnitX(m.u))}_${getTileCenter(GetUnitY(m.u))}`], m.u)
@@ -39,7 +38,7 @@ export const renderWorldSingle = (renderInfo: IRenderInfo, playerIndex: number, 
 
                     if (!monstersMap[`${getTileCenter(GetUnitX(m))}_${getTileCenter(GetUnitY(m))}`]) {
                         monstersMap[`${getTileCenter(GetUnitX(m))}_${getTileCenter(GetUnitY(m))}`] =
-                            ArrayHandler.getNewArray()
+                            MemoryHandler.getEmptyArray()
                     }
 
                     arrayPush(monstersMap[`${getTileCenter(GetUnitX(m))}_${getTileCenter(GetUnitY(m))}`], m)
@@ -98,7 +97,7 @@ export const renderWorldSingle = (renderInfo: IRenderInfo, playerIndex: number, 
             }
 
             if (!renderInfo[playerIndex]) {
-                renderInfo[playerIndex] = ObjectHandler.getNewObject()
+                renderInfo[playerIndex] = MemoryHandler.getEmptyObject()
             }
 
             renderInfo[playerIndex].lastCameraPosX = camX
@@ -106,10 +105,10 @@ export const renderWorldSingle = (renderInfo: IRenderInfo, playerIndex: number, 
         }
 
         for (const [_, v] of pairs(monstersMap)) {
-            ArrayHandler.clearArray(v)
+            MemoryHandler.destroyArray(v)
         }
 
-        ObjectHandler.clearObject(monstersMap)
+        MemoryHandler.destroyObject(monstersMap)
     }
 }
 

@@ -1,31 +1,29 @@
-import {arrayPush, IsNearBounds} from 'core/01_libraries/Basic_functions'
+import { arrayPush, IsNearBounds } from 'core/01_libraries/Basic_functions'
 import { LARGEUR_CASE } from 'core/01_libraries/Constants'
 import { Text } from 'core/01_libraries/Text'
 import { ZLibrary } from 'core/02_bibliotheques_externes/ZLibrary'
+import { MemoryHandler } from 'Utils/MemoryHandler'
+import { globals } from '../../../../globals'
 import { I2HexaString } from '../../01_libraries/Functions_on_numbers'
-import {globals} from "../../../../globals";
-import {ArrayHandler} from "../../../Utils/ArrayHandler";
-import {clearArrayOrObject} from "../../../Utils/clearArrayOrObject";
 
 const initSaveTerrainHeights = () => {
-
     //save terrain cliff levels
-    let cachedTerrainCliffs = ""
+    let cachedTerrainCliffs = ''
 
-    const SaveTerrainCliffs = (json: {[x: string]: any}) => {
-        if(cachedTerrainCliffs !== ""){
+    const SaveTerrainCliffs = (json: { [x: string]: any }) => {
+        if (cachedTerrainCliffs !== '') {
             json.terrainCliffs = cachedTerrainCliffs
             return
         }
 
-        const terrainCliffsArr = ArrayHandler.getNewArray()
+        const terrainCliffsArr = MemoryHandler.getEmptyArray()
 
         let x: number
         let cliffLevel: number
 
         let y = globals.MAP_MIN_Y
 
-        while(y <= globals.MAP_MAX_Y) {
+        while (y <= globals.MAP_MAX_Y) {
             x = globals.MAP_MIN_X
             while (true) {
                 if (x > globals.MAP_MAX_X) break
@@ -43,22 +41,21 @@ const initSaveTerrainHeights = () => {
         }
 
         json.terrainCliffs = cachedTerrainCliffs = terrainCliffsArr.join('')
-        clearArrayOrObject(terrainCliffsArr)
+        MemoryHandler.destroyArray(terrainCliffsArr)
 
         Text.A('terrain cliffs saved')
     }
 
     //save terrain heights
-    const SaveTerrainHeights = (json: {[x: string]: any}) => {
-        json.terrainHeights = ArrayHandler.getNewArray()
+    const SaveTerrainHeights = (json: { [x: string]: any }) => {
+        json.terrainHeights = MemoryHandler.getEmptyArray()
 
         let height: number
         let isWater: boolean
 
         let y = globals.MAP_MIN_Y
 
-        while(y <= globals.MAP_MAX_Y) {
-
+        while (y <= globals.MAP_MAX_Y) {
             let x = globals.MAP_MIN_X
             while (x <= globals.MAP_MAX_X) {
                 height = ZLibrary.GetSurfaceZ(x, y)

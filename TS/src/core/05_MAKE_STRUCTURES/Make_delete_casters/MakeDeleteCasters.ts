@@ -1,6 +1,6 @@
+import { MemoryHandler } from 'Utils/MemoryHandler'
 import { Caster } from 'core/04_STRUCTURES/Caster/Caster'
 import { MakeOneByOneOrTwoClicks } from 'core/05_MAKE_STRUCTURES/Make/MakeOneByOneOrTwoClicks'
-import { ArrayHandler } from 'Utils/ArrayHandler'
 import { arrayPush } from '../../01_libraries/Basic_functions'
 import { Text } from '../../01_libraries/Text'
 import { MakeDeleteMonstersAction } from '../MakeLastActions/MakeDeleteMonstersAction'
@@ -45,7 +45,7 @@ export class MakeDeleteCasters extends MakeOneByOneOrTwoClicks {
                     nbCastersRemoved++
                 }
 
-                ArrayHandler.clearArray(casters)
+                MemoryHandler.destroyArray(casters)
             }
 
             if (nbCastersRemoved <= 1) {

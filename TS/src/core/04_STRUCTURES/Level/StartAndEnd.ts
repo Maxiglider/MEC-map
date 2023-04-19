@@ -1,8 +1,7 @@
+import { MemoryHandler } from 'Utils/MemoryHandler'
+import { createEvent } from 'Utils/mapUtils'
 import { Text } from 'core/01_libraries/Text'
 import { getUdgLevels } from '../../../../globals'
-
-import { createEvent } from 'Utils/mapUtils'
-import { ObjectHandler } from '../../../Utils/ObjectHandler'
 import { Hero2Escaper } from '../Escaper/Escaper_functions'
 
 abstract class RectInterface {
@@ -25,7 +24,7 @@ abstract class RectInterface {
     }
 
     toJson(): false | { [x: string]: any } {
-        const output = ObjectHandler.getNewObject<any>()
+        const output = MemoryHandler.getEmptyObject<any>()
 
         output['minX'] = this.minX
         output['minY'] = this.minY

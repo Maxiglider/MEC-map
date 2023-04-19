@@ -1,6 +1,6 @@
+import { MemoryHandler } from 'Utils/MemoryHandler'
 import { LARGEUR_CASE } from 'core/01_libraries/Constants'
 import { Text } from 'core/01_libraries/Text'
-import { ArrayHandler } from '../../../Utils/ArrayHandler'
 import { ChangeTerrainType } from '../../07_TRIGGERS/Modify_terrain_Functions/Modify_terrain_functions'
 import { MakeAction } from './MakeAction'
 
@@ -29,7 +29,7 @@ export class MakeTerrainVerticalSymmetryAction extends MakeAction {
     }
 
     applySymmetry = () => {
-        const terrainTypeIds = ArrayHandler.getNewArray<number>()
+        const terrainTypeIds = MemoryHandler.getEmptyArray<number>()
 
         //sauvegarde du terrain
         let i = 0
@@ -61,7 +61,7 @@ export class MakeTerrainVerticalSymmetryAction extends MakeAction {
             y = y - LARGEUR_CASE
         }
 
-        ArrayHandler.clearArray(terrainTypeIds)
+        MemoryHandler.destroyArray(terrainTypeIds)
     }
 
     cancel = (): boolean => {

@@ -1,5 +1,5 @@
+import { MemoryHandler } from 'Utils/MemoryHandler'
 import { MakeOneByOneOrTwoClicks } from 'core/05_MAKE_STRUCTURES/Make/MakeOneByOneOrTwoClicks'
-import { ArrayHandler } from '../../../Utils/ArrayHandler'
 import { arrayPush } from '../../01_libraries/Basic_functions'
 import { Text } from '../../01_libraries/Text'
 import { Monster } from '../../04_STRUCTURES/Monster/Monster'
@@ -34,7 +34,7 @@ export class MakeDeleteMonsters extends MakeOneByOneOrTwoClicks {
                 let filterMonsterClassNameArr: string[] | undefined = undefined
 
                 if (this.getMode() != 'all') {
-                    filterMonsterClassNameArr = ArrayHandler.getNewArray()
+                    filterMonsterClassNameArr = MemoryHandler.getEmptyArray()
 
                     if (this.getMode() == 'noMove') {
                         arrayPush(filterMonsterClassNameArr, 'MonsterNoMove')
@@ -59,7 +59,7 @@ export class MakeDeleteMonsters extends MakeOneByOneOrTwoClicks {
                     )
 
                 if (filterMonsterClassNameArr) {
-                    ArrayHandler.clearArray(filterMonsterClassNameArr)
+                    MemoryHandler.destroyArray(filterMonsterClassNameArr)
                 }
 
                 for (const monster of monsters) {
@@ -69,7 +69,7 @@ export class MakeDeleteMonsters extends MakeOneByOneOrTwoClicks {
 
                 nbMonstersRemoved = monsters.length
 
-                ArrayHandler.clearArray(monsters)
+                MemoryHandler.destroyArray(monsters)
             }
 
             if (nbMonstersRemoved <= 1) {

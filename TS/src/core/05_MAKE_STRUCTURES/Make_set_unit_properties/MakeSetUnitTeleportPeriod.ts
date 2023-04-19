@@ -1,10 +1,10 @@
+import { MemoryHandler } from 'Utils/MemoryHandler'
 import { MakeOneByOneOrTwoClicks } from 'core/05_MAKE_STRUCTURES/Make/MakeOneByOneOrTwoClicks'
-import { ArrayHandler } from '../../../Utils/ArrayHandler'
 import { Text } from '../../01_libraries/Text'
 import {
-    MonsterTeleport,
     MONSTER_TELEPORT_PERIOD_MAX,
     MONSTER_TELEPORT_PERIOD_MIN,
+    MonsterTeleport,
 } from '../../04_STRUCTURES/Monster/MonsterTeleport'
 
 export class MakeSetUnitTeleportPeriod extends MakeOneByOneOrTwoClicks {
@@ -59,7 +59,7 @@ export class MakeSetUnitTeleportPeriod extends MakeOneByOneOrTwoClicks {
                     nbMonstersFixed++
                 }
 
-                ArrayHandler.clearArray(monstersTP)
+                MemoryHandler.destroyArray(monstersTP)
             }
 
             if (nbMonstersFixed <= 1) {

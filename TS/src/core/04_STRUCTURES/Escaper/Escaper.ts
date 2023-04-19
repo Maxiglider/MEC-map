@@ -513,6 +513,8 @@ export class Escaper {
         this.portalCooldownTimer = null
 
         DestroyTrigger(this.canClickTrigger)
+
+        this.lastPos?.__destroy()
     }
 
     //getId method
@@ -587,7 +589,8 @@ export class Escaper {
         const lastX = GetUnitX(this.hero)
         const lastY = GetUnitY(this.hero)
 
-        if (!this.lastPos || (this.lastPos[0] !== lastX && this.lastPos[1] !== lastY)) {
+        if (!this.lastPos || (this.lastPos.x !== lastX && this.lastPos.y !== lastY)) {
+            this.lastPos?.__destroy()
             this.lastPos = createPoint(lastX, lastY)
         }
     }

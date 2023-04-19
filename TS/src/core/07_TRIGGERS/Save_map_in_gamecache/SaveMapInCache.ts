@@ -1,14 +1,7 @@
+import { MemoryHandler } from 'Utils/MemoryHandler'
 import { SaveLoad } from 'core/04_STRUCTURES/Escaper/Escaper_StartCommands'
 import { getUdgCasterTypes, getUdgLevels, getUdgMonsterTypes, getUdgTerrainTypes, globals } from '../../../../globals'
 import { PROD } from '../../../env'
-import { ArrayHandler } from '../../../Utils/ArrayHandler'
-import {
-    clearArrayOrObject,
-    getHighestClearedId,
-    getNbArraysObjectsCleared,
-    resetNbArraysObjectsCleared,
-} from '../../../Utils/clearArrayOrObject'
-import { ObjectHandler } from '../../../Utils/ObjectHandler'
 import { jsonEncode } from '../../01_libraries/Basic_functions'
 import { MEC_SMIC_DATA_FILE_DATE_TPL } from '../../01_libraries/Constants'
 import { Text } from '../../01_libraries/Text'
@@ -20,8 +13,8 @@ export class SaveMapInCache {
 
     private static gameAsJsonString = () => {
         //old
-        const jsonTerrain = ObjectHandler.getNewObject<any>()
-        const jsonGameData = ObjectHandler.getNewObject<any>()
+        const jsonTerrain = MemoryHandler.getEmptyObject<any>()
+        const jsonGameData = MemoryHandler.getEmptyObject<any>()
 
         //FOR TERRAIN FILE W3E
         //terrain types, order, height
@@ -29,7 +22,7 @@ export class SaveMapInCache {
         Text.A('map terrain saved')
 
         //FOR GAME DATA
-        jsonGameData.gameData = ObjectHandler.getNewObject<any>()
+        jsonGameData.gameData = MemoryHandler.getEmptyObject<any>()
         jsonGameData.gameData.USE_VTOTO_SLIDE_LOGIC = globals.USE_VTOTO_SLIDE_LOGIC
         jsonGameData.gameData.coopCircles = globals.coopCircles
         jsonGameData.gameData.CAN_TURN_IN_AIR = globals.CAN_TURN_IN_AIR
@@ -52,12 +45,12 @@ export class SaveMapInCache {
         Text.A('levels saved')
 
         //output
-        const objData = ObjectHandler.getNewObject<{ [x: string]: any }>()
+        const objData = MemoryHandler.getEmptyObject<{ [x: string]: any }>()
         objData['terrain'] = jsonTerrain
         objData['gameData'] = jsonGameData
 
         const output = jsonEncode(objData)
-        clearArrayOrObject(objData)
+        MemoryHandler.destroyObject(objData)
 
         return output
     }
@@ -81,15 +74,6 @@ export class SaveMapInCache {
             }
 
             Text.A('saving game data to file "' + filename + '" done')
-
-            print(getNbArraysObjectsCleared() + ' arrays or objects cleared ; highest : ' + getHighestClearedId())
-            print(
-                'Highest Array index : ' +
-                    ArrayHandler.getNextIndex() +
-                    ' ; Highest Object index : ' +
-                    ObjectHandler.getNextIndex()
-            )
-            resetNbArraysObjectsCleared()
 
             const time = os.clock() - startTime
 

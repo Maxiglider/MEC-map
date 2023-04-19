@@ -1,4 +1,4 @@
-import { ArrayHandler } from '../../../Utils/ArrayHandler'
+import { MemoryHandler } from 'Utils/MemoryHandler'
 import { Text } from '../../01_libraries/Text'
 import { ChangeTerrainType } from '../../07_TRIGGERS/Modify_terrain_Functions/Modify_terrain_functions'
 import { ChangingTile } from '../Make_terrain/MakeTerrainCreateBrush'
@@ -10,11 +10,11 @@ export class MakeTerrainCreateBrushAction extends MakeAction {
     constructor(changingTiles: ChangingTile[]) {
         super()
 
-        this.changingTiles = ArrayHandler.getNewArrayFrom(changingTiles)
+        this.changingTiles = MemoryHandler.cloneArray(changingTiles)
     }
 
     destroy = () => {
-        ArrayHandler.clearArray(this.changingTiles)
+        MemoryHandler.destroyArray(this.changingTiles)
     }
 
     terrainModificationCancel = () => {

@@ -1,7 +1,7 @@
+import { ServiceManager } from 'Services'
+import { MemoryHandler } from 'Utils/MemoryHandler'
 import { arrayPush } from 'core/01_libraries/Basic_functions'
 import { Text } from 'core/01_libraries/Text'
-import { ServiceManager } from 'Services'
-import { ArrayHandler } from 'Utils/ArrayHandler'
 import { getUdgEscapers, getUdgLevels } from '../../../../globals'
 import { ChangeAllTerrains } from '../../07_TRIGGERS/Triggers_to_modify_terrains/Change_all_terrains'
 
@@ -31,7 +31,7 @@ export const loseALifeAndRes = (escaperIds: number[]) => {
             TriggerSleepAction(4.0)
         }
 
-        const clonedEscaperIds = ArrayHandler.getNewArray<number>()
+        const clonedEscaperIds = MemoryHandler.getEmptyArray<number>()
 
         for (const i of escaperIds) {
             arrayPush(clonedEscaperIds, i)
@@ -41,7 +41,7 @@ export const loseALifeAndRes = (escaperIds: number[]) => {
             getUdgEscapers().get(i)?.reviveAtStart()
         }
 
-        ArrayHandler.clearArray(clonedEscaperIds)
+        MemoryHandler.destroyArray(clonedEscaperIds)
 
         if (getUdgLevels().getLevelProgression() === 'all') {
             Text.A('|cff5c2e2eYou have lost a life !')

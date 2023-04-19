@@ -1,5 +1,5 @@
-import { ArrayHandler } from '../../../Utils/ArrayHandler'
-import { arrayPush, IsUnitBetweenLocs } from '../../01_libraries/Basic_functions'
+import { MemoryHandler } from 'Utils/MemoryHandler'
+import { IsUnitBetweenLocs, arrayPush } from '../../01_libraries/Basic_functions'
 import { MecHookArray } from '../../API/MecHookArray'
 import { BaseArray } from '../BaseArray'
 import { Caster } from '../Caster/Caster'
@@ -71,7 +71,7 @@ export class MonsterArray extends BaseArray<Monster> {
 
         if (filterMonsterClassName) {
             if (typeof filterMonsterClassName == 'string') {
-                filterMonsterClassNameArr = ArrayHandler.getNewArray()
+                filterMonsterClassNameArr = MemoryHandler.getEmptyArray()
                 clearArrayAtEnd = true
                 filterMonsterClassNameArr[0] = filterMonsterClassName
             } else {
@@ -79,7 +79,7 @@ export class MonsterArray extends BaseArray<Monster> {
             }
         }
 
-        const filteredMonsters = ArrayHandler.getNewArray<Monster>()
+        const filteredMonsters = MemoryHandler.getEmptyArray<Monster>()
 
         for (const [_, monster] of pairs(this.data)) {
             if (monster.u) {
@@ -92,7 +92,7 @@ export class MonsterArray extends BaseArray<Monster> {
         }
 
         if (clearArrayAtEnd) {
-            filterMonsterClassNameArr && ArrayHandler.clearArray(filterMonsterClassNameArr)
+            filterMonsterClassNameArr && MemoryHandler.destroyArray(filterMonsterClassNameArr)
         }
 
         return filteredMonsters

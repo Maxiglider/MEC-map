@@ -366,6 +366,24 @@ end`,
     end
 end`,
                 },
+                {
+                    title: '__TS__ObjectGetOwnPropertyDescriptors',
+                    from: `local function __TS__ObjectGetOwnPropertyDescriptors(object)
+    local metatable = getmetatable(object)
+    if not metatable then
+        return {}
+    end
+    return rawget(metatable, "_descriptors") or ({})
+end`,
+                    to: `local __MEM__EmptyObject = {}
+local function __TS__ObjectGetOwnPropertyDescriptors(object)
+    local metatable = getmetatable(object)
+    if not metatable then
+        return __MEM__EmptyObject
+    end
+    return rawget(metatable, "_descriptors") or (__MEM__EmptyObject)
+end`,
+                },
             ]
 
             for (const luaPatch of luaPatches) {

@@ -1,5 +1,5 @@
+import { MemoryHandler } from 'Utils/MemoryHandler'
 import { MakeOneByOneOrTwoClicks } from 'core/05_MAKE_STRUCTURES/Make/MakeOneByOneOrTwoClicks'
-import { ArrayHandler } from '../../../Utils/ArrayHandler'
 import { Text } from '../../01_libraries/Text'
 import { MonsterType } from '../../04_STRUCTURES/Monster/MonsterType'
 
@@ -44,7 +44,7 @@ export class MakeSetUnitMonsterType extends MakeOneByOneOrTwoClicks {
                     }
                 }
 
-                ArrayHandler.clearArray(monsters)
+                MemoryHandler.destroyArray(monsters)
             }
 
             if (nbMonstersFixed <= 1) {

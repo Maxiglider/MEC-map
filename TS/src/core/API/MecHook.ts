@@ -1,4 +1,4 @@
-import type {MecHookArray} from "./MecHookArray";
+import type { MecHookArray } from './MecHookArray'
 
 export class MecHook {
     static lastId = -1
@@ -7,7 +7,8 @@ export class MecHook {
 
     static destroy = (hookId: number) => {
         const hook = MecHook.mecHooksAll.get(hookId)
-        if(hook){
+
+        if (hook) {
             hook.mecHookArray?.destroy(hookId)
             MecHook.mecHooksAll.delete(hookId)
             return true
@@ -17,10 +18,10 @@ export class MecHook {
     }
 
     private id: number
-    private cb: (this:void, args: any) => any
+    private cb: (this: void, args: any) => any
     public mecHookArray?: MecHookArray
 
-    constructor(cb: (this:void) => any) {
+    constructor(cb: (this: void) => any) {
         this.id = ++MecHook.lastId
         this.cb = cb
         MecHook.mecHooksAll.set(this.id, this)

@@ -1,12 +1,17 @@
 import { ServiceManager } from 'Services'
+import { MemoryHandler } from 'Utils/MemoryHandler'
+import { createTimer } from 'Utils/mapUtils'
 import { IsBoolString, S2B } from 'core/01_libraries/Basic_functions'
 import { NB_ESCAPERS } from 'core/01_libraries/Constants'
 import { Text } from 'core/01_libraries/Text'
+import { Timer } from 'w3ts'
 import { getUdgEscapers } from '../../../../globals'
 import { isPlayerId, resolvePlayerId } from './Command_functions'
 
 export const initExecuteCommandTrueMax = () => {
     const { registerCommand } = ServiceManager.getService('Cmd')
+
+    const memState: { timer: Timer | undefined } = { timer: undefined }
 
     //-beAdmin <Pcolor>|all(a) [<boolean status>]
     registerCommand({
@@ -68,6 +73,40 @@ export const initExecuteCommandTrueMax = () => {
             } else {
                 Text.erP(escaper.getPlayer(), 'param1 must be a player color or "all"')
             }
+            return true
+        },
+    })
+
+    registerCommand({
+        name: 'mem',
+        alias: [],
+        group: 'truemax',
+        argDescription: 'create | timer | all | (track <boolean>)',
+        description: 'Show memory usage',
+        cb: ({ param1: debugObjects, param2 }) => {
+            ;(_G as any)['printCreation'] = false
+            memState.timer?.destroy()
+
+            if (debugObjects === 'create' || debugObjects === 'all') {
+                ;(_G as any)['printCreation'] = true
+            }
+
+            if (debugObjects === 'track' && IsBoolString(param2)) {
+                ;(_G as any)['trackPrintMap'] = S2B(param2)
+                print(`Mem: trackPrintMap ${S2B(param2) ? 'on' : 'off'}`)
+                return true
+            }
+
+            if (debugObjects === 'timer' || debugObjects === 'all') {
+                memState.timer = createTimer(1, true, MemoryHandler.printDebugInfo)
+            }
+
+            if (debugObjects === '') {
+                MemoryHandler.printDebugInfo()
+            } else {
+                print(`Mem: ${debugObjects}`)
+            }
+
             return true
         },
     })

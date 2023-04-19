@@ -8,7 +8,7 @@ import { initCommandExecution } from 'core/06_COMMANDS/COMMANDS_vJass/Command_ex
 import { W3TS_HOOK, addScriptHook } from 'w3ts/hooks'
 import { MEC_core_API } from './core/API/MEC_core_API'
 import { initializers } from './core/Init/initializers'
-import { PROD, SCRIPT_VAR } from './env'
+import { PROD } from './env'
 
 // todo;
 // hide shadows on units when ot 100
@@ -61,13 +61,6 @@ const tsMain = () => {
     //initializers
     initializers()
 
-    if (SCRIPT_VAR === 'test-memory-handler') {
-        createTimer(4, false, () => {
-            print('Memory handler initialized')
-            ;(_G as any)['printCreation'] = true
-        })
-    }
-
     //triggers
     // initOldTriggers()
 
@@ -75,7 +68,7 @@ const tsMain = () => {
     // initEscapers()
 
     // Some stuff to only show units that are visible on cam
-    // const renderInfo = ObjectHandler.getNewObject<IRenderInfo>()
+    // const renderInfo = MemoryHandler.getEmptyObject<IRenderInfo>()
 
     // createTimer(0.2, true, () => {
     //     renderWorld(renderInfo)

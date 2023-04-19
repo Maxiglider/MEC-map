@@ -1,8 +1,7 @@
-import { StopUnit } from 'core/01_libraries/Basic_functions'
-import { ArrayHandler } from 'Utils/ArrayHandler'
+import { MemoryHandler } from 'Utils/MemoryHandler'
 import { createTimer } from 'Utils/mapUtils'
+import { StopUnit } from 'core/01_libraries/Basic_functions'
 import { Timer } from 'w3ts'
-import { ObjectHandler } from '../../../Utils/ObjectHandler'
 import { Escaper } from '../Escaper/Escaper'
 import { Level } from '../Level/Level'
 import { Monster } from '../Monster/Monster'
@@ -19,7 +18,7 @@ export class PortalMob {
 
     id: number = -1
 
-    private timers = ArrayHandler.getNewArray<Timer>()
+    private timers = MemoryHandler.getEmptyArray<Timer>()
 
     constructor(
         triggerMob: Monster,
@@ -102,7 +101,7 @@ export class PortalMob {
         this.level && this.level.portalMobs.removePortalMob(this.id)
 
         this.timers.forEach(t => t.destroy())
-        ArrayHandler.clearArray(this.timers)
+        MemoryHandler.destroyArray(this.timers)
     }
 
     activate = (monster: Monster, escaper: Escaper, hero: unit) => {
@@ -162,7 +161,7 @@ export class PortalMob {
     }
 
     toJson = () => {
-        const output = ObjectHandler.getNewObject<any>()
+        const output = MemoryHandler.getEmptyObject<any>()
 
         output['id'] = this.id
         output['triggerMobId'] = this.triggerMob?.id

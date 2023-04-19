@@ -1,9 +1,8 @@
+import { ServiceManager } from 'Services'
+import { MemoryHandler } from 'Utils/MemoryHandler'
 import { arrayPush } from 'core/01_libraries/Basic_functions'
 import { Text } from 'core/01_libraries/Text'
-import { ServiceManager } from 'Services'
-import { ArrayHandler } from 'Utils/ArrayHandler'
 import { getUdgEscapers, getUdgLevels } from '../../../../globals'
-import { ObjectHandler } from '../../../Utils/ObjectHandler'
 import { MecHookArray } from '../../API/MecHookArray'
 import type { CasterType } from '../Caster/CasterType'
 import type { Escaper } from '../Escaper/Escaper'
@@ -14,12 +13,12 @@ import { MonsterSpawnArray } from '../MonsterSpawn/MonsterSpawnArray'
 import { CircleMobArray } from '../Monster_properties/CircleMobArray'
 import { ClearMobArray } from '../Monster_properties/ClearMobArray'
 import { PortalMobArray } from '../Monster_properties/PortalMobArray'
-import { checkPointReviveHeroes } from './checkpointReviveHeroes_function'
 import { End, Start } from './StartAndEnd'
 import { StaticSlideArray } from './StaticSlideArray'
 import { TriggerArray } from './Triggers'
 import type { VisibilityModifier } from './VisibilityModifier'
 import { VisibilityModifierArray } from './VisibilityModifierArray'
+import { checkPointReviveHeroes } from './checkpointReviveHeroes_function'
 
 export class Level {
     public static earningLivesActivated = true
@@ -250,17 +249,17 @@ export class Level {
                 const rotatedPoints = monsterSpawn.getRotatedPoints()
 
                 this.drawRectangle(
-                    rotatedPoints[0][0],
-                    rotatedPoints[0][1],
-                    rotatedPoints[1][0],
-                    rotatedPoints[1][1],
-                    rotatedPoints[2][0],
-                    rotatedPoints[2][1],
-                    rotatedPoints[3][0],
-                    rotatedPoints[3][1]
+                    rotatedPoints[0].x,
+                    rotatedPoints[0].y,
+                    rotatedPoints[1].x,
+                    rotatedPoints[1].y,
+                    rotatedPoints[2].x,
+                    rotatedPoints[2].y,
+                    rotatedPoints[3].x,
+                    rotatedPoints[3].y
                 )
 
-                ArrayHandler.clearArray(rotatedPoints)
+                MemoryHandler.destroyArray(rotatedPoints)
 
                 if (monsterSpawn.unspawnregpoints.length > 0) {
                     for (const reg of monsterSpawn.unspawnregpoints) {
@@ -325,7 +324,7 @@ export class Level {
     }
 
     toJson = () => {
-        const json = ObjectHandler.getNewObject<any>()
+        const json = MemoryHandler.getEmptyObject<any>()
 
         //level id
         json.id = this.id

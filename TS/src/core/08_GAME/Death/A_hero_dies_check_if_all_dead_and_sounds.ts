@@ -1,9 +1,9 @@
+import { MemoryHandler } from 'Utils/MemoryHandler'
+import { createEvent, runInTrigger } from 'Utils/mapUtils'
 import { arrayPush } from 'core/01_libraries/Basic_functions'
 import { COOP_REVIVE_DIST, NB_ESCAPERS } from 'core/01_libraries/Constants'
 import { IsHero } from 'core/04_STRUCTURES/Escaper/Escaper_functions'
 import { sameLevelProgression } from 'core/04_STRUCTURES/Level/LevelProgression'
-import { ArrayHandler } from 'Utils/ArrayHandler'
-import { createEvent, runInTrigger } from 'Utils/mapUtils'
 import { getUdgEscapers, getUdgTerrainTypes, globals } from '../../../../globals'
 import { Globals } from '../../09_From_old_Worldedit_triggers/globals_variables_and_triggers'
 import { AfkMode } from '../Afk_mode/Afk_mode'
@@ -15,12 +15,12 @@ const initReviveTrigManager = () => {
 
     return {
         createGroup: () => {
-            const group = ArrayHandler.getNewArray<number>()
+            const group = MemoryHandler.getEmptyArray<number>()
             arrayPush(groups, group)
             return group
         },
         clearGroup: (group: number[]) => {
-            ArrayHandler.clearArray(group)
+            MemoryHandler.destroyArray(group)
 
             const index = groups.findIndex(item => item === group)
             groups.splice(index, 1)
@@ -107,6 +107,8 @@ export const InitTrig_A_hero_dies_check_if_all_dead_and_sounds = () => {
                         last = true
                     })
                 } else {
+                    reviveTrigManager.clearGroup(escaperIds)
+
                     if (nbAlive === 1) {
                         StartSound(gg_snd_warning)
                     }
