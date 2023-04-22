@@ -10,15 +10,6 @@ import { MEC_core_API } from './core/API/MEC_core_API'
 import { initializers } from './core/Init/initializers'
 import { PROD } from './env'
 
-// todo;
-// hide shadows on units when ot 100
-
-// Changelog
-// -pcor now also supports different height param
-// MonsterSpawners can now be diagonal! (Does currently not support the long patrol fix)
-// Gametime now depends on the selected leaderboard mode, -ldb current shows you the current gametime since the last -restart
-// You can now change the transparency of specific people or groups: -othersTransparency <number | off | reset> [all | unallied | allied | player]
-
 const tsMain = () => {
     ServiceManager.registerServices({
         Lives: initLives,
