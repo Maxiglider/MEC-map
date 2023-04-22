@@ -1,17 +1,19 @@
+import { EffectUtils } from 'Utils/EffectUtils'
+
 export class EscaperEffect {
-    private ef: effect
+    private ef?: effect
     private efStr: string
     private bodyPart: string
 
     constructor(efStr: string, u: unit, bodyPart: string) {
         this.efStr = efStr
         this.bodyPart = bodyPart
-        this.ef = AddSpecialEffectTarget(efStr, u, bodyPart)
+        this.ef = EffectUtils.addSpecialEffectTarget(efStr, u, bodyPart)
     }
 
     recreate = (u: unit) => {
         this.destroy()
-        this.ef = AddSpecialEffectTarget(this.efStr, u, this.bodyPart)
+        this.ef = EffectUtils.addSpecialEffectTarget(this.efStr, u, this.bodyPart)
     }
 
     toJson = () => ({
@@ -19,6 +21,6 @@ export class EscaperEffect {
     })
 
     destroy = () => {
-        DestroyEffect(this.ef)
+        EffectUtils.destroyEffect(this.ef)
     }
 }

@@ -1,18 +1,24 @@
-import {AnglesDiff, ApplyAngleSymmetry, IsLastOrderPause, IsOnGround, StopUnit} from 'core/01_libraries/Basic_functions'
+import { createEvent, forRange } from 'Utils/mapUtils'
+import {
+    AnglesDiff,
+    ApplyAngleSymmetry,
+    IsLastOrderPause,
+    IsOnGround,
+    StopUnit,
+} from 'core/01_libraries/Basic_functions'
 import { NB_ESCAPERS } from 'core/01_libraries/Constants'
 import { Escaper } from 'core/04_STRUCTURES/Escaper/Escaper'
 import {
     Hero2Escaper,
     IsHero,
-    isSecondaryHero,
     MainEscaperToSecondaryOne,
+    isSecondaryHero,
 } from 'core/04_STRUCTURES/Escaper/Escaper_functions'
 import { TerrainTypeSlide } from 'core/04_STRUCTURES/TerrainType/TerrainTypeSlide'
 import { Apm } from 'core/08_GAME/Apm_clics_par_minute/Apm'
 import { udg_symmetryAngle } from 'core/Double_heroes/double_heroes_config'
-import { createEvent, forRange } from 'Utils/mapUtils'
+import { globals } from '../../../../globals'
 import { AutoContinueAfterSliding } from './Auto_continue_after_sliding'
-import {globals} from "../../../../globals";
 
 const initTurnOnSlide = () => {
     //turn variables
@@ -33,7 +39,7 @@ const initTurnOnSlide = () => {
     let udg_drunk: number[] = []
     let udg_drunkLevel: number[] = []
     const INITIAL_DRUNK = 10
-    let udg_drunkEffect: effect[] = []
+    let udg_drunkEffect: (effect | undefined)[] = []
     let DRUNK_EFFECTS: string[] = []
     const DRUNK_EFFECT_PETIT = 'Abilities\\Weapons\\BloodElfMissile\\BloodElfMissile.mdl'
     const DRUNK_EFFECT_MOYEN = 'Abilities\\Weapons\\ChimaeraAcidMissile\\ChimaeraAcidMissile.mdl'
@@ -85,10 +91,10 @@ const initTurnOnSlide = () => {
                 }
             } else {
                 //turn normally
-                if(escaper.slidingMode == 'max') {
+                if (escaper.slidingMode == 'max') {
                     const currentAngle = GetUnitFacing(slider)
                     escaper.setRemainingDegreesToTurn(AnglesDiff(angle, currentAngle))
-                }else{
+                } else {
                     SetUnitFacing(slider, angle)
                 }
 

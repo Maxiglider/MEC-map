@@ -1,4 +1,5 @@
 import { ServiceManager } from 'Services'
+import { EffectUtils } from 'Utils/EffectUtils'
 import { GetUnitZEx } from 'Utils/LocationUtils'
 import { IPoint, createPoint } from 'Utils/Point'
 import { IsIssuedOrder, StopUnit } from 'core/01_libraries/Basic_functions'
@@ -335,13 +336,13 @@ export class Escaper {
 
     addEffectMeteor = () => {
         if (!this.meteorEffect && this.hero) {
-            this.meteorEffect = AddSpecialEffectTarget(METEOR_EFFECT, this.hero, 'hand right')
+            this.meteorEffect = EffectUtils.addSpecialEffectTarget(METEOR_EFFECT, this.hero, 'hand right')
         }
     }
 
     removeEffectMeteor = () => {
         if (this.meteorEffect) {
-            DestroyEffect(this.meteorEffect)
+            EffectUtils.destroyEffect(this.meteorEffect)
             delete this.meteorEffect
         }
     }
@@ -492,7 +493,7 @@ export class Escaper {
         this.removeHero()
 
         if (this.terrainKillEffect) {
-            DestroyEffect(this.terrainKillEffect)
+            EffectUtils.destroyEffect(this.terrainKillEffect)
             delete this.terrainKillEffect
         }
         this.effects.destroy()
@@ -826,22 +827,31 @@ export class Escaper {
 
     //terrainKill methods
     destroyTerrainKillEffect = () => {
-        this.terrainKillEffect && DestroyEffect(this.terrainKillEffect)
+        EffectUtils.destroyEffect(this.terrainKillEffect)
     }
 
     createTerrainKillEffect(killEffectStr: string) {
         this.destroyTerrainKillEffect()
         this.hero &&
-            (this.terrainKillEffect = AddSpecialEffectTarget(killEffectStr, this.hero, TERRAIN_KILL_EFFECT_BODY_PART))
+            (this.terrainKillEffect = EffectUtils.addSpecialEffectTarget(
+                killEffectStr,
+                this.hero,
+                TERRAIN_KILL_EFFECT_BODY_PART
+            ))
     }
 
     destroyPortalEffect = () => {
-        this.portalEffect && DestroyEffect(this.portalEffect)
+        EffectUtils.destroyEffect(this.portalEffect)
     }
 
     createPortalEffect(effectStr: string) {
         this.destroyPortalEffect()
-        this.hero && (this.portalEffect = AddSpecialEffectTarget(effectStr, this.hero, TERRAIN_KILL_EFFECT_BODY_PART))
+        this.hero &&
+            (this.portalEffect = EffectUtils.addSpecialEffectTarget(
+                effectStr,
+                this.hero,
+                TERRAIN_KILL_EFFECT_BODY_PART
+            ))
     }
 
     //lastTerrainType methods

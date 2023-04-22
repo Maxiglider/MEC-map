@@ -1,4 +1,5 @@
 import { ServiceManager } from 'Services'
+import { EffectUtils } from 'Utils/EffectUtils'
 import { MemoryHandler } from 'Utils/MemoryHandler'
 import { createTimer } from 'Utils/mapUtils'
 import { IsBoolString, S2B } from 'core/01_libraries/Basic_functions'
@@ -162,7 +163,7 @@ export const initExecuteCommandTrueMax = () => {
     //     argDescription: 'on | off',
     //     description: 'hides units in other levels',
     //     cb: ({ param1 }, escaper) => {
-    //         if (!param1) param1 = 'true'
+    //         if (param1.length === 0) param1 = 'true'
 
     //         if (IsBoolString(param1)) {
     //             for (const [_, esc] of pairs(getUdgEscapers().getAll())) {
@@ -207,4 +208,27 @@ export const initExecuteCommandTrueMax = () => {
     //         return true
     //     },
     // })
+
+    //-disableEffects
+    registerCommand({
+        name: 'disableEffects',
+        alias: [],
+        group: 'truemax',
+        argDescription: 'on | off',
+        description: 'disables all effects',
+        cb: ({ param1 }, escaper) => {
+            if (param1.length === 0) param1 = EffectUtils.getDisplayEffects() ? 'on' : 'off'
+
+            if (IsBoolString(param1)) {
+                // GetLocalPlayer causes a desync here mixed with effects
+                // if (GetLocalPlayer() === escaper.getPlayer()) {
+                EffectUtils.setDisplayEffects(!S2B(param1))
+                // }
+
+                Text.mkP(escaper.getPlayer(), `Effects ${!S2B(param1) ? 'shown' : 'hidden'}`)
+            }
+
+            return true
+        },
+    })
 }

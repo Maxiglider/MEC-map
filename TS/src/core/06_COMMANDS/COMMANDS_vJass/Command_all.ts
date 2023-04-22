@@ -1,4 +1,5 @@
 import { ServiceManager } from 'Services'
+import { EffectUtils } from 'Utils/EffectUtils'
 import { createTimer } from 'Utils/mapUtils'
 import { ClearTextForPlayer, IsBoolString, S2B } from 'core/01_libraries/Basic_functions'
 import {
@@ -884,12 +885,16 @@ export const initCommandAll = () => {
                 }
             }
             if (n !== TurnOnSlide.udg_drunkLevel[k]) {
-                DestroyEffect(TurnOnSlide.udg_drunkEffect[k])
+                EffectUtils.destroyEffect(TurnOnSlide.udg_drunkEffect[k])
 
                 const hero = escaper.getHero()
 
                 if (hero) {
-                    TurnOnSlide.udg_drunkEffect[k] = AddSpecialEffectTarget(TurnOnSlide.DRUNK_EFFECTS[n], hero, 'head')
+                    TurnOnSlide.udg_drunkEffect[k] = EffectUtils.addSpecialEffectTarget(
+                        TurnOnSlide.DRUNK_EFFECTS[n],
+                        hero,
+                        'head'
+                    )
                 }
 
                 TurnOnSlide.udg_drunkLevel[k] = n
@@ -910,7 +915,7 @@ export const initCommandAll = () => {
             if (noParam && TurnOnSlide.udg_isDrunk[k]) {
                 TurnOnSlide.udg_isDrunk[k] = false
                 TurnOnSlide.udg_drunkLevel[k] = 0
-                DestroyEffect(TurnOnSlide.udg_drunkEffect[k])
+                EffectUtils.destroyEffect(TurnOnSlide.udg_drunkEffect[k])
                 Text.P(escaper.getPlayer(), 'You feel better now.')
             }
             return true
@@ -1611,7 +1616,7 @@ export const initCommandAll = () => {
         argDescription: 'on | off',
         description: 'hides the chat',
         cb: ({ param1 }, escaper) => {
-            if (!param1) param1 = 'true'
+            if (param1.length === 0) param1 = 'true'
 
             if (IsBoolString(param1)) {
                 const frame = BlzGetOriginFrame(ORIGIN_FRAME_CHAT_MSG, 0)

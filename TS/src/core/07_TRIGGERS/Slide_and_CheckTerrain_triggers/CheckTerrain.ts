@@ -1,3 +1,5 @@
+import { EffectUtils } from 'Utils/EffectUtils'
+import { createEvent } from 'Utils/mapUtils'
 import { IsOnGround } from 'core/01_libraries/Basic_functions'
 import { CHECK_TERRAIN_PERIOD, GM_TOUCH_DEATH_TERRAIN_EFFECT_STR } from 'core/01_libraries/Constants'
 import { Escaper } from 'core/04_STRUCTURES/Escaper/Escaper'
@@ -7,7 +9,6 @@ import { TerrainType } from 'core/04_STRUCTURES/TerrainType/TerrainType'
 import { TerrainTypeDeath } from 'core/04_STRUCTURES/TerrainType/TerrainTypeDeath'
 import { TerrainTypeSlide } from 'core/04_STRUCTURES/TerrainType/TerrainTypeSlide'
 import { TerrainTypeWalk } from 'core/04_STRUCTURES/TerrainType/TerrainTypeWalk'
-import { createEvent } from 'Utils/mapUtils'
 import { getUdgEscapers, getUdgTerrainTypes } from '../../../../globals'
 import { AutoContinueAfterSliding } from './Auto_continue_after_sliding'
 
@@ -168,7 +169,7 @@ const initCheckTerrainTrigger = () => {
 
                 if (touchedByDeathTerrain) {
                     if (escaper.isGodModeOn()) {
-                        DestroyEffect(AddSpecialEffect(GM_TOUCH_DEATH_TERRAIN_EFFECT_STR, x, y))
+                        EffectUtils.destroyEffect(EffectUtils.addSpecialEffect(GM_TOUCH_DEATH_TERRAIN_EFFECT_STR, x, y))
                     } else {
                         currentTerrainType.killEscaper(escaper)
                         escaper.enableSlide(false)

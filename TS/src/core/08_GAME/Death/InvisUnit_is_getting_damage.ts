@@ -1,8 +1,9 @@
 //évènement ajouté à la création de l'unité invisible
 
-import { DUMMY_POWER_CIRCLE, GM_KILLING_EFFECT } from 'core/01_libraries/Constants'
 import { ServiceManager } from 'Services'
+import { EffectUtils } from 'Utils/EffectUtils'
 import { createEvent } from 'Utils/mapUtils'
+import { DUMMY_POWER_CIRCLE, GM_KILLING_EFFECT } from 'core/01_libraries/Constants'
 import { getUdgEscapers, getUdgMonsterTypes, udg_monsters } from '../../../../globals'
 
 export const InitTrig_InvisUnit_is_getting_damage = () => {
@@ -73,8 +74,12 @@ export const InitTrig_InvisUnit_is_getting_damage = () => {
                                 const effect = monster.getJumpPadEffect()
 
                                 if (effect) {
-                                    DestroyEffect(
-                                        AddSpecialEffect(effect, GetUnitX(killingUnit), GetUnitY(killingUnit))
+                                    EffectUtils.destroyEffect(
+                                        EffectUtils.addSpecialEffect(
+                                            effect,
+                                            GetUnitX(killingUnit),
+                                            GetUnitY(killingUnit)
+                                        )
                                     )
                                 }
 
@@ -84,8 +89,12 @@ export const InitTrig_InvisUnit_is_getting_damage = () => {
 
                         if (escaper.isGodModeOn()) {
                             //god mode effect
-                            DestroyEffect(
-                                AddSpecialEffect(GM_KILLING_EFFECT, GetUnitX(killingUnit), GetUnitY(killingUnit))
+                            EffectUtils.destroyEffect(
+                                EffectUtils.addSpecialEffect(
+                                    GM_KILLING_EFFECT,
+                                    GetUnitX(killingUnit),
+                                    GetUnitY(killingUnit)
+                                )
                             )
 
                             //kill monster
@@ -108,9 +117,13 @@ export const InitTrig_InvisUnit_is_getting_damage = () => {
                                 const effectStr = getUdgMonsterTypes().monsterUnit2KillEffectStr(killingUnit)
 
                                 if (effectStr) {
-                                    const eff = AddSpecialEffect(effectStr, GetUnitX(invisUnit), GetUnitY(invisUnit))
+                                    const eff = EffectUtils.addSpecialEffect(
+                                        effectStr,
+                                        GetUnitX(invisUnit),
+                                        GetUnitY(invisUnit)
+                                    )
                                     TriggerSleepAction(3)
-                                    DestroyEffect(eff)
+                                    EffectUtils.destroyEffect(eff)
                                 }
                             }
                         }

@@ -1,3 +1,4 @@
+import { EffectUtils } from 'Utils/EffectUtils'
 import { IPoint, createPoint } from 'Utils/Point'
 import { createEvent } from 'Utils/mapUtils'
 import { NB_ESCAPERS, NB_PLAYERS_MAX } from 'core/01_libraries/Constants'
@@ -168,8 +169,9 @@ export const init_Heroes = () => {
                                 HERO_START_ANGLE
                             )
                     } else {
-                        const anEffect = AddSpecialEffectLoc(EFFECT_FOR_MISSING_HEROES, startPositionsRandomized[n])
-                        DestroyEffect(anEffect)
+                        EffectUtils.destroyEffect(
+                            EffectUtils.addSpecialEffectLoc(EFFECT_FOR_MISSING_HEROES, startPositionsRandomized[n])
+                        )
                     }
                     ;(startPositionsRandomized[n] as any) = null
                     TriggerSleepAction(TIME_BETWEEN_EACH_HERO_SPAWN)

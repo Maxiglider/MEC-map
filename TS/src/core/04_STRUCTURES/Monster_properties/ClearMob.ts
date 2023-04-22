@@ -1,3 +1,4 @@
+import { EffectUtils } from 'Utils/EffectUtils'
 import { MemoryHandler } from 'Utils/MemoryHandler'
 import { arrayPush } from 'core/01_libraries/Basic_functions'
 import { Level } from '../Level/Level'
@@ -127,7 +128,7 @@ export class ClearMob {
         this.triggerMob.setBaseColor('blue')
         this.triggerMob.setVertexColor(30, 60, 100)
         if (!this.triggerMobPermanentEffect && this.triggerMob.u) {
-            this.triggerMobPermanentEffect = AddSpecialEffectTarget(
+            this.triggerMobPermanentEffect = EffectUtils.addSpecialEffectTarget(
                 TRIGGER_MOB_PERMANENT_EFFECT,
                 this.triggerMob.u,
                 'origin'
@@ -138,19 +139,19 @@ export class ClearMob {
 
     close = () => {
         if (this.triggerMobPermanentEffect) {
-            DestroyEffect(this.triggerMobPermanentEffect)
+            EffectUtils.destroyEffect(this.triggerMobPermanentEffect)
             delete this.triggerMobPermanentEffect
         }
     }
 
     redoTriggerMobPermanentEffect = () => {
         if (this.triggerMobPermanentEffect) {
-            DestroyEffect(this.triggerMobPermanentEffect)
+            EffectUtils.destroyEffect(this.triggerMobPermanentEffect)
             delete this.triggerMobPermanentEffect
         }
 
         if (this.triggerMob.u) {
-            this.triggerMobPermanentEffect = AddSpecialEffectTarget(
+            this.triggerMobPermanentEffect = EffectUtils.addSpecialEffectTarget(
                 TRIGGER_MOB_PERMANENT_EFFECT,
                 this.triggerMob.u,
                 'origin'

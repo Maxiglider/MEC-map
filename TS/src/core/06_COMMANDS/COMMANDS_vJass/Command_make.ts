@@ -3219,10 +3219,6 @@ export const initExecuteCommandMake = () => {
         argDescription: '[jumpPadEffect]',
         description: '',
         cb: ({ param1 }, escaper) => {
-            if (!param1.length) {
-                return true
-            }
-
             escaper.makeSetMonsterJumpPadEffect(param1)
 
             Text.mkP(escaper.getPlayer(), 'Click on a monster to apply')
