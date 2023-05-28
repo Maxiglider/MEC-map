@@ -1,10 +1,11 @@
+import { createTimer } from 'Utils/mapUtils'
 import { NB_ESCAPERS, SLIDE_PERIOD } from 'core/01_libraries/Constants'
 import { Apm } from 'core/08_GAME/Apm_clics_par_minute/Apm'
-import { createTimer } from 'Utils/mapUtils'
+import { Cpm } from 'core/08_GAME/Apm_clics_par_minute/Cpm'
 import { getUdgEscapers, globals } from '../../../../globals'
 import { Escaper } from '../../04_STRUCTURES/Escaper/Escaper'
 import { GetMirrorEscaper } from '../../04_STRUCTURES/Escaper/Escaper_functions'
-import { Gravity, GRAVITY_EVERY_N_PERIOD } from './Gravity'
+import { GRAVITY_EVERY_N_PERIOD, Gravity } from './Gravity'
 import { MAX_DEGREE_ON_WHICH_SPEED_TABLE_TAKES_CONTROL, SPEED_AT_LEAST_THAN_50_DEGREES } from './SlidingMax'
 
 const tmpLoc = Location(0, 0)
@@ -109,14 +110,17 @@ const initSlideTrigger = () => {
         //turning
         const allowTurning = escaper.getRotationSpeed() != 0 && (height < 1 || globals.CAN_TURN_IN_AIR)
 
+        let oldAngle = escaper.oldAngle // Get the old angle before calculating the new one.
+        let newAngle = Deg2Rad(GetUnitFacing(hero))
+        let currentTime = os.clock()
+
         if (allowTurning && escaper.slidingMode == 'max') {
             escaperTurnForOnePeriod(escaper)
             escaperTurnForOnePeriod(GetMirrorEscaper(escaper))
         }
 
-        const angle = Deg2Rad(GetUnitFacing(hero))
-        const newX = oldX + escaper.getSlideMovePerPeriod() * Cos(angle)
-        const newY = oldY + escaper.getSlideMovePerPeriod() * Sin(angle)
+        const newX = oldX + escaper.getSlideMovePerPeriod() * Cos(newAngle)
+        const newY = oldY + escaper.getSlideMovePerPeriod() * Sin(newAngle)
 
         if (
             newX >= globals.MAP_MIN_X &&
@@ -129,12 +133,12 @@ const initSlideTrigger = () => {
 
         const gravity = escaper.getLastTerrainType()?.getGravity() || Gravity.GetGravity()
 
-        //gestion de la hauteur du héros
+        // Management of hero's height
         counters[n]++
         if (counters[n] == GRAVITY_EVERY_N_PERIOD) {
             counters[n] = 0
 
-            const diffZ = z - lastZ //différence de hauteur au niveau du terrain
+            const diffZ = z - lastZ // Height difference at the terrain level
             let delta: number
 
             if (height > 1) {
@@ -153,17 +157,47 @@ const initSlideTrigger = () => {
                     escaper.setSpeedZ(oldDiffZ + gravity)
                     SetUnitFlyHeight(hero, -diffZ + escaper.getSpeedZ(), 0)
 
-                    //arrêter de tourner si un clic a été fait juste avant
+                    // Stop turning if a click has been made just before
                     if (!globals.CAN_TURN_IN_AIR) {
                         SetUnitFacing(hero, GetUnitFacing(hero))
                     }
                 } else if (!escaper.isAlive()) {
-                    //le héros mort touche le sol, on désactive le slide
+                    // The dead hero touches the ground, slide is deactivated
                     escaper.enableSlide(false)
                 }
             }
             escaper.setLastZ(z)
             escaper.setOldDiffZ(diffZ)
+        }
+
+        // Accumulate total rotation angle
+        let angleDiff = newAngle - oldAngle
+
+        // If the angle jumps between -Pi and +Pi
+        if (angleDiff > Math.PI) {
+            angleDiff -= 2 * Math.PI
+        } else if (angleDiff < -Math.PI) {
+            angleDiff += 2 * Math.PI
+        }
+
+        // Detect change in rotation direction
+        if (escaper.totalRotation != 0 && Math.sign(escaper.totalRotation) != Math.sign(angleDiff)) {
+            escaper.totalRotation = 0 // Reset rotation count
+            escaper.startTurningTime = currentTime // Reset the start time
+        }
+
+        escaper.totalRotation += angleDiff
+        escaper.oldAngle = newAngle // Store the current angle to be used as the old angle in the next frame
+
+        // Detect full circle
+        if (Math.abs(escaper.totalRotation) >= 2 * Math.PI) {
+            escaper.totalRotation = 0 // Reset rotation count after a full circle
+            escaper.startTurningTime = currentTime // Reset the start time after a full circle
+            Cpm.nbCirclesOnSlide[n]++ // Increment circle counter
+        } else if (currentTime - escaper.startTurningTime > 2) {
+            // If 2 seconds have passed without a full circle
+            escaper.totalRotation = 0 // Reset rotation count
+            escaper.startTurningTime = currentTime // Reset the start time
         }
 
         //update apm

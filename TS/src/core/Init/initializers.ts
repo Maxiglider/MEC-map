@@ -1,3 +1,4 @@
+import { init_Cpm } from 'core/08_GAME/Apm_clics_par_minute/Cpm'
 import { init_terrain_limit_variables } from '../01_libraries/Init_terrain_limit_variables'
 import { initViewAllHideAll } from '../03_view_all_hide_all/View_all_hide_all'
 import { initFirstPerson } from '../04_STRUCTURES/Escaper/Escaper_firstPerson'
@@ -13,17 +14,17 @@ import { init_startFirstLevel } from '../07_TRIGGERS/Start_of_the_game/start_fir
 import { ReinitTerrains } from '../07_TRIGGERS/Triggers_to_modify_terrains/Reinit_terrains'
 import { ReinitTerrainsPositions } from '../07_TRIGGERS/Triggers_to_modify_terrains/Reinit_terrains_position_Change_variations_and_ut_at_beginning'
 import { init_Apm } from '../08_GAME/Apm_clics_par_minute/Apm'
+import { init_cameraPositionAtStart } from '../08_GAME/Camera_reset/Camera_position_at_start'
 import { init_Trig_Allways_day } from '../08_GAME/Init_game/Allways_day'
 import { init_Heroes } from '../08_GAME/Init_game/Heroes'
 import { initNoSelectionCircle } from '../08_GAME/Init_game/No_selection_circle'
 import { initSelectUnit } from '../08_GAME/select_unit'
+import { init_customUI } from '../DisablingInterface/EnableDisableInterface'
 import { init_doubleKill } from '../Double_heroes/double_kill'
 import { init_shortcurt_cancelRedo } from '../Keyboard_shortcuts/Cancel_redo'
 import { init_Test } from '../Test/test'
 import { initArrays } from './initArrays'
 import { initOldTriggers } from './init_old_triggers'
-import {init_cameraPositionAtStart} from "../08_GAME/Camera_reset/Camera_position_at_start";
-import {init_customUI} from "../DisablingInterface/EnableDisableInterface";
 
 export const initializers = () => {
     init_terrain_limit_variables()
@@ -32,6 +33,7 @@ export const initializers = () => {
     initViewAllHideAll()
     initNoSelectionCircle()
     init_Apm()
+    init_Cpm()
     init_Heroes()
     initSelectUnit()
     initOldTriggers()

@@ -239,6 +239,10 @@ export class Escaper {
     //keyboard shortcuts
     private keyboardShortcutsArray = new KeyboardShortcutArray(this)
 
+    public oldAngle = 0
+    public totalRotation = 0
+    public startTurningTime = 0
+
     /*
      * Constructor
      */

@@ -21,6 +21,7 @@ import { ColorInfo, GetMirrorEscaper } from 'core/04_STRUCTURES/Escaper/Escaper_
 import { TerrainTypeWalk } from 'core/04_STRUCTURES/TerrainType/TerrainTypeWalk'
 import { DisplayTerrainDataToPlayer, GetTerrainData } from 'core/07_TRIGGERS/Modify_terrain_Functions/Terrain_functions'
 import { Apm } from 'core/08_GAME/Apm_clics_par_minute/Apm'
+import { Cpm } from 'core/08_GAME/Apm_clics_par_minute/Cpm'
 import { Globals } from 'core/09_From_old_Worldedit_triggers/globals_variables_and_triggers'
 import { PRESS_TIME_TO_ENABLE_FOLLOW_MOUSE } from 'core/Follow_mouse/Follow_mouse'
 import { getUdgEscapers, getUdgLevels } from '../../../../globals'
@@ -963,6 +964,26 @@ export const initCommandAll = () => {
             } else {
                 if (nbParam === 1 && (param1 === 'all' || param1 === 'a')) {
                     Apm.DisplayApmAll(k)
+                }
+            }
+            return true
+        },
+    })
+
+    //-cpm(-) [all|a]   --> displays cpm on slide of everybody or just yourself
+    registerCommand({
+        name: 'cpm',
+        alias: [],
+        group: 'all',
+        argDescription: '[all|a]',
+        description: 'displays cpm on slide of everybody or just yourself',
+        cb: ({ noParam, nbParam, param1 }, escaper) => {
+            const k = GetPlayerId(escaper.getPlayer())
+            if (noParam) {
+                Cpm.DisplayCpm(k)
+            } else {
+                if (nbParam === 1 && (param1 === 'all' || param1 === 'a')) {
+                    Cpm.DisplayCpmAll(k)
                 }
             }
             return true
