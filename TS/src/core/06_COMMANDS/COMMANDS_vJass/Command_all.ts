@@ -1365,7 +1365,7 @@ export const initCommandAll = () => {
             }
 
             escaper.panCameraOnPortal = S2B(param1)
-            Text.mkP(escaper.getPlayer(), `Pan camera on revive set to: ${param1}`)
+            Text.mkP(escaper.getPlayer(), `Pan camera on portal set to: ${param1}`)
 
             return true
         },

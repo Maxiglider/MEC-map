@@ -190,7 +190,7 @@ const initSlideTrigger = () => {
         escaper.oldAngle = newAngle // Store the current angle to be used as the old angle in the next frame
 
         // Detect full circle
-        if (Math.abs(escaper.totalRotation) >= 2 * Math.PI) {
+        if (Math.abs(escaper.totalRotation) >= (7 / 8) * 2 * Math.PI) {
             escaper.totalRotation = 0 // Reset rotation count after a full circle
             escaper.startTurningTime = currentTime // Reset the start time after a full circle
             Cpm.nbCirclesOnSlide[n]++ // Increment circle counter
