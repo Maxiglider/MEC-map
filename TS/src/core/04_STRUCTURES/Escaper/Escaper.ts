@@ -2,6 +2,7 @@ import { ServiceManager } from 'Services'
 import { EffectUtils } from 'Utils/EffectUtils'
 import { GetUnitZEx } from 'Utils/LocationUtils'
 import { IPoint, createPoint } from 'Utils/Point'
+import { progressionUtils } from 'Utils/ProgressionUtils'
 import { IsIssuedOrder, StopUnit } from 'core/01_libraries/Basic_functions'
 import {
     DEFAULT_CAMERA_FIELD,
@@ -756,6 +757,8 @@ export class Escaper {
 
         const startFacing = getUdgLevels().getCurrentLevel(this).getStart()?.getFacing()
         startFacing && this.turnInstantly(startFacing)
+
+        progressionUtils.resetPlayerProgressionState(this)
 
         return this.revive(x, y)
     }

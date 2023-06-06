@@ -1,8 +1,9 @@
 import { ServiceManager } from 'Services'
 import { literalArray } from 'Utils/ArrayUtils'
-import { MemoryHandler } from 'Utils/MemoryHandler'
+import { IDestroyable, MemoryHandler } from 'Utils/MemoryHandler'
+import { progressionUtils } from 'Utils/ProgressionUtils'
 import { createTimer, forRange } from 'Utils/mapUtils'
-import { ucfirst } from 'core/01_libraries/Basic_functions'
+import { arrayPush, ucfirst } from 'core/01_libraries/Basic_functions'
 import { NB_ESCAPERS, PURPLE, RED } from 'core/01_libraries/Constants'
 import { udg_colorCode } from 'core/01_libraries/Init_colorCodes'
 import { getUdgEscapers, getUdgLevels } from '../../../../globals'
@@ -27,7 +28,7 @@ const getLongestNameWidth = () => {
 
 type IBoardMode = 'multiboard' | 'leaderboard'
 
-type IStatsMode = typeof statsModes[0]
+type IStatsMode = (typeof statsModes)[0]
 const statsModes = literalArray(['global', 'current'])
 
 export type IMultiboard = ReturnType<typeof initMultiboard>
@@ -52,8 +53,11 @@ export const initMultiboard = () => {
         }
     } = {}
 
+    const playerLastRowIndex: { [x: number]: number } = {}
+
     let amountOfEscapers = 0
     let pointsEnabled = false
+    let progressionEnabled = false
 
     forRange(NB_ESCAPERS, i => {
         playerScores[i] = {
@@ -82,7 +86,7 @@ export const initMultiboard = () => {
     }
 
     const initMultiboard = () => {
-        const cols = 4 + (pointsEnabled ? 1 : 0)
+        const cols = 4 + (pointsEnabled ? 1 : 0) + (progressionEnabled ? 1 : 0)
         const rows = 3 + getUdgEscapers().countMain()
 
         const nameWidth = getLongestNameWidth()
@@ -112,6 +116,7 @@ export const initMultiboard = () => {
         MultiboardSetItemValueBJ(mb, 3, 3, 'Saves')
         MultiboardSetItemValueBJ(mb, 4, 3, 'Deaths')
         pointsEnabled && MultiboardSetItemValueBJ(mb, 5, 3, 'Points')
+        progressionEnabled && MultiboardSetItemValueBJ(mb, pointsEnabled ? 6 : 5, 3, 'Prog')
     }
 
     const initLeaderboard = () => {
@@ -192,6 +197,31 @@ export const initMultiboard = () => {
                     lb && LeaderboardSetPlayerItemLabelBJ(Player(0), lb, `|Cfffed312Game time: ${globalGameTimeStr}`)
                 }
             }
+
+            if (progressionEnabled) {
+                const escaper = getUdgEscapers().get(i)
+
+                if (!escaper) {
+                    continue
+                }
+
+                const rowIndex = playerLastRowIndex[escaper.getId()]
+
+                if (!rowIndex) {
+                    continue
+                }
+
+                const playerId = escaper.getEscaperId()
+                const colorCode = udg_colorCode[playerId2colorId(playerId)]
+
+                mb &&
+                    MultiboardSetItemValueBJ(
+                        mb,
+                        pointsEnabled ? 6 : 5,
+                        4 + rowIndex,
+                        colorCode + progressionUtils.getPlayerProgression(escaper) + '%'
+                    )
+            }
         }
     }
 
@@ -254,6 +284,15 @@ export const initMultiboard = () => {
                     MultiboardSetItemValueBJ(mb, 3, 4 + rowIndex, colorCode + playerScore.saves)
                     MultiboardSetItemValueBJ(mb, 4, 4 + rowIndex, colorCode + playerScore.deaths)
                     pointsEnabled && MultiboardSetItemValueBJ(mb, 5, 4 + rowIndex, colorCode + playerScore.points)
+                    progressionEnabled &&
+                        MultiboardSetItemValueBJ(
+                            mb,
+                            pointsEnabled ? 6 : 5,
+                            4 + rowIndex,
+                            colorCode + progressionUtils.getPlayerProgression(escaper) + '%'
+                        )
+
+                    playerLastRowIndex[escaper.getId()] = rowIndex
 
                     rowIndex++
                 }
@@ -317,9 +356,17 @@ export const initMultiboard = () => {
     }
 
     const setPointsEnabled = (enabled: boolean) => {
-        pointsEnabled = enabled
+        if (pointsEnabled !== enabled) {
+            pointsEnabled = enabled
+            reinitBoards()
+        }
+    }
 
-        updatePlayers()
+    const setProgressionEnabled = (enabled: boolean) => {
+        if (progressionEnabled !== enabled) {
+            progressionEnabled = enabled
+            reinitBoards()
+        }
     }
 
     const adjustPlayerPoints = (playerId: number, points: number) => {
@@ -343,7 +390,74 @@ export const initMultiboard = () => {
         GameTime.current.updateGameTime()
 
         updateGametime(true)
+        handleDitchLogic()
     })
+
+    type ITarget = { escaper: Escaper; progression: number }
+    const progressionCompare = (a: ITarget, b: ITarget) => b.progression > a.progression
+
+    let lastDitchEffect: effect | null = null
+    let lastDitchEffectEscaper: Escaper | null = null
+
+    // Not really multiboard but w/e
+    const handleDitchLogic = () => {
+        const sortedTargets = MemoryHandler.getEmptyArray<ITarget & IDestroyable>()
+
+        for (const [_, escaper] of pairs(getUdgEscapers().getAll())) {
+            const target = MemoryHandler.getEmptyObject<ITarget>()
+            target.escaper = escaper
+            target.progression = progressionUtils.getPlayerProgression(escaper)
+            arrayPush(sortedTargets, target)
+        }
+
+        if (sortedTargets.length > 1) {
+            table.sort(sortedTargets, progressionCompare)
+
+            let deadPlayer = false
+            let currentDitchEffectEscaper: Escaper | null = null
+
+            for (const target of sortedTargets) {
+                const hero = target.escaper.getHero()
+
+                if (!hero) {
+                    continue
+                }
+
+                if (!target.escaper.isAlive()) {
+                    deadPlayer = true
+                    continue
+                }
+
+                // Only enable when all players behind are dead
+                if (!deadPlayer && target.escaper.isAlive()) {
+                    break
+                }
+
+                if (deadPlayer) {
+                    currentDitchEffectEscaper = target.escaper
+                    break
+                }
+            }
+
+            if (currentDitchEffectEscaper) {
+                if (lastDitchEffectEscaper?.getId() !== currentDitchEffectEscaper.getId()) {
+                    lastDitchEffect && DestroyEffect(lastDitchEffect)
+                    lastDitchEffect = AddSpecialEffectTargetUnitBJ(
+                        'overhead',
+                        currentDitchEffectEscaper.getHero()!,
+                        'AbilitiesSpellsOtherTalkToMeTalkToMe.mdl'
+                    )
+                    lastDitchEffectEscaper = currentDitchEffectEscaper
+                }
+            } else {
+                lastDitchEffect && DestroyEffect(lastDitchEffect)
+                lastDitchEffect = null
+                lastDitchEffectEscaper = null
+            }
+        }
+
+        sortedTargets.__destroy(true)
+    }
 
     return {
         setVisibility,
@@ -355,6 +469,7 @@ export const initMultiboard = () => {
         getOrCreateLeaderboard,
         reinitBoards,
         setPointsEnabled,
+        setProgressionEnabled,
         adjustPlayerPoints,
         setPlayerPoints,
     }

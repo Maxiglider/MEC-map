@@ -1,7 +1,7 @@
+import { ServiceManager } from 'Services'
 import { NB_ESCAPERS, NB_LIVES_AT_BEGINNING, NB_PLAYERS_MAX } from 'core/01_libraries/Constants'
 import { Text } from 'core/01_libraries/Text'
 import { gg_trg_apparition_dialogue_et_fermeture_automatique } from 'core/08_GAME/Mode_coop/creation_dialogue'
-import { ServiceManager } from 'Services'
 import { getUdgCasterTypes, getUdgEscapers, getUdgMonsterTypes, getUdgTerrainTypes, globals } from '../../../../globals'
 import { udg_colorCode } from '../../01_libraries/Init_colorCodes'
 import { BaseArray } from '../BaseArray'
@@ -256,6 +256,25 @@ export class LevelArray extends BaseArray<Level> {
 
         //coop
         TriggerExecute(gg_trg_apparition_dialogue_et_fermeture_automatique)
+    }
+
+    restartCurrentLevel = () => {
+        const currentLevel = this.currentLevel
+
+        this.currentLevel = -1 //to assure level changing
+        this.data[currentLevel].activate(false)
+
+        this.goToLevel(undefined, currentLevel)
+        ServiceManager.getService('Lives').setNb(this.data[currentLevel].getNbLives())
+
+        const start = this.data[currentLevel].getStart()
+        start && SetCameraPosition(start.getCenterX(), start.getCenterY())
+
+        for (const [_, escaper] of pairs(getUdgEscapers().getAll())) {
+            if (escaper.isLockCamTarget()) {
+                escaper.resetCamera()
+            }
+        }
     }
 
     new = () => {

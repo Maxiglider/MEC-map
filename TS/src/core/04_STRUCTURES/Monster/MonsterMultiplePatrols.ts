@@ -4,8 +4,8 @@ import { udg_monsters } from '../../../../globals'
 import { errorHandler } from '../../../Utils/mapUtils'
 import { IsHero } from '../Escaper/Escaper_functions'
 import { Monster } from './Monster'
-import { MonsterType } from './MonsterType'
 import { NewPatrolMonster } from './Monster_functions'
+import { MonsterType } from './MonsterType'
 
 const NewRegion = (x: number, y: number): region => {
     let r = Rect(x - 16, y - 16, x + 16, y + 16)
@@ -36,8 +36,8 @@ export class MonsterMultiplePatrols extends Monster {
     private currentMove: number
     private sens: number //0 : normal toujours positif, 1 : sens normal avec changement, 2 : sens inversé avec changement
 
-    private x: number[] = []
-    private y: number[] = []
+    x: number[] = []
+    y: number[] = []
     private r: region[] = []
     private t: trigger[] = []
     private currentTrigger?: trigger

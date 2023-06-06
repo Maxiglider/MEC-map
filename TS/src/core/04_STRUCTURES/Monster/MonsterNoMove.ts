@@ -4,8 +4,8 @@ import { MonsterType } from './MonsterType'
 import { NewImmobileMonster } from './Monster_functions'
 
 export class MonsterNoMove extends Monster {
-    private x: number
-    private y: number
+    x: number
+    y: number
     private angle: number
 
     constructor(mt: MonsterType, x: number, y: number, angle: number, forceId: number | null = null) {
@@ -34,7 +34,7 @@ export class MonsterNoMove extends Monster {
 
     toJson() {
         const output = super.toJson()
-        if(output){
+        if (output) {
             output['x'] = R2I(this.x)
             output['y'] = R2I(this.y)
             output['angle'] = R2I(this.angle)

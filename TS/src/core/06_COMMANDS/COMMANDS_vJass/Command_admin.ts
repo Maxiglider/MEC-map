@@ -10,6 +10,7 @@ import { AfkMode } from 'core/08_GAME/Afk_mode/Afk_mode'
 import { Globals } from 'core/09_From_old_Worldedit_triggers/globals_variables_and_triggers'
 import { udg_doubleHeroesEnabled } from 'core/Double_heroes/double_heroes_config'
 import { ServiceManager } from 'Services'
+import { progressionUtils } from 'Utils/ProgressionUtils'
 import {
     getUdgCasterTypes,
     getUdgEscapers,
@@ -869,6 +870,21 @@ export const initExecuteCommandMax = () => {
             } else {
                 Text.erP(escaper.getPlayer(), 'param1 must be a player color or "all"')
             }
+            return true
+        },
+    })
+
+    //-reinitProgressionMap
+    registerCommand({
+        name: 'reinitProgressionMap',
+        alias: [],
+        group: 'max',
+        argDescription: '',
+        description: '',
+        cb: (_, escaper) => {
+            Text.P(escaper.getPlayer(), 'Reinitializing progression map')
+            progressionUtils.init()
+            Text.P(escaper.getPlayer(), 'Done')
             return true
         },
     })

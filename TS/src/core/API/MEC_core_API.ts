@@ -1,9 +1,10 @@
 import { ServiceManager } from 'Services'
+import { progressionUtils } from 'Utils/ProgressionUtils'
 import { getUdgEscapers, getUdgLevels, getUdgMonsterTypes, getUdgTerrainTypes, globals } from '../../../globals'
 import { errorHandler } from '../../Utils/mapUtils'
 import { SetMeteorEffect } from '../04_STRUCTURES/Escaper/Escaper'
 import { Hero2Escaper, IsHero } from '../04_STRUCTURES/Escaper/Escaper_functions'
-import { createMonsterSmartPatrol, MonsterSimplePatrol } from '../04_STRUCTURES/Monster/MonsterSimplePatrol'
+import { MonsterSimplePatrol, createMonsterSmartPatrol } from '../04_STRUCTURES/Monster/MonsterSimplePatrol'
 import { makingRightsToAll } from '../06_COMMANDS/Rights/manage_rights'
 import { LoadMapFromCache } from '../07_TRIGGERS/Load_map_from_gamecache/LoadMapFromCache'
 import { Gravity } from '../07_TRIGGERS/Slide_and_CheckTerrain_triggers/Gravity'
@@ -18,6 +19,8 @@ export const MEC_core_API = {
         errorHandler(() => {
             LoadMapFromCache.gameDataJsonString = jsonString
             LoadMapFromCache.initializeGameData()
+
+            progressionUtils.init()
         })()
     },
 
@@ -97,4 +100,7 @@ export const MEC_core_API = {
     setPlayerPoints: (playerId: number, points: number) => {
         ServiceManager.getService('Multiboard').setPlayerPoints(playerId, points)
     },
+
+    removeMonsterType: (label: string) => getUdgMonsterTypes().remove(label),
+    removeMonsterSpawn: (level: number, ms: string) => getUdgLevels().get(level)?.monsterSpawns.clearMonsterSpawn(ms),
 }

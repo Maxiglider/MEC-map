@@ -1,7 +1,7 @@
+import { ServiceManager } from 'Services'
 import { IsBoolString, S2B } from 'core/01_libraries/Basic_functions'
 import { NB_ESCAPERS } from 'core/01_libraries/Constants'
 import { Text } from 'core/01_libraries/Text'
-import { ServiceManager } from 'Services'
 import { getUdgEscapers, getUdgLevels, globals } from '../../../../globals'
 import { isPlayerId, resolvePlayerId, resolvePlayerIds } from './Command_functions'
 
@@ -105,6 +105,21 @@ export const initExecuteCommandRed = () => {
         cb: ({ noParam }) => {
             if (noParam) {
                 getUdgLevels().restartTheGame()
+            }
+            return true
+        },
+    })
+
+    //-restartLevel(-)
+    registerCommand({
+        name: 'restartLevel',
+        alias: [],
+        group: 'red',
+        argDescription: '',
+        description: 'Restarts the level',
+        cb: ({ noParam }) => {
+            if (noParam) {
+                getUdgLevels().restartCurrentLevel()
             }
             return true
         },
@@ -223,6 +238,63 @@ export const initExecuteCommandRed = () => {
 
             Text.A(`Level progression changed to: ${param1}`)
             getUdgLevels().setLevelProgression(param1)
+            return true
+        },
+    })
+
+    //-setPointsEnabled(setpe) bool
+    registerCommand({
+        name: 'setPointsEnabled',
+        alias: ['setpe'],
+        group: 'red',
+        argDescription: '<bool>',
+        description: '',
+        cb: ({ param1 }, escaper) => {
+            if (!IsBoolString(param1)) {
+                return true
+            }
+
+            const enabled = S2B(param1)
+            ServiceManager.getService('Multiboard').setPointsEnabled(enabled)
+            Text.P(escaper.getPlayer(), `Points have been ${enabled ? 'enabled' : 'disabled'}`)
+            return true
+        },
+    })
+
+    //-adjustPlayerPoints(adjustpp) <playerId> <points>
+    registerCommand({
+        name: 'adjustPlayerPoints',
+        alias: ['adjustpp'],
+        group: 'red',
+        argDescription: '<playerId> <points>',
+        description: '',
+        cb: ({ param1, param2 }, escaper) => {
+            const playerId = resolvePlayerId(param1)
+            const points = S2I(param2)
+            ServiceManager.getService('Multiboard').adjustPlayerPoints(playerId, points)
+            Text.P(
+                escaper.getPlayer(),
+                `Player ${getUdgEscapers().get(playerId)?.getDisplayName()} points adjusted by ${points}`
+            )
+            return true
+        },
+    })
+
+    //-setPlayerPoints(setpp) <playerId> <points>
+    registerCommand({
+        name: 'setPlayerPoints',
+        alias: ['setpp'],
+        group: 'red',
+        argDescription: '<playerId> <points>',
+        description: '',
+        cb: ({ param1, param2 }, escaper) => {
+            const playerId = resolvePlayerId(param1)
+            const points = S2I(param2)
+            ServiceManager.getService('Multiboard').setPlayerPoints(playerId, points)
+            Text.P(
+                escaper.getPlayer(),
+                `Player ${getUdgEscapers().get(playerId)?.getDisplayName()} points set to ${points}`
+            )
             return true
         },
     })
