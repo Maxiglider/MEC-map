@@ -10,10 +10,6 @@ import { MEC_core_API } from './core/API/MEC_core_API'
 import { initializers } from './core/Init/initializers'
 import { PROD } from './env'
 
-// + Added -restartLevel command (Might reduce lag after 1h+ of gametime)
-// + Added GPS triangulation to calculate realtime per player level progression
-// + Made it look more like RKR
-
 const tsMain = () => {
     ServiceManager.registerServices({
         Lives: initLives,
