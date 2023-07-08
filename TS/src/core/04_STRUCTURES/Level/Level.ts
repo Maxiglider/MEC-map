@@ -1,5 +1,6 @@
 import { ServiceManager } from 'Services'
 import { MemoryHandler } from 'Utils/MemoryHandler'
+import { ThemeUtils } from 'Utils/ThemeUtils'
 import { arrayPush } from 'core/01_libraries/Basic_functions'
 import { Text } from 'core/01_libraries/Text'
 import { getUdgEscapers, getUdgLevels } from '../../../../globals'
@@ -107,6 +108,7 @@ export class Level {
         }
 
         this.isActivatedB = activ
+        ThemeUtils.applyGameTheme()
     }
 
     checkpointReviveHeroes(finisher: Escaper | undefined) {

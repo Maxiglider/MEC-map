@@ -1,8 +1,12 @@
 import { ServiceManager } from 'Services'
+import { ThemeUtils } from 'Utils/ThemeUtils'
 import { IsBoolString, S2B } from 'core/01_libraries/Basic_functions'
-import { NB_ESCAPERS } from 'core/01_libraries/Constants'
+import { NB_ESCAPERS, NB_MAX_OF_TERRAINS } from 'core/01_libraries/Constants'
 import { Text } from 'core/01_libraries/Text'
-import { getUdgEscapers, getUdgLevels, globals } from '../../../../globals'
+import { TerrainTypeFromString } from 'core/07_TRIGGERS/Modify_terrain_Functions/Terrain_type_from_string'
+import { ReinitTerrainsPositions } from 'core/07_TRIGGERS/Triggers_to_modify_terrains/Reinit_terrains_position_Change_variations_and_ut_at_beginning'
+import { Globals } from 'core/09_From_old_Worldedit_triggers/globals_variables_and_triggers'
+import { getUdgEscapers, getUdgLevels, getUdgTerrainTypes, globals } from '../../../../globals'
 import { isPlayerId, resolvePlayerId, resolvePlayerIds } from './Command_functions'
 
 export const initExecuteCommandRed = () => {
@@ -183,23 +187,25 @@ export const initExecuteCommandRed = () => {
         argDescription: '<active> [player]',
         description: '',
         cb: ({ nbParam, param1, param2 }, escaper) => {
-            if (nbParam === 2 && IsBoolString(param1)) {
+            if (param2.length === 0) param2 = 'all'
+
+            if ((nbParam === 1 || nbParam === 2) && IsBoolString(param1)) {
                 resolvePlayerIds(param2, e => {
                     if (S2B(param1)) {
-                        Text.P(escaper.getPlayer(), 'Letsgoooooo!')
+                        Text.P(e.getPlayer(), 'Letsgoooooo!')
 
-                        if (e.getId() !== escaper.getId()) {
-                            Text.P(e.getPlayer(), 'Letsgoooooo!')
+                        if (e.getId() !== escaper.getId() && nbParam === 2) {
+                            Text.P(escaper.getPlayer(), 'Letsgoooooo!')
                         }
 
                         e.isSpeedEdit = true
                         e.absoluteSlideSpeed(800, true)
                         e.absoluteRotationSpeed(1.34)
                     } else {
-                        Text.P(escaper.getPlayer(), 'Speed disabled')
+                        Text.P(e.getPlayer(), 'Speed disabled')
 
-                        if (e.getId() !== escaper.getId()) {
-                            Text.P(e.getPlayer(), 'Speed disabled')
+                        if (e.getId() !== escaper.getId() && nbParam === 2) {
+                            Text.P(escaper.getPlayer(), 'Speed disabled')
                         }
 
                         e.isSpeedEdit = false
@@ -207,14 +213,6 @@ export const initExecuteCommandRed = () => {
                         e.stopAbsoluteRotationSpeed()
                     }
                 })
-            }
-
-            if (nbParam === 1 && IsBoolString(param1)) {
-                if (S2B(param1)) {
-                    Text.A('Letsgoooooo!')
-                } else {
-                    Text.A('Speed disabled')
-                }
 
                 getUdgLevels().setIsSpeedEdit(S2B(param1))
             }
@@ -295,6 +293,132 @@ export const initExecuteCommandRed = () => {
                 escaper.getPlayer(),
                 `Player ${getUdgEscapers().get(playerId)?.getDisplayName()} points set to ${points}`
             )
+            return true
+        },
+    })
+
+    registerCommand({
+        name: 'setGameTheme',
+        alias: [],
+        group: 'red',
+        argDescription: '<theme>',
+        description: '',
+        cb: ({ param1 }, escaper) => {
+            if (IsBoolString(param1) && !S2B(param1)) {
+                ThemeUtils.setCurrentTheme(undefined)
+                ReinitTerrainsPositions.ReinitTerrainsPosition()
+                return true
+            }
+
+            if (param1 !== 'fullskill' && param1 !== 'murloc') {
+                Text.P(escaper.getPlayer(), 'Invalid theme: ' + ['fullskill', 'murloc'].join(', '))
+                return true
+            }
+
+            const availableTerrains = NB_MAX_OF_TERRAINS - Globals.udg_nb_used_terrains
+
+            let createTerrains = 0
+
+            const tt = getUdgTerrainTypes()
+            const availableThemes = ThemeUtils.availableThemes
+
+            if (!tt.getByCode(availableThemes[param1].slideTerrain)) createTerrains++
+            if (!tt.getByCode(availableThemes[param1].deathTerrain)) createTerrains++
+            if (!tt.getByCode(availableThemes[param1].walkTerrain)) createTerrains++
+
+            if (createTerrains > availableTerrains) {
+                Text.P(escaper.getPlayer(), `Failed, limit of ${NB_MAX_OF_TERRAINS} terrain types reached`)
+                return true
+            }
+
+            for (const terrainOrder of availableThemes[param1].terrainOrder) {
+                if (terrainOrder === 'slide') {
+                    if (!tt.getByCode(availableThemes[param1].slideTerrain)) {
+                        tt.newSlide(
+                            `sgt${param1}s`,
+                            TerrainTypeFromString.TerrainTypeString2TerrainTypeId(
+                                `'${availableThemes[param1].slideTerrain}'`
+                            ),
+                            550,
+                            true
+                        )
+                    }
+                } else if (terrainOrder === 'death') {
+                    if (!tt.getByCode(availableThemes[param1].deathTerrain)) {
+                        tt.newDeath(
+                            `sgt${param1}d`,
+                            TerrainTypeFromString.TerrainTypeString2TerrainTypeId(
+                                `'${availableThemes[param1].deathTerrain}'`
+                            ),
+                            'Abilities\\Spells\\NightElf\\EntanglingRoots\\EntanglingRootsTarget.mdl',
+                            0.2,
+                            20
+                        )
+                    }
+                } else if (terrainOrder === 'walk') {
+                    if (!tt.getByCode(availableThemes[param1].walkTerrain)) {
+                        tt.newWalk(
+                            `sgt${param1}w`,
+                            TerrainTypeFromString.TerrainTypeString2TerrainTypeId(
+                                `'${availableThemes[param1].walkTerrain}'`
+                            ),
+                            522
+                        )
+                    }
+                }
+            }
+
+            ThemeUtils.setCurrentTheme(param1)
+            ThemeUtils.applyGameTheme()
+
+            const slideTerrain = tt.getByCode(availableThemes[param1].slideTerrain)
+            const deathTerrain = tt.getByCode(availableThemes[param1].deathTerrain)
+            const walkTerrain = tt.getByCode(availableThemes[param1].walkTerrain)
+
+            if (!slideTerrain || !deathTerrain || !walkTerrain) {
+                return true
+            }
+
+            for (const [_, terrainType] of pairs(getUdgTerrainTypes().getAll())) {
+                for (const terrainOrder of availableThemes[param1].terrainOrder) {
+                    if (
+                        terrainOrder === 'slide' &&
+                        terrainType.kind === 'slide' &&
+                        terrainType.terrainTypeId !== slideTerrain.terrainTypeId
+                    ) {
+                        ThemeUtils.modifyTerrain(
+                            terrainType.terrainTypeId,
+                            TerrainTypeFromString.TerrainTypeString2TerrainTypeId(
+                                `'${availableThemes[param1].slideTerrain}'`
+                            )
+                        )
+                    } else if (
+                        terrainOrder === 'death' &&
+                        terrainType.kind === 'death' &&
+                        terrainType.terrainTypeId !== deathTerrain.terrainTypeId
+                    ) {
+                        ThemeUtils.modifyTerrain(
+                            terrainType.terrainTypeId,
+                            TerrainTypeFromString.TerrainTypeString2TerrainTypeId(
+                                `'${availableThemes[param1].deathTerrain}'`
+                            )
+                        )
+                    } else if (
+                        terrainOrder === 'walk' &&
+                        terrainType.kind === 'walk' &&
+                        terrainType.terrainTypeId !== walkTerrain.terrainTypeId
+                    ) {
+                        ThemeUtils.modifyTerrain(
+                            terrainType.terrainTypeId,
+                            TerrainTypeFromString.TerrainTypeString2TerrainTypeId(
+                                `'${availableThemes[param1].walkTerrain}'`
+                            )
+                        )
+                    }
+                }
+            }
+
+            Text.A(`Welcome to: ${param1} 2.0`)
             return true
         },
     })

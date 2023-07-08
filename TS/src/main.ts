@@ -10,6 +10,18 @@ import { MEC_core_API } from './core/API/MEC_core_API'
 import { initializers } from './core/Init/initializers'
 import { PROD } from './env'
 
+// [X] per player rkr thing, ignore players who haven't clicked yet (support arrowkeys too somehow)
+// [X] ignore noobedit players
+// [O] make it activate for closest alive player in front of you
+// [O] add max distance cmd
+// [O] add disable cmd
+// [O] detect walk terrain with end region, if you touch it set progression to 100%
+// [O] get current lvl highest prog cmd / stats
+// [X] added -setgametheme murloc|fullskill
+// [X] -setgametheme with -se 1 doesn't change ss of newly created terrains
+// [X] make speededit work per player instead of changing terrains
+// [X] fix bug where cam doesn't follow player on -rpos, -smn and -back
+
 const tsMain = () => {
     ServiceManager.registerServices({
         Lives: initLives,

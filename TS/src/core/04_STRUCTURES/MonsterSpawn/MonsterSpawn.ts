@@ -684,9 +684,7 @@ export class MonsterSpawn {
         this.mt = mt
 
         if (this._active) {
-            this.deactivate()
-            this.simpleUnitRecycler.reinit()
-            this.activate()
+            this.refresh()
         }
     }
 
@@ -694,9 +692,7 @@ export class MonsterSpawn {
         this.rotation = rotation
 
         if (this._active) {
-            this.deactivate()
-            this.simpleUnitRecycler.reinit()
-            this.activate()
+            this.refresh()
         }
 
         this.level?.updateDebugRegions()
@@ -780,6 +776,12 @@ export class MonsterSpawn {
         const centerY = (topLeftY + bottomRightY) / 2
 
         return { x: centerX, y: centerY }
+    }
+
+    refresh = () => {
+        this.deactivate()
+        this.simpleUnitRecycler.reinit()
+        this.activate()
     }
 
     toJson = () => {

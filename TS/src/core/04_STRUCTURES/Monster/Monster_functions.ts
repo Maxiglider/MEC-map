@@ -1,3 +1,4 @@
+import { ThemeUtils } from 'Utils/ThemeUtils'
 import { GetCurrentMonsterPlayer } from 'core/01_libraries/Basic_functions'
 import { ENNEMY_PLAYER, MOBS_VARIOUS_COLORS } from 'core/01_libraries/Constants'
 import { Monster } from './Monster'
@@ -72,6 +73,13 @@ export const NewImmobileMonsterForPlayer = (mt: MonsterType, p: player, x: numbe
     if (Monster.forceYforNextMonster != 0) {
         y = Monster.forceYforNextMonster
         Monster.forceYforNextMonster = 0
+    }
+
+    const themeMonsterType = ThemeUtils.getRandomAvailableMonsterType()
+
+    if (themeMonsterType) {
+        unitTypeId = themeMonsterType.getUnitTypeId()
+        mt = themeMonsterType
     }
 
     let scale: number

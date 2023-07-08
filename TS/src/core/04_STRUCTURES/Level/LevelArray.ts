@@ -18,7 +18,7 @@ import { MonsterTeleport } from '../Monster/MonsterTeleport'
 import type { MonsterType } from '../Monster/MonsterType'
 import type { MonsterSpawnArray } from '../MonsterSpawn/MonsterSpawnArray'
 import type { ClearMobArray } from '../Monster_properties/ClearMobArray'
-import { isDeathTerrain, isSlideTerrain } from '../TerrainType/TerrainType'
+import { isDeathTerrain } from '../TerrainType/TerrainType'
 import { Level } from './Level'
 import { sameLevelProgression } from './LevelProgression'
 import { IsLevelBeingMade } from './Level_functions'
@@ -42,10 +42,10 @@ export class LevelArray extends BaseArray<Level> {
             autoreviveDelay: number | undefined
             terrains: { [label: string]: { timeToKill: number } }
         }
-        speedEdit: { active: boolean; terrains: { [label: string]: { slideSpeed: number; rotationSpeed: number } } }
+        speedEdit: { active: boolean }
     } = {
         noobEdit: { active: false, lives: 0, autoreviveDelay: undefined, terrains: {} },
-        speedEdit: { active: false, terrains: {} },
+        speedEdit: { active: false },
     }
 
     private levelProgression: ILevelProgression = 'all'
@@ -558,27 +558,6 @@ export class LevelArray extends BaseArray<Level> {
         }
 
         this.modeState.speedEdit.active = isSpeedEdit
-
-        if (isSpeedEdit) {
-            for (const [_, terrain] of pairs(getUdgTerrainTypes().getAll())) {
-                if (isSlideTerrain(terrain)) {
-                    this.modeState.speedEdit.terrains[terrain.label] = {
-                        slideSpeed: terrain.getSlideSpeed(),
-                        rotationSpeed: terrain.getRotationSpeed(),
-                    }
-
-                    terrain.setSlideSpeed(Math.max(800, terrain.getSlideSpeed()))
-                    terrain.setRotationSpeed(Math.max(1.34, terrain.getRotationSpeed()))
-                }
-            }
-        } else {
-            for (const [_, terrain] of pairs(getUdgTerrainTypes().getAll())) {
-                if (isSlideTerrain(terrain)) {
-                    terrain.setSlideSpeed(this.modeState.speedEdit.terrains[terrain.label].slideSpeed)
-                    terrain.setRotationSpeed(this.modeState.speedEdit.terrains[terrain.label].rotationSpeed)
-                }
-            }
-        }
 
         // If speedEdit gets disabled we'll still show the speedEdit tag on the leaderboard.
         if (!this.speedEdit) {

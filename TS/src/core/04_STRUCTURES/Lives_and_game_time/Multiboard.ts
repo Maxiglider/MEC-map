@@ -6,6 +6,7 @@ import { createTimer, forRange } from 'Utils/mapUtils'
 import { arrayPush, ucfirst } from 'core/01_libraries/Basic_functions'
 import { NB_ESCAPERS, PURPLE, RED } from 'core/01_libraries/Constants'
 import { udg_colorCode } from 'core/01_libraries/Init_colorCodes'
+import { AfkMode } from 'core/08_GAME/Afk_mode/Afk_mode'
 import { getUdgEscapers, getUdgLevels } from '../../../../globals'
 import { playerId2colorId, rawPlayerNames } from '../../06_COMMANDS/COMMANDS_vJass/Command_functions'
 import { Escaper } from '../Escaper/Escaper'
@@ -401,9 +402,17 @@ export const initMultiboard = () => {
 
     // Not really multiboard but w/e
     const handleDitchLogic = () => {
+        if (getUdgLevels().getLevelProgression() !== 'all') {
+            return
+        }
+
         const sortedTargets = MemoryHandler.getEmptyArray<ITarget & IDestroyable>()
 
         for (const [_, escaper] of pairs(getUdgEscapers().getAll())) {
+            if (!AfkMode.isActive[escaper.getId()] || escaper.hasAutorevive()) {
+                continue
+            }
+
             const target = MemoryHandler.getEmptyObject<ITarget>()
             target.escaper = escaper
             target.progression = progressionUtils.getPlayerProgression(escaper)

@@ -244,6 +244,52 @@ export class Escaper {
     public totalRotation = 0
     public startTurningTime = 0
 
+    private stats: {
+        slideTiles: number
+        slideTime: number
+        gameTime: number
+        deathTime: number
+        saves: number
+        deaths: number
+        clicks: number
+        circles: number
+        circleTime: number
+
+        // Can we figure out a unique identifier for the current game?
+        currentGameBeaten: number
+        globalGamesBeaten: number
+        currentLevelsBeaten: number
+        globalLevelsBeaten: number
+        currentMonstersDodged: number
+        globalMonstersDodged: number
+
+        levels: {
+            [levelIndex: number]: {
+                beaten: number
+                maxProgression: number
+                currentMonstersDodged: number
+
+                slideTiles: number
+                slideTime: number
+                gameTime: number
+                deathTime: number
+                saves: number
+                deaths: number
+                clicks: number
+                circles: number
+                circleTime: number
+            }
+        }
+        players: {
+            saved: {
+                [playerName: string]: number
+            }
+            savedBy: {
+                [playerName: string]: number
+            }
+        }
+    } = {} as any
+
     /*
      * Constructor
      */
@@ -674,7 +720,18 @@ export class Escaper {
     }
 
     revive(x: number, y: number, type: 'coop' | 'other' = 'other') {
-        if (!this.hero || !this.invisUnit || this.isAlive()) {
+        const isAlive = this.isAlive()
+
+        if (!this.hero || !this.invisUnit || isAlive) {
+            if (isAlive) {
+                if (this.hero && (this.panCameraOnRevive === 'all' || this.panCameraOnRevive === type)) {
+                    //move camera if needed
+                    if (GetLocalPlayer() == this.p) {
+                        this.moveCameraToHeroIfNecessary()
+                    }
+                }
+            }
+
             return false
         }
 
