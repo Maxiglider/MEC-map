@@ -59,7 +59,7 @@ export class StaticSlide {
 
         if (itemIndex !== -1) {
             getUdgEscapers().get(playerId)?.enableSlide(true)
-            getUdgEscapers().get(playerId)?.setStaticSliding(false)
+            getUdgEscapers().get(playerId)?.setStaticSliding(undefined)
             this.slidingPlayers.splice(itemIndex, 1)
         }
     }
@@ -85,7 +85,7 @@ export class StaticSlide {
                                 !this.slidingPlayers.includes(escaper.getEscaperId())
                             ) {
                                 arrayPush(this.slidingPlayers, escaper.getEscaperId())
-                                escaper.setStaticSliding(true)
+                                escaper.setStaticSliding(this)
                                 SetUnitFacing(hero, this.angle)
                                 Hero2Escaper(hero)?.enableSlide(false)
                                 Hero2Escaper(hero)?.setLastTerrainType(undefined)

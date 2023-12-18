@@ -30,6 +30,7 @@ import { MakeMonsterSimplePatrol } from 'core/05_MAKE_STRUCTURES/Make_create_mon
 import { MakeMonsterTeleport } from 'core/05_MAKE_STRUCTURES/Make_create_monsters/MakeMonsterTeleport'
 import { MakeDeleteStaticSlide } from 'core/05_MAKE_STRUCTURES/Make_create_static_slide/MakeDeleteStaticSlide'
 import { MakeStaticSlide } from 'core/05_MAKE_STRUCTURES/Make_create_static_slide/MakeStaticSlide'
+import { MakeStaticSlideInfo } from 'core/05_MAKE_STRUCTURES/Make_create_static_slide/MakeStaticSlideInfo'
 import { MakeDeleteCasters } from 'core/05_MAKE_STRUCTURES/Make_delete_casters/MakeDeleteCasters'
 import { MakeDeleteMeteors } from 'core/05_MAKE_STRUCTURES/Make_delete_meteors/MakeDeleteMeteors'
 import { MakeDeleteMonsters } from 'core/05_MAKE_STRUCTURES/Make_delete_monsters/MakeDeleteMonsters'
@@ -82,6 +83,7 @@ import type { CasterType } from '../Caster/CasterType'
 import { Level } from '../Level/Level'
 import { IsLevelBeingMade } from '../Level/Level_functions'
 import { DEPART_PAR_DEFAUT } from '../Level/StartAndEnd'
+import { StaticSlide } from '../Level/StaticSlide'
 import { METEOR_CHEAT, METEOR_NORMAL, udg_meteors } from '../Meteor/Meteor'
 import type { MonsterType } from '../Monster/MonsterType'
 import type { TerrainType } from '../TerrainType/TerrainType'
@@ -206,7 +208,7 @@ export class Escaper {
     private displayName: string
 
     private showNames = false
-    private staticSliding = false
+    private staticSliding: StaticSlide | undefined
 
     public isNoobedit = false
     public isSpeedEdit = false
@@ -1592,6 +1594,11 @@ export class Escaper {
         if (this.hero) this.make = new MakeDeleteStaticSlide(this.hero)
     }
 
+    makeStaticSlideInfo = () => {
+        this.destroyMake()
+        if (this.hero) this.make = new MakeStaticSlideInfo(this.hero)
+    }
+
     makeSetPortalMobFreezeDuration(freezeDuration: number) {
         this.destroyMake()
         if (this.hero) {
@@ -2041,9 +2048,9 @@ export class Escaper {
         this.updateShowNames(true)
     }
 
-    isStaticSliding = () => this.staticSliding
+    isStaticSliding = () => !!this.staticSliding
 
-    setStaticSliding = (staticSliding: boolean) => {
+    setStaticSliding = (staticSliding: StaticSlide | undefined) => {
         this.staticSliding = staticSliding
     }
 

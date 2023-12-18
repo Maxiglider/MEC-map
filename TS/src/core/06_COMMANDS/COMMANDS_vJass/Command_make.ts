@@ -3151,6 +3151,23 @@ export const initExecuteCommandMake = () => {
         },
     })
 
+    //-getStaticSlideInfo
+    registerCommand({
+        name: 'getStaticSlideInfo',
+        alias: ['gssi', 'getssi'],
+        group: 'make',
+        argDescription: '',
+        description: '',
+        cb: ({ noParam }, escaper) => {
+            if (!noParam) {
+                return true
+            }
+            escaper.makeStaticSlideInfo()
+            Text.mkP(escaper.getPlayer(), 'Click on a static slide')
+            return true
+        },
+    })
+
     //-setStaticSlideSpeed(setsss) <speed>
     registerCommand({
         name: 'setStaticSlideSpeed',
