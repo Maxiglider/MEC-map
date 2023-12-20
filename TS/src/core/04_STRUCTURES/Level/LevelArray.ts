@@ -157,8 +157,8 @@ export class LevelArray extends BaseArray<Level> {
         return true
     }
 
-    goToNextLevel = (finisher?: Escaper): boolean => {
-        if (this.getCurrentLevel(finisher).id >= this.lastInstanceId) {
+    goToNextLevel = (escaper: Escaper, finished?: boolean): boolean => {
+        if (this.getCurrentLevel(escaper).id >= this.lastInstanceId) {
             return false
         }
 
@@ -170,10 +170,10 @@ export class LevelArray extends BaseArray<Level> {
         if (!this.tLastGoToNextLevel) this.tLastGoToNextLevel = CreateTimer()
         TimerStart(this.tLastGoToNextLevel, 10, false, DoNothing)
 
-        this.currentLevel = this.getCurrentLevel(finisher).id + 1
+        this.currentLevel = this.getCurrentLevel(escaper).id + 1
 
         for (let i = 0; i < NB_PLAYERS_MAX; i++) {
-            if (!finisher || (getUdgEscapers().get(i) && sameLevelProgression(finisher, getUdgEscapers().get(i)!))) {
+            if (getUdgEscapers().get(i) && sameLevelProgression(escaper, getUdgEscapers().get(i)!)) {
                 this.levelProgressionState[i] = this.currentLevel
             }
         }
@@ -185,10 +185,11 @@ export class LevelArray extends BaseArray<Level> {
         }
 
         this.data[this.currentLevel].activate(true)
-        this.data[this.currentLevel].checkpointReviveHeroes(finisher)
+        this.data[this.currentLevel].checkpointReviveHeroes(escaper, finished)
 
-        if (this.moveCamToStart(this.data[this.currentLevel], finisher) && finisher) {
-            Text.A(udg_colorCode[finisher.getColorId()] + 'Good job ' + finisher.getDisplayName() + ' !')
+        if (this.moveCamToStart(this.data[this.currentLevel], escaper) && finished) {
+            Text.A(udg_colorCode[escaper.getColorId()] + 'Good job ' + escaper.getDisplayName() + ' !')
+            ServiceManager.getService('Multiboard').onPlayerLevelCompleted(escaper)
         }
 
         return true

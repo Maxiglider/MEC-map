@@ -111,8 +111,8 @@ export class Level {
         ThemeUtils.applyGameTheme()
     }
 
-    checkpointReviveHeroes(finisher: Escaper | undefined) {
-        checkPointReviveHeroes(this, finisher)
+    checkpointReviveHeroes(finisher: Escaper | undefined, finished?: boolean) {
+        checkPointReviveHeroes(this, finisher, finished)
     }
 
     getStart = () => {

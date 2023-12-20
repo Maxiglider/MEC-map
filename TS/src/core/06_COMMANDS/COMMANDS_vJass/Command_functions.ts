@@ -1,6 +1,6 @@
 import { MemoryHandler } from 'Utils/MemoryHandler'
 import { forRange } from 'Utils/mapUtils'
-import { stringReplaceAll } from 'core/01_libraries/Basic_functions'
+import { arrayPush, stringReplaceAll } from 'core/01_libraries/Basic_functions'
 import { NB_ESCAPERS, NB_PLAYERS_MAX, NB_PLAYERS_MAX_REFORGED } from 'core/01_libraries/Constants'
 import { ColorString2Id } from 'core/01_libraries/Init_colorCodes'
 import { Escaper } from 'core/04_STRUCTURES/Escaper/Escaper'
@@ -198,24 +198,37 @@ export const resolvePlayerId = (arg: string) => {
     return targetPlayer
 }
 
-export const resolvePlayerIds = (arg: string, cb: (targetPlayer: Escaper) => void) => {
+export const resolvePlayerIdsArray = (arg: string) => {
     const larg = arg.toLowerCase()
+    const escapers = MemoryHandler.getEmptyArray<Escaper>()
 
     if (larg === 'a' || larg === 'all') {
         for (let i = 0; i < NB_ESCAPERS; i++) {
             const escaper = getUdgEscapers().get(i)
 
             if (escaper) {
-                cb(escaper)
+                arrayPush(escapers, escaper)
             }
         }
     } else if (isPlayerId(arg)) {
         const escaper = getUdgEscapers().get(resolvePlayerId(arg))
 
         if (escaper) {
-            cb(escaper)
+            arrayPush(escapers, escaper)
         }
     } else {
         throw `Invalid player: '${arg}'`
     }
+
+    return escapers
+}
+
+export const resolvePlayerIds = (arg: string, cb: (targetPlayer: Escaper) => void) => {
+    const escapers = resolvePlayerIdsArray(arg)
+
+    for (const escaper of escapers) {
+        cb(escaper)
+    }
+
+    escapers.__destroy()
 }

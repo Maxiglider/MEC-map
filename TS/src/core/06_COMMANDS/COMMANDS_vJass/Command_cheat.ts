@@ -510,9 +510,9 @@ export const initExecuteCommandCheat = () => {
         group: 'cheat',
         argDescription: '',
         description: 'Go to the end of the current level',
-        cb: ({ noParam }) => {
+        cb: ({ noParam }, escaper) => {
             if (noParam) {
-                getUdgLevels().goToNextLevel()
+                getUdgLevels().goToNextLevel(escaper)
             }
             return true
         },

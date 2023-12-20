@@ -60,17 +60,19 @@ export const initCommandExecution = () => {
     }
 
     const accessCheck = (escaper: Escaper, cmd: ICommand) => {
+        if (escaper.cmdAccessMap[cmd.name]) {
+            return true
+        }
+
         switch (cmd.group) {
             case 'truemax': {
                 if (!escaper.isTrueMaximaxou()) {
-                    Text.erP(escaper.getPlayer(), 'unknown command or not enough rights')
                     return false
                 }
             }
 
             case 'max': {
                 if (!escaper.isMaximaxou()) {
-                    Text.erP(escaper.getPlayer(), 'unknown command or not enough rights')
                     return false
                 }
             }
@@ -78,14 +80,12 @@ export const initCommandExecution = () => {
             case 'make':
             case 'cheat': {
                 if (!escaper.canCheat()) {
-                    Text.erP(escaper.getPlayer(), 'unknown command or not enough rights')
                     return false
                 }
             }
 
             case 'red': {
                 if (!((escaper.getPlayer() === Player(0) && Globals.udg_areRedRightsOn) || escaper.canCheat())) {
-                    Text.erP(escaper.getPlayer(), 'unknown command or not enough rights')
                     return false
                 }
             }
@@ -112,6 +112,28 @@ export const initCommandExecution = () => {
             const hasAccess = accessCheck(escaper, cmd)
 
             if ((isMatchedName || isMatchedAlias) && isEnabled && hasAccess) {
+                return cmd
+            }
+        }
+
+        Text.erP(escaper.getPlayer(), 'unknown command or not enough rights')
+    }
+
+    const findTargetCommandSingle = (name: string, escaper: Escaper) => {
+        for (const cmd of commands) {
+            const isMatchedName = cmd.name.toLowerCase() === name.toLowerCase()
+            let isMatchedAlias = false
+
+            for (const alias of cmd.alias) {
+                if (alias.toLowerCase() === name.toLowerCase()) {
+                    isMatchedAlias = true
+                    break
+                }
+            }
+
+            const hasAccess = accessCheck(escaper, cmd)
+
+            if ((isMatchedName || isMatchedAlias) && hasAccess) {
                 return cmd
             }
         }
@@ -276,5 +298,5 @@ export const initCommandExecution = () => {
         })
     }
 
-    return { registerCommand, ExecuteCommand, initCommands }
+    return { registerCommand, ExecuteCommand, initCommands, findTargetCommandSingle }
 }

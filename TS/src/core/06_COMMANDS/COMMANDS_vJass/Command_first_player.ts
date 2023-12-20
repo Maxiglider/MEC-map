@@ -7,7 +7,7 @@ import { TerrainTypeFromString } from 'core/07_TRIGGERS/Modify_terrain_Functions
 import { ReinitTerrainsPositions } from 'core/07_TRIGGERS/Triggers_to_modify_terrains/Reinit_terrains_position_Change_variations_and_ut_at_beginning'
 import { Globals } from 'core/09_From_old_Worldedit_triggers/globals_variables_and_triggers'
 import { getUdgEscapers, getUdgLevels, getUdgTerrainTypes, globals } from '../../../../globals'
-import { isPlayerId, resolvePlayerId, resolvePlayerIds } from './Command_functions'
+import { isPlayerId, resolvePlayerId, resolvePlayerIds, resolvePlayerIdsArray } from './Command_functions'
 
 export const initExecuteCommandRed = () => {
     const { registerCommand } = ServiceManager.getService('Cmd')
@@ -259,6 +259,22 @@ export const initExecuteCommandRed = () => {
         },
     })
 
+    //-setPointsEarnedOnLevelCompletion(setpeolc) number
+    registerCommand({
+        name: 'setPointsEarnedOnLevelCompletion',
+        alias: ['setpeolc'],
+        group: 'red',
+        argDescription: '<number>',
+        description: '',
+        enabled: () => ServiceManager.getService('Multiboard').arePointsEnabled(),
+        cb: ({ param1 }, escaper) => {
+            const points = S2I(param1)
+            ServiceManager.getService('Multiboard').setPointsEarnedOnLevelCompletion(points)
+            Text.P(escaper.getPlayer(), `Points earned on level completion ${points}`)
+            return true
+        },
+    })
+
     //-adjustPlayerPoints(adjustpp) <playerId> <points>
     registerCommand({
         name: 'adjustPlayerPoints',
@@ -419,6 +435,76 @@ export const initExecuteCommandRed = () => {
             }
 
             Text.A(`Welcome to: ${param1} 2.0`)
+            return true
+        },
+    })
+
+    //-overrideCommandAccess(oca) <view|grant|revoke> <cmd> <player|all>
+    registerCommand({
+        name: 'overrideCommandAccess',
+        alias: ['oca'],
+        group: 'red',
+        argDescription: '<view | grant | revoke> <cmd> <player|all>',
+        description: 'override command access',
+        cb: ({ param1, param2, param3 }, escaper) => {
+            if (param1 !== 'view' && param1 !== 'grant' && param1 !== 'revoke') {
+                return true
+            }
+
+            const cmd = ServiceManager.getService('Cmd').findTargetCommandSingle(param2, escaper)
+
+            if (!cmd) {
+                Text.P(escaper.getPlayer(), 'You need access to this command to be able to override it')
+                return true
+            }
+
+            switch (param1) {
+                case 'view': {
+                    const targets = resolvePlayerIdsArray(param3)
+
+                    for (const target of targets) {
+                        Text.P(
+                            escaper.getPlayer(),
+                            `${target.getDisplayName()}: ${cmd.name}: ${
+                                target.cmdAccessMap[cmd.name] ? 'Access' : 'No access'
+                            }`
+                        )
+                    }
+
+                    targets.__destroy()
+                    break
+                }
+
+                case 'grant': {
+                    const targets = resolvePlayerIdsArray(param3)
+
+                    for (const target of targets) {
+                        target.cmdAccessMap[cmd.name] = true
+                        Text.P(escaper.getPlayer(), `${target.getDisplayName()}: ${cmd.name}: access granted`)
+                    }
+
+                    targets.__destroy()
+                    break
+                }
+
+                case 'revoke': {
+                    const targets = resolvePlayerIdsArray(param3)
+
+                    for (const target of targets) {
+                        delete target.cmdAccessMap[cmd.name]
+                        Text.P(escaper.getPlayer(), `${target.getDisplayName()}: ${cmd.name}: access revoked`)
+                    }
+
+                    targets.__destroy()
+                    break
+                }
+
+                default: {
+                    Text.P(escaper.getPlayer(), 'Invalid mode')
+                    break
+                }
+            }
+
             return true
         },
     })

@@ -10,6 +10,7 @@ import { AfkMode } from 'core/08_GAME/Afk_mode/Afk_mode'
 import { getUdgEscapers, getUdgLevels } from '../../../../globals'
 import { playerId2colorId, rawPlayerNames } from '../../06_COMMANDS/COMMANDS_vJass/Command_functions'
 import { Escaper } from '../Escaper/Escaper'
+import { sameLevelProgression } from '../Level/LevelProgression'
 import { LIVES_PLAYER } from './Lives_and_game_time'
 import { GameTime } from './Time_of_game_trigger'
 
@@ -59,6 +60,7 @@ export const initMultiboard = () => {
     let amountOfEscapers = 0
     let pointsEnabled = false
     let progressionEnabled = false
+    let pointsEarnedOnLevelCompletion = 0
 
     forRange(NB_ESCAPERS, i => {
         playerScores[i] = {
@@ -370,6 +372,18 @@ export const initMultiboard = () => {
         }
     }
 
+    const onPlayerLevelCompleted = (player: Escaper) => {
+        if (pointsEnabled && pointsEarnedOnLevelCompletion > 0) {
+            for (const [targetId] of pairs(playerScores)) {
+                const targetEscaper = getUdgEscapers().get(targetId)
+
+                if (targetEscaper && sameLevelProgression(player, targetEscaper)) {
+                    adjustPlayerPoints(targetId, pointsEarnedOnLevelCompletion)
+                }
+            }
+        }
+    }
+
     const adjustPlayerPoints = (playerId: number, points: number) => {
         for (const statsMode of statsModes) {
             playerScores[playerId].stats[statsMode].points += points
@@ -384,6 +398,10 @@ export const initMultiboard = () => {
         }
 
         updatePlayers()
+    }
+
+    const setPointsEarnedOnLevelCompletion = (points: number) => {
+        pointsEarnedOnLevelCompletion = points
     }
 
     createTimer(1, true, () => {
@@ -481,5 +499,8 @@ export const initMultiboard = () => {
         setProgressionEnabled,
         adjustPlayerPoints,
         setPlayerPoints,
+        setPointsEarnedOnLevelCompletion,
+        onPlayerLevelCompleted,
+        arePointsEnabled: () => pointsEnabled,
     }
 }

@@ -7,12 +7,16 @@ import { Escaper } from '../Escaper/Escaper'
 import type { Level } from './Level'
 import { sameLevelProgression } from './LevelProgression'
 
-export const checkPointReviveHeroes = (levelForRevining: Level, revivingFinisher: Escaper | undefined) => {
+export const checkPointReviveHeroes = (
+    levelForRevining: Level,
+    revivingFinisher: Escaper | undefined,
+    finished?: boolean
+) => {
     for (let i = 0; i < NB_ESCAPERS; i++) {
         const escaper = getUdgEscapers().get(i)
 
         if (escaper) {
-            if (escaper !== revivingFinisher) {
+            if (escaper !== revivingFinisher || !finished) {
                 const unit = escaper.getHero()
 
                 if (revivingFinisher && !sameLevelProgression(revivingFinisher, escaper)) {
@@ -42,7 +46,7 @@ export const checkPointReviveHeroes = (levelForRevining: Level, revivingFinisher
 
     for (let i = 0; i < NB_ESCAPERS; i++) {
         const escaper = getUdgEscapers().get(i)
-        if (escaper && escaper !== revivingFinisher) {
+        if (escaper && (escaper !== revivingFinisher || !finished)) {
             escaper.pause(false)
         }
     }

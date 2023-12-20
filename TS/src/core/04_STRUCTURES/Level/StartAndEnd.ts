@@ -1,3 +1,4 @@
+import { ServiceManager } from 'Services'
 import { MemoryHandler } from 'Utils/MemoryHandler'
 import { createEvent } from 'Utils/mapUtils'
 import { Text } from 'core/01_libraries/Text'
@@ -95,7 +96,16 @@ export class End extends RectInterface {
                         return
                     }
 
-                    if (!getUdgLevels().goToNextLevel(finisher)) {
+                    if (!getUdgLevels().goToNextLevel(finisher, true)) {
+                        ServiceManager.getService('Multiboard').onPlayerLevelCompleted(finisher)
+
+                        if (getUdgLevels().getLevelProgression() !== 'all') {
+                            // Disable the trigger so winner cant retrigger it, downside is that nobody else will get points for beating the game
+                            DisableTrigger(this.endReaching)
+                            Text.A('Good job ! You have finished the game.')
+                            return
+                        }
+
                         DisableTrigger(this.endReaching)
                         Text.A('Good job ! You have finished the game.')
                         TriggerSleepAction(2)

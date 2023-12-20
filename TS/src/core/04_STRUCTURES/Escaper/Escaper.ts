@@ -154,6 +154,8 @@ export class Escaper {
     private isMaximaxouB: boolean
     private isTrueMaximaxouB: boolean
 
+    public cmdAccessMap: { [cmd: string]: boolean } = {}
+
     private make?: Make
     private makeLastActions: MakeLastActions
     private makingLevel?: Level
