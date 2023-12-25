@@ -26,6 +26,7 @@ import { PROD } from './env'
 // [O] get current lvl highest prog cmd / stats or add to multiboard
 // [O] -ot should also apply to their death circles
 // [O] add option 'progression' to -lc to lock cam to #1 slider
+// [O] make setPointsEarnedOnLevelCompletion give out points to other teams on game completion
 
 const tsMain = () => {
     ServiceManager.registerServices({
