@@ -11,16 +11,21 @@ import { initializers } from './core/Init/initializers'
 import { PROD } from './env'
 
 // [X] per player rkr thing, ignore players who haven't clicked yet (support arrowkeys too somehow)
-// [X] ignore noobedit players
-// [O] make it activate for closest alive player in front of you
-// [O] add max distance cmd
-// [O] add disable cmd
+//   ^ [X] ignore noobedit players
+//   ^ [O] make it activate for closest alive player in front of you
+//   ^ [O] add max distance cmd
+//   ^ [O] add disable cmd
+//   ^ [O] make it work for only allied players
+// [O] bug; whenever u -back after dying on death terrain u revive on death terrain and it kills you again
+// [O] oldest bug in the book; when u die to terrain and then touch a unit, the unit will kill u, then u revive, then death terrain will kill you again. Should cancel the death terrain kill in progress after revive
+// [O] make cmd to determine if meteor kills should persist after level load (for tour etc)
+//   ^ [O] make cmd to reset persisted meteor kills
+// [O] make cmd setPointsEarnedOnMeteor to give points to people who use meteor
+//   ^ [O] make cmd setPointsEarnedOnMeteorMaxPerLevel to limit max meteor kill points earned per level
 // [O] detect walk terrain with end region, if you touch it set progression to 100%
-// [O] get current lvl highest prog cmd / stats
-// [X] added -setgametheme murloc|fullskill
-// [X] -setgametheme with -se 1 doesn't change ss of newly created terrains
-// [X] make speededit work per player instead of changing terrains
-// [X] fix bug where cam doesn't follow player on -rpos, -smn and -back
+// [O] get current lvl highest prog cmd / stats or add to multiboard
+// [O] -ot should also apply to their death circles
+// [O] add option 'progression' to -lc to lock cam to #1 slider
 
 const tsMain = () => {
     ServiceManager.registerServices({
