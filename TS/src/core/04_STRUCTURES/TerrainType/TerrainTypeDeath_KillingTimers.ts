@@ -1,5 +1,5 @@
-import { NB_ESCAPERS } from 'core/01_libraries/Constants'
 import { forRange } from 'Utils/mapUtils'
+import { NB_ESCAPERS } from 'core/01_libraries/Constants'
 import { getUdgEscapers, getUdgLevels, getUdgTerrainTypes } from '../../../../globals'
 import { isDeathTerrain } from './TerrainType'
 
@@ -12,6 +12,10 @@ export class KillingTimers {
 
     destroy = () => {
         forRange(NB_ESCAPERS, i => DestroyTimer(this.timers[i]))
+    }
+
+    destroyTimer = (timerId: number) => {
+        PauseTimer(this.timers[timerId])
     }
 
     TerrainKillTimer2Escaper = (theTimer: timer) => {

@@ -56,6 +56,11 @@ export class TerrainTypeDeath extends TerrainType {
         this.killingTimers.start(escaper.getId(), this.timeToKill)
     }
 
+    abortKillEscaper = (escaper: Escaper) => {
+        escaper.destroyTerrainKillEffect()
+        this.killingTimers.destroyTimer(escaper.getId())
+    }
+
     getTimer = (escaperId: number): timer => {
         return this.killingTimers.get(escaperId)
     }

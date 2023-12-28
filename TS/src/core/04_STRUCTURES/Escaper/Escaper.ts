@@ -86,7 +86,7 @@ import { DEPART_PAR_DEFAUT } from '../Level/StartAndEnd'
 import { StaticSlide } from '../Level/StaticSlide'
 import { METEOR_CHEAT, METEOR_NORMAL, udg_meteors } from '../Meteor/Meteor'
 import type { MonsterType } from '../Monster/MonsterType'
-import type { TerrainType } from '../TerrainType/TerrainType'
+import { isDeathTerrain, type TerrainType } from '../TerrainType/TerrainType'
 import { TerrainTypeSlide } from '../TerrainType/TerrainTypeSlide'
 import { TerrainTypeWalk } from '../TerrainType/TerrainTypeWalk'
 import { EscaperEffectArray } from './EscaperEffectArray'
@@ -748,6 +748,12 @@ export class Escaper {
         this.SpecialIllidan()
         this.selectHero()
         this.updateUnitVertexColor()
+
+        for (const [_, terrainType] of pairs(getUdgTerrainTypes().getAll())) {
+            if (isDeathTerrain(terrainType)) {
+                terrainType.abortKillEscaper(this)
+            }
+        }
 
         if (!this.firstPersonHandle.isFirstPerson()) {
             this.setCanClick(true)

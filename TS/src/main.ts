@@ -23,10 +23,11 @@ import { PROD } from './env'
 // [O] make cmd setPointsEarnedOnMeteor to give points to people who use meteor
 //   ^ [O] make cmd setPointsEarnedOnMeteorMaxPerLevel to limit max meteor kill points earned per level
 // [O] detect walk terrain with end region, if you touch it set progression to 100%
-// [O] get current lvl highest prog cmd / stats or add to multiboard
+// [O] get current lvl highest prog cmd / stats or add to multiboard; maybe show `current/highest` achieved
 // [O] -ot should also apply to their death circles
 // [O] add option 'progression' to -lc to lock cam to #1 slider
 // [O] make setPointsEarnedOnLevelCompletion give out points to other teams on game completion
+// [O] whenever u -el it doesn't pan camera to new lvl
 
 const tsMain = () => {
     ServiceManager.registerServices({
