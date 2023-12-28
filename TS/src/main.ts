@@ -18,13 +18,13 @@ import { PROD } from './env'
 //   ^ [O] make it work for only allied players
 // [X] bug; whenever u -back or -rpos after dying on death terrain u revive on death terrain and it kills you again
 // [X] oldest bug in the book; when u die to terrain and then touch a unit, the unit will kill u, then u revive, then death terrain will kill you again. Should cancel the death terrain kill in progress after revive
+// [X] -ot should also apply to their death circles. -vc too
 // [O] make cmd to determine if meteor kills should persist after level load (for tour etc)
 //   ^ [O] make cmd to reset persisted meteor kills
 // [O] make cmd setPointsEarnedOnMeteor to give points to people who use meteor
 //   ^ [O] make cmd setPointsEarnedOnMeteorMaxPerLevel to limit max meteor kill points earned per level
 // [O] detect walk terrain with end region, if you touch it set progression to 100%
 // [O] get current lvl highest prog cmd / stats or add to multiboard; maybe show `current/highest` achieved
-// [O] -ot should also apply to their death circles
 // [O] add option 'progression' to -lc to lock cam to #1 slider
 // [O] make setPointsEarnedOnLevelCompletion give out points to other teams on game completion
 // [O] whenever u -el it doesn't pan camera to new lvl

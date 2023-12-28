@@ -2090,6 +2090,16 @@ export class Escaper {
                     ? this.vcTransparency
                     : otherTransparency
             )
+
+            SetUnitVertexColorBJ(
+                this.powerCircle,
+                this.vcRed,
+                this.vcGreen,
+                this.vcBlue,
+                GetLocalPlayer() === this.getPlayer() || otherTransparency === null || this.isEscaperSecondary()
+                    ? this.vcTransparency
+                    : otherTransparency
+            )
         }
     }
 
