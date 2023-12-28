@@ -12,6 +12,7 @@ import { runInTrigger } from '../../../Utils/mapUtils'
 import { getUdgViewAll } from '../../03_view_all_hide_all/View_all_hide_all'
 import { MeteorFunctions } from '../../04_STRUCTURES/Meteor/Meteor_functions'
 import { Trig_InvisUnit_is_getting_damage } from '../../08_GAME/Death/InvisUnit_is_getting_damage'
+import { DeplacementHeroHorsDeathPath } from '../../08_GAME/Mode_coop/deplacement_heros_hors_death_path'
 import { isPlayerId, resolvePlayerId, resolvePlayerIds } from './Command_functions'
 import { ActivateTeleport } from './Teleport'
 
@@ -28,6 +29,7 @@ export const initExecuteCommandCheat = () => {
         }
 
         if (!escaper.isAlive()) {
+            DeplacementHeroHorsDeathPath.DeplacementHeroHorsDeathPath(hero)
             runInTrigger(escaper.coopReviveHero)
         }
     }
@@ -352,8 +354,11 @@ export const initExecuteCommandCheat = () => {
         description: 'Teleports you to your previous location',
         cb: ({ noParam }, escaper) => {
             if (noParam) {
-                if (escaper.lastPos) {
+                const hero = escaper.getHero()
+
+                if (escaper.lastPos && hero) {
                     escaper.moveHero(escaper.lastPos.x, escaper.lastPos.y)
+                    DeplacementHeroHorsDeathPath.DeplacementHeroHorsDeathPath(hero)
                     escaper.coopReviveHero()
                 }
 

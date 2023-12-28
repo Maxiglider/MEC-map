@@ -16,8 +16,8 @@ import { PROD } from './env'
 //   ^ [O] add max distance cmd
 //   ^ [O] add disable cmd
 //   ^ [O] make it work for only allied players
-// [O] bug; whenever u -back after dying on death terrain u revive on death terrain and it kills you again
-// [O] oldest bug in the book; when u die to terrain and then touch a unit, the unit will kill u, then u revive, then death terrain will kill you again. Should cancel the death terrain kill in progress after revive
+// [X] bug; whenever u -back or -rpos after dying on death terrain u revive on death terrain and it kills you again
+// [X] oldest bug in the book; when u die to terrain and then touch a unit, the unit will kill u, then u revive, then death terrain will kill you again. Should cancel the death terrain kill in progress after revive
 // [O] make cmd to determine if meteor kills should persist after level load (for tour etc)
 //   ^ [O] make cmd to reset persisted meteor kills
 // [O] make cmd setPointsEarnedOnMeteor to give points to people who use meteor
