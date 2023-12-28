@@ -261,11 +261,17 @@ const initProgressionUtils = () => {
     }
 
     const progressionState: { [player: number]: { reverse: boolean; progression: number } & IDestroyable } = {}
+    const progressionStateLvl: { [player: number]: { progressionLvl: number } & IDestroyable } = {}
 
-    const resetPlayerProgressionState = (escaper: Escaper) => {
+    const resetPlayerProgressionState = (escaper: Escaper, resetLvl?: boolean) => {
         if (progressionState[escaper.getId()]) {
             progressionState[escaper.getId()].__destroy()
             delete progressionState[escaper.getId()]
+        }
+
+        if (resetLvl && progressionStateLvl[escaper.getId()]) {
+            progressionStateLvl[escaper.getId()].__destroy()
+            delete progressionStateLvl[escaper.getId()]
         }
     }
 
@@ -298,7 +304,26 @@ const initProgressionUtils = () => {
         }
     }
 
-    return { init, getPlayerProgression, resetPlayerProgressionState }
+    const getPlayerProgressionLvl = (escaper: Escaper) => {
+        if (!progressionStateLvl[escaper.getId()]) {
+            progressionStateLvl[escaper.getId()] = MemoryHandler.getEmptyObject()
+            progressionStateLvl[escaper.getId()].progressionLvl = -1
+        }
+
+        const nextProgression = getPlayerProgression(escaper)
+
+        if (nextProgression > progressionStateLvl[escaper.getId()].progressionLvl) {
+            progressionStateLvl[escaper.getId()].progressionLvl = nextProgression
+        }
+
+        if (progressionStateLvl[escaper.getId()].progressionLvl === -1) {
+            return 0
+        }
+
+        return progressionStateLvl[escaper.getId()].progressionLvl
+    }
+
+    return { init, getPlayerProgression, getPlayerProgressionLvl, resetPlayerProgressionState }
 }
 
 export const progressionUtils = initProgressionUtils()

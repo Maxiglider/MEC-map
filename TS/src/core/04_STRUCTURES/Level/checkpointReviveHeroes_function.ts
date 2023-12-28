@@ -37,9 +37,9 @@ export const checkPointReviveHeroes = (
 
                 unit && SetUnitFlyHeight(unit, 0, 0)
                 escaper.enableSlide(false)
-            } else {
-                progressionUtils.resetPlayerProgressionState(escaper)
             }
+
+            progressionUtils.resetPlayerProgressionState(escaper, true)
         }
     }
 
