@@ -25,6 +25,7 @@ export const checkPointReviveHeroes = (
 
                 if (!escaper.reviveAtStart()) {
                     escaper.moveHero(levelForRevining.getStartRandomX(), levelForRevining.getStartRandomY())
+                    escaper.moveCameraToHeroIfNecessary()
 
                     unit && StopUnit(unit)
 

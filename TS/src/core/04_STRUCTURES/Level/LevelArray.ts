@@ -152,7 +152,8 @@ export class LevelArray extends BaseArray<Level> {
             }
         }
 
-        this.moveCamToStart(this.data[levelId], finisher)
+        // Revive already moves camera
+        // this.moveCamToStart(this.data[levelId], finisher)
 
         return true
     }
@@ -187,7 +188,10 @@ export class LevelArray extends BaseArray<Level> {
         this.data[this.currentLevel].activate(true)
         this.data[this.currentLevel].checkpointReviveHeroes(escaper, finished)
 
-        if (this.moveCamToStart(this.data[this.currentLevel], escaper) && finished) {
+        // Revive already moves camera
+        // this.moveCamToStart(this.data[this.currentLevel], escaper)
+
+        if (finished) {
             Text.A(udg_colorCode[escaper.getColorId()] + 'Good job ' + escaper.getDisplayName() + ' !')
             ServiceManager.getService('Multiboard').onPlayerLevelCompleted(escaper)
         }
@@ -195,48 +199,48 @@ export class LevelArray extends BaseArray<Level> {
         return true
     }
 
-    moveCamToStart(level: Level, finisher: Escaper | undefined) {
-        const start = level.getStart()
+    // moveCamToStart(level: Level, finisher: Escaper | undefined) {
+    //     const start = level.getStart()
 
-        if (start) {
-            const xCam = start.getCenterX()
-            const yCam = start.getCenterY()
+    //     if (start) {
+    //         const xCam = start.getCenterX()
+    //         const yCam = start.getCenterY()
 
-            if (finisher) {
-                let x = xCam
-                let y = yCam
+    //         if (finisher) {
+    //             let x = xCam
+    //             let y = yCam
 
-                if (GetLocalPlayer() === finisher.getPlayer()) {
-                    x = GetCameraTargetPositionX()
-                    y = GetCameraTargetPositionY()
-                }
+    //             if (GetLocalPlayer() === finisher.getPlayer()) {
+    //                 x = GetCameraTargetPositionX()
+    //                 y = GetCameraTargetPositionY()
+    //             }
 
-                for (const [_, escaper] of pairs(getUdgEscapers().getAll())) {
-                    if (!finisher || sameLevelProgression(finisher, escaper)) {
-                        SetCameraPositionForPlayer(escaper.getPlayer(), x, y)
-                    }
-                }
-            } else {
-                for (const [_, escaper] of pairs(getUdgEscapers().getAll())) {
-                    if (!finisher || sameLevelProgression(finisher, escaper)) {
-                        SetCameraPositionForPlayer(escaper.getPlayer(), xCam, yCam)
-                    }
-                }
-            }
+    //             for (const [_, escaper] of pairs(getUdgEscapers().getAll())) {
+    //                 if (!finisher || sameLevelProgression(finisher, escaper)) {
+    //                     SetCameraPositionForPlayer(escaper.getPlayer(), x, y)
+    //                 }
+    //             }
+    //         } else {
+    //             for (const [_, escaper] of pairs(getUdgEscapers().getAll())) {
+    //                 if (!finisher || sameLevelProgression(finisher, escaper)) {
+    //                     SetCameraPositionForPlayer(escaper.getPlayer(), xCam, yCam)
+    //                 }
+    //             }
+    //         }
 
-            for (const [_, escaper] of pairs(getUdgEscapers().getAll())) {
-                if (!finisher || sameLevelProgression(finisher, escaper)) {
-                    if (escaper.isLockCamTarget()) {
-                        escaper.resetCamera()
-                    }
-                }
-            }
+    //         for (const [_, escaper] of pairs(getUdgEscapers().getAll())) {
+    //             if (!finisher || sameLevelProgression(finisher, escaper)) {
+    //                 if (escaper.isLockCamTarget()) {
+    //                     escaper.resetCamera()
+    //                 }
+    //             }
+    //         }
 
-            return true
-        } else {
-            return false
-        }
-    }
+    //         return true
+    //     } else {
+    //         return false
+    //     }
+    // }
 
     restartTheGame = () => {
         if (this.currentLevel === 0) {
