@@ -61,6 +61,8 @@ export const initMultiboard = () => {
     let pointsEnabled = false
     let progressionEnabled = false
     let pointsEarnedOnLevelCompletion = 0
+    let pointsEarnedOnMeteorCompletion = 0
+    let pointsEarnedOnMeteorCompletionMaxPerLevel = 0
 
     forRange(NB_ESCAPERS, i => {
         playerScores[i] = {
@@ -387,6 +389,44 @@ export const initMultiboard = () => {
         }
     }
 
+    const playerMeteorsInLvl: { [levelIdAndPlayerId: string]: number } = {}
+
+    const onPlayerMeteorCompleted = (player: Escaper) => {
+        if (pointsEnabled && pointsEarnedOnMeteorCompletion > 0) {
+            for (const [targetId] of pairs(playerScores)) {
+                const targetEscaper = getUdgEscapers().get(targetId)
+
+                if (targetEscaper && sameLevelProgression(player, targetEscaper)) {
+                    const currentLevel = getUdgLevels().getCurrentLevel().id
+
+                    if (!playerMeteorsInLvl[`${currentLevel}_${targetId}`]) {
+                        playerMeteorsInLvl[`${currentLevel}_${targetId}`] = 0
+                    }
+
+                    let pointsToGive = pointsEarnedOnMeteorCompletion
+
+                    if (
+                        pointsEarnedOnMeteorCompletionMaxPerLevel > 0 &&
+                        pointsToGive + playerMeteorsInLvl[`${currentLevel}_${targetId}`] >
+                            pointsEarnedOnMeteorCompletionMaxPerLevel
+                    ) {
+                        pointsToGive =
+                            pointsEarnedOnMeteorCompletionMaxPerLevel -
+                            playerMeteorsInLvl[`${currentLevel}_${targetId}`]
+                    }
+
+                    // Shouldn't be possible
+                    if (pointsToGive < 0) {
+                        continue
+                    }
+
+                    playerMeteorsInLvl[`${currentLevel}_${targetId}`] += pointsToGive
+                    adjustPlayerPoints(targetId, pointsToGive)
+                }
+            }
+        }
+    }
+
     const adjustPlayerPoints = (playerId: number, points: number) => {
         for (const statsMode of statsModes) {
             playerScores[playerId].stats[statsMode].points += points
@@ -405,6 +445,14 @@ export const initMultiboard = () => {
 
     const setPointsEarnedOnLevelCompletion = (points: number) => {
         pointsEarnedOnLevelCompletion = points
+    }
+
+    const setPointsEarnedOnMeteorCompletion = (points: number) => {
+        pointsEarnedOnMeteorCompletion = points
+    }
+
+    const setPointsEarnedOnMeteorCompletionMaxPerLevel = (points: number) => {
+        pointsEarnedOnMeteorCompletionMaxPerLevel = points
     }
 
     createTimer(1, true, () => {
@@ -503,7 +551,10 @@ export const initMultiboard = () => {
         adjustPlayerPoints,
         setPlayerPoints,
         setPointsEarnedOnLevelCompletion,
+        setPointsEarnedOnMeteorCompletion,
+        setPointsEarnedOnMeteorCompletionMaxPerLevel,
         onPlayerLevelCompleted,
+        onPlayerMeteorCompleted,
         arePointsEnabled: () => pointsEnabled,
     }
 }

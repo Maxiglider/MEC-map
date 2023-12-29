@@ -275,6 +275,38 @@ export const initExecuteCommandRed = () => {
         },
     })
 
+    //-setPointsEarnedOnMeteorCompletion(setpeomc) number
+    registerCommand({
+        name: 'setPointsEarnedOnMeteorCompletion',
+        alias: ['setpeomc'],
+        group: 'red',
+        argDescription: '<number>',
+        description: '',
+        enabled: () => ServiceManager.getService('Multiboard').arePointsEnabled(),
+        cb: ({ param1 }, escaper) => {
+            const points = S2I(param1)
+            ServiceManager.getService('Multiboard').setPointsEarnedOnMeteorCompletion(points)
+            Text.P(escaper.getPlayer(), `Points earned on meteor completion ${points}`)
+            return true
+        },
+    })
+
+    //-setPointsEarnedOnMeteorCompletionMaxPerLevel(setpeomcmpl) number
+    registerCommand({
+        name: 'setPointsEarnedOnMeteorCompletionMaxPerLevel',
+        alias: ['setpeomcmpl'],
+        group: 'red',
+        argDescription: '<number>',
+        description: '',
+        enabled: () => ServiceManager.getService('Multiboard').arePointsEnabled(),
+        cb: ({ param1 }, escaper) => {
+            const points = S2I(param1)
+            ServiceManager.getService('Multiboard').setPointsEarnedOnMeteorCompletionMaxPerLevel(points)
+            Text.P(escaper.getPlayer(), `Points earned on meteor completion max per level ${points}`)
+            return true
+        },
+    })
+
     //-adjustPlayerPoints(adjustpp) <playerId> <points>
     registerCommand({
         name: 'adjustPlayerPoints',

@@ -1,4 +1,6 @@
+import { ServiceManager } from 'Services'
 import { createEvent } from 'Utils/mapUtils'
+import { getUdgEscapers } from '../../../../globals'
 import { Hero2Escaper } from '../Escaper/Escaper_functions'
 import { METEOR_NORMAL, udg_meteors } from './Meteor'
 import { gg_trg_Stop_using_normal_meteor } from './Stop_using_normal_meteor'
@@ -21,6 +23,9 @@ export const InitTrig_Meteor_being_used = () => {
 
                     EnableTrigger(GetTriggeringTrigger())
                     DisableTrigger(gg_trg_Stop_using_normal_meteor)
+
+                    const escaper = getUdgEscapers().get(GetPlayerId(GetTriggerPlayer()))
+                    escaper && ServiceManager.getService('Multiboard').onPlayerMeteorCompleted(escaper)
                 }
             },
         ],

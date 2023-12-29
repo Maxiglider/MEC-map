@@ -4,6 +4,7 @@ import { createEvent } from 'Utils/mapUtils'
 import { Text } from 'core/01_libraries/Text'
 import { getUdgLevels } from '../../../../globals'
 import { Hero2Escaper } from '../Escaper/Escaper_functions'
+import { getSameLevelProgressionPlayers } from './LevelProgression'
 
 abstract class RectInterface {
     minX: number
@@ -78,6 +79,7 @@ export class Start extends RectInterface {
 
 export class End extends RectInterface {
     private endReaching: trigger
+    private alliedPlayersBeaten: { [x: number]: boolean } = {}
 
     constructor(levelId: number, x1: number, y1: number, x2: number, y2: number) {
         super(RMinBJ(x1, x2), RMinBJ(y1, y2), RMaxBJ(x1, x2), RMaxBJ(y1, y2))
@@ -97,14 +99,21 @@ export class End extends RectInterface {
                     }
 
                     if (!getUdgLevels().goToNextLevel(finisher, true)) {
-                        ServiceManager.getService('Multiboard').onPlayerLevelCompleted(finisher)
-
                         if (getUdgLevels().getLevelProgression() !== 'all') {
-                            // Disable the trigger so winner cant retrigger it, downside is that nobody else will get points for beating the game
-                            DisableTrigger(this.endReaching)
+                            if (this.alliedPlayersBeaten[finisher.getId()]) {
+                                return
+                            }
+
+                            for (const player of getSameLevelProgressionPlayers(finisher)) {
+                                this.alliedPlayersBeaten[player.getId()] = true
+                            }
+
+                            ServiceManager.getService('Multiboard').onPlayerLevelCompleted(finisher)
                             Text.A('Good job ! You have finished the game.')
                             return
                         }
+
+                        ServiceManager.getService('Multiboard').onPlayerLevelCompleted(finisher)
 
                         DisableTrigger(this.endReaching)
                         Text.A('Good job ! You have finished the game.')
