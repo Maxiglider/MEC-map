@@ -59,6 +59,30 @@ export const initExecuteCommandCheat = () => {
         }
     }
 
+    const scaleCb = (escaper: Escaper, scale: string) => {
+        const hero = escaper.getHero()
+
+        if (!hero) {
+            return
+        }
+
+        const oldScale = escaper.getScale()
+
+        if (IsBoolString(scale) && !S2R(scale)) {
+            escaper.setScale(undefined)
+        } else {
+            escaper.setScale(S2R(scale))
+        }
+
+        if (oldScale !== escaper.getScale()) {
+            const x = getUdgLevels().getCurrentLevel(this).getStartRandomX()
+            const y = getUdgLevels().getCurrentLevel(this).getStartRandomY()
+
+            escaper.removeHero()
+            escaper.createHero(x, y, HERO_START_ANGLE)
+        }
+    }
+
     //-slideSpeed(ss) <speed>   --> changes the slide speed of your hero, ignoring terrains
     registerCommand({
         name: 'setSlideSpeed',
@@ -392,6 +416,32 @@ export const initExecuteCommandCheat = () => {
             }
 
             resolvePlayerIds(param2, targetEscaper => skinCb(targetEscaper, param1))
+            return true
+        },
+    })
+
+    //-scale <scale> [player]   --> Change your slider unit
+    registerCommand({
+        name: 'scale',
+        alias: [],
+        group: 'cheat',
+        argDescription: '<scale> [player]',
+        description: 'Change your slider unit scale',
+        cb: ({ param1, param2 }, escaper) => {
+            if (param1.length === 0) {
+                return true
+            }
+
+            if (param2.length === 0) {
+                scaleCb(escaper, param1)
+                return true
+            }
+
+            if (!escaper.isMaximaxou()) {
+                return true
+            }
+
+            resolvePlayerIds(param2, targetEscaper => scaleCb(targetEscaper, param1))
             return true
         },
     })

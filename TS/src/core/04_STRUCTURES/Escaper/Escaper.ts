@@ -224,6 +224,7 @@ export class Escaper {
     public moveCamDistanceHeight = 1536
 
     private skin: number | undefined
+    private scale: number | undefined
 
     //mouse position updated when a trigger dependant of mouse movement is being used
     mouseX = 0
@@ -433,6 +434,15 @@ export class Escaper {
             }
 
             return
+        }
+
+        if (this.skin) {
+            UnitRemoveAbility(this.hero, FourCC('Aloc'))
+            UnitAddAbility(this.hero, FourCC('Aloc'))
+        }
+
+        if (this.scale) {
+            SetUnitScale(this.hero, this.scale, this.scale, this.scale)
         }
 
         globals.heroToEscaperHandles[GetHandleId(this.hero)] = this.escaperId
@@ -2211,6 +2221,12 @@ export class Escaper {
 
     setSkin = (skin: number | undefined) => {
         this.skin = skin
+    }
+
+    getScale = () => this.scale
+
+    setScale = (scale: number | undefined) => {
+        this.scale = scale
     }
 
     toJson = () => ({
