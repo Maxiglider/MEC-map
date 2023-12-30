@@ -540,4 +540,32 @@ export const initExecuteCommandRed = () => {
             return true
         },
     })
+
+    //-day
+    registerCommand({
+        name: 'day',
+        alias: [],
+        group: 'red',
+        argDescription: '',
+        description: '',
+        cb: () => {
+            SetFloatGameState(GAME_STATE_TIME_OF_DAY, 12)
+            SetTimeOfDayScale(0.0)
+            return true
+        },
+    })
+
+    //-night
+    registerCommand({
+        name: 'night',
+        alias: [],
+        group: 'red',
+        argDescription: '',
+        description: '',
+        cb: () => {
+            SetFloatGameState(GAME_STATE_TIME_OF_DAY, 0.0)
+            SetTimeOfDayScale(0.0)
+            return true
+        },
+    })
 }

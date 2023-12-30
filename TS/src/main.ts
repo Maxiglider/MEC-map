@@ -33,6 +33,7 @@ import { PROD } from './env'
 // [X] -an walk works again, you can now play animations by index so -an 8 instead of knowing their names
 // [X] new cmd: -skin; change your slider unit skin
 // [X] new cmd: -scale; change your slider unit scale
+// [X] added day/night commands
 // [O] detect walk terrain with end region, if you touch it set progression to 100%
 // [O] add option 'progression' to -lc to lock cam to #1 slider
 
