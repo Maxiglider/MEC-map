@@ -581,11 +581,15 @@ export const initMultiboard = () => {
             // Create ditch effects that are needed
             for (const [_, escaper] of pairs(ditchEffectPlayers)) {
                 if (!ditchEffects[escaper.getId()]) {
-                    ditchEffects[escaper.getId()] = AddSpecialEffectTargetUnitBJ(
-                        'overhead',
-                        escaper.getHero()!,
-                        'AbilitiesSpellsOtherTalkToMeTalkToMe.mdl'
-                    )
+                    const hero = escaper.getHero()
+
+                    if (hero) {
+                        ditchEffects[escaper.getId()] = AddSpecialEffectTargetUnitBJ(
+                            'overhead',
+                            hero,
+                            'AbilitiesSpellsOtherTalkToMeTalkToMe.mdl'
+                        )
+                    }
                 }
             }
 
