@@ -2138,6 +2138,7 @@ export class Escaper {
                     : otherTransparency
             )
 
+            // Changing base color with -red will break the teamglow. Thats why we need to reapply it
             BlzShowUnitTeamGlow(this.hero, true)
             BlzShowUnitTeamGlow(this.hero, this.glow)
             BlzShowUnitTeamGlow(this.powerCircle, true)
