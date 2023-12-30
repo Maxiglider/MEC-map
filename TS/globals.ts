@@ -23,6 +23,7 @@ export const globals: {
     CAN_TURN_IN_AIR: boolean
     USE_VTOTO_SLIDE_LOGIC: boolean
     coopCircles: boolean
+    heroToEscaperHandles: { [heroId: number]: number }
 } = {
     logStrings: [],
     MAP_MIN_X: 0,
@@ -33,6 +34,7 @@ export const globals: {
     CAN_TURN_IN_AIR: false,
     USE_VTOTO_SLIDE_LOGIC: false,
     coopCircles: true,
+    heroToEscaperHandles: {},
 }
 
 //SETTERS - GETTERS

@@ -121,9 +121,9 @@ export const initExecuteCommandRed = () => {
         group: 'red',
         argDescription: '',
         description: 'Restarts the level',
-        cb: ({ noParam }) => {
+        cb: ({ noParam }, escaper) => {
             if (noParam) {
-                getUdgLevels().restartCurrentLevel()
+                getUdgLevels().restartCurrentLevel(escaper)
             }
             return true
         },

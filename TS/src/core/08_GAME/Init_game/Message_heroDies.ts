@@ -44,11 +44,17 @@ const initMessageHeroDies = () => {
 
     const PlaySoundHeroDies = (fallenPlayer: player) => {
         if (!isSoundPlaying) {
-            if (GetLocalPlayer() === fallenPlayer) {
-                StartSound(GetRandomSoundHeroDies())
-            } else {
-                StartSound(GetRandomSoundAllyHeroDies())
-            }
+            forRange(NB_ESCAPERS, i => {
+                // For some reason this still plays the sound even tho the player is ignoring death messages
+                if (!getUdgEscapers().get(i)?.isIgnoringDeathMessages()) {
+                    if (GetLocalPlayer() === fallenPlayer) {
+                        StartSoundForPlayerBJ(Player(i), GetRandomSoundHeroDies())
+                    } else {
+                        StartSoundForPlayerBJ(Player(i), GetRandomSoundAllyHeroDies())
+                    }
+                }
+            })
+
             isSoundPlaying = true
             TimerStart(timerSonJoue, DUREE_SON, false, SoundEnd)
         }

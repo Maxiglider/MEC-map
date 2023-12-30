@@ -99,15 +99,21 @@ export class LevelArray extends BaseArray<Level> {
 
     deactivateEmptyLevels = () => {
         for (const [levelId] of pairs(this.data)) {
-            if (!IsLevelBeingMade(this.data[levelId]) && !this.hasPlayersInLevel(levelId)) {
+            const hasPlayersInLevel = this.hasPlayersInLevel(levelId)
+
+            if (!IsLevelBeingMade(this.data[levelId]) && !hasPlayersInLevel) {
                 this.data[levelId].activate(false)
+            }
+
+            if (hasPlayersInLevel && !this.data[levelId].isActivated()) {
+                this.data[levelId].activate(true)
             }
         }
     }
 
-    goToLevel = (finisher: Escaper | undefined, levelId: number): boolean => {
+    goToLevel = (escaper: Escaper | undefined, finished: boolean, levelId: number): boolean => {
         let i: number
-        let previousLevelId = this.getCurrentLevel(finisher)?.id || -1
+        let previousLevelId = this.getCurrentLevel(escaper)?.id || -1
 
         if (levelId < 0 || levelId > this.lastInstanceId || levelId === this.currentLevel) {
             return false
@@ -116,7 +122,7 @@ export class LevelArray extends BaseArray<Level> {
         this.currentLevel = levelId
 
         for (let i = 0; i < NB_PLAYERS_MAX; i++) {
-            if (!finisher || (getUdgEscapers().get(i) && sameLevelProgression(finisher, getUdgEscapers().get(i)!))) {
+            if (!escaper || (getUdgEscapers().get(i) && sameLevelProgression(escaper, getUdgEscapers().get(i)!))) {
                 this.levelProgressionState[i] = levelId
             }
         }
@@ -132,7 +138,7 @@ export class LevelArray extends BaseArray<Level> {
         }
 
         this.data[this.currentLevel].activate(true)
-        this.data[this.currentLevel].checkpointReviveHeroes(finisher)
+        this.data[this.currentLevel].checkpointReviveHeroes(escaper, finished)
 
         if (levelId > previousLevelId + 1) {
             i = previousLevelId + 1
@@ -247,7 +253,7 @@ export class LevelArray extends BaseArray<Level> {
             this.currentLevel = -1 //to assure level changing
             this.data[0].activate(false)
         }
-        this.goToLevel(undefined, 0)
+        this.goToLevel(undefined, false, 0)
         ServiceManager.getService('Lives').setNb(this.data[0].getNbLives())
 
         const start = this.data[0].getStart()
@@ -263,13 +269,13 @@ export class LevelArray extends BaseArray<Level> {
         TriggerExecute(gg_trg_apparition_dialogue_et_fermeture_automatique)
     }
 
-    restartCurrentLevel = () => {
+    restartCurrentLevel = (escaper: Escaper) => {
         const currentLevel = this.currentLevel
 
         this.currentLevel = -1 //to assure level changing
         this.data[currentLevel].activate(false)
 
-        this.goToLevel(undefined, currentLevel)
+        this.goToLevel(escaper, false, currentLevel)
         ServiceManager.getService('Lives').setNb(this.data[currentLevel].getNbLives())
 
         const start = this.data[currentLevel].getStart()
@@ -572,5 +578,8 @@ export class LevelArray extends BaseArray<Level> {
     }
 
     getLevelProgression = () => this.levelProgression
-    setLevelProgression = (levelProgression: ILevelProgression) => (this.levelProgression = levelProgression)
+    setLevelProgression = (levelProgression: ILevelProgression) => {
+        this.levelProgression = levelProgression
+        ServiceManager.getService('Multiboard').setLevelEnabled(levelProgression !== 'all')
+    }
 }

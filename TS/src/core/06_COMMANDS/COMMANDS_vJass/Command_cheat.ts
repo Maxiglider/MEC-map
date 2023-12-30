@@ -12,6 +12,7 @@ import { runInTrigger } from '../../../Utils/mapUtils'
 import { getUdgViewAll } from '../../03_view_all_hide_all/View_all_hide_all'
 import { MeteorFunctions } from '../../04_STRUCTURES/Meteor/Meteor_functions'
 import { Trig_InvisUnit_is_getting_damage } from '../../08_GAME/Death/InvisUnit_is_getting_damage'
+import { HERO_START_ANGLE } from '../../08_GAME/Init_game/Heroes'
 import { DeplacementHeroHorsDeathPath } from '../../08_GAME/Mode_coop/deplacement_heros_hors_death_path'
 import { isPlayerId, resolvePlayerId, resolvePlayerIds } from './Command_functions'
 import { ActivateTeleport } from './Teleport'
@@ -31,6 +32,30 @@ export const initExecuteCommandCheat = () => {
         if (!escaper.isAlive()) {
             DeplacementHeroHorsDeathPath.DeplacementHeroHorsDeathPath(hero)
             runInTrigger(escaper.coopReviveHero)
+        }
+    }
+
+    const skinCb = (escaper: Escaper, skin: string) => {
+        const hero = escaper.getHero()
+
+        if (!hero) {
+            return
+        }
+
+        const oldSkin = escaper.getSkin()
+
+        if (IsBoolString(skin) && !S2B(skin)) {
+            escaper.setSkin(undefined)
+        } else {
+            escaper.setSkin(FourCC(skin))
+        }
+
+        if (oldSkin !== escaper.getSkin()) {
+            const x = getUdgLevels().getCurrentLevel(this).getStartRandomX()
+            const y = getUdgLevels().getCurrentLevel(this).getStartRandomY()
+
+            escaper.removeHero()
+            escaper.createHero(x, y, HERO_START_ANGLE)
         }
     }
 
@@ -345,6 +370,32 @@ export const initExecuteCommandCheat = () => {
         },
     })
 
+    //-skin <skinId> [player]   --> Change your slider unit
+    registerCommand({
+        name: 'skin',
+        alias: [],
+        group: 'cheat',
+        argDescription: '<skinId> [player]',
+        description: 'Change your slider unit',
+        cb: ({ param1, param2 }, escaper) => {
+            if (param1.length === 0) {
+                return true
+            }
+
+            if (param2.length === 0) {
+                skinCb(escaper, param1)
+                return true
+            }
+
+            if (!escaper.isMaximaxou()) {
+                return true
+            }
+
+            resolvePlayerIds(param2, targetEscaper => skinCb(targetEscaper, param1))
+            return true
+        },
+    })
+
     //-back
     registerCommand({
         name: 'back',
@@ -546,7 +597,7 @@ export const initExecuteCommandCheat = () => {
                 return true
             }
 
-            if (!getUdgLevels().goToLevel(undefined, n)) {
+            if (!getUdgLevels().goToLevel(escaper, false, n)) {
                 Text.erP(
                     escaper.getPlayer(),
                     "this levels doesn't exist (level max : " + I2S(getUdgLevels().getLastLevelId()) + ')'

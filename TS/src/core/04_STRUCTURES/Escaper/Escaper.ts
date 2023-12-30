@@ -45,9 +45,9 @@ import { MakeSetUnitMonsterType } from 'core/05_MAKE_STRUCTURES/Make_set_unit_pr
 import { MakeSetUnitTeleportPeriod } from 'core/05_MAKE_STRUCTURES/Make_set_unit_properties/MakeSetUnitTeleportPeriod'
 import { AfkMode } from 'core/08_GAME/Afk_mode/Afk_mode'
 import { Timer } from 'w3ts'
-import { getUdgEscapers, getUdgLevels, getUdgTerrainTypes } from '../../../../globals'
+import { getUdgEscapers, getUdgLevels, getUdgTerrainTypes, globals } from '../../../../globals'
 import { EncodingBase64 } from '../../../Utils/SaveLoad/TreeLib/EncodingBase64'
-import { createEvent, createTimer } from '../../../Utils/mapUtils'
+import { createEvent, createTimer, runInTrigger } from '../../../Utils/mapUtils'
 import type { Make } from '../../05_MAKE_STRUCTURES/Make/Make'
 import type { MakeAction } from '../../05_MAKE_STRUCTURES/MakeLastActions/MakeAction'
 import { MakeLastActions } from '../../05_MAKE_STRUCTURES/MakeLastActions/MakeLastActions'
@@ -222,6 +222,8 @@ export class Escaper {
 
     public moveCamDistanceWidth = 2048
     public moveCamDistanceHeight = 1536
+
+    private skin: number | undefined
 
     //mouse position updated when a trigger dependant of mouse movement is being used
     mouseX = 0
@@ -411,7 +413,7 @@ export class Escaper {
     //creation method
     createHero(x: number, y: number, angle: number) {
         //retourne false si le héros existe déja
-        let heroTypeId = HERO_TYPE_ID
+        let heroTypeId = this.skin || HERO_TYPE_ID
 
         if (this.hero) {
             return false
@@ -424,8 +426,16 @@ export class Escaper {
         this.hero = CreateUnit(this.p, heroTypeId, x, y, angle)
 
         if (!this.hero) {
+            // Invalid skin, reset and try again
+            if (this.skin) {
+                this.setSkin(undefined)
+                this.createHero(x, y, angle)
+            }
+
             return
         }
+
+        globals.heroToEscaperHandles[GetHandleId(this.hero)] = this.escaperId
 
         if (this.escaperId >= NB_PLAYERS_MAX) {
             SetUnitTimeScale(this.hero, this.animSpeedSecondaryHero)
@@ -441,6 +451,7 @@ export class Escaper {
         UnitRemoveAbility(this.hero, FourCC('Aloc'))
         SetUnitMoveSpeed(this.hero, this.walkSpeed) //voir pour le nom de la fonction
         this.selectHero()
+        this.moveCameraToHeroIfNecessary()
 
         SetUnitColor(this.hero, ConvertPlayerColor(this.baseColorId))
 
@@ -514,6 +525,7 @@ export class Escaper {
 
         this.kill()
 
+        delete globals.heroToEscaperHandles[GetHandleId(this.hero)]
         RemoveUnit(this.hero)
         delete this.hero
 
@@ -740,7 +752,16 @@ export class Escaper {
         }
 
         this.setLastPos()
-        ReviveHero(this.hero, x, y, SHOW_REVIVE_EFFECTS)
+
+        if (IsHeroUnitId(GetUnitTypeId(this.hero))) {
+            ReviveHero(this.hero, x, y, SHOW_REVIVE_EFFECTS)
+        } else {
+            const angle = GetUnitFacing(this.hero)
+
+            this.removeHero()
+            this.createHero(x, y, angle)
+        }
+
         SetUnitX(this.invisUnit, x)
         SetUnitY(this.invisUnit, y)
         ShowUnit(this.invisUnit, true)
@@ -1331,6 +1352,9 @@ export class Escaper {
         )
         kicked.destroy()
         GetMirrorEscaper(kicked)?.destroy()
+
+        // Delay it a bit
+        runInTrigger(() => getUdgLevels().deactivateEmptyLevels())
     }
 
     //autorevive methods
@@ -2181,6 +2205,12 @@ export class Escaper {
         } else {
             EnableTrigger(this.canClickTrigger)
         }
+    }
+
+    getSkin = () => this.skin
+
+    setSkin = (skin: number | undefined) => {
+        this.skin = skin
     }
 
     toJson = () => ({

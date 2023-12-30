@@ -60,6 +60,7 @@ export const initMultiboard = () => {
     let amountOfEscapers = 0
     let pointsEnabled = false
     let progressionEnabled = false
+    let levelEnabled = false
     let pointsEarnedOnLevelCompletion = 0
     let pointsEarnedOnMeteorCompletion = 0
     let pointsEarnedOnMeteorCompletionMaxPerLevel = 0
@@ -91,7 +92,7 @@ export const initMultiboard = () => {
     }
 
     const initMultiboard = () => {
-        const cols = 4 + (pointsEnabled ? 1 : 0) + (progressionEnabled ? 1 : 0)
+        const cols = 4 + (pointsEnabled ? 1 : 0) + (progressionEnabled ? 1 : 0) + (levelEnabled ? 1 : 0)
         const rows = 3 + getUdgEscapers().countMain()
 
         const nameWidth = getLongestNameWidth()
@@ -122,6 +123,7 @@ export const initMultiboard = () => {
         MultiboardSetItemValueBJ(mb, 4, 3, 'Deaths')
         pointsEnabled && MultiboardSetItemValueBJ(mb, 5, 3, 'Points')
         progressionEnabled && MultiboardSetItemValueBJ(mb, pointsEnabled ? 6 : 5, 3, 'Prog')
+        levelEnabled && MultiboardSetItemValueBJ(mb, pointsEnabled ? 7 : 6, 3, 'Level')
     }
 
     const initLeaderboard = () => {
@@ -227,6 +229,14 @@ export const initMultiboard = () => {
                         4 + rowIndex,
                         colorCode + progressionUtils.getPlayerProgressionLvl(escaper) + '%'
                     )
+
+                mb &&
+                    MultiboardSetItemValueBJ(
+                        mb,
+                        pointsEnabled ? 7 : 6,
+                        4 + rowIndex,
+                        colorCode + getUdgLevels().getCurrentLevel(escaper).getId()
+                    )
             }
         }
     }
@@ -298,6 +308,14 @@ export const initMultiboard = () => {
                             pointsEnabled ? 6 : 5,
                             4 + rowIndex,
                             colorCode + progressionUtils.getPlayerProgressionLvl(escaper) + '%'
+                        )
+
+                    mb &&
+                        MultiboardSetItemValueBJ(
+                            mb,
+                            pointsEnabled ? 7 : 6,
+                            4 + rowIndex,
+                            colorCode + getUdgLevels().getCurrentLevel(escaper).getId()
                         )
 
                     playerLastRowIndex[escaper.getId()] = rowIndex
@@ -377,6 +395,13 @@ export const initMultiboard = () => {
         }
     }
 
+    const setLevelEnabled = (enabled: boolean) => {
+        if (levelEnabled !== enabled) {
+            levelEnabled = progressionEnabled && enabled
+            reinitBoards()
+        }
+    }
+
     const onPlayerLevelCompleted = (player: Escaper) => {
         if (pointsEnabled && pointsEarnedOnLevelCompletion > 0) {
             for (const [targetId] of pairs(playerScores)) {
@@ -397,7 +422,7 @@ export const initMultiboard = () => {
                 const targetEscaper = getUdgEscapers().get(targetId)
 
                 if (targetEscaper && sameLevelProgression(player, targetEscaper)) {
-                    const currentLevel = getUdgLevels().getCurrentLevel().id
+                    const currentLevel = getUdgLevels().getCurrentLevel(targetEscaper).id
 
                     if (!playerMeteorsInLvl[`${currentLevel}_${targetId}`]) {
                         playerMeteorsInLvl[`${currentLevel}_${targetId}`] = 0
@@ -466,12 +491,11 @@ export const initMultiboard = () => {
     type ITarget = { escaper: Escaper; progression: number }
     const progressionCompare = (a: ITarget, b: ITarget) => b.progression > a.progression
 
-    let lastDitchEffect: effect | null = null
-    let lastDitchEffectEscaper: Escaper | null = null
+    const ditchEffects: { [escaperId: number]: effect } = {}
 
     // Not really multiboard but w/e
     const handleDitchLogic = () => {
-        if (getUdgLevels().getLevelProgression() !== 'all') {
+        if (getUdgLevels().getLevelProgression() === 'solo') {
             return
         }
 
@@ -491,47 +515,87 @@ export const initMultiboard = () => {
         if (sortedTargets.length > 1) {
             table.sort(sortedTargets, progressionCompare)
 
-            let deadPlayer = false
-            let currentDitchEffectEscaper: Escaper | null = null
+            const groupedTargets = MemoryHandler.getEmptyArray<ITarget[] & IDestroyable>()
 
+            // Group players with same level progression
             for (const target of sortedTargets) {
-                const hero = target.escaper.getHero()
+                let foundGroup = false
 
-                if (!hero) {
-                    continue
+                for (const group of groupedTargets) {
+                    if (sameLevelProgression(group[0].escaper, target.escaper)) {
+                        arrayPush(group, target)
+                        foundGroup = true
+                        break
+                    }
                 }
 
-                if (!target.escaper.isAlive()) {
-                    deadPlayer = true
-                    continue
-                }
-
-                // Only enable when all players behind are dead
-                if (!deadPlayer && target.escaper.isAlive()) {
-                    break
-                }
-
-                if (deadPlayer) {
-                    currentDitchEffectEscaper = target.escaper
-                    break
+                if (!foundGroup) {
+                    const newGroup = MemoryHandler.getEmptyArray<ITarget>()
+                    arrayPush(newGroup, target)
+                    arrayPush(groupedTargets, newGroup)
                 }
             }
 
-            if (currentDitchEffectEscaper) {
-                if (lastDitchEffectEscaper?.getId() !== currentDitchEffectEscaper.getId()) {
-                    lastDitchEffect && DestroyEffect(lastDitchEffect)
-                    lastDitchEffect = AddSpecialEffectTargetUnitBJ(
+            // Figure out which players should have the ditch effect
+            const ditchEffectPlayers = MemoryHandler.getEmptyObject<{ [escaperId: string]: Escaper }>()
+
+            for (const group of groupedTargets) {
+                if (group.length < 2) {
+                    continue
+                }
+
+                let deadPlayer: Escaper | undefined = undefined
+
+                for (const target of group) {
+                    const hero = target.escaper.getHero()
+
+                    if (!hero) {
+                        continue
+                    }
+
+                    if (!target.escaper.isAlive()) {
+                        deadPlayer = target.escaper
+                        continue
+                    }
+
+                    // Only enable when all players behind are dead
+                    if (!deadPlayer && target.escaper.isAlive()) {
+                        break
+                    }
+
+                    if (deadPlayer) {
+                        ditchEffectPlayers[target.escaper.getId()] = target.escaper
+                        break
+                    }
+                }
+            }
+
+            // Remove ditch effects that are no longer needed
+            for (const [escaperId, ditchEffect] of pairs(ditchEffects)) {
+                if (!ditchEffectPlayers[escaperId]) {
+                    DestroyEffect(ditchEffect)
+                    delete ditchEffects[escaperId]
+                }
+            }
+
+            // Create ditch effects that are needed
+            for (const [_, escaper] of pairs(ditchEffectPlayers)) {
+                if (!ditchEffects[escaper.getId()]) {
+                    ditchEffects[escaper.getId()] = AddSpecialEffectTargetUnitBJ(
                         'overhead',
-                        currentDitchEffectEscaper.getHero()!,
+                        escaper.getHero()!,
                         'AbilitiesSpellsOtherTalkToMeTalkToMe.mdl'
                     )
-                    lastDitchEffectEscaper = currentDitchEffectEscaper
                 }
-            } else {
-                lastDitchEffect && DestroyEffect(lastDitchEffect)
-                lastDitchEffect = null
-                lastDitchEffectEscaper = null
             }
+
+            // Cleanup variables
+            for (const group of groupedTargets) {
+                group.__destroy()
+            }
+
+            groupedTargets.__destroy()
+            ditchEffectPlayers.__destroy()
         }
 
         sortedTargets.__destroy(true)
@@ -548,6 +612,7 @@ export const initMultiboard = () => {
         reinitBoards,
         setPointsEnabled,
         setProgressionEnabled,
+        setLevelEnabled,
         adjustPlayerPoints,
         setPlayerPoints,
         setPointsEarnedOnLevelCompletion,

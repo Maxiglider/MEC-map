@@ -25,6 +25,7 @@ import { Cpm } from 'core/08_GAME/Apm_clics_par_minute/Cpm'
 import { Globals } from 'core/09_From_old_Worldedit_triggers/globals_variables_and_triggers'
 import { PRESS_TIME_TO_ENABLE_FOLLOW_MOUSE } from 'core/Follow_mouse/Follow_mouse'
 import { getUdgEscapers, getUdgLevels } from '../../../../globals'
+import { runInTrigger } from '../../../Utils/mapUtils'
 import { IsInteger, PercentageStringOrX2Integer } from '../../01_libraries/Functions_on_numbers'
 import { EscaperEffectFunctions } from '../../04_STRUCTURES/Escaper/EscaperEffect_functions'
 import { execute, newCmd } from '../../04_STRUCTURES/Escaper/EscaperSavedCommands'
@@ -34,7 +35,7 @@ import { TerrainTypeNamesAndData } from '../../07_TRIGGERS/Modify_terrain_Functi
 import { AutoContinueAfterSliding } from '../../07_TRIGGERS/Slide_and_CheckTerrain_triggers/Auto_continue_after_sliding'
 import { TurnOnSlide } from '../../07_TRIGGERS/Slide_and_CheckTerrain_triggers/To_turn_on_slide'
 import { GetStringAssignedFromCommand, KeyboardShortcut } from '../../Keyboard_shortcuts/KeyboardShortcut'
-import { CmdParam, isPlayerId, resolvePlayerId, resolvePlayerIds } from './Command_functions'
+import { isPlayerId, resolvePlayerId, resolvePlayerIds } from './Command_functions'
 
 const cameraFieldMap: { [x: string]: camerafield } = {
     TARGET_DISTANCE: CAMERA_FIELD_TARGET_DISTANCE,
@@ -533,7 +534,7 @@ export const initCommandAll = () => {
         group: 'all',
         argDescription: '<string>',
         description: 'makes your hero doing an animation',
-        cb: ({ cmd, noParam }, escaper) => {
+        cb: ({ cmd, noParam, param1 }, escaper) => {
             if (noParam || !escaper.isAlive()) {
                 return true
             }
@@ -541,13 +542,25 @@ export const initCommandAll = () => {
             const hero = escaper.getHero()
 
             if (hero) {
-                SetUnitAnimation(hero, CmdParam(cmd, 0))
+                if (param1 === 'walk') {
+                    SetUnitAnimationByIndex(hero, 8)
+                } else if (S2I(param1) !== 0 || param1 === '0') {
+                    SetUnitAnimationByIndex(hero, S2I(param1))
+                } else {
+                    SetUnitAnimation(hero, param1)
+                }
 
                 if (!escaper.isEscaperSecondary()) {
                     const hero2 = GetMirrorEscaper(escaper)?.getHero()
 
                     if (hero2) {
-                        SetUnitAnimation(hero2, CmdParam(cmd, 0))
+                        if (param1 === 'walk') {
+                            SetUnitAnimationByIndex(hero2, 8)
+                        } else if (S2I(param1) !== 0 || param1 === '0') {
+                            SetUnitAnimationByIndex(hero2, S2I(param1))
+                        } else {
+                            SetUnitAnimation(hero2, param1)
+                        }
                     }
                 }
             }
@@ -665,6 +678,10 @@ export const initCommandAll = () => {
             Text.A(udg_colorCode[escaper.getColorId()] + escaper.getDisplayName() + ' has kicked himself !')
             escaper.destroy()
             GetMirrorEscaper(escaper)?.destroy()
+
+            // Delay it a bit
+            runInTrigger(() => getUdgLevels().deactivateEmptyLevels())
+
             return true
         },
     })
@@ -1092,16 +1109,28 @@ export const initCommandAll = () => {
         name: 'getCurrentLevel',
         alias: ['getcl'],
         group: 'all',
-        argDescription: '',
+        argDescription: '[player]',
         description: 'displays the number of the current level (first one is number 0)',
-        cb: ({ noParam }, escaper) => {
-            if (!noParam) {
+        cb: ({ nbParam, param1 }, escaper) => {
+            if (nbParam > 1) {
                 return true
             }
-            Text.P(
-                escaper.getPlayer(),
-                'the current level is number ' + I2S(getUdgLevels().getCurrentLevel(escaper).getId())
-            )
+
+            const targetEscaper = nbParam === 1 ? getUdgEscapers().get(resolvePlayerId(param1)) || escaper : escaper
+
+            if (targetEscaper.getId() === escaper.getId()) {
+                Text.P(
+                    escaper.getPlayer(),
+                    'the current level is number ' + I2S(getUdgLevels().getCurrentLevel(targetEscaper).getId())
+                )
+            } else {
+                Text.P(
+                    escaper.getPlayer(),
+                    `${targetEscaper.getDisplayName()} is on level number ` +
+                        I2S(getUdgLevels().getCurrentLevel(targetEscaper).getId())
+                )
+            }
+
             return true
         },
     })

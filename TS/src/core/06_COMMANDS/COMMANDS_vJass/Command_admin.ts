@@ -346,6 +346,8 @@ export const initExecuteCommandMax = () => {
                 if (!escaper.createHeroAtStart()) {
                     Text.erP(escaper.getPlayer(), 'You already have a hero !')
                 }
+
+                getUdgLevels().deactivateEmptyLevels()
                 return true
             }
             if (!(nbParam === 1)) {
@@ -370,6 +372,8 @@ export const initExecuteCommandMax = () => {
                     }
                     i = i + 1
                 }
+
+                getUdgLevels().deactivateEmptyLevels()
                 return true
             }
             if (isPlayerId(param1)) {
@@ -388,7 +392,10 @@ export const initExecuteCommandMax = () => {
                         .get(n + NB_PLAYERS_MAX)
                         ?.createHeroAtStart()
                 }
+
+                getUdgLevels().deactivateEmptyLevels()
             }
+
             return true
         },
     })
@@ -403,12 +410,15 @@ export const initExecuteCommandMax = () => {
         cb: ({ noParam, nbParam, param1 }, escaper) => {
             if (noParam) {
                 escaper.removeHero()
+                getUdgLevels().deactivateEmptyLevels()
                 return true
             }
+
             if (!(nbParam === 1)) {
                 Text.erP(escaper.getPlayer(), 'no more than one param allowed for this command')
                 return true
             }
+
             if (param1 === 'all' || param1 === 'a') {
                 let i = 0
                 while (i < NB_ESCAPERS) {
@@ -425,8 +435,11 @@ export const initExecuteCommandMax = () => {
                     }
                     i = i + 1
                 }
+
+                getUdgLevels().deactivateEmptyLevels()
                 return true
             }
+
             if (isPlayerId(param1)) {
                 let n = resolvePlayerId(param1)
                 if (getUdgEscapers().get(n) != null) {
@@ -438,6 +451,8 @@ export const initExecuteCommandMax = () => {
                 } else {
                     Text.erP(escaper.getPlayer(), 'escaper ' + param1 + " doesn't exist")
                 }
+
+                getUdgLevels().deactivateEmptyLevels()
             } else {
                 Text.erP(escaper.getPlayer(), 'param1 should be a player color or "all"')
             }
