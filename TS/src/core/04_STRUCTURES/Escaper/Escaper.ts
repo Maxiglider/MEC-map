@@ -225,6 +225,7 @@ export class Escaper {
 
     private skin: number | undefined
     private scale: number | undefined
+    private glow = true
 
     //mouse position updated when a trigger dependant of mouse movement is being used
     mouseX = 0
@@ -1172,6 +1173,8 @@ export class Escaper {
                 SetUnitColor(this.hero, ConvertPlayerColor(baseColorId))
             }
         }
+
+        this.updateUnitVertexColor()
 
         if (!this.isEscaperSecondary()) {
             ColorInfo(this, this.p)
@@ -2134,6 +2137,11 @@ export class Escaper {
                     ? this.vcTransparency
                     : otherTransparency
             )
+
+            BlzShowUnitTeamGlow(this.hero, true)
+            BlzShowUnitTeamGlow(this.hero, this.glow)
+            BlzShowUnitTeamGlow(this.powerCircle, true)
+            BlzShowUnitTeamGlow(this.powerCircle, this.glow)
         }
     }
 
@@ -2227,6 +2235,11 @@ export class Escaper {
 
     setScale = (scale: number | undefined) => {
         this.scale = scale
+    }
+
+    setGlow = (glow: boolean) => {
+        this.glow = glow
+        this.updateUnitVertexColor()
     }
 
     toJson = () => ({

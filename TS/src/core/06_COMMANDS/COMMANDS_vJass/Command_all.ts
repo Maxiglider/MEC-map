@@ -54,6 +54,16 @@ const cameraFieldMap: { [x: string]: camerafield } = {
 export const initCommandAll = () => {
     const { registerCommand } = ServiceManager.getService('Cmd')
 
+    const glowCb = (escaper: Escaper, glow: boolean) => {
+        const hero = escaper.getHero()
+
+        if (!hero) {
+            return
+        }
+
+        escaper.setGlow(glow)
+    }
+
     for (const { name, alias } of udg_colorStrings) {
         //-<color>   --> change the base color of the hero
         registerCommand({
@@ -1678,6 +1688,32 @@ export const initCommandAll = () => {
                 Text.mkP(escaper.getPlayer(), `Chat ${!S2B(param1) ? 'shown' : 'hidden'}`)
             }
 
+            return true
+        },
+    })
+
+    //-glow <boolean> [player]   --> Toggle your slider glow
+    registerCommand({
+        name: 'glow',
+        alias: [],
+        group: 'all',
+        argDescription: '<boolean> [player]',
+        description: 'Change your slider glow',
+        cb: ({ param1, param2 }, escaper) => {
+            if (param1.length === 0) {
+                return true
+            }
+
+            if (param2.length === 0) {
+                glowCb(escaper, S2B(param1))
+                return true
+            }
+
+            if (!escaper.isMaximaxou()) {
+                return true
+            }
+
+            resolvePlayerIds(param2, targetEscaper => glowCb(targetEscaper, S2B(param1)))
             return true
         },
     })
