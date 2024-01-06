@@ -36,7 +36,8 @@ import { PROD } from './env'
 // [X] new cmd: -glow; toggle your slider glow
 // [X] added day/night commands
 // [X] renamed setMonsterSpawnSpawnAmount to setMonsterSpawnAmount and setMonsterSpawnSpawnOffset to setMonsterSpawnOffset
-// [X] monsterspawn fixes, it will now spawn max 400 monsters. Also fixed -setmsfso on a vertical spawner
+// [X] monsterspawn fixes, it will now spawn max 400 monsters. Also fixed -setmsfso on a vertical spawner.
+//   ^ [X] Also fixed a bug in long patrols for doodad slide
 // [O] detect walk terrain with end region, if you touch it set progression to 100%
 // [O] add option 'progression' to -lc to lock cam to #1 slider
 

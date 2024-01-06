@@ -208,11 +208,6 @@ export class MonsterSpawn {
         let x2: number
         let y2: number
 
-        x1 = this.maxX
-        x2 = this.maxX
-        y1 = this.minY - DECALAGE_UNSPAWN
-        y2 = this.maxY + DECALAGE_UNSPAWN
-
         if (this.rotation === 90 || this.rotation === 270) {
             x1 = this.minX - DECALAGE_UNSPAWN
             x2 = this.maxX + DECALAGE_UNSPAWN
@@ -227,6 +222,11 @@ export class MonsterSpawn {
             x2 = nx2
             y2 = ny2
         } else {
+            x1 = this.maxX
+            x2 = this.maxX
+            y1 = this.minY - DECALAGE_UNSPAWN
+            y2 = this.maxY + DECALAGE_UNSPAWN
+
             const { x: nx1, y: ny1 } = this.applyRotation(x1, y1, this.rotation)
             const { x: nx2, y: ny2 } = this.applyRotation(x2, y2, this.rotation)
 
@@ -277,8 +277,8 @@ export class MonsterSpawn {
 
         if (this.multiRegionPatrols) {
             const amountOfPatrols = Math.ceil(maxDistance / maxTiles)
-            const dx = Math.round((this.minX - this.maxX) / amountOfPatrols)
-            const dy = Math.round((this.minY - this.maxY) / amountOfPatrols)
+            const dx = Math.floor((this.minX - this.maxX) / amountOfPatrols)
+            const dy = Math.floor((this.minY - this.maxY) / amountOfPatrols)
 
             this.multiRegionDx = dx
             this.multiRegionDy = dy
@@ -293,10 +293,18 @@ export class MonsterSpawn {
                 const calcX = x1 === x2
                 const calcY = y1 === y2
 
-                const nx1 = this.minX - (calcX ? ddx : 0)
-                const ny1 = this.minY - (calcY ? ddy : 0)
-                const nx2 = calcX ? nx1 - 16 : this.maxX
-                const ny2 = calcY ? ny1 - 16 : this.maxY
+                let nx1 = this.minX - (calcX ? ddx : 0)
+                let ny1 = this.minY - (calcY ? ddy : 0)
+                let nx2 = calcX ? nx1 - 16 : this.maxX
+                let ny2 = calcY ? ny1 - 16 : this.maxY
+
+                if (this.rotation === 90 || this.rotation === 270) {
+                    nx1 = nx1 - DECALAGE_UNSPAWN
+                    nx2 = nx2 + DECALAGE_UNSPAWN
+                } else {
+                    ny1 = ny1 - DECALAGE_UNSPAWN
+                    ny2 = ny2 + DECALAGE_UNSPAWN
+                }
 
                 const r = Rect(nx1, ny1, nx2, ny2)
                 RegionAddRect(reg, r)
@@ -308,27 +316,25 @@ export class MonsterSpawn {
                 MonsterSpawn.anyTrigId2MonsterSpawn.set(GetHandleId(t), this)
                 TriggerRegisterEnterRegion(t, reg, null)
                 TriggerAddAction(t, () => {
+                    // DON'T USE `n` HERE, LUA USES A VARIABLE REFERENCE CAUSING IT TO ALWAYS BE THE LAST VALUE
                     const ms = MonsterSpawn.anyTrigId2MonsterSpawn.get(GetHandleId(GetTriggeringTrigger()))
                     if (ms && ms.monsters && IsUnitInGroup(GetTriggerUnit(), ms.monsters)) {
                         const u = GetTriggerUnit()
 
-                        let x = Math.round(GetUnitX(u))
-                        let y = Math.round(GetUnitY(u))
+                        let x = Math.floor(GetUnitX(u))
+                        let y = Math.floor(GetUnitY(u))
 
-                        let nddx = (n + 1) * dx
-                        let nddy = (n + 1) * dy
-
-                        nddx = expand(nddx, DECALAGE_UNSPAWN)
-                        nddy = expand(nddy, DECALAGE_UNSPAWN)
+                        const ndx = expand(dx, DECALAGE_UNSPAWN)
+                        const ndy = expand(dy, DECALAGE_UNSPAWN)
 
                         if (this.rotation === 0) {
-                            x = this.minX - nddx
+                            x = x - ndx
                         } else if (this.rotation === 270) {
-                            y = this.maxY + nddy
+                            y = y + ndy
                         } else if (this.rotation === 180) {
-                            x = this.maxX + nddx
+                            x = x + ndx
                         } else {
-                            y = this.minY - nddy
+                            y = y - ndy
                         }
 
                         IssuePointOrder(u, 'move', x, y)
@@ -560,27 +566,31 @@ export class MonsterSpawn {
 
         if (this.rotation === 90 || this.rotation === 270) {
             {
-                const { x, y } = this.applyRotation(x1, y1, this.rotation + 90)
-                nx1 = x
-                ny1 = y
+                const rot = this.applyRotation(x1, y1, this.rotation + 90)
+                nx1 = rot.x
+                ny1 = rot.y
+                rot.__destroy()
             }
 
             {
-                const { x, y } = this.applyRotation(x2, y2, this.rotation + 90)
-                nx2 = x
-                ny2 = y
+                const rot = this.applyRotation(x2, y2, this.rotation + 90)
+                nx2 = rot.x
+                ny2 = rot.y
+                rot.__destroy()
             }
         } else {
             {
-                const { x, y } = this.applyRotation(x1, y1, this.rotation)
-                nx1 = x
-                ny1 = y
+                const rot = this.applyRotation(x1, y1, this.rotation)
+                nx1 = rot.x
+                ny1 = rot.y
+                rot.__destroy()
             }
 
             {
-                const { x, y } = this.applyRotation(x2, y2, this.rotation)
-                nx2 = x
-                ny2 = y
+                const rot = this.applyRotation(x2, y2, this.rotation)
+                nx2 = rot.x
+                ny2 = rot.y
+                rot.__destroy()
             }
         }
 
