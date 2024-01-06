@@ -29,7 +29,9 @@ export class MonsterNoMove extends Monster {
     }
 
     createUnit = () => {
-        super.createUnit(() => (this.mt ? NewImmobileMonster(this.mt, this.x, this.y, this.angle) : undefined))
+        super.createUnit(() =>
+            this.mt ? NewImmobileMonster(this.mt, this.x, this.y, this.angle, !this.hasAttackGroundPos()) : undefined
+        )
     }
 
     toJson() {

@@ -5,7 +5,7 @@ import { Monster } from './Monster'
 import { MonsterType } from './MonsterType'
 
 let monster: unit
-let ATTACK_SKILL = FourCC('Aatk')
+const ATTACK_SKILL = FourCC('Aatk')
 const ABILITY_1_LIFE = FourCC('ABV1')
 const ABILITY_10_LIFE = FourCC('ABV2')
 const ABILITY_100_LIFE = FourCC('ABV3')
@@ -57,7 +57,14 @@ export const SetUnitMaxLife = (u: unit, newMaxLife: number): boolean => {
     return true
 }
 
-export const NewImmobileMonsterForPlayer = (mt: MonsterType, p: player, x: number, y: number, angle: number): unit => {
+export const NewImmobileMonsterForPlayer = (
+    mt: MonsterType,
+    p: player,
+    x: number,
+    y: number,
+    angle: number,
+    disableAttack = true
+): unit => {
     let unitTypeId = mt.getUnitTypeId()
 
     if (Monster.forceUnitTypeIdForNextMonster > 0) {
@@ -109,7 +116,11 @@ export const NewImmobileMonsterForPlayer = (mt: MonsterType, p: player, x: numbe
     if (!MOBS_VARIOUS_COLORS) {
         SetUnitColor(monster, ConvertPlayerColor(24))
     }
-    UnitRemoveAbility(monster, ATTACK_SKILL)
+
+    if (disableAttack) {
+        UnitRemoveAbility(monster, ATTACK_SKILL)
+    }
+
     UnitRemoveType(monster, UNIT_TYPE_PEON)
     if (mt.getHeight() != -1) {
         UnitAddAbility(monster, ABILITY_FORME_CORBEAU)
@@ -118,14 +129,20 @@ export const NewImmobileMonsterForPlayer = (mt: MonsterType, p: player, x: numbe
     return monster
 }
 
-export const NewImmobileMonster = (mt: MonsterType, x: number, y: number, angle: number): unit => {
+export const NewImmobileMonster = (
+    mt: MonsterType,
+    x: number,
+    y: number,
+    angle: number,
+    disableAttack = true
+): unit => {
     let p: player
     if (mt.isClickable()) {
         p = ENNEMY_PLAYER
     } else {
         p = GetCurrentMonsterPlayer()
     }
-    return NewImmobileMonsterForPlayer(mt, p, x, y, angle)
+    return NewImmobileMonsterForPlayer(mt, p, x, y, angle, disableAttack)
 }
 
 export const NewPatrolMonster = (mt: MonsterType, x1: number, y1: number, x2: number, y2: number): unit => {

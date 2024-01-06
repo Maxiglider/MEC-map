@@ -110,7 +110,16 @@ export const InitTrig_InvisUnit_is_getting_damage = () => {
                         }
 
                         if (!escaper.isCoopInvul()) {
-                            escaper.kill()
+                            if (monster.hasAttackGroundPos()) {
+                                SetWidgetLife(hero, GetWidgetLife(hero) - GetEventDamage())
+                            }
+
+                            if (
+                                !monster.hasAttackGroundPos() ||
+                                (monster.hasAttackGroundPos() && GetWidgetLife(hero) - GetEventDamage() <= 0.405)
+                            ) {
+                                escaper.kill()
+                            }
 
                             //effet de tuation du héros par le monstre, suivant le type du monstre
                             if (monster) {

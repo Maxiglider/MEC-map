@@ -3256,6 +3256,21 @@ export const initExecuteCommandMake = () => {
         },
     })
 
+    //-setMonsterAttackGroundOrder(setmago)
+    registerCommand({
+        name: 'setMonsterAttackGroundOrder',
+        alias: ['setmago'],
+        group: 'make',
+        argDescription: '',
+        description: '',
+        cb: (_, escaper) => {
+            escaper.makeSetMonsterAttackGroundOrder()
+
+            Text.mkP(escaper.getPlayer(), 'Click on a monster to apply')
+            return true
+        },
+    })
+
     //-debugRegions <active>
     registerCommand({
         name: 'debugRegions',

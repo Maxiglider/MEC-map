@@ -52,6 +52,9 @@ export abstract class Monster {
     private jumpPad?: number
     private jumpPadEffect?: string
 
+    private attackGroundX: number | undefined = undefined
+    private attackGroundY: number | undefined = undefined
+
     constructor(monsterType?: MonsterType, forceId: number | null = null) {
         this.mt = monsterType
 
@@ -259,6 +262,8 @@ export abstract class Monster {
             }
         }
         MemoryHandler.destroyArray(hookArray2)
+
+        this.doAttackGroundPos()
     }
 
     delete = () => {
@@ -380,6 +385,24 @@ export abstract class Monster {
         }
     }
 
+    hasAttackGroundPos = () => {
+        return this.attackGroundX !== undefined && this.attackGroundY !== undefined
+    }
+
+    setAttackGroundPos = (x: number | undefined, y: number | undefined) => {
+        this.attackGroundX = x
+        this.attackGroundY = y
+
+        this.removeUnit()
+        this.createUnit()
+    }
+
+    doAttackGroundPos = () => {
+        if (this.u && this.attackGroundX && this.attackGroundY) {
+            IssuePointOrder(this.u, 'attackground', this.attackGroundX, this.attackGroundY)
+        }
+    }
+
     destroy() {
         if (this.u) {
             this.removeUnit()
@@ -416,6 +439,8 @@ export abstract class Monster {
             output['monsterTypeLabel'] = this.mt?.label
             output['jumpPad'] = this.jumpPad
             output['jumpPadEffect'] = this.jumpPadEffect
+            output['attackGroundX'] = this.attackGroundX
+            output['attackGroundY'] = this.attackGroundY
             return output
         }
     }

@@ -38,11 +38,11 @@ import { PROD } from './env'
 // [X] renamed setMonsterSpawnSpawnAmount to setMonsterSpawnAmount and setMonsterSpawnSpawnOffset to setMonsterSpawnOffset
 // [X] monsterspawn fixes, it will now spawn max 400 monsters. Also fixed -setmsfso on a vertical spawner.
 //   ^ [X] Also fixed a bug in long patrols for doodad slide
+// [X] mortar support, any unit with an attack ground ability can be used. -crmi and then -setmago
 // [O] detect walk terrain with end region, if you touch it set progression to 100%
 // [O] add option 'progression' to -lc to lock cam to #1 slider
 
 // [O] make the switch perm kill units instead of timed
-// [O] mortar support
 
 // TODO; make a -slideafterdark(SAD) command that changes vision using below abilities
 // call UnitRemoveAbilityBJ( 'A0AV', GetEnumUnit() )

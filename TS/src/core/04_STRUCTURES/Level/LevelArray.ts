@@ -399,6 +399,10 @@ export class LevelArray extends BaseArray<Level> {
                         m.jumpPad && monster.setJumpPad(m.jumpPad)
                         m.jumpPadEffect && monster.setJumpPadEffect(m.jumpPadEffect)
 
+                        if (m.attackGroundX && m.attackGroundY) {
+                            monster.setAttackGroundPos(m.attackGroundX, m.attackGroundY)
+                        }
+
                         level.monsters.new(monster, false)
                     }
                 }

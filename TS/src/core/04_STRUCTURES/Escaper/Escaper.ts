@@ -39,6 +39,7 @@ import { MakeClearMob } from 'core/05_MAKE_STRUCTURES/Make_monster_properties/Ma
 import { MakeDeleteCircleMob } from 'core/05_MAKE_STRUCTURES/Make_monster_properties/MakeDeleteCircleMob'
 import { MakeDeleteClearMob } from 'core/05_MAKE_STRUCTURES/Make_monster_properties/MakeDeleteClearMob'
 import { MakeDeletePortalMob } from 'core/05_MAKE_STRUCTURES/Make_monster_properties/MakeDeletePortalMob'
+import { MakeMonsterAttackGroundOrder } from 'core/05_MAKE_STRUCTURES/Make_monster_properties/MakeMonsterAttackGroundOrder'
 import { MakePortalMob } from 'core/05_MAKE_STRUCTURES/Make_monster_properties/MakePortalMob'
 import { MakeGetUnitTeleportPeriod } from 'core/05_MAKE_STRUCTURES/Make_set_unit_properties/MakeGetUnitTeleportPeriod'
 import { MakeSetUnitMonsterType } from 'core/05_MAKE_STRUCTURES/Make_set_unit_properties/MakeSetUnitMonsterType'
@@ -1801,6 +1802,11 @@ export class Escaper {
                 (monster, jumpPadEffect) => monster.setJumpPadEffect(jumpPadEffect)
             )
         }
+    }
+
+    makeSetMonsterAttackGroundOrder() {
+        this.destroyMake()
+        if (this.hero) this.make = new MakeMonsterAttackGroundOrder(this.hero)
     }
 
     makeCreateTerrain(terrainType: TerrainType) {
