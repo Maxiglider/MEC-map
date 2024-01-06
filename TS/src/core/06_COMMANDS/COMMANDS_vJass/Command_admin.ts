@@ -614,6 +614,7 @@ export const initExecuteCommandMax = () => {
                     const gameData = (jsonDecode(data) as any).gameData
 
                     MEC_core_API.setGameData(jsonEncode(gameData))
+                    getUdgLevels().reloadAllLevels()
                     Text.A('Done')
                 }
             )
@@ -889,16 +890,27 @@ export const initExecuteCommandMax = () => {
         },
     })
 
-    //-reinitProgressionMap
+    //-reinitProgressionMap ['level' | 'distance' | 'bfs' | 'segment']
     registerCommand({
         name: 'reinitProgressionMap',
         alias: [],
         group: 'max',
-        argDescription: '',
+        argDescription: "['level' | 'distance' | 'bfs' | 'segment']",
         description: '',
-        cb: (_, escaper) => {
+        cb: ({ param1 }, escaper) => {
             Text.P(escaper.getPlayer(), 'Reinitializing progression map')
-            progressionUtils.init()
+
+            if (param1.length > 0) {
+                if (param1 !== 'level' && param1 !== 'distance' && param1 !== 'bfs' && param1 !== 'segment') {
+                    Text.erP(escaper.getPlayer(), 'param1 must be "level" or "distance" or "bfs" or "segment"')
+                    return true
+                }
+
+                progressionUtils.init({ debug: param1 })
+            } else {
+                progressionUtils.init()
+            }
+
             Text.P(escaper.getPlayer(), 'Done')
             return true
         },

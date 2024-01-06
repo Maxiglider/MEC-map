@@ -465,6 +465,7 @@ export class Escaper {
         this.moveCameraToHeroIfNecessary()
 
         SetUnitColor(this.hero, ConvertPlayerColor(this.baseColorId))
+        SetUnitColor(this.powerCircle, ConvertPlayerColor(this.baseColorId))
 
         this.updateUnitVertexColor()
         this.SpecialIllidan()
@@ -1169,8 +1170,10 @@ export class Escaper {
         if (this.hero) {
             if (baseColorId == 0) {
                 SetUnitColor(this.hero, PLAYER_COLOR_RED)
+                SetUnitColor(this.powerCircle, PLAYER_COLOR_RED)
             } else {
                 SetUnitColor(this.hero, ConvertPlayerColor(baseColorId))
+                SetUnitColor(this.powerCircle, ConvertPlayerColor(baseColorId))
             }
         }
 
@@ -1191,8 +1194,10 @@ export class Escaper {
         if (this.hero) {
             if (baseColorId == 0) {
                 SetUnitColor(this.hero, PLAYER_COLOR_RED)
+                SetUnitColor(this.powerCircle, PLAYER_COLOR_RED)
             } else {
                 SetUnitColor(this.hero, ConvertPlayerColor(baseColorId))
+                SetUnitColor(this.powerCircle, ConvertPlayerColor(baseColorId))
             }
         }
 

@@ -12,6 +12,9 @@ import { udg_colorCode } from 'core/01_libraries/Init_colorCodes'
 import { Text } from 'core/01_libraries/Text'
 import { Level } from 'core/04_STRUCTURES/Level/Level'
 import { IMMOLATION_SKILLS } from 'core/04_STRUCTURES/Monster/Immolation_skills'
+import { MonsterMultiplePatrols } from 'core/04_STRUCTURES/Monster/MonsterMultiplePatrols'
+import { MonsterNoMove } from 'core/04_STRUCTURES/Monster/MonsterNoMove'
+import { MonsterSimplePatrol } from 'core/04_STRUCTURES/Monster/MonsterSimplePatrol'
 import { PORTAL_MOB_MAX_FREEZE_DURATION } from 'core/04_STRUCTURES/Monster_properties/PortalMob'
 import { DEATH_TERRAIN_MAX_TOLERANCE, TerrainTypeDeath } from 'core/04_STRUCTURES/TerrainType/TerrainTypeDeath'
 import { TerrainTypeSlide } from 'core/04_STRUCTURES/TerrainType/TerrainTypeSlide'
@@ -1934,10 +1937,10 @@ export const initExecuteCommandMake = () => {
         },
     })
 
-    //-setMonsterSpawnSpawnAmount(setmssa) <label> <amount>
+    //-setMonsterSpawnAmount(setmsa) <label> <amount>
     registerCommand({
-        name: 'setMonsterSpawnSpawnAmount',
-        alias: ['setmssa'],
+        name: 'setMonsterSpawnAmount',
+        alias: ['setmsa'],
         group: 'make',
         argDescription: '<label> <amount>',
         description: '',
@@ -1949,8 +1952,8 @@ export const initExecuteCommandMake = () => {
                 return true
             }
 
-            if (!(S2I(param2) > 0 && S2I(param2) <= 10)) {
-                Text.erP(escaper.getPlayer(), 'Amount must be > 0 and <= 10')
+            if (!(S2I(param2) > 0 && S2I(param2) <= 500)) {
+                Text.erP(escaper.getPlayer(), 'Amount must be > 0 and <= 500')
                 return true
             }
 
@@ -1960,10 +1963,10 @@ export const initExecuteCommandMake = () => {
         },
     })
 
-    //-setMonsterSpawnSpawnOffset(setmsso) <label> <offset>
+    //-setMonsterSpawnOffset(setmso) <label> <offset>
     registerCommand({
-        name: 'setMonsterSpawnSpawnOffset',
-        alias: ['setmsso'],
+        name: 'setMonsterSpawnOffset',
+        alias: ['setmso'],
         group: 'make',
         argDescription: '<label> <offset>',
         description: '',
@@ -2027,6 +2030,11 @@ export const initExecuteCommandMake = () => {
                 return true
             }
 
+            if (!monsterSpawn.getFixedSpawnOffset()) {
+                Text.erP(escaper.getPlayer(), 'fixedSpawnOffset has to be enabled for this to work')
+                return true
+            }
+
             if (!IsBoolString(param2)) {
                 Text.erP(escaper.getPlayer(), 'Bounce must be a boolean')
                 return true
@@ -2050,6 +2058,11 @@ export const initExecuteCommandMake = () => {
 
             if (!monsterSpawn) {
                 Text.erP(escaper.getPlayer(), 'unknown monster spawn "' + param1 + '" in this level')
+                return true
+            }
+
+            if (!monsterSpawn.getFixedSpawnOffset()) {
+                Text.erP(escaper.getPlayer(), 'fixedSpawnOffset has to be enabled for this to work')
                 return true
             }
 
@@ -3438,19 +3451,61 @@ export const initExecuteCommandMake = () => {
     // -setClickGrid <value>
     registerCommand({
         name: 'setClickGrid',
-        alias: ['setcg'],
+        alias: ['setcg', 'snapClicks'],
         group: 'make',
         argDescription: '<value>',
-        description: 'set the click grid',
+        description: 'snap clicks to nearest <value>',
         cb: ({ nbParam, param1 }, escaper) => {
             if (nbParam === 1) {
                 escaper.roundToGrid = S2I(param1) > 1 && S2I(param1) <= 128 ? S2I(param1) : null
 
                 if (escaper.roundToGrid) {
-                    Text.mkP(escaper.getPlayer(), `Now rounding clicks to: '${escaper.roundToGrid}'`)
+                    Text.mkP(escaper.getPlayer(), `Now snapping clicks to: '${escaper.roundToGrid}'`)
                 } else {
-                    Text.erP(escaper.getPlayer(), `Disabled rounding clicks`)
+                    Text.erP(escaper.getPlayer(), `Disabled snapping clicks`)
                 }
+            }
+
+            return true
+        },
+    })
+
+    // -snapPatrolsToGrid <value>
+    registerCommand({
+        name: 'snapPatrolsToGrid',
+        alias: ['sptg'],
+        group: 'make',
+        argDescription: '<value>',
+        description: 'snap all patrols to nearest <value>',
+        cb: ({ nbParam, param1 }, escaper) => {
+            if (nbParam === 1) {
+                escaper.roundToGrid = S2I(param1) > 1 && S2I(param1) <= 128 ? S2I(param1) : null
+
+                // todo should turn this into a ctrl+z able action
+                if (escaper.roundToGrid) {
+                    for (const [_, level] of pairs(getUdgLevels().getAll())) {
+                        for (const [_, monster] of pairs(level.monsters.getAll())) {
+                            if (monster instanceof MonsterSimplePatrol) {
+                                monster.x1 = Math.round(monster.x1 / escaper.roundToGrid) * escaper.roundToGrid
+                                monster.y1 = Math.round(monster.y1 / escaper.roundToGrid) * escaper.roundToGrid
+                                monster.x2 = Math.round(monster.x2 / escaper.roundToGrid) * escaper.roundToGrid
+                                monster.y2 = Math.round(monster.y2 / escaper.roundToGrid) * escaper.roundToGrid
+                            } else if (monster instanceof MonsterNoMove) {
+                                monster.x = Math.round(monster.x / escaper.roundToGrid) * escaper.roundToGrid
+                                monster.y = Math.round(monster.y / escaper.roundToGrid) * escaper.roundToGrid
+                            } else if (monster instanceof MonsterMultiplePatrols) {
+                                for (let i = 0; i < monster.x.length; i++) {
+                                    monster.x[i] = Math.round(monster.x[i] / escaper.roundToGrid) * escaper.roundToGrid
+                                    monster.y[i] = Math.round(monster.y[i] / escaper.roundToGrid) * escaper.roundToGrid
+                                }
+                            }
+                        }
+                    }
+                }
+
+                getUdgLevels().reloadAllLevels()
+
+                Text.mkP(escaper.getPlayer(), `Snapped all monsters to: '${escaper.roundToGrid}'`)
             }
 
             return true

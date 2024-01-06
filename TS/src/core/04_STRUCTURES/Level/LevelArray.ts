@@ -97,6 +97,28 @@ export class LevelArray extends BaseArray<Level> {
         this.data[this.currentLevel].activate(true)
     }
 
+    reloadAllLevels = () => {
+        let numberOfActivatedLevels = 0
+
+        // For some reason if you start the game the very first level isn't always marked as activated, could also just be the mec dev version though.
+        for (const [_, level] of pairs(this.getAll())) {
+            if (level.isActivated()) {
+                numberOfActivatedLevels++
+            }
+        }
+
+        let first = true
+
+        for (const [_, level] of pairs(this.getAll())) {
+            if (level.isActivated() || (first && numberOfActivatedLevels === 0)) {
+                level.activate(false)
+                level.activate(true)
+            }
+
+            first = false
+        }
+    }
+
     deactivateEmptyLevels = () => {
         for (const [levelId] of pairs(this.data)) {
             const hasPlayersInLevel = this.hasPlayersInLevel(levelId)

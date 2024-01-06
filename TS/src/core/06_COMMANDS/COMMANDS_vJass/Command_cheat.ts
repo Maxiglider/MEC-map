@@ -6,6 +6,7 @@ import { Text } from 'core/01_libraries/Text'
 import { Escaper } from 'core/04_STRUCTURES/Escaper/Escaper'
 import { GetMirrorEscaper } from 'core/04_STRUCTURES/Escaper/Escaper_functions'
 import { METEOR_CHEAT } from 'core/04_STRUCTURES/Meteor/Meteor'
+import { TerrainTypeWalk } from 'core/04_STRUCTURES/TerrainType/TerrainTypeWalk'
 import { Gravity } from 'core/07_TRIGGERS/Slide_and_CheckTerrain_triggers/Gravity'
 import { getUdgEscapers, getUdgLevels, globals } from '../../../../globals'
 import { runInTrigger } from '../../../Utils/mapUtils'
@@ -51,11 +52,20 @@ export const initExecuteCommandCheat = () => {
         }
 
         if (oldSkin !== escaper.getSkin()) {
-            const x = getUdgLevels().getCurrentLevel(this).getStartRandomX()
-            const y = getUdgLevels().getCurrentLevel(this).getStartRandomY()
+            const x =
+                escaper.getLastTerrainType() instanceof TerrainTypeWalk
+                    ? GetUnitX(hero)
+                    : getUdgLevels().getCurrentLevel(this).getStartRandomX()
+
+            const y =
+                escaper.getLastTerrainType() instanceof TerrainTypeWalk
+                    ? GetUnitY(hero)
+                    : getUdgLevels().getCurrentLevel(this).getStartRandomY()
+
+            const a = escaper.getLastTerrainType() instanceof TerrainTypeWalk ? GetUnitFacing(hero) : HERO_START_ANGLE
 
             escaper.removeHero()
-            escaper.createHero(x, y, HERO_START_ANGLE)
+            escaper.createHero(x, y, a)
         }
     }
 
@@ -75,11 +85,20 @@ export const initExecuteCommandCheat = () => {
         }
 
         if (oldScale !== escaper.getScale()) {
-            const x = getUdgLevels().getCurrentLevel(this).getStartRandomX()
-            const y = getUdgLevels().getCurrentLevel(this).getStartRandomY()
+            const x =
+                escaper.getLastTerrainType() instanceof TerrainTypeWalk
+                    ? GetUnitX(hero)
+                    : getUdgLevels().getCurrentLevel(this).getStartRandomX()
+
+            const y =
+                escaper.getLastTerrainType() instanceof TerrainTypeWalk
+                    ? GetUnitY(hero)
+                    : getUdgLevels().getCurrentLevel(this).getStartRandomY()
+
+            const a = escaper.getLastTerrainType() instanceof TerrainTypeWalk ? GetUnitFacing(hero) : HERO_START_ANGLE
 
             escaper.removeHero()
-            escaper.createHero(x, y, HERO_START_ANGLE)
+            escaper.createHero(x, y, a)
         }
     }
 

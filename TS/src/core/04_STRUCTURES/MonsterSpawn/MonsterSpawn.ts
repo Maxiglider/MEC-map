@@ -156,7 +156,7 @@ export class MonsterSpawn {
         for (const point of this.points) {
             arrayPush(
                 rotatedPoints,
-                this.baseApplyRotation(
+                this.applyRotation(
                     point.x,
                     point.y,
                     this.rotation === 90 || this.rotation === 270 ? this.rotation + 90 : this.rotation
@@ -213,22 +213,22 @@ export class MonsterSpawn {
         y1 = this.minY - DECALAGE_UNSPAWN
         y2 = this.maxY + DECALAGE_UNSPAWN
 
-        if (this.rotation !== 90 && this.rotation !== 270) {
-            const { x: nx1, y: ny1 } = this.applyRotation(x1, y1)
-            const { x: nx2, y: ny2 } = this.applyRotation(x2, y2)
+        if (this.rotation === 90 || this.rotation === 270) {
+            x1 = this.minX - DECALAGE_UNSPAWN
+            x2 = this.maxX + DECALAGE_UNSPAWN
+            y1 = this.minY
+            y2 = this.minY
+
+            const { x: nx1, y: ny1 } = this.applyRotation(x1, y1, this.rotation + 90)
+            const { x: nx2, y: ny2 } = this.applyRotation(x2, y2, this.rotation + 90)
 
             x1 = nx1
             y1 = ny1
             x2 = nx2
             y2 = ny2
         } else {
-            x1 = this.minX - DECALAGE_UNSPAWN
-            x2 = this.maxX + DECALAGE_UNSPAWN
-            y1 = this.minY
-            y2 = this.minY
-
-            const { x: nx1, y: ny1 } = this.baseApplyRotation(x1, y1, this.rotation + 90)
-            const { x: nx2, y: ny2 } = this.baseApplyRotation(x2, y2, this.rotation + 90)
+            const { x: nx1, y: ny1 } = this.applyRotation(x1, y1, this.rotation)
+            const { x: nx2, y: ny2 } = this.applyRotation(x2, y2, this.rotation)
 
             x1 = nx1
             y1 = ny1
@@ -380,6 +380,10 @@ export class MonsterSpawn {
         const ms = MonsterSpawn.anyTrigId2MonsterSpawn.get(GetHandleId(GetTriggeringTrigger()))
 
         if (ms) {
+            if (ms.monsters && BlzGroupGetSize(ms.monsters) + ms.getSpawnAmount() > 500) {
+                return
+            }
+
             for (let spawnIndex = 0; spawnIndex < ms.getSpawnAmount(); spawnIndex++) {
                 const mobUnit = ms.createMob()
 
@@ -521,15 +525,6 @@ export class MonsterSpawn {
         let y2: number
         let facing: number
 
-        x1 = this.minX
-        x2 = this.maxX + DECALAGE_UNSPAWN
-        y1 = this.calcValOffset(this.getMinY(), this.getMaxY(), spawnIndex, spawnAmount)
-        y2 = y1
-
-        if (this.multiRegionPatrols) {
-            x2 = this.minX - this.multiRegionDx + 16
-        }
-
         if (this.rotation === 90 || this.rotation === 270) {
             x1 = this.calcValOffset(this.minX, this.maxX, spawnIndex, spawnAmount)
             x2 = x1
@@ -538,6 +533,15 @@ export class MonsterSpawn {
 
             if (this.multiRegionPatrols) {
                 y2 = this.maxY + this.multiRegionDy - 16
+            }
+        } else {
+            x1 = this.minX
+            x2 = this.maxX + DECALAGE_UNSPAWN
+            y1 = this.calcValOffset(this.minY, this.maxY, spawnIndex, spawnAmount)
+            y2 = y1
+
+            if (this.multiRegionPatrols) {
+                x2 = this.minX - this.multiRegionDx + 16
             }
         }
 
@@ -556,25 +560,25 @@ export class MonsterSpawn {
 
         if (this.rotation === 90 || this.rotation === 270) {
             {
-                const { x, y } = this.baseApplyRotation(x1, y1, this.rotation + 90)
+                const { x, y } = this.applyRotation(x1, y1, this.rotation + 90)
                 nx1 = x
                 ny1 = y
             }
 
             {
-                const { x, y } = this.baseApplyRotation(x2, y2, this.rotation + 90)
+                const { x, y } = this.applyRotation(x2, y2, this.rotation + 90)
                 nx2 = x
                 ny2 = y
             }
         } else {
             {
-                const { x, y } = this.applyRotation(x1, y1)
+                const { x, y } = this.applyRotation(x1, y1, this.rotation)
                 nx1 = x
                 ny1 = y
             }
 
             {
-                const { x, y } = this.applyRotation(x2, y2)
+                const { x, y } = this.applyRotation(x2, y2, this.rotation)
                 nx2 = x
                 ny2 = y
             }
@@ -750,7 +754,7 @@ export class MonsterSpawn {
         this.fixedSpawnOffsetMirrored = fixedSpawnOffsetMirrored || false
     }
 
-    baseApplyRotation = (x: number, y: number, rotation: number) => {
+    applyRotation = (x: number, y: number, rotation: number) => {
         const theta = Deg2Rad(rotation)
 
         const c = math.cos(theta)
@@ -760,10 +764,6 @@ export class MonsterSpawn {
         const newY = (x - this.anchor.x) * s + (y - this.anchor.y) * c + this.anchor.y
 
         return createPoint(newX, newY)
-    }
-
-    applyRotation = (x: number, y: number) => {
-        return this.baseApplyRotation(x, y, this.rotation)
     }
 
     calculateCenterPoint = (
