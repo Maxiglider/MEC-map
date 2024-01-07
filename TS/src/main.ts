@@ -34,6 +34,7 @@ import { PROD } from './env'
 // [X] new cmd: -skin; change your slider unit skin
 // [X] new cmd: -scale; change your slider unit scale
 // [X] new cmd: -glow; toggle your slider glow
+// [X] new cmd: -shadow; toggle your or others slider shadow, even supports monsters
 // [X] added day/night commands
 // [X] renamed setMonsterSpawnSpawnAmount to setMonsterSpawnAmount and setMonsterSpawnSpawnOffset to setMonsterSpawnOffset
 // [X] monsterspawn fixes, it will now spawn max 400 monsters. Also fixed -setmsfso on a vertical spawner.

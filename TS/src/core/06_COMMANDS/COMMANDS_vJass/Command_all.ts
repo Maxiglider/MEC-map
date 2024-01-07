@@ -1520,6 +1520,118 @@ export const initCommandAll = () => {
         },
     })
 
+    //-shadow <boolean | reset> [all | unallied | allied | player]
+    registerCommand({
+        name: 'shadow',
+        alias: [],
+        group: 'all',
+        argDescription: '<boolean | reset> [all | unallied | allied | player | monsters]',
+        description: '',
+        cb: ({ nbParam, param1, param2 }, escaper) => {
+            if (nbParam < 1 || nbParam > 2) {
+                return true
+            }
+
+            if (param1 === 'reset') param1 = '0'
+
+            const p1 = S2B(param1)
+
+            if (!IsBoolString(param1)) {
+                return true
+            }
+
+            if (param2 === 'all') {
+                for (const [_, esc] of pairs(getUdgEscapers().getAll())) {
+                    escaper.setShadow(esc, S2B(param1))
+                }
+
+                if (p1) {
+                    Text.mkP(escaper.getPlayer(), `Showing other heroes with shadow`)
+                } else {
+                    Text.mkP(escaper.getPlayer(), `Showing other heroes without shadow`)
+                }
+
+                return true
+            } else if (param2 === 'allied') {
+                for (const [_, esc] of pairs(getUdgEscapers().getAll())) {
+                    if (escaper.alliedState[esc.getId()]) {
+                        escaper.setShadow(esc, p1)
+                    }
+                }
+
+                if (p1) {
+                    Text.mkP(escaper.getPlayer(), `Showing allied heroes with shadow`)
+                } else {
+                    Text.mkP(escaper.getPlayer(), `Showing allied heroes without shadow`)
+                }
+
+                return true
+            } else if (param2 === 'unallied') {
+                for (const [_, esc] of pairs(getUdgEscapers().getAll())) {
+                    if (!escaper.alliedState[esc.getId()]) {
+                        escaper.setShadow(esc, p1)
+                    }
+                }
+
+                if (p1) {
+                    Text.mkP(escaper.getPlayer(), `Showing unallied heroes with shadow`)
+                } else {
+                    Text.mkP(escaper.getPlayer(), `Showing unallied heroes without shadow`)
+                }
+
+                return true
+            } else if (isPlayerId(param2)) {
+                const esc = getUdgEscapers().get(resolvePlayerId(param2))
+
+                if (esc) {
+                    escaper.setShadow(esc, p1)
+
+                    if (p1) {
+                        Text.mkP(escaper.getPlayer(), `Showing ${esc.getDisplayName()} hero with shadow`)
+                    } else {
+                        Text.mkP(escaper.getPlayer(), `Showing ${esc.getDisplayName()} hero without shadow`)
+                    }
+                }
+
+                return true
+            } else if (param2 === 'monsters') {
+                escaper.setMonsterShadow(p1)
+
+                if (p1) {
+                    Text.mkP(escaper.getPlayer(), `Showing monsters with shadow`)
+                } else {
+                    Text.mkP(escaper.getPlayer(), `Showing monsters without shadow`)
+                }
+
+                for (const [_, target] of pairs(getUdgLevels().getCurrentLevel(escaper).monsters.getAll())) {
+                    const shadow = getUdgEscapers().get(GetPlayerId(GetLocalPlayer()))?.getMonsterShadow()
+                    const monster = target.u
+
+                    if (monster) {
+                        if (shadow === false) {
+                            // Force toggle it to update the shadow
+                            const skinId = BlzGetUnitSkin(monster)
+                            BlzSetUnitSkin(monster, skinId === FourCC('hpea') ? FourCC('hfoo') : FourCC('hpea'))
+                            BlzSetUnitSkin(monster, skinId)
+                        } else {
+                            // Unfortunately we can't disable the skin, you'll have to recreate the unit
+                        }
+                    }
+                }
+            } else {
+                escaper.setShadow(escaper, p1)
+
+                if (p1) {
+                    Text.mkP(escaper.getPlayer(), `Showing ${escaper.getDisplayName()} hero with shadow`)
+                } else {
+                    Text.mkP(escaper.getPlayer(), `Showing ${escaper.getDisplayName()} hero without shadow`)
+                }
+            }
+
+            return true
+        },
+    })
+
     //-myStartCommands(msc) [ list [player] | add <command> | del <commandNumber> | ec <commandNumber> | delall ]
     registerCommand({
         name: 'myStartCommands',

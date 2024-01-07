@@ -236,12 +236,26 @@ export class Escaper {
 
     //others transparency
     private othersTransparencyState: { [escaperId: number]: number } = {}
+    private shadowState: { [escaperId: number]: boolean } = {}
+    private monsterShadowState = true
 
     public setOthersTransparency = (escaper: Escaper, ot: number) => {
         this.othersTransparencyState[escaper.getId()] = ot
 
         escaper.updateUnitVertexColor()
     }
+
+    public setShadow = (escaper: Escaper, shadow: boolean) => {
+        this.shadowState[escaper.getId()] = shadow
+
+        escaper.updateUnitVertexColor()
+    }
+
+    public setMonsterShadow = (shadow: boolean) => {
+        this.monsterShadowState = shadow
+    }
+
+    public getMonsterShadow = () => this.monsterShadowState
 
     //user interface
     private uiMode = 'on'
@@ -507,6 +521,8 @@ export class Escaper {
             ],
         })
 
+        this.skin && SetUnitPathing(this.hero, false)
+
         return true
     }
 
@@ -768,6 +784,12 @@ export class Escaper {
 
         if (IsHeroUnitId(GetUnitTypeId(this.hero))) {
             ReviveHero(this.hero, x, y, SHOW_REVIVE_EFFECTS)
+
+            if (this.skin) {
+                SetUnitPathing(this.hero, false)
+                SetUnitX(this.hero, x)
+                SetUnitY(this.hero, y)
+            }
         } else {
             const angle = GetUnitFacing(this.hero)
 
@@ -2129,6 +2151,8 @@ export class Escaper {
             const otherTransparency =
                 getUdgEscapers().get(GetPlayerId(GetLocalPlayer()))?.othersTransparencyState[this.escaperId] || null
 
+            const shadow = getUdgEscapers().get(GetPlayerId(GetLocalPlayer()))?.shadowState[this.escaperId]
+
             SetUnitVertexColorBJ(
                 this.hero,
                 this.vcRed,
@@ -2148,6 +2172,14 @@ export class Escaper {
                     ? this.vcTransparency
                     : otherTransparency
             )
+
+            if (shadow === false) {
+                // Force toggle it to update the shadow
+                BlzSetUnitSkin(this.hero, this.skin === FourCC('hpea') ? FourCC('hfoo') : FourCC('hpea'))
+                BlzSetUnitSkin(this.hero, this.skin || HERO_TYPE_ID)
+            } else {
+                // Unfortunately we can't disable the skin, you'll have to recreate the unit
+            }
 
             // Changing base color with -red will break the teamglow. Thats why we need to reapply it
             BlzShowUnitTeamGlow(this.hero, true)

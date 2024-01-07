@@ -1,6 +1,7 @@
 import { ThemeUtils } from 'Utils/ThemeUtils'
 import { GetCurrentMonsterPlayer } from 'core/01_libraries/Basic_functions'
 import { ENNEMY_PLAYER, MOBS_VARIOUS_COLORS } from 'core/01_libraries/Constants'
+import { getUdgEscapers } from '../../../../globals'
 import { Monster } from './Monster'
 import { MonsterType } from './MonsterType'
 
@@ -126,6 +127,18 @@ export const NewImmobileMonsterForPlayer = (
         UnitAddAbility(monster, ABILITY_FORME_CORBEAU)
         SetUnitFlyHeight(monster, mt.getHeight(), 0)
     }
+
+    const shadow = getUdgEscapers().get(GetPlayerId(GetLocalPlayer()))?.getMonsterShadow()
+
+    if (shadow === false) {
+        // Force toggle it to update the shadow
+        const skinId = BlzGetUnitSkin(monster)
+        BlzSetUnitSkin(monster, skinId === FourCC('hpea') ? FourCC('hfoo') : FourCC('hpea'))
+        BlzSetUnitSkin(monster, skinId)
+    } else {
+        // Unfortunately we can't disable the skin, you'll have to recreate the unit
+    }
+
     return monster
 }
 

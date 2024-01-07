@@ -4,6 +4,7 @@ import { ServiceManager } from 'Services'
 import { EffectUtils } from 'Utils/EffectUtils'
 import { createEvent } from 'Utils/mapUtils'
 import { DUMMY_POWER_CIRCLE, GM_KILLING_EFFECT } from 'core/01_libraries/Constants'
+import { Monster } from 'core/04_STRUCTURES/Monster/Monster'
 import { getUdgEscapers, getUdgMonsterTypes, udg_monsters } from '../../../../globals'
 
 export const InitTrig_InvisUnit_is_getting_damage = () => {
@@ -53,7 +54,7 @@ export const InitTrig_InvisUnit_is_getting_damage = () => {
 
                         return
                     } else {
-                        const monster = udg_monsters[GetUnitUserData(killingUnit)]
+                        const monster = udg_monsters[GetUnitUserData(killingUnit)] as Monster | undefined
 
                         if (monster) {
                             const clearMob = monster.getClearMob()
@@ -110,12 +111,12 @@ export const InitTrig_InvisUnit_is_getting_damage = () => {
                         }
 
                         if (!escaper.isCoopInvul()) {
-                            if (monster.hasAttackGroundPos()) {
+                            if (monster?.hasAttackGroundPos()) {
                                 SetWidgetLife(hero, GetWidgetLife(hero) - GetEventDamage())
                             }
 
                             if (
-                                !monster.hasAttackGroundPos() ||
+                                !monster?.hasAttackGroundPos() ||
                                 (monster.hasAttackGroundPos() && GetWidgetLife(hero) - GetEventDamage() <= 0.405)
                             ) {
                                 escaper.kill()
