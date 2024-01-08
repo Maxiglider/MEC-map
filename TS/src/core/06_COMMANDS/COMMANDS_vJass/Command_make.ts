@@ -3256,10 +3256,10 @@ export const initExecuteCommandMake = () => {
         },
     })
 
-    //-setMonsterAttackGroundOrder(setmago)
+    //-setMonsterAttackGround(setmag)
     registerCommand({
-        name: 'setMonsterAttackGroundOrder',
-        alias: ['setmago'],
+        name: 'setMonsterAttackGround',
+        alias: ['setmag'],
         group: 'make',
         argDescription: '',
         description: '',
