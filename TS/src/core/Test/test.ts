@@ -1,5 +1,6 @@
-import { PROD } from 'env'
 import { ServiceManager } from 'Services'
+import { progressionUtils } from 'Utils/ProgressionUtils'
+import { PROD } from 'env'
 import { getUdgEscapers } from '../../../globals'
 import { makingRightsToAll } from '../06_COMMANDS/Rights/manage_rights'
 
@@ -19,6 +20,8 @@ export const init_Test = () => {
 
             ExecuteCommand(escaper, "-newm caisse 'cais' 40, newm naga 'nnsw' 60, newm peon 'opeo' 40")
             ExecuteCommand(escaper, '-newCaster c naga peon')
+
+            progressionUtils.init()
         }
     }
 }
