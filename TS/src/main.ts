@@ -17,32 +17,6 @@ import { PROD } from './env'
 //   ^ [O] add disable cmd
 //   ^ [>TEST] make it work for only allied players
 //   ^ [>TEST] make it work for all allied teams
-// [X] bug; whenever u -back or -rpos after dying on death terrain u revive on death terrain and it kills you again
-// [X] oldest bug in the book; when u die to terrain and then touch a unit, the unit will kill u, then u revive, then death terrain will kill you again. Should cancel the death terrain kill in progress after revive
-// [X] -ot should also apply to their death circles. -vc too
-// [X] whenever u -el it doesn't pan camera to new lvl
-// [X] make multiboard only show highest progression
-// [X] make setPointsEarnedOnLevelCompletion give out points to other teams on game completion
-// [X] make cmd setPointsEarnedOnMeteorCompletion to give points to people who use meteor
-//   ^ [X] make cmd setPointsEarnedOnMeteorCompletionMaxPerLevel to limit max meteor kill points earned per level
-// [X] on ldb add lvl number column when lp is allied or solo
-// [Added but doesnt work] disable death sound when idm is on
-// [X] when players leave the game or get kicked the level should be unloaded on -setlp solo/allied
-// [X] make -gotl work with lp solo/allied like -el
-// [X] -getCurrentLevel supports player parameter now for when ur playing lp solo/allied
-// [X] -an walk works again, you can now play animations by index so -an 8 instead of knowing their names
-// [X] new cmd: -skin; change your slider unit skin
-// [X] new cmd: -scale; change your slider unit scale
-// [X] new cmd: -glow; toggle your slider glow
-// [X] new cmd: -shadow; toggle your or others slider shadow, even supports monsters
-// [X] added day/night commands
-// [X] renamed setMonsterSpawnSpawnAmount to setMonsterSpawnAmount and setMonsterSpawnSpawnOffset to setMonsterSpawnOffset
-// [X] monsterspawn fixes, it will now spawn max 400 monsters. Also fixed -setmsfso on a vertical spawner.
-//   ^ [X] Also fixed a bug in long patrols for doodad slide
-// [X] mortar support, any unit with an attack ground ability can be used. -crmi and then -setmag
-// [X] progression calculation improvements for diagonal paths
-// [X] progression calculation now supports portalmobs and staticslides
-// [X] add option 'progression' to -lc to lock cam to #1 slider
 // [O] make the switch perm kill units instead of timed
 
 const tsMain = () => {
