@@ -191,6 +191,7 @@ export class Escaper {
     private lockCamTarget: Escaper | null = null
     private lockCamRotation: Timer | null = null
     private lockCamHeight: Timer | null = null
+    private lockCamTargetMode: 'default' | 'progression' | undefined = undefined
 
     public hideLeaderboard = false
 
@@ -739,6 +740,12 @@ export class Escaper {
 
         if (!this.isEscaperSecondary()) {
             ServiceManager.getService('Multiboard').increasePlayerScore(GetPlayerId(this.getPlayer()), 'deaths')
+        }
+
+        for (const [_, target] of pairs(getUdgEscapers().getAll())) {
+            if (target.lockCamTarget === this) {
+                target.calcProgressionLockCamTarget()
+            }
         }
     }
 
@@ -2029,8 +2036,35 @@ export class Escaper {
 
     isLockCamTarget = () => !!this.lockCamTarget
 
-    setLockCamTarget = (lockCamTarget: Escaper | null) => {
+    setLockCamTarget = (lockCamTarget: Escaper | null, lockCamTargetMode: 'default' | 'progression' = 'default') => {
         this.lockCamTarget = lockCamTarget
+        this.lockCamTargetMode = lockCamTargetMode
+        this.resetCamera()
+
+        this.calcProgressionLockCamTarget()
+    }
+
+    calcProgressionLockCamTarget = () => {
+        if (this.lockCamTargetMode !== 'progression') {
+            return
+        }
+
+        let highestProgression = 0
+        let highestProgressionPlayer: Escaper | undefined = undefined
+
+        for (const [_, player] of pairs(getUdgEscapers().getAll())) {
+            const targetProgression = progressionUtils.getPlayerProgression(player)
+
+            if (highestProgressionPlayer === undefined || targetProgression > highestProgression) {
+                highestProgression = targetProgression
+                highestProgressionPlayer = player
+            }
+        }
+
+        if (highestProgressionPlayer) {
+            this.lockCamTarget = highestProgressionPlayer
+            this.resetCamera()
+        }
     }
 
     toggleLockCamRotation = (lockCamRotation: boolean) => {

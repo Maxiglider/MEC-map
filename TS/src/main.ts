@@ -42,7 +42,7 @@ import { PROD } from './env'
 // [X] mortar support, any unit with an attack ground ability can be used. -crmi and then -setmag
 // [X] progression calculation improvements for diagonal paths
 // [X] progression calculation now supports portalmobs and staticslides
-// [O] add option 'progression' to -lc to lock cam to #1 slider
+// [X] add option 'progression' to -lc to lock cam to #1 slider
 // [O] make the switch perm kill units instead of timed
 
 const tsMain = () => {

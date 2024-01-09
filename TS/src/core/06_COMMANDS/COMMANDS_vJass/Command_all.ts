@@ -1194,7 +1194,7 @@ export const initCommandAll = () => {
     //-lockCam(lc)
     registerCommand({
         name: 'lockCam',
-        alias: ['lc'],
+        alias: ['lc', 'spectate'],
         group: 'all',
         argDescription: '[<player> | on | off]',
         description: 'locks the camera',
@@ -1205,20 +1205,21 @@ export const initCommandAll = () => {
                 throw 'Wrong command parameters'
             }
 
-            if (IsBoolString(param1)) {
-                if (S2B(param1)) {
-                    target = escaper
+            if (param1 !== 'progression') {
+                if (IsBoolString(param1)) {
+                    if (S2B(param1)) {
+                        target = escaper
+                    } else {
+                        target = null
+                    }
                 } else {
-                    target = null
+                    target = noParam ? escaper : nbParam === 1 ? getUdgEscapers().get(resolvePlayerId(param1)) : null
                 }
-            } else {
-                target = noParam ? escaper : nbParam === 1 ? getUdgEscapers().get(resolvePlayerId(param1)) : null
             }
 
-            escaper.setLockCamTarget(target)
-            escaper.resetCamera()
+            escaper.setLockCamTarget(target, param1 === 'progression' ? param1 : undefined)
 
-            if (target) {
+            if (target || param1 === 'progression') {
                 Text.mkP(escaper.getPlayer(), 'Camera locked')
             } else {
                 Text.mkP(escaper.getPlayer(), 'Camera unlocked')
@@ -1238,7 +1239,6 @@ export const initCommandAll = () => {
         cb: ({ nbParam, param1 }, escaper) => {
             if (nbParam === 1 && IsBoolString(param1)) {
                 escaper.setLockCamTarget(S2B(param1) ? escaper : null)
-                escaper.resetCamera()
                 escaper.toggleLockCamRotation(S2B(param1))
                 Text.mkP(escaper.getPlayer(), `Camera rotation ${S2B(param1) ? 'locked' : 'unlocked'}`)
             }
