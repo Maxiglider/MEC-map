@@ -242,6 +242,14 @@ const initProgressionUtils = () => {
             const visitedTunnel = MemoryHandler.getEmptyObject<{ [key: string]: boolean }>()
             visited[`${point.x}_${point.y}`] = true
 
+            if (distanceMap && props?.debug === 'distance') {
+                const u = CreateUnit(Player(0), String2Ascii('hfoo'), point.x, point.y, 0)
+                const t = CreateTextTagUnitBJ(udg_colorCode[playerId2colorId(0)] + `${0}`, u, -50, 8, 100, 100, 100, 0)
+
+                debugVariables.units.push(u)
+                debugVariables.textTags.push(t)
+            }
+
             const queue = MemoryHandler.getEmptyArray<[Point, number]>()
             arrayPush(queue, [point, 0])
 
