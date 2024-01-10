@@ -227,7 +227,7 @@ export const initMultiboard = () => {
                         mb,
                         pointsEnabled ? 6 : 5,
                         4 + rowIndex,
-                        colorCode + progressionUtils.getPlayerProgressionLvl(escaper) + '%'
+                        colorCode + progressionUtils.getPlayerProgression(escaper) + '%'
                     )
 
                 mb &&
@@ -307,7 +307,7 @@ export const initMultiboard = () => {
                             mb,
                             pointsEnabled ? 6 : 5,
                             4 + rowIndex,
-                            colorCode + progressionUtils.getPlayerProgressionLvl(escaper) + '%'
+                            colorCode + progressionUtils.getPlayerProgression(escaper) + '%'
                         )
 
                     mb &&

@@ -414,6 +414,10 @@ const initProgressionUtils = () => {
 
     // Might be in reversed order since we don't know the slide direction at this point
     const calculatePlayerProgression = (escaper: Escaper) => {
+        if (escaper.isStaticSliding()) {
+            return -1
+        }
+
         const hero = escaper.getHero()
 
         if (!hero) {

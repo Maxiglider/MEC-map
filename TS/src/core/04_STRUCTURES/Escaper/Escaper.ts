@@ -888,8 +888,6 @@ export class Escaper {
         const startFacing = getUdgLevels().getCurrentLevel(this).getStart()?.getFacing()
         startFacing && this.turnInstantly(startFacing)
 
-        progressionUtils.resetPlayerProgressionState(this)
-
         return this.revive(x, y)
     }
 
