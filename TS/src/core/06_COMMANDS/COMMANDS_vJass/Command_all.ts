@@ -1,5 +1,6 @@
 import { ServiceManager } from 'Services'
 import { EffectUtils } from 'Utils/EffectUtils'
+import { progressionUtils } from 'Utils/ProgressionUtils'
 import { createTimer } from 'Utils/mapUtils'
 import { ClearTextForPlayer, IsBoolString, S2B } from 'core/01_libraries/Basic_functions'
 import {
@@ -1826,6 +1827,29 @@ export const initCommandAll = () => {
             }
 
             resolvePlayerIds(param2, targetEscaper => glowCb(targetEscaper, S2B(param1)))
+            return true
+        },
+    })
+
+    //-progression(prog) [player]
+    registerCommand({
+        name: 'progression',
+        alias: ['prog'],
+        group: 'all',
+        argDescription: '[player]',
+        description: '',
+        cb: ({ nbParam, param1 }, escaper) => {
+            const targetEscaper = nbParam === 1 ? getUdgEscapers().get(resolvePlayerId(param1)) || escaper : escaper
+
+            Text.P(
+                escaper.getPlayer(),
+                `Current progression: ${progressionUtils.getPlayerProgression(
+                    targetEscaper
+                )}%\nHighest progression: ${progressionUtils.getPlayerProgressionLvl(targetEscaper)}%\nCurrent level: ${
+                    getUdgLevels().getCurrentLevel(targetEscaper).getId() + 1
+                }`
+            )
+
             return true
         },
     })

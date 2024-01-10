@@ -457,8 +457,7 @@ const initProgressionUtils = () => {
         }
     }
 
-    // Doesn't take teleports into consideration (cheat: -t). We don't want this either because its far more likely for a portal at the end of the level which is a valid teleport and you don't want to reverse progression there
-    const getPlayerProgression = (escaper: Escaper) => {
+    const calcDisplayedPlayerProgression = (escaper: Escaper) => {
         const nextProgression = calculatePlayerProgression(escaper)
 
         if (!progressionState[escaper.getId()]) {
@@ -475,6 +474,25 @@ const initProgressionUtils = () => {
             progressionState[escaper.getId()].progression = nextProgression
         }
 
+        // Level
+        const nextProgression2 = getPlayerProgression(escaper)
+
+        if (!progressionStateLvl[escaper.getId()]) {
+            progressionStateLvl[escaper.getId()] = MemoryHandler.getEmptyObject()
+            progressionStateLvl[escaper.getId()].progressionLvl = -1
+        }
+
+        if (nextProgression2 > progressionStateLvl[escaper.getId()].progressionLvl) {
+            progressionStateLvl[escaper.getId()].progressionLvl = nextProgression2
+        }
+    }
+
+    // Doesn't take teleports into consideration (cheat: -t). We don't want this either because its far more likely for a portal at the end of the level which is a valid teleport and you don't want to reverse progression there
+    const getPlayerProgression = (escaper: Escaper) => {
+        if (!progressionState[escaper.getId()]) {
+            return 0
+        }
+
         if (progressionState[escaper.getId()].progression === -1) {
             return 0
         }
@@ -488,14 +506,7 @@ const initProgressionUtils = () => {
 
     const getPlayerProgressionLvl = (escaper: Escaper) => {
         if (!progressionStateLvl[escaper.getId()]) {
-            progressionStateLvl[escaper.getId()] = MemoryHandler.getEmptyObject()
-            progressionStateLvl[escaper.getId()].progressionLvl = -1
-        }
-
-        const nextProgression = getPlayerProgression(escaper)
-
-        if (nextProgression > progressionStateLvl[escaper.getId()].progressionLvl) {
-            progressionStateLvl[escaper.getId()].progressionLvl = nextProgression
+            return 0
         }
 
         if (progressionStateLvl[escaper.getId()].progressionLvl === -1) {
@@ -505,7 +516,13 @@ const initProgressionUtils = () => {
         return progressionStateLvl[escaper.getId()].progressionLvl
     }
 
-    return { init, getPlayerProgression, getPlayerProgressionLvl, resetPlayerProgressionState }
+    return {
+        init,
+        calcDisplayedPlayerProgression,
+        getPlayerProgression,
+        getPlayerProgressionLvl,
+        resetPlayerProgressionState,
+    }
 }
 
 export const progressionUtils = initProgressionUtils()

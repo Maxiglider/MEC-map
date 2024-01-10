@@ -221,7 +221,8 @@ export const initMultiboard = () => {
                 const playerId = escaper.getEscaperId()
                 const colorCode = udg_colorCode[playerId2colorId(playerId)]
 
-                // Used to be `progressionUtils.getPlayerProgression(escaper)` but we only want the highest progression
+                progressionUtils.calcDisplayedPlayerProgression(escaper)
+
                 mb &&
                     MultiboardSetItemValueBJ(
                         mb,
@@ -301,7 +302,6 @@ export const initMultiboard = () => {
                     MultiboardSetItemValueBJ(mb, 4, 4 + rowIndex, colorCode + playerScore.deaths)
                     pointsEnabled && MultiboardSetItemValueBJ(mb, 5, 4 + rowIndex, colorCode + playerScore.points)
 
-                    // Used to be `progressionUtils.getPlayerProgression(escaper)` but we only want the highest progression
                     progressionEnabled &&
                         MultiboardSetItemValueBJ(
                             mb,
