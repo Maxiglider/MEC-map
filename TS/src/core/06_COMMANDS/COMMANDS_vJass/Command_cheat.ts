@@ -1,4 +1,5 @@
 import { ServiceManager } from 'Services'
+import { pathingBlockerUtils } from 'Utils/PathingBlockerUtils'
 import { IsBoolString, S2B } from 'core/01_libraries/Basic_functions'
 import { NB_ESCAPERS } from 'core/01_libraries/Constants'
 import { IsInteger, IsPositiveInteger } from 'core/01_libraries/Functions_on_numbers'
@@ -992,6 +993,51 @@ export const initExecuteCommandCheat = () => {
         cb: ({ noParam }, escaper) => {
             if (noParam) {
                 Text.P(escaper.getPlayer(), 'Can turn in air is ' + (globals.CAN_TURN_IN_AIR ? 'enabled' : 'disabled'))
+            }
+            return true
+        },
+    })
+
+    //-setCanSlideOverPathingBlockers <boolean status>
+    registerCommand({
+        name: 'setCanSlideOverPathingBlockers',
+        alias: [],
+        group: 'cheat',
+        argDescription: '<boolean status>',
+        description: '',
+        cb: ({ nbParam, param1 }, escaper) => {
+            if (!(nbParam === 1)) {
+                Text.erP(escaper.getPlayer(), 'one param for this command')
+                return true
+            }
+
+            if (!IsBoolString(param1)) {
+                Text.erP(escaper.getPlayer(), 'invalid boolean')
+                return true
+            }
+
+            globals.canSlideOverPathingBlockers = S2B(param1)
+            pathingBlockerUtils.init()
+
+            Text.A((S2B(param1) ? 'Enabled' : 'Disabled') + ' canSlideOverPathingBlockers')
+            return true
+        },
+    })
+
+    //-getCanSlideOverPathingBlockers
+    registerCommand({
+        name: 'getCanSlideOverPathingBlockers',
+        alias: [],
+        group: 'cheat',
+        argDescription: '',
+        description: '',
+        cb: ({ noParam }, escaper) => {
+            if (noParam) {
+                Text.P(
+                    escaper.getPlayer(),
+                    'Can slide over pathing blockers is ' +
+                        (globals.canSlideOverPathingBlockers ? 'enabled' : 'disabled')
+                )
             }
             return true
         },

@@ -24,6 +24,7 @@ export const globals: {
     USE_VTOTO_SLIDE_LOGIC: boolean
     coopCircles: boolean
     heroToEscaperHandles: { [heroId: number]: number }
+    canSlideOverPathingBlockers: boolean
 } = {
     logStrings: [],
     MAP_MIN_X: 0,
@@ -35,6 +36,7 @@ export const globals: {
     USE_VTOTO_SLIDE_LOGIC: false,
     coopCircles: true,
     heroToEscaperHandles: {},
+    canSlideOverPathingBlockers: true,
 }
 
 //SETTERS - GETTERS

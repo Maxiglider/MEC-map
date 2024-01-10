@@ -1,3 +1,4 @@
+import { pathingBlockerUtils } from 'Utils/PathingBlockerUtils'
 import { createTimer } from 'Utils/mapUtils'
 import { NB_ESCAPERS, SLIDE_PERIOD } from 'core/01_libraries/Constants'
 import { Apm } from 'core/08_GAME/Apm_clics_par_minute/Apm'
@@ -119,8 +120,29 @@ const initSlideTrigger = () => {
             escaperTurnForOnePeriod(GetMirrorEscaper(escaper))
         }
 
-        const newX = oldX + escaper.getSlideMovePerPeriod() * Cos(newAngle)
-        const newY = oldY + escaper.getSlideMovePerPeriod() * Sin(newAngle)
+        let newX = oldX + escaper.getSlideMovePerPeriod() * Cos(newAngle)
+        let newY = oldY + escaper.getSlideMovePerPeriod() * Sin(newAngle)
+
+        if (!globals.canSlideOverPathingBlockers) {
+            const oldXd = Math.floor(oldX / 64) * 64 + 32
+            const oldYd = Math.floor(oldY / 64) * 64 + 32
+            const newXd = Math.floor(newX / 64) * 64 + 32
+            const newYd = Math.floor(newY / 64) * 64 + 32
+
+            if (
+                pathingBlockerUtils.pathingBlockerMap[`${newXd}_${newYd}`] ||
+                (pathingBlockerUtils.pathingBlockerMap[`${newXd}_${oldYd}`] &&
+                    pathingBlockerUtils.pathingBlockerMap[`${oldXd}_${newYd}`])
+            ) {
+                if (pathingBlockerUtils.pathingBlockerMap[`${newXd}_${oldYd}`]) {
+                    newX = oldX
+                }
+
+                if (pathingBlockerUtils.pathingBlockerMap[`${oldXd}_${newYd}`]) {
+                    newY = oldY
+                }
+            }
+        }
 
         if (
             newX >= globals.MAP_MIN_X &&

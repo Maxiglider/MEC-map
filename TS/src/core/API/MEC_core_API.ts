@@ -1,4 +1,5 @@
 import { ServiceManager } from 'Services'
+import { pathingBlockerUtils } from 'Utils/PathingBlockerUtils'
 import { progressionUtils } from 'Utils/ProgressionUtils'
 import { getUdgEscapers, getUdgLevels, getUdgMonsterTypes, getUdgTerrainTypes, globals } from '../../../globals'
 import { errorHandler } from '../../Utils/mapUtils'
@@ -21,6 +22,7 @@ export const MEC_core_API = {
             LoadMapFromCache.initializeGameData()
 
             progressionUtils.init()
+            pathingBlockerUtils.init()
         })()
     },
 

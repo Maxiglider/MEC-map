@@ -18,6 +18,7 @@ import { PROD } from './env'
 //   ^ [>TEST] make it work for only allied players
 //   ^ [>TEST] make it work for all allied teams
 // [O] make the switch perm kill units instead of timed
+// [X] Support for pathing blockers with a new command: -setCanSlideOverPathingBlockers; prevents sliders from going through pathing blockers
 
 const tsMain = () => {
     ServiceManager.registerServices({

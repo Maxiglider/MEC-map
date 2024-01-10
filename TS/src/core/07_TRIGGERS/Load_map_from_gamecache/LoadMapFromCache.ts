@@ -1,5 +1,5 @@
-import { PROD } from 'env'
 import { errorHandler } from 'Utils/mapUtils'
+import { PROD } from 'env'
 import { getUdgCasterTypes, getUdgLevels, getUdgMonsterTypes, getUdgTerrainTypes, globals } from '../../../../globals'
 import { jsonDecode } from '../../01_libraries/Basic_functions'
 import { Text } from '../../01_libraries/Text'
@@ -26,6 +26,10 @@ export class LoadMapFromCache {
 
                     if (gameData.gameData.CAN_TURN_IN_AIR) {
                         globals.CAN_TURN_IN_AIR = gameData.gameData.CAN_TURN_IN_AIR
+                    }
+
+                    if (gameData.gameData.canSlideOverPathingBlockers) {
+                        globals.canSlideOverPathingBlockers = gameData.gameData.canSlideOverPathingBlockers
                     }
 
                     if (gameData.gameData.gravity) {
