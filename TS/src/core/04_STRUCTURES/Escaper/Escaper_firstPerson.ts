@@ -1,8 +1,9 @@
+import { GetUnitZEx } from 'Utils/LocationUtils'
+import { pathingBlockerUtils } from 'Utils/PathingBlockerUtils'
 import { NB_ESCAPERS } from 'core/01_libraries/Constants'
 import { AfkMode } from 'core/08_GAME/Afk_mode/Afk_mode'
-import { GetUnitZEx } from 'Utils/LocationUtils'
 import { Timer } from 'w3ts'
-import { getUdgEscapers } from '../../../../globals'
+import { getUdgEscapers, globals } from '../../../../globals'
 import { createEvent, createTimer, forRange } from '../../../Utils/mapUtils'
 import { Escaper } from './Escaper'
 
@@ -72,8 +73,20 @@ export class EscaperFirstPerson {
 
                                 const newX = GetUnitX(hero) + fwd * Cos(angle)
                                 const newY = GetUnitY(hero) + fwd * Sin(angle)
+                                let preventMove = false
 
-                                this.escaper.moveHero(newX, newY, false)
+                                if (!globals.canSlideOverPathingBlockers) {
+                                    const newXd = Math.floor(newX / 64) * 64 + 32
+                                    const newYd = Math.floor(newY / 64) * 64 + 32
+
+                                    if (pathingBlockerUtils.pathingBlockerMap[`${newXd}_${newYd}`]) {
+                                        preventMove = true
+                                    }
+                                }
+
+                                if (!preventMove) {
+                                    this.escaper.moveHero(newX, newY, false)
+                                }
                             }
                         }
 
