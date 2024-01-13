@@ -2180,6 +2180,23 @@ export const initExecuteCommandMake = () => {
         },
     })
 
+    //-getRegionAtPoint(getrap)
+    registerCommand({
+        name: 'getRegionAtPoint',
+        alias: ['getrap'],
+        group: 'make',
+        argDescription: '',
+        description: '',
+        cb: ({ noParam }, escaper) => {
+            if (!noParam) {
+                return true
+            }
+            escaper.makeGetRegionAtPoint()
+            Text.mkP(escaper.getPlayer(), 'Getting region at point enabled')
+            return true
+        },
+    })
+
     //-deleteRegion(delr) <regionLabel>
     registerCommand({
         name: 'deleteRegion',

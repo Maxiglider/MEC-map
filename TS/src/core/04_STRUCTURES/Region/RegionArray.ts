@@ -1,3 +1,5 @@
+import { MemoryHandler } from 'Utils/MemoryHandler'
+import { arrayPush } from 'core/01_libraries/Basic_functions'
 import { Text } from '../../01_libraries/Text'
 import { BaseArray } from '../BaseArray'
 import type { Level } from '../Level/Level'
@@ -61,6 +63,18 @@ export class RegionArray extends BaseArray<Region> {
         }
 
         return null
+    }
+
+    getRegionsAt = (x: number, y: number) => {
+        const regions = MemoryHandler.getEmptyArray<Region>()
+
+        for (const [_, r] of pairs(this.data)) {
+            if (r.getMinX() <= x && r.getMaxX() >= x && r.getMinY() <= y && r.getMaxY() >= y) {
+                arrayPush(regions, r)
+            }
+        }
+
+        return regions
     }
 
     getRegionAtWithFlag = (x: number, y: number, flag: IRegionFlags) => {
