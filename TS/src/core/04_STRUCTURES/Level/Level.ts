@@ -14,6 +14,7 @@ import { MonsterSpawnArray } from '../MonsterSpawn/MonsterSpawnArray'
 import { CircleMobArray } from '../Monster_properties/CircleMobArray'
 import { ClearMobArray } from '../Monster_properties/ClearMobArray'
 import { PortalMobArray } from '../Monster_properties/PortalMobArray'
+import { RegionArray } from '../Region/RegionArray'
 import { End, Start } from './StartAndEnd'
 import { StaticSlideArray } from './StaticSlideArray'
 import { TriggerArray } from './Triggers'
@@ -42,6 +43,7 @@ export class Level {
     portalMobs: PortalMobArray
     circleMobs: CircleMobArray
     staticSlides: StaticSlideArray
+    regions: RegionArray
 
     //hooks
     public hooks_onStart = new MecHookArray()
@@ -57,6 +59,7 @@ export class Level {
         this.portalMobs = new PortalMobArray(this)
         this.circleMobs = new CircleMobArray(this)
         this.staticSlides = new StaticSlideArray(this)
+        this.regions = new RegionArray(this)
         this.livesEarnedAtBeginning = 1
         this.isActivatedB = false
         this.startMessage = ''
@@ -247,6 +250,10 @@ export class Level {
                 this.drawRegion(staticSlide.getX3(), staticSlide.getY3(), staticSlide.getX4(), staticSlide.getY4())
             }
 
+            for (const [_, region] of pairs(this.regions.getAll())) {
+                this.drawRegion(region.getMinX(), region.getMinY(), region.getMaxX(), region.getMaxY())
+            }
+
             for (const [_, monsterSpawn] of pairs(this.monsterSpawns.getAll())) {
                 const rotatedPoints = monsterSpawn.getRotatedPoints()
 
@@ -368,6 +375,9 @@ export class Level {
 
         //staticSlides
         json.staticSlides = this.staticSlides.toJson()
+
+        //regions
+        json.regions = this.regions.toJson()
 
         return json
     }

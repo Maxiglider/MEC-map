@@ -52,6 +52,9 @@ export class MonsterTypeArray extends BaseArray<MonsterType> {
             if (mt.killingEffect) {
                 monsterType.setKillingEffectStr(mt.killingEffect)
             }
+            if (mt.isWanderable) {
+                monsterType.setIsWanderable(mt.isWanderable)
+            }
         }
     }
 

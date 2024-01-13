@@ -34,6 +34,7 @@ import {
 } from '../../04_STRUCTURES/Caster/CasterType'
 import { MONSTER_TELEPORT_PERIOD_MAX, MONSTER_TELEPORT_PERIOD_MIN } from '../../04_STRUCTURES/Monster/MonsterTeleport'
 import { CLEAR_MOB_MAX_DURATION, FRONT_MONTANT_DURATION } from '../../04_STRUCTURES/Monster_properties/ClearMob'
+import { IRegionFlags, regionFlags } from '../../04_STRUCTURES/Region/Region'
 import { MakeMonsterSimplePatrol } from '../../05_MAKE_STRUCTURES/Make_create_monsters/MakeMonsterSimplePatrol'
 import { TerrainTypeFromString } from '../../07_TRIGGERS/Modify_terrain_Functions/Terrain_type_from_string'
 import { HERO_ROTATION_SPEED } from '../../07_TRIGGERS/Slide_and_CheckTerrain_triggers/SlidingMax'
@@ -2134,6 +2135,140 @@ export const initExecuteCommandMake = () => {
                 Text.mkP(escaper.getPlayer(), 'monster spawn deleted')
             } else {
                 Text.erP(escaper.getPlayer(), 'unknown monster spawn for this level')
+            }
+            return true
+        },
+    })
+
+    //-createRegion(crr) <regionLabel>
+    registerCommand({
+        name: 'createRegion',
+        alias: ['crr'],
+        group: 'make',
+        argDescription: '<regionLabel>',
+        description: 'Create a region',
+        cb: ({ param1 }, escaper) => {
+            if (param1.length === 0) {
+                Text.erP(escaper.getPlayer(), 'regionLabel required')
+                return true
+            }
+
+            if (escaper.getMakingLevel().monsterSpawns.getByLabel(param1)) {
+                Text.erP(escaper.getPlayer(), 'a region with label "' + param1 + '" already exists for this level')
+                return true
+            }
+
+            escaper.makeCreateRegion(param1)
+            Text.mkP(escaper.getPlayer(), 'region making on')
+            return true
+        },
+    })
+
+    //-displayRegions(drs)
+    registerCommand({
+        name: 'displayRegions',
+        alias: ['drs'],
+        group: 'make',
+        argDescription: '',
+        description: '',
+        cb: ({ noParam }, escaper) => {
+            if (!noParam) {
+                return true
+            }
+            escaper.getMakingLevel().regions.displayForPlayer(escaper.getPlayer())
+            return true
+        },
+    })
+
+    //-deleteRegion(delr) <regionLabel>
+    registerCommand({
+        name: 'deleteRegion',
+        alias: ['delr'],
+        group: 'make',
+        argDescription: '<regionLabel>',
+        description: '',
+        cb: ({ nbParam, param1 }, escaper) => {
+            if (!(nbParam === 1)) {
+                return true
+            }
+            if (escaper.getMakingLevel().regions.clearRegion(param1)) {
+                Text.mkP(escaper.getPlayer(), 'region deleted')
+            } else {
+                Text.erP(escaper.getPlayer(), 'unknown region for this level')
+            }
+            return true
+        },
+    })
+
+    //-setRegionFlag(setrf) <regionLabel> <flag> <boolean>
+    registerCommand({
+        name: 'setRegionFlag',
+        alias: ['setrf'],
+        group: 'make',
+        argDescription: '<regionLabel> <flag> <boolean>',
+        description: '',
+        cb: ({ nbParam, param1, param2, param3 }, escaper) => {
+            if (!(nbParam === 3)) {
+                return true
+            }
+
+            const targetRegion = getUdgLevels().getCurrentLevel(escaper).regions.getByLabel(param1)
+
+            if (!targetRegion) {
+                Text.erP(escaper.getPlayer(), 'unknown region')
+                return true
+            }
+
+            if (!regionFlags.includes(param2 as any)) {
+                Text.erP(escaper.getPlayer(), 'unknown region flag, options: ' + regionFlags.join(', '))
+                return true
+            }
+
+            if (!IsBoolString(param3)) {
+                Text.erP(escaper.getPlayer(), "wrong \"flag boolean\" value ; should be 'true', 'false', '0' or '1'")
+                return true
+            }
+
+            targetRegion.setFlag(param2 as IRegionFlags, S2B(param3))
+            Text.mkP(escaper.getPlayer(), `Region: ${targetRegion.getLabel()}, flag: ${param2}, value: ${param3}`)
+
+            return true
+        },
+    })
+
+    //-setMonsterWanderable(setmw) <monsterLabel> <boolean clickable>
+    registerCommand({
+        name: 'setMonsterWanderable',
+        alias: ['setmw'],
+        group: 'make',
+        argDescription: '<monsterLabel> <boolean clickable>',
+        description: '',
+        cb: ({ nbParam, param1, param2 }, escaper) => {
+            if (!(nbParam === 2)) {
+                return true
+            }
+            //checkParam1
+            if (!getUdgMonsterTypes().isLabelAlreadyUsed(param1)) {
+                Text.erP(escaper.getPlayer(), 'unknown monster type')
+                return true
+            }
+            //checkParam2
+            if (!IsBoolString(param2)) {
+                Text.erP(escaper.getPlayer(), "wrong \"is wanderable\" value ; should be 'true', 'false', '0' or '1'")
+                return true
+            }
+            if (getUdgMonsterTypes().getByLabel(param1)?.setIsWanderable(S2B(param2))) {
+                if (S2B(param2)) {
+                    Text.mkP(escaper.getPlayer(), 'this monster type is now wanderable')
+                } else {
+                    Text.mkP(escaper.getPlayer(), 'this monster type is now unable to wander')
+                }
+            } else {
+                if (S2B(param2)) {
+                    Text.erP(escaper.getPlayer(), 'this monster type is already wanderable')
+                } else {
+                    Text.erP(escaper.getPlayer(), 'this monster type is already unable to wander')
+                }
             }
             return true
         },

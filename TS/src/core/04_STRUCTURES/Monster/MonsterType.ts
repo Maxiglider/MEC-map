@@ -21,6 +21,7 @@ export class MonsterType {
     private immolationSkill: number | null
     private speed: number
     private isClickableB: boolean
+    private isWanderableB: boolean
     private killingEffectStr?: string
     private maxLife: number
     private height: number
@@ -58,6 +59,7 @@ export class MonsterType {
         this.immolationSkill = IMMOLATION_SKILLS[immolationRadius]
         this.speed = speed
         this.isClickableB = isClickable
+        this.isWanderableB = false
         this.maxLife = 10000
         this.height = -1
     }
@@ -179,6 +181,17 @@ export class MonsterType {
         return true
     }
 
+    isWanderable = () => this.isWanderableB
+
+    setIsWanderable = (isWanderable: boolean): boolean => {
+        if (this.isWanderableB === isWanderable) {
+            return false
+        }
+        this.isWanderableB = isWanderable
+        this.refresh()
+        return true
+    }
+
     getKillingEffectStr = () => {
         return this.killingEffectStr
     }
@@ -284,6 +297,9 @@ export class MonsterType {
         if (this.isClickableB) {
             display = display + space + 'clickable' + space + I2S(this.maxLife / 10000)
         }
+        if (this.isWanderableB) {
+            display = display + space + 'wanderable'
+        }
         Text.P_timed(p, TERRAIN_DATA_DISPLAY_TIME, display)
     }
 
@@ -297,6 +313,7 @@ export class MonsterType {
         output['immolationRadius'] = S2I(this.getImmolationRadiusStr())
         output['speed'] = R2I(this.speed)
         output['isClickable'] = this.isClickableB
+        output['isWanderable'] = this.isWanderableB
         output['killingEffect'] = this.killingEffectStr
         output['nbMeteorsToKill'] = this.maxLife / 10000
         output['height'] = R2I(this.height)

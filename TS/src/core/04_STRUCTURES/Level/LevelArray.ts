@@ -437,6 +437,11 @@ export class LevelArray extends BaseArray<Level> {
             if (levelJson.staticSlides) {
                 level.staticSlides.newFromJson(levelJson.staticSlides)
             }
+
+            //regions
+            if (levelJson.regions) {
+                level.regions.newFromJson(levelJson.regions)
+            }
         }
     }
 

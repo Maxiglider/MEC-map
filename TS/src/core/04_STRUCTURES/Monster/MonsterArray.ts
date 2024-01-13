@@ -6,6 +6,7 @@ import { Caster } from '../Caster/Caster'
 import type { CasterType } from '../Caster/CasterType'
 import type { Level } from '../Level/Level'
 import type { Monster } from './Monster'
+import { MonsterNoMove } from './MonsterNoMove'
 import type { MonsterType } from './MonsterType'
 import { countMonstersAccordingToMode } from './Monster_count'
 
@@ -38,6 +39,10 @@ export class MonsterArray extends BaseArray<Monster> {
 
         if (this.level) {
             monster.level = this.level
+
+            if (monster instanceof MonsterNoMove) {
+                monster.wander()
+            }
         }
     }
 
