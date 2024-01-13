@@ -28,7 +28,7 @@ export class LoadMapFromCache {
                         globals.CAN_TURN_IN_AIR = gameData.gameData.CAN_TURN_IN_AIR
                     }
 
-                    if (gameData.gameData.canSlideOverPathingBlockers) {
+                    if (gameData.gameData.canSlideOverPathingBlockers !== undefined) {
                         globals.canSlideOverPathingBlockers = gameData.gameData.canSlideOverPathingBlockers
                     }
 

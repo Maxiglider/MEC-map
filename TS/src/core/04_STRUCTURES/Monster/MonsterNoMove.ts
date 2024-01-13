@@ -79,7 +79,7 @@ export class MonsterNoMove extends Monster {
         }
 
         const createTimer = () => {
-            this.moveTimer = new Timer().start(Math.random() * 5 + (this.initialWander ? 0 : 7), false, () => {
+            this.moveTimer = new Timer().start(Math.random() * 7 + (this.initialWander ? 0 : 5), false, () => {
                 if (this.initialWander) {
                     this.initialWander = false
                 }
