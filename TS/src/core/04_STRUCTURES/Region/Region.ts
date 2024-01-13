@@ -49,6 +49,38 @@ export class Region {
     getMinY = () => this.minY
     getMaxY = () => this.maxY
 
+    setMinX = (x: number) => {
+        this.minX = x
+        this.recalcXY()
+    }
+
+    setMaxX = (x: number) => {
+        this.maxX = x
+        this.recalcXY()
+    }
+
+    setMinY = (y: number) => {
+        this.minY = y
+        this.recalcXY()
+    }
+
+    setMaxY = (y: number) => {
+        this.maxY = y
+        this.recalcXY()
+    }
+
+    recalcXY = () => {
+        const x1 = this.minX
+        const y1 = this.minY
+        const x2 = this.maxX
+        const y2 = this.maxY
+
+        this.minX = Math.round(RMinBJ(x1, x2))
+        this.minY = Math.round(RMinBJ(y1, y2))
+        this.maxX = Math.round(RMaxBJ(x1, x2))
+        this.maxY = Math.round(RMaxBJ(y1, y2))
+    }
+
     getRandomPoint = () => {
         return createPoint(
             this.minX + Math.random() * (this.maxX - this.minX),

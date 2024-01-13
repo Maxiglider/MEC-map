@@ -29,6 +29,7 @@ import { MakeMonsterMultiplePatrols } from 'core/05_MAKE_STRUCTURES/Make_create_
 import { MakeMonsterSimplePatrol } from 'core/05_MAKE_STRUCTURES/Make_create_monsters/MakeMonsterSimplePatrol'
 import { MakeMonsterTeleport } from 'core/05_MAKE_STRUCTURES/Make_create_monsters/MakeMonsterTeleport'
 import { MakeGetRegion } from 'core/05_MAKE_STRUCTURES/Make_create_region/MakeGetRegion'
+import { MakeMoveRegionPoint } from 'core/05_MAKE_STRUCTURES/Make_create_region/MakeMoveRegionPoint'
 import { MakeRegion } from 'core/05_MAKE_STRUCTURES/Make_create_region/MakeRegion'
 import { MakeDeleteStaticSlide } from 'core/05_MAKE_STRUCTURES/Make_create_static_slide/MakeDeleteStaticSlide'
 import { MakeStaticSlide } from 'core/05_MAKE_STRUCTURES/Make_create_static_slide/MakeStaticSlide'
@@ -1562,6 +1563,11 @@ export class Escaper {
     makeGetRegionAtPoint = () => {
         this.destroyMake()
         if (this.hero) this.make = new MakeGetRegion(this.hero)
+    }
+
+    makeMoveRegionPoint = () => {
+        this.destroyMake()
+        if (this.hero) this.make = new MakeMoveRegionPoint(this.hero)
     }
 
     makeDeleteMonsters(mode: string) {

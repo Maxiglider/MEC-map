@@ -2164,6 +2164,23 @@ export const initExecuteCommandMake = () => {
         },
     })
 
+    //-moveRegionPoint(mrp)
+    registerCommand({
+        name: 'moveRegionPoint',
+        alias: ['mrp'],
+        group: 'make',
+        argDescription: '',
+        description: 'Move a region point',
+        cb: ({ noParam }, escaper) => {
+            if (!noParam) {
+                return true
+            }
+            escaper.makeMoveRegionPoint()
+            Text.mkP(escaper.getPlayer(), 'region point moving on')
+            return true
+        },
+    })
+
     //-displayRegions(drs)
     registerCommand({
         name: 'displayRegions',
@@ -2180,10 +2197,10 @@ export const initExecuteCommandMake = () => {
         },
     })
 
-    //-getRegionAtPoint(getrap)
+    //-getRegionAtPoint(getr|getrap)
     registerCommand({
         name: 'getRegionAtPoint',
-        alias: ['getrap'],
+        alias: ['getr', 'getrap'],
         group: 'make',
         argDescription: '',
         description: '',
@@ -2481,6 +2498,28 @@ export const initExecuteCommandMake = () => {
                 } else {
                     Text.erP(escaper.getPlayer(), 'nombre maximum de niveaux atteint')
                 }
+            }
+            return true
+        },
+    })
+
+    //-copyLevel
+    registerCommand({
+        name: 'copyLevel',
+        alias: [],
+        group: 'make',
+        argDescription: '',
+        description: 'creates a new level after the last one by copying the current make level',
+        cb: ({ noParam }, escaper) => {
+            if (noParam) {
+                const currentLevel = escaper.getMakingLevel()
+
+                getUdgLevels().newFromJson([currentLevel.toJson()], true)
+
+                Text.mkP(
+                    escaper.getPlayer(),
+                    `Copied level: ${currentLevel.getId()} to ${getUdgLevels().getLastLevelId()}`
+                )
             }
             return true
         },

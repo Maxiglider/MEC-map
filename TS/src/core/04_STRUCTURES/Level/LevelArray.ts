@@ -317,8 +317,8 @@ export class LevelArray extends BaseArray<Level> {
         return lvl
     }
 
-    newFromJson = (levelsJson: { [x: string]: any }[]) => {
-        if (levelsJson.length > 0) {
+    newFromJson = (levelsJson: { [x: string]: any }[], preventDestroyLastLevel = false) => {
+        if (levelsJson.length > 0 && !preventDestroyLastLevel) {
             this.destroyLastLevel(true)
         }
 

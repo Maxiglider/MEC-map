@@ -19,7 +19,8 @@ import { PROD } from './env'
 //   ^ [>TEST] make it work for all allied teams
 // [O] make the switch perm kill units instead of timed
 // [X] Support for pathing blockers with a new command: -setCanSlideOverPathingBlockers; prevents sliders from going through pathing blockers
-// [O] New cmds, -createRegion, displayRegions, deleteRegion, getRegionAtPoint. Not used for many things yet. Also new cmds: setRegionFlag, setMonsterWanderable; Used to recreate Slide Kitty Slide :)
+// [X] New cmds, -createRegion, displayRegions, deleteRegion, getRegionAtPoint, moveRegionPoint. Not used for many things yet. Also new cmds: setRegionFlag, setMonsterWanderable; Used to recreate Slide Kitty Slide :)
+// [X] New make cmd: -copyLevel; copies the current making level to a new one
 
 const tsMain = () => {
     ServiceManager.registerServices({
