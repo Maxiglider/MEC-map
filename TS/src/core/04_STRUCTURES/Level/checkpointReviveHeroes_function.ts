@@ -1,6 +1,6 @@
 import { progressionUtils } from 'Utils/ProgressionUtils'
 import { NB_ESCAPERS } from 'core/01_libraries/Constants'
-import { getUdgEscapers } from '../../../../globals'
+import { getUdgEscapers, globals } from '../../../../globals'
 import { StopUnit } from '../../01_libraries/Basic_functions'
 import { ChangeAllTerrains } from '../../07_TRIGGERS/Triggers_to_modify_terrains/Change_all_terrains'
 import { Escaper } from '../Escaper/Escaper'
@@ -16,7 +16,7 @@ export const checkPointReviveHeroes = (
         const escaper = getUdgEscapers().get(i)
 
         if (escaper) {
-            if (escaper !== revivingFinisher || !finished) {
+            if (escaper !== revivingFinisher || !finished || globals.forceReviveAtStart) {
                 const unit = escaper.getHero()
 
                 if (revivingFinisher && !sameLevelProgression(revivingFinisher, escaper)) {
@@ -47,7 +47,7 @@ export const checkPointReviveHeroes = (
 
     for (let i = 0; i < NB_ESCAPERS; i++) {
         const escaper = getUdgEscapers().get(i)
-        if (escaper && (escaper !== revivingFinisher || !finished)) {
+        if (escaper && (escaper !== revivingFinisher || !finished || globals.forceReviveAtStart)) {
             escaper.pause(false)
         }
     }

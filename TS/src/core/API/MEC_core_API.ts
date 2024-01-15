@@ -118,4 +118,5 @@ export const MEC_core_API = {
     reinitProgressionMap: (forcedLevelIndex?: number) => progressionUtils.init({ forcedLevelIndex }),
     setWanderMinTime: (time: number) => (globals.wanderMinTime = time),
     setWanderExtraTime: (time: number) => (globals.wanderExtraTime = time),
+    setForceReviveAtStart: (b: boolean) => (globals.forceReviveAtStart = b),
 }

@@ -28,6 +28,7 @@ export const globals: {
     animOnRevive: string
     wanderMinTime: number
     wanderExtraTime: number
+    forceReviveAtStart: boolean
 } = {
     logStrings: [],
     MAP_MIN_X: 0,
@@ -43,6 +44,7 @@ export const globals: {
     animOnRevive: 'channel',
     wanderMinTime: 5,
     wanderExtraTime: 7,
+    forceReviveAtStart: false,
 }
 
 //SETTERS - GETTERS
