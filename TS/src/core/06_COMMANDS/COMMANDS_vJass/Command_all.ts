@@ -1,4 +1,5 @@
 import { ServiceManager } from 'Services'
+import { animUtils } from 'Utils/AnimUtils'
 import { EffectUtils } from 'Utils/EffectUtils'
 import { progressionUtils } from 'Utils/ProgressionUtils'
 import { createTimer } from 'Utils/mapUtils'
@@ -553,25 +554,13 @@ export const initCommandAll = () => {
             const hero = escaper.getHero()
 
             if (hero) {
-                if (param1 === 'walk') {
-                    SetUnitAnimationByIndex(hero, 8)
-                } else if (S2I(param1) !== 0 || param1 === '0') {
-                    SetUnitAnimationByIndex(hero, S2I(param1))
-                } else {
-                    SetUnitAnimation(hero, param1)
-                }
+                animUtils.setAnimation(hero, param1)
 
                 if (!escaper.isEscaperSecondary()) {
                     const hero2 = GetMirrorEscaper(escaper)?.getHero()
 
                     if (hero2) {
-                        if (param1 === 'walk') {
-                            SetUnitAnimationByIndex(hero2, 8)
-                        } else if (S2I(param1) !== 0 || param1 === '0') {
-                            SetUnitAnimationByIndex(hero2, S2I(param1))
-                        } else {
-                            SetUnitAnimation(hero2, param1)
-                        }
+                        animUtils.setAnimation(hero2, param1)
                     }
                 }
             }

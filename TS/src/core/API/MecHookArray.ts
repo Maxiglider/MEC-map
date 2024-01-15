@@ -2,11 +2,11 @@ import { MemoryHandler } from 'Utils/MemoryHandler'
 import { arrayPush } from 'core/01_libraries/Basic_functions'
 import { MecHook } from './MecHook'
 
-export class MecHookArray {
-    private hooks = MemoryHandler.getEmptyArray<MecHook>()
+export class MecHookArray<T extends (...args: any) => any> {
+    private hooks = MemoryHandler.getEmptyArray<MecHook<T>>()
 
-    public new = (cb: () => any) => {
-        const hook = new MecHook(cb)
+    public new = (cb: T) => {
+        const hook = new MecHook<T>(cb)
         arrayPush(this.hooks, hook)
         hook.mecHookArray = this
         return hook.getId()
@@ -25,8 +25,11 @@ export class MecHookArray {
     public getHooks = () => this.hooks
 }
 
-export function CombineHooks(ha1: MecHookArray | undefined, ha2: MecHookArray | undefined) {
-    const outHookArray = MemoryHandler.getEmptyArray<MecHook>()
+export function CombineHooks<T extends (...args: any) => void>(
+    ha1: MecHookArray<T> | undefined,
+    ha2: MecHookArray<T> | undefined
+) {
+    const outHookArray = MemoryHandler.getEmptyArray<MecHook<T>>()
 
     if (ha1) {
         for (const value of ha1.getHooks()) {

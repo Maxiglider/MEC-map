@@ -1,7 +1,9 @@
+import { animUtils } from 'Utils/AnimUtils'
 import { MemoryHandler } from 'Utils/MemoryHandler'
 import { createTimer } from 'Utils/mapUtils'
 import { StopUnit } from 'core/01_libraries/Basic_functions'
 import { Timer } from 'w3ts'
+import { globals } from '../../../../globals'
 import { Escaper } from '../Escaper/Escaper'
 import { Level } from '../Level/Level'
 import { Monster } from '../Monster/Monster'
@@ -128,7 +130,7 @@ export class PortalMob {
         this.portalEffect && escaper.createPortalEffect(this.portalEffect)
 
         if (this.freezeDuration > 0) {
-            SetUnitAnimation(hero, 'channel')
+            animUtils.setAnimation(hero, globals.animOnRevive || 'channel')
             escaper.absoluteSlideSpeed(0)
             escaper.setCanClick(false)
 

@@ -11,6 +11,7 @@ import { playerId2colorId } from 'core/06_COMMANDS/COMMANDS_vJass/Command_functi
 import { PROD } from 'env'
 import { getUdgLevels, getUdgTerrainTypes, globals } from '../../globals'
 import { MonsterSimplePatrol } from '../core/04_STRUCTURES/Monster/MonsterSimplePatrol'
+import { pathingBlockerUtils } from './PathingBlockerUtils'
 import { IPoint, createPoint } from './Point'
 
 type Point = { x: number; y: number }
@@ -36,7 +37,7 @@ const initProgressionUtils = () => {
         textTags: [],
     }
 
-    const init = (props?: { debug: 'level' | 'distance' | 'bfs' | 'segment' }) => {
+    const init = (props?: { debug?: 'level' | 'distance' | 'bfs' | 'segment'; forcedLevelIndex?: number }) => {
         // clear previous data
         segments = {}
         progressionMap = {}
@@ -75,41 +76,56 @@ const initProgressionUtils = () => {
                 const tt = tts.getTerrainType(x, y)
 
                 if (tt && tt.kind === 'slide') {
-                    if (!tileMap[x]) tileMap[x] = {}
+                    let isNotBlocked = true
 
-                    // Order matters, from 'oldest' to 'newest'
-                    const a = tileMap[x - LARGEUR_CASE]?.[y - LARGEUR_CASE]
-                    const b = tileMap[x]?.[y - LARGEUR_CASE]
-                    const c = tileMap[x + LARGEUR_CASE]?.[y - LARGEUR_CASE]
-                    const d = tileMap[x - LARGEUR_CASE]?.[y]
-
-                    const newValue = a || b || c || d || ++currentSegment
-
-                    tileMap[x][y] = newValue
-
-                    if (!segments[newValue]) segments[newValue] = []
-                    arrayPush(segments[newValue], { x, y })
-
-                    const opts = MemoryHandler.getEmptyArray<number>()
-
-                    arrayPush(opts, a)
-                    arrayPush(opts, b)
-                    arrayPush(opts, c)
-                    arrayPush(opts, d)
-
-                    for (const o of opts) {
-                        if (o && newValue !== o) {
-                            for (const s of segments[o]) {
-                                tileMap[s.x][s.y] = newValue
-                                arrayPush(segments[newValue], s)
-                            }
-
-                            // segments[o].__destroy()
-                            delete segments[o]
+                    if (!globals.canSlideOverPathingBlockers) {
+                        if (
+                            pathingBlockerUtils.isBlocked(x + 32, y + 32) &&
+                            pathingBlockerUtils.isBlocked(x + 32 + 64, y + 32) &&
+                            pathingBlockerUtils.isBlocked(x + 32, y + 32 + 64) &&
+                            pathingBlockerUtils.isBlocked(x + 32 + 64, y + 32 + 64)
+                        ) {
+                            isNotBlocked = false
                         }
                     }
 
-                    opts.__destroy()
+                    if (isNotBlocked) {
+                        if (!tileMap[x]) tileMap[x] = {}
+
+                        // Order matters, from 'oldest' to 'newest'
+                        const a = tileMap[x - LARGEUR_CASE]?.[y - LARGEUR_CASE]
+                        const b = tileMap[x]?.[y - LARGEUR_CASE]
+                        const c = tileMap[x + LARGEUR_CASE]?.[y - LARGEUR_CASE]
+                        const d = tileMap[x - LARGEUR_CASE]?.[y]
+
+                        const newValue = a || b || c || d || ++currentSegment
+
+                        tileMap[x][y] = newValue
+
+                        if (!segments[newValue]) segments[newValue] = []
+                        arrayPush(segments[newValue], { x, y })
+
+                        const opts = MemoryHandler.getEmptyArray<number>()
+
+                        arrayPush(opts, a)
+                        arrayPush(opts, b)
+                        arrayPush(opts, c)
+                        arrayPush(opts, d)
+
+                        for (const o of opts) {
+                            if (o && newValue !== o) {
+                                for (const s of segments[o]) {
+                                    tileMap[s.x][s.y] = newValue
+                                    arrayPush(segments[newValue], s)
+                                }
+
+                                // segments[o].__destroy()
+                                delete segments[o]
+                            }
+                        }
+
+                        opts.__destroy()
+                    }
                 }
 
                 x = x + LARGEUR_CASE
@@ -286,19 +302,23 @@ const initProgressionUtils = () => {
 
                             if (props?.debug === 'distance') {
                                 const u = CreateUnit(Player(0), String2Ascii('hfoo'), newPoint.x, newPoint.y, 0)
-                                const t = CreateTextTagUnitBJ(
-                                    udg_colorCode[playerId2colorId(0)] + `${newDistance}`,
-                                    u,
-                                    -50,
-                                    8,
-                                    100,
-                                    100,
-                                    100,
-                                    0
-                                )
-
                                 debugVariables.units.push(u)
-                                debugVariables.textTags.push(t)
+
+                                // Amount of tags is limited
+                                if (debugVariables.units.length % 64 === 0) {
+                                    const t = CreateTextTagUnitBJ(
+                                        udg_colorCode[playerId2colorId(0)] + `${newDistance}`,
+                                        u,
+                                        -50,
+                                        8,
+                                        100,
+                                        100,
+                                        100,
+                                        0
+                                    )
+
+                                    debugVariables.textTags.push(t)
+                                }
                             }
                         }
                     }
@@ -362,6 +382,11 @@ const initProgressionUtils = () => {
                 }
             }
 
+            // When reusing segments for multiple levels it only counts for the last level, it was too complicated to make it work for all levels so I allow it to be forced through the API
+            if (props?.forcedLevelIndex !== undefined) {
+                foundLevelIndex = props.forcedLevelIndex
+            }
+
             if (foundLevelIndex !== -1) {
                 if (!levelSegments[foundLevelIndex]) {
                     levelSegments[foundLevelIndex] = { numSegments: 0, segmentsMaxDistance: 0 }
@@ -385,19 +410,23 @@ const initProgressionUtils = () => {
 
                     if (props?.debug === 'segment') {
                         const u = CreateUnit(Player(foundLevelIndex), String2Ascii('hfoo'), tile.x, tile.y, 0)
-                        const t = CreateTextTagUnitBJ(
-                            udg_colorCode[playerId2colorId(0)] + `${progression}`,
-                            u,
-                            -50,
-                            8,
-                            100,
-                            100,
-                            100,
-                            0
-                        )
-
                         debugVariables.units.push(u)
-                        debugVariables.textTags.push(t)
+
+                        // Amount of tags is limited
+                        if (debugVariables.units.length % 64 === 0) {
+                            const t = CreateTextTagUnitBJ(
+                                udg_colorCode[playerId2colorId(0)] + `${progression}`,
+                                u,
+                                -50,
+                                8,
+                                100,
+                                100,
+                                100,
+                                0
+                            )
+
+                            debugVariables.textTags.push(t)
+                        }
                     }
                 }
             }

@@ -32,6 +32,18 @@ export class LoadMapFromCache {
                         globals.canSlideOverPathingBlockers = gameData.gameData.canSlideOverPathingBlockers
                     }
 
+                    if (gameData.gameData.animOnRevive !== undefined) {
+                        globals.animOnRevive = gameData.gameData.animOnRevive
+                    }
+
+                    if (gameData.gameData.wanderMinTime !== undefined) {
+                        globals.wanderMinTime = gameData.gameData.wanderMinTime
+                    }
+
+                    if (gameData.gameData.wanderExtraTime !== undefined) {
+                        globals.wanderExtraTime = gameData.gameData.wanderExtraTime
+                    }
+
                     if (gameData.gameData.gravity) {
                         Gravity.SetGravity(gameData.gameData.gravity)
                     }

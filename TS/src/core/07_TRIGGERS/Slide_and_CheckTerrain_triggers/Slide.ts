@@ -130,15 +130,14 @@ const initSlideTrigger = () => {
             const newYd = Math.floor(newY / 64) * 64 + 32
 
             if (
-                pathingBlockerUtils.pathingBlockerMap[`${newXd}_${newYd}`] ||
-                (pathingBlockerUtils.pathingBlockerMap[`${newXd}_${oldYd}`] &&
-                    pathingBlockerUtils.pathingBlockerMap[`${oldXd}_${newYd}`])
+                pathingBlockerUtils.isBlocked(newXd, newYd) ||
+                (pathingBlockerUtils.isBlocked(newXd, oldYd) && pathingBlockerUtils.isBlocked(oldXd, newYd))
             ) {
-                if (pathingBlockerUtils.pathingBlockerMap[`${newXd}_${oldYd}`]) {
+                if (pathingBlockerUtils.isBlocked(newXd, oldYd)) {
                     newX = oldX
                 }
 
-                if (pathingBlockerUtils.pathingBlockerMap[`${oldXd}_${newYd}`]) {
+                if (pathingBlockerUtils.isBlocked(oldXd, newYd)) {
                     newY = oldY
                 }
             }

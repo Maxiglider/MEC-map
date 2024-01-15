@@ -27,6 +27,9 @@ export class SaveMapInCache {
         jsonGameData.gameData.coopCircles = globals.coopCircles
         jsonGameData.gameData.CAN_TURN_IN_AIR = globals.CAN_TURN_IN_AIR
         jsonGameData.gameData.canSlideOverPathingBlockers = globals.canSlideOverPathingBlockers
+        jsonGameData.gameData.animOnRevive = globals.animOnRevive
+        jsonGameData.gameData.wanderMinTime = globals.wanderMinTime
+        jsonGameData.gameData.wanderExtraTime = globals.wanderExtraTime
         jsonGameData.gameData.gravity = Gravity.GetRealGravity()
 
         //terrain config

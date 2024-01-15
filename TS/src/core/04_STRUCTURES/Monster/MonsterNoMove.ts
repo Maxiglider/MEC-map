@@ -1,5 +1,5 @@
 import { Timer } from 'w3ts'
-import { udg_monsters } from '../../../../globals'
+import { globals, udg_monsters } from '../../../../globals'
 import { Monster } from './Monster'
 import { MonsterType } from './MonsterType'
 import { NewImmobileMonster } from './Monster_functions'
@@ -79,53 +79,57 @@ export class MonsterNoMove extends Monster {
         }
 
         const createTimer = () => {
-            this.moveTimer = new Timer().start(Math.random() * 7 + (this.initialWander ? 0 : 5), false, () => {
-                if (this.initialWander) {
-                    this.initialWander = false
-                }
-
-                if (this.wanderEffect) DestroyEffect(this.wanderEffect)
-                this.wanderEffect = AddSpecialEffectTargetUnitBJ(
-                    'overhead',
-                    targetUnit,
-                    'AbilitiesSpellsOtherTalkToMeTalkToMe.mdl'
-                )
-
-                this.wanderTimer = new Timer().start(Math.random() * 1.5 + 0.5, false, () => {
-                    let targetPoint = region.getRandomPoint()
-
-                    for (let i = 0; i < 20; i++) {
-                        if (
-                            distanceBetweenPoints(
-                                GetUnitX(targetUnit),
-                                GetUnitY(targetUnit),
-                                targetPoint.x,
-                                targetPoint.y
-                            ) < 1200
-                        ) {
-                            break
-                        }
-
-                        if (targetPoint) targetPoint.__destroy()
-                        targetPoint = region.getRandomPoint()
+            this.moveTimer = new Timer().start(
+                Math.random() * globals.wanderExtraTime + (this.initialWander ? 0 : globals.wanderMinTime),
+                false,
+                () => {
+                    if (this.initialWander) {
+                        this.initialWander = false
                     }
 
-                    IssuePointOrder(targetUnit, 'move', targetPoint.x, targetPoint.y)
+                    if (this.wanderEffect) DestroyEffect(this.wanderEffect)
+                    this.wanderEffect = AddSpecialEffectTargetUnitBJ(
+                        'overhead',
+                        targetUnit,
+                        'AbilitiesSpellsOtherTalkToMeTalkToMe.mdl'
+                    )
 
-                    this.wanderEffect && DestroyEffect(this.wanderEffect)
-                    this.wanderEffect = null
+                    this.wanderTimer = new Timer().start(Math.random() * 1.5 + 0.5, false, () => {
+                        let targetPoint = region.getRandomPoint()
 
-                    this.wanderTimer?.destroy()
-                    this.wanderTimer = null
+                        for (let i = 0; i < 20; i++) {
+                            if (
+                                distanceBetweenPoints(
+                                    GetUnitX(targetUnit),
+                                    GetUnitY(targetUnit),
+                                    targetPoint.x,
+                                    targetPoint.y
+                                ) < 1200
+                            ) {
+                                break
+                            }
 
-                    targetPoint.__destroy()
-                })
+                            if (targetPoint) targetPoint.__destroy()
+                            targetPoint = region.getRandomPoint()
+                        }
 
-                this.moveTimer?.destroy()
-                this.moveTimer = null
+                        IssuePointOrder(targetUnit, 'move', targetPoint.x, targetPoint.y)
 
-                createTimer()
-            })
+                        this.wanderEffect && DestroyEffect(this.wanderEffect)
+                        this.wanderEffect = null
+
+                        this.wanderTimer?.destroy()
+                        this.wanderTimer = null
+
+                        targetPoint.__destroy()
+                    })
+
+                    this.moveTimer?.destroy()
+                    this.moveTimer = null
+
+                    createTimer()
+                }
+            )
         }
 
         createTimer()

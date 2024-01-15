@@ -1,5 +1,6 @@
 import { ServiceManager } from 'Services'
 import { pathingBlockerUtils } from 'Utils/PathingBlockerUtils'
+import { progressionUtils } from 'Utils/ProgressionUtils'
 import { IsBoolString, S2B } from 'core/01_libraries/Basic_functions'
 import { NB_ESCAPERS } from 'core/01_libraries/Constants'
 import { IsInteger, IsPositiveInteger } from 'core/01_libraries/Functions_on_numbers'
@@ -1018,6 +1019,7 @@ export const initExecuteCommandCheat = () => {
 
             globals.canSlideOverPathingBlockers = S2B(param1)
             pathingBlockerUtils.init()
+            progressionUtils.init()
 
             Text.A((S2B(param1) ? 'Enabled' : 'Disabled') + ' canSlideOverPathingBlockers')
             return true
@@ -1037,6 +1039,92 @@ export const initExecuteCommandCheat = () => {
                     escaper.getPlayer(),
                     'Can slide over pathing blockers is ' +
                         (globals.canSlideOverPathingBlockers ? 'enabled' : 'disabled')
+                )
+            }
+            return true
+        },
+    })
+
+    //-setAnimOnRevive <anim>
+    registerCommand({
+        name: 'setAnimOnRevive',
+        alias: [],
+        group: 'cheat',
+        argDescription: '<anim>',
+        description: '',
+        cb: ({ nbParam, param1 }, escaper) => {
+            if (!(nbParam === 1)) {
+                Text.erP(escaper.getPlayer(), 'one param for this command')
+                return true
+            }
+
+            globals.animOnRevive = param1
+            Text.A('Set anim on revive to ' + param1)
+            return true
+        },
+    })
+
+    //-getAnimOnRevive
+    registerCommand({
+        name: 'getAnimOnRevive',
+        alias: [],
+        group: 'cheat',
+        argDescription: '',
+        description: '',
+        cb: ({ noParam }, escaper) => {
+            if (noParam) {
+                Text.P(escaper.getPlayer(), 'Anim on revive is: ' + globals.animOnRevive)
+            }
+            return true
+        },
+    })
+
+    //-setWanderTimes <min> <extra>
+    registerCommand({
+        name: 'setWanderTimes',
+        alias: [],
+        group: 'cheat',
+        argDescription: '<min> <extra>',
+        description: '',
+        cb: ({ nbParam, param1, param2 }, escaper) => {
+            if (!(nbParam === 2)) {
+                Text.erP(escaper.getPlayer(), 'two params for this command')
+                return true
+            }
+
+            if (!IsInteger(param1) || !IsInteger(param2)) {
+                Text.erP(escaper.getPlayer(), 'invalid integer')
+                return true
+            }
+
+            if (S2I(param1) < 1 || S2I(param2) < 0) {
+                Text.erP(escaper.getPlayer(), 'values must be bigger than 1')
+                return true
+            }
+
+            globals.wanderMinTime = S2I(param1)
+            globals.wanderExtraTime = S2I(param2)
+            Text.A('Set wander times to ' + param1 + ' and ' + param2)
+            return true
+        },
+    })
+
+    //-getWanderTimes
+    registerCommand({
+        name: 'getWanderTimes',
+        alias: [],
+        group: 'cheat',
+        argDescription: '',
+        description: '',
+        cb: ({ noParam }, escaper) => {
+            if (noParam) {
+                Text.P(
+                    escaper.getPlayer(),
+                    'Wander times are ' +
+                        globals.wanderMinTime +
+                        ' + a random value between 0 and ' +
+                        globals.wanderExtraTime +
+                        ' seconds'
                 )
             }
             return true

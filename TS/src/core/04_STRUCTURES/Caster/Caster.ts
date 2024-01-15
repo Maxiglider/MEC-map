@@ -1,3 +1,4 @@
+import { animUtils } from 'Utils/AnimUtils'
 import { errorHandler } from '../../../Utils/mapUtils'
 import { IsOnGround } from '../../01_libraries/Basic_functions'
 import { Escaper } from '../Escaper/Escaper'
@@ -233,7 +234,7 @@ const CasterTryToShoot = () => {
                     if (caster.isEnabled()) {
                         angleDeTir = Atan2BJ(yHero - y3, xHero - x3)
                         SetUnitFacing(caster.u, angleDeTir)
-                        SetUnitAnimation(caster.u, caster.getAnimation())
+                        animUtils.setAnimation(caster.u, caster.getAnimation())
                         new CasterShot(
                             caster.getProjectileMonsterType(),
                             x3,
@@ -430,10 +431,10 @@ export class Caster extends Monster {
 
     toJson() {
         const output = super.toJson()
-        if(output){
-            output['casterTypeLabel'] = this.casterType.label,
-            output['x'] = R2I(this.x),
-            output['y'] = R2I(this.y),
+        if (output) {
+            output['casterTypeLabel'] = this.casterType.label
+            output['x'] = R2I(this.x)
+            output['y'] = R2I(this.y)
             output['angle'] = R2I(this.angle)
         }
         return output

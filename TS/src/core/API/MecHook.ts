@@ -1,9 +1,9 @@
 import type { MecHookArray } from './MecHookArray'
 
-export class MecHook {
+export class MecHook<T extends (...args: any) => any> {
     static lastId = -1
 
-    static mecHooksAll = new Map<number, MecHook>()
+    static mecHooksAll = new Map<number, MecHook<any>>()
 
     static destroy = (hookId: number) => {
         const hook = MecHook.mecHooksAll.get(hookId)
@@ -18,20 +18,21 @@ export class MecHook {
     }
 
     private id: number
-    private cb: (this: void, args: any) => any
-    public mecHookArray?: MecHookArray
+    private cb: T
+    public mecHookArray?: MecHookArray<T>
 
-    constructor(cb: (this: void) => any) {
+    constructor(cb: T) {
         this.id = ++MecHook.lastId
         this.cb = cb
-        MecHook.mecHooksAll.set(this.id, this)
+        MecHook.mecHooksAll.set(this.id, this as any)
     }
 
     public getId = () => {
         return this.id
     }
 
-    public execute = (args: any) => {
+    // The type should be `...args: Parameters<T>` but TSTL doesn't support it so currently hooks only support 1 typed argument
+    public execute = (args: Parameters<T>[0]) => {
         return this.cb(args)
     }
 }

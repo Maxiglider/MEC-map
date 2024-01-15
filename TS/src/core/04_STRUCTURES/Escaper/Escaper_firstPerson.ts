@@ -79,7 +79,7 @@ export class EscaperFirstPerson {
                                     const newXd = Math.floor(newX / 64) * 64 + 32
                                     const newYd = Math.floor(newY / 64) * 64 + 32
 
-                                    if (pathingBlockerUtils.pathingBlockerMap[`${newXd}_${newYd}`]) {
+                                    if (pathingBlockerUtils.isBlocked(newXd, newYd)) {
                                         preventMove = true
                                     }
                                 }

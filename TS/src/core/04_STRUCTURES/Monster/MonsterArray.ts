@@ -18,8 +18,8 @@ export class MonsterArray extends BaseArray<Monster> {
     private level?: Level
 
     //hooks
-    public hooks_onBeforeCreateMonsterUnit = new MecHookArray()
-    public hooks_onAfterCreateMonsterUnit = new MecHookArray()
+    public hooks_onBeforeCreateMonsterUnit = new MecHookArray<(monster: Partial<Monster>) => void>()
+    public hooks_onAfterCreateMonsterUnit = new MecHookArray<(monster: Partial<Monster>) => void>()
 
     constructor(level?: Level) {
         super(false)

@@ -3,6 +3,7 @@ import { MemoryHandler } from 'Utils/MemoryHandler'
 import { ThemeUtils } from 'Utils/ThemeUtils'
 import { arrayPush } from 'core/01_libraries/Basic_functions'
 import { Text } from 'core/01_libraries/Text'
+import { hooks } from 'core/API/GeneralHooks'
 import { getUdgEscapers, getUdgLevels } from '../../../../globals'
 import { MecHookArray } from '../../API/MecHookArray'
 import type { CasterType } from '../Caster/CasterType'
@@ -46,8 +47,8 @@ export class Level {
     regions: RegionArray
 
     //hooks
-    public hooks_onStart = new MecHookArray()
-    public hooks_onEnd = new MecHookArray()
+    public hooks_onStart = new MecHookArray<(level: Level) => void>()
+    public hooks_onEnd = new MecHookArray<(level: Level) => void>()
 
     constructor() {
         this.visibilities = new VisibilityModifierArray(this)
@@ -96,6 +97,12 @@ export class Level {
                     hook.execute(this)
                 }
             }
+
+            if (hooks.hooks_onStartLevelAny) {
+                for (const hook of hooks.hooks_onStartLevelAny.getHooks()) {
+                    hook.execute(this)
+                }
+            }
         } else {
             this.monsters.removeMonstersUnits()
             this.monsterSpawns.deactivate()
@@ -105,6 +112,12 @@ export class Level {
 
             if (this.hooks_onEnd) {
                 for (const hook of this.hooks_onEnd.getHooks()) {
+                    hook.execute(this)
+                }
+            }
+
+            if (hooks.hooks_onEndLevelAny) {
+                for (const hook of hooks.hooks_onEndLevelAny.getHooks()) {
                     hook.execute(this)
                 }
             }

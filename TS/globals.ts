@@ -25,6 +25,9 @@ export const globals: {
     coopCircles: boolean
     heroToEscaperHandles: { [heroId: number]: number }
     canSlideOverPathingBlockers: boolean
+    animOnRevive: string
+    wanderMinTime: number
+    wanderExtraTime: number
 } = {
     logStrings: [],
     MAP_MIN_X: 0,
@@ -37,6 +40,9 @@ export const globals: {
     coopCircles: true,
     heroToEscaperHandles: {},
     canSlideOverPathingBlockers: true,
+    animOnRevive: 'channel',
+    wanderMinTime: 5,
+    wanderExtraTime: 7,
 }
 
 //SETTERS - GETTERS

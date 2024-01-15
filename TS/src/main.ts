@@ -21,6 +21,9 @@ import { PROD } from './env'
 // [X] Support for pathing blockers with a new command: -setCanSlideOverPathingBlockers; prevents sliders from going through pathing blockers
 // [X] New cmds, -createRegion, displayRegions, deleteRegion, getRegionAtPoint, moveRegionPoint. Not used for many things yet. Also new cmds: setRegionFlag, setMonsterWanderable; Used to recreate Slide Kitty Slide :)
 // [X] New make cmd: -copyLevel; copies the current making level to a new one
+// [X] SKS; setAnimOnRevive cmd (for the revive anim), kitty has a different one than DH
+// [X] SKS; progression; support pathing blocker?
+// [X] SKS; setMonsterWanderableTimeout <monsterType> <min> <max>; set the timeout in sec;; Shud create a custom hook in SKS map to execute this on new level start
 
 const tsMain = () => {
     ServiceManager.registerServices({

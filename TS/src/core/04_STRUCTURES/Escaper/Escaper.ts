@@ -1,4 +1,5 @@
 import { ServiceManager } from 'Services'
+import { animUtils } from 'Utils/AnimUtils'
 import { EffectUtils } from 'Utils/EffectUtils'
 import { GetUnitZEx } from 'Utils/LocationUtils'
 import { IPoint, createPoint } from 'Utils/Point'
@@ -1979,7 +1980,7 @@ export class Escaper {
             const yHero = GetUnitY(this.hero)
             this.revive(xHero, yHero, 'coop')
             RunCoopSoundOnHero(this.hero)
-            SetUnitAnimation(this.hero, 'channel')
+            animUtils.setAnimation(this.hero, globals.animOnRevive || 'channel')
             this.absoluteSlideSpeed(0)
             this.setCoopInvul(true)
         }
@@ -1987,7 +1988,7 @@ export class Escaper {
         if (mirrorHero && mirrorEscaper) {
             mirrorEscaper.revive(GetUnitX(mirrorHero), GetUnitY(mirrorHero), 'coop')
             RunCoopSoundOnHero(mirrorHero)
-            SetUnitAnimation(mirrorHero, 'channel')
+            animUtils.setAnimation(mirrorHero, globals.animOnRevive || 'channel')
             mirrorEscaper.absoluteSlideSpeed(0)
             mirrorEscaper.setCoopInvul(true)
         }

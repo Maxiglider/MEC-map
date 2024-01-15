@@ -1,6 +1,7 @@
 import { ServiceManager } from 'Services'
 import { pathingBlockerUtils } from 'Utils/PathingBlockerUtils'
 import { progressionUtils } from 'Utils/ProgressionUtils'
+import { Level } from 'core/04_STRUCTURES/Level/Level'
 import { getUdgEscapers, getUdgLevels, getUdgMonsterTypes, getUdgTerrainTypes, globals } from '../../../globals'
 import { errorHandler } from '../../Utils/mapUtils'
 import { SetMeteorEffect } from '../04_STRUCTURES/Escaper/Escaper'
@@ -21,8 +22,8 @@ export const MEC_core_API = {
             LoadMapFromCache.gameDataJsonString = jsonString
             LoadMapFromCache.initializeGameData()
 
-            progressionUtils.init()
             pathingBlockerUtils.init()
+            progressionUtils.init()
         })()
     },
 
@@ -72,6 +73,14 @@ export const MEC_core_API = {
         return null
     },
 
+    onStartLevelAny: (cb: (level: Level) => any) => {
+        return hooks.hooks_onStartLevelAny.new(cb)
+    },
+
+    onEndLevelAny: (cb: (level: Level) => any) => {
+        return hooks.hooks_onEndLevelAny.new(cb)
+    },
+
     //terrain
     terrain: {
         reinitTypes: ReinitTerrains.ReinitTerrains,
@@ -105,4 +114,8 @@ export const MEC_core_API = {
 
     removeMonsterType: (label: string) => getUdgMonsterTypes().remove(label),
     removeMonsterSpawn: (level: number, ms: string) => getUdgLevels().get(level)?.monsterSpawns.clearMonsterSpawn(ms),
+
+    reinitProgressionMap: (forcedLevelIndex?: number) => progressionUtils.init({ forcedLevelIndex }),
+    setWanderMinTime: (time: number) => (globals.wanderMinTime = time),
+    setWanderExtraTime: (time: number) => (globals.wanderExtraTime = time),
 }

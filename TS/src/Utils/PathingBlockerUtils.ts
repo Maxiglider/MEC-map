@@ -1,7 +1,7 @@
 import { globals } from '../../globals'
 
 const initPathingBlockerUtils = () => {
-    const pathingBlockerMap: { [x_y: string]: boolean } = {}
+    const pathingBlockerMap: { [x: string]: { [y: string]: boolean } } = {}
 
     const init = () => {
         EnumDestructablesInRect(
@@ -10,8 +10,21 @@ const initPathingBlockerUtils = () => {
             () => {
                 const d = GetEnumDestructable()
 
-                if (GetDestructableName(d).includes('Pathing Blocker')) {
-                    pathingBlockerMap[`${Math.floor(GetDestructableX(d))}_${Math.floor(GetDestructableY(d))}`] = true
+                if (
+                    GetDestructableTypeId(d) === FourCC('YTlb') ||
+                    GetDestructableTypeId(d) === FourCC('Ytlc') ||
+                    GetDestructableTypeId(d) === FourCC('YTab') ||
+                    GetDestructableTypeId(d) === FourCC('YTac') ||
+                    GetDestructableTypeId(d) === FourCC('YTfb') ||
+                    GetDestructableTypeId(d) === FourCC('YTfc') ||
+                    GetDestructableTypeId(d) === FourCC('YTpb') ||
+                    GetDestructableTypeId(d) === FourCC('YTpc')
+                ) {
+                    if (!pathingBlockerMap[Math.floor(GetDestructableX(d))]) {
+                        pathingBlockerMap[Math.floor(GetDestructableX(d))] = {}
+                    }
+
+                    pathingBlockerMap[Math.floor(GetDestructableX(d))][Math.floor(GetDestructableY(d))] = true
                 }
             }
         )
@@ -19,7 +32,7 @@ const initPathingBlockerUtils = () => {
 
     return {
         init,
-        pathingBlockerMap,
+        isBlocked: (x: number, y: number) => pathingBlockerMap[x]?.[y],
     }
 }
 
