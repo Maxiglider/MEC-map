@@ -23,7 +23,7 @@ import { PROD } from './env'
 // [X] New make cmd: -copyLevel; copies the current making level to a new one
 // [X] SKS; setAnimOnRevive cmd (for the revive anim), kitty has a different one than DH
 // [X] SKS; progression; support pathing blocker?
-// [X] SKS; setMonsterWanderableTimeout <monsterType> <min> <max>; set the timeout in sec;; Shud create a custom hook in SKS map to execute this on new level start
+// [X] SKS; setMonsterWanderableTimeout <monsterType> <min> <max>; set the timeout in sec
 
 const tsMain = () => {
     ServiceManager.registerServices({

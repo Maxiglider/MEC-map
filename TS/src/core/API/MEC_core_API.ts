@@ -6,6 +6,7 @@ import { getUdgEscapers, getUdgLevels, getUdgMonsterTypes, getUdgTerrainTypes, g
 import { errorHandler } from '../../Utils/mapUtils'
 import { SetMeteorEffect } from '../04_STRUCTURES/Escaper/Escaper'
 import { Hero2Escaper, IsHero } from '../04_STRUCTURES/Escaper/Escaper_functions'
+import { MonsterNoMove } from '../04_STRUCTURES/Monster/MonsterNoMove'
 import { MonsterSimplePatrol, createMonsterSmartPatrol } from '../04_STRUCTURES/Monster/MonsterSimplePatrol'
 import { makingRightsToAll } from '../06_COMMANDS/Rights/manage_rights'
 import { LoadMapFromCache } from '../07_TRIGGERS/Load_map_from_gamecache/LoadMapFromCache'
@@ -119,4 +120,21 @@ export const MEC_core_API = {
     setWanderMinTime: (time: number) => (globals.wanderMinTime = time),
     setWanderExtraTime: (time: number) => (globals.wanderExtraTime = time),
     setForceReviveAtStart: (b: boolean) => (globals.forceReviveAtStart = b),
+
+    createMonsterNoMoveForLevel: (levelId: number, mtLabel: string, x: number, y: number) => {
+        const mt = getUdgMonsterTypes().getByLabel(mtLabel)
+        const level = getUdgLevels().get(levelId)
+
+        if (mt && level) {
+            level.monsters.new(new MonsterNoMove(mt, x, y, 0), true)
+        }
+    },
+
+    removeMonsterNoMoveForLevel: (levelId: number, monsterId: number) => {
+        const level = getUdgLevels().get(levelId)
+
+        if (level) {
+            level.monsters.clearMonster(monsterId)
+        }
+    },
 }
