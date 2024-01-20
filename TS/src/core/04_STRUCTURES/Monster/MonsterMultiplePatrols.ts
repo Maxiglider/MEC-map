@@ -199,6 +199,18 @@ export class MonsterMultiplePatrols extends Monster {
         TriggerRegisterEnterRegionSimple(this.t[id], this.r[id])
     }
 
+    setLocAt(id: number, x: number, y: number) {
+        this.x[id] = x
+        this.y[id] = y
+        RemoveRegion(this.r[id])
+        this.r[id] = NewRegion(x, y)
+        DestroyTrigger(this.t[id])
+        this.t[id] = CreateTrigger()
+        DisableTrigger(this.t[id])
+        TriggerAddAction(this.t[id], errorHandler(MonsterMultiplePatrols_move_Actions))
+        TriggerRegisterEnterRegionSimple(this.t[id], this.r[id])
+    }
+
     addNewLoc(x: number, y: number) {
         let lastLocInd = this.x.length - 1
 

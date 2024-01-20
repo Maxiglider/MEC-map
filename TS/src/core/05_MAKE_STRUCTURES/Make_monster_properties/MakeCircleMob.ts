@@ -44,6 +44,8 @@ export class MakeCircleMob extends Make {
             this.circleMob = this.escaper
                 .getMakingLevel()
                 .circleMobs.new(this.triggerMob, this.speed, this.direction, this.facing, this.radius)
+
+            this.circleMob.activate(true)
         }
     }
 

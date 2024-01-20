@@ -1780,6 +1780,20 @@ export class Escaper {
         }
     }
 
+    makeSetCircleMobInitialAngle(initialAngle: number) {
+        this.destroyMake()
+        if (this.hero) {
+            this.make = new MakePropertyChange(
+                this.hero,
+                'initialAngle',
+                initialAngle,
+                (x, y) => this.getMakingLevel().monsters.getMonsterNear(x, y)?.getCircleMob(),
+                monster => monster.getInitialAngle(),
+                (monster, initialAngle) => monster.setInitialAngle(initialAngle)
+            )
+        }
+    }
+
     makeSetCircleMobRadius(radius: number) {
         this.destroyMake()
         if (this.hero) {

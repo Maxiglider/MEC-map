@@ -24,6 +24,9 @@ import { PROD } from './env'
 // [X] SKS; setAnimOnRevive cmd (for the revive anim), kitty has a different one than DH
 // [X] SKS; progression; support pathing blocker?
 // [X] SKS; setMonsterWanderableTimeout <monsterType> <min> <max>; set the timeout in sec
+// [X] New make cmd: -snapPatrolsToSlide; Kinda like snapPatrolsToGrid but snaps to nearest slide terrain instead of grid, better.
+// [X] Improved CircleMob logic
+// [X] New make cmd: -setCircleMobInitialAngle; Force the initial angle on a CircleMob to time it with other CircleMobs
 
 const tsMain = () => {
     ServiceManager.registerServices({

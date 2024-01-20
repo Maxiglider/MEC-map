@@ -83,7 +83,7 @@ export class Level {
             this.meteors.createMeteorsItems()
             this.clearMobs.initializeClearMobs()
             this.portalMobs.initializePortalMobs()
-            this.circleMobs.initializeCircleMobs()
+            this.circleMobs.activate(true)
             this.staticSlides.activate(true)
 
             if (getUdgLevels().getLevelProgression() === 'all') {
@@ -107,6 +107,7 @@ export class Level {
             this.monsters.removeMonstersUnits()
             this.monsterSpawns.deactivate()
             this.meteors.removeMeteorsItems()
+            this.circleMobs.activate(false)
             this.staticSlides.activate(false)
             getUdgEscapers().deleteSpecificActionsForLevel(this)
 

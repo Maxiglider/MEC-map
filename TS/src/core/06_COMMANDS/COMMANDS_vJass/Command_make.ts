@@ -22,6 +22,7 @@ import { TerrainTypeWalk } from 'core/04_STRUCTURES/TerrainType/TerrainTypeWalk'
 import { ExchangeTerrains } from 'core/07_TRIGGERS/Triggers_to_modify_terrains/Exchange_terrains'
 import { RandomizeTerrains } from 'core/07_TRIGGERS/Triggers_to_modify_terrains/Randomize_terrains'
 import { ServiceManager } from 'Services'
+import { createPoint } from 'Utils/Point'
 import { getUdgCasterTypes, getUdgLevels, getUdgMonsterTypes, getUdgTerrainTypes } from '../../../../globals'
 import { IsInteger, IsPositiveInteger } from '../../01_libraries/Functions_on_numbers'
 import {
@@ -3232,7 +3233,7 @@ export const initExecuteCommandMake = () => {
         },
     })
 
-    //-setCircleMobSpeed(scms) <speed>
+    //-setCircleMobSpeed(setcims) <speed>
     registerCommand({
         name: 'setCircleMobSpeed',
         alias: ['setcims'],
@@ -3251,7 +3252,7 @@ export const initExecuteCommandMake = () => {
         },
     })
 
-    //-setCircleMobDirection(scmd) <direction>
+    //-setCircleMobDirection(setcimd) <direction>
     registerCommand({
         name: 'setCircleMobDirection',
         alias: ['setcimd'],
@@ -3271,7 +3272,7 @@ export const initExecuteCommandMake = () => {
         },
     })
 
-    //-setCircleMobFacing(scmf) <facing>
+    //-setCircleMobFacing(setcimf) <facing>
     registerCommand({
         name: 'setCircleMobFacing',
         alias: ['setcimf'],
@@ -3291,7 +3292,28 @@ export const initExecuteCommandMake = () => {
         },
     })
 
-    //-setCircleMobRadius(scmr) <radius>
+    //-setCircleMobInitialAngle(setcimia) <angle>
+    registerCommand({
+        name: 'setCircleMobInitialAngle',
+        alias: ['setcimia'],
+        group: 'make',
+        argDescription: '<angle>',
+        description: '',
+        cb: ({ param1 }, escaper) => {
+            const angle = convertTextToAngle(param1)
+
+            if (!angle) {
+                Text.erP(escaper.getPlayer(), 'Angle must be > 0 and <= 360')
+                return true
+            }
+
+            escaper.makeSetCircleMobInitialAngle(angle)
+            Text.mkP(escaper.getPlayer(), 'Click on the circle to apply')
+            return true
+        },
+    })
+
+    //-setCircleMobRadius(setcimr) <radius>
     registerCommand({
         name: 'setCircleMobRadius',
         alias: ['setcimr'],
@@ -3685,24 +3707,24 @@ export const initExecuteCommandMake = () => {
         description: 'snap all patrols to nearest <value>',
         cb: ({ nbParam, param1 }, escaper) => {
             if (nbParam === 1) {
-                escaper.roundToGrid = S2I(param1) > 1 && S2I(param1) <= 128 ? S2I(param1) : null
+                const roundToGrid = S2I(param1) > 1 && S2I(param1) <= 128 ? S2I(param1) : null
 
                 // todo should turn this into a ctrl+z able action
-                if (escaper.roundToGrid) {
+                if (roundToGrid) {
                     for (const [_, level] of pairs(getUdgLevels().getAll())) {
                         for (const [_, monster] of pairs(level.monsters.getAll())) {
                             if (monster instanceof MonsterSimplePatrol) {
-                                monster.x1 = Math.round(monster.x1 / escaper.roundToGrid) * escaper.roundToGrid
-                                monster.y1 = Math.round(monster.y1 / escaper.roundToGrid) * escaper.roundToGrid
-                                monster.x2 = Math.round(monster.x2 / escaper.roundToGrid) * escaper.roundToGrid
-                                monster.y2 = Math.round(monster.y2 / escaper.roundToGrid) * escaper.roundToGrid
+                                monster.x1 = Math.round(monster.x1 / roundToGrid) * roundToGrid
+                                monster.y1 = Math.round(monster.y1 / roundToGrid) * roundToGrid
+                                monster.x2 = Math.round(monster.x2 / roundToGrid) * roundToGrid
+                                monster.y2 = Math.round(monster.y2 / roundToGrid) * roundToGrid
                             } else if (monster instanceof MonsterNoMove) {
-                                monster.x = Math.round(monster.x / escaper.roundToGrid) * escaper.roundToGrid
-                                monster.y = Math.round(monster.y / escaper.roundToGrid) * escaper.roundToGrid
+                                monster.x = Math.round(monster.x / roundToGrid) * roundToGrid
+                                monster.y = Math.round(monster.y / roundToGrid) * roundToGrid
                             } else if (monster instanceof MonsterMultiplePatrols) {
                                 for (let i = 0; i < monster.x.length; i++) {
-                                    monster.x[i] = Math.round(monster.x[i] / escaper.roundToGrid) * escaper.roundToGrid
-                                    monster.y[i] = Math.round(monster.y[i] / escaper.roundToGrid) * escaper.roundToGrid
+                                    monster.x[i] = Math.round(monster.x[i] / roundToGrid) * roundToGrid
+                                    monster.y[i] = Math.round(monster.y[i] / roundToGrid) * roundToGrid
                                 }
                             }
                         }
@@ -3711,10 +3733,155 @@ export const initExecuteCommandMake = () => {
 
                 getUdgLevels().reloadAllLevels()
 
-                Text.mkP(escaper.getPlayer(), `Snapped all monsters to: '${escaper.roundToGrid}'`)
+                Text.mkP(escaper.getPlayer(), `Snapped all monsters to: '${roundToGrid}'`)
             }
 
             return true
         },
     })
+
+    // -snapPatrolsToSlide <value> [boolean fixStartOnSlidePatrols]
+    registerCommand({
+        name: 'snapPatrolsToSlide',
+        alias: ['spts'],
+        group: 'make',
+        argDescription: '<value> [boolean fixStartOnSlidePatrols]',
+        description: 'snap all patrols to nearest slide terrain with an offset of <value>',
+        cb: ({ nbParam, param1, param2 }, escaper) => {
+            if (nbParam === 1 || nbParam === 2) {
+                const snapToSlide = S2I(param1)
+
+                if (snapToSlide > 256) {
+                    Text.erP(escaper.getPlayer(), `Snap to slide value must be between -256 and 256`)
+                    return true
+                }
+
+                const fixStartOnSlidePatrols = S2B(param2)
+
+                // todo should turn this into a ctrl+z able action
+                if (snapToSlide) {
+                    for (const [_, level] of pairs(getUdgLevels().getAll())) {
+                        for (const [_, monster] of pairs(level.monsters.getAll())) {
+                            if (monster instanceof MonsterSimplePatrol) {
+                                const p1 = snapPointToSlide(
+                                    monster.x1,
+                                    monster.y1,
+                                    monster.x2,
+                                    monster.y2,
+                                    snapToSlide,
+                                    fixStartOnSlidePatrols
+                                )
+
+                                const p2 = snapPointToSlide(
+                                    monster.x2,
+                                    monster.y2,
+                                    monster.x1,
+                                    monster.y1,
+                                    snapToSlide,
+                                    fixStartOnSlidePatrols
+                                )
+
+                                monster.x1 = p1.x
+                                monster.y1 = p1.y
+                                monster.x2 = p2.x
+                                monster.y2 = p2.y
+
+                                p1.__destroy()
+                                p2.__destroy()
+                            } else if (monster instanceof MonsterMultiplePatrols) {
+                                for (let i = 0; i < monster.x.length; i++) {
+                                    const nx = i + 1 > monster.x.length - 1 ? 0 : i + 1
+                                    const ny = i + 1 > monster.y.length - 1 ? 0 : i + 1
+
+                                    const p1 = snapPointToSlide(
+                                        monster.x[i],
+                                        monster.y[i],
+                                        monster.x[nx],
+                                        monster.y[ny],
+                                        snapToSlide,
+                                        fixStartOnSlidePatrols
+                                    )
+
+                                    monster.setLocAt(i, p1.x, p1.y)
+                                    p1.__destroy()
+                                }
+                            }
+                        }
+                    }
+                }
+
+                getUdgLevels().reloadAllLevels()
+
+                Text.mkP(escaper.getPlayer(), `Snapped all monsters to: '${snapToSlide}'`)
+            }
+
+            return true
+        },
+    })
+
+    const snapPointToSlide = (
+        x1: number,
+        y1: number,
+        x2: number,
+        y2: number,
+        preferredDistance: number,
+        fixStartOnSlidePatrols: boolean
+    ) => {
+        const currentTerrain = getUdgTerrainTypes().getTerrainType(x1, y1)
+        let newX = x1
+        let newY = y1
+
+        if (currentTerrain?.kind === 'death') {
+            const angle = Atan2(y2 - y1, x2 - x1)
+            let currentX: number | undefined = undefined
+            let currentY: number | undefined = undefined
+
+            for (let i = 0; i <= 256; i++) {
+                const testX = x1 + Math.cos(angle) * i
+                const testY = y1 + Math.sin(angle) * i
+                const tt = getUdgTerrainTypes().getTerrainType(testX, testY)
+
+                if (tt?.kind === 'slide' || tt?.kind === 'walk') {
+                    currentX = testX
+                    currentY = testY
+                    break
+                }
+            }
+
+            if (currentX !== undefined && currentY !== undefined) {
+                const oppositeAngle = angle + Math.PI
+
+                newX = currentX + Math.cos(oppositeAngle) * preferredDistance
+                newY = currentY + Math.sin(oppositeAngle) * preferredDistance
+            }
+        }
+
+        if (fixStartOnSlidePatrols && (currentTerrain?.kind === 'slide' || currentTerrain?.kind === 'walk')) {
+            const angle = Atan2(y2 - y1, x2 - x1) + Math.PI
+
+            let currentX: number | undefined = undefined
+            let currentY: number | undefined = undefined
+
+            for (let i = 0; i <= 256; i++) {
+                const testX = x1 + Math.cos(angle) * i
+                const testY = y1 + Math.sin(angle) * i
+                const tt = getUdgTerrainTypes().getTerrainType(testX, testY)
+
+                if (tt?.kind === 'death') {
+                    currentX = testX
+                    currentY = testY
+                    break
+                }
+            }
+
+            if (currentX !== undefined && currentY !== undefined) {
+                const oppositeAngle = angle
+
+                newX = currentX + Math.cos(oppositeAngle) * preferredDistance
+                newY = currentY + Math.sin(oppositeAngle) * preferredDistance
+            }
+        }
+
+        return createPoint(newX, newY)
+    }
 }

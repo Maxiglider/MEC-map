@@ -43,6 +43,8 @@ export class CircleMobArray extends BaseArray<CircleMob> {
             } else {
                 const circleMob = this.new(mainMob, cm.rotationSpeed, cm.direction, cm.facing, cm.radius)
 
+                circleMob.setInitialAngle(cm.initialAngle)
+
                 for (const [_, blockMobId] of pairs(cm.blockMobsIds)) {
                     const mob = this.level.monsters.get(blockMobId)
 
@@ -93,9 +95,9 @@ export class CircleMobArray extends BaseArray<CircleMob> {
         return null
     }
 
-    initializeCircleMobs = () => {
+    activate = (activ: boolean) => {
         for (const [_, circleMob] of pairs(this.data)) {
-            circleMob.initialize()
+            circleMob.activate(activ)
         }
     }
 
