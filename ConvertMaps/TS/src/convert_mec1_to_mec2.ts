@@ -1,5 +1,6 @@
 import { copyFileSync, existsSync, readFileSync, renameSync, writeFileSync } from 'fs'
 import { copySync } from 'fs-extra'
+import Import from 'mdx-m3-viewer/dist/cjs/parsers/w3x/imp/import'
 import War3Map from 'mdx-m3-viewer/dist/cjs/parsers/w3x/map'
 import path, { normalize } from 'path'
 import { simpleExec } from './Utils/SimpleExec'
@@ -66,12 +67,17 @@ const initMain = async () => {
                 'war3map.w3q',
                 'war3map.w3h',
                 'war3map.imp',
+                'war3map.wpm',
 
                 // Info
+                'war3map.mmp',
+                'war3mapMap.blp',
+                'war3mapMap.b00',
+                'war3mapMap.tga',
                 'war3mapPreview.tga',
-                'war3mapmap.tga',
             ]
 
+            const importedFileTypes: { [importedFile: string]: number } = {}
             const fileData: { [transferFile: string]: ArrayBuffer } = {}
 
             // Extract
@@ -79,8 +85,16 @@ const initMain = async () => {
                 const war3Map = new War3Map()
                 war3Map.load(readFileSync(originalFile).buffer)
 
-                for (const importedFile of war3Map.getImportNames()) {
-                    transferFiles.push(importedFile)
+                for (const file of war3Map.imports.entries.values()) {
+                    if (file.isCustom === 10 || file.isCustom === 13) {
+                        transferFiles.push(file.path)
+                        importedFileTypes[file.path] = file.isCustom
+                    } else if (file.path) {
+                        const path = `war3mapImported\\${file.path}`
+
+                        transferFiles.push(path)
+                        importedFileTypes[path] = file.isCustom
+                    }
                 }
 
                 let nbExtractedFiles = 0
@@ -112,8 +126,17 @@ const initMain = async () => {
 
                 for (const file of transferFiles) {
                     if (fileData[file]) {
-                        if (!war3Map.set(file, fileData[file])) {
-                            console.log(`Error while importing ${file}`)
+                        if (importedFileTypes[file]) {
+                            if (war3Map.archive.set(file, fileData[file])) {
+                                const entry = new Import()
+                                entry.isCustom = importedFileTypes[file]
+                                entry.path = file
+                                war3Map.imports.entries.set(file, entry)
+                            }
+                        } else {
+                            if (!war3Map.import(file, fileData[file])) {
+                                console.log(`Error while importing ${file}`)
+                            }
                         }
                     }
                 }
