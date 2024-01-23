@@ -1,13 +1,12 @@
 import { MemoryHandler } from 'Utils/MemoryHandler'
 import { createPoint } from 'Utils/Point'
+import { createEvent } from 'Utils/mapUtils'
+import { hooks } from 'core/API/GeneralHooks'
 import { GREY, TERRAIN_DATA_DISPLAY_TIME } from '../../01_libraries/Constants'
 import { udg_colorCode } from '../../01_libraries/Init_colorCodes'
 import { Text } from '../../01_libraries/Text'
+import { Hero2Escaper } from '../Escaper/Escaper_functions'
 import { Level } from '../Level/Level'
-
-export const regionFlags = ['wanderable'] as const
-
-export type IRegionFlags = (typeof regionFlags)[number]
 
 export class Region {
     private static lastInstanceId = -1
@@ -25,7 +24,13 @@ export class Region {
     private maxX: number
     private maxY: number
 
-    private flags: IRegionFlags[] = []
+    private flags: string[] = []
+
+    private wRect: rect | null = null
+    private wRectOnce: { [x: number]: boolean } = {}
+    private wTrigger: trigger | null = null
+
+    private activeB = false
 
     constructor(label: string, x1: number, y1: number, x2: number, y2: number) {
         this.id = Region.getNextId()
@@ -34,6 +39,11 @@ export class Region {
         this.minY = Math.round(RMinBJ(y1, y2))
         this.maxX = Math.round(RMaxBJ(x1, x2))
         this.maxY = Math.round(RMaxBJ(y1, y2))
+    }
+
+    activate = (activ: boolean) => {
+        this.activeB = activ
+        this.recalcRect()
     }
 
     getId() {
@@ -79,6 +89,47 @@ export class Region {
         this.minY = Math.round(RMinBJ(y1, y2))
         this.maxX = Math.round(RMaxBJ(x1, x2))
         this.maxY = Math.round(RMaxBJ(y1, y2))
+        this.recalcRect()
+    }
+
+    recalcRect = () => {
+        this.wRect && RemoveRect(this.wRect)
+
+        if (this.activeB) {
+            this.wRect = Rect(this.minX, this.minY, this.maxX, this.maxY)
+
+            if (hooks.hooks_onHeroEnterRegion || hooks.hooks_onHeroEnterRegionOnce) {
+                this.wTrigger && DestroyTrigger(this.wTrigger)
+                this.wTrigger = createEvent({
+                    events: [t => this.wRect && TriggerRegisterEnterRectSimple(t, this.wRect)],
+                    actions: [
+                        () => {
+                            const escaper = Hero2Escaper(GetTriggerUnit())
+
+                            if (escaper) {
+                                if (hooks.hooks_onHeroEnterRegion) {
+                                    for (const hook of hooks.hooks_onHeroEnterRegion.getHooks()) {
+                                        hook.execute2(escaper, this)
+                                    }
+                                }
+
+                                if (!this.wRectOnce[escaper.getId()]) {
+                                    this.wRectOnce[escaper.getId()] = true
+
+                                    if (hooks.hooks_onHeroEnterRegionOnce) {
+                                        for (const hook of hooks.hooks_onHeroEnterRegionOnce.getHooks()) {
+                                            hook.execute2(escaper, this)
+                                        }
+                                    }
+                                }
+                            }
+                        },
+                    ],
+                })
+            }
+        } else {
+            this.wTrigger && DestroyTrigger(this.wTrigger)
+        }
     }
 
     getRandomPoint = () => {
@@ -102,15 +153,15 @@ export class Region {
         Text.P_timed(p, TERRAIN_DATA_DISPLAY_TIME, display)
     }
 
-    setFlags = (flags: IRegionFlags[]) => {
+    setFlags = (flags: string[]) => {
         this.flags = flags
     }
 
-    hasFlag = (flag: IRegionFlags) => {
+    hasFlag = (flag: string) => {
         return this.flags.includes(flag)
     }
 
-    setFlag = (flag: IRegionFlags, b: boolean) => {
+    setFlag = (flag: string, b: boolean) => {
         if (b) {
             if (!this.flags.includes(flag)) {
                 this.flags.push(flag)

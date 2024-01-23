@@ -1,7 +1,9 @@
 import { ServiceManager } from 'Services'
 import { pathingBlockerUtils } from 'Utils/PathingBlockerUtils'
 import { progressionUtils } from 'Utils/ProgressionUtils'
+import { Escaper } from 'core/04_STRUCTURES/Escaper/Escaper'
 import { Level } from 'core/04_STRUCTURES/Level/Level'
+import { Region } from 'core/04_STRUCTURES/Region/Region'
 import { getUdgEscapers, getUdgLevels, getUdgMonsterTypes, getUdgTerrainTypes, globals } from '../../../globals'
 import { errorHandler } from '../../Utils/mapUtils'
 import { SetMeteorEffect } from '../04_STRUCTURES/Escaper/Escaper'
@@ -80,6 +82,18 @@ export const MEC_core_API = {
 
     onEndLevelAny: (cb: (level: Level) => any) => {
         return hooks.hooks_onEndLevelAny.new(cb)
+    },
+
+    onCoopHeroRevive: (cb: (reviver: Escaper, revived: Escaper) => any) => {
+        return hooks.hooks_onCoopHeroRevive.new(cb)
+    },
+
+    onHeroEnterRegion: (cb: (escaper: Escaper, region: Region) => any) => {
+        return hooks.hooks_onHeroEnterRegion.new(cb)
+    },
+
+    onHeroEnterRegionOnce: (cb: (escaper: Escaper, region: Region) => any) => {
+        return hooks.hooks_onHeroEnterRegionOnce.new(cb)
     },
 
     //terrain

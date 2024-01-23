@@ -213,6 +213,9 @@ export class Escaper {
     private panCameraOnRevive: 'coop' | 'all' | 'none' = 'coop'
     public panCameraOnPortal = true
 
+    private tempSlideSpeedTimer: Timer | null = null
+    private tempSlideSpeedEffect: effect | null = null
+
     private displayName: string
 
     private showNames = false
@@ -588,6 +591,11 @@ export class Escaper {
         this.textTag = null
         this.textTagTimer?.destroy()
         this.textTagTimer = null
+
+        this.tempSlideSpeedTimer?.destroy()
+        this.tempSlideSpeedTimer = null
+        this.tempSlideSpeedEffect && EffectUtils.destroyEffect(this.tempSlideSpeedEffect)
+        this.tempSlideSpeedEffect = null
     }
 
     destroy = () => {
@@ -1006,6 +1014,26 @@ export class Escaper {
     setSlideSpeed(ss: number) {
         this.slideSpeed = ss
         this.slideMovePerPeriod = ss * SLIDE_PERIOD
+    }
+
+    setSlideSpeedTemporarily(ss: number, duration: number, effect?: string) {
+        const oldSs = this.slideSpeed
+
+        this.slideSpeed = ss
+        this.slideMovePerPeriod = ss * SLIDE_PERIOD
+
+        if (this.hero && effect) {
+            this.tempSlideSpeedEffect && DestroyEffect(this.tempSlideSpeedEffect)
+            this.tempSlideSpeedEffect = AddSpecialEffectTargetUnitBJ('origin', this.hero, effect)
+        }
+
+        this.tempSlideSpeedTimer?.destroy()
+        this.tempSlideSpeedTimer = createTimer(duration, false, () => {
+            this.slideSpeed = oldSs
+            this.slideMovePerPeriod = oldSs * SLIDE_PERIOD
+
+            this.tempSlideSpeedEffect && DestroyEffect(this.tempSlideSpeedEffect)
+        })
     }
 
     //speed methods

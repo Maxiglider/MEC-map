@@ -35,7 +35,6 @@ import {
 } from '../../04_STRUCTURES/Caster/CasterType'
 import { MONSTER_TELEPORT_PERIOD_MAX, MONSTER_TELEPORT_PERIOD_MIN } from '../../04_STRUCTURES/Monster/MonsterTeleport'
 import { CLEAR_MOB_MAX_DURATION, FRONT_MONTANT_DURATION } from '../../04_STRUCTURES/Monster_properties/ClearMob'
-import { IRegionFlags, regionFlags } from '../../04_STRUCTURES/Region/Region'
 import { MakeMonsterSimplePatrol } from '../../05_MAKE_STRUCTURES/Make_create_monsters/MakeMonsterSimplePatrol'
 import { TerrainTypeFromString } from '../../07_TRIGGERS/Modify_terrain_Functions/Terrain_type_from_string'
 import { HERO_ROTATION_SPEED } from '../../07_TRIGGERS/Slide_and_CheckTerrain_triggers/SlidingMax'
@@ -2254,17 +2253,12 @@ export const initExecuteCommandMake = () => {
                 return true
             }
 
-            if (!regionFlags.includes(param2 as any)) {
-                Text.erP(escaper.getPlayer(), 'unknown region flag, options: ' + regionFlags.join(', '))
-                return true
-            }
-
             if (!IsBoolString(param3)) {
                 Text.erP(escaper.getPlayer(), "wrong \"flag boolean\" value ; should be 'true', 'false', '0' or '1'")
                 return true
             }
 
-            targetRegion.setFlag(param2 as IRegionFlags, S2B(param3))
+            targetRegion.setFlag(param2, S2B(param3))
             Text.mkP(escaper.getPlayer(), `Region: ${targetRegion.getLabel()}, flag: ${param2}, value: ${param3}`)
 
             return true

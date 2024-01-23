@@ -1,10 +1,13 @@
 import { ServiceManager } from 'Services'
-import { MemoryHandler } from 'Utils/MemoryHandler'
+import { IDestroyable, MemoryHandler } from 'Utils/MemoryHandler'
 import { ThemeUtils } from 'Utils/ThemeUtils'
+import { createTimer } from 'Utils/mapUtils'
 import { arrayPush } from 'core/01_libraries/Basic_functions'
 import { Text } from 'core/01_libraries/Text'
 import { hooks } from 'core/API/GeneralHooks'
-import { getUdgEscapers, getUdgLevels } from '../../../../globals'
+import { Timer } from 'w3ts'
+import { getUdgEscapers, getUdgLevels, getUdgTerrainTypes } from '../../../../globals'
+import { ChangeTerrainType } from '../../07_TRIGGERS/Modify_terrain_Functions/Modify_terrain_functions'
 import { MecHookArray } from '../../API/MecHookArray'
 import type { CasterType } from '../Caster/CasterType'
 import type { Escaper } from '../Escaper/Escaper'
@@ -22,6 +25,19 @@ import { TriggerArray } from './Triggers'
 import type { VisibilityModifier } from './VisibilityModifier'
 import { VisibilityModifierArray } from './VisibilityModifierArray'
 import { checkPointReviveHeroes } from './checkpointReviveHeroes_function'
+
+type ITempTerrainTypeMap = {
+    [x_y: string]:
+        | ({
+              x?: number
+              y?: number
+              terrainTypeId?: number
+              effectOnShow?: effect
+              effectOnHide?: effect
+              tempTerrainTimer?: Timer
+          } & IDestroyable)
+        | null
+}
 
 export class Level {
     public static earningLivesActivated = true
@@ -85,6 +101,8 @@ export class Level {
             this.portalMobs.initializePortalMobs()
             this.circleMobs.activate(true)
             this.staticSlides.activate(true)
+            this.regions.activate(true)
+            this.removeTempTerrainTypes()
 
             if (getUdgLevels().getLevelProgression() === 'all') {
                 if (Level.earningLivesActivated && this.getId() > 0) {
@@ -109,6 +127,8 @@ export class Level {
             this.meteors.removeMeteorsItems()
             this.circleMobs.activate(false)
             this.staticSlides.activate(false)
+            this.regions.activate(false)
+            this.removeTempTerrainTypes()
             getUdgEscapers().deleteSpecificActionsForLevel(this)
 
             if (this.hooks_onEnd) {
@@ -186,6 +206,7 @@ export class Level {
         this.monsters.destroy()
         this.monsterSpawns.destroy()
         this.destroyDebugRegions()
+        this.removeTempTerrainTypes()
     }
 
     recreateMonstersUnitsOfType(mt: MonsterType) {
@@ -344,6 +365,76 @@ export class Level {
         }
 
         this.lights.length = 0
+    }
+
+    removeTempTerrainTypes = () => {
+        for (const [key, tempTerrainType] of pairs(this.tempTerrainTypeMap)) {
+            if (tempTerrainType) {
+                tempTerrainType.terrainTypeId &&
+                    tempTerrainType.x &&
+                    tempTerrainType.y &&
+                    ChangeTerrainType(tempTerrainType.x, tempTerrainType.y, tempTerrainType.terrainTypeId)
+
+                tempTerrainType.effectOnShow && DestroyEffect(tempTerrainType.effectOnShow)
+                tempTerrainType.effectOnHide && DestroyEffect(tempTerrainType.effectOnHide)
+                tempTerrainType.tempTerrainTimer?.destroy()
+                tempTerrainType.__destroy()
+                this.tempTerrainTypeMap[key] = null
+            }
+        }
+    }
+
+    private tempTerrainTypeMap: ITempTerrainTypeMap = {}
+
+    setTerrainTypeTemporarily(
+        x: number,
+        y: number,
+        tt: string,
+        duration: number,
+        effectOnShow?: string,
+        effectOnHide?: string
+    ) {
+        const terrainType = getUdgTerrainTypes().getByLabel(tt)
+
+        if (!terrainType) {
+            return
+        }
+
+        const oldTerrainType = this.tempTerrainTypeMap[`${x}_${y}`]
+
+        if (oldTerrainType) {
+            oldTerrainType.terrainTypeId && ChangeTerrainType(x, y, oldTerrainType.terrainTypeId)
+            oldTerrainType.effectOnShow && DestroyEffect(oldTerrainType.effectOnShow)
+            oldTerrainType.effectOnHide && DestroyEffect(oldTerrainType.effectOnHide)
+            oldTerrainType.tempTerrainTimer?.destroy()
+            oldTerrainType.__destroy()
+            this.tempTerrainTypeMap[`${x}_${y}`] = null
+        }
+
+        const tempTerrainType = MemoryHandler.getEmptyObject<ITempTerrainTypeMap[string]>()
+        this.tempTerrainTypeMap[`${x}_${y}`] = tempTerrainType
+
+        tempTerrainType.x = x
+        tempTerrainType.y = y
+
+        tempTerrainType.terrainTypeId = GetTerrainType(x, y)
+        ChangeTerrainType(x, y, terrainType.getTerrainTypeId())
+
+        if (effectOnShow) {
+            tempTerrainType.effectOnShow = AddSpecialEffect(effectOnShow, x, y)
+        }
+
+        tempTerrainType.tempTerrainTimer = createTimer(duration, false, () => {
+            if (tempTerrainType.terrainTypeId) {
+                ChangeTerrainType(x, y, tempTerrainType.terrainTypeId)
+            }
+
+            tempTerrainType.effectOnShow && DestroyEffect(tempTerrainType.effectOnShow)
+
+            if (effectOnHide) {
+                tempTerrainType.effectOnHide = AddSpecialEffect(effectOnHide, x, y)
+            }
+        })
     }
 
     toJson = () => {

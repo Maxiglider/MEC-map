@@ -35,4 +35,9 @@ export class MecHook<T extends (...args: any) => any> {
     public execute = (args: Parameters<T>[0]) => {
         return this.cb(args)
     }
+
+    // Silly wrapper to support 2 typed arguments
+    public execute2 = (arg1: Parameters<T>[0], arg2: Parameters<T>[1]) => {
+        return this.cb(arg1, arg2)
+    }
 }

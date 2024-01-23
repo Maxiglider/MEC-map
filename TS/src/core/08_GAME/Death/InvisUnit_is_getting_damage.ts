@@ -5,6 +5,7 @@ import { EffectUtils } from 'Utils/EffectUtils'
 import { createEvent } from 'Utils/mapUtils'
 import { DUMMY_POWER_CIRCLE, GM_KILLING_EFFECT } from 'core/01_libraries/Constants'
 import { Monster } from 'core/04_STRUCTURES/Monster/Monster'
+import { hooks } from 'core/API/GeneralHooks'
 import { getUdgEscapers, getUdgMonsterTypes, udg_monsters } from '../../../../globals'
 
 export const InitTrig_InvisUnit_is_getting_damage = () => {
@@ -42,14 +43,22 @@ export const InitTrig_InvisUnit_is_getting_damage = () => {
                         const targetPlayer = GetUnitUserData(killingUnit)
 
                         if (escaper.alliedState[targetPlayer]) {
+                            const targetEscaper = getUdgEscapers().get(targetPlayer)
+
                             if (!escaper.isEscaperSecondary()) {
                                 ServiceManager.getService('Multiboard').increasePlayerScore(
                                     GetPlayerId(escaper.getPlayer()),
                                     'saves'
                                 )
+
+                                if (targetEscaper && hooks.hooks_onCoopHeroRevive) {
+                                    for (const hook of hooks.hooks_onCoopHeroRevive.getHooks()) {
+                                        hook.execute2(escaper, targetEscaper)
+                                    }
+                                }
                             }
 
-                            getUdgEscapers().get(targetPlayer)?.coopReviveHero()
+                            targetEscaper?.coopReviveHero()
                         }
 
                         return

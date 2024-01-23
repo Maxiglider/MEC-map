@@ -27,6 +27,9 @@ import { PROD } from './env'
 // [X] New make cmd: -snapPatrolsToSlide; Kinda like snapPatrolsToGrid but snaps to nearest slide terrain instead of grid, better.
 // [X] Improved CircleMob logic
 // [X] New make cmd: -setCircleMobInitialAngle; Force the initial angle on a CircleMob to time it with other CircleMobs
+// [X] SKS; Yoink music code from slidespongebobslide and boost skill
+// [X] SKS; Add exp on revive; add exp for reaching corners
+// [O] Show current level on multiboard
 
 const tsMain = () => {
     ServiceManager.registerServices({

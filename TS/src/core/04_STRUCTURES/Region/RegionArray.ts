@@ -3,7 +3,7 @@ import { arrayPush } from 'core/01_libraries/Basic_functions'
 import { Text } from '../../01_libraries/Text'
 import { BaseArray } from '../BaseArray'
 import type { Level } from '../Level/Level'
-import { IRegionFlags, Region } from './Region'
+import { Region } from './Region'
 
 export class RegionArray extends BaseArray<Region> {
     private level: Level
@@ -77,7 +77,7 @@ export class RegionArray extends BaseArray<Region> {
         return regions
     }
 
-    getRegionAtWithFlag = (x: number, y: number, flag: IRegionFlags) => {
+    getRegionAtWithFlag = (x: number, y: number, flag: string) => {
         for (const [_, r] of pairs(this.data)) {
             if (r.getMinX() <= x && r.getMaxX() >= x && r.getMinY() <= y && r.getMaxY() >= y) {
                 if (r.hasFlag(flag)) {
@@ -97,6 +97,12 @@ export class RegionArray extends BaseArray<Region> {
             for (const [_, r] of pairs(this.data)) {
                 r.displayForPlayer(p)
             }
+        }
+    }
+
+    activate = (activ: boolean) => {
+        for (const [_, region] of pairs(this.data)) {
+            region.activate(activ)
         }
     }
 
