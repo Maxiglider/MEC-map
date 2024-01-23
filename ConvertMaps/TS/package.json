@@ -1,0 +1,12 @@
+{
+    "name": "scripts",
+    "version": "1.0.0",
+    "main": "index.js",
+    "license": "MIT",
+    "dependencies": {
+        "@types/fs-extra": "^11.0.4",
+        "@types/node": "^20.11.5",
+        "fs-extra": "^11.2.0",
+        "mdx-m3-viewer": "^5.12.0"
+    }
+}
