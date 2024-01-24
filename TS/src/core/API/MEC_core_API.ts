@@ -151,4 +151,6 @@ export const MEC_core_API = {
             level.monsters.clearMonster(monsterId)
         }
     },
+
+    errorHandler,
 }

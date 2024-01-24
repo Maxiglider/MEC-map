@@ -1834,9 +1834,9 @@ export const initCommandAll = () => {
                 escaper.getPlayer(),
                 `Current progression: ${progressionUtils.getPlayerProgression(
                     targetEscaper
-                )}%\nHighest progression: ${progressionUtils.getPlayerProgressionLvl(targetEscaper)}%\nCurrent level: ${
-                    getUdgLevels().getCurrentLevel(targetEscaper).getId() + 1
-                }`
+                )}%\nHighest progression: ${progressionUtils.getPlayerProgressionLvl(
+                    targetEscaper
+                )}%\nCurrent level: ${getUdgLevels().getCurrentLevel(targetEscaper).getId()}`
             )
 
             return true
