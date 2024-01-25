@@ -214,7 +214,6 @@ export class Escaper {
     public panCameraOnPortal = true
 
     private tempSlideSpeedPerPeriod: number | null = null
-    private tempSlideSpeedOriginal: number | null = null
     private tempSlideSpeedTimer: Timer | null = null
     private tempSlideSpeedEffect: effect | null = null
 
@@ -593,11 +592,6 @@ export class Escaper {
         this.textTag = null
         this.textTagTimer?.destroy()
         this.textTagTimer = null
-
-        this.tempSlideSpeedTimer?.destroy()
-        this.tempSlideSpeedTimer = null
-        this.tempSlideSpeedEffect && EffectUtils.destroyEffect(this.tempSlideSpeedEffect)
-        this.tempSlideSpeedEffect = null
     }
 
     destroy = () => {
@@ -767,6 +761,8 @@ export class Escaper {
         if (this.isAlive()) {
             if (this.hero) {
                 KillUnit(this.hero)
+
+                this.disableSlideSpeedTemporarily()
             }
             return true
         }
@@ -1018,38 +1014,26 @@ export class Escaper {
         this.slideMovePerPeriod = ss * SLIDE_PERIOD
     }
 
-    setSlideSpeedTemporarily(ss: number, duration: number, effect?: string) {
-        if (this.tempSlideSpeedOriginal) {
+    disableSlideSpeedTemporarily() {
+        if (this.tempSlideSpeedTimer) {
             this.tempSlideSpeedEffect && DestroyEffect(this.tempSlideSpeedEffect)
+            this.tempSlideSpeedEffect = null
             this.tempSlideSpeedTimer?.destroy()
-            this.slideSpeed = this.tempSlideSpeedOriginal
-            this.slideMovePerPeriod = this.tempSlideSpeedOriginal * SLIDE_PERIOD
+            this.tempSlideSpeedTimer = null
             this.tempSlideSpeedPerPeriod = null
         }
+    }
 
-        this.tempSlideSpeedOriginal = this.slideSpeed
-
-        this.slideSpeed = ss
-        this.slideMovePerPeriod = ss * SLIDE_PERIOD
-
-        this.tempSlideSpeedPerPeriod = this.slideMovePerPeriod
+    setSlideSpeedTemporarily(ss: number, duration: number, effect?: string) {
+        this.disableSlideSpeedTemporarily()
+        this.tempSlideSpeedPerPeriod = ss * SLIDE_PERIOD
 
         if (this.hero && effect) {
-            this.tempSlideSpeedEffect && DestroyEffect(this.tempSlideSpeedEffect)
             this.tempSlideSpeedEffect = AddSpecialEffectTargetUnitBJ('origin', this.hero, effect)
         }
 
-        this.tempSlideSpeedTimer?.destroy()
         this.tempSlideSpeedTimer = createTimer(duration, false, () => {
-            if (this.tempSlideSpeedOriginal) {
-                this.slideSpeed = this.tempSlideSpeedOriginal
-                this.slideMovePerPeriod = this.tempSlideSpeedOriginal * SLIDE_PERIOD
-            }
-
-            this.tempSlideSpeedEffect && DestroyEffect(this.tempSlideSpeedEffect)
-            this.tempSlideSpeedEffect = null
-            this.tempSlideSpeedOriginal = null
-            this.tempSlideSpeedPerPeriod = null
+            this.disableSlideSpeedTemporarily()
         })
     }
 
