@@ -5,7 +5,7 @@ import { Escaper } from 'core/04_STRUCTURES/Escaper/Escaper'
 import { Level } from 'core/04_STRUCTURES/Level/Level'
 import { Region } from 'core/04_STRUCTURES/Region/Region'
 import { getUdgEscapers, getUdgLevels, getUdgMonsterTypes, getUdgTerrainTypes, globals } from '../../../globals'
-import { errorHandler } from '../../Utils/mapUtils'
+import { errorHandler, runInTrigger } from '../../Utils/mapUtils'
 import { SetMeteorEffect } from '../04_STRUCTURES/Escaper/Escaper'
 import { Hero2Escaper, IsHero } from '../04_STRUCTURES/Escaper/Escaper_functions'
 import { MonsterNoMove } from '../04_STRUCTURES/Monster/MonsterNoMove'
@@ -153,4 +153,5 @@ export const MEC_core_API = {
     },
 
     errorHandler,
+    runInTrigger,
 }

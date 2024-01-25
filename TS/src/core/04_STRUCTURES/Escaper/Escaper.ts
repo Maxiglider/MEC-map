@@ -213,6 +213,7 @@ export class Escaper {
     private panCameraOnRevive: 'coop' | 'all' | 'none' = 'coop'
     public panCameraOnPortal = true
 
+    private tempSlideSpeedPerPeriod: number | null = null
     private tempSlideSpeedOriginal: number | null = null
     private tempSlideSpeedTimer: Timer | null = null
     private tempSlideSpeedEffect: effect | null = null
@@ -1023,12 +1024,15 @@ export class Escaper {
             this.tempSlideSpeedTimer?.destroy()
             this.slideSpeed = this.tempSlideSpeedOriginal
             this.slideMovePerPeriod = this.tempSlideSpeedOriginal * SLIDE_PERIOD
+            this.tempSlideSpeedPerPeriod = null
         }
 
         this.tempSlideSpeedOriginal = this.slideSpeed
 
         this.slideSpeed = ss
         this.slideMovePerPeriod = ss * SLIDE_PERIOD
+
+        this.tempSlideSpeedPerPeriod = this.slideMovePerPeriod
 
         if (this.hero && effect) {
             this.tempSlideSpeedEffect && DestroyEffect(this.tempSlideSpeedEffect)
@@ -1045,6 +1049,7 @@ export class Escaper {
             this.tempSlideSpeedEffect && DestroyEffect(this.tempSlideSpeedEffect)
             this.tempSlideSpeedEffect = null
             this.tempSlideSpeedOriginal = null
+            this.tempSlideSpeedPerPeriod = null
         })
     }
 
@@ -1064,7 +1069,7 @@ export class Escaper {
     }
 
     getSlideMovePerPeriod = () => {
-        return this.slideMovePerPeriod
+        return this.tempSlideSpeedPerPeriod || this.slideMovePerPeriod
     }
 
     getMaxSlideTurnPerPeriod = () => {

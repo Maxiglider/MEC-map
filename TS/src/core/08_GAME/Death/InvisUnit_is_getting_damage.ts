@@ -15,6 +15,10 @@ export const InitTrig_InvisUnit_is_getting_damage = () => {
         events: [],
         actions: [
             () => {
+                if (GetEventDamage() === 0) {
+                    return
+                }
+
                 const invisUnit = GetTriggerUnit()
                 const n = GetUnitUserData(invisUnit)
                 const escaper = getUdgEscapers().get(n)
