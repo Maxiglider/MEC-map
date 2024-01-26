@@ -1026,7 +1026,7 @@ export class Escaper {
 
     setSlideSpeedTemporarily(ss: number, duration: number, effect?: string) {
         this.disableSlideSpeedTemporarily()
-        this.tempSlideSpeedPerPeriod = ss * SLIDE_PERIOD
+        this.tempSlideSpeedPerPeriod = (this.getSlideMirror() ? -1 : 1) * ss * SLIDE_PERIOD
 
         if (this.hero && effect) {
             this.tempSlideSpeedEffect = AddSpecialEffectTargetUnitBJ('origin', this.hero, effect)
@@ -1091,7 +1091,7 @@ export class Escaper {
 
     absoluteSlideSpeed(slideSpeed: number, isCommand = false) {
         this.slideSpeedAbsolute = true
-        this.setSlideSpeed(slideSpeed)
+        this.setSlideSpeed((this.getSlideMirror() ? -1 : 1) * slideSpeed)
         isCommand && (this.slideSpeedCmd = slideSpeed)
 
         if (!this.isEscaperSecondary()) {

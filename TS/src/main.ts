@@ -29,6 +29,7 @@ import { PROD } from './env'
 // [X] New make cmd: -setCircleMobInitialAngle; Force the initial angle on a CircleMob to time it with other CircleMobs
 // [X] SKS; Yoink music code from slidespongebobslide and boost skill
 // [X] SKS; Add exp on revive; add exp for reaching corners
+// [X] Activating speededit when mirror is on will now mirror the speededit
 // [O] Show current level on multiboard
 
 const tsMain = () => {

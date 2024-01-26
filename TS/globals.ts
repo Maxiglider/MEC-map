@@ -29,6 +29,7 @@ export const globals: {
     wanderMinTime: number
     wanderExtraTime: number
     forceReviveAtStart: boolean
+    killAfkHeroes: boolean
 } = {
     logStrings: [],
     MAP_MIN_X: 0,
@@ -45,6 +46,7 @@ export const globals: {
     wanderMinTime: 5,
     wanderExtraTime: 7,
     forceReviveAtStart: false,
+    killAfkHeroes: true,
 }
 
 //SETTERS - GETTERS
