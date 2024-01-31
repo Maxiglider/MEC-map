@@ -30,6 +30,8 @@ export const globals: {
     wanderExtraTime: number
     forceReviveAtStart: boolean
     killAfkHeroes: boolean
+    wanderEffectStr: string
+    wanderEffectFacing: boolean
 } = {
     logStrings: [],
     MAP_MIN_X: 0,
@@ -47,6 +49,8 @@ export const globals: {
     wanderExtraTime: 7,
     forceReviveAtStart: false,
     killAfkHeroes: true,
+    wanderEffectStr: 'AbilitiesSpellsOtherTalkToMeTalkToMe.mdl',
+    wanderEffectFacing: false,
 }
 
 //SETTERS - GETTERS

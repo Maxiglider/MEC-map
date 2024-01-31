@@ -88,11 +88,7 @@ export class MonsterNoMove extends Monster {
                     }
 
                     if (this.wanderEffect) DestroyEffect(this.wanderEffect)
-                    this.wanderEffect = AddSpecialEffectTargetUnitBJ(
-                        'overhead',
-                        targetUnit,
-                        'AbilitiesSpellsOtherTalkToMeTalkToMe.mdl'
-                    )
+                    this.wanderEffect = AddSpecialEffectTargetUnitBJ('overhead', targetUnit, globals.wanderEffectStr)
 
                     this.wanderTimer = new Timer().start(Math.random() * 1.5 + 0.5, false, () => {
                         let targetPoint = region.getRandomPoint()

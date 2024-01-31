@@ -135,6 +135,8 @@ export const MEC_core_API = {
     setWanderExtraTime: (time: number) => (globals.wanderExtraTime = time),
     setForceReviveAtStart: (b: boolean) => (globals.forceReviveAtStart = b),
     setKillAfkHeroes: (b: boolean) => (globals.killAfkHeroes = b),
+    setWanderEffect: (effect: string) => (globals.wanderEffectStr = effect),
+    setWanderEffectFacing: (b: boolean) => (globals.wanderEffectFacing = b),
 
     createMonsterNoMoveForLevel: (levelId: number, mtLabel: string, x: number, y: number) => {
         const mt = getUdgMonsterTypes().getByLabel(mtLabel)
