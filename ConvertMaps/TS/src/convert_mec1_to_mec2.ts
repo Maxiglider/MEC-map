@@ -54,6 +54,8 @@ const initMain = async () => {
                 'war3map.w3e',
                 'war3map.w3r',
 
+                // FOR NON MEC1 UNCOMMENT ALL BELOW
+
                 // Extra
                 // 'war3mapUnits.doo', // => Crashes
                 // 'war3map.doo', // => Crashes

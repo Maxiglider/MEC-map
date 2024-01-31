@@ -7,6 +7,7 @@
         "@types/fs-extra": "^11.0.4",
         "@types/node": "^20.11.5",
         "fs-extra": "^11.2.0",
-        "mdx-m3-viewer": "^5.12.0"
+        "mdx-m3-viewer": "^5.12.0",
+        "wc3maptranslator": "^4.0.4"
     }
 }
