@@ -30,6 +30,7 @@ import { PROD } from './env'
 // [X] SKS; Yoink music code from slidespongebobslide and boost skill
 // [X] SKS; Add exp on revive; add exp for reaching corners
 // [X] Activating speededit when mirror is on will now mirror the speededit
+// [X] When going to -el and if ur camera is already on the new spawn point it seems to move it back to the previous level
 // [O] Show current level on multiboard
 
 const tsMain = () => {

@@ -785,15 +785,6 @@ export class Escaper {
         const isAlive = this.isAlive()
 
         if (!this.hero || !this.invisUnit || isAlive) {
-            if (isAlive) {
-                if (this.hero && (this.panCameraOnRevive === 'all' || this.panCameraOnRevive === type)) {
-                    //move camera if needed
-                    if (GetLocalPlayer() == this.p) {
-                        this.moveCameraToHeroIfNecessary()
-                    }
-                }
-            }
-
             return false
         }
 
@@ -2021,7 +2012,16 @@ export class Escaper {
         if (this.hero) {
             const xHero = GetUnitX(this.hero)
             const yHero = GetUnitY(this.hero)
-            this.revive(xHero, yHero, 'coop')
+
+            if (!this.revive(xHero, yHero, 'coop')) {
+                if (this.hero && (this.panCameraOnRevive === 'all' || this.panCameraOnRevive === 'coop')) {
+                    //move camera if needed
+                    if (GetLocalPlayer() == this.p) {
+                        this.moveCameraToHeroIfNecessary()
+                    }
+                }
+            }
+
             RunCoopSoundOnHero(this.hero)
             animUtils.setAnimation(this.hero, globals.animOnRevive || 'channel')
             this.absoluteSlideSpeed(0)
