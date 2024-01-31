@@ -1,5 +1,11 @@
 import { String2Ascii } from 'core/01_libraries/Ascii'
-import { convertTextToAngle, IsBoolString, S2B, tileset2tilesetString } from 'core/01_libraries/Basic_functions'
+import {
+    convertAngleToDirection,
+    convertTextToAngle,
+    IsBoolString,
+    S2B,
+    tileset2tilesetString,
+} from 'core/01_libraries/Basic_functions'
 import {
     DEFAULT_MONSTER_SPEED,
     HERO_SLIDE_SPEED,
@@ -15,6 +21,7 @@ import { IMMOLATION_SKILLS } from 'core/04_STRUCTURES/Monster/Immolation_skills'
 import { MonsterMultiplePatrols } from 'core/04_STRUCTURES/Monster/MonsterMultiplePatrols'
 import { MonsterNoMove } from 'core/04_STRUCTURES/Monster/MonsterNoMove'
 import { MonsterSimplePatrol } from 'core/04_STRUCTURES/Monster/MonsterSimplePatrol'
+import { MonsterType } from 'core/04_STRUCTURES/Monster/MonsterType'
 import { PORTAL_MOB_MAX_FREEZE_DURATION } from 'core/04_STRUCTURES/Monster_properties/PortalMob'
 import { DEATH_TERRAIN_MAX_TOLERANCE, TerrainTypeDeath } from 'core/04_STRUCTURES/TerrainType/TerrainTypeDeath'
 import { TerrainTypeSlide } from 'core/04_STRUCTURES/TerrainType/TerrainTypeSlide'
@@ -3708,17 +3715,19 @@ export const initExecuteCommandMake = () => {
                     for (const [_, level] of pairs(getUdgLevels().getAll())) {
                         for (const [_, monster] of pairs(level.monsters.getAll())) {
                             if (monster instanceof MonsterSimplePatrol) {
-                                monster.x1 = Math.round(monster.x1 / roundToGrid) * roundToGrid
-                                monster.y1 = Math.round(monster.y1 / roundToGrid) * roundToGrid
-                                monster.x2 = Math.round(monster.x2 / roundToGrid) * roundToGrid
-                                monster.y2 = Math.round(monster.y2 / roundToGrid) * roundToGrid
+                                monster.x1 = Math.round(monster.x1 / roundToGrid) * roundToGrid + GetRandomInt(-2, 2)
+                                monster.y1 = Math.round(monster.y1 / roundToGrid) * roundToGrid + GetRandomInt(-2, 2)
+                                monster.x2 = Math.round(monster.x2 / roundToGrid) * roundToGrid + GetRandomInt(-2, 2)
+                                monster.y2 = Math.round(monster.y2 / roundToGrid) * roundToGrid + GetRandomInt(-2, 2)
                             } else if (monster instanceof MonsterNoMove) {
-                                monster.x = Math.round(monster.x / roundToGrid) * roundToGrid
-                                monster.y = Math.round(monster.y / roundToGrid) * roundToGrid
+                                monster.x = Math.round(monster.x / roundToGrid) * roundToGrid + GetRandomInt(-2, 2)
+                                monster.y = Math.round(monster.y / roundToGrid) * roundToGrid + GetRandomInt(-2, 2)
                             } else if (monster instanceof MonsterMultiplePatrols) {
                                 for (let i = 0; i < monster.x.length; i++) {
-                                    monster.x[i] = Math.round(monster.x[i] / roundToGrid) * roundToGrid
-                                    monster.y[i] = Math.round(monster.y[i] / roundToGrid) * roundToGrid
+                                    monster.x[i] =
+                                        Math.round(monster.x[i] / roundToGrid) * roundToGrid + GetRandomInt(-2, 2)
+                                    monster.y[i] =
+                                        Math.round(monster.y[i] / roundToGrid) * roundToGrid + GetRandomInt(-2, 2)
                                 }
                             }
                         }
@@ -3731,6 +3740,50 @@ export const initExecuteCommandMake = () => {
             }
 
             return true
+        },
+    })
+
+    const snapPatrolsToSlideOffsetMap: { [mt: string]: { angle: number; offset: number } | null } = {}
+
+    // -snapPatrolsToSlideOffset [<mt> <angle> <offset>]
+    registerCommand({
+        name: 'snapPatrolsToSlideOffset',
+        alias: ['sptso'],
+        group: 'make',
+        argDescription: '[<mt> <angle> <offset>]',
+        description: '',
+        cb: ({ nbParam, param1, param2, param3 }, escaper) => {
+            if (nbParam === 0) {
+                for (const [mt, item] of pairs(snapPatrolsToSlideOffsetMap)) {
+                    Text.mkP(escaper.getPlayer(), `${mt}: ${convertAngleToDirection(item.angle)} ${item.offset}`)
+                }
+
+                return true
+            } else {
+                const mt = param1
+                const angle = convertTextToAngle(param2)
+                const offset = S2I(param3)
+
+                if (!getUdgMonsterTypes().getByLabel(mt)) {
+                    Text.erP(escaper.getPlayer(), `Invalid monster type`)
+                    return true
+                }
+
+                if (!angle) {
+                    Text.erP(escaper.getPlayer(), `Invalid angle`)
+                    return true
+                }
+
+                if (!offset || offset > 256) {
+                    Text.erP(escaper.getPlayer(), `Offset must be between -256 and 256`)
+                    return true
+                }
+
+                snapPatrolsToSlideOffsetMap[mt] = { angle, offset }
+
+                Text.mkP(escaper.getPlayer(), `Set offset for ${mt} to ${offset}`)
+                return true
+            }
         },
     })
 
@@ -3756,6 +3809,10 @@ export const initExecuteCommandMake = () => {
                 if (snapToSlide) {
                     for (const [_, level] of pairs(getUdgLevels().getAll())) {
                         for (const [_, monster] of pairs(level.monsters.getAll())) {
+                            if (!monster.mt) {
+                                continue
+                            }
+
                             if (monster instanceof MonsterSimplePatrol) {
                                 const p1 = snapPointToSlide(
                                     monster.x1,
@@ -3763,7 +3820,8 @@ export const initExecuteCommandMake = () => {
                                     monster.x2,
                                     monster.y2,
                                     snapToSlide,
-                                    fixStartOnSlidePatrols
+                                    fixStartOnSlidePatrols,
+                                    monster.mt
                                 )
 
                                 const p2 = snapPointToSlide(
@@ -3772,7 +3830,8 @@ export const initExecuteCommandMake = () => {
                                     monster.x1,
                                     monster.y1,
                                     snapToSlide,
-                                    fixStartOnSlidePatrols
+                                    fixStartOnSlidePatrols,
+                                    monster.mt
                                 )
 
                                 monster.x1 = p1.x
@@ -3793,7 +3852,8 @@ export const initExecuteCommandMake = () => {
                                         monster.x[nx],
                                         monster.y[ny],
                                         snapToSlide,
-                                        fixStartOnSlidePatrols
+                                        fixStartOnSlidePatrols,
+                                        monster.mt
                                     )
 
                                     monster.setLocAt(i, p1.x, p1.y)
@@ -3819,9 +3879,11 @@ export const initExecuteCommandMake = () => {
         x2: number,
         y2: number,
         preferredDistance: number,
-        fixStartOnSlidePatrols: boolean
+        fixStartOnSlidePatrols: boolean,
+        mt: MonsterType
     ) => {
         const currentTerrain = getUdgTerrainTypes().getTerrainType(x1, y1)
+        let hasChanged = false
         let newX = x1
         let newY = y1
 
@@ -3845,8 +3907,9 @@ export const initExecuteCommandMake = () => {
             if (currentX !== undefined && currentY !== undefined) {
                 const oppositeAngle = angle + Math.PI
 
-                newX = currentX + Math.cos(oppositeAngle) * preferredDistance
-                newY = currentY + Math.sin(oppositeAngle) * preferredDistance
+                hasChanged = true
+                newX = currentX + Math.cos(oppositeAngle) * (preferredDistance + GetRandomInt(-2, 2))
+                newY = currentY + Math.sin(oppositeAngle) * (preferredDistance + GetRandomInt(-2, 2))
             }
         }
 
@@ -3871,8 +3934,20 @@ export const initExecuteCommandMake = () => {
             if (currentX !== undefined && currentY !== undefined) {
                 const oppositeAngle = angle
 
-                newX = currentX + Math.cos(oppositeAngle) * preferredDistance
-                newY = currentY + Math.sin(oppositeAngle) * preferredDistance
+                hasChanged = true
+                newX = currentX + Math.cos(oppositeAngle) * (preferredDistance + GetRandomInt(-2, 2))
+                newY = currentY + Math.sin(oppositeAngle) * (preferredDistance + GetRandomInt(-2, 2))
+            }
+        }
+
+        // TODO; The math seems wrong here :/
+        if (hasChanged) {
+            const item = snapPatrolsToSlideOffsetMap[mt.label]
+
+            if (item) {
+                print(`x: ${Math.cos(item.angle) * item.offset}, y: ${Math.sin(item.angle) * item.offset}`)
+                newX += Math.cos(item.angle) * item.offset
+                newY += Math.sin(item.angle) * item.offset
             }
         }
 
