@@ -374,7 +374,7 @@ export const initExecuteCommandRed = () => {
             if (!tt.getByCode(availableThemes[param1].deathTerrain)) createTerrains++
             if (!tt.getByCode(availableThemes[param1].walkTerrain)) createTerrains++
 
-            if (createTerrains > availableTerrains) {
+            if (createTerrains >= availableTerrains) {
                 Text.P(escaper.getPlayer(), `Failed, limit of ${NB_MAX_OF_TERRAINS} terrain types reached`)
                 return true
             }
