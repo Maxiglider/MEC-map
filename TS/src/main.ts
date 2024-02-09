@@ -27,7 +27,7 @@ import { PROD } from './env'
 // [X] New make cmd: -snapPatrolsToSlide; Kinda like snapPatrolsToGrid but snaps to nearest slide terrain instead of grid, better.
 // [X] Improved CircleMob logic
 // [X] New make cmd: -setCircleMobInitialAngle; Force the initial angle on a CircleMob to time it with other CircleMobs
-// [X] SKS; Yoink music code from slidespongebobslide and boost skill
+// [X] SKS; Added skills
 // [X] SKS; Add exp on revive; add exp for reaching corners
 // [X] Activating speededit when mirror is on will now mirror the speededit
 // [X] When going to -el and if ur camera is already on the new spawn point it seems to move it back to the previous level

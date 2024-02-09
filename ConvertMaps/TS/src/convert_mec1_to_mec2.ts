@@ -38,6 +38,7 @@ const initMain = async () => {
             }
 
             console.log('[2/4] created Set_game_data.lua')
+            console.log('!! Remember to copy over the set_game_data.lua to the MEC2 map !!')
             // Fall through
         }
 
