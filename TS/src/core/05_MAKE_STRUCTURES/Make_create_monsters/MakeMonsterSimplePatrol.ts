@@ -18,8 +18,9 @@ export class MakeMonsterSimplePatrol extends MakeOneByOneOrTwoClicks {
     private static distOnTerrain: number = 50
 
     private mt: MonsterType
+    private forcedAngle: number | undefined = undefined
 
-    constructor(maker: unit, mode: string, mt: MonsterType) {
+    constructor(maker: unit, mode: string, mt: MonsterType, angle?: number) {
         super(maker, 'monsterCreateSimplePatrol', mode, ['normal', 'string', 'auto'])
 
         if (!mt) {
@@ -27,6 +28,7 @@ export class MakeMonsterSimplePatrol extends MakeOneByOneOrTwoClicks {
         }
 
         this.mt = mt
+        this.forcedAngle = angle
     }
 
     getMonsterType = (): MonsterType => {
@@ -98,39 +100,48 @@ export class MakeMonsterSimplePatrol extends MakeOneByOneOrTwoClicks {
                 dist = MakeMonsterSimplePatrol.MIN_DIST
                 while (true) {
                     if (found || dist > MakeMonsterSimplePatrol.MAX_DIST) break
-                    angle = 0
-                    x1 = this.orderX + dist * CosBJ(angle)
-                    y1 = this.orderY + dist * SinBJ(angle)
-                    found = IsTerrainTypeOfKind(GetTerrainType(x1, y1), 'death')
-                    if (found) break
 
-                    angle = 90
-                    x1 = this.orderX + dist * CosBJ(angle)
-                    y1 = this.orderY + dist * SinBJ(angle)
-                    found = IsTerrainTypeOfKind(GetTerrainType(x1, y1), 'death')
-                    if (found) break
-
-                    angle = 180
-                    x1 = this.orderX + dist * CosBJ(angle)
-                    y1 = this.orderY + dist * SinBJ(angle)
-                    found = IsTerrainTypeOfKind(GetTerrainType(x1, y1), 'death')
-                    if (found) break
-
-                    angle = 270
-                    x1 = this.orderX + dist * CosBJ(angle)
-                    y1 = this.orderY + dist * SinBJ(angle)
-                    found = IsTerrainTypeOfKind(GetTerrainType(x1, y1), 'death')
-                    if (found) break
-
-                    angle = 1
-                    while (true) {
-                        if (found || angle >= 360) break
+                    if (this.forcedAngle) {
+                        angle = this.forcedAngle
                         x1 = this.orderX + dist * CosBJ(angle)
                         y1 = this.orderY + dist * SinBJ(angle)
                         found = IsTerrainTypeOfKind(GetTerrainType(x1, y1), 'death')
-                        angle = angle + MakeMonsterSimplePatrol.ECART_ANGLE
+                        if (found) break
+                    } else {
+                        angle = 0
+                        x1 = this.orderX + dist * CosBJ(angle)
+                        y1 = this.orderY + dist * SinBJ(angle)
+                        found = IsTerrainTypeOfKind(GetTerrainType(x1, y1), 'death')
+                        if (found) break
+
+                        angle = 90
+                        x1 = this.orderX + dist * CosBJ(angle)
+                        y1 = this.orderY + dist * SinBJ(angle)
+                        found = IsTerrainTypeOfKind(GetTerrainType(x1, y1), 'death')
+                        if (found) break
+
+                        angle = 180
+                        x1 = this.orderX + dist * CosBJ(angle)
+                        y1 = this.orderY + dist * SinBJ(angle)
+                        found = IsTerrainTypeOfKind(GetTerrainType(x1, y1), 'death')
+                        if (found) break
+
+                        angle = 270
+                        x1 = this.orderX + dist * CosBJ(angle)
+                        y1 = this.orderY + dist * SinBJ(angle)
+                        found = IsTerrainTypeOfKind(GetTerrainType(x1, y1), 'death')
+                        if (found) break
+
+                        angle = 1
+                        while (true) {
+                            if (found || angle >= 360) break
+                            x1 = this.orderX + dist * CosBJ(angle)
+                            y1 = this.orderY + dist * SinBJ(angle)
+                            found = IsTerrainTypeOfKind(GetTerrainType(x1, y1), 'death')
+                            angle = angle + MakeMonsterSimplePatrol.ECART_ANGLE
+                        }
+                        angle = angle - MakeMonsterSimplePatrol.ECART_ANGLE
                     }
-                    angle = angle - MakeMonsterSimplePatrol.ECART_ANGLE
 
                     dist = dist + MakeMonsterSimplePatrol.ECART_DIST
                 }
@@ -188,7 +199,13 @@ export class MakeMonsterSimplePatrol extends MakeOneByOneOrTwoClicks {
                 y2 = this.orderY + dist * SinBJ(angle)
 
                 //the two locations were found, creating monster
-                monster = createMonsterSmartPatrol(this.getMonsterType(), x1, y1, x2, y2)
+                monster = createMonsterSmartPatrol(
+                    this.getMonsterType(),
+                    x1 + GetRandomInt(-2, 2),
+                    y1 + GetRandomInt(-2, 2),
+                    x2 + GetRandomInt(-2, 2),
+                    y2 + GetRandomInt(-2, 2)
+                )
             }
 
             if (monster) {

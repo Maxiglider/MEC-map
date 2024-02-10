@@ -567,7 +567,7 @@ export const initExecuteCommandCheat = () => {
 
             targetEscaper.moveHero(x, y)
             targetEscaper.turnInstantly(GetUnitFacing(hero))
-            targetEscaper.coopReviveHero()
+            runInTrigger(targetEscaper.coopReviveHero)
 
             const escaperSecond = GetMirrorEscaper(targetEscaper)
             if (escaperSecond) {

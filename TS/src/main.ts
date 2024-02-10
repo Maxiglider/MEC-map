@@ -25,12 +25,18 @@ import { PROD } from './env'
 // [X] SKS; progression; support pathing blocker?
 // [X] SKS; setMonsterWanderableTimeout <monsterType> <min> <max>; set the timeout in sec
 // [X] New make cmd: -snapPatrolsToSlide; Kinda like snapPatrolsToGrid but snaps to nearest slide terrain instead of grid, better.
+// [X] New make cmd: -snapPatrolsToSlideOffset; Allows setting an offset for specific monster types when using -snapPatrolsToSlide so that they look better. -sptso <monsterType> <angle> <offset>
 // [X] Improved CircleMob logic
 // [X] New make cmd: -setCircleMobInitialAngle; Force the initial angle on a CircleMob to time it with other CircleMobs
 // [X] SKS; Added skills
 // [X] SKS; Add exp on revive; add exp for reaching corners
 // [X] Activating speededit when mirror is on will now mirror the speededit
 // [X] When going to -el and if ur camera is already on the new spawn point it seems to move it back to the previous level
+// [X] -crma now supports an [angle] param to force a specific angle
+// [X] When a level gets deactivated it also removes the debug regions
+// [X] Debug regions now support monster patrols by writing `-dr 1 1`
+// [X] Fixed a bug in -smn chain where it delays the each smn
+// [X] -crma patrols now have a slight offset to prevent the patrols from walking in sync
 // [O] Show current level on multiboard
 
 const tsMain = () => {

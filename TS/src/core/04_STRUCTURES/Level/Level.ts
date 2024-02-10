@@ -13,6 +13,8 @@ import type { CasterType } from '../Caster/CasterType'
 import type { Escaper } from '../Escaper/Escaper'
 import { MeteorArray } from '../Meteor/MeteorArray'
 import { MonsterArray } from '../Monster/MonsterArray'
+import { MonsterMultiplePatrols } from '../Monster/MonsterMultiplePatrols'
+import { MonsterSimplePatrol } from '../Monster/MonsterSimplePatrol'
 import type { MonsterType } from '../Monster/MonsterType'
 import { MonsterSpawnArray } from '../MonsterSpawn/MonsterSpawnArray'
 import { CircleMobArray } from '../Monster_properties/CircleMobArray'
@@ -50,7 +52,7 @@ export class Level {
     private triggers: TriggerArray
     public id: number = -1
     private lights: lightning[] = []
-    debugRegionsVisible = false
+    debugRegionsVisible: 'on' | 'off' | 'on_monsters' = 'off'
 
     visibilities: VisibilityModifierArray
     monsters: MonsterArray
@@ -130,6 +132,7 @@ export class Level {
             this.regions.activate(false)
             this.removeTempTerrainTypes()
             getUdgEscapers().deleteSpecificActionsForLevel(this)
+            this.setDebugRegionsVisible('off')
 
             if (this.hooks_onEnd) {
                 for (const hook of this.hooks_onEnd.getHooks()) {
@@ -276,7 +279,7 @@ export class Level {
     updateDebugRegions = () => {
         this.destroyDebugRegions()
 
-        if (this.debugRegionsVisible) {
+        if (this.debugRegionsVisible !== 'off') {
             this.start && this.drawRegion(this.start.minX, this.start.minY, this.start.maxX, this.start.maxY)
             this.end && this.drawRegion(this.end.minX, this.end.minY, this.end.maxX, this.end.maxY)
 
@@ -318,15 +321,24 @@ export class Level {
                 }
             }
 
-            // for (const [_, monster] of pairs(this.monsters.getAll())) {
-            //     if (monster instanceof MonsterSimplePatrol) {
-            //         this.drawLine(monster.x1, monster.y1, monster.x2, monster.y2)
-            //     }
-            // }
+            if (this.debugRegionsVisible === 'on_monsters') {
+                for (const [_, monster] of pairs(this.monsters.getAll())) {
+                    if (monster instanceof MonsterSimplePatrol) {
+                        this.drawLine(monster.x1, monster.y1, monster.x2, monster.y2)
+                    } else if (monster instanceof MonsterMultiplePatrols) {
+                        for (let i = 0; i < monster.x.length; i++) {
+                            const nx = i + 1 > monster.x.length - 1 ? 0 : i + 1
+                            const ny = i + 1 > monster.y.length - 1 ? 0 : i + 1
+
+                            this.drawLine(monster.x[i], monster.y[i], monster.x[nx], monster.y[ny])
+                        }
+                    }
+                }
+            }
         }
     }
 
-    setDebugRegionsVisible = (active: boolean) => {
+    setDebugRegionsVisible = (active: typeof this.debugRegionsVisible) => {
         this.debugRegionsVisible = active
         this.updateDebugRegions()
     }

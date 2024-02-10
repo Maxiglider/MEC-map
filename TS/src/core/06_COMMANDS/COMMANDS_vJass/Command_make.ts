@@ -1322,26 +1322,34 @@ export const initExecuteCommandMake = () => {
         },
     })
 
-    //-createMonsterAuto(crma) <monsterLabel>  --> simple patrols created with only one click (click on a slide terrain)
+    //-createMonsterAuto(crma) <monsterLabel> [angle]  --> simple patrols created with only one click (click on a slide terrain)
     registerCommand({
         name: 'createMonsterAuto',
         alias: ['crma'],
         group: 'make',
-        argDescription: '<monsterLabel>',
+        argDescription: '<monsterLabel> [angle]',
         description:
             'creates a monster at the current location, patrolling between 2 locations, created with only one click (click on a slide terrain)',
-        cb: ({ nbParam, param1 }, escaper) => {
-            if (!(nbParam === 1)) {
+        cb: ({ nbParam, param1, param2 }, escaper) => {
+            if (!(nbParam === 1) && !(nbParam === 2)) {
                 return true
             }
+
             //checkParam1
             if (!getUdgMonsterTypes().isLabelAlreadyUsed(param1)) {
                 Text.erP(escaper.getPlayer(), 'unknown monster type')
                 return true
             }
 
+            const angle = nbParam === 2 ? convertTextToAngle(param2) : undefined
+
+            if (nbParam === 2 && angle === undefined) {
+                Text.erP(escaper.getPlayer(), 'wrong angle value')
+                return true
+            }
+
             const monsterType = getUdgMonsterTypes().getByLabel(param1)
-            monsterType && escaper.makeCreateSimplePatrolMonsters('auto', monsterType)
+            monsterType && escaper.makeCreateSimplePatrolMonsters('auto', monsterType, angle)
 
             Text.mkP(escaper.getPlayer(), 'monster making on')
             return true
@@ -3490,15 +3498,30 @@ export const initExecuteCommandMake = () => {
         name: 'debugRegions',
         alias: ['dr'],
         group: 'make',
-        argDescription: '<active>',
+        argDescription: '<active> [monsters]',
         description: '',
-        cb: ({ param1 }, escaper) => {
+        cb: ({ param1, param2 }, escaper) => {
             if (!IsBoolString(param1)) {
                 Text.erP(escaper.getPlayer(), 'the property "active" must be a boolean (true or false)')
                 return true
             }
 
-            escaper.getMakingLevel().setDebugRegionsVisible(S2B(param1))
+            if (param2.length > 0 && !IsBoolString(param2)) {
+                Text.erP(escaper.getPlayer(), 'the property "monsters" must be a boolean (true or false)')
+                return true
+            }
+
+            escaper
+                .getMakingLevel()
+                .setDebugRegionsVisible(
+                    param2.length > 0
+                        ? S2B(param1) && S2B(param2)
+                            ? 'on_monsters'
+                            : 'off'
+                        : S2B(param1)
+                        ? 'on'
+                        : 'off'
+                )
             Text.mkP(escaper.getPlayer(), `debugRegions ${S2B(param1) ? 'on' : 'off'}`)
             return true
         },
@@ -3774,14 +3797,17 @@ export const initExecuteCommandMake = () => {
                     return true
                 }
 
-                if (!offset || offset > 256) {
+                if (param3 === '' || offset < -256 || offset > 256) {
                     Text.erP(escaper.getPlayer(), `Offset must be between -256 and 256`)
                     return true
                 }
 
                 snapPatrolsToSlideOffsetMap[mt] = { angle, offset }
 
-                Text.mkP(escaper.getPlayer(), `Set offset for ${mt} to ${offset}`)
+                Text.mkP(
+                    escaper.getPlayer(),
+                    `Set angle to ${convertAngleToDirection(angle)} and offset to ${offset} for ${mt}`
+                )
                 return true
             }
         },
@@ -3883,7 +3909,6 @@ export const initExecuteCommandMake = () => {
         mt: MonsterType
     ) => {
         const currentTerrain = getUdgTerrainTypes().getTerrainType(x1, y1)
-        let hasChanged = false
         let newX = x1
         let newY = y1
 
@@ -3907,7 +3932,6 @@ export const initExecuteCommandMake = () => {
             if (currentX !== undefined && currentY !== undefined) {
                 const oppositeAngle = angle + Math.PI
 
-                hasChanged = true
                 newX = currentX + Math.cos(oppositeAngle) * (preferredDistance + GetRandomInt(-2, 2))
                 newY = currentY + Math.sin(oppositeAngle) * (preferredDistance + GetRandomInt(-2, 2))
             }
@@ -3934,21 +3958,16 @@ export const initExecuteCommandMake = () => {
             if (currentX !== undefined && currentY !== undefined) {
                 const oppositeAngle = angle
 
-                hasChanged = true
                 newX = currentX + Math.cos(oppositeAngle) * (preferredDistance + GetRandomInt(-2, 2))
                 newY = currentY + Math.sin(oppositeAngle) * (preferredDistance + GetRandomInt(-2, 2))
             }
         }
 
-        // TODO; The math seems wrong here :/
-        if (hasChanged) {
-            const item = snapPatrolsToSlideOffsetMap[mt.label]
+        const item = snapPatrolsToSlideOffsetMap[mt.label]
 
-            if (item) {
-                print(`x: ${Math.cos(item.angle) * item.offset}, y: ${Math.sin(item.angle) * item.offset}`)
-                newX += Math.cos(item.angle) * item.offset
-                newY += Math.sin(item.angle) * item.offset
-            }
+        if (item) {
+            newX += Math.cos(item.angle) * item.offset
+            newY += Math.sin(item.angle) * item.offset
         }
 
         return createPoint(newX, newY)

@@ -1519,11 +1519,11 @@ export class Escaper {
         if (this.hero) this.make = new MakeMonsterNoMove(this.hero, mt, facingAngle)
     }
 
-    makeCreateSimplePatrolMonsters(mode: string, mt: MonsterType) {
+    makeCreateSimplePatrolMonsters(mode: string, mt: MonsterType, angle?: number) {
         this.destroyMake()
         //modes : normal, string, auto
         if (mode == 'normal' || mode == 'string' || mode == 'auto') {
-            if (this.hero) this.make = new MakeMonsterSimplePatrol(this.hero, mode, mt)
+            if (this.hero) this.make = new MakeMonsterSimplePatrol(this.hero, mode, mt,angle)
         }
     }
 
