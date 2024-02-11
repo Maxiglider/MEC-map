@@ -3505,14 +3505,7 @@ export const initExecuteCommandMake = () => {
         argDescription: '<angle>',
         description: '',
         cb: ({ param1 }, escaper) => {
-            const angle = convertTextToAngle(param1)
-
-            if (!angle) {
-                Text.erP(escaper.getPlayer(), 'Angle must be > 0 and <= 360')
-                return true
-            }
-
-            escaper.makeSetStaticSlideCanTurnAngle(angle)
+            escaper.makeSetStaticSlideCanTurnAngle(convertTextToAngle(param1))
             Text.mkP(escaper.getPlayer(), 'Click on the staticSlide to apply')
             return true
         },
