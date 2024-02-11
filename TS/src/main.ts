@@ -45,8 +45,6 @@ import { PROD } from './env'
 // [X] New make cmd: -setStaticSlideCanTurnAngle; Allows setting a specific angle for the slider to turn on the static slide
 // [O] Show current level on multiboard
 
-// [O] BUG; if we're on lvl 1 and i do -setmkl 0; then -crmi p and it breaks
-
 const tsMain = () => {
     ServiceManager.registerServices({
         Lives: initLives,

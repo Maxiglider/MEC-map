@@ -20,7 +20,7 @@ export class MakeLastActions {
             //suppression des actions annulées (à l'ajout d'une nouvelle action)
             i = this.lastActionEffective + 1
             while (i <= this.lastActionId) {
-                this.lastActions[i].destroy()
+                this.lastActions[i]?.destroy()
                 i++
             }
         }
@@ -108,7 +108,7 @@ export class MakeLastActions {
         }
 
         while (this.lastActionId > this.lastActionEffective) {
-            this.lastActions[this.lastActionId].destroy()
+            this.lastActions[this.lastActionId]?.destroy()
             this.lastActionId--
         }
     }
