@@ -1,12 +1,10 @@
-import { AnglesDiff, arrayPush, IsIssuedOrder, StopUnit } from 'core/01_libraries/Basic_functions'
-import { createEvent } from 'Utils/mapUtils'
 import { MemoryHandler } from 'Utils/MemoryHandler'
+import { createEvent } from 'Utils/mapUtils'
+import { AnglesDiff, arrayPush } from 'core/01_libraries/Basic_functions'
 import { getUdgEscapers } from '../../../../globals'
 import { Hero2Escaper, IsHero } from '../Escaper/Escaper_functions'
 import { createDiagonalRegions } from '../MonsterSpawn/MonsterSpawn'
 import { Level } from './Level'
-
-const SLIDE_PERIOD_TPs = 0.01
 
 export class StaticSlide {
     private x1: number
@@ -153,28 +151,6 @@ export class StaticSlide {
                         () => {
                             const hero = GetTriggerUnit()
                             this.removePlayer(Hero2Escaper(hero)?.getEscaperId() || -1)
-                        },
-                    ],
-                })
-            )
-
-            // Prevent clicks
-            arrayPush(
-                this.triggers,
-                createEvent({
-                    events: [
-                        t => TriggerRegisterAnyUnitEventBJ(t, EVENT_PLAYER_UNIT_ISSUED_POINT_ORDER),
-                        t => TriggerRegisterAnyUnitEventBJ(t, EVENT_PLAYER_UNIT_ISSUED_TARGET_ORDER),
-                    ],
-                    actions: [
-                        () => {
-                            if (this.slidingPlayers.includes(Hero2Escaper(GetTriggerUnit())?.getEscaperId() || -1)) {
-                                if (!IsIssuedOrder('smart')) {
-                                    return
-                                }
-
-                                StopUnit(GetTriggerUnit())
-                            }
                         },
                     ],
                 })
