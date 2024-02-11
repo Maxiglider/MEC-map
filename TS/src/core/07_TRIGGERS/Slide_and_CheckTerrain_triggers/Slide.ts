@@ -154,6 +154,10 @@ const initSlideTrigger = () => {
             if (staticSliding) {
                 if (staticSliding.isInRegion(newX, newY)) {
                     escaper.moveHero(newX, newY, false)
+
+                    if (!escaper.isAlive()) {
+                        escaper.refreshCerclePosition()
+                    }
                 } else {
                     escaper.kill()
                 }

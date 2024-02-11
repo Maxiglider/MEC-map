@@ -67,6 +67,10 @@ export class StaticSlide {
                 this.slidingPlayers.splice(itemIndex, 1)
 
                 escaper.setSlideSpeed(this.slidingPlayerPrevSpeed[escaper.getEscaperId()])
+
+                if (!escaper.isAlive()) {
+                    escaper.enableSlide(false)
+                }
             }
         }
     }

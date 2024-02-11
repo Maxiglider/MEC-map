@@ -635,6 +635,10 @@ export class Escaper {
             return false
         }
 
+        if (this.isStaticSliding()) {
+            return false
+        }
+
         if (doEnable) {
             this.slide = SlideTrigger.CreateSlideTimer(this.escaperId)
 
