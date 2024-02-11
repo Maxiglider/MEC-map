@@ -16,6 +16,7 @@ import { MonsterArray } from '../Monster/MonsterArray'
 import { MonsterMultiplePatrols } from '../Monster/MonsterMultiplePatrols'
 import { MonsterSimplePatrol } from '../Monster/MonsterSimplePatrol'
 import type { MonsterType } from '../Monster/MonsterType'
+import { createDiagonalRegions } from '../MonsterSpawn/MonsterSpawn'
 import { MonsterSpawnArray } from '../MonsterSpawn/MonsterSpawnArray'
 import { CircleMobArray } from '../Monster_properties/CircleMobArray'
 import { ClearMobArray } from '../Monster_properties/ClearMobArray'
@@ -284,8 +285,22 @@ export class Level {
             this.end && this.drawRegion(this.end.minX, this.end.minY, this.end.maxX, this.end.maxY)
 
             for (const [_, staticSlide] of pairs(this.staticSlides.getAll())) {
-                this.drawRegion(staticSlide.getX1(), staticSlide.getY1(), staticSlide.getX2(), staticSlide.getY2())
-                this.drawRegion(staticSlide.getX3(), staticSlide.getY3(), staticSlide.getX4(), staticSlide.getY4())
+                const isDiagonal = staticSlide.getAngle() % 90 !== 0
+
+                this.drawRegion(
+                    staticSlide.getX1(),
+                    staticSlide.getY1(),
+                    staticSlide.getX2(),
+                    staticSlide.getY2(),
+                    isDiagonal
+                )
+                this.drawRegion(
+                    staticSlide.getX3(),
+                    staticSlide.getY3(),
+                    staticSlide.getX4(),
+                    staticSlide.getY4(),
+                    isDiagonal
+                )
             }
 
             for (const [_, region] of pairs(this.regions.getAll())) {
@@ -359,11 +374,29 @@ export class Level {
         this.drawLine(x4, y4, x1, y1)
     }
 
-    drawRegion = (x1: number, y1: number, x2: number, y2: number) => {
-        this.drawLine(x1, y1, x1, y2)
-        this.drawLine(x1, y1, x2, y1)
-        this.drawLine(x2, y2, x1, y2)
-        this.drawLine(x2, y2, x2, y1)
+    drawRegion = (x1: number, y1: number, x2: number, y2: number, isDiagonal = false) => {
+        if (isDiagonal) {
+            const regions = createDiagonalRegions(x1, y1, x2, y2, 32)
+
+            for (const region of regions) {
+                const x1 = region.topLeft.x
+                const y1 = region.topLeft.y
+                const x2 = region.bottomRight.x
+                const y2 = region.bottomRight.y
+
+                this.drawLine(x1, y1, x1, y2)
+                this.drawLine(x1, y1, x2, y1)
+                this.drawLine(x2, y2, x1, y2)
+                this.drawLine(x2, y2, x2, y1)
+            }
+
+            regions.__destroy(true)
+        } else {
+            this.drawLine(x1, y1, x1, y2)
+            this.drawLine(x1, y1, x2, y1)
+            this.drawLine(x2, y2, x1, y2)
+            this.drawLine(x2, y2, x2, y1)
+        }
     }
 
     drawLine = (x1: number, y1: number, x2: number, y2: number) => {

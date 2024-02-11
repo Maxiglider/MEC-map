@@ -3,6 +3,7 @@ import { createEvent } from 'Utils/mapUtils'
 import { MemoryHandler } from 'Utils/MemoryHandler'
 import { getUdgEscapers, globals } from '../../../../globals'
 import { Hero2Escaper, IsHero } from '../Escaper/Escaper_functions'
+import { createDiagonalRegions } from '../MonsterSpawn/MonsterSpawn'
 import { Level } from './Level'
 
 const SLIDE_PERIOD_TPs = 0.01
@@ -66,13 +67,36 @@ export class StaticSlide {
 
     activate = (activ: boolean) => {
         if (activ) {
-            // Start region
-            const rect = Rect(this.x1, this.y1, this.x2, this.y2)
+            const isDiagonal = this.angle % 90 !== 0
 
+            // Start region
             arrayPush(
                 this.triggers,
                 createEvent({
-                    events: [t => TriggerRegisterEnterRectSimple(t, rect)],
+                    events: [
+                        t => {
+                            if (isDiagonal) {
+                                const regions = createDiagonalRegions(this.x1, this.y1, this.x2, this.y2, 32)
+
+                                for (const region of regions) {
+                                    const r = Rect(
+                                        region.topLeft.x,
+                                        region.topLeft.y,
+                                        region.bottomRight.x,
+                                        region.bottomRight.y
+                                    )
+                                    TriggerRegisterEnterRectSimple(t, r)
+                                    RemoveRect(r)
+                                }
+
+                                regions.__destroy(true)
+                            } else {
+                                const rect = Rect(this.x1, this.y1, this.x2, this.y2)
+                                TriggerRegisterEnterRectSimple(t, rect)
+                                RemoveRect(rect)
+                            }
+                        },
+                    ],
                     actions: [
                         () => {
                             const hero = GetTriggerUnit()
@@ -95,15 +119,34 @@ export class StaticSlide {
                 })
             )
 
-            RemoveRect(rect)
-
             // End region
-            const rect2 = Rect(this.x3, this.y3, this.x4, this.y4)
-
             arrayPush(
                 this.triggers,
                 createEvent({
-                    events: [t => TriggerRegisterEnterRectSimple(t, rect2)],
+                    events: [
+                        t => {
+                            if (isDiagonal) {
+                                const regions = createDiagonalRegions(this.x3, this.y3, this.x4, this.y4, 32)
+
+                                for (const region of regions) {
+                                    const r = Rect(
+                                        region.topLeft.x,
+                                        region.topLeft.y,
+                                        region.bottomRight.x,
+                                        region.bottomRight.y
+                                    )
+                                    TriggerRegisterEnterRectSimple(t, r)
+                                    RemoveRect(r)
+                                }
+
+                                regions.__destroy(true)
+                            } else {
+                                const rect = Rect(this.x3, this.y3, this.x4, this.y4)
+                                TriggerRegisterEnterRectSimple(t, rect)
+                                RemoveRect(rect)
+                            }
+                        },
+                    ],
                     actions: [
                         () => {
                             const hero = GetTriggerUnit()
@@ -112,8 +155,6 @@ export class StaticSlide {
                     ],
                 })
             )
-
-            RemoveRect(rect2)
 
             // Move sliders
             arrayPush(

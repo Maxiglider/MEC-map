@@ -17,7 +17,7 @@ import { initSimpleUnitRecycler } from './SimpleUnitRecycler'
 const DECALAGE_UNSPAWN = 200
 const DELAY_BETWEEN_SPAWN_AND_MOVEMENT = 0.5
 
-const createDiagonalRegions = (startX: number, startY: number, endX: number, endY: number, size: number) => {
+export const createDiagonalRegions = (startX: number, startY: number, endX: number, endY: number, size: number) => {
     const regions = MemoryHandler.getEmptyArray<{ topLeft: IPoint; bottomRight: IPoint }>()
     const distance = Math.sqrt(Math.pow(endX - startX, 2) + Math.pow(endY - startY, 2))
     const numRegions = Math.floor(distance / size)
