@@ -3792,19 +3792,19 @@ export const initExecuteCommandMake = () => {
                     for (const [_, level] of pairs(getUdgLevels().getAll())) {
                         for (const [_, monster] of pairs(level.monsters.getAll())) {
                             if (monster instanceof MonsterSimplePatrol) {
-                                monster.x1 = Math.round(monster.x1 / roundToGrid) * roundToGrid + GetRandomInt(-2, 2)
-                                monster.y1 = Math.round(monster.y1 / roundToGrid) * roundToGrid + GetRandomInt(-2, 2)
-                                monster.x2 = Math.round(monster.x2 / roundToGrid) * roundToGrid + GetRandomInt(-2, 2)
-                                monster.y2 = Math.round(monster.y2 / roundToGrid) * roundToGrid + GetRandomInt(-2, 2)
+                                monster.x1 = Math.round(monster.x1 / roundToGrid) * roundToGrid + GetRandomInt(-4, 4)
+                                monster.y1 = Math.round(monster.y1 / roundToGrid) * roundToGrid + GetRandomInt(-4, 4)
+                                monster.x2 = Math.round(monster.x2 / roundToGrid) * roundToGrid + GetRandomInt(-4, 4)
+                                monster.y2 = Math.round(monster.y2 / roundToGrid) * roundToGrid + GetRandomInt(-4, 4)
                             } else if (monster instanceof MonsterNoMove) {
-                                monster.x = Math.round(monster.x / roundToGrid) * roundToGrid + GetRandomInt(-2, 2)
-                                monster.y = Math.round(monster.y / roundToGrid) * roundToGrid + GetRandomInt(-2, 2)
+                                monster.x = Math.round(monster.x / roundToGrid) * roundToGrid + GetRandomInt(-4, 4)
+                                monster.y = Math.round(monster.y / roundToGrid) * roundToGrid + GetRandomInt(-4, 4)
                             } else if (monster instanceof MonsterMultiplePatrols) {
                                 for (let i = 0; i < monster.x.length; i++) {
                                     monster.x[i] =
-                                        Math.round(monster.x[i] / roundToGrid) * roundToGrid + GetRandomInt(-2, 2)
+                                        Math.round(monster.x[i] / roundToGrid) * roundToGrid + GetRandomInt(-4, 4)
                                     monster.y[i] =
-                                        Math.round(monster.y[i] / roundToGrid) * roundToGrid + GetRandomInt(-2, 2)
+                                        Math.round(monster.y[i] / roundToGrid) * roundToGrid + GetRandomInt(-4, 4)
                                 }
                             }
                         }
@@ -3986,8 +3986,8 @@ export const initExecuteCommandMake = () => {
             if (currentX !== undefined && currentY !== undefined) {
                 const oppositeAngle = angle + Math.PI
 
-                newX = currentX + Math.cos(oppositeAngle) * (preferredDistance + GetRandomInt(-2, 2))
-                newY = currentY + Math.sin(oppositeAngle) * (preferredDistance + GetRandomInt(-2, 2))
+                newX = currentX + Math.cos(oppositeAngle) * (preferredDistance + GetRandomInt(-4, 4))
+                newY = currentY + Math.sin(oppositeAngle) * (preferredDistance + GetRandomInt(-4, 4))
             }
         }
 
@@ -4012,8 +4012,8 @@ export const initExecuteCommandMake = () => {
             if (currentX !== undefined && currentY !== undefined) {
                 const oppositeAngle = angle
 
-                newX = currentX + Math.cos(oppositeAngle) * (preferredDistance + GetRandomInt(-2, 2))
-                newY = currentY + Math.sin(oppositeAngle) * (preferredDistance + GetRandomInt(-2, 2))
+                newX = currentX + Math.cos(oppositeAngle) * (preferredDistance + GetRandomInt(-4, 4))
+                newY = currentY + Math.sin(oppositeAngle) * (preferredDistance + GetRandomInt(-4, 4))
             }
         }
 

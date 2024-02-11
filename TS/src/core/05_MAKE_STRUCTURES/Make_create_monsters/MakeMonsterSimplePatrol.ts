@@ -201,10 +201,10 @@ export class MakeMonsterSimplePatrol extends MakeOneByOneOrTwoClicks {
                 //the two locations were found, creating monster
                 monster = createMonsterSmartPatrol(
                     this.getMonsterType(),
-                    x1 + GetRandomInt(-2, 2),
-                    y1 + GetRandomInt(-2, 2),
-                    x2 + GetRandomInt(-2, 2),
-                    y2 + GetRandomInt(-2, 2)
+                    x1 + GetRandomInt(-4, 4),
+                    y1 + GetRandomInt(-4, 4),
+                    x2 + GetRandomInt(-4, 4),
+                    y2 + GetRandomInt(-4, 4)
                 )
             }
 
