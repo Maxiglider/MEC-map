@@ -1,7 +1,7 @@
-import { arrayPush, IsIssuedOrder, StopUnit } from 'core/01_libraries/Basic_functions'
+import { AnglesDiff, arrayPush, IsIssuedOrder, StopUnit } from 'core/01_libraries/Basic_functions'
 import { createEvent } from 'Utils/mapUtils'
 import { MemoryHandler } from 'Utils/MemoryHandler'
-import { getUdgEscapers, globals } from '../../../../globals'
+import { getUdgEscapers } from '../../../../globals'
 import { Hero2Escaper, IsHero } from '../Escaper/Escaper_functions'
 import { createDiagonalRegions } from '../MonsterSpawn/MonsterSpawn'
 import { Level } from './Level'
@@ -59,8 +59,8 @@ export class StaticSlide {
         const itemIndex = this.slidingPlayers.indexOf(playerId)
 
         if (itemIndex !== -1) {
-            getUdgEscapers().get(playerId)?.enableSlide(true)
             getUdgEscapers().get(playerId)?.setStaticSliding(undefined)
+            getUdgEscapers().get(playerId)?.setLastTerrainType(undefined)
             this.slidingPlayers.splice(itemIndex, 1)
         }
     }
@@ -110,9 +110,11 @@ export class StaticSlide {
                             ) {
                                 arrayPush(this.slidingPlayers, escaper.getEscaperId())
                                 escaper.setStaticSliding(this)
-                                SetUnitFacing(hero, this.angle)
-                                Hero2Escaper(hero)?.enableSlide(false)
-                                Hero2Escaper(hero)?.setLastTerrainType(undefined)
+
+                                const currentAngle = GetUnitFacing(hero)
+                                escaper.setRemainingDegreesToTurn(AnglesDiff(this.angle, currentAngle))
+                                escaper.setSlideSpeed(this.speed)
+                                escaper.setLastTerrainType(undefined)
                             }
                         },
                     ],
@@ -151,51 +153,6 @@ export class StaticSlide {
                         () => {
                             const hero = GetTriggerUnit()
                             this.removePlayer(Hero2Escaper(hero)?.getEscaperId() || -1)
-                        },
-                    ],
-                })
-            )
-
-            // Move sliders
-            arrayPush(
-                this.triggers,
-                createEvent({
-                    events: [t => TriggerRegisterTimerEventPeriodic(t, SLIDE_PERIOD_TPs)],
-                    actions: [
-                        () => {
-                            for (const playerId of this.slidingPlayers) {
-                                const targetPlayer = getUdgEscapers().get(playerId)
-
-                                if (!targetPlayer) {
-                                    this.removePlayer(playerId)
-                                    continue
-                                }
-
-                                const hero = targetPlayer.getHero()
-
-                                if (!hero) {
-                                    this.removePlayer(playerId)
-                                    continue
-                                }
-
-                                const x = GetUnitX(hero)
-                                const y = GetUnitY(hero)
-
-                                const distanceSlidePerPeriod = this.speed * SLIDE_PERIOD_TPs
-
-                                const newX = x + distanceSlidePerPeriod * Cos(Deg2Rad(this.angle))
-                                const newY = y + distanceSlidePerPeriod * Sin(Deg2Rad(this.angle))
-
-                                if (newX >= globals.MAP_MIN_X && newX <= globals.MAP_MAX_X) {
-                                    SetUnitX(hero, newX)
-                                }
-
-                                if (newY >= globals.MAP_MIN_Y && newY <= globals.MAP_MAX_Y) {
-                                    SetUnitY(hero, newY)
-                                }
-
-                                targetPlayer.refreshCerclePosition()
-                            }
                         },
                     ],
                 })

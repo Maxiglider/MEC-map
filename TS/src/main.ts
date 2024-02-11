@@ -43,7 +43,6 @@ import { PROD } from './env'
 // [O] Show current level on multiboard
 
 // [O] Clusterfuck 2: Static slide property to allow moving on the static slide but only the 90 degree angles of static slide angle. So if static slide goes from left to right then ur allowed to go up/down. Add limit to min/max y so u cant go out of bounds
-// todo; test if crma random offset works
 
 const tsMain = () => {
     ServiceManager.registerServices({

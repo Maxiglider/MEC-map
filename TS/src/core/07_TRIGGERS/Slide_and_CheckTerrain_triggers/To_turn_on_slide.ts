@@ -80,6 +80,10 @@ const initTurnOnSlide = () => {
             canTurn = globals.CAN_TURN_IN_AIR
         }
 
+        if (escaper.isStaticSliding()) {
+            canTurn = false
+        }
+
         angleSecond = ApplyAngleSymmetry(angle, udg_symmetryAngle)
 
         if (canTurn) {
