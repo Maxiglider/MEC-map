@@ -1862,6 +1862,20 @@ export class Escaper {
         }
     }
 
+    makeSetStaticSlideCanTurnAngle(canTurnAngle: number | undefined) {
+        this.destroyMake()
+        if (this.hero) {
+            this.make = new MakePropertyChange(
+                this.hero,
+                'canTurnAngle',
+                canTurnAngle,
+                (x, y) => this.getMakingLevel().staticSlides.getStaticSlideFromPoint(x, y),
+                staticSlide => staticSlide.getCanTurnAngle(),
+                (staticSlide, canTurnAngle) => staticSlide.setCanTurnAngle(canTurnAngle)
+            )
+        }
+    }
+
     makeSetMonsterJumpPad(jumpPad: number | undefined) {
         this.destroyMake()
         if (this.hero) {
@@ -2227,6 +2241,8 @@ export class Escaper {
     }
 
     isStaticSliding = () => !!this.staticSliding
+
+    getStaticSliding = () => this.staticSliding
 
     setStaticSliding = (staticSliding: StaticSlide | undefined) => {
         this.staticSliding = staticSliding

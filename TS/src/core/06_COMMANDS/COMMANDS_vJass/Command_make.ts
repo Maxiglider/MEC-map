@@ -3497,6 +3497,27 @@ export const initExecuteCommandMake = () => {
         },
     })
 
+    //-setStaticSlideCanTurnAngle(setsscta) <angle>
+    registerCommand({
+        name: 'setStaticSlideCanTurnAngle',
+        alias: ['setsscta'],
+        group: 'make',
+        argDescription: '<angle>',
+        description: '',
+        cb: ({ param1 }, escaper) => {
+            const angle = convertTextToAngle(param1)
+
+            if (!angle) {
+                Text.erP(escaper.getPlayer(), 'Angle must be > 0 and <= 360')
+                return true
+            }
+
+            escaper.makeSetStaticSlideCanTurnAngle(angle)
+            Text.mkP(escaper.getPlayer(), 'Click on the staticSlide to apply')
+            return true
+        },
+    })
+
     //-setMonsterJumpPad(setmjp) <jumpPadZ>
     registerCommand({
         name: 'setMonsterJumpPad',

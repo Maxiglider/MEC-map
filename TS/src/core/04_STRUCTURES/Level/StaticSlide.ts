@@ -17,11 +17,13 @@ export class StaticSlide {
     private y4: number
     private angle: number
     private speed: number
+    private canTurnAngle: number | undefined
     level?: Level
 
     id?: number
 
     private slidingPlayers: number[] = []
+    private slidingPlayerPrevSpeed: number[] = []
     private triggers: trigger[] = []
 
     constructor(
@@ -57,9 +59,15 @@ export class StaticSlide {
         const itemIndex = this.slidingPlayers.indexOf(playerId)
 
         if (itemIndex !== -1) {
-            getUdgEscapers().get(playerId)?.setStaticSliding(undefined)
-            getUdgEscapers().get(playerId)?.setLastTerrainType(undefined)
-            this.slidingPlayers.splice(itemIndex, 1)
+            const escaper = getUdgEscapers().get(playerId)
+
+            if (escaper) {
+                escaper.setStaticSliding(undefined)
+                escaper.setLastTerrainType(undefined)
+                this.slidingPlayers.splice(itemIndex, 1)
+
+                escaper.setSlideSpeed(this.slidingPlayerPrevSpeed[escaper.getEscaperId()])
+            }
         }
     }
 
@@ -111,8 +119,9 @@ export class StaticSlide {
 
                                 const currentAngle = GetUnitFacing(hero)
                                 escaper.setRemainingDegreesToTurn(AnglesDiff(this.angle, currentAngle))
+
+                                this.slidingPlayerPrevSpeed[escaper.getEscaperId()] = escaper.getSlideSpeed()
                                 escaper.setSlideSpeed(this.speed)
-                                escaper.setLastTerrainType(undefined)
                             }
                         },
                     ],
@@ -166,6 +175,7 @@ export class StaticSlide {
         }
     }
 
+    // If the point is in either of the start/end regions
     containsPoint = (x: number, y: number) => {
         const x1 = Math.min(this.x1, this.x2)
         const x2 = Math.max(this.x1, this.x2)
@@ -177,6 +187,17 @@ export class StaticSlide {
         const y4 = Math.max(this.y3, this.y4)
 
         return (x >= x1 && x <= x2 && y >= y1 && y <= y2) || (x >= x3 && x <= x4 && y >= y3 && y <= y4)
+    }
+
+    // If the point is in the sliding region
+    isInRegion = (x: number, y: number) => {
+        // 32 offset is needed cuz TriggerRegisterEnterRectSimple gets called even before the unit is in the region
+        const x1 = Math.min(this.x1, this.x2, this.x3, this.x4) - 32
+        const x4 = Math.max(this.x1, this.x2, this.x3, this.x4) + 32
+        const y1 = Math.min(this.y1, this.y2, this.y3, this.y4) - 32
+        const y4 = Math.max(this.y1, this.y2, this.y3, this.y4) + 32
+
+        return x >= x1 && x <= x4 && y >= y1 && y <= y4
     }
 
     getX1 = () => this.x1
@@ -199,6 +220,12 @@ export class StaticSlide {
         this.angle = angle
     }
 
+    getCanTurnAngle = () => this.canTurnAngle
+
+    setCanTurnAngle = (canTurnAngle: number | undefined) => {
+        this.canTurnAngle = canTurnAngle
+    }
+
     toJson = () => {
         const output = MemoryHandler.getEmptyObject<any>()
 
@@ -212,6 +239,7 @@ export class StaticSlide {
         output['y4'] = R2I(this.y4)
         output['angle'] = R2I(this.angle)
         output['speed'] = R2I(this.speed)
+        output['canTurnAngle'] = this.canTurnAngle
 
         return output
     }

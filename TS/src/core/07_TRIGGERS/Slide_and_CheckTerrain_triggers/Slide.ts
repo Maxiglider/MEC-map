@@ -149,7 +149,17 @@ const initSlideTrigger = () => {
             newY >= globals.MAP_MIN_Y &&
             newY <= globals.MAP_MAX_Y
         ) {
-            escaper.moveHero(newX, newY, false)
+            const staticSliding = escaper.getStaticSliding()
+
+            if (staticSliding) {
+                if (staticSliding.isInRegion(newX, newY)) {
+                    escaper.moveHero(newX, newY, false)
+                } else {
+                    escaper.kill()
+                }
+            } else {
+                escaper.moveHero(newX, newY, false)
+            }
         }
 
         const gravity = escaper.getLastTerrainType()?.getGravity() || Gravity.GetGravity()

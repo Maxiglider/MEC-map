@@ -80,8 +80,24 @@ const initTurnOnSlide = () => {
             canTurn = globals.CAN_TURN_IN_AIR
         }
 
-        if (escaper.isStaticSliding()) {
-            canTurn = false
+        const staticSliding = escaper.getStaticSliding()
+
+        if (staticSliding) {
+            const canTurnAngle = staticSliding.getCanTurnAngle()
+
+            if (canTurnAngle) {
+                const currentAngle = staticSliding.getAngle()
+                const minAngle = currentAngle - canTurnAngle
+                const maxAngle = currentAngle + canTurnAngle
+
+                if (angle < minAngle) {
+                    angle = minAngle
+                } else if (angle > maxAngle) {
+                    angle = maxAngle
+                }
+            } else {
+                canTurn = false
+            }
         }
 
         angleSecond = ApplyAngleSymmetry(angle, udg_symmetryAngle)

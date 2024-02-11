@@ -34,7 +34,11 @@ export class StaticSlideArray extends BaseArray<StaticSlide> {
 
     newFromJson = (staticSlidesJson: { [x: string]: any }[]) => {
         for (const s of staticSlidesJson) {
-            this.new(s.x1, s.y1, s.x2, s.y2, s.x3, s.y3, s.x4, s.y4, s.angle, s.speed)
+            const staticSlide = this.new(s.x1, s.y1, s.x2, s.y2, s.x3, s.y3, s.x4, s.y4, s.angle, s.speed)
+
+            if (s.canTurnAngle) {
+                staticSlide.setCanTurnAngle(s.canTurnAngle)
+            }
         }
     }
 

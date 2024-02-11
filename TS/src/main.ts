@@ -40,9 +40,9 @@ import { PROD } from './env'
 // [X] New make cmd: -setMonsterCreateTerrain(setmct) <monsterLabel> <terrainLabel> -- When a monstertype has a createTerrainLabel, it will create the terrain at the monsters position and then remove the monster
 // [X] New make cmd: -copyLevelPatrol [targetLevel] -- Copy a patrol from your current working level to another
 // [X] Static slides now support diagonal slides
+// [X] Static slides will now kill the slider when they go out of bounds
+// [X] New make cmd: -setStaticSlideCanTurnAngle; Allows setting a specific angle for the slider to turn on the static slide
 // [O] Show current level on multiboard
-
-// [O] Clusterfuck 2: Static slide property to allow moving on the static slide but only the 90 degree angles of static slide angle. So if static slide goes from left to right then ur allowed to go up/down. Add limit to min/max y so u cant go out of bounds
 
 const tsMain = () => {
     ServiceManager.registerServices({
