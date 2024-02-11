@@ -1108,6 +1108,39 @@ export const initExecuteCommandMake = () => {
         },
     })
 
+    //-setMonsterCreateTerrain(setmct) <monsterLabel> <terrainLabel>   --> Create terrain
+    registerCommand({
+        name: 'setMonsterCreateTerrain',
+        alias: ['setmct'],
+        group: 'make',
+        argDescription: '<monsterLabel> <terrainLabel>',
+        description: 'change the scale of a monster',
+        cb: ({ nbParam, param1, param2 }, escaper) => {
+            if (!(nbParam === 2)) {
+                return true
+            }
+
+            const monsterType = getUdgMonsterTypes().getByLabel(param1)
+
+            //checkParam1
+            if (!monsterType) {
+                Text.erP(escaper.getPlayer(), 'unknown monster type')
+                return true
+            }
+
+            //checkParam2
+            if (!getUdgTerrainTypes().getByLabel(param2)) {
+                monsterType.setCreateTerrainLabel(undefined)
+                Text.mkP(escaper.getPlayer(), 'Create terrain disabled')
+                return true
+            }
+
+            monsterType.setCreateTerrainLabel(param2)
+            Text.mkP(escaper.getPlayer(), `Create terrain changed to: ${param2}`)
+            return true
+        },
+    })
+
     //-setMonsterClickable(setmc) <monsterLabel> <boolean clickable>   --> sets if locust or not for this kind of monster
     registerCommand({
         name: 'setMonsterClickable',
@@ -2535,6 +2568,27 @@ export const initExecuteCommandMake = () => {
         },
     })
 
+    //-copyLevelPatrol <targetLvl>
+    registerCommand({
+        name: 'copyLevelPatrol',
+        alias: [],
+        group: 'make',
+        argDescription: '<targetLvl>',
+        description: '',
+        cb: ({ param1 }, escaper) => {
+            const targetLevel = getUdgLevels().get(S2I(param1))
+
+            if (!targetLevel || param1 === '') {
+                Text.erP(escaper.getPlayer(), 'Target level does not exist')
+                return true
+            }
+
+            escaper.makeCopyLevelPatrol(targetLevel)
+            Text.mkP(escaper.getPlayer(), `Click on a monster to copy to level: ${targetLevel.getId()}`)
+            return true
+        },
+    })
+
     //-setLivesEarned(setle) <livesNumber> [<levelID>]   --> the number of lives earned at the specified level
     registerCommand({
         name: 'setLivesEarned',
@@ -3787,7 +3841,7 @@ export const initExecuteCommandMake = () => {
                 const angle = convertTextToAngle(param2)
                 const offset = S2I(param3)
 
-                if (!getUdgMonsterTypes().getByLabel(mt)) {
+                if (!getUdgMonsterTypes().getByLabel(mt) && mt !== 'all') {
                     Text.erP(escaper.getPlayer(), `Invalid monster type`)
                     return true
                 }
@@ -3963,7 +4017,7 @@ export const initExecuteCommandMake = () => {
             }
         }
 
-        const item = snapPatrolsToSlideOffsetMap[mt.label]
+        const item = snapPatrolsToSlideOffsetMap['all'] || snapPatrolsToSlideOffsetMap[mt.label]
 
         if (item) {
             newX += Math.cos(item.angle) * item.offset

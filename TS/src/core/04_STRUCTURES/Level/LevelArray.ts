@@ -359,52 +359,7 @@ export class LevelArray extends BaseArray<Level> {
             //monsters
             if (levelJson.monsters) {
                 for (let m of levelJson.monsters) {
-                    let monster: Monster | null = null
-
-                    if (m.monsterClassName == 'Caster') {
-                        const ct = getUdgCasterTypes().getByLabel(m.casterTypeLabel)
-
-                        if (!ct) {
-                            Text.erA(`Caster type "${m.casterTypeLabel}" unknown`)
-                        } else {
-                            monster = new Caster(ct, m.x, m.y, m.angle, m.id)
-                        }
-                    } else {
-                        const mt = getUdgMonsterTypes().getByLabel(m.monsterTypeLabel)
-
-                        if (!mt) {
-                            Text.erA(`Monster label "${m.monsterTypeLabel}" unknown`)
-                        } else {
-                            if (m.monsterClassName == 'MonsterNoMove') {
-                                monster = new MonsterNoMove(mt, m.x, m.y, m.angle, m.id)
-                            } else if (m.monsterClassName == 'MonsterSimplePatrol') {
-                                monster = createMonsterSmartPatrol(mt, m.x1, m.y1, m.x2, m.y2, m.id)
-                            } else if (m.monsterClassName == 'MonsterMultiplePatrols') {
-                                for (const [n, x] of pairs(m.xArr)) {
-                                    const y = m.yArr[n]
-                                    MonsterMultiplePatrols.storeNewLoc(x, y)
-                                }
-                                monster = new MonsterMultiplePatrols(mt, m.mode, m.id)
-                            } else if (m.monsterClassName == 'MonsterTeleport') {
-                                for (const [n, x] of pairs(m.xArr)) {
-                                    const y = m.yArr[n]
-                                    MonsterTeleport.storeNewLoc(x, y)
-                                }
-                                monster = new MonsterTeleport(mt, m.period, m.angle, m.mode, m.id)
-                            }
-                        }
-                    }
-
-                    if (monster) {
-                        m.jumpPad && monster.setJumpPad(m.jumpPad)
-                        m.jumpPadEffect && monster.setJumpPadEffect(m.jumpPadEffect)
-
-                        if (m.attackGroundX && m.attackGroundY) {
-                            monster.setAttackGroundPos(m.attackGroundX, m.attackGroundY)
-                        }
-
-                        level.monsters.new(monster, false)
-                    }
+                    this.newFromJsonMonster(m, level, false)
                 }
             }
 
@@ -443,6 +398,61 @@ export class LevelArray extends BaseArray<Level> {
                 level.regions.newFromJson(levelJson.regions)
             }
         }
+    }
+
+    newFromJsonMonster = (m: any, level: Level, createUnit: boolean) => {
+        let monster: Monster | null = null
+
+        if (!m.angle) {
+            m.angle = -1
+        }
+
+        if (m.monsterClassName == 'Caster') {
+            const ct = getUdgCasterTypes().getByLabel(m.casterTypeLabel)
+
+            if (!ct) {
+                Text.erA(`Caster type "${m.casterTypeLabel}" unknown`)
+            } else {
+                monster = new Caster(ct, m.x, m.y, m.angle, m.id)
+            }
+        } else {
+            const mt = getUdgMonsterTypes().getByLabel(m.monsterTypeLabel)
+
+            if (!mt) {
+                Text.erA(`Monster label "${m.monsterTypeLabel}" unknown`)
+            } else {
+                if (m.monsterClassName == 'MonsterNoMove') {
+                    monster = new MonsterNoMove(mt, m.x, m.y, m.angle, m.id)
+                } else if (m.monsterClassName == 'MonsterSimplePatrol') {
+                    monster = createMonsterSmartPatrol(mt, m.x1, m.y1, m.x2, m.y2, m.id)
+                } else if (m.monsterClassName == 'MonsterMultiplePatrols') {
+                    for (const [n, x] of pairs(m.xArr)) {
+                        const y = m.yArr[n]
+                        MonsterMultiplePatrols.storeNewLoc(x, y)
+                    }
+                    monster = new MonsterMultiplePatrols(mt, m.mode, m.id)
+                } else if (m.monsterClassName == 'MonsterTeleport') {
+                    for (const [n, x] of pairs(m.xArr)) {
+                        const y = m.yArr[n]
+                        MonsterTeleport.storeNewLoc(x, y)
+                    }
+                    monster = new MonsterTeleport(mt, m.period, m.angle, m.mode, m.id)
+                }
+            }
+        }
+
+        if (monster) {
+            m.jumpPad && monster.setJumpPad(m.jumpPad)
+            m.jumpPadEffect && monster.setJumpPadEffect(m.jumpPadEffect)
+
+            if (m.attackGroundX && m.attackGroundY) {
+                monster.setAttackGroundPos(m.attackGroundX, m.attackGroundY)
+            }
+
+            level.monsters.new(monster, createUnit)
+        }
+
+        return monster
     }
 
     destroyLastLevel = (forceDelete0: boolean = false): boolean => {

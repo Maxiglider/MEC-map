@@ -23,6 +23,7 @@ import {
 import { udg_colorCode } from 'core/01_libraries/Init_colorCodes'
 import { Text } from 'core/01_libraries/Text'
 import { MakePropertyChange } from 'core/05_MAKE_STRUCTURES/Make/MakePropertyChange'
+import { MakeCopyLevelPatrol } from 'core/05_MAKE_STRUCTURES/Make_copy_paste/MakeCopyLevelPatrol'
 import { MakeCaster } from 'core/05_MAKE_STRUCTURES/Make_create_casters/MakeCaster'
 import { MakeMeteor } from 'core/05_MAKE_STRUCTURES/Make_create_meteors/MakeMeteor'
 import { MakeMonsterSpawn } from 'core/05_MAKE_STRUCTURES/Make_create_monster_spawn/MakeMonsterSpawn'
@@ -1523,7 +1524,7 @@ export class Escaper {
         this.destroyMake()
         //modes : normal, string, auto
         if (mode == 'normal' || mode == 'string' || mode == 'auto') {
-            if (this.hero) this.make = new MakeMonsterSimplePatrol(this.hero, mode, mt,angle)
+            if (this.hero) this.make = new MakeMonsterSimplePatrol(this.hero, mode, mt, angle)
         }
     }
 
@@ -1589,6 +1590,11 @@ export class Escaper {
     makeMoveRegionPoint = () => {
         this.destroyMake()
         if (this.hero) this.make = new MakeMoveRegionPoint(this.hero)
+    }
+
+    makeCopyLevelPatrol = (targetLevel: Level) => {
+        this.destroyMake()
+        if (this.hero) this.make = new MakeCopyLevelPatrol(this.hero, targetLevel)
     }
 
     makeDeleteMonsters(mode: string) {

@@ -55,6 +55,9 @@ export class MonsterTypeArray extends BaseArray<MonsterType> {
             if (mt.isWanderable) {
                 monsterType.setIsWanderable(mt.isWanderable)
             }
+            if (mt.createTerrainLabel) {
+                monsterType.setCreateTerrainLabel(mt.createTerrainLabel)
+            }
         }
     }
 

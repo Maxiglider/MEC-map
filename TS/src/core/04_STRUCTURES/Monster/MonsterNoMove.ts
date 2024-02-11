@@ -1,5 +1,6 @@
+import { ChangeTerrainType } from 'core/07_TRIGGERS/Modify_terrain_Functions/Modify_terrain_functions'
 import { Timer } from 'w3ts'
-import { globals, udg_monsters } from '../../../../globals'
+import { getUdgTerrainTypes, globals, udg_monsters } from '../../../../globals'
 import { Monster } from './Monster'
 import { MonsterType } from './MonsterType'
 import { NewImmobileMonster } from './Monster_functions'
@@ -8,6 +9,8 @@ export class MonsterNoMove extends Monster {
     x: number
     y: number
     private angle: number
+
+    private oldCreateTerrainId: number | null = null
 
     constructor(mt: MonsterType, x: number, y: number, angle: number, forceId: number | null = null) {
         super(mt, forceId)
@@ -35,6 +38,7 @@ export class MonsterNoMove extends Monster {
         )
 
         this.wander()
+        this.startCreateTerrain()
     }
 
     private moveTimer: Timer | null = null
@@ -59,6 +63,8 @@ export class MonsterNoMove extends Monster {
             DestroyEffect(this.wanderEffect)
             this.wanderEffect = null
         }
+
+        this.stopCreateTerrain()
     }
 
     wander = () => {
@@ -129,6 +135,30 @@ export class MonsterNoMove extends Monster {
         }
 
         createTimer()
+    }
+
+    startCreateTerrain = () => {
+        this.stopCreateTerrain()
+
+        const ctl = this.mt?.getCreateTerrainLabel()
+
+        if (ctl) {
+            this.removeUnit()
+
+            const ct = getUdgTerrainTypes().getByLabel(ctl)
+
+            if (ct) {
+                this.oldCreateTerrainId = GetTerrainType(this.x, this.y)
+                ChangeTerrainType(this.x, this.y, ct.getTerrainTypeId())
+            }
+        }
+    }
+
+    stopCreateTerrain = () => {
+        if (this.oldCreateTerrainId) {
+            ChangeTerrainType(this.x, this.y, this.oldCreateTerrainId)
+            this.oldCreateTerrainId = null
+        }
     }
 
     toJson() {

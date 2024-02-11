@@ -25,6 +25,7 @@ export class MonsterType {
     private killingEffectStr?: string
     private maxLife: number
     private height: number
+    private createTerrainLabel?: string
 
     constructor(
         label: string,
@@ -140,6 +141,15 @@ export class MonsterType {
         this.scale = scale
         this.refresh()
         return true
+    }
+
+    getCreateTerrainLabel = () => {
+        return this.createTerrainLabel
+    }
+
+    setCreateTerrainLabel = (createTerrainLabel?: string): MonsterType => {
+        this.createTerrainLabel = createTerrainLabel
+        return this
     }
 
     getImmolationSkill = () => {
@@ -317,6 +327,7 @@ export class MonsterType {
         output['killingEffect'] = this.killingEffectStr
         output['nbMeteorsToKill'] = this.maxLife / 10000
         output['height'] = R2I(this.height)
+        output['createTerrainLabel'] = this.createTerrainLabel
 
         return output
     }
