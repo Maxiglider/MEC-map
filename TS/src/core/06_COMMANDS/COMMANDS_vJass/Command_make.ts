@@ -2571,7 +2571,7 @@ export const initExecuteCommandMake = () => {
     //-copyLevelPatrol <targetLvl>
     registerCommand({
         name: 'copyLevelPatrol',
-        alias: [],
+        alias: ['clp'],
         group: 'make',
         argDescription: '<targetLvl>',
         description: '',
@@ -2583,8 +2583,29 @@ export const initExecuteCommandMake = () => {
                 return true
             }
 
-            escaper.makeCopyLevelPatrol(targetLevel)
+            escaper.makeCopyLevelPatrol(targetLevel, 'oneByOne')
             Text.mkP(escaper.getPlayer(), `Click on a monster to copy to level: ${targetLevel.getId()}`)
+            return true
+        },
+    })
+
+    //-copyLevelPatrolBetweenPoints <targetLvl>
+    registerCommand({
+        name: 'copyLevelPatrolBetweenPoints',
+        alias: ['clpbp'],
+        group: 'make',
+        argDescription: '<targetLvl>',
+        description: '',
+        cb: ({ param1 }, escaper) => {
+            const targetLevel = getUdgLevels().get(S2I(param1))
+
+            if (!targetLevel || param1 === '') {
+                Text.erP(escaper.getPlayer(), 'Target level does not exist')
+                return true
+            }
+
+            escaper.makeCopyLevelPatrol(targetLevel, 'all')
+            Text.mkP(escaper.getPlayer(), `Click on a region to copy to level: ${targetLevel.getId()}`)
             return true
         },
     })

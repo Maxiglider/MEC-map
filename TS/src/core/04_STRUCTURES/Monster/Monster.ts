@@ -24,7 +24,7 @@ export abstract class Monster {
 
     public static DISABLE_TRANSPARENCY = 80
 
-    private static lastInstanceId = -1
+    public static lastInstanceId = -1
 
     id: number
     u?: unit

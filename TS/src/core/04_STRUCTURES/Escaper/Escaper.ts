@@ -1592,9 +1592,9 @@ export class Escaper {
         if (this.hero) this.make = new MakeMoveRegionPoint(this.hero)
     }
 
-    makeCopyLevelPatrol = (targetLevel: Level) => {
+    makeCopyLevelPatrol = (targetLevel: Level, mode: string) => {
         this.destroyMake()
-        if (this.hero) this.make = new MakeCopyLevelPatrol(this.hero, targetLevel)
+        if (this.hero) this.make = new MakeCopyLevelPatrol(this.hero, mode, targetLevel)
     }
 
     makeDeleteMonsters(mode: string) {

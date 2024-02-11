@@ -39,10 +39,13 @@ import { PROD } from './env'
 // [X] -crma patrols now have a slight offset to prevent the patrols from walking in sync
 // [X] New make cmd: -setMonsterCreateTerrain(setmct) <monsterLabel> <terrainLabel> -- When a monstertype has a createTerrainLabel, it will create the terrain at the monsters position and then remove the monster
 // [X] New make cmd: -copyLevelPatrol [targetLevel] -- Copy a patrol from your current working level to another
+// [X] New make cmd: -copyLevelPatrolBp [targetLevel] -- Copy multiple patrols from your current working level to another
 // [X] Static slides now support diagonal slides
 // [X] Static slides will now kill the slider when they go out of bounds
 // [X] New make cmd: -setStaticSlideCanTurnAngle; Allows setting a specific angle for the slider to turn on the static slide
 // [O] Show current level on multiboard
+
+// [O] BUG; if we're on lvl 1 and i do -setmkl 0; then -crmi p and it breaks
 
 const tsMain = () => {
     ServiceManager.registerServices({
