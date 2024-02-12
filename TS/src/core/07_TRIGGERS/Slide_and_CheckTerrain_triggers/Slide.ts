@@ -1,6 +1,7 @@
+import { EffectUtils } from 'Utils/EffectUtils'
 import { pathingBlockerUtils } from 'Utils/PathingBlockerUtils'
 import { createTimer } from 'Utils/mapUtils'
-import { NB_ESCAPERS, SLIDE_PERIOD } from 'core/01_libraries/Constants'
+import { GM_KILLING_EFFECT, NB_ESCAPERS, SLIDE_PERIOD } from 'core/01_libraries/Constants'
 import { Apm } from 'core/08_GAME/Apm_clics_par_minute/Apm'
 import { Cpm } from 'core/08_GAME/Apm_clics_par_minute/Cpm'
 import { getUdgEscapers, globals } from '../../../../globals'
@@ -159,7 +160,13 @@ const initSlideTrigger = () => {
                         escaper.refreshCerclePosition()
                     }
                 } else {
-                    escaper.kill()
+                    staticSliding.removePlayer(escaper.getId())
+
+                    if (!escaper.isGodModeOn()) {
+                        escaper.kill()
+                    } else {
+                        EffectUtils.destroyEffect(EffectUtils.addSpecialEffect(GM_KILLING_EFFECT, newX, newY))
+                    }
                 }
             } else {
                 escaper.moveHero(newX, newY, false)

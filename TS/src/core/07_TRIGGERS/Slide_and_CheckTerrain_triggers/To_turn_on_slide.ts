@@ -2,6 +2,7 @@ import { createEvent, forRange } from 'Utils/mapUtils'
 import {
     AnglesDiff,
     ApplyAngleSymmetry,
+    ForceAngleBetween0And360,
     IsLastOrderPause,
     IsOnGround,
     StopUnit,
@@ -87,14 +88,33 @@ const initTurnOnSlide = () => {
 
             if (canTurnAngle) {
                 const currentAngle = staticSliding.getAngle()
-                const minAngle = currentAngle - canTurnAngle
-                const maxAngle = currentAngle + canTurnAngle
 
-                if (angle < minAngle) {
-                    angle = minAngle
-                } else if (angle > maxAngle) {
-                    angle = maxAngle
+                const minAngle = ForceAngleBetween0And360(currentAngle - canTurnAngle)
+                const maxAngle = ForceAngleBetween0And360(currentAngle + canTurnAngle)
+
+                if (
+                    !(
+                        ForceAngleBetween0And360(angle - currentAngle) < canTurnAngle ||
+                        ForceAngleBetween0And360(angle - currentAngle) > 360 - canTurnAngle
+                    )
+                ) {
+                    if (
+                        ForceAngleBetween0And360(angle - currentAngle) < 180 ||
+                        ForceAngleBetween0And360(currentAngle - angle) > 180
+                    ) {
+                        angle = maxAngle
+                    } else {
+                        angle = minAngle
+                    }
                 }
+
+                // if (Math.abs(nAngle - currentAngle) > canTurnAngle) {
+                //     if (Math.abs(nAngle - currentAngle) > 180) {
+                //         angle = minAngle
+                //     } else {
+                //         angle = maxAngle
+                //     }
+                // }
             } else {
                 canTurn = false
             }

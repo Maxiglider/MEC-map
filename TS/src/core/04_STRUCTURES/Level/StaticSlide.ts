@@ -115,6 +115,7 @@ export class StaticSlide {
                             if (
                                 IsHero(hero) &&
                                 escaper &&
+                                escaper.isSliding() &&
                                 !escaper.isStaticSliding() &&
                                 !this.slidingPlayers.includes(escaper.getEscaperId())
                             ) {

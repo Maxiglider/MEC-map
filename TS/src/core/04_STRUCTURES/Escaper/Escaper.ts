@@ -578,6 +578,12 @@ export class Escaper {
         delete this.make
         this.effects.hideEffects()
 
+        const staticSliding = this.staticSliding
+
+        if (staticSliding) {
+            staticSliding.removePlayer(this.getId())
+        }
+
         DisableTrigger(this.checkTerrain)
         this.slide && this.slide.pause().destroy()
 
