@@ -32,6 +32,7 @@ export const globals: {
     killAfkHeroes: boolean
     wanderEffectStr: string
     wanderEffectFacing: boolean
+    scoreboardLabel: string
 } = {
     logStrings: [],
     MAP_MIN_X: 0,
@@ -51,6 +52,7 @@ export const globals: {
     killAfkHeroes: true,
     wanderEffectStr: 'AbilitiesSpellsOtherTalkToMeTalkToMe.mdl',
     wanderEffectFacing: false,
+    scoreboardLabel: 'Scoreboard',
 }
 
 //SETTERS - GETTERS

@@ -96,6 +96,10 @@ export const MEC_core_API = {
         return hooks.hooks_onHeroEnterRegionOnce.new(cb)
     },
 
+    onModeSelection: (cb: (mode: 'solo' | 'coop') => any) => {
+        return hooks.hooks_onModeSelection.new(cb)
+    },
+
     //terrain
     terrain: {
         reinitTypes: ReinitTerrains.ReinitTerrains,
@@ -137,6 +141,7 @@ export const MEC_core_API = {
     setKillAfkHeroes: (b: boolean) => (globals.killAfkHeroes = b),
     setWanderEffect: (effect: string) => (globals.wanderEffectStr = effect),
     setWanderEffectFacing: (b: boolean) => (globals.wanderEffectFacing = b),
+    setScoreboardLabel: (label: string) => (globals.scoreboardLabel = label),
 
     createMonsterNoMoveForLevel: (levelId: number, mtLabel: string, x: number, y: number) => {
         const mt = getUdgMonsterTypes().getByLabel(mtLabel)

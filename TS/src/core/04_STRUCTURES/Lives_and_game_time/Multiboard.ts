@@ -7,7 +7,7 @@ import { arrayPush, ucfirst } from 'core/01_libraries/Basic_functions'
 import { NB_ESCAPERS, PURPLE, RED } from 'core/01_libraries/Constants'
 import { udg_colorCode } from 'core/01_libraries/Init_colorCodes'
 import { AfkMode } from 'core/08_GAME/Afk_mode/Afk_mode'
-import { getUdgEscapers, getUdgLevels } from '../../../../globals'
+import { getUdgEscapers, getUdgLevels, globals } from '../../../../globals'
 import { playerId2colorId, rawPlayerNames } from '../../06_COMMANDS/COMMANDS_vJass/Command_functions'
 import { Escaper } from '../Escaper/Escaper'
 import { sameLevelProgression } from '../Level/LevelProgression'
@@ -97,7 +97,7 @@ export const initMultiboard = () => {
 
         const nameWidth = getLongestNameWidth()
 
-        mb = CreateMultiboardBJ(cols, rows, `Scoreboard - Global`)
+        mb = CreateMultiboardBJ(cols, rows, `${globals.scoreboardLabel} - Global`)
 
         for (let col = 1; col <= cols; col++) {
             for (let row = 1; row <= rows; row++) {
@@ -347,7 +347,7 @@ export const initMultiboard = () => {
             mb &&
                 MultiboardSetTitleText(
                     mb,
-                    `Scoreboard - ${ucfirst(playerMode.statsMode)}` +
+                    `${globals.scoreboardLabel} - ${ucfirst(playerMode.statsMode)}` +
                         (getUdgLevels().isNoobEdit() ? ' - ' + udg_colorCode[RED] + 'Noobedit' + '|r' : '') +
                         (getUdgLevels().isSpeedEdit() ? ' - ' + udg_colorCode[PURPLE] + 'SPEED' + '|r' : '')
                 )

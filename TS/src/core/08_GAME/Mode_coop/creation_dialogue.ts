@@ -1,6 +1,7 @@
-import { NB_PLAYERS_MAX } from 'core/01_libraries/Constants'
 import { ServiceManager } from 'Services'
 import { createEvent, createTimer } from 'Utils/mapUtils'
+import { NB_PLAYERS_MAX } from 'core/01_libraries/Constants'
+import { hooks } from 'core/API/GeneralHooks'
 import { globals } from '../../../../globals'
 
 let dialChoixModeCoop: dialog
@@ -29,6 +30,12 @@ export const InitTrig_creation_dialogue = () => {
                     }
 
                     ServiceManager.getService('Multiboard').resetRoundScores()
+
+                    if (hooks.hooks_onModeSelection) {
+                        for (const hook of hooks.hooks_onModeSelection.getHooks()) {
+                            hook.execute(globals.coopModeActive ? 'coop' : 'solo')
+                        }
+                    }
                 },
             ],
         })
@@ -66,6 +73,12 @@ export const gg_trg_apparition_dialogue_et_fermeture_automatique = createEvent({
                     }
 
                     ServiceManager.getService('Multiboard').resetRoundScores()
+
+                    if (hooks.hooks_onModeSelection) {
+                        for (const hook of hooks.hooks_onModeSelection.getHooks()) {
+                            hook.execute(globals.coopModeActive ? 'coop' : 'solo')
+                        }
+                    }
                 }
             })
         },

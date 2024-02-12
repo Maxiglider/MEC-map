@@ -12,4 +12,5 @@ export const hooks = {
     hooks_onCoopHeroRevive: new MecHookArray<(reviver: Escaper, revived: Escaper) => void>(),
     hooks_onHeroEnterRegion: new MecHookArray<(escaper: Escaper, region: Region) => void>(),
     hooks_onHeroEnterRegionOnce: new MecHookArray<(escaper: Escaper, region: Region) => void>(),
+    hooks_onModeSelection: new MecHookArray<(mode: 'solo' | 'coop') => void>(),
 }
