@@ -29,13 +29,13 @@ export const InitTrig_creation_dialogue = () => {
                         DisplayTextToForce(GetPlayersAll(), 'Solo mode chosen by first player')
                     }
 
-                    ServiceManager.getService('Multiboard').resetRoundScores()
-
                     if (hooks.hooks_onModeSelection) {
                         for (const hook of hooks.hooks_onModeSelection.getHooks()) {
                             hook.execute(globals.coopModeActive ? 'coop' : 'solo')
                         }
                     }
+
+                    ServiceManager.getService('Multiboard').resetRoundScores()
                 },
             ],
         })
@@ -72,13 +72,13 @@ export const gg_trg_apparition_dialogue_et_fermeture_automatique = createEvent({
                         DisplayTextToForce(GetPlayersAll(), 'Solo mode automatically chosen')
                     }
 
-                    ServiceManager.getService('Multiboard').resetRoundScores()
-
                     if (hooks.hooks_onModeSelection) {
                         for (const hook of hooks.hooks_onModeSelection.getHooks()) {
                             hook.execute(globals.coopModeActive ? 'coop' : 'solo')
                         }
                     }
+
+                    ServiceManager.getService('Multiboard').resetRoundScores()
                 }
             })
         },
