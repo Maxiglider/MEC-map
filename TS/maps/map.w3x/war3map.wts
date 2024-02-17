@@ -1139,3 +1139,9 @@ STRING 223
 Player 24
 }
 
+STRING 224
+// Units: hgrd (Grid), Name (Name)
+{
+Grid
+}
+
