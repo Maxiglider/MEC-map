@@ -43,6 +43,8 @@ import { PROD } from './env'
 // [X] Static slides now support diagonal slides
 // [X] Static slides will now kill the slider when they go out of bounds
 // [X] New make cmd: -setStaticSlideCanTurnAngle; Allows setting a specific angle for the slider to turn on the static slide
+// [X] -setmct QoL will automatically remove other setmct units when placed on the same tile
+// [X] New make cmd: -grid 1/2/3; Toggles grid visibility
 // [O] Show current level on multiboard
 
 const tsMain = () => {

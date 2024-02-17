@@ -554,13 +554,16 @@ export const initCommandAll = () => {
             const hero = escaper.getHero()
 
             if (hero) {
-                animUtils.setAnimation(hero, param1)
+                const spaceIndex = cmd.indexOf(' ')
+                const args = spaceIndex ? cmd.substring(spaceIndex + 1) : param1
+
+                animUtils.setAnimation(hero, args)
 
                 if (!escaper.isEscaperSecondary()) {
                     const hero2 = GetMirrorEscaper(escaper)?.getHero()
 
                     if (hero2) {
-                        animUtils.setAnimation(hero2, param1)
+                        animUtils.setAnimation(hero2, args)
                     }
                 }
             }

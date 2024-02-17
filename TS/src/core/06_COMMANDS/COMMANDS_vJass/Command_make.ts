@@ -1,7 +1,9 @@
 import { String2Ascii } from 'core/01_libraries/Ascii'
 import {
+    arrayPush,
     convertAngleToDirection,
     convertTextToAngle,
+    GetCurrentMonsterPlayer,
     IsBoolString,
     S2B,
     tileset2tilesetString,
@@ -18,6 +20,7 @@ import { udg_colorCode } from 'core/01_libraries/Init_colorCodes'
 import { Text } from 'core/01_libraries/Text'
 import { Level } from 'core/04_STRUCTURES/Level/Level'
 import { IMMOLATION_SKILLS } from 'core/04_STRUCTURES/Monster/Immolation_skills'
+import { ABILITY_ANNULER_VISION } from 'core/04_STRUCTURES/Monster/Monster_functions'
 import { MonsterMultiplePatrols } from 'core/04_STRUCTURES/Monster/MonsterMultiplePatrols'
 import { MonsterNoMove } from 'core/04_STRUCTURES/Monster/MonsterNoMove'
 import { MonsterSimplePatrol } from 'core/04_STRUCTURES/Monster/MonsterSimplePatrol'
@@ -30,7 +33,7 @@ import { ExchangeTerrains } from 'core/07_TRIGGERS/Triggers_to_modify_terrains/E
 import { RandomizeTerrains } from 'core/07_TRIGGERS/Triggers_to_modify_terrains/Randomize_terrains'
 import { ServiceManager } from 'Services'
 import { createPoint } from 'Utils/Point'
-import { getUdgCasterTypes, getUdgLevels, getUdgMonsterTypes, getUdgTerrainTypes } from '../../../../globals'
+import { getUdgCasterTypes, getUdgLevels, getUdgMonsterTypes, getUdgTerrainTypes, globals } from '../../../../globals'
 import { IsInteger, IsPositiveInteger } from '../../01_libraries/Functions_on_numbers'
 import {
     DEFAULT_CASTER_ANIMATION,
@@ -3811,6 +3814,50 @@ export const initExecuteCommandMake = () => {
         },
     })
 
+    const gridUnits: unit[] = []
+
+    // -grid <boolean>
+    registerCommand({
+        name: 'grid',
+        alias: [],
+        group: 'make',
+        argDescription: '<boolean>',
+        description: 'Toggle grid',
+        cb: ({ param1 }) => {
+            const showGrid = param1 === '3' ? '3' : param1 === '2' ? '2' : S2B(param1)
+
+            for (const unit of gridUnits) {
+                RemoveUnit(unit)
+            }
+
+            if (showGrid) {
+                const gridUnitWidth = 128 * 4
+
+                for (let x = globals.MAP_MIN_X + gridUnitWidth; x < globals.MAP_MAX_X; x += gridUnitWidth) {
+                    for (let y = globals.MAP_MIN_Y + gridUnitWidth; y < globals.MAP_MAX_Y; y += gridUnitWidth) {
+                        const gridUnit = CreateUnit(GetCurrentMonsterPlayer(), FourCC('hgrd'), x, y, 0)
+                        SetUnitUseFood(gridUnit, false)
+                        UnitAddAbility(gridUnit, FourCC('Aloc'))
+                        UnitAddAbility(gridUnit, ABILITY_ANNULER_VISION)
+                        UnitRemoveType(gridUnit, UNIT_TYPE_PEON)
+
+                        if (showGrid === '3') {
+                            SetUnitAnimation(gridUnit, 'Stand Upgrade Second')
+                        } else if (showGrid === '2') {
+                            SetUnitAnimation(gridUnit, 'Stand Upgrade First')
+                        } else {
+                            SetUnitAnimation(gridUnit, 'Stand')
+                        }
+
+                        arrayPush(gridUnits, gridUnit)
+                    }
+                }
+            }
+
+            return true
+        },
+    })
+
     // -snapPatrolsToGrid <value>
     registerCommand({
         name: 'snapPatrolsToGrid',
@@ -3882,7 +3929,8 @@ export const initExecuteCommandMake = () => {
                 }
 
                 if (!angle) {
-                    Text.erP(escaper.getPlayer(), `Invalid angle`)
+                    snapPatrolsToSlideOffsetMap[mt] = null
+                    Text.P(escaper.getPlayer(), `Disabled offset for ${mt}`)
                     return true
                 }
 
@@ -3930,6 +3978,7 @@ export const initExecuteCommandMake = () => {
 
                             if (monster instanceof MonsterSimplePatrol) {
                                 const p1 = snapPointToSlide(
+                                    `${monster.id}_1`,
                                     monster.x1,
                                     monster.y1,
                                     monster.x2,
@@ -3940,6 +3989,7 @@ export const initExecuteCommandMake = () => {
                                 )
 
                                 const p2 = snapPointToSlide(
+                                    `${monster.id}_2`,
                                     monster.x2,
                                     monster.y2,
                                     monster.x1,
@@ -3962,6 +4012,7 @@ export const initExecuteCommandMake = () => {
                                     const ny = i + 1 > monster.y.length - 1 ? 0 : i + 1
 
                                     const p1 = snapPointToSlide(
+                                        `${monster.id}_${i}`,
                                         monster.x[i],
                                         monster.y[i],
                                         monster.x[nx],
@@ -3988,15 +4039,25 @@ export const initExecuteCommandMake = () => {
         },
     })
 
+    const snappedHistoryMap: { [historyId: string]: { x: number | undefined; y: number | undefined } } = {}
+
     const snapPointToSlide = (
-        x1: number,
-        y1: number,
+        historyId: string,
+        _x1: number,
+        _y1: number,
         x2: number,
         y2: number,
         preferredDistance: number,
         fixStartOnSlidePatrols: boolean,
         mt: MonsterType
     ) => {
+        const x1 = snappedHistoryMap[historyId]?.x || _x1
+        const y1 = snappedHistoryMap[historyId]?.y || _y1
+
+        if (!snappedHistoryMap[historyId]) {
+            snappedHistoryMap[historyId] = { x: _x1, y: _y1 }
+        }
+
         const currentTerrain = getUdgTerrainTypes().getTerrainType(x1, y1)
         let newX = x1
         let newY = y1
@@ -4052,7 +4113,7 @@ export const initExecuteCommandMake = () => {
             }
         }
 
-        const item = snapPatrolsToSlideOffsetMap['all'] || snapPatrolsToSlideOffsetMap[mt.label]
+        const item = snapPatrolsToSlideOffsetMap[mt.label] || snapPatrolsToSlideOffsetMap['all']
 
         if (item) {
             newX += Math.cos(item.angle) * item.offset

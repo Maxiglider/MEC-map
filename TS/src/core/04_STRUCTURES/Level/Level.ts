@@ -338,6 +338,10 @@ export class Level {
 
             if (this.debugRegionsVisible === 'on_monsters') {
                 for (const [_, monster] of pairs(this.monsters.getAll())) {
+                    if (monster.isDeleted()) {
+                        continue
+                    }
+
                     if (monster instanceof MonsterSimplePatrol) {
                         this.drawLine(monster.x1, monster.y1, monster.x2, monster.y2)
                     } else if (monster instanceof MonsterMultiplePatrols) {

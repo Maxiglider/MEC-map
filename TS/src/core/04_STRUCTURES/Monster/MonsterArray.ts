@@ -103,6 +103,21 @@ export class MonsterArray extends BaseArray<Monster> {
         return filteredMonsters
     }
 
+    getMonsterNoMoveNearTile = (x: number, y: number): Monster | null => {
+        for (const [_, monster] of pairs(this.data)) {
+            if (monster instanceof MonsterNoMove && !monster.isDeleted()) {
+                if (
+                    Math.floor((x - 64) / 128) === Math.floor((monster.x - 64) / 128) &&
+                    Math.floor((y - 64) / 128) === Math.floor((monster.y - 64) / 128)
+                ) {
+                    return monster
+                }
+            }
+        }
+
+        return null
+    }
+
     createMonstersUnits = () => {
         for (const [_, monster] of pairs(this.data)) {
             monster.createUnit()

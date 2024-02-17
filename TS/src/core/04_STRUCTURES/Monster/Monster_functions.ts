@@ -12,7 +12,7 @@ const ABILITY_10_LIFE = FourCC('ABV2')
 const ABILITY_100_LIFE = FourCC('ABV3')
 const ABILITY_1000_LIFE = FourCC('ABV4')
 const ABILITY_10000_LIFE = FourCC('ABV5')
-const ABILITY_ANNULER_VISION = FourCC('A0AV')
+export const ABILITY_ANNULER_VISION = FourCC('A0AV')
 const ABILITY_FORME_CORBEAU = FourCC('Amrf')
 
 export const UnitAddRemoveLifeAbility = (u: unit, lifeAbility: number) => {
