@@ -31,7 +31,7 @@ const getLongestNameWidth = () => {
 type IBoardMode = 'multiboard' | 'leaderboard'
 
 type IStatsMode = (typeof statsModes)[0]
-const statsModes = literalArray(['global', 'current'])
+const statsModes = literalArray(['global', 'current', 'speedrun'])
 
 export type IMultiboard = ReturnType<typeof initMultiboard>
 
@@ -70,6 +70,7 @@ export const initMultiboard = () => {
             stats: {
                 global: { score: 0, saves: 0, deaths: 0, points: 0 },
                 current: { score: 0, saves: 0, deaths: 0, points: 0 },
+                speedrun: { score: 0, saves: 0, deaths: 0, points: 0 },
             },
             mode: 'multiboard',
             statsMode: 'global',
@@ -86,6 +87,7 @@ export const initMultiboard = () => {
         })
 
         GameTime.current.resetGameTime()
+        GameTime.speedrun.resetGameTime()
 
         reinitBoards()
         amountOfEscapers = getUdgEscapers().countMain()
@@ -191,6 +193,7 @@ export const initMultiboard = () => {
 
         const globalGameTimeStr = GameTime.global.getGameTime()
         const currentGameTimeStr = GameTime.current.getGameTime()
+        const speedrunGameTimeStr = GameTime.speedrun.getGameTime()
 
         for (let i = 0; i < NB_ESCAPERS; i++) {
             if (GetLocalPlayer() === Player(i)) {
@@ -202,6 +205,9 @@ export const initMultiboard = () => {
                 } else if (statsMode === 'global') {
                     mb && MultiboardSetItemValueBJ(mb, 1, 2, `|Cfffed312Game time: ${globalGameTimeStr}`)
                     lb && LeaderboardSetPlayerItemLabelBJ(Player(0), lb, `|Cfffed312Game time: ${globalGameTimeStr}`)
+                } else if (statsMode === 'speedrun') {
+                    mb && MultiboardSetItemValueBJ(mb, 1, 2, `|Cfffed312Game time: ${speedrunGameTimeStr}`)
+                    lb && LeaderboardSetPlayerItemLabelBJ(Player(0), lb, `|Cfffed312Game time: ${speedrunGameTimeStr}`)
                 }
             }
 
@@ -483,6 +489,19 @@ export const initMultiboard = () => {
     createTimer(1, true, () => {
         GameTime.global.updateGameTime()
         GameTime.current.updateGameTime()
+
+        let isSliding = false
+
+        for (const [_, escaper] of pairs(getUdgEscapers().getAll())) {
+            if (escaper.isSliding()) {
+                isSliding = true
+                break
+            }
+        }
+
+        if (isSliding) {
+            GameTime.speedrun.updateGameTime()
+        }
 
         updateGametime(true)
         handleDitchLogic()

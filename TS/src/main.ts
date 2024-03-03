@@ -38,13 +38,14 @@ import { PROD } from './env'
 // [X] Fixed a bug in -smn chain where it delays the each smn
 // [X] -crma patrols now have a slight offset to prevent the patrols from walking in sync
 // [X] New make cmd: -setMonsterCreateTerrain(setmct) <monsterLabel> <terrainLabel> -- When a monstertype has a createTerrainLabel, it will create the terrain at the monsters position and then remove the monster
-// [X] New make cmd: -copyLevelPatrol [targetLevel] -- Copy a patrol from your current working level to another
-// [X] New make cmd: -copyLevelPatrolBp [targetLevel] -- Copy multiple patrols from your current working level to another
+// [X] New make cmd: -copyLevelPatrol [targetLevel] -- Copy a patrol from your current making level to another
+// [X] New make cmd: -copyLevelPatrolBp [targetLevel] -- Copy multiple patrols from your current making level to another
 // [X] Static slides now support diagonal slides
 // [X] Static slides will now kill the slider when they go out of bounds
 // [X] New make cmd: -setStaticSlideCanTurnAngle; Allows setting a specific angle for the slider to turn on the static slide
 // [X] -setmct QoL will automatically remove other setmct units when placed on the same tile
 // [X] New make cmd: -grid 1/2/3; Toggles grid visibility
+// [X] New leaderboard option: -ldb speedrun. Shows the total time on slide for any slider
 // [O] Show current level on multiboard
 
 const tsMain = () => {

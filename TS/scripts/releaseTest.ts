@@ -1,5 +1,6 @@
 import * as fs from 'fs-extra'
 import War3Map from 'mdx-m3-viewer/dist/cjs/parsers/w3x/map'
+import { simpleExec } from './Utils/SimpleExec'
 
 const targetDir = 'C:/Users/Stan/Documents/Warcraft III/Maps/Maps/Ts/MecTest'
 const coreStart = '-- Max Escape Creation'
@@ -15,6 +16,8 @@ const main = async () => {
         .toString()
         // For some reason the final-we.lua contains double %%
         .replace(new RegExp('%%', 'g'), '%')
+
+    const versionDate = new Date()
 
     await Promise.all(
         files.map(async targetFile => {
@@ -68,7 +71,7 @@ const main = async () => {
 
                 const newFile =
                     targetFile.substring(0, targetFile.lastIndexOf('_') + 1) +
-                    new Date().getTime() +
+                    versionDate.getTime() +
                     targetFile.substring(targetFile.indexOf('.', targetFile.lastIndexOf('_') + 1))
 
                 fs.renameSync(`${targetDir}/${targetFile}`, `${targetDir}/${newFile}`)
@@ -77,6 +80,16 @@ const main = async () => {
             console.info(`[${targetFile}] Updated`)
         })
     )
+
+    if (process.argv[2] === '--publish') {
+        await simpleExec({
+            cmd: `cd "${targetDir.replace(
+                new RegExp('/', 'g'),
+                '\\'
+            )}" && git add . && git commit -m "Updated to DEV core v${versionDate.toISOString()}" && git push`,
+            verbose: true,
+        })
+    }
 
     console.timeEnd('Modified test maps')
 }

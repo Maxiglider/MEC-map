@@ -1143,7 +1143,7 @@ export const initCommandAll = () => {
         name: 'leaderboard',
         alias: ['ldb'],
         group: 'all',
-        argDescription: 'on | off | mb|multiboard|reset | classic | global | current',
+        argDescription: 'on | off | mb|multiboard|reset | classic | global | current | speedrun',
         description: 'displays the leaderboard',
         cb: ({ nbParam, param1 }, escaper) => {
             if (nbParam === 1) {
@@ -1160,6 +1160,9 @@ export const initCommandAll = () => {
                 } else if (param1 === 'current') {
                     ServiceManager.getService('Multiboard').setMode(escaper, 'multiboard')
                     ServiceManager.getService('Multiboard').setStatsMode(escaper, 'current')
+                } else if (param1 === 'speedrun') {
+                    ServiceManager.getService('Multiboard').setMode(escaper, 'multiboard')
+                    ServiceManager.getService('Multiboard').setStatsMode(escaper, 'speedrun')
                 }
             }
 
