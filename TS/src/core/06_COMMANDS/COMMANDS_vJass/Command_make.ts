@@ -3970,6 +3970,9 @@ export const initExecuteCommandMake = () => {
 
                 // todo should turn this into a ctrl+z able action
                 if (snapToSlide) {
+                    const currentVtoto = globals.USE_VTOTO_SLIDE_LOGIC
+                    globals.USE_VTOTO_SLIDE_LOGIC = true
+
                     for (const [_, level] of pairs(getUdgLevels().getAll())) {
                         for (const [_, monster] of pairs(level.monsters.getAll())) {
                             if (!monster.mt) {
@@ -4028,6 +4031,8 @@ export const initExecuteCommandMake = () => {
                             }
                         }
                     }
+
+                    globals.USE_VTOTO_SLIDE_LOGIC = currentVtoto
                 }
 
                 getUdgLevels().reloadAllLevels()
