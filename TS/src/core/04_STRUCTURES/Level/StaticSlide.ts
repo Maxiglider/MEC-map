@@ -126,6 +126,7 @@ export class StaticSlide {
                                     const currentAngle = GetUnitFacing(hero)
                                     escaper.setRemainingDegreesToTurn(AnglesDiff(this.angle, currentAngle))
                                 } else {
+                                    escaper.setRemainingDegreesToTurn(0)
                                     escaper.turnInstantly(this.angle)
                                 }
 
