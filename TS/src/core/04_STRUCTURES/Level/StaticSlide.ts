@@ -238,11 +238,11 @@ export class StaticSlide {
 
     // If the point is in the sliding region
     isInRegion = (x: number, y: number) => {
-        // 32 offset is needed cuz TriggerRegisterEnterRectSimple gets called even before the unit is in the region
-        const x1 = Math.min(this.x1, this.x2, this.x3, this.x4) - 32
-        const x4 = Math.max(this.x1, this.x2, this.x3, this.x4) + 32
-        const y1 = Math.min(this.y1, this.y2, this.y3, this.y4) - 32
-        const y4 = Math.max(this.y1, this.y2, this.y3, this.y4) + 32
+        // 32 offset is needed cuz TriggerRegisterEnterRectSimple gets called even before the unit is in the region. Sometimes its not enough so 64 for good measure.
+        const x1 = Math.min(this.x1, this.x2, this.x3, this.x4) - 64
+        const x4 = Math.max(this.x1, this.x2, this.x3, this.x4) + 64
+        const y1 = Math.min(this.y1, this.y2, this.y3, this.y4) - 64
+        const y4 = Math.max(this.y1, this.y2, this.y3, this.y4) + 64
 
         return x >= x1 && x <= x4 && y >= y1 && y <= y4
     }
