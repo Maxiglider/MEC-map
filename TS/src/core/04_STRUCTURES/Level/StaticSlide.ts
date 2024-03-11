@@ -122,8 +122,12 @@ export class StaticSlide {
                                 arrayPush(this.slidingPlayers, escaper.getEscaperId())
                                 escaper.setStaticSliding(this)
 
-                                const currentAngle = GetUnitFacing(hero)
-                                escaper.setRemainingDegreesToTurn(AnglesDiff(this.angle, currentAngle))
+                                if (this.canTurnAngle) {
+                                    const currentAngle = GetUnitFacing(hero)
+                                    escaper.setRemainingDegreesToTurn(AnglesDiff(this.angle, currentAngle))
+                                } else {
+                                    escaper.turnInstantly(this.angle)
+                                }
 
                                 this.slidingPlayerPrevSpeed[escaper.getEscaperId()] = escaper.getSlideSpeed()
                                 escaper.setSlideSpeed(this.speed)
