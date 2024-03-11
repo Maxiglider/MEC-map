@@ -182,16 +182,58 @@ export class StaticSlide {
 
     // If the point is in either of the start/end regions
     containsPoint = (x: number, y: number) => {
-        const x1 = Math.min(this.x1, this.x2)
-        const x2 = Math.max(this.x1, this.x2)
-        const x3 = Math.min(this.x3, this.x4)
-        const x4 = Math.max(this.x3, this.x4)
-        const y1 = Math.min(this.y1, this.y2)
-        const y2 = Math.max(this.y1, this.y2)
-        const y3 = Math.min(this.y3, this.y4)
-        const y4 = Math.max(this.y3, this.y4)
+        const isDiagonal = this.angle % 90 !== 0
 
-        return (x >= x1 && x <= x2 && y >= y1 && y <= y2) || (x >= x3 && x <= x4 && y >= y3 && y <= y4)
+        if (isDiagonal) {
+            // First
+            {
+                const regions = createDiagonalRegions(this.x1, this.y1, this.x2, this.y2, 32)
+
+                for (const region of regions) {
+                    const x1 = Math.min(region.topLeft.x, region.bottomRight.x)
+                    const x2 = Math.max(region.topLeft.x, region.bottomRight.x)
+                    const y1 = Math.min(region.topLeft.y, region.bottomRight.y)
+                    const y2 = Math.max(region.topLeft.y, region.bottomRight.y)
+
+                    if (x >= x1 && x <= x2 && y >= y1 && y <= y2) {
+                        return true
+                    }
+                }
+
+                regions.__destroy(true)
+            }
+
+            // Second
+            {
+                const regions = createDiagonalRegions(this.x3, this.y3, this.x4, this.y4, 32)
+
+                for (const region of regions) {
+                    const x1 = Math.min(region.topLeft.x, region.bottomRight.x)
+                    const x2 = Math.max(region.topLeft.x, region.bottomRight.x)
+                    const y1 = Math.min(region.topLeft.y, region.bottomRight.y)
+                    const y2 = Math.max(region.topLeft.y, region.bottomRight.y)
+
+                    if (x >= x1 && x <= x2 && y >= y1 && y <= y2) {
+                        return true
+                    }
+                }
+
+                regions.__destroy(true)
+            }
+
+            return false
+        } else {
+            const x1 = Math.min(this.x1, this.x2)
+            const x2 = Math.max(this.x1, this.x2)
+            const x3 = Math.min(this.x3, this.x4)
+            const x4 = Math.max(this.x3, this.x4)
+            const y1 = Math.min(this.y1, this.y2)
+            const y2 = Math.max(this.y1, this.y2)
+            const y3 = Math.min(this.y3, this.y4)
+            const y4 = Math.max(this.y3, this.y4)
+
+            return (x >= x1 && x <= x2 && y >= y1 && y <= y2) || (x >= x3 && x <= x4 && y >= y3 && y <= y4)
+        }
     }
 
     // If the point is in the sliding region
