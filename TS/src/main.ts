@@ -18,34 +18,6 @@ import { PROD } from './env'
 //   ^ [>TEST] make it work for only allied players
 //   ^ [>TEST] make it work for all allied teams
 // [O] make the switch perm kill units instead of timed
-// [X] Support for pathing blockers with a new command: -setCanSlideOverPathingBlockers; prevents sliders from going through pathing blockers
-// [X] New cmds, -createRegion, displayRegions, deleteRegion, getRegionAtPoint, moveRegionPoint. Not used for many things yet. Also new cmds: setRegionFlag, setMonsterWanderable; Used to recreate Slide Kitty Slide :)
-// [X] New make cmd: -copyLevel; copies the current making level to a new one
-// [X] SKS; setAnimOnRevive cmd (for the revive anim), kitty has a different one than DH
-// [X] SKS; progression; support pathing blocker?
-// [X] SKS; setMonsterWanderableTimeout <monsterType> <min> <max>; set the timeout in sec
-// [X] New make cmd: -snapPatrolsToSlide; Kinda like snapPatrolsToGrid but snaps to nearest slide terrain instead of grid, better.
-// [X] New make cmd: -snapPatrolsToSlideOffset; Allows setting an offset for specific monster types when using -snapPatrolsToSlide so that they look better. -sptso <monsterType> <angle> <offset>
-// [X] Improved CircleMob logic
-// [X] New make cmd: -setCircleMobInitialAngle; Force the initial angle on a CircleMob to time it with other CircleMobs
-// [X] SKS; Added skills
-// [X] SKS; Add exp on revive; add exp for reaching corners
-// [X] Activating speededit when mirror is on will now mirror the speededit
-// [X] When going to -el and if ur camera is already on the new spawn point it seems to move it back to the previous level
-// [X] -crma now supports an [angle] param to force a specific angle
-// [X] When a level gets deactivated it also removes the debug regions
-// [X] Debug regions now support monster patrols by writing `-dr 1 1`
-// [X] Fixed a bug in -smn chain where it delays the each smn
-// [X] -crma patrols now have a slight offset to prevent the patrols from walking in sync
-// [X] New make cmd: -setMonsterCreateTerrain(setmct) <monsterLabel> <terrainLabel> -- When a monstertype has a createTerrainLabel, it will create the terrain at the monsters position and then remove the monster
-// [X] New make cmd: -copyLevelPatrol [targetLevel] -- Copy a patrol from your current making level to another
-// [X] New make cmd: -copyLevelPatrolBp [targetLevel] -- Copy multiple patrols from your current making level to another
-// [X] Static slides now support diagonal slides
-// [X] Static slides will now kill the slider when they go out of bounds
-// [X] New make cmd: -setStaticSlideCanTurnAngle; Allows setting a specific angle for the slider to turn on the static slide
-// [X] -setmct QoL will automatically remove other setmct units when placed on the same tile
-// [X] New make cmd: -grid 1/2/3; Toggles grid visibility
-// [X] New leaderboard option: -ldb speedrun. Shows the total time on slide for any slider
 // [O] Show current level on multiboard
 
 const tsMain = () => {
