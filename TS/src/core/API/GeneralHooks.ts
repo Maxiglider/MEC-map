@@ -1,6 +1,7 @@
 import { Escaper } from 'core/04_STRUCTURES/Escaper/Escaper'
 import { Level } from 'core/04_STRUCTURES/Level/Level'
 import { Region } from 'core/04_STRUCTURES/Region/Region'
+import { TerrainType } from 'core/04_STRUCTURES/TerrainType/TerrainType'
 import { Monster } from '../04_STRUCTURES/Monster/Monster'
 import { MecHookArray } from './MecHookArray'
 
@@ -13,4 +14,7 @@ export const hooks = {
     hooks_onHeroEnterRegion: new MecHookArray<(escaper: Escaper, region: Region) => void>(),
     hooks_onHeroEnterRegionOnce: new MecHookArray<(escaper: Escaper, region: Region) => void>(),
     hooks_onModeSelection: new MecHookArray<(mode: 'solo' | 'coop') => void>(),
+    hooks_onHeroTerrainChange: new MecHookArray<
+        (escaper: Escaper, newTerrainType: TerrainType, oldTerrainType?: TerrainType) => void
+    >(),
 }

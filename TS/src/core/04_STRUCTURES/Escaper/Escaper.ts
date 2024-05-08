@@ -4,7 +4,7 @@ import { EffectUtils } from 'Utils/EffectUtils'
 import { GetUnitZEx } from 'Utils/LocationUtils'
 import { IPoint, createPoint } from 'Utils/Point'
 import { progressionUtils } from 'Utils/ProgressionUtils'
-import { IsIssuedOrder, StopUnit } from 'core/01_libraries/Basic_functions'
+import { ForceAngleBetween0And360, IsIssuedOrder, StopUnit } from 'core/01_libraries/Basic_functions'
 import {
     DEFAULT_CAMERA_FIELD,
     DUMMY_POWER_CIRCLE,
@@ -197,6 +197,8 @@ export class Escaper {
     private lockCamRotation: Timer | null = null
     private lockCamHeight: Timer | null = null
     private lockCamTargetMode: 'default' | 'progression' | undefined = undefined
+    private spinCamTimer: Timer | null = null
+    private spinCamSpeed: number = 0
 
     public hideLeaderboard = false
 
@@ -1409,7 +1411,10 @@ export class Escaper {
     }
 
     resetCamera = () => {
-        ResetToGameCameraForPlayer(this.p, 0)
+        if (!this.spinCamTimer) {
+            ResetToGameCameraForPlayer(this.p, 0)
+        }
+
         SetCameraFieldForPlayer(this.p, CAMERA_FIELD_TARGET_DISTANCE, this.cameraField, 0)
 
         if (this.lockCamTarget) {
@@ -1418,6 +1423,34 @@ export class Escaper {
             if (hero) {
                 SetCameraTargetControllerNoZForPlayer(this.getPlayer(), hero, 0, 0, false)
             }
+        }
+
+        this.startSpinCam()
+    }
+
+    startSpinCam = () => {
+        if (this.spinCamSpeed !== 0 && this.lastTerrainType?.getKind() === 'slide') {
+            this.stopSpinCam()
+
+            this.spinCamTimer = createTimer(SLIDE_PERIOD, true, () => {
+                if (this.hero) {
+                    SetCameraFieldForPlayer(
+                        this.getPlayer(),
+                        CAMERA_FIELD_ROTATION,
+                        ForceAngleBetween0And360(Rad2Deg(GetCameraField(CAMERA_FIELD_ROTATION)) + this.spinCamSpeed),
+                        0
+                    )
+                }
+            })
+        } else {
+            this.stopSpinCam()
+        }
+    }
+
+    stopSpinCam = () => {
+        if (this.spinCamTimer) {
+            this.spinCamTimer?.destroy()
+            this.spinCamTimer = null
         }
     }
 
@@ -2132,6 +2165,11 @@ export class Escaper {
         this.resetCamera()
 
         this.calcProgressionLockCamTarget()
+    }
+
+    setSpinCamSpeed = (speed: number) => {
+        this.spinCamSpeed = speed
+        this.resetCamera()
     }
 
     calcProgressionLockCamTarget = () => {

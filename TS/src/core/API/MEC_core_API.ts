@@ -4,6 +4,7 @@ import { progressionUtils } from 'Utils/ProgressionUtils'
 import { Escaper } from 'core/04_STRUCTURES/Escaper/Escaper'
 import { Level } from 'core/04_STRUCTURES/Level/Level'
 import { Region } from 'core/04_STRUCTURES/Region/Region'
+import { TerrainType } from 'core/04_STRUCTURES/TerrainType/TerrainType'
 import { getUdgEscapers, getUdgLevels, getUdgMonsterTypes, getUdgTerrainTypes, globals } from '../../../globals'
 import { errorHandler, runInTrigger } from '../../Utils/mapUtils'
 import { SetMeteorEffect } from '../04_STRUCTURES/Escaper/Escaper'
@@ -98,6 +99,10 @@ export const MEC_core_API = {
 
     onModeSelection: (cb: (mode: 'solo' | 'coop') => any) => {
         return hooks.hooks_onModeSelection.new(cb)
+    },
+
+    onHeroTerrainChange: (cb: (escaper: Escaper, newTerrainType: TerrainType, oldTerrainType?: TerrainType) => any) => {
+        return hooks.hooks_onHeroTerrainChange.new(cb)
     },
 
     //terrain

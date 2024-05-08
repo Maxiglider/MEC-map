@@ -40,4 +40,9 @@ export class MecHook<T extends (...args: any) => any> {
     public execute2 = (arg1: Parameters<T>[0], arg2: Parameters<T>[1]) => {
         return this.cb(arg1, arg2)
     }
+
+    // Silly wrapper to support 3 typed arguments
+    public execute3 = (arg1: Parameters<T>[0], arg2: Parameters<T>[1], arg3: Parameters<T>[2]) => {
+        return this.cb(arg1, arg2, arg3)
+    }
 }

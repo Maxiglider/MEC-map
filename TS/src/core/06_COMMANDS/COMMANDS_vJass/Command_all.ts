@@ -1261,6 +1261,26 @@ export const initCommandAll = () => {
         },
     })
 
+    //-spinCam
+    registerCommand({
+        name: 'spinCam',
+        alias: [],
+        group: 'all',
+        argDescription: '[speed | off]',
+        description: 'spins the camera',
+        cb: ({ nbParam, param1 }, escaper) => {
+            if (IsBoolString(param1) && !S2B(param1)) {
+                Text.mkP(escaper.getPlayer(), 'Spin disabled')
+                escaper.setSpinCamSpeed(0)
+            } else {
+                Text.mkP(escaper.getPlayer(), 'Spin enabled')
+                escaper.setSpinCamSpeed(nbParam === 1 ? -S2R(param1) : 1)
+            }
+
+            return true
+        },
+    })
+
     //-followMouse <boolean>
     registerCommand({
         name: 'followMouse',

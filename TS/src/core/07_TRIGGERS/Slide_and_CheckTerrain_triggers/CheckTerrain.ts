@@ -9,6 +9,7 @@ import { TerrainType } from 'core/04_STRUCTURES/TerrainType/TerrainType'
 import { TerrainTypeDeath } from 'core/04_STRUCTURES/TerrainType/TerrainTypeDeath'
 import { TerrainTypeSlide } from 'core/04_STRUCTURES/TerrainType/TerrainTypeSlide'
 import { TerrainTypeWalk } from 'core/04_STRUCTURES/TerrainType/TerrainTypeWalk'
+import { hooks } from 'core/API/GeneralHooks'
 import { getUdgEscapers, getUdgTerrainTypes } from '../../../../globals'
 import { AutoContinueAfterSliding } from './Auto_continue_after_sliding'
 
@@ -129,6 +130,16 @@ const initCheckTerrainTrigger = () => {
             }
 
             escaper.setLastTerrainType(currentTerrainType)
+
+            if (currentTerrainType instanceof TerrainTypeSlide) {
+                escaper.startSpinCam()
+            } else {
+                escaper.stopSpinCam()
+            }
+
+            for (const hook of hooks.hooks_onHeroTerrainChange.getHooks()) {
+                hook.execute3(escaper, currentTerrainType, lastTerrainType)
+            }
 
             if (currentTerrainType instanceof TerrainTypeSlide) {
                 SlideTerrainCheck(currentTerrainType, escaper, hero, playerId, wasSliding, wasReversed)

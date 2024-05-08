@@ -17,6 +17,7 @@ import { PROD } from './env'
 //   ^ [O] add disable cmd
 //   ^ [>TEST] make it work for only allied players
 //   ^ [>TEST] make it work for all allied teams
+// [X] New cmd: -spinCam [speed]; Recommended 0.5 or less speed
 // [O] make the switch perm kill units instead of timed
 // [O] Show current level on multiboard
 
