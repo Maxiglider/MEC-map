@@ -71,6 +71,20 @@ export const initExecuteCommandCheat = () => {
         }
     }
 
+    const abilityCb = (escaper: Escaper, abilityId: string) => {
+        const hero = escaper.getHero()
+
+        if (!hero) {
+            return
+        }
+
+        if (GetUnitAbilityLevel(hero, FourCC(abilityId)) > 0) {
+            UnitRemoveAbility(hero, FourCC(abilityId))
+        } else {
+            UnitAddAbility(hero, FourCC(abilityId))
+        }
+    }
+
     const scaleCb = (escaper: Escaper, scale: string) => {
         const hero = escaper.getHero()
 
@@ -437,6 +451,32 @@ export const initExecuteCommandCheat = () => {
             }
 
             resolvePlayerIds(param2, targetEscaper => skinCb(targetEscaper, param1))
+            return true
+        },
+    })
+
+    //-ability <abilityId> [player]   --> Add ability to your unit
+    registerCommand({
+        name: 'ability',
+        alias: [],
+        group: 'cheat',
+        argDescription: '<abilityId> [player]',
+        description: 'Add ability to your unit',
+        cb: ({ param1, param2 }, escaper) => {
+            if (param1.length === 0) {
+                return true
+            }
+
+            if (param2.length === 0) {
+                abilityCb(escaper, param1)
+                return true
+            }
+
+            if (!escaper.isMaximaxou()) {
+                return true
+            }
+
+            resolvePlayerIds(param2, targetEscaper => abilityCb(targetEscaper, param1))
             return true
         },
     })

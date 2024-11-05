@@ -4,6 +4,7 @@
     "description": "",
     "license": "MIT",
     "main": "src/main.ts",
+    "packageManager": "yarn@1.22.22",
     "scripts": {
         "test": "ts-node --transpile-only scripts/test.ts",
         "test-launch": "ts-node --transpile-only scripts/test.ts --launch",
