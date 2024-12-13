@@ -539,7 +539,7 @@ export const initExecuteCommandMax = () => {
         alias: ['setafkt'],
         group: 'max',
         argDescription: '<time>',
-        description: 'set the afk time for a player',
+        description: 'set the afk time',
         cb: ({ nbParam, param1 }, escaper) => {
             if (nbParam !== 1 || S2I(param1) <= 0) {
                 Text.erP(escaper.getPlayer(), 'there must be one param which is an integer higher than 0')

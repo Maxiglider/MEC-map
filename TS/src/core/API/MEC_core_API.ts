@@ -5,6 +5,7 @@ import { Escaper } from 'core/04_STRUCTURES/Escaper/Escaper'
 import { Level } from 'core/04_STRUCTURES/Level/Level'
 import { Region } from 'core/04_STRUCTURES/Region/Region'
 import { TerrainType } from 'core/04_STRUCTURES/TerrainType/TerrainType'
+import { AfkMode } from 'core/08_GAME/Afk_mode/Afk_mode'
 import { getUdgEscapers, getUdgLevels, getUdgMonsterTypes, getUdgTerrainTypes, globals } from '../../../globals'
 import { errorHandler, runInTrigger } from '../../Utils/mapUtils'
 import { SetMeteorEffect } from '../04_STRUCTURES/Escaper/Escaper'
@@ -167,4 +168,8 @@ export const MEC_core_API = {
 
     errorHandler,
     runInTrigger,
+
+    setAfkTime: (time: number) => {
+        AfkMode.timeMinAfk = time
+    },
 }
