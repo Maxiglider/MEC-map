@@ -3268,7 +3268,7 @@ export const initExecuteCommandMake = () => {
         argDescription: '[<speed> [<direction> [<facing [<radius>]]]]',
         description: '',
         cb: ({ param1, param2, param3, param4 }, escaper) => {
-            if (param1 !== '' && S2I(param1) === 0) {
+            if (param1 !== '' && param1 !== '0' && S2I(param1) === 0) {
                 Text.erP(escaper.getPlayer(), 'Speed must be > 0')
                 return true
             }
@@ -3328,7 +3328,7 @@ export const initExecuteCommandMake = () => {
         argDescription: '<speed>',
         description: '',
         cb: ({ param1 }, escaper) => {
-            if (S2R(param1) == 0) {
+            if (param1 !== '0' && S2R(param1) == 0) {
                 Text.erP(escaper.getPlayer(), 'Speed must be > 0')
                 return true
             }
