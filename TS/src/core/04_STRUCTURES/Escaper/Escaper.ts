@@ -1961,9 +1961,9 @@ export class Escaper {
         }
     }
 
-    makeSetMonsterAttackGroundOrder() {
+    makeSetMonsterAttackGroundOrder(delay: number = 0) {
         this.destroyMake()
-        if (this.hero) this.make = new MakeMonsterAttackGroundOrder(this.hero)
+        if (this.hero) this.make = new MakeMonsterAttackGroundOrder(this.hero, delay)
     }
 
     makeCreateTerrain(terrainType: TerrainType) {

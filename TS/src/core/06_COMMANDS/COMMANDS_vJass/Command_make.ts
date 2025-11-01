@@ -3384,11 +3384,26 @@ export const initExecuteCommandMake = () => {
         name: 'setCircleMobShape',
         alias: ['setcimsh'],
         group: 'make',
-        argDescription: 'circle | square | triangle | pentagon | hexagon | octagon | eight | star | spiral | heart | infinity | rose | butterfly',
+        argDescription:
+            'circle | square | triangle | pentagon | hexagon | octagon | eight | star | spiral | heart | infinity | rose | butterfly',
         description: 'Shape of the CircleMob formation',
         cb: ({ param1 }, escaper) => {
             param1 = param1.toLowerCase()
-            const validShapes = ['circle', 'square', 'triangle', 'pentagon', 'hexagon', 'octagon', 'eight', 'star', 'spiral', 'heart', 'infinity', 'rose', 'butterfly']
+            const validShapes = [
+                'circle',
+                'square',
+                'triangle',
+                'pentagon',
+                'hexagon',
+                'octagon',
+                'eight',
+                'star',
+                'spiral',
+                'heart',
+                'infinity',
+                'rose',
+                'butterfly',
+            ]
             if (!validShapes.includes(param1)) {
                 Text.erP(
                     escaper.getPlayer(),
@@ -3594,15 +3609,22 @@ export const initExecuteCommandMake = () => {
         },
     })
 
-    //-setMonsterAttackGround(setmag)
+    //-setMonsterAttackGround(setmag) [<delay>]
     registerCommand({
         name: 'setMonsterAttackGround',
         alias: ['setmag'],
         group: 'make',
-        argDescription: '',
-        description: '',
-        cb: (_, escaper) => {
-            escaper.makeSetMonsterAttackGroundOrder()
+        argDescription: '[<delay>]',
+        description: 'Set monster to attack ground with optional delay',
+        cb: ({ param1 }, escaper) => {
+            const delay = param1 ? S2R(param1) : 0
+
+            if (param1 && (delay < 0 || delay > 60)) {
+                Text.erP(escaper.getPlayer(), 'Delay must be between 0 and 60 seconds')
+                return true
+            }
+
+            escaper.makeSetMonsterAttackGroundOrder(delay)
 
             Text.mkP(escaper.getPlayer(), 'Click on a monster to apply')
             return true

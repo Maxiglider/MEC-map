@@ -7,9 +7,11 @@ export class MakeMonsterAttackGroundOrder extends Make {
     private targetMob: Monster | null = null
     private targetX: number | null = null
     private targetY: number | null = null
+    private delay: number
 
-    constructor(maker: unit) {
+    constructor(maker: unit, delay: number = 0) {
         super(maker, 'setMonsterAttackGroundOrder')
+        this.delay = delay
     }
 
     doActions = () => {
@@ -27,11 +29,11 @@ export class MakeMonsterAttackGroundOrder extends Make {
                 this.targetX = this.orderX
                 this.targetY = this.orderY
 
-                this.targetMob.setAttackGroundPos(this.targetX, this.targetY)
+                this.targetMob.setAttackGroundPos(this.targetX, this.targetY, this.delay)
 
                 Text.mkP(this.makerOwner, 'done')
                 this.escaper.destroyMake()
-                this.escaper.makeSetMonsterAttackGroundOrder()
+                this.escaper.makeSetMonsterAttackGroundOrder(this.delay)
             }
         }
     }
@@ -39,7 +41,7 @@ export class MakeMonsterAttackGroundOrder extends Make {
     cancelLastAction = () => {
         if (this.targetMob) {
             if (this.targetMob.hasAttackGroundPos()) {
-                this.targetMob.setAttackGroundPos(undefined, undefined)
+                this.targetMob.setAttackGroundPos(undefined, undefined, 0)
                 Text.mkP(this.makerOwner, 'click on the ground')
             } else {
                 this._lastTargetMob = this.targetMob
@@ -60,7 +62,7 @@ export class MakeMonsterAttackGroundOrder extends Make {
             Text.mkP(this.makerOwner, 'click on the ground')
             return true
         } else if (!this.targetMob.hasAttackGroundPos() && this.targetX && this.targetY) {
-            this.targetMob.setAttackGroundPos(this.targetX, this.targetY)
+            this.targetMob.setAttackGroundPos(this.targetX, this.targetY, this.delay)
             Text.mkP(this.makerOwner, 'done')
             return true
         } else {

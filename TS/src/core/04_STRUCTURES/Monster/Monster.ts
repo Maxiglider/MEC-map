@@ -1,4 +1,5 @@
 import { MemoryHandler } from 'Utils/MemoryHandler'
+import { Timer } from 'w3ts'
 import { udg_monsters } from '../../../../globals'
 import { MOBS_VARIOUS_COLORS, NB_PLAYERS_MAX } from '../../01_libraries/Constants'
 import { ColorString2Id } from '../../01_libraries/Init_colorCodes'
@@ -54,6 +55,7 @@ export abstract class Monster {
 
     private attackGroundX: number | undefined = undefined
     private attackGroundY: number | undefined = undefined
+    private attackGroundDelay: number = 0
 
     constructor(monsterType?: MonsterType, forceId: number | null = null) {
         this.mt = monsterType
@@ -389,17 +391,37 @@ export abstract class Monster {
         return this.attackGroundX !== undefined && this.attackGroundY !== undefined
     }
 
-    setAttackGroundPos = (x: number | undefined, y: number | undefined) => {
+    setAttackGroundPos = (x: number | undefined, y: number | undefined, delay: number = 0) => {
         this.attackGroundX = x
         this.attackGroundY = y
+        this.attackGroundDelay = delay
 
         this.removeUnit()
         this.createUnit()
     }
 
+    getAttackGroundDelay = () => {
+        return this.attackGroundDelay
+    }
+
+    setAttackGroundDelay = (delay: number) => {
+        this.attackGroundDelay = delay
+    }
+
     doAttackGroundPos = () => {
         if (this.u && this.attackGroundX && this.attackGroundY) {
-            IssuePointOrder(this.u, 'attackground', this.attackGroundX, this.attackGroundY)
+            if (this.attackGroundDelay > 0) {
+                const targetUnit = this.u
+                const targetX = this.attackGroundX
+                const targetY = this.attackGroundY
+                new Timer().start(this.attackGroundDelay, false, () => {
+                    if (targetUnit && GetUnitTypeId(targetUnit) !== 0) {
+                        IssuePointOrder(targetUnit, 'attackground', targetX, targetY)
+                    }
+                })
+            } else {
+                IssuePointOrder(this.u, 'attackground', this.attackGroundX, this.attackGroundY)
+            }
         }
     }
 
@@ -441,6 +463,7 @@ export abstract class Monster {
             output['jumpPadEffect'] = this.jumpPadEffect
             output['attackGroundX'] = this.attackGroundX
             output['attackGroundY'] = this.attackGroundY
+            output['attackGroundDelay'] = this.attackGroundDelay
             return output
         }
     }
