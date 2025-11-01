@@ -1849,6 +1849,20 @@ export class Escaper {
         }
     }
 
+    makeSetCircleMobShape(shape: 'circle' | 'square' | 'triangle' | 'pentagon' | 'hexagon' | 'octagon' | 'eight') {
+        this.destroyMake()
+        if (this.hero) {
+            this.make = new MakePropertyChange(
+                this.hero,
+                'shape',
+                shape,
+                (x, y) => this.getMakingLevel().monsters.getMonsterNear(x, y)?.getCircleMob(),
+                monster => monster.getShape(),
+                (monster, shape) => monster.setShape(shape)
+            )
+        }
+    }
+
     makeSetCircleMobInitialAngle(initialAngle: number) {
         this.destroyMake()
         if (this.hero) {

@@ -3379,6 +3379,30 @@ export const initExecuteCommandMake = () => {
         },
     })
 
+    //-setCircleMobShape(setcimsh) <shape>
+    registerCommand({
+        name: 'setCircleMobShape',
+        alias: ['setcimsh'],
+        group: 'make',
+        argDescription: 'circle | square | triangle | pentagon | hexagon | octagon | eight | star | spiral | heart | infinity | rose | butterfly',
+        description: 'Shape of the CircleMob formation',
+        cb: ({ param1 }, escaper) => {
+            param1 = param1.toLowerCase()
+            const validShapes = ['circle', 'square', 'triangle', 'pentagon', 'hexagon', 'octagon', 'eight', 'star', 'spiral', 'heart', 'infinity', 'rose', 'butterfly']
+            if (!validShapes.includes(param1)) {
+                Text.erP(
+                    escaper.getPlayer(),
+                    'Shape must be one of: circle, square, triangle, pentagon, hexagon, octagon, eight, star, spiral, heart, infinity, rose, butterfly'
+                )
+                return true
+            }
+
+            escaper.makeSetCircleMobShape(param1 as any)
+            Text.mkP(escaper.getPlayer(), 'Click on the circle to apply')
+            return true
+        },
+    })
+
     //-setCircleMobInitialAngle(setcimia) <angle>
     registerCommand({
         name: 'setCircleMobInitialAngle',

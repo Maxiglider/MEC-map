@@ -10,6 +10,22 @@ const TIMER_PERIOD = 0.02
 const DEFAULT_ROTATION_SPEED = 90
 const DEFAULT_DIRECTION = 'cw'
 const DEFAULT_FACING = 'cw'
+const DEFAULT_SHAPE = 'circle'
+
+export type CircleMobShape =
+    | 'circle'
+    | 'square'
+    | 'triangle'
+    | 'pentagon'
+    | 'hexagon'
+    | 'octagon'
+    | 'eight'
+    | 'star'
+    | 'spiral'
+    | 'heart'
+    | 'infinity'
+    | 'rose'
+    | 'butterfly'
 
 export class CircleMob {
     level?: Level
@@ -20,6 +36,7 @@ export class CircleMob {
     private rotationSpeed: number
     private direction: 'cw' | 'ccw'
     private facing: 'cw' | 'ccw' | 'in' | 'out'
+    private shape: CircleMobShape
     private radius: number
     private initialAngle = 0
     private currentBaseAngle = 0
@@ -41,6 +58,7 @@ export class CircleMob {
         this.rotationSpeed = rotationSpeed || DEFAULT_ROTATION_SPEED
         this.direction = direction || DEFAULT_DIRECTION
         this.facing = facing || DEFAULT_FACING
+        this.shape = DEFAULT_SHAPE
         this.radius = radius
     }
 
@@ -64,6 +82,13 @@ export class CircleMob {
 
     setFacing = (facing: 'cw' | 'ccw' | 'in' | 'out') => {
         this.facing = facing
+        this.reactivate()
+    }
+
+    getShape = () => this.shape
+
+    setShape = (shape: CircleMobShape) => {
+        this.shape = shape
         this.reactivate()
     }
 
@@ -162,14 +187,102 @@ export class CircleMob {
 
                 let angle = this.currentBaseAngle
 
-                for (const monsterId of this.mobs) {
+                for (let i = 0; i < this.mobs.length; i++) {
+                    const monsterId = this.mobs[i]
                     const mob = this.level?.monsters.get(monsterId)
 
                     if (mob?.u) {
-                        const unitX = centerX + this.radius * CosBJ(angle)
-                        const unitY = centerY + this.radius * SinBJ(angle)
+                        let unitX: number
+                        let unitY: number
 
-                        const facingAngle = angle + 90 * directionReal
+                        // Calculate position based on shape
+                        if (this.shape === 'circle') {
+                            unitX = centerX + this.radius * CosBJ(angle)
+                            unitY = centerY + this.radius * SinBJ(angle)
+                        } else if (this.shape === 'eight') {
+                            // Figure-eight/lemniscate pattern (vertical)
+                            // Parametric equation: x = r*sin(t), y = r*sin(t)*cos(t)
+                            const t = angle * (Math.PI / 180) // Convert to radians
+                            const scale = this.radius * 0.8 // Scale factor for the figure-eight
+                            unitX = centerX + scale * Math.sin(t)
+                            unitY = centerY + scale * Math.sin(t) * Math.cos(t)
+                        } else if (this.shape === 'star') {
+                            // 5-pointed star pattern
+                            const t = angle * (Math.PI / 180)
+                            const outerRadius = this.radius
+                            const innerRadius = this.radius * 0.4
+                            const pointAngle = (angle % 72) / 72 // Each point is 72 degrees
+                            const r = pointAngle < 0.5 ? outerRadius : innerRadius
+                            unitX = centerX + r * Math.cos(t)
+                            unitY = centerY + r * Math.sin(t)
+                        } else if (this.shape === 'spiral') {
+                            // Expanding/contracting spiral
+                            const t = angle * (Math.PI / 180)
+                            const cycles = 3 // Number of full rotations
+                            const radiusFactor = (angle % 360) / 360 // 0 to 1
+                            const r = this.radius * (0.3 + 0.7 * Math.sin(cycles * t))
+                            unitX = centerX + r * Math.cos(t)
+                            unitY = centerY + r * Math.sin(t)
+                        } else if (this.shape === 'heart') {
+                            // Heart shape using parametric equations
+                            const t = angle * (Math.PI / 180)
+                            const scale = this.radius * 0.08
+                            unitX = centerX + scale * 16 * Math.pow(Math.sin(t), 3)
+                            unitY =
+                                centerY +
+                                scale * (13 * Math.cos(t) - 5 * Math.cos(2 * t) - 2 * Math.cos(3 * t) - Math.cos(4 * t))
+                        } else if (this.shape === 'infinity') {
+                            // Horizontal figure-eight (infinity symbol)
+                            const t = angle * (Math.PI / 180)
+                            const scale = this.radius * 0.8
+                            unitX = centerX + scale * Math.sin(t) * Math.cos(t)
+                            unitY = centerY + scale * Math.sin(t)
+                        } else if (this.shape === 'rose') {
+                            // Rose curve (flower pattern with 5 petals)
+                            const t = angle * (Math.PI / 180)
+                            const k = 5 // Number of petals
+                            const r = this.radius * Math.abs(Math.cos(k * t))
+                            unitX = centerX + r * Math.cos(t)
+                            unitY = centerY + r * Math.sin(t)
+                        } else if (this.shape === 'butterfly') {
+                            // Butterfly curve
+                            const t = angle * (Math.PI / 180)
+                            const scale = this.radius * 0.15
+                            const exp = Math.exp(Math.cos(t))
+                            const r = Math.sin(t) * (exp - 2 * Math.cos(4 * t) - Math.pow(Math.sin(t / 12), 5))
+                            unitX = centerX + scale * r * Math.cos(t) * 5
+                            unitY = centerY + scale * r * Math.sin(t) * 5
+                        } else {
+                            const shapeVertices = this.getShapeVertices()
+                            const t = (angle - this.currentBaseAngle + 360) % 360
+                            const segmentAngle = 360.0 / shapeVertices
+                            const vertexIndex = Math.floor(t / segmentAngle)
+                            const nextVertexIndex = (vertexIndex + 1) % shapeVertices
+                            const localT = (t % segmentAngle) / segmentAngle
+
+                            const vertex1Angle = this.currentBaseAngle + vertexIndex * segmentAngle
+                            const vertex2Angle = this.currentBaseAngle + nextVertexIndex * segmentAngle
+
+                            const x1 = centerX + this.radius * CosBJ(vertex1Angle)
+                            const y1 = centerY + this.radius * SinBJ(vertex1Angle)
+                            const x2 = centerX + this.radius * CosBJ(vertex2Angle)
+                            const y2 = centerY + this.radius * SinBJ(vertex2Angle)
+
+                            unitX = x1 + (x2 - x1) * localT
+                            unitY = y1 + (y2 - y1) * localT
+                        }
+
+                        let facingAngle: number
+                        if (this.facing === 'cw') {
+                            facingAngle = angle - 90
+                        } else if (this.facing === 'ccw') {
+                            facingAngle = angle + 90
+                        } else if (this.facing === 'in') {
+                            facingAngle = angle + 180
+                        } else {
+                            // 'out'
+                            facingAngle = angle
+                        }
 
                         if (globals.MAP_MIN_X <= unitX && globals.MAP_MAX_X >= unitX) {
                             SetUnitX(mob.u, unitX)
@@ -192,6 +305,23 @@ export class CircleMob {
         }
     }
 
+    private getShapeVertices = (): number => {
+        switch (this.shape) {
+            case 'triangle':
+                return 3
+            case 'square':
+                return 4
+            case 'pentagon':
+                return 5
+            case 'hexagon':
+                return 6
+            case 'octagon':
+                return 8
+            default:
+                return 0 // circle has no vertices
+        }
+    }
+
     toJson = () => {
         const blockMobIds: number[] = []
 
@@ -209,6 +339,7 @@ export class CircleMob {
         output['rotationSpeed'] = this.rotationSpeed
         output['direction'] = this.direction
         output['facing'] = this.facing
+        output['shape'] = this.shape
         output['radius'] = this.radius
         output['initialAngle'] = this.initialAngle
 
