@@ -44,6 +44,7 @@ export class CircleMobArray extends BaseArray<CircleMob> {
                 const circleMob = this.new(mainMob, cm.rotationSpeed, cm.direction, cm.facing, cm.radius)
 
                 circleMob.setInitialAngle(cm.initialAngle)
+                circleMob.setShape(cm.shape)
 
                 for (const [_, blockMobId] of pairs(cm.blockMobsIds)) {
                     const mob = this.level.monsters.get(blockMobId)
