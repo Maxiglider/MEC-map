@@ -521,7 +521,12 @@ export const initMultiboard = () => {
         const sortedTargets = MemoryHandler.getEmptyArray<ITarget & IDestroyable>()
 
         for (const [_, escaper] of pairs(getUdgEscapers().getAll())) {
-            if (!AfkMode.isActive[escaper.getId()] || escaper.hasAutorevive()) {
+            if (
+                !AfkMode.isActive[escaper.getId()] ||
+                escaper.hasAutorevive() ||
+                !escaper.isSliding() ||
+                !escaper.getHero()
+            ) {
                 continue
             }
 
