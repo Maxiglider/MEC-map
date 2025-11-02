@@ -4,7 +4,7 @@ import { createEvent } from '../../Utils/mapUtils'
 import { Escaper } from '../04_STRUCTURES/Escaper/Escaper'
 import { TurnOnSlide } from '../07_TRIGGERS/Slide_and_CheckTerrain_triggers/To_turn_on_slide'
 
-const FOLLOW_MOUSE_PERIOD = 0.1
+const FOLLOW_MOUSE_PERIOD = 0.2
 
 /**
  * Class SimpleFollowMouse - Active while holding right mouse button
@@ -17,6 +17,7 @@ export class SimpleFollowMouse {
     private tMouseMove: trigger | undefined
 
     private tFollowMouse: timer
+    private tMouseMoveThrottle: timer | undefined
 
     public angle?: number
     public isActive = false
@@ -62,39 +63,14 @@ export class SimpleFollowMouse {
             ],
         })
 
-        this.tMouseMove = createEvent({
-            events: [t => TriggerRegisterPlayerEvent(t, player, EVENT_PLAYER_MOUSE_MOVE)],
-            actions: [
-                () => {
-                    const escaper = getUdgEscapers().get(GetPlayerId(GetTriggerPlayer()))
-                    const followMouse = escaper?.getSimpleFollowMouse()
+        this.createMouseMoveTrigger(player)
 
-                    if (followMouse) {
-                        if (BlzGetTriggerPlayerMouseX() == 0 && BlzGetTriggerPlayerMouseY() == 0) {
-                            return
-                        }
-
-                        this.escaper.mouseX = BlzGetTriggerPlayerMouseX()
-                        this.escaper.mouseY = BlzGetTriggerPlayerMouseY()
-
-                        const slider = this.escaper.getHero()
-
-                        if (slider) {
-                            const sliderX = GetUnitX(slider)
-                            const sliderY = GetUnitY(slider)
-                            const orderX = this.escaper.mouseX
-                            const orderY = this.escaper.mouseY
-                            this.angle = Atan2(orderY - sliderY, orderX - sliderX) * bj_RADTODEG
-
-                            if (this.isActive) {
-                                AutoContinueAfterSliding.lastClickedX[this.escaper.getId()] = orderX
-                                AutoContinueAfterSliding.lastClickedY[this.escaper.getId()] = orderY
-                                AutoContinueAfterSliding.isLastTargetALocation[this.escaper.getId()] = true
-                            }
-                        }
-                    }
-                },
-            ],
+        // Create throttle timer to recreate mouse move trigger (5 times per second)
+        this.tMouseMoveThrottle = CreateTimer()
+        TimerStart(this.tMouseMoveThrottle, FOLLOW_MOUSE_PERIOD, true, () => {
+            if (!this.tMouseMove) {
+                this.createMouseMoveTrigger(player)
+            }
         })
 
         // Create the timer and start it immediately
@@ -115,9 +91,58 @@ export class SimpleFollowMouse {
         })
     }
 
+    private onMouseMoveAction(this: void) {
+        const escaper = getUdgEscapers().get(GetPlayerId(GetTriggerPlayer()))
+        const dis = escaper?.getSimpleFollowMouse()
+
+        if (!dis) {
+            return
+        }
+
+        const followMouse = escaper?.getSimpleFollowMouse()
+
+        if (followMouse) {
+            if (BlzGetTriggerPlayerMouseX() == 0 && BlzGetTriggerPlayerMouseY() == 0) {
+                return
+            }
+
+            dis.escaper.mouseX = BlzGetTriggerPlayerMouseX()
+            dis.escaper.mouseY = BlzGetTriggerPlayerMouseY()
+
+            const slider = dis.escaper.getHero()
+
+            if (slider) {
+                const sliderX = GetUnitX(slider)
+                const sliderY = GetUnitY(slider)
+                const orderX = dis.escaper.mouseX
+                const orderY = dis.escaper.mouseY
+                dis.angle = Atan2(orderY - sliderY, orderX - sliderX) * bj_RADTODEG
+
+                if (dis.isActive) {
+                    AutoContinueAfterSliding.lastClickedX[dis.escaper.getId()] = orderX
+                    AutoContinueAfterSliding.lastClickedY[dis.escaper.getId()] = orderY
+                    AutoContinueAfterSliding.isLastTargetALocation[dis.escaper.getId()] = true
+                }
+            }
+        }
+
+        // Destroy the trigger after processing
+        if (dis.tMouseMove) {
+            DestroyTrigger(dis.tMouseMove)
+            dis.tMouseMove = undefined
+        }
+    }
+
+    private createMouseMoveTrigger(player: player) {
+        this.tMouseMove = CreateTrigger()
+        TriggerRegisterPlayerEvent(this.tMouseMove, player, EVENT_PLAYER_MOUSE_MOVE)
+        TriggerAddAction(this.tMouseMove, this.onMouseMoveAction)
+    }
+
     destroy = () => {
         this.isActive = false
         DestroyTimer(this.tFollowMouse)
+        this.tMouseMoveThrottle && DestroyTimer(this.tMouseMoveThrottle)
         this.tPress && DestroyTrigger(this.tPress)
         this.tUnpress && DestroyTrigger(this.tUnpress)
         this.tMouseMove && DestroyTrigger(this.tMouseMove)
