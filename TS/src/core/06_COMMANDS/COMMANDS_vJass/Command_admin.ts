@@ -837,27 +837,53 @@ export const initExecuteCommandMax = () => {
         name: 'clickWhereYouAre',
         alias: ['cwya'],
         group: 'max',
-        argDescription: '',
-        description: '',
-        cb: ({ nbParam, param1, param2 }, escaper) => {
+        argDescription: '[<boolean status> [<Pcolor>|all(a)]]',
+        description: 'toggle or set click where you are feature',
+        cb: ({ noParam, nbParam, param1, param2 }, escaper) => {
+            if (noParam) {
+                // Toggle for self
+                const currentState = escaper.tClickWhereYouAre !== null
+                escaper.enableClickWhereYouAre(!currentState)
+                if (!currentState) {
+                    Text.P(escaper.getPlayer(), 'you now turn')
+                } else {
+                    Text.P(escaper.getPlayer(), 'you stop turn')
+                }
+                return true
+            }
+
             if (!(nbParam === 1 || nbParam === 2)) {
-                Text.erP(escaper.getPlayer(), 'one or two params for this command')
+                Text.erP(escaper.getPlayer(), 'zero, one or two params for this command')
                 return true
             }
 
             let b = false
 
             if (nbParam === 2) {
-                if (IsBoolString(param2)) {
-                    b = S2B(param2)
+                if (IsBoolString(param1)) {
+                    b = S2B(param1)
                 } else {
-                    Text.erP(escaper.getPlayer(), 'param2 must be a boolean')
+                    Text.erP(escaper.getPlayer(), 'param1 must be a boolean')
                     return true
                 }
-            } else {
-                b = true
+            } else if (nbParam === 1) {
+                if (IsBoolString(param1)) {
+                    // Single boolean param applies to self
+                    b = S2B(param1)
+                    escaper.enableClickWhereYouAre(b)
+                    if (b) {
+                        Text.P(escaper.getPlayer(), 'you now turn')
+                    } else {
+                        Text.P(escaper.getPlayer(), 'you stop turn')
+                    }
+                    return true
+                } else {
+                    Text.erP(escaper.getPlayer(), 'param1 must be a boolean')
+                    return true
+                }
             }
-            if (param1 === 'all' || param1 === 'a') {
+
+            if (param2 === 'all' || param2 === 'a') {
                 let i = 0
                 while (true) {
                     if (i >= NB_ESCAPERS) break
@@ -871,20 +897,20 @@ export const initExecuteCommandMax = () => {
                 }
                 return true
             }
-            if (isPlayerId(param1)) {
-                let n = resolvePlayerId(param1)
+            if (isPlayerId(param2)) {
+                let n = resolvePlayerId(param2)
                 if (getUdgEscapers().get(n) != null) {
                     getUdgEscapers().get(n)?.enableClickWhereYouAre(b)
                     if (b) {
-                        Text.P(escaper.getPlayer(), 'player ' + param1 + ' now turn')
+                        Text.P(escaper.getPlayer(), 'player ' + param2 + ' now turn')
                     } else {
-                        Text.P(escaper.getPlayer(), 'player ' + param1 + ' no longer turn')
+                        Text.P(escaper.getPlayer(), 'player ' + param2 + ' no longer turn')
                     }
                 } else {
-                    Text.erP(escaper.getPlayer(), 'escaper ' + param1 + " doesn't exist")
+                    Text.erP(escaper.getPlayer(), 'escaper ' + param2 + " doesn't exist")
                 }
             } else {
-                Text.erP(escaper.getPlayer(), 'param1 must be a player color or "all"')
+                Text.erP(escaper.getPlayer(), 'param2 must be a player color or "all"')
             }
             return true
         },

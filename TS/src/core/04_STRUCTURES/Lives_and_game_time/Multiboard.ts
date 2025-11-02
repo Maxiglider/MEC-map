@@ -11,6 +11,7 @@ import { getUdgEscapers, getUdgLevels, globals } from '../../../../globals'
 import { playerId2colorId, rawPlayerNames } from '../../06_COMMANDS/COMMANDS_vJass/Command_functions'
 import { Escaper } from '../Escaper/Escaper'
 import { sameLevelProgression } from '../Level/LevelProgression'
+import { TerrainTypeSlide } from '../TerrainType/TerrainTypeSlide'
 import { LIVES_PLAYER } from './Lives_and_game_time'
 import { GameTime } from './Time_of_game_trigger'
 
@@ -522,9 +523,10 @@ export const initMultiboard = () => {
 
         for (const [_, escaper] of pairs(getUdgEscapers().getAll())) {
             if (
-                !AfkMode.isActive[escaper.getId()] ||
+                AfkMode.isAfk[escaper.getId()] ||
                 escaper.hasAutorevive() ||
-                !escaper.isSliding() ||
+                (escaper.getLastTerrainType() !== null &&
+                    !(escaper.getLastTerrainType() instanceof TerrainTypeSlide)) ||
                 !escaper.getHero()
             ) {
                 continue

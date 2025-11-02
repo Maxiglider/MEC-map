@@ -135,7 +135,7 @@ export class Escaper {
 
     public slidingMode: 'normal' | 'max' = 'max'
     public rotationTimeForMaximumSpeed = HERO_ROTATION_TIME_FOR_MAXIMUM_SPEED
-    private tClickWhereYouAre: Timer | null = null
+    public tClickWhereYouAre: Timer | null = null
 
     private slide?: Timer
     private checkTerrain: trigger
@@ -2370,13 +2370,14 @@ export class Escaper {
     enableClickWhereYouAre = (b: boolean) => {
         if (this.tClickWhereYouAre) {
             this.tClickWhereYouAre.destroy()
+            this.tClickWhereYouAre = null
         }
 
         if (b && this.hero) {
             const x = GetUnitX(this.hero)
             const y = GetUnitY(this.hero)
-            this.tClickWhereYouAre = createTimer(0.1, true, () => {
-                this.hero && IssuePointOrder(this.hero, 'smart', x, y)
+            this.tClickWhereYouAre = createTimer(0.2, true, () => {
+                this.hero && this.isSliding() && IssuePointOrder(this.hero, 'smart', x, y)
             })
         }
     }

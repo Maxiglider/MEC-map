@@ -1281,10 +1281,10 @@ export const initCommandAll = () => {
         },
     })
 
-    //-followMouse <boolean>
+    //-followMouseLegacy <boolean>
     registerCommand({
-        name: 'followMouse',
-        alias: ['fm'],
+        name: 'followMouseLegacy',
+        alias: [],
         group: 'all',
         argDescription: '<boolean> [neverDisable|nd]',
         description: 'follows the mouse',
@@ -1865,6 +1865,40 @@ export const initCommandAll = () => {
                 )}%\nCurrent level: ${getUdgLevels().getCurrentLevel(targetEscaper).getId()}`
             )
 
+            return true
+        },
+    })
+
+    //-autoCircle(ac) [<boolean status>]   --> toggle auto circle for current player
+    registerCommand({
+        name: 'autoCircle',
+        alias: [],
+        group: 'all',
+        argDescription: '[<boolean status>]',
+        description: 'toggle auto circle for current player',
+        cb: ({ noParam, nbParam, param1 }, escaper) => {
+            let b = true
+
+            if (noParam) {
+                // Toggle: if already on (has timer), turn off; otherwise turn on
+                b = !escaper.tClickWhereYouAre
+            } else if (nbParam === 1) {
+                if (!IsBoolString(param1)) {
+                    Text.erP(escaper.getPlayer(), 'param1 must be a boolean')
+                    return true
+                }
+                b = S2B(param1)
+            } else {
+                Text.erP(escaper.getPlayer(), 'no more than one param allowed for this command')
+                return true
+            }
+
+            escaper.enableClickWhereYouAre(b)
+            if (b) {
+                Text.P(escaper.getPlayer(), 'auto circle on')
+            } else {
+                Text.P(escaper.getPlayer(), 'auto circle off')
+            }
             return true
         },
     })
