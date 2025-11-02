@@ -1281,9 +1281,46 @@ export const initCommandAll = () => {
         },
     })
 
-    //-followMouseLegacy <boolean>
+    //-followMouse [<boolean>]   --> toggle or set follow mouse mode (active while holding right mouse button)
     registerCommand({
-        name: 'followMouseLegacy',
+        name: 'followMouse',
+        alias: ['fm'],
+        group: 'all',
+        argDescription: '[<boolean>]',
+        description: 'toggle or set follow mouse mode (active while holding right mouse button)',
+        cb: ({ noParam, nbParam, param1 }, escaper) => {
+            let flag = true
+
+            if (noParam) {
+                // Toggle mode
+                flag = !escaper.getSimpleFollowMouse()
+            } else if (nbParam === 1) {
+                if (!IsBoolString(param1)) {
+                    return true
+                }
+                flag = S2B(param1)
+            } else {
+                return true
+            }
+
+            escaper.enableSimpleFollowMouseMode(flag)
+
+            if (flag) {
+                Text.mkP(
+                    escaper.getPlayer(),
+                    'Follow mouse mode enabled: hold right click while sliding to follow mouse'
+                )
+            } else {
+                Text.mkP(escaper.getPlayer(), 'Follow mouse mode disabled')
+            }
+
+            return true
+        },
+    })
+
+    //-followMouseMax <boolean>
+    registerCommand({
+        name: 'followMouseMax',
         alias: [],
         group: 'all',
         argDescription: '<boolean> [neverDisable|nd]',

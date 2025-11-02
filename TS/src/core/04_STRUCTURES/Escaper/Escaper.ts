@@ -84,6 +84,7 @@ import { MessageHeroDies } from '../../08_GAME/Init_game/Message_heroDies'
 import { RunCoopSoundOnHero } from '../../08_GAME/Mode_coop/coop_init_sounds'
 import { DisableInterface, EnableInterface } from '../../DisablingInterface/EnableDisableInterface'
 import { FollowMouse } from '../../Follow_mouse/Follow_mouse'
+import { SimpleFollowMouse } from '../../Follow_mouse/Follow_mouse_simple'
 import { KeyboardShortcutArray } from '../../Keyboard_shortcuts/KeyboardShortcutArray'
 import type { CasterType } from '../Caster/CasterType'
 import { Level } from '../Level/Level'
@@ -204,6 +205,7 @@ export class Escaper {
 
     //follow mode
     private followMouse?: FollowMouse
+    private simpleFollowMouse?: SimpleFollowMouse
 
     //make
     private gumTerrain?: TerrainType
@@ -2271,6 +2273,19 @@ export class Escaper {
 
     getFollowMouse = () => {
         return this.followMouse
+    }
+
+    enableSimpleFollowMouseMode = (flag: boolean) => {
+        this.simpleFollowMouse?.destroy()
+        if (flag) {
+            this.simpleFollowMouse = new SimpleFollowMouse(this)
+        } else {
+            delete this.simpleFollowMouse
+        }
+    }
+
+    getSimpleFollowMouse = () => {
+        return this.simpleFollowMouse
     }
 
     getSlideMirror = () => this.slideMirror
