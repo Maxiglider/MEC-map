@@ -254,22 +254,29 @@ export class CircleMob {
                             unitY = centerY + scale * r * Math.sin(t) * 5
                         } else {
                             const shapeVertices = this.getShapeVertices()
-                            const t = (angle - this.currentBaseAngle + 360) % 360
-                            const segmentAngle = 360.0 / shapeVertices
-                            const vertexIndex = Math.floor(t / segmentAngle)
-                            const nextVertexIndex = (vertexIndex + 1) % shapeVertices
-                            const localT = (t % segmentAngle) / segmentAngle
 
-                            const vertex1Angle = this.currentBaseAngle + vertexIndex * segmentAngle
-                            const vertex2Angle = this.currentBaseAngle + nextVertexIndex * segmentAngle
+                            // Fallback to circle if shape has no vertices
+                            if (shapeVertices === 0) {
+                                unitX = centerX + this.radius * CosBJ(angle)
+                                unitY = centerY + this.radius * SinBJ(angle)
+                            } else {
+                                const t = (angle - this.currentBaseAngle + 360) % 360
+                                const segmentAngle = 360.0 / shapeVertices
+                                const vertexIndex = Math.floor(t / segmentAngle)
+                                const nextVertexIndex = (vertexIndex + 1) % shapeVertices
+                                const localT = (t % segmentAngle) / segmentAngle
 
-                            const x1 = centerX + this.radius * CosBJ(vertex1Angle)
-                            const y1 = centerY + this.radius * SinBJ(vertex1Angle)
-                            const x2 = centerX + this.radius * CosBJ(vertex2Angle)
-                            const y2 = centerY + this.radius * SinBJ(vertex2Angle)
+                                const vertex1Angle = this.currentBaseAngle + vertexIndex * segmentAngle
+                                const vertex2Angle = this.currentBaseAngle + nextVertexIndex * segmentAngle
 
-                            unitX = x1 + (x2 - x1) * localT
-                            unitY = y1 + (y2 - y1) * localT
+                                const x1 = centerX + this.radius * CosBJ(vertex1Angle)
+                                const y1 = centerY + this.radius * SinBJ(vertex1Angle)
+                                const x2 = centerX + this.radius * CosBJ(vertex2Angle)
+                                const y2 = centerY + this.radius * SinBJ(vertex2Angle)
+
+                                unitX = x1 + (x2 - x1) * localT
+                                unitY = y1 + (y2 - y1) * localT
+                            }
                         }
 
                         let facingAngle: number
