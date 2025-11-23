@@ -210,6 +210,30 @@ export const resolvePlayerIdsArray = (arg: string) => {
                 arrayPush(escapers, escaper)
             }
         }
+    } else if (larg === 'ai' || larg === 'computer' || larg === 'computers') {
+        for (let i = 0; i < NB_ESCAPERS; i++) {
+            const escaper = getUdgEscapers().get(i)
+
+            if (
+                escaper &&
+                GetPlayerSlotState(Player(i)) === PLAYER_SLOT_STATE_PLAYING &&
+                GetPlayerController(Player(i)) === MAP_CONTROL_COMPUTER
+            ) {
+                arrayPush(escapers, escaper)
+            }
+        }
+    } else if (larg === 'gamer' || larg === 'gamers' || larg === 'player' || larg === 'players') {
+        for (let i = 0; i < NB_ESCAPERS; i++) {
+            const escaper = getUdgEscapers().get(i)
+
+            if (
+                escaper &&
+                GetPlayerSlotState(Player(i)) === PLAYER_SLOT_STATE_PLAYING &&
+                GetPlayerController(Player(i)) === MAP_CONTROL_USER
+            ) {
+                arrayPush(escapers, escaper)
+            }
+        }
     } else if (isPlayerId(arg)) {
         const escaper = getUdgEscapers().get(resolvePlayerId(arg))
 

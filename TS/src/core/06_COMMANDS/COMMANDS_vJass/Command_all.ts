@@ -26,6 +26,7 @@ import { Apm } from 'core/08_GAME/Apm_clics_par_minute/Apm'
 import { Cpm } from 'core/08_GAME/Apm_clics_par_minute/Cpm'
 import { Globals } from 'core/09_From_old_Worldedit_triggers/globals_variables_and_triggers'
 import { PRESS_TIME_TO_ENABLE_FOLLOW_MOUSE } from 'core/Follow_mouse/Follow_mouse'
+import { creepData } from 'creeps'
 import { getUdgEscapers, getUdgLevels } from '../../../../globals'
 import { runInTrigger } from '../../../Utils/mapUtils'
 import { IsInteger, PercentageStringOrX2Integer } from '../../01_libraries/Functions_on_numbers'
@@ -743,13 +744,30 @@ export const initCommandAll = () => {
         },
     })
 
-    //-stop(s)   --> stop creating monsters or terrain or stop getTerrainInfoMode
+    //-getMonsterInfo(gmi)   --> click on a monster to get its info
+    registerCommand({
+        name: 'getMonsterInfo',
+        alias: ['gmi'],
+        group: 'all',
+        argDescription: '',
+        description: 'click on a monster to get its info',
+        cb: ({ noParam }, escaper) => {
+            if (!noParam) {
+                return true
+            }
+            escaper.makeGetMonsterInfo()
+            Text.mkP(escaper.getPlayer(), 'Get monster info mode enabled')
+            return true
+        },
+    })
+
+    //-stop(s)   --> stop creating monsters or terrain or stop getTerrainInfoMode or getMonsterInfoMode
     registerCommand({
         name: 'stop',
         alias: ['s'],
         group: 'all',
         argDescription: '',
-        description: 'stop creating monsters or terrain or stop getTerrainInfoMode',
+        description: 'stop creating monsters or terrain or stop getTerrainInfoMode or getMonsterInfoMode',
         cb: ({ noParam }, escaper) => {
             if (!noParam) {
                 return true
@@ -1936,6 +1954,49 @@ export const initCommandAll = () => {
             } else {
                 Text.P(escaper.getPlayer(), 'auto circle off')
             }
+            return true
+        },
+    })
+
+    //-monsterDatabase(mdb) <search>   --> lookup monsters by id, name, or comment
+    registerCommand({
+        name: 'monsterDatabase',
+        alias: ['mdb', 'monsterdb'],
+        group: 'all',
+        argDescription: '<search>',
+        description: 'lookup monsters by id, name, or comment',
+        cb: ({ nbParam, param1 }, escaper) => {
+            if (nbParam !== 1) {
+                Text.erP(escaper.getPlayer(), 'usage: -mdb <search>')
+                return true
+            }
+
+            const searchTerm = param1.toLowerCase()
+            const results: string[] = []
+
+            for (const [id, data] of Object.entries(creepData)) {
+                if (
+                    id.toLowerCase().includes(searchTerm) ||
+                    data.name.toLowerCase().includes(searchTerm) ||
+                    data.comment.toLowerCase().includes(searchTerm)
+                ) {
+                    results.push(
+                        `${udg_colorCode[TEAL]}${id}|r - ${udg_colorCode[GREEN]}${data.name}|r - ${udg_colorCode[GREY]}${data.comment}|r`
+                    )
+                }
+            }
+
+            if (results.length === 0) {
+                Text.P(escaper.getPlayer(), `No monsters found matching: "${param1}"`)
+            } else {
+                Text.P(
+                    escaper.getPlayer(),
+                    `Found ${results.length} monster(s):\n${results.slice(0, 20).join('\n')}${
+                        results.length > 20 ? `\n...and ${results.length - 20} more` : ''
+                    }`
+                )
+            }
+
             return true
         },
     })

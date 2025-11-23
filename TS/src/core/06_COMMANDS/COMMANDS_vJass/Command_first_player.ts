@@ -345,128 +345,214 @@ export const initExecuteCommandRed = () => {
         },
     })
 
+    //-setGameTheme(-) <theme|off> <units|rocks|terrain|all>
     registerCommand({
         name: 'setGameTheme',
         alias: [],
         group: 'red',
-        argDescription: '<theme>',
+        argDescription: '<theme|off> <units|rocks|terrain|all>',
         description: '',
-        cb: ({ param1 }, escaper) => {
+        cb: ({ nbParam, param1, param2 }, escaper) => {
+            // Reset theme
             if (IsBoolString(param1) && !S2B(param1)) {
                 ThemeUtils.setCurrentTheme(undefined)
                 ReinitTerrainsPositions.ReinitTerrainsPosition()
+                Text.P(escaper.getPlayer(), 'Theme reset')
                 return true
             }
 
-            if (param1 !== 'fullskill' && param1 !== 'murloc') {
-                Text.P(escaper.getPlayer(), 'Invalid theme: ' + ['fullskill', 'murloc'].join(', '))
+            // Validate parameters
+            if (nbParam !== 2) {
+                Text.P(escaper.getPlayer(), 'Usage: -setGameTheme <theme|off> <units|rocks|terrain|all>')
                 return true
             }
 
-            const availableTerrains = NB_MAX_OF_TERRAINS - Globals.udg_nb_used_terrains
+            if (param1 !== 'fullskill' && param1 !== 'murloc' && param1 !== 'rkr') {
+                Text.P(escaper.getPlayer(), 'Invalid theme: ' + ['fullskill', 'murloc', 'rkr'].join(', '))
+                return true
+            }
 
-            let createTerrains = 0
+            if (param2 !== 'units' && param2 !== 'rocks' && param2 !== 'terrain' && param2 !== 'all') {
+                Text.P(escaper.getPlayer(), 'Invalid target: must be units, rocks, terrain, or all')
+                return true
+            }
 
-            const tt = getUdgTerrainTypes()
+            const theme = param1 as 'fullskill' | 'murloc' | 'rkr'
+            const target = param2 as 'units' | 'rocks' | 'terrain' | 'all'
             const availableThemes = ThemeUtils.availableThemes
 
-            if (!tt.getByCode(availableThemes[param1].slideTerrain)) createTerrains++
-            if (!tt.getByCode(availableThemes[param1].deathTerrain)) createTerrains++
-            if (!tt.getByCode(availableThemes[param1].walkTerrain)) createTerrains++
+            // Handle units (moving monsters)
+            if (target === 'units' || target === 'all') {
+                ThemeUtils.setCurrentTheme(theme)
+                ThemeUtils.applyGameTheme('units')
+                Text.P(escaper.getPlayer(), `Applied ${theme} theme to units`)
+            }
 
-            if (createTerrains >= availableTerrains) {
-                Text.P(escaper.getPlayer(), `Failed, limit of ${NB_MAX_OF_TERRAINS} terrain types reached`)
+            // Handle rocks (stationary monsters)
+            if (target === 'rocks' || target === 'all') {
+                ThemeUtils.setCurrentTheme(theme)
+                ThemeUtils.applyGameTheme('rocks')
+                Text.P(escaper.getPlayer(), `Applied ${theme} theme to rocks`)
+            }
+
+            // Handle terrain
+            if (target === 'terrain' || target === 'all') {
+                const availableTerrains = NB_MAX_OF_TERRAINS - Globals.udg_nb_used_terrains
+                let createTerrains = 0
+                const tt = getUdgTerrainTypes()
+
+                if (!tt.getByCode(availableThemes[theme].slideTerrain)) createTerrains++
+                if (!tt.getByCode(availableThemes[theme].deathTerrain)) createTerrains++
+                if (!tt.getByCode(availableThemes[theme].walkTerrain)) createTerrains++
+
+                if (createTerrains >= availableTerrains) {
+                    Text.P(escaper.getPlayer(), `Failed, limit of ${NB_MAX_OF_TERRAINS} terrain types reached`)
+                    return true
+                }
+
+                // Create terrain types if needed
+                for (const terrainOrder of availableThemes[theme].terrainOrder) {
+                    if (terrainOrder === 'slide') {
+                        if (!tt.getByCode(availableThemes[theme].slideTerrain)) {
+                            tt.newSlide(
+                                `sgt${theme}s`,
+                                TerrainTypeFromString.TerrainTypeString2TerrainTypeId(
+                                    `'${availableThemes[theme].slideTerrain}'`
+                                ),
+                                550,
+                                true
+                            )
+                        }
+                    } else if (terrainOrder === 'death') {
+                        if (!tt.getByCode(availableThemes[theme].deathTerrain)) {
+                            tt.newDeath(
+                                `sgt${theme}d`,
+                                TerrainTypeFromString.TerrainTypeString2TerrainTypeId(
+                                    `'${availableThemes[theme].deathTerrain}'`
+                                ),
+                                'Abilities\\Spells\\NightElf\\EntanglingRoots\\EntanglingRootsTarget.mdl',
+                                0.2,
+                                20
+                            )
+                        }
+                    } else if (terrainOrder === 'walk') {
+                        if (!tt.getByCode(availableThemes[theme].walkTerrain)) {
+                            tt.newWalk(
+                                `sgt${theme}w`,
+                                TerrainTypeFromString.TerrainTypeString2TerrainTypeId(
+                                    `'${availableThemes[theme].walkTerrain}'`
+                                ),
+                                522
+                            )
+                        }
+                    }
+                }
+
+                const slideTerrain = tt.getByCode(availableThemes[theme].slideTerrain)
+                const deathTerrain = tt.getByCode(availableThemes[theme].deathTerrain)
+                const walkTerrain = tt.getByCode(availableThemes[theme].walkTerrain)
+
+                if (!slideTerrain || !deathTerrain || !walkTerrain) {
+                    Text.P(escaper.getPlayer(), 'Failed to create terrain types')
+                    return true
+                }
+
+                // Modify existing terrains
+                for (const [_, terrainType] of pairs(getUdgTerrainTypes().getAll())) {
+                    for (const terrainOrder of availableThemes[theme].terrainOrder) {
+                        if (
+                            terrainOrder === 'slide' &&
+                            terrainType.kind === 'slide' &&
+                            terrainType.terrainTypeId !== slideTerrain.terrainTypeId
+                        ) {
+                            ThemeUtils.modifyTerrain(
+                                terrainType.terrainTypeId,
+                                TerrainTypeFromString.TerrainTypeString2TerrainTypeId(
+                                    `'${availableThemes[theme].slideTerrain}'`
+                                )
+                            )
+                        } else if (
+                            terrainOrder === 'death' &&
+                            terrainType.kind === 'death' &&
+                            terrainType.terrainTypeId !== deathTerrain.terrainTypeId
+                        ) {
+                            ThemeUtils.modifyTerrain(
+                                terrainType.terrainTypeId,
+                                TerrainTypeFromString.TerrainTypeString2TerrainTypeId(
+                                    `'${availableThemes[theme].deathTerrain}'`
+                                )
+                            )
+                        } else if (
+                            terrainOrder === 'walk' &&
+                            terrainType.kind === 'walk' &&
+                            terrainType.terrainTypeId !== walkTerrain.terrainTypeId
+                        ) {
+                            ThemeUtils.modifyTerrain(
+                                terrainType.terrainTypeId,
+                                TerrainTypeFromString.TerrainTypeString2TerrainTypeId(
+                                    `'${availableThemes[theme].walkTerrain}'`
+                                )
+                            )
+                        }
+                    }
+                }
+
+                Text.P(escaper.getPlayer(), `Applied ${theme} theme to terrain`)
+            }
+
+            Text.A(`Welcome to: ${theme} 2.0`)
+            return true
+        },
+    })
+
+    //-setMonsterSkin <unitId|off>
+    registerCommand({
+        name: 'setMonsterSkin',
+        alias: [],
+        group: 'red',
+        argDescription: '<unitId|off>',
+        description: 'Change monster skin',
+        cb: ({ param1 }, escaper) => {
+            // Reset to default
+            if (IsBoolString(param1) && !S2B(param1)) {
+                ThemeUtils.setCustomMonsterSkin(undefined)
+
+                for (const [_, level] of pairs(getUdgLevels().getAll())) {
+                    if (level.isActivated()) {
+                        for (const [_, monster] of pairs(level.monsters.getAll())) {
+                            if (monster.u) {
+                                monster.setMonsterSkin(undefined)
+                            }
+                        }
+
+                        for (const [_, monsterSpawn] of pairs(level.monsterSpawns.getAll())) {
+                            monsterSpawn.refresh()
+                        }
+                    }
+                }
+
+                Text.P(escaper.getPlayer(), 'Monster skins reset to default')
                 return true
             }
 
-            for (const terrainOrder of availableThemes[param1].terrainOrder) {
-                if (terrainOrder === 'slide') {
-                    if (!tt.getByCode(availableThemes[param1].slideTerrain)) {
-                        tt.newSlide(
-                            `sgt${param1}s`,
-                            TerrainTypeFromString.TerrainTypeString2TerrainTypeId(
-                                `'${availableThemes[param1].slideTerrain}'`
-                            ),
-                            550,
-                            true
-                        )
+            const skinId = FourCC(param1)
+            ThemeUtils.setCustomMonsterSkin(skinId)
+
+            for (const [_, level] of pairs(getUdgLevels().getAll())) {
+                if (level.isActivated()) {
+                    for (const [_, monster] of pairs(level.monsters.getAll())) {
+                        if (monster.u) {
+                            monster.setMonsterSkin(skinId)
+                        }
                     }
-                } else if (terrainOrder === 'death') {
-                    if (!tt.getByCode(availableThemes[param1].deathTerrain)) {
-                        tt.newDeath(
-                            `sgt${param1}d`,
-                            TerrainTypeFromString.TerrainTypeString2TerrainTypeId(
-                                `'${availableThemes[param1].deathTerrain}'`
-                            ),
-                            'Abilities\\Spells\\NightElf\\EntanglingRoots\\EntanglingRootsTarget.mdl',
-                            0.2,
-                            20
-                        )
-                    }
-                } else if (terrainOrder === 'walk') {
-                    if (!tt.getByCode(availableThemes[param1].walkTerrain)) {
-                        tt.newWalk(
-                            `sgt${param1}w`,
-                            TerrainTypeFromString.TerrainTypeString2TerrainTypeId(
-                                `'${availableThemes[param1].walkTerrain}'`
-                            ),
-                            522
-                        )
+
+                    for (const [_, monsterSpawn] of pairs(level.monsterSpawns.getAll())) {
+                        monsterSpawn.refresh()
                     }
                 }
             }
 
-            ThemeUtils.setCurrentTheme(param1)
-            ThemeUtils.applyGameTheme()
-
-            const slideTerrain = tt.getByCode(availableThemes[param1].slideTerrain)
-            const deathTerrain = tt.getByCode(availableThemes[param1].deathTerrain)
-            const walkTerrain = tt.getByCode(availableThemes[param1].walkTerrain)
-
-            if (!slideTerrain || !deathTerrain || !walkTerrain) {
-                return true
-            }
-
-            for (const [_, terrainType] of pairs(getUdgTerrainTypes().getAll())) {
-                for (const terrainOrder of availableThemes[param1].terrainOrder) {
-                    if (
-                        terrainOrder === 'slide' &&
-                        terrainType.kind === 'slide' &&
-                        terrainType.terrainTypeId !== slideTerrain.terrainTypeId
-                    ) {
-                        ThemeUtils.modifyTerrain(
-                            terrainType.terrainTypeId,
-                            TerrainTypeFromString.TerrainTypeString2TerrainTypeId(
-                                `'${availableThemes[param1].slideTerrain}'`
-                            )
-                        )
-                    } else if (
-                        terrainOrder === 'death' &&
-                        terrainType.kind === 'death' &&
-                        terrainType.terrainTypeId !== deathTerrain.terrainTypeId
-                    ) {
-                        ThemeUtils.modifyTerrain(
-                            terrainType.terrainTypeId,
-                            TerrainTypeFromString.TerrainTypeString2TerrainTypeId(
-                                `'${availableThemes[param1].deathTerrain}'`
-                            )
-                        )
-                    } else if (
-                        terrainOrder === 'walk' &&
-                        terrainType.kind === 'walk' &&
-                        terrainType.terrainTypeId !== walkTerrain.terrainTypeId
-                    ) {
-                        ThemeUtils.modifyTerrain(
-                            terrainType.terrainTypeId,
-                            TerrainTypeFromString.TerrainTypeString2TerrainTypeId(
-                                `'${availableThemes[param1].walkTerrain}'`
-                            )
-                        )
-                    }
-                }
-            }
-
-            Text.A(`Welcome to: ${param1} 2.0`)
+            Text.P(escaper.getPlayer(), `Monster skin changed to: ${param1}`)
             return true
         },
     })

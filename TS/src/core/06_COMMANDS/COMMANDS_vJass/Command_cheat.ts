@@ -1,6 +1,7 @@
 import { ServiceManager } from 'Services'
 import { pathingBlockerUtils } from 'Utils/PathingBlockerUtils'
 import { progressionUtils } from 'Utils/ProgressionUtils'
+import { SlideAfterDarkUtils } from 'Utils/SlideAfterDarkUtils'
 import { IsBoolString, S2B } from 'core/01_libraries/Basic_functions'
 import { NB_ESCAPERS } from 'core/01_libraries/Constants'
 import { IsInteger, IsPositiveInteger } from 'core/01_libraries/Functions_on_numbers'
@@ -1249,6 +1250,44 @@ export const initExecuteCommandCheat = () => {
                 } else {
                     Text.erP(escaper.getPlayer(), 'wrong sliding mode')
                 }
+            }
+
+            return true
+        },
+    })
+
+    //-slideAfterDark   --> randomly changes monster skins every 1-10 seconds
+    registerCommand({
+        name: 'slideAfterDark',
+        alias: [],
+        group: 'cheat',
+        argDescription: '[on|off]',
+        description: 'Randomly changes monster skins every 1-10 seconds',
+        cb: ({ noParam, nbParam, param1 }, escaper) => {
+            if (noParam) {
+                if (SlideAfterDarkUtils.isActive()) {
+                    SlideAfterDarkUtils.deactivate()
+                    Text.P(escaper.getPlayer(), 'slideAfterDark deactivated')
+                } else {
+                    SlideAfterDarkUtils.activate()
+                    Text.P(escaper.getPlayer(), 'slideAfterDark activated')
+                }
+                return true
+            }
+
+            if (nbParam === 1) {
+                if (IsBoolString(param1)) {
+                    if (S2B(param1)) {
+                        SlideAfterDarkUtils.activate()
+                        Text.P(escaper.getPlayer(), 'slideAfterDark activated')
+                    } else {
+                        SlideAfterDarkUtils.deactivate()
+                        Text.P(escaper.getPlayer(), 'slideAfterDark deactivated')
+                    }
+                } else {
+                    Text.erP(escaper.getPlayer(), 'param must be a boolean (on/off, true/false, 1/0)')
+                }
+                return true
             }
 
             return true

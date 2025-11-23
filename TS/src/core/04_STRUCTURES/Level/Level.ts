@@ -1,5 +1,6 @@
 import { ServiceManager } from 'Services'
 import { IDestroyable, MemoryHandler } from 'Utils/MemoryHandler'
+import { SlideAfterDarkUtils } from 'Utils/SlideAfterDarkUtils'
 import { ThemeUtils } from 'Utils/ThemeUtils'
 import { createTimer } from 'Utils/mapUtils'
 import { arrayPush } from 'core/01_libraries/Basic_functions'
@@ -150,6 +151,7 @@ export class Level {
 
         this.isActivatedB = activ
         ThemeUtils.applyGameTheme()
+        SlideAfterDarkUtils.applyToLevel(this.id)
     }
 
     checkpointReviveHeroes(finisher: Escaper | undefined, finished?: boolean) {

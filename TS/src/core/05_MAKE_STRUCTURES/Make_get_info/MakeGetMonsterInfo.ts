@@ -1,0 +1,101 @@
+import { Make } from 'core/05_MAKE_STRUCTURES/Make/Make'
+import { Ascii2String } from '../../01_libraries/Ascii'
+import { GREY, RED, TEAL, TERRAIN_DATA_DISPLAY_TIME } from '../../01_libraries/Constants'
+import { udg_colorCode } from '../../01_libraries/Init_colorCodes'
+import { Text } from '../../01_libraries/Text'
+import { Escaper } from '../../04_STRUCTURES/Escaper/Escaper'
+
+const MONSTER_MAX_RANGE = 256
+
+export class MakeGetMonsterInfo extends Make {
+    public escaper: Escaper
+
+    constructor(maker: unit, escaper: Escaper) {
+        super(maker, 'getMonsterInfo', false)
+        this.escaper = escaper
+    }
+
+    doActions = () => {
+        if (super.doBaseActions()) {
+            const level = this.escaper.getMakingLevel()
+            const monster = level.monsters.getMonsterNear(this.orderX, this.orderY)
+
+            if (!monster || !monster.u) {
+                Text.erP(this.makerOwner, 'No monster found near click location (max range: ' + MONSTER_MAX_RANGE + ')')
+                return
+            }
+
+            const monsterType = monster.getMonsterType()
+            const xMob = GetUnitX(monster.u)
+            const yMob = GetUnitY(monster.u)
+            const distance = R2I(SquareRoot((this.orderX - xMob) ** 2 + (this.orderY - yMob) ** 2))
+
+            Text.DisplayLineToPlayer(this.makerOwner)
+            Text.P_timed(this.makerOwner, TERRAIN_DATA_DISPLAY_TIME, udg_colorCode[TEAL] + '--- Monster Info ---')
+
+            // Monster Type Info
+            if (monsterType) {
+                const space = '   '
+                let display = udg_colorCode[RED] + 'Type: ' + monsterType.label
+                if (monsterType.theAlias) {
+                    display += ' (' + monsterType.theAlias + ')'
+                }
+                Text.P_timed(this.makerOwner, TERRAIN_DATA_DISPLAY_TIME, display)
+
+                display = udg_colorCode[GREY] + 'Unit: ' + Ascii2String(monsterType.getUnitTypeId())
+                display += space + 'Speed: ' + I2S(R2I(monsterType.getUnitMoveSpeed()))
+                display += space + 'Immolation: ' + monsterType.getImmolationRadiusStr()
+                Text.P_timed(this.makerOwner, TERRAIN_DATA_DISPLAY_TIME, display)
+
+                const monsterSkin = monster.getMonsterSkin()
+                if (monsterSkin !== undefined) {
+                    const skinDisplay = udg_colorCode[GREY] + 'Skin: ' + Ascii2String(monsterSkin)
+                    Text.P_timed(this.makerOwner, TERRAIN_DATA_DISPLAY_TIME, skinDisplay)
+                }
+
+                const scale = monsterType.getScale()
+                const height = monsterType.getHeight()
+                display = udg_colorCode[GREY] + 'Scale: ' + (scale === -1 ? 'default' : R2S(scale))
+                display += space + 'Height: ' + (height === -1 ? 'default' : I2S(R2I(height)))
+                if (monsterType.isClickable()) {
+                    display += space + 'Clickable: ' + I2S(monsterType.getMaxLife() / 10000)
+                }
+                if (monsterType.isWanderable()) {
+                    display += space + 'Wanderable'
+                }
+                Text.P_timed(this.makerOwner, TERRAIN_DATA_DISPLAY_TIME, display)
+            }
+
+            // Monster Instance Info
+            let instanceInfo = udg_colorCode[GREY] + 'ID: ' + I2S(monster.getId())
+            instanceInfo += '   Life: ' + I2S(monster.getLife())
+            instanceInfo += '   Distance: ' + I2S(distance)
+            Text.P_timed(this.makerOwner, TERRAIN_DATA_DISPLAY_TIME, instanceInfo)
+
+            // Position
+            const posInfo = udg_colorCode[GREY] + 'Position: (' + I2S(R2I(xMob)) + ', ' + I2S(R2I(yMob)) + ')'
+            Text.P_timed(this.makerOwner, TERRAIN_DATA_DISPLAY_TIME, posInfo)
+
+            // Monster properties
+            const clearMob = monster.getClearMob()
+            const portalMob = monster.getPortalMob()
+            const circleMob = monster.getCircleMob()
+            const jumpPad = monster.getJumpPad()
+
+            if (clearMob || portalMob || circleMob || jumpPad) {
+                let propertiesInfo = udg_colorCode[TEAL] + 'Properties: '
+                const props: string[] = []
+                if (clearMob) props.push('ClearMob')
+                if (portalMob) props.push('PortalMob')
+                if (circleMob) props.push('CircleMob')
+                if (jumpPad) props.push('JumpPad')
+                propertiesInfo += props.join(', ')
+                Text.P_timed(this.makerOwner, TERRAIN_DATA_DISPLAY_TIME, propertiesInfo)
+            }
+
+            // Monster class
+            const className = udg_colorCode[GREY] + 'Class: ' + monster.constructor.name
+            Text.P_timed(this.makerOwner, TERRAIN_DATA_DISPLAY_TIME, className)
+        }
+    }
+}

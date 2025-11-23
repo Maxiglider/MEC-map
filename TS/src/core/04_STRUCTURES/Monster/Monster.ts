@@ -56,6 +56,7 @@ export abstract class Monster {
     private attackGroundX: number | undefined = undefined
     private attackGroundY: number | undefined = undefined
     private attackGroundDelay: number = 0
+    private monsterSkin: number | undefined = undefined
 
     constructor(monsterType?: MonsterType, forceId: number | null = null) {
         this.mt = monsterType
@@ -148,6 +149,21 @@ export abstract class Monster {
         this.jumpPadEffect = jumpPadEffect
     }
 
+    getMonsterSkin = () => this.monsterSkin
+    setMonsterSkin = (monsterSkin: number | undefined) => {
+        this.monsterSkin = monsterSkin
+
+        if (this.u) {
+            if (monsterSkin !== undefined) {
+                BlzSetUnitSkin(this.u, monsterSkin)
+            } else {
+                const currentSkin = BlzGetUnitSkin(this.u)
+                BlzSetUnitSkin(this.u, currentSkin === FourCC('hpea') ? FourCC('hfoo') : FourCC('hpea'))
+                BlzSetUnitSkin(this.u, currentSkin)
+            }
+        }
+    }
+
     removeUnit() {
         if (this.u) {
             GroupRemoveUnit(monstersClickable, this.u)
@@ -226,6 +242,10 @@ export abstract class Monster {
         this.u = this.createUnitFunc()
 
         this.u && SetUnitUserData(this.u, this.id)
+
+        if (this.monsterSkin !== undefined) {
+            this.setMonsterSkin(this.monsterSkin)
+        }
 
         if (this.mt && this.mt.isClickable()) {
             this.life = this.mt.getMaxLife()

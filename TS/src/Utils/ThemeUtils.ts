@@ -1,9 +1,8 @@
-import { String2Ascii } from 'core/01_libraries/Ascii'
-import { arrayPush } from 'core/01_libraries/Basic_functions'
 import { LARGEUR_CASE } from 'core/01_libraries/Constants'
-import { MonsterType } from 'core/04_STRUCTURES/Monster/MonsterType'
+import { Caster } from 'core/04_STRUCTURES/Caster/Caster'
+import { MonsterNoMove } from 'core/04_STRUCTURES/Monster/MonsterNoMove'
 import { ChangeTerrainType } from 'core/07_TRIGGERS/Modify_terrain_Functions/Modify_terrain_functions'
-import { getUdgLevels, getUdgMonsterTypes, globals } from '../../globals'
+import { getUdgLevels, globals } from '../../globals'
 
 const initThemeUtils = () => {
     // Terrain order is based on how its saved in WE, all newly loaded terrains overrule all others
@@ -14,7 +13,7 @@ const initThemeUtils = () => {
             walkTerrain: 'Lgrd',
             slideTerrain: 'Nice',
             deathTerrain: 'Ywmb',
-            monsterIds: ['hfoo'],
+            monsterSkins: [FourCC('hfoo')],
         },
         murloc: {
             // slide < death < walk
@@ -22,7 +21,15 @@ const initThemeUtils = () => {
             walkTerrain: 'Yblm',
             slideTerrain: 'Nsnw',
             deathTerrain: 'Avin',
-            monsterIds: ['nmrl', 'nmrr', 'nmfs', 'nmrm', 'nmmu'],
+            monsterSkins: [FourCC('nmrl'), FourCC('nmrr'), FourCC('nmfs'), FourCC('nmrm'), FourCC('nmmu')],
+        },
+        rkr: {
+            // death < slide < walk
+            terrainOrder: ['death', 'slide', 'walk'],
+            walkTerrain: 'Yblm',
+            slideTerrain: 'Nice',
+            deathTerrain: 'Wsnw',
+            monsterSkins: [FourCC('nwwd')],
         },
     }
 
@@ -46,38 +53,39 @@ const initThemeUtils = () => {
         }
     }
 
-    let currentTheme: 'fullskill' | 'murloc' | undefined = undefined
-    let currentAvailableMonsters: MonsterType[] | undefined = []
-    let appliedMonsters: { [monsterId: number]: MonsterType | undefined } = {}
+    let currentTheme: 'fullskill' | 'murloc' | 'rkr' | undefined = undefined
+    let appliedMonsterSkins: { [monsterId: number]: number | undefined } = {}
+    let customMonsterSkin: number | undefined = undefined // Manually set via -setMonsterSkin
 
-    const applyGameTheme = () => {
-        if (!currentTheme) {
+    const applyGameTheme = (target?: 'units' | 'rocks') => {
+        if (!currentTheme && !customMonsterSkin) {
             return
         }
 
-        const monsterTypes = getUdgMonsterTypes()
-        const availableMonsters: MonsterType[] = []
-
-        for (const i of availableThemes[currentTheme].monsterIds) {
-            let cMonster = monsterTypes.getByLabel(`sgt${currentTheme}m${i}`)
-
-            if (!cMonster) {
-                cMonster = monsterTypes.new(`sgt${currentTheme}m${i}`, String2Ascii(i), 1, 40, 380, false)
-            }
-
-            arrayPush(availableMonsters, cMonster)
-        }
-
-        currentAvailableMonsters = availableMonsters
+        const skinIds = currentTheme ? availableThemes[currentTheme].monsterSkins : []
 
         for (const [_, level] of pairs(getUdgLevels().getAll())) {
             if (level.isActivated()) {
                 for (const [_, monster] of pairs(level.monsters.getAll())) {
-                    const oldMonsterType = monster.getMonsterType()
+                    // Filter by target type
+                    const isStationary = monster instanceof MonsterNoMove || monster instanceof Caster
+                    const shouldApply =
+                        !target || (target === 'rocks' && isStationary) || (target === 'units' && !isStationary)
 
-                    if (oldMonsterType) {
-                        monster.setMonsterType(availableMonsters[GetRandomInt(0, availableMonsters.length - 1)])
-                        appliedMonsters[monster.getId()] = oldMonsterType
+                    if (monster.u && shouldApply) {
+                        // Store original skin (or undefined if not set)
+                        if (appliedMonsterSkins[monster.getId()] === undefined) {
+                            appliedMonsterSkins[monster.getId()] = monster.getMonsterSkin()
+                        }
+
+                        // Apply custom skin if set, otherwise apply theme skin
+                        if (customMonsterSkin !== undefined) {
+                            monster.setMonsterSkin(customMonsterSkin)
+                        } else if (currentTheme) {
+                            // Apply random skin from theme
+                            const randomSkin = skinIds[GetRandomInt(0, skinIds.length - 1)]
+                            monster.setMonsterSkin(randomSkin)
+                        }
                     }
                 }
 
@@ -88,28 +96,34 @@ const initThemeUtils = () => {
         }
     }
 
-    const getRandomAvailableMonsterType = () => {
-        if (currentAvailableMonsters && currentAvailableMonsters?.length > 0) {
-            return currentAvailableMonsters[GetRandomInt(0, currentAvailableMonsters.length - 1)]
+    const getRandomAvailableMonsterSkin = () => {
+        if (currentTheme) {
+            const skinIds = availableThemes[currentTheme].monsterSkins
+            return skinIds[GetRandomInt(0, skinIds.length - 1)]
         }
+        return undefined
     }
 
     return {
         applyGameTheme,
-        getRandomAvailableMonsterType,
+        getRandomAvailableMonsterSkin,
         getCurrentTheme: () => currentTheme,
-        setCurrentTheme: (theme: 'fullskill' | 'murloc' | undefined) => {
+        setCurrentTheme: (theme: 'fullskill' | 'murloc' | 'rkr' | undefined) => {
             if (!theme) {
-                currentAvailableMonsters = undefined
-
+                // Restore original skins for all monsters that had theme applied
                 for (const [_, level] of pairs(getUdgLevels().getAll())) {
                     if (level.isActivated()) {
                         for (const [_, monster] of pairs(level.monsters.getAll())) {
-                            const oldMonsterType = appliedMonsters[monster.getId()]
+                            const monsterId = monster.getId()
 
-                            if (oldMonsterType) {
-                                monster.setMonsterType(oldMonsterType)
-                                appliedMonsters[monster.getId()] = undefined
+                            // Only reset if this monster had a theme applied
+                            if (appliedMonsterSkins[monsterId] !== undefined || monster.u) {
+                                const originalSkin = appliedMonsterSkins[monsterId]
+
+                                if (monster.u) {
+                                    // Restore original skin (or undefined if it never had one)
+                                    monster.setMonsterSkin(originalSkin)
+                                }
                             }
                         }
 
@@ -118,10 +132,17 @@ const initThemeUtils = () => {
                         }
                     }
                 }
+
+                // Clear the applied skins map
+                appliedMonsterSkins = {}
             }
 
             currentTheme = theme
         },
+        setCustomMonsterSkin: (skinId: number | undefined) => {
+            customMonsterSkin = skinId
+        },
+        getCustomMonsterSkin: () => customMonsterSkin,
         availableThemes,
         modifyTerrain,
     }

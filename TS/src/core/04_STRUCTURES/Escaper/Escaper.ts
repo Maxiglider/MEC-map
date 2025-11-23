@@ -60,6 +60,7 @@ import { MakeLastActions } from '../../05_MAKE_STRUCTURES/MakeLastActions/MakeLa
 import { MakeMonsterNoMove } from '../../05_MAKE_STRUCTURES/Make_create_monsters/MakeMonsterNoMove'
 import { MakeDoNothing } from '../../05_MAKE_STRUCTURES/Make_do_nothing/MakeDoNothing'
 import { MakeExchangeTerrains } from '../../05_MAKE_STRUCTURES/Make_exchange_terrains/MakeExchangeTerrains'
+import { MakeGetMonsterInfo } from '../../05_MAKE_STRUCTURES/Make_get_info/MakeGetMonsterInfo'
 import { MakeGetTerrainType } from '../../05_MAKE_STRUCTURES/Make_get_info/MakeGetTerrainType'
 import { MakeEnd } from '../../05_MAKE_STRUCTURES/Make_start_end_visibilityModifier/MakeEnd'
 import { MakeStart } from '../../05_MAKE_STRUCTURES/Make_start_end_visibilityModifier/MakeStart'
@@ -2001,6 +2002,11 @@ export class Escaper {
     makeGetTerrainType = () => {
         this.destroyMake()
         if (this.hero) this.make = new MakeGetTerrainType(this.hero)
+    }
+
+    makeGetMonsterInfo = () => {
+        this.destroyMake()
+        if (this.hero) this.make = new MakeGetMonsterInfo(this.hero, this)
     }
 
     makeExchangeTerrains = () => {
