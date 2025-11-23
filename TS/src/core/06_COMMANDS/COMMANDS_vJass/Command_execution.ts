@@ -267,31 +267,68 @@ export const initCommandExecution = () => {
             name: 'help',
             alias: ['h', '?'],
             group: 'all',
-            argDescription: '',
-            description: '',
-            cb: ({ param1 }) => {
+            argDescription: '[search] [page]',
+            description: 'List commands. Use page number for pagination (10 per page)',
+            cb: ({ param1, param2 }) => {
+                const CMDS_PER_PAGE = 8
+
+                // Determine which param is page number and which is search
+                let searchTerm = ''
+                let pageNum = 1
+
+                if (param1) {
+                    const param1Num = S2I(param1)
+                    if (param1Num > 0 && I2S(param1Num) === param1) {
+                        // param1 is a number
+                        pageNum = param1Num
+                        searchTerm = param2 || ''
+                    } else {
+                        // param1 is search term
+                        searchTerm = param1
+                        if (param2) {
+                            const param2Num = S2I(param2)
+                            if (param2Num > 0 && I2S(param2Num) === param2) {
+                                pageNum = param2Num
+                            }
+                        }
+                    }
+                }
+
                 const filtered = commands.filter(cmd => {
-                    return param1
-                        ? cmd.name.toLowerCase().indexOf(param1.toLowerCase()) >= 0 ||
+                    return searchTerm
+                        ? cmd.name.toLowerCase().indexOf(searchTerm.toLowerCase()) >= 0 ||
                               (cmd.alias &&
-                                  cmd.alias.find(alias => alias.toLowerCase().indexOf(param1.toLowerCase()) >= 0))
+                                  cmd.alias.find(alias => alias.toLowerCase().indexOf(searchTerm.toLowerCase()) >= 0))
                         : true
                 })
 
-                const s =
-                    'Commands:\n' +
-                    filtered
-                        .map(
-                            cmd =>
-                                '-' +
-                                cmd.name +
-                                (cmd.alias.length > 0 ? `(${cmd.alias.join(' | ')})` : '') +
-                                (cmd.argDescription.length > 0 ? ' ' + cmd.argDescription : '') +
-                                (cmd.description.length > 0 ? ' --> ' + cmd.description : '')
-                        )
-                        .join('\n')
+                const totalPages = Math.ceil(filtered.length / CMDS_PER_PAGE)
+                const startIdx = (pageNum - 1) * CMDS_PER_PAGE
+                const endIdx = Math.min(startIdx + CMDS_PER_PAGE, filtered.length)
+                const paginatedCmds = filtered.slice(startIdx, endIdx)
 
-                Text.P(GetTriggerPlayer(), s)
+                Text.P(
+                    GetTriggerPlayer(),
+                    `|cff00ff00Commands (page |cff00ccff${pageNum}|r|cff00ff00/|cff00ccff${totalPages}|r|cff00ff00)|r`
+                )
+
+                paginatedCmds.forEach(cmd => {
+                    let line = '|cffffcc00-' + cmd.name + '|r'
+
+                    if (cmd.alias.length > 0) {
+                        line += '|cffcccccc(' + cmd.alias.join(' | ') + ')|r'
+                    }
+
+                    if (cmd.argDescription.length > 0) {
+                        line += ' |cff88ccff' + cmd.argDescription + '|r'
+                    }
+
+                    if (cmd.description.length > 0) {
+                        line += ' |cffaaaaaa-->|r ' + cmd.description
+                    }
+
+                    Text.P(GetTriggerPlayer(), line)
+                })
 
                 return true
             },
