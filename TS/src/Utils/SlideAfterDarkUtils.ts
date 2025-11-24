@@ -64,6 +64,17 @@ const initSlideAfterDarkUtils = () => {
             DestroyTimer(timer)
             delete monsterTimers[monsterId]
         }
+
+        // Reset all monster skins to original
+        for (const [_, level] of pairs(getUdgLevels().getAll())) {
+            if (level.isActivated()) {
+                for (const [_, monster] of pairs(level.monsters.getAll())) {
+                    if (monster.u) {
+                        monster.setMonsterSkin(undefined)
+                    }
+                }
+            }
+        }
     }
 
     const isSlideAfterDarkActive = () => isActive

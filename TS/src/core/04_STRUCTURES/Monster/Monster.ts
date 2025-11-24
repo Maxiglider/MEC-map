@@ -154,12 +154,11 @@ export abstract class Monster {
         this.monsterSkin = monsterSkin
 
         if (this.u) {
-            if (monsterSkin !== undefined) {
+            if (monsterSkin) {
                 BlzSetUnitSkin(this.u, monsterSkin)
             } else {
-                const currentSkin = BlzGetUnitSkin(this.u)
-                BlzSetUnitSkin(this.u, currentSkin === FourCC('hpea') ? FourCC('hfoo') : FourCC('hpea'))
-                BlzSetUnitSkin(this.u, currentSkin)
+                this.removeUnit()
+                this.createUnit()
             }
         }
     }
