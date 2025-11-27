@@ -1881,7 +1881,7 @@ export const initExecuteCommandMake = () => {
         alias: ['setmsl'],
         group: 'make',
         argDescription: '<oldMonsterSpawnLabel> <newMonsterSpawnLabel>',
-        description: '',
+        description: 'change the label of an existing monster spawn',
         cb: ({ nbParam, param1, param2 }, escaper) => {
             if (!(nbParam === 2)) {
                 return true
@@ -1901,7 +1901,7 @@ export const initExecuteCommandMake = () => {
         alias: ['setmsm'],
         group: 'make',
         argDescription: '<monsterSpawnLabel> <monsterLabel>',
-        description: '',
+        description: 'change which monster type a monster spawn will create',
         cb: ({ nbParam, param1, param2 }, escaper) => {
             if (!(nbParam === 2)) {
                 return true
@@ -1931,7 +1931,7 @@ export const initExecuteCommandMake = () => {
         alias: ['setmsd', 'setMonsterSpawnRotation', 'setmsr'],
         group: 'make',
         argDescription: '<monsterSpawnLabel> <direction>',
-        description: 'leftToRight(ltr), upToDown(utd), rightToLeft(rtl), downToUp(dtu)',
+        description: 'leftToRight(ltr), upToDown(utd), rightToLeft(rtl), downToUp(dtu), any angle in degrees',
         cb: ({ param1, param2 }, escaper) => {
             const monsterSpawn = escaper.getMakingLevel().monsterSpawns.getByLabel(param1)
 
@@ -1966,7 +1966,7 @@ export const initExecuteCommandMake = () => {
         alias: ['setmsf'],
         group: 'make',
         argDescription: '<monsterSpawnLabel> <frequency>',
-        description: 'maximum 20 mobs per second',
+        description: 'set how often monsters spawn (frequency between 0.1 and 30)',
         cb: ({ nbParam, param1, param2 }, escaper) => {
             if (!(nbParam === 2)) {
                 return true
@@ -1995,7 +1995,7 @@ export const initExecuteCommandMake = () => {
         alias: ['setmsa'],
         group: 'make',
         argDescription: '<label> <amount>',
-        description: '',
+        description: 'set how many monsters spawn simultaneously per spawn cycle (1-500)',
         cb: ({ param1, param2 }, escaper) => {
             const monsterSpawn = escaper.getMakingLevel().monsterSpawns.getByLabel(param1)
 
@@ -2021,7 +2021,7 @@ export const initExecuteCommandMake = () => {
         alias: ['setmso'],
         group: 'make',
         argDescription: '<label> <offset>',
-        description: '',
+        description: 'distance between each individual monster when spawnAmount > 1 (0-16384, 0 disables)',
         cb: ({ param1, param2 }, escaper) => {
             const monsterSpawn = escaper.getMakingLevel().monsterSpawns.getByLabel(param1)
 
@@ -2047,7 +2047,7 @@ export const initExecuteCommandMake = () => {
         alias: ['setmsfso'],
         group: 'make',
         argDescription: '<label> <offset>',
-        description: '',
+        description: 'distance between each spawn (0-16384, 0 disables)',
         cb: ({ param1, param2 }, escaper) => {
             const monsterSpawn = escaper.getMakingLevel().monsterSpawns.getByLabel(param1)
 
@@ -2073,7 +2073,7 @@ export const initExecuteCommandMake = () => {
         alias: ['setmsfsob'],
         group: 'make',
         argDescription: '<label> <bounce>',
-        description: '',
+        description: 'toggle whether fixed spawn offset bounces back and forth (requires fixedSpawnOffset enabled)',
         cb: ({ param1, param2 }, escaper) => {
             const monsterSpawn = escaper.getMakingLevel().monsterSpawns.getByLabel(param1)
 
@@ -2104,7 +2104,7 @@ export const initExecuteCommandMake = () => {
         alias: ['setmsfsom'],
         group: 'make',
         argDescription: '<label> <mirrored>',
-        description: '',
+        description: 'toggle whether fixed spawn offset mirrors on opposite side (requires fixedSpawnOffset enabled)',
         cb: ({ param1, param2 }, escaper) => {
             const monsterSpawn = escaper.getMakingLevel().monsterSpawns.getByLabel(param1)
 
@@ -2135,7 +2135,7 @@ export const initExecuteCommandMake = () => {
         alias: ['setmsid'],
         group: 'make',
         argDescription: '<label> <delay>',
-        description: '',
+        description: 'set delay in seconds before monster spawn starts spawning (1-10)',
         cb: ({ param1, param2 }, escaper) => {
             const monsterSpawn = escaper.getMakingLevel().monsterSpawns.getByLabel(param1)
 
@@ -2151,6 +2151,36 @@ export const initExecuteCommandMake = () => {
 
             monsterSpawn.setInitialDelay(S2I(param2))
             Text.mkP(escaper.getPlayer(), 'Delay changed')
+            return true
+        },
+    })
+
+    //-setMonsterSpawnTimedUnspawn(setmstu) <label> <time>
+    registerCommand({
+        name: 'setMonsterSpawnTimedUnspawn',
+        alias: ['setmstu'],
+        group: 'make',
+        argDescription: '<label> <time>',
+        description: 'set time in seconds after which spawned monsters will automatically despawn (0 to disable)',
+        cb: ({ param1, param2 }, escaper) => {
+            const monsterSpawn = escaper.getMakingLevel().monsterSpawns.getByLabel(param1)
+
+            if (!monsterSpawn) {
+                Text.erP(escaper.getPlayer(), 'unknown monster spawn "' + param1 + '" in this level')
+                return true
+            }
+
+            const time = S2R(param2)
+            if (time < 0) {
+                Text.erP(escaper.getPlayer(), 'Time must be >= 0')
+                return true
+            }
+
+            monsterSpawn.setTimedUnspawn(time === 0 ? undefined : time)
+            Text.mkP(
+                escaper.getPlayer(),
+                time === 0 ? 'Timed unspawn disabled' : 'Timed unspawn set to ' + R2S(time) + ' seconds'
+            )
             return true
         },
     })

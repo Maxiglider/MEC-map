@@ -5,6 +5,8 @@ export type IRenderInterface = ReturnType<typeof renderInterface>
 
 export const renderInterface = (props: InterfaceProps) => {
     let forceUpdate: (() => void) | null = null
+    let historyVisible: { [playerId: number]: boolean } = {}
+    let clearUnpinnedCallback: ((playerId: number) => void) | null = null
 
     return {
         init: () => {
@@ -15,5 +17,16 @@ export const renderInterface = (props: InterfaceProps) => {
         },
         setForceUpdate: (cb: (() => void) | null) => (forceUpdate = cb),
         forceUpdate: () => forceUpdate?.(),
+        getHistoryVisible: (playerId: number) => historyVisible[playerId] || false,
+        setHistoryVisible: (playerId: number, visible: boolean) => {
+            historyVisible[playerId] = visible
+            forceUpdate?.()
+        },
+        setClearUnpinnedCallback: (cb: ((playerId: number) => void) | null) => {
+            clearUnpinnedCallback = cb
+        },
+        clearUnpinnedHistory: (playerId: number) => {
+            clearUnpinnedCallback?.(playerId)
+        },
     }
 }

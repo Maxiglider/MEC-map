@@ -4,7 +4,9 @@ import { Text } from 'core/01_libraries/Text'
 import { ServiceManager } from 'Services'
 import * as React from 'w3ts-jsx/dist/src/index'
 import { getUdgEscapers, getUdgTerrainTypes } from '../../globals'
+import { CommandHistory } from './Components/CommandHistory'
 import { Item } from './Components/Item'
+import { useCommandHistory } from './Hooks/useCommandHistory'
 import { usePlayerVariable } from './Hooks/usePlayerVisible'
 import { terrainItems } from './Media/Terrains'
 import { IAbsPos } from './Utils'
@@ -15,6 +17,7 @@ export type InterfaceProps = {
     cb: (props: {
         setVisible: ({ visible, playerId }: { visible: boolean; playerId: number }) => void
         resetUI: (playerId: number) => void
+        addCommandToHistory: (this: void, command: string, playerId: number) => void
     }) => void
 }
 
@@ -27,10 +30,16 @@ export const Interface = ({ cb }: InterfaceProps) => {
 
     const { get: getPos, set: setPos } = usePlayerVariable<{ x: number; y: number }>()
 
+    const commandHistory = useCommandHistory()
+
     const defaultPos = { x: 0.007, y: 0.471 }
     const mainPos = getPos(GetPlayerId(GetLocalPlayer())) || defaultPos
 
+    const historyPos = { x: 0.6, y: 0.5 }
+
     const forceUpdate = React.useForceUpdate()
+
+    const reactService = ServiceManager.getService('React')
 
     React.useEffect(() => {
         ServiceManager.getService('React').setForceUpdate(forceUpdate)
@@ -50,6 +59,10 @@ export const Interface = ({ cb }: InterfaceProps) => {
     //     },
     // })
 
+    const addCommandToHistoryWrapper = function (this: void, command: string, playerId: number) {
+        commandHistory.addCommand(command, playerId)
+    }
+
     React.useEffect(() => {
         cb({
             setVisible: ({ playerId, visible }) => {
@@ -58,6 +71,12 @@ export const Interface = ({ cb }: InterfaceProps) => {
             resetUI: playerId => {
                 setPos(playerId, defaultPos)
             },
+            addCommandToHistory: addCommandToHistoryWrapper,
+        })
+
+        // Register clear callback with the React service
+        ServiceManager.getService('React').setClearUnpinnedCallback(playerId => {
+            commandHistory.clearUnpinned(playerId)
         })
 
         // Always on
@@ -240,6 +259,25 @@ export const Interface = ({ cb }: InterfaceProps) => {
                     />
                 </container> */}
             </container>
+
+            {/* Command History */}
+            <CommandHistory
+                visible={reactService.getHistoryVisible(GetPlayerId(GetLocalPlayer()))}
+                entries={commandHistory.getEntries(GetPlayerId(GetLocalPlayer()))}
+                position={historyPos}
+                onPinToggle={id => {
+                    commandHistory.togglePin(id, GetPlayerId(GetTriggerPlayer()))
+                }}
+                onRemove={id => {
+                    commandHistory.removeEntry(id, GetPlayerId(GetTriggerPlayer()))
+                }}
+                onCommandClick={command => {
+                    const escaper = getUdgEscapers().get(GetPlayerId(GetTriggerPlayer()))
+                    if (escaper) {
+                        ServiceManager.getService('Cmd').ExecuteCommand(escaper, command)
+                    }
+                }}
+            />
         </container>
     )
 }

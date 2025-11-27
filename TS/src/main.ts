@@ -2,6 +2,7 @@ import { renderInterface } from 'App/renderInterface'
 import { ServiceManager } from 'Services'
 import { createTimer, errorHandler } from 'Utils/mapUtils'
 import { IsBoolString, S2B } from 'core/01_libraries/Basic_functions'
+import { Text } from 'core/01_libraries/Text'
 import { initLives } from 'core/04_STRUCTURES/Lives_and_game_time/Lives_and_game_time'
 import { initMultiboard } from 'core/04_STRUCTURES/Lives_and_game_time/Multiboard'
 import { initCommandExecution } from 'core/06_COMMANDS/COMMANDS_vJass/Command_execution'
@@ -28,7 +29,7 @@ const tsMain = () => {
         Cmd: initCommandExecution,
         React: () => {
             return renderInterface({
-                cb: ({ setVisible, resetUI }) => {
+                cb: ({ setVisible, resetUI, addCommandToHistory }) => {
                     ServiceManager.getService('Cmd').registerCommand({
                         name: 'palette',
                         alias: ['p'],
@@ -53,6 +54,46 @@ const tsMain = () => {
                             return true
                         },
                     })
+
+                    ServiceManager.getService('Cmd').registerCommand({
+                        name: 'commandHistory',
+                        alias: ['cmdh', 'cmdhis', 'cmdhist', 'cmdhistory'],
+                        group: 'all',
+                        argDescription: '[on|off|toggle|clear]',
+                        description: 'Toggle command history display, or clear unpinned commands',
+                        cb: ({ noParam, param1 }, escaper) => {
+                            const playerId = GetPlayerId(GetTriggerPlayer())
+
+                            if (noParam || param1 === 'toggle') {
+                                // Toggle visibility
+                                const currentVisible =
+                                    ServiceManager.getService('React').getHistoryVisible(playerId) || false
+                                ServiceManager.getService('React').setHistoryVisible(playerId, !currentVisible)
+                                return true
+                            }
+
+                            if (param1 === 'on') {
+                                ServiceManager.getService('React').setHistoryVisible(playerId, true)
+                                return true
+                            }
+
+                            if (param1 === 'off') {
+                                ServiceManager.getService('React').setHistoryVisible(playerId, false)
+                                return true
+                            }
+
+                            if (param1 === 'clear') {
+                                ServiceManager.getService('React').clearUnpinnedHistory(playerId)
+                                Text.P(escaper.getPlayer(), 'Cleared unpinned command history')
+                                return true
+                            }
+
+                            return true
+                        },
+                    })
+
+                    // Store the addCommandToHistory function in the service
+                    ServiceManager.getService('Cmd').setAddCommandToHistory(addCommandToHistory)
                 },
             })
         },

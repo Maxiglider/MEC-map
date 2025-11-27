@@ -45,6 +45,9 @@ export class MonsterSpawn {
     static anyTimerId2SpawnIndex = new Map<number, number>()
     static anyTimerId2SpawnAmount = new Map<number, number>()
     static anyTimerId2MonsterSpawn = new Map<number, MonsterSpawn>()
+    static anyUnit2TimedUnspawnTimer = new Map<number, timer>()
+    static anyTimedUnspawnTimerId2Unit = new Map<number, unit>()
+    static anyTimedUnspawnTimerId2MonsterSpawn = new Map<number, MonsterSpawn>()
     private static lastInstanceId = -1
 
     public static getNextId = () => {
@@ -57,6 +60,7 @@ export class MonsterSpawn {
     private spawnAmount = 1
     private spawnOffset = 0
     private initialDelay = 0
+    private timedUnspawn: number | undefined
 
     private minX: number
     private minY: number
@@ -196,7 +200,17 @@ export class MonsterSpawn {
         }
 
         if (this.monsters) {
-            ForGroup(this.monsters, () => this.simpleUnitRecycler.removeUnit(GetEnumUnit()))
+            ForGroup(this.monsters, () => {
+                const u = GetEnumUnit()
+                const timer = MonsterSpawn.anyUnit2TimedUnspawnTimer.get(GetHandleId(u))
+                if (timer) {
+                    MonsterSpawn.anyTimedUnspawnTimerId2Unit.delete(GetHandleId(timer))
+                    MonsterSpawn.anyTimedUnspawnTimerId2MonsterSpawn.delete(GetHandleId(timer))
+                    MonsterSpawn.anyUnit2TimedUnspawnTimer.delete(GetHandleId(u))
+                    DestroyTimer(timer)
+                }
+                this.simpleUnitRecycler.removeUnit(u)
+            })
             DestroyGroup(this.monsters)
             delete this.monsters
         }
@@ -405,6 +419,15 @@ export class MonsterSpawn {
                     ShowUnit(mobUnit, false)
                     UnitRemoveAbility(mobUnit, FourCC('Aloc'))
                     ms.monsters && GroupAddUnit(ms.monsters, mobUnit)
+
+                    // Start timed unspawn timer if configured
+                    if (ms.timedUnspawn !== undefined && ms.timedUnspawn > 0) {
+                        const unspawnTimer = CreateTimer()
+                        MonsterSpawn.anyTimedUnspawnTimerId2Unit.set(GetHandleId(unspawnTimer), mobUnit)
+                        MonsterSpawn.anyTimedUnspawnTimerId2MonsterSpawn.set(GetHandleId(unspawnTimer), ms)
+                        MonsterSpawn.anyUnit2TimedUnspawnTimer.set(GetHandleId(mobUnit), unspawnTimer)
+                        TimerStart(unspawnTimer, ms.timedUnspawn, false, ms.TimedUnspawn_Actions)
+                    }
                 }
             }
 
@@ -435,9 +458,18 @@ export class MonsterSpawn {
 
         const UnspawMonster_Actions = () => {
             const ms = MonsterSpawn.anyTrigId2MonsterSpawn.get(GetHandleId(GetTriggeringTrigger()))
-            if (ms && ms.monsters && IsUnitInGroup(GetTriggerUnit(), ms.monsters)) {
-                GroupRemoveUnit(ms.monsters, GetTriggerUnit())
-                this.simpleUnitRecycler.removeUnit(GetTriggerUnit())
+            const u = GetTriggerUnit()
+            if (ms && ms.monsters && IsUnitInGroup(u, ms.monsters)) {
+                // Clear timed unspawn timer if it exists
+                const timer = MonsterSpawn.anyUnit2TimedUnspawnTimer.get(GetHandleId(u))
+                if (timer) {
+                    MonsterSpawn.anyTimedUnspawnTimerId2Unit.delete(GetHandleId(timer))
+                    MonsterSpawn.anyTimedUnspawnTimerId2MonsterSpawn.delete(GetHandleId(timer))
+                    MonsterSpawn.anyUnit2TimedUnspawnTimer.delete(GetHandleId(u))
+                    DestroyTimer(timer)
+                }
+                GroupRemoveUnit(ms.monsters, u)
+                this.simpleUnitRecycler.removeUnit(u)
             }
         }
 
@@ -446,6 +478,22 @@ export class MonsterSpawn {
         MonsterSpawn.anyTrigId2MonsterSpawn.set(GetHandleId(this.tUnspawn), this)
         this.unspawnReg && TriggerRegisterEnterRegion(this.tUnspawn, this.unspawnReg, null)
         TriggerAddAction(this.tUnspawn, UnspawMonster_Actions)
+    }
+
+    private TimedUnspawn_Actions: (this: void) => void = () => {
+        const unspawnTimer = GetExpiredTimer()
+        const u = MonsterSpawn.anyTimedUnspawnTimerId2Unit.get(GetHandleId(unspawnTimer))
+        const ms = MonsterSpawn.anyTimedUnspawnTimerId2MonsterSpawn.get(GetHandleId(unspawnTimer))
+
+        if (u && ms && ms.monsters && IsUnitInGroup(u, ms.monsters)) {
+            MonsterSpawn.anyTimedUnspawnTimerId2Unit.delete(GetHandleId(unspawnTimer))
+            MonsterSpawn.anyTimedUnspawnTimerId2MonsterSpawn.delete(GetHandleId(unspawnTimer))
+            MonsterSpawn.anyUnit2TimedUnspawnTimer.delete(GetHandleId(u))
+            DestroyTimer(unspawnTimer)
+
+            GroupRemoveUnit(ms.monsters, u)
+            ms.simpleUnitRecycler.removeUnit(u)
+        }
     }
 
     destroy = () => {
@@ -764,6 +812,12 @@ export class MonsterSpawn {
         this.fixedSpawnOffsetMirrored = fixedSpawnOffsetMirrored || false
     }
 
+    getTimedUnspawn = () => this.timedUnspawn
+    setTimedUnspawn = (timedUnspawn: number | undefined) => {
+        this.timedUnspawn = timedUnspawn
+        this.refresh()
+    }
+
     applyRotation = (x: number, y: number, rotation: number) => {
         const theta = Deg2Rad(rotation)
 
@@ -807,6 +861,7 @@ export class MonsterSpawn {
         output['fixedSpawnOffset'] = this.fixedSpawnOffset
         output['fixedSpawnOffsetBounce'] = this.fixedSpawnOffsetBounce
         output['fixedSpawnOffsetMirrored'] = this.fixedSpawnOffsetMirrored
+        output['timedUnspawn'] = this.timedUnspawn
         output['minX'] = R2I(this.minX)
         output['minY'] = R2I(this.minY)
         output['maxX'] = R2I(this.maxX)

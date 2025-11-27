@@ -54,9 +54,14 @@ const parseCmdContext = (cmd: string) => {
 
 export const initCommandExecution = () => {
     const commands: ICommand[] = []
+    let addCommandToHistoryCallback: ((this: void, command: string, playerId: number) => void) | null = null
 
     const registerCommand = (cmd: ICommand) => {
         commands.push(cmd)
+    }
+
+    const setAddCommandToHistory = (cb: (this: void, command: string, playerId: number) => void) => {
+        addCommandToHistoryCallback = cb
     }
 
     const accessCheck = (escaper: Escaper, cmd: ICommand) => {
@@ -145,6 +150,11 @@ export const initCommandExecution = () => {
             const targetCmd = findTargetCommand(commands, parsedContext, escaper)
 
             targetCmd?.cb(parsedContext, escaper)
+
+            // Add to command history if it's a valid command
+            if (targetCmd && addCommandToHistoryCallback) {
+                addCommandToHistoryCallback(cmd, GetPlayerId(escaper.getPlayer()))
+            }
 
             MemoryHandler.destroyObject(parsedContext)
 
@@ -255,6 +265,24 @@ export const initCommandExecution = () => {
         ],
     })
 
+    const getCmdMessage = (cmd: ICommand) => {
+        let line = '|cffffcc00-' + cmd.name + '|r'
+
+        if (cmd.alias.length > 0) {
+            line += '|cffcccccc(' + cmd.alias.join(' | ') + ')|r'
+        }
+
+        if (cmd.argDescription.length > 0) {
+            line += ' |cff88ccff' + cmd.argDescription + '|r'
+        }
+
+        if (cmd.description.length > 0) {
+            line += ' |cffaaaaaa-->|r ' + cmd.description
+        }
+
+        return line
+    }
+
     const initCommands = () => {
         initCommandAll()
         initExecuteCommandRed()
@@ -267,73 +295,106 @@ export const initCommandExecution = () => {
             name: 'help',
             alias: ['h', '?'],
             group: 'all',
-            argDescription: '[search] [page]',
+            argDescription: '[search terms...] [page]',
             description: 'List commands. Use page number for pagination (10 per page)',
-            cb: ({ param1, param2 }) => {
-                const CMDS_PER_PAGE = 8
+            cb: ({ cmd }) => {
+                const MAX_DISPLAY_LENGTH = 1000
+                const MIN_LINE_LENGTH = 80
 
-                // Determine which param is page number and which is search
-                let searchTerm = ''
+                // Get all params by splitting on space and removing first element (command name)
+                const allParts = cmd.split(' ')
+                const params = allParts.slice(1).filter(p => p !== '')
+
+                // Separate search terms from page number
+                const searchTerms: string[] = []
                 let pageNum = 1
 
-                if (param1) {
-                    const param1Num = S2I(param1)
-                    if (param1Num > 0 && I2S(param1Num) === param1) {
-                        // param1 is a number
-                        pageNum = param1Num
-                        searchTerm = param2 || ''
+                for (const param of params) {
+                    const paramNum = S2I(param)
+                    if (paramNum > 0 && I2S(paramNum) === param) {
+                        // It's a number - use as page
+                        pageNum = paramNum
                     } else {
-                        // param1 is search term
-                        searchTerm = param1
-                        if (param2) {
-                            const param2Num = S2I(param2)
-                            if (param2Num > 0 && I2S(param2Num) === param2) {
-                                pageNum = param2Num
-                            }
-                        }
+                        // It's a search term
+                        searchTerms.push(param.toLowerCase())
                     }
                 }
 
+                // Filter by all search terms
                 const filtered = commands.filter(cmd => {
-                    return searchTerm
-                        ? cmd.name.toLowerCase().indexOf(searchTerm.toLowerCase()) >= 0 ||
-                              (cmd.alias &&
-                                  cmd.alias.find(alias => alias.toLowerCase().indexOf(searchTerm.toLowerCase()) >= 0))
-                        : true
+                    if (searchTerms.length === 0) {
+                        return true
+                    }
+
+                    // Check if all search terms match
+                    for (const searchTerm of searchTerms) {
+                        let matched = false
+
+                        // Check command name
+                        if (cmd.name.toLowerCase().indexOf(searchTerm) >= 0) {
+                            matched = true
+                        }
+
+                        // Check aliases
+                        if (!matched && cmd.alias) {
+                            for (const alias of cmd.alias) {
+                                if (alias.toLowerCase().indexOf(searchTerm) >= 0) {
+                                    matched = true
+                                    break
+                                }
+                            }
+                        }
+
+                        // If this search term didn't match, exclude this command
+                        if (!matched) {
+                            return false
+                        }
+                    }
+
+                    return true
                 })
 
-                const totalPages = Math.ceil(filtered.length / CMDS_PER_PAGE)
-                const startIdx = (pageNum - 1) * CMDS_PER_PAGE
-                const endIdx = Math.min(startIdx + CMDS_PER_PAGE, filtered.length)
-                const paginatedCmds = filtered.slice(startIdx, endIdx)
+                // First pass: figure out how many commands fit per page by calculating length
+                const pages: ICommand[][] = []
+                let currentPage: ICommand[] = []
+                let currentPageLength = 0
+
+                for (const cmd of filtered) {
+                    const line = getCmdMessage(cmd)
+                    const lineLength = Math.max(line.length, MIN_LINE_LENGTH)
+
+                    if (currentPageLength + lineLength > MAX_DISPLAY_LENGTH && currentPage.length > 0) {
+                        pages.push(currentPage)
+                        currentPage = []
+                        currentPageLength = 0
+                    }
+
+                    currentPage.push(cmd)
+                    currentPageLength += lineLength
+                }
+
+                if (currentPage.length > 0) {
+                    pages.push(currentPage)
+                }
+
+                const totalPages = pages.length
+                const displayableCmds = pages[pageNum - 1] || []
 
                 Text.P(
                     GetTriggerPlayer(),
                     `|cff00ff00Commands (page |cff00ccff${pageNum}|r|cff00ff00/|cff00ccff${totalPages}|r|cff00ff00)|r`
                 )
 
-                paginatedCmds.forEach(cmd => {
-                    let line = '|cffffcc00-' + cmd.name + '|r'
-
-                    if (cmd.alias.length > 0) {
-                        line += '|cffcccccc(' + cmd.alias.join(' | ') + ')|r'
-                    }
-
-                    if (cmd.argDescription.length > 0) {
-                        line += ' |cff88ccff' + cmd.argDescription + '|r'
-                    }
-
-                    if (cmd.description.length > 0) {
-                        line += ' |cffaaaaaa-->|r ' + cmd.description
-                    }
-
+                // Second pass: actually display the commands
+                for (const cmd of displayableCmds) {
+                    const line = getCmdMessage(cmd)
                     Text.P(GetTriggerPlayer(), line)
-                })
+                }
 
                 return true
             },
         })
     }
 
-    return { registerCommand, ExecuteCommand, initCommands, findTargetCommandSingle }
+    return { registerCommand, ExecuteCommand, initCommands, findTargetCommandSingle, setAddCommandToHistory }
 }

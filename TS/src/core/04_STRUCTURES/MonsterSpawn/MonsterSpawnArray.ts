@@ -53,6 +53,7 @@ export class MonsterSpawnArray extends BaseArray<MonsterSpawn> {
                 monsterSpawn.setFixedSpawnOffset(ms.fixedSpawnOffset)
                 monsterSpawn.setFixedSpawnOffsetBounce(ms.fixedSpawnOffsetBounce)
                 monsterSpawn.setFixedSpawnOffsetMirrored(ms.fixedSpawnOffsetMirrored)
+                monsterSpawn.setTimedUnspawn(ms.timedUnspawn)
                 this.new(monsterSpawn, false)
             }
         }
