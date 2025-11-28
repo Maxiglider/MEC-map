@@ -205,6 +205,7 @@ export const initCommandExecution = () => {
         let nbParenthesesNonFermees = 0
         let singleCommandId = 0
         let charId: number
+        let prevChar: string
 
         //ex : "-(abc def)" --> "-abc def"
         if (SubStringBJ(cmd, 2, 2) === '(' && SubStringBJ(cmd, StringLength(cmd), StringLength(cmd)) === ')') {
@@ -212,10 +213,11 @@ export const initCommandExecution = () => {
         }
 
         charId = 2
+        prevChar = ''
         while (true) {
             if (charId > StringLength(cmd)) break
             char = SubStringBJ(cmd, charId, charId)
-            if (char === ',') {
+            if (char === ',' && prevChar !== '\\') {
                 if (nbParenthesesNonFermees <= 0) {
                     singleCommandId = singleCommandId + 1
                     charId = charId + 1
@@ -229,9 +231,20 @@ export const initCommandExecution = () => {
                     }
                 }
             }
-            if (char !== ',' || nbParenthesesNonFermees > 0) {
-                singleCommands[singleCommandId] = (singleCommands[singleCommandId] || '') + char
+            if (char !== ',' || nbParenthesesNonFermees > 0 || prevChar === '\\') {
+                if (char === ',' && prevChar === '\\') {
+                    // Remove the backslash and add the comma
+                    singleCommands[singleCommandId] =
+                        SubStringBJ(
+                            singleCommands[singleCommandId] || '',
+                            1,
+                            StringLength(singleCommands[singleCommandId] || '') - 1
+                        ) + char
+                } else {
+                    singleCommands[singleCommandId] = (singleCommands[singleCommandId] || '') + char
+                }
             }
+            prevChar = char
             charId = charId + 1
         }
         i = 0
