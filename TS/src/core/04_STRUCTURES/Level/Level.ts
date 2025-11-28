@@ -310,20 +310,40 @@ export class Level {
             }
 
             for (const [_, monsterSpawn] of pairs(this.monsterSpawns.getAll())) {
-                const rotatedPoints = monsterSpawn.getRotatedPoints()
+                const spawnShape = monsterSpawn.getSpawnShape()
 
-                this.drawRectangle(
-                    rotatedPoints[0].x,
-                    rotatedPoints[0].y,
-                    rotatedPoints[1].x,
-                    rotatedPoints[1].y,
-                    rotatedPoints[2].x,
-                    rotatedPoints[2].y,
-                    rotatedPoints[3].x,
-                    rotatedPoints[3].y
-                )
+                if (spawnShape === 'line') {
+                    // Draw a line for line mode
+                    this.drawLine(
+                        monsterSpawn.getClickX1(),
+                        monsterSpawn.getClickY1(),
+                        monsterSpawn.getClickX2(),
+                        monsterSpawn.getClickY2()
+                    )
+                } else if (spawnShape === 'point') {
+                    // Draw a point for point mode (small cross)
+                    const x = monsterSpawn.getClickX1()
+                    const y = monsterSpawn.getClickY1()
+                    const size = 32 // Small cross size
+                    this.drawLine(x - size, y, x + size, y)
+                    this.drawLine(x, y - size, x, y + size)
+                } else {
+                    // Draw a rectangle for region spawns
+                    const rotatedPoints = monsterSpawn.getRotatedPoints()
 
-                MemoryHandler.destroyArray(rotatedPoints)
+                    this.drawRectangle(
+                        rotatedPoints[0].x,
+                        rotatedPoints[0].y,
+                        rotatedPoints[1].x,
+                        rotatedPoints[1].y,
+                        rotatedPoints[2].x,
+                        rotatedPoints[2].y,
+                        rotatedPoints[3].x,
+                        rotatedPoints[3].y
+                    )
+
+                    MemoryHandler.destroyArray(rotatedPoints)
+                }
 
                 if (monsterSpawn.unspawnregpoints.length > 0) {
                     for (const reg of monsterSpawn.unspawnregpoints) {

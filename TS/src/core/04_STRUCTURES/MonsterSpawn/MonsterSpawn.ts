@@ -3,6 +3,7 @@ import { IPoint, createPoint } from 'Utils/Point'
 import { createTimer, errorHandler } from 'Utils/mapUtils'
 import { CombineHooks } from 'core/API/MecHookArray'
 import { Timer } from 'w3ts'
+import { globals } from '../../../../globals'
 import { GetCurrentMonsterPlayer, arrayPush, convertAngleToDirection } from '../../01_libraries/Basic_functions'
 import { ENNEMY_PLAYER, GREY, MOBS_VARIOUS_COLORS, TERRAIN_DATA_DISPLAY_TIME } from '../../01_libraries/Constants'
 import { udg_colorCode } from '../../01_libraries/Init_colorCodes'
@@ -61,6 +62,12 @@ export class MonsterSpawn {
     private spawnOffset = 0
     private initialDelay = 0
     private timedUnspawn: number | undefined
+    private spawnShape: 'region' | 'line' | 'point' = 'region'
+
+    private clickX1: number
+    private clickY1: number
+    private clickX2: number
+    private clickY2: number
 
     private minX: number
     private minY: number
@@ -122,10 +129,16 @@ export class MonsterSpawn {
         this.label = label
         this.mt = mt
         this.frequence = frequence
+
         this.minX = Math.round(RMinBJ(x1, x2))
         this.minY = Math.round(RMinBJ(y1, y2))
         this.maxX = Math.round(RMaxBJ(x1, x2))
         this.maxY = Math.round(RMaxBJ(y1, y2))
+
+        this.clickX1 = Math.round(x1) || this.minX
+        this.clickY1 = Math.round(y1) || this.minY
+        this.clickX2 = Math.round(x2) || this.maxX
+        this.clickY2 = Math.round(y2) || this.maxY
 
         this.points = MemoryHandler.getEmptyArray()
 
@@ -175,28 +188,11 @@ export class MonsterSpawn {
         this._active = false
         this.initialDelayTimer?.pause().destroy()
 
-        if (this.multiRegionPatrols) {
-            for (let i = 0; i < this.x1.length; i++) {
-                DestroyTrigger(this.t[i])
-                RemoveRegion(this.r[i])
-
-                delete this.t[i]
-                delete this.r[i]
-                delete this.x1[i]
-                delete this.y1[i]
-                delete this.x2[i]
-                delete this.y2[i]
-            }
-        }
+        this.destroyUnspawnReg()
 
         if (this.tSpawn) {
             DestroyTrigger(this.tSpawn)
             delete this.tSpawn
-        }
-
-        if (this.tUnspawn) {
-            DestroyTrigger(this.tUnspawn)
-            delete this.tUnspawn
         }
 
         if (this.monsters) {
@@ -214,6 +210,41 @@ export class MonsterSpawn {
             DestroyGroup(this.monsters)
             delete this.monsters
         }
+    }
+
+    private destroyUnspawnReg = () => {
+        if (this.unspawnReg) {
+            RemoveRegion(this.unspawnReg)
+            delete this.unspawnReg
+        }
+
+        if (this.tUnspawn) {
+            DestroyTrigger(this.tUnspawn)
+            delete this.tUnspawn
+        }
+
+        if (this.multiRegionPatrols) {
+            for (let i = 0; i < this.x1.length; i++) {
+                if (this.t[i]) {
+                    DestroyTrigger(this.t[i])
+                    delete this.t[i]
+                }
+
+                if (this.r[i]) {
+                    RemoveRegion(this.r[i])
+                    delete this.r[i]
+                }
+
+                delete this.x1[i]
+                delete this.y1[i]
+                delete this.x2[i]
+                delete this.y2[i]
+            }
+
+            this.multiRegionPatrols = false
+        }
+
+        this.unspawnregpoints.length = 0
     }
 
     private createUnspawnReg = () => {
@@ -287,7 +318,7 @@ export class MonsterSpawn {
 
         // Multi region patrols does not work with rotation yet
         const maxTiles = 6 * 128
-        this.multiRegionPatrols = !isDiagonal && maxDistance >= maxTiles
+        this.multiRegionPatrols = !isDiagonal && maxDistance >= maxTiles && this.spawnShape === 'region'
 
         if (this.multiRegionPatrols) {
             const amountOfPatrols = Math.ceil(maxDistance / maxTiles)
@@ -439,6 +470,18 @@ export class MonsterSpawn {
     })
 
     activate = () => {
+        // Validate that timedUnspawn is set when spawnShape is not 'region'
+        if (this.spawnShape !== 'region' && (this.timedUnspawn === undefined || this.timedUnspawn <= 0)) {
+            print(
+                'Error: Monster spawn "' +
+                    this.label +
+                    '" requires setMonsterSpawnTimedUnspawn > 0 when using spawn shape "' +
+                    this.spawnShape +
+                    '".'
+            )
+            return
+        }
+
         this._active = true
         this.monsters = CreateGroup()
 
@@ -473,11 +516,15 @@ export class MonsterSpawn {
             }
         }
 
-        this.createUnspawnReg()
-        this.tUnspawn = CreateTrigger()
-        MonsterSpawn.anyTrigId2MonsterSpawn.set(GetHandleId(this.tUnspawn), this)
-        this.unspawnReg && TriggerRegisterEnterRegion(this.tUnspawn, this.unspawnReg, null)
-        TriggerAddAction(this.tUnspawn, UnspawMonster_Actions)
+        this.destroyUnspawnReg()
+
+        if (this.spawnShape === 'region') {
+            this.createUnspawnReg()
+            this.tUnspawn = CreateTrigger()
+            MonsterSpawn.anyTrigId2MonsterSpawn.set(GetHandleId(this.tUnspawn), this)
+            this.unspawnReg && TriggerRegisterEnterRegion(this.tUnspawn, this.unspawnReg, null)
+            TriggerAddAction(this.tUnspawn, UnspawMonster_Actions)
+        }
     }
 
     private TimedUnspawn_Actions: (this: void) => void = () => {
@@ -579,6 +626,104 @@ export class MonsterSpawn {
         let y2: number
         let facing: number
 
+        // Handle line mode: spawn at random point along line and walk in direction
+        if (this.spawnShape === 'line') {
+            // Get random spawn point along the line between clickX1,clickY1 and clickX2,clickY2
+            const t = GetRandomReal(0, 1)
+            const spawnX = this.clickX1 + t * (this.clickX2 - this.clickX1)
+            const spawnY = this.clickY1 + t * (this.clickY2 - this.clickY1)
+
+            BlzSetUnitFacingEx(mobUnit, this.rotation)
+            SetUnitX(mobUnit, spawnX)
+            SetUnitY(mobUnit, spawnY)
+
+            if (ms.getMonsterType().isClickable()) {
+                p = ENNEMY_PLAYER
+            } else {
+                p = GetCurrentMonsterPlayer()
+            }
+
+            SetUnitOwner(mobUnit, p, MOBS_VARIOUS_COLORS)
+            ShowUnit(mobUnit, true)
+
+            // Calculate a far away point in the direction, clamped to world bounds
+            const angleRad = Deg2Rad(this.rotation)
+            const dirX = math.cos(angleRad)
+            const dirY = math.sin(angleRad)
+
+            // Calculate max distance based on mob speed and timed unspawn duration, plus half a tile buffer
+            const mobSpeed = this.mt.getUnitMoveSpeed()
+            const travelTime = this.timedUnspawn || 0
+            const halfTile = 64 // Half of 128 (tile size)
+            let maxDistance = mobSpeed * travelTime + halfTile
+
+            if (dirX > 0) {
+                maxDistance = math.min(maxDistance, (globals.MAP_MAX_X - spawnX) / dirX)
+            } else if (dirX < 0) {
+                maxDistance = math.min(maxDistance, (globals.MAP_MIN_X - spawnX) / dirX)
+            }
+            if (dirY > 0) {
+                maxDistance = math.min(maxDistance, (globals.MAP_MAX_Y - spawnY) / dirY)
+            } else if (dirY < 0) {
+                maxDistance = math.min(maxDistance, (globals.MAP_MIN_Y - spawnY) / dirY)
+            }
+
+            const targetX = spawnX + maxDistance * dirX
+            const targetY = spawnY + maxDistance * dirY
+
+            IssuePointOrder(mobUnit, 'move', targetX, targetY)
+            return
+        }
+
+        // Handle point mode: spawn at fixed point and walk in direction
+        if (this.spawnShape === 'point') {
+            // Spawn at clickX1, clickY1 point
+            const spawnX = this.clickX1
+            const spawnY = this.clickY1
+
+            BlzSetUnitFacingEx(mobUnit, this.rotation)
+            SetUnitX(mobUnit, spawnX)
+            SetUnitY(mobUnit, spawnY)
+
+            if (ms.getMonsterType().isClickable()) {
+                p = ENNEMY_PLAYER
+            } else {
+                p = GetCurrentMonsterPlayer()
+            }
+
+            SetUnitOwner(mobUnit, p, MOBS_VARIOUS_COLORS)
+            ShowUnit(mobUnit, true)
+
+            // Calculate a far away point in the direction, clamped to world bounds
+            const angleRad = Deg2Rad(this.rotation)
+            const dirX = math.cos(angleRad)
+            const dirY = math.sin(angleRad)
+
+            // Calculate max distance based on mob speed and timed unspawn duration, plus half a tile buffer
+            const mobSpeed = this.mt.getUnitMoveSpeed()
+            const travelTime = this.timedUnspawn || 0
+            const halfTile = 64 // Half of 128 (tile size)
+            let maxDistance = mobSpeed * travelTime + halfTile
+
+            if (dirX > 0) {
+                maxDistance = math.min(maxDistance, (globals.MAP_MAX_X - spawnX) / dirX)
+            } else if (dirX < 0) {
+                maxDistance = math.min(maxDistance, (globals.MAP_MIN_X - spawnX) / dirX)
+            }
+            if (dirY > 0) {
+                maxDistance = math.min(maxDistance, (globals.MAP_MAX_Y - spawnY) / dirY)
+            } else if (dirY < 0) {
+                maxDistance = math.min(maxDistance, (globals.MAP_MIN_Y - spawnY) / dirY)
+            }
+
+            const targetX = spawnX + maxDistance * dirX
+            const targetY = spawnY + maxDistance * dirY
+
+            IssuePointOrder(mobUnit, 'move', targetX, targetY)
+            return
+        }
+
+        // Original behavior for region spawns
         if (this.rotation === 90 || this.rotation === 270) {
             x1 = this.calcValOffset(this.minX, this.maxX, spawnIndex, spawnAmount)
             x2 = x1
@@ -744,18 +889,12 @@ export class MonsterSpawn {
 
     setMonsterType = (mt: MonsterType) => {
         this.mt = mt
-
-        if (this._active) {
-            this.refresh()
-        }
+        this._active && this.refresh()
     }
 
     setRotation = (rotation: number) => {
         this.rotation = rotation
-
-        if (this._active) {
-            this.refresh()
-        }
+        this._active && this.refresh()
 
         this.level?.updateDebugRegions()
     }
@@ -815,7 +954,35 @@ export class MonsterSpawn {
     getTimedUnspawn = () => this.timedUnspawn
     setTimedUnspawn = (timedUnspawn: number | undefined) => {
         this.timedUnspawn = timedUnspawn
-        this.refresh()
+        this._active && this.refresh()
+    }
+
+    getSpawnShape = () => this.spawnShape
+    setSpawnShape = (spawnShape: 'region' | 'line' | 'point') => {
+        this.spawnShape = spawnShape
+        this._active && this.refresh()
+
+        this.level?.updateDebugRegions()
+    }
+
+    getClickX1 = () => this.clickX1
+    setClickX1 = (clickX1: number) => {
+        this.clickX1 = clickX1
+    }
+
+    getClickY1 = () => this.clickY1
+    setClickY1 = (clickY1: number) => {
+        this.clickY1 = clickY1
+    }
+
+    getClickX2 = () => this.clickX2
+    setClickX2 = (clickX2: number) => {
+        this.clickX2 = clickX2
+    }
+
+    getClickY2 = () => this.clickY2
+    setClickY2 = (clickY2: number) => {
+        this.clickY2 = clickY2
     }
 
     applyRotation = (x: number, y: number, rotation: number) => {
@@ -862,6 +1029,11 @@ export class MonsterSpawn {
         output['fixedSpawnOffsetBounce'] = this.fixedSpawnOffsetBounce
         output['fixedSpawnOffsetMirrored'] = this.fixedSpawnOffsetMirrored
         output['timedUnspawn'] = this.timedUnspawn
+        output['spawnShape'] = this.spawnShape
+        output['clickX1'] = this.clickX1
+        output['clickY1'] = R2I(this.clickY1)
+        output['clickX2'] = R2I(this.clickX2)
+        output['clickY2'] = R2I(this.clickY2)
         output['minX'] = R2I(this.minX)
         output['minY'] = R2I(this.minY)
         output['maxX'] = R2I(this.maxX)

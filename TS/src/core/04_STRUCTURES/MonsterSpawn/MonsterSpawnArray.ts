@@ -47,6 +47,13 @@ export class MonsterSpawnArray extends BaseArray<MonsterSpawn> {
                     ms.maxX,
                     ms.maxY
                 )
+
+                // Load click coordinates if they exist
+                if (ms.clickX1 !== undefined) monsterSpawn.setClickX1(ms.clickX1)
+                if (ms.clickY1 !== undefined) monsterSpawn.setClickY1(ms.clickY1)
+                if (ms.clickX2 !== undefined) monsterSpawn.setClickX2(ms.clickX2)
+                if (ms.clickY2 !== undefined) monsterSpawn.setClickY2(ms.clickY2)
+
                 monsterSpawn.setSpawnAmount(ms.spawnAmount || 1)
                 monsterSpawn.setSpawnOffset(ms.spawnOffset || 0)
                 monsterSpawn.setInitialDelay(ms.initialDelay || 0)
@@ -54,6 +61,7 @@ export class MonsterSpawnArray extends BaseArray<MonsterSpawn> {
                 monsterSpawn.setFixedSpawnOffsetBounce(ms.fixedSpawnOffsetBounce)
                 monsterSpawn.setFixedSpawnOffsetMirrored(ms.fixedSpawnOffsetMirrored)
                 monsterSpawn.setTimedUnspawn(ms.timedUnspawn)
+                if (ms.spawnShape !== undefined) monsterSpawn.setSpawnShape(ms.spawnShape)
                 this.new(monsterSpawn, false)
             }
         }

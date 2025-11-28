@@ -2185,6 +2185,48 @@ export const initExecuteCommandMake = () => {
         },
     })
 
+    //-setMonsterSpawnShape(setmssh) <label> <shape>
+    registerCommand({
+        name: 'setMonsterSpawnShape',
+        alias: ['setmssh'],
+        group: 'make',
+        argDescription: '<label> <shape>',
+        description:
+            'set spawn shape (region=default, line, point) - line/point modes spawn at clicks and walk in direction (requires timedUnspawn)',
+        cb: ({ param1, param2 }, escaper) => {
+            const monsterSpawn = escaper.getMakingLevel().monsterSpawns.getByLabel(param1)
+
+            if (!monsterSpawn) {
+                Text.erP(escaper.getPlayer(), 'unknown monster spawn "' + param1 + '" in this level')
+                return true
+            }
+
+            const shape = param2.toLowerCase()
+            if (shape !== 'region' && shape !== 'line' && shape !== 'point') {
+                Text.erP(escaper.getPlayer(), 'shape must be one of: region, line, point')
+                return true
+            }
+
+            if (
+                shape !== 'region' &&
+                (monsterSpawn.getTimedUnspawn() === undefined || monsterSpawn.getTimedUnspawn()! <= 0)
+            ) {
+                Text.erP(
+                    escaper.getPlayer(),
+                    'Cannot set shape to "' +
+                        shape +
+                        '" without timedUnspawn set. Use setMonsterSpawnTimedUnspawn first.'
+                )
+                return true
+            }
+
+            monsterSpawn.setSpawnShape(shape as 'region' | 'line' | 'point')
+
+            Text.mkP(escaper.getPlayer(), `Spawn shape set to: ${shape}`)
+            return true
+        },
+    })
+
     //-displayMonsterSpawns(dms)
     registerCommand({
         name: 'displayMonsterSpawns',
