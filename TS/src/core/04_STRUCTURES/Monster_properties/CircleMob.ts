@@ -207,12 +207,22 @@ export class CircleMob {
                             unitX = centerX + scale * Math.sin(t)
                             unitY = centerY + scale * Math.sin(t) * Math.cos(t)
                         } else if (this.shape === 'star') {
-                            // 5-pointed star pattern
+                            // 5-pointed star pattern with smooth interpolation
                             const t = angle * (Math.PI / 180)
                             const outerRadius = this.radius
                             const innerRadius = this.radius * 0.4
-                            const pointAngle = (angle % 72) / 72 // Each point is 72 degrees
-                            const r = pointAngle < 0.5 ? outerRadius : innerRadius
+                            const points = 5
+                            const segmentAngle = 360 / (points * 2) // 36 degrees per segment
+                            const normalizedAngle = ((angle % 360) + 360) % 360
+                            const segmentPosition = (normalizedAngle % segmentAngle) / segmentAngle
+                            const segmentIndex = Math.floor(normalizedAngle / segmentAngle)
+
+                            // Smooth interpolation between outer and inner radii
+                            const r =
+                                segmentIndex % 2 === 0
+                                    ? outerRadius - (outerRadius - innerRadius) * segmentPosition
+                                    : innerRadius + (outerRadius - innerRadius) * segmentPosition
+
                             unitX = centerX + r * Math.cos(t)
                             unitY = centerY + r * Math.sin(t)
                         } else if (this.shape === 'spiral') {
