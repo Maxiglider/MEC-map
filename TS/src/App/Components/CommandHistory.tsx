@@ -5,11 +5,12 @@ export type ICommandHistoryEntry = {
     timestamp: number
     pinned: boolean
     id: number
+    playerId: number
 }
 
 export type CommandHistoryProps = {
     visible: boolean
-    entries: ICommandHistoryEntry[]
+    allEntries: ICommandHistoryEntry[]
     position: { x: number; y: number }
     onPinToggle: (id: number) => void
     onRemove: (id: number) => void
@@ -18,7 +19,7 @@ export type CommandHistoryProps = {
 
 export const CommandHistory = ({
     visible,
-    entries,
+    allEntries,
     position,
     onPinToggle,
     onRemove,
@@ -29,8 +30,11 @@ export const CommandHistory = ({
     const buttonWidth = 0.025
     const containerWidth = 0.25
 
+    const localPlayerId = GetPlayerId(GetLocalPlayer())
+    const localEntries = allEntries.filter(e => e.playerId === localPlayerId)
+
     // Sort entries: pinned first, then by timestamp (newest first)
-    const sortedEntries = [...entries].sort((a, b) => {
+    const sortedEntries = [...localEntries].sort((a, b) => {
         if (a.pinned && !b.pinned) return -1
         if (!a.pinned && b.pinned) return 1
         return b.timestamp - a.timestamp
@@ -52,12 +56,15 @@ export const CommandHistory = ({
             />
 
             {/* Command entries */}
-            {sortedEntries.map((entry, index) => {
-                const entryY = position.y - containerPadding - 0.02 - index * entryHeight
+            {allEntries.map((entry, index) => {
+                const isLocalEntry = entry.playerId === localPlayerId
+                const localIndex = sortedEntries.findIndex(e => e.id === entry.id)
+                const entryY = position.y - containerPadding - 0.02 - localIndex * entryHeight
                 const isPinned = entry.pinned
+                const entryVisible = visible && isLocalEntry && localIndex !== -1
 
                 return (
-                    <container key={entry.id}>
+                    <container key={entry.id} visible={entryVisible}>
                         {/* Command text - clickable */}
                         <text
                             text={`${isPinned ? '|cff00ff00[PIN] |r' : ''}|cffaaaaaa${entry.command}|r`}

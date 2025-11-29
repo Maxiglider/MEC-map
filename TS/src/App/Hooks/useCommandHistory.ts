@@ -39,6 +39,7 @@ export const useCommandHistory = () => {
                 timestamp: os.clock(),
                 pinned: false,
                 id: getNextId(playerId),
+                playerId,
             }
 
             let updatedHistory = [newEntry, ...playerHistory]
@@ -80,8 +81,17 @@ export const useCommandHistory = () => {
         return historyByPlayer[playerId] || []
     }
 
+    const getAllEntries = (): ICommandHistoryEntry[] => {
+        const allEntries: ICommandHistoryEntry[] = []
+        for (const playerId in historyByPlayer) {
+            allEntries.push(...historyByPlayer[playerId])
+        }
+        return allEntries
+    }
+
     return {
         getEntries,
+        getAllEntries,
         addCommand,
         togglePin,
         removeEntry,

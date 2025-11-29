@@ -263,7 +263,7 @@ export const Interface = ({ cb }: InterfaceProps) => {
             {/* Command History */}
             <CommandHistory
                 visible={reactService.getHistoryVisible(GetPlayerId(GetLocalPlayer()))}
-                entries={commandHistory.getEntries(GetPlayerId(GetLocalPlayer()))}
+                allEntries={commandHistory.getAllEntries()}
                 position={historyPos}
                 onPinToggle={id => {
                     commandHistory.togglePin(id, GetPlayerId(GetTriggerPlayer()))
