@@ -908,8 +908,8 @@ export class MonsterSpawn {
         TriggerAddAction(this.tSpawn, this.MonsterSpawn_Actions)
     }
 
-    displayForPlayer = (p: player) => {
-        const display =
+    toText = (): string => {
+        return (
             udg_colorCode[GREY] +
             this.label +
             ' : ' +
@@ -918,7 +918,11 @@ export class MonsterSpawn {
             convertAngleToDirection(this.rotation) +
             '   ' +
             R2S(this.frequence)
-        Text.P_timed(p, TERRAIN_DATA_DISPLAY_TIME, display)
+        )
+    }
+
+    displayForPlayer = (p: player) => {
+        Text.P_timed(p, TERRAIN_DATA_DISPLAY_TIME, this.toText())
     }
 
     getSpawnAmount = () => this.spawnAmount

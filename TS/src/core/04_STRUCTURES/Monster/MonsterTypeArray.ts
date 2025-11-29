@@ -1,5 +1,8 @@
+import { TERRAIN_DATA_DISPLAY_TIME } from 'core/01_libraries/Constants'
 import { Text } from 'core/01_libraries/Text'
+import { handlePaginationObj } from 'core/06_COMMANDS/COMMANDS_vJass/Pagination'
 import { udg_monsters } from '../../../../globals'
+import { handlePaginationArgs } from '../../06_COMMANDS/COMMANDS_vJass/Pagination'
 import { BaseArray } from '../BaseArray'
 import { MonsterType } from './MonsterType'
 
@@ -73,16 +76,26 @@ export class MonsterTypeArray extends BaseArray<MonsterType> {
         return false
     }
 
-    displayForPlayer = (p: player) => {
-        let hasOne = false
+    displayPaginatedForPlayer = (p: player, cmd: string) => {
+        const { searchTerms, pageNum } = handlePaginationArgs(cmd)
+        const searchTerm = searchTerms.join(' ')
 
-        for (const [_, monsterType] of pairs(this.data)) {
-            hasOne = true
-            monsterType.displayForPlayer(p)
-        }
+        if (searchTerm.length !== 0) {
+            if (this.isLabelAlreadyUsed(searchTerm)) {
+                this.getByLabel(searchTerm)?.displayForPlayer(p)
+            } else {
+                Text.erP(p, `unknown monster type`)
+            }
+        } else {
+            const pag = handlePaginationObj(this.getAll(), pageNum)
 
-        if (!hasOne) {
-            Text.erP(p, 'no monster type saved')
+            if (pag.cmds.length === 0) {
+                Text.erP(p, `no monster type saved`)
+            } else {
+                for (const l of pag.cmds) {
+                    Text.P_timed(p, TERRAIN_DATA_DISPLAY_TIME, l)
+                }
+            }
         }
     }
 

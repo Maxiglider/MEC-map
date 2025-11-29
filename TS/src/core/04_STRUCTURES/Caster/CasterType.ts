@@ -152,7 +152,7 @@ export class CasterType {
         this.animation = animation
     }
 
-    displayForPlayer = (p: player) => {
+    toText = (): string => {
         let space = '   '
         const aliasDisplay = this.theAlias ? ' ' + this.theAlias : ''
         let display = udg_colorCode[TEAL] + this.label + aliasDisplay + ' : '
@@ -174,7 +174,11 @@ export class CasterType {
             R2S(this.loadTime) +
             space +
             this.animation
-        Text.P_timed(p, TERRAIN_DATA_DISPLAY_TIME, display)
+        return display
+    }
+
+    displayForPlayer = (p: player) => {
+        Text.P_timed(p, TERRAIN_DATA_DISPLAY_TIME, this.toText())
     }
 
     toJson = () => {

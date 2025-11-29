@@ -250,7 +250,7 @@ export class MonsterType {
         return I2S(S2I(immoStr))
     }
 
-    displayForPlayer = (p: player) => {
+    toText = (): string => {
         let space = '   '
         let display = udg_colorCode[RED] + this.label + (this.theAlias ? ' ' + this.theAlias : '') + " : '"
         let scaleDisplay: string
@@ -280,37 +280,20 @@ export class MonsterType {
             space +
             'height_' +
             heightDisplay
-        if (this.isClickableB) {
-            display = display + space + 'clickable' + space + I2S(this.maxLife / 10000)
+        if (this.killingEffectStr) {
+            display = display + space + this.killingEffectStr
         }
-        Text.P_timed(p, TERRAIN_DATA_DISPLAY_TIME, display)
-    }
-
-    displayTotalForPlayer = (p: player) => {
-        let space = '   '
-        let display = udg_colorCode[RED] + this.label + (this.theAlias ? ' ' + this.theAlias : '') + " : '"
-        let scaleDisplay: string
-        let heightDisplay: string
-        if (this.scale === -1) {
-            scaleDisplay = 'default'
-        } else {
-            scaleDisplay = R2S(this.scale)
-        }
-        if (this.height === -1) {
-            heightDisplay = 'default'
-        } else {
-            heightDisplay = I2S(R2I(this.height))
-        }
-        display = display + Ascii2String(this.unitTypeId) + "'" + space
-        display = display + space + 'speed_' + I2S(R2I(this.speed)) + space + 'immo_' + this.getImmolationRadiusStr()
-        space + 'scale_' + scaleDisplay + space + 'height_' + heightDisplay + space + this.killingEffectStr
         if (this.isClickableB) {
             display = display + space + 'clickable' + space + I2S(this.maxLife / 10000)
         }
         if (this.isWanderableB) {
             display = display + space + 'wanderable'
         }
-        Text.P_timed(p, TERRAIN_DATA_DISPLAY_TIME, display)
+        return display
+    }
+
+    displayForPlayer = (p: player) => {
+        Text.P_timed(p, TERRAIN_DATA_DISPLAY_TIME, this.toText())
     }
 
     toJson = () => {

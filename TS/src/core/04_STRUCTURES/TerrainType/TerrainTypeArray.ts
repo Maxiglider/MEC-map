@@ -3,9 +3,11 @@ import { MemoryHandler } from 'Utils/MemoryHandler'
 import { MazeUtils } from 'Utils/vToto'
 import { Ascii2String } from 'core/01_libraries/Ascii'
 import { arrayPush, tileset2tilesetChar } from 'core/01_libraries/Basic_functions'
+import { TERRAIN_DATA_DISPLAY_TIME } from 'core/01_libraries/Constants'
 import { Text } from 'core/01_libraries/Text'
 import { globals } from '../../../../globals'
 import { CmdParam, NbParam } from '../../06_COMMANDS/COMMANDS_vJass/Command_functions'
+import { handlePaginationArgs, handlePaginationObj } from '../../06_COMMANDS/COMMANDS_vJass/Pagination'
 import { TerrainTypeMax } from '../../07_TRIGGERS/Modify_terrain_Functions/Terrain_type_max'
 import { BaseArray } from '../BaseArray'
 import { TerrainType, isDeathTerrain } from './TerrainType'
@@ -148,16 +150,26 @@ export class TerrainTypeArray extends BaseArray<TerrainType> {
         return true
     }
 
-    displayForPlayer = (p: player) => {
-        let hadOne = false
+    displayPaginatedForPlayer = (p: player, cmd: string) => {
+        const { searchTerms, pageNum } = handlePaginationArgs(cmd)
+        const searchTerm = searchTerms.join(' ')
 
-        for (const [_, terrainType] of pairs(this.data)) {
-            terrainType.displayForPlayer(p)
-            hadOne = true
-        }
+        if (searchTerm.length !== 0) {
+            if (this.isLabelAlreadyUsed(searchTerm)) {
+                this.getByLabel(searchTerm)?.displayForPlayer(p)
+            } else {
+                Text.erP(p, `unknown terrain`)
+            }
+        } else {
+            const pag = handlePaginationObj(this.getAll(), pageNum)
 
-        if (!hadOne) {
-            Text.erP(p, 'no terrain saved')
+            if (pag.cmds.length === 0) {
+                Text.erP(p, `no terrain type saved`)
+            } else {
+                for (const l of pag.cmds) {
+                    Text.P_timed(p, TERRAIN_DATA_DISPLAY_TIME, l)
+                }
+            }
         }
     }
 

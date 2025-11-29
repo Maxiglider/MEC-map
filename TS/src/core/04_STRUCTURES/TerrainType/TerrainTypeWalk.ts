@@ -24,14 +24,18 @@ export class TerrainTypeWalk extends TerrainType {
         return COLOR_TERRAIN_WALK
     }
 
-    displayForPlayer = (p: player) => {
+    toText = (): string => {
         let display = this.baseTextForDisplay()
 
         display += I2S(R2I(this.getWalkSpeed()))
 
         //display cliff class
         display += DISPLAY_SPACE + 'cliff' + I2S(this.cliffClassId)
-        Text.P_timed(p, TERRAIN_DATA_DISPLAY_TIME, display)
+        return display
+    }
+
+    displayForPlayer = (p: player) => {
+        Text.P_timed(p, TERRAIN_DATA_DISPLAY_TIME, this.toText())
     }
 
     toJson() {

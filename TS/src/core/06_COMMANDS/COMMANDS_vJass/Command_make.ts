@@ -800,26 +800,15 @@ export const initExecuteCommandMake = () => {
         },
     })
 
-    //-displayTerrains(dt) [<terrainLabel>]   --> displays the characteristics of the terrains added by the maker(s)
+    //-displayTerrains(dt) [<terrainLabel>] [page]   --> displays the characteristics of the terrains added by the maker(s)
     registerCommand({
         name: 'displayTerrains',
         alias: ['dt'],
         group: 'make',
-        argDescription: ' [<terrainLabel>]',
+        argDescription: ' [<terrainLabel>] [page]',
         description: 'displays the characteristics of the terrains added by the maker(s)',
-        cb: ({ nbParam, param1 }, escaper) => {
-            if (!(nbParam <= 1)) {
-                return true
-            }
-            if (nbParam === 1) {
-                if (getUdgTerrainTypes().isLabelAlreadyUsed(param1)) {
-                    getUdgTerrainTypes().getByLabel(param1)?.displayForPlayer(escaper.getPlayer())
-                } else {
-                    Text.erP(escaper.getPlayer(), 'unknown terrain')
-                }
-            } else {
-                getUdgTerrainTypes().displayForPlayer(escaper.getPlayer())
-            }
+        cb: ({ cmd }, escaper) => {
+            getUdgTerrainTypes().displayPaginatedForPlayer(escaper.getPlayer(), cmd)
             return true
         },
     })
@@ -1736,26 +1725,15 @@ export const initExecuteCommandMake = () => {
         },
     })
 
-    //-displayMonsters(dm) [<monsterLabel>]   --> displays the characteristics of the kinds of monsters added by the maker(s)
+    //-displayMonsters(dm) [<monsterLabel>] [page]   --> displays the characteristics of the kinds of monsters added by the maker(s)
     registerCommand({
         name: 'displayMonsters',
         alias: ['dm'],
         group: 'make',
-        argDescription: '[<monsterLabel>]',
+        argDescription: '[<monsterLabel>] [page]',
         description: 'displays the characteristics of the kinds of monsters added by the maker(s)',
-        cb: ({ nbParam, param1 }, escaper) => {
-            if (!(nbParam <= 1)) {
-                return true
-            }
-            if (nbParam === 1) {
-                if (getUdgMonsterTypes().isLabelAlreadyUsed(param1)) {
-                    getUdgMonsterTypes().getByLabel(param1)?.displayTotalForPlayer(escaper.getPlayer())
-                } else {
-                    Text.erP(escaper.getPlayer(), 'unknown monster type')
-                }
-            } else {
-                getUdgMonsterTypes().displayForPlayer(escaper.getPlayer())
-            }
+        cb: ({ cmd }, escaper) => {
+            getUdgMonsterTypes().displayPaginatedForPlayer(escaper.getPlayer(), cmd)
             return true
         },
     })
@@ -2227,18 +2205,15 @@ export const initExecuteCommandMake = () => {
         },
     })
 
-    //-displayMonsterSpawns(dms)
+    //-displayMonsterSpawns(dms) [<monsterSpawnLabel>] [page]
     registerCommand({
         name: 'displayMonsterSpawns',
         alias: ['dms'],
         group: 'make',
-        argDescription: '',
-        description: '',
-        cb: ({ noParam }, escaper) => {
-            if (!noParam) {
-                return true
-            }
-            escaper.getMakingLevel().monsterSpawns.displayForPlayer(escaper.getPlayer())
+        argDescription: '[<monsterSpawnLabel>] [page]',
+        description: 'displays the monster spawns for this level',
+        cb: ({ cmd }, escaper) => {
+            escaper.getMakingLevel().monsterSpawns.displayPaginatedForPlayer(escaper.getPlayer(), cmd)
             return true
         },
     })
@@ -2304,18 +2279,15 @@ export const initExecuteCommandMake = () => {
         },
     })
 
-    //-displayRegions(drs)
+    //-displayRegions(drs) [<regionLabel>] [page]
     registerCommand({
         name: 'displayRegions',
         alias: ['drs'],
         group: 'make',
-        argDescription: '',
-        description: '',
-        cb: ({ noParam }, escaper) => {
-            if (!noParam) {
-                return true
-            }
-            escaper.getMakingLevel().regions.displayForPlayer(escaper.getPlayer())
+        argDescription: '[<regionLabel>] [page]',
+        description: 'displays the regions for this level',
+        cb: ({ cmd }, escaper) => {
+            escaper.getMakingLevel().regions.displayPaginatedForPlayer(escaper.getPlayer(), cmd)
             return true
         },
     })
@@ -3263,26 +3235,15 @@ export const initExecuteCommandMake = () => {
         },
     })
 
-    //-displayCasters(dc) [<casterLabel>]
+    //-displayCasters(dc) [<casterLabel>] [page]
     registerCommand({
         name: 'displayCasters',
         alias: ['dc'],
         group: 'make',
-        argDescription: '[<casterLabel>]',
+        argDescription: '[<casterLabel>] [page]',
         description: 'display the casters of the map',
-        cb: ({ nbParam, param1 }, escaper) => {
-            if (!(nbParam <= 1)) {
-                return true
-            }
-            if (nbParam === 1) {
-                if (getUdgCasterTypes().isLabelAlreadyUsed(param1)) {
-                    getUdgCasterTypes().getByLabel(param1)?.displayForPlayer(escaper.getPlayer())
-                } else {
-                    Text.erP(escaper.getPlayer(), 'unknown caster type')
-                }
-            } else {
-                getUdgCasterTypes().displayForPlayer(escaper.getPlayer())
-            }
+        cb: ({ cmd }, escaper) => {
+            getUdgCasterTypes().displayPaginatedForPlayer(escaper.getPlayer(), cmd)
             return true
         },
     })

@@ -1,6 +1,8 @@
 import { convertTextToAngle } from 'core/01_libraries/Basic_functions'
+import { TERRAIN_DATA_DISPLAY_TIME } from 'core/01_libraries/Constants'
+import { Text } from 'core/01_libraries/Text'
 import { getUdgMonsterTypes } from '../../../../globals'
-import { Text } from '../../01_libraries/Text'
+import { handlePaginationArgs, handlePaginationObj } from '../../06_COMMANDS/COMMANDS_vJass/Pagination'
 import { BaseArray } from '../BaseArray'
 import type { Level } from '../Level/Level'
 import { MonsterSpawn } from './MonsterSpawn'
@@ -96,17 +98,6 @@ export class MonsterSpawnArray extends BaseArray<MonsterSpawn> {
         }
     }
 
-    displayForPlayer = (p: player) => {
-        let nbMs = this.count()
-        if (nbMs == 0) {
-            Text.erP(p, 'no monster spawn for this level')
-        } else {
-            for (const [_, ms] of pairs(this.data)) {
-                ms.displayForPlayer(p)
-            }
-        }
-    }
-
     changeLabel = (oldLabel: string, newLabel: string): boolean => {
         const msWithOldLabel = this.getByLabel(oldLabel)
         const msWithNewLabel = this.getByLabel(newLabel)
@@ -118,5 +109,28 @@ export class MonsterSpawnArray extends BaseArray<MonsterSpawn> {
         msWithOldLabel.setLabel(newLabel)
 
         return true
+    }
+
+    displayPaginatedForPlayer = (p: player, cmd: string) => {
+        const { searchTerms, pageNum } = handlePaginationArgs(cmd)
+        const searchTerm = searchTerms.join(' ')
+
+        if (searchTerm.length !== 0) {
+            if (this.getByLabel(searchTerm)) {
+                this.getByLabel(searchTerm)?.displayForPlayer(p)
+            } else {
+                Text.erP(p, `unknown monster spawn`)
+            }
+        } else {
+            const pag = handlePaginationObj(this.getAll(), pageNum)
+
+            if (pag.cmds.length === 0) {
+                Text.erP(p, `no monster spawn for this level`)
+            } else {
+                for (const l of pag.cmds) {
+                    Text.P_timed(p, TERRAIN_DATA_DISPLAY_TIME, l)
+                }
+            }
+        }
     }
 }

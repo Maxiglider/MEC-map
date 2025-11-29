@@ -147,10 +147,12 @@ export class Region {
         this.label = newLabel
     }
 
-    displayForPlayer = (p: player) => {
-        const display = udg_colorCode[GREY] + this.label
+    toText = (): string => {
+        return udg_colorCode[GREY] + this.label
+    }
 
-        Text.P_timed(p, TERRAIN_DATA_DISPLAY_TIME, display)
+    displayForPlayer = (p: player) => {
+        Text.P_timed(p, TERRAIN_DATA_DISPLAY_TIME, this.toText())
     }
 
     setFlags = (flags: string[]) => {

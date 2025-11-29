@@ -81,7 +81,7 @@ export class TerrainTypeDeath extends TerrainType {
         return COLOR_TERRAIN_DEATH
     }
 
-    displayForPlayer = (p: player) => {
+    toText = (): string => {
         let display = this.baseTextForDisplay()
 
         display +=
@@ -93,7 +93,11 @@ export class TerrainTypeDeath extends TerrainType {
 
         //display cliff class
         display += DISPLAY_SPACE + 'cliff' + I2S(this.cliffClassId)
-        Text.P_timed(p, TERRAIN_DATA_DISPLAY_TIME, display)
+        return display
+    }
+
+    displayForPlayer = (p: player) => {
+        Text.P_timed(p, TERRAIN_DATA_DISPLAY_TIME, this.toText())
     }
 
     toJson() {

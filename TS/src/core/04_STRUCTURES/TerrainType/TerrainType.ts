@@ -100,6 +100,8 @@ export abstract class TerrainType {
 
     abstract displayForPlayer(p: player): void
 
+    abstract toText(): string
+
     baseTextForDisplay = () => {
         let order: string
         if (this.orderId !== 0) {

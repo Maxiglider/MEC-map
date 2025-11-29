@@ -1,8 +1,10 @@
+import { TERRAIN_DATA_DISPLAY_TIME } from 'core/01_libraries/Constants'
 import { Text } from 'core/01_libraries/Text'
+import { handlePaginationArgs, handlePaginationObj } from 'core/06_COMMANDS/COMMANDS_vJass/Pagination'
+import { getUdgMonsterTypes } from '../../../../globals'
 import { BaseArray } from '../BaseArray'
 import { MonsterType } from '../Monster/MonsterType'
 import { CasterType } from './CasterType'
-import {getUdgMonsterTypes} from "../../../../globals";
 
 export class CasterTypeArray extends BaseArray<CasterType> {
     constructor() {
@@ -51,16 +53,24 @@ export class CasterTypeArray extends BaseArray<CasterType> {
         return casterType
     }
 
-    newFromJson = (casterTypesJson: {[x: string]: any}[]) => {
-        for(let ct of casterTypesJson){
+    newFromJson = (casterTypesJson: { [x: string]: any }[]) => {
+        for (let ct of casterTypesJson) {
             const casterMT = getUdgMonsterTypes().getByLabel(ct.casterMonsterTypeLabel)
             const projectileMT = getUdgMonsterTypes().getByLabel(ct.projectileMonsterTypeLabel)
 
-            if(!casterMT || !projectileMT){
-                Text.erA("Unknown monster type for caster type \"" + ct.label + "\"")
-            }else {
-                const casterType = this.new(ct.label, casterMT, projectileMT, ct.range, ct.projectileSpeed, ct.loadTime, ct.animation)
-                if(ct.alias){
+            if (!casterMT || !projectileMT) {
+                Text.erA('Unknown monster type for caster type "' + ct.label + '"')
+            } else {
+                const casterType = this.new(
+                    ct.label,
+                    casterMT,
+                    projectileMT,
+                    ct.range,
+                    ct.projectileSpeed,
+                    ct.loadTime,
+                    ct.animation
+                )
+                if (ct.alias) {
                     casterType?.setAlias(ct.alias)
                 }
             }
@@ -78,16 +88,26 @@ export class CasterTypeArray extends BaseArray<CasterType> {
         return true
     }
 
-    displayForPlayer = (p: player) => {
-        let hadOne = false
+    displayPaginatedForPlayer = (p: player, cmd: string) => {
+        const { searchTerms, pageNum } = handlePaginationArgs(cmd)
+        const searchTerm = searchTerms.join(' ')
 
-        for (const [_, casterType] of pairs(this.data)) {
-            casterType.displayForPlayer(p)
-            hadOne = true
-        }
+        if (searchTerm.length !== 0) {
+            if (this.isLabelAlreadyUsed(searchTerm)) {
+                this.getByLabel(searchTerm)?.displayForPlayer(p)
+            } else {
+                Text.erP(p, `unknown caster type`)
+            }
+        } else {
+            const pag = handlePaginationObj(this.getAll(), pageNum)
 
-        if (!hadOne) {
-            Text.erP(p, 'no caster type saved')
+            if (pag.cmds.length === 0) {
+                Text.erP(p, `no caster type saved`)
+            } else {
+                for (const l of pag.cmds) {
+                    Text.P_timed(p, TERRAIN_DATA_DISPLAY_TIME, l)
+                }
+            }
         }
     }
 }

@@ -1,6 +1,8 @@
 import { MemoryHandler } from 'Utils/MemoryHandler'
 import { arrayPush } from 'core/01_libraries/Basic_functions'
-import { Text } from '../../01_libraries/Text'
+import { TERRAIN_DATA_DISPLAY_TIME } from 'core/01_libraries/Constants'
+import { Text } from 'core/01_libraries/Text'
+import { handlePaginationArgs, handlePaginationObj } from '../../06_COMMANDS/COMMANDS_vJass/Pagination'
 import { BaseArray } from '../BaseArray'
 import type { Level } from '../Level/Level'
 import { Region } from './Region'
@@ -89,17 +91,6 @@ export class RegionArray extends BaseArray<Region> {
         return null
     }
 
-    displayForPlayer = (p: player) => {
-        const nbRs = this.count()
-        if (nbRs == 0) {
-            Text.erP(p, 'no regions for this level')
-        } else {
-            for (const [_, r] of pairs(this.data)) {
-                r.displayForPlayer(p)
-            }
-        }
-    }
-
     activate = (activ: boolean) => {
         for (const [_, region] of pairs(this.data)) {
             region.activate(activ)
@@ -117,5 +108,28 @@ export class RegionArray extends BaseArray<Region> {
         rWithOldLabel.setLabel(newLabel)
 
         return true
+    }
+
+    displayPaginatedForPlayer = (p: player, cmd: string) => {
+        const { searchTerms, pageNum } = handlePaginationArgs(cmd)
+        const searchTerm = searchTerms.join(' ')
+
+        if (searchTerm.length !== 0) {
+            if (this.getByLabel(searchTerm)) {
+                this.getByLabel(searchTerm)?.displayForPlayer(p)
+            } else {
+                Text.erP(p, `unknown region`)
+            }
+        } else {
+            const pag = handlePaginationObj(this.getAll(), pageNum)
+
+            if (pag.cmds.length === 0) {
+                Text.erP(p, `no region for this level`)
+            } else {
+                for (const l of pag.cmds) {
+                    Text.P_timed(p, TERRAIN_DATA_DISPLAY_TIME, l)
+                }
+            }
+        }
     }
 }

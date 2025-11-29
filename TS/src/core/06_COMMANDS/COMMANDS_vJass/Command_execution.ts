@@ -12,6 +12,7 @@ import { initExecuteCommandRed } from './Command_first_player'
 import { CmdName, CmdParam, IsCmd, NbParam, NoParam } from './Command_functions'
 import { initExecuteCommandMake } from './Command_make'
 import { initExecuteCommandTrueMax } from './Command_superadmin'
+import { handlePagination, handlePaginationArgs } from './Pagination'
 
 export type ICommandExecution = ReturnType<typeof initCommandExecution>
 
@@ -311,27 +312,7 @@ export const initCommandExecution = () => {
             argDescription: '[search terms...] [page]',
             description: 'List commands. Use page number for pagination (10 per page)',
             cb: ({ cmd }) => {
-                const MAX_DISPLAY_LENGTH = 1000
-                const MIN_LINE_LENGTH = 80
-
-                // Get all params by splitting on space and removing first element (command name)
-                const allParts = cmd.split(' ')
-                const params = allParts.slice(1).filter(p => p !== '')
-
-                // Separate search terms from page number
-                const searchTerms: string[] = []
-                let pageNum = 1
-
-                for (const param of params) {
-                    const paramNum = S2I(param)
-                    if (paramNum > 0 && I2S(paramNum) === param) {
-                        // It's a number - use as page
-                        pageNum = paramNum
-                    } else {
-                        // It's a search term
-                        searchTerms.push(param.toLowerCase())
-                    }
-                }
+                const { searchTerms, pageNum } = handlePaginationArgs(cmd)
 
                 // Filter by all search terms
                 const filtered = commands.filter(cmd => {
@@ -367,40 +348,18 @@ export const initCommandExecution = () => {
                     return true
                 })
 
-                // First pass: figure out how many commands fit per page by calculating length
-                const pages: ICommand[][] = []
-                let currentPage: ICommand[] = []
-                let currentPageLength = 0
-
-                for (const cmd of filtered) {
-                    const line = getCmdMessage(cmd)
-                    const lineLength = Math.max(line.length, MIN_LINE_LENGTH)
-
-                    if (currentPageLength + lineLength > MAX_DISPLAY_LENGTH && currentPage.length > 0) {
-                        pages.push(currentPage)
-                        currentPage = []
-                        currentPageLength = 0
-                    }
-
-                    currentPage.push(cmd)
-                    currentPageLength += lineLength
-                }
-
-                if (currentPage.length > 0) {
-                    pages.push(currentPage)
-                }
-
-                const totalPages = pages.length
-                const displayableCmds = pages[pageNum - 1] || []
+                const displayableCmds = handlePagination(
+                    filtered.map(d => getCmdMessage(d)),
+                    pageNum
+                )
 
                 Text.P(
                     GetTriggerPlayer(),
-                    `|cff00ff00Commands (page |cff00ccff${pageNum}|r|cff00ff00/|cff00ccff${totalPages}|r|cff00ff00)|r`
+                    `|cff00ff00Commands (page |cff00ccff${pageNum}|r|cff00ff00/|cff00ccff${displayableCmds.totalPages}|r|cff00ff00)|r`
                 )
 
-                // Second pass: actually display the commands
-                for (const cmd of displayableCmds) {
-                    const line = getCmdMessage(cmd)
+                for (const cmd of displayableCmds.cmds) {
+                    const line = cmd
                     Text.P(GetTriggerPlayer(), line)
                 }
 
@@ -409,5 +368,11 @@ export const initCommandExecution = () => {
         })
     }
 
-    return { registerCommand, ExecuteCommand, initCommands, findTargetCommandSingle, setAddCommandToHistory }
+    return {
+        registerCommand,
+        ExecuteCommand,
+        initCommands,
+        findTargetCommandSingle,
+        setAddCommandToHistory,
+    }
 }
