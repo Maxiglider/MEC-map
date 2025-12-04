@@ -60,6 +60,8 @@ export class ClearMob {
     private timerFrontMontant: timer //le trigger mob reste en vert pêtant le temps du "front montant"
     enabled: boolean
     private triggerMobPermanentEffect?: effect
+    private clearMobSpecialEffect?: string
+    private blockMobSpecialEffect?: string
 
     id: number = -1
 
@@ -122,6 +124,22 @@ export class ClearMob {
 
     getBlockMobs = () => {
         return this.blockMobs
+    }
+
+    getClearMobSpecialEffect = () => {
+        return this.clearMobSpecialEffect
+    }
+
+    setClearMobSpecialEffect = (effectPath: string | undefined) => {
+        this.clearMobSpecialEffect = effectPath
+    }
+
+    getBlockMobSpecialEffect = () => {
+        return this.blockMobSpecialEffect
+    }
+
+    setBlockMobSpecialEffect = (effectPath: string | undefined) => {
+        this.blockMobSpecialEffect = effectPath
     }
 
     initialize = () => {
@@ -205,13 +223,37 @@ export class ClearMob {
         if (!this.enabled) {
             return
         }
+
+        // Play special effect on clear mob location if configured
+        if (this.clearMobSpecialEffect && this.triggerMob.u) {
+            const x = GetUnitX(this.triggerMob.u)
+            const y = GetUnitY(this.triggerMob.u)
+            const eff = EffectUtils.addSpecialEffect(this.clearMobSpecialEffect, x, y)
+            EffectUtils.destroyEffect(eff)
+        }
+
         if (this.disableDuration === 0) {
             this.blockMobs.forAll(KillMonster)
             this.enabled = false
         } else {
             udp_currentTimer = this.timerActivated
             TimerStart(this.timerActivated, this.disableDuration, false, ClearMobTimerExpires)
-            this.blockMobs.forAll(TemporarilyDisableMonster)
+
+            // Play special effect on block mobs if configured
+            if (this.blockMobSpecialEffect) {
+                this.blockMobs.forAll((monster: Monster) => {
+                    if (monster.u) {
+                        const x = GetUnitX(monster.u)
+                        const y = GetUnitY(monster.u)
+                        const eff = EffectUtils.addSpecialEffect(this.blockMobSpecialEffect!, x, y)
+                        EffectUtils.destroyEffect(eff)
+                    }
+                    TemporarilyDisableMonster(monster)
+                })
+            } else {
+                this.blockMobs.forAll(TemporarilyDisableMonster)
+            }
+
             TimerStart(this.timerFrontMontant, FRONT_MONTANT_DURATION, false, ClearMobFrontMontantTimerExpires)
         }
         //dans tous les cas le trigger mob "s'active"
@@ -234,6 +276,14 @@ export class ClearMob {
         output['triggerMobId'] = this.triggerMob.id
         output['disableDuration'] = this.disableDuration
         output['blockMobsIds'] = blockMobIds
+
+        if (this.clearMobSpecialEffect) {
+            output['clearMobSpecialEffect'] = this.clearMobSpecialEffect
+        }
+
+        if (this.blockMobSpecialEffect) {
+            output['blockMobSpecialEffect'] = this.blockMobSpecialEffect
+        }
 
         return output
     }

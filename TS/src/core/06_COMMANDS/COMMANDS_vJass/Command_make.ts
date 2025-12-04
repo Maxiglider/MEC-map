@@ -3293,6 +3293,40 @@ export const initExecuteCommandMake = () => {
         },
     })
 
+    //-setClearMobEffect(setcme) <effectPath>
+    registerCommand({
+        name: 'setClearMobEffect',
+        alias: ['setcme'],
+        group: 'make',
+        argDescription: '<effectPath>',
+        description: 'set special effect to play when stepping on clear mob trigger',
+        cb: ({ nbParam, param1 }, escaper) => {
+            if (!(nbParam === 1)) {
+                return true
+            }
+            escaper.makeSetClearMobEffect(param1)
+            Text.mkP(escaper.getPlayer(), 'Click on the trigger mob to set its effect')
+            return true
+        },
+    })
+
+    //-setBlockMobEffect(setbme) <effectPath>
+    registerCommand({
+        name: 'setBlockMobEffect',
+        alias: ['setbme'],
+        group: 'make',
+        argDescription: '<effectPath>',
+        description: 'set special effect to play on block mobs when clear mob is triggered',
+        cb: ({ nbParam, param1 }, escaper) => {
+            if (!(nbParam === 1)) {
+                return true
+            }
+            escaper.makeSetBlockMobEffect(param1)
+            Text.mkP(escaper.getPlayer(), 'Click on the trigger mob to set its block mob effect')
+            return true
+        },
+    })
+
     //-createCircleMob [<speed> [<direction> [<radius>]]]
     registerCommand({
         name: 'createCircleMob',

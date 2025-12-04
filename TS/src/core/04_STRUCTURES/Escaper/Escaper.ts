@@ -46,6 +46,8 @@ import { MakeDeleteClearMob } from 'core/05_MAKE_STRUCTURES/Make_monster_propert
 import { MakeDeletePortalMob } from 'core/05_MAKE_STRUCTURES/Make_monster_properties/MakeDeletePortalMob'
 import { MakeMonsterAttackGroundOrder } from 'core/05_MAKE_STRUCTURES/Make_monster_properties/MakeMonsterAttackGroundOrder'
 import { MakePortalMob } from 'core/05_MAKE_STRUCTURES/Make_monster_properties/MakePortalMob'
+import { MakeSetBlockMobEffect } from 'core/05_MAKE_STRUCTURES/Make_monster_properties/MakeSetBlockMobEffect'
+import { MakeSetClearMobEffect } from 'core/05_MAKE_STRUCTURES/Make_monster_properties/MakeSetClearMobEffect'
 import { MakeGetUnitTeleportPeriod } from 'core/05_MAKE_STRUCTURES/Make_set_unit_properties/MakeGetUnitTeleportPeriod'
 import { MakeSetUnitMonsterType } from 'core/05_MAKE_STRUCTURES/Make_set_unit_properties/MakeSetUnitMonsterType'
 import { MakeSetUnitTeleportPeriod } from 'core/05_MAKE_STRUCTURES/Make_set_unit_properties/MakeSetUnitTeleportPeriod'
@@ -1726,6 +1728,16 @@ export class Escaper {
     makeDeleteClearMobs = () => {
         this.destroyMake()
         if (this.hero) this.make = new MakeDeleteClearMob(this.hero)
+    }
+
+    makeSetClearMobEffect = (effectPath: string) => {
+        this.destroyMake()
+        if (this.hero) this.make = new MakeSetClearMobEffect(this.hero, effectPath)
+    }
+
+    makeSetBlockMobEffect = (effectPath: string) => {
+        this.destroyMake()
+        if (this.hero) this.make = new MakeSetBlockMobEffect(this.hero, effectPath)
     }
 
     makeCreatePortalMobs(freezeDuration: number, portalEffect: string | null, portalEffectDuration: number | null) {

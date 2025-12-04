@@ -34,6 +34,14 @@ export class ClearMobArray extends BaseArray<ClearMob> {
             } else {
                 const clearMob = this.new(mt, cm.disableDuration, false)
 
+                if (cm.clearMobSpecialEffect) {
+                    clearMob.setClearMobSpecialEffect(cm.clearMobSpecialEffect)
+                }
+
+                if (cm.blockMobSpecialEffect) {
+                    clearMob.setBlockMobSpecialEffect(cm.blockMobSpecialEffect)
+                }
+
                 for (const [_, blockMobId] of pairs(cm.blockMobsIds)) {
                     const mt = this.level.monsters.get(blockMobId)
 

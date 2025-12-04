@@ -91,6 +91,23 @@ export class MakeGetMonsterInfo extends Make {
                 if (jumpPad) props.push('JumpPad')
                 propertiesInfo += props.join(', ')
                 Text.P_timed(this.makerOwner, TERRAIN_DATA_DISPLAY_TIME, propertiesInfo)
+
+                if (clearMob) {
+                    const clearMobEffect = clearMob.getClearMobSpecialEffect()
+                    const blockMobEffect = clearMob.getBlockMobSpecialEffect()
+
+                    if (clearMobEffect || blockMobEffect) {
+                        if (clearMobEffect) {
+                            const effectInfo = udg_colorCode[GREY] + '  Clear Effect: ' + clearMobEffect
+                            Text.P_timed(this.makerOwner, TERRAIN_DATA_DISPLAY_TIME, effectInfo)
+                        }
+
+                        if (blockMobEffect) {
+                            const effectInfo = udg_colorCode[GREY] + '  Block Effect: ' + blockMobEffect
+                            Text.P_timed(this.makerOwner, TERRAIN_DATA_DISPLAY_TIME, effectInfo)
+                        }
+                    }
+                }
             }
 
             // Monster class
