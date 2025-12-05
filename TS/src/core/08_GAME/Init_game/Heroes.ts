@@ -1,7 +1,7 @@
 import { EffectUtils } from 'Utils/EffectUtils'
 import { IPoint, createPoint } from 'Utils/Point'
 import { createEvent } from 'Utils/mapUtils'
-import { NB_ESCAPERS, NB_PLAYERS_MAX } from 'core/01_libraries/Constants'
+import { Constants } from 'core/01_libraries/Constants'
 import { udg_doubleHeroesEnabled } from 'core/Double_heroes/double_heroes_config'
 import { getUdgEscapers } from '../../../../globals'
 
@@ -29,7 +29,7 @@ export const heroes = {
         if (spawns.length > 0) {
             let i = 0
 
-            while (staticSpawns.length < NB_ESCAPERS) {
+            while (staticSpawns.length < Constants.NB_ESCAPERS) {
                 const spawn = spawns[i++]
                 staticSpawns.push(createPoint(GetRectCenterX(spawn), GetRectCenterY(spawn)))
 
@@ -49,9 +49,9 @@ const RandomizeStartPositionsAndHeroSpawnOrder = () => {
     //randomize start positions
     i = 0
     while (true) {
-        if (i >= NB_ESCAPERS) break
+        if (i >= Constants.NB_ESCAPERS) break
         while (true) {
-            n = GetRandomInt(0, NB_ESCAPERS - 1)
+            n = GetRandomInt(0, Constants.NB_ESCAPERS - 1)
             if (!alreadyAdded[n]) break
         }
         startPositionsRandomized[i] =
@@ -63,7 +63,7 @@ const RandomizeStartPositionsAndHeroSpawnOrder = () => {
     //reinit alreadyAdded to false
     i = 0
     while (true) {
-        if (i >= NB_ESCAPERS) break
+        if (i >= Constants.NB_ESCAPERS) break
         alreadyAdded[i] = false
         i = i + 1
     }
@@ -71,9 +71,9 @@ const RandomizeStartPositionsAndHeroSpawnOrder = () => {
     //randomize hero spawn order
     i = 0
     while (true) {
-        if (i >= NB_PLAYERS_MAX) break
+        if (i >= Constants.NB_PLAYERS_MAX) break
         while (true) {
-            n = GetRandomInt(0, NB_PLAYERS_MAX - 1)
+            n = GetRandomInt(0, Constants.NB_PLAYERS_MAX - 1)
             if (!alreadyAdded[n]) break
         }
         playerIdsRandomized[i] = n
@@ -83,9 +83,9 @@ const RandomizeStartPositionsAndHeroSpawnOrder = () => {
 
     if (udg_doubleHeroesEnabled) {
         while (true) {
-            if (i >= NB_ESCAPERS) break
+            if (i >= Constants.NB_ESCAPERS) break
             while (true) {
-                n = GetRandomInt(NB_PLAYERS_MAX, NB_ESCAPERS - 1)
+                n = GetRandomInt(Constants.NB_PLAYERS_MAX, Constants.NB_ESCAPERS - 1)
                 if (!alreadyAdded[n]) break
             }
             playerIdsRandomized[i] = n
@@ -150,7 +150,7 @@ export const init_Heroes = () => {
                 RandomizeStartPositionsAndHeroSpawnOrder()
 
                 //create heroes
-                for (let i = 0; i < NB_ESCAPERS; i++) {
+                for (let i = 0; i < Constants.NB_ESCAPERS; i++) {
                     if (!getUdgEscapers().get(i)?.getHero()) {
                         if (GetPlayerId(GetLocalPlayer()) === i) {
                             ClearSelection()
@@ -158,7 +158,7 @@ export const init_Heroes = () => {
                     }
                 }
 
-                for (let i = 0; i < NB_ESCAPERS; i++) {
+                for (let i = 0; i < Constants.NB_ESCAPERS; i++) {
                     const n = playerIdsRandomized[i]
                     if (getUdgEscapers().get(n)) {
                         getUdgEscapers()

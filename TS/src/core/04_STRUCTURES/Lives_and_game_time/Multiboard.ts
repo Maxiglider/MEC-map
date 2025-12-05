@@ -4,7 +4,7 @@ import { IDestroyable, MemoryHandler } from 'Utils/MemoryHandler'
 import { progressionUtils } from 'Utils/ProgressionUtils'
 import { createTimer, forRange } from 'Utils/mapUtils'
 import { arrayPush, ucfirst } from 'core/01_libraries/Basic_functions'
-import { NB_ESCAPERS, PURPLE, RED } from 'core/01_libraries/Constants'
+import { Constants } from 'core/01_libraries/Constants'
 import { udg_colorCode } from 'core/01_libraries/Init_colorCodes'
 import { AfkMode } from 'core/08_GAME/Afk_mode/Afk_mode'
 import { getUdgEscapers, getUdgLevels, globals } from '../../../../globals'
@@ -66,7 +66,7 @@ export const initMultiboard = () => {
     let pointsEarnedOnMeteorCompletion = 0
     let pointsEarnedOnMeteorCompletionMaxPerLevel = 0
 
-    forRange(NB_ESCAPERS, i => {
+    forRange(Constants.NB_ESCAPERS, i => {
         playerScores[i] = {
             stats: {
                 global: { score: 0, saves: 0, deaths: 0, points: 0 },
@@ -80,7 +80,7 @@ export const initMultiboard = () => {
     })
 
     const resetRoundScores = () => {
-        forRange(NB_ESCAPERS, i => {
+        forRange(Constants.NB_ESCAPERS, i => {
             playerScores[i].stats.current.score = 0
             playerScores[i].stats.current.saves = 0
             playerScores[i].stats.current.deaths = 0
@@ -196,7 +196,7 @@ export const initMultiboard = () => {
         const currentGameTimeStr = GameTime.current.getGameTime()
         const speedrunGameTimeStr = GameTime.speedrun.getGameTime()
 
-        for (let i = 0; i < NB_ESCAPERS; i++) {
+        for (let i = 0; i < Constants.NB_ESCAPERS; i++) {
             if (GetLocalPlayer() === Player(i)) {
                 const statsMode = playerScores[i].statsMode
 
@@ -282,7 +282,7 @@ export const initMultiboard = () => {
             sortedArray.push(escaper)
         }
 
-        for (let i = 0; i < NB_ESCAPERS; i++) {
+        for (let i = 0; i < Constants.NB_ESCAPERS; i++) {
             if (GetLocalPlayer() === Player(i)) {
                 const statsMode = playerScores[i].statsMode
 
@@ -355,8 +355,8 @@ export const initMultiboard = () => {
                 MultiboardSetTitleText(
                     mb,
                     `${globals.scoreboardLabel} - ${ucfirst(playerMode.statsMode)}` +
-                        (getUdgLevels().isNoobEdit() ? ' - ' + udg_colorCode[RED] + 'Noobedit' + '|r' : '') +
-                        (getUdgLevels().isSpeedEdit() ? ' - ' + udg_colorCode[PURPLE] + 'SPEED' + '|r' : '')
+                        (getUdgLevels().isNoobEdit() ? ' - ' + udg_colorCode[Constants.RED] + 'Noobedit' + '|r' : '') +
+                        (getUdgLevels().isSpeedEdit() ? ' - ' + udg_colorCode[Constants.PURPLE] + 'SPEED' + '|r' : '')
                 )
 
             mb && MultiboardDisplay(mb, !escaper.hideLeaderboard && playerMode.mode === 'multiboard' && visible)

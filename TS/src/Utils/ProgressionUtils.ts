@@ -2,7 +2,7 @@ import { ServiceManager } from 'Services'
 import { IDestroyable, MemoryHandler } from 'Utils/MemoryHandler'
 import { String2Ascii } from 'core/01_libraries/Ascii'
 import { arrayPush } from 'core/01_libraries/Basic_functions'
-import { LARGEUR_CASE } from 'core/01_libraries/Constants'
+import { Constants } from 'core/01_libraries/Constants'
 import { udg_colorCode } from 'core/01_libraries/Init_colorCodes'
 import { Escaper } from 'core/04_STRUCTURES/Escaper/Escaper'
 import { MonsterMultiplePatrols } from 'core/04_STRUCTURES/Monster/MonsterMultiplePatrols'
@@ -93,10 +93,10 @@ const initProgressionUtils = () => {
                         if (!tileMap[x]) tileMap[x] = {}
 
                         // Order matters, from 'oldest' to 'newest'
-                        const a = tileMap[x - LARGEUR_CASE]?.[y - LARGEUR_CASE]
-                        const b = tileMap[x]?.[y - LARGEUR_CASE]
-                        const c = tileMap[x + LARGEUR_CASE]?.[y - LARGEUR_CASE]
-                        const d = tileMap[x - LARGEUR_CASE]?.[y]
+                        const a = tileMap[x - Constants.LARGEUR_CASE]?.[y - Constants.LARGEUR_CASE]
+                        const b = tileMap[x]?.[y - Constants.LARGEUR_CASE]
+                        const c = tileMap[x + Constants.LARGEUR_CASE]?.[y - Constants.LARGEUR_CASE]
+                        const d = tileMap[x - Constants.LARGEUR_CASE]?.[y]
 
                         const newValue = a || b || c || d || ++currentSegment
 
@@ -128,15 +128,15 @@ const initProgressionUtils = () => {
                     }
                 }
 
-                x = x + LARGEUR_CASE
+                x = x + Constants.LARGEUR_CASE
             }
 
-            y = y + LARGEUR_CASE
+            y = y + Constants.LARGEUR_CASE
         }
 
         const addLevelMapPoint = (levelIndex: number, x: number, y: number) => {
-            const nx = Math.floor(x / LARGEUR_CASE) * LARGEUR_CASE
-            const ny = Math.floor(y / LARGEUR_CASE) * LARGEUR_CASE
+            const nx = Math.floor(x / Constants.LARGEUR_CASE) * Constants.LARGEUR_CASE
+            const ny = Math.floor(y / Constants.LARGEUR_CASE) * Constants.LARGEUR_CASE
 
             if (!levelMap[nx]) levelMap[nx] = {}
             levelMap[nx][ny] = levelIndex
@@ -200,10 +200,10 @@ const initProgressionUtils = () => {
                     }
 
                     if (x1 && y1 && x2 && y2) {
-                        const m1x = Math.floor(x1 / LARGEUR_CASE) * LARGEUR_CASE
-                        const m1y = Math.floor(y1 / LARGEUR_CASE) * LARGEUR_CASE
-                        const m2x = Math.floor(x2 / LARGEUR_CASE) * LARGEUR_CASE
-                        const m2y = Math.floor(y2 / LARGEUR_CASE) * LARGEUR_CASE
+                        const m1x = Math.floor(x1 / Constants.LARGEUR_CASE) * Constants.LARGEUR_CASE
+                        const m1y = Math.floor(y1 / Constants.LARGEUR_CASE) * Constants.LARGEUR_CASE
+                        const m2x = Math.floor(x2 / Constants.LARGEUR_CASE) * Constants.LARGEUR_CASE
+                        const m2y = Math.floor(y2 / Constants.LARGEUR_CASE) * Constants.LARGEUR_CASE
 
                         tunnels[`${m1x}_${m1y}`] = createPoint(m2x, m2y)
                         tunnels[`${m2x}_${m2y}`] = createPoint(m1x, m1y)
@@ -220,10 +220,18 @@ const initProgressionUtils = () => {
             }
 
             for (const [_, staticSlide] of pairs(level.staticSlides.getAll())) {
-                const m1x = Math.floor((staticSlide.getX1() + staticSlide.getX2()) / 2 / LARGEUR_CASE) * LARGEUR_CASE
-                const m1y = Math.floor((staticSlide.getY1() + staticSlide.getY2()) / 2 / LARGEUR_CASE) * LARGEUR_CASE
-                const m2x = Math.floor((staticSlide.getX3() + staticSlide.getX4()) / 2 / LARGEUR_CASE) * LARGEUR_CASE
-                const m2y = Math.floor((staticSlide.getY3() + staticSlide.getY4()) / 2 / LARGEUR_CASE) * LARGEUR_CASE
+                const m1x =
+                    Math.floor((staticSlide.getX1() + staticSlide.getX2()) / 2 / Constants.LARGEUR_CASE) *
+                    Constants.LARGEUR_CASE
+                const m1y =
+                    Math.floor((staticSlide.getY1() + staticSlide.getY2()) / 2 / Constants.LARGEUR_CASE) *
+                    Constants.LARGEUR_CASE
+                const m2x =
+                    Math.floor((staticSlide.getX3() + staticSlide.getX4()) / 2 / Constants.LARGEUR_CASE) *
+                    Constants.LARGEUR_CASE
+                const m2y =
+                    Math.floor((staticSlide.getY3() + staticSlide.getY4()) / 2 / Constants.LARGEUR_CASE) *
+                    Constants.LARGEUR_CASE
 
                 tunnels[`${m1x}_${m1y}`] = createPoint(m2x, m2y)
                 tunnels[`${m2x}_${m2y}`] = createPoint(m1x, m1y)
@@ -239,14 +247,14 @@ const initProgressionUtils = () => {
         }
 
         const directions: (Point & { d: number })[] = [
-            { x: -LARGEUR_CASE, y: 0, d: 1 },
-            { x: LARGEUR_CASE, y: 0, d: 1 },
-            { x: 0, y: -LARGEUR_CASE, d: 1 },
-            { x: 0, y: LARGEUR_CASE, d: 1 },
-            { x: -LARGEUR_CASE, y: -LARGEUR_CASE, d: 1.414 },
-            { x: -LARGEUR_CASE, y: LARGEUR_CASE, d: 1.414 },
-            { x: LARGEUR_CASE, y: -LARGEUR_CASE, d: 1.414 },
-            { x: LARGEUR_CASE, y: LARGEUR_CASE, d: 1.414 },
+            { x: -Constants.LARGEUR_CASE, y: 0, d: 1 },
+            { x: Constants.LARGEUR_CASE, y: 0, d: 1 },
+            { x: 0, y: -Constants.LARGEUR_CASE, d: 1 },
+            { x: 0, y: Constants.LARGEUR_CASE, d: 1 },
+            { x: -Constants.LARGEUR_CASE, y: -Constants.LARGEUR_CASE, d: 1.414 },
+            { x: -Constants.LARGEUR_CASE, y: Constants.LARGEUR_CASE, d: 1.414 },
+            { x: Constants.LARGEUR_CASE, y: -Constants.LARGEUR_CASE, d: 1.414 },
+            { x: Constants.LARGEUR_CASE, y: Constants.LARGEUR_CASE, d: 1.414 },
         ]
 
         const BFS_far = (
@@ -453,8 +461,8 @@ const initProgressionUtils = () => {
             return -1
         }
 
-        const xHero = Math.floor(GetUnitX(hero) / LARGEUR_CASE) * LARGEUR_CASE
-        const yHero = Math.floor(GetUnitY(hero) / LARGEUR_CASE) * LARGEUR_CASE
+        const xHero = Math.floor(GetUnitX(hero) / Constants.LARGEUR_CASE) * Constants.LARGEUR_CASE
+        const yHero = Math.floor(GetUnitY(hero) / Constants.LARGEUR_CASE) * Constants.LARGEUR_CASE
 
         const heroProgression = progressionMap[xHero]?.[yHero]
 

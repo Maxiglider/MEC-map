@@ -1,4 +1,4 @@
-import { LARGEUR_CASE } from 'core/01_libraries/Constants'
+import { Constants } from 'core/01_libraries/Constants'
 import { TerrainType } from 'core/04_STRUCTURES/TerrainType/TerrainType'
 import { getUdgTerrainTypes, globals } from '../../../../globals'
 import { ChangeTerrainType } from '../Modify_terrain_Functions/Modify_terrain_functions'
@@ -26,10 +26,10 @@ const initRandomizeTerrains = () => {
                     j = j + 1
                 }
 
-                x += LARGEUR_CASE
+                x += Constants.LARGEUR_CASE
             }
 
-            y += LARGEUR_CASE
+            y += Constants.LARGEUR_CASE
         }
     }
 

@@ -1,5 +1,5 @@
 import { IsBoolString, IsEscaperInGame, jsonDecode, jsonEncode, S2B } from 'core/01_libraries/Basic_functions'
-import { NB_ESCAPERS, NB_PLAYERS_MAX } from 'core/01_libraries/Constants'
+import { Constants } from 'core/01_libraries/Constants'
 import { Text } from 'core/01_libraries/Text'
 import { Escaper } from 'core/04_STRUCTURES/Escaper/Escaper'
 import { GetMirrorEscaper } from 'core/04_STRUCTURES/Escaper/Escaper_functions'
@@ -146,7 +146,7 @@ export const initExecuteCommandMax = () => {
             if (param1 === 'all' || param1 === 'a') {
                 let i = 0
                 while (true) {
-                    if (i >= NB_ESCAPERS) break
+                    if (i >= Constants.NB_ESCAPERS) break
                     if (getUdgEscapers().get(i) !== null) {
                         getUdgEscapers().get(i)?.giveHeroControl(escaper2)
                     }
@@ -189,7 +189,7 @@ export const initExecuteCommandMax = () => {
             if (noParam) {
                 let i = 0
                 while (true) {
-                    if (i >= NB_ESCAPERS) break
+                    if (i >= Constants.NB_ESCAPERS) break
                     if (getUdgEscapers().get(i) !== null) {
                         getUdgEscapers().get(i)?.resetOwner()
                     }
@@ -302,7 +302,7 @@ export const initExecuteCommandMax = () => {
             if (param2 === 'all' || param2 === 'a') {
                 let i = 0
                 while (true) {
-                    if (i >= NB_ESCAPERS) break
+                    if (i >= Constants.NB_ESCAPERS) break
                     if (getUdgEscapers().get(i) !== null) {
                         getUdgEscapers().get(i)?.setHasAutorevive(b)
                     }
@@ -357,17 +357,17 @@ export const initExecuteCommandMax = () => {
             if (param1 === 'all' || param1 === 'a') {
                 let i = 0
                 while (true) {
-                    if (i >= NB_ESCAPERS) break
+                    if (i >= Constants.NB_ESCAPERS) break
                     if (getUdgEscapers().get(i) == null) {
                         getUdgEscapers().newAt(i)
                         if (udg_doubleHeroesEnabled) {
-                            getUdgEscapers().newAt(i + NB_PLAYERS_MAX)
+                            getUdgEscapers().newAt(i + Constants.NB_PLAYERS_MAX)
                         }
                     }
                     getUdgEscapers().get(i)?.createHeroAtStart()
                     if (udg_doubleHeroesEnabled) {
                         getUdgEscapers()
-                            .get(i + NB_PLAYERS_MAX)
+                            .get(i + Constants.NB_PLAYERS_MAX)
                             ?.createHeroAtStart()
                     }
                     i = i + 1
@@ -381,7 +381,7 @@ export const initExecuteCommandMax = () => {
                 if (getUdgEscapers().get(n) == null) {
                     getUdgEscapers().newAt(n)
                     if (udg_doubleHeroesEnabled) {
-                        getUdgEscapers().newAt(n + NB_PLAYERS_MAX)
+                        getUdgEscapers().newAt(n + Constants.NB_PLAYERS_MAX)
                     }
                 }
                 if (!getUdgEscapers().get(n)?.createHeroAtStart()) {
@@ -389,7 +389,7 @@ export const initExecuteCommandMax = () => {
                 }
                 if (udg_doubleHeroesEnabled) {
                     getUdgEscapers()
-                        .get(n + NB_PLAYERS_MAX)
+                        .get(n + Constants.NB_PLAYERS_MAX)
                         ?.createHeroAtStart()
                 }
 
@@ -421,7 +421,7 @@ export const initExecuteCommandMax = () => {
 
             if (param1 === 'all' || param1 === 'a') {
                 let i = 0
-                while (i < NB_ESCAPERS) {
+                while (i < Constants.NB_ESCAPERS) {
                     if (
                         getUdgEscapers().get(i) != null &&
                         getUdgEscapers().get(i) != escaper &&
@@ -488,7 +488,7 @@ export const initExecuteCommandMax = () => {
             if (param1 === 'all' || param1 === 'a') {
                 let i = 0
                 while (true) {
-                    if (i >= NB_ESCAPERS) break
+                    if (i >= Constants.NB_ESCAPERS) break
                     if (getUdgEscapers().get(i) != null && getUdgEscapers().get(i) != escaper) {
                         if (!getUdgEscapers().get(i)?.isMaximaxou()) {
                             getUdgEscapers().get(i)?.setCanCheat(b)
@@ -886,7 +886,7 @@ export const initExecuteCommandMax = () => {
             if (param2 === 'all' || param2 === 'a') {
                 let i = 0
                 while (true) {
-                    if (i >= NB_ESCAPERS) break
+                    if (i >= Constants.NB_ESCAPERS) break
                     getUdgEscapers().get(i)?.enableClickWhereYouAre(b)
                     i = i + 1
                 }

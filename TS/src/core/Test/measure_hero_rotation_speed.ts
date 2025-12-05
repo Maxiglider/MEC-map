@@ -1,36 +1,33 @@
-import {createTimer} from "../../Utils/mapUtils";
-import {getUdgEscapers} from "../../../globals";
-import {AnglesDiff} from "../01_libraries/Basic_functions";
-import {SLIDE_PERIOD} from "../01_libraries/Constants";
-import {log} from "../Log/log";
+import { Constants } from 'core/01_libraries/Constants'
+import { Timer } from 'w3ts'
+import { getUdgEscapers } from '../../../globals'
+import { createTimer } from '../../Utils/mapUtils'
+import { AnglesDiff } from '../01_libraries/Basic_functions'
 import {
     HERO_ROTATION_SPEED,
-    HERO_ROTATION_TIME_FOR_MAXIMUM_SPEED, MAX_DEGREE_ON_WHICH_SPEED_TABLE_TAKES_CONTROL, SPEED_AT_LEAST_THAN_50_DEGREES
-} from "../07_TRIGGERS/Slide_and_CheckTerrain_triggers/SlidingMax";
-import {Timer} from "w3ts";
-
+    HERO_ROTATION_TIME_FOR_MAXIMUM_SPEED,
+} from '../07_TRIGGERS/Slide_and_CheckTerrain_triggers/SlidingMax'
+import { log } from '../Log/log'
 
 export const init_measureSpeed = () => {
     createTimer(10, false, () => {
         const hero = getUdgEscapers().get(0)?.getHero()
         const hero2 = getUdgEscapers().get(1)?.getHero()
-               
 
         if (hero && hero2) {
-
             // BlzSetUnitFacingEx(hero, 0)
             // BlzSetUnitFacingEx(hero2, 0)
 
-
             //blue hero new rotation
-            const maxSlideTurnPerPeriod = HERO_ROTATION_SPEED * SLIDE_PERIOD * 360 //degrees
+            const maxSlideTurnPerPeriod = HERO_ROTATION_SPEED * Constants.SLIDE_PERIOD * 360 //degrees
             let heroBlueStarted = false
 
             let sens = 1
             let lastSens = sens
 
             let currentRotationSpeed = 0
-            let increaseRotationSpeedPerPeriod = maxSlideTurnPerPeriod * SLIDE_PERIOD / HERO_ROTATION_TIME_FOR_MAXIMUM_SPEED
+            let increaseRotationSpeedPerPeriod =
+                (maxSlideTurnPerPeriod * Constants.SLIDE_PERIOD) / HERO_ROTATION_TIME_FOR_MAXIMUM_SPEED
 
             let tBlueHero: Timer | null = null
 
@@ -38,8 +35,8 @@ export const init_measureSpeed = () => {
 
             const startBlueHero = () => {
                 // let numTimer = 0
-                // tBlueHero = createTimer(SLIDE_PERIOD, true, () => {
-                //     numTimer += SLIDE_PERIOD
+                // tBlueHero = createTimer(Constants.SLIDE_PERIOD, true, () => {
+                //     numTimer += Constants.SLIDE_PERIOD
                 //     const currentAngle = GetUnitFacing(hero2)
                 //     const remainingDegrees = aimAngleWithSens - currentAngle
                 //     if (RAbsBJ(remainingDegrees) > 0.05) {
@@ -49,7 +46,7 @@ export const init_measureSpeed = () => {
                 //         if (diffToApplyAbs > 0.01) {
                 //             //sens
                 //             const sens = (remainingDegrees * maxSlideTurnPerPeriod) > 0 ? 1 : -1
-                //             const maxIncreaseRotationSpeedPerPeriod = RAbsBJ(maxSlideTurnPerPeriod * SLIDE_PERIOD / HERO_ROTATION_TIME_FOR_MAXIMUM_SPEED)
+                //             const maxIncreaseRotationSpeedPerPeriod = RAbsBJ(maxSlideTurnPerPeriod * Constants.SLIDE_PERIOD / HERO_ROTATION_TIME_FOR_MAXIMUM_SPEED)
                 //
                 //             let newSlideTurn: number
                 //
@@ -97,18 +94,17 @@ export const init_measureSpeed = () => {
             }
 
             const stopBlueHero = () => {
-                tBlueHero?.destroy()
+                // tBlueHero?.destroy()
             }
 
             // red hero normal rotation
             let lastTimeAngle0 = 0
             let currentTime = 0
 
-
             BlzSetUnitFacingEx(hero, 0)
 
             createTimer(0.01, true, () => {
-                if(!heroBlueStarted){
+                if (!heroBlueStarted) {
                     // startBlueHero()
                     heroBlueStarted = true
                 }
@@ -118,12 +114,22 @@ export const init_measureSpeed = () => {
                 SetUnitFacing(hero, newAngle)
 
                 currentTime += 0.01
-                if(RAbsBJ(AnglesDiff(GetUnitFacing(hero), 0)) < 5){
+                if (RAbsBJ(AnglesDiff(GetUnitFacing(hero), 0)) < 5) {
                     const circleDuration = currentTime - lastTimeAngle0
-                    if(circleDuration > 0.3) {
+                    if (circleDuration > 0.3) {
                         const roundsPerSecond = 1 / circleDuration
 
-                        const str = "Angle " + GetUnitFacing(hero) + " ; anglesDiff " + AnglesDiff(GetUnitFacing(hero), 0) + " ; lastTime " + lastTimeAngle0 + " ; currentTime : " + currentTime + " ;  speed : " + roundsPerSecond
+                        const str =
+                            'Angle ' +
+                            GetUnitFacing(hero) +
+                            ' ; anglesDiff ' +
+                            AnglesDiff(GetUnitFacing(hero), 0) +
+                            ' ; lastTime ' +
+                            lastTimeAngle0 +
+                            ' ; currentTime : ' +
+                            currentTime +
+                            ' ;  speed : ' +
+                            roundsPerSecond
                         print(str)
                         log(str)
 
@@ -183,9 +189,6 @@ export const init_measureSpeed = () => {
             //         stopBlueHero()
             //     }
             // })
-
         }
-
-
     })
 }

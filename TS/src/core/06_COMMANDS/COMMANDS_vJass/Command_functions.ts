@@ -1,7 +1,7 @@
 import { MemoryHandler } from 'Utils/MemoryHandler'
 import { forRange } from 'Utils/mapUtils'
 import { arrayPush, stringReplaceAll } from 'core/01_libraries/Basic_functions'
-import { NB_ESCAPERS, NB_PLAYERS_MAX, NB_PLAYERS_MAX_REFORGED } from 'core/01_libraries/Constants'
+import { Constants } from 'core/01_libraries/Constants'
 import { ColorString2Id } from 'core/01_libraries/Init_colorCodes'
 import { Escaper } from 'core/04_STRUCTURES/Escaper/Escaper'
 import { getUdgEscapers } from '../../../../globals'
@@ -118,7 +118,7 @@ export const IsColorString = (colorString: string): boolean => {
 }
 
 export const IsPlayerColorString = (colorString: string): boolean => {
-    return ColorString2Id(colorString) >= 0 && ColorString2Id(colorString) <= NB_PLAYERS_MAX
+    return ColorString2Id(colorString) >= 0 && ColorString2Id(colorString) <= Constants.NB_PLAYERS_MAX
 }
 
 export const isPlayerId = (arg: string) => {
@@ -131,7 +131,7 @@ export const isPlayerId = (arg: string) => {
 
 const blzColors2ids = new Map<playercolor, number>()
 
-for (let i = 0; i < NB_PLAYERS_MAX_REFORGED; i++) {
+for (let i = 0; i < Constants.NB_PLAYERS_MAX_REFORGED; i++) {
     blzColors2ids.set(ConvertPlayerColor(i), i)
 }
 
@@ -140,7 +140,7 @@ export const BlzColor2Id = (color: playercolor) => {
 }
 
 export function colorId2playerId(colorId: number) {
-    for (let i = 0; i < NB_PLAYERS_MAX; i++) {
+    for (let i = 0; i < Constants.NB_PLAYERS_MAX; i++) {
         if (BlzColor2Id(GetPlayerColor(Player(i))) == colorId) {
             return i
         }
@@ -160,7 +160,7 @@ export const resolvePlayerId = (arg: string) => {
     if (larg === 's' || larg === 'sel' || larg === 'select' || larg === 'selected') {
         const a = (getUdgEscapers().get(GetPlayerId(GetTriggerPlayer()))?.getSelectedPlayerId() || 0) + 1
 
-        if (a > 0 && a <= NB_ESCAPERS) {
+        if (a > 0 && a <= Constants.NB_ESCAPERS) {
             targetPlayer = a - 1
         }
     } else if (IsPlayerColorString(larg)) {
@@ -168,7 +168,7 @@ export const resolvePlayerId = (arg: string) => {
     } else if (S2I(larg) !== 0) {
         const a = S2I(larg)
 
-        if (a > 0 && a <= NB_ESCAPERS) {
+        if (a > 0 && a <= Constants.NB_ESCAPERS) {
             targetPlayer = colorId2playerId(a - 1)
         }
     } else if (cachedPlayerNames[removeHash(larg)]) {
@@ -203,7 +203,7 @@ export const resolvePlayerIdsArray = (arg: string) => {
     const escapers = MemoryHandler.getEmptyArray<Escaper>()
 
     if (larg === 'a' || larg === 'all') {
-        for (let i = 0; i < NB_ESCAPERS; i++) {
+        for (let i = 0; i < Constants.NB_ESCAPERS; i++) {
             const escaper = getUdgEscapers().get(i)
 
             if (escaper) {
@@ -211,7 +211,7 @@ export const resolvePlayerIdsArray = (arg: string) => {
             }
         }
     } else if (larg === 'ai' || larg === 'computer' || larg === 'computers') {
-        for (let i = 0; i < NB_ESCAPERS; i++) {
+        for (let i = 0; i < Constants.NB_ESCAPERS; i++) {
             const escaper = getUdgEscapers().get(i)
 
             if (
@@ -223,7 +223,7 @@ export const resolvePlayerIdsArray = (arg: string) => {
             }
         }
     } else if (larg === 'gamer' || larg === 'gamers' || larg === 'player' || larg === 'players') {
-        for (let i = 0; i < NB_ESCAPERS; i++) {
+        for (let i = 0; i < Constants.NB_ESCAPERS; i++) {
             const escaper = getUdgEscapers().get(i)
 
             if (

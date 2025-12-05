@@ -8,14 +8,7 @@ import {
     S2B,
     tileset2tilesetString,
 } from 'core/01_libraries/Basic_functions'
-import {
-    DEFAULT_MONSTER_SPEED,
-    HERO_SLIDE_SPEED,
-    HERO_WALK_SPEED,
-    MAX_MOVE_SPEED,
-    RED,
-    TERRAIN_DEATH_TIME_TO_KILL,
-} from 'core/01_libraries/Constants'
+import { Constants } from 'core/01_libraries/Constants'
 import { udg_colorCode } from 'core/01_libraries/Init_colorCodes'
 import { Text } from 'core/01_libraries/Text'
 import { Level } from 'core/04_STRUCTURES/Level/Level'
@@ -76,7 +69,7 @@ export const initExecuteCommandMake = () => {
                 }
                 speed = S2R(param3)
             } else {
-                speed = HERO_WALK_SPEED
+                speed = Constants.HERO_WALK_SPEED
             }
 
             getUdgTerrainTypes().newWalk(param1, TerrainTypeFromString.TerrainTypeString2TerrainTypeId(param2), speed)
@@ -113,7 +106,7 @@ export const initExecuteCommandMake = () => {
                 }
                 x = S2R(param4)
             } else {
-                x = TERRAIN_DEATH_TIME_TO_KILL
+                x = Constants.TERRAIN_DEATH_TIME_TO_KILL
             }
 
             getUdgTerrainTypes().newDeath(
@@ -152,7 +145,7 @@ export const initExecuteCommandMake = () => {
                 }
                 speed = S2R(param3)
             } else {
-                speed = HERO_SLIDE_SPEED
+                speed = Constants.HERO_SLIDE_SPEED
             }
             if (nbParam === 4) {
                 if (!IsBoolString(param4)) {
@@ -494,7 +487,7 @@ export const initExecuteCommandMake = () => {
             Text.DisplayLineToPlayer(escaper.getPlayer())
             const str = ChangeOneTerrain.ChangeOneTerrain(param1, param2)
             if (str !== null) {
-                Text.mkP(escaper.getPlayer(), 'changed to ' + udg_colorCode[RED] + str)
+                Text.mkP(escaper.getPlayer(), 'changed to ' + udg_colorCode[Constants.RED] + str)
             } else {
                 Text.erP(escaper.getPlayer(), "couldn't change terrain")
             }
@@ -840,7 +833,7 @@ export const initExecuteCommandMake = () => {
             let str = ''
 
             let immoRadius = 0
-            let speed = DEFAULT_MONSTER_SPEED
+            let speed = Constants.DEFAULT_MONSTER_SPEED
             let scale = -1
             let clickable = false
 
@@ -858,7 +851,7 @@ export const initExecuteCommandMake = () => {
                 //checkParam4
                 if (nbParam >= 4) {
                     str = CmdParam(cmd, 4)
-                    if (!IsPositiveInteger(str) || S2I(str) > MAX_MOVE_SPEED) {
+                    if (!IsPositiveInteger(str) || S2I(str) > Constants.MAX_MOVE_SPEED) {
                         Text.erP(
                             escaper.getPlayer(),
                             'Wrong speed value ; should be a positive integer between 0 and 522'
@@ -1049,7 +1042,7 @@ export const initExecuteCommandMake = () => {
                 return true
             }
             //checkParam2
-            if (!IsPositiveInteger(param2) || S2I(param2) > MAX_MOVE_SPEED) {
+            if (!IsPositiveInteger(param2) || S2I(param2) > Constants.MAX_MOVE_SPEED) {
                 Text.erP(escaper.getPlayer(), 'wrong speed value ; should be a positive integer between 0 and 522')
                 return true
             }

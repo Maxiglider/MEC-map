@@ -1,7 +1,7 @@
 import { EffectUtils } from 'Utils/EffectUtils'
 import { createEvent } from 'Utils/mapUtils'
 import { IsOnGround } from 'core/01_libraries/Basic_functions'
-import { CHECK_TERRAIN_PERIOD, GM_TOUCH_DEATH_TERRAIN_EFFECT_STR } from 'core/01_libraries/Constants'
+import { Constants } from 'core/01_libraries/Constants'
 import { Escaper } from 'core/04_STRUCTURES/Escaper/Escaper'
 import { GetMirrorEscaper } from 'core/04_STRUCTURES/Escaper/Escaper_functions'
 import { MeteorFunctions } from 'core/04_STRUCTURES/Meteor/Meteor_functions'
@@ -180,7 +180,9 @@ const initCheckTerrainTrigger = () => {
 
                 if (touchedByDeathTerrain) {
                     if (escaper.isGodModeOn()) {
-                        EffectUtils.destroyEffect(EffectUtils.addSpecialEffect(GM_TOUCH_DEATH_TERRAIN_EFFECT_STR, x, y))
+                        EffectUtils.destroyEffect(
+                            EffectUtils.addSpecialEffect(Constants.GM_TOUCH_DEATH_TERRAIN_EFFECT_STR, x, y)
+                        )
                     } else {
                         currentTerrainType.killEscaper(escaper)
                         escaper.enableSlide(false)
@@ -205,7 +207,7 @@ const initCheckTerrainTrigger = () => {
 
     const CreateCheckTerrainTrigger = (playerId: number) => {
         const checkTerrainTrigger = createEvent({
-            events: [t => TriggerRegisterTimerEventPeriodic(t, CHECK_TERRAIN_PERIOD)],
+            events: [t => TriggerRegisterTimerEventPeriodic(t, Constants.CHECK_TERRAIN_PERIOD)],
             actions: [() => CheckTerrainActions(playerId)],
         })
 

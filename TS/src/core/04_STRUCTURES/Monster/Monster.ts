@@ -1,7 +1,7 @@
+import { Constants } from 'core/01_libraries/Constants'
 import { MemoryHandler } from 'Utils/MemoryHandler'
 import { Timer } from 'w3ts'
 import { udg_monsters } from '../../../../globals'
-import { MOBS_VARIOUS_COLORS, NB_PLAYERS_MAX } from '../../01_libraries/Constants'
 import { ColorString2Id } from '../../01_libraries/Init_colorCodes'
 import { IsColorString } from '../../06_COMMANDS/COMMANDS_vJass/Command_functions'
 import { hooks } from '../../API/GeneralHooks'
@@ -359,7 +359,7 @@ export abstract class Monster {
         let baseColorId: number
         if (IsColorString(colorString)) {
             baseColorId = ColorString2Id(colorString)
-            if (baseColorId < 0 || baseColorId > NB_PLAYERS_MAX) {
+            if (baseColorId < 0 || baseColorId > Constants.NB_PLAYERS_MAX) {
                 return
             }
             this.baseColorId = baseColorId
@@ -392,7 +392,7 @@ export abstract class Monster {
         this.vcTransparency = 0
         //changement couleur du mob actuel
         if (this.u !== null) {
-            if (MOBS_VARIOUS_COLORS && this.u) {
+            if (Constants.MOBS_VARIOUS_COLORS && this.u) {
                 initBaseColorId = GetPlayerId(GetOwningPlayer(this.u))
             } else {
                 initBaseColorId = 12

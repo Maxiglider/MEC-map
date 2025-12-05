@@ -1,5 +1,5 @@
 import { ServiceManager } from 'Services'
-import { NB_ESCAPERS, NB_LIVES_AT_BEGINNING, NB_PLAYERS_MAX } from 'core/01_libraries/Constants'
+import { Constants } from 'core/01_libraries/Constants'
 import { Text } from 'core/01_libraries/Text'
 import { gg_trg_apparition_dialogue_et_fermeture_automatique } from 'core/08_GAME/Mode_coop/creation_dialogue'
 import { getUdgCasterTypes, getUdgEscapers, getUdgMonsterTypes, getUdgTerrainTypes, globals } from '../../../../globals'
@@ -62,14 +62,14 @@ export class LevelArray extends BaseArray<Level> {
         this.data[0] = new Level()
         this.data[0].id = 0
         this.data[0].newStart(x1, y1, x2, y2)
-        this.data[0].setNbLivesEarned(NB_LIVES_AT_BEGINNING)
+        this.data[0].setNbLivesEarned(Constants.NB_LIVES_AT_BEGINNING)
         this.lastInstanceId++
 
         ServiceManager.getService('Lives').initLives()
 
         this.currentLevel = 0
 
-        for (let i = 0; i < NB_PLAYERS_MAX; i++) {
+        for (let i = 0; i < Constants.NB_PLAYERS_MAX; i++) {
             this.levelProgressionState[i] = 0
         }
     }
@@ -77,7 +77,7 @@ export class LevelArray extends BaseArray<Level> {
     hasPlayersInLevel = (lvlId: number) => {
         let j = 0
 
-        for (let i = 0; i < NB_PLAYERS_MAX; i++) {
+        for (let i = 0; i < Constants.NB_PLAYERS_MAX; i++) {
             const p = Player(i)
 
             if (
@@ -143,7 +143,7 @@ export class LevelArray extends BaseArray<Level> {
 
         this.currentLevel = levelId
 
-        for (let i = 0; i < NB_PLAYERS_MAX; i++) {
+        for (let i = 0; i < Constants.NB_PLAYERS_MAX; i++) {
             if (!escaper || (getUdgEscapers().get(i) && sameLevelProgression(escaper, getUdgEscapers().get(i)!))) {
                 this.levelProgressionState[i] = levelId
             }
@@ -201,7 +201,7 @@ export class LevelArray extends BaseArray<Level> {
 
         this.currentLevel = this.getCurrentLevel(escaper).id + 1
 
-        for (let i = 0; i < NB_PLAYERS_MAX; i++) {
+        for (let i = 0; i < Constants.NB_PLAYERS_MAX; i++) {
             if (getUdgEscapers().get(i) && sameLevelProgression(escaper, getUdgEscapers().get(i)!)) {
                 this.levelProgressionState[i] = this.currentLevel
             }
@@ -571,7 +571,7 @@ export class LevelArray extends BaseArray<Level> {
             ServiceManager.getService('Lives').setNb(9999)
             globals.autoreviveDelay = 0.3
 
-            for (let i = 0; i < NB_ESCAPERS; i++) {
+            for (let i = 0; i < Constants.NB_ESCAPERS; i++) {
                 getUdgEscapers().get(i)?.setHasAutorevive(true)
             }
 
@@ -585,7 +585,7 @@ export class LevelArray extends BaseArray<Level> {
             ServiceManager.getService('Lives').setNb(this.modeState.noobEdit.lives)
             globals.autoreviveDelay = this.modeState.noobEdit.autoreviveDelay
 
-            for (let i = 0; i < NB_ESCAPERS; i++) {
+            for (let i = 0; i < Constants.NB_ESCAPERS; i++) {
                 getUdgEscapers().get(i)?.setHasAutorevive(false)
             }
 

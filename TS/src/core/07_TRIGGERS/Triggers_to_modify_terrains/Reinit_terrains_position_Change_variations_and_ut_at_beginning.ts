@@ -1,12 +1,11 @@
-import { LARGEUR_CASE } from 'core/01_libraries/Constants'
+import { Constants } from 'core/01_libraries/Constants'
 import { Text } from 'core/01_libraries/Text'
 import { TerrainType } from 'core/04_STRUCTURES/TerrainType/TerrainType'
 import { TerrainTypeId2TerrainType } from 'core/04_STRUCTURES/TerrainType/Terrain_type_functions'
 import { globals } from '../../../../globals'
+import { createTimer } from '../../../Utils/mapUtils'
 import { ChangeTerrainType } from '../Modify_terrain_Functions/Modify_terrain_functions'
 import { AddNewTerrain } from '../Modify_terrain_Functions/Terrain_functions'
-import {createTimer} from "../../../Utils/mapUtils";
-
 
 const initReinitTerrainsPositions = () => {
     let TERRAIN_SAVE: (TerrainType | null)[] = []
@@ -31,12 +30,12 @@ const initReinitTerrainsPositions = () => {
                     //sauvegarde du terrain
                     TERRAIN_SAVE[terrainSave_id] = TerrainTypeId2TerrainType(terrainType)
                     terrainSave_id = terrainSave_id + 1
-                    x = x + LARGEUR_CASE
+                    x = x + Constants.LARGEUR_CASE
                 }
 
-                y = y + LARGEUR_CASE
+                y = y + Constants.LARGEUR_CASE
             }
-        });
+        })
     }
 
     //reinitTerrainPositions
@@ -55,10 +54,10 @@ const initReinitTerrainsPositions = () => {
                 }
 
                 terrainSave_id = terrainSave_id + 1
-                x = x + LARGEUR_CASE
+                x = x + Constants.LARGEUR_CASE
             }
 
-            y = y + LARGEUR_CASE
+            y = y + Constants.LARGEUR_CASE
         }
 
         if (y > globals.MAP_MAX_Y) {

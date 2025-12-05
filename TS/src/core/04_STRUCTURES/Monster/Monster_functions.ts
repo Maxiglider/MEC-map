@@ -1,5 +1,5 @@
 import { GetCurrentMonsterPlayer } from 'core/01_libraries/Basic_functions'
-import { ENNEMY_PLAYER, MOBS_VARIOUS_COLORS } from 'core/01_libraries/Constants'
+import { Constants } from 'core/01_libraries/Constants'
 import { getUdgEscapers } from '../../../../globals'
 import { Monster } from './Monster'
 import { MonsterType } from './MonsterType'
@@ -106,7 +106,7 @@ export const NewImmobileMonsterForPlayer = (
         SetUnitScale(monster, scale, scale, scale)
     }
     SetUnitMoveSpeed(monster, mt.getUnitMoveSpeed())
-    if (!MOBS_VARIOUS_COLORS) {
+    if (!Constants.MOBS_VARIOUS_COLORS) {
         SetUnitColor(monster, ConvertPlayerColor(24))
     }
 
@@ -143,7 +143,7 @@ export const NewImmobileMonster = (
 ): unit => {
     let p: player
     if (mt.isClickable()) {
-        p = ENNEMY_PLAYER
+        p = Constants.ENNEMY_PLAYER
     } else {
         p = GetCurrentMonsterPlayer()
     }

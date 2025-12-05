@@ -1,5 +1,5 @@
 import { forRange } from 'Utils/mapUtils'
-import { NB_ESCAPERS } from 'core/01_libraries/Constants'
+import { Constants } from 'core/01_libraries/Constants'
 import { udg_colorCode } from 'core/01_libraries/Init_colorCodes'
 import { Text } from 'core/01_libraries/Text'
 import { getUdgEscapers } from '../../../../globals'
@@ -44,7 +44,7 @@ const initMessageHeroDies = () => {
 
     const PlaySoundHeroDies = (fallenPlayer: player) => {
         if (!isSoundPlaying) {
-            forRange(NB_ESCAPERS, i => {
+            forRange(Constants.NB_ESCAPERS, i => {
                 // For some reason this still plays the sound even tho the player is ignoring death messages
                 if (!getUdgEscapers().get(i)?.isIgnoringDeathMessages()) {
                     if (GetLocalPlayer() === fallenPlayer) {
@@ -66,7 +66,7 @@ const initMessageHeroDies = () => {
         TimerStart(CreateTimer(), TIME_BETWEEN_DEATH_AND_MESSAGE, false, () => {
             PlaySoundHeroDies(Player(n))
 
-            forRange(NB_ESCAPERS, i => {
+            forRange(Constants.NB_ESCAPERS, i => {
                 if (!getUdgEscapers().get(i)?.isIgnoringDeathMessages()) {
                     const targetEscaper = getUdgEscapers().get(n)
 

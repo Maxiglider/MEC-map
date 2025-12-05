@@ -1,10 +1,10 @@
-import { NB_PLAYERS_MAX_REFORGED } from 'core/01_libraries/Constants'
+import { Constants } from 'core/01_libraries/Constants'
 import { createEvent, forRange } from 'Utils/mapUtils'
 
 type IDrag = (playerId: number, x: number, y: number) => void
 
 export const useDrag = (props: { onDrag: IDrag }) => {
-    forRange(NB_PLAYERS_MAX_REFORGED, i => {
+    forRange(Constants.NB_PLAYERS_MAX_REFORGED, i => {
         new FollowMouse(i, props.onDrag)
     })
 }

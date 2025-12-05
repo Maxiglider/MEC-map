@@ -1,7 +1,7 @@
 import { EffectUtils } from 'Utils/EffectUtils'
 import { pathingBlockerUtils } from 'Utils/PathingBlockerUtils'
 import { createTimer } from 'Utils/mapUtils'
-import { GM_KILLING_EFFECT, NB_ESCAPERS, SLIDE_PERIOD } from 'core/01_libraries/Constants'
+import { Constants } from 'core/01_libraries/Constants'
 import { Apm } from 'core/08_GAME/Apm_clics_par_minute/Apm'
 import { Cpm } from 'core/08_GAME/Apm_clics_par_minute/Cpm'
 import { getUdgEscapers, globals } from '../../../../globals'
@@ -28,7 +28,7 @@ const escaperTurnForOnePeriod = (escaper: Escaper | null) => {
             //sens
             const sens = remainingDegrees * escaper.getMaxSlideTurnPerPeriod() > 0 ? 1 : -1
             const maxIncreaseRotationSpeedPerPeriod = RAbsBJ(
-                (escaper.getMaxSlideTurnPerPeriod() * SLIDE_PERIOD) / escaper.rotationTimeForMaximumSpeed
+                (escaper.getMaxSlideTurnPerPeriod() * Constants.SLIDE_PERIOD) / escaper.rotationTimeForMaximumSpeed
             )
 
             let newSlideTurn: number
@@ -83,7 +83,7 @@ const escaperTurnForOnePeriod = (escaper: Escaper | null) => {
 const initSlideTrigger = () => {
     //counter for height which has to execute at 0.01s period
     const counters: number[] = []
-    for (let i = 0; i < NB_ESCAPERS; i++) {
+    for (let i = 0; i < Constants.NB_ESCAPERS; i++) {
         counters[i] = 0
     }
 
@@ -165,7 +165,7 @@ const initSlideTrigger = () => {
                     if (!escaper.isGodModeOn()) {
                         escaper.kill()
                     } else {
-                        EffectUtils.destroyEffect(EffectUtils.addSpecialEffect(GM_KILLING_EFFECT, newX, newY))
+                        EffectUtils.destroyEffect(EffectUtils.addSpecialEffect(Constants.GM_KILLING_EFFECT, newX, newY))
                     }
                 }
             } else {
@@ -243,11 +243,11 @@ const initSlideTrigger = () => {
         }
 
         //update apm
-        Apm.timeOnSlide[n] = Apm.timeOnSlide[n] + SLIDE_PERIOD
+        Apm.timeOnSlide[n] = Apm.timeOnSlide[n] + Constants.SLIDE_PERIOD
     }
 
     const CreateSlideTimer = (escaperId: number) => {
-        return createTimer(SLIDE_PERIOD, true, () => Slide_Actions(escaperId))
+        return createTimer(Constants.SLIDE_PERIOD, true, () => Slide_Actions(escaperId))
     }
 
     return { CreateSlideTimer }

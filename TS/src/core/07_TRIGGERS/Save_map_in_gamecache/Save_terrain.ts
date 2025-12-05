@@ -1,6 +1,6 @@
 import { MemoryHandler } from 'Utils/MemoryHandler'
 import { Ascii2String } from 'core/01_libraries/Ascii'
-import { LARGEUR_CASE } from 'core/01_libraries/Constants'
+import { Constants } from 'core/01_libraries/Constants'
 import { Text } from 'core/01_libraries/Text'
 import { TerrainType } from 'core/04_STRUCTURES/TerrainType/TerrainType'
 import { getUdgTerrainTypes, globals } from '../../../../globals'
@@ -23,8 +23,8 @@ const SaveTerrainsUsed = (json: { [x: string]: any }) => {
 }
 
 const SaveMapDimensionsAndCenterOffset = (json: { [x: string]: any }) => {
-    let largeurMap = R2I((globals.MAP_MAX_X - globals.MAP_MIN_X) / LARGEUR_CASE)
-    let hauteurMap = R2I((globals.MAP_MAX_Y - globals.MAP_MIN_Y) / LARGEUR_CASE)
+    let largeurMap = R2I((globals.MAP_MAX_X - globals.MAP_MIN_X) / Constants.LARGEUR_CASE)
+    let hauteurMap = R2I((globals.MAP_MAX_Y - globals.MAP_MIN_Y) / Constants.LARGEUR_CASE)
     let offsetX = R2I(globals.MAP_MIN_X)
     let offsetY = R2I(globals.MAP_MIN_Y)
 
@@ -106,9 +106,9 @@ const SaveTerrain = (json: { [x: string]: any }) => {
         let x = globals.MAP_MIN_X
         while (x <= globals.MAP_MAX_X) {
             arrayPush(terrainTypesArr, GetTerrainId(x, y))
-            x = x + LARGEUR_CASE
+            x = x + Constants.LARGEUR_CASE
         }
-        y = y + LARGEUR_CASE
+        y = y + Constants.LARGEUR_CASE
     }
 
     json.terrainTypes = terrainTypesArr.join('')
@@ -143,11 +143,11 @@ export function saveTerrainType2Dims() {
             terrainsTypes[xInd][yInd] = getUdgTerrainTypes().getTerrainType(x, y)
 
             xInd++
-            x = x + LARGEUR_CASE
+            x = x + Constants.LARGEUR_CASE
         }
 
         yInd++
-        y = y + LARGEUR_CASE
+        y = y + Constants.LARGEUR_CASE
     }
 
     return terrainsTypes

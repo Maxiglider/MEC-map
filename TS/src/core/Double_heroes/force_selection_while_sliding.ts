@@ -1,4 +1,4 @@
-import { NB_PLAYERS_MAX } from 'core/01_libraries/Constants'
+import { Constants } from 'core/01_libraries/Constants'
 import { ForceSelectHeroes, GetMirrorEscaper } from 'core/04_STRUCTURES/Escaper/Escaper_functions'
 import { createTimer } from 'Utils/mapUtils'
 import { getUdgEscapers } from '../../../globals'
@@ -14,7 +14,7 @@ export const init_forceSelectionWhileSliding = () => {
 
         if (udg_doubleHeroesEnabled) {
             while (true) {
-                if (i >= NB_PLAYERS_MAX) break
+                if (i >= Constants.NB_PLAYERS_MAX) break
                 escaper1 = getUdgEscapers().get(i)
                 if (escaper1 !== null) {
                     escaper2 = GetMirrorEscaper(escaper1)

@@ -7,7 +7,7 @@ import {
     IsOnGround,
     StopUnit,
 } from 'core/01_libraries/Basic_functions'
-import { NB_ESCAPERS } from 'core/01_libraries/Constants'
+import { Constants } from 'core/01_libraries/Constants'
 import { Escaper } from 'core/04_STRUCTURES/Escaper/Escaper'
 import {
     Hero2Escaper,
@@ -224,7 +224,7 @@ const initTurnOnSlide = () => {
         })
 
         //drunk mode
-        forRange(NB_ESCAPERS, i => (udg_drunk[i] = INITIAL_DRUNK))
+        forRange(Constants.NB_ESCAPERS, i => (udg_drunk[i] = INITIAL_DRUNK))
 
         DRUNK_EFFECTS[1] = DRUNK_EFFECT_PETIT
         DRUNK_EFFECTS[2] = DRUNK_EFFECT_MOYEN

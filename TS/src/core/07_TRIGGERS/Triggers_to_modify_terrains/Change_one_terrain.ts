@@ -1,4 +1,4 @@
-import { LARGEUR_CASE } from 'core/01_libraries/Constants'
+import { Constants } from 'core/01_libraries/Constants'
 import { getUdgTerrainTypes, globals } from '../../../../globals'
 import { ChangeTerrainType } from '../Modify_terrain_Functions/Modify_terrain_functions'
 import { GetTerrainData } from '../Modify_terrain_Functions/Terrain_functions'
@@ -17,9 +17,9 @@ const initChangeOneTerrain = () => {
                 if (GetTerrainType(x, y) === oldTerrain) {
                     ChangeTerrainType(x, y, newTerrain)
                 }
-                x = x + LARGEUR_CASE
+                x = x + Constants.LARGEUR_CASE
             }
-            y = y + LARGEUR_CASE
+            y = y + Constants.LARGEUR_CASE
         }
     }
 

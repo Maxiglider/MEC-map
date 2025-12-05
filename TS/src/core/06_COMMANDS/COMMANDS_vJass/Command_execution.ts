@@ -4,7 +4,7 @@ import { Text } from 'core/01_libraries/Text'
 import { Escaper } from 'core/04_STRUCTURES/Escaper/Escaper'
 import { Globals } from 'core/09_From_old_Worldedit_triggers/globals_variables_and_triggers'
 import { getUdgEscapers } from '../../../../globals'
-import { NB_PLAYERS_MAX } from '../../01_libraries/Constants'
+import { Constants } from '../../01_libraries/Constants'
 import { initExecuteCommandMax } from './Command_admin'
 import { initCommandAll } from './Command_all'
 import { initExecuteCommandCheat } from './Command_cheat'
@@ -261,7 +261,9 @@ export const initCommandExecution = () => {
     }
 
     createEvent({
-        events: [t => forRange(NB_PLAYERS_MAX, i => TriggerRegisterPlayerChatEvent(t, Player(i), '-', false))],
+        events: [
+            t => forRange(Constants.NB_PLAYERS_MAX, i => TriggerRegisterPlayerChatEvent(t, Player(i), '-', false)),
+        ],
         actions: [
             () => {
                 if (!IsCmd(GetEventPlayerChatString())) {

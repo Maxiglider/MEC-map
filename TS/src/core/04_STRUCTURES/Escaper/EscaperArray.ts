@@ -1,5 +1,5 @@
 import { IsEscaperInGame } from 'core/01_libraries/Basic_functions'
-import { NB_ESCAPERS } from 'core/01_libraries/Constants'
+import { Constants } from 'core/01_libraries/Constants'
 import { BaseArray } from '../BaseArray'
 import type { Level } from '../Level/Level'
 import { Escaper } from './Escaper'
@@ -8,7 +8,7 @@ export class EscaperArray extends BaseArray<Escaper> {
     constructor() {
         super(false)
 
-        for (let escaperId = 0; escaperId < NB_ESCAPERS; escaperId++) {
+        for (let escaperId = 0; escaperId < Constants.NB_ESCAPERS; escaperId++) {
             if (IsEscaperInGame(escaperId)) {
                 this.data[escaperId] = new Escaper(escaperId)
             }
@@ -28,7 +28,7 @@ export class EscaperArray extends BaseArray<Escaper> {
     }
 
     newAt = (id: number) => {
-        if (id < 0 || id >= NB_ESCAPERS) {
+        if (id < 0 || id >= Constants.NB_ESCAPERS) {
             return
         }
 

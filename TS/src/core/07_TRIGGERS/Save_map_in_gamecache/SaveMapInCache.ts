@@ -1,9 +1,9 @@
 import { MemoryHandler } from 'Utils/MemoryHandler'
+import { Constants } from 'core/01_libraries/Constants'
 import { SaveLoad } from 'core/04_STRUCTURES/Escaper/Escaper_StartCommands'
 import { getUdgCasterTypes, getUdgLevels, getUdgMonsterTypes, getUdgTerrainTypes, globals } from '../../../../globals'
 import { PROD } from '../../../env'
 import { jsonEncode } from '../../01_libraries/Basic_functions'
-import { MEC_SMIC_DATA_FILE_DATE_TPL } from '../../01_libraries/Constants'
 import { Text } from '../../01_libraries/Text'
 import { Gravity } from '../Slide_and_CheckTerrain_triggers/Gravity'
 import { PushTerrainDataIntoJson } from './Save_terrain'
@@ -65,7 +65,8 @@ export class SaveMapInCache {
         if (p === null || GetLocalPlayer() == p) {
             const startTime = os.clock()
 
-            const filename = fileName || MEC_SMIC_DATA_FILE_DATE_TPL.replace('[date]', os.date('%Y-%m-%d_%H-%M-%S'))
+            const filename =
+                fileName || Constants.MEC_SMIC_DATA_FILE_DATE_TPL.replace('[date]', os.date('%Y-%m-%d_%H-%M-%S'))
 
             SaveMapInCache.smicStringObj.str = SaveMapInCache.gameAsJsonString()
 

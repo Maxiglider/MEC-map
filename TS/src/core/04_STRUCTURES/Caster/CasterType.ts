@@ -1,5 +1,5 @@
 import { MemoryHandler } from 'Utils/MemoryHandler'
-import { NB_ESCAPERS, TEAL, TERRAIN_DATA_DISPLAY_TIME } from 'core/01_libraries/Constants'
+import { Constants } from 'core/01_libraries/Constants'
 import { Text } from 'core/01_libraries/Text'
 import { getUdgEscapers, getUdgLevels } from '../../../../globals'
 import { udg_colorCode } from '../../01_libraries/Init_colorCodes'
@@ -61,7 +61,7 @@ export class CasterType {
         const currentLevel = getUdgLevels().getCurrentLevel()
         currentLevel.refreshCastersOfType(this)
 
-        for (let i = 0; i < NB_ESCAPERS; i++) {
+        for (let i = 0; i < Constants.NB_ESCAPERS; i++) {
             const escaper = getUdgEscapers().get(i)
             if (escaper) {
                 if (escaper.getMakingLevel() != currentLevel) {
@@ -155,7 +155,7 @@ export class CasterType {
     toText = (): string => {
         let space = '   '
         const aliasDisplay = this.theAlias ? ' ' + this.theAlias : ''
-        let display = udg_colorCode[TEAL] + this.label + aliasDisplay + ' : '
+        let display = udg_colorCode[Constants.TEAL] + this.label + aliasDisplay + ' : '
         display =
             display +
             this.casterMonsterType.label +
@@ -178,7 +178,7 @@ export class CasterType {
     }
 
     displayForPlayer = (p: player) => {
-        Text.P_timed(p, TERRAIN_DATA_DISPLAY_TIME, this.toText())
+        Text.P_timed(p, Constants.TERRAIN_DATA_DISPLAY_TIME, this.toText())
     }
 
     toJson = () => {

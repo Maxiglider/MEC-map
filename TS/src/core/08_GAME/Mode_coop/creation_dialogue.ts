@@ -1,6 +1,6 @@
 import { ServiceManager } from 'Services'
 import { createEvent, createTimer } from 'Utils/mapUtils'
-import { NB_PLAYERS_MAX } from 'core/01_libraries/Constants'
+import { Constants } from 'core/01_libraries/Constants'
 import { hooks } from 'core/API/GeneralHooks'
 import { globals } from '../../../../globals'
 
@@ -52,12 +52,12 @@ export const gg_trg_apparition_dialogue_et_fermeture_automatique = createEvent({
                 if (
                     (GetPlayerController(Player(i)) === MAP_CONTROL_USER &&
                         GetPlayerSlotState(Player(i)) === PLAYER_SLOT_STATE_PLAYING) ||
-                    i > NB_PLAYERS_MAX - 1
+                    i > Constants.NB_PLAYERS_MAX - 1
                 )
                     break
                 i = i + 1
             }
-            if (i > NB_PLAYERS_MAX - 1) {
+            if (i > Constants.NB_PLAYERS_MAX - 1) {
                 return
             }
             const udg_joueurDialogue = Player(i)

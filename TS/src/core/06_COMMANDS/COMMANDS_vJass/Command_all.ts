@@ -4,18 +4,7 @@ import { EffectUtils } from 'Utils/EffectUtils'
 import { progressionUtils } from 'Utils/ProgressionUtils'
 import { createTimer } from 'Utils/mapUtils'
 import { ClearTextForPlayer, IsBoolString, S2B } from 'core/01_libraries/Basic_functions'
-import {
-    BLUE,
-    DEFAULT_CAMERA_FIELD,
-    GREEN,
-    GREY,
-    LIMIT_NB_HERO_EFFECTS,
-    NB_MAX_TERRAIN_DATA_DISPLAY,
-    NB_PLAYERS_MAX,
-    RED,
-    TEAL,
-    TERRAIN_DATA_DISPLAY_TIME,
-} from 'core/01_libraries/Constants'
+import { Constants } from 'core/01_libraries/Constants'
 import { ColorString2Id, udg_colorCode, udg_colorStrings } from 'core/01_libraries/Init_colorCodes'
 import { Text } from 'core/01_libraries/Text'
 import { Escaper } from 'core/04_STRUCTURES/Escaper/Escaper'
@@ -118,25 +107,28 @@ export const initCommandAll = () => {
                     return true
                 }
                 if (!escaper.setVcRed(I2R(PercentageStringOrX2Integer(param1)))) {
-                    Text.P(escaper.getPlayer(), udg_colorCode[RED] + 'Red : not a correct percentage (' + param1 + ')')
+                    Text.P(
+                        escaper.getPlayer(),
+                        udg_colorCode[Constants.RED] + 'Red : not a correct percentage (' + param1 + ')'
+                    )
                 }
                 if (!escaper.setVcGreen(I2R(PercentageStringOrX2Integer(param2)))) {
                     Text.P(
                         escaper.getPlayer(),
-                        udg_colorCode[GREEN] + 'Green : not a correct percentage (' + param2 + ')'
+                        udg_colorCode[Constants.GREEN] + 'Green : not a correct percentage (' + param2 + ')'
                     )
                 }
                 if (!escaper.setVcBlue(I2R(PercentageStringOrX2Integer(param3)))) {
                     Text.P(
                         escaper.getPlayer(),
-                        udg_colorCode[BLUE] + 'Blue : not a correct percentage (' + param3 + ')'
+                        udg_colorCode[Constants.BLUE] + 'Blue : not a correct percentage (' + param3 + ')'
                     )
                 }
                 if (nbParam === 4) {
                     if (!escaper.setVcTransparency(I2R(PercentageStringOrX2Integer(param4)))) {
                         Text.P(
                             escaper.getPlayer(),
-                            udg_colorCode[GREY] + 'Transparency : not a correct percentage (' + param4 + ')'
+                            udg_colorCode[Constants.GREY] + 'Transparency : not a correct percentage (' + param4 + ')'
                         )
                     }
                 }
@@ -163,7 +155,10 @@ export const initCommandAll = () => {
                 return true
             }
             if (!escaper.setVcRed(I2R(PercentageStringOrX2Integer(param1)))) {
-                Text.P(escaper.getPlayer(), udg_colorCode[RED] + 'Red : not a correct percentage (' + param1 + ')')
+                Text.P(
+                    escaper.getPlayer(),
+                    udg_colorCode[Constants.RED] + 'Red : not a correct percentage (' + param1 + ')'
+                )
                 return true
             }
             escaper.refreshVertexColor()
@@ -188,7 +183,10 @@ export const initCommandAll = () => {
                 return true
             }
             if (!escaper.setVcGreen(I2R(PercentageStringOrX2Integer(param1)))) {
-                Text.P(escaper.getPlayer(), udg_colorCode[GREEN] + 'Green : not a correct percentage (' + param1 + ')')
+                Text.P(
+                    escaper.getPlayer(),
+                    udg_colorCode[Constants.GREEN] + 'Green : not a correct percentage (' + param1 + ')'
+                )
                 return true
             }
             escaper.refreshVertexColor()
@@ -213,7 +211,10 @@ export const initCommandAll = () => {
                 return true
             }
             if (!escaper.setVcBlue(I2R(PercentageStringOrX2Integer(param1)))) {
-                Text.P(escaper.getPlayer(), udg_colorCode[BLUE] + 'Blue : not a correct percentage (' + param1 + ')')
+                Text.P(
+                    escaper.getPlayer(),
+                    udg_colorCode[Constants.BLUE] + 'Blue : not a correct percentage (' + param1 + ')'
+                )
                 return true
             }
             escaper.refreshVertexColor()
@@ -240,7 +241,7 @@ export const initCommandAll = () => {
             if (!escaper.setVcTransparency(I2R(PercentageStringOrX2Integer(param1)))) {
                 Text.P(
                     escaper.getPlayer(),
-                    udg_colorCode[GREY] + 'Transparency : not a correct percentage (' + param1 + ')'
+                    udg_colorCode[Constants.GREY] + 'Transparency : not a correct percentage (' + param1 + ')'
                 )
                 return true
             }
@@ -423,7 +424,7 @@ export const initCommandAll = () => {
             if (nbParam === 1) {
                 if (S2I(param1) !== 0) {
                     n = S2I(param1)
-                    if (n < 1 || n > LIMIT_NB_HERO_EFFECTS) {
+                    if (n < 1 || n > Constants.LIMIT_NB_HERO_EFFECTS) {
                         return true
                     }
                 } else if (isPlayerId(param1)) {
@@ -438,12 +439,12 @@ export const initCommandAll = () => {
                     }
 
                     escaper = targetEscaper
-                    n = LIMIT_NB_HERO_EFFECTS
+                    n = Constants.LIMIT_NB_HERO_EFFECTS
                 } else {
                     n = 0
                 }
             } else {
-                n = LIMIT_NB_HERO_EFFECTS
+                n = Constants.LIMIT_NB_HERO_EFFECTS
             }
             escaper.destroyLastEffects(n)
             return true
@@ -535,7 +536,7 @@ export const initCommandAll = () => {
             if (!noParam) {
                 return true
             }
-            escaper.setCameraField(DEFAULT_CAMERA_FIELD)
+            escaper.setCameraField(Constants.DEFAULT_CAMERA_FIELD)
             return true
         },
     })
@@ -722,7 +723,7 @@ export const initCommandAll = () => {
                         i >= 1 &&
                         i < n &&
                         n <= TerrainTypeNamesAndData.NB_TERRAINS_TOTAL &&
-                        n - i < NB_MAX_TERRAIN_DATA_DISPLAY
+                        n - i < Constants.NB_MAX_TERRAIN_DATA_DISPLAY
                     ) {
                         Text.DisplayLineToPlayer(escaper.getPlayer())
                         while (true) {
@@ -859,8 +860,8 @@ export const initCommandAll = () => {
                 Text.DisplayLineToPlayer(escaper.getPlayer())
                 Text.P_timed(
                     escaper.getPlayer(),
-                    TERRAIN_DATA_DISPLAY_TIME,
-                    udg_colorCode[TEAL] + '       Used terrains :'
+                    Constants.TERRAIN_DATA_DISPLAY_TIME,
+                    udg_colorCode[Constants.TEAL] + '       Used terrains :'
                 )
 
                 let i = 0
@@ -868,9 +869,9 @@ export const initCommandAll = () => {
 
                 while (true) {
                     if (i >= Globals.udg_nb_used_terrains) break
-                    str = udg_colorCode[TEAL] + I2S(i + 1) + ' : '
+                    str = udg_colorCode[Constants.TEAL] + I2S(i + 1) + ' : '
                     str = str + GetTerrainData(Globals.udg_used_terrain_types[i])
-                    Text.P_timed(escaper.getPlayer(), TERRAIN_DATA_DISPLAY_TIME, str)
+                    Text.P_timed(escaper.getPlayer(), Constants.TERRAIN_DATA_DISPLAY_TIME, str)
                     i = i + 1
                 }
             }
@@ -973,8 +974,9 @@ export const initCommandAll = () => {
             if (nbParam === 1 && IsBoolString(param1)) {
                 if (AutoContinueAfterSliding.udg_autoContinueAfterSliding[k] !== S2B(param1)) {
                     AutoContinueAfterSliding.udg_autoContinueAfterSliding[k] = S2B(param1)
-                    if (k < NB_PLAYERS_MAX) {
-                        AutoContinueAfterSliding.udg_autoContinueAfterSliding[k + NB_PLAYERS_MAX] = S2B(param1)
+                    if (k < Constants.NB_PLAYERS_MAX) {
+                        AutoContinueAfterSliding.udg_autoContinueAfterSliding[k + Constants.NB_PLAYERS_MAX] =
+                            S2B(param1)
                     }
 
                     if (S2B(param1)) {
@@ -1981,7 +1983,9 @@ export const initCommandAll = () => {
                     data.comment.toLowerCase().includes(searchTerm)
                 ) {
                     results.push(
-                        `${udg_colorCode[TEAL]}${id}|r - ${udg_colorCode[GREEN]}${data.name}|r - ${udg_colorCode[GREY]}${data.comment}|r`
+                        `${udg_colorCode[Constants.TEAL]}${id}|r - ${udg_colorCode[Constants.GREEN]}${data.name}|r - ${
+                            udg_colorCode[Constants.GREY]
+                        }${data.comment}|r`
                     )
                 }
             }

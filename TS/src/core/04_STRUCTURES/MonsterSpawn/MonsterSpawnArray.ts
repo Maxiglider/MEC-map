@@ -1,5 +1,5 @@
 import { convertTextToAngle } from 'core/01_libraries/Basic_functions'
-import { TERRAIN_DATA_DISPLAY_TIME } from 'core/01_libraries/Constants'
+import { Constants } from 'core/01_libraries/Constants'
 import { Text } from 'core/01_libraries/Text'
 import { getUdgMonsterTypes } from '../../../../globals'
 import { handlePaginationArgs, handlePaginationObj } from '../../06_COMMANDS/COMMANDS_vJass/Pagination'
@@ -128,7 +128,7 @@ export class MonsterSpawnArray extends BaseArray<MonsterSpawn> {
                 Text.erP(p, `no monster spawn for this level`)
             } else {
                 for (const l of pag.cmds) {
-                    Text.P_timed(p, TERRAIN_DATA_DISPLAY_TIME, l)
+                    Text.P_timed(p, Constants.TERRAIN_DATA_DISPLAY_TIME, l)
                 }
             }
         }

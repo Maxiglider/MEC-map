@@ -1,8 +1,8 @@
-import {LARGEUR_CASE} from 'core/01_libraries/Constants'
-import {CanUseTerrain} from "./Terrain_functions";
+import { Constants } from 'core/01_libraries/Constants'
+import { CanUseTerrain } from './Terrain_functions'
 
 export const GetNbCaseBetween = (minX: number, minY: number, maxX: number, maxY: number): number => {
-    return R2I((maxX - minX) / LARGEUR_CASE) * R2I((maxY - minY) / LARGEUR_CASE)
+    return R2I((maxX - minX) / Constants.LARGEUR_CASE) * R2I((maxY - minY) / Constants.LARGEUR_CASE)
 }
 
 export const ChangeTerrainType = (x: number, y: number, terrainTypeId: number) => {
@@ -31,10 +31,10 @@ export const ChangeTerrainBetween = (terrainType: number, x1: number, y1: number
         while (true) {
             if (x > maxX) break
             ChangeTerrainType(x, y, terrainType)
-            x = x + LARGEUR_CASE
+            x = x + Constants.LARGEUR_CASE
         }
         x = minX
-        y = y + LARGEUR_CASE
+        y = y + Constants.LARGEUR_CASE
     }
 
     //call Text.A( "terrain changed to : " + TerrainTypeId2TerrainTypeAsciiString( GetTerrainType( minX, minY ) ) )

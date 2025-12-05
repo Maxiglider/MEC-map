@@ -1,6 +1,6 @@
 import { getUdgEscapers } from '../../../globals'
 import { ServiceManager } from '../../Services'
-import { NB_PLAYERS_MAX } from '../01_libraries/Constants'
+import { Constants } from '../01_libraries/Constants'
 
 export const init_shortcurt_cancelRedo = () => {
     const { ExecuteCommand } = ServiceManager.getService('Cmd')
@@ -15,7 +15,7 @@ export const init_shortcurt_cancelRedo = () => {
         escaper && ExecuteCommand(escaper, '-y')
     }
 
-    for (let i = 0; i < NB_PLAYERS_MAX; i++) {
+    for (let i = 0; i < Constants.NB_PLAYERS_MAX; i++) {
         //cancel
         const trgCancel = CreateTrigger()
 

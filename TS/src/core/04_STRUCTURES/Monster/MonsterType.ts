@@ -1,14 +1,8 @@
 import { MemoryHandler } from 'Utils/MemoryHandler'
+import { Constants } from 'core/01_libraries/Constants'
 import { Text } from 'core/01_libraries/Text'
 import { getUdgEscapers, getUdgLevels } from '../../../../globals'
 import { Ascii2String } from '../../01_libraries/Ascii'
-import {
-    MAX_MOVE_SPEED,
-    NB_ESCAPERS,
-    NEUTRAL_PLAYER,
-    RED,
-    TERRAIN_DATA_DISPLAY_TIME,
-} from '../../01_libraries/Constants'
 import { udg_colorCode } from '../../01_libraries/Init_colorCodes'
 import { Level } from '../Level/Level'
 import { IMMOLATION_SKILLS } from './Immolation_skills'
@@ -35,7 +29,7 @@ export class MonsterType {
         speed: number,
         isClickable: boolean
     ) {
-        if (speed <= 0 || speed > MAX_MOVE_SPEED) {
+        if (speed <= 0 || speed > Constants.MAX_MOVE_SPEED) {
             throw this.constructor.name + ' : wrong speed value "' + speed + '"'
         }
 
@@ -47,7 +41,7 @@ export class MonsterType {
             throw `${this.constructor.name} - '${label}' - '${unitTypeId}' - wrong immolation radius - '${immolationRadius}'`
         }
 
-        const testMonster = CreateUnit(NEUTRAL_PLAYER, unitTypeId, 0, 0, 0)
+        const testMonster = CreateUnit(Constants.NEUTRAL_PLAYER, unitTypeId, 0, 0, 0)
         if (!testMonster) {
             throw `Unit type unknown: ${label}`
         } else {
@@ -85,7 +79,7 @@ export class MonsterType {
         const currentLevel = getUdgLevels().getCurrentLevel()
         currentLevel.recreateMonstersUnitsOfType(this)
 
-        for (let i = 0; i < NB_ESCAPERS; i++) {
+        for (let i = 0; i < Constants.NB_ESCAPERS; i++) {
             let escaper = getUdgEscapers().get(i)
             if (escaper && escaper.getMakingLevel() != currentLevel) {
                 levelAlreadyChecked = false
@@ -118,7 +112,7 @@ export class MonsterType {
     }
 
     setUnitTypeId = (unitTypeId: number): boolean => {
-        let testMonster = CreateUnit(NEUTRAL_PLAYER, unitTypeId, 0, 0, 0)
+        let testMonster = CreateUnit(Constants.NEUTRAL_PLAYER, unitTypeId, 0, 0, 0)
         if (!testMonster) {
             return false
         }
@@ -170,7 +164,7 @@ export class MonsterType {
     }
 
     setUnitMoveSpeed = (speed: number): boolean => {
-        if (speed <= 0 || speed > MAX_MOVE_SPEED) {
+        if (speed <= 0 || speed > Constants.MAX_MOVE_SPEED) {
             return false
         }
         this.speed = speed
@@ -252,7 +246,7 @@ export class MonsterType {
 
     toText = (): string => {
         let space = '   '
-        let display = udg_colorCode[RED] + this.label + (this.theAlias ? ' ' + this.theAlias : '') + " : '"
+        let display = udg_colorCode[Constants.RED] + this.label + (this.theAlias ? ' ' + this.theAlias : '') + " : '"
         let scaleDisplay: string
         let heightDisplay: string
         if (this.scale === -1) {
@@ -293,7 +287,7 @@ export class MonsterType {
     }
 
     displayForPlayer = (p: player) => {
-        Text.P_timed(p, TERRAIN_DATA_DISPLAY_TIME, this.toText())
+        Text.P_timed(p, Constants.TERRAIN_DATA_DISPLAY_TIME, this.toText())
     }
 
     toJson = () => {

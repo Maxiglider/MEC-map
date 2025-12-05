@@ -3,7 +3,7 @@ import { pathingBlockerUtils } from 'Utils/PathingBlockerUtils'
 import { progressionUtils } from 'Utils/ProgressionUtils'
 import { SlideAfterDarkUtils } from 'Utils/SlideAfterDarkUtils'
 import { IsBoolString, S2B } from 'core/01_libraries/Basic_functions'
-import { NB_ESCAPERS } from 'core/01_libraries/Constants'
+import { Constants } from 'core/01_libraries/Constants'
 import { IsInteger, IsPositiveInteger } from 'core/01_libraries/Functions_on_numbers'
 import { Text } from 'core/01_libraries/Text'
 import { Escaper } from 'core/04_STRUCTURES/Escaper/Escaper'
@@ -142,7 +142,7 @@ export const initExecuteCommandCheat = () => {
             if (param2 === 'all' || param2 === 'a') {
                 let i = 0
                 while (true) {
-                    if (i >= NB_ESCAPERS) break
+                    if (i >= Constants.NB_ESCAPERS) break
                     if (getUdgEscapers().get(i) != null) {
                         getUdgEscapers().get(i)?.absoluteSlideSpeed(speed, true)
                     }
@@ -180,7 +180,7 @@ export const initExecuteCommandCheat = () => {
             if (param1 === 'all' || param1 === 'a') {
                 let i = 0
                 while (true) {
-                    if (i >= NB_ESCAPERS) break
+                    if (i >= Constants.NB_ESCAPERS) break
                     if (getUdgEscapers().get(i) != null) {
                         getUdgEscapers().get(i)?.stopAbsoluteSlideSpeed(true)
                     }
@@ -223,7 +223,7 @@ export const initExecuteCommandCheat = () => {
             if (param2 === 'all' || param2 === 'a') {
                 let i = 0
                 while (true) {
-                    if (i >= NB_ESCAPERS) break
+                    if (i >= Constants.NB_ESCAPERS) break
                     if (getUdgEscapers().get(i) != null) {
                         getUdgEscapers().get(i)?.absoluteRotationSpeed(speed)
                     }
@@ -261,7 +261,7 @@ export const initExecuteCommandCheat = () => {
             if (param1 === 'all' || param1 === 'a') {
                 let i = 0
                 while (true) {
-                    if (i >= NB_ESCAPERS) break
+                    if (i >= Constants.NB_ESCAPERS) break
                     if (getUdgEscapers().get(i) != null) {
                         getUdgEscapers().get(i)?.stopAbsoluteRotationSpeed()
                     }
@@ -303,7 +303,7 @@ export const initExecuteCommandCheat = () => {
             if (param2 === 'all' || param2 === 'a') {
                 let i = 0
                 while (true) {
-                    if (i >= NB_ESCAPERS) break
+                    if (i >= Constants.NB_ESCAPERS) break
                     if (getUdgEscapers().get(i) != null) {
                         getUdgEscapers().get(i)?.absoluteWalkSpeed(speed)
                     }
@@ -341,7 +341,7 @@ export const initExecuteCommandCheat = () => {
             if (param1 === 'all' || param1 === 'a') {
                 let i = 0
                 while (true) {
-                    if (i >= NB_ESCAPERS) break
+                    if (i >= Constants.NB_ESCAPERS) break
                     if (getUdgEscapers().get(i) != null) {
                         getUdgEscapers().get(i)?.stopAbsoluteWalkSpeed()
                     }
@@ -787,7 +787,7 @@ export const initExecuteCommandCheat = () => {
             if (param2 === 'all' || param2 === 'a') {
                 let i = 0
                 while (true) {
-                    if (i >= NB_ESCAPERS) break
+                    if (i >= Constants.NB_ESCAPERS) break
                     if (getUdgEscapers().get(i) != null) {
                         getUdgEscapers().get(i)?.setGodMode(b)
                     }
@@ -856,7 +856,7 @@ export const initExecuteCommandCheat = () => {
             if (param2 === 'all' || param2 === 'a') {
                 let i = 0
                 while (true) {
-                    if (i >= NB_ESCAPERS) break
+                    if (i >= Constants.NB_ESCAPERS) break
                     if (getUdgEscapers().get(i) != null) {
                         getUdgEscapers().get(i)?.setGodModeKills(b)
                     }

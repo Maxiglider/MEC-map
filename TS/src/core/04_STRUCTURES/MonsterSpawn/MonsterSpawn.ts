@@ -1,11 +1,11 @@
 import { IDestroyable, MemoryHandler } from 'Utils/MemoryHandler'
 import { IPoint, createPoint } from 'Utils/Point'
 import { createTimer, errorHandler } from 'Utils/mapUtils'
+import { Constants } from 'core/01_libraries/Constants'
 import { CombineHooks } from 'core/API/MecHookArray'
 import { Timer } from 'w3ts'
 import { globals } from '../../../../globals'
 import { GetCurrentMonsterPlayer, arrayPush, convertAngleToDirection } from '../../01_libraries/Basic_functions'
-import { ENNEMY_PLAYER, GREY, MOBS_VARIOUS_COLORS, TERRAIN_DATA_DISPLAY_TIME } from '../../01_libraries/Constants'
 import { udg_colorCode } from '../../01_libraries/Init_colorCodes'
 import { Text } from '../../01_libraries/Text'
 import { hooks } from '../../API/GeneralHooks'
@@ -446,7 +446,7 @@ export class MonsterSpawn {
                     MonsterSpawn.anyTimerId2SpawnAmount.set(GetHandleId(mobTimer), ms.getSpawnAmount())
 
                     TimerStart(mobTimer, DELAY_BETWEEN_SPAWN_AND_MOVEMENT, false, this.MonsterStartMovement)
-                    SetUnitOwner(mobUnit, ENNEMY_PLAYER, false)
+                    SetUnitOwner(mobUnit, Constants.ENNEMY_PLAYER, false)
                     ShowUnit(mobUnit, false)
                     UnitRemoveAbility(mobUnit, FourCC('Aloc'))
                     ms.monsters && GroupAddUnit(ms.monsters, mobUnit)
@@ -638,12 +638,12 @@ export class MonsterSpawn {
             SetUnitY(mobUnit, spawnY)
 
             if (ms.getMonsterType().isClickable()) {
-                p = ENNEMY_PLAYER
+                p = Constants.ENNEMY_PLAYER
             } else {
                 p = GetCurrentMonsterPlayer()
             }
 
-            SetUnitOwner(mobUnit, p, MOBS_VARIOUS_COLORS)
+            SetUnitOwner(mobUnit, p, Constants.MOBS_VARIOUS_COLORS)
             ShowUnit(mobUnit, true)
 
             // Calculate a far away point in the direction, clamped to world bounds
@@ -686,12 +686,12 @@ export class MonsterSpawn {
             SetUnitY(mobUnit, spawnY)
 
             if (ms.getMonsterType().isClickable()) {
-                p = ENNEMY_PLAYER
+                p = Constants.ENNEMY_PLAYER
             } else {
                 p = GetCurrentMonsterPlayer()
             }
 
-            SetUnitOwner(mobUnit, p, MOBS_VARIOUS_COLORS)
+            SetUnitOwner(mobUnit, p, Constants.MOBS_VARIOUS_COLORS)
             ShowUnit(mobUnit, true)
 
             // Calculate a far away point in the direction, clamped to world bounds
@@ -792,12 +792,12 @@ export class MonsterSpawn {
         SetUnitY(mobUnit, ny1)
 
         if (ms.getMonsterType().isClickable()) {
-            p = ENNEMY_PLAYER
+            p = Constants.ENNEMY_PLAYER
         } else {
             p = GetCurrentMonsterPlayer()
         }
 
-        SetUnitOwner(mobUnit, p, MOBS_VARIOUS_COLORS)
+        SetUnitOwner(mobUnit, p, Constants.MOBS_VARIOUS_COLORS)
         ShowUnit(mobUnit, true)
         IssuePointOrder(mobUnit, 'move', nx2, ny2)
     }
@@ -855,7 +855,7 @@ export class MonsterSpawn {
 
             monster = NewImmobileMonsterForPlayer(
                 this.mt,
-                ENNEMY_PLAYER,
+                Constants.ENNEMY_PLAYER,
                 (this.minX + this.maxX) / 2,
                 (this.minY + this.maxY) / 2,
                 angle
@@ -910,7 +910,7 @@ export class MonsterSpawn {
 
     toText = (): string => {
         return (
-            udg_colorCode[GREY] +
+            udg_colorCode[Constants.GREY] +
             this.label +
             ' : ' +
             this.mt.label +
@@ -922,7 +922,7 @@ export class MonsterSpawn {
     }
 
     displayForPlayer = (p: player) => {
-        Text.P_timed(p, TERRAIN_DATA_DISPLAY_TIME, this.toText())
+        Text.P_timed(p, Constants.TERRAIN_DATA_DISPLAY_TIME, this.toText())
     }
 
     getSpawnAmount = () => this.spawnAmount

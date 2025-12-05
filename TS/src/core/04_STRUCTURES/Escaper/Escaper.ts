@@ -5,21 +5,7 @@ import { GetUnitZEx } from 'Utils/LocationUtils'
 import { IPoint, createPoint } from 'Utils/Point'
 import { progressionUtils } from 'Utils/ProgressionUtils'
 import { ForceAngleBetween0And360, IsIssuedOrder, StopUnit } from 'core/01_libraries/Basic_functions'
-import {
-    DEFAULT_CAMERA_FIELD,
-    DUMMY_POWER_CIRCLE,
-    HERO_SECONDARY_TYPE_ID,
-    HERO_SLIDE_SPEED,
-    HERO_TYPE_ID,
-    HERO_WALK_SPEED,
-    INVIS_UNIT_TYPE_ID,
-    NB_PLAYERS_MAX,
-    NB_PLAYERS_MAX_REFORGED,
-    PLAYER_INVIS_UNIT,
-    POWER_CIRCLE,
-    SLIDE_PERIOD,
-    TERRAIN_KILL_EFFECT_BODY_PART,
-} from 'core/01_libraries/Constants'
+import { Constants } from 'core/01_libraries/Constants'
 import { udg_colorCode } from 'core/01_libraries/Init_colorCodes'
 import { Text } from 'core/01_libraries/Text'
 import { MakePropertyChange } from 'core/05_MAKE_STRUCTURES/Make/MakePropertyChange'
@@ -334,28 +320,28 @@ export class Escaper {
      * Constructor
      */
     constructor(escaperId: number) {
-        this.playerId = escaperId >= NB_PLAYERS_MAX ? escaperId - 12 : escaperId
+        this.playerId = escaperId >= Constants.NB_PLAYERS_MAX ? escaperId - 12 : escaperId
 
         this.escaperId = escaperId
         this.p = Player(this.playerId)
-        this.walkSpeed = HERO_WALK_SPEED
-        this.slideSpeed = HERO_SLIDE_SPEED
+        this.walkSpeed = Constants.HERO_WALK_SPEED
+        this.slideSpeed = Constants.HERO_SLIDE_SPEED
         this.rotationSpeed = HERO_ROTATION_SPEED
-        this.slideMovePerPeriod = HERO_SLIDE_SPEED * SLIDE_PERIOD
-        this.maxSlideTurnPerPeriod = HERO_ROTATION_SPEED * SLIDE_PERIOD
+        this.slideMovePerPeriod = Constants.HERO_SLIDE_SPEED * Constants.SLIDE_PERIOD
+        this.maxSlideTurnPerPeriod = HERO_ROTATION_SPEED * Constants.SLIDE_PERIOD
         this.slideCurrentTurnPerPeriod = 0
         this.baseColorId = BlzColor2Id(GetPlayerColor(this.p)) || -1
 
         this.checkTerrain = CheckTerrainTrigger.CreateCheckTerrainTrigger(escaperId)
 
-        this.cameraField = DEFAULT_CAMERA_FIELD
+        this.cameraField = Constants.DEFAULT_CAMERA_FIELD
         SetCameraFieldForPlayer(this.p, CAMERA_FIELD_TARGET_DISTANCE, this.cameraField, 0)
 
         this.effects = new EscaperEffectArray()
         this.vcRed = 100
         this.vcGreen = 100
         this.vcBlue = 100
-        this.vcTransparency = escaperId >= NB_PLAYERS_MAX ? 50 : 0
+        this.vcTransparency = escaperId >= Constants.NB_PLAYERS_MAX ? 50 : 0
 
         this.makeLastActions = new MakeLastActions(this)
 
@@ -386,17 +372,17 @@ export class Escaper {
         //coop
         this.coopInvul = false
 
-        this.powerCircle = CreateUnit(this.p, POWER_CIRCLE, 0, 0, 0)
+        this.powerCircle = CreateUnit(this.p, Constants.POWER_CIRCLE, 0, 0, 0)
         SetUnitUserData(this.powerCircle, escaperId)
         ShowUnit(this.powerCircle, false)
 
-        this.dummyPowerCircle = CreateUnit(this.p, DUMMY_POWER_CIRCLE, 0, 0, 0)
+        this.dummyPowerCircle = CreateUnit(this.p, Constants.DUMMY_POWER_CIRCLE, 0, 0, 0)
         SetUnitUserData(this.dummyPowerCircle, escaperId)
         ShowUnit(this.dummyPowerCircle, false)
 
         this.displayName = removeHash(GetPlayerName(this.p))
 
-        for (let i = 0; i < NB_PLAYERS_MAX; i++) {
+        for (let i = 0; i < Constants.NB_PLAYERS_MAX; i++) {
             this.alliedState[i] = true
         }
 
@@ -447,14 +433,14 @@ export class Escaper {
     //creation method
     createHero(x: number, y: number, angle: number) {
         //retourne false si le héros existe déja
-        let heroTypeId = this.skin || HERO_TYPE_ID
+        let heroTypeId = this.skin || Constants.HERO_TYPE_ID
 
         if (this.hero) {
             return false
         }
 
-        if (this.escaperId >= NB_PLAYERS_MAX) {
-            heroTypeId = HERO_SECONDARY_TYPE_ID
+        if (this.escaperId >= Constants.NB_PLAYERS_MAX) {
+            heroTypeId = Constants.HERO_SECONDARY_TYPE_ID
         }
 
         this.hero = CreateUnit(this.p, heroTypeId, x, y, angle)
@@ -480,7 +466,7 @@ export class Escaper {
 
         globals.heroToEscaperHandles[GetHandleId(this.hero)] = this.escaperId
 
-        if (this.escaperId >= NB_PLAYERS_MAX) {
+        if (this.escaperId >= Constants.NB_PLAYERS_MAX) {
             SetUnitTimeScale(this.hero, this.animSpeedSecondaryHero)
         }
 
@@ -501,7 +487,7 @@ export class Escaper {
 
         this.updateUnitVertexColor()
         this.SpecialIllidan()
-        this.invisUnit = CreateUnit(PLAYER_INVIS_UNIT, INVIS_UNIT_TYPE_ID, x, y, angle)
+        this.invisUnit = CreateUnit(Constants.PLAYER_INVIS_UNIT, Constants.INVIS_UNIT_TYPE_ID, x, y, angle)
         SetUnitUserData(this.invisUnit, GetPlayerId(this.p))
         TriggerRegisterUnitEvent(
             Trig_InvisUnit_is_getting_damage.gg_trg_InvisUnit_is_getting_damage,
@@ -990,7 +976,7 @@ export class Escaper {
             (this.terrainKillEffect = EffectUtils.addSpecialEffectTarget(
                 killEffectStr,
                 this.hero,
-                TERRAIN_KILL_EFFECT_BODY_PART
+                Constants.TERRAIN_KILL_EFFECT_BODY_PART
             ))
     }
 
@@ -1004,7 +990,7 @@ export class Escaper {
             (this.portalEffect = EffectUtils.addSpecialEffectTarget(
                 effectStr,
                 this.hero,
-                TERRAIN_KILL_EFFECT_BODY_PART
+                Constants.TERRAIN_KILL_EFFECT_BODY_PART
             ))
     }
 
@@ -1020,7 +1006,7 @@ export class Escaper {
     //speed methods
     setSlideSpeed(ss: number) {
         this.slideSpeed = ss
-        this.slideMovePerPeriod = ss * SLIDE_PERIOD
+        this.slideMovePerPeriod = ss * Constants.SLIDE_PERIOD
     }
 
     disableSlideSpeedTemporarily() {
@@ -1035,7 +1021,7 @@ export class Escaper {
 
     setSlideSpeedTemporarily(ss: number, duration: number, effect?: string) {
         this.disableSlideSpeedTemporarily()
-        this.tempSlideSpeedPerPeriod = (this.getSlideMirror() ? -1 : 1) * ss * SLIDE_PERIOD
+        this.tempSlideSpeedPerPeriod = (this.getSlideMirror() ? -1 : 1) * ss * Constants.SLIDE_PERIOD
 
         if (this.hero && effect) {
             this.tempSlideSpeedEffect = AddSpecialEffectTargetUnitBJ('origin', this.hero, effect)
@@ -1049,7 +1035,7 @@ export class Escaper {
     //speed methods
     setRotationSpeed(rs: number) {
         this.rotationSpeed = rs //rounds
-        this.maxSlideTurnPerPeriod = rs * SLIDE_PERIOD * 360 //degrees
+        this.maxSlideTurnPerPeriod = rs * Constants.SLIDE_PERIOD * 360 //degrees
     }
 
     getRemainingDegreesToTurn() {
@@ -1233,7 +1219,7 @@ export class Escaper {
 
     //color methods
     setBaseColor(baseColorId: number) {
-        if (baseColorId < 0 || baseColorId >= NB_PLAYERS_MAX_REFORGED) {
+        if (baseColorId < 0 || baseColorId >= Constants.NB_PLAYERS_MAX_REFORGED) {
             return false
         }
         this.baseColorId = baseColorId
@@ -1257,7 +1243,7 @@ export class Escaper {
     }
 
     setBaseColorDisco(baseColorId: number) {
-        if (baseColorId < 0 || baseColorId >= NB_PLAYERS_MAX_REFORGED) {
+        if (baseColorId < 0 || baseColorId >= Constants.NB_PLAYERS_MAX_REFORGED) {
             return false
         }
         this.baseColorId = baseColorId
@@ -1437,7 +1423,7 @@ export class Escaper {
         if (this.spinCamSpeed !== 0 && this.lastTerrainType?.getKind() === 'slide') {
             this.stopSpinCam()
 
-            this.spinCamTimer = createTimer(SLIDE_PERIOD, true, () => {
+            this.spinCamTimer = createTimer(Constants.SLIDE_PERIOD, true, () => {
                 if (this.hero) {
                     SetCameraFieldForPlayer(
                         this.getPlayer(),
@@ -2174,7 +2160,7 @@ export class Escaper {
     }
 
     isEscaperSecondary = () => {
-        return this.escaperId >= NB_PLAYERS_MAX
+        return this.escaperId >= Constants.NB_PLAYERS_MAX
     }
 
     isPortalCooldown = () => this.portalCooldown
@@ -2387,7 +2373,7 @@ export class Escaper {
             if (shadow === false) {
                 // Force toggle it to update the shadow
                 BlzSetUnitSkin(this.hero, this.skin === FourCC('hpea') ? FourCC('hfoo') : FourCC('hpea'))
-                BlzSetUnitSkin(this.hero, this.skin || HERO_TYPE_ID)
+                BlzSetUnitSkin(this.hero, this.skin || Constants.HERO_TYPE_ID)
             } else {
                 // Unfortunately we can't disable the skin, you'll have to recreate the unit
             }

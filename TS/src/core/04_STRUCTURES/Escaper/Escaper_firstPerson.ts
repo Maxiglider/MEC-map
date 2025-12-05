@@ -1,6 +1,6 @@
 import { GetUnitZEx } from 'Utils/LocationUtils'
 import { pathingBlockerUtils } from 'Utils/PathingBlockerUtils'
-import { NB_ESCAPERS } from 'core/01_libraries/Constants'
+import { Constants } from 'core/01_libraries/Constants'
 import { AfkMode } from 'core/08_GAME/Afk_mode/Afk_mode'
 import { Timer } from 'w3ts'
 import { getUdgEscapers, globals } from '../../../../globals'
@@ -134,7 +134,10 @@ export const initFirstPerson = () => {
         keys.forEach(({ key, blzKey }) => {
             createEvent({
                 events: [
-                    t => forRange(NB_ESCAPERS, i => TriggerRegisterPlayerKeyEventBJ(t, Player(i), blzKeyDown, blzKey)),
+                    t =>
+                        forRange(Constants.NB_ESCAPERS, i =>
+                            TriggerRegisterPlayerKeyEventBJ(t, Player(i), blzKeyDown, blzKey)
+                        ),
                 ],
                 actions: [
                     () => {

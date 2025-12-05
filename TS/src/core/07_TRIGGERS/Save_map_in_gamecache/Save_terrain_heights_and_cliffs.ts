@@ -1,5 +1,5 @@
 import { arrayPush, IsNearBounds } from 'core/01_libraries/Basic_functions'
-import { LARGEUR_CASE } from 'core/01_libraries/Constants'
+import { Constants } from 'core/01_libraries/Constants'
 import { Text } from 'core/01_libraries/Text'
 import { ZLibrary } from 'core/02_bibliotheques_externes/ZLibrary'
 import { MemoryHandler } from 'Utils/MemoryHandler'
@@ -35,9 +35,9 @@ const initSaveTerrainHeights = () => {
 
                 arrayPush(terrainCliffsArr, I2HexaString(cliffLevel))
 
-                x = x + LARGEUR_CASE
+                x = x + Constants.LARGEUR_CASE
             }
-            y = y + LARGEUR_CASE
+            y = y + Constants.LARGEUR_CASE
         }
 
         json.terrainCliffs = cachedTerrainCliffs = terrainCliffsArr.join('')
@@ -74,9 +74,9 @@ const initSaveTerrainHeights = () => {
 
                 arrayPush(json.terrainHeights, R2I(height))
 
-                x = x + LARGEUR_CASE
+                x = x + Constants.LARGEUR_CASE
             }
-            y = y + LARGEUR_CASE
+            y = y + Constants.LARGEUR_CASE
         }
 
         Text.A('terrain heights saved')

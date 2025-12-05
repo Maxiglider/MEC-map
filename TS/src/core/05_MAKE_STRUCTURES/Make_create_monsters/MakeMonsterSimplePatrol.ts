@@ -1,6 +1,6 @@
 import { GetLocDist } from 'core/01_libraries/Basic_functions'
+import { Constants } from 'core/01_libraries/Constants'
 import { Text } from 'core/01_libraries/Text'
-import { PATROL_DISTANCE_MIN } from '../../01_libraries/Constants'
 import { Monster } from '../../04_STRUCTURES/Monster/Monster'
 import { createMonsterSmartPatrol } from '../../04_STRUCTURES/Monster/MonsterSimplePatrol'
 import { MonsterType } from '../../04_STRUCTURES/Monster/MonsterType'
@@ -64,7 +64,7 @@ export class MakeMonsterSimplePatrol extends MakeOneByOneOrTwoClicks {
             //normal or string modes
             if (['normal', 'string'].includes(this.getMode())) {
                 if (this.isLastLocSavedUsed()) {
-                    if (GetLocDist(this.lastX, this.lastY, this.orderX, this.orderY) <= PATROL_DISTANCE_MIN) {
+                    if (GetLocDist(this.lastX, this.lastY, this.orderX, this.orderY) <= Constants.PATROL_DISTANCE_MIN) {
                         Text.erP(this.makerOwner, 'Too close to the start location !')
                         return
                     } else {

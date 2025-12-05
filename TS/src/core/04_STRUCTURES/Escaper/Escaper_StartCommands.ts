@@ -1,5 +1,5 @@
 import { arrayPush, IsEscaperInGame, jsonDecode, jsonEncode } from 'core/01_libraries/Basic_functions'
-import { MEC_MSC_DATA_FILE } from 'core/01_libraries/Constants'
+import { Constants } from 'core/01_libraries/Constants'
 import { ServiceManager } from 'Services'
 import { initSaveLoad } from '../../../Utils/SaveLoad/SaveLoad'
 import { Escaper } from './Escaper'
@@ -27,7 +27,7 @@ export class EscaperStartCommands {
             return
         }
 
-        SaveLoad.readFile(MEC_MSC_DATA_FILE, this.escaper.getPlayer(), data => {
+        SaveLoad.readFile(Constants.MEC_MSC_DATA_FILE, this.escaper.getPlayer(), data => {
             if (data.length === 0) {
                 this.loaded = true
                 return
@@ -83,7 +83,7 @@ export class EscaperStartCommands {
     }
 
     saveStartCommands = () => {
-        SaveLoad.saveFile(MEC_MSC_DATA_FILE, this.escaper.getPlayer(), jsonEncode(this.startCommands))
+        SaveLoad.saveFile(Constants.MEC_MSC_DATA_FILE, this.escaper.getPlayer(), jsonEncode(this.startCommands))
     }
 
     isLoaded = () => this.loaded

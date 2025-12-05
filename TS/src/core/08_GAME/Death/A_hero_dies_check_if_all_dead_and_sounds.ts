@@ -1,7 +1,7 @@
 import { MemoryHandler } from 'Utils/MemoryHandler'
 import { createEvent, runInTrigger } from 'Utils/mapUtils'
 import { arrayPush } from 'core/01_libraries/Basic_functions'
-import { COOP_REVIVE_DIST, NB_ESCAPERS } from 'core/01_libraries/Constants'
+import { Constants } from 'core/01_libraries/Constants'
 import { IsHero } from 'core/04_STRUCTURES/Escaper/Escaper_functions'
 import { sameLevelProgression } from 'core/04_STRUCTURES/Level/LevelProgression'
 import { getUdgEscapers, getUdgTerrainTypes, globals } from '../../../../globals'
@@ -61,7 +61,7 @@ export const InitTrig_A_hero_dies_check_if_all_dead_and_sounds = () => {
 
                 const escaperIds = reviveTrigManager.createGroup()
 
-                for (let i = 0; i < NB_ESCAPERS; i++) {
+                for (let i = 0; i < Constants.NB_ESCAPERS; i++) {
                     if (
                         getUdgEscapers().get(i)?.isAlive() &&
                         !getUdgEscapers().get(i)?.hasAutorevive() &&
@@ -153,7 +153,7 @@ export const InitTrig_A_hero_dies_check_if_all_dead_and_sounds = () => {
 
                         if (globals.coopCircles) {
                             //revive si autre héros (vivant) au même endroit
-                            for (let i = 0; i < NB_ESCAPERS; i++) {
+                            for (let i = 0; i < Constants.NB_ESCAPERS; i++) {
                                 if (i !== n && getUdgEscapers().get(i)?.isAlive()) {
                                     const h1 = getUdgEscapers().get(i)?.getHero()
 
@@ -164,7 +164,7 @@ export const InitTrig_A_hero_dies_check_if_all_dead_and_sounds = () => {
                                     const diffX = GetUnitX(h1) - GetUnitX(hero2)
                                     const diffY = GetUnitY(h1) - GetUnitY(hero2)
 
-                                    if (SquareRoot(diffX * diffX + diffY * diffY) < COOP_REVIVE_DIST) {
+                                    if (SquareRoot(diffX * diffX + diffY * diffY) < Constants.COOP_REVIVE_DIST) {
                                         getUdgEscapers().get(n)?.coopReviveHero()
                                         TriggerSleepAction(3.7)
                                         udg_nbKilled = udg_nbKilled - 1

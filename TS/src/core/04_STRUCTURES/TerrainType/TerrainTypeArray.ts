@@ -3,7 +3,7 @@ import { MemoryHandler } from 'Utils/MemoryHandler'
 import { MazeUtils } from 'Utils/vToto'
 import { Ascii2String } from 'core/01_libraries/Ascii'
 import { arrayPush, tileset2tilesetChar } from 'core/01_libraries/Basic_functions'
-import { TERRAIN_DATA_DISPLAY_TIME } from 'core/01_libraries/Constants'
+import { Constants } from 'core/01_libraries/Constants'
 import { Text } from 'core/01_libraries/Text'
 import { globals } from '../../../../globals'
 import { CmdParam, NbParam } from '../../06_COMMANDS/COMMANDS_vJass/Command_functions'
@@ -167,7 +167,7 @@ export class TerrainTypeArray extends BaseArray<TerrainType> {
                 Text.erP(p, `no terrain type saved`)
             } else {
                 for (const l of pag.cmds) {
-                    Text.P_timed(p, TERRAIN_DATA_DISPLAY_TIME, l)
+                    Text.P_timed(p, Constants.TERRAIN_DATA_DISPLAY_TIME, l)
                 }
             }
         }

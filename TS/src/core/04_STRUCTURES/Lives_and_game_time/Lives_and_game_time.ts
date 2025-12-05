@@ -1,20 +1,20 @@
-import { NB_LIVES_AT_BEGINNING } from 'core/01_libraries/Constants'
+import { Constants } from 'core/01_libraries/Constants'
 import { udg_colorCode } from 'core/01_libraries/Init_colorCodes'
 import { Text } from 'core/01_libraries/Text'
 import { ServiceManager } from 'Services'
 import { createTimer } from 'Utils/mapUtils'
 import { getUdgLevels } from '../../../../globals'
 
-export const LIVES_PLAYER = Player(6) //GREEN
+export const LIVES_PLAYER = Player(6) //Constants.GREEN
 
 export type ILives = ReturnType<typeof initLives>
 
 export const initLives = () => {
-    let nb = NB_LIVES_AT_BEGINNING
+    let nb = Constants.NB_LIVES_AT_BEGINNING
 
     const initLives = () => {
         createTimer(0, false, () => {
-            nb = getUdgLevels().get(0)?.getNbLives() || NB_LIVES_AT_BEGINNING
+            nb = getUdgLevels().get(0)?.getNbLives() || Constants.NB_LIVES_AT_BEGINNING
             ServiceManager.getService('Multiboard').updateLives(nb)
         })
     }

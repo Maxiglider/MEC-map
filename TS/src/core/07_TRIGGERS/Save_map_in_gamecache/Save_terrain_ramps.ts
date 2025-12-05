@@ -1,5 +1,5 @@
 import { arrayPush, IsNearBounds } from 'core/01_libraries/Basic_functions'
-import { LARGEUR_CASE } from 'core/01_libraries/Constants'
+import { Constants } from 'core/01_libraries/Constants'
 import { Text } from 'core/01_libraries/Text'
 import { MemoryHandler } from 'Utils/MemoryHandler'
 import { globals } from '../../../../globals'
@@ -39,11 +39,11 @@ if one of the N tilepoints is at a cliff level different than CL or CL+1, the ra
             while (true) {
                 if (diff > 1) break
                 if (isRampDirectionX) {
-                    x2 = x + diff * LARGEUR_CASE
-                    y2 = y + sens * LARGEUR_CASE
+                    x2 = x + diff * Constants.LARGEUR_CASE
+                    y2 = y + sens * Constants.LARGEUR_CASE
                 } else {
-                    x2 = x + sens * LARGEUR_CASE
-                    y2 = y + diff * LARGEUR_CASE
+                    x2 = x + sens * Constants.LARGEUR_CASE
+                    y2 = y + diff * Constants.LARGEUR_CASE
                 }
                 diffCliffLevel = GetTerrainCliffLevel(x2, y2) - middleRampcliffLevel
                 if (diffCliffLevel < 0 || diffCliffLevel > 1) {
@@ -95,12 +95,12 @@ if one of the N tilepoints is at a cliff level different than CL or CL+1, the ra
 
                     if (!isRampMiddleRaisedB) {
                         //droite
-                        otherX = x + LARGEUR_CASE
+                        otherX = x + Constants.LARGEUR_CASE
                         otherY = y
                         if (otherX <= globals.MAP_MAX_X) {
                             otherCliffLevel = GetTerrainCliffLevel(otherX, otherY)
 
-                            otherX = x + LARGEUR_CASE / 2
+                            otherX = x + Constants.LARGEUR_CASE / 2
                             walkable =
                                 !IsTerrainPathable(otherX, otherY + DECAL_TEST_PATH, PATHING_TYPE_WALKABILITY) ||
                                 !IsTerrainPathable(otherX, otherY - DECAL_TEST_PATH, PATHING_TYPE_WALKABILITY)
@@ -113,9 +113,9 @@ if one of the N tilepoints is at a cliff level different than CL or CL+1, the ra
                                     //ce n'est pas walkable, mais il y a peut-être une rampe, de largeur 1
                                     //si ce n'est pas walkable non plus en bas de la falaise, c'est qu'il y a une rampe
                                     if (currentCliffLevel > otherCliffLevel) {
-                                        otherX = x + (3 * LARGEUR_CASE) / 2
+                                        otherX = x + (3 * Constants.LARGEUR_CASE) / 2
                                     } else {
-                                        otherX = x - LARGEUR_CASE / 2
+                                        otherX = x - Constants.LARGEUR_CASE / 2
                                     }
                                     walkable2 =
                                         !IsTerrainPathable(
@@ -128,10 +128,10 @@ if one of the N tilepoints is at a cliff level different than CL or CL+1, the ra
                                         //il y a une rampe à condition que les deux points en bas de la falaise soient au même niveau de falaise et pas à la même hauteur
                                         if (currentCliffLevel < otherCliffLevel) {
                                             MoveLocation(loc1, x, y)
-                                            MoveLocation(loc2, x - LARGEUR_CASE, y)
+                                            MoveLocation(loc2, x - Constants.LARGEUR_CASE, y)
                                         } else {
                                             MoveLocation(loc1, otherX, y)
-                                            MoveLocation(loc2, otherX + LARGEUR_CASE, y)
+                                            MoveLocation(loc2, otherX + Constants.LARGEUR_CASE, y)
                                         }
                                         if (
                                             GetLocationZ(loc1) !== GetLocationZ(loc2) && //todomax remove leak locations
@@ -150,23 +150,23 @@ if one of the N tilepoints is at a cliff level different than CL or CL+1, the ra
                             } else {
                                 //il n'y a pas de falaise entre les deux ; si ce n'est pas walkable, il y a une rampe de largeur 1 s'il y a une falaise ensuite vers le haut de différence 1
                                 if (!walkable) {
-                                    otherX = x + LARGEUR_CASE * 2
+                                    otherX = x + Constants.LARGEUR_CASE * 2
                                     otherCliffLevel2 = GetTerrainCliffLevel(otherX, otherY)
                                     if (otherCliffLevel2 - currentCliffLevel === 1) {
                                         //il y a une rampe sauf si les deux points en bas de la falaise sont à la même hauteur
                                         MoveLocation(loc1, x, y)
-                                        MoveLocation(loc2, x + LARGEUR_CASE, y)
+                                        MoveLocation(loc2, x + Constants.LARGEUR_CASE, y)
                                         if (GetLocationZ(loc1) !== GetLocationZ(loc2)) {
                                             ramp = true
                                         }
                                     }
                                 } else {
                                     //il peut y avoir une rampe s'il y a une falaise juste après, vers le haut et walkable
-                                    otherX = x + LARGEUR_CASE * 2
+                                    otherX = x + Constants.LARGEUR_CASE * 2
                                     if (otherX <= globals.MAP_MAX_X) {
                                         otherCliffLevel2 = GetTerrainCliffLevel(otherX, otherY)
                                         if (currentCliffLevel < otherCliffLevel2) {
-                                            otherX = otherX - LARGEUR_CASE / 2
+                                            otherX = otherX - Constants.LARGEUR_CASE / 2
                                             walkable2 =
                                                 !IsTerrainPathable(
                                                     otherX,
@@ -190,12 +190,12 @@ if one of the N tilepoints is at a cliff level different than CL or CL+1, the ra
 
                     if (!isRampMiddleRaisedB) {
                         //gauche
-                        otherX = x - LARGEUR_CASE
+                        otherX = x - Constants.LARGEUR_CASE
                         otherY = y
                         if (otherX >= globals.MAP_MIN_X) {
                             otherCliffLevel = GetTerrainCliffLevel(otherX, otherY)
 
-                            otherX = x - LARGEUR_CASE / 2
+                            otherX = x - Constants.LARGEUR_CASE / 2
                             walkable =
                                 !IsTerrainPathable(otherX, otherY + DECAL_TEST_PATH, PATHING_TYPE_WALKABILITY) ||
                                 !IsTerrainPathable(otherX, otherY - DECAL_TEST_PATH, PATHING_TYPE_WALKABILITY)
@@ -208,9 +208,9 @@ if one of the N tilepoints is at a cliff level different than CL or CL+1, the ra
                                     //ce n'est pas walkable, mais il y a peut-être une rampe, de largeur 1
                                     //si ce n'est pas walkable non plus en bas de la falaise, c'est qu'il y a une rampe
                                     if (currentCliffLevel > otherCliffLevel) {
-                                        otherX = x - (3 * LARGEUR_CASE) / 2
+                                        otherX = x - (3 * Constants.LARGEUR_CASE) / 2
                                     } else {
-                                        otherX = x + LARGEUR_CASE / 2
+                                        otherX = x + Constants.LARGEUR_CASE / 2
                                     }
                                     walkable2 =
                                         !IsTerrainPathable(
@@ -223,10 +223,10 @@ if one of the N tilepoints is at a cliff level different than CL or CL+1, the ra
                                         //il y a une rampe à condition que les deux points en bas de la falaise soient au même niveau de falaise et pas à la même hauteur
                                         if (currentCliffLevel < otherCliffLevel) {
                                             MoveLocation(loc1, x, y)
-                                            MoveLocation(loc2, x + LARGEUR_CASE, y)
+                                            MoveLocation(loc2, x + Constants.LARGEUR_CASE, y)
                                         } else {
                                             MoveLocation(loc1, otherX, y)
-                                            MoveLocation(loc2, otherX - LARGEUR_CASE, y)
+                                            MoveLocation(loc2, otherX - Constants.LARGEUR_CASE, y)
                                         }
                                         if (
                                             GetLocationZ(loc1) !== GetLocationZ(loc2) &&
@@ -245,23 +245,23 @@ if one of the N tilepoints is at a cliff level different than CL or CL+1, the ra
                             } else {
                                 //il n'y a pas de falaise entre les deux ; si ce n'est pas walkable, il y a une rampe de largeur 1 s'il y a une falaise ensuite vers le haut de différence 1
                                 if (!walkable) {
-                                    otherX = x - LARGEUR_CASE * 2
+                                    otherX = x - Constants.LARGEUR_CASE * 2
                                     otherCliffLevel2 = GetTerrainCliffLevel(otherX, otherY)
                                     if (otherCliffLevel2 - currentCliffLevel === 1) {
                                         //il y a une rampe sauf si les deux points en bas de la falaise sont à la même hauteur
                                         MoveLocation(loc1, x, y)
-                                        MoveLocation(loc2, x - LARGEUR_CASE, y)
+                                        MoveLocation(loc2, x - Constants.LARGEUR_CASE, y)
                                         if (GetLocationZ(loc1) !== GetLocationZ(loc2)) {
                                             ramp = true
                                         }
                                     }
                                 } else {
                                     //il peut y avoir une rampe s'il y a une falaise juste après, vers le haut et walkable
-                                    otherX = x - LARGEUR_CASE * 2
+                                    otherX = x - Constants.LARGEUR_CASE * 2
                                     if (otherX >= globals.MAP_MIN_X) {
                                         otherCliffLevel2 = GetTerrainCliffLevel(otherX, otherY)
                                         if (currentCliffLevel < otherCliffLevel2) {
-                                            otherX = otherX + LARGEUR_CASE / 2
+                                            otherX = otherX + Constants.LARGEUR_CASE / 2
                                             walkable2 =
                                                 !IsTerrainPathable(
                                                     otherX,
@@ -286,11 +286,11 @@ if one of the N tilepoints is at a cliff level different than CL or CL+1, the ra
                     if (!isRampMiddleRaisedB) {
                         //haut
                         otherX = x
-                        otherY = y + LARGEUR_CASE
+                        otherY = y + Constants.LARGEUR_CASE
                         if (otherY <= globals.MAP_MAX_Y) {
                             otherCliffLevel = GetTerrainCliffLevel(otherX, otherY)
 
-                            otherY = y + LARGEUR_CASE / 2
+                            otherY = y + Constants.LARGEUR_CASE / 2
                             walkable =
                                 !IsTerrainPathable(otherX + DECAL_TEST_PATH, otherY, PATHING_TYPE_WALKABILITY) ||
                                 !IsTerrainPathable(otherX - DECAL_TEST_PATH, otherY, PATHING_TYPE_WALKABILITY)
@@ -303,9 +303,9 @@ if one of the N tilepoints is at a cliff level different than CL or CL+1, the ra
                                     //ce n'est pas walkable, mais il y a peut-être une rampe, de largeur 1
                                     //si ce n'est pas walkable non plus en bas de la falaise, c'est qu'il y a une rampe
                                     if (currentCliffLevel > otherCliffLevel) {
-                                        otherY = y + (3 * LARGEUR_CASE) / 2
+                                        otherY = y + (3 * Constants.LARGEUR_CASE) / 2
                                     } else {
-                                        otherY = y - LARGEUR_CASE / 2
+                                        otherY = y - Constants.LARGEUR_CASE / 2
                                     }
                                     walkable2 =
                                         !IsTerrainPathable(
@@ -318,10 +318,10 @@ if one of the N tilepoints is at a cliff level different than CL or CL+1, the ra
                                         //il y a une rampe à condition que les deux points en bas de la falaise soient au même niveau de falaise et pas à la même hauteur
                                         if (currentCliffLevel < otherCliffLevel) {
                                             MoveLocation(loc1, x, y)
-                                            MoveLocation(loc2, x, y - LARGEUR_CASE)
+                                            MoveLocation(loc2, x, y - Constants.LARGEUR_CASE)
                                         } else {
                                             MoveLocation(loc1, x, otherY)
-                                            MoveLocation(loc2, x, otherY + LARGEUR_CASE)
+                                            MoveLocation(loc2, x, otherY + Constants.LARGEUR_CASE)
                                         }
                                         if (
                                             GetLocationZ(loc1) !== GetLocationZ(loc2) &&
@@ -340,23 +340,23 @@ if one of the N tilepoints is at a cliff level different than CL or CL+1, the ra
                             } else {
                                 //il n'y a pas de falaise entre les deux ; si ce n'est pas walkable, il y a une rampe de largeur 1 s'il y a une falaise ensuite vers le haut de différence 1
                                 if (!walkable) {
-                                    otherY = y + LARGEUR_CASE * 2
+                                    otherY = y + Constants.LARGEUR_CASE * 2
                                     otherCliffLevel2 = GetTerrainCliffLevel(otherX, otherY)
                                     if (otherCliffLevel2 - currentCliffLevel === 1) {
                                         //il y a une rampe sauf si les deux points en bas de la falaise sont à la même hauteur
                                         MoveLocation(loc1, x, y)
-                                        MoveLocation(loc2, x, y + LARGEUR_CASE)
+                                        MoveLocation(loc2, x, y + Constants.LARGEUR_CASE)
                                         if (GetLocationZ(loc1) !== GetLocationZ(loc2)) {
                                             ramp = true
                                         }
                                     }
                                 } else {
                                     //il peut y avoir une rampe s'il y a une falaise juste après, vers le haut et walkable
-                                    otherY = y + LARGEUR_CASE * 2
+                                    otherY = y + Constants.LARGEUR_CASE * 2
                                     if (otherY <= globals.MAP_MAX_Y) {
                                         otherCliffLevel2 = GetTerrainCliffLevel(otherX, otherY)
                                         if (currentCliffLevel < otherCliffLevel2) {
-                                            otherY = otherY - LARGEUR_CASE / 2
+                                            otherY = otherY - Constants.LARGEUR_CASE / 2
                                             walkable2 =
                                                 !IsTerrainPathable(
                                                     otherX + DECAL_TEST_PATH,
@@ -381,11 +381,11 @@ if one of the N tilepoints is at a cliff level different than CL or CL+1, the ra
                     if (!isRampMiddleRaisedB) {
                         //bas
                         otherX = x
-                        otherY = y - LARGEUR_CASE
+                        otherY = y - Constants.LARGEUR_CASE
                         if (otherY >= globals.MAP_MIN_Y) {
                             otherCliffLevel = GetTerrainCliffLevel(otherX, otherY)
 
-                            otherY = y - LARGEUR_CASE / 2
+                            otherY = y - Constants.LARGEUR_CASE / 2
                             walkable =
                                 !IsTerrainPathable(otherX + DECAL_TEST_PATH, otherY, PATHING_TYPE_WALKABILITY) ||
                                 !IsTerrainPathable(otherX - DECAL_TEST_PATH, otherY, PATHING_TYPE_WALKABILITY)
@@ -398,9 +398,9 @@ if one of the N tilepoints is at a cliff level different than CL or CL+1, the ra
                                     //ce n'est pas walkable, mais il y a peut-être une rampe, de largeur 1
                                     //si ce n'est pas walkable non plus en bas de la falaise, c'est qu'il y a une rampe
                                     if (currentCliffLevel > otherCliffLevel) {
-                                        otherY = y - (3 * LARGEUR_CASE) / 2
+                                        otherY = y - (3 * Constants.LARGEUR_CASE) / 2
                                     } else {
-                                        otherY = y + LARGEUR_CASE / 2
+                                        otherY = y + Constants.LARGEUR_CASE / 2
                                     }
                                     walkable2 =
                                         !IsTerrainPathable(
@@ -413,10 +413,10 @@ if one of the N tilepoints is at a cliff level different than CL or CL+1, the ra
                                         //il y a une rampe à condition que les deux points en bas de la falaise soient au même niveau de falaise et pas à la même hauteur
                                         if (currentCliffLevel < otherCliffLevel) {
                                             MoveLocation(loc1, x, y)
-                                            MoveLocation(loc2, x, y + LARGEUR_CASE)
+                                            MoveLocation(loc2, x, y + Constants.LARGEUR_CASE)
                                         } else {
                                             MoveLocation(loc1, x, otherY)
-                                            MoveLocation(loc2, x, otherY - LARGEUR_CASE)
+                                            MoveLocation(loc2, x, otherY - Constants.LARGEUR_CASE)
                                         }
                                         if (
                                             GetLocationZ(loc1) !== GetLocationZ(loc2) &&
@@ -435,23 +435,23 @@ if one of the N tilepoints is at a cliff level different than CL or CL+1, the ra
                             } else {
                                 //il n'y a pas de falaise entre les deux ; si ce n'est pas walkable, il y a une rampe de largeur 1 s'il y a une falaise ensuite vers le haut de différence 1
                                 if (!walkable) {
-                                    otherY = y - LARGEUR_CASE * 2
+                                    otherY = y - Constants.LARGEUR_CASE * 2
                                     otherCliffLevel2 = GetTerrainCliffLevel(otherX, otherY)
                                     if (otherCliffLevel2 - currentCliffLevel === 1) {
                                         //il y a une rampe sauf si les deux points en bas de la falaise sont à la même hauteur
                                         MoveLocation(loc1, x, y)
-                                        MoveLocation(loc2, x, y - LARGEUR_CASE)
+                                        MoveLocation(loc2, x, y - Constants.LARGEUR_CASE)
                                         if (GetLocationZ(loc1) !== GetLocationZ(loc2)) {
                                             ramp = true
                                         }
                                     }
                                 } else {
                                     //il peut y avoir une rampe s'il y a une falaise juste après, vers le haut et walkable
-                                    otherY = y - LARGEUR_CASE * 2
+                                    otherY = y - Constants.LARGEUR_CASE * 2
                                     if (otherY >= globals.MAP_MIN_Y) {
                                         otherCliffLevel2 = GetTerrainCliffLevel(otherX, otherY)
                                         if (currentCliffLevel < otherCliffLevel2) {
-                                            otherY = otherY + LARGEUR_CASE / 2
+                                            otherY = otherY + Constants.LARGEUR_CASE / 2
                                             walkable2 =
                                                 !IsTerrainPathable(
                                                     otherX + DECAL_TEST_PATH,
@@ -481,14 +481,14 @@ if one of the N tilepoints is at a cliff level different than CL or CL+1, the ra
                             signX = -1
                             while (true) {
                                 if (ramp || signX > 1) break
-                                otherX = x + LARGEUR_CASE * signX
-                                otherY = y + LARGEUR_CASE * signY
+                                otherX = x + Constants.LARGEUR_CASE * signX
+                                otherY = y + Constants.LARGEUR_CASE * signY
                                 otherCliffLevel = GetTerrainCliffLevel(otherX, otherY)
                                 //call BJDebugMsg("signX : " + R2S(signX) + " ; signY : " + R2S(signY) + " ; x : " + R2S(otherX) + " ; y : " + R2S(otherY))
                                 //on ne prend en compte que si ça monte et que c'est walkable
                                 if (currentCliffLevel < otherCliffLevel) {
-                                    otherX = x + (LARGEUR_CASE * signX) / 2
-                                    otherY = y + (LARGEUR_CASE * signY) / 2
+                                    otherX = x + (Constants.LARGEUR_CASE * signX) / 2
+                                    otherY = y + (Constants.LARGEUR_CASE * signY) / 2
                                     walkable = !IsTerrainPathable(otherX, otherY, PATHING_TYPE_WALKABILITY)
                                     if (walkable) {
                                         ramp = true
@@ -516,9 +516,9 @@ if one of the N tilepoints is at a cliff level different than CL or CL+1, the ra
 
                 arrayPush(terrainRampsArr, rampStr)
 
-                x = x + LARGEUR_CASE
+                x = x + Constants.LARGEUR_CASE
             }
-            y = y + LARGEUR_CASE
+            y = y + Constants.LARGEUR_CASE
         }
 
         json.terrainRamps = cachedTerrainRamps = terrainRampsArr.join('')

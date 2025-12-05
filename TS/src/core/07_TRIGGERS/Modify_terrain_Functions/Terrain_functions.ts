@@ -1,15 +1,15 @@
-import {NB_MAX_OF_TERRAINS, RED, TERRAIN_DATA_DISPLAY_TIME} from 'core/01_libraries/Constants'
+import { Constants } from 'core/01_libraries/Constants'
 import {
     COLOR_TERRAIN_DEATH,
     COLOR_TERRAIN_SLIDE,
     COLOR_TERRAIN_WALK,
     udg_colorCode,
 } from 'core/01_libraries/Init_colorCodes'
-import type {TerrainType} from 'core/04_STRUCTURES/TerrainType/TerrainType'
-import {Globals} from 'core/09_From_old_Worldedit_triggers/globals_variables_and_triggers'
-import {TerrainTypeMax} from './Terrain_type_max'
-import {TerrainTypeNamesAndData} from './Terrain_type_names_and_data'
-import {TerrainTypeId2TerrainType} from "../../04_STRUCTURES/TerrainType/Terrain_type_functions";
+import type { TerrainType } from 'core/04_STRUCTURES/TerrainType/TerrainType'
+import { Globals } from 'core/09_From_old_Worldedit_triggers/globals_variables_and_triggers'
+import { TerrainTypeId2TerrainType } from '../../04_STRUCTURES/TerrainType/Terrain_type_functions'
+import { TerrainTypeMax } from './Terrain_type_max'
+import { TerrainTypeNamesAndData } from './Terrain_type_names_and_data'
 
 export const IsTerrainAlreadyUsed = (terrainType: number): boolean => {
     let i = 0
@@ -23,7 +23,7 @@ export const IsTerrainAlreadyUsed = (terrainType: number): boolean => {
 }
 
 export const IsTerrainsLimitNumberReached = (): boolean => {
-    return Globals.udg_nb_used_terrains === NB_MAX_OF_TERRAINS
+    return Globals.udg_nb_used_terrains === Constants.NB_MAX_OF_TERRAINS
 }
 
 export const AddNewTerrain = (newTerrain: number): boolean => {
@@ -85,7 +85,7 @@ export const GetTerrainData = (terrain: number) => {
     } else {
         return null
     }
-    str = udg_colorCode[RED] + TerrainTypeNamesAndData.TERRAIN_TYPE_DATA[maxId]
+    str = udg_colorCode[Constants.RED] + TerrainTypeNamesAndData.TERRAIN_TYPE_DATA[maxId]
 
     terrainType = TerrainTypeId2TerrainType(terrain)
     if (terrainType) {
@@ -108,5 +108,5 @@ export const GetTerrainData = (terrain: number) => {
 }
 
 export const DisplayTerrainDataToPlayer = (p: player, terrain: number) => {
-    DisplayTimedTextToPlayer(p, 0, 0, TERRAIN_DATA_DISPLAY_TIME, GetTerrainData(terrain)!)
+    DisplayTimedTextToPlayer(p, 0, 0, Constants.TERRAIN_DATA_DISPLAY_TIME, GetTerrainData(terrain)!)
 }

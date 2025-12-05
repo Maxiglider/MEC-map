@@ -3,7 +3,7 @@
 import { ServiceManager } from 'Services'
 import { EffectUtils } from 'Utils/EffectUtils'
 import { createEvent } from 'Utils/mapUtils'
-import { DUMMY_POWER_CIRCLE, GM_KILLING_EFFECT } from 'core/01_libraries/Constants'
+import { Constants } from 'core/01_libraries/Constants'
 import { Monster } from 'core/04_STRUCTURES/Monster/Monster'
 import { hooks } from 'core/API/GeneralHooks'
 import { getUdgEscapers, getUdgMonsterTypes, udg_monsters } from '../../../../globals'
@@ -43,7 +43,7 @@ export const InitTrig_InvisUnit_is_getting_damage = () => {
                 }
 
                 if (RAbsBJ(hauteurHero - hauteurKillingUnit) < TAILLE_UNITE) {
-                    if (GetUnitTypeId(killingUnit) === DUMMY_POWER_CIRCLE) {
+                    if (GetUnitTypeId(killingUnit) === Constants.DUMMY_POWER_CIRCLE) {
                         const targetPlayer = GetUnitUserData(killingUnit)
 
                         if (escaper.alliedState[targetPlayer]) {
@@ -105,7 +105,7 @@ export const InitTrig_InvisUnit_is_getting_damage = () => {
                             //god mode effect
                             EffectUtils.destroyEffect(
                                 EffectUtils.addSpecialEffect(
-                                    GM_KILLING_EFFECT,
+                                    Constants.GM_KILLING_EFFECT,
                                     GetUnitX(killingUnit),
                                     GetUnitY(killingUnit)
                                 )

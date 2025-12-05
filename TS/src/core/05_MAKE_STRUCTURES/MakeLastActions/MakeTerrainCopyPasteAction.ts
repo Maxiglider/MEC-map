@@ -1,5 +1,5 @@
 import { MemoryHandler } from 'Utils/MemoryHandler'
-import { LARGEUR_CASE } from 'core/01_libraries/Constants'
+import { Constants } from 'core/01_libraries/Constants'
 import { getUdgTerrainTypes, globals } from '../../../../globals'
 import { Text } from '../../01_libraries/Text'
 import { TerrainType } from '../../04_STRUCTURES/TerrainType/TerrainType'
@@ -92,13 +92,13 @@ export class MakeTerrainCopyPasteAction extends MakeAction {
                         ChangeTerrainType(xPaste, yPaste, terrainTypeId)
                     }
                 }
-                xPaste = xPaste + LARGEUR_CASE
-                xCopy = xCopy + LARGEUR_CASE
+                xPaste = xPaste + Constants.LARGEUR_CASE
+                xCopy = xCopy + Constants.LARGEUR_CASE
             }
             xPaste = minXpaste
             xCopy = minXcopy
-            yPaste = yPaste + LARGEUR_CASE
-            yCopy = yCopy + LARGEUR_CASE
+            yPaste = yPaste + Constants.LARGEUR_CASE
+            yCopy = yCopy + Constants.LARGEUR_CASE
         }
 
         this.isActionMadeB = true
@@ -114,10 +114,10 @@ export class MakeTerrainCopyPasteAction extends MakeAction {
                 if (terrainType && terrainType.getTerrainTypeId() != 0) {
                     ChangeTerrainType(x, y, terrainType.getTerrainTypeId())
                 }
-                x = x + LARGEUR_CASE
+                x = x + Constants.LARGEUR_CASE
             }
             x = this.minX
-            y = y + LARGEUR_CASE
+            y = y + Constants.LARGEUR_CASE
         }
     }
 
@@ -131,10 +131,10 @@ export class MakeTerrainCopyPasteAction extends MakeAction {
                 if (terrainType && terrainType.getTerrainTypeId() != 0) {
                     ChangeTerrainType(x, y, terrainType.getTerrainTypeId())
                 }
-                x = x + LARGEUR_CASE
+                x = x + Constants.LARGEUR_CASE
             }
             x = this.minX
-            y = y + LARGEUR_CASE
+            y = y + Constants.LARGEUR_CASE
         }
     }
 

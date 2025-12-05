@@ -1,5 +1,5 @@
 import { arrayValuesRound, GetLocDist } from 'core/01_libraries/Basic_functions'
-import { PATROL_DISTANCE_MIN } from 'core/01_libraries/Constants'
+import { Constants } from 'core/01_libraries/Constants'
 import { udg_monsters } from '../../../../globals'
 import { errorHandler } from '../../../Utils/mapUtils'
 import { IsHero } from '../Escaper/Escaper_functions'
@@ -214,11 +214,15 @@ export class MonsterMultiplePatrols extends Monster {
     addNewLoc(x: number, y: number) {
         let lastLocInd = this.x.length - 1
 
-        if (GetLocDist(this.getX(lastLocInd), this.getY(lastLocInd), x, y) <= PATROL_DISTANCE_MIN) {
+        if (GetLocDist(this.getX(lastLocInd), this.getY(lastLocInd), x, y) <= Constants.PATROL_DISTANCE_MIN) {
             return 2
         }
 
-        if (lastLocInd >= 0 && this.sens === 0 && GetLocDist(this.x[0], this.y[0], x, y) <= PATROL_DISTANCE_MIN) {
+        if (
+            lastLocInd >= 0 &&
+            this.sens === 0 &&
+            GetLocDist(this.x[0], this.y[0], x, y) <= Constants.PATROL_DISTANCE_MIN
+        ) {
             return 1
         }
 

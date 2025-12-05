@@ -1,5 +1,5 @@
+import { Constants } from 'core/01_libraries/Constants'
 import { forRange } from 'Utils/mapUtils'
-import { NB_ESCAPERS } from 'core/01_libraries/Constants'
 import { getUdgEscapers, getUdgLevels, getUdgTerrainTypes } from '../../../../globals'
 import { isDeathTerrain } from './TerrainType'
 
@@ -7,11 +7,11 @@ export class KillingTimers {
     private timers: timer[] = []
 
     constructor() {
-        forRange(NB_ESCAPERS, i => (this.timers[i] = CreateTimer()))
+        forRange(Constants.NB_ESCAPERS, i => (this.timers[i] = CreateTimer()))
     }
 
     destroy = () => {
-        forRange(NB_ESCAPERS, i => DestroyTimer(this.timers[i]))
+        forRange(Constants.NB_ESCAPERS, i => DestroyTimer(this.timers[i]))
     }
 
     destroyTimer = (timerId: number) => {
@@ -25,7 +25,7 @@ export class KillingTimers {
             if (isDeathTerrain(terrainType)) {
                 escaperId = 0
 
-                while (!(escaperId >= NB_ESCAPERS)) {
+                while (!(escaperId >= Constants.NB_ESCAPERS)) {
                     if (theTimer == terrainType.getTimer(escaperId)) {
                         return getUdgEscapers().get(escaperId)
                     }

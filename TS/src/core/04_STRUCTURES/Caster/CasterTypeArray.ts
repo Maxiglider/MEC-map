@@ -1,4 +1,4 @@
-import { TERRAIN_DATA_DISPLAY_TIME } from 'core/01_libraries/Constants'
+import { Constants } from 'core/01_libraries/Constants'
 import { Text } from 'core/01_libraries/Text'
 import { handlePaginationArgs, handlePaginationObj } from 'core/06_COMMANDS/COMMANDS_vJass/Pagination'
 import { getUdgMonsterTypes } from '../../../../globals'
@@ -105,7 +105,7 @@ export class CasterTypeArray extends BaseArray<CasterType> {
                 Text.erP(p, `no caster type saved`)
             } else {
                 for (const l of pag.cmds) {
-                    Text.P_timed(p, TERRAIN_DATA_DISPLAY_TIME, l)
+                    Text.P_timed(p, Constants.TERRAIN_DATA_DISPLAY_TIME, l)
                 }
             }
         }

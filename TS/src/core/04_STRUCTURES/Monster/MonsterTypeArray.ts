@@ -1,4 +1,4 @@
-import { TERRAIN_DATA_DISPLAY_TIME } from 'core/01_libraries/Constants'
+import { Constants } from 'core/01_libraries/Constants'
 import { Text } from 'core/01_libraries/Text'
 import { handlePaginationObj } from 'core/06_COMMANDS/COMMANDS_vJass/Pagination'
 import { udg_monsters } from '../../../../globals'
@@ -93,7 +93,7 @@ export class MonsterTypeArray extends BaseArray<MonsterType> {
                 Text.erP(p, `no monster type saved`)
             } else {
                 for (const l of pag.cmds) {
-                    Text.P_timed(p, TERRAIN_DATA_DISPLAY_TIME, l)
+                    Text.P_timed(p, Constants.TERRAIN_DATA_DISPLAY_TIME, l)
                 }
             }
         }

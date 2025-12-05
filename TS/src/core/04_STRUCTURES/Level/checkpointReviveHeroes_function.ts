@@ -1,5 +1,5 @@
+import { Constants } from 'core/01_libraries/Constants'
 import { progressionUtils } from 'Utils/ProgressionUtils'
-import { NB_ESCAPERS } from 'core/01_libraries/Constants'
 import { getUdgEscapers, globals } from '../../../../globals'
 import { StopUnit } from '../../01_libraries/Basic_functions'
 import { ChangeAllTerrains } from '../../07_TRIGGERS/Triggers_to_modify_terrains/Change_all_terrains'
@@ -12,7 +12,7 @@ export const checkPointReviveHeroes = (
     revivingFinisher: Escaper | undefined,
     finished?: boolean
 ) => {
-    for (let i = 0; i < NB_ESCAPERS; i++) {
+    for (let i = 0; i < Constants.NB_ESCAPERS; i++) {
         const escaper = getUdgEscapers().get(i)
 
         if (escaper) {
@@ -45,7 +45,7 @@ export const checkPointReviveHeroes = (
 
     TriggerSleepAction(1)
 
-    for (let i = 0; i < NB_ESCAPERS; i++) {
+    for (let i = 0; i < Constants.NB_ESCAPERS; i++) {
         const escaper = getUdgEscapers().get(i)
         if (escaper && (escaper !== revivingFinisher || !finished || globals.forceReviveAtStart)) {
             escaper.pause(false)

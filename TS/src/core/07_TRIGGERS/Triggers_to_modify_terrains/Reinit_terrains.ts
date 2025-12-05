@@ -1,4 +1,4 @@
-import { LARGEUR_CASE } from 'core/01_libraries/Constants'
+import { Constants } from 'core/01_libraries/Constants'
 import { Text } from 'core/01_libraries/Text'
 import { TerrainType } from 'core/04_STRUCTURES/TerrainType/TerrainType'
 import { getUdgTerrainTypes, globals } from '../../../../globals'
@@ -46,10 +46,10 @@ const initReinitTerrains = () => {
                     j = j + 1
                 }
 
-                x = x + LARGEUR_CASE
+                x = x + Constants.LARGEUR_CASE
             }
 
-            y = y + LARGEUR_CASE
+            y = y + Constants.LARGEUR_CASE
         }
 
         Text.mkA('Terrains reinitialized')

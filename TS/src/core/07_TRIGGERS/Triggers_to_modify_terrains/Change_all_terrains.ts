@@ -1,4 +1,4 @@
-import { LARGEUR_CASE, NB_MAX_OF_TERRAINS } from 'core/01_libraries/Constants'
+import { Constants } from 'core/01_libraries/Constants'
 import { TerrainType } from 'core/04_STRUCTURES/TerrainType/TerrainType'
 import { Globals } from 'core/09_From_old_Worldedit_triggers/globals_variables_and_triggers'
 import { getUdgTerrainTypes, globals } from '../../../../globals'
@@ -54,10 +54,10 @@ const initChangeAllTerrains = () => {
                     }
                     j = j + 1
                 }
-                x = x + LARGEUR_CASE
+                x = x + Constants.LARGEUR_CASE
             }
 
-            y = y + LARGEUR_CASE
+            y = y + Constants.LARGEUR_CASE
         }
     }
 
@@ -144,7 +144,7 @@ const initChangeAllTerrains = () => {
         }
 
         lastTerrainArrayId = n - 1
-        nbNewTerrainsAllowed = NB_MAX_OF_TERRAINS - Globals.udg_nb_used_terrains
+        nbNewTerrainsAllowed = Constants.NB_MAX_OF_TERRAINS - Globals.udg_nb_used_terrains
 
         if (mode === 'normal') {
             nbNewTerrains = 0

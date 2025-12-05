@@ -1,7 +1,7 @@
 import { ServiceManager } from 'Services'
 import { ThemeUtils } from 'Utils/ThemeUtils'
 import { IsBoolString, S2B } from 'core/01_libraries/Basic_functions'
-import { NB_ESCAPERS, NB_MAX_OF_TERRAINS } from 'core/01_libraries/Constants'
+import { Constants } from 'core/01_libraries/Constants'
 import { Text } from 'core/01_libraries/Text'
 import { TerrainTypeFromString } from 'core/07_TRIGGERS/Modify_terrain_Functions/Terrain_type_from_string'
 import { ReinitTerrainsPositions } from 'core/07_TRIGGERS/Triggers_to_modify_terrains/Reinit_terrains_position_Change_variations_and_ut_at_beginning'
@@ -74,7 +74,7 @@ export const initExecuteCommandRed = () => {
                 if (param1 === 'all' || param1 === 'a') {
                     let i = 0
                     while (true) {
-                        if (i >= NB_ESCAPERS) break
+                        if (i >= Constants.NB_ESCAPERS) break
 
                         const target = getUdgEscapers().get(i)
 
@@ -397,7 +397,7 @@ export const initExecuteCommandRed = () => {
 
             // Handle terrain
             if (target === 'terrain' || target === 'all') {
-                const availableTerrains = NB_MAX_OF_TERRAINS - Globals.udg_nb_used_terrains
+                const availableTerrains = Constants.NB_MAX_OF_TERRAINS - Globals.udg_nb_used_terrains
                 let createTerrains = 0
                 const tt = getUdgTerrainTypes()
 
@@ -406,7 +406,10 @@ export const initExecuteCommandRed = () => {
                 if (!tt.getByCode(availableThemes[theme].walkTerrain)) createTerrains++
 
                 if (createTerrains >= availableTerrains) {
-                    Text.P(escaper.getPlayer(), `Failed, limit of ${NB_MAX_OF_TERRAINS} terrain types reached`)
+                    Text.P(
+                        escaper.getPlayer(),
+                        `Failed, limit of ${Constants.NB_MAX_OF_TERRAINS} terrain types reached`
+                    )
                     return true
                 }
 

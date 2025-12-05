@@ -1,5 +1,5 @@
 import { MemoryHandler } from 'Utils/MemoryHandler'
-import { LARGEUR_CASE } from 'core/01_libraries/Constants'
+import { Constants } from 'core/01_libraries/Constants'
 import { Text } from 'core/01_libraries/Text'
 import { ChangeTerrainType } from '../../07_TRIGGERS/Modify_terrain_Functions/Modify_terrain_functions'
 import { MakeAction } from './MakeAction'
@@ -19,10 +19,10 @@ export class MakeTerrainVerticalSymmetryAction extends MakeAction {
         this.maxY = RMaxBJ(y1, y2)
 
         //pour éviter les ptits décalages
-        this.minX = I2R(R2I(this.minX / LARGEUR_CASE)) * LARGEUR_CASE
-        this.minY = I2R(R2I(this.minY / LARGEUR_CASE)) * LARGEUR_CASE
-        this.maxX = I2R(R2I(this.maxX / LARGEUR_CASE)) * LARGEUR_CASE
-        this.maxY = I2R(R2I(this.maxY / LARGEUR_CASE)) * LARGEUR_CASE
+        this.minX = I2R(R2I(this.minX / Constants.LARGEUR_CASE)) * Constants.LARGEUR_CASE
+        this.minY = I2R(R2I(this.minY / Constants.LARGEUR_CASE)) * Constants.LARGEUR_CASE
+        this.maxX = I2R(R2I(this.maxX / Constants.LARGEUR_CASE)) * Constants.LARGEUR_CASE
+        this.maxY = I2R(R2I(this.maxY / Constants.LARGEUR_CASE)) * Constants.LARGEUR_CASE
 
         this.applySymmetry()
         this.isActionMadeB = true
@@ -40,10 +40,10 @@ export class MakeTerrainVerticalSymmetryAction extends MakeAction {
             while (x <= this.maxX) {
                 terrainTypeIds[i] = GetTerrainType(x, y)
                 i = i + 1
-                x = x + LARGEUR_CASE
+                x = x + Constants.LARGEUR_CASE
             }
             x = this.minX
-            y = y + LARGEUR_CASE
+            y = y + Constants.LARGEUR_CASE
         }
 
         //application de la symétrie
@@ -55,10 +55,10 @@ export class MakeTerrainVerticalSymmetryAction extends MakeAction {
             while (x <= this.maxX) {
                 ChangeTerrainType(x, y, terrainTypeIds[i])
                 i = i + 1
-                x = x + LARGEUR_CASE
+                x = x + Constants.LARGEUR_CASE
             }
             x = this.minX
-            y = y - LARGEUR_CASE
+            y = y - Constants.LARGEUR_CASE
         }
 
         MemoryHandler.destroyArray(terrainTypeIds)

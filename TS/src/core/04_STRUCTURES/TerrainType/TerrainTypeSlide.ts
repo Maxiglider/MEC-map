@@ -1,4 +1,4 @@
-import { TERRAIN_DATA_DISPLAY_TIME } from 'core/01_libraries/Constants'
+import { Constants } from 'core/01_libraries/Constants'
 import { COLOR_TERRAIN_SLIDE } from '../../01_libraries/Init_colorCodes'
 import { Text } from '../../01_libraries/Text'
 import { HERO_ROTATION_SPEED } from '../../07_TRIGGERS/Slide_and_CheckTerrain_triggers/SlidingMax'
@@ -78,7 +78,7 @@ export class TerrainTypeSlide extends TerrainType {
     }
 
     displayForPlayer = (p: player) => {
-        Text.P_timed(p, TERRAIN_DATA_DISPLAY_TIME, this.toText())
+        Text.P_timed(p, Constants.TERRAIN_DATA_DISPLAY_TIME, this.toText())
     }
 
     toJson() {

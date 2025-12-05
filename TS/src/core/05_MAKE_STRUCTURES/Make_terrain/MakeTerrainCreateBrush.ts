@@ -1,7 +1,7 @@
 import { MemoryHandler } from 'Utils/MemoryHandler'
 import { getUdgTerrainTypes } from '../../../../globals'
 import { arrayPush, outOfBounds, roundCoordinateToCenterOfTile } from '../../01_libraries/Basic_functions'
-import { LARGEUR_CASE } from '../../01_libraries/Constants'
+import { Constants } from '../../01_libraries/Constants'
 import { Escaper } from '../../04_STRUCTURES/Escaper/Escaper'
 import { TerrainType } from '../../04_STRUCTURES/TerrainType/TerrainType'
 import { ChangeTerrainType } from '../../07_TRIGGERS/Modify_terrain_Functions/Modify_terrain_functions'
@@ -48,10 +48,10 @@ export class MakeTerrainCreateBrush extends MakeHoldClick {
             if (terrainTypeToApply) {
                 const centerX = roundCoordinateToCenterOfTile(this.escaper.mouseX)
                 const centerY = roundCoordinateToCenterOfTile(this.escaper.mouseY)
-                const offset = (sizeToApply - 1) * LARGEUR_CASE
+                const offset = (sizeToApply - 1) * Constants.LARGEUR_CASE
 
-                for (let x = centerX - offset; x <= centerX + offset; x += LARGEUR_CASE) {
-                    for (let y = centerY - offset; y <= centerY + offset; y += LARGEUR_CASE) {
+                for (let x = centerX - offset; x <= centerX + offset; x += Constants.LARGEUR_CASE) {
+                    for (let y = centerY - offset; y <= centerY + offset; y += Constants.LARGEUR_CASE) {
                         if (!outOfBounds(x, y)) {
                             const terrainType = getUdgTerrainTypes().getTerrainType(x, y)
                             if (terrainType && terrainType != terrainTypeToApply) {
@@ -78,20 +78,20 @@ export class MakeTerrainCreateBrush extends MakeHoldClick {
                                     if (sizeToApply >= 4) {
                                         //up or down
                                         if (
-                                            y == centerY + offset - LARGEUR_CASE ||
-                                            y == centerY - offset + LARGEUR_CASE
+                                            y == centerY + offset - Constants.LARGEUR_CASE ||
+                                            y == centerY - offset + Constants.LARGEUR_CASE
                                         ) {
-                                            if (diffXcenter > LARGEUR_CASE * 2) {
+                                            if (diffXcenter > Constants.LARGEUR_CASE * 2) {
                                                 continue
                                             }
                                         }
 
                                         //left or right
                                         if (
-                                            x == centerX + offset - LARGEUR_CASE ||
-                                            x == centerX - offset + LARGEUR_CASE
+                                            x == centerX + offset - Constants.LARGEUR_CASE ||
+                                            x == centerX - offset + Constants.LARGEUR_CASE
                                         ) {
-                                            if (diffYcenter > LARGEUR_CASE * 2) {
+                                            if (diffYcenter > Constants.LARGEUR_CASE * 2) {
                                                 continue
                                             }
                                         }
@@ -99,7 +99,10 @@ export class MakeTerrainCreateBrush extends MakeHoldClick {
 
                                     //a little more corner for size 8
                                     if (sizeToApply == 8) {
-                                        if (diffXcenter == LARGEUR_CASE * 5 && diffYcenter == LARGEUR_CASE * 5) {
+                                        if (
+                                            diffXcenter == Constants.LARGEUR_CASE * 5 &&
+                                            diffYcenter == Constants.LARGEUR_CASE * 5
+                                        ) {
                                             continue
                                         }
                                     }

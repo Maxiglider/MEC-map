@@ -3,7 +3,7 @@ import { EffectUtils } from 'Utils/EffectUtils'
 import { MemoryHandler } from 'Utils/MemoryHandler'
 import { createTimer } from 'Utils/mapUtils'
 import { IsBoolString, S2B } from 'core/01_libraries/Basic_functions'
-import { NB_ESCAPERS } from 'core/01_libraries/Constants'
+import { Constants } from 'core/01_libraries/Constants'
 import { Text } from 'core/01_libraries/Text'
 import { Timer } from 'w3ts'
 import { getUdgEscapers } from '../../../../globals'
@@ -42,7 +42,7 @@ export const initExecuteCommandTrueMax = () => {
             if (param1 === 'all' || param1 === 'a') {
                 let i = 0
                 while (true) {
-                    if (i >= NB_ESCAPERS) break
+                    if (i >= Constants.NB_ESCAPERS) break
                     if (getUdgEscapers().get(i) != null && getUdgEscapers().get(i) != escaper) {
                         getUdgEscapers().get(i)?.setIsMaximaxou(b)
                     }

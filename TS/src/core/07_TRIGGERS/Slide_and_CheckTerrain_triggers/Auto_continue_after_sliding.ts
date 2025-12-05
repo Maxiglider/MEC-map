@@ -1,4 +1,4 @@
-import { NB_ESCAPERS } from 'core/01_libraries/Constants'
+import { Constants } from 'core/01_libraries/Constants'
 import { forRange } from 'Utils/mapUtils'
 import { getUdgEscapers } from '../../../../globals'
 
@@ -9,7 +9,7 @@ const initAutoContinueAfterSliding = () => {
     let isLastTargetALocation: boolean[] = []
     let udg_autoContinueAfterSliding: boolean[] = []
 
-    forRange(NB_ESCAPERS, i => (udg_autoContinueAfterSliding[i] = true))
+    forRange(Constants.NB_ESCAPERS, i => (udg_autoContinueAfterSliding[i] = true))
 
     const ECART_MAX_ANGLE = 45
 

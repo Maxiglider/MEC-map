@@ -1,8 +1,8 @@
 import { MemoryHandler } from 'Utils/MemoryHandler'
 import { createPoint } from 'Utils/Point'
 import { createEvent } from 'Utils/mapUtils'
+import { Constants } from 'core/01_libraries/Constants'
 import { hooks } from 'core/API/GeneralHooks'
-import { GREY, TERRAIN_DATA_DISPLAY_TIME } from '../../01_libraries/Constants'
 import { udg_colorCode } from '../../01_libraries/Init_colorCodes'
 import { Text } from '../../01_libraries/Text'
 import { Hero2Escaper } from '../Escaper/Escaper_functions'
@@ -148,11 +148,11 @@ export class Region {
     }
 
     toText = (): string => {
-        return udg_colorCode[GREY] + this.label
+        return udg_colorCode[Constants.GREY] + this.label
     }
 
     displayForPlayer = (p: player) => {
-        Text.P_timed(p, TERRAIN_DATA_DISPLAY_TIME, this.toText())
+        Text.P_timed(p, Constants.TERRAIN_DATA_DISPLAY_TIME, this.toText())
     }
 
     setFlags = (flags: string[]) => {

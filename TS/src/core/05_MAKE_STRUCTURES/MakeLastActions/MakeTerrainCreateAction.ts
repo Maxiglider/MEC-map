@@ -1,4 +1,4 @@
-import { LARGEUR_CASE } from 'core/01_libraries/Constants'
+import { Constants } from 'core/01_libraries/Constants'
 import { getUdgTerrainTypes } from '../../../../globals'
 import { Text } from '../../01_libraries/Text'
 import { TerrainType } from '../../04_STRUCTURES/TerrainType/TerrainType'
@@ -41,10 +41,10 @@ export class MakeTerrainCreateAction extends MakeAction {
                     !this.terrainTypesBefore[x] && (this.terrainTypesBefore[x] = [])
                     this.terrainTypesBefore[x][y] = tt
                 }
-                x = x + LARGEUR_CASE
+                x = x + Constants.LARGEUR_CASE
             }
             x = this.minX
-            y = y + LARGEUR_CASE
+            y = y + Constants.LARGEUR_CASE
         }
 
         ChangeTerrainBetween(terrainTypeNew.getTerrainTypeId(), this.minX, this.minY, this.maxX, this.maxY)
@@ -67,10 +67,10 @@ export class MakeTerrainCreateAction extends MakeAction {
                 if (terrainType && terrainType.getTerrainTypeId() != 0) {
                     ChangeTerrainType(x, y, terrainType.getTerrainTypeId())
                 }
-                x = x + LARGEUR_CASE
+                x = x + Constants.LARGEUR_CASE
             }
             x = this.minX
-            y = y + LARGEUR_CASE
+            y = y + Constants.LARGEUR_CASE
         }
     }
 
