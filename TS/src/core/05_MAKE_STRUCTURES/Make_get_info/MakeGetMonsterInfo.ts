@@ -76,6 +76,13 @@ export class MakeGetMonsterInfo extends Make {
             instanceInfo += '   Distance: ' + I2S(distance)
             Text.P_timed(this.makerOwner, Constants.TERRAIN_DATA_DISPLAY_TIME, instanceInfo)
 
+            // Attack Ground Info
+            if (monster.hasAttackGroundPos()) {
+                const attackDelay = monster.getAttackGroundDelay()
+                const attackDelayInfo = udg_colorCode[Constants.GREY] + 'Attack Ground Delay: ' + R2S(attackDelay) + 's'
+                Text.P_timed(this.makerOwner, Constants.TERRAIN_DATA_DISPLAY_TIME, attackDelayInfo)
+            }
+
             // Position
             const posInfo = udg_colorCode[Constants.GREY] + 'Position: (' + I2S(R2I(xMob)) + ', ' + I2S(R2I(yMob)) + ')'
             Text.P_timed(this.makerOwner, Constants.TERRAIN_DATA_DISPLAY_TIME, posInfo)
