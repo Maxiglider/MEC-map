@@ -1,0 +1,2 @@
+# Make github believe the .j files are TypeScript, for the repository to be recognized as a TypeScript project
+*.j linguist-language=TypeScript
