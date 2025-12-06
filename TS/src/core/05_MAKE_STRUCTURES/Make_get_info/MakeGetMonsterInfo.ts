@@ -112,6 +112,37 @@ export class MakeGetMonsterInfo extends Make {
                         }
                     }
                 }
+
+                if (jumpPad !== undefined) {
+                    const jumpPadEffect = monster.getJumpPadEffect()
+                    let jumpPadInfo = udg_colorCode[Constants.GREY] + '  Jump Height: ' + R2S(jumpPad)
+
+                    if (jumpPadEffect) {
+                        jumpPadInfo += '   Effect: ' + jumpPadEffect
+                    }
+
+                    Text.P_timed(this.makerOwner, Constants.TERRAIN_DATA_DISPLAY_TIME, jumpPadInfo)
+                }
+
+                if (portalMob) {
+                    const portalEffect = portalMob.getPortalEffect()
+                    const portalEffectDuration = portalMob.getPortalEffectDuration()
+                    const freezeDuration = portalMob.getFreezeDuration()
+
+                    let portalInfo = udg_colorCode[Constants.GREY] + '  Freeze Duration: ' + R2S(freezeDuration) + 's'
+                    Text.P_timed(this.makerOwner, Constants.TERRAIN_DATA_DISPLAY_TIME, portalInfo)
+
+                    if (portalEffect) {
+                        const effectInfo =
+                            udg_colorCode[Constants.GREY] +
+                            '  Portal Effect: ' +
+                            portalEffect +
+                            '   Duration: ' +
+                            R2S(portalEffectDuration) +
+                            's'
+                        Text.P_timed(this.makerOwner, Constants.TERRAIN_DATA_DISPLAY_TIME, effectInfo)
+                    }
+                }
             }
 
             // Monster class

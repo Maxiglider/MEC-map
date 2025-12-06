@@ -225,7 +225,7 @@ export class ClearMob {
         }
 
         // Play special effect on clear mob location if configured
-        if (this.clearMobSpecialEffect && this.triggerMob.u) {
+        if (!this.isBeingActivated() && this.clearMobSpecialEffect && this.triggerMob.u) {
             const x = GetUnitX(this.triggerMob.u)
             const y = GetUnitY(this.triggerMob.u)
             const eff = EffectUtils.addSpecialEffect(this.clearMobSpecialEffect, x, y)
@@ -236,11 +236,13 @@ export class ClearMob {
             this.blockMobs.forAll(KillMonster)
             this.enabled = false
         } else {
+            const alreadyActivated = this.isBeingActivated()
+
             udp_currentTimer = this.timerActivated
             TimerStart(this.timerActivated, this.disableDuration, false, ClearMobTimerExpires)
 
             // Play special effect on block mobs if configured
-            if (this.blockMobSpecialEffect) {
+            if (!alreadyActivated && this.blockMobSpecialEffect) {
                 this.blockMobs.forAll((monster: Monster) => {
                     if (monster.u) {
                         const x = GetUnitX(monster.u)

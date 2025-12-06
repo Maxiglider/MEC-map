@@ -3306,7 +3306,7 @@ export const initExecuteCommandMake = () => {
     //-setBlockMobEffect(setbme) <effectPath>
     registerCommand({
         name: 'setBlockMobEffect',
-        alias: ['setbme'],
+        alias: ['setbme', 'setClearMobBlockMobEffect', 'setcmbme'],
         group: 'make',
         argDescription: '<effectPath>',
         description: 'set special effect to play on block mobs when clear mob is triggered',
