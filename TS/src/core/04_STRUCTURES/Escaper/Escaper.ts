@@ -1726,6 +1726,20 @@ export class Escaper {
         if (this.hero) this.make = new MakeSetBlockMobEffect(this.hero, effectPath)
     }
 
+    makeSetClearMobDisableDuration(disableDuration: number) {
+        this.destroyMake()
+        if (this.hero) {
+            this.make = new MakePropertyChange(
+                this.hero,
+                'disableDuration',
+                disableDuration,
+                (x, y) => this.getMakingLevel().monsters.getMonsterNear(x, y)?.getClearMob(),
+                clearMob => clearMob.getDisableDuration(),
+                (clearMob, disableDuration) => clearMob.setDisableDuration(disableDuration)
+            )
+        }
+    }
+
     makeCreatePortalMobs(freezeDuration: number, portalEffect: string | null, portalEffectDuration: number | null) {
         this.destroyMake()
         if (this.hero) this.make = new MakePortalMob(this.hero, freezeDuration, portalEffect, portalEffectDuration)

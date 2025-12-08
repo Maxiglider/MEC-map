@@ -104,8 +104,16 @@ export class MakeGetMonsterInfo extends Make {
                 Text.P_timed(this.makerOwner, Constants.TERRAIN_DATA_DISPLAY_TIME, propertiesInfo)
 
                 if (clearMob) {
+                    const disableDuration = clearMob.getDisableDuration()
                     const clearMobEffect = clearMob.getClearMobSpecialEffect()
                     const blockMobEffect = clearMob.getBlockMobSpecialEffect()
+
+                    // Display disable duration if set
+                    if (disableDuration !== 0) {
+                        const clearMobInfo =
+                            udg_colorCode[Constants.GREY] + '  Disable Duration: ' + R2S(disableDuration) + 's'
+                        Text.P_timed(this.makerOwner, Constants.TERRAIN_DATA_DISPLAY_TIME, clearMobInfo)
+                    }
 
                     if (clearMobEffect || blockMobEffect) {
                         if (clearMobEffect) {

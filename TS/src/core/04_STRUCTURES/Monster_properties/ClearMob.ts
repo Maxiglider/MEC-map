@@ -94,7 +94,10 @@ export class ClearMob {
     }
 
     setDisableDuration = (disableDuration: number): boolean => {
-        if (disableDuration > CLEAR_MOB_MAX_DURATION || disableDuration < FRONT_MONTANT_DURATION) {
+        if (
+            disableDuration !== 0 &&
+            (disableDuration > CLEAR_MOB_MAX_DURATION || disableDuration < FRONT_MONTANT_DURATION)
+        ) {
             return false
         }
         this.disableDuration = disableDuration

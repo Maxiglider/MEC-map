@@ -3320,6 +3320,34 @@ export const initExecuteCommandMake = () => {
         },
     })
 
+    //-setClearMobDisableDuration(setcmdd) <disableDuration>
+    registerCommand({
+        name: 'setClearMobDisableDuration',
+        alias: ['setcmdd'],
+        group: 'make',
+        argDescription: '<disableDuration>',
+        description: 'set the disable duration of the clear mob',
+        cb: ({ nbParam, param1 }, escaper) => {
+            if (!(nbParam === 1)) {
+                return true
+            }
+            const x = S2R(param1)
+            if (x !== 0 && (x > CLEAR_MOB_MAX_DURATION || x < FRONT_MONTANT_DURATION)) {
+                Text.erP(
+                    escaper.getPlayer(),
+                    'the disable duration must be a real between ' +
+                        R2S(FRONT_MONTANT_DURATION) +
+                        ' and ' +
+                        R2S(CLEAR_MOB_MAX_DURATION)
+                )
+                return true
+            }
+            escaper.makeSetClearMobDisableDuration(x)
+            Text.mkP(escaper.getPlayer(), 'clear mob disable duration setting on')
+            return true
+        },
+    })
+
     //-createCircleMob [<speed> [<direction> [<radius>]]]
     registerCommand({
         name: 'createCircleMob',
