@@ -83,7 +83,7 @@ export const initExecuteCommandTrueMax = () => {
         alias: [],
         group: 'truemax',
         argDescription: 'create | timer | all | (track <boolean>)',
-        description: 'Show memory usage',
+        description: 'Shows memory usage',
         cb: ({ param1: debugObjects, param2 }) => {
             ;(_G as any)['printCreation'] = false
             memState.timer?.destroy()
@@ -118,7 +118,7 @@ export const initExecuteCommandTrueMax = () => {
         alias: ['e'],
         group: 'truemax',
         argDescription: '<string>',
-        description: 'Execute raw lua code',
+        description: 'Executes raw lua code',
         cb: ({ name }, escaper) => {
             const args = GetEventPlayerChatString().substring(name.length + 2)
 
@@ -161,7 +161,7 @@ export const initExecuteCommandTrueMax = () => {
     //     alias: ['hu'],
     //     group: 'truemax',
     //     argDescription: 'on | off',
-    //     description: 'hides units in other levels',
+    //     description: 'Hides units in other levels',
     //     cb: ({ param1 }, escaper) => {
     //         if (param1.length === 0) param1 = 'true'
 
@@ -215,7 +215,7 @@ export const initExecuteCommandTrueMax = () => {
         alias: [],
         group: 'truemax',
         argDescription: 'on | off',
-        description: 'disables all effects',
+        description: 'Disables all effects',
         cb: ({ param1 }, escaper) => {
             if (param1.length === 0) param1 = EffectUtils.getDisplayEffects() ? 'on' : 'off'
 

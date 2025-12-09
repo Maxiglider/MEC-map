@@ -36,7 +36,7 @@ export const initExecuteCommandMax = () => {
         alias: ['rit'],
         group: 'max',
         argDescription: '',
-        description: 'reinitTerrains(<nb>): reinit terrains with <nb> terrains',
+        description: 'ReinitTerrains(<nb>): reinitializes terrains type with <nb> terrains',
         cb: ({ noParam }) => {
             if (noParam) {
                 ReinitTerrains.ReinitTerrains()
@@ -51,7 +51,7 @@ export const initExecuteCommandMax = () => {
         alias: ['ritp'],
         group: 'max',
         argDescription: '',
-        description: 'rethe terrain on the map',
+        description: 'Reinitializes the terrain on the map as it was at start of the game',
         cb: ({ noParam }) => {
             if (noParam) {
                 ReinitTerrainsPositions.ReinitTerrainsPosition()
@@ -66,7 +66,7 @@ export const initExecuteCommandMax = () => {
         alias: ['st'],
         group: 'max',
         argDescription: '<slotName>',
-        description: 'save terrain in <slotName>',
+        description: 'Saves terrain in <slotName>',
         cb: ({ cmd, noParam }) => {
             if (noParam) {
                 SaveLoadTerrain.SaveTerrain('')
@@ -83,7 +83,7 @@ export const initExecuteCommandMax = () => {
         alias: ['lt'],
         group: 'max',
         argDescription: '<slotName>',
-        description: 'load terrain in <slotName>',
+        description: 'Loads terrain in <slotName>',
         cb: ({ cmd, noParam }, escaper) => {
             if (noParam) {
                 SaveLoadTerrain.LoadTerrain('')
@@ -102,7 +102,7 @@ export const initExecuteCommandMax = () => {
         alias: ['delts'],
         group: 'max',
         argDescription: '<slotName>',
-        description: 'delete terrain save in <slotName>',
+        description: 'Deletes terrain save in <slotName>',
         cb: ({ cmd, noParam }, escaper) => {
             if (noParam) {
                 return true
@@ -122,7 +122,7 @@ export const initExecuteCommandMax = () => {
         alias: ['cl'],
         group: 'max',
         argDescription: '<Pcolor1>|all(a) [<Pcolor2>]',
-        description: 'gives the control of a hero to player <Pcolor2>',
+        description: 'Gives the control of a hero to player <Pcolor2>',
         cb: ({ nbParam, param1, param2 }, escaper) => {
             if (!(nbParam === 1 || nbParam === 2)) {
                 return true
@@ -184,7 +184,7 @@ export const initExecuteCommandMax = () => {
         alias: ['ro'],
         group: 'max',
         argDescription: '',
-        description: 'gives back the control of heroes to their owner',
+        description: 'Gives back the control of heroes to their owner',
         cb: ({ noParam }, escaper) => {
             if (noParam) {
                 let i = 0
@@ -207,7 +207,7 @@ export const initExecuteCommandMax = () => {
         alias: ['setl'],
         group: 'max',
         argDescription: '<nbLives>',
-        description: 'set the number of lives',
+        description: 'Sets the number of lives',
         cb: ({ nbParam, param1 }) => {
             if (!(nbParam === 1 && IsPositiveInteger(param1))) {
                 return true
@@ -223,7 +223,7 @@ export const initExecuteCommandMax = () => {
         alias: ['t'],
         group: 'max',
         argDescription: '<boolean status>',
-        description: 'enable or disable teleport trigger',
+        description: 'Enables or disables teleport trigger',
         cb: ({ nbParam, param1 }, escaper) => {
             if (!(nbParam === 1)) {
                 return true
@@ -253,7 +253,7 @@ export const initExecuteCommandMax = () => {
         alias: ['redr'],
         group: 'max',
         argDescription: '<boolean status>',
-        description: 'enable or disable red rights',
+        description: 'Enables or disables red rights',
         cb: ({ nbParam, param1 }, escaper) => {
             if (!(nbParam === 1 && IsBoolString(param1))) {
                 return true
@@ -274,7 +274,7 @@ export const initExecuteCommandMax = () => {
         alias: ['ar'],
         group: 'max',
         argDescription: '<boolean status> [<Pcolor>|all(a)]',
-        description: 'enable or disable autorevive',
+        description: 'Enables or disables autorevive',
         cb: ({ noParam, nbParam, param1, param2 }, escaper) => {
             if (noParam) {
                 escaper.setHasAutorevive(true)
@@ -340,7 +340,7 @@ export const initExecuteCommandMax = () => {
         alias: ['crh'],
         group: 'max',
         argDescription: '<Pcolor>|all(a)',
-        description: 'create a hero for the player',
+        description: 'Creates a hero for the player',
         cb: ({ noParam, nbParam, param1 }, escaper) => {
             if (noParam) {
                 if (!escaper.createHeroAtStart()) {
@@ -406,7 +406,7 @@ export const initExecuteCommandMax = () => {
         alias: ['delh'],
         group: 'max',
         argDescription: '<Pcolor>|all(a)',
-        description: 'delete a hero for the player',
+        description: 'Deletes a hero for the player',
         cb: ({ noParam, nbParam, param1 }, escaper) => {
             if (noParam) {
                 escaper.removeHero()
@@ -466,7 +466,7 @@ export const initExecuteCommandMax = () => {
         alias: ['cc'],
         group: 'max',
         argDescription: '<Pcolor>|all(a) [<boolean status>]',
-        description: 'set the canCheat status for the player',
+        description: 'Sets the canCheat status for the player',
         cb: ({ nbParam, param1, param2 }, escaper) => {
             if (!(nbParam === 1 || nbParam === 2)) {
                 Text.erP(escaper.getPlayer(), 'one or two params for this command')
@@ -539,7 +539,7 @@ export const initExecuteCommandMax = () => {
         alias: ['setafkt'],
         group: 'max',
         argDescription: '<time>',
-        description: 'set the afk time',
+        description: 'Sets the afk time',
         cb: ({ nbParam, param1 }, escaper) => {
             if (nbParam !== 1 || S2I(param1) <= 0) {
                 Text.erP(escaper.getPlayer(), 'there must be one param which is an integer higher than 0')
@@ -557,7 +557,7 @@ export const initExecuteCommandMax = () => {
         alias: ['setard'],
         group: 'max',
         argDescription: '<time>',
-        description: 'set the autorevive delay, maximum 15 seconds',
+        description: 'Sets the autorevive delay, maximum 15 seconds',
         cb: ({ nbParam, param1 }, escaper) => {
             if (!(nbParam === 1 && (S2R(param1) > 0 || param1 === '0') && S2R(param1) <= 15)) {
                 Text.erP(escaper.getPlayer(), 'there must be one param positive real (maximum 15)')
@@ -580,7 +580,7 @@ export const initExecuteCommandMax = () => {
         alias: ['smic'],
         group: 'max',
         argDescription: '',
-        description: 'save the map in cache',
+        description: 'Saves the map in cache',
         cb: ({ noParam, param1 }, escaper) => {
             if (noParam) {
                 SaveMapInCache.smic(escaper.getPlayer())
@@ -597,7 +597,7 @@ export const initExecuteCommandMax = () => {
         alias: ['lmfc'],
         group: 'max',
         argDescription: '',
-        description: 'load the map from cache',
+        description: 'Loads the map from cache',
         cb: ({ param1 }, escaper) => {
             if (!param1 && SaveMapInCache.lastSaveFile === '') {
                 Text.mkP(escaper.getPlayer(), 'Failed to load, use -smic first')
@@ -629,7 +629,7 @@ export const initExecuteCommandMax = () => {
         alias: ['remt'],
         group: 'max',
         argDescription: '<terrainLabel>',
-        description: 'remove a terrain from the map',
+        description: 'Removes a terrain from the map',
         cb: ({ nbParam, param1 }, escaper) => {
             if (!(nbParam === 1)) {
                 return true
@@ -649,7 +649,7 @@ export const initExecuteCommandMax = () => {
         alias: ['remm'],
         group: 'max',
         argDescription: '<monsterLabel>',
-        description: 'remove a monster from the map',
+        description: 'Removes a monster from the map',
         cb: ({ nbParam, param1 }, escaper) => {
             if (!(nbParam === 1)) {
                 return true
@@ -669,7 +669,7 @@ export const initExecuteCommandMax = () => {
         alias: ['remll'],
         group: 'max',
         argDescription: '',
-        description: 'remove the last level from the map',
+        description: 'Removes the last level from the map',
         cb: ({ noParam }, escaper) => {
             if (noParam) {
                 if (getUdgLevels().destroyLastLevel()) {
@@ -691,7 +691,7 @@ export const initExecuteCommandMax = () => {
         alias: ['remc'],
         group: 'max',
         argDescription: '<casterLabel>',
-        description: 'remove a caster from the map',
+        description: 'Removes a caster from the map',
         cb: ({ nbParam, param1 }, escaper) => {
             if (nbParam !== 1) {
                 return true
@@ -714,7 +714,7 @@ export const initExecuteCommandMax = () => {
         alias: ['setto'],
         group: 'max',
         argDescription: '<terrainLabels>',
-        description: 'set the order of the terrains',
+        description: 'Sets the order of the terrains',
         cb: ({ cmd }, escaper) => {
             if (getUdgTerrainTypes().setOrder(cmd)) {
                 Text.mkP(escaper.getPlayer(), 'terrains order set')
@@ -734,7 +734,7 @@ export const initExecuteCommandMax = () => {
         alias: ['settcc'],
         group: 'max',
         argDescription: '<terrainLabel> <cliffClass>',
-        description: 'set the cliff class of a terrain',
+        description: 'Sets the cliff class of a terrain',
         cb: ({ nbParam, param1, param2 }, escaper) => {
             if (nbParam !== 2) {
                 return true
@@ -761,7 +761,7 @@ export const initExecuteCommandMax = () => {
         alias: [],
         group: 'max',
         argDescription: '<tileset>',
-        description: 'set the main tileset',
+        description: 'Sets the main tileset',
         cb: ({ nbParam, param1 }, escaper) => {
             if (nbParam > 1) {
                 return true
@@ -838,7 +838,7 @@ export const initExecuteCommandMax = () => {
         alias: ['cwya'],
         group: 'max',
         argDescription: '[<boolean status> [<Pcolor>|all(a)]]',
-        description: 'toggle or set click where you are feature',
+        description: 'Toggles or sets click where you are feature',
         cb: ({ noParam, nbParam, param1, param2 }, escaper) => {
             if (noParam) {
                 // Toggle for self

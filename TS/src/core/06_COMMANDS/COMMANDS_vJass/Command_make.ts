@@ -54,7 +54,7 @@ export const initExecuteCommandMake = () => {
         alias: ['neww'],
         group: 'make',
         argDescription: '<label> <terrainType> [<walkSpeed>]',
-        description: 'add a new kind of walk terrain',
+        description: 'Add a new kind of walk terrain',
         cb: ({ nbParam, param1, param2, param3 }, escaper) => {
             if (nbParam < 2 || nbParam > 3) {
                 return true
@@ -86,7 +86,7 @@ export const initExecuteCommandMake = () => {
         alias: ['newd'],
         group: 'make',
         argDescription: '<label> <terrainType> [<killingEffect> [<terrainTimeToKill>]]',
-        description: 'add a new kind of death terrain',
+        description: 'Add a new kind of death terrain',
         cb: ({ nbParam, param1, param2, param3, param4 }, escaper) => {
             if (nbParam < 2 || nbParam > 4) {
                 return true
@@ -129,7 +129,7 @@ export const initExecuteCommandMake = () => {
         alias: ['news'],
         group: 'make',
         argDescription: '<label> <terrainType> [<slideSpeed> [<canTurn>]]',
-        description: 'add a new kind of slide terrain',
+        description: 'Add a new kind of slide terrain',
         cb: ({ nbParam, param1, param2, param3, param4 }, escaper) => {
             if (nbParam < 2 || nbParam > 4) {
                 return true
@@ -176,7 +176,7 @@ export const initExecuteCommandMake = () => {
         alias: ['settl'],
         group: 'make',
         argDescription: '<oldTerrainLabel> <newTerrainLabel>',
-        description: 'change the label of a terrain type',
+        description: 'Change the label of a terrain type',
         cb: ({ nbParam, param1, param2 }, escaper) => {
             if (!(nbParam === 2)) {
                 return true
@@ -201,7 +201,7 @@ export const initExecuteCommandMake = () => {
         alias: ['setta'],
         group: 'make',
         argDescription: '<terrainLabel> <alias>',
-        description: 'an alias is a shortcut which can be used like a label',
+        description: 'An alias is a shortcut which can be used like a label',
         cb: ({ nbParam, param1, param2 }, escaper) => {
             if (!(nbParam === 2)) {
                 return true
@@ -226,7 +226,7 @@ export const initExecuteCommandMake = () => {
         alias: ['settws'],
         group: 'make',
         argDescription: '<walkTerrainLabel> <walkSpeed>',
-        description: 'max walk speed : 522',
+        description: 'Max walk speed : 522',
         cb: ({ nbParam, param1, param2 }, escaper) => {
             if (!(nbParam === 2)) {
                 return true
@@ -256,7 +256,7 @@ export const initExecuteCommandMake = () => {
         alias: ['settke'],
         group: 'make',
         argDescription: '<deathTerrainLabel> <killingEffect>',
-        description: 'special effect appearing when a hero touch the death terrain',
+        description: 'Special effect appearing when a hero touch the death terrain',
         cb: ({ nbParam, param1, param2 }, escaper) => {
             if (!(nbParam === 2)) {
                 return true
@@ -282,7 +282,7 @@ export const initExecuteCommandMake = () => {
         alias: ['settkd'],
         group: 'make',
         argDescription: '<deathTerrainLabel> <killingDelay>',
-        description: 'time before which the hero dies when he touch the death terrain',
+        description: 'Time before which the hero dies when he touch the death terrain',
         cb: ({ nbParam, param1, param2 }, escaper) => {
             if (!(nbParam === 2)) {
                 return true
@@ -345,7 +345,7 @@ export const initExecuteCommandMake = () => {
         alias: ['settss'],
         group: 'make',
         argDescription: '<slideTerrainLabel> <slideSpeed>',
-        description: 'max slide speed : 522',
+        description: 'Max slide speed : 522',
         cb: ({ nbParam, param1, param2 }, escaper) => {
             if (!(nbParam === 2)) {
                 return true
@@ -438,7 +438,7 @@ export const initExecuteCommandMake = () => {
         alias: ['settct'],
         group: 'make',
         argDescription: '<slideTerrainLabel> <canTurn>',
-        description: 'can the hero turn when he slide on the terrain',
+        description: 'Can the hero turn when he slide on the terrain',
         cb: ({ nbParam, param1, param2 }, escaper) => {
             if (!(nbParam === 2)) {
                 return true
@@ -501,7 +501,7 @@ export const initExecuteCommandMake = () => {
         alias: ['chat'],
         group: 'make',
         argDescription: '[known(k)|notKnown(nk)]',
-        description: 'change all terrains to a random terrain type, or to a terrain type known to the player',
+        description: 'Change all terrains to a random terrain type, or to a terrain type known to the player',
         cb: ({ noParam, nbParam, param1 }, escaper) => {
             let str = ''
 
@@ -533,7 +533,7 @@ export const initExecuteCommandMake = () => {
         alias: ['chatar'],
         group: 'make',
         argDescription: '<boolean change>',
-        description: 'change all terrains to a random terrain type',
+        description: 'Change all terrains to a random terrain type',
         cb: ({ nbParam, param1 }, escaper) => {
             if (
                 nbParam === 1 &&
@@ -553,7 +553,7 @@ export const initExecuteCommandMake = () => {
         alias: ['excht'],
         group: 'make',
         argDescription: '[<terrainLabelA> <terrainLabelB>]',
-        description: 'exchange two terrains, without parameter, click on the terrains to exchange them',
+        description: 'Exchange two terrains, without parameter, click on the terrains to exchange them',
         cb: ({ noParam, nbParam, param1, param2 }, escaper) => {
             if (noParam) {
                 escaper.makeExchangeTerrains()
@@ -578,7 +578,7 @@ export const initExecuteCommandMake = () => {
         alias: ['rdmt'],
         group: 'make',
         argDescription: '',
-        description: 'randomize terrains',
+        description: 'Randomize terrains',
         cb: ({ noParam }) => {
             if (noParam) {
                 RandomizeTerrains.RandomizeTerrains()
@@ -593,7 +593,7 @@ export const initExecuteCommandMake = () => {
         alias: ['crt'],
         group: 'make',
         argDescription: '<terrainLabel> [<brushSize> [<shape>]',
-        description: 'create the terrain on the map, by clicking',
+        description: 'Create the terrain on the map, by clicking',
         cb: ({ nbParam, param1, param2, param3 }, escaper) => {
             if (nbParam < 1 || nbParam > 3) {
                 return true
@@ -632,7 +632,7 @@ export const initExecuteCommandMake = () => {
         alias: ['setbs'],
         group: 'make',
         argDescription: '<brushSize>',
-        description: 'sets the brush size',
+        description: 'Sets the brush size',
         cb: ({ nbParam, param1 }, escaper) => {
             if (nbParam != 1) {
                 return true
@@ -656,7 +656,7 @@ export const initExecuteCommandMake = () => {
         alias: ['setgt'],
         group: 'make',
         argDescription: '<terrainLabel>',
-        description: 'sets the gum terrain',
+        description: 'Sets the gum terrain',
         cb: ({ nbParam, param1 }, escaper) => {
             if (nbParam != 1) {
                 return true
@@ -680,7 +680,7 @@ export const initExecuteCommandMake = () => {
         alias: ['setgbs'],
         group: 'make',
         argDescription: '<brushSize>',
-        description: 'set the gum brush size',
+        description: 'Set the gum brush size',
         cb: ({ nbParam, param1 }, escaper) => {
             if (nbParam != 1) {
                 return true
@@ -704,7 +704,7 @@ export const initExecuteCommandMake = () => {
         alias: ['cpt'],
         group: 'make',
         argDescription: '',
-        description: 'copy paste a rectangle of terrain on the map',
+        description: 'Copy paste a rectangle of terrain on the map',
         cb: ({ noParam }, escaper) => {
             if (noParam) {
                 escaper.makeTerrainCopyPaste()
@@ -720,7 +720,7 @@ export const initExecuteCommandMake = () => {
         alias: ['vst'],
         group: 'make',
         argDescription: '',
-        description: 'transform a rectangle of terrain by a vertical symmetry',
+        description: 'Transform a rectangle of terrain by a vertical symmetry',
         cb: ({ noParam }, escaper) => {
             if (noParam) {
                 escaper.makeTerrainVerticalSymmetry()
@@ -736,7 +736,7 @@ export const initExecuteCommandMake = () => {
         alias: ['hst'],
         group: 'make',
         argDescription: '',
-        description: 'transform a rectangle of terrain by an horizontal symmetry',
+        description: 'Transform a rectangle of terrain by an horizontal symmetry',
         cb: ({ noParam }, escaper) => {
             if (noParam) {
                 escaper.makeTerrainHorizontalSymmetry()
@@ -752,7 +752,7 @@ export const initExecuteCommandMake = () => {
         alias: ['th'],
         group: 'make',
         argDescription: ' [<terrainRadius> [<height>]]',
-        description: 'apply a terrain height at chosen places ; default radius 100, default height 100',
+        description: 'Apply a terrain height at chosen places ; default radius 100, default height 100',
         cb: ({ nbParam, param1, param2 }, escaper) => {
             if (!(nbParam <= 2)) {
                 return true
@@ -799,7 +799,7 @@ export const initExecuteCommandMake = () => {
         alias: ['dt'],
         group: 'make',
         argDescription: ' [<terrainLabel>] [page]',
-        description: 'displays the characteristics of the terrains added by the maker(s)',
+        description: 'Displays the characteristics of the terrains added by the maker(s)',
         cb: ({ cmd }, escaper) => {
             getUdgTerrainTypes().displayPaginatedForPlayer(escaper.getPlayer(), cmd)
             return true
@@ -812,7 +812,7 @@ export const initExecuteCommandMake = () => {
         alias: ['newm'],
         group: 'make',
         argDescription: '<label> <unitTypeId> [<immolationRadius> [<speed> [<scale> [<isClickable>]]]]',
-        description: 'add a new monster',
+        description: 'Add a new monster',
         cb: ({ cmd, nbParam, param1, param2, param3 }, escaper) => {
             if (nbParam < 2 || nbParam > 6) {
                 return true
@@ -911,7 +911,7 @@ export const initExecuteCommandMake = () => {
         alias: ['setml'],
         group: 'make',
         argDescription: '<oldMonsterLabel> <newMonsterLabel>',
-        description: 'change the label of a monster',
+        description: 'Change the label of a monster',
         cb: ({ nbParam, param1, param2 }, escaper) => {
             if (!(nbParam === 2)) {
                 return true
@@ -936,7 +936,7 @@ export const initExecuteCommandMake = () => {
         alias: ['setma'],
         group: 'make',
         argDescription: '<monsterLabel> <alias>',
-        description: 'change the alias of a monster',
+        description: 'Change the alias of a monster',
         cb: ({ nbParam, param1, param2 }, escaper) => {
             if (!(nbParam === 2)) {
                 return true
@@ -961,7 +961,7 @@ export const initExecuteCommandMake = () => {
         alias: ['setmu'],
         group: 'make',
         argDescription: '<monsterLabel> <unitType>',
-        description: 'change the unit type of a monster',
+        description: 'Change the unit type of a monster',
         cb: ({ nbParam, param1, param2 }, escaper) => {
             if (!(nbParam === 2)) {
                 return true
@@ -997,7 +997,7 @@ export const initExecuteCommandMake = () => {
         alias: ['setmi'],
         group: 'make',
         argDescription: '<monsterLabel> <immolationRadius>',
-        description: 'change the immolation radius of a monster',
+        description: 'Change the immolation radius of a monster',
         cb: ({ nbParam, param1, param2 }, escaper) => {
             if (!(nbParam === 2)) {
                 return true
@@ -1031,7 +1031,7 @@ export const initExecuteCommandMake = () => {
         alias: ['setmms'],
         group: 'make',
         argDescription: '<monsterLabel> <speed>',
-        description: 'change the move speed of a monster',
+        description: 'Change the move speed of a monster',
         cb: ({ nbParam, param1, param2 }, escaper) => {
             if (!(nbParam === 2)) {
                 return true
@@ -1061,7 +1061,7 @@ export const initExecuteCommandMake = () => {
         alias: ['setms'],
         group: 'make',
         argDescription: '<monsterLabel> <scale>',
-        description: 'change the scale of a monster',
+        description: 'Change the scale of a monster',
         cb: ({ nbParam, param1, param2 }, escaper) => {
             if (!(nbParam === 2)) {
                 return true
@@ -1099,7 +1099,7 @@ export const initExecuteCommandMake = () => {
         alias: ['setmct'],
         group: 'make',
         argDescription: '<monsterLabel> <terrainLabel>',
-        description: 'change the scale of a monster',
+        description: 'Change the scale of a monster',
         cb: ({ nbParam, param1, param2 }, escaper) => {
             if (!(nbParam === 2)) {
                 return true
@@ -1132,7 +1132,7 @@ export const initExecuteCommandMake = () => {
         alias: ['setmc'],
         group: 'make',
         argDescription: '<monsterLabel> <boolean clickable>',
-        description: 'sets if locust or not for this kind of monster',
+        description: 'Sets if locust or not for this kind of monster',
         cb: ({ nbParam, param1, param2 }, escaper) => {
             if (!(nbParam === 2)) {
                 return true
@@ -1170,7 +1170,7 @@ export const initExecuteCommandMake = () => {
         alias: ['setmke'],
         group: 'make',
         argDescription: '<monsterLabel> <killingEffect>',
-        description: 'sets the killing effect of a monster',
+        description: 'Sets the killing effect of a monster',
         cb: ({ nbParam, param1, param2 }, escaper) => {
             if (!(nbParam === 2)) {
                 return true
@@ -1192,7 +1192,7 @@ export const initExecuteCommandMake = () => {
         alias: ['setmmtk'],
         group: 'make',
         argDescription: '<monsterLabel> <meteorNumber>',
-        description: 'sets the number of meteors to kill for this monster type',
+        description: 'Sets the number of meteors to kill for this monster type',
         cb: ({ nbParam, param1, param2 }, escaper) => {
             if (!(nbParam === 2)) {
                 return true
@@ -1219,7 +1219,7 @@ export const initExecuteCommandMake = () => {
         alias: ['setmh'],
         group: 'make',
         argDescription: '<monsterLabel> <height>|default|d',
-        description: 'sets the height of a monster',
+        description: 'Sets the height of a monster',
         cb: ({ nbParam, param1, param2 }, escaper) => {
             if (!(nbParam === 2)) {
                 return true
@@ -1295,7 +1295,7 @@ export const initExecuteCommandMake = () => {
         alias: ['crm'],
         group: 'make',
         argDescription: '<monsterLabel>',
-        description: 'creates a monster at the current location, patrolling between 2 locations',
+        description: 'Creates a monster at the current location, patrolling between 2 locations',
         cb: ({ nbParam, param1 }, escaper) => {
             if (!(nbParam === 1)) {
                 return true
@@ -1380,7 +1380,7 @@ export const initExecuteCommandMake = () => {
         alias: ['setadot'],
         group: 'make',
         argDescription: '<newDist>',
-        description: 'for patrol monsters created in one click, distance between locations and slide terrain',
+        description: 'For patrol monsters created in one click, distance between locations and slide terrain',
         cb: ({ nbParam, param1 }, escaper) => {
             if (!(nbParam === 1 && (S2R(param1) !== 0 || param1 === '0' || param1 === 'default' || param1 === 'd'))) {
                 return true
@@ -1404,7 +1404,7 @@ export const initExecuteCommandMake = () => {
         alias: ['crmmp'],
         group: 'make',
         argDescription: '<monsterLabel>',
-        description: 'creates a monster at the current location, patrolling between 2 locations, until 20 locations',
+        description: 'Creates a monster at the current location, patrolling between 2 locations, until 20 locations',
         cb: ({ nbParam, param1 }, escaper) => {
             if (!(nbParam === 1)) {
                 return true
@@ -1454,7 +1454,7 @@ export const initExecuteCommandMake = () => {
         alias: ['crmt'],
         group: 'make',
         argDescription: '<monsterLabel> <period> <angle>',
-        description: 'creates a monster at the current location, patrolling between 2 locations, until 20 locations',
+        description: 'Creates a monster at the current location, patrolling between 2 locations, until 20 locations',
         cb: ({ nbParam, param1, param2, param3 }, escaper) => {
             if (!(nbParam === 3)) {
                 return true
@@ -1496,7 +1496,7 @@ export const initExecuteCommandMake = () => {
         alias: ['crmts'],
         group: 'make',
         argDescription: '<monsterLabel> <period> <angle>',
-        description: 'creates a monster at the current location, patrolling between 2 locations, until 20 locations',
+        description: 'Creates a monster at the current location, patrolling between 2 locations, until 20 locations',
         cb: ({ nbParam, param1, param2, param3 }, escaper) => {
             if (!(nbParam === 3)) {
                 return true
@@ -1538,7 +1538,7 @@ export const initExecuteCommandMake = () => {
         alias: ['n'],
         group: 'make',
         argDescription: '',
-        description: 'finalize the current multi patrols or teleport monster and start the next one',
+        description: 'Finalize the current multi patrols or teleport monster and start the next one',
         cb: ({ noParam }, escaper) => {
             if (!noParam) {
                 return true
@@ -1558,7 +1558,7 @@ export const initExecuteCommandMake = () => {
         alias: ['mtw'],
         group: 'make',
         argDescription: '',
-        description: 'a wait period for the monster teleport being created',
+        description: 'A wait period for the monster teleport being created',
         cb: ({ noParam }, escaper) => {
             if (!noParam) {
                 return true
@@ -1578,7 +1578,7 @@ export const initExecuteCommandMake = () => {
         alias: ['mth'],
         group: 'make',
         argDescription: '',
-        description: 'a hide period for the monster teleport being created',
+        description: 'A hide period for the monster teleport being created',
         cb: ({ noParam }, escaper) => {
             if (!noParam) {
                 return true
@@ -1598,7 +1598,7 @@ export const initExecuteCommandMake = () => {
         alias: ['setutp'],
         group: 'make',
         argDescription: '<period>',
-        description: 'set the period for the unit teleport being created',
+        description: 'Set the period for the unit teleport being created',
         cb: ({ nbParam, param1 }, escaper) => {
             if (nbParam !== 1) {
                 return true
@@ -1628,7 +1628,7 @@ export const initExecuteCommandMake = () => {
         alias: ['setutpbp'],
         group: 'make',
         argDescription: '<period>',
-        description: 'set the period for the unit teleport being created',
+        description: 'Set the period for the unit teleport being created',
         cb: ({ nbParam, param1 }, escaper) => {
             if (nbParam !== 1) {
                 return true
@@ -1658,7 +1658,7 @@ export const initExecuteCommandMake = () => {
         alias: ['getutp'],
         group: 'make',
         argDescription: '',
-        description: 'displays the period of any teleporting unit you click',
+        description: 'Displays the period of any teleporting unit you click',
         cb: ({ noParam }, escaper) => {
             if (!noParam) {
                 return true
@@ -1724,7 +1724,7 @@ export const initExecuteCommandMake = () => {
         alias: ['dm'],
         group: 'make',
         argDescription: '[<monsterLabel>] [page]',
-        description: 'displays the characteristics of the kinds of monsters added by the maker(s)',
+        description: 'Displays the characteristics of the kinds of monsters added by the maker(s)',
         cb: ({ cmd }, escaper) => {
             getUdgMonsterTypes().displayPaginatedForPlayer(escaper.getPlayer(), cmd)
             return true
@@ -1737,7 +1737,7 @@ export const initExecuteCommandMake = () => {
         alias: ['delmbp'],
         group: 'make',
         argDescription: '[<deleteMode>]',
-        description: 'delete monsters in a rectangle formed with two clicks',
+        description: 'Delete monsters in a rectangle formed with two clicks',
         cb: ({ nbParam, param1 }, escaper) => {
             //delete modes : all, noMove, move, simplePatrol, multiplePatrols
             if (!(nbParam <= 1)) {
@@ -1783,7 +1783,7 @@ export const initExecuteCommandMake = () => {
         alias: ['delm'],
         group: 'make',
         argDescription: '',
-        description: 'delete the monsters clicked by the player',
+        description: 'Delete the monsters clicked by the player',
         cb: ({ noParam }, escaper) => {
             if (noParam) {
                 escaper.makeDeleteMonsters('oneByOne')
@@ -1799,7 +1799,7 @@ export const initExecuteCommandMake = () => {
         alias: ['crmsp'],
         group: 'make',
         argDescription: '<monsterSpawnLabel> <monsterLabel> <direction> [<frequency>]',
-        description: 'default frequency is 2, minimum is 0.1, maximum is 30',
+        description: 'Default frequency is 2, minimum is 0.1, maximum is 30',
         cb: ({ nbParam, param1, param2, param3, param4 }, escaper) => {
             if (!(nbParam >= 3 && nbParam <= 4)) {
                 Text.erP(escaper.getPlayer(), 'uncorrect number of parameters')
@@ -1852,7 +1852,7 @@ export const initExecuteCommandMake = () => {
         alias: ['setmsl'],
         group: 'make',
         argDescription: '<oldMonsterSpawnLabel> <newMonsterSpawnLabel>',
-        description: 'change the label of an existing monster spawn',
+        description: 'Change the label of an existing monster spawn',
         cb: ({ nbParam, param1, param2 }, escaper) => {
             if (!(nbParam === 2)) {
                 return true
@@ -1872,7 +1872,7 @@ export const initExecuteCommandMake = () => {
         alias: ['setmsm'],
         group: 'make',
         argDescription: '<monsterSpawnLabel> <monsterLabel>',
-        description: 'change which monster type a monster spawn will create',
+        description: 'Change which monster type a monster spawn will create',
         cb: ({ nbParam, param1, param2 }, escaper) => {
             if (!(nbParam === 2)) {
                 return true
@@ -1902,7 +1902,7 @@ export const initExecuteCommandMake = () => {
         alias: ['setmsd', 'setMonsterSpawnRotation', 'setmsr'],
         group: 'make',
         argDescription: '<monsterSpawnLabel> <direction>',
-        description: 'leftToRight(ltr), upToDown(utd), rightToLeft(rtl), downToUp(dtu), any angle in degrees',
+        description: 'LeftToRight(ltr), upToDown(utd), rightToLeft(rtl), downToUp(dtu), any angle in degrees',
         cb: ({ param1, param2 }, escaper) => {
             const monsterSpawn = escaper.getMakingLevel().monsterSpawns.getByLabel(param1)
 
@@ -1937,7 +1937,7 @@ export const initExecuteCommandMake = () => {
         alias: ['setmsf'],
         group: 'make',
         argDescription: '<monsterSpawnLabel> <frequency>',
-        description: 'set how often monsters spawn (frequency between 0.1 and 30)',
+        description: 'Set how often monsters spawn (frequency between 0.1 and 30)',
         cb: ({ nbParam, param1, param2 }, escaper) => {
             if (!(nbParam === 2)) {
                 return true
@@ -1966,7 +1966,7 @@ export const initExecuteCommandMake = () => {
         alias: ['setmsa'],
         group: 'make',
         argDescription: '<label> <amount>',
-        description: 'set how many monsters spawn simultaneously per spawn cycle (1-500)',
+        description: 'Set how many monsters spawn simultaneously per spawn cycle (1-500)',
         cb: ({ param1, param2 }, escaper) => {
             const monsterSpawn = escaper.getMakingLevel().monsterSpawns.getByLabel(param1)
 
@@ -1992,7 +1992,7 @@ export const initExecuteCommandMake = () => {
         alias: ['setmso'],
         group: 'make',
         argDescription: '<label> <offset>',
-        description: 'distance between each individual monster when spawnAmount > 1 (0-16384, 0 disables)',
+        description: 'Distance between each individual monster when spawnAmount > 1 (0-16384, 0 disables)',
         cb: ({ param1, param2 }, escaper) => {
             const monsterSpawn = escaper.getMakingLevel().monsterSpawns.getByLabel(param1)
 
@@ -2018,7 +2018,7 @@ export const initExecuteCommandMake = () => {
         alias: ['setmsfso'],
         group: 'make',
         argDescription: '<label> <offset>',
-        description: 'distance between each spawn (0-16384, 0 disables)',
+        description: 'Distance between each spawn (0-16384, 0 disables)',
         cb: ({ param1, param2 }, escaper) => {
             const monsterSpawn = escaper.getMakingLevel().monsterSpawns.getByLabel(param1)
 
@@ -2044,7 +2044,7 @@ export const initExecuteCommandMake = () => {
         alias: ['setmsfsob'],
         group: 'make',
         argDescription: '<label> <bounce>',
-        description: 'toggle whether fixed spawn offset bounces back and forth (requires fixedSpawnOffset enabled)',
+        description: 'Toggle whether fixed spawn offset bounces back and forth (requires fixedSpawnOffset enabled)',
         cb: ({ param1, param2 }, escaper) => {
             const monsterSpawn = escaper.getMakingLevel().monsterSpawns.getByLabel(param1)
 
@@ -2075,7 +2075,7 @@ export const initExecuteCommandMake = () => {
         alias: ['setmsfsom'],
         group: 'make',
         argDescription: '<label> <mirrored>',
-        description: 'toggle whether fixed spawn offset mirrors on opposite side (requires fixedSpawnOffset enabled)',
+        description: 'Toggle whether fixed spawn offset mirrors on opposite side (requires fixedSpawnOffset enabled)',
         cb: ({ param1, param2 }, escaper) => {
             const monsterSpawn = escaper.getMakingLevel().monsterSpawns.getByLabel(param1)
 
@@ -2106,7 +2106,7 @@ export const initExecuteCommandMake = () => {
         alias: ['setmsid'],
         group: 'make',
         argDescription: '<label> <delay>',
-        description: 'set delay in seconds before monster spawn starts spawning (1-10)',
+        description: 'Set delay in seconds before monster spawn starts spawning (1-10)',
         cb: ({ param1, param2 }, escaper) => {
             const monsterSpawn = escaper.getMakingLevel().monsterSpawns.getByLabel(param1)
 
@@ -2132,7 +2132,7 @@ export const initExecuteCommandMake = () => {
         alias: ['setmstu'],
         group: 'make',
         argDescription: '<label> <time>',
-        description: 'set time in seconds after which spawned monsters will automatically despawn (0 to disable)',
+        description: 'Set time in seconds after which spawned monsters will automatically despawn (0 to disable)',
         cb: ({ param1, param2 }, escaper) => {
             const monsterSpawn = escaper.getMakingLevel().monsterSpawns.getByLabel(param1)
 
@@ -2204,7 +2204,7 @@ export const initExecuteCommandMake = () => {
         alias: ['dms'],
         group: 'make',
         argDescription: '[<monsterSpawnLabel>] [page]',
-        description: 'displays the monster spawns for this level',
+        description: 'Displays the monster spawns for this level',
         cb: ({ cmd }, escaper) => {
             escaper.getMakingLevel().monsterSpawns.displayPaginatedForPlayer(escaper.getPlayer(), cmd)
             return true
@@ -2278,7 +2278,7 @@ export const initExecuteCommandMake = () => {
         alias: ['drs'],
         group: 'make',
         argDescription: '[<regionLabel>] [page]',
-        description: 'displays the regions for this level',
+        description: 'Displays the regions for this level',
         cb: ({ cmd }, escaper) => {
             escaper.getMakingLevel().regions.displayPaginatedForPlayer(escaper.getPlayer(), cmd)
             return true
@@ -2397,7 +2397,7 @@ export const initExecuteCommandMake = () => {
         alias: ['crk'],
         group: 'make',
         argDescription: '',
-        description: 'create meteors used to kill clickable monsters',
+        description: 'Create meteors used to kill clickable monsters',
         cb: ({ noParam }, escaper) => {
             if (noParam) {
                 escaper.makeCreateMeteor()
@@ -2413,7 +2413,7 @@ export const initExecuteCommandMake = () => {
         alias: ['delkbp'],
         group: 'make',
         argDescription: '',
-        description: 'delete meteors in a rectangle formed with two clicks',
+        description: 'Delete meteors in a rectangle formed with two clicks',
         cb: ({ noParam }, escaper) => {
             if (noParam) {
                 escaper.makeDeleteMeteors('twoClics')
@@ -2429,7 +2429,7 @@ export const initExecuteCommandMake = () => {
         alias: ['delk'],
         group: 'make',
         argDescription: '',
-        description: 'delete the meteors clicked by the player',
+        description: 'Delete the meteors clicked by the player',
         cb: ({ noParam }, escaper) => {
             if (noParam) {
                 escaper.makeDeleteMeteors('oneByOne')
@@ -2476,7 +2476,7 @@ export const initExecuteCommandMake = () => {
         alias: ['cre'],
         group: 'make',
         argDescription: '',
-        description: 'create the end (a rectangle formed with two clicks) of the current level',
+        description: 'Create the end (a rectangle formed with two clicks) of the current level',
         cb: ({ noParam }, escaper) => {
             if (!noParam) {
                 return true
@@ -2493,7 +2493,7 @@ export const initExecuteCommandMake = () => {
         alias: ['getmkl'],
         group: 'make',
         argDescription: '',
-        description: 'displays the id of the level the player is creating (the first one is id 0)',
+        description: 'Displays the id of the level the player is creating (the first one is id 0)',
         cb: ({ noParam }, escaper) => {
             if (!noParam) {
                 return true
@@ -2520,7 +2520,7 @@ export const initExecuteCommandMake = () => {
         alias: ['setmkl'],
         group: 'make',
         argDescription: '<levelId> | current(c)',
-        description: 'sets the level the players chose to continue creating',
+        description: 'Sets the level the players chose to continue creating',
         cb: ({ nbParam, param1 }, escaper) => {
             if (!(nbParam === 1)) {
                 return true
@@ -2573,7 +2573,7 @@ export const initExecuteCommandMake = () => {
         alias: ['newl'],
         group: 'make',
         argDescription: '',
-        description: 'creates a new level after the last one',
+        description: 'Creates a new level after the last one',
         cb: ({ noParam }, escaper) => {
             if (noParam) {
                 if (getUdgLevels().new()) {
@@ -2592,7 +2592,7 @@ export const initExecuteCommandMake = () => {
         alias: [],
         group: 'make',
         argDescription: '',
-        description: 'creates a new level after the last one by copying the current make level',
+        description: 'Creates a new level after the last one by copying the current make level',
         cb: ({ noParam }, escaper) => {
             if (noParam) {
                 const currentLevel = escaper.getMakingLevel()
@@ -2656,7 +2656,7 @@ export const initExecuteCommandMake = () => {
         alias: ['setle'],
         group: 'make',
         argDescription: '<livesNumber> [<levelID>]',
-        description: 'the number of lives earned at the specified level',
+        description: 'The number of lives earned at the specified level',
         cb: ({ nbParam, param1, param2 }, escaper) => {
             if (!(nbParam >= 1 && nbParam <= 2)) {
                 return true
@@ -2702,7 +2702,7 @@ export const initExecuteCommandMake = () => {
         alias: ['crv'],
         group: 'make',
         argDescription: '',
-        description: 'create visibility rectangles for the current level',
+        description: 'Create visibility rectangles for the current level',
         cb: ({ noParam }, escaper) => {
             if (noParam) {
                 escaper.makeCreateVisibilityModifier()
@@ -2718,7 +2718,7 @@ export const initExecuteCommandMake = () => {
         alias: ['remv'],
         group: 'make',
         argDescription: '[<levelId>]',
-        description: 'remove all visibility rectangles made for the current level',
+        description: 'Remove all visibility rectangles made for the current level',
         cb: ({ noParam, nbParam, param1, param2 }, escaper) => {
             if (!(noParam || nbParam === 1)) {
                 return true
@@ -2752,7 +2752,7 @@ export const initExecuteCommandMake = () => {
         alias: ['setsm'],
         group: 'make',
         argDescription: '[<message>]',
-        description: 'sets the start message of the current level (spaces allowed)',
+        description: 'Sets the start message of the current level (spaces allowed)',
         cb: ({ cmd }, escaper) => {
             escaper.getMakingLevel().setStartMessage(CmdParam(cmd, 0))
             Text.mkP(
@@ -2769,7 +2769,7 @@ export const initExecuteCommandMake = () => {
         alias: ['getsm'],
         group: 'make',
         argDescription: '',
-        description: 'displays the start message of the current level',
+        description: 'Displays the start message of the current level',
         cb: ({}, escaper) => {
             const str = escaper.getMakingLevel().getStartMessage()
             if (str === '' || str === null) {
@@ -2793,7 +2793,7 @@ export const initExecuteCommandMake = () => {
         alias: ['z'],
         group: 'make',
         argDescription: '',
-        description: 'cancel the last action made on the map',
+        description: 'Cancel the last action made on the map',
         cb: ({ noParam }, escaper) => {
             if (noParam) {
                 if (!escaper.cancelLastAction()) {
@@ -2810,7 +2810,7 @@ export const initExecuteCommandMake = () => {
         alias: ['y'],
         group: 'make',
         argDescription: '',
-        description: 'redo the last action cancelled',
+        description: 'Redo the last action cancelled',
         cb: ({ noParam }, escaper) => {
             if (noParam) {
                 if (!escaper.redoLastAction()) {
@@ -2827,7 +2827,7 @@ export const initExecuteCommandMake = () => {
         alias: ['nbl'],
         group: 'make',
         argDescription: '',
-        description: 'display the number of levels that are currently in the map',
+        description: 'Display the number of levels that are currently in the map',
         cb: ({ noParam }, escaper) => {
             if (noParam) {
                 const n = getUdgLevels().count()
@@ -2849,7 +2849,7 @@ export const initExecuteCommandMake = () => {
         group: 'make',
         argDescription:
             '<label> <casterMonsterType> <projectileMonsterType> [<range> [<projectileSpeed> [<loadTime>]]]',
-        description: 'create a new caster monster',
+        description: 'Create a new caster monster',
         cb: ({ cmd, nbParam, param1, param2, param3, param4 }, escaper) => {
             if (nbParam < 3 || nbParam > 6) {
                 return true
@@ -2941,7 +2941,7 @@ export const initExecuteCommandMake = () => {
         alias: ['setcl'],
         group: 'make',
         argDescription: '<oldCasterLabel> <newCasterLabel>',
-        description: 'change the label of a caster monster',
+        description: 'Change the label of a caster monster',
         cb: ({ nbParam, param1, param2 }, escaper) => {
             if (!(nbParam === 2)) {
                 return true
@@ -2966,7 +2966,7 @@ export const initExecuteCommandMake = () => {
         alias: ['setca'],
         group: 'make',
         argDescription: '<casterLabel> <alias>',
-        description: 'change the alias of a caster monster',
+        description: 'Change the alias of a caster monster',
         cb: ({ nbParam, param1, param2 }, escaper) => {
             if (!(nbParam === 2)) {
                 return true
@@ -2991,7 +2991,7 @@ export const initExecuteCommandMake = () => {
         alias: ['setcc'],
         group: 'make',
         argDescription: '<casterLabel> <casterMonsterType>',
-        description: 'change the caster monster type of a caster monster',
+        description: 'Change the caster monster type of a caster monster',
         cb: ({ nbParam, param1, param2 }, escaper) => {
             if (nbParam !== 2) {
                 return true
@@ -3020,7 +3020,7 @@ export const initExecuteCommandMake = () => {
         alias: ['setcp'],
         group: 'make',
         argDescription: '<casterLabel> <projectileMonsterType>',
-        description: 'change the projectile monster type of a caster monster',
+        description: 'Change the projectile monster type of a caster monster',
         cb: ({ nbParam, param1, param2 }, escaper) => {
             if (nbParam !== 2) {
                 return true
@@ -3049,7 +3049,7 @@ export const initExecuteCommandMake = () => {
         alias: ['setcr'],
         group: 'make',
         argDescription: '<casterLabel> <range>',
-        description: 'change the range of a caster monster',
+        description: 'Change the range of a caster monster',
         cb: ({ nbParam, param1, param2 }, escaper) => {
             if (nbParam !== 2) {
                 return true
@@ -3077,7 +3077,7 @@ export const initExecuteCommandMake = () => {
         alias: ['setcs'],
         group: 'make',
         argDescription: '<casterLabel> <projectileSpeed>',
-        description: 'change the speed of a caster monster',
+        description: 'Change the speed of a caster monster',
         cb: ({ nbParam, param1, param2 }, escaper) => {
             if (nbParam !== 2) {
                 return true
@@ -3108,7 +3108,7 @@ export const initExecuteCommandMake = () => {
         alias: ['setclt'],
         group: 'make',
         argDescription: '<casterLabel> <loadTime>',
-        description: 'change the load time of a caster monster',
+        description: 'Change the load time of a caster monster',
         cb: ({ nbParam, param1, param2 }, escaper) => {
             if (nbParam !== 2) {
                 return true
@@ -3139,7 +3139,7 @@ export const initExecuteCommandMake = () => {
         alias: ['setcan'],
         group: 'make',
         argDescription: '<casterLabel> <animation>',
-        description: 'change the animation of a caster monster',
+        description: 'Change the animation of a caster monster',
         cb: ({ cmd, name, nbParam, param1 }, escaper) => {
             if (!(nbParam >= 2)) {
                 return true
@@ -3165,7 +3165,7 @@ export const initExecuteCommandMake = () => {
         alias: ['crc'],
         group: 'make',
         argDescription: '<casterLabel> [<facingAngle>]',
-        description: 'create a caster monster',
+        description: 'Create a caster monster',
         cb: ({ nbParam, param1, param2 }, escaper) => {
             if (nbParam < 1 || nbParam > 2) {
                 return true
@@ -3202,7 +3202,7 @@ export const initExecuteCommandMake = () => {
         alias: ['delcbp'],
         group: 'make',
         argDescription: '',
-        description: 'delete casters in a rectangle formed with two clicks',
+        description: 'Delete casters in a rectangle formed with two clicks',
         cb: ({ noParam }, escaper) => {
             if (noParam) {
                 escaper.makeDeleteCasters('twoClics')
@@ -3218,7 +3218,7 @@ export const initExecuteCommandMake = () => {
         alias: ['delc'],
         group: 'make',
         argDescription: '',
-        description: 'delete the casters clicked by the player',
+        description: 'Delete the casters clicked by the player',
         cb: ({ noParam }, escaper) => {
             if (noParam) {
                 escaper.makeDeleteCasters('oneByOne')
@@ -3234,7 +3234,7 @@ export const initExecuteCommandMake = () => {
         alias: ['dc'],
         group: 'make',
         argDescription: '[<casterLabel>] [page]',
-        description: 'display the casters of the map',
+        description: 'Display the casters of the map',
         cb: ({ cmd }, escaper) => {
             getUdgCasterTypes().displayPaginatedForPlayer(escaper.getPlayer(), cmd)
             return true
@@ -3247,7 +3247,7 @@ export const initExecuteCommandMake = () => {
         alias: ['crcm'],
         group: 'make',
         argDescription: '<disableDuration>',
-        description: 'create a clear mob',
+        description: 'Create a clear mob',
         cb: ({ nbParam, param1 }, escaper) => {
             if (!(nbParam === 1)) {
                 return true
@@ -3275,7 +3275,7 @@ export const initExecuteCommandMake = () => {
         alias: ['delcm'],
         group: 'make',
         argDescription: '',
-        description: 'delete the clear mob',
+        description: 'Delete the clear mob',
         cb: ({ noParam }, escaper) => {
             if (!noParam) {
                 return true
@@ -3292,7 +3292,7 @@ export const initExecuteCommandMake = () => {
         alias: ['setcme'],
         group: 'make',
         argDescription: '<effectPath>',
-        description: 'set special effect to play when stepping on clear mob trigger',
+        description: 'Set special effect to play when stepping on clear mob trigger',
         cb: ({ nbParam, param1 }, escaper) => {
             if (!(nbParam === 1)) {
                 return true
@@ -3309,7 +3309,7 @@ export const initExecuteCommandMake = () => {
         alias: ['setbme', 'setClearMobBlockMobEffect', 'setcmbme'],
         group: 'make',
         argDescription: '<effectPath>',
-        description: 'set special effect to play on block mobs when clear mob is triggered',
+        description: 'Set special effect to play on block mobs when clear mob is triggered',
         cb: ({ nbParam, param1 }, escaper) => {
             if (!(nbParam === 1)) {
                 return true
@@ -3326,7 +3326,7 @@ export const initExecuteCommandMake = () => {
         alias: ['setcmdd'],
         group: 'make',
         argDescription: '<disableDuration>',
-        description: 'set the disable duration of the clear mob',
+        description: 'Set the disable duration of the clear mob',
         cb: ({ nbParam, param1 }, escaper) => {
             if (!(nbParam === 1)) {
                 return true
@@ -3745,8 +3745,8 @@ export const initExecuteCommandMake = () => {
                             ? 'on_monsters'
                             : 'off'
                         : S2B(param1)
-                        ? 'on'
-                        : 'off'
+                          ? 'on'
+                          : 'off'
                 )
             Text.mkP(escaper.getPlayer(), `debugRegions ${S2B(param1) ? 'on' : 'off'}`)
             return true
@@ -3759,7 +3759,7 @@ export const initExecuteCommandMake = () => {
         alias: ['crpm'],
         group: 'make',
         argDescription: '<freezeDuration> [<portalEffect> [<portalEffectDuration>]]',
-        description: 'create a portal mob',
+        description: 'Create a portal mob',
         cb: ({ nbParam, param1, param2, param3 }, escaper) => {
             if (!(nbParam === 1 || nbParam === 2 || nbParam === 3)) {
                 return true
@@ -3795,7 +3795,7 @@ export const initExecuteCommandMake = () => {
         alias: ['delpm'],
         group: 'make',
         argDescription: '',
-        description: 'delete the portal mob',
+        description: 'Delete the portal mob',
         cb: ({ noParam }, escaper) => {
             if (!noParam) {
                 return true
@@ -3812,7 +3812,7 @@ export const initExecuteCommandMake = () => {
         alias: ['setpmfd'],
         group: 'make',
         argDescription: '<freezeDuration>',
-        description: 'set the freeze duration of the portal mob',
+        description: 'Set the freeze duration of the portal mob',
         cb: ({ nbParam, param1 }, escaper) => {
             if (!(nbParam === 1)) {
                 return true
@@ -3840,7 +3840,7 @@ export const initExecuteCommandMake = () => {
         alias: ['setpme'],
         group: 'make',
         argDescription: '<portalEffect>',
-        description: 'set the portal effect of the portal mob',
+        description: 'Set the portal effect of the portal mob',
         cb: ({ nbParam, param1 }, escaper) => {
             if (!(nbParam === 1)) {
                 return true
@@ -3858,7 +3858,7 @@ export const initExecuteCommandMake = () => {
         alias: ['setpmed'],
         group: 'make',
         argDescription: '<portalEffectDuration>',
-        description: 'set the portal effect duration of the portal mob',
+        description: 'Set the portal effect duration of the portal mob',
         cb: ({ param1 }, escaper) => {
             if (param1 !== '') {
                 if (!(S2R(param1) > 0)) {
@@ -3879,7 +3879,7 @@ export const initExecuteCommandMake = () => {
         alias: ['gettcc'],
         group: 'make',
         argDescription: '<terrainLabel>',
-        description: 'get the cliff class of the terrain',
+        description: 'Get the cliff class of the terrain',
         cb: ({ nbParam, param1 }, escaper) => {
             if (nbParam !== 1) {
                 return true
@@ -3906,7 +3906,7 @@ export const initExecuteCommandMake = () => {
         alias: [],
         group: 'make',
         argDescription: '',
-        description: 'get the main tileset',
+        description: 'Get the main tileset',
         cb: ({ noParam }, escaper) => {
             if (!noParam) {
                 return true
@@ -3932,7 +3932,7 @@ export const initExecuteCommandMake = () => {
         alias: ['setcg', 'snapClicks'],
         group: 'make',
         argDescription: '<value>',
-        description: 'snap clicks to nearest <value>',
+        description: 'Snap clicks to nearest <value>',
         cb: ({ nbParam, param1 }, escaper) => {
             if (nbParam === 1) {
                 escaper.roundToGrid = S2I(param1) > 1 && S2I(param1) <= 128 ? S2I(param1) : null
@@ -3998,7 +3998,7 @@ export const initExecuteCommandMake = () => {
         alias: ['sptg'],
         group: 'make',
         argDescription: '<value>',
-        description: 'snap all patrols to nearest <value>',
+        description: 'Snap all patrols to nearest <value>',
         cb: ({ nbParam, param1 }, escaper) => {
             if (nbParam === 1) {
                 const roundToGrid = S2I(param1) > 1 && S2I(param1) <= 128 ? S2I(param1) : null
@@ -4090,7 +4090,7 @@ export const initExecuteCommandMake = () => {
         alias: ['spts'],
         group: 'make',
         argDescription: '<value> [boolean fixStartOnSlidePatrols]',
-        description: 'snap all patrols to nearest slide terrain with an offset of <value>',
+        description: 'Snap all patrols to nearest slide terrain with an offset of <value>',
         cb: ({ nbParam, param1, param2 }, escaper) => {
             if (nbParam === 1 || nbParam === 2) {
                 const snapToSlide = S2I(param1)

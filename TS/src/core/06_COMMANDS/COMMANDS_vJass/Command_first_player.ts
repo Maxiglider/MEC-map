@@ -566,7 +566,7 @@ export const initExecuteCommandRed = () => {
         alias: ['oca'],
         group: 'red',
         argDescription: '<view | grant | revoke> <cmd> <player|all>',
-        description: 'override command access',
+        description: 'Override command access',
         cb: ({ param1, param2, param3 }, escaper) => {
             if (param1 !== 'view' && param1 !== 'grant' && param1 !== 'revoke') {
                 return true

@@ -825,7 +825,7 @@ export const initExecuteCommandCheat = () => {
         alias: ['setgmk'],
         group: 'cheat',
         argDescription: '<boolean status>',
-        description: 'if activated, monsters will be killed by your hero',
+        description: 'If activated, monsters will be killed by your hero',
         cb: ({ nbParam, param1, param2 }, escaper) => {
             if (!(nbParam === 1 || nbParam === 2)) {
                 Text.erP(escaper.getPlayer(), 'one or two params for this command')
@@ -897,7 +897,7 @@ export const initExecuteCommandCheat = () => {
         alias: ['setg'],
         group: 'cheat',
         argDescription: 'x',
-        description: 'set the gravity of the game',
+        description: 'Set the gravity of the game',
         cb: ({ nbParam, param1 }, escaper) => {
             if (!(nbParam === 1) || (S2R(param1) === 0 && param1 !== '0')) {
                 return true
@@ -914,7 +914,7 @@ export const initExecuteCommandCheat = () => {
         alias: ['getg'],
         group: 'cheat',
         argDescription: '',
-        description: 'get the gravity of the game',
+        description: 'Get the gravity of the game',
         cb: ({ noParam }, escaper) => {
             if (noParam) {
                 Text.P(escaper.getPlayer(), 'current gravity is ' + R2S(Gravity.GetRealGravity()))
@@ -1178,7 +1178,7 @@ export const initExecuteCommandCheat = () => {
         alias: ['seth'],
         group: 'cheat',
         argDescription: '',
-        description: 'set the height of the game',
+        description: 'Set the height of the game',
         cb: ({ nbParam, param1 }, escaper) => {
             if (nbParam !== 1 || (S2R(param1) <= 0 && param1 !== '0')) {
                 return true
@@ -1200,7 +1200,7 @@ export const initExecuteCommandCheat = () => {
         alias: ['settu'],
         group: 'cheat',
         argDescription: '',
-        description: 'set the size of the units',
+        description: 'Set the size of the units',
         cb: ({ nbParam, param1 }) => {
             if (nbParam !== 1 || (S2R(param1) <= 0 && param1 !== '0')) {
                 return true
@@ -1216,7 +1216,7 @@ export const initExecuteCommandCheat = () => {
         alias: ['it'],
         group: 'cheat',
         argDescription: '',
-        description: 'instant turn',
+        description: 'Instant turn',
         cb: ({ nbParam, param1 }, escaper) => {
             if (nbParam === 1 && IsBoolString(param1)) {
                 if (escaper.isAbsoluteInstantTurn() != S2B(param1)) {

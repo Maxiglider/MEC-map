@@ -83,7 +83,7 @@ export const initCommandAll = () => {
         alias: ['vc', 'wild'],
         group: 'all',
         argDescription: '[ <red> <green> <blue> [<transparency>] ]',
-        description: 'without parameter takes a random vertex color without changing transparency',
+        description: 'Without parameter takes a random vertex color without changing transparency',
         cb: ({ noParam, nbParam, param1, param2, param3, param4 }, escaper) => {
             if (noParam || nbParam === 1) {
                 if (nbParam === 1) {
@@ -144,7 +144,7 @@ export const initCommandAll = () => {
         alias: ['vcr'],
         group: 'all',
         argDescription: '[<red>]',
-        description: 'changes the red part of the vertex color only',
+        description: 'Changes the red part of the vertex color only',
         cb: ({ noParam, nbParam, param1 }, escaper) => {
             if (noParam) {
                 escaper.setVcRed(GetRandomPercentageBJ())
@@ -172,7 +172,7 @@ export const initCommandAll = () => {
         alias: ['vcg'],
         group: 'all',
         argDescription: '[<Green>]',
-        description: 'changes the green part of the vertex color only',
+        description: 'Changes the green part of the vertex color only',
         cb: ({ noParam, nbParam, param1 }, escaper) => {
             if (noParam) {
                 escaper.setVcGreen(GetRandomPercentageBJ())
@@ -200,7 +200,7 @@ export const initCommandAll = () => {
         alias: ['vcb'],
         group: 'all',
         argDescription: '[<Blue>]',
-        description: 'changes the blue part of the vertex color only',
+        description: 'Changes the blue part of the vertex color only',
         cb: ({ noParam, nbParam, param1 }, escaper) => {
             if (noParam) {
                 escaper.setVcBlue(GetRandomPercentageBJ())
@@ -228,7 +228,7 @@ export const initCommandAll = () => {
         alias: ['vct'],
         group: 'all',
         argDescription: '[<transparency>]',
-        description: 'changes the transparency of the hero',
+        description: 'Changes the transparency of the hero',
         cb: ({ noParam, nbParam, param1 }, escaper) => {
             if (noParam) {
                 escaper.setVcTransparency(GetRandomPercentageBJ())
@@ -256,7 +256,7 @@ export const initCommandAll = () => {
         alias: ['nv'],
         group: 'all',
         argDescription: '',
-        description: 'put normal vertex color : RGB(100, 100, 100) with 0 transparency',
+        description: 'Put normal vertex color : RGB(100, 100, 100) with 0 transparency',
         cb: ({ noParam, nbParam, param1 }, escaper) => {
             if (!(noParam || nbParam === 1)) {
                 return true
@@ -289,7 +289,7 @@ export const initCommandAll = () => {
         alias: ['ci'],
         group: 'all',
         argDescription: '[<Pcolor>]',
-        description: 'displays base color and vertex color of a hero',
+        description: 'Displays base color and vertex color of a hero',
         cb: ({ noParam, nbParam, param1 }, escaper) => {
             if (noParam) {
                 ColorInfo(escaper, escaper.getPlayer())
@@ -310,7 +310,7 @@ export const initCommandAll = () => {
         alias: ['ef'],
         group: 'all',
         argDescription: '<effect>',
-        description: 'adds an effect on each hand of the hero',
+        description: 'Adds an effect on each hand of the hero',
         cb: ({ nbParam, param1, param2 }, escaper) => {
             if (!EscaperEffectFunctions.IsEffectStr(param1)) {
                 return true
@@ -345,7 +345,7 @@ export const initCommandAll = () => {
         alias: ['ce'],
         group: 'all',
         argDescription: '<effect> <body_part>',
-        description: 'adds an effect on a body part of the hero',
+        description: 'Adds an effect on a body part of the hero',
         cb: ({ nbParam, param1, param2 }, escaper) => {
             if (nbParam !== 2) {
                 return true
@@ -373,7 +373,7 @@ export const initCommandAll = () => {
         alias: ['efe'],
         group: 'all',
         argDescription: '<effect>',
-        description: 'adds the same effect to each body part of the hero',
+        description: 'Adds the same effect to each body part of the hero',
         cb: ({ nbParam, param1, param2 }, escaper) => {
             if (!EscaperEffectFunctions.IsEffectStr(param1)) {
                 return true
@@ -413,7 +413,7 @@ export const initCommandAll = () => {
         alias: ['de'],
         group: 'all',
         argDescription: '[<numberOfEffectsToRemove>]',
-        description: 'delete a specified effect of the hero or all effects if not specified',
+        description: 'Delete a specified effect of the hero or all effects if not specified',
         cb: ({ noParam, nbParam, param1 }, escaper) => {
             if (!(noParam || nbParam === 1)) {
                 return true
@@ -457,7 +457,7 @@ export const initCommandAll = () => {
         alias: ['cf'],
         group: 'all',
         argDescription: 'x',
-        description: 'changes the camera field (height), default is 2500',
+        description: 'Changes the camera field (height), default is 2500',
         cb: ({ nbParam, param1, param2 }, escaper) => {
             if (!((nbParam === 1 || nbParam === 2) && IsInteger(param1))) {
                 return true
@@ -515,7 +515,7 @@ export const initCommandAll = () => {
         alias: ['rc'],
         group: 'all',
         argDescription: '',
-        description: 'put the camera back like chosen field',
+        description: 'Put the camera back like chosen field',
         cb: ({ noParam }, escaper) => {
             if (!noParam) {
                 return true
@@ -531,7 +531,7 @@ export const initCommandAll = () => {
         alias: ['rci'],
         group: 'all',
         argDescription: '',
-        description: 'changes the camera field back to its default value (2500)',
+        description: 'Changes the camera field back to its default value (2500)',
         cb: ({ noParam }, escaper) => {
             if (!noParam) {
                 return true
@@ -547,7 +547,7 @@ export const initCommandAll = () => {
         alias: ['an'],
         group: 'all',
         argDescription: '<string>',
-        description: 'makes your hero doing an animation',
+        description: 'Makes your hero doing an animation',
         cb: ({ cmd, noParam, param1 }, escaper) => {
             if (noParam || !escaper.isAlive()) {
                 return true
@@ -660,7 +660,7 @@ export const initCommandAll = () => {
         alias: ['kl'],
         group: 'all',
         argDescription: '',
-        description: 'kills your hero',
+        description: 'Kills your hero',
         enabled: ({ noParam }) => noParam,
         cb: ({}, escaper) => {
             if (!escaper.kill()) {
@@ -676,7 +676,7 @@ export const initCommandAll = () => {
         alias: ['kc'],
         group: 'all',
         argDescription: '',
-        description: 'kicks yourself',
+        description: 'Kicks yourself',
         enabled: ({ noParam }) => noParam,
         cb: ({}, escaper) => {
             CustomDefeatBJ(escaper.getPlayer(), 'You have kicked... yourself.')
@@ -751,7 +751,7 @@ export const initCommandAll = () => {
         alias: ['gmi'],
         group: 'all',
         argDescription: '',
-        description: 'click on a monster to get its info',
+        description: 'Click on a monster to get its info',
         cb: ({ noParam }, escaper) => {
             if (!noParam) {
                 return true
@@ -768,7 +768,7 @@ export const initCommandAll = () => {
         alias: ['s'],
         group: 'all',
         argDescription: '',
-        description: 'stop creating monsters or terrain or stop getTerrainInfoMode or getMonsterInfoMode',
+        description: 'Stop creating monsters or terrain or stop getTerrainInfoMode or getMonsterInfoMode',
         cb: ({ noParam }, escaper) => {
             if (!noParam) {
                 return true
@@ -839,7 +839,7 @@ export const initCommandAll = () => {
         alias: ['clr'],
         group: 'all',
         argDescription: '',
-        description: 'remove the text on the screen',
+        description: 'Remove the text on the screen',
         cb: ({ noParam }, escaper) => {
             if (noParam) {
                 ClearTextForPlayer(escaper.getPlayer())
@@ -854,7 +854,7 @@ export const initCommandAll = () => {
         alias: ['ut'],
         group: 'all',
         argDescription: '',
-        description: 'display the terrains already used (onto the map) during this game (16 is the maximum possible !)',
+        description: 'Display the terrains already used (onto the map) during this game (16 is the maximum possible !)',
         cb: ({ noParam }, escaper) => {
             if (noParam) {
                 Text.DisplayLineToPlayer(escaper.getPlayer())
@@ -885,7 +885,7 @@ export const initCommandAll = () => {
         alias: [],
         group: 'all',
         argDescription: '<real drunkValue>',
-        description: 'value between 5 and 60',
+        description: 'Value between 5 and 60',
         cb: ({ noParam, nbParam, param1 }, escaper) => {
             const k = GetPlayerId(escaper.getPlayer())
             let x = 0
@@ -949,7 +949,7 @@ export const initCommandAll = () => {
         alias: [],
         group: 'all',
         argDescription: '',
-        description: 'stop drunk mode',
+        description: 'Stop drunk mode',
         cb: ({ noParam }, escaper) => {
             const k = GetPlayerId(escaper.getPlayer())
             if (noParam && TurnOnSlide.udg_isDrunk[k]) {
@@ -996,7 +996,7 @@ export const initCommandAll = () => {
         alias: [],
         group: 'all',
         argDescription: '[all|a]',
-        description: 'displays apm on slide of everybody or just yourself',
+        description: 'Displays apm on slide of everybody or just yourself',
         cb: ({ noParam, nbParam, param1 }, escaper) => {
             const k = GetPlayerId(escaper.getPlayer())
             if (noParam) {
@@ -1016,7 +1016,7 @@ export const initCommandAll = () => {
         alias: [],
         group: 'all',
         argDescription: '[all|a]',
-        description: 'displays cpm on slide of everybody or just yourself',
+        description: 'Displays cpm on slide of everybody or just yourself',
         cb: ({ noParam, nbParam, param1 }, escaper) => {
             const k = GetPlayerId(escaper.getPlayer())
             if (noParam) {
@@ -1061,7 +1061,7 @@ export const initCommandAll = () => {
         alias: ['uas'],
         group: 'all',
         argDescription: '[<modifier>]<key>',
-        description: 'removes the command put into a key',
+        description: 'Removes the command put into a key',
         cb: ({ nbParam, param1 }, escaper) => {
             if (!(nbParam === 1)) {
                 return true
@@ -1083,7 +1083,7 @@ export const initCommandAll = () => {
         alias: ['ds'],
         group: 'all',
         argDescription: '',
-        description: 'displays the commands associated to your shortcuts',
+        description: 'Displays the commands associated to your shortcuts',
         cb: ({ noParam }, escaper) => {
             if (noParam) {
                 escaper.getKeyboardShortcutsArray().displayAll()
@@ -1098,7 +1098,7 @@ export const initCommandAll = () => {
         alias: ['sc'],
         group: 'all',
         argDescription: '<commandLabel> <command>',
-        description: 'save a command into a name of your choice',
+        description: 'Save a command into a name of your choice',
         cb: ({ cmd, nbParam, param1 }, escaper) => {
             if (!(nbParam > 1)) {
                 return true
@@ -1115,7 +1115,7 @@ export const initCommandAll = () => {
         alias: ['ec'],
         group: 'all',
         argDescription: '<commandLabel>',
-        description: 'execute a command you saved with "saveCommand"',
+        description: 'Execute a command you saved with "saveCommand"',
         cb: ({ nbParam, param1 }, escaper) => {
             if (!(nbParam === 1)) {
                 return true
@@ -1133,7 +1133,7 @@ export const initCommandAll = () => {
         alias: ['getcl'],
         group: 'all',
         argDescription: '[player]',
-        description: 'displays the number of the current level (first one is number 0)',
+        description: 'Displays the number of the current level (first one is number 0)',
         cb: ({ nbParam, param1 }, escaper) => {
             if (nbParam > 1) {
                 return true
@@ -1164,7 +1164,7 @@ export const initCommandAll = () => {
         alias: ['ldb'],
         group: 'all',
         argDescription: 'on | off | mb|multiboard|reset | classic | global | current | speedrun',
-        description: 'displays the leaderboard',
+        description: 'Displays the leaderboard',
         cb: ({ nbParam, param1 }, escaper) => {
             if (nbParam === 1) {
                 if (IsBoolString(param1)) {
@@ -1196,7 +1196,7 @@ export const initCommandAll = () => {
         alias: ['fpc'],
         group: 'all',
         argDescription: 'on | off',
-        description: 'displays the first person camera',
+        description: 'Displays the first person camera',
         cb: ({ nbParam, param1 }, escaper) => {
             if (nbParam === 1 && IsBoolString(param1)) {
                 escaper.getFirstPersonHandle().toggleFirstPerson(S2B(param1))
@@ -1213,7 +1213,7 @@ export const initCommandAll = () => {
         alias: ['lc', 'spectate'],
         group: 'all',
         argDescription: '[<player> | on | off]',
-        description: 'locks the camera',
+        description: 'Locks the camera',
         cb: ({ noParam, nbParam, param1 }, escaper) => {
             let target: Escaper | null = null
 
@@ -1287,7 +1287,7 @@ export const initCommandAll = () => {
         alias: [],
         group: 'all',
         argDescription: '[speed | off]',
-        description: 'spins the camera',
+        description: 'Spins the camera',
         cb: ({ nbParam, param1 }, escaper) => {
             if (IsBoolString(param1) && !S2B(param1)) {
                 Text.mkP(escaper.getPlayer(), 'Spin disabled')
@@ -1307,7 +1307,7 @@ export const initCommandAll = () => {
         alias: ['fm'],
         group: 'all',
         argDescription: '[<boolean>]',
-        description: 'toggle or set follow mouse mode (active while holding right mouse button)',
+        description: 'Toggle or set follow mouse mode (active while holding right mouse button)',
         cb: ({ noParam, nbParam, param1 }, escaper) => {
             let flag = true
 
@@ -1344,7 +1344,7 @@ export const initCommandAll = () => {
         alias: [],
         group: 'all',
         argDescription: '<boolean> [neverDisable|nd]',
-        description: 'follows the mouse',
+        description: 'Follows the mouse',
         cb: ({ nbParam, param1, param2 }, escaper) => {
             if (nbParam != 1 && nbParam != 2) {
                 return true
@@ -1375,7 +1375,7 @@ export const initCommandAll = () => {
         alias: ['m', 'reverse'],
         group: 'all',
         argDescription: '<boolean>',
-        description: 'mirrors the camera',
+        description: 'Mirrors the camera',
         cb: ({ nbParam, param1 }, escaper) => {
             if (nbParam != 1) {
                 return true
@@ -1408,7 +1408,7 @@ export const initCommandAll = () => {
         alias: ['idm'],
         group: 'all',
         argDescription: '<boolean>',
-        description: 'ignores death messages',
+        description: 'Ignores death messages',
         cb: ({ nbParam, param1 }, escaper) => {
             if (nbParam != 1) {
                 return true
@@ -1436,7 +1436,7 @@ export const initCommandAll = () => {
         alias: ['pcor'],
         group: 'all',
         argDescription: '<coop | all | none> [width] [height]',
-        description: 'pan camera on revive, default width = 2048; height = 1536',
+        description: 'Pan camera on revive, default width = 2048; height = 1536',
         cb: ({ param1, param2, param3 }, escaper) => {
             if (param1 !== 'coop' && param1 !== 'all' && param1 !== 'none') {
                 Text.mkP(escaper.getPlayer(), `param1 must be: coop | all | none`)
@@ -1469,7 +1469,7 @@ export const initCommandAll = () => {
         alias: ['pcop'],
         group: 'all',
         argDescription: '<boolean>',
-        description: 'pan camera on portal',
+        description: 'Pan camera on portal',
         cb: ({ param1 }, escaper) => {
             if (!IsBoolString(param1)) {
                 Text.mkP(escaper.getPlayer(), 'Invalid boolean')
@@ -1859,7 +1859,7 @@ export const initCommandAll = () => {
         alias: ['hc', 'monk'],
         group: 'all',
         argDescription: 'on | off',
-        description: 'hides the chat',
+        description: 'Hides the chat',
         cb: ({ param1 }, escaper) => {
             if (param1.length === 0) param1 = 'true'
 
@@ -1932,7 +1932,7 @@ export const initCommandAll = () => {
         alias: [],
         group: 'all',
         argDescription: '[<boolean status>]',
-        description: 'toggle auto circle for current player',
+        description: 'Toggle auto circle for current player',
         cb: ({ noParam, nbParam, param1 }, escaper) => {
             let b = true
 
@@ -1966,7 +1966,7 @@ export const initCommandAll = () => {
         alias: ['mdb', 'monsterdb'],
         group: 'all',
         argDescription: '<search>',
-        description: 'lookup monsters by id, name, or comment',
+        description: 'Lookup monsters by id, name, or comment',
         cb: ({ nbParam, param1 }, escaper) => {
             if (nbParam !== 1) {
                 Text.erP(escaper.getPlayer(), 'usage: -mdb <search>')
@@ -2000,6 +2000,33 @@ export const initCommandAll = () => {
                     }`
                 )
             }
+
+            return true
+        },
+    })
+
+    //-heroStopAction   --> use the basic Stop action from WC3 for your selected units
+    registerCommand({
+        name: 'heroStopAction',
+        alias: [],
+        group: 'all',
+        argDescription: '',
+        description: 'Use the basic Stop action from WC3 for your selected units',
+        cb: ({ noParam }, escaper) => {
+            if (!noParam) {
+                Text.erP(escaper.getPlayer(), 'no parameter allowed with command "heroStopAction"')
+                return true
+            }
+
+            const group = CreateGroup()
+            GroupEnumUnitsSelected(group, escaper.getPlayer(), null)
+            ForGroup(group, () => {
+                const unit = GetEnumUnit()
+                if (GetOwningPlayer(unit) === escaper.getPlayer()) {
+                    IssueImmediateOrder(unit, 'stop')
+                }
+            })
+            DestroyGroup(group)
 
             return true
         },
