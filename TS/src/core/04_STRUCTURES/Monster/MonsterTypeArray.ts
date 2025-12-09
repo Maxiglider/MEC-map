@@ -34,7 +34,7 @@ export class MonsterTypeArray extends BaseArray<MonsterType> {
         isClickable: boolean
     ) {
         if (this.isLabelAlreadyUsed(label)) {
-            throw 'Label already used'
+            throw `MonsterType label already used: "${label}"`
         }
 
         const monsterType = new MonsterType(label, unitTypeId, scale, immolationRadius, speed, isClickable)

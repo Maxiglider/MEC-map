@@ -94,7 +94,7 @@ export class TerrainTypeArray extends BaseArray<TerrainType> {
     }
 
     newWalk = (label: string, terrainTypeId: number, walkspeed: number) => {
-        if (this.isLabelAlreadyUsed(label)) throw 'Label already used'
+        if (this.isLabelAlreadyUsed(label)) throw `TerrainType label already used: "${label}"`
         if (this.isTerrainTypeIdAlreadyUsed(terrainTypeId)) throw 'Terrain type already used'
         if (terrainTypeId === 0) throw 'Wrong terrain type'
 
@@ -111,7 +111,7 @@ export class TerrainTypeArray extends BaseArray<TerrainType> {
         timeToKill: number,
         toleranceDist: number
     ) => {
-        if (this.isLabelAlreadyUsed(label)) throw 'Label already used'
+        if (this.isLabelAlreadyUsed(label)) throw `TerrainType label already used: "${label}"`
         if (this.isTerrainTypeIdAlreadyUsed(terrainTypeId)) throw 'Terrain type already used'
         if (terrainTypeId === 0) throw 'Wrong terrain type'
 
@@ -128,7 +128,7 @@ export class TerrainTypeArray extends BaseArray<TerrainType> {
         canTurn: boolean,
         rotationSpeed: number | null = null
     ) => {
-        if (this.isLabelAlreadyUsed(label)) throw 'Label already used'
+        if (this.isLabelAlreadyUsed(label)) throw `TerrainType label already used: "${label}"`
         if (this.isTerrainTypeIdAlreadyUsed(terrainTypeId)) throw 'Terrain type already used'
         if (terrainTypeId === 0) throw 'Wrong terrain type'
 
