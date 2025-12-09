@@ -77,6 +77,7 @@ export abstract class BaseArray<T extends BaseModel> {
             v.destroy()
             delete this.data[id]
         }
+        this.lastInstanceId = -1;
     }
 
     // First index is 0

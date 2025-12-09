@@ -1,9 +1,8 @@
-import { errorHandler } from 'Utils/mapUtils'
-import { PROD } from 'env'
 import { getUdgCasterTypes, getUdgLevels, getUdgMonsterTypes, getUdgTerrainTypes, globals } from '../../../../globals'
 import { jsonDecode } from '../../01_libraries/Basic_functions'
 import { Text } from '../../01_libraries/Text'
 import { Gravity } from '../Slide_and_CheckTerrain_triggers/Gravity'
+import { initCasterTypes, initLevels, initMonsterTypes, initTerrainTypes } from '../../Init/initArrays'
 
 export class LoadMapFromCache {
     public static gameDataJsonString: string | null = null
@@ -15,16 +14,27 @@ export class LoadMapFromCache {
             if (!gameData || typeof gameData !== 'object') {
                 Text.erA('invalid game data string')
             } else {
+                //erase previous data from the game
+                getUdgLevels().destroy()
+                getUdgCasterTypes().destroy()
+                getUdgMonsterTypes().destroy()
+                getUdgTerrainTypes().destroy()
+                initTerrainTypes()
+                initMonsterTypes()
+                initCasterTypes()
+                initLevels()
+
+                // game properties
                 if (gameData.gameData) {
-                    if (gameData.gameData.USE_VTOTO_SLIDE_LOGIC) {
+                    if (gameData.gameData.USE_VTOTO_SLIDE_LOGIC !== undefined) {
                         globals.USE_VTOTO_SLIDE_LOGIC = gameData.gameData.USE_VTOTO_SLIDE_LOGIC
                     }
 
-                    if (gameData.gameData.coopCircles) {
+                    if (gameData.gameData.coopCircles !== undefined) {
                         globals.coopCircles = gameData.gameData.coopCircles
                     }
 
-                    if (gameData.gameData.CAN_TURN_IN_AIR) {
+                    if (gameData.gameData.CAN_TURN_IN_AIR !== undefined) {
                         globals.CAN_TURN_IN_AIR = gameData.gameData.CAN_TURN_IN_AIR
                     }
 
@@ -44,47 +54,33 @@ export class LoadMapFromCache {
                         globals.wanderExtraTime = gameData.gameData.wanderExtraTime
                     }
 
-                    if (gameData.gameData.gravity) {
+                    if (gameData.gameData.gravity !== undefined) {
                         Gravity.SetGravity(gameData.gameData.gravity)
                     }
                 }
 
                 //terrain types MEC
                 if (gameData.terrainTypesMec) {
-                    if (PROD) {
-                        getUdgTerrainTypes().newFromJson(gameData.terrainTypesMec)
-                    } else {
-                        // Dont care during development
-                        errorHandler(() => getUdgTerrainTypes().newFromJson(gameData.terrainTypesMec))
-                    }
+                    getUdgTerrainTypes().newFromJson(gameData.terrainTypesMec)
                 }
 
                 //monster types
                 if (gameData.monsterTypes) {
-                    if (PROD) {
-                        getUdgMonsterTypes().newFromJson(gameData.monsterTypes)
-                    } else {
-                        // Dont care during development
-                        errorHandler(() => getUdgMonsterTypes().newFromJson(gameData.monsterTypes))
-                    }
+                    getUdgMonsterTypes().newFromJson(gameData.monsterTypes)
                 }
 
                 //caster types
                 if (gameData.casterTypes) {
-                    if (gameData.monsterTypes) {
-                        if (PROD) {
-                            getUdgCasterTypes().newFromJson(gameData.casterTypes)
-                        } else {
-                            // Dont care during development
-                            errorHandler(() => getUdgCasterTypes().newFromJson(gameData.casterTypes))
-                        }
-                    }
+                    getUdgCasterTypes().newFromJson(gameData.casterTypes)
                 }
 
                 //levels
                 if (gameData.levels) {
                     getUdgLevels().newFromJson(gameData.levels)
                 }
+
+                //restart the game to apply the changes and make mobs appear
+                getUdgLevels().restartTheGame()
             }
         }
     }

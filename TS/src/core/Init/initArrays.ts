@@ -19,25 +19,25 @@ const initEscapers = () => {
 
 
 //Levels
-const initLevels = () => {
+export const initLevels = () => {
     setUdgLevels(new LevelArray())
 }
 
 
 //Terrain types
-const initTerrainTypes = () => {
+export const initTerrainTypes = () => {
     setUdgTerrainTypes(new TerrainTypeArray())
 }
 
 
 //Monster types
-const initMonsterTypes = () => {
+export const initMonsterTypes = () => {
     setUdgMonsterTypes(new MonsterTypeArray())
 }
 
 
 //Caster types
-const initCasterTypes = () => {
+export const initCasterTypes = () => {
     setUdgCasterTypes(new CasterTypeArray())
 }
 

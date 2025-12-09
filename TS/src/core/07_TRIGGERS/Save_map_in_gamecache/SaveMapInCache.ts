@@ -72,11 +72,7 @@ export class SaveMapInCache {
 
             SaveMapInCache.lastSaveFile = filename
 
-            if (PROD) {
-                SaveLoad.saveFileWithoutPossibleLoading(filename, p, SaveMapInCache.smicStringObj.str, false)
-            } else {
-                SaveLoad.saveFile(filename, p, SaveMapInCache.smicStringObj.str, true)
-            }
+            SaveLoad.saveFileWithoutPossibleLoading(filename, p, SaveMapInCache.smicStringObj.str, false)
 
             Text.A('saving game data to file "' + filename + '" done')
 
