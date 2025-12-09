@@ -415,8 +415,10 @@ export abstract class Monster {
         this.attackGroundY = y
         this.attackGroundDelay = delay
 
-        this.removeUnit()
-        this.createUnit()
+        if (this.u) {
+            this.removeUnit()
+            this.createUnit()
+        }
     }
 
     getAttackGroundDelay = () => {
