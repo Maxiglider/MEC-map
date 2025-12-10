@@ -19,7 +19,8 @@
         "release-test-publish": "yarn release && ts-node scripts/releaseTest.ts --publish",
         "dev": "npm-watch",
         "build:defs": "ts-node scripts/dev",
-        "postinstall": "ts-node --transpile-only scripts/patch.ts"
+        "postinstall": "ts-node --transpile-only scripts/patch.ts",
+        "prepare": "cd .. && husky TS/.husky"
     },
     "devDependencies": {
         "@types/fs-extra": "^9.0.13",
@@ -27,6 +28,7 @@
         "@types/pako": "^2.0.0",
         "fs-extra": "^11.1.0",
         "get-all-files": "^4.1.0",
+        "husky": "^9.1.7",
         "jass-to-ts": "^1.2.5",
         "lua-types": "^2.11.0",
         "luamin": "^1.0.4",
