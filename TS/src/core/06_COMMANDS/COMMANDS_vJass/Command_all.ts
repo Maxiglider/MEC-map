@@ -3,7 +3,7 @@ import { animUtils } from 'Utils/AnimUtils'
 import { EffectUtils } from 'Utils/EffectUtils'
 import { progressionUtils } from 'Utils/ProgressionUtils'
 import { createTimer } from 'Utils/mapUtils'
-import { ClearTextForPlayer, IsBoolString, S2B } from 'core/01_libraries/Basic_functions'
+import { canPlayerControlUnit, ClearTextForPlayer, IsBoolString, S2B } from 'core/01_libraries/Basic_functions'
 import { Constants } from 'core/01_libraries/Constants'
 import { ColorString2Id, udg_colorCode, udg_colorStrings } from 'core/01_libraries/Init_colorCodes'
 import { Text } from 'core/01_libraries/Text'
@@ -2023,7 +2023,7 @@ export const initCommandAll = () => {
             GroupEnumUnitsSelected(group, escaper.getPlayer(), null)
             ForGroup(group, () => {
                 const unit = GetEnumUnit()
-                if (GetOwningPlayer(unit) === escaper.getPlayer()) {
+                if (canPlayerControlUnit(escaper.getPlayer(), unit)) {
                     IssueImmediateOrder(unit, 'stop')
                 }
             })
