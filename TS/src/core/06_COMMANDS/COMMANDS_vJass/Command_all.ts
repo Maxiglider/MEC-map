@@ -1796,6 +1796,7 @@ export const initCommandAll = () => {
                 enable = S2B(param1)
             } else {
                 Text.erP(escaper.getPlayer(), 'wrong command parameters')
+                return true
             }
 
             if (!escaper.enableInterface(enable, showMinimap)) {
