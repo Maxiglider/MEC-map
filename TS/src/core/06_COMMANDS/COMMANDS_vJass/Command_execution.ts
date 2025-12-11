@@ -152,11 +152,6 @@ export const initCommandExecution = () => {
 
             targetCmd?.cb(parsedContext, escaper)
 
-            // Add to command history if it's a valid command
-            if (targetCmd && addCommandToHistoryCallback) {
-                addCommandToHistoryCallback(cmd, GetPlayerId(escaper.getPlayer()))
-            }
-
             MemoryHandler.destroyObject(parsedContext)
 
             // if (!ExecuteCommandAll(escaper, cmd)) {
@@ -211,6 +206,11 @@ export const initCommandExecution = () => {
         //ex : "-(abc def)" --> "-abc def"
         if (SubStringBJ(cmd, 2, 2) === '(' && SubStringBJ(cmd, StringLength(cmd), StringLength(cmd)) === ')') {
             cmd = SubStringBJ(cmd, 1, 1) + SubStringBJ(cmd, 3, StringLength(cmd) - 1)
+        }
+
+        // Add to command history
+        if (addCommandToHistoryCallback) {
+            addCommandToHistoryCallback(cmd, GetPlayerId(escaper.getPlayer()))
         }
 
         charId = 2
