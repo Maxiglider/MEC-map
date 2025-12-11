@@ -1,5 +1,5 @@
-import { createEvent } from 'Utils/mapUtils'
-import { Hero2Escaper, IsHero } from 'core/04_STRUCTURES/Escaper/Escaper_functions'
+import { createEvent } from '../../../Utils/mapUtils'
+import { Hero2Escaper, IsHero } from '../../04_STRUCTURES/Escaper/Escaper_functions'
 import { globals } from '../../../../globals'
 
 export const initTrig_Autorevive = () => {

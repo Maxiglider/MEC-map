@@ -1,9 +1,9 @@
-import { MemoryHandler } from 'Utils/MemoryHandler'
-import { forRange } from 'Utils/mapUtils'
-import { arrayPush, stringReplaceAll } from 'core/01_libraries/Basic_functions'
-import { Constants } from 'core/01_libraries/Constants'
-import { ColorString2Id } from 'core/01_libraries/Init_colorCodes'
-import { Escaper } from 'core/04_STRUCTURES/Escaper/Escaper'
+import { MemoryHandler } from '../../../Utils/MemoryHandler'
+import { forRange } from '../../../Utils/mapUtils'
+import { arrayPush, stringReplaceAll } from '../../01_libraries/Basic_functions'
+import { Constants } from '../../01_libraries/Constants'
+import { ColorString2Id } from '../../01_libraries/Init_colorCodes'
+import { Escaper } from '../../04_STRUCTURES/Escaper/Escaper'
 import { getUdgEscapers } from '../../../../globals'
 
 export const rawPlayerNames: string[] = []

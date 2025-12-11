@@ -1,6 +1,6 @@
 import { Constants } from 'core/01_libraries/Constants'
 import { Text } from 'core/01_libraries/Text'
-import { handlePaginationArgs, handlePaginationObj } from 'core/06_COMMANDS/COMMANDS_vJass/Pagination'
+import { handlePaginationArgs, handlePaginationObj } from '../../06_COMMANDS/Helpers/Pagination'
 import { getUdgMonsterTypes } from '../../../../globals'
 import { BaseArray } from '../BaseArray'
 import { MonsterType } from '../Monster/MonsterType'

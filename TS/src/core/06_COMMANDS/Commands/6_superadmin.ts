@@ -1,13 +1,13 @@
-import { ServiceManager } from 'Services'
-import { EffectUtils } from 'Utils/EffectUtils'
-import { MemoryHandler } from 'Utils/MemoryHandler'
-import { createTimer } from 'Utils/mapUtils'
-import { IsBoolString, S2B } from 'core/01_libraries/Basic_functions'
-import { Constants } from 'core/01_libraries/Constants'
-import { Text } from 'core/01_libraries/Text'
+import { ServiceManager } from '../../../Services'
+import { EffectUtils } from '../../../Utils/EffectUtils'
+import { MemoryHandler } from '../../../Utils/MemoryHandler'
+import { createTimer } from '../../../Utils/mapUtils'
+import { IsBoolString, S2B } from '../../01_libraries/Basic_functions'
+import { Constants } from '../../01_libraries/Constants'
+import { Text } from '../../01_libraries/Text'
 import { Timer } from 'w3ts'
 import { getUdgEscapers } from '../../../../globals'
-import { isPlayerId, resolvePlayerId } from './Command_functions'
+import { isPlayerId, resolvePlayerId } from '../Helpers/Command_functions'
 
 export const initExecuteCommandTrueMax = () => {
     const { registerCommand } = ServiceManager.getService('Cmd')

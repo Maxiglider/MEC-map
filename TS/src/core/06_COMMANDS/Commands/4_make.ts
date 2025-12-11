@@ -1,4 +1,4 @@
-import { String2Ascii } from 'core/01_libraries/Ascii'
+import { String2Ascii } from '../../01_libraries/Ascii'
 import {
     arrayPush,
     convertAngleToDirection,
@@ -7,25 +7,25 @@ import {
     IsBoolString,
     S2B,
     tileset2tilesetString,
-} from 'core/01_libraries/Basic_functions'
-import { Constants } from 'core/01_libraries/Constants'
-import { udg_colorCode } from 'core/01_libraries/Init_colorCodes'
-import { Text } from 'core/01_libraries/Text'
-import { Level } from 'core/04_STRUCTURES/Level/Level'
-import { IMMOLATION_SKILLS } from 'core/04_STRUCTURES/Monster/Immolation_skills'
-import { ABILITY_ANNULER_VISION } from 'core/04_STRUCTURES/Monster/Monster_functions'
-import { MonsterMultiplePatrols } from 'core/04_STRUCTURES/Monster/MonsterMultiplePatrols'
-import { MonsterNoMove } from 'core/04_STRUCTURES/Monster/MonsterNoMove'
-import { MonsterSimplePatrol } from 'core/04_STRUCTURES/Monster/MonsterSimplePatrol'
-import { MonsterType } from 'core/04_STRUCTURES/Monster/MonsterType'
-import { PORTAL_MOB_MAX_FREEZE_DURATION } from 'core/04_STRUCTURES/Monster_properties/PortalMob'
-import { DEATH_TERRAIN_MAX_TOLERANCE, TerrainTypeDeath } from 'core/04_STRUCTURES/TerrainType/TerrainTypeDeath'
-import { TerrainTypeSlide } from 'core/04_STRUCTURES/TerrainType/TerrainTypeSlide'
-import { TerrainTypeWalk } from 'core/04_STRUCTURES/TerrainType/TerrainTypeWalk'
-import { ExchangeTerrains } from 'core/07_TRIGGERS/Triggers_to_modify_terrains/Exchange_terrains'
-import { RandomizeTerrains } from 'core/07_TRIGGERS/Triggers_to_modify_terrains/Randomize_terrains'
-import { ServiceManager } from 'Services'
-import { createPoint } from 'Utils/Point'
+} from '../../01_libraries/Basic_functions'
+import { Constants } from '../../01_libraries/Constants'
+import { udg_colorCode } from '../../01_libraries/Init_colorCodes'
+import { Text } from '../../01_libraries/Text'
+import { Level } from '../../04_STRUCTURES/Level/Level'
+import { IMMOLATION_SKILLS } from '../../04_STRUCTURES/Monster/Immolation_skills'
+import { ABILITY_ANNULER_VISION } from '../../04_STRUCTURES/Monster/Monster_functions'
+import { MonsterMultiplePatrols } from '../../04_STRUCTURES/Monster/MonsterMultiplePatrols'
+import { MonsterNoMove } from '../../04_STRUCTURES/Monster/MonsterNoMove'
+import { MonsterSimplePatrol } from '../../04_STRUCTURES/Monster/MonsterSimplePatrol'
+import { MonsterType } from '../../04_STRUCTURES/Monster/MonsterType'
+import { PORTAL_MOB_MAX_FREEZE_DURATION } from '../../04_STRUCTURES/Monster_properties/PortalMob'
+import { DEATH_TERRAIN_MAX_TOLERANCE, TerrainTypeDeath } from '../../04_STRUCTURES/TerrainType/TerrainTypeDeath'
+import { TerrainTypeSlide } from '../../04_STRUCTURES/TerrainType/TerrainTypeSlide'
+import { TerrainTypeWalk } from '../../04_STRUCTURES/TerrainType/TerrainTypeWalk'
+import { ExchangeTerrains } from '../../07_TRIGGERS/Triggers_to_modify_terrains/Exchange_terrains'
+import { RandomizeTerrains } from '../../07_TRIGGERS/Triggers_to_modify_terrains/Randomize_terrains'
+import { ServiceManager } from '../../../Services'
+import { createPoint } from '../../../Utils/Point'
 import { getUdgCasterTypes, getUdgLevels, getUdgMonsterTypes, getUdgTerrainTypes, globals } from '../../../../globals'
 import { IsInteger, IsPositiveInteger } from '../../01_libraries/Functions_on_numbers'
 import {
@@ -43,7 +43,7 @@ import { TerrainTypeFromString } from '../../07_TRIGGERS/Modify_terrain_Function
 import { HERO_ROTATION_SPEED } from '../../07_TRIGGERS/Slide_and_CheckTerrain_triggers/SlidingMax'
 import { ChangeAllTerrains } from '../../07_TRIGGERS/Triggers_to_modify_terrains/Change_all_terrains'
 import { ChangeOneTerrain } from '../../07_TRIGGERS/Triggers_to_modify_terrains/Change_one_terrain'
-import { CmdParam } from './Command_functions'
+import { CmdParam } from '../Helpers/Command_functions'
 
 export const initExecuteCommandMake = () => {
     const { registerCommand } = ServiceManager.getService('Cmd')

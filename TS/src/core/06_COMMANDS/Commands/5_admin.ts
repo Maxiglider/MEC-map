@@ -1,16 +1,16 @@
-import { IsBoolString, IsEscaperInGame, jsonDecode, jsonEncode, S2B } from 'core/01_libraries/Basic_functions'
-import { Constants } from 'core/01_libraries/Constants'
-import { Text } from 'core/01_libraries/Text'
-import { Escaper } from 'core/04_STRUCTURES/Escaper/Escaper'
-import { GetMirrorEscaper } from 'core/04_STRUCTURES/Escaper/Escaper_functions'
-import { SaveLoad } from 'core/04_STRUCTURES/Escaper/Escaper_StartCommands'
-import { ReinitTerrains } from 'core/07_TRIGGERS/Triggers_to_modify_terrains/Reinit_terrains'
-import { ReinitTerrainsPositions } from 'core/07_TRIGGERS/Triggers_to_modify_terrains/Reinit_terrains_position_Change_variations_and_ut_at_beginning'
-import { AfkMode } from 'core/08_GAME/Afk_mode/Afk_mode'
-import { Globals } from 'core/09_From_old_Worldedit_triggers/globals_variables_and_triggers'
-import { udg_doubleHeroesEnabled } from 'core/Double_heroes/double_heroes_config'
-import { ServiceManager } from 'Services'
-import { progressionUtils } from 'Utils/ProgressionUtils'
+import { IsBoolString, IsEscaperInGame, jsonDecode, jsonEncode, S2B } from '../../01_libraries/Basic_functions'
+import { Constants } from '../../01_libraries/Constants'
+import { Text } from '../../01_libraries/Text'
+import { Escaper } from '../../04_STRUCTURES/Escaper/Escaper'
+import { GetMirrorEscaper } from '../../04_STRUCTURES/Escaper/Escaper_functions'
+import { SaveLoad } from '../../04_STRUCTURES/Escaper/Escaper_StartCommands'
+import { ReinitTerrains } from '../../07_TRIGGERS/Triggers_to_modify_terrains/Reinit_terrains'
+import { ReinitTerrainsPositions } from '../../07_TRIGGERS/Triggers_to_modify_terrains/Reinit_terrains_position_Change_variations_and_ut_at_beginning'
+import { AfkMode } from '../../08_GAME/Afk_mode/Afk_mode'
+import { Globals } from '../../09_From_old_Worldedit_triggers/globals_variables_and_triggers'
+import { udg_doubleHeroesEnabled } from '../../Double_heroes/double_heroes_config'
+import { ServiceManager } from '../../../Services'
+import { progressionUtils } from '../../../Utils/ProgressionUtils'
 import {
     getUdgCasterTypes,
     getUdgEscapers,
@@ -24,8 +24,8 @@ import { SaveMapInCache } from '../../07_TRIGGERS/Save_map_in_gamecache/SaveMapI
 import { SaveLoadTerrain } from '../../07_TRIGGERS/Triggers_to_modify_terrains/Save_load_terrain'
 import { MEC_core_API } from '../../API/MEC_core_API'
 import { flushLogs } from '../../Log/log'
-import { CmdParam, isPlayerId, resolvePlayerId } from './Command_functions'
-import { ActivateTeleport, DisableTeleport } from './Teleport'
+import { CmdParam, isPlayerId, resolvePlayerId } from '../Helpers/Command_functions'
+import { ActivateTeleport, DisableTeleport } from '../Helpers/Teleport'
 
 export const initExecuteCommandMax = () => {
     const { registerCommand } = ServiceManager.getService('Cmd')

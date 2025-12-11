@@ -3,7 +3,7 @@ import { Constants } from 'core/01_libraries/Constants'
 import { udg_colorCode } from 'core/01_libraries/Init_colorCodes'
 import { Text } from 'core/01_libraries/Text'
 import { getUdgEscapers } from '../../../../globals'
-import { playerId2colorId } from '../../06_COMMANDS/COMMANDS_vJass/Command_functions'
+import { playerId2colorId } from '../../06_COMMANDS/Helpers/Command_functions'
 
 const initMessageHeroDies = () => {
     const MESSAGE_DURATION = 6

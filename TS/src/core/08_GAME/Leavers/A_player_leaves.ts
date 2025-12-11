@@ -3,7 +3,7 @@ import { Constants } from 'core/01_libraries/Constants'
 import { udg_colorCode } from 'core/01_libraries/Init_colorCodes'
 import { getUdgEscapers, getUdgLevels } from '../../../../globals'
 import { runInTrigger } from '../../../Utils/mapUtils'
-import { playerId2colorId } from '../../06_COMMANDS/COMMANDS_vJass/Command_functions'
+import { playerId2colorId } from '../../06_COMMANDS/Helpers/Command_functions'
 import { AfkMode } from '../Afk_mode/Afk_mode'
 
 export const InitTrig_A_player_leaves = () => {

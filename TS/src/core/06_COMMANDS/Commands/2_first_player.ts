@@ -1,13 +1,13 @@
-import { ServiceManager } from 'Services'
-import { ThemeUtils } from 'Utils/ThemeUtils'
-import { IsBoolString, S2B } from 'core/01_libraries/Basic_functions'
-import { Constants } from 'core/01_libraries/Constants'
-import { Text } from 'core/01_libraries/Text'
-import { TerrainTypeFromString } from 'core/07_TRIGGERS/Modify_terrain_Functions/Terrain_type_from_string'
-import { ReinitTerrainsPositions } from 'core/07_TRIGGERS/Triggers_to_modify_terrains/Reinit_terrains_position_Change_variations_and_ut_at_beginning'
-import { Globals } from 'core/09_From_old_Worldedit_triggers/globals_variables_and_triggers'
+import { ServiceManager } from '../../../Services'
+import { ThemeUtils } from '../../../Utils/ThemeUtils'
+import { IsBoolString, S2B } from '../../01_libraries/Basic_functions'
+import { Constants } from '../../01_libraries/Constants'
+import { Text } from '../../01_libraries/Text'
+import { TerrainTypeFromString } from '../../07_TRIGGERS/Modify_terrain_Functions/Terrain_type_from_string'
+import { ReinitTerrainsPositions } from '../../07_TRIGGERS/Triggers_to_modify_terrains/Reinit_terrains_position_Change_variations_and_ut_at_beginning'
+import { Globals } from '../../09_From_old_Worldedit_triggers/globals_variables_and_triggers'
 import { getUdgEscapers, getUdgLevels, getUdgTerrainTypes, globals } from '../../../../globals'
-import { isPlayerId, resolvePlayerId, resolvePlayerIds, resolvePlayerIdsArray } from './Command_functions'
+import { isPlayerId, resolvePlayerId, resolvePlayerIds, resolvePlayerIdsArray } from '../Helpers/Command_functions'
 
 export const initExecuteCommandRed = () => {
     const { registerCommand } = ServiceManager.getService('Cmd')
