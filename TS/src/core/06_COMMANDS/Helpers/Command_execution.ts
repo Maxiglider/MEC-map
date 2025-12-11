@@ -16,7 +16,7 @@ import { handlePagination, handlePaginationArgs } from './Pagination'
 
 export type ICommandExecution = ReturnType<typeof initCommandExecution>
 
-type ICommand = {
+export type ICommand = {
     name: string
     alias: string[]
     group: 'all' | 'red' | 'cheat' | 'make' | 'max' | 'truemax'
