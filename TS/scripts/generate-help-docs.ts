@@ -1,5 +1,8 @@
 import * as fs from 'fs-extra'
 import * as path from 'path'
+// @ts-ignore
+import { ICommand } from '../src/core/06_COMMANDS/Helpers/Command_execution'
+import { tsToJs } from './Utils/transpileTsToJs'
 
 interface CommandInfo {
     name: string
@@ -11,12 +14,49 @@ interface CommandInfo {
     lineNumber: number
 }
 
+let parser: CommandParser;
+
+// Mock implementation of registerCommand for block code js evaluation
+let registerCommand = (cmd: ICommand) => {
+    parser.getCommands().push({
+        name: cmd.name,
+        alias: cmd.alias,
+        group: cmd.group,
+        argDescription: cmd.argDescription,
+        description: cmd.description,
+        filePath: parser.getNextFilePath(),
+        lineNumber: parser.getNextStartLine(),
+    })
+}
+
+// Mock implementation of ServiceManager for block code js evaluation
+const ServiceManager = {
+    getService: (serviceName: string) => {
+        if (serviceName === 'Cmd') {
+            return {
+                registerCommand,
+            }
+        }
+        throw new Error(`Service "${serviceName}" not implemented in mock ServiceManager`)
+    }
+}
+
 class CommandParser {
     private commands: CommandInfo[] = []
     private srcPath: string
+    private nextStartLine: number = 0
+    private nextFilePath: string = ''
 
     constructor(srcPath: string) {
         this.srcPath = srcPath
+    }
+
+    getNextFilePath() {
+        return this.nextFilePath
+    }
+
+    getNextStartLine() {
+        return this.nextStartLine
     }
 
     /**
@@ -68,12 +108,10 @@ class CommandParser {
                 const line = lines[i].trim()
 
                 // Look for registerCommand calls
-                if (line.includes('registerCommand(')) {
-                    const command = this.extractCommandInfo(content, i, filePath)
-                    if (command) {
-                        this.commands.push(command)
-                        console.log(`Found command: ${command.name} (${command.group})`)
-                    }
+                const match = /^(.*?)registerCommand\(/.exec(line)
+                if (match && !new RegExp('\/\/').test(match[1])) {
+                    // we've found a registerCommand call (uncommented)
+                    this.extractCommandInfo(content, i, filePath)
                 }
             }
         } catch (error) {
@@ -84,8 +122,11 @@ class CommandParser {
     /**
      * Extract command information from registerCommand call
      */
-    private extractCommandInfo(content: string, startLine: number, filePath: string): CommandInfo | null {
+    private extractCommandInfo(content: string, startLine: number, filePath: string) {
         try {
+            this.nextStartLine = startLine + 1 // +1 to convert 0-based to 1-based line number
+            this.nextFilePath = path.relative(this.srcPath, filePath)
+
             const lines = content.split('\n')
             let braceCount = 0
             let commandBlock = ''
@@ -108,51 +149,16 @@ class CommandParser {
                 i++
             }
 
-            // Extract command properties using regex patterns
-            const nameMatch = commandBlock.match(/name:\s*['"`]([^'"`]+)['"`]/)
-            const aliasMatch = commandBlock.match(/alias:\s*\[([^\]]*)\]/)
-            const groupMatch = commandBlock.match(/group:\s*['"`]([^'"`]+)['"`]/)
-            const argDescMatch = commandBlock.match(/argDescription:\s*['"`]([^'"`]*)['"`]/)
-            const descriptionMatch = commandBlock.match(/description:\s*['"`]([^'"`]*)['"`]/)
+            const nbRegisteredCommandsBefore = this.commands.length
 
-            if (!nameMatch) {
-                // Try to match old-style cmd pattern
-                const cmdMatch = commandBlock.match(/cmd:\s*['"`]([^'"`]+)['"`]/)
-                if (!cmdMatch) return null
+            const commandBlockJS = tsToJs(commandBlock)
+            eval(commandBlockJS)
 
-                return {
-                    name: cmdMatch[1],
-                    alias: [],
-                    group: 'legacy',
-                    argDescription: '',
-                    description: '',
-                    filePath: path.relative(this.srcPath, filePath),
-                    lineNumber: startLine + 1,
-                }
-            }
-
-            // Parse alias array
-            let aliases: string[] = []
-            if (aliasMatch) {
-                const aliasString = aliasMatch[1]
-                const aliasMatches = aliasString.match(/['"`]([^'"`]+)['"`]/g)
-                if (aliasMatches) {
-                    aliases = aliasMatches.map(match => match.replace(/['"`]/g, ''))
-                }
-            }
-
-            return {
-                name: nameMatch[1],
-                alias: aliases,
-                group: groupMatch ? groupMatch[1] : 'unknown',
-                argDescription: argDescMatch ? argDescMatch[1] : '',
-                description: descriptionMatch ? descriptionMatch[1] : '',
-                filePath: path.relative(this.srcPath, filePath),
-                lineNumber: startLine + 1,
+            if (this.commands.length === nbRegisteredCommandsBefore) {
+                throw new Error('Evaluation did not register any new command')
             }
         } catch (error) {
             console.error(`Error extracting command info from ${filePath}:${startLine}:`, error)
-            return null
         }
     }
 
@@ -299,7 +305,7 @@ async function main() {
         console.log(`Created output directory: ${binPath}`)
     }
 
-    const parser = new CommandParser(srcPath)
+    parser = new CommandParser(srcPath)
     await parser.parseCommands()
 
     const commands = parser.getCommands()
