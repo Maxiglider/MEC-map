@@ -909,7 +909,7 @@ export class MonsterSpawn {
     }
 
     toText = (): string => {
-        return (
+        let text =
             udg_colorCode[Constants.GREY] +
             this.label +
             ' : ' +
@@ -918,7 +918,16 @@ export class MonsterSpawn {
             convertAngleToDirection(this.rotation) +
             '   ' +
             R2S(this.frequence)
-        )
+
+        if (this.spawnShape !== 'region') {
+            text = text + '   shape:' + this.spawnShape
+        }
+
+        if (this.timedUnspawn !== undefined) {
+            text = text + '   unspawn:' + R2S(this.timedUnspawn) + 's'
+        }
+
+        return text
     }
 
     displayForPlayer = (p: player) => {
