@@ -22,10 +22,10 @@ import { hooks } from './GeneralHooks'
 import { MecHook } from './MecHook'
 
 export const MEC_core_API = {
-    setGameData: (jsonString: string) => {
+    setGameData: (jsonString: string, currentlyOnGameStart = true) => {
         errorHandler(() => {
             LoadMapFromCache.gameDataJsonString = jsonString
-            LoadMapFromCache.initializeGameData()
+            LoadMapFromCache.initializeGameData(currentlyOnGameStart)
 
             pathingBlockerUtils.init()
             progressionUtils.init()

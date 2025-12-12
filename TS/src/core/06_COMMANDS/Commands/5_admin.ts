@@ -613,7 +613,7 @@ export const initExecuteCommandMax = () => {
 
                     const gameData = (jsonDecode(data) as any).gameData
 
-                    MEC_core_API.setGameData(jsonEncode(gameData))
+                    MEC_core_API.setGameData(jsonEncode(gameData), false)
                     getUdgLevels().reloadAllLevels()
                     Text.A('Done')
                 }
