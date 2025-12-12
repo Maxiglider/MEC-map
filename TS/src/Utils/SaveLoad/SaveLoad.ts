@@ -19,7 +19,12 @@ export const initSaveLoad = () => {
             }
         },
 
-        saveFileWithoutPossibleLoading: (fileName: string, player: player | null, data: string, base64 = BASE_64_DEFAULT) => {
+        saveFileWithoutPossibleLoading: (
+            fileName: string,
+            player: player | null,
+            data: string,
+            base64 = BASE_64_DEFAULT
+        ) => {
             player && (localFileCache[`${GetPlayerId(player)}_${fileName}`] = data)
 
             if (!player || GetLocalPlayer() === player) {
@@ -29,12 +34,19 @@ export const initSaveLoad = () => {
 
         readFile: (fileName: string, player: player, onRead: (promise: string) => void, base64 = BASE_64_DEFAULT) => {
             if (localFileCache[`${GetPlayerId(player)}_${fileName}`]) {
+                // print(`[SaveLoad] readFile: cache hit for player ${GetPlayerName(player)} and file "${fileName}"`)
                 onRead(localFileCache[`${GetPlayerId(player)}_${fileName}`])
             } else {
-                syncSaveLoad.read(fileName, player, data => {
-                    localFileCache[`${GetPlayerId(player)}_${fileName}`] = data
-                    onRead(data)
-                }, base64)
+                // print(`[SaveLoad] readFile: cache miss for player ${GetPlayerName(player)} and file "${fileName}"`)
+                syncSaveLoad.read(
+                    fileName,
+                    player,
+                    data => {
+                        localFileCache[`${GetPlayerId(player)}_${fileName}`] = data
+                        onRead(data)
+                    },
+                    base64
+                )
             }
         },
     }
