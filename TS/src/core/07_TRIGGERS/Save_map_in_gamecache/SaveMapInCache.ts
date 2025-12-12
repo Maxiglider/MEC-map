@@ -65,16 +65,12 @@ export class SaveMapInCache {
         if (p === null || GetLocalPlayer() == p) {
             const startTime = os.clock()
 
-            const filename =
-                fileName || Constants.MEC_SMIC_DATA_FILE_DATE_TPL.replace('[date]', os.date('%Y-%m-%d_%H-%M-%S'))
-
             SaveMapInCache.smicStringObj.str = SaveMapInCache.gameAsJsonString()
+            fileName = fileName || Constants.MEC_SMIC_DATA_FILE_DATE_TPL.replace('[date]', os.date('%Y-%m-%d_%H-%M-%S'))
+            SaveLoad.saveFile(fileName, p, SaveMapInCache.smicStringObj.str, false)
+            SaveMapInCache.lastSaveFile = fileName
 
-            SaveMapInCache.lastSaveFile = filename
-
-            SaveLoad.saveFileWithoutPossibleLoading(filename, p, SaveMapInCache.smicStringObj.str, false)
-
-            Text.A('saving game data to file "' + filename + '" done')
+            Text.A('saving game data to file "' + fileName + '" done')
 
             const time = os.clock() - startTime
 
