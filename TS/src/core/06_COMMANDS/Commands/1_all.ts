@@ -1,34 +1,33 @@
+import { getUdgEscapers, getUdgLevels } from '../../../../globals'
 import { ServiceManager } from '../../../Services'
 import { animUtils } from '../../../Utils/AnimUtils'
 import { EffectUtils } from '../../../Utils/EffectUtils'
 import { progressionUtils } from '../../../Utils/ProgressionUtils'
-import { createTimer } from '../../../Utils/mapUtils'
+import { createTimer, runInTrigger } from '../../../Utils/mapUtils'
+import { creepData } from '../../../creeps'
 import { canPlayerControlUnit, ClearTextForPlayer, IsBoolString, S2B } from '../../01_libraries/Basic_functions'
 import { Constants } from '../../01_libraries/Constants'
+import { IsInteger, PercentageStringOrX2Integer } from '../../01_libraries/Functions_on_numbers'
 import { ColorString2Id, udg_colorCode, udg_colorStrings } from '../../01_libraries/Init_colorCodes'
 import { Text } from '../../01_libraries/Text'
 import { Escaper } from '../../04_STRUCTURES/Escaper/Escaper'
+import { EscaperEffectFunctions } from '../../04_STRUCTURES/Escaper/EscaperEffect_functions'
+import { execute, newCmd } from '../../04_STRUCTURES/Escaper/EscaperSavedCommands'
+import { Disco } from '../../04_STRUCTURES/Escaper/Escaper_disco'
 import { ColorInfo, GetMirrorEscaper } from '../../04_STRUCTURES/Escaper/Escaper_functions'
 import { TerrainTypeWalk } from '../../04_STRUCTURES/TerrainType/TerrainTypeWalk'
 import {
     DisplayTerrainDataToPlayer,
     GetTerrainData,
 } from '../../07_TRIGGERS/Modify_terrain_Functions/Terrain_functions'
-import { Apm } from '../../08_GAME/Apm_clics_par_minute/Apm'
-import { Cpm } from '../../08_GAME/Apm_clics_par_minute/Cpm'
-import { Globals } from '../../09_From_old_Worldedit_triggers/globals_variables_and_triggers'
-import { PRESS_TIME_TO_ENABLE_FOLLOW_MOUSE } from '../../Follow_mouse/Follow_mouse'
-import { creepData } from '../../../creeps'
-import { getUdgEscapers, getUdgLevels } from '../../../../globals'
-import { runInTrigger } from '../../../Utils/mapUtils'
-import { IsInteger, PercentageStringOrX2Integer } from '../../01_libraries/Functions_on_numbers'
-import { EscaperEffectFunctions } from '../../04_STRUCTURES/Escaper/EscaperEffect_functions'
-import { execute, newCmd } from '../../04_STRUCTURES/Escaper/EscaperSavedCommands'
-import { Disco } from '../../04_STRUCTURES/Escaper/Escaper_disco'
 import { TerrainTypeFromString } from '../../07_TRIGGERS/Modify_terrain_Functions/Terrain_type_from_string'
 import { TerrainTypeNamesAndData } from '../../07_TRIGGERS/Modify_terrain_Functions/Terrain_type_names_and_data'
 import { AutoContinueAfterSliding } from '../../07_TRIGGERS/Slide_and_CheckTerrain_triggers/Auto_continue_after_sliding'
 import { TurnOnSlide } from '../../07_TRIGGERS/Slide_and_CheckTerrain_triggers/To_turn_on_slide'
+import { Apm } from '../../08_GAME/Apm_clics_par_minute/Apm'
+import { Cpm } from '../../08_GAME/Apm_clics_par_minute/Cpm'
+import { Globals } from '../../09_From_old_Worldedit_triggers/globals_variables_and_triggers'
+import { PRESS_TIME_TO_ENABLE_FOLLOW_MOUSE } from '../../Follow_mouse/Follow_mouse'
 import { GetStringAssignedFromCommand, KeyboardShortcut } from '../../Keyboard_shortcuts/KeyboardShortcut'
 import { isPlayerId, resolvePlayerId, resolvePlayerIds } from '../Helpers/Command_functions'
 
@@ -1708,12 +1707,13 @@ export const initCommandAll = () => {
         },
     })
 
-    //-myStartCommands(msc) [ list [player] | add <command> | del <commandNumber> | ec <commandNumber> | delall ]
+    //-myStartCommands(msc) [ list [player] | add <command> | del <commandNumber> | ec <commandNumber> | set <commandNumber> <command> | delall ]
     registerCommand({
         name: 'myStartCommands',
         alias: ['msc'],
         group: 'all',
-        argDescription: '[ list [player] | add <command> | del <commandNumber> | ec <commandNumber> | delall ]',
+        argDescription:
+            '[ list [player] | add <command> | del <commandNumber> | ec <commandNumber> | set <commandNumber> <command> | delall ]',
         description: 'Run commands on start of the game',
         cb: ({ cmd, nbParam, param1, param2 }, escaper) => {
             if (!escaper.getStartCommandsHandle().isLoaded()) {
@@ -1760,6 +1760,25 @@ export const initCommandAll = () => {
 
                 escaper.getStartCommandsHandle().addStartCommand(targetCmd)
                 Text.P(escaper.getPlayer(), `Added command: '${targetCmd}'`)
+            } else if (param1 === 'set') {
+                if (nbParam < 3) {
+                    Text.erP(escaper.getPlayer(), 'Usage: -msc set <commandNumber> <command>')
+                    return true
+                }
+
+                if (S2I(param2) === 0) {
+                    Text.erP(escaper.getPlayer(), 'You must specify a valid command number')
+                    return true
+                }
+
+                const targetCmd = cmd.substring(cmd.indexOf(param2) + param2.length + 1)
+                const commandIndex = S2I(param2) - 1
+
+                if (escaper.getStartCommandsHandle().setStartCommand(commandIndex, targetCmd)) {
+                    Text.P(escaper.getPlayer(), `Command ${param2} updated to: '${targetCmd}'`)
+                } else {
+                    Text.erP(escaper.getPlayer(), 'Invalid command number')
+                }
             } else if (param1 === 'ec' && nbParam === 2) {
                 if (S2I(param2) === 0) {
                     Text.erP(escaper.getPlayer(), 'You must specify a command to execute')
