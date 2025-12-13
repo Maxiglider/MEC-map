@@ -581,10 +581,13 @@ export const initExecuteCommandMax = () => {
         group: 'max',
         argDescription: '',
         description: 'Saves the map in cache',
-        cb: ({ noParam, param1 }, escaper) => {
+        cb: ({ noParam, param1, nbParam }, escaper) => {
+            if (nbParam > 1) {
+                Text.erP(escaper.getPlayer(), 'Wrong command parameters')
+            }
             if (noParam) {
                 SaveMapInCache.smic(escaper.getPlayer())
-            } else if (param1) {
+            } else {
                 SaveMapInCache.smic(escaper.getPlayer(), `MEC/mec-smic-data-custom_${param1}.txt`)
             }
             return true
@@ -596,27 +599,31 @@ export const initExecuteCommandMax = () => {
         name: 'loadMapFromCache',
         alias: ['lmfc'],
         group: 'max',
-        argDescription: '',
-        description: 'Loads the map from cache',
-        cb: ({ param1 }, escaper) => {
-            if (!param1 && SaveMapInCache.lastSaveFile === '') {
-                Text.mkP(escaper.getPlayer(), 'Failed to load, use -smic first')
+        argDescription: '[<smicName>]',
+        description:
+            'Loads the specified map from cache created with -smic. If no parameter, loads the last cache saved during this game.',
+        cb: ({ noParam, nbParam, param1 }, escaper) => {
+            if (nbParam > 1) {
+                Text.erP(escaper.getPlayer(), 'Wrong command parameters')
                 return true
             }
 
-            Text.A('Loading')
+            if (noParam && SaveMapInCache.lastSaveFile === '') {
+                Text.erP(escaper.getPlayer(), 'First use -smic in this game, or specify a smicName')
+                return true
+            }
+
+            Text.A('Loading map from cache...')
             SaveLoad.readFile(
-                param1 ? `MEC/mec-smic-data-custom_${param1}.txt` : SaveMapInCache.lastSaveFile,
+                noParam ? SaveMapInCache.lastSaveFile : `MEC/mec-smic-data-custom_${param1}.txt`,
                 GetTriggerPlayer(),
                 data => {
-                    Text.A('Loaded')
-
                     const gameData = (jsonDecode(data) as any).gameData
 
                     MEC_core_API.setGameData(jsonEncode(gameData), false)
-                    getUdgLevels().reloadAllLevels()
-                    Text.A('Done')
-                }
+                    Text.A('Loading map from cache done.')
+                },
+                false
             )
 
             return true

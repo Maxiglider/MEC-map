@@ -14,6 +14,8 @@ export class LoadMapFromCache {
             if (!gameData || typeof gameData !== 'object') {
                 Text.erA('invalid game data string')
             } else {
+                const levelIdBefore = getUdgLevels().getCurrentLevel().id
+
                 if (!currentlyOnGameStart) {
                     //erase previous data from the game
                     getUdgLevels().destroy()
@@ -82,8 +84,13 @@ export class LoadMapFromCache {
                 }
 
                 if (!currentlyOnGameStart) {
-                    //restart the game to apply the changes and make mobs appear
-                    getUdgLevels().restartTheGame()
+                    // load the level number we were in before, or first level if the previous level id doesn't exist
+                    const newLevelId = levelIdBefore <= getUdgLevels().getLastLevelId() ? levelIdBefore : 0
+                    if (newLevelId === levelIdBefore) {
+                        getUdgLevels().refreshCurrentLevel()
+                    } else {
+                        getUdgLevels().goToLevel(undefined, false, newLevelId)
+                    }
                 }
             }
         }

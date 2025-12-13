@@ -4,6 +4,7 @@ import { EncodingHex } from './EncodingHex'
 import { Logger } from './Logger'
 
 const BASE_64_DEFAULT = true
+const ESCAPE_DOUBLE_QUOTES_FOR_JSON_CHAR = '#DQ#'
 
 export const SyncSaveLoad = () => {
     const syncPrefix = 'S_TIO'
@@ -56,31 +57,27 @@ export const SyncSaveLoad = () => {
         PreloadGenStart()
 
         const rawData = data
-        const toCompile = base64Encode ? EncodingBase64.Encode(rawData) : rawData
+
+        let toCompile: string
+        if (base64Encode) {
+            toCompile = EncodingBase64.Encode(rawData)
+        } else {
+            // Escape doubles quotes for BlzSendSyncData calls not to crash on lmfc
+            toCompile = strings().replaceAll('"', ESCAPE_DOUBLE_QUOTES_FOR_JSON_CHAR, rawData)
+        }
+
         const chunkSize = 180
-        let assemble = ''
         const noOfChunks = math.ceil(toCompile.length / chunkSize)
 
         Logger.verbose('rawData.length: ', rawData.length)
         Logger.verbose('toCompile.length: ', toCompile.length)
 
         xpcall(() => {
-            for (let i = 0; i < toCompile.length; i++) {
-                assemble += toCompile.charAt(i)
+            for (let i = 0; i < noOfChunks; i++) {
+                const chunk = toCompile.substring(i * chunkSize, (i + 1) * chunkSize)
 
-                if (assemble.length >= chunkSize) {
-                    const header =
-                        EncodingHex.To32BitHexString(noOfChunks) +
-                        EncodingHex.To32BitHexString(math.ceil(i / chunkSize))
-                    Preload(`")\ncall BlzSendSyncData("${syncPrefix}","${header + assemble}`)
-                    assemble = ''
-                }
-            }
-
-            if (assemble.length > 0) {
-                const header = EncodingHex.To32BitHexString(noOfChunks) + EncodingHex.To32BitHexString(noOfChunks)
-                Preload(`")\ncall BlzSendSyncData("${syncPrefix}","${header + assemble}`)
-                //Final curtain call
+                const header = EncodingHex.To32BitHexString(noOfChunks) + EncodingHex.To32BitHexString(i + 1)
+                Preload(`")\ncall BlzSendSyncData("${syncPrefix}","${header + chunk}`)
             }
         }, Logger.critical)
         PreloadGenEnd(fileName)
@@ -100,7 +97,7 @@ export const SyncSaveLoad = () => {
         Logger.verbose('toCompile.length: ', toCompile.length)
 
         xpcall(() => {
-            for(let i = 0; i < noOfChunks; i++){
+            for (let i = 0; i < noOfChunks; i++) {
                 const start = i * chunkSize
                 const end = i < noOfChunks - 1 ? start + chunkSize : undefined
                 assemble = toCompile.substring(start, end)
@@ -136,7 +133,7 @@ export const SyncSaveLoad = () => {
     return {
         read,
         writeFile,
-        writeFileWithoutPossibleLoading
+        writeFileWithoutPossibleLoading,
     }
 }
 
@@ -144,12 +141,17 @@ type IFinishedFilePromise = string
 
 type IFilePromise = ReturnType<typeof FilePromise>
 
-const FilePromise = (syncOwner: player, onFinish: (promise: IFinishedFilePromise) => void, base64Encode = BASE_64_DEFAULT) => {
+const FilePromise = (
+    syncOwner: player,
+    onFinish: (promise: IFinishedFilePromise) => void,
+    base64Encode = BASE_64_DEFAULT
+) => {
     const buffer: string[] = []
 
     const finish = () => {
         const loadString = buffer.join('')
-        const finalString = base64Encode ? EncodingBase64.Decode(loadString) : loadString
+        const stringNotEscaped = base64Encode ? EncodingBase64.Decode(loadString) : loadString
+        const finalString = strings().replaceAll(ESCAPE_DOUBLE_QUOTES_FOR_JSON_CHAR, '"', stringNotEscaped)
 
         Logger.verbose('loadString.length', loadString.length)
         Logger.verbose('onFinish', onFinish)
