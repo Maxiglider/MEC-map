@@ -143,6 +143,8 @@ export class LevelArray extends BaseArray<Level> {
 
         this.currentLevel = levelId
 
+        this.refreshVisibilities();
+
         for (let i = 0; i < Constants.NB_PLAYERS_MAX; i++) {
             if (!escaper || (getUdgEscapers().get(i) && sameLevelProgression(escaper, getUdgEscapers().get(i)!))) {
                 this.levelProgressionState[i] = levelId
@@ -161,24 +163,6 @@ export class LevelArray extends BaseArray<Level> {
 
         this.data[this.currentLevel].activate(true)
         this.data[this.currentLevel].checkpointReviveHeroes(escaper, finished)
-
-        if (levelId > previousLevelId + 1) {
-            i = previousLevelId + 1
-            while (true) {
-                if (i >= levelId) break
-                this.data[i].activateVisibilities(true)
-                i = i + 1
-            }
-        } else {
-            if (levelId < previousLevelId) {
-                i = levelId + 1
-                while (true) {
-                    if (i > previousLevelId) break
-                    this.data[i].activateVisibilities(false)
-                    i = i + 1
-                }
-            }
-        }
 
         // Revive already moves camera
         // this.moveCamToStart(this.data[levelId], finisher)
@@ -200,6 +184,8 @@ export class LevelArray extends BaseArray<Level> {
         TimerStart(this.tLastGoToNextLevel, 10, false, DoNothing)
 
         this.currentLevel = this.getCurrentLevel(escaper).id + 1
+
+        this.refreshVisibilities()
 
         for (let i = 0; i < Constants.NB_PLAYERS_MAX; i++) {
             if (getUdgEscapers().get(i) && sameLevelProgression(escaper, getUdgEscapers().get(i)!)) {
@@ -225,6 +211,28 @@ export class LevelArray extends BaseArray<Level> {
         }
 
         return true
+    }
+
+    /**
+     * Applies the visibilities of the current level, recursively activating all previous levels' visibilities as well.
+     */
+    refreshVisibilities = () => {
+        let blackMaskActivated = false
+        this.forAllReversed((level: Level, levelId: number) => {
+            if(IsLevelBeingMade(level)){
+                level.activateVisibilities(true)
+                if(level.getResetVisiblitiesAtStart()){
+                    blackMaskActivated = true
+                }
+            }else if (levelId > this.currentLevel || blackMaskActivated) {
+                level.activateVisibilities(false)
+            }else if(levelId <= this.currentLevel) {
+                level.activateVisibilities(true)
+                if(level.getResetVisiblitiesAtStart()){
+                    blackMaskActivated = true
+                }
+            }
+        })
     }
 
     // moveCamToStart(level: Level, finisher: Escaper | undefined) {
@@ -355,6 +363,7 @@ export class LevelArray extends BaseArray<Level> {
             if (levelJson.visibilities) {
                 level.visibilities.newFromJson(levelJson.visibilities)
             }
+            level.setResetVisiblitiesAtStart(levelJson.resetVisiblitiesAtStart ?? false)
 
             //monsters
             if (levelJson.monsters) {

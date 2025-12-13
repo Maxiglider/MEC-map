@@ -47,6 +47,20 @@ export abstract class BaseArray<T extends BaseModel> {
         }
     }
 
+    forAllReversed(cb: (v: T, id: number) => void) {
+        const keys: number[] = []
+
+        for (const [id, _element] of pairs(this.data)) {
+            arrayPush(keys, id)
+        }
+
+        keys.sort((a, b) => b - a)
+
+        for (const id of keys) {
+            cb(this.data[id], id)
+        }
+    }
+
     getAll = () => this.data
 
     toJson: () => any = () => {

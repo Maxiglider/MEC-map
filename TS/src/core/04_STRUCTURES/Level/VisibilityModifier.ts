@@ -3,6 +3,8 @@ import { RefreshHideAllVM } from '../../03_view_all_hide_all/View_all_hide_all'
 import { Level } from './Level'
 
 export class VisibilityModifier {
+    private isActive = false
+
     private x1: number
     private y1: number
     private x2: number
@@ -30,11 +32,15 @@ export class VisibilityModifier {
     }
 
     activate = (activ: boolean) => {
+        if(this.isActive === activ){
+            return
+        }
         if (activ) {
             FogModifierStart(this.fm)
         } else {
             FogModifierStop(this.fm)
         }
+        this.isActive = activ
     }
 
     copy = (): VisibilityModifier => {

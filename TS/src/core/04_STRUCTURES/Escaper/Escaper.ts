@@ -1494,10 +1494,6 @@ export class Escaper {
 
         if (oldMakingLevel && !IsLevelBeingMade(oldMakingLevel)) {
             oldMakingLevel.activate(false)
-
-            if (getUdgLevels().getCurrentLevel().getId() < oldMakingLevel.getId()) {
-                oldMakingLevel.activateVisibilities(false)
-            }
         }
 
         if (level) {
@@ -1506,6 +1502,8 @@ export class Escaper {
             Level.earningLivesActivated = true
             this.makingLevel = level
         }
+
+        getUdgLevels().refreshVisibilities()
 
         return true
     }

@@ -57,6 +57,7 @@ export class Level {
     debugRegionsVisible: 'on' | 'off' | 'on_monsters' = 'off'
 
     visibilities: VisibilityModifierArray
+    private resetVisiblitiesAtStart: boolean // if true, all visibilities from previous levels are disabled at level start
     monsters: MonsterArray
     monsterSpawns: MonsterSpawnArray
     meteors: MeteorArray
@@ -72,6 +73,7 @@ export class Level {
 
     constructor() {
         this.visibilities = new VisibilityModifierArray(this)
+        this.resetVisiblitiesAtStart = false
         this.triggers = new TriggerArray()
         this.monsters = new MonsterArray(this)
         this.monsterSpawns = new MonsterSpawnArray(this)
@@ -97,7 +99,6 @@ export class Level {
                 Text.A(this.startMessage)
             }
 
-            this.visibilities.activate(true)
             this.monsters.createMonstersUnits()
             this.monsterSpawns.activate()
             this.meteors.createMeteorsItems()
@@ -508,6 +509,20 @@ export class Level {
         })
     }
 
+    getResetVisiblitiesAtStart() {
+        return this.resetVisiblitiesAtStart
+    }
+
+    setResetVisiblitiesAtStart(reset: boolean) {
+        if(reset === this.resetVisiblitiesAtStart){
+            return
+        }
+
+        this.resetVisiblitiesAtStart = reset
+
+        getUdgLevels().refreshVisibilities()
+    }
+
     toJson = () => {
         const json = MemoryHandler.getEmptyObject<any>()
 
@@ -530,6 +545,7 @@ export class Level {
 
         //visibilities
         json.visibilities = this.visibilities.toJson()
+        json.resetVisiblitiesAtStart = this.resetVisiblitiesAtStart
 
         //monsters
         json.monsters = this.monsters.toJson()
