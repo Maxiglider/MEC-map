@@ -2,7 +2,6 @@ import { Text } from 'core/01_libraries/Text'
 import { Level } from 'core/04_STRUCTURES/Level/Level'
 import { MakeOneByOneOrTwoClicks } from 'core/05_MAKE_STRUCTURES/Make/MakeOneByOneOrTwoClicks'
 import { getUdgLevels } from '../../../../globals'
-import { Monster } from '../../04_STRUCTURES/Monster/Monster'
 import { MakeMonsterAction } from '../MakeLastActions/MakeMonsterAction'
 
 export class MakeCopyLevelPatrol extends MakeOneByOneOrTwoClicks {
@@ -24,8 +23,12 @@ export class MakeCopyLevelPatrol extends MakeOneByOneOrTwoClicks {
                 }
 
                 const jsonM = monster.toJson()
-                jsonM && (jsonM['id'] = ++Monster.lastInstanceId)
-                const m2 = getUdgLevels().newFromJsonMonster(jsonM, this.targetLevel, this.targetLevel.isActivated())
+                const m2 = getUdgLevels().newFromJsonMonster(
+                    jsonM,
+                    this.targetLevel,
+                    this.targetLevel.isActivated(),
+                    true
+                )
                 jsonM && jsonM.__destroy()
 
                 if (m2) {
@@ -51,11 +54,11 @@ export class MakeCopyLevelPatrol extends MakeOneByOneOrTwoClicks {
 
                 for (const m of monsters) {
                     const jsonM = m.toJson()
-                    jsonM && (jsonM['id'] = ++Monster.lastInstanceId)
                     const m2 = getUdgLevels().newFromJsonMonster(
                         jsonM,
                         this.targetLevel,
-                        this.targetLevel.isActivated()
+                        this.targetLevel.isActivated(),
+                        true
                     )
                     jsonM && jsonM.__destroy()
 

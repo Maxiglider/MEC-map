@@ -1,3 +1,6 @@
+import { getUdgCasterTypes, getUdgLevels, getUdgMonsterTypes, getUdgTerrainTypes, globals } from '../../../../globals'
+import { ServiceManager } from '../../../Services'
+import { createPoint } from '../../../Utils/Point'
 import { String2Ascii } from '../../01_libraries/Ascii'
 import {
     arrayPush,
@@ -9,25 +12,9 @@ import {
     tileset2tilesetString,
 } from '../../01_libraries/Basic_functions'
 import { Constants } from '../../01_libraries/Constants'
+import { IsInteger, IsPositiveInteger } from '../../01_libraries/Functions_on_numbers'
 import { udg_colorCode } from '../../01_libraries/Init_colorCodes'
 import { Text } from '../../01_libraries/Text'
-import { Level } from '../../04_STRUCTURES/Level/Level'
-import { IMMOLATION_SKILLS } from '../../04_STRUCTURES/Monster/Immolation_skills'
-import { ABILITY_ANNULER_VISION } from '../../04_STRUCTURES/Monster/Monster_functions'
-import { MonsterMultiplePatrols } from '../../04_STRUCTURES/Monster/MonsterMultiplePatrols'
-import { MonsterNoMove } from '../../04_STRUCTURES/Monster/MonsterNoMove'
-import { MonsterSimplePatrol } from '../../04_STRUCTURES/Monster/MonsterSimplePatrol'
-import { MonsterType } from '../../04_STRUCTURES/Monster/MonsterType'
-import { PORTAL_MOB_MAX_FREEZE_DURATION } from '../../04_STRUCTURES/Monster_properties/PortalMob'
-import { DEATH_TERRAIN_MAX_TOLERANCE, TerrainTypeDeath } from '../../04_STRUCTURES/TerrainType/TerrainTypeDeath'
-import { TerrainTypeSlide } from '../../04_STRUCTURES/TerrainType/TerrainTypeSlide'
-import { TerrainTypeWalk } from '../../04_STRUCTURES/TerrainType/TerrainTypeWalk'
-import { ExchangeTerrains } from '../../07_TRIGGERS/Triggers_to_modify_terrains/Exchange_terrains'
-import { RandomizeTerrains } from '../../07_TRIGGERS/Triggers_to_modify_terrains/Randomize_terrains'
-import { ServiceManager } from '../../../Services'
-import { createPoint } from '../../../Utils/Point'
-import { getUdgCasterTypes, getUdgLevels, getUdgMonsterTypes, getUdgTerrainTypes, globals } from '../../../../globals'
-import { IsInteger, IsPositiveInteger } from '../../01_libraries/Functions_on_numbers'
 import {
     DEFAULT_CASTER_ANIMATION,
     DEFAULT_CASTER_LOAD_TIME,
@@ -36,13 +23,26 @@ import {
     MIN_CASTER_LOAD_TIME,
     MIN_CASTER_PROJECTILE_SPEED,
 } from '../../04_STRUCTURES/Caster/CasterType'
+import { Level } from '../../04_STRUCTURES/Level/Level'
+import { IMMOLATION_SKILLS } from '../../04_STRUCTURES/Monster/Immolation_skills'
+import { ABILITY_ANNULER_VISION } from '../../04_STRUCTURES/Monster/Monster_functions'
+import { MonsterMultiplePatrols } from '../../04_STRUCTURES/Monster/MonsterMultiplePatrols'
+import { MonsterNoMove } from '../../04_STRUCTURES/Monster/MonsterNoMove'
+import { MonsterSimplePatrol } from '../../04_STRUCTURES/Monster/MonsterSimplePatrol'
 import { MONSTER_TELEPORT_PERIOD_MAX, MONSTER_TELEPORT_PERIOD_MIN } from '../../04_STRUCTURES/Monster/MonsterTeleport'
+import { MonsterType } from '../../04_STRUCTURES/Monster/MonsterType'
 import { CLEAR_MOB_MAX_DURATION, FRONT_MONTANT_DURATION } from '../../04_STRUCTURES/Monster_properties/ClearMob'
+import { PORTAL_MOB_MAX_FREEZE_DURATION } from '../../04_STRUCTURES/Monster_properties/PortalMob'
+import { DEATH_TERRAIN_MAX_TOLERANCE, TerrainTypeDeath } from '../../04_STRUCTURES/TerrainType/TerrainTypeDeath'
+import { TerrainTypeSlide } from '../../04_STRUCTURES/TerrainType/TerrainTypeSlide'
+import { TerrainTypeWalk } from '../../04_STRUCTURES/TerrainType/TerrainTypeWalk'
 import { MakeMonsterSimplePatrol } from '../../05_MAKE_STRUCTURES/Make_create_monsters/MakeMonsterSimplePatrol'
 import { TerrainTypeFromString } from '../../07_TRIGGERS/Modify_terrain_Functions/Terrain_type_from_string'
 import { HERO_ROTATION_SPEED } from '../../07_TRIGGERS/Slide_and_CheckTerrain_triggers/SlidingMax'
 import { ChangeAllTerrains } from '../../07_TRIGGERS/Triggers_to_modify_terrains/Change_all_terrains'
 import { ChangeOneTerrain } from '../../07_TRIGGERS/Triggers_to_modify_terrains/Change_one_terrain'
+import { ExchangeTerrains } from '../../07_TRIGGERS/Triggers_to_modify_terrains/Exchange_terrains'
+import { RandomizeTerrains } from '../../07_TRIGGERS/Triggers_to_modify_terrains/Randomize_terrains'
 import { CmdParam } from '../Helpers/Command_functions'
 
 export const initExecuteCommandMake = () => {
@@ -2597,7 +2597,7 @@ export const initExecuteCommandMake = () => {
             if (noParam) {
                 const currentLevel = escaper.getMakingLevel()
 
-                getUdgLevels().newFromJson([currentLevel.toJson()], true)
+                getUdgLevels().newFromJson([currentLevel.toJson()], true, true)
 
                 Text.mkP(
                     escaper.getPlayer(),
