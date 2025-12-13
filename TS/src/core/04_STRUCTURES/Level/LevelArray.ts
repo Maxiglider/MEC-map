@@ -317,7 +317,7 @@ export class LevelArray extends BaseArray<Level> {
         return lvl
     }
 
-    newFromJson = (levelsJson: { [x: string]: any }[], preventDestroyLastLevel = false) => {
+    newFromJson = (levelsJson: { [x: string]: any }[], preventDestroyLastLevel = false, forceNewIds = false) => {
         if (levelsJson.length > 0 && !preventDestroyLastLevel) {
             this.destroyLastLevel(true)
         }
@@ -359,7 +359,7 @@ export class LevelArray extends BaseArray<Level> {
             //monsters
             if (levelJson.monsters) {
                 for (let m of levelJson.monsters) {
-                    this.newFromJsonMonster(m, level, false)
+                    this.newFromJsonMonster(m, level, false, forceNewIds)
                 }
             }
 
@@ -400,12 +400,15 @@ export class LevelArray extends BaseArray<Level> {
         }
     }
 
-    newFromJsonMonster = (m: any, level: Level, createUnit: boolean) => {
+    newFromJsonMonster = (m: any, level: Level, createUnit: boolean, forceNewIds = false) => {
         let monster: Monster | null = null
 
         if (!m.angle) {
             m.angle = -1
         }
+
+        // Generate new ID if forceNewIds is true, otherwise use existing ID
+        const monsterId = forceNewIds ? null : m.id
 
         if (m.monsterClassName == 'Caster') {
             const ct = getUdgCasterTypes().getByLabel(m.casterTypeLabel)
@@ -413,7 +416,7 @@ export class LevelArray extends BaseArray<Level> {
             if (!ct) {
                 Text.erA(`Caster type "${m.casterTypeLabel}" unknown`)
             } else {
-                monster = new Caster(ct, m.x, m.y, m.angle, m.id)
+                monster = new Caster(ct, m.x, m.y, m.angle, monsterId)
             }
         } else {
             const mt = getUdgMonsterTypes().getByLabel(m.monsterTypeLabel)
@@ -422,21 +425,21 @@ export class LevelArray extends BaseArray<Level> {
                 Text.erA(`Monster label "${m.monsterTypeLabel}" unknown`)
             } else {
                 if (m.monsterClassName == 'MonsterNoMove') {
-                    monster = new MonsterNoMove(mt, m.x, m.y, m.angle, m.id)
+                    monster = new MonsterNoMove(mt, m.x, m.y, m.angle, monsterId)
                 } else if (m.monsterClassName == 'MonsterSimplePatrol') {
-                    monster = createMonsterSmartPatrol(mt, m.x1, m.y1, m.x2, m.y2, m.id)
+                    monster = createMonsterSmartPatrol(mt, m.x1, m.y1, m.x2, m.y2, monsterId)
                 } else if (m.monsterClassName == 'MonsterMultiplePatrols') {
                     for (const [n, x] of pairs(m.xArr)) {
                         const y = m.yArr[n]
                         MonsterMultiplePatrols.storeNewLoc(x, y)
                     }
-                    monster = new MonsterMultiplePatrols(mt, m.mode, m.id)
+                    monster = new MonsterMultiplePatrols(mt, m.mode, monsterId)
                 } else if (m.monsterClassName == 'MonsterTeleport') {
                     for (const [n, x] of pairs(m.xArr)) {
                         const y = m.yArr[n]
                         MonsterTeleport.storeNewLoc(x, y)
                     }
-                    monster = new MonsterTeleport(mt, m.period, m.angle, m.mode, m.id)
+                    monster = new MonsterTeleport(mt, m.period, m.angle, m.mode, monsterId)
                 }
             }
         }
