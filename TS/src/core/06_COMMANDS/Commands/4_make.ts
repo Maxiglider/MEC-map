@@ -2712,6 +2712,43 @@ export const initExecuteCommandMake = () => {
         },
     })
 
+    //-setLevelResetVisibilities(setlrv) <boolean> [<levelId>]   --> set whether visibilities are reset when re-entering the level
+    registerCommand({
+        name: 'setLevelResetVisibilities',
+        alias: ['setlrv'],
+        group: 'make',
+        argDescription: '<boolean> [<levelId>]',
+        description: 'Set whether visibilities are reset when re-entering the level (applies a total black mask on the map when true)',
+        cb: ({ nbParam, param1, param2 }, escaper) => {
+            if (nbParam > 2 || !IsBoolString(param1)) {
+                Text.erP(escaper.getPlayer(), 'Usage: -setLevelResetVisibilities <boolean> [<levelId>]')
+                return true
+            }
+
+            const levelNum = nbParam == 2 ? S2I(param2) : escaper.getMakingLevel().getId()
+            const level = getUdgLevels().get(levelNum)
+            if (!level) {
+                Text.erP(escaper.getPlayer(), `Level number ${param2} doesn't exist`)
+                return true
+            }
+
+            const doReset = S2B(param1)
+
+            if(level.getResetVisiblitiesAtStart() === doReset) {
+                Text.erP(escaper.getPlayer(), `Level ${levelNum} already has reset visibilities at start set to ${param1}`)
+                return true
+            }
+
+            level.setResetVisiblitiesAtStart(doReset)
+            Text.mkP(
+                escaper.getPlayer(),
+                `Level ${levelNum} will ${doReset ? '' : 'no longer '}reset visibilities at start`
+            )
+
+            return true
+        }
+    })
+
     //-removeVisibilities(remv) [<levelId>]   --> remove all visibility rectangles made for the current level
     registerCommand({
         name: 'removeVisibilities',
