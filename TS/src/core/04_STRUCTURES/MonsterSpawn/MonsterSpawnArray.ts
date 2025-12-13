@@ -127,6 +127,11 @@ export class MonsterSpawnArray extends BaseArray<MonsterSpawn> {
             if (pag.cmds.length === 0) {
                 Text.erP(p, `no monster spawn for this level`)
             } else {
+                Text.P_timed(
+                    p,
+                    Constants.TERRAIN_DATA_DISPLAY_TIME,
+                    `|cff00ff00Monster Spawns (page |cff00ccff${pageNum}|r|cff00ff00/|cff00ccff${pag.totalPages}|r|cff00ff00)|r`
+                )
                 for (const l of pag.cmds) {
                     Text.P_timed(p, Constants.TERRAIN_DATA_DISPLAY_TIME, l)
                 }

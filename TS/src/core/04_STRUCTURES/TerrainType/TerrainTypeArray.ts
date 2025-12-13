@@ -166,6 +166,11 @@ export class TerrainTypeArray extends BaseArray<TerrainType> {
             if (pag.cmds.length === 0) {
                 Text.erP(p, `no terrain type saved`)
             } else {
+                Text.P_timed(
+                    p,
+                    Constants.TERRAIN_DATA_DISPLAY_TIME,
+                    `|cff00ff00Terrain Types (page |cff00ccff${pageNum}|r|cff00ff00/|cff00ccff${pag.totalPages}|r|cff00ff00)|r`
+                )
                 for (const l of pag.cmds) {
                     Text.P_timed(p, Constants.TERRAIN_DATA_DISPLAY_TIME, l)
                 }
