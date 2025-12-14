@@ -5,6 +5,7 @@ import { Logger } from './Logger'
 
 const BASE_64_DEFAULT = true
 const ESCAPE_DOUBLE_QUOTES_FOR_JSON_CHAR = '#DQ#'
+const CHUNK_SIZE = 150
 
 export const SyncSaveLoad = () => {
     const syncPrefix = 'S_TIO'
@@ -64,17 +65,18 @@ export const SyncSaveLoad = () => {
         } else {
             // Escape doubles quotes for BlzSendSyncData calls not to crash on lmfc
             toCompile = strings().replaceAll('"', ESCAPE_DOUBLE_QUOTES_FOR_JSON_CHAR, rawData)
+            // Fix for too many backslashes
+            toCompile = strings().replaceAll('\\\\\\\\\\\\\\\\', '\\\\\\\\', toCompile)
         }
 
-        const chunkSize = 180
-        const noOfChunks = math.ceil(toCompile.length / chunkSize)
+        const noOfChunks = math.ceil(toCompile.length / CHUNK_SIZE)
 
         Logger.verbose('rawData.length: ', rawData.length)
         Logger.verbose('toCompile.length: ', toCompile.length)
 
         xpcall(() => {
             for (let i = 0; i < noOfChunks; i++) {
-                const chunk = toCompile.substring(i * chunkSize, (i + 1) * chunkSize)
+                const chunk = toCompile.substring(i * CHUNK_SIZE, (i + 1) * CHUNK_SIZE)
 
                 const header = EncodingHex.To32BitHexString(noOfChunks) + EncodingHex.To32BitHexString(i + 1)
                 Preload(`")\ncall BlzSendSyncData("${syncPrefix}","${header + chunk}`)
@@ -89,17 +91,16 @@ export const SyncSaveLoad = () => {
 
         const rawData = data
         const toCompile = base64Encode ? EncodingBase64.Encode(rawData) : rawData
-        const chunkSize = 180
         let assemble = ''
-        const noOfChunks = math.ceil(toCompile.length / chunkSize)
+        const noOfChunks = math.ceil(toCompile.length / CHUNK_SIZE)
 
         Logger.verbose('rawData.length: ', rawData.length)
         Logger.verbose('toCompile.length: ', toCompile.length)
 
         xpcall(() => {
             for (let i = 0; i < noOfChunks; i++) {
-                const start = i * chunkSize
-                const end = i < noOfChunks - 1 ? start + chunkSize : undefined
+                const start = i * CHUNK_SIZE
+                const end = i < noOfChunks - 1 ? start + CHUNK_SIZE : undefined
                 assemble = toCompile.substring(start, end)
                 Preload(assemble)
             }
