@@ -318,10 +318,11 @@ export class MonsterSpawn {
 
         // Multi region patrols does not work with rotation yet
         const maxTiles = 6 * 128
-        this.multiRegionPatrols = !isDiagonal && maxDistance >= maxTiles && this.spawnShape === 'region'
+        this.multiRegionPatrols = maxDistance >= maxTiles && this.spawnShape === 'region'
 
         if (this.multiRegionPatrols) {
             const amountOfPatrols = Math.ceil(maxDistance / maxTiles)
+
             const dx = Math.floor((this.minX - this.maxX) / amountOfPatrols)
             const dy = Math.floor((this.minY - this.maxY) / amountOfPatrols)
 
@@ -332,9 +333,85 @@ export class MonsterSpawn {
             for (let n = 0; n < amountOfPatrols - 1; n++) {
                 const reg = CreateRegion()
 
+                if (isDiagonal) {
+                    // --- DIAGONAL CHECKPOINTS ---
+                    // Movement for diagonal rotations uses the "x-axis" local model (same as your region spawn else-branch),
+                    // so checkpoints are vertical lines in local space at intermediate x positions, rotated by this.rotation.
+
+                    const checkpointX = this.minX - (n + 1) * dx // dx is negative => moves forward
+
+                    // build a "line" across the corridor in local space, then rotate into world space
+                    const p1 = this.applyRotation(checkpointX, this.minY - DECALAGE_UNSPAWN, this.rotation)
+                    const p2 = this.applyRotation(checkpointX, this.maxY + DECALAGE_UNSPAWN, this.rotation)
+
+                    // paint a diagonal line region (thick enough due to 32x32 stamps)
+                    const regions = createDiagonalRegions(p1.x, p1.y, p2.x, p2.y, 32)
+
+                    for (const region of regions) {
+                        const rr = Rect(region.topLeft.x, region.topLeft.y, region.bottomRight.x, region.bottomRight.y)
+                        RegionAddRect(reg, rr)
+                        RemoveRect(rr)
+
+                        // keep debug rectangles
+                        this.unspawnregpoints.push([
+                            region.topLeft.x,
+                            region.topLeft.y,
+                            region.bottomRight.x,
+                            region.bottomRight.y,
+                        ])
+                    }
+
+                    regions.__destroy(true)
+
+                    // Save for debug/cleanup arrays (endpoints are fine for inspection)
+                    this.x1[n] = p1.x
+                    this.y1[n] = p1.y
+                    this.x2[n] = p2.x
+                    this.y2[n] = p2.y
+
+                    p1.__destroy()
+                    p2.__destroy()
+
+                    const t = CreateTrigger()
+                    MonsterSpawn.anyTrigId2MonsterSpawn.set(GetHandleId(t), this)
+                    TriggerRegisterEnterRegion(t, reg, null)
+                    TriggerAddAction(t, () => {
+                        const ms = MonsterSpawn.anyTrigId2MonsterSpawn.get(GetHandleId(GetTriggeringTrigger()))
+                        if (ms && ms.monsters && IsUnitInGroup(GetTriggerUnit(), ms.monsters)) {
+                            const u = GetTriggerUnit()
+
+                            let x = GetUnitX(u)
+                            let y = GetUnitY(u)
+
+                            const theta = Deg2Rad(ms.rotation)
+                            const dirX = math.cos(theta)
+                            const dirY = math.sin(theta)
+
+                            // Step size matches what startMobMovement uses when multiRegionPatrols is enabled
+                            const step = Math.abs(ms.multiRegionDx)
+                            const dist = step + DECALAGE_UNSPAWN
+
+                            let tx = x + dist * dirX
+                            let ty = y + dist * dirY
+
+                            // Clamp to map bounds (prevents bad coords on long paths)
+                            tx = math.max(globals.MAP_MIN_X, math.min(globals.MAP_MAX_X, tx))
+                            ty = math.max(globals.MAP_MIN_Y, math.min(globals.MAP_MAX_Y, ty))
+
+                            IssuePointOrder(u, 'move', tx, ty)
+                        }
+                    })
+
+                    this.r[n] = reg
+                    this.t[n] = t
+                    continue
+                }
+
+                // --- ORIGINAL ORTHOGONAL CHECKPOINTS (unchanged) ---
                 const ddx = (n + 1) * dx
                 const ddy = (n + 1) * dy
 
+                // these come from the outer createUnspawnReg() values (keep your existing logic)
                 const calcX = x1 === x2
                 const calcY = y1 === y2
 
