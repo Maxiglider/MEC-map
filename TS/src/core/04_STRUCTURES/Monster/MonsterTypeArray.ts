@@ -1,6 +1,5 @@
 import { Constants } from 'core/01_libraries/Constants'
 import { Text } from 'core/01_libraries/Text'
-import { udg_monsters } from '../../../../globals'
 import { handlePaginationArgs, handlePaginationObj } from '../../06_COMMANDS/Helpers/Pagination'
 import { BaseArray } from '../BaseArray'
 import { MonsterType } from './MonsterType'
@@ -101,11 +100,5 @@ export class MonsterTypeArray extends BaseArray<MonsterType> {
                 }
             }
         }
-    }
-
-    monsterUnit2KillEffectStr(monsterUnit: unit) {
-        const monster = udg_monsters[GetUnitUserData(monsterUnit)]
-        const mt = monster.getMonsterType()
-        return mt?.getKillingEffectStr()
     }
 }

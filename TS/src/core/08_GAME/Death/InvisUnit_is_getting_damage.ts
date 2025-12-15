@@ -6,7 +6,7 @@ import { createEvent } from 'Utils/mapUtils'
 import { Constants } from 'core/01_libraries/Constants'
 import { Monster } from 'core/04_STRUCTURES/Monster/Monster'
 import { hooks } from 'core/API/GeneralHooks'
-import { getUdgEscapers, getUdgMonsterTypes, udg_monsters } from '../../../../globals'
+import { getUdgEscapers, udg_monsters } from '../../../../globals'
 
 export const InitTrig_InvisUnit_is_getting_damage = () => {
     let TAILLE_UNITE = 100
@@ -68,6 +68,8 @@ export const InitTrig_InvisUnit_is_getting_damage = () => {
                         return
                     } else {
                         const monster = udg_monsters[GetUnitUserData(killingUnit)] as Monster | undefined
+
+                        // TODO; monsterSpawn mobs are null here, need a reference somehow as they're not in udg_monsters
 
                         if (monster) {
                             const clearMob = monster.getClearMob()
@@ -137,7 +139,7 @@ export const InitTrig_InvisUnit_is_getting_damage = () => {
 
                             //effet de tuation du héros par le monstre, suivant le type du monstre
                             if (monster) {
-                                const effectStr = getUdgMonsterTypes().monsterUnit2KillEffectStr(killingUnit)
+                                const effectStr = monster.getMonsterType()?.getKillingEffectStr()
 
                                 if (effectStr) {
                                     const eff = EffectUtils.addSpecialEffect(
