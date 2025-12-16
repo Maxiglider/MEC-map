@@ -9,15 +9,15 @@ export const InitTrig_Effect_meteor_on_pick_down = () => {
             () => {
                 if (
                     !(
-                        IsHero(GetTriggerUnit()) &&
-                        (GetItemTypeId(GetManipulatedItem()) === METEOR_NORMAL ||
-                            GetItemTypeId(GetManipulatedItem()) === METEOR_CHEAT)
+                        IsHero(GetTriggerUnit()!) &&
+                        (GetItemTypeId(GetManipulatedItem()!) === METEOR_NORMAL ||
+                            GetItemTypeId(GetManipulatedItem()!) === METEOR_CHEAT)
                     )
                 ) {
                     return
                 }
 
-                Hero2Escaper(GetTriggerUnit())?.removeEffectMeteor()
+                Hero2Escaper(GetTriggerUnit()!)?.removeEffectMeteor()
             },
         ],
     })

@@ -18,10 +18,10 @@ const NewRegion = (x: number, y: number): region => {
 const MonsterMultiplePatrols_move_Actions = () => {
     let monster: Monster
     let MMP: MonsterMultiplePatrols
-    if (IsHero(GetTriggerUnit())) {
+    if (IsHero(GetTriggerUnit()!)) {
         return
     }
-    monster = udg_monsters[GetUnitUserData(GetTriggerUnit())]
+    monster = udg_monsters[GetUnitUserData(GetTriggerUnit()!)]
     if (monster instanceof MonsterMultiplePatrols) {
         if (monster.getCurrentTrigger() == GetTriggeringTrigger()) {
             monster.nextMove()

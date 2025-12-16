@@ -42,7 +42,7 @@ const tsMain = () => {
                             }
 
                             if (param1 === 'reset') {
-                                resetUI(GetPlayerId(GetTriggerPlayer()))
+                                resetUI(GetPlayerId(GetTriggerPlayer()!))
                                 return true
                             }
 
@@ -50,7 +50,7 @@ const tsMain = () => {
                                 return true
                             }
 
-                            setVisible({ visible: S2B(param1), playerId: GetPlayerId(GetTriggerPlayer()) })
+                            setVisible({ visible: S2B(param1), playerId: GetPlayerId(GetTriggerPlayer()!) })
                             return true
                         },
                     })
@@ -62,7 +62,7 @@ const tsMain = () => {
                         argDescription: '[on|off|toggle|clear]',
                         description: 'Toggle command history display, or clear unpinned commands',
                         cb: ({ noParam, param1 }, escaper) => {
-                            const playerId = GetPlayerId(GetTriggerPlayer())
+                            const playerId = GetPlayerId(GetTriggerPlayer()!)
 
                             if (noParam || param1 === 'toggle') {
                                 // Toggle visibility

@@ -1,4 +1,4 @@
-import * as React from 'w3ts-jsx/dist/src/index'
+import * as React from 'w3ts-jsx/dist/index'
 import { Interface, InterfaceProps } from './Interface'
 
 export type IRenderInterface = ReturnType<typeof renderInterface>

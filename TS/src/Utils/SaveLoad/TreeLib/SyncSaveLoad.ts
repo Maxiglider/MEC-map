@@ -15,22 +15,22 @@ export const SyncSaveLoad = () => {
     const allPromises: (IFilePromise | undefined)[] = []
 
     for (let i = 0; i < GetBJMaxPlayers(); i++) {
-        BlzTriggerRegisterPlayerSyncEvent(syncEvent, Player(i), syncPrefix, false)
-        BlzTriggerRegisterPlayerSyncEvent(syncEvent, Player(i), syncPrefixFinish, false)
+        BlzTriggerRegisterPlayerSyncEvent(syncEvent, Player(i)!, syncPrefix, false)
+        BlzTriggerRegisterPlayerSyncEvent(syncEvent, Player(i)!, syncPrefixFinish, false)
     }
 
     TriggerAddAction(
         syncEvent,
         errorHandler(
             () => {
-                const readData = BlzGetTriggerSyncData()
+                const readData = BlzGetTriggerSyncData()!
                 const totalChunkSize = EncodingHex.ToNumber(readData.substr(0, 8))
                 const currentChunk = EncodingHex.ToNumber(readData.substr(8, 8))
                 const theRest = readData.substr(16)
 
                 Logger.verbose('Loading ', currentChunk, ' out of ', totalChunkSize)
 
-                const promise = allPromises[GetPlayerId(GetTriggerPlayer())]
+                const promise = allPromises[GetPlayerId(GetTriggerPlayer()!)]
 
                 if (promise) {
                     if (BlzGetTriggerSyncPrefix() === syncPrefix) {
@@ -42,13 +42,13 @@ export const SyncSaveLoad = () => {
                 } else {
                     Logger.warning(
                         `Syncronised data in SyncSaveLoad when there is no promise present for player: ${GetPlayerName(
-                            GetTriggerPlayer()
+                            GetTriggerPlayer()!
                         )}`
                     )
                 }
             },
             () => {
-                allPromises[GetPlayerId(GetTriggerPlayer())] = undefined
+                allPromises[GetPlayerId(GetTriggerPlayer()!)] = undefined
             }
         )
     )

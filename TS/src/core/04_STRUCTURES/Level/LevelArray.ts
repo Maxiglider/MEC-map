@@ -78,7 +78,7 @@ export class LevelArray extends BaseArray<Level> {
         let j = 0
 
         for (let i = 0; i < Constants.NB_PLAYERS_MAX; i++) {
-            const p = Player(i)
+            const p = Player(i)!
 
             if (
                 this.levelProgressionState[i] === lvlId &&
@@ -143,7 +143,7 @@ export class LevelArray extends BaseArray<Level> {
 
         this.currentLevel = levelId
 
-        this.refreshVisibilities();
+        this.refreshVisibilities()
 
         for (let i = 0; i < Constants.NB_PLAYERS_MAX; i++) {
             if (!escaper || (getUdgEscapers().get(i) && sameLevelProgression(escaper, getUdgEscapers().get(i)!))) {
@@ -219,16 +219,16 @@ export class LevelArray extends BaseArray<Level> {
     refreshVisibilities = () => {
         let blackMaskActivated = false
         this.forAllReversed((level: Level, levelId: number) => {
-            if(IsLevelBeingMade(level)){
+            if (IsLevelBeingMade(level)) {
                 level.activateVisibilities(true)
-                if(level.getResetVisiblitiesAtStart()){
+                if (level.getResetVisiblitiesAtStart()) {
                     blackMaskActivated = true
                 }
-            }else if (levelId > this.currentLevel || blackMaskActivated) {
+            } else if (levelId > this.currentLevel || blackMaskActivated) {
                 level.activateVisibilities(false)
-            }else if(levelId <= this.currentLevel) {
+            } else if (levelId <= this.currentLevel) {
                 level.activateVisibilities(true)
-                if(level.getResetVisiblitiesAtStart()){
+                if (level.getResetVisiblitiesAtStart()) {
                     blackMaskActivated = true
                 }
             }

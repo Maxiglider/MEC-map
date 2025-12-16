@@ -34,7 +34,7 @@ export const renderWorldSingle = (renderInfo: IRenderInfo, playerIndex: number, 
         for (const [_, ms] of pairs(getUdgLevels().getCurrentLevel().monsterSpawns.getAll())) {
             if (ms.monsters) {
                 ForGroup(ms.monsters, () => {
-                    const m = GetEnumUnit()
+                    const m = GetEnumUnit()!
 
                     if (!monstersMap[`${getTileCenter(GetUnitX(m))}_${getTileCenter(GetUnitY(m))}`]) {
                         monstersMap[`${getTileCenter(GetUnitX(m))}_${getTileCenter(GetUnitY(m))}`] =
@@ -115,8 +115,8 @@ export const renderWorldSingle = (renderInfo: IRenderInfo, playerIndex: number, 
 export const renderWorld = (renderInfo: IRenderInfo) => {
     for (let i = 0; i < 24; i++) {
         if (
-            GetPlayerSlotState(Player(i)) === PLAYER_SLOT_STATE_PLAYING &&
-            GetPlayerController(Player(i)) === MAP_CONTROL_USER
+            GetPlayerSlotState(Player(i)!) === PLAYER_SLOT_STATE_PLAYING &&
+            GetPlayerController(Player(i)!) === MAP_CONTROL_USER
         ) {
             renderWorldSingle(renderInfo, i, GetCameraEyePositionX(), GetCameraEyePositionY())
         }

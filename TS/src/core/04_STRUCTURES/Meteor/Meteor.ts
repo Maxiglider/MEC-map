@@ -45,7 +45,7 @@ export class Meteor {
             this.removeMeteorItem()
         }
 
-        this.item = CreateItem(METEOR_NORMAL, this.x, this.y)
+        this.item = CreateItem(METEOR_NORMAL, this.x, this.y)!
         if (getUdgTerrainTypes().getTerrainType(this.x, this.y)?.getKind() == 'slide') {
             SetItemDroppable(this.item, false)
         }

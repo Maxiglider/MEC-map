@@ -1679,7 +1679,7 @@ export const initCommandAll = () => {
                 }
 
                 for (const [_, target] of pairs(getUdgLevels().getCurrentLevel(escaper).monsters.getAll())) {
-                    const shadow = getUdgEscapers().get(GetPlayerId(GetLocalPlayer()))?.getMonsterShadow()
+                    const shadow = getUdgEscapers().get(GetPlayerId(GetLocalPlayer()!))?.getMonsterShadow()
                     const monster = target.u
 
                     if (monster) {
@@ -1889,7 +1889,7 @@ export const initCommandAll = () => {
             if (IsBoolString(param1)) {
                 const frame = BlzGetOriginFrame(ORIGIN_FRAME_CHAT_MSG, 0)
 
-                if (GetLocalPlayer() === escaper.getPlayer()) {
+                if (frame && GetLocalPlayer() === escaper.getPlayer()) {
                     BlzFrameSetVisible(frame, !S2B(param1))
                 }
 
@@ -2041,10 +2041,10 @@ export const initCommandAll = () => {
                 return true
             }
 
-            const group = CreateGroup()
-            GroupEnumUnitsSelected(group, escaper.getPlayer(), null)
+            const group = CreateGroup()!
+            GroupEnumUnitsSelected(group, escaper.getPlayer())
             ForGroup(group, () => {
-                const unit = GetEnumUnit()
+                const unit = GetEnumUnit()!
                 if (canPlayerControlUnit(escaper.getPlayer(), unit)) {
                     IssueImmediateOrder(unit, 'stop')
                 }

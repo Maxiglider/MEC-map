@@ -5,7 +5,7 @@ export const InitTrig_Forces_ally = () => {
     forRange(Constants.NB_PLAYERS_MAX_REFORGED, i => {
         forRange(Constants.NB_PLAYERS_MAX_REFORGED, j => {
             if (i != j) {
-                SetPlayerAllianceStateBJ(Player(i), Player(j), bj_ALLIANCE_ALLIED_VISION)
+                SetPlayerAllianceStateBJ(Player(i)!, Player(j)!, bj_ALLIANCE_ALLIED_VISION)
             }
         })
     })

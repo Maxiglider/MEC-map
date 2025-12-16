@@ -20,7 +20,7 @@ export class VisibilityModifier {
         this.y1 = y1
         this.x2 = x2
         this.y2 = y2
-        this.fm = CreateFogModifierRect(Player(0), FOG_OF_WAR_VISIBLE, visionRect, true, false)
+        this.fm = CreateFogModifierRect(Player(0)!, FOG_OF_WAR_VISIBLE, visionRect, true, false)!
 
         RemoveRect(visionRect)
         RefreshHideAllVM()
@@ -32,7 +32,7 @@ export class VisibilityModifier {
     }
 
     activate = (activ: boolean) => {
-        if(this.isActive === activ){
+        if (this.isActive === activ) {
             return
         }
         if (activ) {

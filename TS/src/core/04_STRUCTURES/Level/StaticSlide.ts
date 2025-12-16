@@ -110,28 +110,31 @@ export class StaticSlide {
                     actions: [
                         () => {
                             const hero = GetTriggerUnit()
-                            const escaper = Hero2Escaper(hero)
 
-                            if (
-                                IsHero(hero) &&
-                                escaper &&
-                                escaper.isSliding() &&
-                                !escaper.isStaticSliding() &&
-                                !this.slidingPlayers.includes(escaper.getEscaperId())
-                            ) {
-                                arrayPush(this.slidingPlayers, escaper.getEscaperId())
-                                escaper.setStaticSliding(this)
+                            if (hero) {
+                                const escaper = Hero2Escaper(hero)
 
-                                if (this.canTurnAngle) {
-                                    const currentAngle = GetUnitFacing(hero)
-                                    escaper.setRemainingDegreesToTurn(AnglesDiff(this.angle, currentAngle))
-                                } else {
-                                    escaper.setRemainingDegreesToTurn(0)
-                                    escaper.turnInstantly(this.angle)
+                                if (
+                                    IsHero(hero) &&
+                                    escaper &&
+                                    escaper.isSliding() &&
+                                    !escaper.isStaticSliding() &&
+                                    !this.slidingPlayers.includes(escaper.getEscaperId())
+                                ) {
+                                    arrayPush(this.slidingPlayers, escaper.getEscaperId())
+                                    escaper.setStaticSliding(this)
+
+                                    if (this.canTurnAngle) {
+                                        const currentAngle = GetUnitFacing(hero)
+                                        escaper.setRemainingDegreesToTurn(AnglesDiff(this.angle, currentAngle))
+                                    } else {
+                                        escaper.setRemainingDegreesToTurn(0)
+                                        escaper.turnInstantly(this.angle)
+                                    }
+
+                                    this.slidingPlayerPrevSpeed[escaper.getEscaperId()] = escaper.getSlideSpeed()
+                                    escaper.setSlideSpeed(this.speed)
                                 }
-
-                                this.slidingPlayerPrevSpeed[escaper.getEscaperId()] = escaper.getSlideSpeed()
-                                escaper.setSlideSpeed(this.speed)
                             }
                         },
                     ],
@@ -169,7 +172,7 @@ export class StaticSlide {
                     actions: [
                         () => {
                             const hero = GetTriggerUnit()
-                            this.removePlayer(Hero2Escaper(hero)?.getEscaperId() || -1)
+                            hero && this.removePlayer(Hero2Escaper(hero)?.getEscaperId() || -1)
                         },
                     ],
                 })

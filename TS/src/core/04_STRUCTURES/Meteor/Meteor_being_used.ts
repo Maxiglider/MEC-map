@@ -10,21 +10,21 @@ export const InitTrig_Meteor_being_used = () => {
         events: [t => TriggerRegisterAnyUnitEventBJ(t, EVENT_PLAYER_UNIT_USE_ITEM)],
         actions: [
             () => {
-                SetUnitAnimation(GetTriggerUnit(), 'attack')
+                SetUnitAnimation(GetTriggerUnit()!, 'attack')
 
-                if (GetItemTypeId(GetManipulatedItem()) === METEOR_NORMAL) {
-                    DisableTrigger(GetTriggeringTrigger())
+                if (GetItemTypeId(GetManipulatedItem()!) === METEOR_NORMAL) {
+                    DisableTrigger(GetTriggeringTrigger()!)
                     EnableTrigger(gg_trg_Stop_using_normal_meteor) //todomax fix the bug that sometimes the hero runs towards the target after launching the ball
 
-                    udg_meteors[GetItemUserData(GetManipulatedItem())].removeMeteorItem()
-                    Hero2Escaper(GetTriggerUnit())?.removeEffectMeteor()
+                    udg_meteors[GetItemUserData(GetManipulatedItem()!)].removeMeteorItem()
+                    Hero2Escaper(GetTriggerUnit()!)?.removeEffectMeteor()
 
                     TriggerSleepAction(1)
 
-                    EnableTrigger(GetTriggeringTrigger())
+                    EnableTrigger(GetTriggeringTrigger()!)
                     DisableTrigger(gg_trg_Stop_using_normal_meteor)
 
-                    const escaper = getUdgEscapers().get(GetPlayerId(GetTriggerPlayer()))
+                    const escaper = getUdgEscapers().get(GetPlayerId(GetTriggerPlayer()!))
                     escaper && ServiceManager.getService('Multiboard').onPlayerMeteorCompleted(escaper)
                 }
             },

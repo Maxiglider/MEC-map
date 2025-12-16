@@ -19,7 +19,7 @@ export const InitTrig_InvisUnit_is_getting_damage = () => {
                     return
                 }
 
-                const invisUnit = GetTriggerUnit()
+                const invisUnit = GetTriggerUnit()!
                 const n = GetUnitUserData(invisUnit)
                 const escaper = getUdgEscapers().get(n)
 
@@ -27,7 +27,7 @@ export const InitTrig_InvisUnit_is_getting_damage = () => {
                     return
                 }
 
-                const killingUnit = GetEventDamageSource()
+                const killingUnit = GetEventDamageSource()!
 
                 const hero = escaper.getHero()
 

@@ -1,4 +1,4 @@
-import * as React from 'w3ts-jsx/dist/src/index'
+import * as React from 'w3ts-jsx/dist/index'
 
 export type ICommandHistoryEntry = {
     command: string
@@ -30,7 +30,7 @@ export const CommandHistory = ({
     const buttonWidth = 0.025
     const containerWidth = 0.25
 
-    const localPlayerId = GetPlayerId(GetLocalPlayer())
+    const localPlayerId = GetPlayerId(GetLocalPlayer()!)
     const localEntries = allEntries.filter(e => e.playerId === localPlayerId)
 
     // Sort entries: pinned first, then by timestamp (newest first)

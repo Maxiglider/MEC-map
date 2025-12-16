@@ -5,7 +5,7 @@ export const InitTrig_Sound_monster_dies = () => {
         events: [t => TriggerRegisterAnyUnitEventBJ(t, EVENT_PLAYER_UNIT_DEATH)],
         conditions: [
             () => {
-                if (!(GetOwningPlayer(GetTriggerUnit()) === Player(PLAYER_NEUTRAL_AGGRESSIVE))) {
+                if (!(GetOwningPlayer(GetTriggerUnit()!) === Player(PLAYER_NEUTRAL_AGGRESSIVE))) {
                     return false
                 }
                 return true

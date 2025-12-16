@@ -892,7 +892,7 @@ export const initExecuteCommandMake = () => {
 
             getUdgMonsterTypes().new(
                 param1,
-                String2Ascii(SubStringBJ(param2, 2, 5)),
+                String2Ascii(SubStringBJ(param2, 2, 5) ?? ''),
                 scale,
                 immoRadius,
                 speed,
@@ -981,7 +981,7 @@ export const initExecuteCommandMake = () => {
             if (
                 getUdgMonsterTypes()
                     .getByLabel(param1)
-                    ?.setUnitTypeId(String2Ascii(SubStringBJ(param2, 2, 5)))
+                    ?.setUnitTypeId(String2Ascii(SubStringBJ(param2, 2, 5) ?? ''))
             ) {
                 Text.mkP(escaper.getPlayer(), 'unit type changed')
             } else {
@@ -2718,7 +2718,8 @@ export const initExecuteCommandMake = () => {
         alias: ['setlrv'],
         group: 'make',
         argDescription: '<boolean> [<levelId>]',
-        description: 'Set whether visibilities are reset when re-entering the level (applies a total black mask on the map when true)',
+        description:
+            'Set whether visibilities are reset when re-entering the level (applies a total black mask on the map when true)',
         cb: ({ nbParam, param1, param2 }, escaper) => {
             if (nbParam > 2 || !IsBoolString(param1)) {
                 Text.erP(escaper.getPlayer(), 'Usage: -setLevelResetVisibilities <boolean> [<levelId>]')
@@ -2734,8 +2735,11 @@ export const initExecuteCommandMake = () => {
 
             const doReset = S2B(param1)
 
-            if(level.getResetVisiblitiesAtStart() === doReset) {
-                Text.erP(escaper.getPlayer(), `Level ${levelNum} already has reset visibilities at start set to ${param1}`)
+            if (level.getResetVisiblitiesAtStart() === doReset) {
+                Text.erP(
+                    escaper.getPlayer(),
+                    `Level ${levelNum} already has reset visibilities at start set to ${param1}`
+                )
                 return true
             }
 
@@ -2746,7 +2750,7 @@ export const initExecuteCommandMake = () => {
             )
 
             return true
-        }
+        },
     })
 
     //-removeVisibilities(remv) [<levelId>]   --> remove all visibility rectangles made for the current level
@@ -3188,7 +3192,7 @@ export const initExecuteCommandMake = () => {
             }
             //checkParam 2
             const n = StringLength(name) + StringLength(param1) + 4
-            const str = SubStringBJ(cmd, n, StringLength(cmd))
+            const str = SubStringBJ(cmd, n, StringLength(cmd)) ?? ''
             //apply command
             getUdgCasterTypes().getByLabel(param1)?.setAnimation(str)
             Text.mkP(escaper.getPlayer(), 'caster animation changed')
@@ -4007,20 +4011,23 @@ export const initExecuteCommandMake = () => {
                 for (let x = globals.MAP_MIN_X + gridUnitWidth; x < globals.MAP_MAX_X; x += gridUnitWidth) {
                     for (let y = globals.MAP_MIN_Y + gridUnitWidth; y < globals.MAP_MAX_Y; y += gridUnitWidth) {
                         const gridUnit = CreateUnit(GetCurrentMonsterPlayer(), FourCC('hgrd'), x, y, 0)
-                        SetUnitUseFood(gridUnit, false)
-                        UnitAddAbility(gridUnit, FourCC('Aloc'))
-                        UnitAddAbility(gridUnit, ABILITY_ANNULER_VISION)
-                        UnitRemoveType(gridUnit, UNIT_TYPE_PEON)
 
-                        if (showGrid === '3') {
-                            SetUnitAnimation(gridUnit, 'Stand Upgrade Second')
-                        } else if (showGrid === '2') {
-                            SetUnitAnimation(gridUnit, 'Stand Upgrade First')
-                        } else {
-                            SetUnitAnimation(gridUnit, 'Stand')
+                        if (gridUnit) {
+                            SetUnitUseFood(gridUnit, false)
+                            UnitAddAbility(gridUnit, FourCC('Aloc'))
+                            UnitAddAbility(gridUnit, ABILITY_ANNULER_VISION)
+                            UnitRemoveType(gridUnit, UNIT_TYPE_PEON)
+
+                            if (showGrid === '3') {
+                                SetUnitAnimation(gridUnit, 'Stand Upgrade Second')
+                            } else if (showGrid === '2') {
+                                SetUnitAnimation(gridUnit, 'Stand Upgrade First')
+                            } else {
+                                SetUnitAnimation(gridUnit, 'Stand')
+                            }
+
+                            arrayPush(gridUnits, gridUnit)
                         }
-
-                        arrayPush(gridUnits, gridUnit)
                     }
                 }
             }

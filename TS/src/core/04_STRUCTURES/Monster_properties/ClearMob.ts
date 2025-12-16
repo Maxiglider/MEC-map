@@ -16,17 +16,17 @@ let udp_currentTimer: timer
 const TRIGGER_MOB_PERMANENT_EFFECT = 'Abilities\\Spells\\Orc\\StasisTrap\\StasisTotemTarget.mdl'
 
 const ClearMobTimerExpires = () => {
-    const clearMob = ClearMob.anyTimerActivatedId2ClearMob.get(GetHandleId(GetExpiredTimer()))
+    const clearMob = ClearMob.anyTimerActivatedId2ClearMob.get(GetHandleId(GetExpiredTimer()!))
 
     if (clearMob) {
         clearMob.initialize() //réinitialise la couleur du trigger mob
-        udp_currentTimer = GetExpiredTimer()
+        udp_currentTimer = GetExpiredTimer()!
         clearMob.getBlockMobs().forAll(TemporarilyEnableMonster)
     }
 }
 
 const ClearMobFrontMontantTimerExpires = () => {
-    const clearMob = ClearMob.anyTimerFrontMontantId2ClearMob.get(GetHandleId(GetExpiredTimer()))
+    const clearMob = ClearMob.anyTimerFrontMontantId2ClearMob.get(GetHandleId(GetExpiredTimer()!))
 
     if (clearMob) {
         if (clearMob.isBeingActivated()) {

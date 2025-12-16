@@ -8,25 +8,25 @@ export const PRESS_TIME_TO_ENABLE_FOLLOW_MOUSE = 0.2
 const FOLLOW_MOUSE_PERIOD = 0.1
 
 const onPressActions = () => {
-    const escaper = getUdgEscapers().get(GetPlayerId(GetTriggerPlayer()))
+    const escaper = getUdgEscapers().get(GetPlayerId(GetTriggerPlayer()!))
     const followMouse = escaper?.getFollowMouse()
     followMouse && followMouse.doPressActions()
 }
 
 const onUnpressActions = () => {
-    const escaper = getUdgEscapers().get(GetPlayerId(GetTriggerPlayer()))
+    const escaper = getUdgEscapers().get(GetPlayerId(GetTriggerPlayer()!))
     const followMouse = escaper?.getFollowMouse()
     followMouse && followMouse.doUnpressActions()
 }
 
 const onMouseMoveActions = () => {
-    const escaper = getUdgEscapers().get(GetPlayerId(GetTriggerPlayer()))
+    const escaper = getUdgEscapers().get(GetPlayerId(GetTriggerPlayer()!))
     const followMouse = escaper?.getFollowMouse()
     followMouse && followMouse.doMouseMoveActions()
 }
 
 const followMouseActions = () => {
-    const escaper = FollowMouse.anyTimer2escaper.get(GetExpiredTimer())
+    const escaper = FollowMouse.anyTimer2escaper.get(GetExpiredTimer()!)
     const slider = escaper?.getHero()
 
     if (escaper && slider) {
@@ -102,7 +102,7 @@ export class FollowMouse {
     }
 
     doMouseMoveActions() {
-        if(BlzGetTriggerPlayerMouseX() == 0 && BlzGetTriggerPlayerMouseY() == 0){
+        if (BlzGetTriggerPlayerMouseX() == 0 && BlzGetTriggerPlayerMouseY() == 0) {
             return
         }
 

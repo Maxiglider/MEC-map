@@ -18,20 +18,22 @@ export const ActivateTeleport = (hero: unit, onceOnlyB: boolean) => {
                 return
             }
 
-            let hero: unit | null = GetTriggerUnit()
+            let hero: unit | null = GetTriggerUnit() ?? null
 
-            if (!IsIssuedOrder('smart')) {
-                return
+            if (hero) {
+                if (!IsIssuedOrder('smart')) {
+                    return
+                }
+
+                StopUnit(hero)
+                escaper.moveHero(GetOrderPointX(), GetOrderPointY())
+
+                if (onceOnly[GetUnitUserData(hero)]) {
+                    DestroyTrigger(GetTriggeringTrigger()!)
+                }
+
+                hero = null
             }
-
-            StopUnit(hero)
-            escaper.moveHero(GetOrderPointX(), GetOrderPointY())
-
-            if (onceOnly[GetUnitUserData(hero)]) {
-                DestroyTrigger(GetTriggeringTrigger())
-            }
-
-            hero = null
         })
     )
     TriggerRegisterUnitEvent(teleTriggers[escaperId], hero, EVENT_UNIT_ISSUED_POINT_ORDER)

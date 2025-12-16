@@ -197,7 +197,7 @@ export class MonsterSpawn {
 
         if (this.monsters) {
             ForGroup(this.monsters, () => {
-                const u = GetEnumUnit()
+                const u = GetEnumUnit()!
                 const timer = MonsterSpawn.anyUnit2TimedUnspawnTimer.get(GetHandleId(u))
                 if (timer) {
                     MonsterSpawn.anyTimedUnspawnTimerId2Unit.delete(GetHandleId(timer))
@@ -374,11 +374,11 @@ export class MonsterSpawn {
 
                     const t = CreateTrigger()
                     MonsterSpawn.anyTrigId2MonsterSpawn.set(GetHandleId(t), this)
-                    TriggerRegisterEnterRegion(t, reg, null)
+                    TriggerRegisterEnterRegion(t, reg)
                     TriggerAddAction(t, () => {
-                        const ms = MonsterSpawn.anyTrigId2MonsterSpawn.get(GetHandleId(GetTriggeringTrigger()))
-                        if (ms && ms.monsters && IsUnitInGroup(GetTriggerUnit(), ms.monsters)) {
-                            const u = GetTriggerUnit()
+                        const ms = MonsterSpawn.anyTrigId2MonsterSpawn.get(GetHandleId(GetTriggeringTrigger()!))
+                        if (ms && ms.monsters && IsUnitInGroup(GetTriggerUnit()!, ms.monsters)) {
+                            const u = GetTriggerUnit()!
 
                             let x = GetUnitX(u)
                             let y = GetUnitY(u)
@@ -436,12 +436,12 @@ export class MonsterSpawn {
 
                 const t = CreateTrigger()
                 MonsterSpawn.anyTrigId2MonsterSpawn.set(GetHandleId(t), this)
-                TriggerRegisterEnterRegion(t, reg, null)
+                TriggerRegisterEnterRegion(t, reg)
                 TriggerAddAction(t, () => {
                     // DON'T USE `n` HERE, LUA USES A VARIABLE REFERENCE CAUSING IT TO ALWAYS BE THE LAST VALUE
-                    const ms = MonsterSpawn.anyTrigId2MonsterSpawn.get(GetHandleId(GetTriggeringTrigger()))
-                    if (ms && ms.monsters && IsUnitInGroup(GetTriggerUnit(), ms.monsters)) {
-                        const u = GetTriggerUnit()
+                    const ms = MonsterSpawn.anyTrigId2MonsterSpawn.get(GetHandleId(GetTriggeringTrigger()!))
+                    if (ms && ms.monsters && IsUnitInGroup(GetTriggerUnit()!, ms.monsters)) {
+                        const u = GetTriggerUnit()!
 
                         let x = Math.floor(GetUnitX(u))
                         let y = Math.floor(GetUnitY(u))
@@ -478,7 +478,7 @@ export class MonsterSpawn {
             return
         }
 
-        const mobTimer = GetExpiredTimer()
+        const mobTimer = GetExpiredTimer()!
         const ms = MonsterSpawn.anyTimerId2MonsterSpawn.get(GetHandleId(mobTimer))
         MonsterSpawn.anyTimerId2MonsterSpawn.delete(GetHandleId(mobTimer))
 
@@ -505,7 +505,7 @@ export class MonsterSpawn {
     }
 
     private MonsterSpawn_Actions = errorHandler(() => {
-        const ms = MonsterSpawn.anyTrigId2MonsterSpawn.get(GetHandleId(GetTriggeringTrigger()))
+        const ms = MonsterSpawn.anyTrigId2MonsterSpawn.get(GetHandleId(GetTriggeringTrigger()!))
 
         if (ms) {
             if (ms.monsters && BlzGroupGetSize(ms.monsters) + ms.getSpawnAmount() > 500) {
@@ -577,8 +577,8 @@ export class MonsterSpawn {
         }
 
         const UnspawMonster_Actions = () => {
-            const ms = MonsterSpawn.anyTrigId2MonsterSpawn.get(GetHandleId(GetTriggeringTrigger()))
-            const u = GetTriggerUnit()
+            const ms = MonsterSpawn.anyTrigId2MonsterSpawn.get(GetHandleId(GetTriggeringTrigger()!))
+            const u = GetTriggerUnit()!
             if (ms && ms.monsters && IsUnitInGroup(u, ms.monsters)) {
                 // Clear timed unspawn timer if it exists
                 const timer = MonsterSpawn.anyUnit2TimedUnspawnTimer.get(GetHandleId(u))
@@ -599,24 +599,27 @@ export class MonsterSpawn {
             this.createUnspawnReg()
             this.tUnspawn = CreateTrigger()
             MonsterSpawn.anyTrigId2MonsterSpawn.set(GetHandleId(this.tUnspawn), this)
-            this.unspawnReg && TriggerRegisterEnterRegion(this.tUnspawn, this.unspawnReg, null)
+            this.unspawnReg && TriggerRegisterEnterRegion(this.tUnspawn, this.unspawnReg)
             TriggerAddAction(this.tUnspawn, UnspawMonster_Actions)
         }
     }
 
     private TimedUnspawn_Actions: (this: void) => void = () => {
         const unspawnTimer = GetExpiredTimer()
-        const u = MonsterSpawn.anyTimedUnspawnTimerId2Unit.get(GetHandleId(unspawnTimer))
-        const ms = MonsterSpawn.anyTimedUnspawnTimerId2MonsterSpawn.get(GetHandleId(unspawnTimer))
 
-        if (u && ms && ms.monsters && IsUnitInGroup(u, ms.monsters)) {
-            MonsterSpawn.anyTimedUnspawnTimerId2Unit.delete(GetHandleId(unspawnTimer))
-            MonsterSpawn.anyTimedUnspawnTimerId2MonsterSpawn.delete(GetHandleId(unspawnTimer))
-            MonsterSpawn.anyUnit2TimedUnspawnTimer.delete(GetHandleId(u))
-            DestroyTimer(unspawnTimer)
+        if (unspawnTimer) {
+            const u = MonsterSpawn.anyTimedUnspawnTimerId2Unit.get(GetHandleId(unspawnTimer))
+            const ms = MonsterSpawn.anyTimedUnspawnTimerId2MonsterSpawn.get(GetHandleId(unspawnTimer))
 
-            GroupRemoveUnit(ms.monsters, u)
-            ms.simpleUnitRecycler.removeUnit(u)
+            if (u && ms && ms.monsters && IsUnitInGroup(u, ms.monsters)) {
+                MonsterSpawn.anyTimedUnspawnTimerId2Unit.delete(GetHandleId(unspawnTimer))
+                MonsterSpawn.anyTimedUnspawnTimerId2MonsterSpawn.delete(GetHandleId(unspawnTimer))
+                MonsterSpawn.anyUnit2TimedUnspawnTimer.delete(GetHandleId(u))
+                DestroyTimer(unspawnTimer)
+
+                GroupRemoveUnit(ms.monsters, u)
+                ms.simpleUnitRecycler.removeUnit(u)
+            }
         }
     }
 

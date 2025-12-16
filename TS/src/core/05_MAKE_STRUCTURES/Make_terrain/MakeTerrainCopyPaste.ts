@@ -1,6 +1,6 @@
-import {Text} from 'core/01_libraries/Text'
-import {Make, MAKE_LAST_CLIC_UNIT_ID} from 'core/05_MAKE_STRUCTURES/Make/Make'
-import {MakeTerrainCopyPasteAction} from "../MakeLastActions/MakeTerrainCopyPasteAction";
+import { Text } from 'core/01_libraries/Text'
+import { Make, MAKE_LAST_CLIC_UNIT_ID } from 'core/05_MAKE_STRUCTURES/Make/Make'
+import { MakeTerrainCopyPasteAction } from '../MakeLastActions/MakeTerrainCopyPasteAction'
 
 export class MakeTerrainCopyPaste extends Make {
     x1: number = 0
@@ -18,7 +18,6 @@ export class MakeTerrainCopyPaste extends Make {
     private isPoint1Used: boolean
     private isPoint2Used: boolean
     private isPoint3Used: boolean
-
 
     constructor(maker: unit) {
         super(maker, 'terrainCopyPaste', false)
@@ -41,7 +40,7 @@ export class MakeTerrainCopyPaste extends Make {
 
     private createUnitClic = (u: unit | undefined, x: number, y: number): unit => {
         if (!u) {
-            u = CreateUnit(this.makerOwner, MAKE_LAST_CLIC_UNIT_ID, x, y, GetRandomDirectionDeg())
+            u = CreateUnit(this.makerOwner, MAKE_LAST_CLIC_UNIT_ID, x, y, GetRandomDirectionDeg())!
         } else {
             SetUnitX(u, x)
             SetUnitY(u, y)
@@ -73,7 +72,6 @@ export class MakeTerrainCopyPaste extends Make {
         }
     }
 
-
     unsaveLocsDefinitely = () => {
         this.unsaveLocDefinitely(1)
         this.unsaveLocDefinitely(2)
@@ -104,7 +102,16 @@ export class MakeTerrainCopyPaste extends Make {
             this.isPoint3Used = true
         } else {
             try {
-                const action = new MakeTerrainCopyPasteAction(this.x1, this.y1, this.x2, this.y2, this.x3, this.y3, x, y)
+                const action = new MakeTerrainCopyPasteAction(
+                    this.x1,
+                    this.y1,
+                    this.x2,
+                    this.y2,
+                    this.x3,
+                    this.y3,
+                    x,
+                    y
+                )
                 this.unsaveLocsDefinitely()
                 this.escaper.newAction(action)
             } catch (error) {

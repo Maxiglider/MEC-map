@@ -44,10 +44,10 @@ export const InitTrig_A_hero_dies_check_if_all_dead_and_sounds = () => {
 
     createEvent({
         events: [t => TriggerRegisterAnyUnitEventBJ(t, EVENT_PLAYER_UNIT_DEATH)],
-        conditions: [() => IsHero(GetTriggerUnit())],
+        conditions: [() => IsHero(GetTriggerUnit()!)],
         actions: [
             () => {
-                const hero = GetTriggerUnit()
+                const hero = GetTriggerUnit()!
                 const n = GetUnitUserData(hero)
                 let nbAlive = 0
                 let nbAliveWithoutAr = 0
@@ -85,8 +85,8 @@ export const InitTrig_A_hero_dies_check_if_all_dead_and_sounds = () => {
 
                     if (
                         !getUdgEscapers().get(i)?.hasAutorevive() &&
-                        GetPlayerController(Player(i)) === MAP_CONTROL_USER &&
-                        GetPlayerSlotState(Player(i)) === PLAYER_SLOT_STATE_PLAYING
+                        GetPlayerController(Player(i)!) === MAP_CONTROL_USER &&
+                        GetPlayerSlotState(Player(i)!) === PLAYER_SLOT_STATE_PLAYING
                     ) {
                         nbAliveWithoutAr++
                     }

@@ -1,4 +1,4 @@
-import * as React from 'w3ts-jsx/dist/src/index'
+import * as React from 'w3ts-jsx/dist/index'
 import { ICommandHistoryEntry } from '../Components/CommandHistory'
 
 export type ICommandHistoryManager = {

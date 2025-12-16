@@ -616,7 +616,7 @@ export const initExecuteCommandMax = () => {
             Text.A('Loading map from cache...')
             SaveLoad.readFile(
                 noParam ? SaveMapInCache.lastSaveFile : `MEC/mec-smic-data-custom_${param1}.txt`,
-                GetTriggerPlayer(),
+                GetTriggerPlayer()!,
                 data => {
                     const gameData = (jsonDecode(data) as any).gameData
 

@@ -31,7 +31,7 @@ export class SimpleFollowMouse {
             events: [t => TriggerRegisterPlayerEvent(t, player, EVENT_PLAYER_MOUSE_DOWN)],
             actions: [
                 () => {
-                    const escaper = getUdgEscapers().get(GetPlayerId(GetTriggerPlayer()))
+                    const escaper = getUdgEscapers().get(GetPlayerId(GetTriggerPlayer()!))
                     const followMouse = escaper?.getSimpleFollowMouse()
 
                     if (followMouse) {
@@ -49,7 +49,7 @@ export class SimpleFollowMouse {
             events: [t => TriggerRegisterPlayerEvent(t, player, EVENT_PLAYER_MOUSE_UP)],
             actions: [
                 () => {
-                    const escaper = getUdgEscapers().get(GetPlayerId(GetTriggerPlayer()))
+                    const escaper = getUdgEscapers().get(GetPlayerId(GetTriggerPlayer()!))
                     const followMouse = escaper?.getSimpleFollowMouse()
 
                     if (followMouse) {
@@ -92,7 +92,7 @@ export class SimpleFollowMouse {
     }
 
     private onMouseMoveAction(this: void) {
-        const escaper = getUdgEscapers().get(GetPlayerId(GetTriggerPlayer()))
+        const escaper = getUdgEscapers().get(GetPlayerId(GetTriggerPlayer()!))
         const dis = escaper?.getSimpleFollowMouse()
 
         if (!dis) {

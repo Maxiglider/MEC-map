@@ -240,8 +240,8 @@ export class MonsterType {
         }
 
         let immoStr = Ascii2String(this.immolationSkill)
-        immoStr = SubStringBJ(immoStr, 2, 4)
-        return I2S(S2I(immoStr))
+        immoStr = SubStringBJ(immoStr, 2, 4) ?? ''
+        return I2S(S2I(immoStr)) ?? ''
     }
 
     toText = (): string => {
@@ -252,12 +252,12 @@ export class MonsterType {
         if (this.scale === -1) {
             scaleDisplay = 'default'
         } else {
-            scaleDisplay = R2S(this.scale)
+            scaleDisplay = R2S(this.scale) ?? ''
         }
         if (this.height === -1) {
             heightDisplay = 'default'
         } else {
-            heightDisplay = I2S(R2I(this.height))
+            heightDisplay = I2S(R2I(this.height)) ?? ''
         }
         display = display + Ascii2String(this.unitTypeId) + "'"
         display =

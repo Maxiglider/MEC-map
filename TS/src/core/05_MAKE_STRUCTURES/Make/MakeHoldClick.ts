@@ -6,7 +6,7 @@ import { Make } from './Make'
 export const MIN_TIME_BETWEEN_ACTIONS = null
 
 const onPressActions = () => {
-    const escaper = getUdgEscapers().get(GetPlayerId(GetTriggerPlayer()))
+    const escaper = getUdgEscapers().get(GetPlayerId(GetTriggerPlayer()!))
     const make = escaper?.getMake()
 
     if (make instanceof MakeHoldClick) {
@@ -15,7 +15,7 @@ const onPressActions = () => {
 }
 
 const onUnpressActions = () => {
-    const escaper = getUdgEscapers().get(GetPlayerId(GetTriggerPlayer()))
+    const escaper = getUdgEscapers().get(GetPlayerId(GetTriggerPlayer()!))
     const make = escaper?.getMake()
 
     if (make instanceof MakeHoldClick) {
@@ -24,7 +24,7 @@ const onUnpressActions = () => {
 }
 
 const onMouseMoveActions = () => {
-    const escaper = getUdgEscapers().get(GetPlayerId(GetTriggerPlayer()))
+    const escaper = getUdgEscapers().get(GetPlayerId(GetTriggerPlayer()!))
     const make = escaper?.getMake()
 
     if (make instanceof MakeHoldClick) {
@@ -108,7 +108,7 @@ export abstract class MakeHoldClick extends Make {
     }
 
     doPressActions() {
-        this.activeBtn = BlzGetTriggerPlayerMouseButton()
+        this.activeBtn = BlzGetTriggerPlayerMouseButton()!
         this.activeBtnStr = this.activeBtn == MOUSE_BUTTON_TYPE_LEFT ? 'left' : 'right'
         this.isPressed = true
 

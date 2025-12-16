@@ -120,7 +120,7 @@ const CasterTryToShoot = () => {
     let numEscaper: number
 
     //récupération du caster et vérification qu'il existe toujours
-    caster = Caster.anyTimerId2Caster.get(GetHandleId(GetExpiredTimer()))
+    caster = Caster.anyTimerId2Caster.get(GetHandleId(GetExpiredTimer()!))
     if (!caster || !caster.u) {
         return
     }
@@ -275,12 +275,12 @@ const CasterTryToShoot = () => {
 const errorHandlerCasterTryToShoot = errorHandler(CasterTryToShoot)
 
 export const CasterUnitWithinRange_Actions = () => {
-    let escaperInRange = Hero2Escaper(GetTriggerUnit())
+    let escaperInRange = Hero2Escaper(GetTriggerUnit()!)
     if (!escaperInRange) {
         return
     }
 
-    const caster = Caster.anyTriggerWithinRangeId2Caster.get(GetHandleId(GetTriggeringTrigger()))
+    const caster = Caster.anyTriggerWithinRangeId2Caster.get(GetHandleId(GetTriggeringTrigger()!))
     if (caster) {
         caster.escapersInRange[caster.nbEscapersInRange] = escaperInRange
         caster.nbEscapersInRange++

@@ -120,7 +120,7 @@ export const initExecuteCommandTrueMax = () => {
         argDescription: '<string>',
         description: 'Executes raw lua code',
         cb: ({ name }, escaper) => {
-            const args = GetEventPlayerChatString().substring(name.length + 2)
+            const args = GetEventPlayerChatString()!.substring(name.length + 2)
 
             const [func, err] = load(`return function() return ${args} end`)
 

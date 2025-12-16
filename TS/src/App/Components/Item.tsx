@@ -1,5 +1,5 @@
 import { IItem } from 'App/Interface'
-import * as React from 'w3ts-jsx/dist/src/index'
+import * as React from 'w3ts-jsx/dist/index'
 import { IAbsPos } from '../Utils'
 
 export const Item = ({
@@ -24,7 +24,7 @@ export const Item = ({
             visible={visible}
             onLoad={() =>
                 v.texFile &&
-                BlzFrameSetTexture(BlzGetFrameByName(`TerrainPreviewValue_${v.scale}`, 0), v.texFile, 0, false)
+                BlzFrameSetTexture(BlzGetFrameByName(`TerrainPreviewValue_${v.scale}`, 0)!, v.texFile, 0, false)
             }
         />
 

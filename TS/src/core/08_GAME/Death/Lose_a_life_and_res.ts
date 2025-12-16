@@ -15,9 +15,9 @@ export const loseALifeAndRes = (escaperIds: number[]) => {
     if (ServiceManager.getService('Lives').get() < 0) {
         if (!udg_gameIsLost) {
             udg_gameIsLost = true
-            DisplayTextToForce(GetPlayersAll(), 'You have no more lives !')
+            DisplayTextToForce(GetPlayersAll()!, 'You have no more lives !')
             TriggerSleepAction(2)
-            DisplayTextToForce(GetPlayersAll(), 'The game will restart in 10 seconds.')
+            DisplayTextToForce(GetPlayersAll()!, 'The game will restart in 10 seconds.')
             TriggerSleepAction(10.0)
             getUdgLevels().restartTheGame()
             udg_gameIsLost = false

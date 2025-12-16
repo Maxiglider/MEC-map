@@ -24,7 +24,7 @@ export const CaractereVersAscii = (caractere: string): number => {
         return curseurSurTableAscii + DEBUT_TABLE_ASCII
     }
 
-    //Caractère non reconnue.
+    //Caractère non reconnu.
     return -1
 }
 
@@ -35,7 +35,7 @@ export const CaractereVersAscii = (caractere: string): number => {
 export const AsciiVersCaractere = (source: number): string => {
     //Le caractère de TABLE_ASCII correspondant au rang est renvoyé.
     if (source >= DEBUT_TABLE_ASCII && source <= StringLength(TABLE_ASCII) - 1 + DEBUT_TABLE_ASCII) {
-        return SubString(TABLE_ASCII, source - DEBUT_TABLE_ASCII, source - (DEBUT_TABLE_ASCII - 1))
+        return SubString(TABLE_ASCII, source - DEBUT_TABLE_ASCII, source - (DEBUT_TABLE_ASCII - 1)) ?? ''
     }
     //Code Ascii non reconnu.
     return ''
@@ -51,7 +51,7 @@ export const String2Ascii = (source: string): number => {
     const sourceTaille = StringLength(source)
 
     while (!(curseurSurSource >= sourceTaille || resultatIntermediaire == -1)) {
-        resultatIntermediaire = CaractereVersAscii(SubString(source, curseurSurSource, curseurSurSource + 1))
+        resultatIntermediaire = CaractereVersAscii(SubString(source, curseurSurSource, curseurSurSource + 1) ?? '')
         resultat = resultat * 256 + resultatIntermediaire
         curseurSurSource = curseurSurSource + 1
     }

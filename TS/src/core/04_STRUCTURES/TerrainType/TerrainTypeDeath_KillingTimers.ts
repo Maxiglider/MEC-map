@@ -38,7 +38,7 @@ export class KillingTimers {
 
     start = (timerId: number, time: number) => {
         TimerStart(this.timers[timerId], time, false, () => {
-            const escaper = this.TerrainKillTimer2Escaper(GetExpiredTimer())
+            const escaper = this.TerrainKillTimer2Escaper(GetExpiredTimer()!)
 
             if (!escaper) {
                 return

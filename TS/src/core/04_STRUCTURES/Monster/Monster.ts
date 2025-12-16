@@ -262,7 +262,7 @@ export abstract class Monster {
                 if (this.baseColorId === 0) {
                     this.u && SetUnitColor(this.u, PLAYER_COLOR_RED)
                 } else {
-                    this.u && SetUnitColor(this.u, ConvertPlayerColor(this.baseColorId))
+                    this.u && SetUnitColor(this.u, ConvertPlayerColor(this.baseColorId)!)
                 }
             }
             this.u && SetUnitVertexColorBJ(this.u, this.vcRed, this.vcGreen, this.vcBlue, this.vcTransparency)
@@ -367,7 +367,7 @@ export abstract class Monster {
                 if (baseColorId === 0) {
                     this.u && SetUnitColor(this.u, PLAYER_COLOR_RED)
                 } else {
-                    this.u && SetUnitColor(this.u, ConvertPlayerColor(baseColorId))
+                    this.u && SetUnitColor(this.u, ConvertPlayerColor(baseColorId)!)
                 }
             }
         }
@@ -393,14 +393,14 @@ export abstract class Monster {
         //changement couleur du mob actuel
         if (this.u !== null) {
             if (Constants.MOBS_VARIOUS_COLORS && this.u) {
-                initBaseColorId = GetPlayerId(GetOwningPlayer(this.u))
+                initBaseColorId = GetPlayerId(GetOwningPlayer(this.u)!)
             } else {
                 initBaseColorId = 12
             }
             if (initBaseColorId === 0) {
                 this.u && SetUnitColor(this.u, PLAYER_COLOR_RED)
             } else {
-                this.u && SetUnitColor(this.u, ConvertPlayerColor(initBaseColorId))
+                this.u && SetUnitColor(this.u, ConvertPlayerColor(initBaseColorId)!)
             }
             this.u && SetUnitVertexColorBJ(this.u, this.vcRed, this.vcGreen, this.vcBlue, this.vcTransparency)
         }

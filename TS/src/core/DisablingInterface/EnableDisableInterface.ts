@@ -12,18 +12,18 @@ const minimapSize = 0.15
 
 export const init_customUI = function () {
     createTimer(2, false, () => {
-        minimap = BlzGetFrameByName('MiniMapFrame', 0)
-        minimapOriginalParent = BlzFrameGetParent(minimap)
+        minimap = BlzGetFrameByName('MiniMapFrame', 0)!
+        minimapOriginalParent = BlzFrameGetParent(minimap)!
 
         /**
          * Frame parent to allow above 4:3
          */
         // ServiceManager.getService('Multiboard').getOrCreateLeaderboard()
-        CreateLeaderboardBJ(bj_FORCE_ALL_PLAYERS, 'title')
-        parentFullscreen = BlzGetFrameByName('Leaderboard', 0)
+        CreateLeaderboardBJ(bj_FORCE_ALL_PLAYERS!, 'title')
+        parentFullscreen = BlzGetFrameByName('Leaderboard', 0)!
         BlzFrameSetSize(parentFullscreen, 0, 0)
-        BlzFrameSetVisible(BlzGetFrameByName('LeaderboardBackdrop', 0), false)
-        BlzFrameSetVisible(BlzGetFrameByName('LeaderboardTitle', 0), false)
+        BlzFrameSetVisible(BlzGetFrameByName('LeaderboardBackdrop', 0)!, false)
+        BlzFrameSetVisible(BlzGetFrameByName('LeaderboardTitle', 0)!, false)
 
         /**
          * Calculate left coordinate
@@ -36,7 +36,7 @@ export const init_customUI = function () {
          * Place a minimapBackground for the minimap
          */
         const outOffScreeBackground = 0.2
-        minimapBackground = BlzCreateFrame('QuestButtonDisabledBackdropTemplate', parentFullscreen, 0, 0)
+        minimapBackground = BlzCreateFrame('QuestButtonDisabledBackdropTemplate', parentFullscreen, 0, 0)!
         BlzFrameSetAbsPoint(
             minimapBackground,
             FRAMEPOINT_BOTTOMLEFT,
@@ -49,9 +49,9 @@ export const init_customUI = function () {
         /**
          * Handles
          */
-        consoleUIBackdrop = BlzGetFrameByName('ConsoleUIBackdrop', 0)
-        consoleUI = BlzGetFrameByName('ConsoleUI', 0)
-        portrait = BlzGetOriginFrame(ORIGIN_FRAME_PORTRAIT, 0)
+        consoleUIBackdrop = BlzGetFrameByName('ConsoleUIBackdrop', 0)!
+        consoleUI = BlzGetFrameByName('ConsoleUI', 0)!
+        portrait = BlzGetOriginFrame(ORIGIN_FRAME_PORTRAIT, 0)!
     })
 }
 

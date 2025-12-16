@@ -104,7 +104,7 @@ export class Region {
                     events: [t => this.wRect && TriggerRegisterEnterRectSimple(t, this.wRect)],
                     actions: [
                         () => {
-                            const escaper = Hero2Escaper(GetTriggerUnit())
+                            const escaper = Hero2Escaper(GetTriggerUnit()!)
 
                             if (escaper) {
                                 if (hooks.hooks_onHeroEnterRegion) {

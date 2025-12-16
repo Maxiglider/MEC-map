@@ -659,8 +659,8 @@ export const initExecuteCommandCheat = () => {
                 const hero = escaper.getHero()
 
                 if (hero) {
-                    if (GetItemTypeId(UnitItemInSlot(hero, 0)) == METEOR_CHEAT) {
-                        RemoveItem(UnitItemInSlot(hero, 0))
+                    if (GetItemTypeId(UnitItemInSlot(hero, 0)!) == METEOR_CHEAT) {
+                        RemoveItem(UnitItemInSlot(hero, 0)!)
                         Text.P(escaper.getPlayer(), 'infinite meteors removed')
                     } else {
                         Text.erP(escaper.getPlayer(), 'no infinite meteors to remove')

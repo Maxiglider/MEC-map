@@ -2,7 +2,7 @@ import { Ascii2String } from 'core/01_libraries/Ascii'
 import { arrayPush } from 'core/01_libraries/Basic_functions'
 import { Text } from 'core/01_libraries/Text'
 import { ServiceManager } from 'Services'
-import * as React from 'w3ts-jsx/dist/src/index'
+import * as React from 'w3ts-jsx/dist/index'
 import { getUdgEscapers, getUdgTerrainTypes } from '../../globals'
 import { CommandHistory } from './Components/CommandHistory'
 import { Item } from './Components/Item'
@@ -33,7 +33,7 @@ export const Interface = ({ cb }: InterfaceProps) => {
     const commandHistory = useCommandHistory()
 
     const defaultPos = { x: 0.007, y: 0.471 }
-    const mainPos = getPos(GetPlayerId(GetLocalPlayer())) || defaultPos
+    const mainPos = getPos(GetPlayerId(GetLocalPlayer()!)) || defaultPos
 
     const historyPos = { x: 0.6, y: 0.5 }
 
@@ -146,7 +146,7 @@ export const Interface = ({ cb }: InterfaceProps) => {
 
     return (
         <container>
-            <container visible={getVisible(GetPlayerId(GetLocalPlayer())) || false}>
+            <container visible={getVisible(GetPlayerId(GetLocalPlayer()!)) || false}>
                 <container>
                     <backdrop
                         inherits="EscMenuBackdrop"
@@ -166,9 +166,9 @@ export const Interface = ({ cb }: InterfaceProps) => {
                                 v={item}
                                 absPosition={absPos}
                                 size={{ width: 0.03, height: 0.03 }}
-                                visible={(getVisible(GetPlayerId(GetLocalPlayer())) || false) && visible}
+                                visible={(getVisible(GetPlayerId(GetLocalPlayer()!)) || false) && visible}
                                 onClick={() => {
-                                    const escaper = getUdgEscapers().get(GetPlayerId(GetTriggerPlayer()))
+                                    const escaper = getUdgEscapers().get(GetPlayerId(GetTriggerPlayer()!))
                                     const terrainType = getUdgTerrainTypes().getByCode(item.title)
 
                                     if (escaper && terrainType) {
@@ -262,17 +262,17 @@ export const Interface = ({ cb }: InterfaceProps) => {
 
             {/* Command History */}
             <CommandHistory
-                visible={reactService.getHistoryVisible(GetPlayerId(GetLocalPlayer()))}
+                visible={reactService.getHistoryVisible(GetPlayerId(GetLocalPlayer()!))}
                 allEntries={commandHistory.getAllEntries()}
                 position={historyPos}
                 onPinToggle={id => {
-                    commandHistory.togglePin(id, GetPlayerId(GetTriggerPlayer()))
+                    commandHistory.togglePin(id, GetPlayerId(GetTriggerPlayer()!))
                 }}
                 onRemove={id => {
-                    commandHistory.removeEntry(id, GetPlayerId(GetTriggerPlayer()))
+                    commandHistory.removeEntry(id, GetPlayerId(GetTriggerPlayer()!))
                 }}
                 onCommandClick={command => {
-                    const escaper = getUdgEscapers().get(GetPlayerId(GetTriggerPlayer()))
+                    const escaper = getUdgEscapers().get(GetPlayerId(GetTriggerPlayer()!))
                     if (escaper) {
                         ServiceManager.getService('Cmd').ExecuteCommand(escaper, command)
                     }

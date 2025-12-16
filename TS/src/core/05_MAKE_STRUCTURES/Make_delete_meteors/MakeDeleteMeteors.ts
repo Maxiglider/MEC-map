@@ -19,11 +19,11 @@ export class MakeDeleteMeteors extends MakeOneByOneOrTwoClicks {
 
             if (this.getMode() == 'oneByOne') {
                 //mode oneClick
-                if (GetItemTypeId(GetOrderTargetItem()) !== METEOR_NORMAL) {
+                if (GetItemTypeId(GetOrderTargetItem()!) !== METEOR_NORMAL) {
                     return
                 }
 
-                meteor = udg_meteors[GetItemUserData(GetOrderTargetItem())]
+                meteor = udg_meteors[GetItemUserData(GetOrderTargetItem()!)]
 
                 if (meteor && meteor.getItem()) {
                     meteor.delete()

@@ -100,7 +100,7 @@ export const initMultiboard = () => {
 
         const nameWidth = getLongestNameWidth()
 
-        mb = CreateMultiboardBJ(cols, rows, `${globals.scoreboardLabel} - Global`)
+        mb = CreateMultiboardBJ(cols, rows, `${globals.scoreboardLabel} - Global`)!
 
         for (let col = 1; col <= cols; col++) {
             for (let row = 1; row <= rows; row++) {
@@ -202,13 +202,13 @@ export const initMultiboard = () => {
 
                 if (statsMode === 'current') {
                     mb && MultiboardSetItemValueBJ(mb, 1, 2, `|Cfffed312Game time: ${currentGameTimeStr}`)
-                    lb && LeaderboardSetPlayerItemLabelBJ(Player(0), lb, `|Cfffed312Game time: ${currentGameTimeStr}`)
+                    lb && LeaderboardSetPlayerItemLabelBJ(Player(0)!, lb, `|Cfffed312Game time: ${currentGameTimeStr}`)
                 } else if (statsMode === 'global') {
                     mb && MultiboardSetItemValueBJ(mb, 1, 2, `|Cfffed312Game time: ${globalGameTimeStr}`)
-                    lb && LeaderboardSetPlayerItemLabelBJ(Player(0), lb, `|Cfffed312Game time: ${globalGameTimeStr}`)
+                    lb && LeaderboardSetPlayerItemLabelBJ(Player(0)!, lb, `|Cfffed312Game time: ${globalGameTimeStr}`)
                 } else if (statsMode === 'speedrun') {
                     mb && MultiboardSetItemValueBJ(mb, 1, 2, `|Cfffed312Game time: ${speedrunGameTimeStr}`)
-                    lb && LeaderboardSetPlayerItemLabelBJ(Player(0), lb, `|Cfffed312Game time: ${speedrunGameTimeStr}`)
+                    lb && LeaderboardSetPlayerItemLabelBJ(Player(0)!, lb, `|Cfffed312Game time: ${speedrunGameTimeStr}`)
                 }
             }
 
@@ -614,7 +614,7 @@ export const initMultiboard = () => {
                             'overhead',
                             hero,
                             'AbilitiesSpellsOtherTalkToMeTalkToMe.mdl'
-                        )
+                        )!
                     }
                 }
             }

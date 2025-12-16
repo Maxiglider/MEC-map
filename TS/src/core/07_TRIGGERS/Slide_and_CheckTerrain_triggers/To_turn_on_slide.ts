@@ -160,14 +160,14 @@ const initTurnOnSlide = () => {
     }
 
     const HandleTurn = (triggerIsToLocation: boolean) => {
-        const escaper = Hero2Escaper(GetTriggerUnit())
+        const escaper = Hero2Escaper(GetTriggerUnit()!)
 
         if (!escaper) {
             return
         }
 
         //init variables
-        slider = GetTriggerUnit()
+        slider = GetTriggerUnit()!
         n = GetUnitUserData(slider)
         sliderX = GetUnitX(slider)
         sliderY = GetUnitY(slider)
@@ -176,7 +176,7 @@ const initTurnOnSlide = () => {
             orderX = GetOrderPointX()
             orderY = GetOrderPointY()
         } else {
-            orderWidget = GetOrderTarget()
+            orderWidget = GetOrderTarget()!
             orderX = GetWidgetX(orderWidget)
             orderY = GetWidgetY(orderWidget)
         }
@@ -204,8 +204,8 @@ const initTurnOnSlide = () => {
             events: [t => TriggerRegisterAnyUnitEventBJ(t, EVENT_PLAYER_UNIT_ISSUED_POINT_ORDER)],
             conditions: [
                 () => {
-                    const escaper = Hero2Escaper(GetTriggerUnit())
-                    return IsHero(GetTriggerUnit()) && !!escaper?.isSliding() && !IsLastOrderPause()
+                    const escaper = Hero2Escaper(GetTriggerUnit()!)
+                    return IsHero(GetTriggerUnit()!) && !!escaper?.isSliding() && !IsLastOrderPause()
                 },
             ],
             actions: [() => HandleTurn(true)],
@@ -216,8 +216,8 @@ const initTurnOnSlide = () => {
             events: [t => TriggerRegisterAnyUnitEventBJ(t, EVENT_PLAYER_UNIT_ISSUED_TARGET_ORDER)],
             conditions: [
                 () => {
-                    const escaper = Hero2Escaper(GetTriggerUnit())
-                    return IsHero(GetTriggerUnit()) && !!escaper?.isSliding()
+                    const escaper = Hero2Escaper(GetTriggerUnit()!)
+                    return IsHero(GetTriggerUnit()!) && !!escaper?.isSliding()
                 },
             ],
             actions: [() => HandleTurn(false)],

@@ -6,12 +6,12 @@ export const init_shortcurt_cancelRedo = () => {
     const { ExecuteCommand } = ServiceManager.getService('Cmd')
 
     function Cancel_Actions() {
-        const escaper = getUdgEscapers().get(GetPlayerId(GetTriggerPlayer()))
+        const escaper = getUdgEscapers().get(GetPlayerId(GetTriggerPlayer()!))
         escaper && ExecuteCommand(escaper, '-z')
     }
 
     function Redo_Actions() {
-        const escaper = getUdgEscapers().get(GetPlayerId(GetTriggerPlayer()))
+        const escaper = getUdgEscapers().get(GetPlayerId(GetTriggerPlayer()!))
         escaper && ExecuteCommand(escaper, '-y')
     }
 
@@ -20,13 +20,13 @@ export const init_shortcurt_cancelRedo = () => {
         const trgCancel = CreateTrigger()
 
         TriggerAddAction(trgCancel, Cancel_Actions)
-        BlzTriggerRegisterPlayerKeyEvent(trgCancel, Player(i), OSKEY_Z, 2, false) //CTRL Z
+        BlzTriggerRegisterPlayerKeyEvent(trgCancel, Player(i)!, OSKEY_Z, 2, false) //CTRL Z
 
         //redo
         const trgRedo = CreateTrigger()
 
         TriggerAddAction(trgRedo, Redo_Actions)
-        BlzTriggerRegisterPlayerKeyEvent(trgRedo, Player(i), OSKEY_Z, 3, false) //CTRL SHIFT Z
-        BlzTriggerRegisterPlayerKeyEvent(trgRedo, Player(i), OSKEY_Y, 2, false) //CTRL Y
+        BlzTriggerRegisterPlayerKeyEvent(trgRedo, Player(i)!, OSKEY_Z, 3, false) //CTRL SHIFT Z
+        BlzTriggerRegisterPlayerKeyEvent(trgRedo, Player(i)!, OSKEY_Y, 2, false) //CTRL Y
     }
 }

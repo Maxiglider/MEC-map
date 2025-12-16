@@ -1,5 +1,5 @@
 import { createEvent } from 'Utils/mapUtils'
-import {StopUnit} from "../../01_libraries/Basic_functions";
+import { StopUnit } from '../../01_libraries/Basic_functions'
 
 export let gg_trg_Stop_using_normal_meteor: trigger
 
@@ -15,7 +15,7 @@ export const InitTrig_Stop_using_normal_meteor = () => {
                 return true
             },
         ],
-        actions: [() => StopUnit(GetTriggerUnit())],
+        actions: [() => StopUnit(GetTriggerUnit()!)],
     })
 
     DisableTrigger(gg_trg_Stop_using_normal_meteor)

@@ -48,9 +48,9 @@ const initMessageHeroDies = () => {
                 // For some reason this still plays the sound even tho the player is ignoring death messages
                 if (!getUdgEscapers().get(i)?.isIgnoringDeathMessages()) {
                     if (GetLocalPlayer() === fallenPlayer) {
-                        StartSoundForPlayerBJ(Player(i), GetRandomSoundHeroDies())
+                        StartSoundForPlayerBJ(Player(i)!, GetRandomSoundHeroDies())
                     } else {
-                        StartSoundForPlayerBJ(Player(i), GetRandomSoundAllyHeroDies())
+                        StartSoundForPlayerBJ(Player(i)!, GetRandomSoundAllyHeroDies())
                     }
                 }
             })
@@ -64,7 +64,7 @@ const initMessageHeroDies = () => {
         const n = GetPlayerId(p)
 
         TimerStart(CreateTimer(), TIME_BETWEEN_DEATH_AND_MESSAGE, false, () => {
-            PlaySoundHeroDies(Player(n))
+            PlaySoundHeroDies(Player(n)!)
 
             forRange(Constants.NB_ESCAPERS, i => {
                 if (!getUdgEscapers().get(i)?.isIgnoringDeathMessages()) {
@@ -73,7 +73,7 @@ const initMessageHeroDies = () => {
                     // When players leave their escaper gets removed so we dont show a death message
                     if (targetEscaper) {
                         Text.P_timed(
-                            Player(i),
+                            Player(i)!,
                             MESSAGE_DURATION,
                             udg_colorCode[playerId2colorId(n)] + targetEscaper.getDisplayName() + '|r has fallen.'
                         )
@@ -81,7 +81,7 @@ const initMessageHeroDies = () => {
                 }
             })
 
-            DestroyTimer(GetExpiredTimer())
+            DestroyTimer(GetExpiredTimer()!)
         })
     }
 

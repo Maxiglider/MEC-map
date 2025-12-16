@@ -7,10 +7,10 @@ export const initTrig_Autorevive = () => {
 
     createEvent({
         events: [t => TriggerRegisterAnyUnitEventBJ(t, EVENT_PLAYER_UNIT_DEATH)],
-        conditions: [() => IsHero(GetTriggerUnit())],
+        conditions: [() => IsHero(GetTriggerUnit()!)],
         actions: [
             () => {
-                const escaper = Hero2Escaper(GetTriggerUnit())
+                const escaper = Hero2Escaper(GetTriggerUnit()!)
 
                 if (!escaper) {
                     return

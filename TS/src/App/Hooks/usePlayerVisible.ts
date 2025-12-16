@@ -1,4 +1,4 @@
-import * as React from 'w3ts-jsx/dist/src/index'
+import * as React from 'w3ts-jsx/dist/index'
 
 export const usePlayerVariable = <T>() => {
     const [state, setState] = React.useState<{ [playerId: number]: T | undefined }>({})

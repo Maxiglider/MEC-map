@@ -7,13 +7,13 @@ import { NewPatrolMonster } from './Monster_functions'
 
 export const initMonsterSimplePatrol = () => {
     //vérification que les monstres multi-patrouilles patrouillent bien
-    simplePatrolMobs = CreateGroup()
+    simplePatrolMobs = CreateGroup()!
 
     const checkSimplePatrolMobsPeriod = 5
 
     const CheckSimplePatrolMobsEnum = () => {
-        if (GetUnitCurrentOrder(GetEnumUnit()) === 0) {
-            udg_monsters[GetUnitUserData(GetEnumUnit())].createUnit()
+        if (GetUnitCurrentOrder(GetEnumUnit()!) === 0) {
+            udg_monsters[GetUnitUserData(GetEnumUnit()!)].createUnit()
         }
     }
 

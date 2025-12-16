@@ -205,7 +205,7 @@ export const initCommandExecution = () => {
 
         //ex : "-(abc def)" --> "-abc def"
         if (SubStringBJ(cmd, 2, 2) === '(' && SubStringBJ(cmd, StringLength(cmd), StringLength(cmd)) === ')') {
-            cmd = SubStringBJ(cmd, 1, 1) + SubStringBJ(cmd, 3, StringLength(cmd) - 1)
+            cmd = SubStringBJ(cmd, 1, 1)! + SubStringBJ(cmd, 3, StringLength(cmd) - 1)!
         }
 
         // Add to command history
@@ -217,7 +217,7 @@ export const initCommandExecution = () => {
         prevChar = ''
         while (true) {
             if (charId > StringLength(cmd)) break
-            char = SubStringBJ(cmd, charId, charId)
+            char = SubStringBJ(cmd, charId, charId)!
             if (char === ',' && prevChar !== '\\') {
                 if (nbParenthesesNonFermees <= 0) {
                     singleCommandId = singleCommandId + 1
@@ -262,21 +262,21 @@ export const initCommandExecution = () => {
 
     createEvent({
         events: [
-            t => forRange(Constants.NB_PLAYERS_MAX, i => TriggerRegisterPlayerChatEvent(t, Player(i), '-', false)),
+            t => forRange(Constants.NB_PLAYERS_MAX, i => TriggerRegisterPlayerChatEvent(t, Player(i)!, '-', false)),
         ],
         actions: [
             () => {
-                if (!IsCmd(GetEventPlayerChatString())) {
+                if (!IsCmd(GetEventPlayerChatString()!)) {
                     return
                 }
 
-                const escaper = getUdgEscapers().get(GetPlayerId(GetTriggerPlayer()))
+                const escaper = getUdgEscapers().get(GetPlayerId(GetTriggerPlayer()!))
 
                 if (!escaper) {
                     return
                 }
 
-                ExecuteCommand(escaper, GetEventPlayerChatString())
+                ExecuteCommand(escaper, GetEventPlayerChatString()!)
             },
         ],
     })
@@ -356,13 +356,13 @@ export const initCommandExecution = () => {
                 )
 
                 Text.P(
-                    GetTriggerPlayer(),
+                    GetTriggerPlayer()!,
                     `|cff00ff00Commands (page |cff00ccff${pageNum}|r|cff00ff00/|cff00ccff${displayableCmds.totalPages}|r|cff00ff00)|r`
                 )
 
                 for (const cmd of displayableCmds.cmds) {
                     const line = cmd
-                    Text.P(GetTriggerPlayer(), line)
+                    Text.P(GetTriggerPlayer()!, line)
                 }
 
                 return true

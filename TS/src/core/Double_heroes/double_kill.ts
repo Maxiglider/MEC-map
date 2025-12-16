@@ -8,8 +8,8 @@ export const init_doubleKill = () => {
     TriggerAddAction(
         triggerDoubleKill,
         errorHandler(() => {
-            if (udg_doubleHeroesEnabled && IsHero(GetTriggerUnit())) {
-                GetMirrorEscaper(Hero2Escaper(GetTriggerUnit()))?.kill()
+            if (udg_doubleHeroesEnabled && IsHero(GetTriggerUnit()!)) {
+                GetMirrorEscaper(Hero2Escaper(GetTriggerUnit()!))?.kill()
             }
         })
     )

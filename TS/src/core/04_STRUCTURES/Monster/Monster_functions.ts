@@ -84,9 +84,9 @@ export const NewImmobileMonsterForPlayer = (
 
     let scale: number
     if (angle === -1) {
-        monster = CreateUnit(p, unitTypeId, x, y, GetRandomDirectionDeg())
+        monster = CreateUnit(p, unitTypeId, x, y, GetRandomDirectionDeg())!
     } else {
-        monster = CreateUnit(p, unitTypeId, x, y, angle)
+        monster = CreateUnit(p, unitTypeId, x, y, angle)!
     }
 
     SetUnitUseFood(monster, false)
@@ -107,7 +107,7 @@ export const NewImmobileMonsterForPlayer = (
     }
     SetUnitMoveSpeed(monster, mt.getUnitMoveSpeed())
     if (!Constants.MOBS_VARIOUS_COLORS) {
-        SetUnitColor(monster, ConvertPlayerColor(24))
+        SetUnitColor(monster, ConvertPlayerColor(24)!)
     }
 
     if (disableAttack) {
@@ -120,7 +120,7 @@ export const NewImmobileMonsterForPlayer = (
         SetUnitFlyHeight(monster, mt.getHeight(), 0)
     }
 
-    const shadow = getUdgEscapers().get(GetPlayerId(GetLocalPlayer()))?.getMonsterShadow()
+    const shadow = getUdgEscapers().get(GetPlayerId(GetLocalPlayer()!))?.getMonsterShadow()
 
     if (shadow === false) {
         // Force toggle it to update the shadow

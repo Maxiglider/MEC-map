@@ -88,7 +88,7 @@ export class End extends RectInterface {
             events: [t => TriggerRegisterEnterRectSimple(t, this.r)],
             actions: [
                 () => {
-                    const finisher = Hero2Escaper(GetTriggerUnit())
+                    const finisher = Hero2Escaper(GetTriggerUnit()!)
 
                     if (!finisher) {
                         return

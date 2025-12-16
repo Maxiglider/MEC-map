@@ -1,34 +1,34 @@
-import {createTimer} from 'Utils/mapUtils'
-import {udg_monsters} from '../../../../globals'
+import { createTimer } from 'Utils/mapUtils'
+import { udg_monsters } from '../../../../globals'
 
 const PERIOD = 0.1
 
-export const monstersClickable = CreateGroup()
-
+export const monstersClickable = CreateGroup()!
 
 const forEachClickableMonster = () => {
     const monsterUnit = GetEnumUnit()
-    const currentLife = GetUnitState(monsterUnit, UNIT_STATE_LIFE)
-    const monster = udg_monsters[GetUnitUserData(monsterUnit)]
 
-    if (monster) {
-        const previousLife = I2R(monster.getLife())
-        let diffLife = RMaxBJ(currentLife, previousLife) - RMinBJ(currentLife, previousLife)
-        if (diffLife < 100) {
-            SetUnitLifeBJ(GetEnumUnit(), previousLife - 0.9)
-        } else {
-            while (!(diffLife <= 0)) {
-                monster.setLife(R2I(previousLife) - 10000)
-                diffLife = diffLife - 10000
+    if (monsterUnit) {
+        const currentLife = GetUnitState(monsterUnit, UNIT_STATE_LIFE)
+        const monster = udg_monsters[GetUnitUserData(monsterUnit)]
+
+        if (monster) {
+            const previousLife = I2R(monster.getLife())
+            let diffLife = RMaxBJ(currentLife, previousLife) - RMinBJ(currentLife, previousLife)
+            if (diffLife < 100) {
+                SetUnitLifeBJ(monsterUnit, previousLife - 0.9)
+            } else {
+                while (!(diffLife <= 0)) {
+                    monster.setLife(R2I(previousLife) - 10000)
+                    diffLife = diffLife - 10000
+                }
             }
         }
     }
 }
-
 
 export const init_TrigMonstersClickableSetLife = () => {
     createTimer(PERIOD, true, () => {
         ForGroup(monstersClickable, forEachClickableMonster)
     })
 }
-

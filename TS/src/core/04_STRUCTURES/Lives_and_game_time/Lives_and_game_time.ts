@@ -5,7 +5,7 @@ import { ServiceManager } from 'Services'
 import { createTimer } from 'Utils/mapUtils'
 import { getUdgLevels } from '../../../../globals'
 
-export const LIVES_PLAYER = Player(6) //Constants.GREEN
+export const LIVES_PLAYER = Player(6)! //Constants.GREEN
 
 export type ILives = ReturnType<typeof initLives>
 

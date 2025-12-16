@@ -136,17 +136,17 @@ export const initFirstPerson = () => {
                 events: [
                     t =>
                         forRange(Constants.NB_ESCAPERS, i =>
-                            TriggerRegisterPlayerKeyEventBJ(t, Player(i), blzKeyDown, blzKey)
+                            TriggerRegisterPlayerKeyEventBJ(t, Player(i)!, blzKeyDown, blzKey)
                         ),
                 ],
                 actions: [
                     () => {
                         getUdgEscapers()
-                            .get(GetPlayerId(GetTriggerPlayer()))
+                            .get(GetPlayerId(GetTriggerPlayer()!))
                             ?.getFirstPersonHandle()
                             .setKeyDownState(key, keyDown)
 
-                        AfkMode.resetAfk(GetPlayerId(GetTriggerPlayer()))
+                        AfkMode.resetAfk(GetPlayerId(GetTriggerPlayer()!))
                     },
                 ],
             })
