@@ -2,6 +2,7 @@ import type { CasterTypeArray } from './src/core/04_STRUCTURES/Caster/CasterType
 import type { EscaperArray } from './src/core/04_STRUCTURES/Escaper/EscaperArray'
 import type { LevelArray } from './src/core/04_STRUCTURES/Level/LevelArray'
 import type { Monster } from './src/core/04_STRUCTURES/Monster/Monster'
+import type { MonsterType } from './src/core/04_STRUCTURES/Monster/MonsterType'
 import type { MonsterTypeArray } from './src/core/04_STRUCTURES/Monster/MonsterTypeArray'
 import type { TerrainTypeArray } from './src/core/04_STRUCTURES/TerrainType/TerrainTypeArray'
 
@@ -114,3 +115,5 @@ export const getUdgMonsterTypes = (): MonsterTypeArray => {
 
 //Monsters
 export const udg_monsters: { [x: number]: Monster } = {}
+
+export const udg_spawned_monsters: { [x: number]: MonsterType | null } = {}

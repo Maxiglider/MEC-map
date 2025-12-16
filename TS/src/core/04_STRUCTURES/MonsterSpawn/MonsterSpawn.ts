@@ -4,7 +4,7 @@ import { createTimer, errorHandler } from 'Utils/mapUtils'
 import { Constants } from 'core/01_libraries/Constants'
 import { CombineHooks } from 'core/API/MecHookArray'
 import { Timer } from 'w3ts'
-import { globals } from '../../../../globals'
+import { globals, udg_spawned_monsters } from '../../../../globals'
 import { GetCurrentMonsterPlayer, arrayPush, convertAngleToDirection } from '../../01_libraries/Basic_functions'
 import { udg_colorCode } from '../../01_libraries/Init_colorCodes'
 import { Text } from '../../01_libraries/Text'
@@ -206,6 +206,7 @@ export class MonsterSpawn {
                     DestroyTimer(timer)
                 }
                 this.simpleUnitRecycler.removeUnit(u)
+                udg_spawned_monsters[GetHandleId(u)] = null
             })
             DestroyGroup(this.monsters)
             delete this.monsters
@@ -590,6 +591,7 @@ export class MonsterSpawn {
                 }
                 GroupRemoveUnit(ms.monsters, u)
                 this.simpleUnitRecycler.removeUnit(u)
+                udg_spawned_monsters[GetHandleId(u)] = null
             }
         }
 
@@ -617,6 +619,7 @@ export class MonsterSpawn {
 
             GroupRemoveUnit(ms.monsters, u)
             ms.simpleUnitRecycler.removeUnit(u)
+            udg_spawned_monsters[GetHandleId(u)] = null
         }
     }
 
@@ -938,6 +941,8 @@ export class MonsterSpawn {
                 angle
             )
         }
+
+        udg_spawned_monsters[GetHandleId(monster)] = this.mt
 
         //hook after create unit
         const hookArray2 = CombineHooks(
