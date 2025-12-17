@@ -1,4 +1,3 @@
-import { renderInterface } from 'App/renderInterface'
 import { ServiceManager } from 'Services'
 import { createTimer, errorHandler } from 'Utils/mapUtils'
 import { IsBoolString, S2B } from 'core/01_libraries/Basic_functions'
@@ -27,76 +26,6 @@ const tsMain = () => {
         Lives: initLives,
         Multiboard: initMultiboard,
         Cmd: initCommandExecution,
-        React: () => {
-            return renderInterface({
-                cb: ({ setVisible, resetUI, addCommandToHistory }) => {
-                    ServiceManager.getService('Cmd').registerCommand({
-                        name: 'palette',
-                        alias: ['p'],
-                        group: 'make',
-                        argDescription: '',
-                        description: '',
-                        cb: ({ nbParam, param1 }) => {
-                            if (nbParam !== 1) {
-                                throw 'Wrong command parameters'
-                            }
-
-                            if (param1 === 'reset') {
-                                resetUI(GetPlayerId(GetTriggerPlayer()!))
-                                return true
-                            }
-
-                            if (!IsBoolString(param1)) {
-                                return true
-                            }
-
-                            setVisible({ visible: S2B(param1), playerId: GetPlayerId(GetTriggerPlayer()!) })
-                            return true
-                        },
-                    })
-
-                    ServiceManager.getService('Cmd').registerCommand({
-                        name: 'commandHistory',
-                        alias: ['cmdh', 'cmdhis', 'cmdhist', 'cmdhistory'],
-                        group: 'all',
-                        argDescription: '[on|off|toggle|clear]',
-                        description: 'Toggle command history display, or clear unpinned commands',
-                        cb: ({ noParam, param1 }, escaper) => {
-                            const playerId = GetPlayerId(GetTriggerPlayer()!)
-
-                            if (noParam || param1 === 'toggle') {
-                                // Toggle visibility
-                                const currentVisible =
-                                    ServiceManager.getService('React').getHistoryVisible(playerId) || false
-                                ServiceManager.getService('React').setHistoryVisible(playerId, !currentVisible)
-                                return true
-                            }
-
-                            if (param1 === 'on') {
-                                ServiceManager.getService('React').setHistoryVisible(playerId, true)
-                                return true
-                            }
-
-                            if (param1 === 'off') {
-                                ServiceManager.getService('React').setHistoryVisible(playerId, false)
-                                return true
-                            }
-
-                            if (param1 === 'clear') {
-                                ServiceManager.getService('React').clearUnpinnedHistory(playerId)
-                                Text.P(escaper.getPlayer(), 'Cleared unpinned command history')
-                                return true
-                            }
-
-                            return true
-                        },
-                    })
-
-                    // Store the addCommandToHistory function in the service
-                    ServiceManager.getService('Cmd').setAddCommandToHistory(addCommandToHistory)
-                },
-            })
-        },
     })
 
     ServiceManager.getService('Cmd').initCommands()
@@ -117,7 +46,7 @@ const tsMain = () => {
     //     renderWorld(renderInfo)
     // })
 
-    ServiceManager.getService('React').init()
+    // ServiceManager.getService('React').init()
 
     if (!PROD) {
         const gcState = { lastRun: os.clock(), waitingForGc: false }
