@@ -37,11 +37,9 @@
             "lua-types/special/5.3",
             "war3-types-strict/1.33.0",
             "war3-transformer/types",
-            "war3-objectdata-th/dist/cjs/objectdata",
-            "w3ts-jsx/dist/types"
+            "war3-objectdata-th/dist/cjs/objectdata"
         ],
-        "skipLibCheck": true,
-        "jsx": "react"
+        "skipLibCheck": true
     },
     "include": [
         "src"
@@ -58,12 +56,6 @@
         "noResolvePaths": [
             "typescript",
             "typescript-to-lua"
-        ],
-        "luaPlugins": [
-            {
-                "name": "tstl-jsx",
-                "import": "JsxTransformer"
-            }
         ]
     }
 }
