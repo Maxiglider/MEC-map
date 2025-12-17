@@ -14,7 +14,7 @@ export class MecHookArray<T extends (...args: any) => any> {
 
     public destroy = (id: number) => {
         const hook = this.hooks[id]
-        if (hook) {
+        if (!!hook) {
             ;(this.hooks as any)[id] = null
             return true
         } else {

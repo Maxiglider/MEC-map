@@ -384,7 +384,7 @@ const initProgressionUtils = () => {
             for (const tile of mergedSegment) {
                 const levelIndex = levelMap[tile.x]?.[tile.y]
 
-                if (levelIndex) {
+                if (levelIndex !== undefined) {
                     foundLevelIndex = levelIndex
                     break
                 }

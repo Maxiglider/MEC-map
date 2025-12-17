@@ -194,7 +194,7 @@ export abstract class Monster {
             this.level?.monsters.hooks_onBeforeCreateMonsterUnit,
             hooks.hooks_onBeforeCreateMonsterUnit
         )
-        if (hookArray) {
+        if (!!hookArray) {
             let forceUnitTypeId = 0
             let forceX = 0
             let forceY = 0
@@ -277,7 +277,7 @@ export abstract class Monster {
             this.level?.monsters.hooks_onAfterCreateMonsterUnit,
             hooks.hooks_onAfterCreateMonsterUnit
         )
-        if (hookArray2) {
+        if (!!hookArray2) {
             for (const hook of hookArray2) {
                 hook.execute(this)
             }

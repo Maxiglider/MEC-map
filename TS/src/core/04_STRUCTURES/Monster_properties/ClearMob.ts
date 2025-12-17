@@ -113,7 +113,7 @@ export class ClearMob {
             return false
         }
 
-        if (this.triggerMob) {
+        if (!!this.triggerMob) {
             this.triggerMob.removeClearMob()
         }
 

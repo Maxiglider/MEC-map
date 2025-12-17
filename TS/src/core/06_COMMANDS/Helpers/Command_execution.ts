@@ -185,7 +185,7 @@ export const initCommandExecution = () => {
             // }
         } catch (error) {
             if (typeof error == 'string') {
-                if (escaper.getPlayer()) {
+                if (!!escaper.getPlayer()) {
                     Text.erP(escaper.getPlayer(), error)
                 } else {
                     Text.erA(error)

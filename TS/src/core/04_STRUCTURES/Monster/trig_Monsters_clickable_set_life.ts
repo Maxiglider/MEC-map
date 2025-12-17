@@ -12,7 +12,7 @@ const forEachClickableMonster = () => {
         const currentLife = GetUnitState(monsterUnit, UNIT_STATE_LIFE)
         const monster = udg_monsters[GetUnitUserData(monsterUnit)]
 
-        if (monster) {
+        if (!!monster) {
             const previousLife = I2R(monster.getLife())
             let diffLife = RMaxBJ(currentLife, previousLife) - RMinBJ(currentLife, previousLife)
             if (diffLife < 100) {

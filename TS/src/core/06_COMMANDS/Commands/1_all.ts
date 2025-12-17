@@ -559,7 +559,7 @@ export const initCommandAll = () => {
 
             if (hero) {
                 const spaceIndex = cmd.indexOf(' ')
-                const args = spaceIndex ? cmd.substring(spaceIndex + 1) : param1
+                const args = spaceIndex !== -1 ? cmd.substring(spaceIndex + 1) : param1
 
                 animUtils.setAnimation(hero, args)
 

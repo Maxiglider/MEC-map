@@ -20,14 +20,14 @@ export class MakeStaticSlide extends Make {
 
     private createStaticSlide = () => {
         if (
-            this.points[0]?.x &&
-            this.points[0]?.y &&
-            this.points[1]?.x &&
-            this.points[1]?.y &&
-            this.points[2]?.x &&
-            this.points[2]?.y &&
-            this.points[3]?.x &&
-            this.points[3]?.y
+            this.points[0]?.x !== undefined &&
+            this.points[0]?.y !== undefined &&
+            this.points[1]?.x !== undefined &&
+            this.points[1]?.y !== undefined &&
+            this.points[2]?.x !== undefined &&
+            this.points[2]?.y !== undefined &&
+            this.points[3]?.x !== undefined &&
+            this.points[3]?.y !== undefined
         ) {
             this.staticSlide = this.escaper
                 .getMakingLevel()

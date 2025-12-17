@@ -115,13 +115,13 @@ export class Level {
                 }
             }
 
-            if (this.hooks_onStart) {
+            if (!!this.hooks_onStart) {
                 for (const hook of this.hooks_onStart.getHooks()) {
                     hook.execute(this)
                 }
             }
 
-            if (hooks.hooks_onStartLevelAny) {
+            if (!!hooks.hooks_onStartLevelAny) {
                 for (const hook of hooks.hooks_onStartLevelAny.getHooks()) {
                     hook.execute(this)
                 }
@@ -137,13 +137,13 @@ export class Level {
             getUdgEscapers().deleteSpecificActionsForLevel(this)
             this.setDebugRegionsVisible('off')
 
-            if (this.hooks_onEnd) {
+            if (!!this.hooks_onEnd) {
                 for (const hook of this.hooks_onEnd.getHooks()) {
                     hook.execute(this)
                 }
             }
 
-            if (hooks.hooks_onEndLevelAny) {
+            if (!!hooks.hooks_onEndLevelAny) {
                 for (const hook of hooks.hooks_onEndLevelAny.getHooks()) {
                     hook.execute(this)
                 }
@@ -441,7 +441,7 @@ export class Level {
 
     removeTempTerrainTypes = () => {
         for (const [key, tempTerrainType] of pairs(this.tempTerrainTypeMap)) {
-            if (tempTerrainType) {
+            if (!!tempTerrainType) {
                 tempTerrainType.terrainTypeId &&
                     tempTerrainType.x &&
                     tempTerrainType.y &&

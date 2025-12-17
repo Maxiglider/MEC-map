@@ -905,7 +905,7 @@ export class MonsterSpawn {
                 hooks.hooks_onBeforeCreateMonsterUnit
             )
 
-            if (hookArray) {
+            if (!!hookArray) {
                 let forceUnitTypeId = 0
                 let quit = false
 
@@ -948,7 +948,7 @@ export class MonsterSpawn {
             hooks.hooks_onAfterCreateMonsterUnit
         )
 
-        if (hookArray2) {
+        if (!!hookArray2) {
             for (const hook of hookArray2) {
                 const unitData = MemoryHandler.getEmptyObject<{ mt: MonsterType; u: unit }>()
                 unitData.mt = this.mt

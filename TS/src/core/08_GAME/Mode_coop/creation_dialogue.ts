@@ -29,7 +29,7 @@ export const InitTrig_creation_dialogue = () => {
                         DisplayTextToForce(GetPlayersAll()!, 'Solo mode chosen by first player')
                     }
 
-                    if (hooks.hooks_onModeSelection) {
+                    if (!!hooks.hooks_onModeSelection) {
                         for (const hook of hooks.hooks_onModeSelection.getHooks()) {
                             hook.execute(globals.coopModeActive ? 'coop' : 'solo')
                         }
@@ -72,7 +72,7 @@ export const gg_trg_apparition_dialogue_et_fermeture_automatique = createEvent({
                         DisplayTextToForce(GetPlayersAll()!, 'Solo mode automatically chosen')
                     }
 
-                    if (hooks.hooks_onModeSelection) {
+                    if (!!hooks.hooks_onModeSelection) {
                         for (const hook of hooks.hooks_onModeSelection.getHooks()) {
                             hook.execute(globals.coopModeActive ? 'coop' : 'solo')
                         }

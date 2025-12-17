@@ -2449,7 +2449,7 @@ export const initExecuteCommandMake = () => {
             'create the start (a rectangle formed with two clicks) of the current level or the next one if specified',
         cb: ({ nbParam, param1, param2 }, escaper) => {
             let forNext = false
-            let facing = param2 ? convertTextToAngle(param2) : undefined
+            let facing = param2 !== '' ? convertTextToAngle(param2) : undefined
 
             //checkParam1
             if (nbParam === 1 || nbParam === 2) {
@@ -2529,7 +2529,7 @@ export const initExecuteCommandMake = () => {
                 const n = S2I(param1)
                 if (getUdgLevels().getLastLevelId() < n) {
                     if (n - getUdgLevels().getLastLevelId() == 1) {
-                        if (getUdgLevels().new()) {
+                        if (!!getUdgLevels().new()) {
                             Text.mkP(escaper.getPlayer(), 'level number ' + I2S(n) + ' created')
                         } else {
                             Text.erP(escaper.getPlayer(), 'nombre maximum de niveaux atteint')
@@ -2576,7 +2576,7 @@ export const initExecuteCommandMake = () => {
         description: 'Creates a new level after the last one',
         cb: ({ noParam }, escaper) => {
             if (noParam) {
-                if (getUdgLevels().new()) {
+                if (!!getUdgLevels().new()) {
                     Text.mkP(escaper.getPlayer(), 'level number ' + I2S(getUdgLevels().getLastLevelId()) + ' created')
                 } else {
                     Text.erP(escaper.getPlayer(), 'nombre maximum de niveaux atteint')
@@ -3746,7 +3746,7 @@ export const initExecuteCommandMake = () => {
         argDescription: '[<delay>]',
         description: 'Set monster to attack ground with optional delay',
         cb: ({ param1 }, escaper) => {
-            const delay = param1 ? S2R(param1) : 0
+            const delay = param1 !== '' ? S2R(param1) : 0
 
             if (param1 && (delay < 0 || delay > 60)) {
                 Text.erP(escaper.getPlayer(), 'Delay must be between 0 and 60 seconds')
@@ -4147,7 +4147,7 @@ export const initExecuteCommandMake = () => {
                 const fixStartOnSlidePatrols = S2B(param2)
 
                 // todo should turn this into a ctrl+z able action
-                if (snapToSlide) {
+                if (!!snapToSlide) {
                     const currentVtoto = globals.USE_VTOTO_SLIDE_LOGIC
                     globals.USE_VTOTO_SLIDE_LOGIC = true
 

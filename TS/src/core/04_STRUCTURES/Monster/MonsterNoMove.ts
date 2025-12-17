@@ -111,7 +111,7 @@ export class MonsterNoMove extends Monster {
                                 break
                             }
 
-                            if (targetPoint) targetPoint.__destroy()
+                            if (!!targetPoint) targetPoint.__destroy()
                             targetPoint = region.getRandomPoint()
                         }
 

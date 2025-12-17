@@ -92,7 +92,7 @@ export class MakeLastActions {
 
         this.lastActionId = highestId
 
-        if (lastActionEffective) {
+        if (!!lastActionEffective) {
             for (let i = 0; i <= this.lastActionId; i++) {
                 if (this.lastActions[i] == lastActionEffective) {
                     this.lastActionEffective = i
