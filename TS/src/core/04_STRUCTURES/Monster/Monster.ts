@@ -12,6 +12,7 @@ import { ClearMob } from '../Monster_properties/ClearMob'
 import { PortalMob } from '../Monster_properties/PortalMob'
 import { MonsterType } from './MonsterType'
 import { monstersClickable } from './trig_Monsters_clickable_set_life'
+import { Natives } from '../../wc3_natives_unsecured/Natives'
 
 export abstract class Monster {
     public static forceUnitTypeIdForNextMonster = 0
@@ -262,7 +263,7 @@ export abstract class Monster {
                 if (this.baseColorId === 0) {
                     this.u && SetUnitColor(this.u, PLAYER_COLOR_RED)
                 } else {
-                    this.u && SetUnitColor(this.u, ConvertPlayerColor(this.baseColorId)!)
+                    this.u && SetUnitColor(this.u, Natives.UConvertPlayerColor(this.baseColorId))
                 }
             }
             this.u && SetUnitVertexColorBJ(this.u, this.vcRed, this.vcGreen, this.vcBlue, this.vcTransparency)
@@ -367,7 +368,7 @@ export abstract class Monster {
                 if (baseColorId === 0) {
                     this.u && SetUnitColor(this.u, PLAYER_COLOR_RED)
                 } else {
-                    this.u && SetUnitColor(this.u, ConvertPlayerColor(baseColorId)!)
+                    this.u && SetUnitColor(this.u, Natives.UConvertPlayerColor(baseColorId))
                 }
             }
         }
@@ -393,14 +394,14 @@ export abstract class Monster {
         //changement couleur du mob actuel
         if (this.u !== null) {
             if (Constants.MOBS_VARIOUS_COLORS && this.u) {
-                initBaseColorId = GetPlayerId(GetOwningPlayer(this.u)!)
+                initBaseColorId = GetPlayerId(GetOwningPlayer(this.u))
             } else {
                 initBaseColorId = 12
             }
             if (initBaseColorId === 0) {
                 this.u && SetUnitColor(this.u, PLAYER_COLOR_RED)
             } else {
-                this.u && SetUnitColor(this.u, ConvertPlayerColor(initBaseColorId)!)
+                this.u && SetUnitColor(this.u, Natives.UConvertPlayerColor(initBaseColorId))
             }
             this.u && SetUnitVertexColorBJ(this.u, this.vcRed, this.vcGreen, this.vcBlue, this.vcTransparency)
         }

@@ -5,6 +5,7 @@ import { Constants } from '../../01_libraries/Constants'
 import { ColorString2Id } from '../../01_libraries/Init_colorCodes'
 import { Escaper } from '../../04_STRUCTURES/Escaper/Escaper'
 import { getUdgEscapers } from '../../../../globals'
+import { Natives } from '../../wc3_natives_unsecured/Natives'
 
 export const rawPlayerNames: string[] = []
 
@@ -22,8 +23,8 @@ export const removeHash = (name: string) => {
 
 export const initCachedPlayerNames = () => {
     forRange(24, i => {
-        cachedPlayerNames[removeHash(stringReplaceAll(' ', '_', GetPlayerName(Player(i)!)!.toLowerCase()))] = i
-        rawPlayerNames.push(GetPlayerName(Player(i)!) ?? '')
+        cachedPlayerNames[removeHash(stringReplaceAll(' ', '_', Natives.UGetPlayerName(Natives.UPlayer(i)).toLowerCase()))] = i
+        rawPlayerNames.push(Natives.UGetPlayerName(Natives.UPlayer(i)))
     })
 }
 
@@ -132,7 +133,7 @@ export const isPlayerId = (arg: string) => {
 const blzColors2ids = new Map<playercolor, number>()
 
 for (let i = 0; i < Constants.NB_PLAYERS_MAX_REFORGED; i++) {
-    blzColors2ids.set(ConvertPlayerColor(i)!, i)
+    blzColors2ids.set(Natives.UConvertPlayerColor(i), i)
 }
 
 export const BlzColor2Id = (color: playercolor) => {
@@ -141,7 +142,7 @@ export const BlzColor2Id = (color: playercolor) => {
 
 export function colorId2playerId(colorId: number) {
     for (let i = 0; i < Constants.NB_PLAYERS_MAX; i++) {
-        if (BlzColor2Id(GetPlayerColor(Player(i)!)) == colorId) {
+        if (BlzColor2Id(GetPlayerColor(Natives.UPlayer(i))) == colorId) {
             return i
         }
     }
@@ -150,7 +151,7 @@ export function colorId2playerId(colorId: number) {
 }
 
 export function playerId2colorId(playerId: number) {
-    return BlzColor2Id(GetPlayerColor(Player(playerId)!)) || -1
+    return BlzColor2Id(GetPlayerColor(Natives.UPlayer(playerId))) || -1
 }
 
 export const resolvePlayerId = (arg: string) => {
@@ -158,7 +159,7 @@ export const resolvePlayerId = (arg: string) => {
     let targetPlayer = -1
 
     if (larg === 's' || larg === 'sel' || larg === 'select' || larg === 'selected') {
-        const a = (getUdgEscapers().get(GetPlayerId(GetTriggerPlayer()!))?.getSelectedPlayerId() || 0) + 1
+        const a = (getUdgEscapers().get(GetPlayerId(Natives.UGetTriggerPlayer()))?.getSelectedPlayerId() || 0) + 1
 
         if (a > 0 && a <= Constants.NB_ESCAPERS) {
             targetPlayer = a - 1
@@ -216,8 +217,8 @@ export const resolvePlayerIdsArray = (arg: string) => {
 
             if (
                 escaper &&
-                GetPlayerSlotState(Player(i)!) === PLAYER_SLOT_STATE_PLAYING &&
-                GetPlayerController(Player(i)!) === MAP_CONTROL_COMPUTER
+                GetPlayerSlotState(Natives.UPlayer(i)) === PLAYER_SLOT_STATE_PLAYING &&
+                GetPlayerController(Natives.UPlayer(i)) === MAP_CONTROL_COMPUTER
             ) {
                 arrayPush(escapers, escaper)
             }
@@ -228,8 +229,8 @@ export const resolvePlayerIdsArray = (arg: string) => {
 
             if (
                 escaper &&
-                GetPlayerSlotState(Player(i)!) === PLAYER_SLOT_STATE_PLAYING &&
-                GetPlayerController(Player(i)!) === MAP_CONTROL_USER
+                GetPlayerSlotState(Natives.UPlayer(i)) === PLAYER_SLOT_STATE_PLAYING &&
+                GetPlayerController(Natives.UPlayer(i)) === MAP_CONTROL_USER
             ) {
                 arrayPush(escapers, escaper)
             }

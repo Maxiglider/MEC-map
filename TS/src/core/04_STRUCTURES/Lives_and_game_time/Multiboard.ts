@@ -14,6 +14,7 @@ import { sameLevelProgression } from '../Level/LevelProgression'
 import { TerrainTypeSlide } from '../TerrainType/TerrainTypeSlide'
 import { LIVES_PLAYER } from './Lives_and_game_time'
 import { GameTime } from './Time_of_game_trigger'
+import { Natives } from '../../wc3_natives_unsecured/Natives'
 
 // Column and row start at index 1
 
@@ -100,7 +101,7 @@ export const initMultiboard = () => {
 
         const nameWidth = getLongestNameWidth()
 
-        mb = CreateMultiboardBJ(cols, rows, `${globals.scoreboardLabel} - Global`)!
+        mb = Natives.UCreateMultiboardBJ(cols, rows, `${globals.scoreboardLabel} - Global`)
 
         for (let col = 1; col <= cols; col++) {
             for (let row = 1; row <= rows; row++) {
@@ -197,18 +198,18 @@ export const initMultiboard = () => {
         const speedrunGameTimeStr = GameTime.speedrun.getGameTime()
 
         for (let i = 0; i < Constants.NB_ESCAPERS; i++) {
-            if (GetLocalPlayer() === Player(i)) {
+            if (GetLocalPlayer() === Natives.UPlayer(i)) {
                 const statsMode = playerScores[i].statsMode
 
                 if (statsMode === 'current') {
                     mb && MultiboardSetItemValueBJ(mb, 1, 2, `|Cfffed312Game time: ${currentGameTimeStr}`)
-                    lb && LeaderboardSetPlayerItemLabelBJ(Player(0)!, lb, `|Cfffed312Game time: ${currentGameTimeStr}`)
+                    lb && LeaderboardSetPlayerItemLabelBJ(Natives.UPlayer(0), lb, `|Cfffed312Game time: ${currentGameTimeStr}`)
                 } else if (statsMode === 'global') {
                     mb && MultiboardSetItemValueBJ(mb, 1, 2, `|Cfffed312Game time: ${globalGameTimeStr}`)
-                    lb && LeaderboardSetPlayerItemLabelBJ(Player(0)!, lb, `|Cfffed312Game time: ${globalGameTimeStr}`)
+                    lb && LeaderboardSetPlayerItemLabelBJ(Natives.UPlayer(0), lb, `|Cfffed312Game time: ${globalGameTimeStr}`)
                 } else if (statsMode === 'speedrun') {
                     mb && MultiboardSetItemValueBJ(mb, 1, 2, `|Cfffed312Game time: ${speedrunGameTimeStr}`)
-                    lb && LeaderboardSetPlayerItemLabelBJ(Player(0)!, lb, `|Cfffed312Game time: ${speedrunGameTimeStr}`)
+                    lb && LeaderboardSetPlayerItemLabelBJ(Natives.UPlayer(0), lb, `|Cfffed312Game time: ${speedrunGameTimeStr}`)
                 }
             }
 
@@ -283,7 +284,7 @@ export const initMultiboard = () => {
         }
 
         for (let i = 0; i < Constants.NB_ESCAPERS; i++) {
-            if (GetLocalPlayer() === Player(i)) {
+            if (GetLocalPlayer() === Natives.UPlayer(i)) {
                 const statsMode = playerScores[i].statsMode
 
                 if (statsMode === 'current') {
@@ -610,11 +611,11 @@ export const initMultiboard = () => {
                     const hero = escaper.getHero()
 
                     if (hero) {
-                        ditchEffects[escaper.getId()] = AddSpecialEffectTargetUnitBJ(
+                        ditchEffects[escaper.getId()] = Natives.UAddSpecialEffectTargetUnitBJ(
                             'overhead',
                             hero,
                             'AbilitiesSpellsOtherTalkToMeTalkToMe.mdl'
-                        )!
+                        )
                     }
                 }
             }

@@ -2,6 +2,7 @@ import { Constants } from 'core/01_libraries/Constants'
 import { forRange } from 'Utils/mapUtils'
 import { getUdgEscapers, getUdgLevels, getUdgTerrainTypes } from '../../../../globals'
 import { isDeathTerrain } from './TerrainType'
+import { Natives } from '../../wc3_natives_unsecured/Natives'
 
 export class KillingTimers {
     private timers: timer[] = []
@@ -38,7 +39,7 @@ export class KillingTimers {
 
     start = (timerId: number, time: number) => {
         TimerStart(this.timers[timerId], time, false, () => {
-            const escaper = this.TerrainKillTimer2Escaper(GetExpiredTimer()!)
+            const escaper = this.TerrainKillTimer2Escaper(Natives.UGetExpiredTimer())
 
             if (!escaper) {
                 return

@@ -6,6 +6,7 @@ import { IsHero } from '../Escaper/Escaper_functions'
 import { Monster } from './Monster'
 import { NewPatrolMonster } from './Monster_functions'
 import { MonsterType } from './MonsterType'
+import { Natives } from '../../wc3_natives_unsecured/Natives'
 
 const NewRegion = (x: number, y: number): region => {
     let r = Rect(x - 16, y - 16, x + 16, y + 16)
@@ -18,12 +19,12 @@ const NewRegion = (x: number, y: number): region => {
 const MonsterMultiplePatrols_move_Actions = () => {
     let monster: Monster
     let MMP: MonsterMultiplePatrols
-    if (IsHero(GetTriggerUnit()!)) {
+    if (IsHero(Natives.UGetTriggerUnit())) {
         return
     }
-    monster = udg_monsters[GetUnitUserData(GetTriggerUnit()!)]
+    monster = udg_monsters[GetUnitUserData(Natives.UGetTriggerUnit())]
     if (monster instanceof MonsterMultiplePatrols) {
-        if (monster.getCurrentTrigger() == GetTriggeringTrigger()) {
+        if (monster.getCurrentTrigger() == Natives.UGetTriggeringTrigger()) {
             monster.nextMove()
         }
     }

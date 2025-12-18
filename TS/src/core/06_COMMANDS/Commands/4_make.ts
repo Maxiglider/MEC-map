@@ -44,7 +44,7 @@ import { ChangeOneTerrain } from '../../07_TRIGGERS/Triggers_to_modify_terrains/
 import { ExchangeTerrains } from '../../07_TRIGGERS/Triggers_to_modify_terrains/Exchange_terrains'
 import { RandomizeTerrains } from '../../07_TRIGGERS/Triggers_to_modify_terrains/Randomize_terrains'
 import { CmdParam } from '../Helpers/Command_functions'
-
+import { Natives } from '../../wc3_natives_unsecured/Natives'
 export const initExecuteCommandMake = () => {
     const { registerCommand } = ServiceManager.getService('Cmd')
 
@@ -3181,8 +3181,8 @@ export const initExecuteCommandMake = () => {
         group: 'make',
         argDescription: '<casterLabel> <animation>',
         description: 'Change the animation of a caster monster',
-        cb: ({ cmd, name, nbParam, param1 }, escaper) => {
-            if (!(nbParam >= 2)) {
+        cb: ({ nbParam, param1, param2 }, escaper) => {
+            if (nbParam < 2) {
                 return true
             }
             //checkParam 1
@@ -3190,11 +3190,8 @@ export const initExecuteCommandMake = () => {
                 Text.erP(escaper.getPlayer(), 'unknown caster type "' + param1 + '"')
                 return true
             }
-            //checkParam 2
-            const n = StringLength(name) + StringLength(param1) + 4
-            const str = SubStringBJ(cmd, n, StringLength(cmd)) ?? ''
             //apply command
-            getUdgCasterTypes().getByLabel(param1)?.setAnimation(str)
+            getUdgCasterTypes().getByLabel(param1)?.setAnimation(param2)
             Text.mkP(escaper.getPlayer(), 'caster animation changed')
             return true
         },
@@ -4010,24 +4007,21 @@ export const initExecuteCommandMake = () => {
 
                 for (let x = globals.MAP_MIN_X + gridUnitWidth; x < globals.MAP_MAX_X; x += gridUnitWidth) {
                     for (let y = globals.MAP_MIN_Y + gridUnitWidth; y < globals.MAP_MAX_Y; y += gridUnitWidth) {
-                        const gridUnit = CreateUnit(GetCurrentMonsterPlayer(), FourCC('hgrd'), x, y, 0)
+                        const gridUnit = Natives.UCreateUnit(GetCurrentMonsterPlayer(), FourCC('hgrd'), x, y, 0)
+                        SetUnitUseFood(gridUnit, false)
+                        UnitAddAbility(gridUnit, FourCC('Aloc'))
+                        UnitAddAbility(gridUnit, ABILITY_ANNULER_VISION)
+                        UnitRemoveType(gridUnit, UNIT_TYPE_PEON)
 
-                        if (gridUnit) {
-                            SetUnitUseFood(gridUnit, false)
-                            UnitAddAbility(gridUnit, FourCC('Aloc'))
-                            UnitAddAbility(gridUnit, ABILITY_ANNULER_VISION)
-                            UnitRemoveType(gridUnit, UNIT_TYPE_PEON)
-
-                            if (showGrid === '3') {
-                                SetUnitAnimation(gridUnit, 'Stand Upgrade Second')
-                            } else if (showGrid === '2') {
-                                SetUnitAnimation(gridUnit, 'Stand Upgrade First')
-                            } else {
-                                SetUnitAnimation(gridUnit, 'Stand')
-                            }
-
-                            arrayPush(gridUnits, gridUnit)
+                        if (showGrid === '3') {
+                            SetUnitAnimation(gridUnit, 'Stand Upgrade Second')
+                        } else if (showGrid === '2') {
+                            SetUnitAnimation(gridUnit, 'Stand Upgrade First')
+                        } else {
+                            SetUnitAnimation(gridUnit, 'Stand')
                         }
+
+                        arrayPush(gridUnits, gridUnit)
                     }
                 }
             }

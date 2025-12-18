@@ -13,6 +13,7 @@ import { getUdgLevels, getUdgTerrainTypes, globals } from '../../globals'
 import { MonsterSimplePatrol } from '../core/04_STRUCTURES/Monster/MonsterSimplePatrol'
 import { pathingBlockerUtils } from './PathingBlockerUtils'
 import { IPoint, createPoint } from './Point'
+import { Natives } from '../core/wc3_natives_unsecured/Natives'
 
 type Point = { x: number; y: number }
 type ITileMap = { [x: number]: { [y: number]: number } }
@@ -142,7 +143,7 @@ const initProgressionUtils = () => {
             levelMap[nx][ny] = levelIndex
 
             if (props?.debug === 'level') {
-                debugVariables.units.push(CreateUnit(Player(levelIndex)!, String2Ascii('hfoo'), nx, ny, 0)!)
+                debugVariables.units.push(Natives.UCreateUnit(Natives.UPlayer(levelIndex), String2Ascii('hfoo'), nx, ny, 0))
             }
         }
 
@@ -212,8 +213,8 @@ const initProgressionUtils = () => {
                         addLevelMapPoint(levelIndex, m2x, m2y)
 
                         if (props?.debug === 'bfs') {
-                            debugVariables.units.push(CreateUnit(Player(5)!, String2Ascii('hfoo'), m1x, m1y, 0)!)
-                            debugVariables.units.push(CreateUnit(Player(5)!, String2Ascii('hfoo'), m2x, m2y, 0)!)
+                            debugVariables.units.push(Natives.UCreateUnit(Natives.UPlayer(5), String2Ascii('hfoo'), m1x, m1y, 0))
+                            debugVariables.units.push(Natives.UCreateUnit(Natives.UPlayer(5), String2Ascii('hfoo'), m2x, m2y, 0))
                         }
                     }
                 }
@@ -240,8 +241,8 @@ const initProgressionUtils = () => {
                 addLevelMapPoint(levelIndex, m2x, m2y)
 
                 if (props?.debug === 'bfs') {
-                    debugVariables.units.push(CreateUnit(Player(5)!, String2Ascii('hfoo'), m1x, m1y, 0)!)
-                    debugVariables.units.push(CreateUnit(Player(5)!, String2Ascii('hfoo'), m2x, m2y, 0)!)
+                    debugVariables.units.push(Natives.UCreateUnit(Natives.UPlayer(5), String2Ascii('hfoo'), m1x, m1y, 0))
+                    debugVariables.units.push(Natives.UCreateUnit(Natives.UPlayer(5), String2Ascii('hfoo'), m2x, m2y, 0))
                 }
             }
         }
@@ -267,8 +268,8 @@ const initProgressionUtils = () => {
             visited[`${point.x}_${point.y}`] = true
 
             if (distanceMap && props?.debug === 'distance') {
-                const u = CreateUnit(Player(0)!, String2Ascii('hfoo'), point.x, point.y, 0)!
-                const t = CreateTextTagUnitBJ(udg_colorCode[playerId2colorId(0)] + `${0}`, u, -50, 8, 100, 100, 100, 0)!
+                const u = Natives.UCreateUnit(Natives.UPlayer(0), String2Ascii('hfoo'), point.x, point.y, 0)
+                const t = Natives.UCreateTextTagUnitBJ(udg_colorCode[playerId2colorId(0)] + `${0}`, u, -50, 8, 100, 100, 100, 0)
 
                 debugVariables.units.push(u)
                 debugVariables.textTags.push(t)
@@ -309,12 +310,12 @@ const initProgressionUtils = () => {
                             distanceMap[newPoint.x][newPoint.y] = newDistance
 
                             if (props?.debug === 'distance') {
-                                const u = CreateUnit(Player(0)!, String2Ascii('hfoo'), newPoint.x, newPoint.y, 0)!
+                                const u = Natives.UCreateUnit(Natives.UPlayer(0), String2Ascii('hfoo'), newPoint.x, newPoint.y, 0)
                                 debugVariables.units.push(u)
 
                                 // Amount of tags is limited
                                 if (debugVariables.units.length % 64 === 0) {
-                                    const t = CreateTextTagUnitBJ(
+                                    const t = Natives.UCreateTextTagUnitBJ(
                                         udg_colorCode[playerId2colorId(0)] + `${newDistance}`,
                                         u,
                                         -50,
@@ -323,7 +324,7 @@ const initProgressionUtils = () => {
                                         100,
                                         100,
                                         0
-                                    )!
+                                    )
 
                                     debugVariables.textTags.push(t)
                                 }
@@ -361,11 +362,11 @@ const initProgressionUtils = () => {
             const [_2, longestDistance] = BFS_far(farthestPoint, distanceMap, processedSegments)
 
             if (props?.debug === 'bfs') {
-                debugVariables.units.push(CreateUnit(Player(0)!, String2Ascii('hfoo'), segment[0].x, segment[0].y, 0)!)
+                debugVariables.units.push(Natives.UCreateUnit(Natives.UPlayer(0), String2Ascii('hfoo'), segment[0].x, segment[0].y, 0))
                 debugVariables.units.push(
-                    CreateUnit(Player(1)!, String2Ascii('hfoo'), farthestPoint.x, farthestPoint.y, 0)!
+                    Natives.UCreateUnit(Natives.UPlayer(1), String2Ascii('hfoo'), farthestPoint.x, farthestPoint.y, 0)
                 )
-                debugVariables.units.push(CreateUnit(Player(2)!, String2Ascii('hfoo'), _2.x, _2.y, 0)!)
+                debugVariables.units.push(Natives.UCreateUnit(Natives.UPlayer(2), String2Ascii('hfoo'), _2.x, _2.y, 0))
             }
 
             const mergedSegment = MemoryHandler.getEmptyArray<Point>()
@@ -417,12 +418,12 @@ const initProgressionUtils = () => {
                     }
 
                     if (props?.debug === 'segment') {
-                        const u = CreateUnit(Player(foundLevelIndex)!, String2Ascii('hfoo'), tile.x, tile.y, 0)!
+                        const u = Natives.UCreateUnit(Natives.UPlayer(foundLevelIndex), String2Ascii('hfoo'), tile.x, tile.y, 0)
                         debugVariables.units.push(u)
 
                         // Amount of tags is limited
                         if (debugVariables.units.length % 64 === 0) {
-                            const t = CreateTextTagUnitBJ(
+                            const t = Natives.UCreateTextTagUnitBJ(
                                 udg_colorCode[playerId2colorId(0)] + `${progression}`,
                                 u,
                                 -50,
@@ -431,7 +432,7 @@ const initProgressionUtils = () => {
                                 100,
                                 100,
                                 0
-                            )!
+                            )
 
                             debugVariables.textTags.push(t)
                         }

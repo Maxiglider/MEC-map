@@ -23,6 +23,7 @@ import { Level } from './Level'
 import { sameLevelProgression } from './LevelProgression'
 import { IsLevelBeingMade } from './Level_functions'
 import type { VisibilityModifierArray } from './VisibilityModifierArray'
+import { Natives } from '../../wc3_natives_unsecured/Natives'
 
 const MIN_TIME_BETWEEN_GOTNL = 0.05
 
@@ -78,7 +79,7 @@ export class LevelArray extends BaseArray<Level> {
         let j = 0
 
         for (let i = 0; i < Constants.NB_PLAYERS_MAX; i++) {
-            const p = Player(i)!
+            const p = Natives.UPlayer(i)
 
             if (
                 this.levelProgressionState[i] === lvlId &&

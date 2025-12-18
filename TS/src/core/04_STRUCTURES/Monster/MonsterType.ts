@@ -6,6 +6,7 @@ import { Ascii2String } from '../../01_libraries/Ascii'
 import { udg_colorCode } from '../../01_libraries/Init_colorCodes'
 import { Level } from '../Level/Level'
 import { IMMOLATION_SKILLS } from './Immolation_skills'
+import { Natives } from '../../wc3_natives_unsecured/Natives'
 
 export class MonsterType {
     label: string
@@ -41,7 +42,7 @@ export class MonsterType {
             throw `${this.constructor.name} - '${label}' - '${unitTypeId}' - wrong immolation radius - '${immolationRadius}'`
         }
 
-        const testMonster = CreateUnit(Constants.NEUTRAL_PLAYER, unitTypeId, 0, 0, 0)
+        const testMonster = Natives.UCreateUnit(Constants.NEUTRAL_PLAYER, unitTypeId, 0, 0, 0)
         if (!testMonster) {
             throw `Unit type unknown: ${label}`
         } else {
@@ -112,7 +113,7 @@ export class MonsterType {
     }
 
     setUnitTypeId = (unitTypeId: number): boolean => {
-        let testMonster = CreateUnit(Constants.NEUTRAL_PLAYER, unitTypeId, 0, 0, 0)
+        let testMonster = Natives.UCreateUnit(Constants.NEUTRAL_PLAYER, unitTypeId, 0, 0, 0)
         if (!testMonster) {
             return false
         }

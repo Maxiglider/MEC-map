@@ -1,6 +1,7 @@
 import { Text } from 'core/01_libraries/Text'
 import { Make, MAKE_LAST_CLIC_UNIT_ID } from 'core/05_MAKE_STRUCTURES/Make/Make'
 import { MakeTerrainCopyPasteAction } from '../MakeLastActions/MakeTerrainCopyPasteAction'
+import { Natives } from '../../wc3_natives_unsecured/Natives'
 
 export class MakeTerrainCopyPaste extends Make {
     x1: number = 0
@@ -40,7 +41,7 @@ export class MakeTerrainCopyPaste extends Make {
 
     private createUnitClic = (u: unit | undefined, x: number, y: number): unit => {
         if (!u) {
-            u = CreateUnit(this.makerOwner, MAKE_LAST_CLIC_UNIT_ID, x, y, GetRandomDirectionDeg())!
+            u = Natives.UCreateUnit(this.makerOwner, MAKE_LAST_CLIC_UNIT_ID, x, y, GetRandomDirectionDeg())
         } else {
             SetUnitX(u, x)
             SetUnitY(u, y)

@@ -2,14 +2,12 @@ import { IsIssuedOrder, StopUnit } from 'core/01_libraries/Basic_functions'
 import { Hero2Escaper } from 'core/04_STRUCTURES/Escaper/Escaper_functions'
 import { createEvent } from '../../../Utils/mapUtils'
 import { Escaper } from '../../04_STRUCTURES/Escaper/Escaper'
-import { getUdgEscapers } from '../../../../globals'
+import { Natives } from '../../wc3_natives_unsecured/Natives'
 
 export const MAKE_LAST_CLIC_UNIT_ID = FourCC('e001') //à remplacer par l'id de l'unité choisie (need couleur variable)
-export const MAKE_CANT_CANCEL_MORE = 'Nothing else to cancel !'
-export const MAKE_CANT_REDO_MORE = 'Nothing else to redo !'
 
 const TriggerActions = () => {
-    Hero2Escaper(GetTriggerUnit()!)?.getMake()?.doActions()
+    Hero2Escaper(Natives.UGetTriggerUnit())?.getMake()?.doActions()
 }
 
 export abstract class Make {
@@ -28,7 +26,7 @@ export abstract class Make {
 
         if (maker) {
             escaper = Hero2Escaper(maker)
-            this.makerOwner = GetOwningPlayer(maker)!
+            this.makerOwner = GetOwningPlayer(maker)
         }
 
         if (!escaper) {
@@ -52,7 +50,7 @@ export abstract class Make {
 
     doBaseActions() {
         const targetWidget = GetOrderTarget()
-        if (targetWidget) {
+        if (!!targetWidget) {
             this.orderX = GetWidgetX(targetWidget)
             this.orderY = GetWidgetX(targetWidget)
         } else {

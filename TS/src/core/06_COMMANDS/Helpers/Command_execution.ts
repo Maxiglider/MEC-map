@@ -13,6 +13,7 @@ import { CmdName, CmdParam, IsCmd, NbParam, NoParam } from './Command_functions'
 import { initExecuteCommandMake } from '../Commands/4_make'
 import { initExecuteCommandTrueMax } from '../Commands/6_superadmin'
 import { handlePagination, handlePaginationArgs } from './Pagination'
+import { Natives } from '../../wc3_natives_unsecured/Natives'
 
 export type ICommandExecution = ReturnType<typeof initCommandExecution>
 
@@ -91,7 +92,7 @@ export const initCommandExecution = () => {
             }
 
             case 'red': {
-                if (!((escaper.getPlayer() === Player(0) && Globals.udg_areRedRightsOn) || escaper.canCheat())) {
+                if (!((escaper.getPlayer() === Natives.UPlayer(0) && Globals.udg_areRedRightsOn) || escaper.canCheat())) {
                     return false
                 }
             }
@@ -205,7 +206,7 @@ export const initCommandExecution = () => {
 
         //ex : "-(abc def)" --> "-abc def"
         if (SubStringBJ(cmd, 2, 2) === '(' && SubStringBJ(cmd, StringLength(cmd), StringLength(cmd)) === ')') {
-            cmd = SubStringBJ(cmd, 1, 1)! + SubStringBJ(cmd, 3, StringLength(cmd) - 1)!
+            cmd = (SubStringBJ(cmd, 1, 1) ?? '') + SubStringBJ(cmd, 3, StringLength(cmd) - 1)
         }
 
         // Add to command history
@@ -217,7 +218,7 @@ export const initCommandExecution = () => {
         prevChar = ''
         while (true) {
             if (charId > StringLength(cmd)) break
-            char = SubStringBJ(cmd, charId, charId)!
+            char = SubStringBJ(cmd, charId, charId) ?? ''
             if (char === ',' && prevChar !== '\\') {
                 if (nbParenthesesNonFermees <= 0) {
                     singleCommandId = singleCommandId + 1
@@ -262,21 +263,21 @@ export const initCommandExecution = () => {
 
     createEvent({
         events: [
-            t => forRange(Constants.NB_PLAYERS_MAX, i => TriggerRegisterPlayerChatEvent(t, Player(i)!, '-', false)),
+            t => forRange(Constants.NB_PLAYERS_MAX, i => TriggerRegisterPlayerChatEvent(t, Natives.UPlayer(i), '-', false)),
         ],
         actions: [
             () => {
-                if (!IsCmd(GetEventPlayerChatString()!)) {
+                if (!IsCmd(Natives.UGetEventPlayerChatString())) {
                     return
                 }
 
-                const escaper = getUdgEscapers().get(GetPlayerId(GetTriggerPlayer()!))
+                const escaper = getUdgEscapers().get(GetPlayerId(Natives.UGetTriggerPlayer()))
 
                 if (!escaper) {
                     return
                 }
 
-                ExecuteCommand(escaper, GetEventPlayerChatString()!)
+                ExecuteCommand(escaper, Natives.UGetEventPlayerChatString())
             },
         ],
     })
@@ -356,13 +357,13 @@ export const initCommandExecution = () => {
                 )
 
                 Text.P(
-                    GetTriggerPlayer()!,
+                    Natives.UGetTriggerPlayer(),
                     `|cff00ff00Commands (page |cff00ccff${pageNum}|r|cff00ff00/|cff00ccff${displayableCmds.totalPages}|r|cff00ff00)|r`
                 )
 
                 for (const cmd of displayableCmds.cmds) {
                     const line = cmd
-                    Text.P(GetTriggerPlayer()!, line)
+                    Text.P(Natives.UGetTriggerPlayer(), line)
                 }
 
                 return true

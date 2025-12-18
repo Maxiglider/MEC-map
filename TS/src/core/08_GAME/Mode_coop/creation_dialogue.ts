@@ -3,6 +3,7 @@ import { createEvent, createTimer } from 'Utils/mapUtils'
 import { Constants } from 'core/01_libraries/Constants'
 import { hooks } from 'core/API/GeneralHooks'
 import { globals } from '../../../../globals'
+import { Natives } from '../../wc3_natives_unsecured/Natives'
 
 let dialChoixModeCoop: dialog
 let dialBoutonAppuye: boolean
@@ -11,7 +12,7 @@ let dialTimerTempLimite: timer
 
 export const InitTrig_creation_dialogue = () => {
     createTimer(0, false, () => {
-        dialChoixModeCoop = DialogCreate()!
+        dialChoixModeCoop = Natives.UDialogCreate()
         dialTimerTempLimite = CreateTimer()
         DialogSetMessageBJ(dialChoixModeCoop, 'Choose a game mode for everybody')
         const btnChoixCoop = DialogAddButton(dialChoixModeCoop, 'Coop (you can revive allies)', 0)
@@ -24,9 +25,9 @@ export const InitTrig_creation_dialogue = () => {
                     globals.coopModeActive = GetClickedButton() === btnChoixCoop
                     dialBoutonAppuye = true
                     if (globals.coopModeActive) {
-                        DisplayTextToForce(GetPlayersAll()!, 'Coop mode chosen by first player')
+                        DisplayTextToForce(Natives.UGetPlayersAll(), 'Coop mode chosen by first player')
                     } else {
-                        DisplayTextToForce(GetPlayersAll()!, 'Solo mode chosen by first player')
+                        DisplayTextToForce(Natives.UGetPlayersAll(), 'Solo mode chosen by first player')
                     }
 
                     if (!!hooks.hooks_onModeSelection) {
@@ -50,8 +51,8 @@ export const gg_trg_apparition_dialogue_et_fermeture_automatique = createEvent({
             let i = 0
             while (true) {
                 if (
-                    (GetPlayerController(Player(i)!) === MAP_CONTROL_USER &&
-                        GetPlayerSlotState(Player(i)!) === PLAYER_SLOT_STATE_PLAYING) ||
+                    (GetPlayerController(Natives.UPlayer(i)) === MAP_CONTROL_USER &&
+                        GetPlayerSlotState(Natives.UPlayer(i)) === PLAYER_SLOT_STATE_PLAYING) ||
                     i > Constants.NB_PLAYERS_MAX - 1
                 )
                     break
@@ -60,16 +61,16 @@ export const gg_trg_apparition_dialogue_et_fermeture_automatique = createEvent({
             if (i > Constants.NB_PLAYERS_MAX - 1) {
                 return
             }
-            const udg_joueurDialogue = Player(i)!
+            const udg_joueurDialogue = Natives.UPlayer(i)
             DialogDisplay(udg_joueurDialogue, dialChoixModeCoop, true)
             dialBoutonAppuye = false
             TimerStart(dialTimerTempLimite, DIAL_TIME_TO_ANSWER, false, () => {
                 if (!dialBoutonAppuye) {
                     DialogDisplay(udg_joueurDialogue, dialChoixModeCoop, false)
                     if (globals.coopModeActive) {
-                        DisplayTextToForce(GetPlayersAll()!, 'Coop mode automatically chosen')
+                        DisplayTextToForce(Natives.UGetPlayersAll(), 'Coop mode automatically chosen')
                     } else {
-                        DisplayTextToForce(GetPlayersAll()!, 'Solo mode automatically chosen')
+                        DisplayTextToForce(Natives.UGetPlayersAll(), 'Solo mode automatically chosen')
                     }
 
                     if (!!hooks.hooks_onModeSelection) {

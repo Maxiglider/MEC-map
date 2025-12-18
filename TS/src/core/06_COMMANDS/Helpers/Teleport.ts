@@ -1,6 +1,7 @@
 import { IsIssuedOrder, StopUnit } from '../../01_libraries/Basic_functions'
 import { getUdgEscapers } from '../../../../globals'
 import { errorHandler } from '../../../Utils/mapUtils'
+import { Natives } from '../../wc3_natives_unsecured/Natives'
 
 let teleTriggers: trigger[] = []
 let onceOnly: boolean[] = []
@@ -18,22 +19,20 @@ export const ActivateTeleport = (hero: unit, onceOnlyB: boolean) => {
                 return
             }
 
-            let hero: unit | null = GetTriggerUnit() ?? null
+            let hero: unit | null = Natives.UGetTriggerUnit()
 
-            if (hero) {
-                if (!IsIssuedOrder('smart')) {
-                    return
-                }
-
-                StopUnit(hero)
-                escaper.moveHero(GetOrderPointX(), GetOrderPointY())
-
-                if (onceOnly[GetUnitUserData(hero)]) {
-                    DestroyTrigger(GetTriggeringTrigger()!)
-                }
-
-                hero = null
+            if (!IsIssuedOrder('smart')) {
+                return
             }
+
+            StopUnit(hero)
+            escaper.moveHero(GetOrderPointX(), GetOrderPointY())
+
+            if (onceOnly[GetUnitUserData(hero)]) {
+                DestroyTrigger(Natives.UGetTriggeringTrigger())
+            }
+
+            hero = null
         })
     )
     TriggerRegisterUnitEvent(teleTriggers[escaperId], hero, EVENT_UNIT_ISSUED_POINT_ORDER)

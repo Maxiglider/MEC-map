@@ -26,6 +26,7 @@ import { MEC_core_API } from '../../API/MEC_core_API'
 import { flushLogs } from '../../Log/log'
 import { CmdParam, isPlayerId, resolvePlayerId } from '../Helpers/Command_functions'
 import { ActivateTeleport, DisableTeleport } from '../Helpers/Teleport'
+import { Natives } from '../../wc3_natives_unsecured/Natives'
 
 export const initExecuteCommandMax = () => {
     const { registerCommand } = ServiceManager.getService('Cmd')
@@ -616,7 +617,7 @@ export const initExecuteCommandMax = () => {
             Text.A('Loading map from cache...')
             SaveLoad.readFile(
                 noParam ? SaveMapInCache.lastSaveFile : `MEC/mec-smic-data-custom_${param1}.txt`,
-                GetTriggerPlayer()!,
+                Natives.UGetTriggerPlayer(),
                 data => {
                     const gameData = (jsonDecode(data) as any).gameData
 

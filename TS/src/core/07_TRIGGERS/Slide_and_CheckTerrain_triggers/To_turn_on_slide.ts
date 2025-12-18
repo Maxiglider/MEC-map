@@ -20,6 +20,7 @@ import { Apm } from 'core/08_GAME/Apm_clics_par_minute/Apm'
 import { udg_symmetryAngle } from 'core/Double_heroes/double_heroes_config'
 import { globals } from '../../../../globals'
 import { AutoContinueAfterSliding } from './Auto_continue_after_sliding'
+import { Natives } from '../../wc3_natives_unsecured/Natives'
 
 const initTurnOnSlide = () => {
     //turn variables
@@ -160,14 +161,14 @@ const initTurnOnSlide = () => {
     }
 
     const HandleTurn = (triggerIsToLocation: boolean) => {
-        const escaper = Hero2Escaper(GetTriggerUnit()!)
+        const escaper = Hero2Escaper(Natives.UGetTriggerUnit())
 
         if (!escaper) {
             return
         }
 
         //init variables
-        slider = GetTriggerUnit()!
+        slider = Natives.UGetTriggerUnit()
         n = GetUnitUserData(slider)
         sliderX = GetUnitX(slider)
         sliderY = GetUnitY(slider)
@@ -176,7 +177,7 @@ const initTurnOnSlide = () => {
             orderX = GetOrderPointX()
             orderY = GetOrderPointY()
         } else {
-            orderWidget = GetOrderTarget()!
+            orderWidget = Natives.UGetOrderTarget()
             orderX = GetWidgetX(orderWidget)
             orderY = GetWidgetY(orderWidget)
         }
@@ -204,8 +205,8 @@ const initTurnOnSlide = () => {
             events: [t => TriggerRegisterAnyUnitEventBJ(t, EVENT_PLAYER_UNIT_ISSUED_POINT_ORDER)],
             conditions: [
                 () => {
-                    const escaper = Hero2Escaper(GetTriggerUnit()!)
-                    return IsHero(GetTriggerUnit()!) && !!escaper?.isSliding() && !IsLastOrderPause()
+                    const escaper = Hero2Escaper(Natives.UGetTriggerUnit())
+                    return IsHero(Natives.UGetTriggerUnit()) && !!escaper?.isSliding() && !IsLastOrderPause()
                 },
             ],
             actions: [() => HandleTurn(true)],
@@ -216,8 +217,8 @@ const initTurnOnSlide = () => {
             events: [t => TriggerRegisterAnyUnitEventBJ(t, EVENT_PLAYER_UNIT_ISSUED_TARGET_ORDER)],
             conditions: [
                 () => {
-                    const escaper = Hero2Escaper(GetTriggerUnit()!)
-                    return IsHero(GetTriggerUnit()!) && !!escaper?.isSliding()
+                    const escaper = Hero2Escaper(Natives.UGetTriggerUnit())
+                    return IsHero(Natives.UGetTriggerUnit()) && !!escaper?.isSliding()
                 },
             ],
             actions: [() => HandleTurn(false)],

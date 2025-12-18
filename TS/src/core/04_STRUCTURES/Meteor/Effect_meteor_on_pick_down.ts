@@ -1,6 +1,7 @@
 import { createEvent } from 'Utils/mapUtils'
 import { Hero2Escaper, IsHero } from '../Escaper/Escaper_functions'
 import { METEOR_CHEAT, METEOR_NORMAL } from './Meteor'
+import { Natives } from '../../wc3_natives_unsecured/Natives'
 
 export const InitTrig_Effect_meteor_on_pick_down = () => {
     createEvent({
@@ -9,15 +10,15 @@ export const InitTrig_Effect_meteor_on_pick_down = () => {
             () => {
                 if (
                     !(
-                        IsHero(GetTriggerUnit()!) &&
-                        (GetItemTypeId(GetManipulatedItem()!) === METEOR_NORMAL ||
-                            GetItemTypeId(GetManipulatedItem()!) === METEOR_CHEAT)
+                        IsHero(Natives.UGetTriggerUnit()) &&
+                        (GetItemTypeId(Natives.UGetManipulatedItem()) === METEOR_NORMAL ||
+                            GetItemTypeId(Natives.UGetManipulatedItem()) === METEOR_CHEAT)
                     )
                 ) {
                     return
                 }
 
-                Hero2Escaper(GetTriggerUnit()!)?.removeEffectMeteor()
+                Hero2Escaper(Natives.UGetTriggerUnit())?.removeEffectMeteor()
             },
         ],
     })

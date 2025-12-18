@@ -4,6 +4,7 @@ import { getUdgTerrainTypes, globals, udg_monsters } from '../../../../globals'
 import { Monster } from './Monster'
 import { MonsterType } from './MonsterType'
 import { NewImmobileMonster } from './Monster_functions'
+import { Natives } from '../../wc3_natives_unsecured/Natives'
 
 export class MonsterNoMove extends Monster {
     x: number
@@ -94,7 +95,7 @@ export class MonsterNoMove extends Monster {
                     }
 
                     if (this.wanderEffect) DestroyEffect(this.wanderEffect)
-                    this.wanderEffect = AddSpecialEffectTargetUnitBJ('overhead', targetUnit, globals.wanderEffectStr)!
+                    this.wanderEffect = Natives.UAddSpecialEffectTargetUnitBJ('overhead', targetUnit, globals.wanderEffectStr)
 
                     this.wanderTimer = new Timer().start(Math.random() * 1.5 + 0.5, false, () => {
                         let targetPoint = region.getRandomPoint()

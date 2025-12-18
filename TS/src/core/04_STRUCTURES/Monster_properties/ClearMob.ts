@@ -4,6 +4,7 @@ import { arrayPush } from 'core/01_libraries/Basic_functions'
 import { Level } from '../Level/Level'
 import { Monster } from '../Monster/Monster'
 import { MonsterArray } from '../Monster/MonsterArray'
+import { Natives } from '../../wc3_natives_unsecured/Natives'
 
 export const CLEAR_MOB_MAX_DURATION = 300
 export const FRONT_MONTANT_DURATION = 0.03
@@ -16,17 +17,17 @@ let udp_currentTimer: timer
 const TRIGGER_MOB_PERMANENT_EFFECT = 'Abilities\\Spells\\Orc\\StasisTrap\\StasisTotemTarget.mdl'
 
 const ClearMobTimerExpires = () => {
-    const clearMob = ClearMob.anyTimerActivatedId2ClearMob.get(GetHandleId(GetExpiredTimer()!))
+    const clearMob = ClearMob.anyTimerActivatedId2ClearMob.get(GetHandleId(Natives.UGetExpiredTimer()))
 
     if (clearMob) {
         clearMob.initialize() //réinitialise la couleur du trigger mob
-        udp_currentTimer = GetExpiredTimer()!
+        udp_currentTimer = Natives.UGetExpiredTimer()
         clearMob.getBlockMobs().forAll(TemporarilyEnableMonster)
     }
 }
 
 const ClearMobFrontMontantTimerExpires = () => {
-    const clearMob = ClearMob.anyTimerFrontMontantId2ClearMob.get(GetHandleId(GetExpiredTimer()!))
+    const clearMob = ClearMob.anyTimerFrontMontantId2ClearMob.get(GetHandleId(Natives.UGetExpiredTimer()))
 
     if (clearMob) {
         if (clearMob.isBeingActivated()) {

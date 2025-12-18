@@ -152,7 +152,7 @@ export const init_Heroes = () => {
                 //create heroes
                 for (let i = 0; i < Constants.NB_ESCAPERS; i++) {
                     if (!getUdgEscapers().get(i)?.getHero()) {
-                        if (GetPlayerId(GetLocalPlayer()!) === i) {
+                        if (GetPlayerId(GetLocalPlayer()) === i) {
                             ClearSelection()
                         }
                     }

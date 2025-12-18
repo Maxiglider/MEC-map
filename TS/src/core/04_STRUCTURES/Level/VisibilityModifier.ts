@@ -1,6 +1,7 @@
 import { MemoryHandler } from 'Utils/MemoryHandler'
 import { RefreshHideAllVM } from '../../03_view_all_hide_all/View_all_hide_all'
 import { Level } from './Level'
+import { Natives } from '../../wc3_natives_unsecured/Natives'
 
 export class VisibilityModifier {
     private isActive = false
@@ -20,7 +21,7 @@ export class VisibilityModifier {
         this.y1 = y1
         this.x2 = x2
         this.y2 = y2
-        this.fm = CreateFogModifierRect(Player(0)!, FOG_OF_WAR_VISIBLE, visionRect, true, false)!
+        this.fm = Natives.UCreateFogModifierRect(Natives.UPlayer(0), FOG_OF_WAR_VISIBLE, visionRect, true, false)
 
         RemoveRect(visionRect)
         RefreshHideAllVM()

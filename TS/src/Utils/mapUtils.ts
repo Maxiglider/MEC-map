@@ -14,7 +14,7 @@ export const createEvent = ({
     events.forEach(event => event(t))
 
     if (conditions) {
-        conditions.forEach(condition => TriggerAddCondition(t, Condition(condition)!))
+        conditions.forEach(condition => TriggerAddCondition(t, Condition(condition)))
     }
 
     actions.forEach(action => TriggerAddAction(t, errorHandler(action)))

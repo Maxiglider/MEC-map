@@ -7,6 +7,7 @@ import { udg_colorCode } from '../../01_libraries/Init_colorCodes'
 import { Text } from '../../01_libraries/Text'
 import { Hero2Escaper } from '../Escaper/Escaper_functions'
 import { Level } from '../Level/Level'
+import { Natives } from '../../wc3_natives_unsecured/Natives'
 
 export class Region {
     private static lastInstanceId = -1
@@ -104,7 +105,7 @@ export class Region {
                     events: [t => this.wRect && TriggerRegisterEnterRectSimple(t, this.wRect)],
                     actions: [
                         () => {
-                            const escaper = Hero2Escaper(GetTriggerUnit()!)
+                            const escaper = Hero2Escaper(Natives.UGetTriggerUnit())
 
                             if (escaper) {
                                 if (!!hooks.hooks_onHeroEnterRegion) {

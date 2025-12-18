@@ -5,6 +5,7 @@ import { getUdgEscapers } from '../../../../globals'
 import { Hero2Escaper, IsHero } from '../Escaper/Escaper_functions'
 import { createDiagonalRegions } from '../MonsterSpawn/MonsterSpawn'
 import { Level } from './Level'
+import { Natives } from '../../wc3_natives_unsecured/Natives'
 
 export class StaticSlide {
     private x1: number
@@ -109,32 +110,29 @@ export class StaticSlide {
                     ],
                     actions: [
                         () => {
-                            const hero = GetTriggerUnit()
+                            const hero = Natives.UGetTriggerUnit()
+                            const escaper = Hero2Escaper(hero)
 
-                            if (hero) {
-                                const escaper = Hero2Escaper(hero)
+                            if (
+                                IsHero(hero) &&
+                                escaper &&
+                                escaper.isSliding() &&
+                                !escaper.isStaticSliding() &&
+                                !this.slidingPlayers.includes(escaper.getEscaperId())
+                            ) {
+                                arrayPush(this.slidingPlayers, escaper.getEscaperId())
+                                escaper.setStaticSliding(this)
 
-                                if (
-                                    IsHero(hero) &&
-                                    escaper &&
-                                    escaper.isSliding() &&
-                                    !escaper.isStaticSliding() &&
-                                    !this.slidingPlayers.includes(escaper.getEscaperId())
-                                ) {
-                                    arrayPush(this.slidingPlayers, escaper.getEscaperId())
-                                    escaper.setStaticSliding(this)
-
-                                    if (this.canTurnAngle) {
-                                        const currentAngle = GetUnitFacing(hero)
-                                        escaper.setRemainingDegreesToTurn(AnglesDiff(this.angle, currentAngle))
-                                    } else {
-                                        escaper.setRemainingDegreesToTurn(0)
-                                        escaper.turnInstantly(this.angle)
-                                    }
-
-                                    this.slidingPlayerPrevSpeed[escaper.getEscaperId()] = escaper.getSlideSpeed()
-                                    escaper.setSlideSpeed(this.speed)
+                                if (this.canTurnAngle) {
+                                    const currentAngle = GetUnitFacing(hero)
+                                    escaper.setRemainingDegreesToTurn(AnglesDiff(this.angle, currentAngle))
+                                } else {
+                                    escaper.setRemainingDegreesToTurn(0)
+                                    escaper.turnInstantly(this.angle)
                                 }
+
+                                this.slidingPlayerPrevSpeed[escaper.getEscaperId()] = escaper.getSlideSpeed()
+                                escaper.setSlideSpeed(this.speed)
                             }
                         },
                     ],
@@ -171,8 +169,8 @@ export class StaticSlide {
                     ],
                     actions: [
                         () => {
-                            const hero = GetTriggerUnit()
-                            hero && this.removePlayer(Hero2Escaper(hero)?.getEscaperId() || -1)
+                            const hero = Natives.UGetTriggerUnit()
+                            this.removePlayer(Hero2Escaper(hero)?.getEscaperId() || -1)
                         },
                     ],
                 })

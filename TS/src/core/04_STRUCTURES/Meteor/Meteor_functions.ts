@@ -1,10 +1,14 @@
 import { StopUnit } from 'core/01_libraries/Basic_functions'
 import { getUdgTerrainTypes } from '../../../../globals'
 import { METEOR_CHEAT, METEOR_NORMAL } from './Meteor'
+import { Natives } from '../../wc3_natives_unsecured/Natives'
 
 const initMeteorFunctions = () => {
     const HeroAddCheatMeteor = (hero: unit) => {
-        const meteor = UnitAddItemById(hero, METEOR_CHEAT)!
+        const meteor = UnitAddItemById(hero, METEOR_CHEAT)
+        if(!meteor){
+            throw new Error('HeroAddCheatMeteor: Failed to add meteor item to hero')
+        }
 
         if (getUdgTerrainTypes().getTerrainType(GetUnitX(hero), GetUnitY(hero))?.getKind() == 'slide') {
             SetItemDroppable(meteor, false)
@@ -14,23 +18,27 @@ const initMeteorFunctions = () => {
     }
 
     const HeroComingToSlide_CheckItem = (hero: unit) => {
-        const meteor = UnitItemInSlot(hero, 0)!
+        const meteor = UnitItemInSlot(hero, 0)
 
-        if (meteor !== null) {
+        if (meteor !== undefined) {
             SetItemDroppable(meteor, false)
         }
     }
 
     const HeroComingOutFromSlide_CheckItem = (hero: unit) => {
-        const meteor = UnitItemInSlot(hero, 0)!
+        const meteor = UnitItemInSlot(hero, 0)
 
-        if (meteor !== null) {
+        if (meteor !== undefined) {
             SetItemDroppable(meteor, true)
         }
     }
 
     const ExecuteRightClicOnUnit = (hero: unit, u: unit) => {
-        let itemCarried = UnitItemInSlot(hero, 0)!
+        let itemCarried = UnitItemInSlot(hero, 0)
+        if(!itemCarried){
+            return
+        }
+
         let itemCarriedType = GetItemTypeId(itemCarried)
 
         if ((itemCarriedType == METEOR_NORMAL || itemCarriedType == METEOR_CHEAT) && GetWidgetLife(u) > 0) {
