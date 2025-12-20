@@ -100,7 +100,7 @@ export class TerrainTypeArray extends BaseArray<TerrainType> {
 
         const tt = new TerrainTypeWalk(label, terrainTypeId, walkspeed)
         this._new(tt)
-        // ServiceManager.getService('React').forceUpdate()
+        ServiceManager.getService('React').forceUpdate()
         return tt
     }
 
@@ -117,7 +117,7 @@ export class TerrainTypeArray extends BaseArray<TerrainType> {
 
         const tt = new TerrainTypeDeath(label, terrainTypeId, killingEffectStr, timeToKill, toleranceDist)
         this._new(tt)
-        // ServiceManager.getService('React').forceUpdate()
+        ServiceManager.getService('React').forceUpdate()
         return tt
     }
 
@@ -134,7 +134,7 @@ export class TerrainTypeArray extends BaseArray<TerrainType> {
 
         const tt = new TerrainTypeSlide(label, terrainTypeId, slideSpeed, canTurn, rotationSpeed)
         this._new(tt)
-        // ServiceManager.getService('React').forceUpdate()
+        ServiceManager.getService('React').forceUpdate()
         return tt
     }
 
@@ -143,7 +143,7 @@ export class TerrainTypeArray extends BaseArray<TerrainType> {
             if (terrainType.label === label || terrainType.theAlias === label) {
                 this.data[terrainTypeId].destroy()
                 delete this.data[terrainTypeId]
-                // ServiceManager.getService('React').forceUpdate()
+                ServiceManager.getService('React').forceUpdate()
             }
         }
 

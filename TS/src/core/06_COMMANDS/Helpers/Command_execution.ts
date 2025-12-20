@@ -1,19 +1,19 @@
+import { getUdgEscapers } from '../../../../globals'
 import { MemoryHandler } from '../../../Utils/MemoryHandler'
 import { createEvent, forRange } from '../../../Utils/mapUtils'
+import { Constants } from '../../01_libraries/Constants'
 import { Text } from '../../01_libraries/Text'
 import { Escaper } from '../../04_STRUCTURES/Escaper/Escaper'
 import { Globals } from '../../09_From_old_Worldedit_triggers/globals_variables_and_triggers'
-import { getUdgEscapers } from '../../../../globals'
-import { Constants } from '../../01_libraries/Constants'
-import { initExecuteCommandMax } from '../Commands/5_admin'
-import { initCommandAll } from '../Commands/1_all'
-import { initExecuteCommandCheat } from '../Commands/3_cheat'
-import { initExecuteCommandRed } from '../Commands/2_first_player'
-import { CmdName, CmdParam, IsCmd, NbParam, NoParam } from './Command_functions'
-import { initExecuteCommandMake } from '../Commands/4_make'
-import { initExecuteCommandTrueMax } from '../Commands/6_superadmin'
-import { handlePagination, handlePaginationArgs } from './Pagination'
 import { Natives } from '../../wc3_natives_unsecured/Natives'
+import { initCommandAll } from '../Commands/1_all'
+import { initExecuteCommandRed } from '../Commands/2_first_player'
+import { initExecuteCommandCheat } from '../Commands/3_cheat'
+import { initExecuteCommandMake } from '../Commands/4_make'
+import { initExecuteCommandMax } from '../Commands/5_admin'
+import { initExecuteCommandTrueMax } from '../Commands/6_superadmin'
+import { CmdName, CmdParam, IsCmd, NbParam, NoParam } from './Command_functions'
+import { handlePagination, handlePaginationArgs } from './Pagination'
 
 export type ICommandExecution = ReturnType<typeof initCommandExecution>
 
@@ -56,13 +56,13 @@ const parseCmdContext = (cmd: string) => {
 
 export const initCommandExecution = () => {
     const commands: ICommand[] = []
-    let addCommandToHistoryCallback: ((this: void, command: string, playerId: number) => void) | null = null
+    let addCommandToHistoryCallback: ((command: string, playerId: number) => void) | null = null
 
     const registerCommand = (cmd: ICommand) => {
         commands.push(cmd)
     }
 
-    const setAddCommandToHistory = (cb: (this: void, command: string, playerId: number) => void) => {
+    const setAddCommandToHistory = (cb: (command: string, playerId: number) => void) => {
         addCommandToHistoryCallback = cb
     }
 
@@ -92,7 +92,9 @@ export const initCommandExecution = () => {
             }
 
             case 'red': {
-                if (!((escaper.getPlayer() === Natives.UPlayer(0) && Globals.udg_areRedRightsOn) || escaper.canCheat())) {
+                if (
+                    !((escaper.getPlayer() === Natives.UPlayer(0) && Globals.udg_areRedRightsOn) || escaper.canCheat())
+                ) {
                     return false
                 }
             }
@@ -263,7 +265,10 @@ export const initCommandExecution = () => {
 
     createEvent({
         events: [
-            t => forRange(Constants.NB_PLAYERS_MAX, i => TriggerRegisterPlayerChatEvent(t, Natives.UPlayer(i), '-', false)),
+            t =>
+                forRange(Constants.NB_PLAYERS_MAX, i =>
+                    TriggerRegisterPlayerChatEvent(t, Natives.UPlayer(i), '-', false)
+                ),
         ],
         actions: [
             () => {
