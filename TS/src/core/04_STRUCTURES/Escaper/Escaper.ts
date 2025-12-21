@@ -1512,7 +1512,7 @@ export class Escaper {
         if (this.makingLevel) {
             return this.makingLevel
         } else {
-            return getUdgLevels().getCurrentLevel()
+            return getUdgLevels().getCurrentLevel(this)
         }
     }
 
