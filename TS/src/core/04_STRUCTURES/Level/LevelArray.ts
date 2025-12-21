@@ -23,6 +23,7 @@ import { Level } from './Level'
 import { sameLevelProgression } from './LevelProgression'
 import { IsLevelBeingMade } from './Level_functions'
 import type { VisibilityModifierArray } from './VisibilityModifierArray'
+import { GetRandomAngle, StopUnit } from '../../01_libraries/Basic_functions'
 
 const MIN_TIME_BETWEEN_GOTNL = 0.05
 
@@ -149,7 +150,7 @@ export class LevelArray extends BaseArray<Level> {
             }
         }
 
-        this.refreshVisibilities();
+        this.refreshVisibilities()
 
         if (
             previousLevelId > -1 &&
@@ -211,6 +212,37 @@ export class LevelArray extends BaseArray<Level> {
         }
 
         return true
+    }
+
+    tpToEndOfLevel(escaper: Escaper) {
+        if (!escaper.isAlive()) {
+            return
+        }
+
+        const end = this.getCurrentLevel(escaper).getEnd()
+
+        if (end) {
+            const x = end.getCenterX()
+            const y = end.getCenterY()
+            let facingAngle = GetRandomAngle()
+
+            // Determine the angle towards the next level start
+            const nextLevel = this.data[this.getCurrentLevel(escaper).id + 1]
+            if (nextLevel) {
+                const xNextStart = nextLevel.getStart()?.getCenterX() ?? 0
+                const yNextStart = nextLevel.getStart()?.getCenterY() ?? 0
+                facingAngle = Math.atan2(yNextStart - y, xNextStart - x) * (180 / Math.PI)
+            }
+
+            // Move the hero
+            escaper.turnInstantly(facingAngle)
+            escaper.moveHero(x, y, true)
+            const hero = escaper.getHero()
+            hero && StopUnit(hero)
+
+            // Move the camera
+            SetCameraPositionForPlayer(escaper.getPlayer(), x, y)
+        }
     }
 
     /**
@@ -371,6 +403,11 @@ export class LevelArray extends BaseArray<Level> {
             //end
             if (levelJson.end) {
                 level.newEndFromJson(levelJson.end)
+            }
+
+            //tp for end
+            if (levelJson.tpForEnd) {
+                level.newTpForEndFromJson(levelJson.tpForEnd)
             }
 
             //visibilities

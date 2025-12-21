@@ -23,7 +23,7 @@ import { CircleMobArray } from '../Monster_properties/CircleMobArray'
 import { ClearMobArray } from '../Monster_properties/ClearMobArray'
 import { PortalMobArray } from '../Monster_properties/PortalMobArray'
 import { RegionArray } from '../Region/RegionArray'
-import { End, Start } from './StartAndEnd'
+import { End, Start, TpForEnd } from './StartAndEnd'
 import { StaticSlideArray } from './StaticSlideArray'
 import { TriggerArray } from './Triggers'
 import type { VisibilityModifier } from './VisibilityModifier'
@@ -51,6 +51,7 @@ export class Level {
     private livesEarnedAtBeginning: number
     private start?: Start
     private end?: End
+    private tpForEnd?: TpForEnd
     private triggers: TriggerArray
     public id: number = -1
     private lights: lightning[] = []
@@ -92,6 +93,8 @@ export class Level {
         if (this.isActivatedB == activ) return
 
         this.end && this.end.activate(activ)
+        this.tpForEnd && this.tpForEnd.activate(activ)
+
         this.triggers.activate(activ)
 
         if (activ) {
@@ -200,6 +203,24 @@ export class Level {
         return this.end
     }
 
+    newTpForEnd(x1: number, y1: number, x2: number, y2: number) {
+        this.tpForEnd && this.tpForEnd.destroy()
+        this.tpForEnd = new TpForEnd(this.id, x1, y1, x2, y2)
+        if (this.isActivatedB) {
+            this.tpForEnd.activate(true)
+        }
+
+        this.updateDebugRegions()
+    }
+
+    newTpForEndFromJson(data: { [x: string]: number }) {
+        this.newTpForEnd(data.minX, data.minY, data.maxX, data.maxY)
+    }
+
+    getTpForEnd = () => {
+        return this.tpForEnd
+    }
+
     getNbMonsters(mode: string) {
         //modes : all, moving, not moving
         return this.monsters.count(mode)
@@ -286,6 +307,7 @@ export class Level {
         if (this.debugRegionsVisible !== 'off') {
             this.start && this.drawRegion(this.start.minX, this.start.minY, this.start.maxX, this.start.maxY)
             this.end && this.drawRegion(this.end.minX, this.end.minY, this.end.maxX, this.end.maxY)
+            this.tpForEnd && this.drawRegion(this.tpForEnd.minX, this.tpForEnd.minY, this.tpForEnd.maxX, this.tpForEnd.maxY)
 
             for (const [_, staticSlide] of pairs(this.staticSlides.getAll())) {
                 const isDiagonal = staticSlide.getAngle() % 90 !== 0
@@ -542,6 +564,9 @@ export class Level {
 
         //end
         json.end = this.getEnd()?.toJson()
+
+        //tpForEnd
+        json.tpForEnd = this.getTpForEnd()?.toJson()
 
         //visibilities
         json.visibilities = this.visibilities.toJson()

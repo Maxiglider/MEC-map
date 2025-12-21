@@ -89,6 +89,7 @@ import { EscaperEffectArray } from './EscaperEffectArray'
 import { EscaperStartCommands } from './Escaper_StartCommands'
 import { EscaperFirstPerson } from './Escaper_firstPerson'
 import { ColorInfo, GetMirrorEscaper } from './Escaper_functions'
+import { MakeTpForEnd } from '../../05_MAKE_STRUCTURES/Make_start_end_visibilityModifier/MakeTpForEnd'
 
 const SHOW_REVIVE_EFFECTS = false
 
@@ -2032,6 +2033,11 @@ export class Escaper {
     makeCreateEnd = () => {
         this.destroyMake()
         if (this.hero) this.make = new MakeEnd(this.hero)
+    }
+
+    makeCreateTpForEnd = () => {
+        this.destroyMake()
+        if (this.hero) this.make = new MakeTpForEnd(this.hero)
     }
 
     makeCreateVisibilityModifier = () => {

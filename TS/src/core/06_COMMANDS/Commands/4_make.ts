@@ -2487,6 +2487,24 @@ export const initExecuteCommandMake = () => {
         },
     })
 
+    //-createTpForEnd(cre)   --> create the (facultative) TP for end (a rectangle formed with two clicks) of the current level
+    registerCommand({
+        name: 'createTpForEnd',
+        alias: ['crtpfe'],
+        group: 'make',
+        argDescription: '',
+        description:
+            'Create the (facultative) TP for end (a rectangle formed with two clicks) of the current level => the hero will teleported to center of end rect',
+        cb: ({ noParam }, escaper) => {
+            if (!noParam) {
+                return true
+            }
+            escaper.makeCreateTpForEnd()
+            Text.mkP(escaper.getPlayer(), 'TP for end making on')
+            return true
+        },
+    })
+
     //-getMakingLevel(getmkl)   --> displays the id of the level the player is creating (the first one is id 0)
     registerCommand({
         name: 'getMakingLevel',
@@ -2718,7 +2736,8 @@ export const initExecuteCommandMake = () => {
         alias: ['setlrv'],
         group: 'make',
         argDescription: '<boolean> [<levelId>]',
-        description: 'Set whether visibilities are reset when re-entering the level (applies a total black mask on the map when true)',
+        description:
+            'Set whether visibilities are reset when re-entering the level (applies a total black mask on the map when true)',
         cb: ({ nbParam, param1, param2 }, escaper) => {
             if (nbParam > 2 || !IsBoolString(param1)) {
                 Text.erP(escaper.getPlayer(), 'Usage: -setLevelResetVisibilities <boolean> [<levelId>]')
@@ -2734,8 +2753,11 @@ export const initExecuteCommandMake = () => {
 
             const doReset = S2B(param1)
 
-            if(level.getResetVisiblitiesAtStart() === doReset) {
-                Text.erP(escaper.getPlayer(), `Level ${levelNum} already has reset visibilities at start set to ${param1}`)
+            if (level.getResetVisiblitiesAtStart() === doReset) {
+                Text.erP(
+                    escaper.getPlayer(),
+                    `Level ${levelNum} already has reset visibilities at start set to ${param1}`
+                )
                 return true
             }
 
@@ -2746,7 +2768,7 @@ export const initExecuteCommandMake = () => {
             )
 
             return true
-        }
+        },
     })
 
     //-removeVisibilities(remv) [<levelId>]   --> remove all visibility rectangles made for the current level

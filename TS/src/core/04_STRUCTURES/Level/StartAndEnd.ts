@@ -21,6 +21,22 @@ abstract class RectInterface {
         this.r = Rect(this.minX, this.minY, this.maxX, this.maxY)
     }
 
+    getRandomX = () => {
+        return GetRandomReal(this.minX, this.maxX)
+    }
+
+    getRandomY = () => {
+        return GetRandomReal(this.minY, this.maxY)
+    }
+
+    getCenterX = () => {
+        return GetRectCenterX(this.r)
+    }
+
+    getCenterY = () => {
+        return GetRectCenterY(this.r)
+    }
+
     destroy() {
         RemoveRect(this.r)
     }
@@ -44,22 +60,6 @@ export class Start extends RectInterface {
         super(RMinBJ(x1, x2), RMinBJ(y1, y2), RMaxBJ(x1, x2), RMaxBJ(y1, y2))
 
         this.facing = facing
-    }
-
-    getRandomX = () => {
-        return GetRandomReal(this.minX, this.maxX)
-    }
-
-    getRandomY = () => {
-        return GetRandomReal(this.minY, this.maxY)
-    }
-
-    getCenterX = () => {
-        return GetRectCenterX(this.r)
-    }
-
-    getCenterY = () => {
-        return GetRectCenterY(this.r)
     }
 
     getFacing = () => this.facing
@@ -140,6 +140,48 @@ export class End extends RectInterface {
     destroy = () => {
         super.destroy()
         DestroyTrigger(this.endReaching)
+    }
+}
+
+export class TpForEnd extends RectInterface {
+    private tpForEndReaching: trigger
+
+    constructor(levelId: number, x1: number, y1: number, x2: number, y2: number) {
+        super(RMinBJ(x1, x2), RMinBJ(y1, y2), RMaxBJ(x1, x2), RMaxBJ(y1, y2))
+
+        this.tpForEndReaching = createEvent({
+            events: [t => TriggerRegisterEnterRectSimple(t, this.r)],
+            actions: [
+                () => {
+                    const finisher = Hero2Escaper(GetTriggerUnit())
+
+                    if (!finisher) {
+                        return
+                    }
+
+                    if (getUdgLevels().levelProgressionState[finisher.getId()] !== levelId) {
+                        return
+                    }
+
+                    getUdgLevels().tpToEndOfLevel(finisher)
+                },
+            ],
+        })
+
+        DisableTrigger(this.tpForEndReaching)
+    }
+
+    activate = (activ: boolean) => {
+        if (activ) {
+            EnableTrigger(this.tpForEndReaching)
+        } else {
+            DisableTrigger(this.tpForEndReaching)
+        }
+    }
+
+    destroy = () => {
+        super.destroy()
+        DestroyTrigger(this.tpForEndReaching)
     }
 }
 
