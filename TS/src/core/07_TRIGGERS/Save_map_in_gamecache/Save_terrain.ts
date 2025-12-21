@@ -4,7 +4,7 @@ import { Constants } from 'core/01_libraries/Constants'
 import { Text } from 'core/01_libraries/Text'
 import { TerrainType } from 'core/04_STRUCTURES/TerrainType/TerrainType'
 import { getUdgTerrainTypes, globals } from '../../../../globals'
-import { arrayPush } from '../../01_libraries/Basic_functions'
+import { arrayPush, ShowAllDestructables } from '../../01_libraries/Basic_functions'
 import { I2CustomBase64String } from '../../01_libraries/Functions_on_numbers'
 import { SaveTerrainHeights } from './Save_terrain_heights_and_cliffs'
 import { SaveTerrainRamps } from './Save_terrain_ramps'
@@ -123,9 +123,11 @@ export const PushTerrainDataIntoJson = (json: { [x: string]: any }) => {
     SaveTerrain(json) //2 MB leak
     SaveTerrainsUsed(json)
     SaveMapDimensionsAndCenterOffset(json)
+    ShowAllDestructables(false)
     SaveTerrainHeights.SaveTerrainHeights(json)
     SaveTerrainHeights.SaveTerrainCliffs(json)
     SaveTerrainRamps.SaveTerrainRamps(json)
+    ShowAllDestructables(true)
     // SaveWater.SaveWater(json) //copie from TerrainHeights for the moment ; disabled because i didn't succeed to handle water yet
 }
 
