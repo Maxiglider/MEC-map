@@ -5,7 +5,7 @@ import { Text } from 'core/01_libraries/Text'
 import { TerrainType } from 'core/04_STRUCTURES/TerrainType/TerrainType'
 import { getUdgTerrainTypes, globals } from '../../../../globals'
 import { arrayPush } from '../../01_libraries/Basic_functions'
-import { I2HexaString } from '../../01_libraries/Functions_on_numbers'
+import { I2CustomBase64String } from '../../01_libraries/Functions_on_numbers'
 import { SaveTerrainHeights } from './Save_terrain_heights_and_cliffs'
 import { SaveTerrainRamps } from './Save_terrain_ramps'
 
@@ -43,15 +43,15 @@ const GetTerrainId = (x: number, y: number): string => {
 
     for (let i = 0; i < nbTerrainTypesUsed; i++) {
         if (terrainTypeId === terrainTypeIds[i]) {
-            return I2HexaString(i)
+            return I2CustomBase64String(i)
         }
     }
 
-    if (nbTerrainTypesUsed < 16) {
+    if (nbTerrainTypesUsed < Constants.NB_MAX_OF_TERRAINS) {
         terrainTypeIds[nbTerrainTypesUsed] = terrainTypeId
         nbTerrainTypesUsed = nbTerrainTypesUsed + 1
     }
-    return I2HexaString(nbTerrainTypesUsed - 1)
+    return I2CustomBase64String(nbTerrainTypesUsed - 1)
 }
 
 const GererOrdreTerrains = () => {
