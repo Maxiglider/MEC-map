@@ -13,3 +13,9 @@ export const SoundPlay3DUnit = (path: string, duration: number) => {
     return sd
 }
 
+export const RunSoundOnUnit = (path: string, duration: number, u: unit) => {
+    const sd = SoundPlay3DUnit(path, duration)
+    AttachSoundToUnit(sd, u)
+    StartSound(sd)
+    KillSoundWhenDone(sd)
+}

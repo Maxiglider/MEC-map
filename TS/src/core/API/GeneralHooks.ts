@@ -10,6 +10,7 @@ export const hooks = {
     hooks_onAfterCreateMonsterUnit: new MecHookArray<(monster: Partial<Monster>) => void>(),
     hooks_onStartLevelAny: new MecHookArray<(level: Level) => void>(),
     hooks_onEndLevelAny: new MecHookArray<(level: Level) => void>(),
+    hooks_onEscaperDeath: new MecHookArray<(dyingEscaper: Escaper) => void>(),
     hooks_onCoopHeroRevive: new MecHookArray<(reviver: Escaper, revived: Escaper) => void>(),
     hooks_onHeroEnterRegion: new MecHookArray<(escaper: Escaper, region: Region) => void>(),
     hooks_onHeroEnterRegionOnce: new MecHookArray<(escaper: Escaper, region: Region) => void>(),

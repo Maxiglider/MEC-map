@@ -24,6 +24,7 @@ import { sameLevelProgression } from './LevelProgression'
 import { IsLevelBeingMade } from './Level_functions'
 import type { VisibilityModifierArray } from './VisibilityModifierArray'
 import { GetRandomAngle, StopUnit } from '../../01_libraries/Basic_functions'
+import { BookOfLife } from '../Monster/BookOfLife'
 
 const MIN_TIME_BETWEEN_GOTNL = 0.05
 
@@ -500,6 +501,8 @@ export class LevelArray extends BaseArray<Level> {
                         MonsterTeleport.storeNewLoc(x, y)
                     }
                     monster = new MonsterTeleport(mt, m.period, m.angle, m.mode, monsterId)
+                } else if( m.monsterClassName == 'BookOfLife') {
+                    monster = new BookOfLife(m.x, m.y, m.angle, monsterId)
                 }
             }
         }

@@ -7,6 +7,7 @@ import { Constants } from 'core/01_libraries/Constants'
 import { Monster } from 'core/04_STRUCTURES/Monster/Monster'
 import { hooks } from 'core/API/GeneralHooks'
 import { getUdgEscapers, udg_monsters, udg_spawned_monsters } from '../../../../globals'
+import { BookOfLife } from '../../04_STRUCTURES/Monster/BookOfLife'
 
 export const InitTrig_InvisUnit_is_getting_damage = () => {
     let TAILLE_UNITE = 100
@@ -101,6 +102,11 @@ export const InitTrig_InvisUnit_is_getting_damage = () => {
 
                                 return
                             }
+                        }
+
+                        if(monster instanceof BookOfLife){
+                            monster.onEscaperReachingBookOfLife(escaper);
+                            return
                         }
 
                         if (escaper.isGodModeOn()) {

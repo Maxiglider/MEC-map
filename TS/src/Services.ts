@@ -2,6 +2,7 @@ import { ILives } from 'core/04_STRUCTURES/Lives_and_game_time/Lives_and_game_ti
 import { IMultiboard } from 'core/04_STRUCTURES/Lives_and_game_time/Multiboard'
 import { IRenderInterface } from './App/renderInterface'
 import { ICommandExecution } from './core/06_COMMANDS/Helpers/Command_execution'
+import { IMEC_core_API } from './core/API/MEC_core_API'
 
 const initServiceManager = <TServices extends { [K in string]: TServices[K] }>() => {
     const services: TServices = {} as any
@@ -32,4 +33,5 @@ export const ServiceManager = initServiceManager<{
     Multiboard: IMultiboard
     Cmd: ICommandExecution
     React: IRenderInterface
+    MEC_core_API: IMEC_core_API
 }>()

@@ -23,6 +23,8 @@ export const globals: {
     MAP_MAX_Y: number
     CAN_TURN_IN_AIR: boolean
     USE_VTOTO_SLIDE_LOGIC: boolean
+    bookOfLifeNbLivesEarned: number
+    bookOfLifeMinimumSurviveTime: number // time to sruvive after touching a book of life to actually get a life (in seconds)
     coopCircles: boolean
     heroToEscaperHandles: { [heroId: number]: number }
     canSlideOverPathingBlockers: boolean
@@ -43,6 +45,8 @@ export const globals: {
     coopModeActive: true,
     CAN_TURN_IN_AIR: false,
     USE_VTOTO_SLIDE_LOGIC: false,
+    bookOfLifeNbLivesEarned: 2,
+    bookOfLifeMinimumSurviveTime: 1.0,
     coopCircles: true,
     heroToEscaperHandles: {},
     canSlideOverPathingBlockers: true,

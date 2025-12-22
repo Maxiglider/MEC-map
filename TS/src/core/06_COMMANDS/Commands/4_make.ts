@@ -44,6 +44,7 @@ import { ChangeOneTerrain } from '../../07_TRIGGERS/Triggers_to_modify_terrains/
 import { ExchangeTerrains } from '../../07_TRIGGERS/Triggers_to_modify_terrains/Exchange_terrains'
 import { RandomizeTerrains } from '../../07_TRIGGERS/Triggers_to_modify_terrains/Randomize_terrains'
 import { CmdParam } from '../Helpers/Command_functions'
+import { BookOfLife } from '../../04_STRUCTURES/Monster/BookOfLife'
 
 export const initExecuteCommandMake = () => {
     const { registerCommand } = ServiceManager.getService('Cmd')
@@ -1268,7 +1269,7 @@ export const initExecuteCommandMake = () => {
                 return true
             }
 
-            let x = 0
+            let facingAngle = 0
 
             //checkParam2
             if (nbParam === 2) {
@@ -1276,13 +1277,13 @@ export const initExecuteCommandMake = () => {
                     Text.erP(escaper.getPlayer(), 'wrong angle value ; should be a real (-1 for random angle)')
                     return true
                 }
-                x = S2R(param2)
+                facingAngle = S2R(param2)
             } else {
-                x = -1
+                facingAngle = -1
             }
 
             const monsterType = getUdgMonsterTypes().getByLabel(param1)
-            monsterType && escaper.makeCreateNoMoveMonsters(monsterType, x)
+            monsterType && escaper.makeCreateNoMoveMonsters(monsterType, facingAngle)
 
             Text.mkP(escaper.getPlayer(), 'monster making on')
             return true
@@ -1669,6 +1670,40 @@ export const initExecuteCommandMake = () => {
             return true
         },
     })
+
+    //-createBookOfLife(crbol) [<facingAngle>]   --> if facing angle not specified, random angles will be chosen
+    registerCommand({
+        name: 'createBookOfLife',
+        alias: ['crbol'],
+        group: 'make',
+        argDescription: '[<facingAngle>]',
+        description:
+            'creates a book of life at the current location, facing the specified angle (or random if not specified)',
+        cb: ({ nbParam, param1, param2 }, escaper) => {
+            if (nbParam > 1) {
+                return true
+            }
+            let facingAngle = 0
+
+            //checkParam1
+            if (nbParam == 1) {
+                if (S2R(param1) === 0 && param1 !== '0') {
+                    Text.erP(escaper.getPlayer(), 'wrong angle value ; should be a real (-1 for random angle)')
+                    return true
+                }
+                facingAngle = S2R(param1)
+            } else {
+                facingAngle = -1
+            }
+
+            escaper.makeCreateBookOfLives(facingAngle)
+
+            Text.mkP(escaper.getPlayer(), 'book of life making on')
+            return true
+        },
+    })
+
+    // todo setBooksOfLifeMonsterType
 
     //-setUnitMonsterType(setumt) <monsterLabel>
     registerCommand({
@@ -4071,7 +4106,7 @@ export const initExecuteCommandMake = () => {
                                 monster.y1 = Math.round(monster.y1 / roundToGrid) * roundToGrid + GetRandomInt(-4, 4)
                                 monster.x2 = Math.round(monster.x2 / roundToGrid) * roundToGrid + GetRandomInt(-4, 4)
                                 monster.y2 = Math.round(monster.y2 / roundToGrid) * roundToGrid + GetRandomInt(-4, 4)
-                            } else if (monster instanceof MonsterNoMove) {
+                            } else if (monster instanceof MonsterNoMove || monster instanceof BookOfLife) {
                                 monster.x = Math.round(monster.x / roundToGrid) * roundToGrid + GetRandomInt(-4, 4)
                                 monster.y = Math.round(monster.y / roundToGrid) * roundToGrid + GetRandomInt(-4, 4)
                             } else if (monster instanceof MonsterMultiplePatrols) {

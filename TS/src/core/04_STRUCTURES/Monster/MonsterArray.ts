@@ -14,7 +14,6 @@ export const MONSTER_NEAR_DIFF_MAX = 64
 
 //represents the monsters in a level
 export class MonsterArray extends BaseArray<Monster> {
-    // private monsters: { [x: number]: Monster } = {} //same ids as in udg_monsters
     private level?: Level
 
     //hooks

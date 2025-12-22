@@ -7,7 +7,7 @@ import { initLives } from 'core/04_STRUCTURES/Lives_and_game_time/Lives_and_game
 import { initMultiboard } from 'core/04_STRUCTURES/Lives_and_game_time/Multiboard'
 import { initCommandExecution } from './core/06_COMMANDS/Helpers/Command_execution'
 import { W3TS_HOOK, addScriptHook } from 'w3ts/hooks'
-import { MEC_core_API } from './core/API/MEC_core_API'
+import { initMEC_core_API, MEC_core_API } from './core/API/MEC_core_API'
 import { initializers } from './core/Init/initializers'
 import { PROD } from './env'
 
@@ -97,6 +97,7 @@ const tsMain = () => {
                 },
             })
         },
+        MEC_core_API: initMEC_core_API
     })
 
     ServiceManager.getService('Cmd').initCommands()

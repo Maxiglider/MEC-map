@@ -8,8 +8,8 @@ export class MakeMonsterNoMove extends Make {
     private mt: MonsterType
     private facingAngle: number
 
-    constructor(maker: unit, mt: MonsterType, facingAngle: number) {
-        super(maker, 'monsterCreateNoMove')
+    constructor(maker: unit, mt: MonsterType, facingAngle: number, kind = 'monsterCreateNoMove') {
+        super(maker, kind)
 
         this.mt = mt
         this.facingAngle = facingAngle

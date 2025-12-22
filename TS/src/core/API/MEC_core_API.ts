@@ -21,6 +21,8 @@ import { heroes } from '../08_GAME/Init_game/Heroes'
 import { hooks } from './GeneralHooks'
 import { MecHook } from './MecHook'
 
+export type IMEC_core_API = typeof MEC_core_API
+
 export const MEC_core_API = {
     setGameData: (jsonString: string, currentlyOnGameStart = true) => {
         errorHandler(() => {
@@ -86,6 +88,10 @@ export const MEC_core_API = {
         return hooks.hooks_onEndLevelAny.new(cb)
     },
 
+    onEscaperDeath: (cb: (escaper: Escaper) => any) => {
+        return hooks.hooks_onEscaperDeath.new(cb)
+    },
+
     onCoopHeroRevive: (cb: (reviver: Escaper, revived: Escaper) => any) => {
         return hooks.hooks_onCoopHeroRevive.new(cb)
     },
@@ -120,6 +126,18 @@ export const MEC_core_API = {
         globals.CAN_TURN_IN_AIR = b
     },
     setStaticSpawnPositions: heroes.setStaticSpawnPositions,
+    setBookOfLifeMinimumSurviveTime: (time: number) => {
+        if(time < 0) {
+            throw new Error("Book of Life minimum survive time cannot be negative")
+        }
+        globals.bookOfLifeMinimumSurviveTime = time
+    },
+    setBookOfLifeNbLivesEarned: (nbLives: number) => {
+        if(nbLives < 0) {
+            throw new Error("Book of Life number of lives earned cannot be negative")
+        }
+        globals.bookOfLifeNbLivesEarned = nbLives
+    },
 
     //helpers
     isHero: IsHero,
@@ -172,4 +190,8 @@ export const MEC_core_API = {
     setAfkTime: (time: number) => {
         AfkMode.timeMinAfk = time
     },
+}
+
+export const initMEC_core_API = () => {
+    return MEC_core_API
 }

@@ -7,7 +7,7 @@ import { progressionUtils } from 'Utils/ProgressionUtils'
 import { ForceAngleBetween0And360, IsIssuedOrder, StopUnit } from 'core/01_libraries/Basic_functions'
 import { Constants } from 'core/01_libraries/Constants'
 import { udg_colorCode } from 'core/01_libraries/Init_colorCodes'
-import { Text } from 'core/01_libraries/Text'
+import { SUCCESS_TEXT_COLORCODE, Text } from 'core/01_libraries/Text'
 import { MakePropertyChange } from 'core/05_MAKE_STRUCTURES/Make/MakePropertyChange'
 import { MakeCopyLevelPatrol } from 'core/05_MAKE_STRUCTURES/Make_copy_paste/MakeCopyLevelPatrol'
 import { MakeCaster } from 'core/05_MAKE_STRUCTURES/Make_create_casters/MakeCaster'
@@ -90,6 +90,8 @@ import { EscaperStartCommands } from './Escaper_StartCommands'
 import { EscaperFirstPerson } from './Escaper_firstPerson'
 import { ColorInfo, GetMirrorEscaper } from './Escaper_functions'
 import { MakeTpForEnd } from '../../05_MAKE_STRUCTURES/Make_start_end_visibilityModifier/MakeTpForEnd'
+import { hooks } from '../../API/GeneralHooks'
+import { MakeBookOfLife } from '../../05_MAKE_STRUCTURES/Make_create_monsters/MakeBookOfLife'
 
 const SHOW_REVIVE_EFFECTS = false
 
@@ -766,6 +768,10 @@ export class Escaper {
         if (this.isAlive()) {
             if (this.hero) {
                 KillUnit(this.hero)
+
+                for (const hook of hooks.hooks_onEscaperDeath.getHooks()) {
+                    hook.execute(this)
+                }
 
                 this.disableSlideSpeedTemporarily()
             }
@@ -1551,6 +1557,11 @@ export class Escaper {
         //mode : noMove
         this.destroyMake()
         if (this.hero) this.make = new MakeMonsterNoMove(this.hero, mt, facingAngle)
+    }
+
+    makeCreateBookOfLives(facingAngle: number) {
+        this.destroyMake()
+        if (this.hero) this.make = new MakeBookOfLife(this.hero, facingAngle)
     }
 
     makeCreateSimplePatrolMonsters(mode: string, mt: MonsterType, angle?: number) {
@@ -2504,6 +2515,12 @@ export class Escaper {
     setGlow = (glow: boolean) => {
         this.glow = glow
         this.updateUnitVertexColor()
+    }
+
+    addLives(numLives: number){
+        ServiceManager.getService('Lives').add(numLives);
+
+        Text.ForAll_timed_withColorCode(3, SUCCESS_TEXT_COLORCODE, `${GetPlayerName(this.getPlayer())} has earned ${numLives} live${numLives > 0 ? 's' : ''} for the team!`);
     }
 
     toJson = () => ({

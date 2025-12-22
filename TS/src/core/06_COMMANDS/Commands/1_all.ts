@@ -605,6 +605,11 @@ export const initCommandAll = () => {
                 Text.P(escaper.getPlayer(), 'There are ' + I2S(n) + ' non moving monsters in the map.')
                 return true
             }
+            if (param1 === 'bookOfLife' || param1 === 'bol') {
+                n = getUdgLevels().getNbMonsters('book of life')
+                Text.P(escaper.getPlayer(), 'There are ' + I2S(n) + ' book(s) of life in the map.')
+                return true
+            }
             return true
         },
     })
@@ -614,7 +619,7 @@ export const initCommandAll = () => {
         name: 'levelNbMonsters',
         alias: ['lnbm'],
         group: 'all',
-        argDescription: '[moving(m)|all(a)|notMoving(nm)]',
+        argDescription: '[moving(m)|all(a)|notMoving(nm)|bookOfLife(bol)]',
         description: '"moving" is the default value',
         cb: ({ noParam, nbParam, param1 }, escaper) => {
             if (!(noParam || nbParam === 1)) {
@@ -649,6 +654,11 @@ export const initCommandAll = () => {
             if (param1 === 'notMoving' || param1 === 'nm') {
                 n = getUdgLevels().getCurrentLevel(escaper).getNbMonsters('not moving')
                 Text.P(escaper.getPlayer(), 'There are ' + I2S(n) + ' non moving monsters in this level.')
+                return true
+            }
+            if (param1 === 'bookOfLife' || param1 === 'bol') {
+                n = getUdgLevels().getCurrentLevel(escaper).getNbMonsters('book of life')
+                Text.P(escaper.getPlayer(), 'There are ' + I2S(n) + ' book(s) of life in this level.')
                 return true
             }
 
