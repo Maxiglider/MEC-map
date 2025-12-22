@@ -1251,6 +1251,73 @@ export const initExecuteCommandMake = () => {
         },
     })
 
+    //-setMonsterKillRectDimensions(setmkrd) <monsterLabel> <width> <height>
+    registerCommand({
+        name: 'setMonsterKillRectDimensions',
+        alias: ['setmkrd'],
+        group: 'make',
+        argDescription: '<monsterLabel> <width> <height>',
+        description: 'Sets dimensions of a monster to apply a rectangle kill zone (applies only to non immobile monsters ; use when circle kill zone is not adapted)',
+        cb: ({ nbParam, param1, param2, param3 }, escaper) => {
+            if (nbParam !== 3) {
+                return true
+            }
+
+            //checkParam1
+            if (!getUdgMonsterTypes().isLabelAlreadyUsed(param1)) {
+                Text.erP(escaper.getPlayer(), 'unknown monster type')
+                return true
+            }
+
+            let x = 0
+
+            //checkParam 2 & 3
+            const width = S2I(param2)
+            const height = S2I(param3)
+            if (width <= 0 || height <= 0) {
+                Text.erP(escaper.getPlayer(), 'wrong width or height ; should be positives integers')
+                return true
+            }
+
+            if(getUdgMonsterTypes().getByLabel(param1)?.setKillRectDimensions(width, height)){
+                Text.mkP(escaper.getPlayer(), 'kill rectangle dimensions changed for this monster type')
+            }else{
+                Text.erP(escaper.getPlayer(), 'the kill rectangle dimensions have to be minimum 32x32')
+            }
+            return true
+        },
+    })
+
+    //-removeMonsterKillRectDimensions(remmkrd) <monsterLabel> <width> <height>
+    registerCommand({
+        name: 'removeMonsterKillRectDimensions',
+        alias: ['remmkrd'],
+        group: 'make',
+        argDescription: '<monsterLabel>',
+        description: 'Remove kill rectangle dimensions of a monster (the corresponding monster units will no longer kills through a rectangle zone)',
+        cb: ({ nbParam, param1 }, escaper) => {
+            if (nbParam !== 1) {
+                return true
+            }
+            //checkParam1
+            const monsterType = getUdgMonsterTypes().getByLabel(param1)
+            if (!monsterType) {
+                Text.erP(escaper.getPlayer(), 'unknown monster type')
+                return true
+            }
+
+            if(monsterType.getKillRectDimensions()){
+                monsterType.removeKillRectDimensions()
+                Text.mkP(escaper.getPlayer(), 'kill rectangle dimensions removed for this monster type')
+            }else{
+                Text.erP(escaper.getPlayer(), 'the kill rectangle dimensions already does not exists for this monster type')
+            }
+            return true
+        },
+    })
+
+
+
     //-createMonsterImmobile(crmi) <monsterLabel> [<facingAngle>]   --> if facing angle not specified, random angles will be chosen
     registerCommand({
         name: 'createMonsterImmobile',

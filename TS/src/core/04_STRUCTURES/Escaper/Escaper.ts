@@ -67,7 +67,6 @@ import {
     HERO_ROTATION_TIME_FOR_MAXIMUM_SPEED,
 } from '../../07_TRIGGERS/Slide_and_CheckTerrain_triggers/SlidingMax'
 import { reviveTrigManager } from '../../08_GAME/Death/A_hero_dies_check_if_all_dead_and_sounds'
-import { Trig_InvisUnit_is_getting_damage } from '../../08_GAME/Death/InvisUnit_is_getting_damage'
 import { HERO_START_ANGLE } from '../../08_GAME/Init_game/Heroes'
 import { MessageHeroDies } from '../../08_GAME/Init_game/Message_heroDies'
 import { RunCoopSoundOnHero } from '../../08_GAME/Mode_coop/coop_init_sounds'
@@ -493,7 +492,7 @@ export class Escaper {
         this.invisUnit = CreateUnit(Constants.PLAYER_INVIS_UNIT, Constants.INVIS_UNIT_TYPE_ID, x, y, angle)
         SetUnitUserData(this.invisUnit, GetPlayerId(this.p))
         TriggerRegisterUnitEvent(
-            Trig_InvisUnit_is_getting_damage.gg_trg_InvisUnit_is_getting_damage,
+            ServiceManager.getService('InvisUnit_is_getting_damage').Trig_InvisUnit_is_getting_damage.gg_trg_InvisUnit_is_getting_damage,
             this.invisUnit,
             EVENT_UNIT_DAMAGED
         )

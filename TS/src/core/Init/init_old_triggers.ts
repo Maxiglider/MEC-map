@@ -6,7 +6,6 @@ import { InitTrig_Stop_using_normal_meteor } from 'core/04_STRUCTURES/Meteor/Sto
 import { InitTrig_Afk_mode_ordre_recu } from 'core/08_GAME/Afk_mode/Afk_mode_ordre_recu'
 import { InitTrig_Camera_reset } from 'core/08_GAME/Camera_reset/Camera_reset'
 import { InitTrig_A_hero_dies_check_if_all_dead_and_sounds } from 'core/08_GAME/Death/A_hero_dies_check_if_all_dead_and_sounds'
-import { InitTrig_InvisUnit_is_getting_damage } from 'core/08_GAME/Death/InvisUnit_is_getting_damage'
 import { InitTrig_Sound_monster_dies } from 'core/08_GAME/Death/Sound_monster_dies'
 import { InitTrig_Forces_ally } from 'core/08_GAME/Init_game/Forces_ally'
 import { InitTrig_Start_sound } from 'core/08_GAME/Init_game/Start_sound'
@@ -27,7 +26,6 @@ export const initOldTriggers = () => {
     InitTrig_Camera_reset()
     InitTrig_Afk_mode_ordre_recu()
     InitTrig_A_player_leaves()
-    InitTrig_InvisUnit_is_getting_damage()
     InitTrig_A_hero_dies_check_if_all_dead_and_sounds()
     InitTrig_Sound_monster_dies()
     InitTrig_Select_hero()

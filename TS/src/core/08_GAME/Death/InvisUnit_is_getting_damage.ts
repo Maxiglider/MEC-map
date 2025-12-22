@@ -8,8 +8,10 @@ import { Monster } from 'core/04_STRUCTURES/Monster/Monster'
 import { hooks } from 'core/API/GeneralHooks'
 import { getUdgEscapers, udg_monsters, udg_spawned_monsters } from '../../../../globals'
 import { BookOfLife } from '../../04_STRUCTURES/Monster/BookOfLife'
+import type { Escaper } from '../../04_STRUCTURES/Escaper/Escaper'
 
-export const InitTrig_InvisUnit_is_getting_damage = () => {
+
+const InitTrig_InvisUnit_is_getting_damage = () => {
     let TAILLE_UNITE = 100
 
     const gg_trg_InvisUnit_is_getting_damage = createEvent({
@@ -68,96 +70,8 @@ export const InitTrig_InvisUnit_is_getting_damage = () => {
 
                         return
                     } else {
-                        const monster = udg_monsters[GetUnitUserData(killingUnit)] as Monster | undefined
-
                         // TODO; monsterSpawn mobs are null here, need a reference somehow as they're not in udg_monsters
-
-                        if (monster) {
-                            const clearMob = monster.getClearMob()
-                            const portalMob = monster.getPortalMob()
-                            const circleMob = monster.getCircleMob()
-                            const jumpPad = monster.getJumpPad()
-
-                            if (clearMob) {
-                                clearMob.activate()
-                                return
-                            } else if (portalMob) {
-                                portalMob.activate(monster, escaper, hero)
-                                return
-                            } else if (circleMob) {
-                                return
-                            } else if (jumpPad !== undefined) {
-                                escaper.setOldDiffZ(jumpPad)
-                                const effect = monster.getJumpPadEffect()
-
-                                if (effect) {
-                                    EffectUtils.destroyEffect(
-                                        EffectUtils.addSpecialEffect(
-                                            effect,
-                                            GetUnitX(killingUnit),
-                                            GetUnitY(killingUnit)
-                                        )
-                                    )
-                                }
-
-                                return
-                            }
-                        }
-
-                        if(monster instanceof BookOfLife){
-                            monster.onEscaperReachingBookOfLife(escaper);
-                            return
-                        }
-
-                        if (escaper.isGodModeOn()) {
-                            //god mode effect
-                            EffectUtils.destroyEffect(
-                                EffectUtils.addSpecialEffect(
-                                    Constants.GM_KILLING_EFFECT,
-                                    GetUnitX(killingUnit),
-                                    GetUnitY(killingUnit)
-                                )
-                            )
-
-                            //kill monster
-                            if (escaper.doesGodModeKills()) {
-                                if (monster) {
-                                    monster.killUnit() //on ne tue pas directement le monstre, pour pouvoir exécuter des actions secondaires éventuelles de la méthode killUnit
-                                } else {
-                                    KillUnit(killingUnit)
-                                }
-                            }
-
-                            return
-                        }
-
-                        if (!escaper.isCoopInvul()) {
-                            if (monster?.hasAttackGroundPos()) {
-                                SetWidgetLife(hero, GetWidgetLife(hero) - GetEventDamage())
-                            }
-
-                            if (
-                                !monster?.hasAttackGroundPos() ||
-                                (monster.hasAttackGroundPos() && GetWidgetLife(hero) - GetEventDamage() <= 0.405)
-                            ) {
-                                escaper.kill()
-                            }
-
-                            const effectStr =
-                                monster?.getMonsterType()?.getKillingEffectStr() ||
-                                udg_spawned_monsters[GetHandleId(killingUnit)]?.getKillingEffectStr()
-
-                            //effet de tuation du héros par le monstre, suivant le type du monstre
-                            if (effectStr) {
-                                const eff = EffectUtils.addSpecialEffect(
-                                    effectStr,
-                                    GetUnitX(invisUnit),
-                                    GetUnitY(invisUnit)
-                                )
-                                TriggerSleepAction(3)
-                                EffectUtils.destroyEffect(eff)
-                            }
-                        }
+                        onEscaperTouchingMonster(escaper, killingUnit)
                     }
                 }
             },
@@ -171,4 +85,112 @@ export const InitTrig_InvisUnit_is_getting_damage = () => {
     return { TAILLE_UNITE, gg_trg_InvisUnit_is_getting_damage, setTailleUnite }
 }
 
-export const Trig_InvisUnit_is_getting_damage = InitTrig_InvisUnit_is_getting_damage()
+
+const onEscaperTouchingMonster = (escaper: Escaper, killingUnit: unit) =>{
+    const hero = escaper.getHero()
+
+    if (!hero) {
+        return
+    }
+
+    if (!escaper.isAlive()) {
+        return
+    }
+
+    const monster = udg_monsters[GetUnitUserData(killingUnit)] as Monster | undefined
+
+    if (monster) {
+        const clearMob = monster.getClearMob()
+        const portalMob = monster.getPortalMob()
+        const circleMob = monster.getCircleMob()
+        const jumpPad = monster.getJumpPad()
+
+        if (clearMob) {
+            clearMob.activate()
+            return
+        } else if (portalMob) {
+            portalMob.activate(monster, escaper, hero)
+            return
+        } else if (circleMob) {
+            return
+        } else if (jumpPad !== undefined) {
+            escaper.setOldDiffZ(jumpPad)
+            const effect = monster.getJumpPadEffect()
+
+            if (effect) {
+                EffectUtils.destroyEffect(
+                    EffectUtils.addSpecialEffect(
+                        effect,
+                        GetUnitX(killingUnit),
+                        GetUnitY(killingUnit)
+                    )
+                )
+            }
+
+            return
+        }
+    }
+
+    if(monster instanceof BookOfLife){
+        monster.onEscaperReachingBookOfLife(escaper);
+        return
+    }
+
+    if (escaper.isGodModeOn()) {
+        //god mode effect
+        EffectUtils.destroyEffect(
+            EffectUtils.addSpecialEffect(
+                Constants.GM_KILLING_EFFECT,
+                GetUnitX(killingUnit),
+                GetUnitY(killingUnit)
+            )
+        )
+
+        //kill monster
+        if (escaper.doesGodModeKills()) {
+            if (monster) {
+                monster.killUnit() //on ne tue pas directement le monstre, pour pouvoir exécuter des actions secondaires éventuelles de la méthode killUnit
+            } else {
+                KillUnit(killingUnit)
+            }
+        }
+
+        return
+    }
+
+    if (!escaper.isCoopInvul()) {
+        if (monster?.hasAttackGroundPos()) {
+            SetWidgetLife(hero, GetWidgetLife(hero) - GetEventDamage())
+        }
+
+        if (
+            !monster?.hasAttackGroundPos() ||
+            (monster.hasAttackGroundPos() && GetWidgetLife(hero) - GetEventDamage() <= 0.405)
+        ) {
+            escaper.kill()
+        }
+
+        const effectStr =
+            monster?.getMonsterType()?.getKillingEffectStr() ||
+            udg_spawned_monsters[GetHandleId(killingUnit)]?.getKillingEffectStr()
+
+        //effet de tuation du héros par le monstre, suivant le type du monstre
+        if (effectStr) {
+            const eff = EffectUtils.addSpecialEffect(
+                effectStr,
+                GetUnitX(hero),
+                GetUnitY(hero)
+            )
+            TriggerSleepAction(3)
+            EffectUtils.destroyEffect(eff)
+        }
+    }
+}
+
+const Trig_InvisUnit_is_getting_damage = InitTrig_InvisUnit_is_getting_damage()
+
+export const init_InvisUnit_is_getting_damage = () => {
+    return { onEscaperTouchingMonster, Trig_InvisUnit_is_getting_damage}
+}
+
+export type IInvisUnit_is_getting_damage = ReturnType<typeof init_InvisUnit_is_getting_damage>

@@ -3,6 +3,7 @@ import { IMultiboard } from 'core/04_STRUCTURES/Lives_and_game_time/Multiboard'
 import { IRenderInterface } from './App/renderInterface'
 import { ICommandExecution } from './core/06_COMMANDS/Helpers/Command_execution'
 import { IMEC_core_API } from './core/API/MEC_core_API'
+import { IInvisUnit_is_getting_damage }  from './core/08_GAME/Death/InvisUnit_is_getting_damage'
 
 const initServiceManager = <TServices extends { [K in string]: TServices[K] }>() => {
     const services: TServices = {} as any
@@ -34,4 +35,5 @@ export const ServiceManager = initServiceManager<{
     Cmd: ICommandExecution
     React: IRenderInterface
     MEC_core_API: IMEC_core_API
+    InvisUnit_is_getting_damage: IInvisUnit_is_getting_damage
 }>()

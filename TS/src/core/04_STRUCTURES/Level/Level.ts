@@ -29,6 +29,7 @@ import { TriggerArray } from './Triggers'
 import type { VisibilityModifier } from './VisibilityModifier'
 import { VisibilityModifierArray } from './VisibilityModifierArray'
 import { checkPointReviveHeroes } from './checkpointReviveHeroes_function'
+import { MonsterNoMove } from '../Monster/MonsterNoMove'
 
 type ITempTerrainTypeMap = {
     [x_y: string]:
@@ -307,7 +308,8 @@ export class Level {
         if (this.debugRegionsVisible !== 'off') {
             this.start && this.drawRegion(this.start.minX, this.start.minY, this.start.maxX, this.start.maxY)
             this.end && this.drawRegion(this.end.minX, this.end.minY, this.end.maxX, this.end.maxY)
-            this.tpForEnd && this.drawRegion(this.tpForEnd.minX, this.tpForEnd.minY, this.tpForEnd.maxX, this.tpForEnd.maxY)
+            this.tpForEnd &&
+                this.drawRegion(this.tpForEnd.minX, this.tpForEnd.minY, this.tpForEnd.maxX, this.tpForEnd.maxY)
 
             for (const [_, staticSlide] of pairs(this.staticSlides.getAll())) {
                 const isDiagonal = staticSlide.getAngle() % 90 !== 0
@@ -395,6 +397,16 @@ export class Level {
                             const ny = i + 1 > monster.y.length - 1 ? 0 : i + 1
 
                             this.drawLine(monster.x[i], monster.y[i], monster.x[nx], monster.y[ny])
+                        }
+                    } else if (monster instanceof MonsterNoMove) {
+                        const killRect = monster.getKillRect()
+                        if (killRect) {
+                            this.drawRegion(
+                                GetRectMinX(killRect),
+                                GetRectMinY(killRect),
+                                GetRectMaxX(killRect),
+                                GetRectMaxY(killRect)
+                            )
                         }
                     }
                 }
@@ -536,7 +548,7 @@ export class Level {
     }
 
     setResetVisiblitiesAtStart(reset: boolean) {
-        if(reset === this.resetVisiblitiesAtStart){
+        if (reset === this.resetVisiblitiesAtStart) {
             return
         }
 

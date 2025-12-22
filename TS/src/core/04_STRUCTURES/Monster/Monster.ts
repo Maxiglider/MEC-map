@@ -43,6 +43,7 @@ export abstract class Monster {
 
     //disabling
     protected disablingTimer?: timer
+    private isDisabledB = false
     private deleted = false
 
     //clear mob that this mob is trigger mob
@@ -285,6 +286,7 @@ export abstract class Monster {
         MemoryHandler.destroyArray(hookArray2)
 
         this.doAttackGroundPos()
+        this.isDisabledB = false
     }
 
     delete = () => {
@@ -342,6 +344,7 @@ export abstract class Monster {
             this.u && immoSkill > 0 && UnitRemoveAbility(this.u, immoSkill)
             this.u && SetUnitVertexColorBJ(this.u, this.vcRed, this.vcGreen, this.vcBlue, Monster.DISABLE_TRANSPARENCY)
             this.vcTransparency = Monster.DISABLE_TRANSPARENCY
+            this.isDisabledB = true
         }
     }
 
@@ -352,7 +355,12 @@ export abstract class Monster {
             this.u && immoSkill > 0 && UnitAddAbility(this.u, immoSkill)
             this.u && SetUnitVertexColorBJ(this.u, this.vcRed, this.vcGreen, this.vcBlue, 0)
             this.vcTransparency = 0
+            this.isDisabledB = false
         }
+    }
+
+    isDisabled = () => {
+        return this.isDisabledB
     }
 
     setBaseColor = (colorString: string) => {

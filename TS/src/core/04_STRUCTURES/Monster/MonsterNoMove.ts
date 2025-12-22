@@ -4,11 +4,16 @@ import { getUdgTerrainTypes, globals, udg_monsters } from '../../../../globals'
 import { Monster } from './Monster'
 import { MonsterType } from './MonsterType'
 import { NewImmobileMonster } from './Monster_functions'
+import { createEvent } from '../../../Utils/mapUtils'
+import { Hero2Escaper } from '../Escaper/Escaper_functions'
+import { ServiceManager } from '../../../Services'
 
 export class MonsterNoMove extends Monster {
     x: number
     y: number
     private angle: number
+    private killRect?: rect
+    private killRectTrigger?: trigger
 
     private oldCreateTerrainId: number | null = null
 
@@ -39,6 +44,7 @@ export class MonsterNoMove extends Monster {
 
         this.wander()
         this.startCreateTerrain()
+        this.applyKillRect()
     }
 
     private moveTimer: Timer | null = null
@@ -65,6 +71,8 @@ export class MonsterNoMove extends Monster {
         }
 
         this.stopCreateTerrain()
+
+        this.killRectTrigger && DestroyTrigger(this.killRectTrigger)
     }
 
     wander = () => {
@@ -159,6 +167,55 @@ export class MonsterNoMove extends Monster {
             ChangeTerrainType(this.x, this.y, this.oldCreateTerrainId)
             this.oldCreateTerrainId = null
         }
+    }
+
+    applyKillRect() {
+        const monsterKillRectDimensions = this.mt?.getKillRectDimensions()
+        if (!monsterKillRectDimensions) {
+            return
+        }
+
+        const roundedAngle = (Math.round(this.angle / 90) * 90) % 360
+        let minX: number, minY: number, maxX: number, maxY: number
+        if (roundedAngle % 90 === 0) {
+            minX = this.x - monsterKillRectDimensions.height / 2
+            maxX = this.x + monsterKillRectDimensions.height / 2
+            minY = this.y - monsterKillRectDimensions.width / 2
+            maxY = this.y + monsterKillRectDimensions.width / 2
+        } else {
+            // Swap width and height for 90 and 270 degrees
+            minX = this.x - monsterKillRectDimensions.width / 2
+            maxX = this.x + monsterKillRectDimensions.width / 2
+            minY = this.y - monsterKillRectDimensions.height / 2
+            maxY = this.y + monsterKillRectDimensions.height / 2
+        }
+
+        this.killRect = Rect(minX, minY, maxX, maxY)
+
+        this.registerKillRectTrigger()
+    }
+
+    registerKillRectTrigger() {
+        this.killRectTrigger && DestroyTrigger(this.killRectTrigger)
+
+        this.killRectTrigger = createEvent({
+            events: [t => this.killRect && TriggerRegisterEnterRectSimple(t, this.killRect)],
+            actions: [
+                () => {
+                    const escaper = Hero2Escaper(GetTriggerUnit())
+
+                    if (!escaper || !escaper.isAlive() || this.isDisabled() || !this.u || !IsUnitAliveBJ(this.u)) {
+                        return
+                    }
+
+                    ServiceManager.getService('InvisUnit_is_getting_damage').onEscaperTouchingMonster(escaper, this.u)
+                },
+            ],
+        })
+    }
+
+    getKillRect() {
+        return this.killRect
     }
 
     toJson() {

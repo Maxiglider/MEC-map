@@ -15,7 +15,6 @@ import { getUdgEscapers, getUdgLevels, globals } from '../../../../globals'
 import { runInTrigger } from '../../../Utils/mapUtils'
 import { getUdgViewAll } from '../../03_view_all_hide_all/View_all_hide_all'
 import { MeteorFunctions } from '../../04_STRUCTURES/Meteor/Meteor_functions'
-import { Trig_InvisUnit_is_getting_damage } from '../../08_GAME/Death/InvisUnit_is_getting_damage'
 import { HERO_START_ANGLE } from '../../08_GAME/Init_game/Heroes'
 import { DeplacementHeroHorsDeathPath } from '../../08_GAME/Mode_coop/deplacement_heros_hors_death_path'
 import { isPlayerId, resolvePlayerId, resolvePlayerIds } from '../Helpers/Command_functions'
@@ -1205,7 +1204,7 @@ export const initExecuteCommandCheat = () => {
             if (nbParam !== 1 || (S2R(param1) <= 0 && param1 !== '0')) {
                 return true
             }
-            Trig_InvisUnit_is_getting_damage.setTailleUnite(S2R(param1))
+            ServiceManager.getService('InvisUnit_is_getting_damage').Trig_InvisUnit_is_getting_damage.setTailleUnite(S2R(param1))
             return true
         },
     })

@@ -6,6 +6,7 @@ import { Ascii2String } from '../../01_libraries/Ascii'
 import { udg_colorCode } from '../../01_libraries/Init_colorCodes'
 import { Level } from '../Level/Level'
 import { IMMOLATION_SKILLS } from './Immolation_skills'
+import { printStackTraceBundleOverride } from 'typescript-to-lua/dist/transpilation/bundle'
 
 export class MonsterType {
     label: string
@@ -20,6 +21,7 @@ export class MonsterType {
     private maxLife: number
     private height: number
     private createTerrainLabel?: string
+    private killRectDimensions?: { width: number; height: number }
 
     constructor(
         label: string,
@@ -244,6 +246,30 @@ export class MonsterType {
         return I2S(S2I(immoStr))
     }
 
+    setKillRectDimensions = (width: number, height: number): boolean => {
+        // round 32 for rect usage
+        const roundedWidth = R2I(width / 32) * 32
+        const roundedHeight = R2I(height / 32) * 32
+
+        if(roundedHeight <= 0 || roundedWidth <= 0){
+            return false
+        }
+
+        this.killRectDimensions = { width: roundedWidth, height: roundedHeight }
+        this.refresh()
+
+        return true
+    }
+
+    removeKillRectDimensions = (): void => {
+        this.killRectDimensions = undefined
+        this.refresh()
+    }
+
+    getKillRectDimensions = (): { width: number; height: number } | undefined => {
+        return this.killRectDimensions
+    }
+
     toText = (): string => {
         let space = '   '
         let display = udg_colorCode[Constants.RED] + this.label + (this.theAlias ? ' ' + this.theAlias : '') + " : '"
@@ -283,6 +309,9 @@ export class MonsterType {
         if (this.isWanderableB) {
             display = display + space + 'wanderable'
         }
+        if(this.killRectDimensions){
+            display = display + space + 'killRect_' + I2S(R2I(this.killRectDimensions.width)) + 'x' + I2S(R2I(this.killRectDimensions.height))
+        }
         return display
     }
 
@@ -305,6 +334,13 @@ export class MonsterType {
         output['nbMeteorsToKill'] = this.maxLife / 10000
         output['height'] = R2I(this.height)
         output['createTerrainLabel'] = this.createTerrainLabel
+
+        if(this.killRectDimensions){
+            output['killRectDimensions'] = {
+                width: this.killRectDimensions.width,
+                height: this.killRectDimensions.height
+            }
+        }
 
         return output
     }

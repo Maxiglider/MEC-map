@@ -10,6 +10,7 @@ import { W3TS_HOOK, addScriptHook } from 'w3ts/hooks'
 import { initMEC_core_API, MEC_core_API } from './core/API/MEC_core_API'
 import { initializers } from './core/Init/initializers'
 import { PROD } from './env'
+import { init_InvisUnit_is_getting_damage } from './core/08_GAME/Death/InvisUnit_is_getting_damage'
 
 // [X] per player rkr thing, ignore players who haven't clicked yet (support arrowkeys too somehow)
 //   ^ [X] ignore noobedit players
@@ -97,7 +98,8 @@ const tsMain = () => {
                 },
             })
         },
-        MEC_core_API: initMEC_core_API
+        MEC_core_API: initMEC_core_API,
+        InvisUnit_is_getting_damage: init_InvisUnit_is_getting_damage
     })
 
     ServiceManager.getService('Cmd').initCommands()
