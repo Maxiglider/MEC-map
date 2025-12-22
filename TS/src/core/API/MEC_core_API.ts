@@ -6,7 +6,9 @@ import { Level } from 'core/04_STRUCTURES/Level/Level'
 import { Region } from 'core/04_STRUCTURES/Region/Region'
 import { TerrainType } from 'core/04_STRUCTURES/TerrainType/TerrainType'
 import { AfkMode } from 'core/08_GAME/Afk_mode/Afk_mode'
-import { getUdgEscapers, getUdgLevels, getUdgMonsterTypes, getUdgTerrainTypes, globals } from '../../../globals'
+import { getUdgEscapers, getUdgLevels, getUdgMonsterTypes, getUdgTerrainTypes, globals, udg_monsters,
+    udg_spawned_monsters
+} from '../../../globals'
 import { errorHandler, runInTrigger } from '../../Utils/mapUtils'
 import { SetMeteorEffect } from '../04_STRUCTURES/Escaper/Escaper'
 import { Hero2Escaper, IsHero } from '../04_STRUCTURES/Escaper/Escaper_functions'
@@ -20,6 +22,7 @@ import { ReinitTerrainsPositions } from '../07_TRIGGERS/Triggers_to_modify_terra
 import { heroes } from '../08_GAME/Init_game/Heroes'
 import { hooks } from './GeneralHooks'
 import { MecHook } from './MecHook'
+import { NewImmobileMonster, NewPatrolMonster } from '../04_STRUCTURES/Monster/Monster_functions'
 
 export type IMEC_core_API = typeof MEC_core_API
 
@@ -43,6 +46,12 @@ export const MEC_core_API = {
     getTerrainTypes: getUdgTerrainTypes,
     getLevels: getUdgLevels,
     getMonsterTypes: getUdgMonsterTypes,
+    getMonstersAll: () => {
+        return udg_monsters
+    },
+    getSpawnedMonstersAll: () => {
+        return udg_spawned_monsters
+    },
 
     //constructors
     newMonsterSimplePatrol: (...args: ConstructorParameters<typeof MonsterSimplePatrol>) => {
@@ -178,6 +187,9 @@ export const MEC_core_API = {
     setAfkTime: (time: number) => {
         AfkMode.timeMinAfk = time
     },
+
+    NewImmobileMonsterUnit: NewImmobileMonster,
+    NewPatrolMonsterUnit: NewPatrolMonster,
 }
 
 export const initMEC_core_API = () => {
