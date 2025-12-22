@@ -90,7 +90,6 @@ import { EscaperFirstPerson } from './Escaper_firstPerson'
 import { ColorInfo, GetMirrorEscaper } from './Escaper_functions'
 import { MakeTpForEnd } from '../../05_MAKE_STRUCTURES/Make_start_end_visibilityModifier/MakeTpForEnd'
 import { hooks } from '../../API/GeneralHooks'
-import { MakeBookOfLife } from '../../05_MAKE_STRUCTURES/Make_create_monsters/MakeBookOfLife'
 
 const SHOW_REVIVE_EFFECTS = false
 
@@ -1556,11 +1555,6 @@ export class Escaper {
         //mode : noMove
         this.destroyMake()
         if (this.hero) this.make = new MakeMonsterNoMove(this.hero, mt, facingAngle)
-    }
-
-    makeCreateBookOfLives(facingAngle: number) {
-        this.destroyMake()
-        if (this.hero) this.make = new MakeBookOfLife(this.hero, facingAngle)
     }
 
     makeCreateSimplePatrolMonsters(mode: string, mt: MonsterType, angle?: number) {

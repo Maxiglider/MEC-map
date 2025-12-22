@@ -44,7 +44,6 @@ import { ChangeOneTerrain } from '../../07_TRIGGERS/Triggers_to_modify_terrains/
 import { ExchangeTerrains } from '../../07_TRIGGERS/Triggers_to_modify_terrains/Exchange_terrains'
 import { RandomizeTerrains } from '../../07_TRIGGERS/Triggers_to_modify_terrains/Randomize_terrains'
 import { CmdParam } from '../Helpers/Command_functions'
-import { BookOfLife } from '../../04_STRUCTURES/Monster/BookOfLife'
 
 export const initExecuteCommandMake = () => {
     const { registerCommand } = ServiceManager.getService('Cmd')
@@ -1257,9 +1256,11 @@ export const initExecuteCommandMake = () => {
         alias: ['setmkrd'],
         group: 'make',
         argDescription: '<monsterLabel> <width> <height>',
-        description: 'Sets dimensions of a monster to apply a rectangle kill zone (applies only to non immobile monsters ; use when circle kill zone is not adapted)',
+        description:
+            'Sets dimensions of a monster to apply a rectangle kill zone (applies only to non immobile monsters ; use when circle kill zone is not adapted)',
         cb: ({ nbParam, param1, param2, param3 }, escaper) => {
             if (nbParam !== 3) {
+                Text.erP(escaper.getPlayer(), 'wrong number of parameters')
                 return true
             }
 
@@ -1279,11 +1280,67 @@ export const initExecuteCommandMake = () => {
                 return true
             }
 
-            if(getUdgMonsterTypes().getByLabel(param1)?.setKillRectDimensions(width, height)){
+            if (getUdgMonsterTypes().getByLabel(param1)?.setKillRectDimensions(width, height)) {
                 Text.mkP(escaper.getPlayer(), 'kill rectangle dimensions changed for this monster type')
-            }else{
+            } else {
                 Text.erP(escaper.getPlayer(), 'the kill rectangle dimensions have to be minimum 32x32')
             }
+            return true
+        },
+    })
+
+    //-setMonsterLifeBonus(setmlb) <monsterLabel> <width> <height>
+    registerCommand({
+        name: 'setMonsterLifeBonus',
+        alias: ['setmlb'],
+        group: 'make',
+        argDescription: '<monsterLabel> <enabled> [<nbLivesEarned = 1> [<minimumSurviveTime = 0>]]',
+        description:
+            'Enables or disables the life bonus characteristic for a monster type. If enabled, a monster will gives lives when a hero touches them and survives the required time.',
+        cb: ({ nbParam, param1, param2, param3, param4 }, escaper) => {
+            if (nbParam < 2 || nbParam > 4) {
+                Text.erP(escaper.getPlayer(), 'wrong parameters')
+                return true
+            }
+
+            //checkParam1
+            const mt = getUdgMonsterTypes().getByLabel(param1)
+            if (!mt) {
+                Text.erP(escaper.getPlayer(), 'unknown monster type')
+                return true
+            }
+
+            //checkParam2
+            if (!IsBoolString(param2)) {
+                Text.erP(escaper.getPlayer(), 'wrong parameters')
+                return true
+            }
+            const enabling = S2B(param2)
+
+            //checkParam3
+            let nbLivesEarned: number | undefined
+            if (nbParam >= 3) {
+                if (!IsPositiveInteger(param3)) {
+                    Text.erP(escaper.getPlayer(), 'wrong parameters')
+                    return true
+                }
+                nbLivesEarned = S2I(param3)
+            }
+
+            //checkParam4
+            let minimumSurviveTime: number | undefined
+            if (nbParam >= 4) {
+                if (S2R(param4) < 0) {
+                    Text.erP(escaper.getPlayer(), 'wrong parameters')
+                    return true
+                }
+                minimumSurviveTime = S2R(param4)
+            }
+
+            //apply the command
+            mt.setLifeBonus(enabling, nbLivesEarned, minimumSurviveTime)
+            Text.mkP(escaper.getPlayer(), 'life bonus characteristic updated for this monster type')
+
             return true
         },
     })
@@ -1737,40 +1794,6 @@ export const initExecuteCommandMake = () => {
             return true
         },
     })
-
-    //-createBookOfLife(crbol) [<facingAngle>]   --> if facing angle not specified, random angles will be chosen
-    registerCommand({
-        name: 'createBookOfLife',
-        alias: ['crbol'],
-        group: 'make',
-        argDescription: '[<facingAngle>]',
-        description:
-            'creates a book of life at the current location, facing the specified angle (or random if not specified)',
-        cb: ({ nbParam, param1, param2 }, escaper) => {
-            if (nbParam > 1) {
-                return true
-            }
-            let facingAngle = 0
-
-            //checkParam1
-            if (nbParam == 1) {
-                if (S2R(param1) === 0 && param1 !== '0') {
-                    Text.erP(escaper.getPlayer(), 'wrong angle value ; should be a real (-1 for random angle)')
-                    return true
-                }
-                facingAngle = S2R(param1)
-            } else {
-                facingAngle = -1
-            }
-
-            escaper.makeCreateBookOfLives(facingAngle)
-
-            Text.mkP(escaper.getPlayer(), 'book of life making on')
-            return true
-        },
-    })
-
-    // todo setBooksOfLifeMonsterType
 
     //-setUnitMonsterType(setumt) <monsterLabel>
     registerCommand({
@@ -4173,7 +4196,7 @@ export const initExecuteCommandMake = () => {
                                 monster.y1 = Math.round(monster.y1 / roundToGrid) * roundToGrid + GetRandomInt(-4, 4)
                                 monster.x2 = Math.round(monster.x2 / roundToGrid) * roundToGrid + GetRandomInt(-4, 4)
                                 monster.y2 = Math.round(monster.y2 / roundToGrid) * roundToGrid + GetRandomInt(-4, 4)
-                            } else if (monster instanceof MonsterNoMove || monster instanceof BookOfLife) {
+                            } else if (monster instanceof MonsterNoMove) {
                                 monster.x = Math.round(monster.x / roundToGrid) * roundToGrid + GetRandomInt(-4, 4)
                                 monster.y = Math.round(monster.y / roundToGrid) * roundToGrid + GetRandomInt(-4, 4)
                             } else if (monster instanceof MonsterMultiplePatrols) {

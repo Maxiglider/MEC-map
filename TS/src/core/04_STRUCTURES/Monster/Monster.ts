@@ -1,7 +1,7 @@
 import { Constants } from 'core/01_libraries/Constants'
 import { MemoryHandler } from 'Utils/MemoryHandler'
 import { Timer } from 'w3ts'
-import { udg_monsters } from '../../../../globals'
+import { globals, udg_monsters } from '../../../../globals'
 import { ColorString2Id } from '../../01_libraries/Init_colorCodes'
 import { IsColorString } from '../../06_COMMANDS/Helpers/Command_functions'
 import { hooks } from '../../API/GeneralHooks'
@@ -12,6 +12,12 @@ import { ClearMob } from '../Monster_properties/ClearMob'
 import { PortalMob } from '../Monster_properties/PortalMob'
 import { MonsterType } from './MonsterType'
 import { monstersClickable } from './trig_Monsters_clickable_set_life'
+import { Escaper } from '../Escaper/Escaper'
+import { ServiceManager } from '../../../Services'
+import { createTimer } from '../../../Utils/mapUtils'
+import { RunSoundOnUnit } from '../../02_bibliotheques_externes/SoundUtils'
+const LIVES_EARNED_SOUND_PATH = 'Sound/Interface/SecretFound.wav'
+const LIVES_EARNED_SOUND_DURATION = 2525
 
 export abstract class Monster {
     public static forceUnitTypeIdForNextMonster = 0
@@ -58,6 +64,9 @@ export abstract class Monster {
     private attackGroundY: number | undefined = undefined
     private attackGroundDelay: number = 0
     private monsterSkin: number | undefined = undefined
+
+    private lifeBonusEscapersWhoJustReached: Set<Escaper> = new Set()
+    private lifeBonusLivesEarned = false
 
     constructor(monsterType?: MonsterType, forceId: number | null = null) {
         this.mt = monsterType
@@ -452,6 +461,55 @@ export abstract class Monster {
                 IssuePointOrder(this.u, 'attackground', this.attackGroundX, this.attackGroundY)
             }
         }
+    }
+
+    onEscaperReachingThisLifeBonus(escaper: Escaper) {
+        const lifeBonus = this.mt?.getLifeBonus()
+        if(!lifeBonus){
+            return
+        }
+
+        if (this.lifeBonusEscapersWhoJustReached.has(escaper)) {
+            return
+        }
+        this.lifeBonusEscapersWhoJustReached.add(escaper)
+
+        if (lifeBonus.minimumSurviveTime <= 0) {
+            this.triggerEscaperEarningLives(escaper)
+        } else {
+            const MEC_core_API = ServiceManager.getService('MEC_core_API')
+
+            const timer = createTimer(lifeBonus.minimumSurviveTime, false, () => {
+                this.triggerEscaperEarningLives(escaper)
+                timer.destroy()
+                MEC_core_API.destroyHook(hookId)
+            })
+            const hookId = MEC_core_API.onEscaperDeath(() => {
+                timer.destroy()
+                this.lifeBonusEscapersWhoJustReached.delete(escaper)
+            })
+        }
+    }
+
+    triggerEscaperEarningLives(escaper: Escaper) {
+        this.lifeBonusEscapersWhoJustReached.delete(escaper)
+
+        const lifeBonus = this.mt?.getLifeBonus()
+        if(!lifeBonus){
+            return
+        }
+
+        if (this.lifeBonusLivesEarned) {
+            return
+        }
+        this.lifeBonusLivesEarned = true
+
+        const heroUnit = escaper.getHero()
+        heroUnit && RunSoundOnUnit(LIVES_EARNED_SOUND_PATH, LIVES_EARNED_SOUND_DURATION, heroUnit)
+
+        escaper.addLives(lifeBonus.nbLivesEarned)
+
+        this.removeUnit()
     }
 
     destroy() {

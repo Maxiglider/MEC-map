@@ -62,6 +62,9 @@ export class MonsterTypeArray extends BaseArray<MonsterType> {
             if (mt.killRectDimensions) {
                 monsterType.setKillRectDimensions(mt.killRectDimensions.width, mt.killRectDimensions.height)
             }
+            if(mt.lifeBonusEnabled){
+                monsterType.setLifeBonus(mt.lifeBonusEnabled, mt.lifeBonusNbLivesEarned, mt.lifeBonusMinimumSurviveTime)
+            }
         }
     }
 

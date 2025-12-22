@@ -126,18 +126,6 @@ export const MEC_core_API = {
         globals.CAN_TURN_IN_AIR = b
     },
     setStaticSpawnPositions: heroes.setStaticSpawnPositions,
-    setBookOfLifeMinimumSurviveTime: (time: number) => {
-        if(time < 0) {
-            throw new Error("Book of Life minimum survive time cannot be negative")
-        }
-        globals.bookOfLifeMinimumSurviveTime = time
-    },
-    setBookOfLifeNbLivesEarned: (nbLives: number) => {
-        if(nbLives < 0) {
-            throw new Error("Book of Life number of lives earned cannot be negative")
-        }
-        globals.bookOfLifeNbLivesEarned = nbLives
-    },
 
     //helpers
     isHero: IsHero,

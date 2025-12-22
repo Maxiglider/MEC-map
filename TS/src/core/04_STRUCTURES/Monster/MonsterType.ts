@@ -23,6 +23,10 @@ export class MonsterType {
     private createTerrainLabel?: string
     private killRectDimensions?: { width: number; height: number }
 
+    private lifeBonusEnabled = false
+    private lifeBonusNbLivesEarned = 0
+    private lifeBonusMinimumSurviveTime = 0
+
     constructor(
         label: string,
         unitTypeId: number,
@@ -251,7 +255,7 @@ export class MonsterType {
         const roundedWidth = R2I(width / 32) * 32
         const roundedHeight = R2I(height / 32) * 32
 
-        if(roundedHeight <= 0 || roundedWidth <= 0){
+        if (roundedHeight <= 0 || roundedWidth <= 0) {
             return false
         }
 
@@ -268,6 +272,29 @@ export class MonsterType {
 
     getKillRectDimensions = (): { width: number; height: number } | undefined => {
         return this.killRectDimensions
+    }
+
+    setLifeBonus = (enabling: boolean, nbLivesEarned?: number, minimumSurviveTime?: number): void => {
+        this.lifeBonusEnabled = enabling
+
+        if (nbLivesEarned !== undefined) {
+            this.lifeBonusNbLivesEarned = nbLivesEarned
+        }
+
+        if (minimumSurviveTime !== undefined) {
+            this.lifeBonusMinimumSurviveTime = minimumSurviveTime
+        }
+    }
+
+    getLifeBonus = (): { nbLivesEarned: number; minimumSurviveTime: number } | undefined => {
+        if (!this.lifeBonusEnabled) {
+            return undefined
+        }
+
+        return {
+            nbLivesEarned: this.lifeBonusNbLivesEarned,
+            minimumSurviveTime: this.lifeBonusMinimumSurviveTime,
+        }
     }
 
     toText = (): string => {
@@ -309,8 +336,24 @@ export class MonsterType {
         if (this.isWanderableB) {
             display = display + space + 'wanderable'
         }
-        if(this.killRectDimensions){
-            display = display + space + 'killRect_' + I2S(R2I(this.killRectDimensions.width)) + 'x' + I2S(R2I(this.killRectDimensions.height))
+        if (this.killRectDimensions) {
+            display =
+                display +
+                space +
+                'killRect_' +
+                I2S(R2I(this.killRectDimensions.width)) +
+                'x' +
+                I2S(R2I(this.killRectDimensions.height))
+        }
+        if(this.lifeBonusEnabled){
+            display =
+                display +
+                space +
+                'lifeBonus_enabled_nb' +
+                I2S(this.lifeBonusNbLivesEarned) +
+                '_minSurv' +
+                R2S(this.lifeBonusMinimumSurviveTime) +
+                's'
         }
         return display
     }
@@ -335,11 +378,17 @@ export class MonsterType {
         output['height'] = R2I(this.height)
         output['createTerrainLabel'] = this.createTerrainLabel
 
-        if(this.killRectDimensions){
+        if (this.killRectDimensions) {
             output['killRectDimensions'] = {
                 width: this.killRectDimensions.width,
-                height: this.killRectDimensions.height
+                height: this.killRectDimensions.height,
             }
+        }
+
+        if(this.lifeBonusEnabled){
+            output['lifeBonusEnabled'] = this.lifeBonusEnabled
+            output['lifeBonusNbLivesEarned'] = this.lifeBonusNbLivesEarned
+            output['lifeBonusMinimumSurviveTime'] = this.lifeBonusMinimumSurviveTime
         }
 
         return output

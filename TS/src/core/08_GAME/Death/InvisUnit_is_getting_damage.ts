@@ -7,7 +7,6 @@ import { Constants } from 'core/01_libraries/Constants'
 import { Monster } from 'core/04_STRUCTURES/Monster/Monster'
 import { hooks } from 'core/API/GeneralHooks'
 import { getUdgEscapers, udg_monsters, udg_spawned_monsters } from '../../../../globals'
-import { BookOfLife } from '../../04_STRUCTURES/Monster/BookOfLife'
 import type { Escaper } from '../../04_STRUCTURES/Escaper/Escaper'
 
 
@@ -131,8 +130,9 @@ const onEscaperTouchingMonster = (escaper: Escaper, killingUnit: unit) =>{
         }
     }
 
-    if(monster instanceof BookOfLife){
-        monster.onEscaperReachingBookOfLife(escaper);
+    const lifeBonus = monster?.getMonsterType()?.getLifeBonus()
+    if(lifeBonus){
+        monster?.onEscaperReachingThisLifeBonus(escaper);
         return
     }
 
