@@ -90,7 +90,7 @@ class InterfaceManager {
     }
 
     private createFrames(): void {
-        const parent = BlzGetOriginFrame(ORIGIN_FRAME_GAME_UI, 0)!
+        const parent = BlzGetFrameByName('ConsoleUIBackdrop', 0)!
 
         // Main root container
         const rootContainer = BlzCreateFrameByType('FRAME', 'InterfaceRoot', parent, '', 0)!
@@ -302,7 +302,7 @@ class InterfaceManager {
 
         const containerPadding = 0.008
         const entryHeight = 0.015
-        const buttonWidth = 0.025
+        const buttonSize = 0.025
         const containerWidth = 0.25
         const containerHeight = 0.045 + sortedEntries.length * (entryHeight + 0.001)
 
@@ -353,7 +353,7 @@ class InterfaceManager {
                 )
                 BlzFrameSetSize(
                     text,
-                    containerWidth - containerPadding * 2 - buttonWidth * 2 - 0.02,
+                    containerWidth - containerPadding * 2 - buttonSize * 2 - 0.02,
                     entryHeight - 0.004
                 )
             }
@@ -382,10 +382,10 @@ class InterfaceManager {
                 BlzFrameSetAbsPoint(
                     pinBtn,
                     FRAMEPOINT_TOPRIGHT,
-                    this.historyPos.x + containerWidth - 0.04 - (buttonWidth + 0.001),
+                    this.historyPos.x + containerWidth - 0.028 - buttonSize + 0.01,
                     entryY
                 )
-                BlzFrameSetSize(pinBtn, buttonWidth, buttonWidth)
+                BlzFrameSetSize(pinBtn, buttonSize, buttonSize)
             }
 
             const pinTrigger = CreateTrigger()!
@@ -407,8 +407,8 @@ class InterfaceManager {
             BlzFrameSetScale(removeBtn, 0.7)
 
             if (GetPlayerId(GetLocalPlayer()!) === localPlayerId) {
-                BlzFrameSetAbsPoint(removeBtn, FRAMEPOINT_TOPRIGHT, this.historyPos.x + containerWidth - 0.04, entryY)
-                BlzFrameSetSize(removeBtn, buttonWidth, buttonWidth)
+                BlzFrameSetAbsPoint(removeBtn, FRAMEPOINT_TOPRIGHT, this.historyPos.x + containerWidth - 0.028, entryY)
+                BlzFrameSetSize(removeBtn, buttonSize, buttonSize)
             }
 
             const removeTrigger = CreateTrigger()!
