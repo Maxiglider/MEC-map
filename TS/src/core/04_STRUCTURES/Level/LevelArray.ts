@@ -144,13 +144,13 @@ export class LevelArray extends BaseArray<Level> {
 
         this.currentLevel = levelId
 
-        this.refreshVisibilities()
-
         for (let i = 0; i < Constants.NB_PLAYERS_MAX; i++) {
             if (!escaper || (getUdgEscapers().get(i) && sameLevelProgression(escaper, getUdgEscapers().get(i)!))) {
                 this.levelProgressionState[i] = levelId
             }
         }
+
+        this.refreshVisibilities();
 
         if (
             previousLevelId > -1 &&
@@ -186,13 +186,13 @@ export class LevelArray extends BaseArray<Level> {
 
         this.currentLevel = this.getCurrentLevel(escaper).id + 1
 
-        this.refreshVisibilities()
-
         for (let i = 0; i < Constants.NB_PLAYERS_MAX; i++) {
             if (getUdgEscapers().get(i) && sameLevelProgression(escaper, getUdgEscapers().get(i)!)) {
                 this.levelProgressionState[i] = this.currentLevel
             }
         }
+
+        this.refreshVisibilities()
 
         if (!IsLevelBeingMade(this.data[this.currentLevel - 1]) && !this.hasPlayersInLevel(this.currentLevel - 1)) {
             getUdgEscapers().destroyMakesIfForSpecificLevel_currentLevel()
@@ -218,22 +218,36 @@ export class LevelArray extends BaseArray<Level> {
      * Applies the visibilities of the current level, recursively activating all previous levels' visibilities as well.
      */
     refreshVisibilities = () => {
+        const highestLevelBeingPlayedOrMade = this.getHighestLevelBeingPlayedOrMade()
+
         let blackMaskActivated = false
         this.forAllReversed((level: Level, levelId: number) => {
-            if (IsLevelBeingMade(level)) {
+            if (IsLevelBeingMade(level) || this.hasPlayersInLevel(levelId)) {
                 level.activateVisibilities(true)
-                if (level.getResetVisiblitiesAtStart()) {
-                    blackMaskActivated = true
-                }
-            } else if (levelId > this.currentLevel || blackMaskActivated) {
+                blackMaskActivated = level.getResetVisiblitiesAtStart()
+            } else if (levelId > highestLevelBeingPlayedOrMade.id || blackMaskActivated) {
                 level.activateVisibilities(false)
-            } else if (levelId <= this.currentLevel) {
+            } else if (levelId <= highestLevelBeingPlayedOrMade.id) {
                 level.activateVisibilities(true)
                 if (level.getResetVisiblitiesAtStart()) {
                     blackMaskActivated = true
                 }
             }
         })
+    }
+
+    getHighestLevelBeingPlayedOrMade = () => {
+        let highestLevelId = -1
+
+        for (let levelId = 0; levelId <= this.lastInstanceId; levelId++) {
+            const level = this.data[levelId]
+
+            if (IsLevelBeingMade(level) || this.hasPlayersInLevel(levelId)) {
+                highestLevelId = levelId
+            }
+        }
+
+        return highestLevelId === -1 ? this.data[0] : this.data[highestLevelId]
     }
 
     // moveCamToStart(level: Level, finisher: Escaper | undefined) {

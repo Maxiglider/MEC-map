@@ -6,7 +6,7 @@ import { createEvent } from 'Utils/mapUtils'
 import { Constants } from 'core/01_libraries/Constants'
 import { Monster } from 'core/04_STRUCTURES/Monster/Monster'
 import { hooks } from 'core/API/GeneralHooks'
-import { getUdgEscapers, udg_monsters } from '../../../../globals'
+import { getUdgEscapers, udg_monsters, udg_spawned_monsters } from '../../../../globals'
 import { Natives } from '../../wc3_natives_unsecured/Natives'
 
 export const InitTrig_InvisUnit_is_getting_damage = () => {
@@ -141,19 +141,19 @@ export const InitTrig_InvisUnit_is_getting_damage = () => {
                                 escaper.kill()
                             }
 
-                            //effet de tuation du héros par le monstre, suivant le type du monstre
-                            if (monster) {
-                                const effectStr = monster.getMonsterType()?.getKillingEffectStr()
+                            const effectStr =
+                                monster?.getMonsterType()?.getKillingEffectStr() ||
+                                udg_spawned_monsters[GetHandleId(killingUnit)]?.getKillingEffectStr()
 
-                                if (effectStr) {
-                                    const eff = EffectUtils.addSpecialEffect(
-                                        effectStr,
-                                        GetUnitX(invisUnit),
-                                        GetUnitY(invisUnit)
-                                    )
-                                    TriggerSleepAction(3)
-                                    EffectUtils.destroyEffect(eff)
-                                }
+                            //effet de tuation du héros par le monstre, suivant le type du monstre
+                            if (effectStr) {
+                                const eff = EffectUtils.addSpecialEffect(
+                                    effectStr,
+                                    GetUnitX(invisUnit),
+                                    GetUnitY(invisUnit)
+                                )
+                                TriggerSleepAction(3)
+                                EffectUtils.destroyEffect(eff)
                             }
                         }
                     }

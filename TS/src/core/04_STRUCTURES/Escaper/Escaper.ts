@@ -1516,7 +1516,7 @@ export class Escaper {
         if (this.makingLevel) {
             return this.makingLevel
         } else {
-            return getUdgLevels().getCurrentLevel()
+            return getUdgLevels().getCurrentLevel(this)
         }
     }
 
@@ -2411,9 +2411,13 @@ export class Escaper {
         if (b && this.hero) {
             const x = GetUnitX(this.hero)
             const y = GetUnitY(this.hero)
-            this.tClickWhereYouAre = createTimer(0.2, true, () => {
+
+            const clickWhereYouAre_Action = () => {
                 this.hero && this.isSliding() && IssuePointOrder(this.hero, 'smart', x, y)
-            })
+            }
+
+            this.tClickWhereYouAre = createTimer(0.1, true, clickWhereYouAre_Action)
+            clickWhereYouAre_Action()
         }
     }
 
