@@ -12,6 +12,7 @@ import { ClearMob } from '../Monster_properties/ClearMob'
 import { PortalMob } from '../Monster_properties/PortalMob'
 import { MonsterType } from './MonsterType'
 import { monstersClickable } from './trig_Monsters_clickable_set_life'
+import { Natives } from '../../wc3_natives_unsecured/Natives'
 import { Escaper } from '../Escaper/Escaper'
 import { ServiceManager } from '../../../Services'
 import { createTimer } from '../../../Utils/mapUtils'
@@ -204,7 +205,7 @@ export abstract class Monster {
             this.level?.monsters.hooks_onBeforeCreateMonsterUnit,
             hooks.hooks_onBeforeCreateMonsterUnit
         )
-        if (hookArray) {
+        if (!!hookArray) {
             let forceUnitTypeId = 0
             let forceX = 0
             let forceY = 0
@@ -272,7 +273,7 @@ export abstract class Monster {
                 if (this.baseColorId === 0) {
                     this.u && SetUnitColor(this.u, PLAYER_COLOR_RED)
                 } else {
-                    this.u && SetUnitColor(this.u, ConvertPlayerColor(this.baseColorId))
+                    this.u && SetUnitColor(this.u, Natives.UConvertPlayerColor(this.baseColorId))
                 }
             }
             this.u && SetUnitVertexColorBJ(this.u, this.vcRed, this.vcGreen, this.vcBlue, this.vcTransparency)
@@ -287,7 +288,7 @@ export abstract class Monster {
             this.level?.monsters.hooks_onAfterCreateMonsterUnit,
             hooks.hooks_onAfterCreateMonsterUnit
         )
-        if (hookArray2) {
+        if (!!hookArray2) {
             for (const hook of hookArray2) {
                 hook.execute(this)
             }
@@ -384,7 +385,7 @@ export abstract class Monster {
                 if (baseColorId === 0) {
                     this.u && SetUnitColor(this.u, PLAYER_COLOR_RED)
                 } else {
-                    this.u && SetUnitColor(this.u, ConvertPlayerColor(baseColorId))
+                    this.u && SetUnitColor(this.u, Natives.UConvertPlayerColor(baseColorId))
                 }
             }
         }
@@ -417,7 +418,7 @@ export abstract class Monster {
             if (initBaseColorId === 0) {
                 this.u && SetUnitColor(this.u, PLAYER_COLOR_RED)
             } else {
-                this.u && SetUnitColor(this.u, ConvertPlayerColor(initBaseColorId))
+                this.u && SetUnitColor(this.u, Natives.UConvertPlayerColor(initBaseColorId))
             }
             this.u && SetUnitVertexColorBJ(this.u, this.vcRed, this.vcGreen, this.vcBlue, this.vcTransparency)
         }

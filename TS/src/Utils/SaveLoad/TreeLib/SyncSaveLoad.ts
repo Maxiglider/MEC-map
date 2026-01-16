@@ -2,6 +2,7 @@ import { errorHandler } from 'Utils/mapUtils'
 import { EncodingBase64 } from './EncodingBase64'
 import { EncodingHex } from './EncodingHex'
 import { Logger } from './Logger'
+import { Natives } from '../../../core/wc3_natives_unsecured/Natives'
 
 const BASE_64_DEFAULT = true
 const ESCAPE_DOUBLE_QUOTES_FOR_JSON_CHAR = '#DQ#'
@@ -15,22 +16,22 @@ export const SyncSaveLoad = () => {
     const allPromises: (IFilePromise | undefined)[] = []
 
     for (let i = 0; i < GetBJMaxPlayers(); i++) {
-        BlzTriggerRegisterPlayerSyncEvent(syncEvent, Player(i), syncPrefix, false)
-        BlzTriggerRegisterPlayerSyncEvent(syncEvent, Player(i), syncPrefixFinish, false)
+        BlzTriggerRegisterPlayerSyncEvent(syncEvent, Natives.UPlayer(i), syncPrefix, false)
+        BlzTriggerRegisterPlayerSyncEvent(syncEvent, Natives.UPlayer(i), syncPrefixFinish, false)
     }
 
     TriggerAddAction(
         syncEvent,
         errorHandler(
             () => {
-                const readData = BlzGetTriggerSyncData()
+                const readData = Natives.UBlzGetTriggerSyncData()
                 const totalChunkSize = EncodingHex.ToNumber(readData.substr(0, 8))
                 const currentChunk = EncodingHex.ToNumber(readData.substr(8, 8))
                 const theRest = readData.substr(16)
 
                 Logger.verbose('Loading ', currentChunk, ' out of ', totalChunkSize)
 
-                const promise = allPromises[GetPlayerId(GetTriggerPlayer())]
+                const promise = allPromises[GetPlayerId(Natives.UGetTriggerPlayer())]
 
                 if (promise) {
                     if (BlzGetTriggerSyncPrefix() === syncPrefix) {
@@ -41,14 +42,14 @@ export const SyncSaveLoad = () => {
                     }
                 } else {
                     Logger.warning(
-                        `Syncronised data in SyncSaveLoad when there is no promise present for player: ${GetPlayerName(
-                            GetTriggerPlayer()
+                        `Syncronised data in SyncSaveLoad when there is no promise present for player: ${Natives.UGetPlayerName(
+                            Natives.UGetTriggerPlayer()
                         )}`
                     )
                 }
             },
             () => {
-                allPromises[GetPlayerId(GetTriggerPlayer())] = undefined
+                allPromises[GetPlayerId(Natives.UGetTriggerPlayer())] = undefined
             }
         )
     )

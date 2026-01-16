@@ -3,6 +3,7 @@ import { Constants } from 'core/01_libraries/Constants'
 import { getUdgEscapers } from '../../../../globals'
 import { Monster } from './Monster'
 import { MonsterType } from './MonsterType'
+import { Natives } from '../../wc3_natives_unsecured/Natives'
 
 let monster: unit
 const ATTACK_SKILL = FourCC('Aatk')
@@ -84,9 +85,9 @@ export const NewImmobileMonsterForPlayer = (
 
     let scale: number
     if (angle === -1) {
-        monster = CreateUnit(p, unitTypeId, x, y, GetRandomDirectionDeg())
+        monster = Natives.UCreateUnit(p, unitTypeId, x, y, GetRandomDirectionDeg())
     } else {
-        monster = CreateUnit(p, unitTypeId, x, y, angle)
+        monster = Natives.UCreateUnit(p, unitTypeId, x, y, angle)
     }
 
     SetUnitUseFood(monster, false)
@@ -107,7 +108,7 @@ export const NewImmobileMonsterForPlayer = (
     }
     SetUnitMoveSpeed(monster, mt.getUnitMoveSpeed())
     if (!Constants.MOBS_VARIOUS_COLORS) {
-        SetUnitColor(monster, ConvertPlayerColor(24))
+        SetUnitColor(monster, Natives.UConvertPlayerColor(24))
     }
 
     if (disableAttack) {

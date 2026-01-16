@@ -3,6 +3,7 @@ import { MakeMonsterAction } from '../MakeLastActions/MakeMonsterAction'
 import { MonsterMultiplePatrols } from '../../04_STRUCTURES/Monster/MonsterMultiplePatrols'
 import { MonsterType } from '../../04_STRUCTURES/Monster/MonsterType'
 import {Make, MAKE_LAST_CLIC_UNIT_ID} from '../Make/Make'
+import { Natives } from '../../wc3_natives_unsecured/Natives'
 
 export class MakeMonsterMultiplePatrols extends Make {
     private mt: MonsterType
@@ -58,7 +59,7 @@ export class MakeMonsterMultiplePatrols extends Make {
 
     setUnitLastClicPosition = (x: number, y: number) => {
         if (!this.unitLastClic) {
-            this.unitLastClic = CreateUnit(
+            this.unitLastClic = Natives.UCreateUnit(
                 this.makerOwner,
                 MAKE_LAST_CLIC_UNIT_ID,
                 x,

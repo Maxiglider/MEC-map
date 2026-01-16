@@ -3,6 +3,7 @@ import { getUdgEscapers } from '../../../globals'
 import { createEvent } from '../../Utils/mapUtils'
 import { Escaper } from '../04_STRUCTURES/Escaper/Escaper'
 import { TurnOnSlide } from '../07_TRIGGERS/Slide_and_CheckTerrain_triggers/To_turn_on_slide'
+import { Natives } from '../wc3_natives_unsecured/Natives'
 
 const FOLLOW_MOUSE_PERIOD = 0.2
 
@@ -31,11 +32,11 @@ export class SimpleFollowMouse {
             events: [t => TriggerRegisterPlayerEvent(t, player, EVENT_PLAYER_MOUSE_DOWN)],
             actions: [
                 () => {
-                    const escaper = getUdgEscapers().get(GetPlayerId(GetTriggerPlayer()))
+                    const escaper = getUdgEscapers().get(GetPlayerId(Natives.UGetTriggerPlayer()))
                     const followMouse = escaper?.getSimpleFollowMouse()
 
                     if (followMouse) {
-                        const activeBtn = BlzGetTriggerPlayerMouseButton()
+                        const activeBtn = Natives.UBlzGetTriggerPlayerMouseButton()
 
                         if (activeBtn == MOUSE_BUTTON_TYPE_RIGHT) {
                             this.isActive = true
@@ -49,11 +50,11 @@ export class SimpleFollowMouse {
             events: [t => TriggerRegisterPlayerEvent(t, player, EVENT_PLAYER_MOUSE_UP)],
             actions: [
                 () => {
-                    const escaper = getUdgEscapers().get(GetPlayerId(GetTriggerPlayer()))
+                    const escaper = getUdgEscapers().get(GetPlayerId(Natives.UGetTriggerPlayer()))
                     const followMouse = escaper?.getSimpleFollowMouse()
 
                     if (followMouse) {
-                        const activeBtn = BlzGetTriggerPlayerMouseButton()
+                        const activeBtn = Natives.UBlzGetTriggerPlayerMouseButton()
 
                         if (activeBtn == MOUSE_BUTTON_TYPE_RIGHT) {
                             this.isActive = false
@@ -92,7 +93,7 @@ export class SimpleFollowMouse {
     }
 
     private onMouseMoveAction(this: void) {
-        const escaper = getUdgEscapers().get(GetPlayerId(GetTriggerPlayer()))
+        const escaper = getUdgEscapers().get(GetPlayerId(Natives.UGetTriggerPlayer()))
         const dis = escaper?.getSimpleFollowMouse()
 
         if (!dis) {

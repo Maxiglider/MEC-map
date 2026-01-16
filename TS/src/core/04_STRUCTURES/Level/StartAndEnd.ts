@@ -5,6 +5,7 @@ import { Text } from 'core/01_libraries/Text'
 import { getUdgLevels } from '../../../../globals'
 import { Hero2Escaper } from '../Escaper/Escaper_functions'
 import { getSameLevelProgressionPlayers } from './LevelProgression'
+import { Natives } from '../../wc3_natives_unsecured/Natives'
 
 abstract class RectInterface {
     minX: number
@@ -88,7 +89,7 @@ export class End extends RectInterface {
             events: [t => TriggerRegisterEnterRectSimple(t, this.r)],
             actions: [
                 () => {
-                    const finisher = Hero2Escaper(GetTriggerUnit())
+                    const finisher = Hero2Escaper(Natives.UGetTriggerUnit())
 
                     if (!finisher) {
                         return

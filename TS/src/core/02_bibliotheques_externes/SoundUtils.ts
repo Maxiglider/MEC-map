@@ -1,5 +1,10 @@
 export const SoundPlay3DUnit = (path: string, duration: number) => {
     const sd = CreateSound(path, false, true, true, 10, 10, 'CombatSoundsEAX')
+
+    if (!sd) {
+        throw new Error(`Could not create sound from path: "${path}"`)
+    }
+
     SetSoundDuration(sd, duration)
     //Things that must be performed immediately upon creation of sounds
     SetSoundChannel(sd, 5)
@@ -10,6 +15,7 @@ export const SoundPlay3DUnit = (path: string, duration: number) => {
     SetSoundDistanceCutoff(sd, 3000)
     SetSoundConeAngles(sd, 0, 0, 127)
     SetSoundConeOrientation(sd, 0, 0, 0)
+
     return sd
 }
 

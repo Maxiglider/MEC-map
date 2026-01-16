@@ -88,6 +88,7 @@ import { EscaperEffectArray } from './EscaperEffectArray'
 import { EscaperStartCommands } from './Escaper_StartCommands'
 import { EscaperFirstPerson } from './Escaper_firstPerson'
 import { ColorInfo, GetMirrorEscaper } from './Escaper_functions'
+import { Natives } from '../../wc3_natives_unsecured/Natives'
 import { MakeTpForEnd } from '../../05_MAKE_STRUCTURES/Make_start_end_visibilityModifier/MakeTpForEnd'
 import { hooks } from '../../API/GeneralHooks'
 
@@ -324,7 +325,7 @@ export class Escaper {
         this.playerId = escaperId >= Constants.NB_PLAYERS_MAX ? escaperId - 12 : escaperId
 
         this.escaperId = escaperId
-        this.p = Player(this.playerId)
+        this.p = Natives.UPlayer(this.playerId)
         this.walkSpeed = Constants.HERO_WALK_SPEED
         this.slideSpeed = Constants.HERO_SLIDE_SPEED
         this.rotationSpeed = HERO_ROTATION_SPEED
@@ -353,7 +354,7 @@ export class Escaper {
         this.rotationSpeedAbsolute = false
         this.hasAutoreviveB = false
 
-        if (VIPs.includes(GetPlayerName(this.p))) {
+        if (VIPs.includes(Natives.UGetPlayerName(this.p))) {
             this.canCheatB = true
             this.isMaximaxouB = true
             this.isTrueMaximaxouB = true
@@ -373,15 +374,15 @@ export class Escaper {
         //coop
         this.coopInvul = false
 
-        this.powerCircle = CreateUnit(this.p, Constants.POWER_CIRCLE, 0, 0, 0)
+        this.powerCircle = Natives.UCreateUnit(this.p, Constants.POWER_CIRCLE, 0, 0, 0)
         SetUnitUserData(this.powerCircle, escaperId)
         ShowUnit(this.powerCircle, false)
 
-        this.dummyPowerCircle = CreateUnit(this.p, Constants.DUMMY_POWER_CIRCLE, 0, 0, 0)
+        this.dummyPowerCircle = Natives.UCreateUnit(this.p, Constants.DUMMY_POWER_CIRCLE, 0, 0, 0)
         SetUnitUserData(this.dummyPowerCircle, escaperId)
         ShowUnit(this.dummyPowerCircle, false)
 
-        this.displayName = removeHash(GetPlayerName(this.p))
+        this.displayName = removeHash(Natives.UGetPlayerName(this.p))
 
         for (let i = 0; i < Constants.NB_PLAYERS_MAX; i++) {
             this.alliedState[i] = true
@@ -404,10 +405,13 @@ export class Escaper {
     resetItem = () => {
         //renvoie true si le héros portait un item
         if (this.hero && UnitHasItemOfTypeBJ(this.hero, METEOR_NORMAL)) {
-            SetItemDroppable(UnitItemInSlot(this.hero, 0), true)
-            udg_meteors[GetItemUserData(UnitItemInSlot(this.hero, 0))]?.replace()
-            this.removeEffectMeteor()
-            return true
+            const item = UnitItemInSlot(this.hero, 0)
+            if (!!item) {
+                SetItemDroppable(item, true)
+                udg_meteors[GetItemUserData(item)]?.replace()
+                this.removeEffectMeteor()
+                return true
+            }
         }
         return false
     }
@@ -444,7 +448,7 @@ export class Escaper {
             heroTypeId = Constants.HERO_SECONDARY_TYPE_ID
         }
 
-        this.hero = CreateUnit(this.p, heroTypeId, x, y, angle)
+        this.hero = Natives.UCreateUnit(this.p, heroTypeId, x, y, angle)
 
         if (!this.hero) {
             // Invalid skin, reset and try again
@@ -483,12 +487,12 @@ export class Escaper {
         this.selectHero()
         this.moveCameraToHeroIfNecessary()
 
-        SetUnitColor(this.hero, ConvertPlayerColor(this.baseColorId))
-        SetUnitColor(this.powerCircle, ConvertPlayerColor(this.baseColorId))
+        SetUnitColor(this.hero, Natives.UConvertPlayerColor(this.baseColorId))
+        SetUnitColor(this.powerCircle, Natives.UConvertPlayerColor(this.baseColorId))
 
         this.updateUnitVertexColor()
         this.SpecialIllidan()
-        this.invisUnit = CreateUnit(Constants.PLAYER_INVIS_UNIT, Constants.INVIS_UNIT_TYPE_ID, x, y, angle)
+        this.invisUnit = Natives.UCreateUnit(Constants.PLAYER_INVIS_UNIT, Constants.INVIS_UNIT_TYPE_ID, x, y, angle)
         SetUnitUserData(this.invisUnit, GetPlayerId(this.p))
         TriggerRegisterUnitEvent(
             ServiceManager.getService('InvisUnit_is_getting_damage').Trig_InvisUnit_is_getting_damage.gg_trg_InvisUnit_is_getting_damage,
@@ -503,7 +507,7 @@ export class Escaper {
 
         EnableTrigger(this.checkTerrain)
 
-        this.textTag = CreateTextTag()
+        this.textTag = Natives.UCreateTextTag()
         SetTextTagTextBJ(this.textTag, udg_colorCode[this.getColorId()] + this.getDisplayName(), 10)
         SetTextTagPermanent(this.textTag, true)
         SetTextTagVisibility(this.textTag, false)
@@ -1029,7 +1033,7 @@ export class Escaper {
         this.tempSlideSpeedPerPeriod = (this.getSlideMirror() ? -1 : 1) * ss * Constants.SLIDE_PERIOD
 
         if (this.hero && effect) {
-            this.tempSlideSpeedEffect = AddSpecialEffectTargetUnitBJ('origin', this.hero, effect)
+            this.tempSlideSpeedEffect = Natives.UAddSpecialEffectTargetUnitBJ('origin', this.hero, effect)
         }
 
         this.tempSlideSpeedTimer = createTimer(duration, false, () => {
@@ -1233,8 +1237,8 @@ export class Escaper {
                 SetUnitColor(this.hero, PLAYER_COLOR_RED)
                 SetUnitColor(this.powerCircle, PLAYER_COLOR_RED)
             } else {
-                SetUnitColor(this.hero, ConvertPlayerColor(baseColorId))
-                SetUnitColor(this.powerCircle, ConvertPlayerColor(baseColorId))
+                SetUnitColor(this.hero, Natives.UConvertPlayerColor(baseColorId))
+                SetUnitColor(this.powerCircle, Natives.UConvertPlayerColor(baseColorId))
             }
         }
 
@@ -1257,8 +1261,8 @@ export class Escaper {
                 SetUnitColor(this.hero, PLAYER_COLOR_RED)
                 SetUnitColor(this.powerCircle, PLAYER_COLOR_RED)
             } else {
-                SetUnitColor(this.hero, ConvertPlayerColor(baseColorId))
-                SetUnitColor(this.powerCircle, ConvertPlayerColor(baseColorId))
+                SetUnitColor(this.hero, Natives.UConvertPlayerColor(baseColorId))
+                SetUnitColor(this.powerCircle, Natives.UConvertPlayerColor(baseColorId))
             }
         }
 
@@ -2467,16 +2471,16 @@ export class Escaper {
             ],
             actions: [
                 () => {
-                    if (this.getPlayer() === GetTriggerPlayer() && !this.canClick) {
+                    if (this.getPlayer() === Natives.UGetTriggerPlayer() && !this.canClick) {
                         if (
                             !IsIssuedOrder('smart') ||
-                            GetItemTypeId(GetOrderTargetItem()) === METEOR_NORMAL ||
-                            GetItemTypeId(GetOrderTargetItem()) === METEOR_CHEAT
+                            GetItemTypeId(Natives.UGetOrderTargetItem()) === METEOR_NORMAL ||
+                            GetItemTypeId(Natives.UGetOrderTargetItem()) === METEOR_CHEAT
                         ) {
                             return
                         }
 
-                        StopUnit(GetTriggerUnit())
+                        StopUnit(Natives.UGetTriggerUnit())
                     }
                 },
             ],

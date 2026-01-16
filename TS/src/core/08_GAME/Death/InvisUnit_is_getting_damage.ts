@@ -7,6 +7,7 @@ import { Constants } from 'core/01_libraries/Constants'
 import { Monster } from 'core/04_STRUCTURES/Monster/Monster'
 import { hooks } from 'core/API/GeneralHooks'
 import { getUdgEscapers, udg_monsters, udg_spawned_monsters } from '../../../../globals'
+import { Natives } from '../../wc3_natives_unsecured/Natives'
 import type { Escaper } from '../../04_STRUCTURES/Escaper/Escaper'
 
 
@@ -21,7 +22,7 @@ const InitTrig_InvisUnit_is_getting_damage = () => {
                     return
                 }
 
-                const invisUnit = GetTriggerUnit()
+                const invisUnit = Natives.UGetTriggerUnit()
                 const n = GetUnitUserData(invisUnit)
                 const escaper = getUdgEscapers().get(n)
 
@@ -30,6 +31,9 @@ const InitTrig_InvisUnit_is_getting_damage = () => {
                 }
 
                 const killingUnit = GetEventDamageSource()
+                if(!killingUnit){
+                    return
+                }
 
                 const hero = escaper.getHero()
 

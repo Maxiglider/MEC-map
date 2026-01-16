@@ -6,7 +6,7 @@ import { Ascii2String } from '../../01_libraries/Ascii'
 import { udg_colorCode } from '../../01_libraries/Init_colorCodes'
 import { Level } from '../Level/Level'
 import { IMMOLATION_SKILLS } from './Immolation_skills'
-import { printStackTraceBundleOverride } from 'typescript-to-lua/dist/transpilation/bundle'
+import { Natives } from '../../wc3_natives_unsecured/Natives'
 
 export class MonsterType {
     label: string
@@ -47,7 +47,7 @@ export class MonsterType {
             throw `${this.constructor.name} - '${label}' - '${unitTypeId}' - wrong immolation radius - '${immolationRadius}'`
         }
 
-        const testMonster = CreateUnit(Constants.NEUTRAL_PLAYER, unitTypeId, 0, 0, 0)
+        const testMonster = Natives.UCreateUnit(Constants.NEUTRAL_PLAYER, unitTypeId, 0, 0, 0)
         if (!testMonster) {
             throw `Unit type unknown: ${label}`
         } else {
@@ -118,7 +118,7 @@ export class MonsterType {
     }
 
     setUnitTypeId = (unitTypeId: number): boolean => {
-        let testMonster = CreateUnit(Constants.NEUTRAL_PLAYER, unitTypeId, 0, 0, 0)
+        let testMonster = Natives.UCreateUnit(Constants.NEUTRAL_PLAYER, unitTypeId, 0, 0, 0)
         if (!testMonster) {
             return false
         }
@@ -246,8 +246,8 @@ export class MonsterType {
         }
 
         let immoStr = Ascii2String(this.immolationSkill)
-        immoStr = SubStringBJ(immoStr, 2, 4)
-        return I2S(S2I(immoStr))
+        immoStr = SubStringBJ(immoStr, 2, 4) ?? ''
+        return I2S(S2I(immoStr)) ?? ''
     }
 
     setKillRectDimensions = (width: number, height: number): boolean => {
@@ -305,12 +305,12 @@ export class MonsterType {
         if (this.scale === -1) {
             scaleDisplay = 'default'
         } else {
-            scaleDisplay = R2S(this.scale)
+            scaleDisplay = R2S(this.scale) ?? ''
         }
         if (this.height === -1) {
             heightDisplay = 'default'
         } else {
-            heightDisplay = I2S(R2I(this.height))
+            heightDisplay = I2S(R2I(this.height)) ?? ''
         }
         display = display + Ascii2String(this.unitTypeId) + "'"
         display =

@@ -7,6 +7,7 @@ import { NewImmobileMonster } from './Monster_functions'
 import { createEvent } from '../../../Utils/mapUtils'
 import { Hero2Escaper } from '../Escaper/Escaper_functions'
 import { ServiceManager } from '../../../Services'
+import { Natives } from '../../wc3_natives_unsecured/Natives'
 
 export class MonsterNoMove extends Monster {
     x: number
@@ -102,7 +103,7 @@ export class MonsterNoMove extends Monster {
                     }
 
                     if (this.wanderEffect) DestroyEffect(this.wanderEffect)
-                    this.wanderEffect = AddSpecialEffectTargetUnitBJ('overhead', targetUnit, globals.wanderEffectStr)
+                    this.wanderEffect = Natives.UAddSpecialEffectTargetUnitBJ('overhead', targetUnit, globals.wanderEffectStr)
 
                     this.wanderTimer = new Timer().start(Math.random() * 1.5 + 0.5, false, () => {
                         let targetPoint = region.getRandomPoint()
@@ -119,7 +120,7 @@ export class MonsterNoMove extends Monster {
                                 break
                             }
 
-                            if (targetPoint) targetPoint.__destroy()
+                            if (!!targetPoint) targetPoint.__destroy()
                             targetPoint = region.getRandomPoint()
                         }
 

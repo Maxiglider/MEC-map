@@ -44,7 +44,7 @@ import { ChangeOneTerrain } from '../../07_TRIGGERS/Triggers_to_modify_terrains/
 import { ExchangeTerrains } from '../../07_TRIGGERS/Triggers_to_modify_terrains/Exchange_terrains'
 import { RandomizeTerrains } from '../../07_TRIGGERS/Triggers_to_modify_terrains/Randomize_terrains'
 import { CmdParam } from '../Helpers/Command_functions'
-
+import { Natives } from '../../wc3_natives_unsecured/Natives'
 export const initExecuteCommandMake = () => {
     const { registerCommand } = ServiceManager.getService('Cmd')
 
@@ -892,7 +892,7 @@ export const initExecuteCommandMake = () => {
 
             getUdgMonsterTypes().new(
                 param1,
-                String2Ascii(SubStringBJ(param2, 2, 5)),
+                String2Ascii(SubStringBJ(param2, 2, 5) ?? ''),
                 scale,
                 immoRadius,
                 speed,
@@ -981,7 +981,7 @@ export const initExecuteCommandMake = () => {
             if (
                 getUdgMonsterTypes()
                     .getByLabel(param1)
-                    ?.setUnitTypeId(String2Ascii(SubStringBJ(param2, 2, 5)))
+                    ?.setUnitTypeId(String2Ascii(SubStringBJ(param2, 2, 5) ?? ''))
             ) {
                 Text.mkP(escaper.getPlayer(), 'unit type changed')
             } else {
@@ -2574,7 +2574,7 @@ export const initExecuteCommandMake = () => {
             'create the start (a rectangle formed with two clicks) of the current level or the next one if specified',
         cb: ({ nbParam, param1, param2 }, escaper) => {
             let forNext = false
-            let facing = param2 ? convertTextToAngle(param2) : undefined
+            let facing = param2 !== '' ? convertTextToAngle(param2) : undefined
 
             //checkParam1
             if (nbParam === 1 || nbParam === 2) {
@@ -2672,7 +2672,7 @@ export const initExecuteCommandMake = () => {
                 const n = S2I(param1)
                 if (getUdgLevels().getLastLevelId() < n) {
                     if (n - getUdgLevels().getLastLevelId() == 1) {
-                        if (getUdgLevels().new()) {
+                        if (!!getUdgLevels().new()) {
                             Text.mkP(escaper.getPlayer(), 'level number ' + I2S(n) + ' created')
                         } else {
                             Text.erP(escaper.getPlayer(), 'nombre maximum de niveaux atteint')
@@ -2719,7 +2719,7 @@ export const initExecuteCommandMake = () => {
         description: 'Creates a new level after the last one',
         cb: ({ noParam }, escaper) => {
             if (noParam) {
-                if (getUdgLevels().new()) {
+                if (!!getUdgLevels().new()) {
                     Text.mkP(escaper.getPlayer(), 'level number ' + I2S(getUdgLevels().getLastLevelId()) + ' created')
                 } else {
                     Text.erP(escaper.getPlayer(), 'nombre maximum de niveaux atteint')
@@ -3324,8 +3324,8 @@ export const initExecuteCommandMake = () => {
         group: 'make',
         argDescription: '<casterLabel> <animation>',
         description: 'Change the animation of a caster monster',
-        cb: ({ cmd, name, nbParam, param1 }, escaper) => {
-            if (!(nbParam >= 2)) {
+        cb: ({ nbParam, param1, param2 }, escaper) => {
+            if (nbParam < 2) {
                 return true
             }
             //checkParam 1
@@ -3333,11 +3333,8 @@ export const initExecuteCommandMake = () => {
                 Text.erP(escaper.getPlayer(), 'unknown caster type "' + param1 + '"')
                 return true
             }
-            //checkParam 2
-            const n = StringLength(name) + StringLength(param1) + 4
-            const str = SubStringBJ(cmd, n, StringLength(cmd))
             //apply command
-            getUdgCasterTypes().getByLabel(param1)?.setAnimation(str)
+            getUdgCasterTypes().getByLabel(param1)?.setAnimation(param2)
             Text.mkP(escaper.getPlayer(), 'caster animation changed')
             return true
         },
@@ -3889,7 +3886,7 @@ export const initExecuteCommandMake = () => {
         argDescription: '[<delay>]',
         description: 'Set monster to attack ground with optional delay',
         cb: ({ param1 }, escaper) => {
-            const delay = param1 ? S2R(param1) : 0
+            const delay = param1 !== '' ? S2R(param1) : 0
 
             if (param1 && (delay < 0 || delay > 60)) {
                 Text.erP(escaper.getPlayer(), 'Delay must be between 0 and 60 seconds')
@@ -4153,7 +4150,7 @@ export const initExecuteCommandMake = () => {
 
                 for (let x = globals.MAP_MIN_X + gridUnitWidth; x < globals.MAP_MAX_X; x += gridUnitWidth) {
                     for (let y = globals.MAP_MIN_Y + gridUnitWidth; y < globals.MAP_MAX_Y; y += gridUnitWidth) {
-                        const gridUnit = CreateUnit(GetCurrentMonsterPlayer(), FourCC('hgrd'), x, y, 0)
+                        const gridUnit = Natives.UCreateUnit(GetCurrentMonsterPlayer(), FourCC('hgrd'), x, y, 0)
                         SetUnitUseFood(gridUnit, false)
                         UnitAddAbility(gridUnit, FourCC('Aloc'))
                         UnitAddAbility(gridUnit, ABILITY_ANNULER_VISION)
@@ -4287,7 +4284,7 @@ export const initExecuteCommandMake = () => {
                 const fixStartOnSlidePatrols = S2B(param2)
 
                 // todo should turn this into a ctrl+z able action
-                if (snapToSlide) {
+                if (!!snapToSlide) {
                     const currentVtoto = globals.USE_VTOTO_SLIDE_LOGIC
                     globals.USE_VTOTO_SLIDE_LOGIC = true
 

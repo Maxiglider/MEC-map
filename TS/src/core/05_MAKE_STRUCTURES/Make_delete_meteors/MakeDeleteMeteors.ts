@@ -4,6 +4,7 @@ import { arrayPush } from '../../01_libraries/Basic_functions'
 import { Text } from '../../01_libraries/Text'
 import { Meteor, METEOR_NORMAL, udg_meteors } from '../../04_STRUCTURES/Meteor/Meteor'
 import { MakeDeleteMeteorsAction } from '../MakeLastActions/MakeDeleteMeteorsAction'
+import { Natives } from '../../wc3_natives_unsecured/Natives'
 
 export class MakeDeleteMeteors extends MakeOneByOneOrTwoClicks {
     constructor(maker: unit, mode: string) {
@@ -19,11 +20,11 @@ export class MakeDeleteMeteors extends MakeOneByOneOrTwoClicks {
 
             if (this.getMode() == 'oneByOne') {
                 //mode oneClick
-                if (GetItemTypeId(GetOrderTargetItem()) !== METEOR_NORMAL) {
+                if (GetItemTypeId(Natives.UGetOrderTargetItem()) !== METEOR_NORMAL) {
                     return
                 }
 
-                meteor = udg_meteors[GetItemUserData(GetOrderTargetItem())]
+                meteor = udg_meteors[GetItemUserData(Natives.UGetOrderTargetItem())]
 
                 if (meteor && meteor.getItem()) {
                     meteor.delete()

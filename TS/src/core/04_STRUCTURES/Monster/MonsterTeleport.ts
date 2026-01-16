@@ -2,7 +2,8 @@ import { udg_monsters } from '../../../../globals'
 import { Monster } from './Monster'
 import { MonsterType } from './MonsterType'
 import { NewImmobileMonster } from './Monster_functions'
-import {arrayValuesRound} from "../../01_libraries/Basic_functions";
+import { arrayValuesRound } from '../../01_libraries/Basic_functions'
+import { Natives } from '../../wc3_natives_unsecured/Natives'
 
 export const WAIT = 1000000
 export const HIDE = 2000000
@@ -10,7 +11,7 @@ export const MONSTER_TELEPORT_PERIOD_MIN = 0.1
 export const MONSTER_TELEPORT_PERIOD_MAX = 10
 
 const MonsterTeleport_move_Actions = () => {
-    const monsterTP = MonsterTeleport.anyMonsterTeleportTimerId2MonsterTeleport.get(GetHandleId(GetExpiredTimer()))
+    const monsterTP = MonsterTeleport.anyMonsterTeleportTimerId2MonsterTeleport.get(GetHandleId(Natives.UGetExpiredTimer()))
     if (monsterTP) {
         monsterTP.nextMove()
     }
@@ -225,7 +226,7 @@ export class MonsterTeleport extends Monster {
 
     toJson() {
         const output = super.toJson()
-        if(output){
+        if (output) {
             output['mode'] = this.sens > 0 ? 'string' : 'normal'
             output['period'] = this.period
             output['angle'] = R2I(this.angle)

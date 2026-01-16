@@ -1,17 +1,18 @@
+import { getUdgEscapers } from '../../../../globals'
 import { MemoryHandler } from '../../../Utils/MemoryHandler'
 import { createEvent, forRange } from '../../../Utils/mapUtils'
+import { Constants } from '../../01_libraries/Constants'
 import { Text } from '../../01_libraries/Text'
 import { Escaper } from '../../04_STRUCTURES/Escaper/Escaper'
 import { Globals } from '../../09_From_old_Worldedit_triggers/globals_variables_and_triggers'
-import { getUdgEscapers } from '../../../../globals'
-import { Constants } from '../../01_libraries/Constants'
-import { initExecuteCommandMax } from '../Commands/5_admin'
+import { Natives } from '../../wc3_natives_unsecured/Natives'
 import { initCommandAll } from '../Commands/1_all'
-import { initExecuteCommandCheat } from '../Commands/3_cheat'
 import { initExecuteCommandRed } from '../Commands/2_first_player'
-import { CmdName, CmdParam, IsCmd, NbParam, NoParam } from './Command_functions'
+import { initExecuteCommandCheat } from '../Commands/3_cheat'
 import { initExecuteCommandMake } from '../Commands/4_make'
+import { initExecuteCommandMax } from '../Commands/5_admin'
 import { initExecuteCommandTrueMax } from '../Commands/6_superadmin'
+import { CmdName, CmdParam, IsCmd, NbParam, NoParam } from './Command_functions'
 import { handlePagination, handlePaginationArgs } from './Pagination'
 
 export type ICommandExecution = ReturnType<typeof initCommandExecution>
@@ -55,13 +56,13 @@ const parseCmdContext = (cmd: string) => {
 
 export const initCommandExecution = () => {
     const commands: ICommand[] = []
-    let addCommandToHistoryCallback: ((this: void, command: string, playerId: number) => void) | null = null
+    let addCommandToHistoryCallback: ((command: string, playerId: number) => void) | null = null
 
     const registerCommand = (cmd: ICommand) => {
         commands.push(cmd)
     }
 
-    const setAddCommandToHistory = (cb: (this: void, command: string, playerId: number) => void) => {
+    const setAddCommandToHistory = (cb: (command: string, playerId: number) => void) => {
         addCommandToHistoryCallback = cb
     }
 
@@ -91,7 +92,9 @@ export const initCommandExecution = () => {
             }
 
             case 'red': {
-                if (!((escaper.getPlayer() === Player(0) && Globals.udg_areRedRightsOn) || escaper.canCheat())) {
+                if (
+                    !((escaper.getPlayer() === Natives.UPlayer(0) && Globals.udg_areRedRightsOn) || escaper.canCheat())
+                ) {
                     return false
                 }
             }
@@ -185,7 +188,7 @@ export const initCommandExecution = () => {
             // }
         } catch (error) {
             if (typeof error == 'string') {
-                if (escaper.getPlayer()) {
+                if (!!escaper.getPlayer()) {
                     Text.erP(escaper.getPlayer(), error)
                 } else {
                     Text.erA(error)
@@ -205,7 +208,7 @@ export const initCommandExecution = () => {
 
         //ex : "-(abc def)" --> "-abc def"
         if (SubStringBJ(cmd, 2, 2) === '(' && SubStringBJ(cmd, StringLength(cmd), StringLength(cmd)) === ')') {
-            cmd = SubStringBJ(cmd, 1, 1) + SubStringBJ(cmd, 3, StringLength(cmd) - 1)
+            cmd = (SubStringBJ(cmd, 1, 1) ?? '') + SubStringBJ(cmd, 3, StringLength(cmd) - 1)
         }
 
         // Add to command history
@@ -217,7 +220,7 @@ export const initCommandExecution = () => {
         prevChar = ''
         while (true) {
             if (charId > StringLength(cmd)) break
-            char = SubStringBJ(cmd, charId, charId)
+            char = SubStringBJ(cmd, charId, charId) ?? ''
             if (char === ',' && prevChar !== '\\') {
                 if (nbParenthesesNonFermees <= 0) {
                     singleCommandId = singleCommandId + 1
@@ -262,21 +265,24 @@ export const initCommandExecution = () => {
 
     createEvent({
         events: [
-            t => forRange(Constants.NB_PLAYERS_MAX, i => TriggerRegisterPlayerChatEvent(t, Player(i), '-', false)),
+            t =>
+                forRange(Constants.NB_PLAYERS_MAX, i =>
+                    TriggerRegisterPlayerChatEvent(t, Natives.UPlayer(i), '-', false)
+                ),
         ],
         actions: [
             () => {
-                if (!IsCmd(GetEventPlayerChatString())) {
+                if (!IsCmd(Natives.UGetEventPlayerChatString())) {
                     return
                 }
 
-                const escaper = getUdgEscapers().get(GetPlayerId(GetTriggerPlayer()))
+                const escaper = getUdgEscapers().get(GetPlayerId(Natives.UGetTriggerPlayer()))
 
                 if (!escaper) {
                     return
                 }
 
-                ExecuteCommand(escaper, GetEventPlayerChatString())
+                ExecuteCommand(escaper, Natives.UGetEventPlayerChatString())
             },
         ],
     })
@@ -356,13 +362,13 @@ export const initCommandExecution = () => {
                 )
 
                 Text.P(
-                    GetTriggerPlayer(),
+                    Natives.UGetTriggerPlayer(),
                     `|cff00ff00Commands (page |cff00ccff${pageNum}|r|cff00ff00/|cff00ccff${displayableCmds.totalPages}|r|cff00ff00)|r`
                 )
 
                 for (const cmd of displayableCmds.cmds) {
                     const line = cmd
-                    Text.P(GetTriggerPlayer(), line)
+                    Text.P(Natives.UGetTriggerPlayer(), line)
                 }
 
                 return true

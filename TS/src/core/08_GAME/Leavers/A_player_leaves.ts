@@ -5,20 +5,21 @@ import { getUdgEscapers, getUdgLevels } from '../../../../globals'
 import { runInTrigger } from '../../../Utils/mapUtils'
 import { playerId2colorId } from '../../06_COMMANDS/Helpers/Command_functions'
 import { AfkMode } from '../Afk_mode/Afk_mode'
+import { Natives } from '../../wc3_natives_unsecured/Natives'
 
 export const InitTrig_A_player_leaves = () => {
     createEvent({
-        events: [t => forRange(Constants.NB_ESCAPERS, i => TriggerRegisterPlayerEventLeave(t, Player(i)))],
+        events: [t => forRange(Constants.NB_ESCAPERS, i => TriggerRegisterPlayerEventLeave(t, Natives.UPlayer(i)))],
         actions: [
             () => {
-                let n = GetPlayerId(GetTriggerPlayer())
+                let n = GetPlayerId(Natives.UGetTriggerPlayer())
                 const displayName = getUdgEscapers().get(n)?.getDisplayName()
 
                 getUdgEscapers().destroyEscaper(n)
                 AfkMode.StopAfk(n)
                 AfkMode.StopAfk(n + Constants.NB_PLAYERS_MAX)
                 DisplayTextToForce(
-                    GetPlayersAll(),
+                    Natives.UGetPlayersAll(),
                     `${
                         udg_colorCode[playerId2colorId(n)]
                     }This is too difficult for ${displayName}, (s)he has left the game.`

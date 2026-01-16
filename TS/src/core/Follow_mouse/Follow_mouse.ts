@@ -3,30 +3,31 @@ import { createEvent } from '../../Utils/mapUtils'
 import { Escaper } from '../04_STRUCTURES/Escaper/Escaper'
 import { AutoContinueAfterSliding } from '../07_TRIGGERS/Slide_and_CheckTerrain_triggers/Auto_continue_after_sliding'
 import { TurnOnSlide } from '../07_TRIGGERS/Slide_and_CheckTerrain_triggers/To_turn_on_slide'
+import { Natives } from '../wc3_natives_unsecured/Natives'
 
 export const PRESS_TIME_TO_ENABLE_FOLLOW_MOUSE = 0.2
 const FOLLOW_MOUSE_PERIOD = 0.1
 
 const onPressActions = () => {
-    const escaper = getUdgEscapers().get(GetPlayerId(GetTriggerPlayer()))
+    const escaper = getUdgEscapers().get(GetPlayerId(Natives.UGetTriggerPlayer()))
     const followMouse = escaper?.getFollowMouse()
     followMouse && followMouse.doPressActions()
 }
 
 const onUnpressActions = () => {
-    const escaper = getUdgEscapers().get(GetPlayerId(GetTriggerPlayer()))
+    const escaper = getUdgEscapers().get(GetPlayerId(Natives.UGetTriggerPlayer()))
     const followMouse = escaper?.getFollowMouse()
     followMouse && followMouse.doUnpressActions()
 }
 
 const onMouseMoveActions = () => {
-    const escaper = getUdgEscapers().get(GetPlayerId(GetTriggerPlayer()))
+    const escaper = getUdgEscapers().get(GetPlayerId(Natives.UGetTriggerPlayer()))
     const followMouse = escaper?.getFollowMouse()
     followMouse && followMouse.doMouseMoveActions()
 }
 
 const followMouseActions = () => {
-    const escaper = FollowMouse.anyTimer2escaper.get(GetExpiredTimer())
+    const escaper = FollowMouse.anyTimer2escaper.get(Natives.UGetExpiredTimer())
     const slider = escaper?.getHero()
 
     if (escaper && slider) {
@@ -79,7 +80,7 @@ export class FollowMouse {
     }
 
     doPressActions = () => {
-        const activeBtn = BlzGetTriggerPlayerMouseButton()
+        const activeBtn = Natives.UBlzGetTriggerPlayerMouseButton()
         if (activeBtn == MOUSE_BUTTON_TYPE_RIGHT) {
             this.tClickingTime = CreateTimer()
             TimerStart(this.tClickingTime, 60, false, DoNothing)
@@ -89,7 +90,7 @@ export class FollowMouse {
     }
 
     doUnpressActions = () => {
-        const activeBtn = BlzGetTriggerPlayerMouseButton()
+        const activeBtn = Natives.UBlzGetTriggerPlayerMouseButton()
         if (activeBtn == MOUSE_BUTTON_TYPE_RIGHT && this.tClickingTime) {
             const elapsedTime = TimerGetElapsed(this.tClickingTime)
             DestroyTimer(this.tClickingTime)
@@ -102,7 +103,7 @@ export class FollowMouse {
     }
 
     doMouseMoveActions() {
-        if(BlzGetTriggerPlayerMouseX() == 0 && BlzGetTriggerPlayerMouseY() == 0){
+        if (BlzGetTriggerPlayerMouseX() == 0 && BlzGetTriggerPlayerMouseY() == 0) {
             return
         }
 

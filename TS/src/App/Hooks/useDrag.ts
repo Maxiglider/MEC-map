@@ -22,7 +22,7 @@ class FollowMouse {
         this.onDrag = onDrag
 
         this.tPress = createEvent({
-            events: [t => TriggerRegisterPlayerEvent(t, Player(this.playerId), EVENT_PLAYER_MOUSE_DOWN)],
+            events: [t => TriggerRegisterPlayerEvent(t, Player(this.playerId)!, EVENT_PLAYER_MOUSE_DOWN)],
             actions: [
                 () => {
                     if (BlzGetTriggerPlayerMouseButton() === MOUSE_BUTTON_TYPE_LEFT) {
@@ -33,7 +33,7 @@ class FollowMouse {
         })
 
         this.tUnpress = createEvent({
-            events: [t => TriggerRegisterPlayerEvent(t, Player(this.playerId), EVENT_PLAYER_MOUSE_UP)],
+            events: [t => TriggerRegisterPlayerEvent(t, Player(this.playerId)!, EVENT_PLAYER_MOUSE_UP)],
             actions: [
                 () => {
                     if (BlzGetTriggerPlayerMouseButton() === MOUSE_BUTTON_TYPE_LEFT) {
@@ -48,7 +48,7 @@ class FollowMouse {
         this.tMouseMove && DestroyTrigger(this.tMouseMove)
 
         this.tMouseMove = createEvent({
-            events: [t => TriggerRegisterPlayerEvent(t, Player(this.playerId), EVENT_PLAYER_MOUSE_MOVE)],
+            events: [t => TriggerRegisterPlayerEvent(t, Player(this.playerId)!, EVENT_PLAYER_MOUSE_MOVE)],
             actions: [
                 () => {
                     if (BlzGetTriggerPlayerMouseX() === 0 && BlzGetTriggerPlayerMouseY() === 0) {

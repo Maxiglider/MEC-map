@@ -1,6 +1,7 @@
 import { MemoryHandler } from 'Utils/MemoryHandler'
 import { arrayPush } from 'core/01_libraries/Basic_functions'
 import { getUdgLevels } from '../globals'
+import { Natives } from './core/wc3_natives_unsecured/Natives'
 
 export type IRenderInfo = {
     [playerId: number]: { lastCameraPosX: number; lastCameraPosY: number }
@@ -12,7 +13,7 @@ const getTileCenter = (a: number) => {
 }
 
 export const renderWorldSingle = (renderInfo: IRenderInfo, playerIndex: number, x: number, y: number) => {
-    if (GetLocalPlayer() === Player(playerIndex)) {
+    if (GetLocalPlayer() === Natives.UPlayer(playerIndex)) {
         const camX = getTileCenter(x)
         const camY = getTileCenter(y)
 
@@ -34,7 +35,7 @@ export const renderWorldSingle = (renderInfo: IRenderInfo, playerIndex: number, 
         for (const [_, ms] of pairs(getUdgLevels().getCurrentLevel().monsterSpawns.getAll())) {
             if (ms.monsters) {
                 ForGroup(ms.monsters, () => {
-                    const m = GetEnumUnit()
+                    const m = Natives.UGetEnumUnit()
 
                     if (!monstersMap[`${getTileCenter(GetUnitX(m))}_${getTileCenter(GetUnitY(m))}`]) {
                         monstersMap[`${getTileCenter(GetUnitX(m))}_${getTileCenter(GetUnitY(m))}`] =
@@ -115,8 +116,8 @@ export const renderWorldSingle = (renderInfo: IRenderInfo, playerIndex: number, 
 export const renderWorld = (renderInfo: IRenderInfo) => {
     for (let i = 0; i < 24; i++) {
         if (
-            GetPlayerSlotState(Player(i)) === PLAYER_SLOT_STATE_PLAYING &&
-            GetPlayerController(Player(i)) === MAP_CONTROL_USER
+            GetPlayerSlotState(Natives.UPlayer(i)) === PLAYER_SLOT_STATE_PLAYING &&
+            GetPlayerController(Natives.UPlayer(i)) === MAP_CONTROL_USER
         ) {
             renderWorldSingle(renderInfo, i, GetCameraEyePositionX(), GetCameraEyePositionY())
         }

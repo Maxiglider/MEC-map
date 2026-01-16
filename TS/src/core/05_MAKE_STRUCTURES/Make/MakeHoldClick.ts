@@ -2,11 +2,12 @@ import { getUdgEscapers } from '../../../../globals'
 import { createEvent } from '../../../Utils/mapUtils'
 import { Escaper } from '../../04_STRUCTURES/Escaper/Escaper'
 import { Make } from './Make'
+import { Natives } from '../../wc3_natives_unsecured/Natives'
 
 export const MIN_TIME_BETWEEN_ACTIONS = null
 
 const onPressActions = () => {
-    const escaper = getUdgEscapers().get(GetPlayerId(GetTriggerPlayer()))
+    const escaper = getUdgEscapers().get(GetPlayerId(Natives.UGetTriggerPlayer()))
     const make = escaper?.getMake()
 
     if (make instanceof MakeHoldClick) {
@@ -15,7 +16,7 @@ const onPressActions = () => {
 }
 
 const onUnpressActions = () => {
-    const escaper = getUdgEscapers().get(GetPlayerId(GetTriggerPlayer()))
+    const escaper = getUdgEscapers().get(GetPlayerId(Natives.UGetTriggerPlayer()))
     const make = escaper?.getMake()
 
     if (make instanceof MakeHoldClick) {
@@ -24,7 +25,7 @@ const onUnpressActions = () => {
 }
 
 const onMouseMoveActions = () => {
-    const escaper = getUdgEscapers().get(GetPlayerId(GetTriggerPlayer()))
+    const escaper = getUdgEscapers().get(GetPlayerId(Natives.UGetTriggerPlayer()))
     const make = escaper?.getMake()
 
     if (make instanceof MakeHoldClick) {
@@ -108,7 +109,7 @@ export abstract class MakeHoldClick extends Make {
     }
 
     doPressActions() {
-        this.activeBtn = BlzGetTriggerPlayerMouseButton()
+        this.activeBtn = Natives.UBlzGetTriggerPlayerMouseButton()
         this.activeBtnStr = this.activeBtn == MOUSE_BUTTON_TYPE_LEFT ? 'left' : 'right'
         this.isPressed = true
 

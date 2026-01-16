@@ -19,6 +19,7 @@ import { HERO_START_ANGLE } from '../../08_GAME/Init_game/Heroes'
 import { DeplacementHeroHorsDeathPath } from '../../08_GAME/Mode_coop/deplacement_heros_hors_death_path'
 import { isPlayerId, resolvePlayerId, resolvePlayerIds } from '../Helpers/Command_functions'
 import { ActivateTeleport } from '../Helpers/Teleport'
+import { Natives } from '../../wc3_natives_unsecured/Natives'
 
 export const initExecuteCommandCheat = () => {
     const { registerCommand } = ServiceManager.getService('Cmd')
@@ -634,7 +635,7 @@ export const initExecuteCommandCheat = () => {
                 const hero = escaper.getHero()
 
                 if (hero) {
-                    if (UnitItemInSlot(hero, 0) == null) {
+                    if (UnitItemInSlot(hero, 0) == undefined) {
                         MeteorFunctions.HeroAddCheatMeteor(hero)
                         Text.P(escaper.getPlayer(), 'you get infinite meteors')
                     } else {
@@ -658,8 +659,9 @@ export const initExecuteCommandCheat = () => {
                 const hero = escaper.getHero()
 
                 if (hero) {
-                    if (GetItemTypeId(UnitItemInSlot(hero, 0)) == METEOR_CHEAT) {
-                        RemoveItem(UnitItemInSlot(hero, 0))
+                    const item = UnitItemInSlot(hero, 0)
+                    if (item && GetItemTypeId(item) == METEOR_CHEAT) {
+                        RemoveItem(item)
                         Text.P(escaper.getPlayer(), 'infinite meteors removed')
                     } else {
                         Text.erP(escaper.getPlayer(), 'no infinite meteors to remove')

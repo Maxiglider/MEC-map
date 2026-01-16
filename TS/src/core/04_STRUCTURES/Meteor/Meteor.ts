@@ -41,11 +41,15 @@ export class Meteor {
     }
 
     createMeteorItem = () => {
-        if (this.item) {
+        if (!!this.item) {
             this.removeMeteorItem()
         }
 
         this.item = CreateItem(METEOR_NORMAL, this.x, this.y)
+        if(!this.item){
+            throw new Error('Meteor item could not be created')
+        }
+
         if (getUdgTerrainTypes().getTerrainType(this.x, this.y)?.getKind() == 'slide') {
             SetItemDroppable(this.item, false)
         }

@@ -4,6 +4,7 @@ import { udg_colorCode } from 'core/01_libraries/Init_colorCodes'
 import { Text } from 'core/01_libraries/Text'
 import { getUdgEscapers } from '../../../../globals'
 import { playerId2colorId } from '../../06_COMMANDS/Helpers/Command_functions'
+import { Natives } from '../../wc3_natives_unsecured/Natives'
 
 const initMessageHeroDies = () => {
     const MESSAGE_DURATION = 6
@@ -48,9 +49,9 @@ const initMessageHeroDies = () => {
                 // For some reason this still plays the sound even tho the player is ignoring death messages
                 if (!getUdgEscapers().get(i)?.isIgnoringDeathMessages()) {
                     if (GetLocalPlayer() === fallenPlayer) {
-                        StartSoundForPlayerBJ(Player(i), GetRandomSoundHeroDies())
+                        StartSoundForPlayerBJ(Natives.UPlayer(i), GetRandomSoundHeroDies())
                     } else {
-                        StartSoundForPlayerBJ(Player(i), GetRandomSoundAllyHeroDies())
+                        StartSoundForPlayerBJ(Natives.UPlayer(i), GetRandomSoundAllyHeroDies())
                     }
                 }
             })
@@ -64,7 +65,7 @@ const initMessageHeroDies = () => {
         const n = GetPlayerId(p)
 
         TimerStart(CreateTimer(), TIME_BETWEEN_DEATH_AND_MESSAGE, false, () => {
-            PlaySoundHeroDies(Player(n))
+            PlaySoundHeroDies(Natives.UPlayer(n))
 
             forRange(Constants.NB_ESCAPERS, i => {
                 if (!getUdgEscapers().get(i)?.isIgnoringDeathMessages()) {
@@ -73,7 +74,7 @@ const initMessageHeroDies = () => {
                     // When players leave their escaper gets removed so we dont show a death message
                     if (targetEscaper) {
                         Text.P_timed(
-                            Player(i),
+                            Natives.UPlayer(i),
                             MESSAGE_DURATION,
                             udg_colorCode[playerId2colorId(n)] + targetEscaper.getDisplayName() + '|r has fallen.'
                         )
@@ -81,7 +82,7 @@ const initMessageHeroDies = () => {
                 }
             })
 
-            DestroyTimer(GetExpiredTimer())
+            DestroyTimer(Natives.UGetExpiredTimer())
         })
     }
 

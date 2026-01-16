@@ -5,6 +5,7 @@ import { getUdgEscapers } from '../../../../globals'
 import { Hero2Escaper, IsHero } from '../Escaper/Escaper_functions'
 import { createDiagonalRegions } from '../MonsterSpawn/MonsterSpawn'
 import { Level } from './Level'
+import { Natives } from '../../wc3_natives_unsecured/Natives'
 
 export class StaticSlide {
     private x1: number
@@ -109,7 +110,7 @@ export class StaticSlide {
                     ],
                     actions: [
                         () => {
-                            const hero = GetTriggerUnit()
+                            const hero = Natives.UGetTriggerUnit()
                             const escaper = Hero2Escaper(hero)
 
                             if (
@@ -168,7 +169,7 @@ export class StaticSlide {
                     ],
                     actions: [
                         () => {
-                            const hero = GetTriggerUnit()
+                            const hero = Natives.UGetTriggerUnit()
                             this.removePlayer(Hero2Escaper(hero)?.getEscaperId() || -1)
                         },
                     ],

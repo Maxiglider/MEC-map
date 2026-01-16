@@ -8,6 +8,7 @@ import { Text } from '../../01_libraries/Text'
 import { Timer } from 'w3ts'
 import { getUdgEscapers } from '../../../../globals'
 import { isPlayerId, resolvePlayerId } from '../Helpers/Command_functions'
+import { Natives } from '../../wc3_natives_unsecured/Natives'
 
 export const initExecuteCommandTrueMax = () => {
     const { registerCommand } = ServiceManager.getService('Cmd')
@@ -120,7 +121,7 @@ export const initExecuteCommandTrueMax = () => {
         argDescription: '<string>',
         description: 'Executes raw lua code',
         cb: ({ name }, escaper) => {
-            const args = GetEventPlayerChatString().substring(name.length + 2)
+            const args = Natives.UGetEventPlayerChatString().substring(name.length + 2)
 
             const [func, err] = load(`return function() return ${args} end`)
 

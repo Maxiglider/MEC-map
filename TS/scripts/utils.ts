@@ -1,5 +1,4 @@
 import { execSync } from 'child_process'
-import { writeFileSync } from 'fs'
 import * as fs from 'fs-extra'
 import { EOL } from 'os'
 import * as path from 'path'
@@ -96,17 +95,6 @@ export function processScriptIncludes(contents: string) {
     return contents
 }
 
-function updateTSConfig(mapFolder: string) {
-    const tsconfig = loadJsonFile('tsconfig.json')
-    const plugin = tsconfig.compilerOptions.plugins[0]
-
-    plugin.mapDir = path.resolve('maps', mapFolder).replace(/\\/g, '/')
-    plugin.entryFile = path.resolve(tsconfig.tstl.luaBundleEntry).replace(/\\/g, '/')
-    plugin.outputDir = path.resolve('dist', mapFolder).replace(/\\/g, '/')
-
-    writeFileSync('tsconfig.json', JSON.stringify(tsconfig, undefined, 4))
-}
-
 /**
  *
  */
@@ -125,9 +113,6 @@ export function compileMap(config: IProjectConfig) {
 
     logger.info(`Building "${config.mapFolder}"...`)
     fs.copySync(`./maps/${config.mapFolder}`, `./dist/${config.mapFolder}`)
-
-    logger.info('Modifying tsconfig.json to work with war3-transformer...')
-    updateTSConfig(config.mapFolder)
 
     logger.info('Transpiling TypeScript to Lua...')
     execSync('tstl -p tsconfig.json', { stdio: 'inherit' })
@@ -179,8 +164,10 @@ local function require(file, ...)
     end
     if ____modules[file] then
         local module = ____modules[file]
-        ____moduleCache[file] = { value = (select("#", ...) > 0) and module(...) or module(file) }
-        return ____moduleCache[file].value
+        local value = nil
+        if (select("#", ...) > 0) then value = module(...) else value = module(file) end
+        ____moduleCache[file] = { value = value }
+        return value
     else
         if ____originalRequire then
             return ____originalRequire(file)
@@ -221,9 +208,10 @@ local function require(file, ...)
             ____moduleCache2[file] = 1
         end
 
-        ____moduleCache[file] = { value = (select("#", ...) > 0) and module(...) or module(file) }
-
-        return ____moduleCache[file].value
+        local value = nil
+        if (select("#", ...) > 0) then value = module(...) else value = module(file) end
+        ____moduleCache[file] = { value = value }
+        return value
     else
         if ____originalRequire then
             return ____originalRequire(file)
@@ -238,7 +226,7 @@ end`,
                     from: `local function __TS__ArraySplice(self, ...)
     local args = {...}
     local len = #self
-    local actualArgumentCount = select("#", ...)
+    local actualArgumentCount = __TS__CountVarargs(...)
     local start = args[1]
     local deleteCount = args[2]
     if start < 0 then
@@ -399,9 +387,6 @@ end`,
                 contents = luamin.minify(contents.toString())
             }
 
-            // Fix a React bug from TSTL
-            contents = contents.replace(new RegExp('React:createElement', 'gmi'), 'React.createElement')
-
             return contents
         }
 
@@ -419,7 +404,7 @@ end`,
  * Formatter for log messages.
  */
 const loggerFormatFunc = printf(({ level, message, timestamp }) => {
-    return `[${timestamp.replace('T', ' ').split('.')[0]}] ${level}: ${message}`
+    return `[${(timestamp as string).replace('T', ' ').split('.')[0]}] ${level}: ${message}`
 })
 
 /**

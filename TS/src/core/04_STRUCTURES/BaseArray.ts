@@ -68,7 +68,7 @@ export abstract class BaseArray<T extends BaseModel> {
 
         for (const [_, element] of pairs(this.data)) {
             const json = element.toJson()
-            if (json) {
+            if (!!json) {
                 arrayPush(outputArray, json)
             }
         }

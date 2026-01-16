@@ -30,6 +30,7 @@ import { Globals } from '../../09_From_old_Worldedit_triggers/globals_variables_
 import { PRESS_TIME_TO_ENABLE_FOLLOW_MOUSE } from '../../Follow_mouse/Follow_mouse'
 import { GetStringAssignedFromCommand, KeyboardShortcut } from '../../Keyboard_shortcuts/KeyboardShortcut'
 import { isPlayerId, resolvePlayerId, resolvePlayerIds } from '../Helpers/Command_functions'
+import { Natives } from '../../wc3_natives_unsecured/Natives'
 
 const cameraFieldMap: { [x: string]: camerafield } = {
     TARGET_DISTANCE: CAMERA_FIELD_TARGET_DISTANCE,
@@ -559,7 +560,7 @@ export const initCommandAll = () => {
 
             if (hero) {
                 const spaceIndex = cmd.indexOf(' ')
-                const args = spaceIndex ? cmd.substring(spaceIndex + 1) : param1
+                const args = spaceIndex !== -1 ? cmd.substring(spaceIndex + 1) : param1
 
                 animUtils.setAnimation(hero, args)
 
@@ -1897,7 +1898,7 @@ export const initCommandAll = () => {
             if (param1.length === 0) param1 = 'true'
 
             if (IsBoolString(param1)) {
-                const frame = BlzGetOriginFrame(ORIGIN_FRAME_CHAT_MSG, 0)
+                const frame = Natives.UBlzGetOriginFrame(ORIGIN_FRAME_CHAT_MSG, 0)
 
                 if (GetLocalPlayer() === escaper.getPlayer()) {
                     BlzFrameSetVisible(frame, !S2B(param1))
@@ -2051,10 +2052,10 @@ export const initCommandAll = () => {
                 return true
             }
 
-            const group = CreateGroup()
-            GroupEnumUnitsSelected(group, escaper.getPlayer(), null)
+            const group = Natives.UCreateGroup()
+            GroupEnumUnitsSelected(group, escaper.getPlayer())
             ForGroup(group, () => {
-                const unit = GetEnumUnit()
+                const unit = Natives.UGetEnumUnit()
                 if (canPlayerControlUnit(escaper.getPlayer(), unit)) {
                     IssueImmediateOrder(unit, 'stop')
                 }

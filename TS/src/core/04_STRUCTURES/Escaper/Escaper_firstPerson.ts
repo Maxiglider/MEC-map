@@ -6,7 +6,7 @@ import { Timer } from 'w3ts'
 import { getUdgEscapers, globals } from '../../../../globals'
 import { createEvent, createTimer, forRange } from '../../../Utils/mapUtils'
 import { Escaper } from './Escaper'
-
+import { Natives } from '../../wc3_natives_unsecured/Natives'
 type IKeys = 'UP' | 'DOWN' | 'LEFT' | 'RIGHT'
 
 const FIRSTPERSON_SPEED_PER_PERIOD = 0.2
@@ -136,17 +136,17 @@ export const initFirstPerson = () => {
                 events: [
                     t =>
                         forRange(Constants.NB_ESCAPERS, i =>
-                            TriggerRegisterPlayerKeyEventBJ(t, Player(i), blzKeyDown, blzKey)
+                            TriggerRegisterPlayerKeyEventBJ(t, Natives.UPlayer(i), blzKeyDown, blzKey)
                         ),
                 ],
                 actions: [
                     () => {
                         getUdgEscapers()
-                            .get(GetPlayerId(GetTriggerPlayer()))
+                            .get(GetPlayerId(Natives.UGetTriggerPlayer()))
                             ?.getFirstPersonHandle()
                             .setKeyDownState(key, keyDown)
 
-                        AfkMode.resetAfk(GetPlayerId(GetTriggerPlayer()))
+                        AfkMode.resetAfk(GetPlayerId(Natives.UGetTriggerPlayer()))
                     },
                 ],
             })

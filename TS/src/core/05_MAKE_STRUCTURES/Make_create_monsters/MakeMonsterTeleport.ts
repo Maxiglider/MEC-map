@@ -8,6 +8,7 @@ import {
 } from '../../04_STRUCTURES/Monster/MonsterTeleport'
 import { MonsterType } from '../../04_STRUCTURES/Monster/MonsterType'
 import {Make, MAKE_LAST_CLIC_UNIT_ID} from '../Make/Make'
+import { Natives } from '../../wc3_natives_unsecured/Natives'
 
 
 export class MakeMonsterTeleport extends Make {
@@ -101,7 +102,7 @@ export class MakeMonsterTeleport extends Make {
 
     setUnitLastClicPosition = (x: number, y: number) => {
         if (!this.unitLastClic) {
-            this.unitLastClic = CreateUnit(this.makerOwner, MAKE_LAST_CLIC_UNIT_ID, x, y, GetRandomDirectionDeg())
+            this.unitLastClic = Natives.UCreateUnit(this.makerOwner, MAKE_LAST_CLIC_UNIT_ID, x, y, GetRandomDirectionDeg())
         } else {
             SetUnitPosition(this.unitLastClic, x, y)
         }

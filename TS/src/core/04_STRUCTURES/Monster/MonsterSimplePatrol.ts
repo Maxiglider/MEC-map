@@ -4,16 +4,17 @@ import { Monster } from './Monster'
 import { MonsterMultiplePatrols } from './MonsterMultiplePatrols'
 import { MonsterType } from './MonsterType'
 import { NewPatrolMonster } from './Monster_functions'
+import { Natives } from '../../wc3_natives_unsecured/Natives'
 
 export const initMonsterSimplePatrol = () => {
     //vérification que les monstres multi-patrouilles patrouillent bien
-    simplePatrolMobs = CreateGroup()
+    simplePatrolMobs = Natives.UCreateGroup()
 
     const checkSimplePatrolMobsPeriod = 5
 
     const CheckSimplePatrolMobsEnum = () => {
-        if (GetUnitCurrentOrder(GetEnumUnit()) === 0) {
-            udg_monsters[GetUnitUserData(GetEnumUnit())].createUnit()
+        if (GetUnitCurrentOrder(Natives.UGetEnumUnit()) === 0) {
+            udg_monsters[GetUnitUserData(Natives.UGetEnumUnit())].createUnit()
         }
     }
 

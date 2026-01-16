@@ -276,7 +276,6 @@ export class TerrainTypeArray extends BaseArray<TerrainType> {
                     break
             }
 
-
             if (tt) {
                 tt.orderId = terrainTypeJson.orderId || 0
 

@@ -1,4 +1,5 @@
 import {Make, MAKE_LAST_CLIC_UNIT_ID} from 'core/05_MAKE_STRUCTURES/Make/Make'
+import { Natives } from '../../wc3_natives_unsecured/Natives'
 
 
 export abstract class MakeOneByOneOrTwoClicks extends Make {
@@ -39,7 +40,7 @@ export abstract class MakeOneByOneOrTwoClicks extends Make {
         this.lastLocSavedIsUsed = true
 
         this.unitLastClic && RemoveUnit(this.unitLastClic)
-        this.unitLastClic = CreateUnit(this.makerOwner, MAKE_LAST_CLIC_UNIT_ID, x, y, GetRandomDirectionDeg())
+        this.unitLastClic = Natives.UCreateUnit(this.makerOwner, MAKE_LAST_CLIC_UNIT_ID, x, y, GetRandomDirectionDeg())
 
         this.escaper.destroyCancelledActions()
     }

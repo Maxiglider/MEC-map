@@ -4,8 +4,9 @@ import { Text } from 'core/01_libraries/Text'
 import { ServiceManager } from 'Services'
 import { createTimer } from 'Utils/mapUtils'
 import { getUdgLevels } from '../../../../globals'
+import { Natives } from '../../wc3_natives_unsecured/Natives'
 
-export const LIVES_PLAYER = Player(6) //Constants.GREEN
+export const LIVES_PLAYER = Natives.UPlayer(6) //Constants.GREEN
 
 export type ILives = ReturnType<typeof initLives>
 
