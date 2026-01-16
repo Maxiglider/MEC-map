@@ -6,8 +6,8 @@ export const renderInterface = (props: InterfaceProps) => {
     let historyVisible: { [playerId: number]: boolean } = {}
     let manager: ReturnType<typeof Interface> | null = null
     let callbacks: {
-        setVisible: (args: { visible: boolean; playerId: number }) => void
-        resetUI: (playerId: number) => void
+        setPalettesVisible: (args: { visible: boolean; playerId: number }) => void
+        resetPalettesUI: (playerId: number) => void
         addCommandToHistory: (command: string, playerId: number) => void
     } | null = null
 

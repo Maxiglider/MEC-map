@@ -44,8 +44,8 @@ const tsMain = () => {
         name: 'palette',
         alias: ['p'],
         group: 'make',
-        argDescription: '',
-        description: '',
+        argDescription: '<boolean>',
+        description: 'Displays or hides a palette on which you can pick terrain to create.',
         cb: ({ nbParam, param1 }) => {
             if (nbParam !== 1) {
                 throw 'Wrong command parameters'
@@ -55,7 +55,7 @@ const tsMain = () => {
             if (!callbacks) return true
 
             if (param1 === 'reset') {
-                callbacks.resetUI(GetPlayerId(GetTriggerPlayer()!))
+                callbacks.resetPalettesUI(GetPlayerId(GetTriggerPlayer()!))
                 return true
             }
 
@@ -63,7 +63,7 @@ const tsMain = () => {
                 return true
             }
 
-            callbacks.setVisible({
+            callbacks.setPalettesVisible({
                 visible: S2B(param1),
                 playerId: GetPlayerId(GetTriggerPlayer()!),
             })

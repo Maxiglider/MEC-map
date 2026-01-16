@@ -9,8 +9,8 @@ export type IItem = { texFile?: string; title: string; scale?: '1:1' | '2:1' }
 
 export type InterfaceProps = {
     cb: (props: {
-        setVisible: ({ visible, playerId }: { visible: boolean; playerId: number }) => void
-        resetUI: (playerId: number) => void
+        setPalettesVisible: ({ visible, playerId }: { visible: boolean; playerId: number }) => void
+        resetPalettesUI: (playerId: number) => void
         addCommandToHistory: (command: string, playerId: number) => void
     }) => void
 }
@@ -28,7 +28,7 @@ const MAX_HISTORY_SIZE = 20
 class InterfaceManager {
     private frames: Map<string, framehandle> = new Map()
     private triggers: trigger[] = []
-    private visibleByPlayer: Map<number, boolean> = new Map()
+    private palettesVisibleByPlayer: Map<number, boolean> = new Map()
     private posByPlayer: Map<number, { x: number; y: number }> = new Map()
     private historyByPlayer: Map<number, ICommandHistoryEntry[]> = new Map()
     private nextIdByPlayer: Map<number, number> = new Map()
@@ -51,13 +51,13 @@ class InterfaceManager {
         }
     > = new Map()
 
-    private readonly defaultPos = { x: 0.007, y: 0.471 }
+    private readonly defaultPalettesPos = { x: 0.007, y: 0.471 }
     private readonly historyPos = { x: 0.6, y: 0.5 }
 
     private forceUpdateCallback: (() => void) | null = null
     private callbacks: {
-        setVisible: (args: { visible: boolean; playerId: number }) => void
-        resetUI: (playerId: number) => void
+        setPalettesVisible: (args: { visible: boolean; playerId: number }) => void
+        resetPalettesUI: (playerId: number) => void
         addCommandToHistory: (command: string, playerId: number) => void
     } | null = null
 
@@ -65,11 +65,11 @@ class InterfaceManager {
         const manager = this
 
         this.callbacks = {
-            setVisible: ({ playerId, visible }) => {
-                manager.setVisible(playerId, visible)
+            setPalettesVisible: ({ playerId, visible }) => {
+                manager.setPalettesVisible(playerId, visible)
             },
-            resetUI: playerId => {
-                manager.resetUI(playerId)
+            resetPalettesUI: playerId => {
+                manager.resetPalettesUI(playerId)
             },
             addCommandToHistory: (command, playerId) => {
                 manager.addCommandToHistory(command, playerId)
@@ -90,14 +90,24 @@ class InterfaceManager {
         const rootContainer = BlzCreateFrameByType('FRAME', 'InterfaceRoot', parent, '', 0)!
         this.frames.set('rootContainer', rootContainer)
 
-        // Visible container (for main UI)
-        const visibleContainer = BlzCreateFrameByType('FRAME', 'InterfaceVisibleContainer', rootContainer, '', 0)!
-        this.frames.set('visibleContainer', visibleContainer)
-        BlzFrameSetVisible(visibleContainer, false)
+        // Palettes container
+        const palettesContainer = BlzCreateFrameByType('FRAME', 'InterfaceVisibleContainer', rootContainer, '', 0)!
+        this.frames.set('palettesContainer', palettesContainer)
+        BlzFrameSetVisible(palettesContainer, false)
 
         // Terrain items container
-        const terrainContainer = BlzCreateFrameByType('FRAME', 'InterfaceTerrainContainer', visibleContainer, '', 0)!
+        const terrainContainer = BlzCreateFrameByType('FRAME', 'InterfaceTerrainContainer', palettesContainer, '', 0)!
         this.frames.set('terrainContainer', terrainContainer)
+
+        // Terrain backdrop
+        const terrainBackdrop = BlzCreateFrameByType(
+            'BACKDROP',
+            'InterfaceTerrainBackdrop',
+            terrainContainer,
+            'EscMenuBackdrop',
+            0
+        )!
+        this.frames.set('terrainBackdrop', terrainBackdrop)
 
         // Command history container
         const historyRootContainer = BlzCreateFrameByType('FRAME', 'InterfaceHistoryRoot', rootContainer, '', 0)!
@@ -150,19 +160,6 @@ class InterfaceManager {
         const nbCols = Math.min(maxNbCols, this.usedTerrains.length)
 
         const terrainContainer = this.frames.get('terrainContainer')!
-
-        // Create backdrop for terrain container
-        let terrainBackdrop = this.frames.get('terrainBackdrop')
-        if (!terrainBackdrop) {
-            terrainBackdrop = BlzCreateFrameByType(
-                'BACKDROP',
-                'InterfaceTerrainBackdrop',
-                terrainContainer,
-                'EscMenuBackdrop',
-                0
-            )!
-            this.frames.set('terrainBackdrop', terrainBackdrop)
-        }
 
         // Create terrain item frames
         for (let i = 0; i < this.usedTerrains.length; i++) {
@@ -237,8 +234,8 @@ class InterfaceManager {
         const nbCols = Math.min(maxNbCols, this.usedTerrains.length)
 
         // Update for each player based on their position
-        for (const [playerId, _] of this.visibleByPlayer) {
-            const mainPos = this.posByPlayer.get(playerId) || this.defaultPos
+        for (const [playerId, visible] of this.palettesVisibleByPlayer) {
+            const mainPos = this.posByPlayer.get(playerId) || this.defaultPalettesPos
 
             const containerX = mainPos.x - containerMargin
             const containerY = mainPos.y + containerMargin
@@ -252,7 +249,7 @@ class InterfaceManager {
                 BlzFrameSetSize(terrainBackdrop, containerWidth, containerHeight)
             }
 
-            // Update item positions
+            // Update item positions and visibilities
             let i = 0
             for (const [key, frames] of this.terrainItemFrames) {
                 const row = Math.floor(i / nbCols)
@@ -264,6 +261,7 @@ class InterfaceManager {
                 if (GetPlayerId(GetLocalPlayer()!) === playerId) {
                     BlzFrameSetAbsPoint(frames.backdrop, FRAMEPOINT_TOPLEFT, x, y)
                     BlzFrameSetAbsPoint(frames.text, FRAMEPOINT_TOPLEFT, x, y)
+                    BlzFrameSetVisible(frames.text, visible) // We apply visibility on text because they are children of GameUI instead of terrain container
                 }
 
                 i++
@@ -425,17 +423,18 @@ class InterfaceManager {
         }
     }
 
-    public setVisible(playerId: number, visible: boolean): void {
-        this.visibleByPlayer.set(playerId, visible)
+    public setPalettesVisible(playerId: number, visible: boolean): void {
+        this.palettesVisibleByPlayer.set(playerId, visible)
 
         if (GetPlayerId(GetLocalPlayer()!) === playerId) {
-            const visibleContainer = this.frames.get('visibleContainer')!
-            BlzFrameSetVisible(visibleContainer, visible)
+            const palettesContainer = this.frames.get('palettesContainer')!
+            BlzFrameSetVisible(palettesContainer, visible)
+            this.updateLayout()
         }
     }
 
-    public resetUI(playerId: number): void {
-        this.posByPlayer.set(playerId, this.defaultPos)
+    public resetPalettesUI(playerId: number): void {
+        this.posByPlayer.set(playerId, this.defaultPalettesPos)
         this.updateLayout()
     }
 
