@@ -41,9 +41,7 @@ export const renderInterface = (props: InterfaceProps) => {
             // This method is kept for backward compatibility but does nothing
         },
         clearUnpinnedHistory: (playerId: number) => {
-            // This is now handled through the service callback
-            // The InterfaceManager registers itself with the React service
-            // which calls clearUnpinned when needed
+            manager?.clearUnpinned(playerId);
         },
     }
 }

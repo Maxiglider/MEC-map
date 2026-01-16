@@ -78,12 +78,6 @@ class InterfaceManager {
 
         cb(this.callbacks)
 
-        // Register with React service
-        const reactService = ServiceManager.getService('React')
-        reactService.setClearUnpinnedCallback((playerId: number) => {
-            this.clearUnpinned(playerId)
-        })
-
         // Create main UI structure
         this.createFrames()
         this.updateTerrainState()
@@ -496,7 +490,7 @@ class InterfaceManager {
         }
     }
 
-    private clearUnpinned(playerId: number): void {
+    public clearUnpinned(playerId: number): void {
         const playerHistory = this.historyByPlayer.get(playerId) || []
         const updatedHistory = playerHistory.filter(entry => entry.pinned)
         this.historyByPlayer.set(playerId, updatedHistory)
