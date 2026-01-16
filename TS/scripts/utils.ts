@@ -164,8 +164,10 @@ local function require(file, ...)
     end
     if ____modules[file] then
         local module = ____modules[file]
-        ____moduleCache[file] = { value = (select("#", ...) > 0) and module(...) or module(file) }
-        return ____moduleCache[file].value
+        local value = nil
+        if (select("#", ...) > 0) then value = module(...) else value = module(file) end
+        ____moduleCache[file] = { value = value }
+        return value
     else
         if ____originalRequire then
             return ____originalRequire(file)
@@ -206,9 +208,10 @@ local function require(file, ...)
             ____moduleCache2[file] = 1
         end
 
-        ____moduleCache[file] = { value = (select("#", ...) > 0) and module(...) or module(file) }
-
-        return ____moduleCache[file].value
+        local value = nil
+        if (select("#", ...) > 0) then value = module(...) else value = module(file) end
+        ____moduleCache[file] = { value = value }
+        return value
     else
         if ____originalRequire then
             return ____originalRequire(file)
@@ -223,7 +226,7 @@ end`,
                     from: `local function __TS__ArraySplice(self, ...)
     local args = {...}
     local len = #self
-    local actualArgumentCount = select("#", ...)
+    local actualArgumentCount = __TS__CountVarargs(...)
     local start = args[1]
     local deleteCount = args[2]
     if start < 0 then
