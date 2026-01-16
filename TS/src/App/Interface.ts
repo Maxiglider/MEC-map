@@ -164,8 +164,6 @@ class InterfaceManager {
         // Create terrain item frames
         for (let i = 0; i < this.usedTerrains.length; i++) {
             const item = this.usedTerrains[i]
-            const row = Math.floor(i / nbCols)
-            const col = i % nbCols
 
             const itemKey = `terrain_${i}_${item.title}`
 
@@ -173,11 +171,9 @@ class InterfaceManager {
             const itemContainer = BlzCreateFrameByType('FRAME', `TerrainItem_${i}`, terrainContainer, '', 0)!
 
             // Create backdrop
-            const backdrop = BlzCreateFrameByType(
-                'BACKDROP',
-                `TerrainPreview_${item.scale}_${i}`,
+            const backdrop = BlzCreateSimpleFrame(
+                `TerrainPreview_${item.scale}`,
                 itemContainer,
-                '',
                 0
             )!
             BlzFrameSetSize(backdrop, itemSize, itemSize)
@@ -261,6 +257,7 @@ class InterfaceManager {
                 if (GetPlayerId(GetLocalPlayer()!) === playerId) {
                     BlzFrameSetAbsPoint(frames.backdrop, FRAMEPOINT_TOPLEFT, x, y)
                     BlzFrameSetAbsPoint(frames.text, FRAMEPOINT_TOPLEFT, x, y)
+                    BlzFrameSetVisible(frames.backdrop, visible) // We apply visibility on text because they are children of GameUI instead of terrain container
                     BlzFrameSetVisible(frames.text, visible) // We apply visibility on text because they are children of GameUI instead of terrain container
                 }
 
