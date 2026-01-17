@@ -47,7 +47,8 @@ export class MonsterSpawnArray extends BaseArray<MonsterSpawn> {
                     ms.minX,
                     ms.minY,
                     ms.maxX,
-                    ms.maxY
+                    ms.maxY,
+                    ms.monsterDirectionMode ?? 'straight'
                 )
 
                 // Load click coordinates if they exist

@@ -1613,9 +1613,9 @@ export class Escaper {
         return this.make.addHidePeriod()
     }
 
-    makeCreateMonsterSpawn(label: string, mt: MonsterType, sens: number, frequence: number) {
+    makeCreateMonsterSpawn(label: string, mt: MonsterType, sens: number, frequency: number, monsterDirectionMode: 'straight'|'random') {
         this.destroyMake()
-        if (this.hero) this.make = new MakeMonsterSpawn(this.hero, label, mt, sens, frequence)
+        if (this.hero) this.make = new MakeMonsterSpawn(this.hero, label, mt, sens, frequency, monsterDirectionMode)
     }
 
     makeCreateRegion(label: string) {

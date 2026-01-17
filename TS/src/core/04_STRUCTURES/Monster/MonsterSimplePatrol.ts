@@ -5,6 +5,7 @@ import { MonsterMultiplePatrols } from './MonsterMultiplePatrols'
 import { MonsterType } from './MonsterType'
 import { NewPatrolMonster } from './Monster_functions'
 import { Natives } from '../../wc3_natives_unsecured/Natives'
+import { Constants } from '../../01_libraries/Constants'
 
 export const initMonsterSimplePatrol = () => {
     //vérification que les monstres multi-patrouilles patrouillent bien
@@ -99,13 +100,12 @@ export const createMonsterSmartPatrol = (
     y2: number,
     forceId: number | null = null
 ) => {
-    const maxDistance = Math.sqrt(Math.pow(Math.abs(x1 - x2), 2) + Math.pow(Math.abs(y1 - y2), 2))
-    const maxTiles = 6 * 128
+    const moveDistance = Math.sqrt(Math.pow(Math.abs(x1 - x2), 2) + Math.pow(Math.abs(y1 - y2), 2))
 
-    if (maxDistance < maxTiles) {
+    if (moveDistance < Constants.MAX_DISTANCE_PER_MOVE_ORDER) {
         return new MonsterSimplePatrol(mt, x1, y1, x2, y2, forceId)
     } else {
-        const amountOfPatrols = Math.ceil(maxDistance / maxTiles)
+        const amountOfPatrols = Math.ceil(moveDistance / Constants.MAX_DISTANCE_PER_MOVE_ORDER)
         const dx = (x1 - x2) / amountOfPatrols
         const dy = (y1 - y2) / amountOfPatrols
 

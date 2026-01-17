@@ -4,6 +4,7 @@ import { getUdgEscapers } from '../../../../globals'
 import { Monster } from './Monster'
 import { MonsterType } from './MonsterType'
 import { Natives } from '../../wc3_natives_unsecured/Natives'
+import { LongDistanceMoveOrder } from './LongDistanceMoveOrder'
 
 let monster: unit
 const ATTACK_SKILL = FourCC('Aatk')

@@ -8,14 +8,16 @@ export class MakeMonsterSpawn extends MakeOneByOneOrTwoClicks {
     mt: MonsterType
     sens: number
     frequence: number
+    monsterDirectionMode: 'straight'|'random'
 
-    constructor(maker: unit, label: string, mt: MonsterType, sens: number, frequence: number) {
+    constructor(maker: unit, label: string, mt: MonsterType, sens: number, frequency: number, monsterDirectionMode: 'straight'|'random') {
         super(maker, 'monsterSpawnCreate', '', [''])
 
         this.label = label
         this.mt = mt
         this.sens = sens
-        this.frequence = frequence
+        this.frequence = frequency
+        this.monsterDirectionMode= monsterDirectionMode
     }
 
     doActions = () => {
@@ -31,7 +33,8 @@ export class MakeMonsterSpawn extends MakeOneByOneOrTwoClicks {
                     this.lastX,
                     this.lastY,
                     this.orderX,
-                    this.orderY
+                    this.orderY,
+                    this.monsterDirectionMode
                 )
 
                 level.monsterSpawns.new(ms, true)

@@ -39,6 +39,7 @@ const parseCmdContext = (cmd: string) => {
         param2: string
         param3: string
         param4: string
+        param5: string
     }>()
 
     obj.cmd = cmd
@@ -50,6 +51,7 @@ const parseCmdContext = (cmd: string) => {
     obj.param2 = CmdParam(cmd, 2)
     obj.param3 = CmdParam(cmd, 3)
     obj.param4 = CmdParam(cmd, 4)
+    obj.param5 = CmdParam(cmd, 5)
 
     return obj
 }

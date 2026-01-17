@@ -72,6 +72,8 @@ const Common = {
     UBlzGetTriggerSyncData: () => assertDefined(BlzGetTriggerSyncData(), 'BlzGetTriggerSyncData'),
 
     UGetEnumDestructable: () => assertDefined(GetEnumDestructable(), 'GetEnumDestructable'),
+
+    UGetTriggeringRegion: () => assertDefined(GetTriggeringRegion(), 'GetTriggeringRegion'),
 }
 
 /**

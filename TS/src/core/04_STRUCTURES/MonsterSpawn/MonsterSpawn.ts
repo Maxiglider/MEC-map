@@ -15,6 +15,7 @@ import { MonsterType } from '../Monster/MonsterType'
 import { NewImmobileMonsterForPlayer } from '../Monster/Monster_functions'
 import { initSimpleUnitRecycler } from './SimpleUnitRecycler'
 import { Natives } from '../../wc3_natives_unsecured/Natives'
+import { IssueMoveOrderForLongDistance } from '../Monster/LongDistanceMoveOrder'
 
 const DECALAGE_UNSPAWN = 200
 const DELAY_BETWEEN_SPAWN_AND_MOVEMENT = 0.5
@@ -75,6 +76,8 @@ export class MonsterSpawn {
     private maxX: number
     private maxY: number
 
+    private monsterDirectionMode: 'straight'|'random'
+
     private tSpawn?: trigger
     private tUnspawn?: trigger
     private unspawnReg?: region
@@ -122,9 +125,11 @@ export class MonsterSpawn {
         x1: number,
         y1: number,
         x2: number,
-        y2: number
+        y2: number,
+        monsterDirectionMode: 'straight'|'random',
     ) {
         this.rotation = rotation
+        this.monsterDirectionMode = monsterDirectionMode;
 
         this.id = MonsterSpawn.getNextId()
         this.label = label
@@ -320,7 +325,7 @@ export class MonsterSpawn {
 
         // Multi region patrols does not work with rotation yet
         const maxTiles = 6 * 128
-        this.multiRegionPatrols = maxDistance >= maxTiles && this.spawnShape === 'region'
+        // this.multiRegionPatrols = maxDistance >= maxTiles && this.spawnShape === 'region' && isDiagonal
 
         if (this.multiRegionPatrols) {
             const amountOfPatrols = Math.ceil(maxDistance / maxTiles)
@@ -400,7 +405,7 @@ export class MonsterSpawn {
                             tx = math.max(globals.MAP_MIN_X, math.min(globals.MAP_MAX_X, tx))
                             ty = math.max(globals.MAP_MIN_Y, math.min(globals.MAP_MAX_Y, ty))
 
-                            IssuePointOrder(u, 'move', tx, ty)
+                            IssueMoveOrderForLongDistance(u, tx, ty)
                         }
                     })
 
@@ -461,7 +466,7 @@ export class MonsterSpawn {
                             y = y - ndy
                         }
 
-                        IssuePointOrder(u, 'move', x, y)
+                        IssueMoveOrderForLongDistance(u, x, y)
                     }
                 })
 
@@ -481,10 +486,10 @@ export class MonsterSpawn {
         }
 
         const mobTimer = Natives.UGetExpiredTimer()
-        const ms = MonsterSpawn.anyTimerId2MonsterSpawn.get(GetHandleId(mobTimer))
+        const monsterSpawn = MonsterSpawn.anyTimerId2MonsterSpawn.get(GetHandleId(mobTimer))
         MonsterSpawn.anyTimerId2MonsterSpawn.delete(GetHandleId(mobTimer))
 
-        if (ms) {
+        if (monsterSpawn) {
             const mobUnit = MonsterSpawn.anyTimerId2Unit.get(GetHandleId(mobTimer))
             MonsterSpawn.anyTimerId2Unit.delete(GetHandleId(mobTimer))
 
@@ -497,7 +502,7 @@ export class MonsterSpawn {
                     MonsterSpawn.anyTimerId2SpawnAmount.delete(GetHandleId(mobTimer))
 
                     if (spawnAmount !== undefined) {
-                        ms.startMobMovement(mobUnit, ms, spawnIndex, spawnAmount)
+                        monsterSpawn.startMobMovement(mobUnit, monsterSpawn, spawnIndex, spawnAmount)
                         UnitAddAbility(mobUnit, FourCC('Aloc'))
                         DestroyTimer(mobTimer)
                     }
@@ -507,36 +512,36 @@ export class MonsterSpawn {
     }
 
     private MonsterSpawn_Actions = errorHandler(() => {
-        const ms = MonsterSpawn.anyTrigId2MonsterSpawn.get(GetHandleId(Natives.UGetTriggeringTrigger()))
+        const monsterSpawn = MonsterSpawn.anyTrigId2MonsterSpawn.get(GetHandleId(Natives.UGetTriggeringTrigger()))
 
-        if (ms) {
-            if (ms.monsters && BlzGroupGetSize(ms.monsters) + ms.getSpawnAmount() > 500) {
+        if (monsterSpawn) {
+            if (monsterSpawn.monsters && BlzGroupGetSize(monsterSpawn.monsters) + monsterSpawn.getSpawnAmount() > 500) {
                 return
             }
 
-            for (let spawnIndex = 0; spawnIndex < ms.getSpawnAmount(); spawnIndex++) {
-                const mobUnit = ms.createMob()
+            for (let spawnIndex = 0; spawnIndex < monsterSpawn.getSpawnAmount(); spawnIndex++) {
+                const mobUnit = monsterSpawn.createMob()
 
                 if (mobUnit) {
                     const mobTimer = CreateTimer()
-                    MonsterSpawn.anyTimerId2MonsterSpawn.set(GetHandleId(mobTimer), ms)
+                    MonsterSpawn.anyTimerId2MonsterSpawn.set(GetHandleId(mobTimer), monsterSpawn)
                     MonsterSpawn.anyTimerId2Unit.set(GetHandleId(mobTimer), mobUnit)
                     MonsterSpawn.anyTimerId2SpawnIndex.set(GetHandleId(mobTimer), spawnIndex)
-                    MonsterSpawn.anyTimerId2SpawnAmount.set(GetHandleId(mobTimer), ms.getSpawnAmount())
+                    MonsterSpawn.anyTimerId2SpawnAmount.set(GetHandleId(mobTimer), monsterSpawn.getSpawnAmount())
 
                     TimerStart(mobTimer, DELAY_BETWEEN_SPAWN_AND_MOVEMENT, false, this.MonsterStartMovement)
                     SetUnitOwner(mobUnit, Constants.ENNEMY_PLAYER, false)
                     ShowUnit(mobUnit, false)
                     UnitRemoveAbility(mobUnit, FourCC('Aloc'))
-                    ms.monsters && GroupAddUnit(ms.monsters, mobUnit)
+                    monsterSpawn.monsters && GroupAddUnit(monsterSpawn.monsters, mobUnit)
 
                     // Start timed unspawn timer if configured
-                    if (ms.timedUnspawn !== undefined && ms.timedUnspawn > 0) {
+                    if (monsterSpawn.timedUnspawn !== undefined && monsterSpawn.timedUnspawn > 0) {
                         const unspawnTimer = CreateTimer()
                         MonsterSpawn.anyTimedUnspawnTimerId2Unit.set(GetHandleId(unspawnTimer), mobUnit)
-                        MonsterSpawn.anyTimedUnspawnTimerId2MonsterSpawn.set(GetHandleId(unspawnTimer), ms)
+                        MonsterSpawn.anyTimedUnspawnTimerId2MonsterSpawn.set(GetHandleId(unspawnTimer), monsterSpawn)
                         MonsterSpawn.anyUnit2TimedUnspawnTimer.set(GetHandleId(mobUnit), unspawnTimer)
-                        TimerStart(unspawnTimer, ms.timedUnspawn, false, ms.TimedUnspawn_Actions)
+                        TimerStart(unspawnTimer, monsterSpawn.timedUnspawn, false, monsterSpawn.TimedUnspawn_Actions)
                     }
                 }
             }
@@ -752,7 +757,7 @@ export class MonsterSpawn {
             const targetX = spawnX + maxDistance * dirX
             const targetY = spawnY + maxDistance * dirY
 
-            IssuePointOrder(mobUnit, 'move', targetX, targetY)
+            IssueMoveOrderForLongDistance(mobUnit, targetX, targetY)
             return
         }
 
@@ -800,14 +805,14 @@ export class MonsterSpawn {
             const targetX = spawnX + maxDistance * dirX
             const targetY = spawnY + maxDistance * dirY
 
-            IssuePointOrder(mobUnit, 'move', targetX, targetY)
+            IssueMoveOrderForLongDistance(mobUnit, targetX, targetY)
             return
         }
 
-        // Original behavior for region spawns
+        // Original behavior for regi   on spawns
         if (this.rotation === 90 || this.rotation === 270) {
             x1 = this.calcValOffset(this.minX, this.maxX, spawnIndex, spawnAmount)
-            x2 = x1
+            x2 = this.monsterDirectionMode === 'straight' ? x1 : this.calcValOffset(this.minX, this.maxX, spawnIndex, spawnAmount)
             y1 = this.maxY
             y2 = this.minY - DECALAGE_UNSPAWN
 
@@ -818,7 +823,7 @@ export class MonsterSpawn {
             x1 = this.minX
             x2 = this.maxX + DECALAGE_UNSPAWN
             y1 = this.calcValOffset(this.minY, this.maxY, spawnIndex, spawnAmount)
-            y2 = y1
+            y2 = this.monsterDirectionMode === 'straight' ? y1 : this.calcValOffset(this.minY, this.maxY, spawnIndex, spawnAmount)
 
             if (this.multiRegionPatrols) {
                 x2 = this.minX - this.multiRegionDx + 16
@@ -880,7 +885,7 @@ export class MonsterSpawn {
 
         SetUnitOwner(mobUnit, p, Constants.MOBS_VARIOUS_COLORS)
         ShowUnit(mobUnit, true)
-        IssuePointOrder(mobUnit, 'move', nx2, ny2)
+        IssueMoveOrderForLongDistance(mobUnit, nx2, ny2)
     }
 
     createMob = () => {
@@ -989,6 +994,10 @@ export class MonsterSpawn {
         MonsterSpawn.anyTrigId2MonsterSpawn.set(GetHandleId(this.tSpawn), this)
         TriggerRegisterTimerEvent(this.tSpawn, 1 / this.frequence, true)
         TriggerAddAction(this.tSpawn, this.MonsterSpawn_Actions)
+    }
+
+    setMonsterDirectionMode(mode: 'straight' | 'random') {
+        this.monsterDirectionMode = mode
     }
 
     toText = (): string => {
@@ -1134,6 +1143,7 @@ export class MonsterSpawn {
         output['minY'] = R2I(this.minY)
         output['maxX'] = R2I(this.maxX)
         output['maxY'] = R2I(this.maxY)
+        output['monsterDirectionMode'] = this.monsterDirectionMode
 
         return output
     }

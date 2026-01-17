@@ -25,6 +25,7 @@ import { init_shortcurt_cancelRedo } from '../Keyboard_shortcuts/Cancel_redo'
 import { init_Test } from '../Test/test'
 import { initArrays } from './initArrays'
 import { initOldTriggers } from './init_old_triggers'
+import { init_LongDistanceMoveOrder_garbageCollector } from '../04_STRUCTURES/Monster/LongDistanceMoveOrder'
 
 export const initializers = () => {
     init_terrain_limit_variables()
@@ -51,6 +52,7 @@ export const initializers = () => {
     initMonsterSimplePatrol()
     init_startFirstLevel()
     init_cameraPositionAtStart()
+    init_LongDistanceMoveOrder_garbageCollector()
 
     //keyboard shortcuts
     init_shortcurt_cancelRedo()

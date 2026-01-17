@@ -1923,10 +1923,10 @@ export const initExecuteCommandMake = () => {
         name: 'createMonsterSpawn',
         alias: ['crmsp'],
         group: 'make',
-        argDescription: '<monsterSpawnLabel> <monsterLabel> <direction> [<frequency>]',
+        argDescription: '<monsterSpawnLabel> <monsterLabel> <direction> [<frequency>] [straight||random]',
         description: 'Default frequency is 2, minimum is 0.1, maximum is 30',
-        cb: ({ nbParam, param1, param2, param3, param4 }, escaper) => {
-            if (!(nbParam >= 3 && nbParam <= 4)) {
+        cb: ({ nbParam, param1, param2, param3, param4, param5 }, escaper) => {
+            if (!(nbParam >= 3 && nbParam <= 5)) {
                 Text.erP(escaper.getPlayer(), 'uncorrect number of parameters')
                 return true
             }
@@ -1944,9 +1944,9 @@ export const initExecuteCommandMake = () => {
                 return true
             }
 
-            const str = convertTextToAngle(param3)
+            const angle = convertTextToAngle(param3)
 
-            if (!str) {
+            if (!angle) {
                 Text.erP(
                     escaper.getPlayer(),
                     'param 3 should be direction : leftToRight, upToDown, rightToLeft or downToUp'
@@ -1954,18 +1954,28 @@ export const initExecuteCommandMake = () => {
                 return true
             }
 
-            let x = 0
+            let frequency = 0
 
-            if (nbParam === 4) {
-                x = S2R(param4)
-                if (x < 0.1 || x > 30) {
+            if (nbParam >= 4) {
+                frequency = S2R(param4)
+                if (frequency < 0.1 || frequency > 30) {
                     Text.erP(escaper.getPlayer(), 'frequency must be a real between 0.1 and 30')
                     return true
                 }
             } else {
-                x = 2
+                frequency = 2
             }
-            escaper.makeCreateMonsterSpawn(param1, monsterType, str, x)
+
+            let monsterDirectionMode: 'straight'|'random' = 'straight'
+            if(nbParam >= 5){
+                if(param5 !== 'straight' && param5 !== 'random'){
+                    Text.erP(escaper.getPlayer(), 'param 5 should be : straight or random')
+                    return true
+                }
+                monsterDirectionMode = param5
+            }
+
+            escaper.makeCreateMonsterSpawn(param1, monsterType, angle, frequency, monsterDirectionMode)
             Text.mkP(escaper.getPlayer(), 'monster spawn making on')
             return true
         },
@@ -2319,6 +2329,39 @@ export const initExecuteCommandMake = () => {
             monsterSpawn.setSpawnShape(shape as 'region' | 'line' | 'point')
 
             Text.mkP(escaper.getPlayer(), `Spawn shape set to: ${shape}`)
+            return true
+        },
+    })
+
+    //-setMonsterSpawnMonsterDirectionMode(setmsmdm) <label> straight|random
+    registerCommand({
+        name: 'setMonsterSpawnMonsterDirectionMode',
+        alias: ['setmsmdm'],
+        group: 'make',
+        argDescription: '<label> straight||random',
+        description:
+            'Set the monster direction mode for spawned monsters (straight or random) => works only for leftToRight, upToDown, rightToLeft, downToUp directions',
+        cb: ({ nbParam, param1, param2 }, escaper) => {
+            if(nbParam !== 2){
+                Text.erP(escaper.getPlayer(), 'Incorrect arguments. Usage: -setMonsterSpawnMonsterDirectionMode <label> straight||random')
+                return true
+            }
+
+            const monsterSpawn = escaper.getMakingLevel().monsterSpawns.getByLabel(param1)
+
+            if (!monsterSpawn) {
+                Text.erP(escaper.getPlayer(), 'unknown monster spawn "' + param1 + '" in this level')
+                return true
+            }
+
+            if(param2 !== 'straight' && param2 !== 'random'){
+                Text.erP(escaper.getPlayer(), 'param 2 should be : straight or random')
+                return true
+            }
+
+            monsterSpawn.setMonsterDirectionMode(param2)
+
+            Text.mkP(escaper.getPlayer(), `Spawn monster direction mode set to: ${param2}`)
             return true
         },
     })
