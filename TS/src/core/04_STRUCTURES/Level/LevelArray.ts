@@ -229,7 +229,7 @@ export class LevelArray extends BaseArray<Level> {
 
             // Determine the angle towards the next level start
             const nextLevel = this.data[this.getCurrentLevel(escaper).id + 1]
-            if (nextLevel) {
+            if (!!nextLevel) {
                 const xNextStart = nextLevel.getStart()?.getCenterX() ?? 0
                 const yNextStart = nextLevel.getStart()?.getCenterY() ?? 0
                 facingAngle = Math.atan2(yNextStart - y, xNextStart - x) * (180 / Math.PI)

@@ -203,7 +203,7 @@ export class MonsterNoMove extends Monster {
             events: [t => this.killRect && TriggerRegisterEnterRectSimple(t, this.killRect)],
             actions: [
                 () => {
-                    const escaper = Hero2Escaper(GetTriggerUnit())
+                    const escaper = Hero2Escaper(Natives.UGetTriggerUnit())
 
                     if (!escaper || !escaper.isAlive() || this.isDisabled() || !this.u || !IsUnitAliveBJ(this.u)) {
                         return

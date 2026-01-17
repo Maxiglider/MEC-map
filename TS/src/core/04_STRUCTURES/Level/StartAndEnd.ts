@@ -154,7 +154,7 @@ export class TpForEnd extends RectInterface {
             events: [t => TriggerRegisterEnterRectSimple(t, this.r)],
             actions: [
                 () => {
-                    const finisher = Hero2Escaper(GetTriggerUnit())
+                    const finisher = Hero2Escaper(Natives.UGetTriggerUnit())
 
                     if (!finisher) {
                         return

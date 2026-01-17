@@ -70,6 +70,8 @@ const Common = {
         assertDefined(BlzCreateFrame(name, owner, priority, createContext), 'BlzCreateFrame'),
 
     UBlzGetTriggerSyncData: () => assertDefined(BlzGetTriggerSyncData(), 'BlzGetTriggerSyncData'),
+
+    UGetEnumDestructable: () => assertDefined(GetEnumDestructable(), 'GetEnumDestructable'),
 }
 
 /**
@@ -107,6 +109,8 @@ const Blizzard = {
 
     UUnitItemInSlotBJ: (whichUnit: unit, itemSlot: number) =>
         assertDefined(UnitItemInSlotBJ(whichUnit, itemSlot), 'UnitItemInSlotBJ'),
+
+    UGetEntireMapRect: () => assertDefined(GetEntireMapRect(), 'GetEntireMapRect'),
 }
 
 /**

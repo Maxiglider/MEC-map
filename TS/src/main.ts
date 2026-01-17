@@ -38,6 +38,8 @@ const tsMain = () => {
                 },
             })
         },
+        MEC_core_API: initMEC_core_API,
+        InvisUnit_is_getting_damage: init_InvisUnit_is_getting_damage
     })
 
     // Register commands after services are set up but before initCommands
@@ -111,8 +113,6 @@ const tsMain = () => {
 
             return true
         },
-        MEC_core_API: initMEC_core_API,
-        InvisUnit_is_getting_damage: init_InvisUnit_is_getting_damage
     })
 
     ServiceManager.getService('Cmd').initCommands()
