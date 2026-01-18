@@ -10,7 +10,10 @@ export const InitTrig_Right_click_on_widget = () => {
         conditions: [() => IsHero(Natives.UGetTriggerUnit()) && IsIssuedOrder('smart')],
         actions: [
             () => {
-                MeteorFunctions.ExecuteRightClicOnUnit(Natives.UGetTriggerUnit(), Natives.UGetOrderTargetUnit())
+                const targetUnit = GetOrderTargetUnit()
+                if (targetUnit) { // an other case can be targetting an item (example: a meteor on the ground)
+                    MeteorFunctions.ExecuteRightClicOnUnit(Natives.UGetTriggerUnit(), targetUnit)
+                }
             },
         ],
     })
