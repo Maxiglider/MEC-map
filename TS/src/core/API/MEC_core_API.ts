@@ -27,6 +27,8 @@ import { NewImmobileMonster, NewPatrolMonster } from '../04_STRUCTURES/Monster/M
 export type IMEC_core_API = typeof MEC_core_API
 
 export const MEC_core_API = {
+    json,
+
     setGameData: (jsonString: string, currentlyOnGameStart = true) => {
         errorHandler(() => {
             LoadMapFromCache.gameDataJsonString = jsonString
