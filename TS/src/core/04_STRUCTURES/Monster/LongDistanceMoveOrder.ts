@@ -1,7 +1,7 @@
 import { createPoint, IPoint } from '../../../Utils/Point'
 import { Constants } from 'core/01_libraries/Constants'
 import { Natives } from '../../wc3_natives_unsecured/Natives'
-import { IsIssuedOrder } from '../../01_libraries/Basic_functions'
+import { MemoryHandler } from '../../../Utils/MemoryHandler'
 
 function OnNextWaypointReached() {
     const triggerId = GetHandleId(GetTriggeringTrigger()!)
@@ -161,6 +161,10 @@ export class LongDistanceMoveOrder {
 
         for (const region of this.waypointRegions) {
             RemoveRegion(region)
+        }
+
+        for(const waypoint of this.waypoints) {
+            MemoryHandler.destroyObject(waypoint)
         }
     }
 
