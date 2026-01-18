@@ -1,5 +1,7 @@
 import type { MecHookArray } from './MecHookArray'
 
+const allMecHooksCallback: ((...args: any) => any)[] = []
+
 export class MecHook<T extends (...args: any) => any> {
     static lastId = -1
 
@@ -9,6 +11,7 @@ export class MecHook<T extends (...args: any) => any> {
         const hook = MecHook.mecHooksAll.get(hookId)
 
         if (hook) {
+            hook.destroy()
             hook.mecHookArray?.destroy(hookId)
             MecHook.mecHooksAll.delete(hookId)
             return true
@@ -18,12 +21,14 @@ export class MecHook<T extends (...args: any) => any> {
     }
 
     private id: number
-    private cb: T
+    private callbackIndex:  number
     public mecHookArray?: MecHookArray<T>
+    private isDestroyed = false
 
-    constructor(cb: T) {
+    constructor(callback: T) {
         this.id = ++MecHook.lastId
-        this.cb = cb
+        this.callbackIndex = allMecHooksCallback.length
+        allMecHooksCallback.push(callback)
         MecHook.mecHooksAll.set(this.id, this as any)
     }
 
@@ -33,16 +38,23 @@ export class MecHook<T extends (...args: any) => any> {
 
     // The type should be `...args: Parameters<T>` but TSTL doesn't support it so currently hooks only support 1 typed argument
     public execute = (args: Parameters<T>[0]) => {
-        return this.cb(args)
+        if(this.isDestroyed) return;
+        return allMecHooksCallback[this.callbackIndex](args)
     }
 
     // Silly wrapper to support 2 typed arguments
     public execute2 = (arg1: Parameters<T>[0], arg2: Parameters<T>[1]) => {
-        return this.cb(arg1, arg2)
+        if(this.isDestroyed) return;
+        return allMecHooksCallback[this.callbackIndex](arg1, arg2)
     }
 
     // Silly wrapper to support 3 typed arguments
     public execute3 = (arg1: Parameters<T>[0], arg2: Parameters<T>[1], arg3: Parameters<T>[2]) => {
-        return this.cb(arg1, arg2, arg3)
+        if(this.isDestroyed) return;
+        return allMecHooksCallback[this.callbackIndex](arg1, arg2, arg3)
+    }
+
+    public destroy = () => {
+        this.isDestroyed = true
     }
 }
