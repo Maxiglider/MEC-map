@@ -93,14 +93,18 @@ export class TerrainTypeArray extends BaseArray<TerrainType> {
         return this.getByLabel(label) !== null
     }
 
-    newWalk = (label: string, terrainTypeId: number, walkspeed: number) => {
+    newWalk = (label: string, terrainTypeId: number, walkspeed: number, paletteUpdate = true) => {
         if (this.isLabelAlreadyUsed(label)) throw `TerrainType label already used: "${label}"`
         if (this.isTerrainTypeIdAlreadyUsed(terrainTypeId)) throw 'Terrain type already used'
         if (terrainTypeId === 0) throw 'Wrong terrain type'
 
         const tt = new TerrainTypeWalk(label, terrainTypeId, walkspeed)
         this._new(tt)
-        ServiceManager.getService('React').forceUpdate()
+
+        if (paletteUpdate) {
+            ServiceManager.getService('React').forceUpdate()
+        }
+
         return tt
     }
 
@@ -109,7 +113,8 @@ export class TerrainTypeArray extends BaseArray<TerrainType> {
         terrainTypeId: number,
         killingEffectStr: string,
         timeToKill: number,
-        toleranceDist: number
+        toleranceDist: number,
+        paletteUpdate = true
     ) => {
         if (this.isLabelAlreadyUsed(label)) throw `TerrainType label already used: "${label}"`
         if (this.isTerrainTypeIdAlreadyUsed(terrainTypeId)) throw 'Terrain type already used'
@@ -117,7 +122,11 @@ export class TerrainTypeArray extends BaseArray<TerrainType> {
 
         const tt = new TerrainTypeDeath(label, terrainTypeId, killingEffectStr, timeToKill, toleranceDist)
         this._new(tt)
-        ServiceManager.getService('React').forceUpdate()
+
+        if (paletteUpdate){
+            ServiceManager.getService('React').forceUpdate()
+        }
+
         return tt
     }
 
@@ -126,7 +135,8 @@ export class TerrainTypeArray extends BaseArray<TerrainType> {
         terrainTypeId: number,
         slideSpeed: number,
         canTurn: boolean,
-        rotationSpeed: number | null = null
+        rotationSpeed: number | null = null,
+        paletteUpdate = true
     ) => {
         if (this.isLabelAlreadyUsed(label)) throw `TerrainType label already used: "${label}"`
         if (this.isTerrainTypeIdAlreadyUsed(terrainTypeId)) throw 'Terrain type already used'
@@ -134,7 +144,11 @@ export class TerrainTypeArray extends BaseArray<TerrainType> {
 
         const tt = new TerrainTypeSlide(label, terrainTypeId, slideSpeed, canTurn, rotationSpeed)
         this._new(tt)
-        ServiceManager.getService('React').forceUpdate()
+
+        if (paletteUpdate){
+            ServiceManager.getService('React').forceUpdate()
+        }
+
         return tt
     }
 
@@ -249,7 +263,7 @@ export class TerrainTypeArray extends BaseArray<TerrainType> {
 
             switch (terrainTypeJson.kind) {
                 case 'walk':
-                    tt = this.newWalk(terrainTypeJson.label, terrainTypeId, terrainTypeJson.walkSpeed)
+                    tt = this.newWalk(terrainTypeJson.label, terrainTypeId, terrainTypeJson.walkSpeed, false)
 
                     break
 
@@ -259,7 +273,8 @@ export class TerrainTypeArray extends BaseArray<TerrainType> {
                         terrainTypeId,
                         terrainTypeJson.slideSpeed,
                         terrainTypeJson.canTurn,
-                        terrainTypeJson.rotationSpeed
+                        terrainTypeJson.rotationSpeed,
+                        false
                     )
 
                     break
@@ -270,7 +285,8 @@ export class TerrainTypeArray extends BaseArray<TerrainType> {
                         terrainTypeId,
                         terrainTypeJson.killingEffet,
                         terrainTypeJson.timeToKill,
-                        terrainTypeJson.toleranceDist
+                        terrainTypeJson.toleranceDist,
+                        false
                     )
 
                     break
@@ -288,5 +304,7 @@ export class TerrainTypeArray extends BaseArray<TerrainType> {
                 }
             }
         }
+
+        ServiceManager.getService('React').forceUpdate()
     }
 }
