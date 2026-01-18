@@ -297,6 +297,7 @@ export abstract class Monster {
 
         this.doAttackGroundPos()
         this.isDisabledB = false
+        this.lifeBonusLivesEarned = false
     }
 
     delete = () => {
@@ -485,9 +486,12 @@ export abstract class Monster {
                 timer.destroy()
                 MEC_core_API.destroyHook(hookId)
             })
-            const hookId = MEC_core_API.onEscaperDeath(() => {
-                timer.destroy()
-                this.lifeBonusEscapersWhoJustReached.delete(escaper)
+            const hookId = MEC_core_API.onEscaperDeath((deadEscaper) => {
+                if(deadEscaper === escaper){
+                    timer.destroy()
+                    this.lifeBonusEscapersWhoJustReached.delete(escaper)
+                    MEC_core_API.destroyHook(hookId)
+                }
             })
         }
     }
