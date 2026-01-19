@@ -24,6 +24,7 @@ type ICommandHistoryEntry = {
 }
 
 const MAX_HISTORY_SIZE = 20
+const lazyTimerTimeout = 0.01
 
 class InterfaceManager {
     private frames: Map<string, framehandle> = new Map()
@@ -55,6 +56,7 @@ class InterfaceManager {
     private readonly historyPos = { x: 0.6, y: 0.5 }
 
     private lazyRebuildHistoryTimer = CreateTimer()
+    private lazyForceUpdateTimer = CreateTimer()
 
     private forceUpdateCallback: (() => void) | null = null
     private callbacks: {
@@ -423,7 +425,7 @@ class InterfaceManager {
     }
 
     private rebuildHistoryFrames(): void {
-        TimerStart(this.lazyRebuildHistoryTimer, 0.01, false, () => this.rebuildHistoryFramesNow())
+        TimerStart(this.lazyRebuildHistoryTimer, lazyTimerTimeout, false, () => this.rebuildHistoryFramesNow())
     }
 
     public setPalettesVisible(playerId: number, visible: boolean): void {
@@ -511,7 +513,7 @@ class InterfaceManager {
         BlzFrameSetVisible(historyRootContainer, visible)
     }
 
-    public forceUpdate(): void {
+    private forceUpdateNow(){
         this.updateTerrainState()
         this.updateLayout()
 
@@ -520,6 +522,10 @@ class InterfaceManager {
         this.updateHistoryVisibility(reactService.getHistoryVisible(localPlayerId))
 
         this.rebuildHistoryFrames()
+    }
+
+    public forceUpdate(): void {
+        TimerStart(this.lazyForceUpdateTimer, lazyTimerTimeout, false, () => this.forceUpdateNow())
     }
 
     public destroy(): void {
