@@ -54,6 +54,8 @@ class InterfaceManager {
     private readonly defaultPalettesPos = { x: 0.007, y: 0.471 }
     private readonly historyPos = { x: 0.6, y: 0.5 }
 
+    private lazyRebuildHistoryTimer = CreateTimer()
+
     private forceUpdateCallback: (() => void) | null = null
     private callbacks: {
         setPalettesVisible: (args: { visible: boolean; playerId: number }) => void
@@ -266,7 +268,7 @@ class InterfaceManager {
         }
     }
 
-    private rebuildHistoryFrames(): void {
+    private rebuildHistoryFramesNow() {
         // Clean up old history frames
         for (const [id, frames] of this.historyFrames) {
             DestroyTrigger(frames.pinTrigger)
@@ -418,6 +420,10 @@ class InterfaceManager {
 
             this.triggers.push(clickTrigger, pinTrigger, removeTrigger)
         }
+    }
+
+    private rebuildHistoryFrames(): void {
+        TimerStart(this.lazyRebuildHistoryTimer, 0.01, false, () => this.rebuildHistoryFramesNow())
     }
 
     public setPalettesVisible(playerId: number, visible: boolean): void {
