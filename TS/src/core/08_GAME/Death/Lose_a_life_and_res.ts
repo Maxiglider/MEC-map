@@ -45,8 +45,7 @@ export const loseALifeAndRes = (escaperIds: number[]) => {
         MemoryHandler.destroyArray(clonedEscaperIds)
 
         if (getUdgLevels().getLevelProgression() === 'all') {
-            Text.A('|cff5c2e2eYou have lost a life !')
+            Text.A('|cff5c2e2eYou have lost a life ! (new count: ' + I2S(ServiceManager.getService('Lives').get()) + ')')
         }
-        //AnticheatTeleport_justRevived = true
     }
 }
