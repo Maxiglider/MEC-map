@@ -283,61 +283,66 @@ class InterfaceManager {
         }
         this.historyFrames.clear()
 
-        const localPlayerId = GetPlayerId(GetLocalPlayer()!)
-        const localEntries = this.getEntriesForPlayer(localPlayerId)
+        getUdgEscapers().forMainEscapers(escaper => {
+            const currentPlayerId = escaper.getEscaperId()
+            const playerEntries = this.getEntriesForPlayer(currentPlayerId)
 
-        // Sort entries
-        const sortedEntries = [...localEntries].sort((a, b) => {
-            if (a.pinned && !b.pinned) return -1
-            if (!a.pinned && b.pinned) return 1
-            return b.timestamp - a.timestamp
-        })
+            // Sort entries
+            const playerSortedEntries = [...playerEntries].sort((a, b) => {
+                if (a.pinned && !b.pinned) return -1
+                if (!a.pinned && b.pinned) return 1
+                return b.timestamp - a.timestamp
+            })
 
-        const containerPadding = 0.008
-        const entryHeight = 0.015
-        const buttonSize = 0.025
-        const containerWidth = 0.25
-        const containerHeight = 0.045 + sortedEntries.length * (entryHeight + 0.001)
+            const containerPadding = 0.008
+            const entryHeight = 0.015
+            const buttonSize = 0.025
+            const containerWidth = 0.25
+            const containerHeightForCurrentPlayer = 0.045 + playerSortedEntries.length * (entryHeight + 0.001)
 
-        const historyRootContainer = this.frames.get('historyRootContainer')!
+            const historyRootContainer = this.frames.get('historyRootContainer')!
 
-        // Create/update history backdrop
-        let historyBackdrop = this.frames.get('historyBackdrop')
-        if (!historyBackdrop) {
-            historyBackdrop = BlzCreateFrameByType(
-                'BACKDROP',
-                'InterfaceHistoryBackdrop',
-                historyRootContainer,
-                'EscMenuBackdrop',
-                0
-            )!
-            this.frames.set('historyBackdrop', historyBackdrop)
-        }
+            // Create/update history backdrop
+            let historyBackdrop = this.frames.get('historyBackdrop')
+            if (!historyBackdrop) {
+                historyBackdrop = BlzCreateFrameByType(
+                    'BACKDROP',
+                    'InterfaceHistoryBackdrop',
+                    historyRootContainer,
+                    'EscMenuBackdrop',
+                    0
+                )!
+                this.frames.set('historyBackdrop', historyBackdrop)
+            }
 
-        if (GetPlayerId(GetLocalPlayer()!) === localPlayerId) {
             BlzFrameSetAbsPoint(historyBackdrop, FRAMEPOINT_TOPLEFT, this.historyPos.x, this.historyPos.y)
-            BlzFrameSetSize(historyBackdrop, containerWidth, containerHeight)
-        }
 
-        // Create frames for each entry
-        for (let i = 0; i < sortedEntries.length; i++) {
-            const entry = sortedEntries[i]
-            const entryY = this.historyPos.y - containerPadding - 0.02 - i * entryHeight
+            if(GetLocalPlayer() === Player(currentPlayerId)){
+                BlzFrameSetSize(historyBackdrop, containerWidth, containerHeightForCurrentPlayer)
+            }
 
-            const entryContainer = BlzCreateFrameByType(
-                'FRAME',
-                `HistoryEntry_${entry.id}`,
-                historyRootContainer,
-                '',
-                0
-            )!
+            // Create frames for each entry
+            for (let i = 0; i < playerSortedEntries.length; i++) {
+                const entry = playerSortedEntries[i]
+                const entryY = this.historyPos.y - containerPadding - 0.02 - i * entryHeight
 
-            // Command text
-            const text = BlzCreateFrameByType('TEXT', `HistoryText_${entry.id}`, entryContainer, '', 0)!
-            const displayText = `${entry.pinned ? '|cff00ff00[PIN] |r' : ''}|cffaaaaaa${entry.command}|r`
-            BlzFrameSetText(text, displayText)
+                const entryContainer = BlzCreateFrameByType(
+                    'FRAME',
+                    `HistoryEntry_${entry.id}`,
+                    historyRootContainer,
+                    '',
+                    0
+                )!
 
-            if (GetPlayerId(GetLocalPlayer()!) === localPlayerId) {
+                if(GetLocalPlayer() !== Player(currentPlayerId)){
+                    BlzFrameSetVisible(entryContainer, false)
+                }
+
+                // Command text
+                const text = BlzCreateFrameByType('TEXT', `HistoryText_${entry.id}`, entryContainer, '', 0)!
+                const displayText = `${entry.pinned ? '|cff00ff00[PIN] |r' : ''}|cffaaaaaa${entry.command}|r`
+                BlzFrameSetText(text, displayText)
+
                 BlzFrameSetAbsPoint(
                     text,
                     FRAMEPOINT_TOPLEFT,
@@ -349,29 +354,27 @@ class InterfaceManager {
                     containerWidth - containerPadding * 2 - buttonSize * 2 - 0.02,
                     entryHeight - 0.004
                 )
-            }
 
-            const clickTrigger = CreateTrigger()!
-            BlzTriggerRegisterFrameEvent(clickTrigger, text, FRAMEEVENT_CONTROL_CLICK)
-            TriggerAddAction(clickTrigger, () => {
-                const escaper = getUdgEscapers().get(GetPlayerId(GetTriggerPlayer()!))
-                if (escaper) {
-                    ServiceManager.getService('Cmd').ExecuteCommand(escaper, entry.command)
-                }
-            })
+                const clickTrigger = CreateTrigger()!
+                BlzTriggerRegisterFrameEvent(clickTrigger, text, FRAMEEVENT_CONTROL_CLICK)
+                TriggerAddAction(clickTrigger, () => {
+                    const escaper = getUdgEscapers().get(GetPlayerId(GetTriggerPlayer()!))
+                    if (escaper) {
+                        ServiceManager.getService('Cmd').ExecuteCommand(escaper, entry.command)
+                    }
+                })
 
-            // Pin button
-            const pinBtn = BlzCreateFrameByType(
-                'GLUETEXTBUTTON',
-                `HistoryPin_${entry.id}`,
-                entryContainer,
-                'ScriptDialogButton',
-                0
-            )!
-            BlzFrameSetText(pinBtn, entry.pinned ? '|cff00ff00*|r' : '|cffcccccc*|r')
-            BlzFrameSetScale(pinBtn, 0.7)
+                // Pin button
+                const pinBtn = BlzCreateFrameByType(
+                    'GLUETEXTBUTTON',
+                    `HistoryPin_${entry.id}`,
+                    entryContainer,
+                    'ScriptDialogButton',
+                    0
+                )!
+                BlzFrameSetText(pinBtn, entry.pinned ? '|cff00ff00*|r' : '|cffcccccc*|r')
+                BlzFrameSetScale(pinBtn, 0.7)
 
-            if (GetPlayerId(GetLocalPlayer()!) === localPlayerId) {
                 BlzFrameSetAbsPoint(
                     pinBtn,
                     FRAMEPOINT_TOPRIGHT,
@@ -379,49 +382,47 @@ class InterfaceManager {
                     entryY
                 )
                 BlzFrameSetSize(pinBtn, buttonSize, buttonSize)
-            }
 
-            const pinTrigger = CreateTrigger()!
-            BlzTriggerRegisterFrameEvent(pinTrigger, pinBtn, FRAMEEVENT_CONTROL_CLICK)
-            const entryId = entry.id
-            TriggerAddAction(pinTrigger, () => {
-                this.togglePin(entryId, GetPlayerId(GetTriggerPlayer()!))
-            })
+                const pinTrigger = CreateTrigger()!
+                BlzTriggerRegisterFrameEvent(pinTrigger, pinBtn, FRAMEEVENT_CONTROL_CLICK)
+                const entryId = entry.id
+                TriggerAddAction(pinTrigger, () => {
+                    this.togglePin(entryId, GetPlayerId(GetTriggerPlayer()!))
+                })
 
-            // Remove button
-            const removeBtn = BlzCreateFrameByType(
-                'GLUETEXTBUTTON',
-                `HistoryRemove_${entry.id}`,
-                entryContainer,
-                'ScriptDialogButton',
-                0
-            )!
-            BlzFrameSetText(removeBtn, '|cffff0000X|r')
-            BlzFrameSetScale(removeBtn, 0.7)
+                // Remove button
+                const removeBtn = BlzCreateFrameByType(
+                    'GLUETEXTBUTTON',
+                    `HistoryRemove_${entry.id}`,
+                    entryContainer,
+                    'ScriptDialogButton',
+                    0
+                )!
+                BlzFrameSetText(removeBtn, '|cffff0000X|r')
+                BlzFrameSetScale(removeBtn, 0.7)
 
-            if (GetPlayerId(GetLocalPlayer()!) === localPlayerId) {
                 BlzFrameSetAbsPoint(removeBtn, FRAMEPOINT_TOPRIGHT, this.historyPos.x + containerWidth - 0.028, entryY)
                 BlzFrameSetSize(removeBtn, buttonSize, buttonSize)
+
+                const removeTrigger = CreateTrigger()!
+                BlzTriggerRegisterFrameEvent(removeTrigger, removeBtn, FRAMEEVENT_CONTROL_CLICK)
+                TriggerAddAction(removeTrigger, () => {
+                    this.removeEntry(entryId, GetPlayerId(GetTriggerPlayer()!))
+                })
+
+                this.historyFrames.set(entry.id, {
+                    container: entryContainer,
+                    text,
+                    pinBtn,
+                    removeBtn,
+                    pinTrigger,
+                    removeTrigger,
+                    clickTrigger,
+                })
+
+                this.triggers.push(clickTrigger, pinTrigger, removeTrigger)
             }
-
-            const removeTrigger = CreateTrigger()!
-            BlzTriggerRegisterFrameEvent(removeTrigger, removeBtn, FRAMEEVENT_CONTROL_CLICK)
-            TriggerAddAction(removeTrigger, () => {
-                this.removeEntry(entryId, GetPlayerId(GetTriggerPlayer()!))
-            })
-
-            this.historyFrames.set(entry.id, {
-                container: entryContainer,
-                text,
-                pinBtn,
-                removeBtn,
-                pinTrigger,
-                removeTrigger,
-                clickTrigger,
-            })
-
-            this.triggers.push(clickTrigger, pinTrigger, removeTrigger)
-        }
+        });
     }
 
     private rebuildHistoryFrames(): void {
@@ -467,9 +468,7 @@ class InterfaceManager {
 
         this.historyByPlayer.set(playerId, updatedHistory)
 
-        if (GetPlayerId(GetLocalPlayer()!) === playerId) {
-            this.rebuildHistoryFrames()
-        }
+        this.rebuildHistoryFrames()
     }
 
     private togglePin(id: number, playerId: number): void {
@@ -479,9 +478,7 @@ class InterfaceManager {
         )
         this.historyByPlayer.set(playerId, updatedHistory)
 
-        if (GetPlayerId(GetLocalPlayer()!) === playerId) {
-            this.rebuildHistoryFrames()
-        }
+        this.rebuildHistoryFrames()
     }
 
     private removeEntry(id: number, playerId: number): void {
@@ -489,9 +486,7 @@ class InterfaceManager {
         const updatedHistory = playerHistory.filter(entry => entry.id !== id)
         this.historyByPlayer.set(playerId, updatedHistory)
 
-        if (GetPlayerId(GetLocalPlayer()!) === playerId) {
-            this.rebuildHistoryFrames()
-        }
+        this.rebuildHistoryFrames()
     }
 
     public clearUnpinned(playerId: number): void {
@@ -499,9 +494,7 @@ class InterfaceManager {
         const updatedHistory = playerHistory.filter(entry => entry.pinned)
         this.historyByPlayer.set(playerId, updatedHistory)
 
-        if (GetPlayerId(GetLocalPlayer()!) === playerId) {
-            this.rebuildHistoryFrames()
-        }
+        this.rebuildHistoryFrames()
     }
 
     private getEntriesForPlayer(playerId: number): ICommandHistoryEntry[] {
