@@ -39,8 +39,8 @@ class InterfaceManager {
         string,
         { container: framehandle; backdrop: framehandle; text: framehandle; trigger: trigger }
     > = new Map()
-    private historyFrames: Map<
-        number,
+    private historyEntries: Map<
+        string,
         {
             container: framehandle
             text: framehandle
@@ -272,16 +272,16 @@ class InterfaceManager {
 
     private rebuildHistoryFramesNow() {
         // Clean up old history frames
-        for (const [id, frames] of this.historyFrames) {
-            DestroyTrigger(frames.pinTrigger)
-            DestroyTrigger(frames.removeTrigger)
-            DestroyTrigger(frames.clickTrigger)
-            BlzDestroyFrame(frames.text)
-            BlzDestroyFrame(frames.pinBtn)
-            BlzDestroyFrame(frames.removeBtn)
-            BlzDestroyFrame(frames.container)
+        for (const [_, entry] of this.historyEntries) {
+            DestroyTrigger(entry.pinTrigger)
+            DestroyTrigger(entry.removeTrigger)
+            DestroyTrigger(entry.clickTrigger)
+            BlzDestroyFrame(entry.text)
+            BlzDestroyFrame(entry.pinBtn)
+            BlzDestroyFrame(entry.removeBtn)
+            BlzDestroyFrame(entry.container)
         }
-        this.historyFrames.clear()
+        this.historyEntries.clear()
 
         getUdgEscapers().forMainEscapers(escaper => {
             const currentPlayerId = escaper.getEscaperId()
@@ -410,7 +410,7 @@ class InterfaceManager {
                     this.removeEntry(entryId, GetPlayerId(GetTriggerPlayer()!))
                 })
 
-                this.historyFrames.set(entry.id, {
+                this.historyEntries.set(`${currentPlayerId}_${entry.id}`, {
                     container: entryContainer,
                     text,
                     pinBtn,
@@ -540,7 +540,7 @@ class InterfaceManager {
         this.terrainItemFrames.clear()
 
         // Destroy history frames
-        for (const [id, frames] of this.historyFrames) {
+        for (const [_, frames] of this.historyEntries) {
             DestroyTrigger(frames.pinTrigger)
             DestroyTrigger(frames.removeTrigger)
             DestroyTrigger(frames.clickTrigger)
@@ -549,10 +549,10 @@ class InterfaceManager {
             BlzDestroyFrame(frames.removeBtn)
             BlzDestroyFrame(frames.container)
         }
-        this.historyFrames.clear()
+        this.historyEntries.clear()
 
         // Destroy main frames
-        for (const [key, frame] of this.frames) {
+        for (const [_, frame] of this.frames) {
             BlzDestroyFrame(frame)
         }
         this.frames.clear()

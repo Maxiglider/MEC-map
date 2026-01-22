@@ -34,7 +34,10 @@ export const renderInterface = (props: InterfaceProps) => {
         getHistoryVisible: (playerId: number) => historyVisible[playerId] || false,
         setHistoryVisible: (playerId: number, visible: boolean) => {
             historyVisible[playerId] = visible
-            manager?.updateHistoryVisibility(visible)
+            
+            if (GetPlayerId(GetLocalPlayer()) === playerId) {
+                manager?.updateHistoryVisibility(visible)
+            }
         },
         setClearUnpinnedCallback: (cb: ((playerId: number) => void) | null) => {
             // The callback is now set up internally in InterfaceManager.init()
