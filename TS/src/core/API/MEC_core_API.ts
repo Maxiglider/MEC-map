@@ -101,6 +101,10 @@ export const MEC_core_API = {
         return hooks.hooks_onEndLevelAny.new(cb)
     },
 
+    onGameWinning: (cb: () => any) => {
+        return hooks.hooks_onGameWinning.new(cb)
+    },
+
     onEscaperDeath: (cb: (escaper: Escaper) => any) => {
         return hooks.hooks_onEscaperDeath.new(cb)
     },

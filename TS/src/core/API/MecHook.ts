@@ -36,6 +36,11 @@ export class MecHook<T extends (...args: any) => any> {
         return this.id
     }
 
+    public execute0 = () => {
+        if(this.isDestroyed) return;
+        return allMecHooksCallback[this.callbackIndex]()
+    }
+
     // The type should be `...args: Parameters<T>` but TSTL doesn't support it so currently hooks only support 1 typed argument
     public execute = (args: Parameters<T>[0]) => {
         if(this.isDestroyed) return;

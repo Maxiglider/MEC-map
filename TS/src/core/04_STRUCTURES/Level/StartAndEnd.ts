@@ -6,6 +6,7 @@ import { getUdgLevels } from '../../../../globals'
 import { Hero2Escaper } from '../Escaper/Escaper_functions'
 import { getSameLevelProgressionPlayers } from './LevelProgression'
 import { Natives } from '../../wc3_natives_unsecured/Natives'
+import { hooks } from '../../API/GeneralHooks'
 
 abstract class RectInterface {
     minX: number
@@ -118,6 +119,11 @@ export class End extends RectInterface {
 
                         DisableTrigger(this.endReaching)
                         Text.A('Good job ! You have finished the game.')
+
+                        for (const hook of hooks.hooks_onGameWinning.getHooks()) {
+                            hook.execute0()
+                        }
+
                         TriggerSleepAction(2)
                         Text.A('restart in 10 seconds')
                         TriggerSleepAction(10)

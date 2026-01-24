@@ -19,4 +19,5 @@ export const hooks = {
         (escaper: Escaper, newTerrainType: TerrainType, oldTerrainType?: TerrainType) => void
     >(),
     hooks_onBeforeHeroUsingMeteor: new MecHookArray<(escaper: Escaper, targetMonster: Monster, meteor: item) => boolean>(),
+    hooks_onGameWinning: new MecHookArray<() => void>(),
 }
