@@ -38,14 +38,9 @@ export const IssueMoveOrderForLongDistance = (whichUnit: unit, x: number, y: num
     const startY = GetUnitY(whichUnit)
     const deltaX = x - startX
     const deltaY = y - startY
-    const sameXorYtoleranceDelta = 10
 
-    let simpleMove = Math.abs(deltaX) < sameXorYtoleranceDelta || Math.abs(deltaY) < sameXorYtoleranceDelta
-
-    if (!simpleMove) {
-        const distance = SquareRoot(deltaX * deltaX + deltaY * deltaY)
-        simpleMove = distance <= Constants.MAX_DISTANCE_PER_MOVE_ORDER
-    }
+    const distance = SquareRoot(deltaX * deltaX + deltaY * deltaY)
+    let simpleMove = distance <= Constants.MAX_DISTANCE_PER_MOVE_ORDER
 
     if (simpleMove) {
         IssuePointOrder(whichUnit, 'move', x, y)
@@ -163,7 +158,7 @@ export class LongDistanceMoveOrder {
             RemoveRegion(region)
         }
 
-        for(const waypoint of this.waypoints) {
+        for (const waypoint of this.waypoints) {
             MemoryHandler.destroyObject(waypoint)
         }
     }
