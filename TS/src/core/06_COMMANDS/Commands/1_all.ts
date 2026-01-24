@@ -1176,7 +1176,7 @@ export const initCommandAll = () => {
         name: 'leaderboard',
         alias: ['ldb'],
         group: 'all',
-        argDescription: 'on | off | mb|multiboard|reset | classic | global | current | speedrun',
+        argDescription: 'on | off | mb|multiboard||reset | classic | global | current | speedrun',
         description: 'Displays the leaderboard',
         cb: ({ nbParam, param1 }, escaper) => {
             if (nbParam === 1) {
