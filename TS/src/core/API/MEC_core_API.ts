@@ -23,6 +23,7 @@ import { heroes } from '../08_GAME/Init_game/Heroes'
 import { hooks } from './GeneralHooks'
 import { MecHook } from './MecHook'
 import { NewImmobileMonster, NewPatrolMonster } from '../04_STRUCTURES/Monster/Monster_functions'
+import { Monster } from '../04_STRUCTURES/Monster/Monster'
 
 export type IMEC_core_API = typeof MEC_core_API
 
@@ -65,7 +66,8 @@ export const MEC_core_API = {
         return MecHook.destroy(hookId)
     },
 
-    onBeforeCreateMonsterUnit: (cb: () => any) => {
+    // if one of the cb for onBeforeCreateMonsterUnit returns false, the monsterUnit won't be created
+    onBeforeCreateMonsterUnit: (cb: () => boolean) => {
         return hooks.hooks_onBeforeCreateMonsterUnit.new(cb)
     },
 
@@ -121,6 +123,11 @@ export const MEC_core_API = {
 
     onHeroTerrainChange: (cb: (escaper: Escaper, newTerrainType: TerrainType, oldTerrainType?: TerrainType) => any) => {
         return hooks.hooks_onHeroTerrainChange.new(cb)
+    },
+
+    // if one of the cb for onBeforeCreateMonsterUnit returns false, the meteor usage will be prevented
+    onBeforeHeroUsingMeteor: (cb: (escaper: Escaper, targetMonster: Monster, meteor: item) => boolean) => {
+        return hooks.hooks_onBeforeHeroUsingMeteor.new(cb)
     },
 
     //terrain

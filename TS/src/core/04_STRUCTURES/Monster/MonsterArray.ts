@@ -17,7 +17,7 @@ export class MonsterArray extends BaseArray<Monster> {
     private level?: Level
 
     //hooks
-    public hooks_onBeforeCreateMonsterUnit = new MecHookArray<(monster: Partial<Monster>) => void>()
+    public hooks_onBeforeCreateMonsterUnit = new MecHookArray<(monster: Partial<Monster>) => boolean>()
     public hooks_onAfterCreateMonsterUnit = new MecHookArray<(monster: Partial<Monster>) => void>()
 
     constructor(level?: Level) {
@@ -211,7 +211,7 @@ export class MonsterArray extends BaseArray<Monster> {
         while (this.removeLast(false));
     }
 
-    onBeforeCreateMonsterUnit = (cb: () => any) => {
+    onBeforeCreateMonsterUnit = (cb: () => boolean) => {
         return this.hooks_onBeforeCreateMonsterUnit.new(cb)
     }
 

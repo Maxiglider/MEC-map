@@ -6,7 +6,7 @@ import { Monster } from '../04_STRUCTURES/Monster/Monster'
 import { MecHookArray } from './MecHookArray'
 
 export const hooks = {
-    hooks_onBeforeCreateMonsterUnit: new MecHookArray<(monster: Partial<Monster>) => void>(),
+    hooks_onBeforeCreateMonsterUnit: new MecHookArray<(monster: Partial<Monster>) => boolean>(),
     hooks_onAfterCreateMonsterUnit: new MecHookArray<(monster: Partial<Monster>) => void>(),
     hooks_onStartLevelAny: new MecHookArray<(level: Level) => void>(),
     hooks_onEndLevelAny: new MecHookArray<(level: Level) => void>(),
@@ -18,4 +18,5 @@ export const hooks = {
     hooks_onHeroTerrainChange: new MecHookArray<
         (escaper: Escaper, newTerrainType: TerrainType, oldTerrainType?: TerrainType) => void
     >(),
+    hooks_onBeforeHeroUsingMeteor: new MecHookArray<(escaper: Escaper, targetMonster: Monster, meteor: item) => boolean>(),
 }

@@ -3,7 +3,7 @@ import { createEvent } from 'Utils/mapUtils'
 import { getUdgEscapers } from '../../../../globals'
 import { Hero2Escaper } from '../Escaper/Escaper_functions'
 import { METEOR_NORMAL, udg_meteors } from './Meteor'
-import { gg_trg_Stop_using_normal_meteor } from './Stop_using_normal_meteor'
+import { allowNormalMeteorUsage, preventNormalMeteorUsage } from './On_using_normal_meteor'
 import { Natives } from '../../wc3_natives_unsecured/Natives'
 
 export const InitTrig_Meteor_being_used = () => {
@@ -15,7 +15,7 @@ export const InitTrig_Meteor_being_used = () => {
 
                 if (GetItemTypeId(Natives.UGetManipulatedItem()) === METEOR_NORMAL) {
                     DisableTrigger(Natives.UGetTriggeringTrigger())
-                    EnableTrigger(gg_trg_Stop_using_normal_meteor) //todomax fix the bug that sometimes the hero runs towards the target after launching the ball
+                    preventNormalMeteorUsage(); //todomax fix the bug that sometimes the hero runs towards the target after launching the ball
 
                     udg_meteors[GetItemUserData(Natives.UGetManipulatedItem())].removeMeteorItem()
                     Hero2Escaper(Natives.UGetTriggerUnit())?.removeEffectMeteor()
@@ -23,7 +23,7 @@ export const InitTrig_Meteor_being_used = () => {
                     TriggerSleepAction(1)
 
                     EnableTrigger(Natives.UGetTriggeringTrigger())
-                    DisableTrigger(gg_trg_Stop_using_normal_meteor)
+                    allowNormalMeteorUsage()
 
                     const escaper = getUdgEscapers().get(GetPlayerId(Natives.UGetTriggerPlayer()))
                     escaper && ServiceManager.getService('Multiboard').onPlayerMeteorCompleted(escaper)

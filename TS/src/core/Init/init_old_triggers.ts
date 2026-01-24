@@ -2,7 +2,7 @@ import { InitTrig_Effect_meteor_on_pick_down } from 'core/04_STRUCTURES/Meteor/E
 import { InitTrig_Effect_meteor_on_pick_up } from 'core/04_STRUCTURES/Meteor/Effect_meteor_on_pick_up'
 import { InitTrig_Meteor_being_used } from 'core/04_STRUCTURES/Meteor/Meteor_being_used'
 import { InitTrig_Right_click_on_widget } from 'core/04_STRUCTURES/Meteor/Right_click_on_widget'
-import { InitTrig_Stop_using_normal_meteor } from 'core/04_STRUCTURES/Meteor/Stop_using_normal_meteor'
+import { InitTrig_On_using_normal_meteor } from '../04_STRUCTURES/Meteor/On_using_normal_meteor'
 import { InitTrig_Afk_mode_ordre_recu } from 'core/08_GAME/Afk_mode/Afk_mode_ordre_recu'
 import { InitTrig_Camera_reset } from 'core/08_GAME/Camera_reset/Camera_reset'
 import { InitTrig_A_hero_dies_check_if_all_dead_and_sounds } from 'core/08_GAME/Death/A_hero_dies_check_if_all_dead_and_sounds'
@@ -17,7 +17,7 @@ import { InitTrig_Unselect_hero } from 'core/08_GAME/Select_and_unselect_heroes/
 export const initOldTriggers = () => {
     InitTrig_Right_click_on_widget()
     InitTrig_Meteor_being_used()
-    InitTrig_Stop_using_normal_meteor()
+    InitTrig_On_using_normal_meteor()
     InitTrig_Effect_meteor_on_pick_up()
     InitTrig_Effect_meteor_on_pick_down()
     InitTrig_Forces_ally()

@@ -424,12 +424,12 @@ export const initMultiboard = () => {
 
     const playerMeteorsInLvl: { [levelIdAndPlayerId: string]: number } = {}
 
-    const onPlayerMeteorCompleted = (player: Escaper) => {
+    const onPlayerMeteorCompleted = (escaper: Escaper) => {
         if (pointsEnabled && pointsEarnedOnMeteorCompletion > 0) {
             for (const [targetId] of pairs(playerScores)) {
                 const targetEscaper = getUdgEscapers().get(targetId)
 
-                if (targetEscaper && sameLevelProgression(player, targetEscaper)) {
+                if (targetEscaper && sameLevelProgression(escaper, targetEscaper)) {
                     const currentLevel = getUdgLevels().getCurrentLevel(targetEscaper).id
 
                     if (!playerMeteorsInLvl[`${currentLevel}_${targetId}`]) {
