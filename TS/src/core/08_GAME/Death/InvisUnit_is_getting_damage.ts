@@ -185,7 +185,6 @@ const onEscaperTouchingMonster = (escaper: Escaper, killingUnit: unit) =>{
                 GetUnitX(hero),
                 GetUnitY(hero)
             )
-            TriggerSleepAction(3)
             EffectUtils.destroyEffect(eff)
         }
     }
