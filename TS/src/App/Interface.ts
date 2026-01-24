@@ -426,7 +426,8 @@ class InterfaceManager {
     }
 
     private rebuildHistoryFrames(): void {
-        TimerStart(this.lazyRebuildHistoryTimer, lazyTimerTimeout, false, () => this.rebuildHistoryFramesNow())
+        // Disable rebuild history because it causes desyncs for the moment
+        // TimerStart(this.lazyRebuildHistoryTimer, lazyTimerTimeout, false, () => this.rebuildHistoryFramesNow())
     }
 
     public setPalettesVisible(playerId: number, visible: boolean): void {
