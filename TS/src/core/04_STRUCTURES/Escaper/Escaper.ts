@@ -2517,7 +2517,7 @@ export class Escaper {
     addLives(numLives: number){
         ServiceManager.getService('Lives').add(numLives);
 
-        Text.ForAll_timed_withColorCode(3, SUCCESS_TEXT_COLORCODE, `${GetPlayerName(this.getPlayer())} has earned ${numLives} live${numLives > 0 ? 's' : ''} for the team!`);
+        Text.ForAll_timed_withColorCode(3, SUCCESS_TEXT_COLORCODE, `${GetPlayerName(this.getPlayer())} has earned ${numLives} ${numLives > 1 ? 'lives' : 'life'} for the team!`);
     }
 
     toJson = () => ({
