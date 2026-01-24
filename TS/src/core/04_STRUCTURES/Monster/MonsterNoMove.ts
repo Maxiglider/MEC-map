@@ -8,6 +8,7 @@ import { createEvent } from '../../../Utils/mapUtils'
 import { Hero2Escaper } from '../Escaper/Escaper_functions'
 import { ServiceManager } from '../../../Services'
 import { Natives } from '../../wc3_natives_unsecured/Natives'
+import { ForceAngleBetween0And360 } from '../../01_libraries/Basic_functions'
 
 export class MonsterNoMove extends Monster {
     x: number
@@ -23,7 +24,7 @@ export class MonsterNoMove extends Monster {
 
         this.x = x
         this.y = y
-        this.angle = angle
+        this.angle = angle === -1 ? angle : ForceAngleBetween0And360(angle)
     }
 
     static count = () => {
@@ -178,7 +179,7 @@ export class MonsterNoMove extends Monster {
 
         const roundedAngle = (Math.round(this.angle / 90) * 90) % 360
         let minX: number, minY: number, maxX: number, maxY: number
-        if (roundedAngle % 90 === 0) {
+        if (roundedAngle % 180 === 0) {
             minX = this.x - monsterKillRectDimensions.height / 2
             maxX = this.x + monsterKillRectDimensions.height / 2
             minY = this.y - monsterKillRectDimensions.width / 2
