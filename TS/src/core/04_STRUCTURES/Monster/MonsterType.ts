@@ -7,6 +7,7 @@ import { udg_colorCode } from '../../01_libraries/Init_colorCodes'
 import { Level } from '../Level/Level'
 import { IMMOLATION_SKILLS } from './Immolation_skills'
 import { Natives } from '../../wc3_natives_unsecured/Natives'
+import { Round32 } from '../../01_libraries/Basic_functions'
 
 export class MonsterType {
     label: string
@@ -252,8 +253,8 @@ export class MonsterType {
 
     setKillRectDimensions = (width: number, height: number): boolean => {
         // round 32 for rect usage
-        const roundedWidth = R2I(width / 32) * 32
-        const roundedHeight = R2I(height / 32) * 32
+        const roundedWidth = Round32(width)
+        const roundedHeight = Round32(height)
 
         if (roundedHeight <= 0 || roundedWidth <= 0) {
             return false

@@ -8,7 +8,7 @@ import { createEvent } from '../../../Utils/mapUtils'
 import { Hero2Escaper } from '../Escaper/Escaper_functions'
 import { ServiceManager } from '../../../Services'
 import { Natives } from '../../wc3_natives_unsecured/Natives'
-import { ForceAngleBetween0And360 } from '../../01_libraries/Basic_functions'
+import { ForceAngleBetween0And360, Round32 } from '../../01_libraries/Basic_functions'
 
 export class MonsterNoMove extends Monster {
     x: number
@@ -180,16 +180,16 @@ export class MonsterNoMove extends Monster {
         const roundedAngle = (Math.round(this.angle / 90) * 90) % 360
         let minX: number, minY: number, maxX: number, maxY: number
         if (roundedAngle % 180 === 0) {
-            minX = this.x - monsterKillRectDimensions.height / 2
-            maxX = this.x + monsterKillRectDimensions.height / 2
-            minY = this.y - monsterKillRectDimensions.width / 2
-            maxY = this.y + monsterKillRectDimensions.width / 2
+            minX = Round32(this.x - monsterKillRectDimensions.height / 2)
+            maxX = Round32(this.x + monsterKillRectDimensions.height / 2)
+            minY = Round32(this.y - monsterKillRectDimensions.width / 2)
+            maxY = Round32(this.y + monsterKillRectDimensions.width / 2)
         } else {
             // Swap width and height for 90 and 270 degrees
-            minX = this.x - monsterKillRectDimensions.width / 2
-            maxX = this.x + monsterKillRectDimensions.width / 2
-            minY = this.y - monsterKillRectDimensions.height / 2
-            maxY = this.y + monsterKillRectDimensions.height / 2
+            minX = Round32(this.x - monsterKillRectDimensions.width / 2)
+            maxX = Round32(this.x + monsterKillRectDimensions.width / 2)
+            minY = Round32(this.y - monsterKillRectDimensions.height / 2)
+            maxY = Round32(this.y + monsterKillRectDimensions.height / 2)
         }
 
         this.killRect = Rect(minX, minY, maxX, maxY)
