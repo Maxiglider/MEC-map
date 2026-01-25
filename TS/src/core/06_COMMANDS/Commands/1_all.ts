@@ -31,6 +31,7 @@ import { PRESS_TIME_TO_ENABLE_FOLLOW_MOUSE } from '../../Follow_mouse/Follow_mou
 import { GetStringAssignedFromCommand, KeyboardShortcut } from '../../Keyboard_shortcuts/KeyboardShortcut'
 import { isPlayerId, resolvePlayerId, resolvePlayerIds } from '../Helpers/Command_functions'
 import { Natives } from '../../wc3_natives_unsecured/Natives'
+import { checkOpacityValue, DrawGrid, SetGridOpacity, SetGridOpacityForAllGrids } from '../../01_libraries/Grid'
 
 const cameraFieldMap: { [x: string]: camerafield } = {
     TARGET_DISTANCE: CAMERA_FIELD_TARGET_DISTANCE,
@@ -2061,6 +2062,82 @@ export const initCommandAll = () => {
                 }
             })
             DestroyGroup(group)
+
+            return true
+        },
+    })
+
+    // -grid <falsyBoolean>|1|2|3]
+    registerCommand({
+        name: 'grid',
+        alias: [],
+        group: 'all',
+        argDescription: '[<falsyBoolean>|1|2|3]',
+        description: 'Toggle grid. Best usage is without parameter to switch between all modes.',
+        cb: ({ param1, noParam, nbParam }, escaper) => {
+            if (GetLocalPlayer() === escaper.getPlayer()) {
+                if (nbParam > 1) {
+                    Text.erP(
+                        escaper.getPlayer(),
+                        'grid: you can provide no parameter, or one parameter: boolean false, 1, 2 or 3'
+                    )
+                } else if (noParam) {
+                    DrawGrid()
+                } else {
+                    if (IsBoolString(param1) && !S2B(param1)) {
+                        DrawGrid(0)
+                    } else if (param1 === '1') {
+                        DrawGrid(512)
+                    } else if (param1 === '2') {
+                        DrawGrid(128)
+                    } else if (param1 === '3') {
+                        DrawGrid(32)
+                    } else {
+                        Text.erP(escaper.getPlayer(), `Invalid parameter. Use no parameter, boolean false, 1, 2 or 3.`)
+                    }
+                }
+            }
+
+            return true
+        },
+    })
+
+    // -setGridOpacity
+    registerCommand({
+        name: 'setGridOpacity',
+        alias: ['setgo'],
+        group: 'all',
+        argDescription: '<opacity>|(<opacityGrid1> <opacityGrid2> <opacityGrid3>)',
+        description:
+            'Set the grid opacity in percentage. You can choose values between 5, 10, 15, 25, 50, 75, and 100. Default opacities are 50%, 50%, 25%.',
+        cb: ({ param1, param2, param3, nbParam }, escaper) => {
+            if (GetLocalPlayer() === escaper.getPlayer()) {
+                const argumentsErrorMsg = 'setGridOpacity: you must provide a parameter: 25, 50, 75 or 100'
+                if (nbParam !== 1 && nbParam !== 3) {
+                    Text.erP(escaper.getPlayer(), argumentsErrorMsg)
+                } else if (nbParam === 1) {
+                    const opacity = S2I(param1)
+                    if (!checkOpacityValue(opacity)) {
+                        Text.erP(escaper.getPlayer(), argumentsErrorMsg)
+                    } else if (SetGridOpacity(opacity)) {
+                        Text.mkP(escaper.getPlayer(), `Grid opacity set to ${opacity}%`)
+                    } else {
+                        Text.erP(escaper.getPlayer(), 'An error occurred while setting the grid opacity')
+                    }
+                } else {
+                    const opacity1 = S2I(param1)
+                    const opacity2 = S2I(param2)
+                    const opacity3 = S2I(param3)
+
+                    if (!checkOpacityValue(opacity1) || !checkOpacityValue(opacity2) || !checkOpacityValue(opacity3)) {
+                        Text.erP(escaper.getPlayer(), argumentsErrorMsg)
+                    } else if (SetGridOpacityForAllGrids(opacity1, opacity2, opacity3)) {
+                        Text.mkP(escaper.getPlayer(), `Grid opacities set to ${opacity1}%, ${opacity2}%, ${opacity3}%`)
+                    } else {
+                        Text.erP(escaper.getPlayer(), 'An error occurred while setting the grid opacities')
+                    }
+                }
+            }
 
             return true
         },

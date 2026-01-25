@@ -3,10 +3,8 @@ import { ServiceManager } from '../../../Services'
 import { createPoint } from '../../../Utils/Point'
 import { String2Ascii } from '../../01_libraries/Ascii'
 import {
-    arrayPush,
     convertAngleToDirection,
     convertTextToAngle,
-    GetCurrentMonsterPlayer,
     IsBoolString,
     S2B,
     tileset2tilesetString,
@@ -25,7 +23,6 @@ import {
 } from '../../04_STRUCTURES/Caster/CasterType'
 import { Level } from '../../04_STRUCTURES/Level/Level'
 import { IMMOLATION_SKILLS } from '../../04_STRUCTURES/Monster/Immolation_skills'
-import { ABILITY_ANNULER_VISION } from '../../04_STRUCTURES/Monster/Monster_functions'
 import { MonsterMultiplePatrols } from '../../04_STRUCTURES/Monster/MonsterMultiplePatrols'
 import { MonsterNoMove } from '../../04_STRUCTURES/Monster/MonsterNoMove'
 import { MonsterSimplePatrol } from '../../04_STRUCTURES/Monster/MonsterSimplePatrol'
@@ -44,7 +41,7 @@ import { ChangeOneTerrain } from '../../07_TRIGGERS/Triggers_to_modify_terrains/
 import { ExchangeTerrains } from '../../07_TRIGGERS/Triggers_to_modify_terrains/Exchange_terrains'
 import { RandomizeTerrains } from '../../07_TRIGGERS/Triggers_to_modify_terrains/Randomize_terrains'
 import { CmdParam } from '../Helpers/Command_functions'
-import { Natives } from '../../wc3_natives_unsecured/Natives'
+
 export const initExecuteCommandMake = () => {
     const { registerCommand } = ServiceManager.getService('Cmd')
 
@@ -1351,7 +1348,8 @@ export const initExecuteCommandMake = () => {
         alias: ['remmkrd'],
         group: 'make',
         argDescription: '<monsterLabel>',
-        description: 'Remove kill rectangle dimensions of a monster (the corresponding monster units will no longer kills through a rectangle zone)',
+        description:
+            'Remove kill rectangle dimensions of a monster (the corresponding monster units will no longer kills through a rectangle zone)',
         cb: ({ nbParam, param1 }, escaper) => {
             if (nbParam !== 1) {
                 return true
@@ -1363,17 +1361,18 @@ export const initExecuteCommandMake = () => {
                 return true
             }
 
-            if(monsterType.getKillRectDimensions()){
+            if (monsterType.getKillRectDimensions()) {
                 monsterType.removeKillRectDimensions()
                 Text.mkP(escaper.getPlayer(), 'kill rectangle dimensions removed for this monster type')
-            }else{
-                Text.erP(escaper.getPlayer(), 'the kill rectangle dimensions already does not exists for this monster type')
+            } else {
+                Text.erP(
+                    escaper.getPlayer(),
+                    'the kill rectangle dimensions already does not exists for this monster type'
+                )
             }
             return true
         },
     })
-
-
 
     //-createMonsterImmobile(crmi) <monsterLabel> [<facingAngle>]   --> if facing angle not specified, random angles will be chosen
     registerCommand({
@@ -1966,9 +1965,9 @@ export const initExecuteCommandMake = () => {
                 frequency = 2
             }
 
-            let monsterDirectionMode: 'straight'|'random' = 'straight'
-            if(nbParam >= 5){
-                if(param5 !== 'straight' && param5 !== 'random'){
+            let monsterDirectionMode: 'straight' | 'random' = 'straight'
+            if (nbParam >= 5) {
+                if (param5 !== 'straight' && param5 !== 'random') {
                     Text.erP(escaper.getPlayer(), 'param 5 should be : straight or random')
                     return true
                 }
@@ -2342,8 +2341,11 @@ export const initExecuteCommandMake = () => {
         description:
             'Set the monster direction mode for spawned monsters (straight or random) => works only for leftToRight, upToDown, rightToLeft, downToUp directions',
         cb: ({ nbParam, param1, param2 }, escaper) => {
-            if(nbParam !== 2){
-                Text.erP(escaper.getPlayer(), 'Incorrect arguments. Usage: -setMonsterSpawnMonsterDirectionMode <label> straight||random')
+            if (nbParam !== 2) {
+                Text.erP(
+                    escaper.getPlayer(),
+                    'Incorrect arguments. Usage: -setMonsterSpawnMonsterDirectionMode <label> straight||random'
+                )
                 return true
             }
 
@@ -2354,7 +2356,7 @@ export const initExecuteCommandMake = () => {
                 return true
             }
 
-            if(param2 !== 'straight' && param2 !== 'random'){
+            if (param2 !== 'straight' && param2 !== 'random') {
                 Text.erP(escaper.getPlayer(), 'param 2 should be : straight or random')
                 return true
             }
@@ -4165,50 +4167,6 @@ export const initExecuteCommandMake = () => {
                     Text.mkP(escaper.getPlayer(), `Now snapping clicks to: '${escaper.roundToGrid}'`)
                 } else {
                     Text.erP(escaper.getPlayer(), `Disabled snapping clicks`)
-                }
-            }
-
-            return true
-        },
-    })
-
-    const gridUnits: unit[] = []
-
-    // -grid <boolean>
-    registerCommand({
-        name: 'grid',
-        alias: [],
-        group: 'make',
-        argDescription: '<boolean>',
-        description: 'Toggle grid',
-        cb: ({ param1 }) => {
-            const showGrid = param1 === '3' ? '3' : param1 === '2' ? '2' : S2B(param1)
-
-            for (const unit of gridUnits) {
-                RemoveUnit(unit)
-            }
-
-            if (showGrid) {
-                const gridUnitWidth = 128 * 4
-
-                for (let x = globals.MAP_MIN_X + gridUnitWidth; x < globals.MAP_MAX_X; x += gridUnitWidth) {
-                    for (let y = globals.MAP_MIN_Y + gridUnitWidth; y < globals.MAP_MAX_Y; y += gridUnitWidth) {
-                        const gridUnit = Natives.UCreateUnit(GetCurrentMonsterPlayer(), FourCC('hgrd'), x, y, 0)
-                        SetUnitUseFood(gridUnit, false)
-                        UnitAddAbility(gridUnit, FourCC('Aloc'))
-                        UnitAddAbility(gridUnit, ABILITY_ANNULER_VISION)
-                        UnitRemoveType(gridUnit, UNIT_TYPE_PEON)
-
-                        if (showGrid === '3') {
-                            SetUnitAnimation(gridUnit, 'Stand Upgrade Second')
-                        } else if (showGrid === '2') {
-                            SetUnitAnimation(gridUnit, 'Stand Upgrade First')
-                        } else {
-                            SetUnitAnimation(gridUnit, 'Stand')
-                        }
-
-                        arrayPush(gridUnits, gridUnit)
-                    }
                 }
             }
 

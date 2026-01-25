@@ -30,6 +30,7 @@ import type { VisibilityModifier } from './VisibilityModifier'
 import { VisibilityModifierArray } from './VisibilityModifierArray'
 import { checkPointReviveHeroes } from './checkpointReviveHeroes_function'
 import { MonsterNoMove } from '../Monster/MonsterNoMove'
+import { DefineDrawLineType, DrawLine } from '../../01_libraries/Draw_lines'
 
 type ITempTerrainTypeMap = {
     [x_y: string]:
@@ -306,11 +307,15 @@ export class Level {
         this.destroyDebugRegions()
 
         if (this.debugRegionsVisible !== 'off') {
+            // Rect for start and end of level
+            DefineDrawLineType('darkblue', 2)
             this.start && this.drawRegion(this.start.minX, this.start.minY, this.start.maxX, this.start.maxY)
             this.end && this.drawRegion(this.end.minX, this.end.minY, this.end.maxX, this.end.maxY)
             this.tpForEnd &&
                 this.drawRegion(this.tpForEnd.minX, this.tpForEnd.minY, this.tpForEnd.maxX, this.tpForEnd.maxY)
 
+            // Static slides
+            DefineDrawLineType('teal', 2)
             for (const [_, staticSlide] of pairs(this.staticSlides.getAll())) {
                 const isDiagonal = staticSlide.getAngle() % 90 !== 0
 
@@ -330,10 +335,14 @@ export class Level {
                 )
             }
 
+            // Regions
+            DefineDrawLineType('black', 2)
             for (const [_, region] of pairs(this.regions.getAll())) {
                 this.drawRegion(region.getMinX(), region.getMinY(), region.getMaxX(), region.getMaxY())
             }
 
+            // Monster spawns
+            DefineDrawLineType('orange', 2)
             for (const [_, monsterSpawn] of pairs(this.monsterSpawns.getAll())) {
                 const spawnShape = monsterSpawn.getSpawnShape()
 
@@ -383,6 +392,8 @@ export class Level {
                 }
             }
 
+            // Monsters
+            DefineDrawLineType('red', 2)
             if (this.debugRegionsVisible === 'on_monsters') {
                 for (const [_, monster] of pairs(this.monsters.getAll())) {
                     if (monster.isDeleted()) {
@@ -461,7 +472,7 @@ export class Level {
     }
 
     drawLine = (x1: number, y1: number, x2: number, y2: number) => {
-        const light = AddLightning('DRAM', false, x1, y1, x2, y2)
+        const light = DrawLine( x1, y1, x2, y2)
         arrayPush(this.lights, light)
     }
 
