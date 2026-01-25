@@ -49,7 +49,7 @@ export const initLives = () => {
             wordLives = 'life.'
         }
         nb = nb + n
-        Text.A(`${udg_colorCode[1]}You have earned ${I2S(n)} ${wordLives} (new count: ${I2S(nb)})`)
+        Text.A(`${udg_colorCode[1]}You have earned ${I2S(n)} ${wordLives} (${I2S(nb)})`)
         ServiceManager.getService('Multiboard').updateLives(nb)
     }
 
