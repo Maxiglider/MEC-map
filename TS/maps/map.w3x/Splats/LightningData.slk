@@ -209,6 +209,57 @@ P;EAptos Narrow;M220;L11
 P;EAptos Narrow;M220;SI;L24
 P;EAptos Narrow;M220;SB;L9
 P;EAptos Narrow;M220;L10
+P;EAptos Narrow;M220;L9
+P;EAptos Display;M360;L57
+P;EAptos Narrow;M300;SB;L57
+P;EAptos Narrow;M260;SB;L57
+P;EAptos Narrow;M220;SB;L57
+P;EAptos Narrow;M220;L18
+P;EAptos Narrow;M220;L21
+P;EAptos Narrow;M220;L61
+P;EAptos Narrow;M220;L63
+P;EAptos Narrow;M220;SB;L64
+P;EAptos Narrow;M220;SB;L53
+P;EAptos Narrow;M220;L53
+P;EAptos Narrow;M220;SB;L10
+P;EAptos Narrow;M220;L11
+P;EAptos Narrow;M220;SI;L24
+P;EAptos Narrow;M220;SB;L9
+P;EAptos Narrow;M220;L10
+P;EAptos Narrow;M220;L9
+P;EAptos Display;M360;L57
+P;EAptos Narrow;M300;SB;L57
+P;EAptos Narrow;M260;SB;L57
+P;EAptos Narrow;M220;SB;L57
+P;EAptos Narrow;M220;L18
+P;EAptos Narrow;M220;L21
+P;EAptos Narrow;M220;L61
+P;EAptos Narrow;M220;L63
+P;EAptos Narrow;M220;SB;L64
+P;EAptos Narrow;M220;SB;L53
+P;EAptos Narrow;M220;L53
+P;EAptos Narrow;M220;SB;L10
+P;EAptos Narrow;M220;L11
+P;EAptos Narrow;M220;SI;L24
+P;EAptos Narrow;M220;SB;L9
+P;EAptos Narrow;M220;L10
+P;EAptos Narrow;M220;L9
+P;EAptos Display;M360;L57
+P;EAptos Narrow;M300;SB;L57
+P;EAptos Narrow;M260;SB;L57
+P;EAptos Narrow;M220;SB;L57
+P;EAptos Narrow;M220;L18
+P;EAptos Narrow;M220;L21
+P;EAptos Narrow;M220;L61
+P;EAptos Narrow;M220;L63
+P;EAptos Narrow;M220;SB;L64
+P;EAptos Narrow;M220;SB;L53
+P;EAptos Narrow;M220;L53
+P;EAptos Narrow;M220;SB;L10
+P;EAptos Narrow;M220;L11
+P;EAptos Narrow;M220;SI;L24
+P;EAptos Narrow;M220;SB;L9
+P;EAptos Narrow;M220;L10
 P;ESegoe UI;M200;L9
 P;EAptos Narrow;M220;L9
 P;EAptos Narrow;M220;L9
@@ -225,8 +276,15 @@ P;EAptos Narrow;M220;SU;L50
 P;EAptos Narrow;M220;SU;L26
 P;EAptos Narrow;M220;L9
 P;EAptos Narrow;M220;L9
+P;EAptos Narrow;M220;L9
+P;EAptos Narrow;M220;SU;L50
+P;EAptos Narrow;M220;SU;L26
+P;EAptos Narrow;M220;L9
+P;EAptos Narrow;M220;SU;L50
+P;EAptos Narrow;M220;SU;L26
+P;EAptos Narrow;M220;L9
 F;P0;DG0G10;M290
-B;Y1117;X14;D0 0 1116 13
+B;Y1138;X14;D0 0 1137 13
 O;D;V0;K47;G100 0.001
 NN;N_FilterDatabase;ER1C1:R1102C14
 C;Y1;X1;K"Name"
@@ -15573,7 +15631,7 @@ C;X11;K0
 C;X12;K0
 C;X13;K0
 C;X14;K0
-C;Y1097;X1;K"grid32a100"
+C;Y1097;X1;K"precise8192Grid32a100"
 C;X3;K"textures"
 C;X4;K"white.blp"
 C;X5;K8192
@@ -15586,7 +15644,7 @@ C;X11;K0
 C;X12;K0
 C;X13;K0
 C;X14;K0
-C;Y1098;X1;K"grid128a100"
+C;Y1098;X1;K"precise8192Grid128a100"
 C;X3;K"textures"
 C;X4;K"white.blp"
 C;X5;K8192
@@ -15599,7 +15657,7 @@ C;X11;K0
 C;X12;K0
 C;X13;K0
 C;X14;K0
-C;Y1099;X1;K"grid512a100"
+C;Y1099;X1;K"precise8192Grid512a100"
 C;X3;K"textures"
 C;X4;K"white.blp"
 C;X5;K8192
@@ -15612,7 +15670,7 @@ C;X11;K0
 C;X12;K0
 C;X13;K0
 C;X14;K0
-C;Y1100;X1;K"grid32a75"
+C;Y1100;X1;K"precise8192Grid32a75"
 C;X3;K"textures"
 C;X4;K"white.blp"
 C;X5;K8192
@@ -15625,7 +15683,7 @@ C;X11;K0
 C;X12;K0
 C;X13;K0
 C;X14;K0
-C;Y1101;X1;K"grid128a75"
+C;Y1101;X1;K"precise8192Grid128a75"
 C;X3;K"textures"
 C;X4;K"white.blp"
 C;X5;K8192
@@ -15638,7 +15696,7 @@ C;X11;K0
 C;X12;K0
 C;X13;K0
 C;X14;K0
-C;Y1102;X1;K"grid512a75"
+C;Y1102;X1;K"precise8192Grid512a75"
 C;X3;K"textures"
 C;X4;K"white.blp"
 C;X5;K8192
@@ -15651,7 +15709,7 @@ C;X11;K0
 C;X12;K0
 C;X13;K0
 C;X14;K0
-C;Y1103;X1;K"grid32a50"
+C;Y1103;X1;K"precise8192Grid32a50"
 C;X3;K"textures"
 C;X4;K"white.blp"
 C;X5;K8192
@@ -15664,7 +15722,7 @@ C;X11;K0
 C;X12;K0
 C;X13;K0
 C;X14;K0
-C;Y1104;X1;K"grid128a50"
+C;Y1104;X1;K"precise8192Grid128a50"
 C;X3;K"textures"
 C;X4;K"white.blp"
 C;X5;K8192
@@ -15677,7 +15735,7 @@ C;X11;K0
 C;X12;K0
 C;X13;K0
 C;X14;K0
-C;Y1105;X1;K"grid512a50"
+C;Y1105;X1;K"precise8192Grid512a50"
 C;X3;K"textures"
 C;X4;K"white.blp"
 C;X5;K8192
@@ -15690,7 +15748,7 @@ C;X11;K0
 C;X12;K0
 C;X13;K0
 C;X14;K0
-C;Y1106;X1;K"grid32a25"
+C;Y1106;X1;K"precise8192Grid32a25"
 C;X3;K"textures"
 C;X4;K"white.blp"
 C;X5;K8192
@@ -15703,7 +15761,7 @@ C;X11;K0
 C;X12;K0
 C;X13;K0
 C;X14;K0
-C;Y1107;X1;K"grid128a25"
+C;Y1107;X1;K"precise8192Grid128a25"
 C;X3;K"textures"
 C;X4;K"white.blp"
 C;X5;K8192
@@ -15716,7 +15774,7 @@ C;X11;K0
 C;X12;K0
 C;X13;K0
 C;X14;K0
-C;Y1108;X1;K"grid512a25"
+C;Y1108;X1;K"precise8192Grid512a25"
 C;X3;K"textures"
 C;X4;K"white.blp"
 C;X5;K8192
@@ -15729,7 +15787,7 @@ C;X11;K0
 C;X12;K0
 C;X13;K0
 C;X14;K0
-C;Y1109;X1;K"grid32a15"
+C;Y1109;X1;K"precise8192Grid32a15"
 C;X3;K"textures"
 C;X4;K"white.blp"
 C;X5;K8192
@@ -15742,7 +15800,7 @@ C;X11;K0
 C;X12;K0
 C;X13;K0
 C;X14;K0
-C;Y1110;X1;K"grid128a15"
+C;Y1110;X1;K"precise8192Grid128a15"
 C;X3;K"textures"
 C;X4;K"white.blp"
 C;X5;K8192
@@ -15755,7 +15813,7 @@ C;X11;K0
 C;X12;K0
 C;X13;K0
 C;X14;K0
-C;Y1111;X1;K"grid512a15"
+C;Y1111;X1;K"precise8192Grid512a15"
 C;X3;K"textures"
 C;X4;K"white.blp"
 C;X5;K8192
@@ -15768,7 +15826,7 @@ C;X11;K0
 C;X12;K0
 C;X13;K0
 C;X14;K0
-C;Y1112;X1;K"grid32a10"
+C;Y1112;X1;K"precise8192Grid32a10"
 C;X3;K"textures"
 C;X4;K"white.blp"
 C;X5;K8192
@@ -15781,7 +15839,7 @@ C;X11;K0
 C;X12;K0
 C;X13;K0
 C;X14;K0
-C;Y1113;X1;K"grid128a10"
+C;Y1113;X1;K"precise8192Grid128a10"
 C;X3;K"textures"
 C;X4;K"white.blp"
 C;X5;K8192
@@ -15794,7 +15852,7 @@ C;X11;K0
 C;X12;K0
 C;X13;K0
 C;X14;K0
-C;Y1114;X1;K"grid512a10"
+C;Y1114;X1;K"precise8192Grid512a10"
 C;X3;K"textures"
 C;X4;K"white.blp"
 C;X5;K8192
@@ -15807,7 +15865,7 @@ C;X11;K0
 C;X12;K0
 C;X13;K0
 C;X14;K0
-C;Y1115;X1;K"grid32a5"
+C;Y1115;X1;K"precise8192Grid32a5"
 C;X3;K"textures"
 C;X4;K"white.blp"
 C;X5;K8192
@@ -15820,7 +15878,7 @@ C;X11;K0
 C;X12;K0
 C;X13;K0
 C;X14;K0
-C;Y1116;X1;K"grid128a5"
+C;Y1116;X1;K"precise8192Grid128a5"
 C;X3;K"textures"
 C;X4;K"white.blp"
 C;X5;K8192
@@ -15833,10 +15891,283 @@ C;X11;K0
 C;X12;K0
 C;X13;K0
 C;X14;K0
-C;Y1117;X1;K"grid512a5"
+C;Y1117;X1;K"precise8192Grid512a5"
 C;X3;K"textures"
 C;X4;K"white.blp"
 C;X5;K8192
+C;X6;K1
+C;X7;K255
+C;X8;K255
+C;X9;K0
+C;X10;K13
+C;X11;K0
+C;X12;K0
+C;X13;K0
+C;X14;K0
+C;Y1118;X1;K"precise128Grid32a100"
+C;X3;K"textures"
+C;X4;K"white.blp"
+C;X5;K128
+C;X6;K1
+C;X7;K153
+C;X8;K153
+C;X9;K153
+C;X10;K255
+C;X11;K0
+C;X12;K0
+C;X13;K0
+C;X14;K0
+C;Y1119;X1;K"precise128Grid128a100"
+C;X3;K"textures"
+C;X4;K"white.blp"
+C;X5;K128
+C;X6;K1
+C;X7;K255
+C;X8;K255
+C;X9;K255
+C;X10;K255
+C;X11;K0
+C;X12;K0
+C;X13;K0
+C;X14;K0
+C;Y1120;X1;K"precise128Grid512a100"
+C;X3;K"textures"
+C;X4;K"white.blp"
+C;X5;K128
+C;X6;K1
+C;X7;K255
+C;X8;K255
+C;X9;K0
+C;X10;K255
+C;X11;K0
+C;X12;K0
+C;X13;K0
+C;X14;K0
+C;Y1121;X1;K"precise128Grid32a75"
+C;X3;K"textures"
+C;X4;K"white.blp"
+C;X5;K128
+C;X6;K1
+C;X7;K153
+C;X8;K153
+C;X9;K153
+C;X10;K191
+C;X11;K0
+C;X12;K0
+C;X13;K0
+C;X14;K0
+C;Y1122;X1;K"precise128Grid128a75"
+C;X3;K"textures"
+C;X4;K"white.blp"
+C;X5;K128
+C;X6;K1
+C;X7;K255
+C;X8;K255
+C;X9;K255
+C;X10;K191
+C;X11;K0
+C;X12;K0
+C;X13;K0
+C;X14;K0
+C;Y1123;X1;K"precise128Grid512a75"
+C;X3;K"textures"
+C;X4;K"white.blp"
+C;X5;K128
+C;X6;K1
+C;X7;K255
+C;X8;K255
+C;X9;K0
+C;X10;K191
+C;X11;K0
+C;X12;K0
+C;X13;K0
+C;X14;K0
+C;Y1124;X1;K"precise128Grid32a50"
+C;X3;K"textures"
+C;X4;K"white.blp"
+C;X5;K128
+C;X6;K1
+C;X7;K153
+C;X8;K153
+C;X9;K153
+C;X10;K127
+C;X11;K0
+C;X12;K0
+C;X13;K0
+C;X14;K0
+C;Y1125;X1;K"precise128Grid128a50"
+C;X3;K"textures"
+C;X4;K"white.blp"
+C;X5;K128
+C;X6;K1
+C;X7;K255
+C;X8;K255
+C;X9;K255
+C;X10;K127
+C;X11;K0
+C;X12;K0
+C;X13;K0
+C;X14;K0
+C;Y1126;X1;K"precise128Grid512a50"
+C;X3;K"textures"
+C;X4;K"white.blp"
+C;X5;K128
+C;X6;K1
+C;X7;K255
+C;X8;K255
+C;X9;K0
+C;X10;K127
+C;X11;K0
+C;X12;K0
+C;X13;K0
+C;X14;K0
+C;Y1127;X1;K"precise128Grid32a25"
+C;X3;K"textures"
+C;X4;K"white.blp"
+C;X5;K128
+C;X6;K1
+C;X7;K153
+C;X8;K153
+C;X9;K153
+C;X10;K64
+C;X11;K0
+C;X12;K0
+C;X13;K0
+C;X14;K0
+C;Y1128;X1;K"precise128Grid128a25"
+C;X3;K"textures"
+C;X4;K"white.blp"
+C;X5;K128
+C;X6;K1
+C;X7;K255
+C;X8;K255
+C;X9;K255
+C;X10;K64
+C;X11;K0
+C;X12;K0
+C;X13;K0
+C;X14;K0
+C;Y1129;X1;K"precise128Grid512a25"
+C;X3;K"textures"
+C;X4;K"white.blp"
+C;X5;K128
+C;X6;K1
+C;X7;K255
+C;X8;K255
+C;X9;K0
+C;X10;K64
+C;X11;K0
+C;X12;K0
+C;X13;K0
+C;X14;K0
+C;Y1130;X1;K"precise128Grid32a15"
+C;X3;K"textures"
+C;X4;K"white.blp"
+C;X5;K128
+C;X6;K1
+C;X7;K153
+C;X8;K153
+C;X9;K153
+C;X10;K38
+C;X11;K0
+C;X12;K0
+C;X13;K0
+C;X14;K0
+C;Y1131;X1;K"precise128Grid128a15"
+C;X3;K"textures"
+C;X4;K"white.blp"
+C;X5;K128
+C;X6;K1
+C;X7;K255
+C;X8;K255
+C;X9;K255
+C;X10;K38
+C;X11;K0
+C;X12;K0
+C;X13;K0
+C;X14;K0
+C;Y1132;X1;K"precise128Grid512a15"
+C;X3;K"textures"
+C;X4;K"white.blp"
+C;X5;K128
+C;X6;K1
+C;X7;K255
+C;X8;K255
+C;X9;K0
+C;X10;K38
+C;X11;K0
+C;X12;K0
+C;X13;K0
+C;X14;K0
+C;Y1133;X1;K"precise128Grid32a10"
+C;X3;K"textures"
+C;X4;K"white.blp"
+C;X5;K128
+C;X6;K1
+C;X7;K153
+C;X8;K153
+C;X9;K153
+C;X10;K25
+C;X11;K0
+C;X12;K0
+C;X13;K0
+C;X14;K0
+C;Y1134;X1;K"precise128Grid128a10"
+C;X3;K"textures"
+C;X4;K"white.blp"
+C;X5;K128
+C;X6;K1
+C;X7;K255
+C;X8;K255
+C;X9;K255
+C;X10;K25
+C;X11;K0
+C;X12;K0
+C;X13;K0
+C;X14;K0
+C;Y1135;X1;K"precise128Grid512a10"
+C;X3;K"textures"
+C;X4;K"white.blp"
+C;X5;K128
+C;X6;K1
+C;X7;K255
+C;X8;K255
+C;X9;K0
+C;X10;K25
+C;X11;K0
+C;X12;K0
+C;X13;K0
+C;X14;K0
+C;Y1136;X1;K"precise128Grid32a5"
+C;X3;K"textures"
+C;X4;K"white.blp"
+C;X5;K128
+C;X6;K1
+C;X7;K153
+C;X8;K153
+C;X9;K153
+C;X10;K13
+C;X11;K0
+C;X12;K0
+C;X13;K0
+C;X14;K0
+C;Y1137;X1;K"precise128Grid128a5"
+C;X3;K"textures"
+C;X4;K"white.blp"
+C;X5;K128
+C;X6;K1
+C;X7;K255
+C;X8;K255
+C;X9;K255
+C;X10;K13
+C;X11;K0
+C;X12;K0
+C;X13;K0
+C;X14;K0
+C;Y1138;X1;K"precise128Grid512a5"
+C;X3;K"textures"
+C;X4;K"white.blp"
+C;X5;K128
 C;X6;K1
 C;X7;K255
 C;X8;K255
