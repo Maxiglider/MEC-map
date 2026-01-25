@@ -19,10 +19,10 @@ export class MakeTerrainHorizontalSymmetryAction extends MakeAction {
         this.maxY = RMaxBJ(y1, y2)
 
         //pour éviter les ptits décalages
-        this.minX = I2R(R2I(this.minX / Constants.LARGEUR_CASE)) * Constants.LARGEUR_CASE
-        this.minY = I2R(R2I(this.minY / Constants.LARGEUR_CASE)) * Constants.LARGEUR_CASE
-        this.maxX = I2R(R2I(this.maxX / Constants.LARGEUR_CASE)) * Constants.LARGEUR_CASE
-        this.maxY = I2R(R2I(this.maxY / Constants.LARGEUR_CASE)) * Constants.LARGEUR_CASE
+        this.minX = I2R(Math.round(this.minX / Constants.LARGEUR_CASE)) * Constants.LARGEUR_CASE
+        this.minY = I2R(Math.round(this.minY / Constants.LARGEUR_CASE)) * Constants.LARGEUR_CASE
+        this.maxX = I2R(Math.round(this.maxX / Constants.LARGEUR_CASE)) * Constants.LARGEUR_CASE
+        this.maxY = I2R(Math.round(this.maxY / Constants.LARGEUR_CASE)) * Constants.LARGEUR_CASE
 
         this.applySymmetry()
         this.isActionMadeB = true
