@@ -89,19 +89,7 @@ export const GetTerrainData = (terrain: number) => {
 
     terrainType = TerrainTypeId2TerrainType(terrain)
     if (terrainType) {
-        if (terrainType.getKind() == 'slide') {
-            str = str + COLOR_TERRAIN_SLIDE
-        } else {
-            if (terrainType.getKind() == 'walk') {
-                str = str + COLOR_TERRAIN_WALK
-            } else {
-                str = str + COLOR_TERRAIN_DEATH
-            }
-        }
-        str = str + '        ' + terrainType.label
-        if (terrainType.theAlias != null) {
-            str = str + '  ' + terrainType.theAlias
-        }
+        str += '\n' + terrainType.toText()
     }
 
     return str
