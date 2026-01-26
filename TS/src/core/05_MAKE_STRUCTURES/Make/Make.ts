@@ -4,8 +4,6 @@ import { createEvent } from '../../../Utils/mapUtils'
 import { Escaper } from '../../04_STRUCTURES/Escaper/Escaper'
 import { Natives } from '../../wc3_natives_unsecured/Natives'
 
-export const MAKE_LAST_CLIC_UNIT_ID = FourCC('e001') //à remplacer par l'id de l'unité choisie (need couleur variable)
-
 const TriggerActions = () => {
     Hero2Escaper(Natives.UGetTriggerUnit())?.getMake()?.doActions()
 }

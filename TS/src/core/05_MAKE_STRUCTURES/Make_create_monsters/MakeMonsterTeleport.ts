@@ -7,8 +7,8 @@ import {
     WAIT,
 } from '../../04_STRUCTURES/Monster/MonsterTeleport'
 import { MonsterType } from '../../04_STRUCTURES/Monster/MonsterType'
-import {Make, MAKE_LAST_CLIC_UNIT_ID} from '../Make/Make'
-import { Natives } from '../../wc3_natives_unsecured/Natives'
+import {Make} from '../Make/Make'
+import { LandmarkForMake } from '../Make/LandmarkForMake'
 
 
 export class MakeMonsterTeleport extends Make {
@@ -20,7 +20,7 @@ export class MakeMonsterTeleport extends Make {
     private lastY: number[] = []
     private lastLocId: number
     private locPointeur: number
-    private unitLastClic?: unit
+    private landmarkForMake?: LandmarkForMake
     private monster?: MonsterTeleport
 
     constructor(maker: unit, mode: string, mt: MonsterType, period: number, angle: number) {
@@ -65,8 +65,8 @@ export class MakeMonsterTeleport extends Make {
     nextMonster = () => {
         this.lastLocId = -1
         this.locPointeur = -1
-        this.unitLastClic && RemoveUnit(this.unitLastClic)
-        delete this.unitLastClic
+        this.landmarkForMake && this.landmarkForMake.destroy()
+        delete this.landmarkForMake
 
         if (this.monster) {
             this.escaper.newAction(new MakeMonsterAction(this.escaper.getMakingLevel(), this.monster))
@@ -101,10 +101,10 @@ export class MakeMonsterTeleport extends Make {
     }
 
     setUnitLastClicPosition = (x: number, y: number) => {
-        if (!this.unitLastClic) {
-            this.unitLastClic = Natives.UCreateUnit(this.makerOwner, MAKE_LAST_CLIC_UNIT_ID, x, y, GetRandomDirectionDeg())
+        if (!this.landmarkForMake) {
+            this.landmarkForMake = new LandmarkForMake(this.escaper, x, y)
         } else {
-            SetUnitPosition(this.unitLastClic, x, y)
+            this.landmarkForMake.move(x, y)
         }
     }
 
@@ -146,12 +146,12 @@ export class MakeMonsterTeleport extends Make {
             if (i >= 0) {
                 this.setUnitLastClicPosition(this.lastX[i], this.lastY[i])
             } else {
-                this.unitLastClic && RemoveUnit(this.unitLastClic)
-                delete this.unitLastClic
+                this.landmarkForMake && this.landmarkForMake.destroy()
+                delete this.landmarkForMake
             }
         } else {
-            this.unitLastClic && RemoveUnit(this.unitLastClic)
-            delete this.unitLastClic
+            this.landmarkForMake && this.landmarkForMake.destroy()
+            delete this.landmarkForMake
         }
         return true
     }
@@ -182,7 +182,8 @@ export class MakeMonsterTeleport extends Make {
             this.escaper.newAction(new MakeMonsterAction(this.escaper.getMakingLevel(), this.monster))
         }
 
-        this.unitLastClic && RemoveUnit(this.unitLastClic)
+        this.landmarkForMake && this.landmarkForMake.destroy()
+        delete this.landmarkForMake
 
         super.destroy()
     }

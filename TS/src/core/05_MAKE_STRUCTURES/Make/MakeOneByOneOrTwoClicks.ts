@@ -1,5 +1,5 @@
-import {Make, MAKE_LAST_CLIC_UNIT_ID} from 'core/05_MAKE_STRUCTURES/Make/Make'
-import { Natives } from '../../wc3_natives_unsecured/Natives'
+import {Make} from 'core/05_MAKE_STRUCTURES/Make/Make'
+import { LandmarkForMake } from './LandmarkForMake'
 
 
 export abstract class MakeOneByOneOrTwoClicks extends Make {
@@ -8,7 +8,7 @@ export abstract class MakeOneByOneOrTwoClicks extends Make {
 
     private lastLocIsSaved: boolean
     private lastLocSavedIsUsed: boolean
-    private unitLastClic?: unit
+    private landmarkForMake?: LandmarkForMake
     private mode: string
     private acceptedModes: string[] = ['oneByOne', 'twoClics']
 
@@ -39,8 +39,8 @@ export abstract class MakeOneByOneOrTwoClicks extends Make {
         this.lastLocIsSaved = true
         this.lastLocSavedIsUsed = true
 
-        this.unitLastClic && RemoveUnit(this.unitLastClic)
-        this.unitLastClic = Natives.UCreateUnit(this.makerOwner, MAKE_LAST_CLIC_UNIT_ID, x, y, GetRandomDirectionDeg())
+        this.landmarkForMake && this.landmarkForMake.destroy()
+        this.landmarkForMake = new LandmarkForMake(this.escaper, x, y)
 
         this.escaper.destroyCancelledActions()
     }
@@ -50,7 +50,8 @@ export abstract class MakeOneByOneOrTwoClicks extends Make {
             return false
         }
 
-        this.unitLastClic && RemoveUnit(this.unitLastClic)
+        this.landmarkForMake && this.landmarkForMake.destroy()
+        delete this.landmarkForMake
         this.lastLocSavedIsUsed = false
 
         return true
@@ -59,8 +60,8 @@ export abstract class MakeOneByOneOrTwoClicks extends Make {
     unsaveLocDefinitely = () => {
         this.unsaveLoc()
         this.lastLocIsSaved = false
-        this.unitLastClic && RemoveUnit(this.unitLastClic)
-        delete this.unitLastClic
+        this.landmarkForMake && this.landmarkForMake.destroy()
+        delete this.landmarkForMake
     }
 
     cancelLastAction = () => {
@@ -82,8 +83,7 @@ export abstract class MakeOneByOneOrTwoClicks extends Make {
     destroy = () => {
         super.destroy()
 
-        if (this.unitLastClic) {
-            RemoveUnit(this.unitLastClic)
-        }
+        this.landmarkForMake && this.landmarkForMake.destroy()
+        delete this.landmarkForMake
     }
 }
