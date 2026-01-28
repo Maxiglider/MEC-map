@@ -1,4 +1,5 @@
 import * as fs from 'fs-extra'
+// @ts-ignore
 import War3Map from 'mdx-m3-viewer/dist/cjs/parsers/w3x/map'
 import { simpleExec } from './Utils/SimpleExec'
 
@@ -29,7 +30,7 @@ const main = async () => {
             const war3Map = new War3Map()
             war3Map.load(fs.readFileSync(`${targetDir}/${targetFile}`).buffer)
 
-            const luaFile = war3Map.archive.files.find(f => f.name === 'war3map.lua')
+            const luaFile = war3Map.archive.files.find((f: { name: string }) => f.name === 'war3map.lua')
 
             if (!luaFile) {
                 console.info(`[${targetFile}] war3map.lua not found, ignoring`)
