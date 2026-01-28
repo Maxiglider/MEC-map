@@ -100,6 +100,9 @@ const VIPs = VIPs64.map(name64 => EncodingBase64.Decode(name64))
 
 let METEOR_EFFECT = 'Abilities\\Weapons\\DemonHunterMissile\\DemonHunterMissile.mdl'
 
+const COLLISION_LANDMARK_MODEL = 'UI\\Feedback\\SelectionCircle\\SelectionCircle.mdl'
+const COLLISION_LANDMARK_MODEL_BASE_RADIUS = 39.2
+
 export const SetMeteorEffect = (newEffect: string) => {
     METEOR_EFFECT = newEffect
 }
@@ -130,7 +133,9 @@ export class Escaper {
     private p: player
     private hero?: unit
     private invisUnit?: unit
-    private invisUnitCollisionSize = 0
+    private collisionSize = 0
+    private collisionLandmarkEffect?: effect
+    private displayCollisionLandmarks = true // if the player chose to display collision landmarks for Heroes and Sliders
     private walkSpeed: number
     private slideSpeed: number
     private slideSpeedCmd: number | undefined
@@ -514,6 +519,7 @@ export class Escaper {
         this.SpecialIllidan()
 
         this.refreshInvisUnit()
+        this.refreshCollisionLandmarkEffect()
 
         this.effects.showEffects(this.hero)
         delete this.lastTerrainType
@@ -2548,8 +2554,9 @@ export class Escaper {
 
     setInvisUnitCollisionSize = (collisionSize: number) => {
         GetInvisUnitTypeFromCollisionSize(collisionSize) // throws if collision size is invalid
-        this.invisUnitCollisionSize = collisionSize
+        this.collisionSize = collisionSize
         this.refreshInvisUnit()
+        this.refreshCollisionLandmarkEffect()
     }
 
     refreshInvisUnit = () => {
@@ -2561,7 +2568,7 @@ export class Escaper {
             RemoveUnit(this.invisUnit)
         }
 
-        const invisUnitUnitTypeId = GetInvisUnitTypeFromCollisionSize(this.invisUnitCollisionSize)
+        const invisUnitUnitTypeId = GetInvisUnitTypeFromCollisionSize(this.collisionSize)
 
         this.invisUnit = Natives.UCreateUnit(
             Constants.PLAYER_INVIS_UNIT,
@@ -2578,6 +2585,27 @@ export class Escaper {
             this.invisUnit,
             EVENT_UNIT_DAMAGED
         )
+    }
+
+    /**
+     * Display or not collision landmark for all players according to their choice, and resize it according to collision size
+     */
+    refreshCollisionLandmarkEffect = () => {
+        const localEscaper = getUdgEscapers().get(GetPlayerId(Natives.UGetLocalPlayer()))
+        const displayCollisionLandmark = localEscaper?.displayCollisionLandmarks ?? false
+
+        if (this.collisionLandmarkEffect) {
+            DestroyEffect(this.collisionLandmarkEffect)
+        }
+
+        if (displayCollisionLandmark && this.hero) {
+            this.collisionLandmarkEffect = AddSpecialEffectTarget(COLLISION_LANDMARK_MODEL, this.hero, 'origin')
+            if(!this.collisionLandmarkEffect){
+                throw new Error("Couldn't create collision landmark effect")
+            }
+            const scale = this.collisionSize / COLLISION_LANDMARK_MODEL_BASE_RADIUS
+            BlzSetSpecialEffectScale(this.collisionLandmarkEffect, scale)
+        }
     }
 
     toJson = () => ({

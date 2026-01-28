@@ -74,6 +74,8 @@ const Common = {
     UGetEnumDestructable: () => assertDefined(GetEnumDestructable(), 'GetEnumDestructable'),
 
     UGetTriggeringRegion: () => assertDefined(GetTriggeringRegion(), 'GetTriggeringRegion'),
+
+    UGetLocalPlayer: () => assertDefined(GetLocalPlayer(), 'GetLocalPlayer'),
 }
 
 /**
