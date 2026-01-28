@@ -8,57 +8,11 @@ import { ForceAngleBetween0And360, IsIssuedOrder, StopUnit } from 'core/01_libra
 import { Constants } from 'core/01_libraries/Constants'
 import { udg_colorCode } from 'core/01_libraries/Init_colorCodes'
 import { SUCCESS_TEXT_COLORCODE, Text } from 'core/01_libraries/Text'
-import { MakePropertyChange } from 'core/05_MAKE_STRUCTURES/Make/MakePropertyChange'
-import { MakeCopyLevelPatrol } from 'core/05_MAKE_STRUCTURES/Make_copy_paste/MakeCopyLevelPatrol'
-import { MakeCaster } from 'core/05_MAKE_STRUCTURES/Make_create_casters/MakeCaster'
-import { MakeMeteor } from 'core/05_MAKE_STRUCTURES/Make_create_meteors/MakeMeteor'
-import { MakeMonsterSpawn } from 'core/05_MAKE_STRUCTURES/Make_create_monster_spawn/MakeMonsterSpawn'
-import { MakeMonsterMultiplePatrols } from 'core/05_MAKE_STRUCTURES/Make_create_monsters/MakeMonsterMultiplePatrols'
-import { MakeMonsterSimplePatrol } from 'core/05_MAKE_STRUCTURES/Make_create_monsters/MakeMonsterSimplePatrol'
-import { MakeMonsterTeleport } from 'core/05_MAKE_STRUCTURES/Make_create_monsters/MakeMonsterTeleport'
-import { MakeGetRegion } from 'core/05_MAKE_STRUCTURES/Make_create_region/MakeGetRegion'
-import { MakeMoveRegionPoint } from 'core/05_MAKE_STRUCTURES/Make_create_region/MakeMoveRegionPoint'
-import { MakeRegion } from 'core/05_MAKE_STRUCTURES/Make_create_region/MakeRegion'
-import { MakeDeleteStaticSlide } from 'core/05_MAKE_STRUCTURES/Make_create_static_slide/MakeDeleteStaticSlide'
-import { MakeStaticSlide } from 'core/05_MAKE_STRUCTURES/Make_create_static_slide/MakeStaticSlide'
-import { MakeStaticSlideInfo } from 'core/05_MAKE_STRUCTURES/Make_create_static_slide/MakeStaticSlideInfo'
-import { MakeDeleteCasters } from 'core/05_MAKE_STRUCTURES/Make_delete_casters/MakeDeleteCasters'
-import { MakeDeleteMeteors } from 'core/05_MAKE_STRUCTURES/Make_delete_meteors/MakeDeleteMeteors'
-import { MakeDeleteMonsters } from 'core/05_MAKE_STRUCTURES/Make_delete_monsters/MakeDeleteMonsters'
-import { MakeCircleMob } from 'core/05_MAKE_STRUCTURES/Make_monster_properties/MakeCircleMob'
-import { MakeClearMob } from 'core/05_MAKE_STRUCTURES/Make_monster_properties/MakeClearMob'
-import { MakeDeleteCircleMob } from 'core/05_MAKE_STRUCTURES/Make_monster_properties/MakeDeleteCircleMob'
-import { MakeDeleteClearMob } from 'core/05_MAKE_STRUCTURES/Make_monster_properties/MakeDeleteClearMob'
-import { MakeDeletePortalMob } from 'core/05_MAKE_STRUCTURES/Make_monster_properties/MakeDeletePortalMob'
-import { MakeMonsterAttackGroundOrder } from 'core/05_MAKE_STRUCTURES/Make_monster_properties/MakeMonsterAttackGroundOrder'
-import { MakePortalMob } from 'core/05_MAKE_STRUCTURES/Make_monster_properties/MakePortalMob'
-import { MakeSetBlockMobEffect } from 'core/05_MAKE_STRUCTURES/Make_monster_properties/MakeSetBlockMobEffect'
-import { MakeSetClearMobEffect } from 'core/05_MAKE_STRUCTURES/Make_monster_properties/MakeSetClearMobEffect'
-import { MakeGetUnitTeleportPeriod } from 'core/05_MAKE_STRUCTURES/Make_set_unit_properties/MakeGetUnitTeleportPeriod'
-import { MakeSetUnitMonsterType } from 'core/05_MAKE_STRUCTURES/Make_set_unit_properties/MakeSetUnitMonsterType'
-import { MakeSetUnitTeleportPeriod } from 'core/05_MAKE_STRUCTURES/Make_set_unit_properties/MakeSetUnitTeleportPeriod'
 import { AfkMode } from 'core/08_GAME/Afk_mode/Afk_mode'
 import { Timer } from 'w3ts'
 import { getUdgEscapers, getUdgLevels, getUdgTerrainTypes, globals } from '../../../../globals'
 import { EncodingBase64 } from '../../../Utils/SaveLoad/TreeLib/EncodingBase64'
 import { createEvent, createTimer, runInTrigger } from '../../../Utils/mapUtils'
-import type { Make } from '../../05_MAKE_STRUCTURES/Make/Make'
-import type { MakeAction } from '../../05_MAKE_STRUCTURES/MakeLastActions/MakeAction'
-import { MakeLastActions } from '../../05_MAKE_STRUCTURES/MakeLastActions/MakeLastActions'
-import { MakeMonsterNoMove } from '../../05_MAKE_STRUCTURES/Make_create_monsters/MakeMonsterNoMove'
-import { MakeDoNothing } from '../../05_MAKE_STRUCTURES/Make_do_nothing/MakeDoNothing'
-import { MakeExchangeTerrains } from '../../05_MAKE_STRUCTURES/Make_exchange_terrains/MakeExchangeTerrains'
-import { MakeGetMonsterInfo } from '../../05_MAKE_STRUCTURES/Make_get_info/MakeGetMonsterInfo'
-import { MakeGetTerrainType } from '../../05_MAKE_STRUCTURES/Make_get_info/MakeGetTerrainType'
-import { MakeEnd } from '../../05_MAKE_STRUCTURES/Make_start_end_visibilityModifier/MakeEnd'
-import { MakeStart } from '../../05_MAKE_STRUCTURES/Make_start_end_visibilityModifier/MakeStart'
-import { MakeVisibilityModifier } from '../../05_MAKE_STRUCTURES/Make_start_end_visibilityModifier/MakeVisibilityModifier'
-import { MakeTerrainCopyPaste } from '../../05_MAKE_STRUCTURES/Make_terrain/MakeTerrainCopyPaste'
-import { MakeTerrainCreate } from '../../05_MAKE_STRUCTURES/Make_terrain/MakeTerrainCreate'
-import { MakeTerrainCreateBrush } from '../../05_MAKE_STRUCTURES/Make_terrain/MakeTerrainCreateBrush'
-import { MakeTerrainHorizontalSymmetry } from '../../05_MAKE_STRUCTURES/Make_terrain/MakeTerrainHorizontalSymmetry'
-import { MakeTerrainVerticalSymmetry } from '../../05_MAKE_STRUCTURES/Make_terrain/MakeTerrainVerticalSymmetry'
-import { MakeTerrainHeight } from '../../05_MAKE_STRUCTURES/Make_terrain_height/MakeTerrainHeight'
 import { BlzColor2Id, removeHash } from '../../06_COMMANDS/Helpers/Command_functions'
 import { CheckTerrainTrigger } from '../../07_TRIGGERS/Slide_and_CheckTerrain_triggers/CheckTerrain'
 import { SlideTrigger } from '../../07_TRIGGERS/Slide_and_CheckTerrain_triggers/Slide'
@@ -89,8 +43,11 @@ import { EscaperStartCommands } from './Escaper_StartCommands'
 import { EscaperFirstPerson } from './Escaper_firstPerson'
 import { ColorInfo, GetMirrorEscaper } from './Escaper_functions'
 import { Natives } from '../../wc3_natives_unsecured/Natives'
-import { MakeTpForEnd } from '../../05_MAKE_STRUCTURES/Make_start_end_visibilityModifier/MakeTpForEnd'
 import { hooks } from '../../API/GeneralHooks'
+import { Makes } from '../../05_MAKE_STRUCTURES/Make/Makes'
+import { MakeAction } from '../../05_MAKE_STRUCTURES/MakeLastActions/MakeAction'
+import { MakeLastActions } from '../../05_MAKE_STRUCTURES/MakeLastActions/MakeLastActions'
+import { Make } from '../../05_MAKE_STRUCTURES/Make/Make'
 
 const SHOW_REVIVE_EFFECTS = false
 
@@ -1574,20 +1531,20 @@ export class Escaper {
 
     makeDoNothing = () => {
         this.destroyMake()
-        if (this.hero) this.make = new MakeDoNothing(this.hero)
+        if (this.hero) this.make = new Makes.MakeDoNothing(this.hero)
     }
 
     makeCreateNoMoveMonsters(mt: MonsterType, facingAngle: number) {
         //mode : noMove
         this.destroyMake()
-        if (this.hero) this.make = new MakeMonsterNoMove(this.hero, mt, facingAngle)
+        if (this.hero) this.make = new Makes.MakeMonsterNoMove(this.hero, mt, facingAngle)
     }
 
     makeCreateSimplePatrolMonsters(mode: string, mt: MonsterType, angle?: number) {
         this.destroyMake()
         //modes : normal, string, auto
         if (mode == 'normal' || mode == 'string' || mode == 'auto') {
-            if (this.hero) this.make = new MakeMonsterSimplePatrol(this.hero, mode, mt, angle)
+            if (this.hero) this.make = new Makes.MakeMonsterSimplePatrol(this.hero, mode, mt, angle)
         }
     }
 
@@ -1595,7 +1552,7 @@ export class Escaper {
         this.destroyMake()
         //modes : normal, string
         if (mode == 'normal' || mode == 'string') {
-            if (this.hero) this.make = new MakeMonsterMultiplePatrols(this.hero, mode, mt)
+            if (this.hero) this.make = new Makes.MakeMonsterMultiplePatrols(this.hero, mode, mt)
         }
     }
 
@@ -1603,7 +1560,7 @@ export class Escaper {
         this.destroyMake()
         //modes : normal, string
         if (mode == 'normal' || mode == 'string') {
-            if (this.hero) this.make = new MakeMonsterTeleport(this.hero, mode, mt, period, angle)
+            if (this.hero) this.make = new Makes.MakeMonsterTeleport(this.hero, mode, mt, period, angle)
         }
     }
 
@@ -1612,7 +1569,7 @@ export class Escaper {
             return false
         }
 
-        if (this.make instanceof MakeMonsterMultiplePatrols || this.make instanceof MakeMonsterTeleport) {
+        if (this.make instanceof Makes.MakeMonsterMultiplePatrols || this.make instanceof Makes.MakeMonsterTeleport) {
             this.make.nextMonster()
         } else {
             return false
@@ -1622,14 +1579,14 @@ export class Escaper {
     }
 
     makeMonsterTeleportWait = () => {
-        if (!this.make || !(this.make instanceof MakeMonsterTeleport)) {
+        if (!this.make || !(this.make instanceof Makes.MakeMonsterTeleport)) {
             return false
         }
         return this.make.addWaitPeriod()
     }
 
     makeMonsterTeleportHide = () => {
-        if (!this.make || !(this.make instanceof MakeMonsterTeleport)) {
+        if (!this.make || !(this.make instanceof Makes.MakeMonsterTeleport)) {
             return false
         }
         return this.make.addHidePeriod()
@@ -1643,34 +1600,35 @@ export class Escaper {
         monsterDirectionMode: 'straight' | 'random'
     ) {
         this.destroyMake()
-        if (this.hero) this.make = new MakeMonsterSpawn(this.hero, label, mt, sens, frequency, monsterDirectionMode)
+        if (this.hero)
+            this.make = new Makes.MakeMonsterSpawn(this.hero, label, mt, sens, frequency, monsterDirectionMode)
     }
 
     makeCreateRegion(label: string) {
         this.destroyMake()
-        if (this.hero) this.make = new MakeRegion(this.hero, label)
+        if (this.hero) this.make = new Makes.MakeRegion(this.hero, label)
     }
 
     makeGetRegionAtPoint = () => {
         this.destroyMake()
-        if (this.hero) this.make = new MakeGetRegion(this.hero)
+        if (this.hero) this.make = new Makes.MakeGetRegion(this.hero)
     }
 
     makeMoveRegionPoint = () => {
         this.destroyMake()
-        if (this.hero) this.make = new MakeMoveRegionPoint(this.hero)
+        if (this.hero) this.make = new Makes.MakeMoveRegionPoint(this.hero)
     }
 
     makeCopyLevelPatrol = (targetLevel: Level, mode: string) => {
         this.destroyMake()
-        if (this.hero) this.make = new MakeCopyLevelPatrol(this.hero, mode, targetLevel)
+        if (this.hero) this.make = new Makes.MakeCopyLevelPatrol(this.hero, mode, targetLevel)
     }
 
     makeDeleteMonsters(mode: string) {
         this.destroyMake()
 
         try {
-            if (this.hero) this.make = new MakeDeleteMonsters(this.hero, mode)
+            if (this.hero) this.make = new Makes.MakeDeleteMonsters(this.hero, mode)
         } catch (error) {
             if (typeof error == 'string') {
                 Text.erP(this.p, error)
@@ -1682,7 +1640,7 @@ export class Escaper {
         this.destroyMake()
 
         try {
-            if (this.hero) this.make = new MakeSetUnitTeleportPeriod(this.hero, mode, period)
+            if (this.hero) this.make = new Makes.MakeSetUnitTeleportPeriod(this.hero, mode, period)
         } catch (error) {
             if (typeof error == 'string') {
                 Text.erP(this.p, error)
@@ -1692,14 +1650,14 @@ export class Escaper {
 
     makeGetUnitTeleportPeriod = () => {
         this.destroyMake()
-        if (this.hero) this.make = new MakeGetUnitTeleportPeriod(this.hero)
+        if (this.hero) this.make = new Makes.MakeGetUnitTeleportPeriod(this.hero)
     }
 
     makeSetUnitMonsterType(mode: string, mt: MonsterType) {
         this.destroyMake()
 
         try {
-            if (this.hero) this.make = new MakeSetUnitMonsterType(this.hero, mode, mt)
+            if (this.hero) this.make = new Makes.MakeSetUnitMonsterType(this.hero, mode, mt)
         } catch (error) {
             if (typeof error == 'string') {
                 Text.erP(this.p, error)
@@ -1709,14 +1667,14 @@ export class Escaper {
 
     makeCreateMeteor = () => {
         this.destroyMake()
-        if (this.hero) this.make = new MakeMeteor(this.hero)
+        if (this.hero) this.make = new Makes.MakeMeteor(this.hero)
     }
 
     makeDeleteMeteors(mode: string) {
         this.destroyMake()
 
         try {
-            if (this.hero) this.make = new MakeDeleteMeteors(this.hero, mode)
+            if (this.hero) this.make = new Makes.MakeDeleteMeteors(this.hero, mode)
         } catch (error) {
             if (typeof error == 'string') {
                 Text.erP(this.p, error)
@@ -1726,14 +1684,14 @@ export class Escaper {
 
     makeCreateCaster(casterType: CasterType, angle: number) {
         this.destroyMake()
-        if (this.hero) this.make = new MakeCaster(this.hero, casterType, angle)
+        if (this.hero) this.make = new Makes.MakeCaster(this.hero, casterType, angle)
     }
 
     makeDeleteCasters(mode: string) {
         this.destroyMake()
 
         try {
-            if (this.hero) this.make = new MakeDeleteCasters(this.hero, mode)
+            if (this.hero) this.make = new Makes.MakeDeleteCasters(this.hero, mode)
         } catch (error) {
             if (typeof error == 'string') {
                 Text.erP(this.p, error)
@@ -1743,28 +1701,28 @@ export class Escaper {
 
     makeCreateClearMobs(disableDuration: number) {
         this.destroyMake()
-        if (this.hero) this.make = new MakeClearMob(this.hero, disableDuration)
+        if (this.hero) this.make = new Makes.MakeClearMob(this.hero, disableDuration)
     }
 
     makeDeleteClearMobs = () => {
         this.destroyMake()
-        if (this.hero) this.make = new MakeDeleteClearMob(this.hero)
+        if (this.hero) this.make = new Makes.MakeDeleteClearMob(this.hero)
     }
 
     makeSetClearMobEffect = (effectPath: string) => {
         this.destroyMake()
-        if (this.hero) this.make = new MakeSetClearMobEffect(this.hero, effectPath)
+        if (this.hero) this.make = new Makes.MakeSetClearMobEffect(this.hero, effectPath)
     }
 
     makeSetBlockMobEffect = (effectPath: string) => {
         this.destroyMake()
-        if (this.hero) this.make = new MakeSetBlockMobEffect(this.hero, effectPath)
+        if (this.hero) this.make = new Makes.MakeSetBlockMobEffect(this.hero, effectPath)
     }
 
     makeSetClearMobDisableDuration(disableDuration: number) {
         this.destroyMake()
         if (this.hero) {
-            this.make = new MakePropertyChange(
+            this.make = new Makes.MakePropertyChange(
                 this.hero,
                 'disableDuration',
                 disableDuration,
@@ -1777,12 +1735,13 @@ export class Escaper {
 
     makeCreatePortalMobs(freezeDuration: number, portalEffect: string | null, portalEffectDuration: number | null) {
         this.destroyMake()
-        if (this.hero) this.make = new MakePortalMob(this.hero, freezeDuration, portalEffect, portalEffectDuration)
+        if (this.hero)
+            this.make = new Makes.MakePortalMob(this.hero, freezeDuration, portalEffect, portalEffectDuration)
     }
 
     makeDeletePortalMobs = () => {
         this.destroyMake()
-        if (this.hero) this.make = new MakeDeletePortalMob(this.hero)
+        if (this.hero) this.make = new Makes.MakeDeletePortalMob(this.hero)
     }
 
     makeCreateCircleMob(
@@ -1792,33 +1751,33 @@ export class Escaper {
         radius: number | null
     ) {
         this.destroyMake()
-        if (this.hero) this.make = new MakeCircleMob(this.hero, speed, direction, facing, radius)
+        if (this.hero) this.make = new Makes.MakeCircleMob(this.hero, speed, direction, facing, radius)
     }
 
     makeDeleteCircleMob = () => {
         this.destroyMake()
-        if (this.hero) this.make = new MakeDeleteCircleMob(this.hero)
+        if (this.hero) this.make = new Makes.MakeDeleteCircleMob(this.hero)
     }
 
     makeCreateStaticSlide(angle: number, speed: number) {
         this.destroyMake()
-        if (this.hero) this.make = new MakeStaticSlide(this.hero, angle, speed)
+        if (this.hero) this.make = new Makes.MakeStaticSlide(this.hero, angle, speed)
     }
 
     makeDeleteStaticSlide = () => {
         this.destroyMake()
-        if (this.hero) this.make = new MakeDeleteStaticSlide(this.hero)
+        if (this.hero) this.make = new Makes.MakeDeleteStaticSlide(this.hero)
     }
 
     makeStaticSlideInfo = () => {
         this.destroyMake()
-        if (this.hero) this.make = new MakeStaticSlideInfo(this.hero)
+        if (this.hero) this.make = new Makes.MakeStaticSlideInfo(this.hero)
     }
 
     makeSetPortalMobFreezeDuration(freezeDuration: number) {
         this.destroyMake()
         if (this.hero) {
-            this.make = new MakePropertyChange(
+            this.make = new Makes.MakePropertyChange(
                 this.hero,
                 'freezeDuration',
                 freezeDuration,
@@ -1832,7 +1791,7 @@ export class Escaper {
     makeSetPortalMobPortalEffect(portalEffect: string | null) {
         this.destroyMake()
         if (this.hero) {
-            this.make = new MakePropertyChange(
+            this.make = new Makes.MakePropertyChange(
                 this.hero,
                 'portalEffect',
                 portalEffect,
@@ -1846,7 +1805,7 @@ export class Escaper {
     makeSetPortalMobPortalEffectDuration(portalEffectDuration: number | null) {
         this.destroyMake()
         if (this.hero) {
-            this.make = new MakePropertyChange(
+            this.make = new Makes.MakePropertyChange(
                 this.hero,
                 'portalEffectDuration',
                 portalEffectDuration,
@@ -1860,7 +1819,7 @@ export class Escaper {
     makeSetCircleMobSpeed(speed: number) {
         this.destroyMake()
         if (this.hero) {
-            this.make = new MakePropertyChange(
+            this.make = new Makes.MakePropertyChange(
                 this.hero,
                 'speed',
                 speed,
@@ -1874,7 +1833,7 @@ export class Escaper {
     makeSetCircleMobDirection(direction: 'cw' | 'ccw') {
         this.destroyMake()
         if (this.hero) {
-            this.make = new MakePropertyChange(
+            this.make = new Makes.MakePropertyChange(
                 this.hero,
                 'direction',
                 direction,
@@ -1888,7 +1847,7 @@ export class Escaper {
     makeSetCircleMobFacing(facing: 'cw' | 'ccw' | 'in' | 'out') {
         this.destroyMake()
         if (this.hero) {
-            this.make = new MakePropertyChange(
+            this.make = new Makes.MakePropertyChange(
                 this.hero,
                 'facing',
                 facing,
@@ -1902,7 +1861,7 @@ export class Escaper {
     makeSetCircleMobShape(shape: 'circle' | 'square' | 'triangle' | 'pentagon' | 'hexagon' | 'octagon' | 'eight') {
         this.destroyMake()
         if (this.hero) {
-            this.make = new MakePropertyChange(
+            this.make = new Makes.MakePropertyChange(
                 this.hero,
                 'shape',
                 shape,
@@ -1916,7 +1875,7 @@ export class Escaper {
     makeSetCircleMobInitialAngle(initialAngle: number) {
         this.destroyMake()
         if (this.hero) {
-            this.make = new MakePropertyChange(
+            this.make = new Makes.MakePropertyChange(
                 this.hero,
                 'initialAngle',
                 initialAngle,
@@ -1930,7 +1889,7 @@ export class Escaper {
     makeSetCircleMobRadius(radius: number) {
         this.destroyMake()
         if (this.hero) {
-            this.make = new MakePropertyChange(
+            this.make = new Makes.MakePropertyChange(
                 this.hero,
                 'radius',
                 radius,
@@ -1944,7 +1903,7 @@ export class Escaper {
     makeSetStaticSlideSpeed(speed: number) {
         this.destroyMake()
         if (this.hero) {
-            this.make = new MakePropertyChange(
+            this.make = new Makes.MakePropertyChange(
                 this.hero,
                 'speed',
                 speed,
@@ -1958,7 +1917,7 @@ export class Escaper {
     makeSetStaticSlideAngle(angle: number) {
         this.destroyMake()
         if (this.hero) {
-            this.make = new MakePropertyChange(
+            this.make = new Makes.MakePropertyChange(
                 this.hero,
                 'angle',
                 angle,
@@ -1972,7 +1931,7 @@ export class Escaper {
     makeSetStaticSlideCanTurnAngle(canTurnAngle: number | undefined) {
         this.destroyMake()
         if (this.hero) {
-            this.make = new MakePropertyChange(
+            this.make = new Makes.MakePropertyChange(
                 this.hero,
                 'canTurnAngle',
                 canTurnAngle,
@@ -1986,7 +1945,7 @@ export class Escaper {
     makeSetMonsterJumpPad(jumpPad: number | undefined) {
         this.destroyMake()
         if (this.hero) {
-            this.make = new MakePropertyChange(
+            this.make = new Makes.MakePropertyChange(
                 this.hero,
                 'jumpPad',
                 jumpPad,
@@ -2000,7 +1959,7 @@ export class Escaper {
     makeSetMonsterJumpPadEffect(jumpPadEffect: string | undefined) {
         this.destroyMake()
         if (this.hero) {
-            this.make = new MakePropertyChange(
+            this.make = new Makes.MakePropertyChange(
                 this.hero,
                 'jumpPadEffect',
                 jumpPadEffect,
@@ -2013,72 +1972,72 @@ export class Escaper {
 
     makeSetMonsterAttackGroundOrder(delay: number = 0) {
         this.destroyMake()
-        if (this.hero) this.make = new MakeMonsterAttackGroundOrder(this.hero, delay)
+        if (this.hero) this.make = new Makes.MakeMonsterAttackGroundOrder(this.hero, delay)
     }
 
     makeCreateTerrain(terrainType: TerrainType) {
         this.destroyMake()
-        if (this.hero) this.make = new MakeTerrainCreate(this.hero, terrainType)
+        if (this.hero) this.make = new Makes.MakeTerrainCreate(this.hero, terrainType)
     }
 
     makeCreateTerrainBrush(terrainType: TerrainType, brushSize: number, shape: 'square' | 'circle' = 'square') {
         this.destroyMake()
-        this.make = new MakeTerrainCreateBrush(this, terrainType, brushSize, shape)
+        this.make = new Makes.MakeTerrainCreateBrush(this, terrainType, brushSize, shape)
     }
 
     makeTerrainCopyPaste = () => {
         this.destroyMake()
-        if (this.hero) this.make = new MakeTerrainCopyPaste(this.hero)
+        if (this.hero) this.make = new Makes.MakeTerrainCopyPaste(this.hero)
     }
 
     makeTerrainVerticalSymmetry = () => {
         this.destroyMake()
-        if (this.hero) this.make = new MakeTerrainVerticalSymmetry(this.hero)
+        if (this.hero) this.make = new Makes.MakeTerrainVerticalSymmetry(this.hero)
     }
 
     makeTerrainHorizontalSymmetry = () => {
         this.destroyMake()
-        if (this.hero) this.make = new MakeTerrainHorizontalSymmetry(this.hero)
+        if (this.hero) this.make = new Makes.MakeTerrainHorizontalSymmetry(this.hero)
     }
 
     makeTerrainHeight(radius: number, height: number) {
         this.destroyMake()
-        if (this.hero) this.make = new MakeTerrainHeight(this.hero, radius, height)
+        if (this.hero) this.make = new Makes.MakeTerrainHeight(this.hero, radius, height)
     }
 
     makeGetTerrainType = () => {
         this.destroyMake()
-        if (this.hero) this.make = new MakeGetTerrainType(this.hero)
+        if (this.hero) this.make = new Makes.MakeGetTerrainType(this.hero)
     }
 
     makeGetMonsterInfo = () => {
         this.destroyMake()
-        if (this.hero) this.make = new MakeGetMonsterInfo(this.hero, this)
+        if (this.hero) this.make = new Makes.MakeGetMonsterInfo(this.hero, this)
     }
 
     makeExchangeTerrains = () => {
         this.destroyMake()
-        if (this.hero) this.make = new MakeExchangeTerrains(this.hero)
+        if (this.hero) this.make = new Makes.MakeExchangeTerrains(this.hero)
     }
 
     makeCreateStart(forNext: boolean, facing?: number) {
         this.destroyMake()
-        if (this.hero) this.make = new MakeStart(this.hero, forNext, facing)
+        if (this.hero) this.make = new Makes.MakeStart(this.hero, forNext, facing)
     }
 
     makeCreateEnd = () => {
         this.destroyMake()
-        if (this.hero) this.make = new MakeEnd(this.hero)
+        if (this.hero) this.make = new Makes.MakeEnd(this.hero)
     }
 
     makeCreateTpForEnd = () => {
         this.destroyMake()
-        if (this.hero) this.make = new MakeTpForEnd(this.hero)
+        if (this.hero) this.make = new Makes.MakeTpForEnd(this.hero)
     }
 
     makeCreateVisibilityModifier = () => {
         this.destroyMake()
-        if (this.hero) this.make = new MakeVisibilityModifier(this.hero)
+        if (this.hero) this.make = new Makes.MakeVisibilityModifier(this.hero)
     }
 
     cancelLastAction = () => {
@@ -2600,7 +2559,7 @@ export class Escaper {
 
         if (displayCollisionLandmark && this.hero) {
             this.collisionLandmarkEffect = AddSpecialEffectTarget(COLLISION_LANDMARK_MODEL, this.hero, 'origin')
-            if(!this.collisionLandmarkEffect){
+            if (!this.collisionLandmarkEffect) {
                 throw new Error("Couldn't create collision landmark effect")
             }
             const scale = this.collisionSize / COLLISION_LANDMARK_MODEL_BASE_RADIUS
