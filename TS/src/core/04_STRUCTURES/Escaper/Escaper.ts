@@ -104,6 +104,25 @@ export const SetMeteorEffect = (newEffect: string) => {
     METEOR_EFFECT = newEffect
 }
 
+function GetInvisUnitTypeFromCollisionSize(collisionSize: number): number {
+    if (collisionSize < 0 || collisionSize > 200 || collisionSize % 4 !== 0) {
+        throw 'GetInvisUnitTypeFromCollisionSize: collisionSize must be between 4 and 200 and multiple of 4'
+    }
+
+    if (collisionSize === 0) {
+        return FourCC('Einv')
+    } else {
+        let fourChars = 'Ei'
+        const num = R2I(collisionSize / 4)
+        if (num < 10) {
+            fourChars += '0'
+        }
+        fourChars += num.toString()
+
+        return FourCC(fourChars)
+    }
+}
+
 export class Escaper {
     private escaperId: number
     private playerId: number
@@ -111,6 +130,7 @@ export class Escaper {
     private p: player
     private hero?: unit
     private invisUnit?: unit
+    private invisUnitCollisionSize = 0
     private walkSpeed: number
     private slideSpeed: number
     private slideSpeedCmd: number | undefined
@@ -492,13 +512,9 @@ export class Escaper {
 
         this.updateUnitVertexColor()
         this.SpecialIllidan()
-        this.invisUnit = Natives.UCreateUnit(Constants.PLAYER_INVIS_UNIT, Constants.INVIS_UNIT_TYPE_ID, x, y, angle)
-        SetUnitUserData(this.invisUnit, GetPlayerId(this.p))
-        TriggerRegisterUnitEvent(
-            ServiceManager.getService('InvisUnit_is_getting_damage').Trig_InvisUnit_is_getting_damage.gg_trg_InvisUnit_is_getting_damage,
-            this.invisUnit,
-            EVENT_UNIT_DAMAGED
-        )
+
+        this.refreshInvisUnit()
+
         this.effects.showEffects(this.hero)
         delete this.lastTerrainType
         TimerStart(AfkMode.afkModeTimers[this.escaperId], AfkMode.timeMinAfk, false, () =>
@@ -1613,7 +1629,13 @@ export class Escaper {
         return this.make.addHidePeriod()
     }
 
-    makeCreateMonsterSpawn(label: string, mt: MonsterType, sens: number, frequency: number, monsterDirectionMode: 'straight'|'random') {
+    makeCreateMonsterSpawn(
+        label: string,
+        mt: MonsterType,
+        sens: number,
+        frequency: number,
+        monsterDirectionMode: 'straight' | 'random'
+    ) {
         this.destroyMake()
         if (this.hero) this.make = new MakeMonsterSpawn(this.hero, label, mt, sens, frequency, monsterDirectionMode)
     }
@@ -2514,10 +2536,48 @@ export class Escaper {
         this.updateUnitVertexColor()
     }
 
-    addLives(numLives: number){
-        ServiceManager.getService('Lives').add(numLives);
+    addLives(numLives: number) {
+        ServiceManager.getService('Lives').add(numLives)
 
-        Text.ForAll_timed_withColorCode(3, SUCCESS_TEXT_COLORCODE, `${GetPlayerName(this.getPlayer())} has earned ${numLives} ${numLives > 1 ? 'lives' : 'life'} for the team!`);
+        Text.ForAll_timed_withColorCode(
+            3,
+            SUCCESS_TEXT_COLORCODE,
+            `${GetPlayerName(this.getPlayer())} has earned ${numLives} ${numLives > 1 ? 'lives' : 'life'} for the team!`
+        )
+    }
+
+    setInvisUnitCollisionSize = (collisionSize: number) => {
+        GetInvisUnitTypeFromCollisionSize(collisionSize) // throws if collision size is invalid
+        this.invisUnitCollisionSize = collisionSize
+        this.refreshInvisUnit()
+    }
+
+    refreshInvisUnit = () => {
+        if (!this.hero) {
+            return
+        }
+
+        if (this.invisUnit) {
+            RemoveUnit(this.invisUnit)
+        }
+
+        const invisUnitUnitTypeId = GetInvisUnitTypeFromCollisionSize(this.invisUnitCollisionSize)
+
+        this.invisUnit = Natives.UCreateUnit(
+            Constants.PLAYER_INVIS_UNIT,
+            invisUnitUnitTypeId,
+            GetUnitX(this.hero),
+            GetUnitY(this.hero),
+            0
+        )
+        SetUnitPathing(this.invisUnit, false)
+        SetUnitUserData(this.invisUnit, GetPlayerId(this.p))
+        TriggerRegisterUnitEvent(
+            ServiceManager.getService('InvisUnit_is_getting_damage').Trig_InvisUnit_is_getting_damage
+                .gg_trg_InvisUnit_is_getting_damage,
+            this.invisUnit,
+            EVENT_UNIT_DAMAGED
+        )
     }
 
     toJson = () => ({

@@ -27,6 +27,7 @@ import { flushLogs } from '../../Log/log'
 import { CmdParam, isPlayerId, resolvePlayerId } from '../Helpers/Command_functions'
 import { ActivateTeleport, DisableTeleport } from '../Helpers/Teleport'
 import { Natives } from '../../wc3_natives_unsecured/Natives'
+import { CollisionTest } from '../../Test/collision-test'
 
 export const initExecuteCommandMax = () => {
     const { registerCommand } = ServiceManager.getService('Cmd')
@@ -946,6 +947,45 @@ export const initExecuteCommandMax = () => {
             }
 
             Text.P(escaper.getPlayer(), 'Done')
+            return true
+        },
+    })
+
+    //-collisionSizeTest <monsterTypeLabel> <radius <mobOffset>
+    registerCommand({
+        name: 'collisionSizeTest',
+        alias: [],
+        group: 'max',
+        argDescription: "<monsterTypeLabel> <radius <mobOffset> <triggerFrequency></triggerFrequency>",
+        description: '',
+        cb: ({ param1, param2, param3, param4, nbParam }, escaper) => {
+            if(nbParam !== 4){
+                Text.erP(escaper.getPlayer(), 'Three parameters are required: <monsterTypeLabel> <radius> <mobOffset>')
+                return true
+            }
+
+            const monsterType = getUdgMonsterTypes().getByLabel(param1)
+            if (!monsterType) {
+                Text.erP(escaper.getPlayer(), `Unknown monster type label: ${param1}`)
+                return true
+            }
+
+            const radius = S2R(param2)
+            const mobOffset = S2R(param3)
+            if (isNaN(radius) || isNaN(mobOffset) || radius <= 0 || mobOffset < 0) {
+                Text.erP(escaper.getPlayer(), 'Radius and mobOffset must be positive numbers')
+                return true
+            }
+
+            const triggerFrequency = S2R(param4)
+            if (isNaN(triggerFrequency) || triggerFrequency <= 0) {
+                Text.erP(escaper.getPlayer(), 'triggerFrequency must be a positive number')
+                return true
+            }
+
+            new CollisionTest(escaper, monsterType, radius, mobOffset, triggerFrequency).start()
+
+            Text.P(escaper.getPlayer(), 'Collision size test started')
             return true
         },
     })
