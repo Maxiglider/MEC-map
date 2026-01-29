@@ -1,4 +1,11 @@
-import { getUdgCasterTypes, getUdgLevels, getUdgMonsterTypes, getUdgTerrainTypes, globals } from '../../../../globals'
+import {
+    getUdgCasterTypes,
+    getUdgLevels,
+    getUdgMonsterTypes,
+    getUdgTerrainTypes,
+    globals,
+    setHeroBaseCollisionSize,
+} from '../../../../globals'
 import { ServiceManager } from '../../../Services'
 import { createPoint } from '../../../Utils/Point'
 import { String2Ascii } from '../../01_libraries/Ascii'
@@ -41,6 +48,8 @@ import { ChangeOneTerrain } from '../../07_TRIGGERS/Triggers_to_modify_terrains/
 import { ExchangeTerrains } from '../../07_TRIGGERS/Triggers_to_modify_terrains/Exchange_terrains'
 import { RandomizeTerrains } from '../../07_TRIGGERS/Triggers_to_modify_terrains/Randomize_terrains'
 import { CmdParam } from '../Helpers/Command_functions'
+import { IsHeroCollisionSizeValid } from '../../04_STRUCTURES/Escaper/Escaper'
+import { adaptMonstersImmolation, snapPatrolsToSlideOffsetMap, snapPointToSlide } from './commands-helpers'
 
 export const initExecuteCommandMake = () => {
     const { registerCommand } = ServiceManager.getService('Cmd')
@@ -4152,6 +4161,80 @@ export const initExecuteCommandMake = () => {
         },
     })
 
+    // -setHeroCollisionSize <value> [<player>|all]
+    registerCommand({
+        name: 'setHeroBaseCollisionSize',
+        alias: ['sethbcs'],
+        group: 'make',
+        argDescription: '<value>',
+        description:
+            'Sets the base hero collision size. Persistent between "smiced" games. Value between 0 and 200, by steps of 5.',
+        cb: ({ nbParam, param1 }, escaper) => {
+            const usageMessage = 'setBaseHeroCollisionSize: you must provide a value between 0 and 200, by steps of 5.'
+            if (nbParam !== 1) {
+                Text.erP(escaper.getPlayer(), usageMessage)
+                return true
+            }
+
+            const value = S2I(param1)
+            if (!IsHeroCollisionSizeValid(value)) {
+                Text.erP(escaper.getPlayer(), usageMessage)
+                return true
+            }
+
+            setHeroBaseCollisionSize(value)
+
+            Text.mkP(escaper.getPlayer(), 'Hero base collision size set to ' + I2S(value))
+
+            return true
+        },
+    })
+
+    // -patchImmo [<heroBaseCollisionSize>]
+    registerCommand({
+        name: 'patchImmo',
+        alias: [],
+        group: 'make',
+        argDescription: '[<heroBaseCollisionSize>]',
+        description:
+            'Change the hero base collision size to the given value (between 0 and 200, by steps of 5, default 25) and change all monsters immolation to keep the same gameplay.',
+        cb: ({ nbParam, param1, param2 }, escaper) => {
+            const usageMessage = `patchImmo usage : -patchImmo [<heroBaseCollisionSize>] where <heroBaseCollisionSize> is an integer between 0 and 200, by steps of 5.`
+
+            if (nbParam > 1) {
+                Text.erP(escaper.getPlayer(), usageMessage)
+                return true
+            }
+
+            let newHeroBaseCollisionSize = Constants.RECOMMANDED_HERO_BASE_COLLISION_SIZE
+            if (nbParam === 1) {
+                newHeroBaseCollisionSize = S2I(param1)
+                if (!IsHeroCollisionSizeValid(newHeroBaseCollisionSize)) {
+                    Text.erP(escaper.getPlayer(), usageMessage)
+                    return true
+                }
+            }
+
+            if (newHeroBaseCollisionSize === globals.heroBaseCollisionSize) {
+                Text.erP(
+                    escaper.getPlayer(),
+                    `The hero base collision size is already set to ${newHeroBaseCollisionSize}.`
+                )
+                return true
+            }
+
+            const delta = globals.heroBaseCollisionSize - newHeroBaseCollisionSize
+            adaptMonstersImmolation(delta)
+            setHeroBaseCollisionSize(newHeroBaseCollisionSize)
+
+            Text.mkP(
+                escaper.getPlayer(),
+                `Hero base collision size set to ${newHeroBaseCollisionSize} and all monsters immolation radius adapted accordingly.`
+            )
+            return true
+        },
+    })
+
     // -setClickGrid <value>
     registerCommand({
         name: 'setClickGrid',
@@ -4217,8 +4300,6 @@ export const initExecuteCommandMake = () => {
             return true
         },
     })
-
-    const snapPatrolsToSlideOffsetMap: { [mt: string]: { angle: number; offset: number } | null } = {}
 
     // -snapPatrolsToSlideOffset [<mt> <angle> <offset>]
     registerCommand({
@@ -4359,88 +4440,4 @@ export const initExecuteCommandMake = () => {
             return true
         },
     })
-
-    const snappedHistoryMap: { [historyId: string]: { x: number | undefined; y: number | undefined } } = {}
-
-    const snapPointToSlide = (
-        historyId: string,
-        _x1: number,
-        _y1: number,
-        x2: number,
-        y2: number,
-        preferredDistance: number,
-        fixStartOnSlidePatrols: boolean,
-        mt: MonsterType
-    ) => {
-        const x1 = snappedHistoryMap[historyId]?.x || _x1
-        const y1 = snappedHistoryMap[historyId]?.y || _y1
-
-        if (!snappedHistoryMap[historyId]) {
-            snappedHistoryMap[historyId] = { x: _x1, y: _y1 }
-        }
-
-        const currentTerrain = getUdgTerrainTypes().getTerrainType(x1, y1)
-        let newX = x1
-        let newY = y1
-
-        if (currentTerrain?.kind === 'death') {
-            const angle = Atan2(y2 - y1, x2 - x1)
-            let currentX: number | undefined = undefined
-            let currentY: number | undefined = undefined
-
-            for (let i = 0; i <= 256; i++) {
-                const testX = x1 + Math.cos(angle) * i
-                const testY = y1 + Math.sin(angle) * i
-                const tt = getUdgTerrainTypes().getTerrainType(testX, testY)
-
-                if (tt?.kind === 'slide' || tt?.kind === 'walk') {
-                    currentX = testX
-                    currentY = testY
-                    break
-                }
-            }
-
-            if (currentX !== undefined && currentY !== undefined) {
-                const oppositeAngle = angle + Math.PI
-
-                newX = currentX + Math.cos(oppositeAngle) * (preferredDistance + GetRandomInt(-4, 4))
-                newY = currentY + Math.sin(oppositeAngle) * (preferredDistance + GetRandomInt(-4, 4))
-            }
-        }
-
-        if (fixStartOnSlidePatrols && (currentTerrain?.kind === 'slide' || currentTerrain?.kind === 'walk')) {
-            const angle = Atan2(y2 - y1, x2 - x1) + Math.PI
-
-            let currentX: number | undefined = undefined
-            let currentY: number | undefined = undefined
-
-            for (let i = 0; i <= 256; i++) {
-                const testX = x1 + Math.cos(angle) * i
-                const testY = y1 + Math.sin(angle) * i
-                const tt = getUdgTerrainTypes().getTerrainType(testX, testY)
-
-                if (tt?.kind === 'death') {
-                    currentX = testX
-                    currentY = testY
-                    break
-                }
-            }
-
-            if (currentX !== undefined && currentY !== undefined) {
-                const oppositeAngle = angle
-
-                newX = currentX + Math.cos(oppositeAngle) * (preferredDistance + GetRandomInt(-4, 4))
-                newY = currentY + Math.sin(oppositeAngle) * (preferredDistance + GetRandomInt(-4, 4))
-            }
-        }
-
-        const item = snapPatrolsToSlideOffsetMap[mt.label] || snapPatrolsToSlideOffsetMap['all']
-
-        if (item) {
-            newX += Math.cos(item.angle) * item.offset
-            newY += Math.sin(item.angle) * item.offset
-        }
-
-        return createPoint(newX, newY)
-    }
 }

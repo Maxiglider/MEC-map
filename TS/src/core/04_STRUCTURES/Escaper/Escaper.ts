@@ -10,7 +10,7 @@ import { udg_colorCode } from 'core/01_libraries/Init_colorCodes'
 import { SUCCESS_TEXT_COLORCODE, Text } from 'core/01_libraries/Text'
 import { AfkMode } from 'core/08_GAME/Afk_mode/Afk_mode'
 import { Timer } from 'w3ts'
-import { getUdgEscapers, getUdgLevels, getUdgTerrainTypes, globals } from '../../../../globals'
+import { getUdgEscapers, getUdgLevels, getUdgTerrainTypes, globals, udg_monsters } from '../../../../globals'
 import { EncodingBase64 } from '../../../Utils/SaveLoad/TreeLib/EncodingBase64'
 import { createEvent, createTimer, runInTrigger } from '../../../Utils/mapUtils'
 import { BlzColor2Id, removeHash } from '../../06_COMMANDS/Helpers/Command_functions'
@@ -48,6 +48,7 @@ import { Makes } from '../../05_MAKE_STRUCTURES/Make/Makes'
 import { MakeAction } from '../../05_MAKE_STRUCTURES/MakeLastActions/MakeAction'
 import { MakeLastActions } from '../../05_MAKE_STRUCTURES/MakeLastActions/MakeLastActions'
 import { Make } from '../../05_MAKE_STRUCTURES/Make/Make'
+import { refreshTrigMoveCollisionLandmarks } from '../../07_TRIGGERS/CollisionLandmarks/MoveCollisionLandmarks'
 
 const SHOW_REVIVE_EFFECTS = false
 
@@ -57,15 +58,12 @@ const VIPs = VIPs64.map(name64 => EncodingBase64.Decode(name64))
 
 let METEOR_EFFECT = 'Abilities\\Weapons\\DemonHunterMissile\\DemonHunterMissile.mdl'
 
-const COLLISION_LANDMARK_MODEL = 'UI\\Feedback\\SelectionCircle\\SelectionCircle.mdl'
-const COLLISION_LANDMARK_MODEL_BASE_RADIUS = 39.2
-
 export const SetMeteorEffect = (newEffect: string) => {
     METEOR_EFFECT = newEffect
 }
 
 function GetInvisUnitTypeFromCollisionSize(collisionSize: number): number {
-    if (collisionSize < 0 || collisionSize > 200 || collisionSize % 4 !== 0) {
+    if (!IsHeroCollisionSizeValid(collisionSize)) {
         throw 'GetInvisUnitTypeFromCollisionSize: collisionSize must be between 4 and 200 and multiple of 4'
     }
 
@@ -83,6 +81,10 @@ function GetInvisUnitTypeFromCollisionSize(collisionSize: number): number {
     }
 }
 
+export function IsHeroCollisionSizeValid(collisionSize: number): boolean {
+    return collisionSize >= 0 && collisionSize <= 200 || collisionSize % 5 === 0
+}
+
 export class Escaper {
     private escaperId: number
     private playerId: number
@@ -90,9 +92,9 @@ export class Escaper {
     private p: player
     private hero?: unit
     private invisUnit?: unit
-    private collisionSize = 0
+    private collisionSize: number
     private collisionLandmarkEffect?: effect
-    private displayCollisionLandmarks = true // if the player chose to display collision landmarks for Heroes and Sliders
+    private displayCollisionLandmarks = false // if the player chose to display collision landmarks for Heroes and Sliders
     private walkSpeed: number
     private slideSpeed: number
     private slideSpeedCmd: number | undefined
@@ -373,6 +375,8 @@ export class Escaper {
         this.canClick = true
         this.canClickTrigger = this.createCanClickTrigger()
         this.setCanClick(true)
+
+        this.collisionSize = globals.heroBaseCollisionSize
     }
 
     getColorId = () => {
@@ -447,7 +451,7 @@ export class Escaper {
             UnitAddAbility(this.hero, FourCC('Aloc'))
         }
 
-        if (this.scale) {
+        if (this.scale !== undefined) {
             SetUnitScale(this.hero, this.scale, this.scale, this.scale)
         }
 
@@ -476,7 +480,7 @@ export class Escaper {
         this.SpecialIllidan()
 
         this.refreshInvisUnit()
-        this.refreshCollisionLandmarkEffect()
+        this.refreshCollisionLandmark()
 
         this.effects.showEffects(this.hero)
         delete this.lastTerrainType
@@ -2511,11 +2515,11 @@ export class Escaper {
         )
     }
 
-    setInvisUnitCollisionSize = (collisionSize: number) => {
+    setHeroCollisionSize = (collisionSize: number) => {
         GetInvisUnitTypeFromCollisionSize(collisionSize) // throws if collision size is invalid
         this.collisionSize = collisionSize
         this.refreshInvisUnit()
-        this.refreshCollisionLandmarkEffect()
+        this.refreshCollisionLandmark()
     }
 
     refreshInvisUnit = () => {
@@ -2549,22 +2553,52 @@ export class Escaper {
     /**
      * Display or not collision landmark for all players according to their choice, and resize it according to collision size
      */
-    refreshCollisionLandmarkEffect = () => {
+    refreshCollisionLandmark = (onlyForEscaper?: Escaper) => {
         const localEscaper = getUdgEscapers().get(GetPlayerId(Natives.UGetLocalPlayer()))
+        if(onlyForEscaper && localEscaper !== onlyForEscaper) {
+            return
+        }
+
         const displayCollisionLandmark = localEscaper?.displayCollisionLandmarks ?? false
 
         if (this.collisionLandmarkEffect) {
+            BlzSetSpecialEffectScale(this.collisionLandmarkEffect, 0) // hide it because an effect doesn't visually instanstly disappear on destroy
             DestroyEffect(this.collisionLandmarkEffect)
+            delete this.collisionLandmarkEffect
         }
 
         if (displayCollisionLandmark && this.hero) {
-            this.collisionLandmarkEffect = AddSpecialEffectTarget(COLLISION_LANDMARK_MODEL, this.hero, 'origin')
+            this.collisionLandmarkEffect = AddSpecialEffect(Constants.COLLISION_LANDMARK_MODEL, GetUnitX(this.hero), GetUnitY(this.hero))
             if (!this.collisionLandmarkEffect) {
                 throw new Error("Couldn't create collision landmark effect")
             }
-            const scale = this.collisionSize / COLLISION_LANDMARK_MODEL_BASE_RADIUS
+            const scale = this.collisionSize / Constants.COLLISION_LANDMARK_MODEL_BASE_RADIUS
             BlzSetSpecialEffectScale(this.collisionLandmarkEffect, scale)
         }
+    }
+
+    moveCollisionLandmark = () => {
+        if (this.collisionLandmarkEffect && this.hero) {
+            const z = GetUnitZEx(this.hero) - Constants.COLLISION_LANDMARK_MODEL_BASE_HEIGHT * this.collisionSize / Constants.COLLISION_LANDMARK_MODEL_BASE_RADIUS
+            BlzSetSpecialEffectPosition(this.collisionLandmarkEffect, GetUnitX(this.hero), GetUnitY(this.hero), z)
+        }
+    }
+
+    getDisplayCollisionLandmarks = () => {
+        return this.displayCollisionLandmarks
+    }
+
+    setDisplayCollisionLandmarks = (flag: boolean) => {
+        this.displayCollisionLandmarks = flag
+
+        getUdgEscapers().forMainEscapers(escaper => {
+            escaper.refreshCollisionLandmark(this)
+        })
+        for (const [_, monster] of pairs(udg_monsters)) {
+            monster.refreshCollisionLandmark(this)
+        }
+
+        refreshTrigMoveCollisionLandmarks()
     }
 
     toJson = () => ({

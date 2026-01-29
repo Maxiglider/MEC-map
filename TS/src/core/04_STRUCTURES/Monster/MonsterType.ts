@@ -14,6 +14,7 @@ export class MonsterType {
     theAlias?: string
     private unitTypeId: number
     private scale: number //influe sur la taille de l'unité ; 1.0 donne une taille normale
+    private immolationRadius = 0
     private immolationSkill: number | null
     private speed: number
     private isClickableB: boolean
@@ -58,6 +59,7 @@ export class MonsterType {
         this.label = label
         this.unitTypeId = unitTypeId
         this.scale = scale
+        this.immolationRadius = immolationRadius;
         this.immolationSkill = IMMOLATION_SKILLS[immolationRadius]
         this.speed = speed
         this.isClickableB = isClickable
@@ -161,6 +163,7 @@ export class MonsterType {
         if (immolationRadius !== 0 && !IMMOLATION_SKILLS[immolationRadius]) {
             return false
         }
+        this.immolationRadius = immolationRadius;
         this.immolationSkill = IMMOLATION_SKILLS[immolationRadius]
         this.refresh()
         return true
@@ -361,6 +364,10 @@ export class MonsterType {
 
     displayForPlayer = (p: player) => {
         Text.P_timed(p, Constants.TERRAIN_DATA_DISPLAY_TIME, this.toText())
+    }
+
+    getImmolationRadius(){
+        return this.immolationRadius
     }
 
     toJson = () => {

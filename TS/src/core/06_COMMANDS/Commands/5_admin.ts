@@ -989,4 +989,48 @@ export const initExecuteCommandMax = () => {
             return true
         },
     })
+
+    //-setSelectionCircleBaseHeight
+    registerCommand({
+        name: 'setSelectionCircleBaseHeight',
+        alias: [],
+        group: 'max',
+        argDescription: "",
+        description: '<value>',
+        cb: ({ param1, nbParam }, escaper) => {
+            if(nbParam !== 1){
+                Text.erP(escaper.getPlayer(), 'One parameter is required: <value>')
+                return true
+            }
+
+            Constants.COLLISION_LANDMARK_MODEL_BASE_HEIGHT = S2R(param1)
+
+            Text.P(escaper.getPlayer(), 'Selection circle base height set to ' + S2R(param1))
+            return true
+        },
+    })
+
+    //-setSelectionCircleBaseRadius
+    registerCommand({
+        name: 'setSelectionCircleBaseRadius',
+        alias: [],
+        group: 'max',
+        argDescription: "",
+        description: '<value>',
+        cb: ({ param1, nbParam }, escaper) => {
+            if(nbParam !== 1){
+                Text.erP(escaper.getPlayer(), 'One parameter is required: <value>')
+                return true
+            }
+
+            Constants.COLLISION_LANDMARK_MODEL_BASE_RADIUS = S2R(param1)
+
+            getUdgEscapers().forAll(escaper => {
+                escaper.refreshCollisionLandmark()
+            })
+
+            Text.P(escaper.getPlayer(), 'Selection circle base height set to ' + S2R(param1))
+            return true
+        },
+    })
 }

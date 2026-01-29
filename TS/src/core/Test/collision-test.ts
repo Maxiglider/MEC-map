@@ -59,7 +59,7 @@ export class CollisionTest {
     progressivelyIncreaseInvisUnitCollisionSize(){
         let currentCollisionSize = COLLISION_MIN
 
-        this.escaper.setInvisUnitCollisionSize(currentCollisionSize)
+        this.escaper.setHeroCollisionSize(currentCollisionSize)
         createTimer(0.1, false, () => {
             const deadMobs = this.monsterUnits.filter(mobUnit => !IsUnitAliveBJ(mobUnit)).length
             const newDeadMobs = deadMobs - this.nbDeadMonsters
@@ -72,7 +72,7 @@ export class CollisionTest {
             currentCollisionSize += 4
             if (currentCollisionSize > COLLISION_MAX) {
                 print('Collision test ended.')
-                this.escaper.setInvisUnitCollisionSize(COLLISION_MIN)
+                this.escaper.setHeroCollisionSize(COLLISION_MIN)
 
                 timer.destroy()
 
@@ -82,7 +82,7 @@ export class CollisionTest {
                     }
                 })
             }else{
-                this.escaper.setInvisUnitCollisionSize(currentCollisionSize)
+                this.escaper.setHeroCollisionSize(currentCollisionSize)
 
                 createTimer(0.1, false, () => {
                     const deadMobs = this.monsterUnits.filter(mobUnit => !IsUnitAliveBJ(mobUnit)).length

@@ -26,8 +26,11 @@ import { init_Test } from '../Test/test'
 import { initArrays } from './initArrays'
 import { initOldTriggers } from './init_old_triggers'
 import { init_LongDistanceMoveOrder_garbageCollector } from '../04_STRUCTURES/Monster/LongDistanceMoveOrder'
+import { init_dataFromWorleditor } from './init_dataFromWorleditor'
+import { init_DetectNullHeroCollisionAtStart } from '../07_TRIGGERS/CollisionLandmarks/DetectNullHeroCollisionAtStart'
 
 export const initializers = () => {
+    init_dataFromWorleditor()
     init_terrain_limit_variables()
     initArrays()
     init_StartAndEnd()
@@ -53,6 +56,7 @@ export const initializers = () => {
     init_startFirstLevel()
     init_cameraPositionAtStart()
     init_LongDistanceMoveOrder_garbageCollector()
+    init_DetectNullHeroCollisionAtStart()
 
     //keyboard shortcuts
     init_shortcurt_cancelRedo()

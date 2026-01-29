@@ -1,7 +1,7 @@
 import { Constants } from 'core/01_libraries/Constants'
 import { MemoryHandler } from 'Utils/MemoryHandler'
 import { Timer } from 'w3ts'
-import { globals, udg_monsters } from '../../../../globals'
+import { getUdgEscapers, udg_monsters } from '../../../../globals'
 import { ColorString2Id } from '../../01_libraries/Init_colorCodes'
 import { IsColorString } from '../../06_COMMANDS/Helpers/Command_functions'
 import { hooks } from '../../API/GeneralHooks'
@@ -17,6 +17,7 @@ import { Escaper } from '../Escaper/Escaper'
 import { ServiceManager } from '../../../Services'
 import { createTimer } from '../../../Utils/mapUtils'
 import { RunSoundOnUnit } from '../../02_bibliotheques_externes/SoundUtils'
+import { GetUnitZEx } from '../../../Utils/LocationUtils'
 const LIVES_EARNED_SOUND_PATH = 'Sound/Interface/SecretFound.wav'
 const LIVES_EARNED_SOUND_DURATION = 2525
 
@@ -68,6 +69,8 @@ export abstract class Monster {
 
     private lifeBonusEscapersWhoJustReached: Set<Escaper> = new Set()
     private lifeBonusLivesEarned = false
+
+    private collisionLandmarkEffect?: effect
 
     constructor(monsterType?: MonsterType, forceId: number | null = null) {
         this.mt = monsterType
@@ -178,6 +181,7 @@ export abstract class Monster {
         if (this.u) {
             GroupRemoveUnit(monstersClickable, this.u)
             RemoveUnit(this.u)
+            this.refreshCollisionLandmark()
             delete this.u
             delete this.disablingTimer
         }
@@ -186,6 +190,7 @@ export abstract class Monster {
     killUnit() {
         if (this.u && IsUnitAliveBJ(this.u)) {
             KillUnit(this.u)
+            this.refreshCollisionLandmark()
         }
     }
 
@@ -298,6 +303,54 @@ export abstract class Monster {
         this.doAttackGroundPos()
         this.isDisabledB = false
         this.lifeBonusLivesEarned = false
+
+        this.refreshCollisionLandmark()
+    }
+
+    refreshCollisionLandmark = (onlyForEscaper?: Escaper) => {
+        const localEscaper = getUdgEscapers().get(GetPlayerId(Natives.UGetLocalPlayer()))
+        if (onlyForEscaper && localEscaper !== onlyForEscaper) {
+            return
+        }
+
+        const displayCollisionLandmark = localEscaper?.getDisplayCollisionLandmarks() ?? false
+
+        if (this.collisionLandmarkEffect) {
+            BlzSetSpecialEffectScale(this.collisionLandmarkEffect, 0) // hide it because an effect doesn't visually instanstly disappear on destroy
+            DestroyEffect(this.collisionLandmarkEffect)
+            delete this.collisionLandmarkEffect
+        }
+
+        if (
+            displayCollisionLandmark &&
+            this.u &&
+            IsUnitAliveBJ(this.u) &&
+            !this.isDisabledB &&
+            !this.isDeleted() &&
+            !IsUnitHidden(this.u)
+        ) {
+            this.collisionLandmarkEffect = AddSpecialEffect(
+                Constants.COLLISION_LANDMARK_MODEL,
+                GetUnitX(this.u),
+                GetUnitY(this.u)
+            )
+            if (!this.collisionLandmarkEffect) {
+                throw new Error("Couldn't create collision landmark effect")
+            }
+            // const scale = 1024 / Constants.COLLISION_LANDMARK_MODEL_BASE_RADIUS
+            const scale = (this.mt?.getImmolationRadius() ?? 0) / Constants.COLLISION_LANDMARK_MODEL_BASE_RADIUS
+            BlzSetSpecialEffectScale(this.collisionLandmarkEffect, scale)
+        }
+    }
+
+    moveCollisionLandmark = () => {
+        if (this.collisionLandmarkEffect && this.u) {
+            const z =
+                GetUnitZEx(this.u) -
+                (Constants.COLLISION_LANDMARK_MODEL_BASE_HEIGHT * (this.mt?.getImmolationRadius() ?? 0)) /
+                    Constants.COLLISION_LANDMARK_MODEL_BASE_RADIUS
+            BlzSetSpecialEffectPosition(this.collisionLandmarkEffect, GetUnitX(this.u), GetUnitY(this.u), z)
+        }
     }
 
     delete = () => {
@@ -356,6 +409,7 @@ export abstract class Monster {
             this.u && SetUnitVertexColorBJ(this.u, this.vcRed, this.vcGreen, this.vcBlue, Monster.DISABLE_TRANSPARENCY)
             this.vcTransparency = Monster.DISABLE_TRANSPARENCY
             this.isDisabledB = true
+            this.refreshCollisionLandmark()
         }
     }
 
@@ -367,6 +421,7 @@ export abstract class Monster {
             this.u && SetUnitVertexColorBJ(this.u, this.vcRed, this.vcGreen, this.vcBlue, 0)
             this.vcTransparency = 0
             this.isDisabledB = false
+            this.refreshCollisionLandmark()
         }
     }
 
@@ -467,7 +522,7 @@ export abstract class Monster {
 
     onEscaperReachingThisLifeBonus(escaper: Escaper) {
         const lifeBonus = this.mt?.getLifeBonus()
-        if(!lifeBonus){
+        if (!lifeBonus) {
             return
         }
 
@@ -486,8 +541,8 @@ export abstract class Monster {
                 timer.destroy()
                 MEC_core_API.destroyHook(hookId)
             })
-            const hookId = MEC_core_API.onEscaperDeath((deadEscaper) => {
-                if(deadEscaper === escaper){
+            const hookId = MEC_core_API.onEscaperDeath(deadEscaper => {
+                if (deadEscaper === escaper) {
                     timer.destroy()
                     this.lifeBonusEscapersWhoJustReached.delete(escaper)
                     MEC_core_API.destroyHook(hookId)
@@ -500,7 +555,7 @@ export abstract class Monster {
         this.lifeBonusEscapersWhoJustReached.delete(escaper)
 
         const lifeBonus = this.mt?.getLifeBonus()
-        if(!lifeBonus){
+        if (!lifeBonus) {
             return
         }
 

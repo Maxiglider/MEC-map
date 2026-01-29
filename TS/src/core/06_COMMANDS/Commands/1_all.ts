@@ -2142,4 +2142,25 @@ export const initCommandAll = () => {
             return true
         },
     })
+
+    // -debugCollisions
+    registerCommand({
+        name: 'debugCollisions',
+        alias: ['debc'],
+        group: 'all',
+        argDescription: '<boolean>',
+        description:
+            'Enable of debug collisions for yourself. Shows collisions circles around units.',
+        cb: ({ param1, nbParam }, escaper) => {
+            if( nbParam !== 1 || !IsBoolString(param1)) {
+                Text.erP(escaper.getPlayer(), 'debugCollisions: you must provide one boolean parameter: true or false')
+                return true
+            }
+
+            escaper.setDisplayCollisionLandmarks(S2B(param1))
+            Text.mkP(escaper.getPlayer(), `Debug collisions ${S2B(param1) ? 'enabled' : 'disabled'}`)
+
+            return true
+        },
+    })
 }

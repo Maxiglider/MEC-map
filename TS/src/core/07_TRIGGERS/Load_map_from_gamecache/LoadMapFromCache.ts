@@ -1,4 +1,11 @@
-import { getUdgCasterTypes, getUdgLevels, getUdgMonsterTypes, getUdgTerrainTypes, globals } from '../../../../globals'
+import {
+    getUdgCasterTypes,
+    getUdgLevels,
+    getUdgMonsterTypes,
+    getUdgTerrainTypes,
+    globals,
+    setHeroBaseCollisionSize,
+} from '../../../../globals'
 import { B2S, jsonDecode } from '../../01_libraries/Basic_functions'
 import { Text } from '../../01_libraries/Text'
 import { Gravity } from '../Slide_and_CheckTerrain_triggers/Gravity'
@@ -61,6 +68,10 @@ export class LoadMapFromCache {
                     if (gameData.gameData.gravity !== undefined) {
                         Gravity.SetGravity(gameData.gameData.gravity)
                     }
+
+                    // For old maps retrocompatibility, the MEC_core.setGameData applied won't contain an heroBaseCollisionSize value,
+                    //    this will be detected and set heroBaseCollisionSize to 0 to keep the same behavior as before
+                    setHeroBaseCollisionSize(gameData.gameData.heroBaseCollisionSize ?? 0)
                 }
 
                 //terrain types MEC

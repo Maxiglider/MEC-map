@@ -5,6 +5,7 @@ import type { Monster } from './src/core/04_STRUCTURES/Monster/Monster'
 import type { MonsterType } from './src/core/04_STRUCTURES/Monster/MonsterType'
 import type { MonsterTypeArray } from './src/core/04_STRUCTURES/Monster/MonsterTypeArray'
 import type { TerrainTypeArray } from './src/core/04_STRUCTURES/TerrainType/TerrainTypeArray'
+import { Constants } from './src/core/01_libraries/Constants'
 
 //GLOBALS
 
@@ -34,6 +35,8 @@ export const globals: {
     wanderEffectStr: string
     wanderEffectFacing: boolean
     scoreboardLabel: string
+    heroBaseCollisionSize: number
+    heroBaseScale?: number // hero base scale from unit type ID (Worleditor value)
 } = {
     logStrings: [],
     MAP_MIN_X: 0,
@@ -54,6 +57,13 @@ export const globals: {
     wanderEffectStr: 'AbilitiesSpellsOtherTalkToMeTalkToMe.mdl',
     wanderEffectFacing: false,
     scoreboardLabel: 'Scoreboard',
+
+    // For old maps retrocompatibility, the MEC_core.setGameData applied won't contain an heroBaseCollisionSize value,
+    //    this will be detected and set heroBaseCollisionSize to 0 to keep the same behavior as before
+    // Very new maps won't have a MEC_core.setGameData call, so heroBaseCollisionSize will be kept to the value bellow
+    // For other maps, those smiced on the version of the add of heroBaseCollisionSize or later, the value set by MEC_core.setGameData will be used
+    heroBaseCollisionSize: Constants.RECOMMANDED_HERO_BASE_COLLISION_SIZE,
+    heroBaseScale: undefined
 }
 
 //SETTERS - GETTERS
@@ -117,3 +127,10 @@ export const getUdgMonsterTypes = (): MonsterTypeArray => {
 export const udg_monsters: { [x: number]: Monster } = {}
 
 export const udg_spawned_monsters: { [x: number]: MonsterType | null } = {}
+
+export const setHeroBaseCollisionSize = (newCollisionSize: number) => {
+    globals.heroBaseCollisionSize = newCollisionSize
+    getUdgEscapers().forAll(escaper => {
+        escaper.setHeroCollisionSize(newCollisionSize)
+    })
+}
