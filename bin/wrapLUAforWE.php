@@ -214,8 +214,7 @@ onGlobalInit(initMEC_core)
 <?php
 $template = ob_get_clean();
 
-$luaFileContent = str_replace('%', '%%', file_get_contents(LUA_FILE));
-$content = str_replace('[LUA_FILE]', $luaFileContent, $template);
+$content = str_replace('[LUA_FILE]', file_get_contents(LUA_FILE), $template);
 $oldContent = $content = str_replace('return require("src.main", ...)', 'return ____modules["src.main"]', $content);
 $content = preg_replace("/addScriptHook\(\s*W3TS_HOOK.MAIN_AFTER,\s*errorHandler\(tsMain\)\s*\)/", "errorHandler(tsMain)()", $content);
 
