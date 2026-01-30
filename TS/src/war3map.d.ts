@@ -1,6 +1,5 @@
 declare var gg_rct_departLvl_0: rect;
 declare var gg_snd_noob: sound;
-declare var gg_snd_multisquish: sound;
 declare var gg_snd_questCompleted: sound;
 declare var gg_snd_questFailed: sound;
 declare var gg_snd_goodJob: sound;

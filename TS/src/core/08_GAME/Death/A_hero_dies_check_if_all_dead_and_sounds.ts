@@ -41,8 +41,6 @@ const initReviveTrigManager = () => {
 export const reviveTrigManager = initReviveTrigManager()
 
 export const InitTrig_A_hero_dies_check_if_all_dead_and_sounds = () => {
-    let udg_nbKilled = 0
-
     createEvent({
         events: [t => TriggerRegisterAnyUnitEventBJ(t, EVENT_PLAYER_UNIT_DEATH)],
         conditions: [() => IsHero(Natives.UGetTriggerUnit())],
@@ -53,12 +51,6 @@ export const InitTrig_A_hero_dies_check_if_all_dead_and_sounds = () => {
                 let nbAlive = 0
                 let nbAliveWithoutAr = 0
                 let last = false
-
-                udg_nbKilled = udg_nbKilled + 1
-                if (udg_nbKilled === 3 && Globals.udg_tripleKillSoundOn) {
-                    StartSound(gg_snd_multisquish)
-                    udg_nbKilled = 0
-                }
 
                 const escaperIds = reviveTrigManager.createGroup()
 
@@ -141,7 +133,6 @@ export const InitTrig_A_hero_dies_check_if_all_dead_and_sounds = () => {
                         //si héros déjà vivant, inutile de le ressuciter
                         if (IsUnitAliveBJ(hero2)) {
                             TriggerSleepAction(3.7)
-                            udg_nbKilled = udg_nbKilled - 1
                             return
                         }
 
@@ -168,7 +159,6 @@ export const InitTrig_A_hero_dies_check_if_all_dead_and_sounds = () => {
                                     if (SquareRoot(diffX * diffX + diffY * diffY) < Constants.COOP_REVIVE_DIST) {
                                         getUdgEscapers().get(n)?.coopReviveHero()
                                         TriggerSleepAction(3.7)
-                                        udg_nbKilled = udg_nbKilled - 1
                                         return
                                     }
                                 }
@@ -184,7 +174,6 @@ export const InitTrig_A_hero_dies_check_if_all_dead_and_sounds = () => {
                 }
 
                 SetUnitAnimation(hero, 'stand')
-                udg_nbKilled = udg_nbKilled - 1
             },
         ],
     })
