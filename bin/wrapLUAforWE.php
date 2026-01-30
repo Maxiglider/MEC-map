@@ -8,7 +8,7 @@
 
 
 const LUA_FILE = __DIR__."/../TS/dist/tstl_output_extended.lua";
-const WRAP_OUTPUT_FILE = __DIR__."/final-we.lua";
+const WRAP_OUTPUT_FILE = __DIR__."/MEC_core.lua";
 
 $v = file_get_contents(__DIR__."/../TS/src/MEC_core_version");
 
