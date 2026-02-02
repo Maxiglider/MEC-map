@@ -15,8 +15,6 @@ const main = async () => {
     const newLua = fs
         .readFileSync(__dirname + '/../../bin/final-we.lua')
         .toString()
-        // For some reason the final-we.lua contains double %%
-        .replace(new RegExp('%%', 'g'), '%')
 
     const versionDate = new Date()
 
