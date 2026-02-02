@@ -1,4 +1,5 @@
 import { existsSync, lstatSync, readFileSync, unlinkSync, writeFileSync } from 'fs'
+// @ts-ignore
 import { getAllFilesSync } from 'get-all-files'
 import { resolve } from 'path'
 import { replaceAll } from './Utils/replaceAll'
@@ -215,8 +216,8 @@ const main = async () => {
     if (lstatSync(inFile).isDirectory()) {
         inFiles = getAllFilesSync(inFile)
             .toArray()
-            .filter(f => f !== '.' && f !== '..')
-            .filter(f => f.endsWith('.j'))
+            .filter((f: string) => f !== '.' && f !== '..')
+            .filter((f: string) => f.endsWith('.j'))
         // .map(f => normalize(`${inFile}/${f}`))
     } else {
         inFiles = [inFile]
