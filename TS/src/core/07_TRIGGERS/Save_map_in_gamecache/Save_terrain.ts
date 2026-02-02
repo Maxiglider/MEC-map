@@ -8,6 +8,7 @@ import { arrayPush, ShowAllDestructables } from '../../01_libraries/Basic_functi
 import { I2CustomBase64String } from '../../01_libraries/Functions_on_numbers'
 import { SaveTerrainHeights } from './Save_terrain_heights_and_cliffs'
 import { SaveTerrainRamps } from './Save_terrain_ramps'
+import { Natives } from '../../wc3_natives_unsecured/Natives'
 
 let terrainTypeIds: number[] = []
 let nbTerrainTypesUsed: number
@@ -117,6 +118,23 @@ const SaveTerrain = (json: { [x: string]: any }) => {
     Text.A('terrain saved')
 }
 
+const SaveBoundsInfo = (json: { [x: string]: any }) => {
+    const worldBoundsMinX = GetRectMinX(Natives.UGetWorldBounds())
+    const worldBoundsMinY = GetRectMinY(Natives.UGetWorldBounds())
+
+    json.boundsInfo = {
+        playableAreaMinTileX: R2I((GetRectMinX(bj_mapInitialPlayableArea!) - worldBoundsMinX) / 128),
+        playableAreaMinTileY: R2I((GetRectMinY(bj_mapInitialPlayableArea!) - worldBoundsMinY) / 128),
+        playableAreaMaxTileX: R2I((GetRectMaxX(bj_mapInitialPlayableArea!) - worldBoundsMinX) / 128),
+        playableAreaMaxTileY: R2I((GetRectMaxY(bj_mapInitialPlayableArea!) - worldBoundsMinY) / 128),
+
+        cameraBoundsMinTileX: R2I((GetRectMinX(bj_mapInitialCameraBounds!) - worldBoundsMinX) / 128),
+        cameraBoundsMinTileY: R2I((GetRectMinY(bj_mapInitialCameraBounds!) - worldBoundsMinY) / 128),
+        cameraBoundsMaxTileX: R2I((GetRectMaxX(bj_mapInitialCameraBounds!) - worldBoundsMinX) / 128),
+        cameraBoundsMaxTileY: R2I((GetRectMaxY(bj_mapInitialCameraBounds!) - worldBoundsMinY) / 128),
+    }
+}
+
 export const PushTerrainDataIntoJson = (json: { [x: string]: any }) => {
     json.mainTileset = getUdgTerrainTypes().getMainTileset()
     GererOrdreTerrains()
@@ -128,29 +146,5 @@ export const PushTerrainDataIntoJson = (json: { [x: string]: any }) => {
     SaveTerrainHeights.SaveTerrainCliffs(json)
     SaveTerrainRamps.SaveTerrainRamps(json)
     ShowAllDestructables(true)
-    // SaveWater.SaveWater(json) //copie from TerrainHeights for the moment ; disabled because i didn't succeed to handle water yet
-}
-
-//function to save whole terrain in an array of array
-export function saveTerrainType2Dims() {
-    const terrainsTypes: (TerrainType | null)[][] = MemoryHandler.getEmptyArray()
-
-    let yInd = 0
-    let y = globals.MAP_MIN_Y
-    while (y <= globals.MAP_MAX_Y) {
-        let xInd = 0
-        let x = globals.MAP_MIN_X
-        while (x <= globals.MAP_MAX_X) {
-            !terrainsTypes[xInd] && (terrainsTypes[xInd] = MemoryHandler.getEmptyArray())
-            terrainsTypes[xInd][yInd] = getUdgTerrainTypes().getTerrainType(x, y)
-
-            xInd++
-            x = x + Constants.LARGEUR_CASE
-        }
-
-        yInd++
-        y = y + Constants.LARGEUR_CASE
-    }
-
-    return terrainsTypes
+    SaveBoundsInfo(json)
 }
