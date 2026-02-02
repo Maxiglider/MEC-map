@@ -165,6 +165,10 @@ export const MEC_core_API = {
         ServiceManager.getService('Multiboard').setPlayerPoints(playerId, points)
     },
 
+    resetRoundScores: () => {
+        ServiceManager.getService('Multiboard').resetRoundScores()
+    },
+
     removeMonsterType: (label: string) => getUdgMonsterTypes().remove(label),
     removeMonsterSpawn: (level: number, ms: string) => getUdgLevels().get(level)?.monsterSpawns.clearMonsterSpawn(ms),
 
