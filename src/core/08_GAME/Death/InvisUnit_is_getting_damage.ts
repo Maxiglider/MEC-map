@@ -1,0 +1,185 @@
+//évènement ajouté à la création de l'unité invisible
+
+import { ServiceManager } from 'Services'
+import { EffectUtils } from 'Utils/EffectUtils'
+import { createEvent } from 'Utils/mapUtils'
+import { Constants } from 'core/01_libraries/Constants'
+import { Monster } from 'core/04_STRUCTURES/Monster/Monster'
+import { hooks } from 'core/API/GeneralHooks'
+import { getUdgEscapers, udg_monsters, udg_spawned_monsters } from '../../../../globals'
+import { Natives } from '../../wc3_natives_unsecured/Natives'
+import type { Escaper } from '../../04_STRUCTURES/Escaper/Escaper'
+
+const InitTrig_InvisUnit_is_getting_damage = () => {
+    let TAILLE_UNITE = 100
+
+    const gg_trg_InvisUnit_is_getting_damage = createEvent({
+        events: [],
+        actions: [
+            () => {
+                if (GetEventDamage() === 0) {
+                    return
+                }
+
+                const invisUnit = Natives.UGetTriggerUnit()
+                const n = GetUnitUserData(invisUnit)
+                const escaper = getUdgEscapers().get(n)
+
+                if (!escaper) {
+                    return
+                }
+
+                const killingUnit = GetEventDamageSource()
+                if (!killingUnit) {
+                    return
+                }
+
+                const hero = escaper.getHero()
+
+                if (!hero) {
+                    return
+                }
+
+                const hauteurHero = BlzGetUnitZ(hero) + GetUnitFlyHeight(hero)
+                const hauteurKillingUnit = BlzGetUnitZ(killingUnit) + GetUnitFlyHeight(killingUnit)
+
+                if (!escaper.isAlive()) {
+                    return
+                }
+
+                if (RAbsBJ(hauteurHero - hauteurKillingUnit) < TAILLE_UNITE) {
+                    if (GetUnitTypeId(killingUnit) === Constants.DUMMY_POWER_CIRCLE) {
+                        const targetPlayer = GetUnitUserData(killingUnit)
+
+                        if (escaper.alliedState[targetPlayer]) {
+                            const targetEscaper = getUdgEscapers().get(targetPlayer)
+
+                            if (!escaper.isEscaperSecondary()) {
+                                ServiceManager.getService('Multiboard').increasePlayerScore(
+                                    GetPlayerId(escaper.getPlayer()),
+                                    'saves'
+                                )
+
+                                if (targetEscaper && hooks.hooks_onCoopHeroRevive) {
+                                    for (const hook of hooks.hooks_onCoopHeroRevive.getHooks()) {
+                                        hook.execute2(escaper, targetEscaper)
+                                    }
+                                }
+                            }
+
+                            targetEscaper?.coopReviveHero()
+                        }
+
+                        return
+                    } else {
+                        // TODO; monsterSpawn mobs are null here, need a reference somehow as they're not in udg_monsters
+                        onEscaperTouchingMonster(escaper, killingUnit)
+                    }
+                }
+            },
+        ],
+    })
+
+    const setTailleUnite = (newSize: number) => {
+        TAILLE_UNITE = newSize
+    }
+
+    return { TAILLE_UNITE, gg_trg_InvisUnit_is_getting_damage, setTailleUnite }
+}
+
+const onEscaperTouchingMonster = (escaper: Escaper, killingUnit: unit) => {
+    const hero = escaper.getHero()
+
+    if (!hero) {
+        return
+    }
+
+    if (!escaper.isAlive()) {
+        return
+    }
+
+    const monster = udg_monsters[GetUnitUserData(killingUnit)] as Monster | undefined
+
+    if (monster) {
+        const clearMob = monster.getClearMob()
+        const portalMob = monster.getPortalMob()
+        const circleMob = monster.getCircleMob()
+        const jumpPad = monster.getJumpPad()
+
+        if (clearMob) {
+            clearMob.activate()
+            return
+        } else if (portalMob) {
+            portalMob.activate(monster, escaper, hero)
+            return
+        } else if (circleMob) {
+            return
+        } else if (jumpPad !== undefined) {
+            escaper.setOldDiffZ(jumpPad)
+            const effect = monster.getJumpPadEffect()
+
+            if (effect) {
+                EffectUtils.destroyEffect(
+                    EffectUtils.addSpecialEffect(effect, GetUnitX(killingUnit), GetUnitY(killingUnit))
+                )
+            }
+
+            return
+        }
+    }
+
+    const lifeBonus = monster?.getMonsterType()?.getLifeBonus()
+    if (lifeBonus) {
+        monster?.onEscaperReachingThisLifeBonus(escaper)
+        return
+    }
+
+    if (escaper.isGodModeOn()) {
+        //god mode effect
+        EffectUtils.destroyEffect(
+            EffectUtils.addSpecialEffect(Constants.GM_KILLING_EFFECT, GetUnitX(killingUnit), GetUnitY(killingUnit))
+        )
+
+        //kill monster
+        if (escaper.doesGodModeKills()) {
+            if (monster) {
+                monster.killUnit() //on ne tue pas directement le monstre, pour pouvoir exécuter des actions secondaires éventuelles de la méthode killUnit
+            } else {
+                KillUnit(killingUnit)
+            }
+        }
+
+        return
+    }
+
+    if (!escaper.isCoopInvul()) {
+        if (monster?.hasAttackGroundPos()) {
+            SetWidgetLife(hero, GetWidgetLife(hero) - GetEventDamage())
+        }
+
+        if (
+            !monster?.hasAttackGroundPos() ||
+            (monster.hasAttackGroundPos() && GetWidgetLife(hero) - GetEventDamage() <= 0.405)
+        ) {
+            escaper.kill()
+        }
+
+        const effectStr =
+            monster?.getMonsterType()?.getKillingEffectStr() ||
+            udg_spawned_monsters[GetHandleId(killingUnit)]?.getKillingEffectStr()
+
+        //effet de tuation du héros par le monstre, suivant le type du monstre
+        if (effectStr) {
+            const eff = EffectUtils.addSpecialEffect(effectStr, GetUnitX(hero), GetUnitY(hero))
+            EffectUtils.destroyEffect(eff)
+        }
+    }
+}
+
+const Trig_InvisUnit_is_getting_damage = InitTrig_InvisUnit_is_getting_damage()
+
+export const init_InvisUnit_is_getting_damage = () => {
+    return { onEscaperTouchingMonster, Trig_InvisUnit_is_getting_damage }
+}
+
+export type IInvisUnit_is_getting_damage = ReturnType<typeof init_InvisUnit_is_getting_damage>

@@ -1,0 +1,1277 @@
+﻿STRING 18
+{
+MaxEscapeCreation 2 (2026-12-06)
+}
+
+STRING 19
+{
+Your Clan
+}
+
+STRING 20
+{
+See mec.maxslid.com for more maps and map making.
+|c00FFFF00Discord: https://discord.gg/N8QwwFTcYJ
+}
+
+STRING 21
+{
+You
+}
+
+STRING 22
+// Units: Einv (InvisUnit), Name (Name)
+{
+InvisUnit
+}
+
+STRING 24
+// Units: D001 (Slider mirror), Propernames (Proper Names)
+{
+A smart slider
+}
+
+STRING 25
+// Items: MND1 (A little meteor), Name (Name)
+{
+A little meteor
+}
+
+STRING 27
+// Items: MND1 (A little meteor), Description (Description)
+{
+To cast a little meteor.
+}
+
+STRING 28
+// Items: MCD1 (Unlimited meteors), Name (Name)
+{
+Unlimited meteors
+}
+
+STRING 30
+// Items: MCD1 (Unlimited meteors), Description (Description)
+{
+To cast little meteors.
+}
+
+STRING 31
+// Abilities: A002 (Petite météore), Name (Name)
+{
+Petite météore
+}
+
+STRING 32
+// Abilities: A002 (Petite météore), Tip (Tooltip - Normal)
+{
+|cffffcc00M|eteor
+}
+
+STRING 33
+// Abilities: A002 (Petite météore), Ubertip (Tooltip - Normal - Extended)
+{
+A meteor hits a naga, killing it.
+}
+
+STRING 34
+// Abilities: A002 (Petite météore), Hotkey (Hotkey - Normal)
+{
+M
+}
+
+STRING 35
+// Abilities: A004 (Petite météore portée infinie), Name (Name)
+{
+Petite météore portée infinie
+}
+
+STRING 36
+// Abilities: A004 (Petite météore portée infinie), Tip (Tooltip - Normal)
+{
+|cffffcc00M|eteor
+}
+
+STRING 37
+// Abilities: A004 (Petite météore portée infinie), Ubertip (Tooltip - Normal - Extended)
+{
+A meteor hits a naga, killing it. Infinite range !
+}
+
+STRING 38
+// Abilities: A004 (Petite météore portée infinie), Hotkey (Hotkey - Normal)
+{
+M
+}
+
+STRING 39
+// Abilities: A004 (Petite météore portée infinie), Researchhotkey (Hotkey - Learn)
+{
+M
+}
+
+STRING 96
+// Abilities: I010 (Immolation 010), Name (Name)
+{
+Immolation 010
+}
+
+STRING 97
+// Abilities: I020 (Immolation 020), Name (Name)
+{
+Immolation 020
+}
+
+STRING 98
+// Abilities: I030 (Immolation 030), Name (Name)
+{
+Immolation 030
+}
+
+STRING 99
+// Abilities: I040 (Immolation 040), Name (Name)
+{
+Immolation 040
+}
+
+STRING 100
+// Abilities: I050 (Immolation 050), Name (Name)
+{
+Immolation 050
+}
+
+STRING 101
+// Abilities: I060 (Immolation 060), Name (Name)
+{
+Immolation 060
+}
+
+STRING 102
+// Abilities: I070 (Immolation 070), Name (Name)
+{
+Immolation 070
+}
+
+STRING 103
+// Abilities: I080 (Immolation 080), Name (Name)
+{
+Immolation 080
+}
+
+STRING 104
+// Abilities: I090 (Immolation 090), Name (Name)
+{
+Immolation 090
+}
+
+STRING 105
+// Abilities: I100 (Immolation 100), Name (Name)
+{
+Immolation 100
+}
+
+STRING 106
+// Abilities: I110 (Immolation 110), Name (Name)
+{
+Immolation 110
+}
+
+STRING 107
+// Abilities: I120 (Immolation 120), Name (Name)
+{
+Immolation 120
+}
+
+STRING 108
+// Abilities: I130 (Immolation 130), Name (Name)
+{
+Immolation 130
+}
+
+STRING 109
+// Abilities: I140 (Immolation 140), Name (Name)
+{
+Immolation 140
+}
+
+STRING 110
+// Abilities: I150 (Immolation 150), Name (Name)
+{
+Immolation 150
+}
+
+STRING 111
+// Abilities: I160 (Immolation 160), Name (Name)
+{
+Immolation 160
+}
+
+STRING 112
+// Abilities: I170 (Immolation 170), Name (Name)
+{
+Immolation 170
+}
+
+STRING 113
+// Abilities: I180 (Immolation 180), Name (Name)
+{
+Immolation 180
+}
+
+STRING 114
+// Abilities: I190 (Immolation 190), Name (Name)
+{
+Immolation 190
+}
+
+STRING 115
+// Abilities: I200 (Immolation 200), Name (Name)
+{
+Immolation 200
+}
+
+STRING 116
+// Abilities: I210 (Immolation 210), Name (Name)
+{
+Immolation 210
+}
+
+STRING 117
+// Abilities: I220 (Immolation 220), Name (Name)
+{
+Immolation 220
+}
+
+STRING 118
+// Abilities: I230 (Immolation 230), Name (Name)
+{
+Immolation 230
+}
+
+STRING 119
+// Abilities: I240 (Immolation 240), Name (Name)
+{
+Immolation 240
+}
+
+STRING 120
+// Abilities: I250 (Immolation 250), Name (Name)
+{
+Immolation 250
+}
+
+STRING 121
+// Abilities: I260 (Immolation 260), Name (Name)
+{
+Immolation 260
+}
+
+STRING 122
+// Abilities: I270 (Immolation 270), Name (Name)
+{
+Immolation 270
+}
+
+STRING 123
+// Abilities: I290 (Immolation 290), Name (Name)
+{
+Immolation 290
+}
+
+STRING 124
+// Abilities: I300 (Immolation 300), Name (Name)
+{
+Immolation 300
+}
+
+STRING 125
+// Abilities: I310 (Immolation 310), Name (Name)
+{
+Immolation 310
+}
+
+STRING 126
+// Abilities: I320 (Immolation 320), Name (Name)
+{
+Immolation 320
+}
+
+STRING 127
+// Abilities: I330 (Immolation 330), Name (Name)
+{
+Immolation 330
+}
+
+STRING 128
+// Abilities: I340 (Immolation 340), Name (Name)
+{
+Immolation 340
+}
+
+STRING 129
+// Abilities: I360 (Immolation 360), Name (Name)
+{
+Immolation 360
+}
+
+STRING 130
+// Abilities: I370 (Immolation 370), Name (Name)
+{
+Immolation 370
+}
+
+STRING 131
+// Abilities: I380 (Immolation 380), Name (Name)
+{
+Immolation 380
+}
+
+STRING 132
+// Abilities: I390 (Immolation 390), Name (Name)
+{
+Immolation 390
+}
+
+STRING 133
+// Abilities: I400 (Immolation 400), Name (Name)
+{
+Immolation 400
+}
+
+STRING 134
+// Abilities: I005 (Immolation 005), Name (Name)
+{
+Immolation 005
+}
+
+STRING 135
+// Abilities: I015 (Immolation 015), Name (Name)
+{
+Immolation 015
+}
+
+STRING 136
+// Abilities: I025 (Immolation 025), Name (Name)
+{
+Immolation 025
+}
+
+STRING 137
+// Abilities: I035 (Immolation 035), Name (Name)
+{
+Immolation 035
+}
+
+STRING 138
+// Abilities: I045 (Immolation 045), Name (Name)
+{
+Immolation 045
+}
+
+STRING 139
+// Abilities: I055 (Immolation 055), Name (Name)
+{
+Immolation 055
+}
+
+STRING 140
+// Abilities: I065 (Immolation 065), Name (Name)
+{
+Immolation 065
+}
+
+STRING 141
+// Abilities: I075 (Immolation 075), Name (Name)
+{
+Immolation 075
+}
+
+STRING 142
+// Abilities: I085 (Immolation 085), Name (Name)
+{
+Immolation 085
+}
+
+STRING 143
+// Abilities: I095 (Immolation 095), Name (Name)
+{
+Immolation 095
+}
+
+STRING 144
+// Abilities: I105 (Immolation 105), Name (Name)
+{
+Immolation 105
+}
+
+STRING 145
+// Abilities: I115 (Immolation 115), Name (Name)
+{
+Immolation 115
+}
+
+STRING 146
+// Abilities: I125 (Immolation 125), Name (Name)
+{
+Immolation 125
+}
+
+STRING 147
+// Abilities: I135 (Immolation 135), Name (Name)
+{
+Immolation 135
+}
+
+STRING 148
+// Abilities: I145 (Immolation 145), Name (Name)
+{
+Immolation 145
+}
+
+STRING 149
+// Abilities: I155 (Immolation 155), Name (Name)
+{
+Immolation 155
+}
+
+STRING 150
+// Abilities: I165 (Immolation 165), Name (Name)
+{
+Immolation 165
+}
+
+STRING 151
+// Abilities: I175 (Immolation 175), Name (Name)
+{
+Immolation 175
+}
+
+STRING 152
+// Abilities: I185 (Immolation 185), Name (Name)
+{
+Immolation 185
+}
+
+STRING 153
+// Abilities: I195 (Immolation 195), Name (Name)
+{
+Immolation 195
+}
+
+STRING 154
+// Abilities: I205 (Immolation 205), Name (Name)
+{
+Immolation 205
+}
+
+STRING 155
+// Abilities: I215 (Immolation 215), Name (Name)
+{
+Immolation 215
+}
+
+STRING 156
+// Abilities: I225 (Immolation 225), Name (Name)
+{
+Immolation 225
+}
+
+STRING 157
+// Abilities: I235 (Immolation 235), Name (Name)
+{
+Immolation 235
+}
+
+STRING 158
+// Abilities: I245 (Immolation 245), Name (Name)
+{
+Immolation 245
+}
+
+STRING 159
+// Abilities: I255 (Immolation 255), Name (Name)
+{
+Immolation 255
+}
+
+STRING 160
+// Abilities: I265 (Immolation 265), Name (Name)
+{
+Immolation 265
+}
+
+STRING 161
+// Abilities: I275 (Immolation 275), Name (Name)
+{
+Immolation 275
+}
+
+STRING 162
+// Abilities: I280 (Immolation 280), Name (Name)
+{
+Immolation 280
+}
+
+STRING 163
+// Abilities: I285 (Immolation 285), Name (Name)
+{
+Immolation 285
+}
+
+STRING 164
+// Abilities: I295 (Immolation 295), Name (Name)
+{
+Immolation 295
+}
+
+STRING 165
+// Abilities: I305 (Immolation 305), Name (Name)
+{
+Immolation 305
+}
+
+STRING 166
+// Abilities: I315 (Immolation 315), Name (Name)
+{
+Immolation 315
+}
+
+STRING 167
+// Abilities: I325 (Immolation 325), Name (Name)
+{
+Immolation 325
+}
+
+STRING 168
+// Abilities: I335 (Immolation 335), Name (Name)
+{
+Immolation 335
+}
+
+STRING 169
+// Abilities: I345 (Immolation 345), Name (Name)
+{
+Immolation 345
+}
+
+STRING 170
+// Abilities: I355 (Immolation 355), Name (Name)
+{
+Immolation 355
+}
+
+STRING 171
+// Abilities: I365 (Immolation 365), Name (Name)
+{
+Immolation 365
+}
+
+STRING 172
+// Abilities: I375 (Immolation 375), Name (Name)
+{
+Immolation 375
+}
+
+STRING 173
+// Abilities: I385 (Immolation 385), Name (Name)
+{
+Immolation 385
+}
+
+STRING 174
+// Abilities: I395 (Immolation 395), Name (Name)
+{
+Immolation 395
+}
+
+STRING 175
+// Abilities: I350 (Immolation 350), Name (Name)
+{
+Immolation 350
+}
+
+STRING 176
+// Abilities: A0AV (Annuler champ de vision), Name (Name)
+{
+Annuler champ de vision
+}
+
+STRING 177
+{
+Map information (|Cfffed312F9|R)
+}
+
+STRING 178
+{
+Commands
+}
+
+STRING 179
+{
+Miscellaneous
+}
+
+STRING 187
+{
+Sliders
+}
+
+STRING 188
+// Items: MND1 (A little meteor), Ubertip (Tooltip - Extended)
+{
+Allow you to cast a little meteor on some monsters.
+}
+
+STRING 189
+// Items: MCD1 (Unlimited meteors), Ubertip (Tooltip - Extended)
+{
+Allow you to cast meteors on some monsters. Unlimited range.
+}
+
+STRING 194
+// Destructibles: B000 (GetZ), Name (Name)
+{
+GetZ
+}
+
+STRING 199
+// Units: D001 (Slider mirror), Name (Name)
+{
+Slider mirror
+}
+
+STRING 200
+{
+Player 1
+}
+
+STRING 201
+{
+Player 2
+}
+
+STRING 202
+{
+Player 3
+}
+
+STRING 203
+{
+Player 4
+}
+
+STRING 204
+{
+Player 5
+}
+
+STRING 205
+{
+Player 6
+}
+
+STRING 206
+{
+Player 7
+}
+
+STRING 207
+{
+Player 8
+}
+
+STRING 208
+{
+Player 9
+}
+
+STRING 209
+{
+Player 10
+}
+
+STRING 210
+{
+Player 11
+}
+
+STRING 211
+{
+Player 12
+}
+
+STRING 212
+{
+Player 13
+}
+
+STRING 213
+{
+Player 14
+}
+
+STRING 214
+{
+Player 15
+}
+
+STRING 215
+{
+Player 16
+}
+
+STRING 216
+{
+Player 17
+}
+
+STRING 217
+{
+Player 18
+}
+
+STRING 218
+{
+Player 19
+}
+
+STRING 219
+{
+Player 20
+}
+
+STRING 220
+{
+Player 21
+}
+
+STRING 221
+{
+Player 22
+}
+
+STRING 222
+{
+Player 23
+}
+
+STRING 223
+{
+Player 24
+}
+
+STRING 231
+{
+Welcome to: |cff78ece2Your map|r
+
+Created by: |cffff0303You|r
+
+}
+
+STRING 250
+{
+|c00FFFF00Map information
+}
+
+STRING 251
+{
+|cff00ebffhttps://discord.gg/N8QwwFTcYJ
+}
+
+STRING 261
+// Units: E000 (Clan SliD), Name (Name)
+{
+Clan SliD
+}
+
+STRING 274
+// Units: E000 (Clan SliD), Propernames (Proper Names)
+{
+discord.gg/N8QwwFTcYJ
+}
+
+STRING 275
+{
+|cffff0303Your name
+}
+
+STRING 296
+{
+Hall of Fame
+}
+
+STRING 297
+{
+|c00FFFF00Sliding Crew's Tournament winners. |r [2022 - 07/04/2025]
+
+|c0020C000Slide Gods of 2022: Freazy & Fieryfox
+Slide Gods of 2023: Stan, Freazy, Nathanserpo, Fieryfox and Thomasse
+December 2024 Slide Tournament winners: Andy and Freazy
+Hopefully more is coming!
+
+|c00FFFF00Join the discord to participate and hang out:|r |cff00ebffhttps://discord.gg/N8QwwFTcYJ|r
+|c00FFFF00See all records: 
+|cff00ebff@Sliding Crew discord #records.
+}
+
+STRING 298
+{
+CreditsContact
+}
+
+STRING 299
+{
+This map is made possible by MEC Founder |c00FF0000Maximaxou#2872|r & MEC Dev |c00FFFF00Stan#22399|r.
+
+|c00FFFF00How to contact us? |rBest way to contact us is to join the Sliding Crew Discord: 
+|cff00ebffhttps://discord.gg/N8QwwFTcYJ
+|cff008000Or you can try these:|r
+|c00FF0000Maxiglider - MEC Founder
+Battle.net: Maximaxou#2872
+Maxpolar@hotmail.fr 
+Discord: maxiglider
+|c00FFFF00Stan - MEC Dev
+Battlenet: Stan#22399
+Discord: Stan0448
+|cffff8080Spermkagen - Clan Slid - Slide Producer
+Battlenet: Spermkagen#2347
+Discord: spermkagen.2347|r
+|c00FF9913Fieryfox - Clan Slid - Slide Producer.
+Battle.net: Fieryfox#21640
+Discord: fieryfox|r
+|cff6f2583ImNotCrazy01 - Clan Slid - Slide Producer
+Battlenet: ImNotCrazy01#2445
+Discord: im_not_crazy01|r
+}
+
+STRING 300
+{
+New Commands
+}
+
+STRING 301
+{
+|c00FFFF0024/7 MEC assistance by Stan. Type -help [keyword] enter (example: -help slide). 
+|c00FF0000Commands explained: |c0020C000lc, m, fm, fpc, ot, idm, sn, monk.
+
+
+|c00FFFF00-lockCamera(lc on/off/1-24)|r
+Temporarily locks your camera to any desired player
+
+|c00FFFF00-mirror (m on/off)|r
+Mirror the corresponded slide speed into reverse / non-reverse.
+
+|c00FFFF00-followMouse (fm on/off)|r
+Follow mouse mode: get an APM of 600 without the pain of clicking. This unfortunately triggers an additional ping 
+
+|c00FFFF00-firstPersonCamera (fpc on/off)|r
+Pog ._z Liding
+
+|c00FFFF00-othersTransparency (ot 0-100)|r
+Trouble finding yourself? Partially remove your comrades from the equation.
+
+|c00FFFF00-ignoreDeathMessages (idm on/off)|r
+Stops death messages from being displayed. 
+
+|c00FFFF00-showNames (sn on/off) |r
+Display player names to all heroes.
+
+|c00FFFF00-hideChat (hc | monk on/off) |r
+Disables pop-chat. Read messages only in F12. 
+}
+
+STRING 302
+{
+Old Commands
+}
+
+STRING 303
+{
+|c00FFFF00Commands that have existed and worked for long over a decade.
+|c00FF0000Commands explained: |c0020C000cf, rc, rci, ldb, an, clr, apm, mnbm, lnbm|r
+
+
+|c00FFFF00-cameraField(cf) <value>|r
+Set the camera to any desired height. Ex: -cf 2800.
+
+|c00FFFF00-resetCamera(rc)|r
+Puts the camera back to the previously chosen field
+
+|c00FFFF00-resetCameraInit(rci)|r
+Changes the camera field back to its default value (2500)
+
+|c00FFFF00-leaderboard(ldb) on|off|r
+Displays or hides the entire leaderboard
+
+|c00FFFF00-animation(an) <string>|r
+Makes your hero doing an animation. ex : -an attack
+
+|c00FFFF00-clearText(clr)|r
+Removes the text on the screen
+
+|c00FFFF00-apm(-) [all|a]|r
+Displays apm on slide of everybody or just yourself
+
+|c00FFFF00-mapNbMonsters(mnbm)|r
+Displays the number of monsters in the map, of the chosen kind. \"Moving\" is the default kind. ex : -mnbm nm
+
+|c00FFFF00-levelNbMonsters(lnbm)|r
+Displays the number of monsters in the current level, of the chosen kind
+}
+
+STRING 304
+{
+Red Commands
+}
+
+STRING 305
+{
+|c00FFFF00Commands explained:|r|c00FF0000 
+-noobedit, -speededit, -kl, kc, restart|r
+|c00FFFF00You may refer any punished players as: 
+|r|c00FF0000Number (2 - 24), Color (Blue - Peanut), Name (Shortened - Exact)|r
+
+|c0020C000-noobedit (on/off)|r
+Gives you infinite lives and instant respawn.
+
+|c0020C000-speededit (on/off)|r
+Be like Stan. Go fast. 
+
+|c0020C000-kill <Pcolor> <Pnumber> <Pname>|r
+examples : -kill blue,  -kl yw, -kl 23, -kl JellyBeans
+
+|c0020C000-kick <Pcolor> <Pnumber> <Pname>|r
+examples : -kick blue,  -kc yw, -kc 11, -kc Bonnick
+
+|c0020C000-restart|r
+" just restart the game like when lose you little noob "
+This also allows for a re-selection on the various game modes.
+}
+
+STRING 306
+{
+Colors
+}
+
+STRING 307
+{
+|c00FF0060Commands explained:|c0020C000 <color>, d, vc, wild, nv, ci. 
+Colors: |c00FF0303rd, |c000042FFbe, |c001CE6B9tl, |c00540081pe, |c00FFFC01yw, |c00fEBA0Eoe,|c0020C000 gn, |c00E55BB0pk, |c00959697gy, |c007EBFF1lb, |c00106246dg, |c004E2A04bn, |cff9c0000mrn, |cff0000c3ny, |cff00ebfftqe, |cffbd00ffvlt, |cffecce87wht, |cfff7a58bph, |cffbfff81mint,|cffdbb8eb lvr, |cff4f5055coal,|cffecf0ff snw,|cff00781e emd, |cffa56f34pnt
+
+|c000042FF-<color>
+change the base color of your character
+
+|c001CE6B9-disco(d) [off|1~30]
+chooses the number of color changes in ten seconds, or stop color changing.
+
+|c00540081-vertexColor [ <red> <green> <blue> [<transparency>] ]
+alias -vc, change the vertex color of you character.
+
+|c00FF1323-W|c32BB2142i|c58BB3462l|c58FB3467d|r
+|c00FF0000Rand|c00FF1323omize |c32BB2142your |c58BB3462vertex |c58FB3467color|r
+
+|c00FFFC01-noVertex
+alias -nv, cancel the vertex color of your character
+it's like -vc 100 100 100
+
+|c00FF9696-colorInfo [<Pcolor>]
+alias -ci, display info about base color and vertex color of a hero
+}
+
+STRING 308
+{
+MapDescription
+}
+
+STRING 309
+{
+This map was made with Max Escape Creation 2.
+Make a map without the need of using the World Editor
+
+https://mec.maxslid.com/
+https://discord.gg/N8QwwFTcYJ
+}
+
+STRING 324
+{
+Effects
+}
+
+STRING 325
+{
+|c00FFFF00Apply effects to your demon hunters various body parts.|r
+
+|cff20c000The effects are:|r [l]ight, [f]ire, [i]ce, [c]orrupution, [p]oison, [s]low.
+|cff20c000The body parts are:|r [l]eft[h]and, [r]ight[h]and, [l]eft[f]oot, [r]ight[f]oot, [o]ver[h]ead, [h]ead, [o]rigin, [c]hest.
+
+|c00FFFF00-effect <effect>|r
+alias -ef, puts an effect on each hand of your hero
+
+|c00FFFF00-customEffect <effect> <bodyPart>|r
+alias -ce, specify any effect towards desired bodypart.
+
+|c00FFFF00-effectsEverywhere <effect>|r
+alias -efe, puts the same effect to each body part of your hero
+
+|c00FFFF00-deleteEffects [<numberOfEffectsToRemove n>]|r
+alias -de, deletes the n last effects of your hero, all effects if no parameter specified
+
+}
+
+STRING 327
+// Units: dcir (Dummy circle - don't use), Name (Name)
+{
+Dummy circle - don't use
+}
+
+STRING 328
+// Units: pcir (Circle - dont use), Name (Name)
+{
+Circle - dont use
+}
+
+STRING 329
+// Units: c000 (Circle - you can  use), Name (Name)
+{
+Circle - you can  use
+}
+
+STRING 330
+// Units: Ei01 (InvisUnit), Name (Name)
+{
+InvisUnit
+}
+
+STRING 331
+// Units: Ei02 (InvisUnit), Name (Name)
+{
+InvisUnit
+}
+
+STRING 332
+// Units: Ei03 (InvisUnit), Name (Name)
+{
+InvisUnit
+}
+
+STRING 333
+// Units: Ei04 (InvisUnit), Name (Name)
+{
+InvisUnit
+}
+
+STRING 334
+// Units: Ei05 (InvisUnit), Name (Name)
+{
+InvisUnit
+}
+
+STRING 335
+// Units: Ei06 (InvisUnit), Name (Name)
+{
+InvisUnit
+}
+
+STRING 336
+// Units: Ei07 (InvisUnit), Name (Name)
+{
+InvisUnit
+}
+
+STRING 337
+// Units: Ei08 (InvisUnit), Name (Name)
+{
+InvisUnit
+}
+
+STRING 338
+// Units: Ei09 (InvisUnit), Name (Name)
+{
+InvisUnit
+}
+
+STRING 339
+// Units: Ei10 (InvisUnit), Name (Name)
+{
+InvisUnit
+}
+
+STRING 340
+// Units: Ei11 (InvisUnit), Name (Name)
+{
+InvisUnit
+}
+
+STRING 341
+// Units: Ei12 (InvisUnit), Name (Name)
+{
+InvisUnit
+}
+
+STRING 342
+// Units: Ei13 (InvisUnit), Name (Name)
+{
+InvisUnit
+}
+
+STRING 343
+// Units: Ei14 (InvisUnit), Name (Name)
+{
+InvisUnit
+}
+
+STRING 344
+// Units: Ei15 (InvisUnit), Name (Name)
+{
+InvisUnit
+}
+
+STRING 345
+// Units: Ei16 (InvisUnit), Name (Name)
+{
+InvisUnit
+}
+
+STRING 346
+// Units: Ei17 (InvisUnit), Name (Name)
+{
+InvisUnit
+}
+
+STRING 347
+// Units: Ei18 (InvisUnit), Name (Name)
+{
+InvisUnit
+}
+
+STRING 348
+// Units: Ei19 (InvisUnit), Name (Name)
+{
+InvisUnit
+}
+
+STRING 349
+// Units: Ei20 (InvisUnit), Name (Name)
+{
+InvisUnit
+}
+
+STRING 350
+// Units: Ei21 (InvisUnit), Name (Name)
+{
+InvisUnit
+}
+
+STRING 351
+// Units: Ei22 (InvisUnit), Name (Name)
+{
+InvisUnit
+}
+
+STRING 352
+// Units: Ei23 (InvisUnit), Name (Name)
+{
+InvisUnit
+}
+
+STRING 353
+// Units: Ei24 (InvisUnit), Name (Name)
+{
+InvisUnit
+}
+
+STRING 354
+// Units: Ei25 (InvisUnit), Name (Name)
+{
+InvisUnit
+}
+
+STRING 355
+// Units: Ei26 (InvisUnit), Name (Name)
+{
+InvisUnit
+}
+
+STRING 356
+// Units: Ei27 (InvisUnit), Name (Name)
+{
+InvisUnit
+}
+
+STRING 357
+// Units: Ei28 (InvisUnit), Name (Name)
+{
+InvisUnit
+}
+
+STRING 358
+// Units: Ei29 (InvisUnit), Name (Name)
+{
+InvisUnit
+}
+
+STRING 359
+// Units: Ei30 (InvisUnit), Name (Name)
+{
+InvisUnit
+}
+
+STRING 360
+// Units: Ei31 (InvisUnit), Name (Name)
+{
+InvisUnit
+}
+
+STRING 361
+// Units: Ei32 (InvisUnit), Name (Name)
+{
+InvisUnit
+}
+
+STRING 362
+// Units: Ei33 (InvisUnit), Name (Name)
+{
+InvisUnit
+}
+
+STRING 363
+// Units: Ei34 (InvisUnit), Name (Name)
+{
+InvisUnit
+}
+
+STRING 364
+// Units: Ei35 (InvisUnit), Name (Name)
+{
+InvisUnit
+}
+
+STRING 365
+// Units: Ei36 (InvisUnit), Name (Name)
+{
+InvisUnit
+}
+
+STRING 366
+// Units: Ei37 (InvisUnit), Name (Name)
+{
+InvisUnit
+}
+
+STRING 367
+// Units: Ei38 (InvisUnit), Name (Name)
+{
+InvisUnit
+}
+
+STRING 368
+// Units: Ei39 (InvisUnit), Name (Name)
+{
+InvisUnit
+}
+
+STRING 369
+// Units: Ei40 (InvisUnit), Name (Name)
+{
+InvisUnit
+}
+

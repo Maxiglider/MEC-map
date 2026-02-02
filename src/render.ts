@@ -1,0 +1,125 @@
+import { MemoryHandler } from './Utils/MemoryHandler'
+import { arrayPush } from './core/01_libraries/Basic_functions'
+import { getUdgLevels } from '../globals'
+import { Natives } from './core/wc3_natives_unsecured/Natives'
+
+export type IRenderInfo = {
+    [playerId: number]: { lastCameraPosX: number; lastCameraPosY: number }
+}
+
+const getTileCenter = (a: number) => {
+    const b = Math.round(a)
+    return b - math.fmod(b, 128)
+}
+
+export const renderWorldSingle = (renderInfo: IRenderInfo, playerIndex: number, x: number, y: number) => {
+    if (GetLocalPlayer() === Natives.UPlayer(playerIndex)) {
+        const camX = getTileCenter(x)
+        const camY = getTileCenter(y)
+
+        const monstersMap = MemoryHandler.getEmptyObject<{
+            [x_y: string]: unit[]
+        }>()
+
+        for (const [_, m] of pairs(getUdgLevels().getCurrentLevel().monsters.getAll())) {
+            if (m.u && m.mt && m.mt?.getUnitMoveSpeed()) {
+                if (!monstersMap[`${getTileCenter(GetUnitX(m.u))}_${getTileCenter(GetUnitY(m.u))}`]) {
+                    monstersMap[`${getTileCenter(GetUnitX(m.u))}_${getTileCenter(GetUnitY(m.u))}`] =
+                        MemoryHandler.getEmptyArray()
+                }
+
+                arrayPush(monstersMap[`${getTileCenter(GetUnitX(m.u))}_${getTileCenter(GetUnitY(m.u))}`], m.u)
+            }
+        }
+
+        for (const [_, ms] of pairs(getUdgLevels().getCurrentLevel().monsterSpawns.getAll())) {
+            if (ms.monsters) {
+                ForGroup(ms.monsters, () => {
+                    const m = Natives.UGetEnumUnit()
+
+                    if (!monstersMap[`${getTileCenter(GetUnitX(m))}_${getTileCenter(GetUnitY(m))}`]) {
+                        monstersMap[`${getTileCenter(GetUnitX(m))}_${getTileCenter(GetUnitY(m))}`] =
+                            MemoryHandler.getEmptyArray()
+                    }
+
+                    arrayPush(monstersMap[`${getTileCenter(GetUnitX(m))}_${getTileCenter(GetUnitY(m))}`], m)
+                })
+            }
+        }
+
+        if (
+            !renderInfo[playerIndex] ||
+            renderInfo[playerIndex].lastCameraPosX !== camX ||
+            renderInfo[playerIndex].lastCameraPosY !== camY
+        ) {
+            const viewDistance = 16
+
+            // Old
+            if (renderInfo[playerIndex]) {
+                const camX = renderInfo[playerIndex].lastCameraPosX
+                const camY = renderInfo[playerIndex].lastCameraPosY
+
+                const minX = camX - 128 * viewDistance
+                const maxX = camX + 128 * viewDistance
+                const minY = camY - 128 * viewDistance
+                const maxY = camY + 128 * viewDistance
+
+                for (let x = minX; x < maxX; x += 128) {
+                    for (let y = minY; y < maxY; y += 128) {
+                        const dKey = `${R2I(x)}_${R2I(y)}`
+
+                        if (monstersMap[`${dKey}`]) {
+                            for (const a of monstersMap[`${dKey}`]) {
+                                ShowUnit(a, false)
+                            }
+                        }
+                    }
+                }
+            }
+
+            // New
+            {
+                const minX = camX - 128 * viewDistance
+                const maxX = camX + 128 * viewDistance
+                const minY = camY - 128 * viewDistance
+                const maxY = camY + 128 * viewDistance
+
+                for (let x = minX; x < maxX; x += 128) {
+                    for (let y = minY; y < maxY; y += 128) {
+                        const dKey = `${R2I(x)}_${R2I(y)}`
+
+                        if (monstersMap[`${dKey}`]) {
+                            for (const a of monstersMap[`${dKey}`]) {
+                                ShowUnit(a, true)
+                            }
+                        }
+                    }
+                }
+            }
+
+            if (!renderInfo[playerIndex]) {
+                renderInfo[playerIndex] = MemoryHandler.getEmptyObject()
+            }
+
+            renderInfo[playerIndex].lastCameraPosX = camX
+            renderInfo[playerIndex].lastCameraPosY = camY
+        }
+
+        for (const [_, v] of pairs(monstersMap)) {
+            MemoryHandler.destroyArray(v)
+        }
+
+        MemoryHandler.destroyObject(monstersMap)
+    }
+}
+
+export const renderWorld = (renderInfo: IRenderInfo) => {
+    for (let i = 0; i < 24; i++) {
+        if (
+            GetPlayerSlotState(Natives.UPlayer(i)) === PLAYER_SLOT_STATE_PLAYING &&
+            GetPlayerController(Natives.UPlayer(i)) === MAP_CONTROL_USER
+        ) {
+            renderWorldSingle(renderInfo, i, GetCameraEyePositionX(), GetCameraEyePositionY())
+        }
+    }
+}

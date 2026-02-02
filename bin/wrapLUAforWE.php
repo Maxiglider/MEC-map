@@ -7,10 +7,10 @@
  */
 
 
-const LUA_FILE = __DIR__."/../TS/dist/tstl_output_extended.lua";
+const LUA_FILE = __DIR__."/../dist/tstl_output_extended.lua";
 const WRAP_OUTPUT_FILE = __DIR__."/MEC_core.lua";
 
-$v = file_get_contents(__DIR__."/../TS/src/MEC_core_version");
+$v = file_get_contents(__DIR__."/../src/MEC_core_version");
 
 $MEC_VERSION = "Max Escape Creation v.$v - ".date("Y-m-d H:i:s");
 

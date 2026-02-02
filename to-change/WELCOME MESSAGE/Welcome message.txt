@@ -1,8 +1,0 @@
-Welcome message
-    Evénements
-        Map initialization
-    Conditions
-    Actions
-        Partie - Display to (All players) for 45.00 seconds the text: Welcome to |cff1ce6...
-        Partie - Display to (All players) for 45.00 seconds the text: created by |cffff03...
-        Quête - Flash the quest dialog button

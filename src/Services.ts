@@ -1,0 +1,39 @@
+import { ILives } from './core/04_STRUCTURES/Lives_and_game_time/Lives_and_game_time'
+import { IMultiboard } from './core/04_STRUCTURES/Lives_and_game_time/Multiboard'
+import { IRenderInterface } from './App/renderInterface'
+import { ICommandExecution } from './core/06_COMMANDS/Helpers/Command_execution'
+import { IMEC_core_API } from './core/API/MEC_core_API'
+import { IInvisUnit_is_getting_damage } from './core/08_GAME/Death/InvisUnit_is_getting_damage'
+
+const initServiceManager = <TServices extends { [K in string]: TServices[K] }>() => {
+    const services: TServices = {} as any
+
+    const registerServices = (servicesIn: {
+        [K in keyof TServices]: () => TServices[K]
+    }) => {
+        for (const [serviceName, service] of pairs(servicesIn)) {
+            services[serviceName] = service()
+        }
+    }
+
+    const getService = <T extends keyof TServices>(serviceName: T) => {
+        const targetService = services[serviceName]
+
+        if (!targetService) {
+            throw `Service: '${String(serviceName)}' not found`
+        }
+
+        return targetService
+    }
+
+    return { registerServices, getService }
+}
+
+export const ServiceManager = initServiceManager<{
+    Lives: ILives
+    Multiboard: IMultiboard
+    Cmd: ICommandExecution
+    React: IRenderInterface
+    MEC_core_API: IMEC_core_API
+    InvisUnit_is_getting_damage: IInvisUnit_is_getting_damage
+}>()

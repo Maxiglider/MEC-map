@@ -1,0 +1,8 @@
+
+Frame "SIMPLEFRAME" "TerrainPreview_1:1" {
+    Width 0.0,
+    Height 0.0,
+    Texture "TerrainPreviewValue_1:1" {
+        TexCoord 0, 0.25, 0, 0.25
+    }
+}
