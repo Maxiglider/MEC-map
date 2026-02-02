@@ -1,21 +1,22 @@
 ﻿STRING 18
 {
-MaxEscapeCreation -devMax
+MaxEscapeCreation 2 (2026-12-06)
 }
 
 STRING 19
 {
-Tous
+Your Clan
 }
 
 STRING 20
 {
-Sans description
+See mec.maxslid.com for more maps and map making.
+|c00FFFF00Discord: https://discord.gg/N8QwwFTcYJ
 }
 
 STRING 21
 {
-Maximaxou
+You
 }
 
 STRING 22
@@ -24,14 +25,8 @@ STRING 22
 InvisUnit
 }
 
-STRING 23
-// Units: E000 (Slider), Name (Name)
-{
-Slider
-}
-
 STRING 24
-// Units: E000 (Slider), Propernames (Proper Names)
+// Units: D001 (Slider mirror), Propernames (Proper Names)
 {
 A smart slider
 }
@@ -112,342 +107,6 @@ STRING 39
 // Abilities: A004 (Petite météore portée infinie), Researchhotkey (Hotkey - Learn)
 {
 M
-}
-
-STRING 40
-// Abilities: SCAu (Shortcut A), Name (Name)
-{
-Shortcut A
-}
-
-STRING 41
-// Abilities: SCAu (Shortcut A), Tip (Tooltip - Normal)
-{
-Shortcut |cffffcc00A|r
-}
-
-STRING 42
-// Abilities: SCAu (Shortcut A), Ubertip (Tooltip - Normal - Extended)
-{
-Type "-assign A command" to assign a command to key A. Replace "command" by the command you want, without typing "-". You can write "-as" instead of "-assign".
-}
-
-STRING 43
-// Abilities: SCZu (Shortcut Z), Name (Name)
-{
-Shortcut Z
-}
-
-STRING 44
-// Abilities: SCZu (Shortcut Z), Tip (Tooltip - Normal)
-{
-Shortcut |cffffcc00Z|r
-}
-
-STRING 45
-// Abilities: SCZu (Shortcut Z), Ubertip (Tooltip - Normal - Extended)
-{
-Type "-assign Z command" to assign a command to key Z. Replace "command" by the command you want, without typing "-". You can write "-as" instead of "-assign".
-}
-
-STRING 46
-// Abilities: SCEu (Shortcut E), Name (Name)
-{
-Shortcut E
-}
-
-STRING 47
-// Abilities: SCEu (Shortcut E), Tip (Tooltip - Normal)
-{
-Shortcut |cffffcc00E|r
-}
-
-STRING 48
-// Abilities: SCEu (Shortcut E), Ubertip (Tooltip - Normal - Extended)
-{
-Type "-assign E command" to assign a command to key E. Replace "command" by the command you want, without typing "-". You can write "-as" instead of "-assign".
-}
-
-STRING 49
-// Abilities: SCRu (Shortcut R), Name (Name)
-{
-Shortcut R
-}
-
-STRING 50
-// Abilities: SCRu (Shortcut R), Tip (Tooltip - Normal)
-{
-Shortcut |cffffcc00R|r
-}
-
-STRING 51
-// Abilities: SCRu (Shortcut R), Ubertip (Tooltip - Normal - Extended)
-{
-Type "-assign R command" to assign a command to key R. Replace "command" by the command you want, without typing "-". You can write "-as" instead of "-assign".
-}
-
-STRING 52
-// Abilities: SCQu (Shortcut Q), Name (Name)
-{
-Shortcut Q
-}
-
-STRING 53
-// Abilities: SCQu (Shortcut Q), Tip (Tooltip - Normal)
-{
-Shortcut |cffffcc00Q|r
-}
-
-STRING 54
-// Abilities: SCQu (Shortcut Q), Ubertip (Tooltip - Normal - Extended)
-{
-Type "-assign Q command" to assign a command to key Q. Replace "command" by the command you want, without typing "-". You can write "-as" instead of "-assign".
-}
-
-STRING 55
-// Abilities: SCSu (Shortcut S), Name (Name)
-{
-Shortcut S
-}
-
-STRING 56
-// Abilities: SCSu (Shortcut S), Tip (Tooltip - Normal)
-{
-Shortcut |cffffcc00S|r
-}
-
-STRING 57
-// Abilities: SCSu (Shortcut S), Ubertip (Tooltip - Normal - Extended)
-{
-Type "-assign S command" to assign a command to key S. Replace "command" by the command you want, without typing "-". You can write "-as" instead of "-assign".
-}
-
-STRING 58
-// Abilities: SCDu (Shortcut D), Name (Name)
-{
-Shortcut D
-}
-
-STRING 59
-// Abilities: SCDu (Shortcut D), Tip (Tooltip - Normal)
-{
-Shortcut |cffffcc00D|r
-}
-
-STRING 60
-// Abilities: SCDu (Shortcut D), Ubertip (Tooltip - Normal - Extended)
-{
-Type "-assign D command" to assign a command to key D. Replace "command" by the command you want, without typing "-". You can write "-as" instead of "-assign".
-}
-
-STRING 61
-// Abilities: SCFu (Shortcut F), Name (Name)
-{
-Shortcut F
-}
-
-STRING 62
-// Abilities: SCFu (Shortcut F), Tip (Tooltip - Normal)
-{
-Shortcut |cffffcc00F|r
-}
-
-STRING 63
-// Abilities: SCFu (Shortcut F), Ubertip (Tooltip - Normal - Extended)
-{
-Type "-assign F command" to assign a command to key F. Replace "command" by the command you want, without typing "-". You can write "-as" instead of "-assign".
-}
-
-STRING 64
-// Abilities: SCAo (Shortcut A used), Tip (Tooltip - Normal)
-{
-|cffffcc00A
-}
-
-STRING 65
-// Abilities: SCAo (Shortcut A used), Ubertip (Tooltip - Normal - Extended)
-{
-Press key A to use this shortcut. To remove this shortcut, type "-unassign A" or "-uas A".
-}
-
-STRING 66
-// Abilities: SCAo (Shortcut A used), Name (Name)
-{
-Shortcut A used
-}
-
-STRING 67
-// Abilities: SCAo (Shortcut A used), Hotkey (Hotkey - Normal)
-{
-A
-}
-
-STRING 68
-// Abilities: SCDo (Shortcut D used), Tip (Tooltip - Normal)
-{
-|cffffcc00D
-}
-
-STRING 69
-// Abilities: SCDo (Shortcut D used), Ubertip (Tooltip - Normal - Extended)
-{
-Press key D to use this shortcut. To remove this shortcut, type "-unassign D" or "-uas D".
-}
-
-STRING 70
-// Abilities: SCDo (Shortcut D used), Name (Name)
-{
-Shortcut D used
-}
-
-STRING 71
-// Abilities: SCDo (Shortcut D used), Hotkey (Hotkey - Normal)
-{
-D
-}
-
-STRING 72
-// Abilities: SCEo (Shortcut E used), Tip (Tooltip - Normal)
-{
-|cffffcc00E
-}
-
-STRING 73
-// Abilities: SCEo (Shortcut E used), Ubertip (Tooltip - Normal - Extended)
-{
-Press key E to use this shortcut. To remove this shortcut, type "-unassign E" or "-uas E".
-}
-
-STRING 74
-// Abilities: SCEo (Shortcut E used), Name (Name)
-{
-Shortcut E used
-}
-
-STRING 75
-// Abilities: SCEo (Shortcut E used), Hotkey (Hotkey - Normal)
-{
-E
-}
-
-STRING 76
-// Abilities: SCFo (Shortcut F used), Tip (Tooltip - Normal)
-{
-|cffffcc00F
-}
-
-STRING 77
-// Abilities: SCFo (Shortcut F used), Ubertip (Tooltip - Normal - Extended)
-{
-Press key F to use this shortcut. To remove this shortcut, type "-unassign F" or "-uas F".
-}
-
-STRING 78
-// Abilities: SCFo (Shortcut F used), Name (Name)
-{
-Shortcut F used
-}
-
-STRING 79
-// Abilities: SCFo (Shortcut F used), Hotkey (Hotkey - Normal)
-{
-F
-}
-
-STRING 80
-// Abilities: SCQo (Shortcut Q used), Tip (Tooltip - Normal)
-{
-|cffffcc00Q
-}
-
-STRING 81
-// Abilities: SCQo (Shortcut Q used), Ubertip (Tooltip - Normal - Extended)
-{
-Press key Q to use this shortcut. To remove this shortcut, type "-unassign Q" or "-uas Q".
-}
-
-STRING 82
-// Abilities: SCQo (Shortcut Q used), Name (Name)
-{
-Shortcut Q used
-}
-
-STRING 83
-// Abilities: SCQo (Shortcut Q used), Hotkey (Hotkey - Normal)
-{
-Q
-}
-
-STRING 84
-// Abilities: SCRo (Shortcut R used), Tip (Tooltip - Normal)
-{
-|cffffcc00R
-}
-
-STRING 85
-// Abilities: SCRo (Shortcut R used), Ubertip (Tooltip - Normal - Extended)
-{
-Press key R to use this shortcut. To remove this shortcut, type "-unassign R" or "-uas R".
-}
-
-STRING 86
-// Abilities: SCRo (Shortcut R used), Name (Name)
-{
-Shortcut R used
-}
-
-STRING 87
-// Abilities: SCRo (Shortcut R used), Hotkey (Hotkey - Normal)
-{
-R
-}
-
-STRING 88
-// Abilities: SCSo (Shortcut S used), Tip (Tooltip - Normal)
-{
-|cffffcc00S
-}
-
-STRING 89
-// Abilities: SCSo (Shortcut S used), Ubertip (Tooltip - Normal - Extended)
-{
-Press key S to use this shortcut. To remove this shortcut, type "-unassign S" or "-uas S".
-}
-
-STRING 90
-// Abilities: SCSo (Shortcut S used), Name (Name)
-{
-Shortcut S used
-}
-
-STRING 91
-// Abilities: SCSo (Shortcut S used), Hotkey (Hotkey - Normal)
-{
-S
-}
-
-STRING 92
-// Abilities: SCZo (Shortcut Z used), Tip (Tooltip - Normal)
-{
-|cffffcc00Z
-}
-
-STRING 93
-// Abilities: SCZo (Shortcut Z used), Ubertip (Tooltip - Normal - Extended)
-{
-Press key Z to use this shortcut. To remove this shortcut, type "-unassign Z" or "-uas Z".
-}
-
-STRING 94
-// Abilities: SCZo (Shortcut Z used), Name (Name)
-{
-Shortcut Z used
-}
-
-STRING 95
-// Abilities: SCZo (Shortcut Z used), Hotkey (Hotkey - Normal)
-{
-Z
 }
 
 STRING 96
@@ -951,21 +610,6 @@ STRING 179
 Miscellaneous
 }
 
-STRING 180
-{
-|cffff0303by Maximaxou
-}
-
-STRING 181
-{
-Map information (|Cfffed312F9|R)
-}
-
-STRING 182
-{
-Map information
-}
-
 STRING 187
 {
 Sliders
@@ -983,34 +627,10 @@ STRING 189
 Allow you to cast meteors on some monsters. Unlimited range.
 }
 
-STRING 192
-// Units: e001 (Esprit de vengeance), Name (Name)
-{
-Esprit de vengeance
-}
-
-STRING 193
-// Units: dcir (Dummy cercle de puissance), Name (Name)
-{
-Dummy cercle de puissance
-}
-
 STRING 194
 // Destructibles: B000 (GetZ), Name (Name)
 {
 GetZ
-}
-
-STRING 195
-// Units: cais (Caisse), Name (Name)
-{
-Caisse
-}
-
-STRING 198
-// Units: D001 (Slider mirror), Propernames (Proper Names)
-{
-A smart slider
 }
 
 STRING 199
@@ -1139,9 +759,519 @@ STRING 223
 Player 24
 }
 
-STRING 224
-// Units: hgrd (Grid), Name (Name)
+STRING 231
 {
-Grid
+Welcome to: |cff78ece2Your map|r
+
+Created by: |cffff0303You|r
+
+}
+
+STRING 250
+{
+|c00FFFF00Map information
+}
+
+STRING 251
+{
+|cff00ebffhttps://discord.gg/N8QwwFTcYJ
+}
+
+STRING 261
+// Units: E000 (Clan SliD), Name (Name)
+{
+Clan SliD
+}
+
+STRING 274
+// Units: E000 (Clan SliD), Propernames (Proper Names)
+{
+discord.gg/N8QwwFTcYJ
+}
+
+STRING 275
+{
+|cffff0303Your name
+}
+
+STRING 296
+{
+Hall of Fame
+}
+
+STRING 297
+{
+|c00FFFF00Sliding Crew's Tournament winners. |r [2022 - 07/04/2025]
+
+|c0020C000Slide Gods of 2022: Freazy & Fieryfox
+Slide Gods of 2023: Stan, Freazy, Nathanserpo, Fieryfox and Thomasse
+December 2024 Slide Tournament winners: Andy and Freazy
+Hopefully more is coming!
+
+|c00FFFF00Join the discord to participate and hang out:|r |cff00ebffhttps://discord.gg/N8QwwFTcYJ|r
+|c00FFFF00See all records: 
+|cff00ebff@Sliding Crew discord #records.
+}
+
+STRING 298
+{
+CreditsContact
+}
+
+STRING 299
+{
+This map is made possible by MEC Founder |c00FF0000Maximaxou#2872|r & MEC Dev |c00FFFF00Stan#22399|r.
+
+|c00FFFF00How to contact us? |rBest way to contact us is to join the Sliding Crew Discord: 
+|cff00ebffhttps://discord.gg/N8QwwFTcYJ
+|cff008000Or you can try these:|r
+|c00FF0000Maxiglider - MEC Founder
+Battle.net: Maximaxou#2872
+Maxpolar@hotmail.fr 
+Discord: maxiglider
+|c00FFFF00Stan - MEC Dev
+Battlenet: Stan#22399
+Discord: Stan0448
+|cffff8080Spermkagen - Clan Slid - Slide Producer
+Battlenet: Spermkagen#2347
+Discord: spermkagen.2347|r
+|c00FF9913Fieryfox - Clan Slid - Slide Producer.
+Battle.net: Fieryfox#21640
+Discord: fieryfox|r
+|cff6f2583ImNotCrazy01 - Clan Slid - Slide Producer
+Battlenet: ImNotCrazy01#2445
+Discord: im_not_crazy01|r
+}
+
+STRING 300
+{
+New Commands
+}
+
+STRING 301
+{
+|c00FFFF0024/7 MEC assistance by Stan. Type -help [keyword] enter (example: -help slide). 
+|c00FF0000Commands explained: |c0020C000lc, m, fm, fpc, ot, idm, sn, monk.
+
+
+|c00FFFF00-lockCamera(lc on/off/1-24)|r
+Temporarily locks your camera to any desired player
+
+|c00FFFF00-mirror (m on/off)|r
+Mirror the corresponded slide speed into reverse / non-reverse.
+
+|c00FFFF00-followMouse (fm on/off)|r
+Follow mouse mode: get an APM of 600 without the pain of clicking. This unfortunately triggers an additional ping 
+
+|c00FFFF00-firstPersonCamera (fpc on/off)|r
+Pog ._z Liding
+
+|c00FFFF00-othersTransparency (ot 0-100)|r
+Trouble finding yourself? Partially remove your comrades from the equation.
+
+|c00FFFF00-ignoreDeathMessages (idm on/off)|r
+Stops death messages from being displayed. 
+
+|c00FFFF00-showNames (sn on/off) |r
+Display player names to all heroes.
+
+|c00FFFF00-hideChat (hc | monk on/off) |r
+Disables pop-chat. Read messages only in F12. 
+}
+
+STRING 302
+{
+Old Commands
+}
+
+STRING 303
+{
+|c00FFFF00Commands that have existed and worked for long over a decade.
+|c00FF0000Commands explained: |c0020C000cf, rc, rci, ldb, an, clr, apm, mnbm, lnbm|r
+
+
+|c00FFFF00-cameraField(cf) <value>|r
+Set the camera to any desired height. Ex: -cf 2800.
+
+|c00FFFF00-resetCamera(rc)|r
+Puts the camera back to the previously chosen field
+
+|c00FFFF00-resetCameraInit(rci)|r
+Changes the camera field back to its default value (2500)
+
+|c00FFFF00-leaderboard(ldb) on|off|r
+Displays or hides the entire leaderboard
+
+|c00FFFF00-animation(an) <string>|r
+Makes your hero doing an animation. ex : -an attack
+
+|c00FFFF00-clearText(clr)|r
+Removes the text on the screen
+
+|c00FFFF00-apm(-) [all|a]|r
+Displays apm on slide of everybody or just yourself
+
+|c00FFFF00-mapNbMonsters(mnbm)|r
+Displays the number of monsters in the map, of the chosen kind. \"Moving\" is the default kind. ex : -mnbm nm
+
+|c00FFFF00-levelNbMonsters(lnbm)|r
+Displays the number of monsters in the current level, of the chosen kind
+}
+
+STRING 304
+{
+Red Commands
+}
+
+STRING 305
+{
+|c00FFFF00Commands explained:|r|c00FF0000 
+-noobedit, -speededit, -kl, kc, restart|r
+|c00FFFF00You may refer any punished players as: 
+|r|c00FF0000Number (2 - 24), Color (Blue - Peanut), Name (Shortened - Exact)|r
+
+|c0020C000-noobedit (on/off)|r
+Gives you infinite lives and instant respawn.
+
+|c0020C000-speededit (on/off)|r
+Be like Stan. Go fast. 
+
+|c0020C000-kill <Pcolor> <Pnumber> <Pname>|r
+examples : -kill blue,  -kl yw, -kl 23, -kl JellyBeans
+
+|c0020C000-kick <Pcolor> <Pnumber> <Pname>|r
+examples : -kick blue,  -kc yw, -kc 11, -kc Bonnick
+
+|c0020C000-restart|r
+" just restart the game like when lose you little noob "
+This also allows for a re-selection on the various game modes.
+}
+
+STRING 306
+{
+Colors
+}
+
+STRING 307
+{
+|c00FF0060Commands explained:|c0020C000 <color>, d, vc, wild, nv, ci. 
+Colors: |c00FF0303rd, |c000042FFbe, |c001CE6B9tl, |c00540081pe, |c00FFFC01yw, |c00fEBA0Eoe,|c0020C000 gn, |c00E55BB0pk, |c00959697gy, |c007EBFF1lb, |c00106246dg, |c004E2A04bn, |cff9c0000mrn, |cff0000c3ny, |cff00ebfftqe, |cffbd00ffvlt, |cffecce87wht, |cfff7a58bph, |cffbfff81mint,|cffdbb8eb lvr, |cff4f5055coal,|cffecf0ff snw,|cff00781e emd, |cffa56f34pnt
+
+|c000042FF-<color>
+change the base color of your character
+
+|c001CE6B9-disco(d) [off|1~30]
+chooses the number of color changes in ten seconds, or stop color changing.
+
+|c00540081-vertexColor [ <red> <green> <blue> [<transparency>] ]
+alias -vc, change the vertex color of you character.
+
+|c00FF1323-W|c32BB2142i|c58BB3462l|c58FB3467d|r
+|c00FF0000Rand|c00FF1323omize |c32BB2142your |c58BB3462vertex |c58FB3467color|r
+
+|c00FFFC01-noVertex
+alias -nv, cancel the vertex color of your character
+it's like -vc 100 100 100
+
+|c00FF9696-colorInfo [<Pcolor>]
+alias -ci, display info about base color and vertex color of a hero
+}
+
+STRING 308
+{
+MapDescription
+}
+
+STRING 309
+{
+This map was made with Max Escape Creation 2.
+Make a map without the need of using the World Editor
+
+https://mec.maxslid.com/
+https://discord.gg/N8QwwFTcYJ
+}
+
+STRING 324
+{
+Effects
+}
+
+STRING 325
+{
+|c00FFFF00Apply effects to your demon hunters various body parts.|r
+
+|cff20c000The effects are:|r [l]ight, [f]ire, [i]ce, [c]orrupution, [p]oison, [s]low.
+|cff20c000The body parts are:|r [l]eft[h]and, [r]ight[h]and, [l]eft[f]oot, [r]ight[f]oot, [o]ver[h]ead, [h]ead, [o]rigin, [c]hest.
+
+|c00FFFF00-effect <effect>|r
+alias -ef, puts an effect on each hand of your hero
+
+|c00FFFF00-customEffect <effect> <bodyPart>|r
+alias -ce, specify any effect towards desired bodypart.
+
+|c00FFFF00-effectsEverywhere <effect>|r
+alias -efe, puts the same effect to each body part of your hero
+
+|c00FFFF00-deleteEffects [<numberOfEffectsToRemove n>]|r
+alias -de, deletes the n last effects of your hero, all effects if no parameter specified
+
+}
+
+STRING 327
+// Units: dcir (Dummy circle - don't use), Name (Name)
+{
+Dummy circle - don't use
+}
+
+STRING 328
+// Units: pcir (Circle - dont use), Name (Name)
+{
+Circle - dont use
+}
+
+STRING 329
+// Units: c000 (Circle - you can  use), Name (Name)
+{
+Circle - you can  use
+}
+
+STRING 330
+// Units: Ei01 (InvisUnit), Name (Name)
+{
+InvisUnit
+}
+
+STRING 331
+// Units: Ei02 (InvisUnit), Name (Name)
+{
+InvisUnit
+}
+
+STRING 332
+// Units: Ei03 (InvisUnit), Name (Name)
+{
+InvisUnit
+}
+
+STRING 333
+// Units: Ei04 (InvisUnit), Name (Name)
+{
+InvisUnit
+}
+
+STRING 334
+// Units: Ei05 (InvisUnit), Name (Name)
+{
+InvisUnit
+}
+
+STRING 335
+// Units: Ei06 (InvisUnit), Name (Name)
+{
+InvisUnit
+}
+
+STRING 336
+// Units: Ei07 (InvisUnit), Name (Name)
+{
+InvisUnit
+}
+
+STRING 337
+// Units: Ei08 (InvisUnit), Name (Name)
+{
+InvisUnit
+}
+
+STRING 338
+// Units: Ei09 (InvisUnit), Name (Name)
+{
+InvisUnit
+}
+
+STRING 339
+// Units: Ei10 (InvisUnit), Name (Name)
+{
+InvisUnit
+}
+
+STRING 340
+// Units: Ei11 (InvisUnit), Name (Name)
+{
+InvisUnit
+}
+
+STRING 341
+// Units: Ei12 (InvisUnit), Name (Name)
+{
+InvisUnit
+}
+
+STRING 342
+// Units: Ei13 (InvisUnit), Name (Name)
+{
+InvisUnit
+}
+
+STRING 343
+// Units: Ei14 (InvisUnit), Name (Name)
+{
+InvisUnit
+}
+
+STRING 344
+// Units: Ei15 (InvisUnit), Name (Name)
+{
+InvisUnit
+}
+
+STRING 345
+// Units: Ei16 (InvisUnit), Name (Name)
+{
+InvisUnit
+}
+
+STRING 346
+// Units: Ei17 (InvisUnit), Name (Name)
+{
+InvisUnit
+}
+
+STRING 347
+// Units: Ei18 (InvisUnit), Name (Name)
+{
+InvisUnit
+}
+
+STRING 348
+// Units: Ei19 (InvisUnit), Name (Name)
+{
+InvisUnit
+}
+
+STRING 349
+// Units: Ei20 (InvisUnit), Name (Name)
+{
+InvisUnit
+}
+
+STRING 350
+// Units: Ei21 (InvisUnit), Name (Name)
+{
+InvisUnit
+}
+
+STRING 351
+// Units: Ei22 (InvisUnit), Name (Name)
+{
+InvisUnit
+}
+
+STRING 352
+// Units: Ei23 (InvisUnit), Name (Name)
+{
+InvisUnit
+}
+
+STRING 353
+// Units: Ei24 (InvisUnit), Name (Name)
+{
+InvisUnit
+}
+
+STRING 354
+// Units: Ei25 (InvisUnit), Name (Name)
+{
+InvisUnit
+}
+
+STRING 355
+// Units: Ei26 (InvisUnit), Name (Name)
+{
+InvisUnit
+}
+
+STRING 356
+// Units: Ei27 (InvisUnit), Name (Name)
+{
+InvisUnit
+}
+
+STRING 357
+// Units: Ei28 (InvisUnit), Name (Name)
+{
+InvisUnit
+}
+
+STRING 358
+// Units: Ei29 (InvisUnit), Name (Name)
+{
+InvisUnit
+}
+
+STRING 359
+// Units: Ei30 (InvisUnit), Name (Name)
+{
+InvisUnit
+}
+
+STRING 360
+// Units: Ei31 (InvisUnit), Name (Name)
+{
+InvisUnit
+}
+
+STRING 361
+// Units: Ei32 (InvisUnit), Name (Name)
+{
+InvisUnit
+}
+
+STRING 362
+// Units: Ei33 (InvisUnit), Name (Name)
+{
+InvisUnit
+}
+
+STRING 363
+// Units: Ei34 (InvisUnit), Name (Name)
+{
+InvisUnit
+}
+
+STRING 364
+// Units: Ei35 (InvisUnit), Name (Name)
+{
+InvisUnit
+}
+
+STRING 365
+// Units: Ei36 (InvisUnit), Name (Name)
+{
+InvisUnit
+}
+
+STRING 366
+// Units: Ei37 (InvisUnit), Name (Name)
+{
+InvisUnit
+}
+
+STRING 367
+// Units: Ei38 (InvisUnit), Name (Name)
+{
+InvisUnit
+}
+
+STRING 368
+// Units: Ei39 (InvisUnit), Name (Name)
+{
+InvisUnit
+}
+
+STRING 369
+// Units: Ei40 (InvisUnit), Name (Name)
+{
+InvisUnit
 }
 
