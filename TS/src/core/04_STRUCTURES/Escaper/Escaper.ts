@@ -64,14 +64,14 @@ export const SetMeteorEffect = (newEffect: string) => {
 
 function GetInvisUnitTypeFromCollisionSize(collisionSize: number): number {
     if (!IsHeroCollisionSizeValid(collisionSize)) {
-        throw 'GetInvisUnitTypeFromCollisionSize: collisionSize must be between 4 and 200 and multiple of 4'
+        throw 'GetInvisUnitTypeFromCollisionSize: collisionSize must be between 4 and 200 and multiple of 5'
     }
 
     if (collisionSize === 0) {
         return FourCC('Einv')
     } else {
         let fourChars = 'Ei'
-        const num = R2I(collisionSize / 4)
+        const num = R2I(collisionSize / 5)
         if (num < 10) {
             fourChars += '0'
         }
