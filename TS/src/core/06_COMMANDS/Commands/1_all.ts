@@ -1198,6 +1198,10 @@ export const initCommandAll = () => {
                     ServiceManager.getService('Multiboard').setMode(escaper, 'multiboard')
                     ServiceManager.getService('Multiboard').setStatsMode(escaper, 'speedrun')
                 }
+
+                Text.mkP(escaper.getPlayer(), "Leaderboard updated for yourself")
+            }else{
+                Text.erP(escaper.getPlayer(), "Leaderboard: wrong command parameters")
             }
 
             return true
