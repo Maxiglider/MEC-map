@@ -2,8 +2,15 @@ import * as fs from 'fs-extra'
 // @ts-ignore
 import War3Map from 'mdx-m3-viewer-th/dist/cjs/parsers/w3x/map'
 import { simpleExec } from './Utils/SimpleExec'
+import 'dotenv/config'
 
-const targetDir = 'C:/Users/Stan/Documents/Warcraft III/Maps/Maps/Ts/MecTest'
+const targetDir = process.env.RELEASE_TEST_TARGET_DIR || null
+
+if(targetDir === null){
+    console.error('RELEASE_TEST_TARGET_DIR is not set in the .env file')
+    process.exit(1)
+}
+
 const coreStart = '-- Max Escape Creation'
 const coreEnd = 'onGlobalInit(initMEC_core)'
 const renameTargets = true

@@ -51,7 +51,7 @@ export function createMapFromDir(output: string, dir: string) {
 
     fs.writeFileSync(output, new Uint8Array(result))
 
-    logger.info('Finished!')
+    logger.info('Build done.')
 }
 
 main()
