@@ -15,9 +15,9 @@
         "plugins": [
             {
                 "transform": "war3-transformer",
-                "mapDir": "D:/MAMP/www/mec-map/TS/maps/map.w3x",
-                "entryFile": "D:/MAMP/www/mec-map/TS/src/main.ts",
-                "outputDir": "D:/MAMP/www/mec-map/TS/dist/map.w3x"
+                "mapDir": "C:/Users/Stan/Node/MEC-map/maps/map.w3x",
+                "entryFile": "C:/Users/Stan/Node/MEC-map/src/main.ts",
+                "outputDir": "C:/Users/Stan/Node/MEC-map/dist/map.w3x"
             }
         ],
         "types": [
