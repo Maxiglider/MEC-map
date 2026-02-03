@@ -86,6 +86,7 @@ const initMain = async () => {
             // Extract
             {
                 const war3Map = new War3Map()
+                // @ts-ignore
                 war3Map.load(readFileSync(originalFile).buffer)
 
                 for (const file of war3Map.imports.entries.values()) {
@@ -125,6 +126,7 @@ const initMain = async () => {
             // Import
             {
                 const war3Map = new War3Map()
+                // @ts-ignore
                 war3Map.load(readFileSync(outFile).buffer)
 
                 for (const file of transferFiles) {

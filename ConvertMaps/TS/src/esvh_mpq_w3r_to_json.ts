@@ -17,6 +17,7 @@ const initMain = () => {
     }
 
     const war3Map = new War3Map()
+    // @ts-ignore
     war3Map.load(readFileSync(targetFile).buffer)
 
     const rawRegions = war3Map.get('war3map.w3r')?.arrayBuffer()
