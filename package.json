@@ -19,7 +19,8 @@
         "release-test-publish": "yarn release && ts-node scripts/releaseTest.ts --publish",
         "dev": "npm-watch",
         "build:defs": "ts-node scripts/dev",
-        "prepare": "husky"
+        "build-tsconfig": "ts-node --transpile-only scripts/build-tsconfig.ts",
+        "prepare": "yarn build-tsconfig && husky"
     },
     "dependencies": {
         "dotenv": "^17.2.3",

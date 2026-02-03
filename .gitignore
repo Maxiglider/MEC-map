@@ -16,3 +16,5 @@ node_modules
 /dist
 project.log
 .env
+
+/tsconfig.json
