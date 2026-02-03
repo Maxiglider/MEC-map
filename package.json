@@ -20,7 +20,11 @@
         "dev": "npm-watch",
         "build:defs": "ts-node scripts/dev",
         "build-tsconfig": "ts-node --transpile-only scripts/build-tsconfig.ts",
+        "prettier-staged-files": "ts-node --transpile-only scripts/prettier-staged-files.ts",
         "prepare": "yarn build-tsconfig && husky"
+    },
+    "lint-staged": {
+        "*.{js,ts,json}": "prettier --write"
     },
     "dependencies": {
         "dotenv": "^17.2.3",
@@ -34,6 +38,7 @@
         "get-all-files": "^6.0.0",
         "husky": "^9.1.7",
         "jass-to-ts": "^1.2.5",
+        "lint-staged": "^16.2.7",
         "lua-types": "^2.13.1",
         "luamin": "^1.0.4",
         "mdx-m3-viewer-th": "^5.13.4",
