@@ -49,6 +49,7 @@ import { MakeAction } from '../../05_MAKE_STRUCTURES/MakeLastActions/MakeAction'
 import { MakeLastActions } from '../../05_MAKE_STRUCTURES/MakeLastActions/MakeLastActions'
 import { Make } from '../../05_MAKE_STRUCTURES/Make/Make'
 import { refreshTrigMoveCollisionLandmarks } from '../../07_TRIGGERS/CollisionLandmarks/MoveCollisionLandmarks'
+import { MakeMECRegionMode } from '../../05_MAKE_STRUCTURES/Make_create_region/MakeMECRegion'
 
 const SHOW_REVIVE_EFFECTS = false
 
@@ -2042,6 +2043,11 @@ export class Escaper {
     makeCreateVisibilityModifier = () => {
         this.destroyMake()
         if (this.hero) this.make = new Makes.MakeVisibilityModifier(this.hero)
+    }
+
+    makeCreateDebugMECRegions = (mode: MakeMECRegionMode) => {
+        this.destroyMake()
+        if (this.hero) this.make = new Makes.MakeMECRegion(this.hero, mode)
     }
 
     cancelLastAction = () => {

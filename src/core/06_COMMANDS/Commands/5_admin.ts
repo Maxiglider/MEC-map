@@ -28,6 +28,7 @@ import { CmdParam, isPlayerId, resolvePlayerId } from '../Helpers/Command_functi
 import { ActivateTeleport, DisableTeleport } from '../Helpers/Teleport'
 import { Natives } from '../../wc3_natives_unsecured/Natives'
 import { CollisionTest } from '../../Test/collision-test'
+import { MakeMECRegionMode } from '../../05_MAKE_STRUCTURES/Make_create_region/MakeMECRegion'
 
 export const initExecuteCommandMax = () => {
     const { registerCommand } = ServiceManager.getService('Cmd')
@@ -1030,6 +1031,37 @@ export const initExecuteCommandMax = () => {
             })
 
             Text.P(escaper.getPlayer(), 'Selection circle base height set to ' + S2R(param1))
+            return true
+        },
+    })
+
+    //-createDebugMecRegion(crdebmr)
+    registerCommand({
+        name: 'createDebugMecRegion',
+        alias: ['crdebmr'],
+        group: 'max',
+        argDescription: '[<mode>]',
+        description: 'Mode can be "horizontal" or "diagonal". Defaults to "horizontal".',
+        cb: ({ param1, nbParam }, escaper) => {
+            const usageMsg = 'createDebugMecRegion: wrong parameters'
+            if (nbParam > 1) {
+                Text.erP(escaper.getPlayer(), usageMsg)
+                return true
+            }
+
+            let mode: MakeMECRegionMode = 'horizontal'
+            if (nbParam === 1) {
+                if (param1 === 'horizontal' || param1 === 'diagonal') {
+                    mode = param1
+                } else {
+                    Text.erP(escaper.getPlayer(), usageMsg)
+                    return true
+                }
+            }
+
+            escaper.makeCreateDebugMECRegions(mode)
+
+            Text.mkP(escaper.getPlayer(), 'MakeCreateDebugMECRegions enabled')
             return true
         },
     })

@@ -33,7 +33,6 @@ import { MakePortalMob } from '../Make_monster_properties/MakePortalMob'
 import { MakeSetUnitMonsterType } from '../Make_set_unit_properties/MakeSetUnitMonsterType'
 import { MakeGetMonsterInfo } from '../Make_get_info/MakeGetMonsterInfo'
 import { MakeTerrainCreateBrushAction } from '../MakeLastActions/MakeTerrainCreateBrushAction'
-import { MakeAction } from '../MakeLastActions/MakeAction'
 import { MakeStart } from '../Make_start_end_visibilityModifier/MakeStart'
 import { MakeMonsterAttackGroundOrder } from '../Make_monster_properties/MakeMonsterAttackGroundOrder'
 import { MakeRegion } from '../Make_create_region/MakeRegion'
@@ -42,7 +41,6 @@ import { MakeDeleteCasters } from '../Make_delete_casters/MakeDeleteCasters'
 import { MakeDeleteMeteors } from '../Make_delete_meteors/MakeDeleteMeteors'
 import { MakeClearMob } from '../Make_monster_properties/MakeClearMob'
 import { MakeDoNothing } from '../Make_do_nothing/MakeDoNothing'
-import { MakeLastActions } from '../MakeLastActions/MakeLastActions'
 import { MakeTerrainCreate } from '../Make_terrain/MakeTerrainCreate'
 import { MakeTerrainCopyPasteAction } from '../MakeLastActions/MakeTerrainCopyPasteAction'
 import { MakeDeleteMonstersAction } from '../MakeLastActions/MakeDeleteMonstersAction'
@@ -56,7 +54,7 @@ import { MakeTerrainVerticalSymmetryAction } from '../MakeLastActions/MakeTerrai
 import { MakeMonsterAction } from '../MakeLastActions/MakeMonsterAction'
 import { MakeDeleteMonsters } from '../Make_delete_monsters/MakeDeleteMonsters'
 import { MakeSetClearMobEffect } from '../Make_monster_properties/MakeSetClearMobEffect'
-import { Make } from './Make'
+import { MakeMECRegion } from '../Make_create_region/MakeMECRegion'
 
 export const Makes = {
     MakePropertyChange,
@@ -115,4 +113,5 @@ export const Makes = {
     MakeMonsterAction,
     MakeDeleteMonsters,
     MakeSetClearMobEffect,
+    MakeMECRegion,
 }
