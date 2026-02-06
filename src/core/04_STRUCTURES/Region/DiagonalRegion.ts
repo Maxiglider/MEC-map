@@ -2,6 +2,10 @@ import { MECRegion } from './MECRegion'
 import { arrayPush } from '../../01_libraries/Basic_functions'
 import { DrawLine } from '../../01_libraries/Draw_lines'
 
+function dot(x1: number, y1: number, x2: number, y2: number): number {
+    return x1 * x2 + y1 * y2
+}
+
 export class DiagonalRegion extends MECRegion {
     private x1: number
     private y1: number
@@ -14,6 +18,11 @@ export class DiagonalRegion extends MECRegion {
 
     private vectorX: number
     private vectorY: number
+
+    private deltaP4X1: number = 0
+    private deltaP4Y1: number = 0
+    private dotP1P2: number = 0
+    private dotP4: number = 0
 
     constructor(x1: number, y1: number, x2: number, y2: number, x3: number, y3: number) {
         super()
@@ -41,6 +50,38 @@ export class DiagonalRegion extends MECRegion {
         this.y1 = y1
         this.x2 = x2
         this.y2 = y2
+
+        this.areCoordsInRegionPreCalculation()
+    }
+
+    /**
+     * Pre-calculations for areCoordsInRegion best performance
+     */
+    private areCoordsInRegionPreCalculation() {
+        // Height of the rectangle
+        let h = Math.sqrt(this.vectorX * this.vectorX + this.vectorY * this.vectorY)
+        if (this.deltaX2X1 * this.vectorY - this.deltaY2Y1 * this.vectorX < 0) {
+            h = -h
+        }
+
+        // Compute P4
+        const deltaX2X1 = this.x2 - this.x1
+        const deltaY2Y1 = this.y2 - this.y1
+
+        const L = Math.sqrt(deltaX2X1 * deltaX2X1 + deltaY2Y1 * deltaY2Y1)
+
+        const nx = -deltaY2Y1 / L
+        const ny = deltaX2X1 / L
+
+        const P4x = this.x1 + h * nx
+        const P4y = this.y1 + h * ny
+
+        // Pre-calculate values for areCoordsInRegion
+        this.deltaP4X1 = P4x - this.x1
+        this.deltaP4Y1 = P4y - this.y1
+
+        this.dotP1P2 = dot(this.deltaX2X1, this.deltaY2Y1, this.deltaX2X1, this.deltaY2Y1)
+        this.dotP4 = dot(this.deltaP4X1, this.deltaP4Y1, this.deltaP4X1, this.deltaP4Y1)
     }
 
     areCoordsInRegion(x: number, y: number) {
@@ -48,39 +89,10 @@ export class DiagonalRegion extends MECRegion {
         const deltaPxX1 = x - this.x1
         const deltaPyY1 = y - this.y1
 
-        // Let's find the orthogonal projections of P on lines 1-2
-        let PvectorX: number
-        let PvectorY: number
-        if (this.points1_2_denominator === 0) {
-            // Points 1 and 2 at the same spot
-            PvectorX = deltaPxX1
-            PvectorY = deltaPyY1
-        } else {
-            const t = (deltaPxX1 * this.deltaX2X1 + deltaPyY1 * this.deltaY2Y1) / this.points1_2_denominator
-            if (t < 0 || t > 1) {
-                // The projection of P on line 1-2 is outside the segment 1-2, so P is outside the region
-                return false
-            }
+        const u = dot(deltaPxX1, deltaPyY1, this.deltaX2X1, this.deltaY2Y1) / this.dotP1P2
+        const v = dot(deltaPxX1, deltaPyY1, this.deltaP4X1, this.deltaP4Y1) / this.dotP4
 
-            const XprojPto1_2 = this.x1 + t * this.deltaX2X1
-            const YprojPto1_2 = this.y1 + t * this.deltaY2Y1
-
-            PvectorX = x - XprojPto1_2
-            PvectorY = y - YprojPto1_2
-        }
-
-        // The Pvector must have same direction as the rectangle vector and its length must be smaller or equal
-        const deltaVectorX = this.vectorX - PvectorX
-        if (deltaVectorX * this.vectorX < 0 || Math.abs(deltaVectorX) > Math.abs(this.vectorX)) {
-            return false
-        }
-
-        const deltaVectorY = this.vectorY - PvectorY
-        if (deltaVectorY * this.vectorY < 0 || Math.abs(deltaVectorY) > Math.abs(this.vectorY)) {
-            return false
-        }
-
-        return true
+        return u >= 0 && u <= 1 && v >= 0 && v <= 1
     }
 
     generateDebugLightnings(): lightning[] {
