@@ -58,23 +58,8 @@ export class DiagonalRegion extends MECRegion {
      * Pre-calculations for areCoordsInRegion best performance
      */
     private areCoordsInRegionPreCalculation() {
-        // Height of the rectangle
-        let h = Math.sqrt(this.vectorX * this.vectorX + this.vectorY * this.vectorY)
-        if (this.deltaX2X1 * this.vectorY - this.deltaY2Y1 * this.vectorX < 0) {
-            h = -h
-        }
-
-        // Compute P4
-        const deltaX2X1 = this.x2 - this.x1
-        const deltaY2Y1 = this.y2 - this.y1
-
-        const L = Math.sqrt(deltaX2X1 * deltaX2X1 + deltaY2Y1 * deltaY2Y1)
-
-        const nx = -deltaY2Y1 / L
-        const ny = deltaX2X1 / L
-
-        const P4x = this.x1 + h * nx
-        const P4y = this.y1 + h * ny
+        const P4x = this.x1 + this.vectorX
+        const P4y = this.y1 + this.vectorY
 
         // Pre-calculate values for areCoordsInRegion
         this.deltaP4X1 = P4x - this.x1

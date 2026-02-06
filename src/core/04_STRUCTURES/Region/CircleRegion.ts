@@ -5,6 +5,7 @@ export class CircleRegion extends MECRegion {
     private centerX: number
     private centerY: number
     private radius: number
+    private radiusSquare: number
 
     constructor(centerX: number, centerY: number, radius: number) {
         super()
@@ -12,12 +13,13 @@ export class CircleRegion extends MECRegion {
         this.centerX = centerX
         this.centerY = centerY
         this.radius = radius
+        this.radiusSquare = radius * radius
     }
 
     areCoordsInRegion(x: number, y: number) {
         const dx = x - this.centerX
         const dy = y - this.centerY
-        return dx * dx + dy * dy <= this.radius * this.radius
+        return dx * dx + dy * dy <= this.radiusSquare
     }
 
     generateDebugEffects(): effect[] {
