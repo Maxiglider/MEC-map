@@ -8,33 +8,34 @@ export class DiagonalRegion extends MECRegion {
     private x2: number
     private y2: number
 
+    private deltaX2X1: number
+    private deltaY2Y1: number
+    private points1_2_denominator: number
+
     private vectorX: number
     private vectorY: number
-    private vectorLength: number
-
-    private dist1_2: number
-    private dist1_3: number
-    private dist2_3: number
 
     constructor(x1: number, y1: number, x2: number, y2: number, x3: number, y3: number) {
         super()
 
-        // Caclulate the vector from line points1-points2 towards direction of point3
-        this.dist1_2 = Math.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2)
-        this.dist1_3 = Math.sqrt((x3 - x1) ** 2 + (y3 - y1) ** 2)
-        this.dist2_3 = Math.sqrt((x3 - x2) ** 2 + (y3 - y2) ** 2)
+        this.deltaX2X1 = x2 - x1
+        this.deltaY2Y1 = y2 - y1
+        const deltaX3X1 = x3 - x1
+        const deltaY3Y1 = y3 - y1
 
-        const cosAngle1 =
-            (this.dist1_2 ** 2 + this.dist1_3 ** 2 - this.dist2_3 ** 2) / (2 * this.dist1_2 * this.dist1_3)
+        this.points1_2_denominator = this.deltaX2X1 * this.deltaX2X1 + this.deltaY2Y1 * this.deltaY2Y1
+        if (this.points1_2_denominator === 0) {
+            // Points 1 and 2 at the same spot
+            this.vectorX = deltaX3X1
+            this.vectorY = deltaY3Y1
+        } else {
+            const t = (deltaX3X1 * this.deltaX2X1 + deltaY3Y1 * this.deltaY2Y1) / this.points1_2_denominator
+            const Xproj3to1_2 = x1 + t * this.deltaX2X1
+            const Yproj3to1_2 = y1 + t * this.deltaY2Y1
 
-        const dist1_X = cosAngle1 * this.dist1_3
-
-        const xX = x1 + (dist1_X * (x2 - x1)) / this.dist1_2
-        const yX = y1 + (dist1_X * (y2 - y1)) / this.dist1_2
-
-        this.vectorX = x3 - xX
-        this.vectorY = y3 - yX
-        this.vectorLength = Math.sqrt(this.vectorX ** 2 + this.vectorY ** 2)
+            this.vectorX = x3 - Xproj3to1_2
+            this.vectorY = y3 - Yproj3to1_2
+        }
 
         this.x1 = x1
         this.y1 = y1
@@ -44,37 +45,38 @@ export class DiagonalRegion extends MECRegion {
 
     areCoordsInRegion(x: number, y: number) {
         // Let's say (x, y) is point P
-        const dist1_P = Math.sqrt((x - this.x1) ** 2 + (y - this.y1) ** 2)
-        const dist2_P = Math.sqrt((x - this.x2) ** 2 + (y - this.y2) ** 2)
-        const dist4_P = Math.sqrt((x - (this.x1 + this.vectorX)) ** 2 + (y - (this.y1 + this.vectorY)) ** 2)
+        const deltaPxX1 = x - this.x1
+        const deltaPyY1 = y - this.y1
 
-        const angleP_1_2 = Rad2Deg(
-            Acos((dist1_P ** 2 + this.dist1_2 ** 2 - dist2_P ** 2) / (2 * dist1_P * this.dist1_2))
-        )
-        if (angleP_1_2 > 90) {
+        // Let's find the orthogonal projections of P on lines 1-2
+        let PvectorX: number
+        let PvectorY: number
+        if (this.points1_2_denominator === 0) {
+            // Points 1 and 2 at the same spot
+            PvectorX = deltaPxX1
+            PvectorY = deltaPyY1
+        } else {
+            const t = (deltaPxX1 * this.deltaX2X1 + deltaPyY1 * this.deltaY2Y1) / this.points1_2_denominator
+            if (t < 0 || t > 1) {
+                // The projection of P on line 1-2 is outside the segment 1-2, so P is outside the region
+                return false
+            }
+
+            const XprojPto1_2 = this.x1 + t * this.deltaX2X1
+            const YprojPto1_2 = this.y1 + t * this.deltaY2Y1
+
+            PvectorX = x - XprojPto1_2
+            PvectorY = y - YprojPto1_2
+        }
+
+        // The Pvector must have same direction as the rectangle vector and its length must be smaller or equal
+        const deltaVectorX = this.vectorX - PvectorX
+        if (deltaVectorX * this.vectorX < 0 || Math.abs(deltaVectorX) > Math.abs(this.vectorX)) {
             return false
         }
 
-        const angleP_1_4 = Rad2Deg(
-            Acos((dist1_P ** 2 + this.vectorLength ** 2 - dist4_P ** 2) / (2 * dist1_P * this.vectorLength))
-        )
-        if (angleP_1_4 > 90) {
-            return false
-        }
-
-        // Pon12 is the projection of point P on line 1-2
-        const dist_Pon12_P = SinBJ(angleP_1_2) * dist1_P
-
-        // If the distance from P to its projection on line 1-2 is greater than the distance from point3 to line 1-2, then P is outside the region
-        if (dist_Pon12_P > this.vectorLength) {
-            return false
-        }
-
-        // Pon14 is the projection of point P on line 1-4
-        const dist_Pon14_P = SinBJ(angleP_1_4) * dist1_P
-
-        // If the distance from P to its projection on line 1-4 is greater than the vector length, then P is outside the region
-        if (dist_Pon14_P > this.dist1_2) {
+        const deltaVectorY = this.vectorY - PvectorY
+        if (deltaVectorY * this.vectorY < 0 || Math.abs(deltaVectorY) > Math.abs(this.vectorY)) {
             return false
         }
 

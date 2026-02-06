@@ -11,12 +11,10 @@ export class HorizontalRegion extends MECRegion {
     constructor(x1: number, y1: number, x2: number, y2: number) {
         super()
 
-        this.minX = RMinBJ(x1, x2)
-        this.maxX = RMaxBJ(x1, x2)
-        this.minY = RMinBJ(y1, y2)
-        this.maxY = RMaxBJ(y1, y2)
-
-        print(`HorizontalRegion created with coords: (${this.minX}, ${this.minY}), (${this.maxX}, ${this.maxY})`)
+        this.minX = Math.min(x1, x2)
+        this.maxX = Math.max(x1, x2)
+        this.minY = Math.min(y1, y2)
+        this.maxY = Math.max(y1, y2)
     }
 
     areCoordsInRegion(x: number, y: number) {
