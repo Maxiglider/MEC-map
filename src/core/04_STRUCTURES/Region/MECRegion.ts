@@ -1,16 +1,13 @@
-import { Natives } from '../../wc3_natives_unsecured/Natives'
 import { DefineDrawLineType } from '../../01_libraries/Draw_lines'
-import { IsHero } from '../Escaper/Escaper_functions'
-import { Round32 } from '../../01_libraries/Basic_functions'
+import { Timer } from 'w3ts'
+import { createTimer } from '../../../Utils/mapUtils'
 
-const UNIT_TIME_DELAY = 0.1
+const WATCH_TIMER_PERIOD = 0.05
 
 export abstract class MECRegion {
-    private rects: rect[]
-    private region: region
-    private enterOrLeaveRegionTrigger: trigger
+    private watchForEventsTimer: Timer
+    private watchedUnits: Map<number, unit>
     private unitsConsideredInRegion: Map<number, unit>
-    private delayUnitTimers: Map<number, timer>
 
     private unitEntersCallbacks: Map<number, (unit: unit) => void>
     private unitLeavesCallbacks: Map<number, (unit: unit) => void>
@@ -20,40 +17,17 @@ export abstract class MECRegion {
     private debugLightnings: lightning[] = []
 
     constructor() {
-        this.rects = []
-        this.region = CreateRegion()
+        this.watchedUnits = new Map()
         this.unitsConsideredInRegion = new Map()
-        this.delayUnitTimers = new Map()
 
         this.unitEntersCallbacks = new Map()
         this.unitLeavesCallbacks = new Map()
 
-        this.enterOrLeaveRegionTrigger = CreateTrigger()
-
-        TriggerRegisterEnterRegion(this.enterOrLeaveRegionTrigger, this.region)
-        TriggerRegisterLeaveRegion(this.enterOrLeaveRegionTrigger, this.region)
-
-        TriggerAddAction(this.enterOrLeaveRegionTrigger, () => {
-            const unit = Natives.UGetTriggerUnit()
-            if (!IsHero(unit)) return
-
-            const unitId = GetHandleId(unit)
-            const wasInRegion = this.unitsConsideredInRegion.has(unitId)
-
-            const previousTimer = this.delayUnitTimers.get(unitId)
-            if (previousTimer) {
-                DestroyTimer(previousTimer)
-            }
-            const timer = CreateTimer()
-            this.delayUnitTimers.set(unitId, timer)
-
-            TimerStart(timer, UNIT_TIME_DELAY, false, () => {
-                DestroyTimer(timer)
-                this.delayUnitTimers.delete(unitId)
-
+        this.watchForEventsTimer = createTimer(WATCH_TIMER_PERIOD, true, () => {
+            for (const [_, unit] of this.watchedUnits) {
+                const unitId = GetHandleId(unit)
+                const wasInRegion = this.unitsConsideredInRegion.has(unitId)
                 const isInRegion = this.isUnitInRegion(unit)
-
-                print('triggered: ' + GetUnitName(unit) + ' wasInRegion: ' + wasInRegion + ' isInRegion: ' + isInRegion)
 
                 if (wasInRegion !== isInRegion) {
                     if (isInRegion) {
@@ -63,23 +37,9 @@ export abstract class MECRegion {
                         this.unitsConsideredInRegion.delete(unitId)
                         this.unitLeavesCallbacks.forEach(callback => callback(unit))
                     }
-                } else {
-                    print('Unit pos: ' + Round32(GetUnitX(unit)) + ', ' + Round32(GetUnitY(unit)))
                 }
-            })
+            }
         })
-    }
-
-    protected defineRects(rects: rect[]): void {
-        for (const rect of this.rects) {
-            RegionClearRect(this.region, rect)
-            RemoveRect(rect)
-        }
-
-        this.rects = rects
-        for (const rect of rects) {
-            RegionAddRect(this.region, rect)
-        }
     }
 
     abstract areCoordsInRegion(x: number, y: number): boolean
@@ -127,5 +87,15 @@ export abstract class MECRegion {
             }
             this.debugLightnings = []
         }
+    }
+
+    watchUnit(unit: unit): void {
+        this.watchedUnits.set(GetHandleId(unit), unit)
+    }
+
+    unwatchUnit(unit: unit): void {
+        const unitId = GetHandleId(unit)
+        this.watchedUnits.delete(unitId)
+        this.unitsConsideredInRegion.delete(unitId)
     }
 }

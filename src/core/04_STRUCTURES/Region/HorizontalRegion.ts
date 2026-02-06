@@ -1,5 +1,5 @@
 import { MECRegion } from './MECRegion'
-import { arrayPush, Round32 } from '../../01_libraries/Basic_functions'
+import { arrayPush } from '../../01_libraries/Basic_functions'
 import { DrawLine } from '../../01_libraries/Draw_lines'
 
 export class HorizontalRegion extends MECRegion {
@@ -11,22 +11,16 @@ export class HorizontalRegion extends MECRegion {
     constructor(x1: number, y1: number, x2: number, y2: number) {
         super()
 
-        this.minX = Round32(RMinBJ(x1, x2))
-        this.maxX = Round32(RMaxBJ(x1, x2))
-        this.minY = Round32(RMinBJ(y1, y2))
-        this.maxY = Round32(RMaxBJ(y1, y2))
-
-        const rect = Rect(this.minX, this.minY, this.maxX, this.maxY)
-        this.defineRects([rect])
+        this.minX = RMinBJ(x1, x2)
+        this.maxX = RMaxBJ(x1, x2)
+        this.minY = RMinBJ(y1, y2)
+        this.maxY = RMaxBJ(y1, y2)
 
         print(`HorizontalRegion created with coords: (${this.minX}, ${this.minY}), (${this.maxX}, ${this.maxY})`)
-        print(`Generate rect: ${GetRectMinX(rect)}, ${GetRectMinY(rect)}, ${GetRectMaxX(rect)}, ${GetRectMaxY(rect)}`)
     }
 
     areCoordsInRegion(x: number, y: number) {
-        const roundedX = Round32(x)
-        const roundedY = Round32(y)
-        return roundedX >= this.minX && roundedX <= this.maxX && roundedY >= this.minY && roundedY <= this.maxY
+        return x >= this.minX && x <= this.maxX && y >= this.minY && y <= this.maxY
     }
 
     generateDebugLightnings(): lightning[] {
