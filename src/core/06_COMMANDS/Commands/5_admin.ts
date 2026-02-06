@@ -1041,7 +1041,7 @@ export const initExecuteCommandMax = () => {
         alias: ['crdebmr'],
         group: 'max',
         argDescription: '[<mode>]',
-        description: 'Mode can be "horizontal" or "diagonal". Defaults to "horizontal".',
+        description: 'Mode can be "horizontal", "diagonal" or "circle". Defaults to "horizontal".',
         cb: ({ param1, nbParam }, escaper) => {
             const usageMsg = 'createDebugMecRegion: wrong parameters'
             if (nbParam > 1) {
@@ -1051,7 +1051,7 @@ export const initExecuteCommandMax = () => {
 
             let mode: MakeMECRegionMode = 'horizontal'
             if (nbParam === 1) {
-                if (param1 === 'horizontal' || param1 === 'diagonal') {
+                if (param1 === 'horizontal' || param1 === 'diagonal' || param1 === 'circle') {
                     mode = param1
                 } else {
                     Text.erP(escaper.getPlayer(), usageMsg)

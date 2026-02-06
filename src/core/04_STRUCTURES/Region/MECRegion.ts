@@ -15,6 +15,7 @@ export abstract class MECRegion {
     private lastUnitEntersOrLeavesCallbackId: number = 0
 
     private debugLightnings: lightning[] = []
+    private debugEffects: effect[] = []
 
     constructor() {
         this.watchedUnits = new Map()
@@ -75,17 +76,36 @@ export abstract class MECRegion {
         this.unitLeavesCallbacks.delete(callbackId)
     }
 
-    abstract generateDebugLightnings(): lightning[]
+    /**
+     * Reimplement in children if needed
+     */
+    generateDebugLightnings(): lightning[] {
+        return []
+    }
+
+    /**
+     * Reimplement in children if needed
+     */
+    generateDebugEffects(): effect[] {
+        return []
+    }
 
     debugRects(enable: boolean): void {
+        for (const lightning of this.debugLightnings) {
+            DestroyLightning(lightning)
+        }
+        for (const effect of this.debugEffects) {
+            BlzSetSpecialEffectScale(effect, 0) // hide it because an effect doesn't visually instanstly disappear on destroy
+            DestroyEffect(effect)
+        }
+
         if (enable) {
             DefineDrawLineType('green', 2)
             this.debugLightnings = this.generateDebugLightnings()
+            this.debugEffects = this.generateDebugEffects()
         } else {
-            for (const lightning of this.debugLightnings) {
-                DestroyLightning(lightning)
-            }
             this.debugLightnings = []
+            this.debugEffects = []
         }
     }
 
