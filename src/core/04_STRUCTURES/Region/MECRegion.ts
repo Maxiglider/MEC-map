@@ -142,4 +142,18 @@ export abstract class MECRegion {
     protected defineDebugLineType() {
         DefineDrawLineType('yellow', 2)
     }
+
+    isWithEnterAndLeaveZone() {
+        return this.withEnterAndLeaveZone
+    }
+
+    destroy(): void {
+        this.watchForEventsTimer.destroy()
+        this.debugRects(false)
+        this.watchedUnits.clear()
+        this.unitsConsideredInRegion.clear()
+        this.unitEntersCallbacks.clear()
+        this.unitLeavesCallbacks.clear()
+        this.debugRects(false)
+    }
 }

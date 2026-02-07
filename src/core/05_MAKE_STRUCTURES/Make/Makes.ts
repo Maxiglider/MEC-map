@@ -54,7 +54,7 @@ import { MakeTerrainVerticalSymmetryAction } from '../MakeLastActions/MakeTerrai
 import { MakeMonsterAction } from '../MakeLastActions/MakeMonsterAction'
 import { MakeDeleteMonsters } from '../Make_delete_monsters/MakeDeleteMonsters'
 import { MakeSetClearMobEffect } from '../Make_monster_properties/MakeSetClearMobEffect'
-import { MakeMECRegion } from '../Make_create_region/MakeMECRegion'
+import { MakeDebugMECRegion } from '../Make_create_region/MakeDebugMECRegion'
 
 export const Makes = {
     MakePropertyChange,
@@ -113,5 +113,5 @@ export const Makes = {
     MakeMonsterAction,
     MakeDeleteMonsters,
     MakeSetClearMobEffect,
-    MakeMECRegion,
+    MakeDebugMECRegion,
 }

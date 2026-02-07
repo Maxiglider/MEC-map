@@ -2048,7 +2048,7 @@ export class Escaper {
 
     makeCreateDebugMECRegions = (mode: MakeMECRegionMode, directionForHorizontal: HorizontalRegionDirection = 'up') => {
         this.destroyMake()
-        if (this.hero) this.make = new Makes.MakeMECRegion(this.hero, mode, directionForHorizontal)
+        if (this.hero) this.make = new Makes.MakeDebugMECRegion(this.hero, mode, directionForHorizontal)
     }
 
     cancelLastAction = () => {
