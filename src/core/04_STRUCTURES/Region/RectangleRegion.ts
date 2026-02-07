@@ -6,7 +6,7 @@ function dot(x1: number, y1: number, x2: number, y2: number): number {
     return x1 * x2 + y1 * y2
 }
 
-export class DiagonalRegion extends MECRegion {
+export class RectangleRegion extends MECRegion {
     private x1: number
     private y1: number
     private x2: number
@@ -24,8 +24,8 @@ export class DiagonalRegion extends MECRegion {
     private dotP1P2: number = 0
     private dotP4: number = 0
 
-    constructor(x1: number, y1: number, x2: number, y2: number, x3: number, y3: number) {
-        super()
+    constructor(x1: number, y1: number, x2: number, y2: number, x3: number, y3: number, withEnterAndLeaveZone = false) {
+        super(withEnterAndLeaveZone)
 
         this.deltaX2X1 = x2 - x1
         this.deltaY2Y1 = y2 - y1
@@ -88,10 +88,15 @@ export class DiagonalRegion extends MECRegion {
         const x4 = this.x1 + this.vectorX
         const y4 = this.y1 + this.vectorY
 
+        this.defineDebugLineTypeForStart()
         arrayPush(lightnings, DrawLine(this.x1, this.y1, this.x2, this.y2))
+
+        this.defineDebugLineType()
         arrayPush(lightnings, DrawLine(this.x2, this.y2, x3, y3))
-        arrayPush(lightnings, DrawLine(x3, y3, x4, y4))
         arrayPush(lightnings, DrawLine(x4, y4, this.x1, this.y1))
+
+        this.defineDebugLineTypeForEnd()
+        arrayPush(lightnings, DrawLine(x3, y3, x4, y4))
 
         return lightnings
     }

@@ -29,6 +29,7 @@ import { ActivateTeleport, DisableTeleport } from '../Helpers/Teleport'
 import { Natives } from '../../wc3_natives_unsecured/Natives'
 import { CollisionTest } from '../../Test/collision-test'
 import { MakeMECRegionMode } from '../../05_MAKE_STRUCTURES/Make_create_region/MakeMECRegion'
+import { HorizontalRegionDirection } from '../../04_STRUCTURES/Region/HorizontalRegion'
 
 export const initExecuteCommandMax = () => {
     const { registerCommand } = ServiceManager.getService('Cmd')
@@ -1040,17 +1041,18 @@ export const initExecuteCommandMax = () => {
         name: 'createDebugMecRegion',
         alias: ['crdebmr'],
         group: 'max',
-        argDescription: '[<mode>]',
-        description: 'Mode can be "horizontal", "diagonal" or "circle". Defaults to "horizontal".',
-        cb: ({ param1, nbParam }, escaper) => {
+        argDescription: '[<mode> [<directionForHorizontal>]]',
+        description:
+            'Mode can be "horizontal", "diagonal" or "circle" (efaults to "horizontal"). Direction for horizontal can be "up", "down", "left" or "right" (defaults to "up")',
+        cb: ({ param1, param2, nbParam }, escaper) => {
             const usageMsg = 'createDebugMecRegion: wrong parameters'
-            if (nbParam > 1) {
+            if (nbParam > 2) {
                 Text.erP(escaper.getPlayer(), usageMsg)
                 return true
             }
 
             let mode: MakeMECRegionMode = 'horizontal'
-            if (nbParam === 1) {
+            if (nbParam >= 1) {
                 if (param1 === 'horizontal' || param1 === 'diagonal' || param1 === 'circle') {
                     mode = param1
                 } else {
@@ -1059,7 +1061,17 @@ export const initExecuteCommandMax = () => {
                 }
             }
 
-            escaper.makeCreateDebugMECRegions(mode)
+            let directionForHorizontal: HorizontalRegionDirection = 'up'
+            if (nbParam === 2) {
+                if (!['up', 'down', 'left', 'right'].includes(param2)) {
+                    Text.erP(escaper.getPlayer(), usageMsg)
+                    return true
+                } else {
+                    directionForHorizontal = param2 as HorizontalRegionDirection
+                }
+            }
+
+            escaper.makeCreateDebugMECRegions(mode, directionForHorizontal)
 
             Text.mkP(escaper.getPlayer(), 'MakeCreateDebugMECRegions enabled')
             return true

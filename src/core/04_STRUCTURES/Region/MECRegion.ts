@@ -17,7 +17,11 @@ export abstract class MECRegion {
     private debugLightnings: lightning[] = []
     private debugEffects: effect[] = []
 
-    constructor() {
+    protected withEnterAndLeaveZone: boolean
+
+    constructor(withEnterAndLeaveZone = false) {
+        this.withEnterAndLeaveZone = withEnterAndLeaveZone
+
         this.watchedUnits = new Map()
         this.unitsConsideredInRegion = new Map()
 
@@ -100,7 +104,7 @@ export abstract class MECRegion {
         }
 
         if (enable) {
-            DefineDrawLineType('green', 2)
+            this.defineDebugLineType()
             this.debugLightnings = this.generateDebugLightnings()
             this.debugEffects = this.generateDebugEffects()
         } else {
@@ -117,5 +121,25 @@ export abstract class MECRegion {
         const unitId = GetHandleId(unit)
         this.watchedUnits.delete(unitId)
         this.unitsConsideredInRegion.delete(unitId)
+    }
+
+    protected defineDebugLineTypeForStart() {
+        if (this.withEnterAndLeaveZone) {
+            DefineDrawLineType('red', 4)
+        } else {
+            this.defineDebugLineType()
+        }
+    }
+
+    protected defineDebugLineTypeForEnd() {
+        if (this.withEnterAndLeaveZone) {
+            DefineDrawLineType('blue', 2)
+        } else {
+            this.defineDebugLineType()
+        }
+    }
+
+    protected defineDebugLineType() {
+        DefineDrawLineType('yellow', 2)
     }
 }
