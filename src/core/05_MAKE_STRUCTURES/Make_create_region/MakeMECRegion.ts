@@ -4,8 +4,9 @@ import { HorizontalRegion, HorizontalRegionDirection } from '../../04_STRUCTURES
 import { Text } from '../../01_libraries/Text'
 import { RectangleRegion } from '../../04_STRUCTURES/Region/RectangleRegion'
 import { CircleRegion } from '../../04_STRUCTURES/Region/CircleRegion'
+import { LineRegion } from '../../04_STRUCTURES/Region/LineRegion'
 
-export type MakeMECRegionMode = 'horizontal' | 'diagonal' | 'circle'
+export type MakeMECRegionMode = 'horizontal' | 'diagonal' | 'circle' | 'line'
 
 export abstract class MakeMECRegion extends MakeBySeveralClicks {
     private mode: MakeMECRegionMode
@@ -53,6 +54,8 @@ export abstract class MakeMECRegion extends MakeBySeveralClicks {
                     const edgeY = this.savedY[1]
                     const radius = Math.sqrt((edgeX - centerX) ** 2 + (edgeY - centerY) ** 2)
                     mecRegion = new CircleRegion(centerX, centerY, radius)
+                } else if (this.mode === 'line') {
+                    mecRegion = new LineRegion(this.savedX[0], this.savedY[0], this.savedX[1], this.savedY[1], true)
                 } else {
                     throw new Error('MakeMECRegion: unknown mode "' + this.mode + '"')
                 }
