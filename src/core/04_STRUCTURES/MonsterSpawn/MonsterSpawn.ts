@@ -39,8 +39,15 @@ const MonsterSpawn_Actions = errorHandler(() => {
         return
     }
 
+    let forcedDistance: number | undefined
+    const unspawnTime = monsterSpawn.getTimedUnspawn()
+    if (unspawnTime !== undefined) {
+        const monsterSpeed = monsterSpawn.getMonsterType().getUnitMoveSpeed()
+        forcedDistance = monsterSpeed * (unspawnTime + 2) // the 2s added to unspawn time are here to be sure that the monster will be unspawned before reaching the end of their movement
+    }
+
     for (let spawnIndex = 0; spawnIndex < monsterSpawn.getSpawnAmount(); spawnIndex++) {
-        const startAndEndPoints = mecRegion.generateStartAndEndPoints()
+        const startAndEndPoints = mecRegion.generateStartAndEndPoints(forcedDistance)
         const mobUnit = monsterSpawn.createMob(startAndEndPoints)
 
         if (mobUnit) {
@@ -70,10 +77,28 @@ const MonsterStartMovement = errorHandler(() => {
 
     if (monsterSpawn?.isActive() && mobUnit && startEndEndPoints) {
         IssueMoveOrderForLongDistance(mobUnit, startEndEndPoints.endX, startEndEndPoints.endY)
+
+        const unspawnTime = monsterSpawn.getTimedUnspawn()
+        if (unspawnTime !== undefined) {
+            const unspawnTimer = CreateTimer()
+            MonsterSpawn.anyTimedUnspawnTimerId2Unit.set(GetHandleId(unspawnTimer), mobUnit)
+            MonsterSpawn.anyUnit2TimedUnspawnTimer.set(GetHandleId(mobUnit), unspawnTimer)
+            TimerStart(unspawnTimer, unspawnTime, false, MonsterUnspawn)
+        }
     }
 
     if (startEndEndPoints?.ephemeral) {
         MemoryHandler.destroyObject(startEndEndPoints)
+    }
+})
+
+const MonsterUnspawn = errorHandler(() => {
+    const unspawnTimer = Natives.UGetExpiredTimer()
+    const mobUnit = MonsterSpawn.anyTimedUnspawnTimerId2Unit.get(GetHandleId(unspawnTimer))
+
+    if (mobUnit) {
+        const monsterSpawn = MonsterSpawn.anyMonsterUnitId2MonsterSpawn.get(GetHandleId(mobUnit))
+        monsterSpawn?.removeMonsterUnit(mobUnit)
     }
 })
 
@@ -91,7 +116,6 @@ export class MonsterSpawn {
 
     static anyUnit2TimedUnspawnTimer = new Map<number, timer>()
     static anyTimedUnspawnTimerId2Unit = new Map<number, unit>()
-    static anyTimedUnspawnTimerId2MonsterSpawn = new Map<number, MonsterSpawn>()
     private static lastInstanceId = -1
 
     public static getNextId = () => {
@@ -197,15 +221,25 @@ export class MonsterSpawn {
     setMECRegion = (newMecRegion: MECRegion) => {
         this.mecRegion && this.mecRegion.destroy()
         this.mecRegion = newMecRegion
-        this.mecRegion.onUnitLeaves(monsterUnit => {
-            this.monsters && GroupRemoveUnit(this.monsters, monsterUnit)
-            this.mecRegion?.unwatchUnit(monsterUnit)
-            UnitRemoveAbility(monsterUnit, FourCC('Aloc'))
-            this.simpleUnitRecycler.removeUnit(monsterUnit)
-            udg_spawned_monsters[GetHandleId(monsterUnit)] = null
-        })
-
+        this.mecRegion.onUnitLeaves(monsterUnit => this.removeMonsterUnit(monsterUnit))
         this._active && this.refresh()
+    }
+
+    // remove monster unit with destroying it but just hiding it with the simpleUnitRecycler
+    removeMonsterUnit(monsterUnit: unit) {
+        this.monsters && GroupRemoveUnit(this.monsters, monsterUnit)
+        this.mecRegion?.unwatchUnit(monsterUnit)
+        UnitRemoveAbility(monsterUnit, FourCC('Aloc'))
+        this.simpleUnitRecycler.removeUnit(monsterUnit)
+        udg_spawned_monsters[GetHandleId(monsterUnit)] = null
+
+        const timer = MonsterSpawn.anyUnit2TimedUnspawnTimer.get(GetHandleId(monsterUnit))
+        if (timer) {
+            MonsterSpawn.anyTimedUnspawnTimerId2Unit.delete(GetHandleId(timer))
+            MonsterSpawn.anyUnit2TimedUnspawnTimer.delete(GetHandleId(monsterUnit))
+            DestroyTimer(timer)
+        }
+        MonsterSpawn.anyMonsterUnitId2MonsterSpawn.delete(GetHandleId(monsterUnit))
     }
 
     deactivate = () => {
@@ -219,16 +253,7 @@ export class MonsterSpawn {
 
         if (this.monsters) {
             ForGroup(this.monsters, () => {
-                const u = Natives.UGetEnumUnit()
-                const timer = MonsterSpawn.anyUnit2TimedUnspawnTimer.get(GetHandleId(u))
-                if (timer) {
-                    MonsterSpawn.anyTimedUnspawnTimerId2Unit.delete(GetHandleId(timer))
-                    MonsterSpawn.anyTimedUnspawnTimerId2MonsterSpawn.delete(GetHandleId(timer))
-                    MonsterSpawn.anyUnit2TimedUnspawnTimer.delete(GetHandleId(u))
-                    DestroyTimer(timer)
-                }
-                this.simpleUnitRecycler.removeUnit(u)
-                udg_spawned_monsters[GetHandleId(u)] = null
+                this.removeMonsterUnit(Natives.UGetEnumUnit())
             })
             DestroyGroup(this.monsters)
             delete this.monsters
@@ -262,13 +287,12 @@ export class MonsterSpawn {
     }
 
     createMob = (startAndEndPoints: StartAndEndPoints) => {
-        const spawnAngle =
-            Rad2Deg(
-                Math.atan2(
-                    startAndEndPoints.endY - startAndEndPoints.startY,
-                    startAndEndPoints.endX - startAndEndPoints.startX
-                )
-            ) + 180
+        const spawnAngle = Rad2Deg(
+            Math.atan2(
+                startAndEndPoints.endY - startAndEndPoints.startY,
+                startAndEndPoints.endX - startAndEndPoints.startX
+            )
+        )
 
         // hook onBeforeCreateMonsterUnit
         const hookArray = CombineHooks(
@@ -324,7 +348,9 @@ export class MonsterSpawn {
         if (this.monsters) {
             GroupAddUnit(this.monsters, monster)
             MonsterSpawn.anyMonsterUnitId2MonsterSpawn.set(GetHandleId(monster), this)
-            this.mecRegion?.watchUnit(monster, true)
+            if (this.timedUnspawn === undefined) {
+                this.mecRegion?.watchUnit(monster, true)
+            }
         }
 
         //hook after create unit
@@ -426,6 +452,7 @@ export class MonsterSpawn {
     getTimedUnspawn = () => this.timedUnspawn
     setTimedUnspawn = (timedUnspawn: number | undefined) => {
         this.timedUnspawn = timedUnspawn
+        this.mecRegion?.setIsLeaveZoneEnabled(timedUnspawn === undefined)
         this._active && this.refresh()
     }
 

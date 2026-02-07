@@ -41,7 +41,22 @@ export class LineRegion extends RectangleRegion {
         this.startAndEndPoints.ephemeral = false
     }
 
-    generateStartAndEndPoints() {
-        return this.startAndEndPoints
+    generateStartAndEndPoints(forcedDistance?: number) {
+        if (forcedDistance === undefined) {
+            return this.startAndEndPoints
+        } else {
+            const startAndEndPoints = MemoryHandler.getEmptyObject<StartAndEndPoints>()
+            startAndEndPoints.startX = this.startAndEndPoints.startX
+            startAndEndPoints.startY = this.startAndEndPoints.startY
+            startAndEndPoints.endX = this.startAndEndPoints.startX + this.directionAngleCos * forcedDistance
+            startAndEndPoints.endY = this.startAndEndPoints.startY + this.directionAngleSine * forcedDistance
+            startAndEndPoints.ephemeral = true
+            return startAndEndPoints
+        }
+    }
+
+    destroy() {
+        MemoryHandler.destroyObject(this.startAndEndPoints)
+        super.destroy()
     }
 }

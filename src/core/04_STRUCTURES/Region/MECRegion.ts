@@ -24,13 +24,16 @@ export abstract class MECRegion {
 
     private lastUnitEntersOrLeavesCallbackId: number = 0
 
+    private currentlyDebugging = false
     private debugLightnings: lightning[] = []
     private debugEffects: effect[] = []
 
     protected withEnterAndLeaveZone: boolean
+    protected isLeaveZoneEnabled: boolean
 
-    constructor(withEnterAndLeaveZone = false) {
+    constructor(withEnterAndLeaveZone = false, isLeaveZoneEnabled = true) {
         this.withEnterAndLeaveZone = withEnterAndLeaveZone
+        this.isLeaveZoneEnabled = isLeaveZoneEnabled
 
         this.watchedUnits = new Map()
         this.unitsConsideredInRegion = new Map()
@@ -117,19 +120,23 @@ export abstract class MECRegion {
     }
 
     debugRects(enable: boolean): void {
-        for (const lightning of this.debugLightnings) {
-            DestroyLightning(lightning)
+        if (enable === this.currentlyDebugging) {
+            return
         }
-        for (const effect of this.debugEffects) {
-            BlzSetSpecialEffectScale(effect, 0) // hide it because an effect doesn't visually instanstly disappear on destroy
-            DestroyEffect(effect)
-        }
+        this.currentlyDebugging = enable
 
         if (enable) {
             this.defineDebugLineType()
             this.debugLightnings = this.generateDebugLightnings()
             this.debugEffects = this.generateDebugEffects()
         } else {
+            for (const lightning of this.debugLightnings) {
+                DestroyLightning(lightning)
+            }
+            for (const effect of this.debugEffects) {
+                BlzSetSpecialEffectScale(effect, 0) // hide it because an effect doesn't visually instanstly disappear on destroy
+                DestroyEffect(effect)
+            }
             this.debugLightnings = []
             this.debugEffects = []
         }
@@ -182,7 +189,20 @@ export abstract class MECRegion {
         this.debugRects(false)
     }
 
-    generateStartAndEndPoints(): StartAndEndPoints & IDestroyable {
+    generateStartAndEndPoints(forcedDistance?: number): StartAndEndPoints & IDestroyable {
         throw new Error('generateStartAndEndPoints method not implemented for this region type')
+    }
+
+    setIsLeaveZoneEnabled(enabled: boolean): void {
+        if (enabled === this.isLeaveZoneEnabled) {
+            return
+        }
+
+        this.isLeaveZoneEnabled = enabled
+        if (this.currentlyDebugging) {
+            // refresh the debug lines
+            this.debugRects(false)
+            this.debugRects(true)
+        }
     }
 }

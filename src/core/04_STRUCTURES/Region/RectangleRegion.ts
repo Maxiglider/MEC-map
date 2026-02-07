@@ -32,8 +32,11 @@ export class RectangleRegion extends MECRegion {
     private vectorX: number
     private vectorY: number
 
-    private vectorXOffsetForEndPoint: number
-    private vectorYOffsetForEndPoint: number
+    private vectorXforEndPoint: number
+    private vectorYforEndPoint: number
+
+    protected directionAngleCos: number
+    protected directionAngleSine: number
 
     private deltaP4X1: number = 0
     private deltaP4Y1: number = 0
@@ -64,10 +67,8 @@ export class RectangleRegion extends MECRegion {
 
         const vectorLength = Math.sqrt(this.vectorX * this.vectorX + this.vectorY * this.vectorY)
 
-        this.vectorXOffsetForEndPoint =
-            (this.vectorX * (vectorLength + END_POINT_OFFSET_AFTER_END_OF_REGION)) / vectorLength
-        this.vectorYOffsetForEndPoint =
-            (this.vectorY * (vectorLength + END_POINT_OFFSET_AFTER_END_OF_REGION)) / vectorLength
+        this.vectorXforEndPoint = (this.vectorX * (vectorLength + END_POINT_OFFSET_AFTER_END_OF_REGION)) / vectorLength
+        this.vectorYforEndPoint = (this.vectorY * (vectorLength + END_POINT_OFFSET_AFTER_END_OF_REGION)) / vectorLength
 
         this.x1 = x1
         this.y1 = y1
@@ -102,6 +103,10 @@ export class RectangleRegion extends MECRegion {
 
         this.deltaX2X1forStartLine = this.x2forStartLine - this.x1forStartLine
         this.deltaY2Y1forStartLine = this.y2forStartLine - this.y1forStartLine
+
+        const directionAngle = Math.atan2(this.vectorY, this.vectorX)
+        this.directionAngleCos = Math.cos(directionAngle)
+        this.directionAngleSine = Math.sin(directionAngle)
 
         this.areCoordsInRegionPreCalculation()
     }
@@ -147,21 +152,30 @@ export class RectangleRegion extends MECRegion {
         arrayPush(lightnings, DrawLine(this.x2, this.y2, x3, y3))
         arrayPush(lightnings, DrawLine(x4, y4, this.x1, this.y1))
 
-        this.defineDebugLineTypeForEnd()
-        arrayPush(lightnings, DrawLine(x3, y3, x4, y4))
+        if (this.isLeaveZoneEnabled) {
+            this.defineDebugLineTypeForEnd()
+            arrayPush(lightnings, DrawLine(x3, y3, x4, y4))
+        }
 
         return lightnings
     }
 
-    generateStartAndEndPoints() {
+    generateStartAndEndPoints(forcedDistance?: number) {
         const startAndEndPoints = MemoryHandler.getEmptyObject<StartAndEndPoints>()
 
         const randomOffsetValue = GetRandomReal(0, 1)
 
         startAndEndPoints.startX = this.x1forStartLine + randomOffsetValue * this.deltaX2X1forStartLine
         startAndEndPoints.startY = this.y1forStartLine + randomOffsetValue * this.deltaY2Y1forStartLine
-        startAndEndPoints.endX = startAndEndPoints.startX + this.vectorXOffsetForEndPoint
-        startAndEndPoints.endY = startAndEndPoints.startY + this.vectorYOffsetForEndPoint
+
+        if (forcedDistance === undefined) {
+            startAndEndPoints.endX = startAndEndPoints.startX + this.vectorXforEndPoint
+            startAndEndPoints.endY = startAndEndPoints.startY + this.vectorYforEndPoint
+        } else {
+            startAndEndPoints.endX = startAndEndPoints.startX + this.directionAngleCos * forcedDistance
+            startAndEndPoints.endY = startAndEndPoints.startY + this.directionAngleSine * forcedDistance
+        }
+
         startAndEndPoints.ephemeral = true
 
         return startAndEndPoints
