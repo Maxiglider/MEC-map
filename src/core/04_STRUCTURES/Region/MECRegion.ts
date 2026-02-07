@@ -1,11 +1,21 @@
 import { DefineDrawLineType } from '../../01_libraries/Draw_lines'
-import { Timer } from 'w3ts'
-import { createTimer } from '../../../Utils/mapUtils'
+import { IDestroyable } from '../../../Utils/MemoryHandler'
 
 const WATCH_TIMER_PERIOD = 0.05
 
+export const OFFSET_FOR_START_LINE_NOT_SPAWNED_MONSTERS_TO_BE_CONSIDERED_OUT = 2
+export const END_POINT_OFFSET_AFTER_END_OF_REGION = 50 // to be sure the monster ends their movement out of the region
+
+export type StartAndEndPoints = {
+    startX: number
+    startY: number
+    endX: number
+    endY: number
+    ephemeral: boolean
+}
+
 export abstract class MECRegion {
-    private watchForEventsTimer: Timer
+    private watchForEventsTimer?: timer
     private watchedUnits: Map<number, unit>
     private unitsConsideredInRegion: Map<number, unit>
 
@@ -27,30 +37,42 @@ export abstract class MECRegion {
 
         this.unitEntersCallbacks = new Map()
         this.unitLeavesCallbacks = new Map()
-
-        this.watchForEventsTimer = createTimer(WATCH_TIMER_PERIOD, true, () => {
-            for (const [_, unit] of this.watchedUnits) {
-                const unitId = GetHandleId(unit)
-                const wasInRegion = this.unitsConsideredInRegion.has(unitId)
-                const isInRegion = this.isUnitInRegion(unit)
-
-                if (wasInRegion !== isInRegion) {
-                    if (isInRegion) {
-                        this.unitsConsideredInRegion.set(unitId, unit)
-                        this.unitEntersCallbacks.forEach(callback => callback(unit))
-                    } else {
-                        this.unitsConsideredInRegion.delete(unitId)
-                        this.unitLeavesCallbacks.forEach(callback => callback(unit))
-                    }
-                }
-            }
-        })
     }
 
     abstract areCoordsInRegion(x: number, y: number): boolean
 
     isUnitInRegion(unit: unit): boolean {
         return this.areCoordsInRegion(GetUnitX(unit), GetUnitY(unit))
+    }
+
+    enableWatchUnits(enabled: boolean): void {
+        if (enabled === !!this.watchForEventsTimer) {
+            return
+        }
+
+        if (enabled) {
+            this.watchForEventsTimer = CreateTimer()
+            TimerStart(this.watchForEventsTimer, WATCH_TIMER_PERIOD, true, () => {
+                for (const [_, unit] of this.watchedUnits) {
+                    const unitId = GetHandleId(unit)
+                    const wasInRegion = this.unitsConsideredInRegion.has(unitId)
+                    const isInRegion = this.isUnitInRegion(unit)
+
+                    if (wasInRegion !== isInRegion) {
+                        if (isInRegion) {
+                            this.unitsConsideredInRegion.set(unitId, unit)
+                            this.unitEntersCallbacks.forEach(callback => callback(unit))
+                        } else {
+                            this.unitsConsideredInRegion.delete(unitId)
+                            this.unitLeavesCallbacks.forEach(callback => callback(unit))
+                        }
+                    }
+                }
+            })
+        } else {
+            this.watchForEventsTimer && DestroyTimer(this.watchForEventsTimer)
+            delete this.watchForEventsTimer
+        }
     }
 
     /**
@@ -113,8 +135,11 @@ export abstract class MECRegion {
         }
     }
 
-    watchUnit(unit: unit): void {
+    watchUnit(unit: unit, initiallyIn = false): void {
         this.watchedUnits.set(GetHandleId(unit), unit)
+        if (initiallyIn) {
+            this.unitsConsideredInRegion.set(GetHandleId(unit), unit)
+        }
     }
 
     unwatchUnit(unit: unit): void {
@@ -148,12 +173,16 @@ export abstract class MECRegion {
     }
 
     destroy(): void {
-        this.watchForEventsTimer.destroy()
+        this.watchForEventsTimer && DestroyTimer(this.watchForEventsTimer)
         this.debugRects(false)
         this.watchedUnits.clear()
         this.unitsConsideredInRegion.clear()
         this.unitEntersCallbacks.clear()
         this.unitLeavesCallbacks.clear()
         this.debugRects(false)
+    }
+
+    generateStartAndEndPoints(): StartAndEndPoints & IDestroyable {
+        throw new Error('generateStartAndEndPoints method not implemented for this region type')
     }
 }

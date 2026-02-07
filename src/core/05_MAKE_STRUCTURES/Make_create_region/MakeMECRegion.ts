@@ -9,8 +9,8 @@ import { LineRegion } from '../../04_STRUCTURES/Region/LineRegion'
 export type MakeMECRegionMode = 'horizontal' | 'diagonal' | 'circle' | 'line'
 
 export abstract class MakeMECRegion extends MakeBySeveralClicks {
-    private mode: MakeMECRegionMode
-    private requiredLocsNumber: number
+    protected mode: MakeMECRegionMode
+    protected requiredLocsNumber: number
     private directionForHorizontal: HorizontalRegionDirection
 
     constructor(maker: unit, mode: MakeMECRegionMode, directionForHorizontal: HorizontalRegionDirection = 'up') {

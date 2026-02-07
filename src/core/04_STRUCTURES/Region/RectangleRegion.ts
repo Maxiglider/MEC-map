@@ -1,6 +1,12 @@
-import { MECRegion } from './MECRegion'
+import {
+    END_POINT_OFFSET_AFTER_END_OF_REGION,
+    MECRegion,
+    OFFSET_FOR_START_LINE_NOT_SPAWNED_MONSTERS_TO_BE_CONSIDERED_OUT,
+    StartAndEndPoints,
+} from './MECRegion'
 import { arrayPush } from '../../01_libraries/Basic_functions'
 import { DrawLine } from '../../01_libraries/Draw_lines'
+import { MemoryHandler } from '../../../Utils/MemoryHandler'
 
 function dot(x1: number, y1: number, x2: number, y2: number): number {
     return x1 * x2 + y1 * y2
@@ -12,12 +18,22 @@ export class RectangleRegion extends MECRegion {
     private x2: number
     private y2: number
 
+    private x1forStartLine: number
+    private y1forStartLine: number
+    private x2forStartLine: number
+    private y2forStartLine: number
+    private deltaX2X1forStartLine: number
+    private deltaY2Y1forStartLine: number
+
     private deltaX2X1: number
     private deltaY2Y1: number
     private points1_2_denominator: number
 
     private vectorX: number
     private vectorY: number
+
+    private vectorXOffsetForEndPoint: number
+    private vectorYOffsetForEndPoint: number
 
     private deltaP4X1: number = 0
     private deltaP4Y1: number = 0
@@ -46,10 +62,46 @@ export class RectangleRegion extends MECRegion {
             this.vectorY = y3 - Yproj3to1_2
         }
 
+        const vectorLength = Math.sqrt(this.vectorX * this.vectorX + this.vectorY * this.vectorY)
+
+        this.vectorXOffsetForEndPoint =
+            (this.vectorX * (vectorLength + END_POINT_OFFSET_AFTER_END_OF_REGION)) / vectorLength
+        this.vectorYOffsetForEndPoint =
+            (this.vectorY * (vectorLength + END_POINT_OFFSET_AFTER_END_OF_REGION)) / vectorLength
+
         this.x1 = x1
         this.y1 = y1
         this.x2 = x2
         this.y2 = y2
+
+        const dist1_2 = Math.sqrt(this.points1_2_denominator)
+
+        // start line reduced a little for edge spawn monsters not to instantly disapear because of considered out of the region
+        this.x1forStartLine =
+            x1 + (OFFSET_FOR_START_LINE_NOT_SPAWNED_MONSTERS_TO_BE_CONSIDERED_OUT * this.deltaX2X1) / dist1_2
+        this.y1forStartLine =
+            y1 + (OFFSET_FOR_START_LINE_NOT_SPAWNED_MONSTERS_TO_BE_CONSIDERED_OUT * this.deltaY2Y1) / dist1_2
+        this.x2forStartLine =
+            x2 - (OFFSET_FOR_START_LINE_NOT_SPAWNED_MONSTERS_TO_BE_CONSIDERED_OUT * this.deltaX2X1) / dist1_2
+        this.y2forStartLine =
+            y2 - (OFFSET_FOR_START_LINE_NOT_SPAWNED_MONSTERS_TO_BE_CONSIDERED_OUT * this.deltaY2Y1) / dist1_2
+
+        // start line moved a little towards the end line for edge spawn monsters not to instantly disapear because of considered out of the region
+        this.x1forStartLine =
+            this.x1forStartLine +
+            (OFFSET_FOR_START_LINE_NOT_SPAWNED_MONSTERS_TO_BE_CONSIDERED_OUT * this.vectorX) / vectorLength
+        this.y1forStartLine =
+            this.y1forStartLine +
+            (OFFSET_FOR_START_LINE_NOT_SPAWNED_MONSTERS_TO_BE_CONSIDERED_OUT * this.vectorY) / vectorLength
+        this.x2forStartLine =
+            this.x2forStartLine +
+            (OFFSET_FOR_START_LINE_NOT_SPAWNED_MONSTERS_TO_BE_CONSIDERED_OUT * this.vectorX) / vectorLength
+        this.y2forStartLine =
+            this.y2forStartLine +
+            (OFFSET_FOR_START_LINE_NOT_SPAWNED_MONSTERS_TO_BE_CONSIDERED_OUT * this.vectorY) / vectorLength
+
+        this.deltaX2X1forStartLine = this.x2forStartLine - this.x1forStartLine
+        this.deltaY2Y1forStartLine = this.y2forStartLine - this.y1forStartLine
 
         this.areCoordsInRegionPreCalculation()
     }
@@ -99,5 +151,19 @@ export class RectangleRegion extends MECRegion {
         arrayPush(lightnings, DrawLine(x3, y3, x4, y4))
 
         return lightnings
+    }
+
+    generateStartAndEndPoints() {
+        const startAndEndPoints = MemoryHandler.getEmptyObject<StartAndEndPoints>()
+
+        const randomOffsetValue = GetRandomReal(0, 1)
+
+        startAndEndPoints.startX = this.x1forStartLine + randomOffsetValue * this.deltaX2X1forStartLine
+        startAndEndPoints.startY = this.y1forStartLine + randomOffsetValue * this.deltaY2Y1forStartLine
+        startAndEndPoints.endX = startAndEndPoints.startX + this.vectorXOffsetForEndPoint
+        startAndEndPoints.endY = startAndEndPoints.startY + this.vectorYOffsetForEndPoint
+        startAndEndPoints.ephemeral = true
+
+        return startAndEndPoints
     }
 }

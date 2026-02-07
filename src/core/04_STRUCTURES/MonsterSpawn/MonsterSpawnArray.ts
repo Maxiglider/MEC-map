@@ -34,40 +34,41 @@ export class MonsterSpawnArray extends BaseArray<MonsterSpawn> {
     }
 
     newFromJson = (monsterSpawnsJson: { [x: string]: any }[]) => {
-        for (let ms of monsterSpawnsJson) {
-            const mt = getUdgMonsterTypes().getByLabel(ms.monsterTypeLabel)
-            if (!mt) {
-                Text.erA('Monster type "' + ms.monsterTypeLabel + '" unknown')
-            } else {
-                const monsterSpawn = new MonsterSpawn(
-                    ms.label,
-                    mt,
-                    typeof ms.sens === 'string' ? convertTextToAngle(ms.sens) : ms.sens,
-                    ms.frequence,
-                    ms.minX,
-                    ms.minY,
-                    ms.maxX,
-                    ms.maxY,
-                    ms.monsterDirectionMode ?? 'straight'
-                )
-
-                // Load click coordinates if they exist
-                if (ms.clickX1 !== undefined) monsterSpawn.setClickX1(ms.clickX1)
-                if (ms.clickY1 !== undefined) monsterSpawn.setClickY1(ms.clickY1)
-                if (ms.clickX2 !== undefined) monsterSpawn.setClickX2(ms.clickX2)
-                if (ms.clickY2 !== undefined) monsterSpawn.setClickY2(ms.clickY2)
-
-                monsterSpawn.setSpawnAmount(ms.spawnAmount || 1)
-                monsterSpawn.setSpawnOffset(ms.spawnOffset || 0)
-                monsterSpawn.setInitialDelay(ms.initialDelay || 0)
-                monsterSpawn.setFixedSpawnOffset(ms.fixedSpawnOffset)
-                monsterSpawn.setFixedSpawnOffsetBounce(ms.fixedSpawnOffsetBounce)
-                monsterSpawn.setFixedSpawnOffsetMirrored(ms.fixedSpawnOffsetMirrored)
-                monsterSpawn.setTimedUnspawn(ms.timedUnspawn)
-                if (ms.spawnShape !== undefined) monsterSpawn.setSpawnShape(ms.spawnShape)
-                this.new(monsterSpawn, false)
-            }
-        }
+        // todo reimplement this method, with retrocompatibity
+        // for (let ms of monsterSpawnsJson) {
+        //     const mt = getUdgMonsterTypes().getByLabel(ms.monsterTypeLabel)
+        //     if (!mt) {
+        //         Text.erA('Monster type "' + ms.monsterTypeLabel + '" unknown')
+        //     } else {
+        //         const monsterSpawn = new MonsterSpawn(
+        //             ms.label,
+        //             mt,
+        //             typeof ms.sens === 'string' ? convertTextToAngle(ms.sens) : ms.sens,
+        //             ms.frequence,
+        //             ms.minX,
+        //             ms.minY,
+        //             ms.maxX,
+        //             ms.maxY,
+        //             ms.monsterDirectionMode ?? 'straight'
+        //         )
+        //
+        //         // Load click coordinates if they exist
+        //         if (ms.clickX1 !== undefined) monsterSpawn.setClickX1(ms.clickX1)
+        //         if (ms.clickY1 !== undefined) monsterSpawn.setClickY1(ms.clickY1)
+        //         if (ms.clickX2 !== undefined) monsterSpawn.setClickX2(ms.clickX2)
+        //         if (ms.clickY2 !== undefined) monsterSpawn.setClickY2(ms.clickY2)
+        //
+        //         monsterSpawn.setSpawnAmount(ms.spawnAmount || 1)
+        //         monsterSpawn.setSpawnOffset(ms.spawnOffset || 0)
+        //         monsterSpawn.setInitialDelay(ms.initialDelay || 0)
+        //         monsterSpawn.setFixedSpawnOffset(ms.fixedSpawnOffset)
+        //         monsterSpawn.setFixedSpawnOffsetBounce(ms.fixedSpawnOffsetBounce)
+        //         monsterSpawn.setFixedSpawnOffsetMirrored(ms.fixedSpawnOffsetMirrored)
+        //         monsterSpawn.setTimedUnspawn(ms.timedUnspawn)
+        //         if (ms.spawnShape !== undefined) monsterSpawn.setSpawnShape(ms.spawnShape)
+        //         this.new(monsterSpawn, false)
+        //     }
+        // }
     }
 
     removeMonsterSpawn = (monsterSpawnId: number) => {

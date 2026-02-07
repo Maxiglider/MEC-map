@@ -3,7 +3,7 @@ import { MakeTerrainHeightAction } from '../MakeLastActions/MakeTerrainHeightAct
 import { MakeCopyLevelPatrol } from '../Make_copy_paste/MakeCopyLevelPatrol'
 import { MakeCaster } from '../Make_create_casters/MakeCaster'
 import { MakeMeteor } from '../Make_create_meteors/MakeMeteor'
-import { MakeMonsterSpawn } from '../Make_create_monster_spawn/MakeMonsterSpawn'
+import { MakeMonsterSpawn } from '../Make_monster_spawn/MakeMonsterSpawn'
 import { MakeMonsterMultiplePatrols } from '../Make_create_monsters/MakeMonsterMultiplePatrols'
 import { MakeMonsterNoMove } from '../Make_create_monsters/MakeMonsterNoMove'
 import { MakeMonsterSimplePatrol } from '../Make_create_monsters/MakeMonsterSimplePatrol'
@@ -55,6 +55,7 @@ import { MakeMonsterAction } from '../MakeLastActions/MakeMonsterAction'
 import { MakeDeleteMonsters } from '../Make_delete_monsters/MakeDeleteMonsters'
 import { MakeSetClearMobEffect } from '../Make_monster_properties/MakeSetClearMobEffect'
 import { MakeDebugMECRegion } from '../Make_create_region/MakeDebugMECRegion'
+import { MakeSetMonsterSpawnZone } from '../Make_monster_spawn/MakeSetMonsterSpawnZone'
 
 export const Makes = {
     MakePropertyChange,
@@ -114,4 +115,5 @@ export const Makes = {
     MakeDeleteMonsters,
     MakeSetClearMobEffect,
     MakeDebugMECRegion,
+    MakeSetMonsterSpawnZone,
 }

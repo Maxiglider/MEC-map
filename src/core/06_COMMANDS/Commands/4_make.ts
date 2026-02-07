@@ -50,6 +50,7 @@ import { RandomizeTerrains } from '../../07_TRIGGERS/Triggers_to_modify_terrains
 import { CmdParam } from '../Helpers/Command_functions'
 import { IsHeroCollisionSizeValid } from '../../04_STRUCTURES/Escaper/Escaper'
 import { adaptMonstersImmolation, snapPatrolsToSlideOffsetMap, snapPointToSlide } from './commands-helpers'
+import { MakeMonsterSpawnKind } from '../../05_MAKE_STRUCTURES/Make_monster_spawn/MakeMonsterSpawn'
 
 export const initExecuteCommandMake = () => {
     const { registerCommand } = ServiceManager.getService('Cmd')
@@ -1931,8 +1932,9 @@ export const initExecuteCommandMake = () => {
         name: 'createMonsterSpawn',
         alias: ['crmsp'],
         group: 'make',
-        argDescription: '<monsterSpawnLabel> <monsterLabel> <direction> [<frequency>] [straight||random]',
-        description: 'Default frequency is 2, minimum is 0.1, maximum is 30',
+        argDescription: '<monsterSpawnLabel> <monsterLabel> <kind> [<frequency>] [straight||random]',
+        description:
+            'Kind must be "up", "down", "left", "right", "line" or "diagonal". Default frequency is 2, minimum is 0.1, maximum is 30',
         cb: ({ nbParam, param1, param2, param3, param4, param5 }, escaper) => {
             if (!(nbParam >= 3 && nbParam <= 5)) {
                 Text.erP(escaper.getPlayer(), 'uncorrect number of parameters')
@@ -1952,26 +1954,21 @@ export const initExecuteCommandMake = () => {
                 return true
             }
 
-            const angle = convertTextToAngle(param3)
-
-            if (!angle) {
-                Text.erP(
-                    escaper.getPlayer(),
-                    'param 3 should be direction : leftToRight, upToDown, rightToLeft or downToUp'
-                )
+            let kind: MakeMonsterSpawnKind = 'up'
+            if (!['up', 'down', 'left', 'right', 'line', 'diagonal'].includes(param3)) {
+                Text.erP(escaper.getPlayer(), 'createMonsterSpawn: wrong kind')
                 return true
+            } else {
+                kind = param3 as MakeMonsterSpawnKind
             }
 
-            let frequency = 0
-
+            let frequency = 2
             if (nbParam >= 4) {
                 frequency = S2R(param4)
                 if (frequency < 0.1 || frequency > 30) {
                     Text.erP(escaper.getPlayer(), 'frequency must be a real between 0.1 and 30')
                     return true
                 }
-            } else {
-                frequency = 2
             }
 
             let monsterDirectionMode: 'straight' | 'random' = 'straight'
@@ -1983,8 +1980,14 @@ export const initExecuteCommandMake = () => {
                 monsterDirectionMode = param5
             }
 
-            escaper.makeCreateMonsterSpawn(param1, monsterType, angle, frequency, monsterDirectionMode)
-            Text.mkP(escaper.getPlayer(), 'monster spawn making on')
+            const make = escaper.makeCreateMonsterSpawn(param1, monsterType, kind, frequency, monsterDirectionMode)
+
+            if (make) {
+                Text.mkP(escaper.getPlayer(), make.getMakingMessage())
+            } else {
+                Text.erP(escaper.getPlayer(), 'failed to initiate the creation of the monster spawn')
+            }
+
             return true
         },
     })
@@ -2039,35 +2042,39 @@ export const initExecuteCommandMake = () => {
         },
     })
 
-    //-setMonsterSpawnDirection(setmsd) <monsterSpawnLabel> <direction>   --> leftToRight(ltr), upToDown(utd), rightToLeft(rtl), downToUp(dtu)
+    // -setMonsterSpawnZone(setmsz) <monsterSpawnLabel> <kind>
     registerCommand({
-        name: 'setMonsterSpawnDirection',
-        alias: ['setmsd', 'setMonsterSpawnRotation', 'setmsr'],
+        name: 'setMonsterSpawnZone',
+        alias: ['setmsz'],
         group: 'make',
-        argDescription: '<monsterSpawnLabel> <direction>',
-        description: 'LeftToRight(ltr), upToDown(utd), rightToLeft(rtl), downToUp(dtu), any angle in degrees',
-        cb: ({ param1, param2 }, escaper) => {
-            const monsterSpawn = escaper.getMakingLevel().monsterSpawns.getByLabel(param1)
+        argDescription: '<monsterSpawnLabel> <kind>',
+        description: 'Kind must be "up", "down", "left", "right", "line" or "diagonal".',
+        cb: ({ param1, param2, nbParam }, escaper) => {
+            if (nbParam !== 2) {
+                Text.erP(escaper.getPlayer(), 'setMonsterSpawnZone: wrong number of parameters')
+                return true
+            }
 
+            const monsterSpawn = escaper.getMakingLevel().monsterSpawns.getByLabel(param1)
             if (!monsterSpawn) {
                 Text.erP(escaper.getPlayer(), 'unknown monster spawn "' + param1 + '" in this level')
                 return true
             }
 
-            let angle: number | undefined = undefined
-
-            if (param2 !== '' && param2 !== '0') {
-                angle = convertTextToAngle(param2)
-
-                if (!angle) {
-                    Text.erP(escaper.getPlayer(), 'Invalid angle')
-                    return true
-                }
-
-                monsterSpawn.setRotation(angle)
-                Text.mkP(escaper.getPlayer(), `Rotation changed to: ${angle}`)
+            let kind: MakeMonsterSpawnKind = 'up'
+            if (!['up', 'down', 'left', 'right', 'line', 'diagonal'].includes(param2)) {
+                Text.erP(escaper.getPlayer(), 'createMonsterSpawn: wrong kind')
+                return true
             } else {
-                Text.mkP(escaper.getPlayer(), 'Invalid rotation')
+                kind = param2 as MakeMonsterSpawnKind
+            }
+
+            const make = escaper.makeSetMonsterSpawnZone(monsterSpawn, kind)
+
+            if (make) {
+                Text.mkP(escaper.getPlayer(), make.getMakingMessage())
+            } else {
+                Text.erP(escaper.getPlayer(), 'failed to initiate the creation of the monster spawn')
             }
 
             return true
@@ -2299,47 +2306,48 @@ export const initExecuteCommandMake = () => {
         },
     })
 
+    // todo will be replaced with setmsZone
     //-setMonsterSpawnShape(setmssh) <label> <shape>
-    registerCommand({
-        name: 'setMonsterSpawnShape',
-        alias: ['setmssh'],
-        group: 'make',
-        argDescription: '<label> <shape>',
-        description:
-            'set spawn shape (region=default, line, point) - line/point modes spawn at clicks and walk in direction (requires timedUnspawn)',
-        cb: ({ param1, param2 }, escaper) => {
-            const monsterSpawn = escaper.getMakingLevel().monsterSpawns.getByLabel(param1)
-
-            if (!monsterSpawn) {
-                Text.erP(escaper.getPlayer(), 'unknown monster spawn "' + param1 + '" in this level')
-                return true
-            }
-
-            const shape = param2.toLowerCase()
-            if (shape !== 'region' && shape !== 'line' && shape !== 'point') {
-                Text.erP(escaper.getPlayer(), 'shape must be one of: region, line, point')
-                return true
-            }
-
-            if (
-                shape !== 'region' &&
-                (monsterSpawn.getTimedUnspawn() === undefined || monsterSpawn.getTimedUnspawn()! <= 0)
-            ) {
-                Text.erP(
-                    escaper.getPlayer(),
-                    'Cannot set shape to "' +
-                        shape +
-                        '" without timedUnspawn set. Use setMonsterSpawnTimedUnspawn first.'
-                )
-                return true
-            }
-
-            monsterSpawn.setSpawnShape(shape as 'region' | 'line' | 'point')
-
-            Text.mkP(escaper.getPlayer(), `Spawn shape set to: ${shape}`)
-            return true
-        },
-    })
+    // registerCommand({
+    //     name: 'setMonsterSpawnShape',
+    //     alias: ['setmssh'],
+    //     group: 'make',
+    //     argDescription: '<label> <shape>',
+    //     description:
+    //         'set spawn shape (region=default, line, point) - line/point modes spawn at clicks and walk in direction (requires timedUnspawn)',
+    //     cb: ({ param1, param2 }, escaper) => {
+    //         const monsterSpawn = escaper.getMakingLevel().monsterSpawns.getByLabel(param1)
+    //
+    //         if (!monsterSpawn) {
+    //             Text.erP(escaper.getPlayer(), 'unknown monster spawn "' + param1 + '" in this level')
+    //             return true
+    //         }
+    //
+    //         const shape = param2.toLowerCase()
+    //         if (shape !== 'region' && shape !== 'line' && shape !== 'point') {
+    //             Text.erP(escaper.getPlayer(), 'shape must be one of: region, line, point')
+    //             return true
+    //         }
+    //
+    //         if (
+    //             shape !== 'region' &&
+    //             (monsterSpawn.getTimedUnspawn() === undefined || monsterSpawn.getTimedUnspawn()! <= 0)
+    //         ) {
+    //             Text.erP(
+    //                 escaper.getPlayer(),
+    //                 'Cannot set shape to "' +
+    //                     shape +
+    //                     '" without timedUnspawn set. Use setMonsterSpawnTimedUnspawn first.'
+    //             )
+    //             return true
+    //         }
+    //
+    //         monsterSpawn.setSpawnShape(shape as 'region' | 'line' | 'point')
+    //
+    //         Text.mkP(escaper.getPlayer(), `Spawn shape set to: ${shape}`)
+    //         return true
+    //     },
+    // })
 
     //-setMonsterSpawnMonsterDirectionMode(setmsmdm) <label> straight|random
     registerCommand({

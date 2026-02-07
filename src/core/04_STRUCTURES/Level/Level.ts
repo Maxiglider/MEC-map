@@ -17,7 +17,6 @@ import { MonsterArray } from '../Monster/MonsterArray'
 import { MonsterMultiplePatrols } from '../Monster/MonsterMultiplePatrols'
 import { MonsterSimplePatrol } from '../Monster/MonsterSimplePatrol'
 import type { MonsterType } from '../Monster/MonsterType'
-import { createDiagonalRegions } from '../MonsterSpawn/MonsterSpawn'
 import { MonsterSpawnArray } from '../MonsterSpawn/MonsterSpawnArray'
 import { CircleMobArray } from '../Monster_properties/CircleMobArray'
 import { ClearMobArray } from '../Monster_properties/ClearMobArray'
@@ -31,6 +30,7 @@ import { VisibilityModifierArray } from './VisibilityModifierArray'
 import { checkPointReviveHeroes } from './checkpointReviveHeroes_function'
 import { MonsterNoMove } from '../Monster/MonsterNoMove'
 import { DefineDrawLineType, DrawLine } from '../../01_libraries/Draw_lines'
+import { createDiagonalRegions } from '../../01_libraries/Regions_functions'
 
 type ITempTerrainTypeMap = {
     [x_y: string]:
@@ -342,54 +342,8 @@ export class Level {
             }
 
             // Monster spawns
-            DefineDrawLineType('orange', 2)
             for (const [_, monsterSpawn] of pairs(this.monsterSpawns.getAll())) {
-                const spawnShape = monsterSpawn.getSpawnShape()
-
-                if (spawnShape === 'line') {
-                    // Draw a line for line mode
-                    this.drawLine(
-                        monsterSpawn.getClickX1(),
-                        monsterSpawn.getClickY1(),
-                        monsterSpawn.getClickX2(),
-                        monsterSpawn.getClickY2()
-                    )
-                } else if (spawnShape === 'point') {
-                    // Draw a point for point mode (small cross)
-                    const x = monsterSpawn.getClickX1()
-                    const y = monsterSpawn.getClickY1()
-                    const size = 32 // Small cross size
-                    this.drawLine(x - size, y, x + size, y)
-                    this.drawLine(x, y - size, x, y + size)
-                } else {
-                    // Draw a rectangle for region spawns
-                    const rotatedPoints = monsterSpawn.getRotatedPoints()
-
-                    this.drawRectangle(
-                        rotatedPoints[0].x,
-                        rotatedPoints[0].y,
-                        rotatedPoints[1].x,
-                        rotatedPoints[1].y,
-                        rotatedPoints[2].x,
-                        rotatedPoints[2].y,
-                        rotatedPoints[3].x,
-                        rotatedPoints[3].y
-                    )
-
-                    MemoryHandler.destroyArray(rotatedPoints)
-                }
-
-                if (monsterSpawn.unspawnregpoints.length > 0) {
-                    for (const reg of monsterSpawn.unspawnregpoints) {
-                        this.drawRegion(reg[0], reg[1], reg[2], reg[3])
-                    }
-                }
-
-                if (monsterSpawn.multiRegionPatrols) {
-                    for (let i = 0; i < monsterSpawn.x1.length; i++) {
-                        this.drawRegion(monsterSpawn.x1[i], monsterSpawn.y1[i], monsterSpawn.x2[i], monsterSpawn.y2[i])
-                    }
-                }
+                monsterSpawn.getMecRegion()?.debugRects(true) // todo find out when to disable this
             }
 
             // Monsters

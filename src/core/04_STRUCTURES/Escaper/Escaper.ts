@@ -51,6 +51,8 @@ import { Make } from '../../05_MAKE_STRUCTURES/Make/Make'
 import { refreshTrigMoveCollisionLandmarks } from '../../07_TRIGGERS/CollisionLandmarks/MoveCollisionLandmarks'
 import { MakeMECRegionMode } from '../../05_MAKE_STRUCTURES/Make_create_region/MakeMECRegion'
 import { HorizontalRegionDirection } from '../Region/HorizontalRegion'
+import { MakeMonsterSpawnKind } from '../../05_MAKE_STRUCTURES/Make_monster_spawn/MakeMonsterSpawn'
+import { MonsterSpawn } from '../MonsterSpawn/MonsterSpawn'
 
 const SHOW_REVIVE_EFFECTS = false
 
@@ -1601,13 +1603,36 @@ export class Escaper {
     makeCreateMonsterSpawn(
         label: string,
         mt: MonsterType,
-        sens: number,
+        kind: MakeMonsterSpawnKind,
         frequency: number,
         monsterDirectionMode: 'straight' | 'random'
     ) {
         this.destroyMake()
-        if (this.hero)
-            this.make = new Makes.MakeMonsterSpawn(this.hero, label, mt, sens, frequency, monsterDirectionMode)
+        if (this.hero) {
+            const makeMonsterSpawn = new Makes.MakeMonsterSpawn(
+                this.hero,
+                label,
+                mt,
+                kind,
+                frequency,
+                monsterDirectionMode
+            )
+            this.make = makeMonsterSpawn
+            return makeMonsterSpawn
+        }
+
+        return null
+    }
+
+    makeSetMonsterSpawnZone(monsterSpawn: MonsterSpawn, kind: MakeMonsterSpawnKind) {
+        this.destroyMake()
+        if (this.hero) {
+            const makeSetMonsterSpawnZone = new Makes.MakeSetMonsterSpawnZone(this.hero, monsterSpawn, kind)
+            this.make = makeSetMonsterSpawnZone
+            return makeSetMonsterSpawnZone
+        }
+
+        return null
     }
 
     makeCreateRegion(label: string) {

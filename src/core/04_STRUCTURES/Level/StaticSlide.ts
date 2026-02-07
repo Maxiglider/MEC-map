@@ -3,9 +3,9 @@ import { createEvent } from 'Utils/mapUtils'
 import { AnglesDiff, arrayPush } from 'core/01_libraries/Basic_functions'
 import { getUdgEscapers } from '../../../../globals'
 import { Hero2Escaper, IsHero } from '../Escaper/Escaper_functions'
-import { createDiagonalRegions } from '../MonsterSpawn/MonsterSpawn'
 import { Level } from './Level'
 import { Natives } from '../../wc3_natives_unsecured/Natives'
+import { createDiagonalRegions } from '../../01_libraries/Regions_functions'
 
 export class StaticSlide {
     private x1: number
