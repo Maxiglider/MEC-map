@@ -99,6 +99,8 @@ export const NewImmobileMonsterForPlayer = (
         UnitAddAbility(monster, ABILITY_ANNULER_VISION)
     }
 
+    SetUnitPathing(monster, false)
+
     const immoSkill = mt.getImmolationSkill() || 0
 
     immoSkill > 0 && UnitAddAbility(monster, immoSkill)
