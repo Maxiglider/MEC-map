@@ -51,6 +51,7 @@ import { CmdParam } from '../Helpers/Command_functions'
 import { IsHeroCollisionSizeValid } from '../../04_STRUCTURES/Escaper/Escaper'
 import { adaptMonstersImmolation, snapPatrolsToSlideOffsetMap, snapPointToSlide } from './commands-helpers'
 import { MakeMonsterSpawnKind } from '../../05_MAKE_STRUCTURES/Make_monster_spawn/MakeMonsterSpawn'
+import { MonsterDirectionMode } from '../../04_STRUCTURES/MonsterSpawn/MonsterSpawn'
 
 export const initExecuteCommandMake = () => {
     const { registerCommand } = ServiceManager.getService('Cmd')
@@ -1971,7 +1972,7 @@ export const initExecuteCommandMake = () => {
                 }
             }
 
-            let monsterDirectionMode: 'straight' | 'random' = 'straight'
+            let monsterDirectionMode: MonsterDirectionMode = 'straight'
             if (nbParam >= 5) {
                 if (param5 !== 'straight' && param5 !== 'random') {
                     Text.erP(escaper.getPlayer(), 'param 5 should be : straight or random')

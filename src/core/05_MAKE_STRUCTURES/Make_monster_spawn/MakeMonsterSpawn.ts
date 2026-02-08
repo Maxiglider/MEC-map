@@ -1,7 +1,7 @@
 import { MonsterType } from 'core/04_STRUCTURES/Monster/MonsterType'
 import { MakeOneByOneOrTwoClicks } from 'core/05_MAKE_STRUCTURES/Make/MakeOneByOneOrTwoClicks'
 import { Text } from '../../01_libraries/Text'
-import { MonsterSpawn } from '../../04_STRUCTURES/MonsterSpawn/MonsterSpawn'
+import { MonsterDirectionMode, MonsterSpawn } from '../../04_STRUCTURES/MonsterSpawn/MonsterSpawn'
 import { MakeMECRegion, MakeMECRegionMode } from '../Make_create_region/MakeMECRegion'
 import { HorizontalRegionDirection } from '../../04_STRUCTURES/Region/HorizontalRegion'
 import { MECRegion } from '../../04_STRUCTURES/Region/MECRegion'
@@ -35,7 +35,7 @@ export class MakeMonsterSpawn extends MakeMECRegion {
     monsterType: MonsterType
     kind: MakeMonsterSpawnKind
     frequency: number
-    monsterDirectionMode: 'straight' | 'random'
+    monsterDirectionMode: MonsterDirectionMode
 
     constructor(
         maker: unit,
@@ -43,7 +43,7 @@ export class MakeMonsterSpawn extends MakeMECRegion {
         mt: MonsterType,
         kind: MakeMonsterSpawnKind,
         frequency: number,
-        monsterDirectionMode: 'straight' | 'random'
+        monsterDirectionMode: MonsterDirectionMode
     ) {
         super(maker, MakeMonsterSpawnKind2MakeMECRegionMode(kind), MakeMonsterSpawnKind2DirectionForHorizontal(kind))
 

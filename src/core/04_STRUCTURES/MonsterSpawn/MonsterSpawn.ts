@@ -16,7 +16,9 @@ import { NewImmobileMonsterForPlayer } from '../Monster/Monster_functions'
 import { initSimpleUnitRecycler } from './SimpleUnitRecycler'
 import { Natives } from '../../wc3_natives_unsecured/Natives'
 import { IssueMoveOrderForLongDistance } from '../Monster/LongDistanceMoveOrder'
-import { MECRegion, StartAndEndPoints } from '../Region/MECRegion'
+import { GenerateStartAndEndPointsOptions, MECRegion, StartAndEndPoints } from '../Region/MECRegion'
+
+export type MonsterDirectionMode = 'straight' | 'random'
 
 const MAXIMUM_SPANWED_MONSTERS_SIMULTANEOUSLY = 500
 
@@ -46,7 +48,13 @@ const MonsterSpawn_Actions = errorHandler(() => {
     }
 
     for (let spawnIndex = 0; spawnIndex < monsterSpawn.getSpawnAmount(); spawnIndex++) {
-        const startAndEndPoints = mecRegion.generateStartAndEndPoints(forcedDistance)
+        const options = MemoryHandler.getEmptyObject<GenerateStartAndEndPointsOptions>()
+        options.forcedDistance = forcedDistance
+        options.monsterDirectionMode = monsterSpawn.getMonsterDirectionMode()
+
+        const startAndEndPoints = mecRegion.generateStartAndEndPoints(options)
+        MemoryHandler.destroyObject(options)
+
         const mobUnit = monsterSpawn.createMob(startAndEndPoints)
 
         if (mobUnit) {
@@ -103,7 +111,7 @@ export class MonsterSpawn {
     private initialDelay = 0
     private timedUnspawn: number | undefined
 
-    private monsterDirectionMode: 'straight' | 'random'
+    private monsterDirectionMode: MonsterDirectionMode
 
     private tSpawn?: trigger
     private tUnspawn?: trigger
@@ -145,7 +153,7 @@ export class MonsterSpawn {
         mt: MonsterType,
         mecRegion: MECRegion,
         frequence: number,
-        monsterDirectionMode: 'straight' | 'random'
+        monsterDirectionMode: MonsterDirectionMode
     ) {
         this.monsterDirectionMode = monsterDirectionMode
 
@@ -364,8 +372,12 @@ export class MonsterSpawn {
         TriggerAddAction(this.tSpawn, MonsterSpawn_Actions)
     }
 
-    setMonsterDirectionMode(mode: 'straight' | 'random') {
+    setMonsterDirectionMode(mode: MonsterDirectionMode) {
         this.monsterDirectionMode = mode
+    }
+
+    getMonsterDirectionMode() {
+        return this.monsterDirectionMode
     }
 
     toText = (): string => {

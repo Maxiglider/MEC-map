@@ -1,5 +1,6 @@
 import {
     END_POINT_OFFSET_AFTER_END_OF_REGION,
+    GenerateStartAndEndPointsOptions,
     MECRegion,
     OFFSET_FOR_START_LINE_NOT_SPAWNED_MONSTERS_TO_BE_CONSIDERED_OUT,
     StartAndEndPoints,
@@ -35,6 +36,13 @@ export class RectangleRegion extends MECRegion {
     private vectorXforEndPoint: number
     private vectorYforEndPoint: number
 
+    private endLineX1: number
+    private endLineY1: number
+    private endLineX2: number
+    private endLineY2: number
+    private endLineDeltaX: number
+    private endLineDeltaY: number
+
     protected directionAngleCos: number
     protected directionAngleSine: number
 
@@ -69,6 +77,13 @@ export class RectangleRegion extends MECRegion {
 
         this.vectorXforEndPoint = (this.vectorX * (vectorLength + END_POINT_OFFSET_AFTER_END_OF_REGION)) / vectorLength
         this.vectorYforEndPoint = (this.vectorY * (vectorLength + END_POINT_OFFSET_AFTER_END_OF_REGION)) / vectorLength
+
+        this.endLineX1 = x1 + this.vectorXforEndPoint
+        this.endLineY1 = y1 + this.vectorYforEndPoint
+        this.endLineX2 = x2 + this.vectorXforEndPoint
+        this.endLineY2 = y2 + this.vectorYforEndPoint
+        this.endLineDeltaX = this.endLineX2 - this.endLineX1
+        this.endLineDeltaY = this.endLineY2 - this.endLineY1
 
         this.x1 = x1
         this.y1 = y1
@@ -160,7 +175,7 @@ export class RectangleRegion extends MECRegion {
         return lightnings
     }
 
-    generateStartAndEndPoints(forcedDistance?: number) {
+    generateStartAndEndPoints(options?: GenerateStartAndEndPointsOptions) {
         const startAndEndPoints = MemoryHandler.getEmptyObject<StartAndEndPoints>()
 
         const randomOffsetValue = GetRandomReal(0, 1)
@@ -168,12 +183,31 @@ export class RectangleRegion extends MECRegion {
         startAndEndPoints.startX = this.x1forStartLine + randomOffsetValue * this.deltaX2X1forStartLine
         startAndEndPoints.startY = this.y1forStartLine + randomOffsetValue * this.deltaY2Y1forStartLine
 
-        if (forcedDistance === undefined) {
-            startAndEndPoints.endX = startAndEndPoints.startX + this.vectorXforEndPoint
-            startAndEndPoints.endY = startAndEndPoints.startY + this.vectorYforEndPoint
+        if (options?.forcedDistance === undefined) {
+            if (options?.monsterDirectionMode === 'random') {
+                const randomReal = GetRandomReal(0, 1)
+                startAndEndPoints.endX = this.endLineX1 + randomReal * this.endLineDeltaX
+                startAndEndPoints.endY = this.endLineY1 + randomReal * this.endLineDeltaY
+            } else {
+                startAndEndPoints.endX = startAndEndPoints.startX + this.vectorXforEndPoint
+                startAndEndPoints.endY = startAndEndPoints.startY + this.vectorYforEndPoint
+            }
         } else {
-            startAndEndPoints.endX = startAndEndPoints.startX + this.directionAngleCos * forcedDistance
-            startAndEndPoints.endY = startAndEndPoints.startY + this.directionAngleSine * forcedDistance
+            let directionAngleCos = this.directionAngleCos
+            let directionAngleSine = this.directionAngleSine
+            if (options?.monsterDirectionMode === 'random') {
+                const randomReal = GetRandomReal(0, 1)
+                const baseEndX = this.endLineX1 + randomReal * this.endLineDeltaX
+                const baseEndY = this.endLineY1 + randomReal * this.endLineDeltaY
+                const directionAngle = Math.atan2(
+                    baseEndY - startAndEndPoints.startY,
+                    baseEndX - startAndEndPoints.startX
+                )
+                directionAngleCos = Math.cos(directionAngle)
+                directionAngleSine = Math.sin(directionAngle)
+            }
+            startAndEndPoints.endX = startAndEndPoints.startX + directionAngleCos * options.forcedDistance
+            startAndEndPoints.endY = startAndEndPoints.startY + directionAngleSine * options.forcedDistance
         }
 
         startAndEndPoints.ephemeral = true

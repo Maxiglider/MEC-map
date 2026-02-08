@@ -1,5 +1,6 @@
 import { DefineDrawLineType } from '../../01_libraries/Draw_lines'
 import { IDestroyable } from '../../../Utils/MemoryHandler'
+import { MonsterDirectionMode } from '../MonsterSpawn/MonsterSpawn'
 
 const WATCH_TIMER_PERIOD = 0.05
 
@@ -12,6 +13,11 @@ export type StartAndEndPoints = {
     endX: number
     endY: number
     ephemeral: boolean
+}
+
+export type GenerateStartAndEndPointsOptions = {
+    forcedDistance?: number
+    monsterDirectionMode: MonsterDirectionMode
 }
 
 export abstract class MECRegion {
@@ -189,7 +195,9 @@ export abstract class MECRegion {
         this.debugRects(false)
     }
 
-    generateStartAndEndPoints(forcedDistance?: number): StartAndEndPoints & IDestroyable {
+    generateStartAndEndPoints(
+        options?: GenerateStartAndEndPointsOptions & IDestroyable
+    ): StartAndEndPoints & IDestroyable {
         throw new Error('generateStartAndEndPoints method not implemented for this region type')
     }
 
