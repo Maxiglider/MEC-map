@@ -1635,6 +1635,21 @@ export class Escaper {
         return null
     }
 
+    makeMonsterSpawnHideRegion(monsterSpawn: MonsterSpawn, mecRegionMode: MakeMECRegionMode) {
+        this.destroyMake()
+        if (this.hero) {
+            const makeMonsterSpawnHideRegion = new Makes.MakeMonsterSpawnHideRegion(
+                this.hero,
+                monsterSpawn,
+                mecRegionMode
+            )
+            this.make = makeMonsterSpawnHideRegion
+            return makeMonsterSpawnHideRegion
+        }
+
+        return null
+    }
+
     makeCreateRegion(label: string) {
         this.destroyMake()
         if (this.hero) this.make = new Makes.MakeRegion(this.hero, label)

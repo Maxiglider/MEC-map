@@ -344,6 +344,7 @@ export class Level {
             // Monster spawns
             for (const [_, monsterSpawn] of pairs(this.monsterSpawns.getAll())) {
                 monsterSpawn.getMecRegion()?.debugRects(true) // todo find out when to disable this
+                monsterSpawn.debugHideRegions(true) // todo find out when to disable this
             }
 
             // Monsters

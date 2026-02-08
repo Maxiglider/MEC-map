@@ -13,10 +13,12 @@ export type StartAndEndPoints = {
     endX: number
     endY: number
     ephemeral: boolean
-    spawnVal?: number // used for RectangleRegions to represent a part of the startLine length from P1 to P2 that generates the spawn point, from 0 to startLineLength. Used in case of fixedSpawnOffsetBounce enabled
 }
 
 export abstract class MECRegion {
+    private static lastId = -1
+
+    private id: number
     private watchForEventsTimer?: timer
     private watchedUnits: Map<number, unit>
     private unitsConsideredInRegion: Map<number, unit>
@@ -27,15 +29,17 @@ export abstract class MECRegion {
     private lastUnitEntersOrLeavesCallbackId: number = 0
 
     private currentlyDebugging = false
-    private debugLightnings: lightning[] = []
-    private debugEffects: effect[] = []
+    private debugLightnings: lightning[] = MemoryHandler.getEmptyArray<lightning>()
+    private debugEffects: effect[] = MemoryHandler.getEmptyArray<effect>()
 
-    protected withEnterAndLeaveZone: boolean
-    protected isLeaveZoneEnabled: boolean
+    protected withEnterAndLeaveZone = false
+    protected isLeaveZoneEnabled = true
 
-    constructor(withEnterAndLeaveZone = false, isLeaveZoneEnabled = true) {
-        this.withEnterAndLeaveZone = withEnterAndLeaveZone
-        this.isLeaveZoneEnabled = isLeaveZoneEnabled
+    private defaultDebugLineColor = 'yellow'
+    private defaultDebugLineWidth = 2
+
+    protected constructor() {
+        this.id = ++MECRegion.lastId
 
         this.watchedUnits = new Map()
         this.unitsConsideredInRegion = new Map()
@@ -111,14 +115,18 @@ export abstract class MECRegion {
      * Reimplement in children if needed
      */
     generateDebugLightnings(): lightning[] {
-        return []
+        MemoryHandler.destroyArray(this.debugLightnings)
+        this.debugLightnings = MemoryHandler.getEmptyArray<lightning>()
+        return this.debugLightnings
     }
 
     /**
      * Reimplement in children if needed
      */
     generateDebugEffects(): effect[] {
-        return []
+        MemoryHandler.destroyArray(this.debugEffects)
+        this.debugEffects = MemoryHandler.getEmptyArray<effect>()
+        return this.debugEffects
     }
 
     debugRects(enable: boolean): void {
@@ -135,12 +143,12 @@ export abstract class MECRegion {
             for (const lightning of this.debugLightnings) {
                 DestroyLightning(lightning)
             }
+            MemoryHandler.destroyArray(this.debugLightnings)
             for (const effect of this.debugEffects) {
                 BlzSetSpecialEffectScale(effect, 0) // hide it because an effect doesn't visually instanstly disappear on destroy
                 DestroyEffect(effect)
             }
-            this.debugLightnings = []
-            this.debugEffects = []
+            MemoryHandler.destroyArray(this.debugEffects)
         }
     }
 
@@ -174,25 +182,44 @@ export abstract class MECRegion {
     }
 
     protected defineDebugLineType() {
-        DefineDrawLineType('yellow', 2)
+        DefineDrawLineType(this.defaultDebugLineColor, this.defaultDebugLineWidth)
     }
 
     isWithEnterAndLeaveZone() {
         return this.withEnterAndLeaveZone
     }
 
-    destroy(): void {
-        this.watchForEventsTimer && DestroyTimer(this.watchForEventsTimer)
+    setWithEnterAndLeaveZone(withEnterAndLeaveZone: boolean): void {
+        if (withEnterAndLeaveZone === this.withEnterAndLeaveZone) {
+            return
+        }
+
+        this.withEnterAndLeaveZone = withEnterAndLeaveZone
+        this.refreshDebuggingRects()
+    }
+
+    disable() {
+        this.enableWatchUnits(false)
         this.debugRects(false)
         this.watchedUnits.clear()
         this.unitsConsideredInRegion.clear()
         this.unitEntersCallbacks.clear()
         this.unitLeavesCallbacks.clear()
-        this.debugRects(false)
+    }
+
+    destroy(): void {
+        this.disable()
     }
 
     generateStartAndEndPoints(monsterSpawn?: MonsterSpawn): StartAndEndPoints & IDestroyable {
         throw new Error('generateStartAndEndPoints method not implemented for this region type')
+    }
+
+    refreshDebuggingRects(): void {
+        if (this.currentlyDebugging) {
+            this.debugRects(false)
+            this.debugRects(true)
+        }
     }
 
     setIsLeaveZoneEnabled(enabled: boolean): void {
@@ -201,11 +228,21 @@ export abstract class MECRegion {
         }
 
         this.isLeaveZoneEnabled = enabled
-        if (this.currentlyDebugging) {
-            // refresh the debug lines
-            this.debugRects(false)
-            this.debugRects(true)
-        }
+        this.refreshDebuggingRects()
+    }
+
+    setDefaultDebugLineColor(color: string): void {
+        this.defaultDebugLineColor = color
+        this.refreshDebuggingRects()
+    }
+
+    setDefaultDebugLineWidth(width: number): void {
+        this.defaultDebugLineWidth = width
+        this.refreshDebuggingRects()
+    }
+
+    getId(): number {
+        return this.id
     }
 
     toJson() {

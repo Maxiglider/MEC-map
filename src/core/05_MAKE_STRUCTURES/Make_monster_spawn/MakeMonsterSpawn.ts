@@ -55,6 +55,8 @@ export class MakeMonsterSpawn extends MakeMECRegion {
     }
 
     onMECRegionCreated(mecRegion: MECRegion) {
+        mecRegion.setWithEnterAndLeaveZone(true)
+
         const level = this.escaper.getMakingLevel()
 
         const monsterSpawn = new MonsterSpawn(

@@ -17,7 +17,7 @@ export class LineRegion extends RectangleRegion {
 
     private startAndEndPoints: StartAndEndPoints & IDestroyable
 
-    constructor(x1: number, y1: number, x2: number, y2: number, withEnterAndLeaveZone = false) {
+    constructor(x1: number, y1: number, x2: number, y2: number) {
         const directionAngle = Rad2Deg(Math.atan2(y2 - y1, x2 - x1))
 
         const diagX1offsetAngle = directionAngle + 90
@@ -31,7 +31,7 @@ export class LineRegion extends RectangleRegion {
         const diagX3 = x2
         const diagY3 = y2
 
-        super(diagX1, diagY1, diagX2, diagY2, diagX3, diagY3, withEnterAndLeaveZone)
+        super(diagX1, diagY1, diagX2, diagY2, diagX3, diagY3)
 
         // End point has to be outside of the region
         const endX = x2 + Math.cos(Deg2Rad(directionAngle)) * END_POINT_OFFSET_AFTER_END_OF_REGION

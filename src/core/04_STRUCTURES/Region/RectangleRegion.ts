@@ -54,8 +54,8 @@ export class RectangleRegion extends MECRegion {
     private dotP1P2: number = 0
     private dotP4: number = 0
 
-    constructor(x1: number, y1: number, x2: number, y2: number, x3: number, y3: number, withEnterAndLeaveZone = false) {
-        super(withEnterAndLeaveZone)
+    constructor(x1: number, y1: number, x2: number, y2: number, x3: number, y3: number) {
+        super()
 
         this.deltaX2X1 = x2 - x1
         this.deltaY2Y1 = y2 - y1
@@ -162,7 +162,7 @@ export class RectangleRegion extends MECRegion {
     }
 
     generateDebugLightnings(): lightning[] {
-        const lightnings: lightning[] = []
+        const lightnings = MemoryHandler.getEmptyArray<lightning>()
 
         const x3 = this.x2 + this.vectorX
         const y3 = this.y2 + this.vectorY

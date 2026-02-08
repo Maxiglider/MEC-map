@@ -50,17 +50,17 @@ export class MonsterSpawnArray extends BaseArray<MonsterSpawn> {
                     switch (ms.mecRegion.type) {
                         case 'HorizontalRegion': {
                             const { x1, y1, x2, y2, direction } = ms.mecRegion
-                            mecRegion = new HorizontalRegion(x1, y1, x2, y2, direction, true)
+                            mecRegion = new HorizontalRegion(x1, y1, x2, y2, direction)
                             break
                         }
                         case 'LineRegion': {
                             const { originalX1, originalY1, originalX2, originalY2 } = ms.mecRegion
-                            mecRegion = new LineRegion(originalX1, originalY1, originalX2, originalY2, true)
+                            mecRegion = new LineRegion(originalX1, originalY1, originalX2, originalY2)
                             break
                         }
                         case 'RectangleRegion': {
                             const { x1, y1, x2, y2, x3, y3 } = ms.mecRegion
-                            mecRegion = new RectangleRegion(x1, y1, x2, y2, x3, y3, true)
+                            mecRegion = new RectangleRegion(x1, y1, x2, y2, x3, y3)
                             break
                         }
                         default: {
@@ -72,6 +72,8 @@ export class MonsterSpawnArray extends BaseArray<MonsterSpawn> {
                 } else {
                     mecRegion = this.generateMecRegionFromOldJsonFormat(ms)
                 }
+
+                mecRegion.setWithEnterAndLeaveZone(true)
 
                 const monsterSpawn = new MonsterSpawn(
                     ms.label,
@@ -125,7 +127,7 @@ export class MonsterSpawnArray extends BaseArray<MonsterSpawn> {
             case 'region': {
                 // HorizontalRegion or RectangleRegion depending on the direction angle
                 if (direction) {
-                    mecRegion = new HorizontalRegion(ms.minX, ms.minY, ms.maxX, ms.maxY, direction, true)
+                    mecRegion = new HorizontalRegion(ms.minX, ms.minY, ms.maxX, ms.maxY, direction)
                 } else {
                     const anchorX = (ms.minX + ms.maxX) / 2
                     const anchorY = (ms.minY + ms.maxY) / 2
@@ -134,7 +136,7 @@ export class MonsterSpawnArray extends BaseArray<MonsterSpawn> {
                     const p2 = ApplyRotation(anchorX, anchorY, directionAngle, createPoint(ms.maxX, ms.minY))
                     const p3 = ApplyRotation(anchorX, anchorY, directionAngle, createPoint(ms.maxX, ms.maxY))
 
-                    mecRegion = new RectangleRegion(p1.x, p1.y, p2.x, p2.y, p3.x, p3.y, true)
+                    mecRegion = new RectangleRegion(p1.x, p1.y, p2.x, p2.y, p3.x, p3.y)
 
                     MemoryHandler.destroyObject(p1)
                     MemoryHandler.destroyObject(p2)
@@ -156,13 +158,13 @@ export class MonsterSpawnArray extends BaseArray<MonsterSpawn> {
                     x2 += p1p2_dist * CosBJ(directionAngle)
                     y2 += p1p2_dist * SinBJ(directionAngle)
 
-                    mecRegion = new HorizontalRegion(x1, y1, x2, y2, direction, true)
+                    mecRegion = new HorizontalRegion(x1, y1, x2, y2, direction)
                 } else {
                     // RectangleRegion
                     const x3 = x2 + p1p2_dist * CosBJ(directionAngle)
                     const y3 = y2 + p1p2_dist * SinBJ(directionAngle)
 
-                    mecRegion = new RectangleRegion(x1, y1, x2, y2, x3, y3, true)
+                    mecRegion = new RectangleRegion(x1, y1, x2, y2, x3, y3)
                 }
 
                 break
@@ -178,7 +180,7 @@ export class MonsterSpawnArray extends BaseArray<MonsterSpawn> {
                 let x2 = x1 + regionLength * CosBJ(directionAngle)
                 let y2 = y1 + regionLength * SinBJ(directionAngle)
 
-                mecRegion = new LineRegion(x1, y1, x2, y2, true)
+                mecRegion = new LineRegion(x1, y1, x2, y2)
 
                 break
             }

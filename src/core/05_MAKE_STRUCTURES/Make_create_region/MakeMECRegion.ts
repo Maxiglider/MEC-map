@@ -34,8 +34,7 @@ export abstract class MakeMECRegion extends MakeBySeveralClicks {
                         this.savedY[0],
                         this.savedX[1],
                         this.savedY[1],
-                        this.directionForHorizontal,
-                        true
+                        this.directionForHorizontal
                     )
                 } else if (this.mode === 'diagonal') {
                     mecRegion = new RectangleRegion(
@@ -44,8 +43,7 @@ export abstract class MakeMECRegion extends MakeBySeveralClicks {
                         this.savedX[1],
                         this.savedY[1],
                         this.savedX[2],
-                        this.savedY[2],
-                        true
+                        this.savedY[2]
                     )
                 } else if (this.mode === 'circle') {
                     const centerX = this.savedX[0]
@@ -55,7 +53,7 @@ export abstract class MakeMECRegion extends MakeBySeveralClicks {
                     const radius = Math.sqrt((edgeX - centerX) ** 2 + (edgeY - centerY) ** 2)
                     mecRegion = new CircleRegion(centerX, centerY, radius)
                 } else if (this.mode === 'line') {
-                    mecRegion = new LineRegion(this.savedX[0], this.savedY[0], this.savedX[1], this.savedY[1], true)
+                    mecRegion = new LineRegion(this.savedX[0], this.savedY[0], this.savedX[1], this.savedY[1])
                 } else {
                     throw new Error('MakeMECRegion: unknown mode "' + this.mode + '"')
                 }

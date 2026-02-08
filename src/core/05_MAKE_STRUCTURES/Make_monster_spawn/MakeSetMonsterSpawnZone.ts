@@ -20,6 +20,8 @@ export class MakeSetMonsterSpawnZone extends MakeMECRegion {
     }
 
     onMECRegionCreated(mecRegion: MECRegion) {
+        mecRegion.setWithEnterAndLeaveZone(true)
+
         this.monsterSpawn.setMECRegion(mecRegion)
 
         Text.mkP(this.makerOwner, 'monster spawn "' + this.monsterSpawn.getLabel() + '" zone updated')

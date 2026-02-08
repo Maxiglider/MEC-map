@@ -7,7 +7,6 @@ import {
     setHeroBaseCollisionSize,
 } from '../../../../globals'
 import { ServiceManager } from '../../../Services'
-import { createPoint } from '../../../Utils/Point'
 import { String2Ascii } from '../../01_libraries/Ascii'
 import {
     convertAngleToDirection,
@@ -34,7 +33,6 @@ import { MonsterMultiplePatrols } from '../../04_STRUCTURES/Monster/MonsterMulti
 import { MonsterNoMove } from '../../04_STRUCTURES/Monster/MonsterNoMove'
 import { MonsterSimplePatrol } from '../../04_STRUCTURES/Monster/MonsterSimplePatrol'
 import { MONSTER_TELEPORT_PERIOD_MAX, MONSTER_TELEPORT_PERIOD_MIN } from '../../04_STRUCTURES/Monster/MonsterTeleport'
-import { MonsterType } from '../../04_STRUCTURES/Monster/MonsterType'
 import { CLEAR_MOB_MAX_DURATION, FRONT_MONTANT_DURATION } from '../../04_STRUCTURES/Monster_properties/ClearMob'
 import { PORTAL_MOB_MAX_FREEZE_DURATION } from '../../04_STRUCTURES/Monster_properties/PortalMob'
 import { DEATH_TERRAIN_MAX_TOLERANCE, TerrainTypeDeath } from '../../04_STRUCTURES/TerrainType/TerrainTypeDeath'
@@ -52,6 +50,7 @@ import { IsHeroCollisionSizeValid } from '../../04_STRUCTURES/Escaper/Escaper'
 import { adaptMonstersImmolation, snapPatrolsToSlideOffsetMap, snapPointToSlide } from './commands-helpers'
 import { MakeMonsterSpawnKind } from '../../05_MAKE_STRUCTURES/Make_monster_spawn/MakeMonsterSpawn'
 import { MonsterDirectionMode } from '../../04_STRUCTURES/MonsterSpawn/MonsterSpawn'
+import { MakeMECRegionMode } from '../../05_MAKE_STRUCTURES/Make_create_region/MakeMECRegion'
 
 export const initExecuteCommandMake = () => {
     const { registerCommand } = ServiceManager.getService('Cmd')
@@ -2326,7 +2325,6 @@ export const initExecuteCommandMake = () => {
             }
 
             const monsterSpawn = escaper.getMakingLevel().monsterSpawns.getByLabel(param1)
-
             if (!monsterSpawn) {
                 Text.erP(escaper.getPlayer(), 'unknown monster spawn "' + param1 + '" in this level')
                 return true
@@ -2340,6 +2338,47 @@ export const initExecuteCommandMake = () => {
             monsterSpawn.setMonsterDirectionMode(param2)
 
             Text.mkP(escaper.getPlayer(), `Spawn monster direction mode set to: ${param2}`)
+            return true
+        },
+    })
+
+    //-createMonsterSpawnDeadZone(crmsdz) <monsterSpawnLabel> <deadZoneShape>
+    registerCommand({
+        name: 'createMonsterSpawnDeadZone',
+        alias: ['crmsdz'],
+        group: 'make',
+        argDescription: '<label> [<deadZoneShape>]',
+        description:
+            'Add one or several dead zones to a monster spawn (spawned monsters will be hidden in that zone and non lethal). deadZoneShape can be "horizontal", "diagonal", "circle" or "line". Default is "horizontal". Stop creating dead zones with -stop.',
+        cb: ({ nbParam, param1, param2 }, escaper) => {
+            if (nbParam < 1 || nbParam > 2) {
+                Text.erP(escaper.getPlayer(), 'createMonsterSpawnDeadZone: wrong arguments')
+                return true
+            }
+
+            const monsterSpawn = escaper.getMakingLevel().monsterSpawns.getByLabel(param1)
+            if (!monsterSpawn) {
+                Text.erP(escaper.getPlayer(), 'unknown monster spawn "' + param1 + '" in this level')
+                return true
+            }
+
+            let makeMecRegionMode: MakeMECRegionMode = 'horizontal'
+            if (nbParam === 2) {
+                if (!['horizontal', 'diagonal', 'circle', 'line'].includes(param2)) {
+                    Text.erP(escaper.getPlayer(), 'param 2 should be : straight or random')
+                    return true
+                }
+                makeMecRegionMode = param2 as MakeMECRegionMode
+            }
+
+            const make = escaper.makeMonsterSpawnHideRegion(monsterSpawn, makeMecRegionMode)
+
+            if (make) {
+                Text.mkP(escaper.getPlayer(), make.getMakingMessage())
+            } else {
+                Text.erP(escaper.getPlayer(), 'failed to initiate the creation of the monster spawn dead zone')
+            }
+
             return true
         },
     })

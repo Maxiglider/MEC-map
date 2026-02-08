@@ -1,5 +1,7 @@
 import { MECRegion } from './MECRegion'
 import { Constants } from '../../01_libraries/Constants'
+import { MemoryHandler } from '../../../Utils/MemoryHandler'
+import { arrayPush } from '../../01_libraries/Basic_functions'
 
 export class CircleRegion extends MECRegion {
     private centerX: number
@@ -35,7 +37,10 @@ export class CircleRegion extends MECRegion {
         const scale = this.radius / Constants.COLLISION_LANDMARK_MODEL_BASE_RADIUS
         BlzSetSpecialEffectScale(circleEffect, scale)
 
-        return [circleEffect]
+        const effects = MemoryHandler.getEmptyArray<effect>()
+        arrayPush(effects, circleEffect)
+
+        return effects
     }
 
     toJson(): any {

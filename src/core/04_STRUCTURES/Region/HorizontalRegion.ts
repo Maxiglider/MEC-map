@@ -10,14 +10,7 @@ export class HorizontalRegion extends RectangleRegion {
     private maxY: number
     private direction: HorizontalRegionDirection
 
-    constructor(
-        x1: number,
-        y1: number,
-        x2: number,
-        y2: number,
-        direction: HorizontalRegionDirection = 'up',
-        withEnterAndLeaveZone = false
-    ) {
+    constructor(x1: number, y1: number, x2: number, y2: number, direction: HorizontalRegionDirection = 'up') {
         const minX = Math.min(x1, x2)
         const maxX = Math.max(x1, x2)
         const minY = Math.min(y1, y2)
@@ -65,7 +58,7 @@ export class HorizontalRegion extends RectangleRegion {
                 break
         }
 
-        super(diagX1, diagY1, diagX2, diagY2, diagX3, diagY3, withEnterAndLeaveZone)
+        super(diagX1, diagY1, diagX2, diagY2, diagX3, diagY3)
 
         this.minX = minX
         this.maxX = maxX
