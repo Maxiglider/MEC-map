@@ -2,6 +2,7 @@ import { createPoint, IPoint } from '../../../Utils/Point'
 import { Constants } from 'core/01_libraries/Constants'
 import { Natives } from '../../wc3_natives_unsecured/Natives'
 import { MemoryHandler } from '../../../Utils/MemoryHandler'
+import { arrayPush } from '../../01_libraries/Basic_functions'
 
 function OnNextWaypointReached() {
     const triggerId = GetHandleId(GetTriggeringTrigger()!)
@@ -58,9 +59,10 @@ export class LongDistanceMoveOrder {
     private unit: unit
     private destinationX: number
     private destinationY: number
-    private waypoints: IPoint[] = []
-    private waypointRects: rect[] = [] // one rect less than number of waypoints because last waypoint is the destination
-    private waypointRegions: region[] = [] // one region less than number of waypoints because last waypoint is the destination
+    private waypointsX = MemoryHandler.getEmptyArray<number>()
+    private waypointsY = MemoryHandler.getEmptyArray<number>()
+    private waypointRects = MemoryHandler.getEmptyArray<rect>() // one rect less than number of waypoints because last waypoint is the destination
+    private waypointRegions = MemoryHandler.getEmptyArray<region>() // one region less than number of waypoints because last waypoint is the destination
     private currentWaypointIndex: number
     private nextWaypointReachedDectectionTrigger: trigger
 
@@ -87,8 +89,15 @@ export class LongDistanceMoveOrder {
     }
 
     private calculateWaypoints() {
-        this.waypoints = []
-        this.waypointRects = []
+        MemoryHandler.destroyArray(this.waypointsX)
+        MemoryHandler.destroyArray(this.waypointsY)
+        MemoryHandler.destroyArray(this.waypointRects)
+        MemoryHandler.destroyArray(this.waypointRegions)
+
+        this.waypointsX = MemoryHandler.getEmptyArray<number>()
+        this.waypointsY = MemoryHandler.getEmptyArray<number>()
+        this.waypointRects = MemoryHandler.getEmptyArray<rect>()
+        this.waypointRegions = MemoryHandler.getEmptyArray<region>()
 
         const startX = GetUnitX(this.unit)
         const startY = GetUnitY(this.unit)
@@ -102,16 +111,17 @@ export class LongDistanceMoveOrder {
             const t = I2R(i) / I2R(steps)
             const waypointX = startX + t * deltaX
             const waypointY = startY + t * deltaY
-            this.waypoints.push(createPoint(waypointX, waypointY))
+            arrayPush(this.waypointsX, waypointX)
+            arrayPush(this.waypointsY, waypointY)
 
             if (i < steps) {
                 // No rect for the final destination
                 const rect = Rect(waypointX - 16, waypointY - 16, waypointX + 16, waypointY + 16)
-                this.waypointRects.push(rect)
+                arrayPush(this.waypointRects, rect)
 
                 const region = CreateRegion()
                 RegionAddRect(region, rect)
-                this.waypointRegions.push(region)
+                arrayPush(this.waypointRegions, region)
 
                 TriggerRegisterEnterRegion(this.nextWaypointReachedDectectionTrigger, region)
             }
@@ -121,11 +131,12 @@ export class LongDistanceMoveOrder {
     private issueMoveOrderToNextWaypoint() {
         this.currentWaypointIndex++
 
-        if (this.currentWaypointIndex < this.waypoints.length) {
-            const waypoint = this.waypoints[this.currentWaypointIndex]
-            IssuePointOrder(this.unit, 'move', waypoint.x, waypoint.y)
+        if (this.currentWaypointIndex < this.waypointsX.length) {
+            const waypointX = this.waypointsX[this.currentWaypointIndex]
+            const waypointY = this.waypointsY[this.currentWaypointIndex]
+            IssuePointOrder(this.unit, 'move', waypointX, waypointY)
 
-            if (this.currentWaypointIndex === this.waypoints.length - 1) {
+            if (this.currentWaypointIndex === this.waypointsX.length - 1) {
                 // Last waypoint is the final destination, we can clean the region entering detection
                 this.destroy()
             }
@@ -153,14 +164,14 @@ export class LongDistanceMoveOrder {
         for (const rect of this.waypointRects) {
             RemoveRect(rect)
         }
-
         for (const region of this.waypointRegions) {
             RemoveRegion(region)
         }
 
-        for (const waypoint of this.waypoints) {
-            MemoryHandler.destroyObject(waypoint)
-        }
+        MemoryHandler.destroyArray(this.waypointsX)
+        MemoryHandler.destroyArray(this.waypointsY)
+        MemoryHandler.destroyArray(this.waypointRects)
+        MemoryHandler.destroyArray(this.waypointRegions)
     }
 
     public destroyIfObsolete() {
