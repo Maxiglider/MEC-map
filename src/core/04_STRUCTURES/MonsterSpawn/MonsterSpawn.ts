@@ -18,7 +18,6 @@ import { Natives } from '../../wc3_natives_unsecured/Natives'
 import { IssueMoveOrderForLongDistance } from '../Monster/LongDistanceMoveOrder'
 import { MECRegion, StartAndEndPoints } from '../Region/MECRegion'
 
-const DELAY_BETWEEN_SPAWN_AND_MOVEMENT = 0.5
 const MAXIMUM_SPANWED_MONSTERS_SIMULTANEOUSLY = 500
 
 const MonsterSpawn_Actions = errorHandler(() => {
@@ -51,44 +50,21 @@ const MonsterSpawn_Actions = errorHandler(() => {
         const mobUnit = monsterSpawn.createMob(startAndEndPoints)
 
         if (mobUnit) {
-            const mobTimer = CreateTimer()
-            MonsterSpawn.anyTimerId2MonsterSpawn.set(GetHandleId(mobTimer), monsterSpawn)
-            MonsterSpawn.anyTimerId2Unit.set(GetHandleId(mobTimer), mobUnit)
-            MonsterSpawn.anyTimerId2StartAndEndPoints.set(GetHandleId(mobTimer), startAndEndPoints)
+            // Make the unit move
+            IssueMoveOrderForLongDistance(mobUnit, startAndEndPoints.endX, startAndEndPoints.endY)
 
-            TimerStart(mobTimer, DELAY_BETWEEN_SPAWN_AND_MOVEMENT, false, MonsterStartMovement)
+            const unspawnTime = monsterSpawn.getTimedUnspawn()
+            if (unspawnTime !== undefined) {
+                const unspawnTimer = CreateTimer()
+                MonsterSpawn.anyTimedUnspawnTimerId2Unit.set(GetHandleId(unspawnTimer), mobUnit)
+                MonsterSpawn.anyUnit2TimedUnspawnTimer.set(GetHandleId(mobUnit), unspawnTimer)
+                TimerStart(unspawnTimer, unspawnTime, false, MonsterUnspawn)
+            }
+
+            if (startAndEndPoints.ephemeral) {
+                MemoryHandler.destroyObject(startAndEndPoints)
+            }
         }
-    }
-})
-
-const MonsterStartMovement = errorHandler(() => {
-    const mobTimer = Natives.UGetExpiredTimer()
-
-    const monsterSpawn = MonsterSpawn.anyTimerId2MonsterSpawn.get(GetHandleId(mobTimer))
-    MonsterSpawn.anyTimerId2MonsterSpawn.delete(GetHandleId(mobTimer))
-
-    const mobUnit = MonsterSpawn.anyTimerId2Unit.get(GetHandleId(mobTimer))
-    MonsterSpawn.anyTimerId2Unit.delete(GetHandleId(mobTimer))
-
-    const startEndEndPoints = MonsterSpawn.anyTimerId2StartAndEndPoints.get(GetHandleId(mobTimer))
-    MonsterSpawn.anyTimerId2StartAndEndPoints.delete(GetHandleId(mobTimer))
-
-    DestroyTimer(mobTimer)
-
-    if (monsterSpawn?.isActive() && mobUnit && startEndEndPoints) {
-        IssueMoveOrderForLongDistance(mobUnit, startEndEndPoints.endX, startEndEndPoints.endY)
-
-        const unspawnTime = monsterSpawn.getTimedUnspawn()
-        if (unspawnTime !== undefined) {
-            const unspawnTimer = CreateTimer()
-            MonsterSpawn.anyTimedUnspawnTimerId2Unit.set(GetHandleId(unspawnTimer), mobUnit)
-            MonsterSpawn.anyUnit2TimedUnspawnTimer.set(GetHandleId(mobUnit), unspawnTimer)
-            TimerStart(unspawnTimer, unspawnTime, false, MonsterUnspawn)
-        }
-    }
-
-    if (startEndEndPoints?.ephemeral) {
-        MemoryHandler.destroyObject(startEndEndPoints)
     }
 })
 
@@ -109,13 +85,9 @@ export class MonsterSpawn {
     static anyTrigId2MonsterSpawn = new Map<number, MonsterSpawn>()
     static anyMonsterUnitId2MonsterSpawn = new Map<number, MonsterSpawn>()
 
-    // for monster movement starting after a little delay
-    static anyTimerId2MonsterSpawn = new Map<number, MonsterSpawn>()
-    static anyTimerId2Unit = new Map<number, unit>()
-    static anyTimerId2StartAndEndPoints = new Map<number, StartAndEndPoints>()
-
     static anyUnit2TimedUnspawnTimer = new Map<number, timer>()
     static anyTimedUnspawnTimerId2Unit = new Map<number, unit>()
+
     private static lastInstanceId = -1
 
     public static getNextId = () => {
