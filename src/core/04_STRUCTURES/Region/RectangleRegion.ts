@@ -1,6 +1,5 @@
 import {
     END_POINT_OFFSET_AFTER_END_OF_REGION,
-    GenerateStartAndEndPointsOptions,
     MECRegion,
     OFFSET_FOR_START_LINE_NOT_SPAWNED_MONSTERS_TO_BE_CONSIDERED_OUT,
     StartAndEndPoints,
@@ -8,6 +7,7 @@ import {
 import { arrayPush } from '../../01_libraries/Basic_functions'
 import { DrawLine } from '../../01_libraries/Draw_lines'
 import { MemoryHandler } from '../../../Utils/MemoryHandler'
+import { MonsterSpawn } from '../MonsterSpawn/MonsterSpawn'
 
 function dot(x1: number, y1: number, x2: number, y2: number): number {
     return x1 * x2 + y1 * y2
@@ -25,6 +25,7 @@ export class RectangleRegion extends MECRegion {
     private y2forStartLine: number
     private deltaX2X1forStartLine: number
     private deltaY2Y1forStartLine: number
+    private startLineLength: number
 
     private deltaX2X1: number
     private deltaY2Y1: number
@@ -118,6 +119,10 @@ export class RectangleRegion extends MECRegion {
 
         this.deltaX2X1forStartLine = this.x2forStartLine - this.x1forStartLine
         this.deltaY2Y1forStartLine = this.y2forStartLine - this.y1forStartLine
+        this.startLineLength = Math.sqrt(
+            this.deltaX2X1forStartLine * this.deltaX2X1forStartLine +
+                this.deltaY2Y1forStartLine * this.deltaY2Y1forStartLine
+        )
 
         const directionAngle = Math.atan2(this.vectorY, this.vectorX)
         this.directionAngleCos = Math.cos(directionAngle)
@@ -175,7 +180,11 @@ export class RectangleRegion extends MECRegion {
         return lightnings
     }
 
-    generateStartAndEndPoints(options?: GenerateStartAndEndPointsOptions) {
+    generateStartAndEndPoints(monsterSpawn?: MonsterSpawn) {
+        if (monsterSpawn?.getFixedSpawnOffset() !== undefined) {
+            return this.generateStartAndEndPointsWithFixedSpawnOffset(monsterSpawn)
+        }
+
         const startAndEndPoints = MemoryHandler.getEmptyObject<StartAndEndPoints>()
 
         const randomOffsetValue = GetRandomReal(0, 1)
@@ -183,8 +192,9 @@ export class RectangleRegion extends MECRegion {
         startAndEndPoints.startX = this.x1forStartLine + randomOffsetValue * this.deltaX2X1forStartLine
         startAndEndPoints.startY = this.y1forStartLine + randomOffsetValue * this.deltaY2Y1forStartLine
 
-        if (options?.forcedDistance === undefined) {
-            if (options?.monsterDirectionMode === 'random') {
+        const forcedDistance = monsterSpawn?.getForcedDistance()
+        if (forcedDistance === undefined) {
+            if (monsterSpawn?.getMonsterDirectionMode() === 'random') {
                 const randomReal = GetRandomReal(0, 1)
                 startAndEndPoints.endX = this.endLineX1 + randomReal * this.endLineDeltaX
                 startAndEndPoints.endY = this.endLineY1 + randomReal * this.endLineDeltaY
@@ -195,7 +205,7 @@ export class RectangleRegion extends MECRegion {
         } else {
             let directionAngleCos = this.directionAngleCos
             let directionAngleSine = this.directionAngleSine
-            if (options?.monsterDirectionMode === 'random') {
+            if (monsterSpawn?.getMonsterDirectionMode() === 'random') {
                 const randomReal = GetRandomReal(0, 1)
                 const baseEndX = this.endLineX1 + randomReal * this.endLineDeltaX
                 const baseEndY = this.endLineY1 + randomReal * this.endLineDeltaY
@@ -206,12 +216,144 @@ export class RectangleRegion extends MECRegion {
                 directionAngleCos = Math.cos(directionAngle)
                 directionAngleSine = Math.sin(directionAngle)
             }
-            startAndEndPoints.endX = startAndEndPoints.startX + directionAngleCos * options.forcedDistance
-            startAndEndPoints.endY = startAndEndPoints.startY + directionAngleSine * options.forcedDistance
+            startAndEndPoints.endX = startAndEndPoints.startX + directionAngleCos * forcedDistance
+            startAndEndPoints.endY = startAndEndPoints.startY + directionAngleSine * forcedDistance
         }
 
         startAndEndPoints.ephemeral = true
 
         return startAndEndPoints
+    }
+
+    private generateStartAndEndPointsWithFixedSpawnOffset(monsterSpawn: MonsterSpawn) {
+        const spawnVal = this.calcValOffset(monsterSpawn)
+
+        const startAndEndPoints = MemoryHandler.getEmptyObject<StartAndEndPoints>()
+        startAndEndPoints.startX = this.x1forStartLine + (spawnVal / this.startLineLength) * this.deltaX2X1forStartLine
+        startAndEndPoints.startY = this.y1forStartLine + (spawnVal / this.startLineLength) * this.deltaY2Y1forStartLine
+
+        const forcedDistance = monsterSpawn?.getForcedDistance()
+        if (forcedDistance === undefined) {
+            startAndEndPoints.endX = startAndEndPoints.startX + this.vectorXforEndPoint
+            startAndEndPoints.endY = startAndEndPoints.startY + this.vectorYforEndPoint
+        } else {
+            startAndEndPoints.endX = startAndEndPoints.startX + this.directionAngleCos * forcedDistance
+            startAndEndPoints.endY = startAndEndPoints.startY + this.directionAngleSine * forcedDistance
+        }
+
+        startAndEndPoints.ephemeral = true
+
+        return startAndEndPoints
+    }
+
+    private calcValOffset = (monsterSpawn: MonsterSpawn) => {
+        const lastSpawnVal = monsterSpawn.getLastSpawnVal() ?? 0
+        const fixedSpawnOffset = monsterSpawn.getFixedSpawnOffset()
+        if (fixedSpawnOffset === undefined) {
+            throw new Error('fixedSpawnOffset is required for RectangleRegion calcValOffset')
+        }
+
+        const spawnOffset = monsterSpawn.getSpawnOffset()
+        const spawnIndex = monsterSpawn.getSpawnIndex()
+        const spawnAmount = monsterSpawn.getSpawnAmount()
+
+        let newSpawnVal: number
+
+        if (monsterSpawn.getFixedSpawnOffsetMirrored() && monsterSpawn.getMirrored()) {
+            newSpawnVal = this.startLineLength - lastSpawnVal
+        } else {
+            newSpawnVal = lastSpawnVal
+            while (true) {
+                const bouncingBefore = monsterSpawn.getBouncing()
+                newSpawnVal = this.calculateNextNewSpawnVal(monsterSpawn, newSpawnVal)
+
+                if (
+                    !monsterSpawn.getFixedSpawnOffsetBounce() ||
+                    bouncingBefore !== monsterSpawn.getBouncing() ||
+                    spawnIndex !== 0 ||
+                    spawnAmount === 1
+                ) {
+                    break
+                }
+
+                // check if other spawnIndex mobs would be out of the start line
+                const spawnValOfLastSpawnIndex =
+                    newSpawnVal + spawnOffset * (spawnAmount - 1) * (monsterSpawn.getBouncing() ? -1 : 1)
+                if (!this.isSpawnValOutOfBounds(spawnValOfLastSpawnIndex)) {
+                    break
+                }
+            }
+        }
+
+        if (monsterSpawn.getFixedSpawnOffsetMirrored()) {
+            if ((spawnOffset === 0 || spawnIndex % 2 === 0) && !monsterSpawn.getMirrored()) {
+                monsterSpawn.setLastSpawnVal(newSpawnVal)
+            }
+
+            monsterSpawn.setMirrored(!monsterSpawn.getMirrored())
+        } else if (spawnOffset === 0 || spawnIndex === 0) {
+            monsterSpawn.setLastSpawnVal(newSpawnVal)
+        }
+
+        return newSpawnVal
+    }
+
+    private calculateNextNewSpawnVal(monsterSpawn: MonsterSpawn, lastSpawnVal: number) {
+        const fixedSpawnOffset = monsterSpawn.getFixedSpawnOffset()
+        if (fixedSpawnOffset === undefined) {
+            throw new Error('fixedSpawnOffset is required for RectangleRegion calcValOffset')
+        }
+
+        let newSpawnVal
+        if (monsterSpawn.getSpawnOffset() === 0 || monsterSpawn.getSpawnIndex() === 0) {
+            newSpawnVal = lastSpawnVal + fixedSpawnOffset * (monsterSpawn.getBouncing() ? -1 : 1)
+        } else {
+            newSpawnVal =
+                lastSpawnVal +
+                monsterSpawn.getSpawnOffset() *
+                    monsterSpawn.getSpawnIndex() *
+                    (monsterSpawn.getBouncing() ? -1 : 1) *
+                    (monsterSpawn.getFixedSpawnOffsetMirrored() ? 0.5 : 1)
+        }
+
+        if (this.isSpawnValOutOfBounds(newSpawnVal)) {
+            newSpawnVal = this.loopSpawnValToBounds(newSpawnVal, monsterSpawn.getFixedSpawnOffsetBounce())
+            if (
+                monsterSpawn.getFixedSpawnOffsetBounce() &&
+                (monsterSpawn.getSpawnOffset() === 0 || monsterSpawn.getSpawnIndex() === 0)
+            ) {
+                monsterSpawn.setBouncing(!monsterSpawn.getBouncing())
+            }
+        }
+
+        return newSpawnVal
+    }
+
+    private isSpawnValOutOfBounds(spawnVal: number): boolean {
+        return spawnVal > this.startLineLength || spawnVal < 0
+    }
+
+    private loopSpawnValToBounds(spawnVal: number, fixedSpawnOffsetBounce = false): number {
+        let newSpawnVal = spawnVal
+        if (fixedSpawnOffsetBounce) {
+            if (newSpawnVal > this.startLineLength) {
+                const delta = newSpawnVal - this.startLineLength
+                newSpawnVal = Math.max(0, this.startLineLength - delta)
+            } else if (newSpawnVal < 0) {
+                newSpawnVal = Math.min(this.startLineLength, -newSpawnVal)
+            }
+
+            return newSpawnVal
+        } else {
+            if (newSpawnVal > this.startLineLength) {
+                newSpawnVal -= this.startLineLength
+            } else if (newSpawnVal < 0) {
+                newSpawnVal += this.startLineLength
+            } else {
+                return newSpawnVal
+            }
+
+            return this.loopSpawnValToBounds(newSpawnVal)
+        }
     }
 }

@@ -1,11 +1,9 @@
 import { MemoryHandler } from 'Utils/MemoryHandler'
-import { IPoint, createPoint } from 'Utils/Point'
 import { createTimer, errorHandler } from 'Utils/mapUtils'
 import { Constants } from 'core/01_libraries/Constants'
 import { CombineHooks } from 'core/API/MecHookArray'
 import { Timer } from 'w3ts'
-import { globals, udg_spawned_monsters } from '../../../../globals'
-import { GetCurrentMonsterPlayer, arrayPush, convertAngleToDirection } from '../../01_libraries/Basic_functions'
+import { udg_spawned_monsters } from '../../../../globals'
 import { udg_colorCode } from '../../01_libraries/Init_colorCodes'
 import { Text } from '../../01_libraries/Text'
 import { hooks } from '../../API/GeneralHooks'
@@ -16,7 +14,7 @@ import { NewImmobileMonsterForPlayer } from '../Monster/Monster_functions'
 import { initSimpleUnitRecycler } from './SimpleUnitRecycler'
 import { Natives } from '../../wc3_natives_unsecured/Natives'
 import { IssueMoveOrderForLongDistance } from '../Monster/LongDistanceMoveOrder'
-import { GenerateStartAndEndPointsOptions, MECRegion, StartAndEndPoints } from '../Region/MECRegion'
+import { MECRegion, StartAndEndPoints } from '../Region/MECRegion'
 
 export type MonsterDirectionMode = 'straight' | 'random'
 
@@ -40,20 +38,16 @@ const MonsterSpawn_Actions = errorHandler(() => {
         return
     }
 
-    let forcedDistance: number | undefined
     const unspawnTime = monsterSpawn.getTimedUnspawn()
     if (unspawnTime !== undefined) {
         const monsterSpeed = monsterSpawn.getMonsterType().getUnitMoveSpeed()
-        forcedDistance = monsterSpeed * (unspawnTime + 2) // the 2s added to unspawn time are here to be sure that the monster will be unspawned before reaching the end of their movement
+        monsterSpawn.setForcedDistance(monsterSpeed * (unspawnTime + 2)) // the 2s added to unspawn time are here to be sure that the monster will be unspawned before reaching the end of their movement
     }
 
     for (let spawnIndex = 0; spawnIndex < monsterSpawn.getSpawnAmount(); spawnIndex++) {
-        const options = MemoryHandler.getEmptyObject<GenerateStartAndEndPointsOptions>()
-        options.forcedDistance = forcedDistance
-        options.monsterDirectionMode = monsterSpawn.getMonsterDirectionMode()
+        monsterSpawn.setSpawnIndex(spawnIndex)
 
-        const startAndEndPoints = mecRegion.generateStartAndEndPoints(options)
-        MemoryHandler.destroyObject(options)
+        const startAndEndPoints = mecRegion.generateStartAndEndPoints(monsterSpawn)
 
         const mobUnit = monsterSpawn.createMob(startAndEndPoints)
 
@@ -102,43 +96,28 @@ export class MonsterSpawn {
         return ++MonsterSpawn.lastInstanceId
     }
 
+    // Properties that determine the spawn behavior and should be saved
     private label: string
     private mt: MonsterType
     private mecRegion?: MECRegion
-    private frequence: number
+    private frequency: number
     private spawnAmount = 1
-    private spawnOffset = 0
     private initialDelay = 0
     private timedUnspawn: number | undefined
-
     private monsterDirectionMode: MonsterDirectionMode
-
-    private tSpawn?: trigger
-    private tUnspawn?: trigger
-    private unspawnReg?: region
-    public unspawnregpoints: number[][] = []
-    monsters?: group
-
-    public multiRegionPatrols = false
-    private multiRegionDx: number = 0
-    private multiRegionDy: number = 0
-    public x1: number[] = []
-    public y1: number[] = []
-    public x2: number[] = []
-    public y2: number[] = []
-    private r: region[] = []
-    private t: trigger[] = []
-
     private fixedSpawnOffset: number | undefined
     private fixedSpawnOffsetBounce = false
     private fixedSpawnOffsetMirrored = false
-    private lastSpawnVal: number | undefined
-    private lastSpawnValMirrored: number | undefined
+    private spawnOffset = 0
 
+    // Properties for runtime use only
+    private tSpawn?: trigger
+    monsters?: group
+    private lastSpawnVal: number | undefined
     private bouncing = false
     private mirrored = false
-
-    private _futureBouncing: boolean | undefined = undefined
+    private spawnIndex = 0
+    private forcedDistance: number | undefined
 
     level?: Level
     id: number
@@ -160,7 +139,7 @@ export class MonsterSpawn {
         this.id = MonsterSpawn.getNextId()
         this.label = label
         this.mt = mt
-        this.frequence = frequence
+        this.frequency = frequence
         this.setMECRegion(mecRegion)
     }
 
@@ -175,24 +154,6 @@ export class MonsterSpawn {
     getMonsterType = () => {
         return this.mt
     }
-
-    // todo remove this commented code
-    // getRotatedPoints = () => {
-    //     const rotatedPoints = MemoryHandler.getEmptyArray<IPoint>()
-    //
-    //     for (const point of this.points) {
-    //         arrayPush(
-    //             rotatedPoints,
-    //             this.applyRotation(
-    //                 point.x,
-    //                 point.y,
-    //                 this.rotation === 90 || this.rotation === 270 ? this.rotation + 90 : this.rotation
-    //             )
-    //         )
-    //     }
-    //
-    //     return rotatedPoints
-    // }
 
     getMecRegion = () => {
         return this.mecRegion
@@ -249,7 +210,7 @@ export class MonsterSpawn {
         this.initialDelayTimer = createTimer(this.initialDelay, false, () => {
             this.tSpawn = CreateTrigger()
             MonsterSpawn.anyTrigId2MonsterSpawn.set(GetHandleId(this.tSpawn), this)
-            TriggerRegisterTimerEvent(this.tSpawn, 1 / this.frequence, true)
+            TriggerRegisterTimerEvent(this.tSpawn, 1 / this.frequency, true)
             TriggerAddAction(this.tSpawn, MonsterSpawn_Actions)
             this.initialDelayTimer?.pause().destroy()
             this.mecRegion?.enableWatchUnits(true)
@@ -264,6 +225,7 @@ export class MonsterSpawn {
         this.deactivate()
         this.level && this.level.monsterSpawns.removeMonsterSpawn(this.id)
         this.simpleUnitRecycler.destroy()
+        this.mecRegion?.destroy()
     }
 
     createMob = (startAndEndPoints: StartAndEndPoints) => {
@@ -364,11 +326,11 @@ export class MonsterSpawn {
     }
 
     setFrequence = (frequence: number) => {
-        this.frequence = frequence
+        this.frequency = frequence
         this.tSpawn && DestroyTrigger(this.tSpawn)
         this.tSpawn = CreateTrigger()
         MonsterSpawn.anyTrigId2MonsterSpawn.set(GetHandleId(this.tSpawn), this)
-        TriggerRegisterTimerEvent(this.tSpawn, 1 / this.frequence, true)
+        TriggerRegisterTimerEvent(this.tSpawn, 1 / this.frequency, true)
         TriggerAddAction(this.tSpawn, MonsterSpawn_Actions)
     }
 
@@ -390,7 +352,7 @@ export class MonsterSpawn {
             '   ' +
             // convertAngleToDirection(this.rotation) +
             '   ' +
-            R2S(this.frequence)
+            R2S(this.frequency)
 
         if (this.timedUnspawn !== undefined) {
             text = text + '   unspawn:' + R2S(this.timedUnspawn) + 's'
@@ -403,14 +365,18 @@ export class MonsterSpawn {
         Text.P_timed(p, Constants.TERRAIN_DATA_DISPLAY_TIME, this.toText())
     }
 
+    getForcedDistance = () => this.forcedDistance
+    setForcedDistance = (forcedDistance: number) => {
+        this.forcedDistance = forcedDistance
+    }
     getSpawnAmount = () => this.spawnAmount
     setSpawnAmount = (spawnAmount: number) => {
         this.spawnAmount = spawnAmount
     }
 
     getSpawnOffset = () => this.spawnOffset
-    setSpawnOffset = (spawnOffset: number | undefined) => {
-        this.spawnOffset = spawnOffset || 0
+    setSpawnOffset = (spawnOffset: number) => {
+        this.spawnOffset = spawnOffset
     }
 
     getInitialDelay = () => this.initialDelay
@@ -424,13 +390,13 @@ export class MonsterSpawn {
     }
 
     getFixedSpawnOffsetBounce = () => this.fixedSpawnOffsetBounce
-    setFixedSpawnOffsetBounce = (fixedSpawnOffsetBounce: boolean | undefined) => {
-        this.fixedSpawnOffsetBounce = fixedSpawnOffsetBounce || false
+    setFixedSpawnOffsetBounce = (fixedSpawnOffsetBounce: boolean) => {
+        this.fixedSpawnOffsetBounce = fixedSpawnOffsetBounce
     }
 
     getFixedSpawnOffsetMirrored = () => this.fixedSpawnOffsetMirrored
-    setFixedSpawnOffsetMirrored = (fixedSpawnOffsetMirrored: boolean | undefined) => {
-        this.fixedSpawnOffsetMirrored = fixedSpawnOffsetMirrored || false
+    setFixedSpawnOffsetMirrored = (fixedSpawnOffsetMirrored: boolean) => {
+        this.fixedSpawnOffsetMirrored = fixedSpawnOffsetMirrored
     }
 
     getTimedUnspawn = () => this.timedUnspawn
@@ -438,6 +404,31 @@ export class MonsterSpawn {
         this.timedUnspawn = timedUnspawn
         this.mecRegion?.setIsLeaveZoneEnabled(timedUnspawn === undefined)
         this._active && this.refresh()
+    }
+
+    getLastSpawnVal = () => {
+        return this.lastSpawnVal
+    }
+    setLastSpawnVal = (lastSpawnVal: number) => {
+        this.lastSpawnVal = lastSpawnVal
+    }
+    getBouncing = () => {
+        return this.bouncing
+    }
+    setBouncing = (bouncing: boolean) => {
+        this.bouncing = bouncing
+    }
+    getMirrored = () => {
+        return this.mirrored
+    }
+    setMirrored = (mirrored: boolean) => {
+        this.mirrored = mirrored
+    }
+    getSpawnIndex(): number {
+        return this.spawnIndex
+    }
+    setSpawnIndex(value: number) {
+        this.spawnIndex = value
     }
 
     refresh = () => {
@@ -453,7 +444,7 @@ export class MonsterSpawn {
         output['label'] = this.label
         output['monsterTypeLabel'] = this.mt.label
         // output['sens'] = this.rotation
-        output['frequence'] = this.frequence
+        output['frequency'] = this.frequency
         output['spawnAmount'] = this.spawnAmount
         output['spawnOffset'] = this.spawnOffset
         output['initialDelay'] = this.initialDelay

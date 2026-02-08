@@ -1,6 +1,6 @@
 import { DefineDrawLineType } from '../../01_libraries/Draw_lines'
 import { IDestroyable } from '../../../Utils/MemoryHandler'
-import { MonsterDirectionMode } from '../MonsterSpawn/MonsterSpawn'
+import type { MonsterSpawn } from '../MonsterSpawn/MonsterSpawn'
 
 const WATCH_TIMER_PERIOD = 0.05
 
@@ -13,11 +13,7 @@ export type StartAndEndPoints = {
     endX: number
     endY: number
     ephemeral: boolean
-}
-
-export type GenerateStartAndEndPointsOptions = {
-    forcedDistance?: number
-    monsterDirectionMode: MonsterDirectionMode
+    spawnVal?: number // used for RectangleRegions to represent a part of the startLine length from P1 to P2 that generates the spawn point, from 0 to startLineLength. Used in case of fixedSpawnOffsetBounce enabled
 }
 
 export abstract class MECRegion {
@@ -195,9 +191,7 @@ export abstract class MECRegion {
         this.debugRects(false)
     }
 
-    generateStartAndEndPoints(
-        options?: GenerateStartAndEndPointsOptions & IDestroyable
-    ): StartAndEndPoints & IDestroyable {
+    generateStartAndEndPoints(monsterSpawn?: MonsterSpawn): StartAndEndPoints & IDestroyable {
         throw new Error('generateStartAndEndPoints method not implemented for this region type')
     }
 

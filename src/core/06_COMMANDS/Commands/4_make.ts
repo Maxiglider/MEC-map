@@ -2157,7 +2157,7 @@ export const initExecuteCommandMake = () => {
                 return true
             }
 
-            monsterSpawn.setSpawnOffset(S2I(param2) === 0 ? undefined : S2I(param2))
+            monsterSpawn.setSpawnOffset(S2I(param2))
             Text.mkP(escaper.getPlayer(), 'spawnOffset changed')
             return true
         },

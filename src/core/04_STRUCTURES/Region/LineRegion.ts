@@ -1,11 +1,11 @@
 import { RectangleRegion } from './RectangleRegion'
 import {
     END_POINT_OFFSET_AFTER_END_OF_REGION,
-    GenerateStartAndEndPointsOptions,
     OFFSET_FOR_START_LINE_NOT_SPAWNED_MONSTERS_TO_BE_CONSIDERED_OUT,
     StartAndEndPoints,
 } from './MECRegion'
 import { IDestroyable, MemoryHandler } from '../../../Utils/MemoryHandler'
+import { MonsterSpawn } from '../MonsterSpawn/MonsterSpawn'
 
 const LINE_REGION_WIDTH = 32
 
@@ -42,15 +42,16 @@ export class LineRegion extends RectangleRegion {
         this.startAndEndPoints.ephemeral = false
     }
 
-    generateStartAndEndPoints(options?: GenerateStartAndEndPointsOptions) {
-        if (options?.forcedDistance === undefined) {
+    generateStartAndEndPoints(monsterSpawn?: MonsterSpawn) {
+        const forcedDistance = monsterSpawn?.getForcedDistance()
+        if (forcedDistance === undefined) {
             return this.startAndEndPoints
         } else {
             const startAndEndPoints = MemoryHandler.getEmptyObject<StartAndEndPoints>()
             startAndEndPoints.startX = this.startAndEndPoints.startX
             startAndEndPoints.startY = this.startAndEndPoints.startY
-            startAndEndPoints.endX = this.startAndEndPoints.startX + this.directionAngleCos * options.forcedDistance
-            startAndEndPoints.endY = this.startAndEndPoints.startY + this.directionAngleSine * options.forcedDistance
+            startAndEndPoints.endX = this.startAndEndPoints.startX + this.directionAngleCos * forcedDistance
+            startAndEndPoints.endY = this.startAndEndPoints.startY + this.directionAngleSine * forcedDistance
             startAndEndPoints.ephemeral = true
             return startAndEndPoints
         }
