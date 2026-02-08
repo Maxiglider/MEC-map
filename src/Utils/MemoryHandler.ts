@@ -7,6 +7,7 @@ const initMemoryHandler = () => {
 
     const debugObjects: { [x: string]: number } = {}
     const cachedObjects: any[] = []
+    const cachedClassObjects: Map<string, any[]> = new Map() // key is a className, value is array of objects of that class
 
     const purgeObject = (obj: any | any[], recursive?: boolean) => {
         for (const [k] of pairs(obj)) {
@@ -37,6 +38,23 @@ const initMemoryHandler = () => {
         }
 
         purgeObject(self, recursive)
+        arrayPush(cachedObjects, self)
+    }
+
+    const destroyClassObject = (self: any, className: string, recursive = false) => {
+        if (!self.__destroy) {
+            print(info().GetStackTrace())
+
+            throw 'Object is not memory handled'
+        }
+
+        purgeObject(self, recursive)
+
+        let cachedObjects = cachedClassObjects.get(className)
+        if (!cachedObjects) {
+            cachedObjects = []
+            cachedClassObjects.set(className, cachedObjects)
+        }
         arrayPush(cachedObjects, self)
     }
 
@@ -116,7 +134,7 @@ const initMemoryHandler = () => {
             params = params.slice(1)
         }
 
-        const obj = getEmptyObject<InstanceType<T>>(debugName)
+        const obj = getEmptyObject<InstanceType<T>>(debugName, classInstance)
 
         // local function __TS__Class(self)
         //     local c = {prototype = {}}
@@ -141,13 +159,28 @@ const initMemoryHandler = () => {
         //     obj[k] = v
         // }
 
+        // Give the methods of the class to the object
+        for (const [k, v] of pairs(classInstance.prototype)) {
+            if (typeof k !== 'string') continue
+            if (k.startsWith('__')) continue
+            obj[k] = v
+        }
+
         classInstance.prototype.____constructor?.(obj, ...params)
 
         return obj
     }
 
-    const getEmptyObject = <T>(debugName?: string) => {
-        let obj: T & IDestroyable = cachedObjects.shift()
+    const getEmptyObject = <T>(debugName?: string, objectClass?: any) => {
+        let cachedObjectsToUse: any[] | undefined = cachedObjects
+        if (objectClass) {
+            cachedObjectsToUse = cachedClassObjects.get(objectClass.prototype.constructor.name)
+        }
+
+        let obj: (T & IDestroyable) | null = null
+        if (cachedObjectsToUse) {
+            obj = cachedObjectsToUse.shift()
+        }
 
         if (!!obj) {
             // Causes bugs if debugName changes where getEmptyObject gets called
@@ -157,6 +190,10 @@ const initMemoryHandler = () => {
             }
         } else {
             obj = {} as any
+            if (!obj) {
+                throw new Error('MemoryHandler: failed to create object')
+            }
+
             numCreatedObjects++
             setmetatable(obj, debugName ? getObjectMeta(debugName) : defaultObjectMeta)
         }
@@ -179,6 +216,7 @@ const initMemoryHandler = () => {
             return getEmptyObject<T[]>(debugName) as T[] & IDestroyable
         },
         destroyObject,
+        destroyClassObject,
         destroyArray: destroyObject,
         cloneArray: <T>(arr: T[]) => {
             const newArray = MemoryHandler.getEmptyArray<T>()
@@ -191,6 +229,8 @@ const initMemoryHandler = () => {
         },
         printDebugInfo: () => {
             print('MemoryHandler')
+
+            //todo calculate numCreatedObjects with class objects too
             print(`Objects: ${numCreatedObjects - cachedObjects.length}/${numCreatedObjects}`)
 
             printDebugNames('objects', debugObjects)

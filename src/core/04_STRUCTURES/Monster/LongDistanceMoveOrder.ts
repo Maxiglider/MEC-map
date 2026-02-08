@@ -46,7 +46,7 @@ export const IssueMoveOrderForLongDistance = (whichUnit: unit, x: number, y: num
         IssuePointOrder(whichUnit, 'move', x, y)
     } else {
         // Handle long distance move with intermediate waypoints
-        new LongDistanceMoveOrder(whichUnit, x, y)
+        MemoryHandler.getEmptyClass(LongDistanceMoveOrder, whichUnit, x, y)
     }
 
     return true
@@ -170,6 +170,8 @@ export class LongDistanceMoveOrder {
         MemoryHandler.destroyArray(this.waypointsY)
         MemoryHandler.destroyArray(this.waypointRects)
         MemoryHandler.destroyArray(this.waypointRegions)
+
+        MemoryHandler.destroyClassObject(this, this.constructor.name)
     }
 
     public destroyIfObsolete() {
