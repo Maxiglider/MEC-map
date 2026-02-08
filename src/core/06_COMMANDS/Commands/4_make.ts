@@ -2347,7 +2347,7 @@ export const initExecuteCommandMake = () => {
         name: 'createMonsterSpawnDeadZone',
         alias: ['crmsdz'],
         group: 'make',
-        argDescription: '<label> [<deadZoneShape>]',
+        argDescription: '<monsterSpawnLabel> [<deadZoneShape>]',
         description:
             'Add one or several dead zones to a monster spawn (spawned monsters will be hidden in that zone and non lethal). deadZoneShape can be "horizontal", "diagonal", "circle" or "line". Default is "horizontal". Stop creating dead zones with -stop.',
         cb: ({ nbParam, param1, param2 }, escaper) => {
@@ -2378,6 +2378,33 @@ export const initExecuteCommandMake = () => {
             } else {
                 Text.erP(escaper.getPlayer(), 'failed to initiate the creation of the monster spawn dead zone')
             }
+
+            return true
+        },
+    })
+
+    //-deleteMonsterSpawnDeadZones  (delmsdz) <monsterSpawnLabel>
+    registerCommand({
+        name: 'deleteMonsterSpawnDeadZones',
+        alias: ['delmsdz'],
+        group: 'make',
+        argDescription: '<monsterSpawnLabel>',
+        description: 'Remove all dead zones of a monster spawn.',
+        cb: ({ nbParam, param1, param2 }, escaper) => {
+            if (nbParam !== 1) {
+                Text.erP(escaper.getPlayer(), 'deleteMonsterSpawnDeadZones: wrong arguments')
+                return true
+            }
+
+            const monsterSpawn = escaper.getMakingLevel().monsterSpawns.getByLabel(param1)
+            if (!monsterSpawn) {
+                Text.erP(escaper.getPlayer(), 'unknown monster spawn "' + param1 + '" in this level')
+                return true
+            }
+
+            monsterSpawn.removeAllHideRegions()
+
+            Text.mkP(escaper.getPlayer(), `Removed all dead zones for monster spawn "${monsterSpawn.getLabel()}"`)
 
             return true
         },

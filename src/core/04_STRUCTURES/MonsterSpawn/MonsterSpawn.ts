@@ -19,6 +19,7 @@ import { MECRegion, StartAndEndPoints } from '../Region/MECRegion'
 export type MonsterDirectionMode = 'straight' | 'random'
 
 const MAXIMUM_SPANWED_MONSTERS_SIMULTANEOUSLY = 500
+const HIDE_REGION_DEBUG_COLOR = 'green'
 
 const MonsterSpawn_Actions = errorHandler(() => {
     const monsterSpawn = MonsterSpawn.anyTrigId2MonsterSpawn.get(GetHandleId(Natives.UGetTriggeringTrigger()))
@@ -109,7 +110,7 @@ export class MonsterSpawn {
     private spawnOffset = 0
     private fixedSpawnOffsetBounce = false
     private fixedSpawnOffsetMirrored = false
-    private hideRegions = new Map<number, MECRegion>()
+    private hideRegions: { [x: number]: MECRegion } = {}
 
     // Properties for runtime use only
     private tSpawn?: trigger
@@ -172,7 +173,7 @@ export class MonsterSpawn {
         this.monsters && GroupRemoveUnit(this.monsters, monsterUnit)
 
         this.mecRegion?.unwatchUnit(monsterUnit)
-        for (const hideRegion of this.hideRegions.values()) {
+        for (const [_, hideRegion] of pairs(this.hideRegions)) {
             hideRegion.unwatchUnit(monsterUnit)
         }
 
@@ -207,7 +208,7 @@ export class MonsterSpawn {
         }
 
         this.mecRegion?.enableWatchUnits(false)
-        for (const hideRegion of this.hideRegions.values()) {
+        for (const [_, hideRegion] of pairs(this.hideRegions)) {
             hideRegion.enableWatchUnits(false)
         }
     }
@@ -224,7 +225,7 @@ export class MonsterSpawn {
             this.initialDelayTimer?.pause().destroy()
 
             this.mecRegion?.enableWatchUnits(true)
-            for (const hideRegion of this.hideRegions.values()) {
+            for (const [_, hideRegion] of pairs(this.hideRegions)) {
                 hideRegion.enableWatchUnits(true)
             }
         })
@@ -240,7 +241,7 @@ export class MonsterSpawn {
         this.simpleUnitRecycler.destroy()
         this.mecRegion?.destroy()
 
-        for (const hideRegion of this.hideRegions.values()) {
+        for (const [_, hideRegion] of pairs(this.hideRegions)) {
             hideRegion.destroy()
         }
         MemoryHandler.destroyArray(this.hideRegions)
@@ -307,7 +308,7 @@ export class MonsterSpawn {
                 this.mecRegion?.watchUnit(monster, true)
             }
 
-            for (const hideRegion of this.hideRegions.values()) {
+            for (const [_, hideRegion] of pairs(this.hideRegions)) {
                 hideRegion.watchUnit(monster)
             }
         }
@@ -334,17 +335,18 @@ export class MonsterSpawn {
     }
 
     addHideRegion(mecRegion: MECRegion) {
-        this.hideRegions.set(mecRegion.getId(), mecRegion)
+        mecRegion.setDefaultDebugLineColor(HIDE_REGION_DEBUG_COLOR)
+        this.hideRegions[mecRegion.getId()] = mecRegion
         this.addHideRegionCallbacks(mecRegion)
         this.activateHideRegion(mecRegion)
     }
 
     removeHideRegion(mecRegion: MECRegion, destroyRegion = true) {
-        if (!this.hideRegions.get(mecRegion.getId())) {
+        if (!this.hideRegions[mecRegion.getId()]) {
             return
         }
 
-        this.hideRegions.delete(mecRegion.getId())
+        delete this.hideRegions[mecRegion.getId()]
 
         if (destroyRegion) {
             mecRegion.destroy()
@@ -354,10 +356,10 @@ export class MonsterSpawn {
     }
 
     removeAllHideRegions(destroyRegions = true) {
-        for (const hideRegion of this.hideRegions.values()) {
+        for (const [regionId, hideRegion] of pairs(this.hideRegions)) {
             this.removeHideRegion(hideRegion, destroyRegions)
+            delete this.hideRegions[regionId]
         }
-        this.hideRegions.clear()
     }
 
     addHideRegionCallbacks(mecRegion: MECRegion) {
@@ -365,12 +367,22 @@ export class MonsterSpawn {
             ShowUnit(monsterUnit, false)
             UnitRemoveAbility(monsterUnit, FourCC('Aloc'))
         })
+
         mecRegion.onUnitLeaves(monsterUnit => {
-            if (this.mecRegion?.isUnitInRegion(monsterUnit)) {
+            if (this.mecRegion?.isUnitInRegion(monsterUnit) && !this.isUnitInAnyHideRegion(monsterUnit, mecRegion)) {
                 ShowUnit(monsterUnit, true)
                 UnitAddAbility(monsterUnit, FourCC('Aloc'))
             }
         })
+    }
+
+    isUnitInAnyHideRegion(monsterUnit: unit, exceptionRegion: MECRegion): boolean {
+        for (const [_, hideRegion] of pairs(this.hideRegions)) {
+            if (hideRegion !== exceptionRegion && hideRegion.isUnitInRegion(monsterUnit)) {
+                return true
+            }
+        }
+        return false
     }
 
     activateHideRegion(mecRegion: MECRegion) {
@@ -384,11 +396,10 @@ export class MonsterSpawn {
         })
 
         mecRegion.enableWatchUnits(true)
-        mecRegion.setDefaultDebugLineColor('orange')
     }
 
     debugHideRegions(enable: boolean) {
-        for (const hideRegion of this.hideRegions.values()) {
+        for (const [_, hideRegion] of pairs(this.hideRegions)) {
             hideRegion.debugRects(enable)
         }
     }

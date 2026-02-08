@@ -1,4 +1,3 @@
-import { createPoint, IPoint } from '../../../Utils/Point'
 import { Constants } from 'core/01_libraries/Constants'
 import { Natives } from '../../wc3_natives_unsecured/Natives'
 import { MemoryHandler } from '../../../Utils/MemoryHandler'
@@ -6,17 +5,17 @@ import { arrayPush } from '../../01_libraries/Basic_functions'
 
 function OnNextWaypointReached() {
     const triggerId = GetHandleId(GetTriggeringTrigger()!)
-    const longDistanceMoveOrder = LongDistanceMoveOrder.triggersToLongDistanceMoveOrder.get(triggerId)
+    const longDistanceMoveOrder = LongDistanceMoveOrder.triggersToLongDistanceMoveOrder[triggerId]
 
-    if (longDistanceMoveOrder) {
+    if (!!longDistanceMoveOrder) {
         longDistanceMoveOrder.onNextWaypointReached()
     }
 }
 
 export function init_LongDistanceMoveOrder_garbageCollector() {
-    const triggerInterval = 10000 // 10 seconds
+    const triggerInterval = 10 // 10 seconds
     TimerStart(CreateTimer(), triggerInterval, true, () => {
-        for (const longDistanceMoveOrder of LongDistanceMoveOrder.triggersToLongDistanceMoveOrder.values()) {
+        for (const [_, longDistanceMoveOrder] of pairs(LongDistanceMoveOrder.triggersToLongDistanceMoveOrder)) {
             longDistanceMoveOrder.destroyIfObsolete()
         }
     })
@@ -54,7 +53,8 @@ export const IssueMoveOrderForLongDistance = (whichUnit: unit, x: number, y: num
 }
 
 export class LongDistanceMoveOrder {
-    static triggersToLongDistanceMoveOrder: Map<number, LongDistanceMoveOrder> = new Map()
+    // todo fix: the creation of instances of this class probably casues memory leaks
+    static triggersToLongDistanceMoveOrder: { [x: number]: LongDistanceMoveOrder } = {}
 
     private unit: unit
     private destinationX: number
@@ -76,10 +76,8 @@ export class LongDistanceMoveOrder {
         }
 
         this.nextWaypointReachedDectectionTrigger = CreateTrigger()
-        LongDistanceMoveOrder.triggersToLongDistanceMoveOrder.set(
-            GetHandleId(this.nextWaypointReachedDectectionTrigger),
+        LongDistanceMoveOrder.triggersToLongDistanceMoveOrder[GetHandleId(this.nextWaypointReachedDectectionTrigger)] =
             this
-        )
         TriggerAddAction(this.nextWaypointReachedDectectionTrigger, OnNextWaypointReached)
 
         this.calculateWaypoints()
@@ -155,9 +153,9 @@ export class LongDistanceMoveOrder {
     }
 
     private destroy() {
-        LongDistanceMoveOrder.triggersToLongDistanceMoveOrder.delete(
+        delete LongDistanceMoveOrder.triggersToLongDistanceMoveOrder[
             GetHandleId(this.nextWaypointReachedDectectionTrigger)
-        )
+        ]
 
         DestroyTrigger(this.nextWaypointReachedDectectionTrigger)
 
