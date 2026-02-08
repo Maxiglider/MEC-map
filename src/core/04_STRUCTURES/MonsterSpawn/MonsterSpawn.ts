@@ -10,7 +10,7 @@ import { hooks } from '../../API/GeneralHooks'
 import { Level } from '../Level/Level'
 import { Monster } from '../Monster/Monster'
 import { MonsterType } from '../Monster/MonsterType'
-import { NewImmobileMonsterForPlayer } from '../Monster/Monster_functions'
+import { NewImmobileMonster } from '../Monster/Monster_functions'
 import { initSimpleUnitRecycler } from './SimpleUnitRecycler'
 import { Natives } from '../../wc3_natives_unsecured/Natives'
 import { IssueMoveOrderForLongDistance } from '../Monster/LongDistanceMoveOrder'
@@ -290,13 +290,7 @@ export class MonsterSpawn {
                 Monster.forceUnitTypeIdForNextMonster = forceUnitTypeId
             }
 
-            monster = NewImmobileMonsterForPlayer(
-                this.mt,
-                Constants.ENNEMY_PLAYER,
-                startAndEndPoints.startX,
-                startAndEndPoints.startY,
-                spawnAngle
-            )
+            monster = NewImmobileMonster(this.mt, startAndEndPoints.startX, startAndEndPoints.startY, spawnAngle)
         } else {
             // todo the forceUnitTypeId should be taken into account and change the unit type of the existing unit without recreating it
             BlzSetUnitFacingEx(monster, spawnAngle)
