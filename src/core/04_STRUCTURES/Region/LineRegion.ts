@@ -10,6 +10,11 @@ import { MonsterSpawn } from '../MonsterSpawn/MonsterSpawn'
 const LINE_REGION_WIDTH = 32
 
 export class LineRegion extends RectangleRegion {
+    private originalX1: number
+    private originalY1: number
+    private originalX2: number
+    private originalY2: number
+
     private startAndEndPoints: StartAndEndPoints & IDestroyable
 
     constructor(x1: number, y1: number, x2: number, y2: number, withEnterAndLeaveZone = false) {
@@ -40,6 +45,11 @@ export class LineRegion extends RectangleRegion {
         this.startAndEndPoints.endX = endX
         this.startAndEndPoints.endY = endY
         this.startAndEndPoints.ephemeral = false
+
+        this.originalX1 = x1
+        this.originalY1 = y1
+        this.originalX2 = x2
+        this.originalY2 = y2
     }
 
     generateStartAndEndPoints(monsterSpawn?: MonsterSpawn) {
@@ -60,5 +70,17 @@ export class LineRegion extends RectangleRegion {
     destroy() {
         MemoryHandler.destroyObject(this.startAndEndPoints)
         super.destroy()
+    }
+
+    toJson() {
+        const output = MemoryHandler.getEmptyObject<any>()
+
+        output.type = this.constructor.name
+        output.originalX1 = R2I(this.originalX1)
+        output.originalY1 = R2I(this.originalY1)
+        output.originalX2 = R2I(this.originalX2)
+        output.originalY2 = R2I(this.originalY2)
+
+        return output
     }
 }

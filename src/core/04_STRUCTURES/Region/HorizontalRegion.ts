@@ -1,4 +1,5 @@
 import { RectangleRegion } from './RectangleRegion'
+import { MemoryHandler } from '../../../Utils/MemoryHandler'
 
 export type HorizontalRegionDirection = 'up' | 'down' | 'left' | 'right'
 
@@ -7,6 +8,7 @@ export class HorizontalRegion extends RectangleRegion {
     private minY: number
     private maxX: number
     private maxY: number
+    private direction: HorizontalRegionDirection
 
     constructor(
         x1: number,
@@ -69,9 +71,24 @@ export class HorizontalRegion extends RectangleRegion {
         this.maxX = maxX
         this.minY = minY
         this.maxY = maxY
+
+        this.direction = direction
     }
 
     areCoordsInRegion(x: number, y: number) {
         return x >= this.minX && x <= this.maxX && y >= this.minY && y <= this.maxY
+    }
+
+    toJson() {
+        const output = MemoryHandler.getEmptyObject<any>()
+
+        output.type = this.constructor.name
+        output.x1 = R2I(this.minX)
+        output.y1 = R2I(this.minY)
+        output.x2 = R2I(this.maxX)
+        output.y2 = R2I(this.maxY)
+        output.direction = this.direction
+
+        return output
     }
 }

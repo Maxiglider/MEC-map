@@ -37,4 +37,14 @@ export class CircleRegion extends MECRegion {
 
         return [circleEffect]
     }
+
+    toJson(): any {
+        const output = super.toJson()
+
+        output.centerX = R2I(this.centerX)
+        output.centerY = R2I(this.centerY)
+        output.radius = this.radius
+
+        return output
+    }
 }

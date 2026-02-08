@@ -1,5 +1,5 @@
 import { DefineDrawLineType } from '../../01_libraries/Draw_lines'
-import { IDestroyable } from '../../../Utils/MemoryHandler'
+import { IDestroyable, MemoryHandler } from '../../../Utils/MemoryHandler'
 import type { MonsterSpawn } from '../MonsterSpawn/MonsterSpawn'
 
 const WATCH_TIMER_PERIOD = 0.05
@@ -206,5 +206,11 @@ export abstract class MECRegion {
             this.debugRects(false)
             this.debugRects(true)
         }
+    }
+
+    toJson() {
+        const output = MemoryHandler.getEmptyObject<any>()
+        output.type = this.constructor.name
+        return output
     }
 }

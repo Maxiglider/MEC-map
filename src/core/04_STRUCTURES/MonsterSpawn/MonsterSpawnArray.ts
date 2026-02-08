@@ -1,4 +1,4 @@
-import { convertTextToAngle } from 'core/01_libraries/Basic_functions'
+import { ApplyRotation, convertTextToAngle, ForceAngleBetween0And360 } from 'core/01_libraries/Basic_functions'
 import { Constants } from 'core/01_libraries/Constants'
 import { Text } from 'core/01_libraries/Text'
 import { getUdgMonsterTypes } from '../../../../globals'
@@ -6,6 +6,12 @@ import { handlePaginationArgs, handlePaginationObj } from '../../06_COMMANDS/Hel
 import { BaseArray } from '../BaseArray'
 import type { Level } from '../Level/Level'
 import { MonsterSpawn } from './MonsterSpawn'
+import { MECRegion } from '../Region/MECRegion'
+import { HorizontalRegion, HorizontalRegionDirection } from '../Region/HorizontalRegion'
+import { LineRegion } from '../Region/LineRegion'
+import { RectangleRegion } from '../Region/RectangleRegion'
+import { MemoryHandler } from '../../../Utils/MemoryHandler'
+import { createPoint } from '../../../Utils/Point'
 
 export class MonsterSpawnArray extends BaseArray<MonsterSpawn> {
     private level: Level
@@ -34,41 +40,155 @@ export class MonsterSpawnArray extends BaseArray<MonsterSpawn> {
     }
 
     newFromJson = (monsterSpawnsJson: { [x: string]: any }[]) => {
-        // todo reimplement this method, with retrocompatibity
-        // for (let ms of monsterSpawnsJson) {
-        //     const mt = getUdgMonsterTypes().getByLabel(ms.monsterTypeLabel)
-        //     if (!mt) {
-        //         Text.erA('Monster type "' + ms.monsterTypeLabel + '" unknown')
-        //     } else {
-        //         const monsterSpawn = new MonsterSpawn(
-        //             ms.label,
-        //             mt,
-        //             typeof ms.sens === 'string' ? convertTextToAngle(ms.sens) : ms.sens,
-        //             ms.frequence,
-        //             ms.minX,
-        //             ms.minY,
-        //             ms.maxX,
-        //             ms.maxY,
-        //             ms.monsterDirectionMode ?? 'straight'
-        //         )
-        //
-        //         // Load click coordinates if they exist
-        //         if (ms.clickX1 !== undefined) monsterSpawn.setClickX1(ms.clickX1)
-        //         if (ms.clickY1 !== undefined) monsterSpawn.setClickY1(ms.clickY1)
-        //         if (ms.clickX2 !== undefined) monsterSpawn.setClickX2(ms.clickX2)
-        //         if (ms.clickY2 !== undefined) monsterSpawn.setClickY2(ms.clickY2)
-        //
-        //         monsterSpawn.setSpawnAmount(ms.spawnAmount || 1)
-        //         monsterSpawn.setSpawnOffset(ms.spawnOffset || 0)
-        //         monsterSpawn.setInitialDelay(ms.initialDelay || 0)
-        //         monsterSpawn.setFixedSpawnOffset(ms.fixedSpawnOffset)
-        //         monsterSpawn.setFixedSpawnOffsetBounce(ms.fixedSpawnOffsetBounce)
-        //         monsterSpawn.setFixedSpawnOffsetMirrored(ms.fixedSpawnOffsetMirrored)
-        //         monsterSpawn.setTimedUnspawn(ms.timedUnspawn)
-        //         if (ms.spawnShape !== undefined) monsterSpawn.setSpawnShape(ms.spawnShape)
-        //         this.new(monsterSpawn, false)
-        //     }
-        // }
+        for (let ms of monsterSpawnsJson) {
+            const mt = getUdgMonsterTypes().getByLabel(ms.monsterTypeLabel)
+            if (!mt) {
+                Text.erA('Monster type "' + ms.monsterTypeLabel + '" unknown')
+            } else {
+                let mecRegion: MECRegion
+                if (ms.mecRegion !== undefined) {
+                    switch (ms.mecRegion.type) {
+                        case 'HorizontalRegion': {
+                            const { x1, y1, x2, y2, direction } = ms.mecRegion
+                            mecRegion = new HorizontalRegion(x1, y1, x2, y2, direction, true)
+                            break
+                        }
+                        case 'LineRegion': {
+                            const { originalX1, originalY1, originalX2, originalY2 } = ms.mecRegion
+                            mecRegion = new LineRegion(originalX1, originalY1, originalX2, originalY2, true)
+                            break
+                        }
+                        case 'RectangleRegion': {
+                            const { x1, y1, x2, y2, x3, y3 } = ms.mecRegion
+                            mecRegion = new RectangleRegion(x1, y1, x2, y2, x3, y3, true)
+                            break
+                        }
+                        default: {
+                            throw new Error(
+                                'MonsterSpawnArray: newFromJson: unknown MECRegion type "' + ms.mecRegion.type + '"'
+                            )
+                        }
+                    }
+                } else {
+                    mecRegion = this.generateMecRegionFromOldJsonFormat(ms)
+                }
+
+                const monsterSpawn = new MonsterSpawn(
+                    ms.label,
+                    mt,
+                    mecRegion,
+                    ms.frequency ?? ms.frequence,
+                    ms.monsterDirectionMode ?? 'straight'
+                )
+
+                monsterSpawn.setSpawnAmount(ms.spawnAmount || 1)
+                monsterSpawn.setInitialDelay(ms.initialDelay || 0)
+                monsterSpawn.setTimedUnspawn(ms.timedUnspawn)
+                monsterSpawn.setFixedSpawnOffset(ms.fixedSpawnOffset)
+                monsterSpawn.setSpawnOffset(ms.spawnOffset || 0)
+                monsterSpawn.setFixedSpawnOffsetBounce(ms.fixedSpawnOffsetBounce)
+                monsterSpawn.setFixedSpawnOffsetMirrored(ms.fixedSpawnOffsetMirrored)
+
+                this.new(monsterSpawn, false)
+            }
+        }
+    }
+
+    /**
+     * This method is used to generate a MECRegion from the old json format, which doesn't have a mecRegion property, but instead has the coordinates and direction angle directly on the monster spawn object. This method is used for retrocompatibility with old maps.
+     * @param ms The monster spawn data in the old json format
+     */
+    generateMecRegionFromOldJsonFormat(ms: any): MECRegion {
+        let mecRegion: MECRegion | null = null
+
+        const directionAngle = ForceAngleBetween0And360(
+            typeof ms.sens === 'string' ? convertTextToAngle(ms.sens) : ms.sens
+        )
+
+        let direction: HorizontalRegionDirection | null = null
+        switch (directionAngle) {
+            case 0:
+                direction = 'right'
+                break
+            case 90:
+                direction = 'up'
+                break
+            case 180:
+                direction = 'left'
+                break
+            case 270:
+                direction = 'down'
+                break
+        }
+
+        switch (ms.spawnShape) {
+            case 'region': {
+                // HorizontalRegion or RectangleRegion depending on the direction angle
+                if (direction) {
+                    mecRegion = new HorizontalRegion(ms.minX, ms.minY, ms.maxX, ms.maxY, direction, true)
+                } else {
+                    const anchorX = (ms.minX + ms.maxX) / 2
+                    const anchorY = (ms.minY + ms.maxY) / 2
+
+                    const p1 = ApplyRotation(anchorX, anchorY, directionAngle, createPoint(ms.minX, ms.minY))
+                    const p2 = ApplyRotation(anchorX, anchorY, directionAngle, createPoint(ms.maxX, ms.minY))
+                    const p3 = ApplyRotation(anchorX, anchorY, directionAngle, createPoint(ms.maxX, ms.maxY))
+
+                    mecRegion = new RectangleRegion(p1.x, p1.y, p2.x, p2.y, p3.x, p3.y, true)
+
+                    MemoryHandler.destroyObject(p1)
+                    MemoryHandler.destroyObject(p2)
+                    MemoryHandler.destroyObject(p3)
+                }
+                break
+            }
+            case 'line': {
+                const x1 = ms.clickX1
+                const y1 = ms.clickY1
+                let x2 = ms.clickX2
+                let y2 = ms.clickY2
+
+                // With old format, on case of line spanw, the unspanwn is determined only by a timer, there is no rect, so we arbitraryly generate a square region
+                const p1p2_dist = Math.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2)
+
+                if (direction) {
+                    // HorizontalRegion
+                    x2 += p1p2_dist * CosBJ(directionAngle)
+                    y2 += p1p2_dist * SinBJ(directionAngle)
+
+                    mecRegion = new HorizontalRegion(x1, y1, x2, y2, direction, true)
+                } else {
+                    // RectangleRegion
+                    const x3 = x2 + p1p2_dist * CosBJ(directionAngle)
+                    const y3 = y2 + p1p2_dist * SinBJ(directionAngle)
+
+                    mecRegion = new RectangleRegion(x1, y1, x2, y2, x3, y3, true)
+                }
+
+                break
+            }
+            case 'point': {
+                // LineRegion
+
+                // With old format, on case of point spawn, the unspanwn is determined only by a timer, there is no rect, so we arbitraryly choose the region length
+                const regionLength = 512
+
+                const x1 = ms.clickX1
+                const y1 = ms.clickY1
+                let x2 = x1 + regionLength * CosBJ(directionAngle)
+                let y2 = y1 + regionLength * SinBJ(directionAngle)
+
+                mecRegion = new LineRegion(x1, y1, x2, y2, true)
+
+                break
+            }
+        }
+
+        if (!mecRegion) {
+            throw new Error("MonsterSpawnArray: generateMecRegionFromOldJsonFormat: couldn't generate the MECRegion")
+        }
+
+        return mecRegion
     }
 
     removeMonsterSpawn = (monsterSpawnId: number) => {

@@ -18,6 +18,8 @@ export class RectangleRegion extends MECRegion {
     private y1: number
     private x2: number
     private y2: number
+    private x3: number
+    private y3: number
 
     private x1forStartLine: number
     private y1forStartLine: number
@@ -90,6 +92,8 @@ export class RectangleRegion extends MECRegion {
         this.y1 = y1
         this.x2 = x2
         this.y2 = y2
+        this.x3 = x3
+        this.y3 = y3
 
         const dist1_2 = Math.sqrt(this.points1_2_denominator)
 
@@ -355,5 +359,19 @@ export class RectangleRegion extends MECRegion {
 
             return this.loopSpawnValToBounds(newSpawnVal)
         }
+    }
+
+    toJson() {
+        const output = MemoryHandler.getEmptyObject<any>()
+
+        output.type = this.constructor.name
+        output.x1 = R2I(this.x1)
+        output.y1 = R2I(this.y1)
+        output.x2 = R2I(this.x2)
+        output.y2 = R2I(this.y2)
+        output.x3 = R2I(this.x3)
+        output.y3 = R2I(this.y3)
+
+        return output
     }
 }

@@ -106,9 +106,9 @@ export class MonsterSpawn {
     private timedUnspawn: number | undefined
     private monsterDirectionMode: MonsterDirectionMode
     private fixedSpawnOffset: number | undefined
+    private spawnOffset = 0
     private fixedSpawnOffsetBounce = false
     private fixedSpawnOffsetMirrored = false
-    private spawnOffset = 0
 
     // Properties for runtime use only
     private tSpawn?: trigger
@@ -438,30 +438,20 @@ export class MonsterSpawn {
     }
 
     toJson = () => {
-        // todo rework the toJson method
         const output = MemoryHandler.getEmptyObject<any>()
 
         output['label'] = this.label
         output['monsterTypeLabel'] = this.mt.label
-        // output['sens'] = this.rotation
+        output['mecRegion'] = this.mecRegion?.toJson()
         output['frequency'] = this.frequency
         output['spawnAmount'] = this.spawnAmount
-        output['spawnOffset'] = this.spawnOffset
         output['initialDelay'] = this.initialDelay
+        output['timedUnspawn'] = this.timedUnspawn
+        output['monsterDirectionMode'] = this.monsterDirectionMode
         output['fixedSpawnOffset'] = this.fixedSpawnOffset
+        output['spawnOffset'] = this.spawnOffset
         output['fixedSpawnOffsetBounce'] = this.fixedSpawnOffsetBounce
         output['fixedSpawnOffsetMirrored'] = this.fixedSpawnOffsetMirrored
-        output['timedUnspawn'] = this.timedUnspawn
-        // output['spawnShape'] = this.spawnShape
-        // output['clickX1'] = this.clickX1
-        // output['clickY1'] = R2I(this.clickY1)
-        // output['clickX2'] = R2I(this.clickX2)
-        // output['clickY2'] = R2I(this.clickY2)
-        // output['minX'] = R2I(this.minX)
-        // output['minY'] = R2I(this.minY)
-        // output['maxX'] = R2I(this.maxX)
-        // output['maxY'] = R2I(this.maxY)
-        output['monsterDirectionMode'] = this.monsterDirectionMode
 
         return output
     }
