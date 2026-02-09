@@ -1,11 +1,10 @@
 import { Constants } from 'core/01_libraries/Constants'
-import { Natives } from '../../wc3_natives_unsecured/Natives'
 import { MemoryHandler } from '../../../Utils/MemoryHandler'
 import { arrayPush } from '../../01_libraries/Basic_functions'
+import { HorizontalRegion } from '../Region/HorizontalRegion'
 
-function OnNextWaypointReached() {
-    const triggerId = GetHandleId(GetTriggeringTrigger()!)
-    const longDistanceMoveOrder = LongDistanceMoveOrder.triggersToLongDistanceMoveOrder[triggerId]
+function OnNextWaypointReached(unit: unit) {
+    const longDistanceMoveOrder = LongDistanceMoveOrder.unitToLongDistanceMoveOrder[GetHandleId(unit)]
 
     if (!!longDistanceMoveOrder) {
         longDistanceMoveOrder.onNextWaypointReached()
@@ -15,7 +14,7 @@ function OnNextWaypointReached() {
 export function init_LongDistanceMoveOrder_garbageCollector() {
     const triggerInterval = 10 // 10 seconds
     TimerStart(CreateTimer(), triggerInterval, true, () => {
-        for (const [_, longDistanceMoveOrder] of pairs(LongDistanceMoveOrder.triggersToLongDistanceMoveOrder)) {
+        for (const [_, longDistanceMoveOrder] of pairs(LongDistanceMoveOrder.unitToLongDistanceMoveOrder)) {
             longDistanceMoveOrder.destroyIfObsolete()
         }
     })
@@ -46,6 +45,7 @@ export const IssueMoveOrderForLongDistance = (whichUnit: unit, x: number, y: num
         IssuePointOrder(whichUnit, 'move', x, y)
     } else {
         // Handle long distance move with intermediate waypoints
+        // new LongDistanceMoveOrder(whichUnit, x, y)
         MemoryHandler.getEmptyClass(LongDistanceMoveOrder, whichUnit, x, y)
     }
 
@@ -53,18 +53,16 @@ export const IssueMoveOrderForLongDistance = (whichUnit: unit, x: number, y: num
 }
 
 export class LongDistanceMoveOrder {
-    // todo fix: the creation of instances of this class probably casues memory leaks
-    static triggersToLongDistanceMoveOrder: { [x: number]: LongDistanceMoveOrder } = {}
+    // todo fix: the creation of instances of this class probably causes memory leaks
+    static unitToLongDistanceMoveOrder: { [x: number]: LongDistanceMoveOrder } = {}
 
     private unit: unit
     private destinationX: number
     private destinationY: number
     private waypointsX = MemoryHandler.getEmptyArray<number>()
     private waypointsY = MemoryHandler.getEmptyArray<number>()
-    private waypointRects = MemoryHandler.getEmptyArray<rect>() // one rect less than number of waypoints because last waypoint is the destination
-    private waypointRegions = MemoryHandler.getEmptyArray<region>() // one region less than number of waypoints because last waypoint is the destination
+    private nextWaypointRegion: HorizontalRegion
     private currentWaypointIndex: number
-    private nextWaypointReachedDectectionTrigger: trigger
 
     constructor(whichUnit: unit, x: number, y: number) {
         this.unit = whichUnit
@@ -75,10 +73,14 @@ export class LongDistanceMoveOrder {
             throw new Error('LongDistanceMoveOrder: whichUnit is invalid or dead')
         }
 
-        this.nextWaypointReachedDectectionTrigger = CreateTrigger()
-        LongDistanceMoveOrder.triggersToLongDistanceMoveOrder[GetHandleId(this.nextWaypointReachedDectectionTrigger)] =
-            this
-        TriggerAddAction(this.nextWaypointReachedDectectionTrigger, OnNextWaypointReached)
+        LongDistanceMoveOrder.unitToLongDistanceMoveOrder[GetHandleId(this.unit)] = this
+
+        // this.nextWaypointRegion = new HorizontalRegion(0, 0, 64, 64)
+        this.nextWaypointRegion = MemoryHandler.getEmptyClass(HorizontalRegion, 0, 0, 64, 64)
+
+        this.nextWaypointRegion.watchUnit(this.unit)
+        this.nextWaypointRegion.onUnitEnters(OnNextWaypointReached)
+        this.nextWaypointRegion.enableWatchUnits(true)
 
         this.calculateWaypoints()
 
@@ -87,16 +89,6 @@ export class LongDistanceMoveOrder {
     }
 
     private calculateWaypoints() {
-        MemoryHandler.destroyArray(this.waypointsX)
-        MemoryHandler.destroyArray(this.waypointsY)
-        MemoryHandler.destroyArray(this.waypointRects)
-        MemoryHandler.destroyArray(this.waypointRegions)
-
-        this.waypointsX = MemoryHandler.getEmptyArray<number>()
-        this.waypointsY = MemoryHandler.getEmptyArray<number>()
-        this.waypointRects = MemoryHandler.getEmptyArray<rect>()
-        this.waypointRegions = MemoryHandler.getEmptyArray<region>()
-
         const startX = GetUnitX(this.unit)
         const startY = GetUnitY(this.unit)
         const deltaX = this.destinationX - startX
@@ -111,18 +103,6 @@ export class LongDistanceMoveOrder {
             const waypointY = startY + t * deltaY
             arrayPush(this.waypointsX, waypointX)
             arrayPush(this.waypointsY, waypointY)
-
-            if (i < steps) {
-                // No rect for the final destination
-                const rect = Rect(waypointX - 16, waypointY - 16, waypointX + 16, waypointY + 16)
-                arrayPush(this.waypointRects, rect)
-
-                const region = CreateRegion()
-                RegionAddRect(region, rect)
-                arrayPush(this.waypointRegions, region)
-
-                TriggerRegisterEnterRegion(this.nextWaypointReachedDectectionTrigger, region)
-            }
         }
     }
 
@@ -134,6 +114,8 @@ export class LongDistanceMoveOrder {
             const waypointY = this.waypointsY[this.currentWaypointIndex]
             IssuePointOrder(this.unit, 'move', waypointX, waypointY)
 
+            this.nextWaypointRegion.moveTo(waypointX, waypointY)
+
             if (this.currentWaypointIndex === this.waypointsX.length - 1) {
                 // Last waypoint is the final destination, we can clean the region entering detection
                 this.destroy()
@@ -142,35 +124,18 @@ export class LongDistanceMoveOrder {
     }
 
     public onNextWaypointReached() {
-        if (
-            Natives.UGetTriggerUnit() !== this.unit ||
-            Natives.UGetTriggeringRegion() !== this.waypointRegions[this.currentWaypointIndex]
-        ) {
-            return
-        }
-
         this.issueMoveOrderToNextWaypoint()
     }
 
     private destroy() {
-        delete LongDistanceMoveOrder.triggersToLongDistanceMoveOrder[
-            GetHandleId(this.nextWaypointReachedDectectionTrigger)
-        ]
+        delete LongDistanceMoveOrder.unitToLongDistanceMoveOrder[GetHandleId(this.unit)]
 
-        DestroyTrigger(this.nextWaypointReachedDectectionTrigger)
-
-        for (const rect of this.waypointRects) {
-            RemoveRect(rect)
-        }
-        for (const region of this.waypointRegions) {
-            RemoveRegion(region)
-        }
+        this.nextWaypointRegion.destroy()
 
         MemoryHandler.destroyArray(this.waypointsX)
         MemoryHandler.destroyArray(this.waypointsY)
-        MemoryHandler.destroyArray(this.waypointRects)
-        MemoryHandler.destroyArray(this.waypointRegions)
 
+        MemoryHandler.destroyClassObject(this.nextWaypointRegion, this.nextWaypointRegion.constructor.name)
         MemoryHandler.destroyClassObject(this, this.constructor.name)
     }
 

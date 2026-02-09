@@ -1,6 +1,8 @@
 import { DefineDrawLineType } from '../../01_libraries/Draw_lines'
 import { IDestroyable, MemoryHandler } from '../../../Utils/MemoryHandler'
 import type { MonsterSpawn } from '../MonsterSpawn/MonsterSpawn'
+import { Natives } from '../../wc3_natives_unsecured/Natives'
+import { emptyOject } from '../../01_libraries/Basic_functions'
 
 const WATCH_TIMER_PERIOD = 0.05
 
@@ -15,22 +17,29 @@ export type StartAndEndPoints = {
     ephemeral: boolean
 }
 
+const WatchForEventsTimerCallback = () => {
+    const mecRegion = MECRegion.timerIdToMECRegionMap.get(GetHandleId(Natives.UGetExpiredTimer()))
+    mecRegion?.watchForEventsTimerCallback()
+}
+
 export abstract class MECRegion {
     private static lastId = -1
 
+    static timerIdToMECRegionMap: Map<number, MECRegion> = new Map()
+
     private id: number
     private watchForEventsTimer?: timer
-    private watchedUnits: Map<number, unit>
-    private unitsConsideredInRegion: Map<number, unit>
+    private watchedUnits: { [x: number]: unit } = MemoryHandler.getEmptyObject()
+    private unitsConsideredInRegion: { [x: number]: unit } = MemoryHandler.getEmptyObject()
 
-    private unitEntersCallbacks: Map<number, (unit: unit) => void>
-    private unitLeavesCallbacks: Map<number, (unit: unit) => void>
+    private unitEntersCallbacks: { [x: number]: (unit: unit) => void } = MemoryHandler.getEmptyObject()
+    private unitLeavesCallbacks: { [x: number]: (unit: unit) => void } = MemoryHandler.getEmptyObject()
 
     private lastUnitEntersOrLeavesCallbackId: number = 0
 
     private currentlyDebugging = false
-    private debugLightnings: lightning[] = MemoryHandler.getEmptyArray<lightning>()
-    private debugEffects: effect[] = MemoryHandler.getEmptyArray<effect>()
+    protected debugLightnings: lightning[] = MemoryHandler.getEmptyArray<lightning>()
+    protected debugEffects: effect[] = MemoryHandler.getEmptyArray<effect>()
 
     protected withEnterAndLeaveZone = false
     protected isLeaveZoneEnabled = true
@@ -40,12 +49,6 @@ export abstract class MECRegion {
 
     protected constructor() {
         this.id = ++MECRegion.lastId
-
-        this.watchedUnits = new Map()
-        this.unitsConsideredInRegion = new Map()
-
-        this.unitEntersCallbacks = new Map()
-        this.unitLeavesCallbacks = new Map()
     }
 
     abstract areCoordsInRegion(x: number, y: number): boolean
@@ -61,26 +64,34 @@ export abstract class MECRegion {
 
         if (enabled) {
             this.watchForEventsTimer = CreateTimer()
-            TimerStart(this.watchForEventsTimer, WATCH_TIMER_PERIOD, true, () => {
-                for (const [_, unit] of this.watchedUnits) {
-                    const unitId = GetHandleId(unit)
-                    const wasInRegion = this.unitsConsideredInRegion.has(unitId)
-                    const isInRegion = this.isUnitInRegion(unit)
+            TimerStart(this.watchForEventsTimer, WATCH_TIMER_PERIOD, true, WatchForEventsTimerCallback)
+            MECRegion.timerIdToMECRegionMap.set(GetHandleId(this.watchForEventsTimer), this)
+        } else if (this.watchForEventsTimer) {
+            MECRegion.timerIdToMECRegionMap.delete(GetHandleId(this.watchForEventsTimer))
+            DestroyTimer(this.watchForEventsTimer)
+            delete this.watchForEventsTimer
+        }
+    }
 
-                    if (wasInRegion !== isInRegion) {
-                        if (isInRegion) {
-                            this.unitsConsideredInRegion.set(unitId, unit)
-                            this.unitEntersCallbacks.forEach(callback => callback(unit))
-                        } else {
-                            this.unitsConsideredInRegion.delete(unitId)
-                            this.unitLeavesCallbacks.forEach(callback => callback(unit))
-                        }
+    watchForEventsTimerCallback() {
+        for (const [_, unit] of pairs(this.watchedUnits)) {
+            const unitId = GetHandleId(unit)
+            const wasInRegion = this.unitsConsideredInRegion[unitId] !== undefined
+            const isInRegion = this.isUnitInRegion(unit)
+
+            if (wasInRegion !== isInRegion) {
+                if (isInRegion) {
+                    this.unitsConsideredInRegion[unitId] = unit
+                    for (const [_, callback] of pairs(this.unitEntersCallbacks)) {
+                        callback(unit)
+                    }
+                } else {
+                    delete this.unitsConsideredInRegion[unitId]
+                    for (const [_, callback] of pairs(this.unitLeavesCallbacks)) {
+                        callback(unit)
                     }
                 }
-            })
-        } else {
-            this.watchForEventsTimer && DestroyTimer(this.watchForEventsTimer)
-            delete this.watchForEventsTimer
+            }
         }
     }
 
@@ -91,7 +102,7 @@ export abstract class MECRegion {
      */
     onUnitEnters(callback: (unit: unit) => void): number {
         const callbackId = ++this.lastUnitEntersOrLeavesCallbackId
-        this.unitEntersCallbacks.set(callbackId, callback)
+        this.unitEntersCallbacks[callbackId] = unit => callback(unit)
         return callbackId
     }
 
@@ -102,21 +113,19 @@ export abstract class MECRegion {
      */
     onUnitLeaves(callback: (unit: unit) => void): number {
         const callbackId = ++this.lastUnitEntersOrLeavesCallbackId
-        this.unitLeavesCallbacks.set(callbackId, callback)
+        this.unitLeavesCallbacks[callbackId] = unit => callback(unit)
         return callbackId
     }
 
     unregisterCallback(callbackId: number): void {
-        this.unitEntersCallbacks.delete(callbackId)
-        this.unitLeavesCallbacks.delete(callbackId)
+        delete this.unitEntersCallbacks[callbackId]
+        delete this.unitLeavesCallbacks[callbackId]
     }
 
     /**
      * Reimplement in children if needed
      */
     generateDebugLightnings(): lightning[] {
-        MemoryHandler.destroyArray(this.debugLightnings)
-        this.debugLightnings = MemoryHandler.getEmptyArray<lightning>()
         return this.debugLightnings
     }
 
@@ -124,8 +133,6 @@ export abstract class MECRegion {
      * Reimplement in children if needed
      */
     generateDebugEffects(): effect[] {
-        MemoryHandler.destroyArray(this.debugEffects)
-        this.debugEffects = MemoryHandler.getEmptyArray<effect>()
         return this.debugEffects
     }
 
@@ -137,32 +144,33 @@ export abstract class MECRegion {
 
         if (enable) {
             this.defineDebugLineType()
-            this.debugLightnings = this.generateDebugLightnings()
-            this.debugEffects = this.generateDebugEffects()
+            this.generateDebugLightnings()
+            this.generateDebugEffects()
         } else {
             for (const lightning of this.debugLightnings) {
                 DestroyLightning(lightning)
             }
-            MemoryHandler.destroyArray(this.debugLightnings)
+            this.debugLightnings.length = 0
+
             for (const effect of this.debugEffects) {
                 BlzSetSpecialEffectScale(effect, 0) // hide it because an effect doesn't visually instanstly disappear on destroy
                 DestroyEffect(effect)
             }
-            MemoryHandler.destroyArray(this.debugEffects)
+            this.debugEffects.length = 0
         }
     }
 
     watchUnit(unit: unit, initiallyIn = false): void {
-        this.watchedUnits.set(GetHandleId(unit), unit)
+        this.watchedUnits[GetHandleId(unit)] = unit
         if (initiallyIn) {
-            this.unitsConsideredInRegion.set(GetHandleId(unit), unit)
+            this.unitsConsideredInRegion[GetHandleId(unit)] = unit
         }
     }
 
     unwatchUnit(unit: unit): void {
         const unitId = GetHandleId(unit)
-        this.watchedUnits.delete(unitId)
-        this.unitsConsideredInRegion.delete(unitId)
+        delete this.watchedUnits[unitId]
+        delete this.unitsConsideredInRegion[unitId]
     }
 
     protected defineDebugLineTypeForStart() {
@@ -201,14 +209,23 @@ export abstract class MECRegion {
     disable() {
         this.enableWatchUnits(false)
         this.debugRects(false)
-        this.watchedUnits.clear()
-        this.unitsConsideredInRegion.clear()
-        this.unitEntersCallbacks.clear()
-        this.unitLeavesCallbacks.clear()
+
+        emptyOject(this.watchedUnits)
+        emptyOject(this.unitsConsideredInRegion)
+        emptyOject(this.unitEntersCallbacks)
+        emptyOject(this.unitLeavesCallbacks)
     }
 
     destroy(): void {
         this.disable()
+
+        MemoryHandler.destroyArray(this.debugLightnings)
+        MemoryHandler.destroyArray(this.debugEffects)
+
+        MemoryHandler.destroyObject(this.watchedUnits)
+        MemoryHandler.destroyObject(this.unitsConsideredInRegion)
+        MemoryHandler.destroyObject(this.unitEntersCallbacks)
+        MemoryHandler.destroyObject(this.unitLeavesCallbacks)
     }
 
     generateStartAndEndPoints(monsterSpawn?: MonsterSpawn): StartAndEndPoints & IDestroyable {

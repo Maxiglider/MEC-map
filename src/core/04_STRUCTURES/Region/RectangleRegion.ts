@@ -21,33 +21,33 @@ export class RectangleRegion extends MECRegion {
     private x3: number
     private y3: number
 
-    private x1forStartLine: number
-    private y1forStartLine: number
-    private x2forStartLine: number
-    private y2forStartLine: number
-    private deltaX2X1forStartLine: number
-    private deltaY2Y1forStartLine: number
-    private startLineLength: number
+    private x1forStartLine: number = 0
+    private y1forStartLine: number = 0
+    private x2forStartLine: number = 0
+    private y2forStartLine: number = 0
+    private deltaX2X1forStartLine: number = 0
+    private deltaY2Y1forStartLine: number = 0
+    private startLineLength: number = 0
 
-    private deltaX2X1: number
-    private deltaY2Y1: number
-    private points1_2_denominator: number
+    private deltaX2X1: number = 0
+    private deltaY2Y1: number = 0
+    private points1_2_denominator: number = 0
 
-    private vectorX: number
-    private vectorY: number
+    private vectorX: number = 0
+    private vectorY: number = 0
 
-    private vectorXforEndPoint: number
-    private vectorYforEndPoint: number
+    private vectorXforEndPoint: number = 0
+    private vectorYforEndPoint: number = 0
 
-    private endLineX1: number
-    private endLineY1: number
-    private endLineX2: number
-    private endLineY2: number
-    private endLineDeltaX: number
-    private endLineDeltaY: number
+    private endLineX1: number = 0
+    private endLineY1: number = 0
+    private endLineX2: number = 0
+    private endLineY2: number = 0
+    private endLineDeltaX: number = 0
+    private endLineDeltaY: number = 0
 
-    protected directionAngleCos: number
-    protected directionAngleSine: number
+    protected directionAngleCos: number = 0
+    protected directionAngleSine: number = 0
 
     private deltaP4X1: number = 0
     private deltaP4Y1: number = 0
@@ -57,10 +57,21 @@ export class RectangleRegion extends MECRegion {
     constructor(x1: number, y1: number, x2: number, y2: number, x3: number, y3: number) {
         super()
 
-        this.deltaX2X1 = x2 - x1
-        this.deltaY2Y1 = y2 - y1
-        const deltaX3X1 = x3 - x1
-        const deltaY3Y1 = y3 - y1
+        this.x1 = x1
+        this.y1 = y1
+        this.x2 = x2
+        this.y2 = y2
+        this.x3 = x3
+        this.y3 = y3
+
+        this.redefineZone()
+    }
+
+    redefineZone() {
+        this.deltaX2X1 = this.x2 - this.x1
+        this.deltaY2Y1 = this.y2 - this.y1
+        const deltaX3X1 = this.x3 - this.x1
+        const deltaY3Y1 = this.y3 - this.y1
 
         this.points1_2_denominator = this.deltaX2X1 * this.deltaX2X1 + this.deltaY2Y1 * this.deltaY2Y1
         if (this.points1_2_denominator === 0) {
@@ -69,11 +80,11 @@ export class RectangleRegion extends MECRegion {
             this.vectorY = deltaY3Y1
         } else {
             const t = (deltaX3X1 * this.deltaX2X1 + deltaY3Y1 * this.deltaY2Y1) / this.points1_2_denominator
-            const Xproj3to1_2 = x1 + t * this.deltaX2X1
-            const Yproj3to1_2 = y1 + t * this.deltaY2Y1
+            const Xproj3to1_2 = this.x1 + t * this.deltaX2X1
+            const Yproj3to1_2 = this.y1 + t * this.deltaY2Y1
 
-            this.vectorX = x3 - Xproj3to1_2
-            this.vectorY = y3 - Yproj3to1_2
+            this.vectorX = this.x3 - Xproj3to1_2
+            this.vectorY = this.y3 - Yproj3to1_2
         }
 
         const vectorLength = Math.sqrt(this.vectorX * this.vectorX + this.vectorY * this.vectorY)
@@ -81,31 +92,24 @@ export class RectangleRegion extends MECRegion {
         this.vectorXforEndPoint = (this.vectorX * (vectorLength + END_POINT_OFFSET_AFTER_END_OF_REGION)) / vectorLength
         this.vectorYforEndPoint = (this.vectorY * (vectorLength + END_POINT_OFFSET_AFTER_END_OF_REGION)) / vectorLength
 
-        this.endLineX1 = x1 + this.vectorXforEndPoint
-        this.endLineY1 = y1 + this.vectorYforEndPoint
-        this.endLineX2 = x2 + this.vectorXforEndPoint
-        this.endLineY2 = y2 + this.vectorYforEndPoint
+        this.endLineX1 = this.x1 + this.vectorXforEndPoint
+        this.endLineY1 = this.y1 + this.vectorYforEndPoint
+        this.endLineX2 = this.x2 + this.vectorXforEndPoint
+        this.endLineY2 = this.y2 + this.vectorYforEndPoint
         this.endLineDeltaX = this.endLineX2 - this.endLineX1
         this.endLineDeltaY = this.endLineY2 - this.endLineY1
-
-        this.x1 = x1
-        this.y1 = y1
-        this.x2 = x2
-        this.y2 = y2
-        this.x3 = x3
-        this.y3 = y3
 
         const dist1_2 = Math.sqrt(this.points1_2_denominator)
 
         // start line reduced a little for edge spawn monsters not to instantly disapear because of considered out of the region
         this.x1forStartLine =
-            x1 + (OFFSET_FOR_START_LINE_NOT_SPAWNED_MONSTERS_TO_BE_CONSIDERED_OUT * this.deltaX2X1) / dist1_2
+            this.x1 + (OFFSET_FOR_START_LINE_NOT_SPAWNED_MONSTERS_TO_BE_CONSIDERED_OUT * this.deltaX2X1) / dist1_2
         this.y1forStartLine =
-            y1 + (OFFSET_FOR_START_LINE_NOT_SPAWNED_MONSTERS_TO_BE_CONSIDERED_OUT * this.deltaY2Y1) / dist1_2
+            this.y1 + (OFFSET_FOR_START_LINE_NOT_SPAWNED_MONSTERS_TO_BE_CONSIDERED_OUT * this.deltaY2Y1) / dist1_2
         this.x2forStartLine =
-            x2 - (OFFSET_FOR_START_LINE_NOT_SPAWNED_MONSTERS_TO_BE_CONSIDERED_OUT * this.deltaX2X1) / dist1_2
+            this.x2 - (OFFSET_FOR_START_LINE_NOT_SPAWNED_MONSTERS_TO_BE_CONSIDERED_OUT * this.deltaX2X1) / dist1_2
         this.y2forStartLine =
-            y2 - (OFFSET_FOR_START_LINE_NOT_SPAWNED_MONSTERS_TO_BE_CONSIDERED_OUT * this.deltaY2Y1) / dist1_2
+            this.y2 - (OFFSET_FOR_START_LINE_NOT_SPAWNED_MONSTERS_TO_BE_CONSIDERED_OUT * this.deltaY2Y1) / dist1_2
 
         // start line moved a little towards the end line for edge spawn monsters not to instantly disapear because of considered out of the region
         this.x1forStartLine =
@@ -150,6 +154,26 @@ export class RectangleRegion extends MECRegion {
         this.dotP4 = dot(this.deltaP4X1, this.deltaP4Y1, this.deltaP4X1, this.deltaP4Y1)
     }
 
+    moveTo(newCenterX: number, newCenterY: number): void {
+        const currentCenterX = (this.x1 + this.x2) / 2 + this.vectorX / 2
+        const currentCenterY = (this.y1 + this.y2) / 2 + this.vectorY / 2
+
+        const deltaX = newCenterX - currentCenterX
+        const deltaY = newCenterY - currentCenterY
+
+        this.x1 += deltaX
+        this.y1 += deltaY
+        this.x2 += deltaX
+        this.y2 += deltaY
+        this.x3 += deltaX
+        this.y3 += deltaY
+
+        this.redefineZone()
+
+        // this.debugRects(false)
+        // this.debugRects(true)
+    }
+
     areCoordsInRegion(x: number, y: number) {
         // Let's say (x, y) is point P
         const deltaPxX1 = x - this.x1
@@ -162,26 +186,24 @@ export class RectangleRegion extends MECRegion {
     }
 
     generateDebugLightnings(): lightning[] {
-        const lightnings = MemoryHandler.getEmptyArray<lightning>()
-
         const x3 = this.x2 + this.vectorX
         const y3 = this.y2 + this.vectorY
         const x4 = this.x1 + this.vectorX
         const y4 = this.y1 + this.vectorY
 
         this.defineDebugLineTypeForStart()
-        arrayPush(lightnings, DrawLine(this.x1, this.y1, this.x2, this.y2))
+        arrayPush(this.debugLightnings, DrawLine(this.x1, this.y1, this.x2, this.y2))
 
         this.defineDebugLineType()
-        arrayPush(lightnings, DrawLine(this.x2, this.y2, x3, y3))
-        arrayPush(lightnings, DrawLine(x4, y4, this.x1, this.y1))
+        arrayPush(this.debugLightnings, DrawLine(this.x2, this.y2, x3, y3))
+        arrayPush(this.debugLightnings, DrawLine(x4, y4, this.x1, this.y1))
 
         if (this.isLeaveZoneEnabled) {
             this.defineDebugLineTypeForEnd()
-            arrayPush(lightnings, DrawLine(x3, y3, x4, y4))
+            arrayPush(this.debugLightnings, DrawLine(x3, y3, x4, y4))
         }
 
-        return lightnings
+        return this.debugLightnings
     }
 
     generateStartAndEndPoints(monsterSpawn?: MonsterSpawn) {

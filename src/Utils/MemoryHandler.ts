@@ -1,4 +1,5 @@
 import { arrayPush } from 'core/01_libraries/Basic_functions'
+import { errorHandler } from './mapUtils'
 
 export type IDestroyable = { __destroy: (recursive?: boolean) => void }
 
@@ -160,11 +161,11 @@ const initMemoryHandler = () => {
         // }
 
         // Give the methods of the class to the object
-        for (const [k, v] of pairs(classInstance.prototype)) {
-            if (typeof k !== 'string') continue
-            if (k.startsWith('__')) continue
-            obj[k] = v
-        }
+        // for (const [k, v] of pairs(classInstance.prototype)) {
+        //     if (typeof k !== 'string') continue
+        //     if (k.startsWith('__')) continue
+        //     obj[k] = v
+        // }
 
         classInstance.prototype.____constructor?.(obj, ...params)
 
@@ -195,7 +196,15 @@ const initMemoryHandler = () => {
             }
 
             numCreatedObjects++
-            setmetatable(obj, debugName ? getObjectMeta(debugName) : defaultObjectMeta)
+
+            errorHandler(() => {
+                if (!obj) return
+                if (objectClass) {
+                    print('Creating object of class ' + objectClass.prototype.constructor.name)
+                    setmetatable(obj, objectClass.prototype)
+                    objectClass.prototype.__destroy = destroyObject
+                } else setmetatable(obj, debugName ? getObjectMeta(debugName) : defaultObjectMeta)
+            })()
         }
 
         if (debugName) {

@@ -291,6 +291,7 @@ export class MonsterSpawn {
                 Monster.forceUnitTypeIdForNextMonster = forceUnitTypeId
             }
 
+            // print(`Creating unit at (${startAndEndPoints.startX}, ${startAndEndPoints.startY})`)
             monster = NewImmobileMonster(this.mt, startAndEndPoints.startX, startAndEndPoints.startY, spawnAngle)
         } else {
             // todo the forceUnitTypeId should be taken into account and change the unit type of the existing unit without recreating it

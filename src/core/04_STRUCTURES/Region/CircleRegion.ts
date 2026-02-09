@@ -37,10 +37,9 @@ export class CircleRegion extends MECRegion {
         const scale = this.radius / Constants.COLLISION_LANDMARK_MODEL_BASE_RADIUS
         BlzSetSpecialEffectScale(circleEffect, scale)
 
-        const effects = MemoryHandler.getEmptyArray<effect>()
-        arrayPush(effects, circleEffect)
+        arrayPush(this.debugEffects, circleEffect)
 
-        return effects
+        return this.debugEffects
     }
 
     toJson(): any {

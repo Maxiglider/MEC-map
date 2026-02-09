@@ -72,6 +72,18 @@ export class HorizontalRegion extends RectangleRegion {
         return x >= this.minX && x <= this.maxX && y >= this.minY && y <= this.maxY
     }
 
+    moveTo(newCenterX: number, newCenterY: number) {
+        const halfWidth = (this.maxX - this.minX) / 2
+        const halfHeight = (this.maxY - this.minY) / 2
+
+        this.minX = newCenterX - halfWidth
+        this.maxX = newCenterX + halfWidth
+        this.minY = newCenterY - halfHeight
+        this.maxY = newCenterY + halfHeight
+
+        super.moveTo(newCenterX, newCenterY)
+    }
+
     toJson() {
         const output = MemoryHandler.getEmptyObject<any>()
 
