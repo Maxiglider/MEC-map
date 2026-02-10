@@ -1,13 +1,10 @@
 import { DefineDrawLineType } from '../../01_libraries/Draw_lines'
 import { IDestroyable, MemoryHandler } from '../../../Utils/MemoryHandler'
 import type { MonsterSpawn } from '../MonsterSpawn/MonsterSpawn'
-import { Natives } from '../../wc3_natives_unsecured/Natives'
 import { emptyOject } from '../../01_libraries/Basic_functions'
 
-const WATCH_TIMER_PERIOD = 0.05
-
-export const OFFSET_FOR_START_LINE_NOT_SPAWNED_MONSTERS_TO_BE_CONSIDERED_OUT = 2
-export const END_POINT_OFFSET_AFTER_END_OF_REGION = 50 // to be sure the monster ends their movement out of the region
+export const OFFSET_FOR_START_LINE_NOT_SPAWNED_MONSTERS_TO_BE_CONSIDERED_OUT = 4
+export const END_POINT_OFFSET_AFTER_END_OF_REGION = 200 // to be sure the monster ends their movement out of the region and doesn't reach the end point
 
 export type StartAndEndPoints = {
     startX: number
@@ -17,18 +14,26 @@ export type StartAndEndPoints = {
     ephemeral: boolean
 }
 
+const WATCH_TIMER_PERIOD = 0.05
+
 const WatchForEventsTimerCallback = () => {
-    const mecRegion = MECRegion.timerIdToMECRegionMap.get(GetHandleId(Natives.UGetExpiredTimer()))
-    mecRegion?.watchForEventsTimerCallback()
+    for (const [_, mecRegion] of pairs(MECRegion.allMecRegions)) {
+        mecRegion.watchForEventsTimerCallback()
+    }
+}
+
+// One single timer for all MECRegions for optimization, instead of one timer per MECRegion
+export const init_MECRegions = () => {
+    TimerStart(CreateTimer(), WATCH_TIMER_PERIOD, true, WatchForEventsTimerCallback)
 }
 
 export abstract class MECRegion {
     private static lastId = -1
 
-    static timerIdToMECRegionMap: Map<number, MECRegion> = new Map()
+    static allMecRegions: { [x: number]: MECRegion } = {}
 
     private id: number
-    private watchForEventsTimer?: timer
+    private watchForEventsEnabled = false
     private watchedUnits: { [x: number]: unit } = MemoryHandler.getEmptyObject()
     private unitsConsideredInRegion: { [x: number]: unit } = MemoryHandler.getEmptyObject()
 
@@ -49,6 +54,7 @@ export abstract class MECRegion {
 
     protected constructor() {
         this.id = ++MECRegion.lastId
+        MECRegion.allMecRegions[this.id] = this
     }
 
     abstract areCoordsInRegion(x: number, y: number): boolean
@@ -58,22 +64,17 @@ export abstract class MECRegion {
     }
 
     enableWatchUnits(enabled: boolean): void {
-        if (enabled === !!this.watchForEventsTimer) {
+        if (enabled === this.watchForEventsEnabled) {
             return
         }
-
-        if (enabled) {
-            this.watchForEventsTimer = CreateTimer()
-            TimerStart(this.watchForEventsTimer, WATCH_TIMER_PERIOD, true, WatchForEventsTimerCallback)
-            MECRegion.timerIdToMECRegionMap.set(GetHandleId(this.watchForEventsTimer), this)
-        } else if (this.watchForEventsTimer) {
-            MECRegion.timerIdToMECRegionMap.delete(GetHandleId(this.watchForEventsTimer))
-            DestroyTimer(this.watchForEventsTimer)
-            delete this.watchForEventsTimer
-        }
+        this.watchForEventsEnabled = enabled
     }
 
     watchForEventsTimerCallback() {
+        if (!this.watchForEventsEnabled) {
+            return
+        }
+
         for (const [_, unit] of pairs(this.watchedUnits)) {
             const unitId = GetHandleId(unit)
             const wasInRegion = this.unitsConsideredInRegion[unitId] !== undefined
@@ -100,9 +101,9 @@ export abstract class MECRegion {
      * @param callback
      * @returns callbackId
      */
-    onUnitEnters(callback: (unit: unit) => void): number {
+    onUnitEnters(callback: (this: any, unit: unit) => void): number {
         const callbackId = ++this.lastUnitEntersOrLeavesCallbackId
-        this.unitEntersCallbacks[callbackId] = unit => callback(unit)
+        this.unitEntersCallbacks[callbackId] = callback
         return callbackId
     }
 
@@ -111,9 +112,9 @@ export abstract class MECRegion {
      * @param callback
      * @returns callbackId
      */
-    onUnitLeaves(callback: (unit: unit) => void): number {
+    onUnitLeaves(callback: (this: any, unit: unit) => void): number {
         const callbackId = ++this.lastUnitEntersOrLeavesCallbackId
-        this.unitLeavesCallbacks[callbackId] = unit => callback(unit)
+        this.unitLeavesCallbacks[callbackId] = callback
         return callbackId
     }
 
@@ -226,6 +227,8 @@ export abstract class MECRegion {
         MemoryHandler.destroyObject(this.unitsConsideredInRegion)
         MemoryHandler.destroyObject(this.unitEntersCallbacks)
         MemoryHandler.destroyObject(this.unitLeavesCallbacks)
+
+        delete MECRegion.allMecRegions[this.id]
     }
 
     generateStartAndEndPoints(monsterSpawn?: MonsterSpawn): StartAndEndPoints & IDestroyable {

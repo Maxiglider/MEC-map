@@ -197,14 +197,12 @@ const initMemoryHandler = () => {
 
             numCreatedObjects++
 
-            errorHandler(() => {
-                if (!obj) return
-                if (objectClass) {
-                    print('Creating object of class ' + objectClass.prototype.constructor.name)
-                    setmetatable(obj, objectClass.prototype)
-                    objectClass.prototype.__destroy = destroyObject
-                } else setmetatable(obj, debugName ? getObjectMeta(debugName) : defaultObjectMeta)
-            })()
+            if (objectClass) {
+                setmetatable(obj, objectClass.prototype)
+                objectClass.prototype.__destroy = destroyObject
+            } else {
+                setmetatable(obj, debugName ? getObjectMeta(debugName) : defaultObjectMeta)
+            }
         }
 
         if (debugName) {
@@ -222,7 +220,9 @@ const initMemoryHandler = () => {
         getEmptyClass,
         getEmptyObject,
         getEmptyArray: <T>(debugName?: string) => {
-            return getEmptyObject<T[]>(debugName) as T[] & IDestroyable
+            const array = getEmptyObject<T[]>(debugName) as T[] & IDestroyable
+            array.length = 0
+            return array
         },
         destroyObject,
         destroyClassObject,

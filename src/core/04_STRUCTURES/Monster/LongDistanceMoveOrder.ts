@@ -3,7 +3,7 @@ import { MemoryHandler } from '../../../Utils/MemoryHandler'
 import { arrayPush } from '../../01_libraries/Basic_functions'
 import { HorizontalRegion } from '../Region/HorizontalRegion'
 
-function OnNextWaypointReached(unit: unit) {
+function OnNextWaypointReached(this: any, unit: unit) {
     const longDistanceMoveOrder = LongDistanceMoveOrder.unitToLongDistanceMoveOrder[GetHandleId(unit)]
 
     if (!!longDistanceMoveOrder) {
@@ -25,9 +25,15 @@ export function init_LongDistanceMoveOrder_garbageCollector() {
  * @param whichUnit The unit to issue the move order to.
  * @param x The x-coordinate of the destination point.
  * @param y The y-coordinate of the destination point.
+ * @param automaticallyDestroyLongMoveOrderAtEndOfMvt If true, the LongDistanceMoveOrder instance will be automatically destroyed at the end of the movement. If false, it will need to be destroyed manually by calling the destroy() method on the LongDistanceMoveOrder instance. Default is true.
  * @returns True if the order was successfully issued, false otherwise.
  */
-export const IssueMoveOrderForLongDistance = (whichUnit: unit, x: number, y: number): boolean => {
+export const IssueMoveOrderForLongDistance = (
+    whichUnit: unit,
+    x: number,
+    y: number,
+    automaticallyDestroyLongMoveOrderAtEndOfMvt = true
+): boolean | LongDistanceMoveOrder => {
     if (!whichUnit || !IsUnitAliveBJ(whichUnit)) {
         return false
     }
@@ -43,17 +49,20 @@ export const IssueMoveOrderForLongDistance = (whichUnit: unit, x: number, y: num
 
     if (simpleMove) {
         IssuePointOrder(whichUnit, 'move', x, y)
+        return true
     } else {
         // Handle long distance move with intermediate waypoints
-        // new LongDistanceMoveOrder(whichUnit, x, y)
-        MemoryHandler.getEmptyClass(LongDistanceMoveOrder, whichUnit, x, y)
+        return MemoryHandler.getEmptyClass(
+            LongDistanceMoveOrder,
+            whichUnit,
+            x,
+            y,
+            automaticallyDestroyLongMoveOrderAtEndOfMvt
+        )
     }
-
-    return true
 }
 
 export class LongDistanceMoveOrder {
-    // todo fix: the creation of instances of this class probably causes memory leaks
     static unitToLongDistanceMoveOrder: { [x: number]: LongDistanceMoveOrder } = {}
 
     private unit: unit
@@ -63,11 +72,13 @@ export class LongDistanceMoveOrder {
     private waypointsY = MemoryHandler.getEmptyArray<number>()
     private nextWaypointRegion: HorizontalRegion
     private currentWaypointIndex: number
+    private automaticallyDestroyAtEndOfMvt: boolean
 
-    constructor(whichUnit: unit, x: number, y: number) {
+    constructor(whichUnit: unit, x: number, y: number, automaticallyDestroyAtEndOfMvt = true) {
         this.unit = whichUnit
         this.destinationX = x
         this.destinationY = y
+        this.automaticallyDestroyAtEndOfMvt = automaticallyDestroyAtEndOfMvt
 
         if (!whichUnit || !IsUnitAliveBJ(whichUnit)) {
             throw new Error('LongDistanceMoveOrder: whichUnit is invalid or dead')
@@ -112,13 +123,14 @@ export class LongDistanceMoveOrder {
         if (this.currentWaypointIndex < this.waypointsX.length) {
             const waypointX = this.waypointsX[this.currentWaypointIndex]
             const waypointY = this.waypointsY[this.currentWaypointIndex]
-            IssuePointOrder(this.unit, 'move', waypointX, waypointY)
 
-            this.nextWaypointRegion.moveTo(waypointX, waypointY)
+            IssuePointOrder(this.unit, 'move', waypointX, waypointY)
 
             if (this.currentWaypointIndex === this.waypointsX.length - 1) {
                 // Last waypoint is the final destination, we can clean the region entering detection
-                this.destroy()
+                this.automaticallyDestroyAtEndOfMvt && this.destroy()
+            } else {
+                this.nextWaypointRegion.moveTo(waypointX, waypointY)
             }
         }
     }
@@ -127,7 +139,7 @@ export class LongDistanceMoveOrder {
         this.issueMoveOrderToNextWaypoint()
     }
 
-    private destroy() {
+    public destroy() {
         delete LongDistanceMoveOrder.unitToLongDistanceMoveOrder[GetHandleId(this.unit)]
 
         this.nextWaypointRegion.destroy()

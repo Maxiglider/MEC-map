@@ -5,10 +5,10 @@ export class MakeDebugMECRegion extends MakeMECRegion {
     onMECRegionCreated(mecRegion: MECRegion) {
         mecRegion.debugRects(true)
 
-        mecRegion.onUnitEnters(unit => {
+        mecRegion.onUnitEnters(function (this: any, unit) {
             SetUnitColor(unit, PLAYER_COLOR_BLUE)
         })
-        mecRegion.onUnitLeaves(unit => {
+        mecRegion.onUnitLeaves(function (this: any, unit) {
             SetUnitColor(unit, PLAYER_COLOR_RED)
         })
 

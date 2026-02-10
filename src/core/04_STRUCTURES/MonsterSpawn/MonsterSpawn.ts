@@ -13,7 +13,7 @@ import { MonsterType } from '../Monster/MonsterType'
 import { NewImmobileMonster } from '../Monster/Monster_functions'
 import { initSimpleUnitRecycler } from './SimpleUnitRecycler'
 import { Natives } from '../../wc3_natives_unsecured/Natives'
-import { IssueMoveOrderForLongDistance } from '../Monster/LongDistanceMoveOrder'
+import { IssueMoveOrderForLongDistance, LongDistanceMoveOrder } from '../Monster/LongDistanceMoveOrder'
 import { MECRegion, StartAndEndPoints } from '../Region/MECRegion'
 
 export type MonsterDirectionMode = 'straight' | 'random'
@@ -54,7 +54,15 @@ const MonsterSpawn_Actions = errorHandler(() => {
 
         if (mobUnit) {
             // Make the unit move
-            IssueMoveOrderForLongDistance(mobUnit, startAndEndPoints.endX, startAndEndPoints.endY)
+            const moveOrder = IssueMoveOrderForLongDistance(
+                mobUnit,
+                startAndEndPoints.endX,
+                startAndEndPoints.endY,
+                false
+            )
+            if (moveOrder instanceof LongDistanceMoveOrder) {
+                MonsterSpawn.anyMonsterUnitId2MoveOrder.set(GetHandleId(mobUnit), moveOrder)
+            }
 
             const unspawnTime = monsterSpawn.getTimedUnspawn()
             if (unspawnTime !== undefined) {
@@ -81,12 +89,34 @@ const MonsterUnspawn = errorHandler(() => {
     }
 })
 
+const OnMonsterUnitLeavesSpawnRegion = function (this: any, monsterUnit: unit) {
+    const monsterSpawn = MonsterSpawn.anyMonsterUnitId2MonsterSpawn.get(GetHandleId(monsterUnit))
+    monsterSpawn?.removeMonsterUnit(monsterUnit)
+}
+
+const OnMonsterUnitEntersHideRegion = function (this: any, monsterUnit: unit) {
+    ShowUnit(monsterUnit, false)
+    UnitRemoveAbility(monsterUnit, FourCC('Aloc'))
+}
+
+const OnMonsterUnitLeavesHideRegion = function (this: any, monsterUnit: unit) {
+    const monsterSpawn = MonsterSpawn.anyMonsterUnitId2MonsterSpawn.get(GetHandleId(monsterUnit))
+    if (
+        monsterSpawn?.getMecRegion()?.isUnitInRegion(monsterUnit) &&
+        !monsterSpawn?.isUnitInAnyHideRegion(monsterUnit)
+    ) {
+        ShowUnit(monsterUnit, true)
+        UnitAddAbility(monsterUnit, FourCC('Aloc'))
+    }
+}
+
 /**
  * class MonsterSpawn
  */
 export class MonsterSpawn {
     static anyTrigId2MonsterSpawn = new Map<number, MonsterSpawn>()
     static anyMonsterUnitId2MonsterSpawn = new Map<number, MonsterSpawn>()
+    static anyMonsterUnitId2MoveOrder = new Map<number, LongDistanceMoveOrder>()
 
     static anyUnit2TimedUnspawnTimer = new Map<number, timer>()
     static anyTimedUnspawnTimerId2Unit = new Map<number, unit>()
@@ -110,7 +140,7 @@ export class MonsterSpawn {
     private spawnOffset = 0
     private fixedSpawnOffsetBounce = false
     private fixedSpawnOffsetMirrored = false
-    private hideRegions: { [x: number]: MECRegion } = {}
+    private hideRegions: { [x: number]: MECRegion } = MemoryHandler.getEmptyObject()
 
     // Properties for runtime use only
     private tSpawn?: trigger
@@ -164,7 +194,7 @@ export class MonsterSpawn {
     setMECRegion = (newMecRegion: MECRegion) => {
         this.mecRegion && this.mecRegion.destroy()
         this.mecRegion = newMecRegion
-        this.mecRegion.onUnitLeaves(monsterUnit => this.removeMonsterUnit(monsterUnit))
+        this.mecRegion.onUnitLeaves(OnMonsterUnitLeavesSpawnRegion)
         this._active && this.refresh()
     }
 
@@ -188,6 +218,12 @@ export class MonsterSpawn {
             DestroyTimer(timer)
         }
         MonsterSpawn.anyMonsterUnitId2MonsterSpawn.delete(GetHandleId(monsterUnit))
+
+        const moveOrder = MonsterSpawn.anyMonsterUnitId2MoveOrder.get(GetHandleId(monsterUnit))
+        if (moveOrder) {
+            moveOrder.destroy()
+            MonsterSpawn.anyMonsterUnitId2MoveOrder.delete(GetHandleId(monsterUnit))
+        }
     }
 
     deactivate = () => {
@@ -364,22 +400,13 @@ export class MonsterSpawn {
     }
 
     addHideRegionCallbacks(mecRegion: MECRegion) {
-        mecRegion.onUnitEnters(monsterUnit => {
-            ShowUnit(monsterUnit, false)
-            UnitRemoveAbility(monsterUnit, FourCC('Aloc'))
-        })
-
-        mecRegion.onUnitLeaves(monsterUnit => {
-            if (this.mecRegion?.isUnitInRegion(monsterUnit) && !this.isUnitInAnyHideRegion(monsterUnit, mecRegion)) {
-                ShowUnit(monsterUnit, true)
-                UnitAddAbility(monsterUnit, FourCC('Aloc'))
-            }
-        })
+        mecRegion.onUnitEnters(OnMonsterUnitEntersHideRegion)
+        mecRegion.onUnitLeaves(OnMonsterUnitLeavesHideRegion)
     }
 
-    isUnitInAnyHideRegion(monsterUnit: unit, exceptionRegion: MECRegion): boolean {
+    isUnitInAnyHideRegion(monsterUnit: unit): boolean {
         for (const [_, hideRegion] of pairs(this.hideRegions)) {
-            if (hideRegion !== exceptionRegion && hideRegion.isUnitInRegion(monsterUnit)) {
+            if (hideRegion.isUnitInRegion(monsterUnit)) {
                 return true
             }
         }

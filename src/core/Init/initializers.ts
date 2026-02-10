@@ -28,6 +28,7 @@ import { initOldTriggers } from './init_old_triggers'
 import { init_LongDistanceMoveOrder_garbageCollector } from '../04_STRUCTURES/Monster/LongDistanceMoveOrder'
 import { init_dataFromWorleditor } from './init_dataFromWorleditor'
 import { init_DetectNullHeroCollisionAtStart } from '../07_TRIGGERS/CollisionLandmarks/DetectNullHeroCollisionAtStart'
+import { init_MECRegions } from '../04_STRUCTURES/Region/MECRegion'
 
 export const initializers = () => {
     init_dataFromWorleditor()
@@ -57,6 +58,7 @@ export const initializers = () => {
     init_cameraPositionAtStart()
     init_LongDistanceMoveOrder_garbageCollector()
     init_DetectNullHeroCollisionAtStart()
+    init_MECRegions()
 
     //keyboard shortcuts
     init_shortcurt_cancelRedo()
