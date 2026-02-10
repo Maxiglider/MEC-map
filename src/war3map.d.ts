@@ -1,3 +1,5 @@
+declare var MEC_core: any
+
 declare var gg_rct_departLvl_0: rect
 declare var gg_snd_noob: sound
 declare var gg_snd_multisquish: sound

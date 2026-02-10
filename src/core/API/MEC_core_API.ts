@@ -30,6 +30,7 @@ import { hooks } from './GeneralHooks'
 import { MecHook } from './MecHook'
 import { NewImmobileMonster, NewPatrolMonster } from '../04_STRUCTURES/Monster/Monster_functions'
 import { Monster } from '../04_STRUCTURES/Monster/Monster'
+import { e2e } from '../Test/e2e-tests/e2e-tests-base'
 
 export type IMEC_core_API = typeof MEC_core_API
 
@@ -213,8 +214,11 @@ export const MEC_core_API = {
 
     NewImmobileMonsterUnit: NewImmobileMonster,
     NewPatrolMonsterUnit: NewPatrolMonster,
+
+    e2e,
 }
 
 export const initMEC_core_API = () => {
+    MEC_core = MEC_core_API
     return MEC_core_API
 }

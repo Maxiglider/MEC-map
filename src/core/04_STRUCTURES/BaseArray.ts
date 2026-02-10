@@ -96,4 +96,10 @@ export abstract class BaseArray<T extends BaseModel> {
 
     // First index is 0
     getLastInstanceId = () => this.lastInstanceId + 1
+
+    getFirst = () => {
+        for (const [_, element] of pairs(this.data)) {
+            return element
+        }
+    }
 }

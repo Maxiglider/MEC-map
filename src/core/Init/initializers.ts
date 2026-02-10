@@ -29,6 +29,7 @@ import { init_LongDistanceMoveOrder_garbageCollector } from '../04_STRUCTURES/Mo
 import { init_dataFromWorleditor } from './init_dataFromWorleditor'
 import { init_DetectNullHeroCollisionAtStart } from '../07_TRIGGERS/CollisionLandmarks/DetectNullHeroCollisionAtStart'
 import { init_MECRegions } from '../04_STRUCTURES/Region/MECRegion'
+import { init_E2ETests } from '../Test/e2e-tests/e2e-tests-registering'
 
 export const initializers = () => {
     init_dataFromWorleditor()
@@ -59,6 +60,7 @@ export const initializers = () => {
     init_LongDistanceMoveOrder_garbageCollector()
     init_DetectNullHeroCollisionAtStart()
     init_MECRegions()
+    init_E2ETests()
 
     //keyboard shortcuts
     init_shortcurt_cancelRedo()

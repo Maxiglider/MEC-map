@@ -71,7 +71,7 @@ export const GetTerrainName = (terrain: number) => {
     return TerrainTypeNamesAndData.TERRAIN_TYPE_NAMES[terrain]
 }
 
-export const GetTerrainData = (terrain: number) => {
+export const GetTerrainData = (terrain: number, x?: number, y?: number) => {
     //GetTerrainData('Nice') == "46 : Northrend - Glace    'Nice'"
     let str: string
     let maxId: number
@@ -90,6 +90,11 @@ export const GetTerrainData = (terrain: number) => {
     terrainType = TerrainTypeId2TerrainType(terrain)
     if (terrainType) {
         str += '\n' + terrainType.toText()
+    }
+
+    // Additionaly display the coordinates of the target point
+    if (x !== undefined && y !== undefined) {
+        str += `\nCoordinates: (${R2I(x)}, ${R2I(y)})`
     }
 
     return str

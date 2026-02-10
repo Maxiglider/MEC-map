@@ -9,6 +9,7 @@ import { Timer } from 'w3ts'
 import { getUdgEscapers } from '../../../../globals'
 import { isPlayerId, resolvePlayerId } from '../Helpers/Command_functions'
 import { Natives } from '../../wc3_natives_unsecured/Natives'
+import { e2e } from '../../Test/e2e-tests/e2e-tests-base'
 
 export const initExecuteCommandTrueMax = () => {
     const { registerCommand } = ServiceManager.getService('Cmd')
@@ -227,6 +228,50 @@ export const initExecuteCommandTrueMax = () => {
                 // }
 
                 Text.mkP(escaper.getPlayer(), `Effects ${!S2B(param1) ? 'shown' : 'hidden'}`)
+            }
+
+            return true
+        },
+    })
+
+    //-e2e tests
+    registerCommand({
+        name: 'e2e',
+        alias: [],
+        group: 'truemax',
+        argDescription: '[run] <testName> | speed <percentage> | stop',
+        description: 'Disables all effects',
+        cb: ({ param1, param2, nbParam }, escaper) => {
+            const usageMsg = 'e2e: bad command usage'
+            if (nbParam > 2 || nbParam === 0) {
+                Text.erP(escaper.getPlayer(), usageMsg)
+                return true
+            }
+
+            switch (param1) {
+                case 'stop':
+                    e2e.stop()
+                    break
+
+                case 'speed':
+                    if (nbParam !== 2) {
+                        Text.erP(escaper.getPlayer(), usageMsg)
+                        return true
+                    }
+                    const speed = Number(param2)
+                    e2e.setSpeed(speed)
+                    break
+
+                case 'run':
+                    if (nbParam !== 2) {
+                        Text.erP(escaper.getPlayer(), usageMsg)
+                        return true
+                    }
+                    e2e.startTest(param2)
+                    break
+
+                default:
+                    e2e.startTest(param1)
             }
 
             return true

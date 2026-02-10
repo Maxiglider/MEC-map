@@ -9,7 +9,7 @@ export class MakeGetTerrainType extends Make {
 
     doActions = () => {
         if (super.doBaseActions()) {
-            const terrainData = GetTerrainData(GetTerrainType(this.orderX, this.orderY))
+            const terrainData = GetTerrainData(GetTerrainType(this.orderX, this.orderY), this.orderX, this.orderY)
             terrainData && Text.P(this.makerOwner, terrainData)
         }
     }
