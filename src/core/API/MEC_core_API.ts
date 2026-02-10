@@ -30,7 +30,7 @@ import { hooks } from './GeneralHooks'
 import { MecHook } from './MecHook'
 import { NewImmobileMonster, NewPatrolMonster } from '../04_STRUCTURES/Monster/Monster_functions'
 import { Monster } from '../04_STRUCTURES/Monster/Monster'
-import { e2e } from '../Test/e2e-tests/e2e-tests-base'
+import { e2e } from '../Test/e2e-tests/base/e2e-tests-base'
 
 export type IMEC_core_API = typeof MEC_core_API
 

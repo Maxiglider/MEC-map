@@ -30,6 +30,7 @@ import { Natives } from '../../wc3_natives_unsecured/Natives'
 import { CollisionTest } from '../../Test/collision-test'
 import { MakeMECRegionMode } from '../../05_MAKE_STRUCTURES/Make_create_region/MakeMECRegion'
 import { HorizontalRegionDirection } from '../../04_STRUCTURES/Region/HorizontalRegion'
+import { e2e } from '../../Test/e2e-tests/base/e2e-tests-base'
 
 export const initExecuteCommandMax = () => {
     const { registerCommand } = ServiceManager.getService('Cmd')
@@ -1074,6 +1075,78 @@ export const initExecuteCommandMax = () => {
             escaper.makeCreateDebugMECRegions(mode, directionForHorizontal)
 
             Text.mkP(escaper.getPlayer(), 'MakeCreateDebugMECRegions enabled')
+            return true
+        },
+    })
+
+    //-e2e tests
+    registerCommand({
+        name: 'e2e',
+        alias: [],
+        group: 'max',
+        argDescription: '[run] <testName> | speed <percentage> | stop | pause | resume',
+        description: 'Disables all effects',
+        cb: ({ param1, param2, nbParam }, escaper) => {
+            const usageMsg = 'e2e: bad command usage'
+            if (nbParam > 2 || nbParam === 0) {
+                Text.erP(escaper.getPlayer(), usageMsg)
+                return true
+            }
+
+            switch (param1) {
+                case 'stop':
+                    if (nbParam !== 1) {
+                        Text.erP(escaper.getPlayer(), usageMsg)
+                        return true
+                    }
+                    e2e.stop()
+                    break
+
+                case 'speed':
+                    if (nbParam !== 2) {
+                        Text.erP(escaper.getPlayer(), usageMsg)
+                        return true
+                    }
+                    const speed = Number(param2)
+                    e2e.setSpeed(speed)
+                    break
+
+                case 'pause':
+                    if (nbParam !== 1) {
+                        Text.erP(escaper.getPlayer(), usageMsg)
+                        return true
+                    }
+                    e2e.pause()
+                    break
+
+                case 'resume':
+                    if (nbParam !== 1) {
+                        Text.erP(escaper.getPlayer(), usageMsg)
+                        return true
+                    }
+                    e2e.resume()
+                    break
+
+                case 'nextStep':
+                    if (nbParam !== 1) {
+                        Text.erP(escaper.getPlayer(), usageMsg)
+                        return true
+                    }
+                    e2e.nextStep()
+                    break
+
+                case 'run':
+                    if (nbParam !== 2) {
+                        Text.erP(escaper.getPlayer(), usageMsg)
+                        return true
+                    }
+                    e2e.startTest(param2)
+                    break
+
+                default:
+                    e2e.startTest(param1)
+            }
+
             return true
         },
     })

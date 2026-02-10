@@ -1,8 +1,15 @@
-import { getUdgEscapers } from '../../../../globals'
-import { errorHandler } from '../../../Utils/mapUtils'
-import { SUCCESS_TEXT_COLORCODE, Text } from 'core/01_libraries/Text'
-import { ServiceManager } from '../../../Services'
-import { ClearText } from '../../01_libraries/Basic_functions'
+import { getUdgEscapers } from '../../../../../globals'
+import { errorHandler } from '../../../../Utils/mapUtils'
+import { SUCCESS_TEXT_COLORCODE, Text } from '../../../01_libraries/Text'
+import { ServiceManager } from '../../../../Services'
+import { ClearText } from '../../../01_libraries/Basic_functions'
+
+const sounds = {
+    start: 'Sound/Interface/BattleNetTick.flac',
+    stop: 'Abilities/Spells/Human/Defend/DefendCaster.flac',
+    end: 'Sound/Interface/Rescue.flac',
+    step: 'Sound/Interface/InGameChatWhat1.flac',
+}
 
 export type E2EAction = {
     command?: string
@@ -19,10 +26,12 @@ export type E2ETest = {
 
 const settings = {
     speed: 1,
-    executing: false,
+    paused: false,
 }
 
+let lastExecutedTest: E2ETest | null = null
 let currentTest: E2ETest | null = null
+let askingForNextStep = false
 
 function executeActions(actions: E2EAction[], testName: string) {
     const firstEscaper = getUdgEscapers().getFirst()
@@ -38,9 +47,16 @@ function executeActions(actions: E2EAction[], testName: string) {
         ClearText()
 
         Text.mkA_timed(-1, `Starting ${testName} test`)
+        PlaySound(sounds.start)
 
-        for (const action of actions) {
+        for (let i = 0; i < actions.length; i++) {
             ClearText()
+
+            if (i > 0) {
+                PlaySound(sounds.step)
+            }
+
+            const action = actions[i]
 
             if (action.command) {
                 Text.mkA_timed(-1, `Executing:|r ${action.command}`)
@@ -56,11 +72,35 @@ function executeActions(actions: E2EAction[], testName: string) {
                 return
             }
 
+            let n = 0
+            while (settings.paused && !askingForNextStep) {
+                TriggerSleepAction(0.25)
+                if (n % 16 === 0) {
+                    // every 4 seconds
+                    Text.mkA_timed(-1, `Test paused...`)
+                }
+                n++
+            }
+
             if (action.waitAfter) {
+                if (askingForNextStep) {
+                    askingForNextStep = false
+                    continue
+                }
+
                 const waitTime = action.waitAfter * settings.speed
                 Text.mkA_timed(-1, `Waiting for ${waitTime}s...`)
 
-                TriggerSleepAction(action.waitAfter * settings.speed)
+                const intervalTime = 0.25
+                const nbWaitingIntervals = Math.ceil(waitTime / intervalTime)
+                for (let i = 0; i < nbWaitingIntervals; i++) {
+                    TriggerSleepAction(intervalTime)
+
+                    if (askingForNextStep) {
+                        askingForNextStep = false
+                        break
+                    }
+                }
 
                 if (!currentTest) {
                     // In case of aborted test
@@ -71,7 +111,9 @@ function executeActions(actions: E2EAction[], testName: string) {
 
         ClearText()
         Text.ForAll_timed_withColorCode(-1, SUCCESS_TEXT_COLORCODE, `${testName} test ended.`)
+        PlaySound(sounds.end)
 
+        lastExecutedTest = currentTest
         currentTest = null
     })
 }
@@ -98,19 +140,55 @@ function startTest(name: string) {
         return
     }
 
-    stop()
+    stop(false)
 
     currentTest = test
     executeActions(test.actions, name)
 }
 
-function stop() {
+function stop(playSound = true) {
     if (currentTest) {
         currentTest.abortFunction?.()
         Text.mkA(`Test "${currentTest.name}" stopped.`)
+        lastExecutedTest = currentTest
         currentTest = null
+
+        playSound && PlaySound(sounds.stop)
     } else {
         Text.erA('No e2e test is currently running')
+    }
+}
+
+function pause() {
+    if (!currentTest) {
+        Text.erA('No e2e test is currently running')
+        return
+    }
+
+    settings.paused = true
+    Text.mkA(`Test "${currentTest.name}" paused.`)
+}
+
+function resume() {
+    if (!currentTest) {
+        Text.erA('No e2e test is currently running')
+        return
+    }
+
+    settings.paused = false
+    Text.mkA(`Test "${currentTest.name}" resumed.`)
+}
+
+function nextStep() {
+    if (!currentTest && !lastExecutedTest) {
+        Text.erA('No e2e test is currently running')
+        return
+    }
+
+    if (currentTest) {
+        askingForNextStep = true
+    } else if (lastExecutedTest) {
+        startTest(lastExecutedTest.shortName)
     }
 }
 
@@ -119,4 +197,7 @@ export const e2e = {
     registerTest,
     startTest,
     stop,
+    pause,
+    resume,
+    nextStep,
 }
