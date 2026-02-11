@@ -6,7 +6,7 @@ import {
     globals,
     setHeroBaseCollisionSize,
 } from '../../../../globals'
-import { B2S, jsonDecode } from '../../01_libraries/Basic_functions'
+import { jsonDecode } from '../../01_libraries/Basic_functions'
 import { Text } from '../../01_libraries/Text'
 import { Gravity } from '../Slide_and_CheckTerrain_triggers/Gravity'
 import { initCasterTypes, initLevels, initMonsterTypes, initTerrainTypes } from '../../Init/initArrays'

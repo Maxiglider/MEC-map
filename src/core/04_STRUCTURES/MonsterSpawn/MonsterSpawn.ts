@@ -15,6 +15,7 @@ import { initSimpleUnitRecycler } from './SimpleUnitRecycler'
 import { Natives } from '../../wc3_natives_unsecured/Natives'
 import { IssueMoveOrderForLongDistance, LongDistanceMoveOrder } from '../Monster/LongDistanceMoveOrder'
 import { MECRegion, StartAndEndPoints } from '../Region/MECRegion'
+import { arrayPush } from '../../01_libraries/Basic_functions'
 
 export type MonsterDirectionMode = 'straight' | 'random'
 
@@ -568,6 +569,12 @@ export class MonsterSpawn {
         output['spawnOffset'] = this.spawnOffset
         output['fixedSpawnOffsetBounce'] = this.fixedSpawnOffsetBounce
         output['fixedSpawnOffsetMirrored'] = this.fixedSpawnOffsetMirrored
+
+        const hideRegionsJson: any = []
+        for (const [_, hideRegion] of pairs(this.hideRegions)) {
+            arrayPush(hideRegionsJson, hideRegion.toJson())
+        }
+        output['hideRegions'] = hideRegionsJson
 
         return output
     }

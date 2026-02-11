@@ -12,6 +12,7 @@ import { LineRegion } from '../Region/LineRegion'
 import { RectangleRegion } from '../Region/RectangleRegion'
 import { MemoryHandler } from '../../../Utils/MemoryHandler'
 import { createPoint } from '../../../Utils/Point'
+import { CircleRegion } from '../Region/CircleRegion'
 
 export class MonsterSpawnArray extends BaseArray<MonsterSpawn> {
     private level: Level
@@ -47,28 +48,7 @@ export class MonsterSpawnArray extends BaseArray<MonsterSpawn> {
             } else {
                 let mecRegion: MECRegion
                 if (ms.mecRegion !== undefined) {
-                    switch (ms.mecRegion.type) {
-                        case 'HorizontalRegion': {
-                            const { x1, y1, x2, y2, direction } = ms.mecRegion
-                            mecRegion = new HorizontalRegion(x1, y1, x2, y2, direction)
-                            break
-                        }
-                        case 'LineRegion': {
-                            const { originalX1, originalY1, originalX2, originalY2 } = ms.mecRegion
-                            mecRegion = new LineRegion(originalX1, originalY1, originalX2, originalY2)
-                            break
-                        }
-                        case 'RectangleRegion': {
-                            const { x1, y1, x2, y2, x3, y3 } = ms.mecRegion
-                            mecRegion = new RectangleRegion(x1, y1, x2, y2, x3, y3)
-                            break
-                        }
-                        default: {
-                            throw new Error(
-                                'MonsterSpawnArray: newFromJson: unknown MECRegion type "' + ms.mecRegion.type + '"'
-                            )
-                        }
-                    }
+                    mecRegion = this.getMECRegionFromJson(ms.mecRegion)
                 } else {
                     mecRegion = this.generateMecRegionFromOldJsonFormat(ms)
                 }
@@ -91,9 +71,48 @@ export class MonsterSpawnArray extends BaseArray<MonsterSpawn> {
                 monsterSpawn.setFixedSpawnOffsetBounce(ms.fixedSpawnOffsetBounce)
                 monsterSpawn.setFixedSpawnOffsetMirrored(ms.fixedSpawnOffsetMirrored)
 
+                // Hide regions
+                if (ms.hideRegions) {
+                    for (const [_, hideRegionJson] of pairs(ms.hideRegions)) {
+                        monsterSpawn.addHideRegion(this.getMECRegionFromJson(hideRegionJson))
+                    }
+                }
+
                 this.new(monsterSpawn, false)
             }
         }
+    }
+
+    getMECRegionFromJson(mecRegionJson: any): MECRegion {
+        let mecRegion: MECRegion
+
+        switch (mecRegionJson.type) {
+            case 'HorizontalRegion': {
+                const { x1, y1, x2, y2, direction } = mecRegionJson
+                mecRegion = new HorizontalRegion(x1, y1, x2, y2, direction)
+                break
+            }
+            case 'LineRegion': {
+                const { originalX1, originalY1, originalX2, originalY2 } = mecRegionJson
+                mecRegion = new LineRegion(originalX1, originalY1, originalX2, originalY2)
+                break
+            }
+            case 'RectangleRegion': {
+                const { x1, y1, x2, y2, x3, y3 } = mecRegionJson
+                mecRegion = new RectangleRegion(x1, y1, x2, y2, x3, y3)
+                break
+            }
+            case 'CircleRegion': {
+                const { centerY, radius, centerX } = mecRegionJson
+                mecRegion = new CircleRegion(centerX, centerY, radius)
+                break
+            }
+            default: {
+                throw new Error('MonsterSpawnArray: newFromJson: unknown MECRegion type "' + mecRegionJson.type + '"')
+            }
+        }
+
+        return mecRegion
     }
 
     /**

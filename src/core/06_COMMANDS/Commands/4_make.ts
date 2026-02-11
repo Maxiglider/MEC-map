@@ -2365,7 +2365,7 @@ export const initExecuteCommandMake = () => {
             let makeMecRegionMode: MakeMECRegionMode = 'horizontal'
             if (nbParam === 2) {
                 if (!['horizontal', 'diagonal', 'circle', 'line'].includes(param2)) {
-                    Text.erP(escaper.getPlayer(), 'param 2 should be : straight or random')
+                    Text.erP(escaper.getPlayer(), 'createMonsterSpawnDeadZone: wrong arguments')
                     return true
                 }
                 makeMecRegionMode = param2 as MakeMECRegionMode
