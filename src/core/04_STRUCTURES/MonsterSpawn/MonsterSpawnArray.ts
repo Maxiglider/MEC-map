@@ -46,11 +46,12 @@ export class MonsterSpawnArray extends BaseArray<MonsterSpawn> {
             if (!mt) {
                 Text.erA('Monster type "' + ms.monsterTypeLabel + '" unknown')
             } else {
+                const oldMecRegionFormat = ms.mecRegion === undefined
                 let mecRegion: MECRegion
-                if (ms.mecRegion !== undefined) {
-                    mecRegion = this.getMECRegionFromJson(ms.mecRegion)
-                } else {
+                if (oldMecRegionFormat) {
                     mecRegion = this.generateMecRegionFromOldJsonFormat(ms)
+                } else {
+                    mecRegion = this.getMECRegionFromJson(ms.mecRegion)
                 }
 
                 mecRegion.setWithEnterAndLeaveZone(true)
@@ -65,7 +66,15 @@ export class MonsterSpawnArray extends BaseArray<MonsterSpawn> {
 
                 monsterSpawn.setSpawnAmount(ms.spawnAmount || 1)
                 monsterSpawn.setInitialDelay(ms.initialDelay || 0)
-                monsterSpawn.setTimedUnspawn(ms.timedUnspawn)
+
+                if (ms.timedUnspawn !== undefined){
+                    let timedUnspawn = S2R(ms.timedUnspawn)
+                    if(oldMecRegionFormat){
+                        timedUnspawn -= 0.5 // handle old DELAY_BETWEEN_SPAWN_AND_MOVEMENT
+                    }
+                    monsterSpawn.setTimedUnspawn(timedUnspawn)
+                }
+
                 monsterSpawn.setFixedSpawnOffset(ms.fixedSpawnOffset)
                 monsterSpawn.setSpawnOffset(ms.spawnOffset || 0)
                 monsterSpawn.setFixedSpawnOffsetBounce(ms.fixedSpawnOffsetBounce)
@@ -143,26 +152,6 @@ export class MonsterSpawnArray extends BaseArray<MonsterSpawn> {
         }
 
         switch (ms.spawnShape) {
-            case 'region': {
-                // HorizontalRegion or RectangleRegion depending on the direction angle
-                if (direction) {
-                    mecRegion = new HorizontalRegion(ms.minX, ms.minY, ms.maxX, ms.maxY, direction)
-                } else {
-                    const anchorX = (ms.minX + ms.maxX) / 2
-                    const anchorY = (ms.minY + ms.maxY) / 2
-
-                    const p1 = ApplyRotation(anchorX, anchorY, directionAngle, createPoint(ms.minX, ms.minY))
-                    const p2 = ApplyRotation(anchorX, anchorY, directionAngle, createPoint(ms.maxX, ms.minY))
-                    const p3 = ApplyRotation(anchorX, anchorY, directionAngle, createPoint(ms.maxX, ms.maxY))
-
-                    mecRegion = new RectangleRegion(p1.x, p1.y, p2.x, p2.y, p3.x, p3.y)
-
-                    MemoryHandler.destroyObject(p1)
-                    MemoryHandler.destroyObject(p2)
-                    MemoryHandler.destroyObject(p3)
-                }
-                break
-            }
             case 'line': {
                 const x1 = ms.clickX1
                 const y1 = ms.clickY1
@@ -192,7 +181,7 @@ export class MonsterSpawnArray extends BaseArray<MonsterSpawn> {
                 // LineRegion
 
                 // With old format, on case of point spawn, the unspanwn is determined only by a timer, there is no rect, so we arbitraryly choose the region length
-                const regionLength = 512
+                const regionLength = 800
 
                 const x1 = ms.clickX1
                 const y1 = ms.clickY1
@@ -201,6 +190,27 @@ export class MonsterSpawnArray extends BaseArray<MonsterSpawn> {
 
                 mecRegion = new LineRegion(x1, y1, x2, y2)
 
+                break
+            }
+            case 'region':
+            default: { // spwawnShape was not defined with old MEC versions
+                // HorizontalRegion or RectangleRegion depending on the direction angle
+                if (direction) {
+                    mecRegion = new HorizontalRegion(ms.minX, ms.minY, ms.maxX, ms.maxY, direction)
+                } else {
+                    const anchorX = (ms.minX + ms.maxX) / 2
+                    const anchorY = (ms.minY + ms.maxY) / 2
+
+                    const p1 = ApplyRotation(anchorX, anchorY, directionAngle, createPoint(ms.minX, ms.minY))
+                    const p2 = ApplyRotation(anchorX, anchorY, directionAngle, createPoint(ms.minX, ms.maxY))
+                    const p3 = ApplyRotation(anchorX, anchorY, directionAngle, createPoint(ms.maxX, ms.minY))
+
+                    mecRegion = new RectangleRegion(p1.x, p1.y, p2.x, p2.y, p3.x, p3.y)
+
+                    MemoryHandler.destroyObject(p1)
+                    MemoryHandler.destroyObject(p2)
+                    MemoryHandler.destroyObject(p3)
+                }
                 break
             }
         }

@@ -2314,7 +2314,7 @@ export const initExecuteCommandMake = () => {
         group: 'make',
         argDescription: '<label> straight||random',
         description:
-            'Set the monster direction mode for spawned monsters (straight or random) => works only for leftToRight, upToDown, rightToLeft, downToUp directions',
+            'Set the monster direction mode for spawned monsters (straight or random) => doesn\'t work for line zones',
         cb: ({ nbParam, param1, param2 }, escaper) => {
             if (nbParam !== 2) {
                 Text.erP(

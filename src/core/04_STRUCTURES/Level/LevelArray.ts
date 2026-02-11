@@ -25,6 +25,7 @@ import { IsLevelBeingMade } from './Level_functions'
 import type { VisibilityModifierArray } from './VisibilityModifierArray'
 import { Natives } from '../../wc3_natives_unsecured/Natives'
 import { GetRandomAngle, StopUnit } from '../../01_libraries/Basic_functions'
+import { errorHandler } from '../../../Utils/mapUtils'
 
 const MIN_TIME_BETWEEN_GOTNL = 0.05
 
@@ -426,7 +427,7 @@ export class LevelArray extends BaseArray<Level> {
 
             //monster spawns
             if (levelJson.monsterSpawns) {
-                level.monsterSpawns.newFromJson(levelJson.monsterSpawns)
+                errorHandler(() => level.monsterSpawns.newFromJson(levelJson.monsterSpawns))()
             }
 
             //meteors
