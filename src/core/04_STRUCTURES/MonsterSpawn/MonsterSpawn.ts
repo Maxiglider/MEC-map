@@ -348,6 +348,12 @@ export class MonsterSpawn {
 
             for (const [_, hideRegion] of pairs(this.hideRegions)) {
                 hideRegion.watchUnit(monster)
+
+                if (hideRegion.isUnitInRegion(monster)) {
+                    ShowUnit(monster, false)
+                    UnitRemoveAbility(monster, FourCC('Aloc'))
+                    break
+                }
             }
         }
 
