@@ -436,6 +436,12 @@ export class Level {
             DestroyLightning(light)
         }
 
+        // Monster spawns
+        for (const [_, monsterSpawn] of pairs(this.monsterSpawns.getAll())) {
+            monsterSpawn.getMecRegion()?.debugRects(false)
+            monsterSpawn.debugHideRegions(false)
+        }
+
         this.lights.length = 0
     }
 
