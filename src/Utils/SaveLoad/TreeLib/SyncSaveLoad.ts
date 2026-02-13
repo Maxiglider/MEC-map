@@ -1,4 +1,4 @@
-import { errorHandler } from 'Utils/mapUtils'
+import { createTimer, errorHandler } from 'Utils/mapUtils'
 import { EncodingBase64 } from './EncodingBase64'
 import { EncodingHex } from './EncodingHex'
 import { Logger } from './Logger'
@@ -8,20 +8,25 @@ const BASE_64_DEFAULT = true
 const ESCAPE_DOUBLE_QUOTES_FOR_JSON_CHAR = '#DQ#'
 const CHUNK_SIZE = 150
 
-export const SyncSaveLoad = () => {
-    const syncPrefix = 'S_TIO'
-    const syncPrefixFinish = 'S_TIOF'
-    const syncEvent: trigger = CreateTrigger()
+const syncPrefix = 'S_TIO'
+const syncPrefixFinish = 'S_TIOF'
+let syncEventsTrigger: trigger | null = null
 
-    const allPromises: (IFilePromise | undefined)[] = []
+const allPromises: (IFilePromise | undefined)[] = []
+
+const init_syncEventsTrigger = () => {
+    if (syncEventsTrigger) {
+        DestroyTrigger(syncEventsTrigger)
+    }
+    syncEventsTrigger = CreateTrigger()
 
     for (let i = 0; i < GetBJMaxPlayers(); i++) {
-        BlzTriggerRegisterPlayerSyncEvent(syncEvent, Natives.UPlayer(i), syncPrefix, false)
-        BlzTriggerRegisterPlayerSyncEvent(syncEvent, Natives.UPlayer(i), syncPrefixFinish, false)
+        BlzTriggerRegisterPlayerSyncEvent(syncEventsTrigger, Natives.UPlayer(i), syncPrefix, false)
+        BlzTriggerRegisterPlayerSyncEvent(syncEventsTrigger, Natives.UPlayer(i), syncPrefixFinish, false)
     }
 
     TriggerAddAction(
-        syncEvent,
+        syncEventsTrigger,
         errorHandler(
             () => {
                 const readData = Natives.UBlzGetTriggerSyncData()
@@ -53,7 +58,9 @@ export const SyncSaveLoad = () => {
             }
         )
     )
+}
 
+export const SyncSaveLoad = () => {
     const writeFile = (fileName: string, data: string, base64Encode = BASE_64_DEFAULT) => {
         PreloadGenClear()
         PreloadGenStart()
@@ -66,8 +73,6 @@ export const SyncSaveLoad = () => {
         } else {
             // Escape doubles quotes for BlzSendSyncData calls not to crash on lmfc
             toCompile = strings().replaceAll('"', ESCAPE_DOUBLE_QUOTES_FOR_JSON_CHAR, rawData)
-            // Fix for too many backslashes
-            toCompile = strings().replaceAll('\\\\\\\\\\\\\\\\', '\\\\\\\\', toCompile)
         }
 
         const noOfChunks = math.ceil(toCompile.length / CHUNK_SIZE)
@@ -91,7 +96,15 @@ export const SyncSaveLoad = () => {
         PreloadGenStart()
 
         const rawData = data
-        const toCompile = base64Encode ? EncodingBase64.Encode(rawData) : rawData
+
+        let toCompile: string
+        if (base64Encode) {
+            toCompile = EncodingBase64.Encode(rawData)
+        } else {
+            // Escape doubles quotes for BlzSendSyncData calls not to crash on lmfc
+            toCompile = strings().replaceAll('"', ESCAPE_DOUBLE_QUOTES_FOR_JSON_CHAR, rawData)
+        }
+
         let assemble = ''
         const noOfChunks = math.ceil(toCompile.length / CHUNK_SIZE)
 
@@ -100,10 +113,8 @@ export const SyncSaveLoad = () => {
 
         xpcall(() => {
             for (let i = 0; i < noOfChunks; i++) {
-                const start = i * CHUNK_SIZE
-                const end = i < noOfChunks - 1 ? start + CHUNK_SIZE : undefined
-                assemble = toCompile.substring(start, end)
-                Preload(assemble)
+                const chunk = toCompile.substring(i * CHUNK_SIZE, (i + 1) * CHUNK_SIZE)
+                Preload(chunk)
             }
         }, Logger.critical)
         PreloadGenEnd(fileName)
@@ -116,6 +127,8 @@ export const SyncSaveLoad = () => {
         base64Encode = BASE_64_DEFAULT
     ): IFilePromise => {
         if (allPromises[GetPlayerId(reader)] === null) {
+            init_syncEventsTrigger()
+
             allPromises[GetPlayerId(reader)] = FilePromise(reader, onFinish, base64Encode)
 
             if (GetLocalPlayer() === reader) {

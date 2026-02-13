@@ -11,15 +11,17 @@ import { PushTerrainDataIntoJson } from './Save_terrain'
 export class SaveMapInCache {
     public static lastSaveFile = ''
 
-    private static gameAsJsonString = () => {
+    private static gameAsJsonString = (withTerrainData = true) => {
         //old
         const jsonTerrain = MemoryHandler.getEmptyObject<any>()
         const jsonGameData = MemoryHandler.getEmptyObject<any>()
 
         //FOR TERRAIN FILE W3E
         //terrain types, order, height
-        PushTerrainDataIntoJson(jsonTerrain)
-        Text.A('map terrain saved')
+        if (withTerrainData) {
+            PushTerrainDataIntoJson(jsonTerrain)
+            Text.A('map terrain saved')
+        }
 
         //FOR GAME DATA
         jsonGameData.gameData = MemoryHandler.getEmptyObject<any>()
@@ -62,13 +64,20 @@ export class SaveMapInCache {
 
     private static smicStringObj = { str: '' }
 
-    public static smic = (p: player | null = null, fileName?: string) => {
+    public static smic = (p: player | null = null, mode: 'solo' | 'multi' = 'multi', fileName?: string) => {
         if (p === null || GetLocalPlayer() == p) {
             const startTime = os.clock()
+            const multi = mode === 'multi'
 
-            SaveMapInCache.smicStringObj.str = SaveMapInCache.gameAsJsonString()
+            SaveMapInCache.smicStringObj.str = SaveMapInCache.gameAsJsonString(multi)
             fileName = fileName || Constants.MEC_SMIC_DATA_FILE_DATE_TPL.replace('[date]', os.date('%Y-%m-%d_%H-%M-%S'))
-            SaveLoad.saveFile(fileName, p, SaveMapInCache.smicStringObj.str, false)
+
+            if (multi) {
+                SaveLoad.saveFileWithoutPossibleLoading(fileName, p, SaveMapInCache.smicStringObj.str, false)
+            } else {
+                SaveLoad.saveFile(fileName, p, SaveMapInCache.smicStringObj.str, false)
+            }
+
             SaveMapInCache.lastSaveFile = fileName
 
             Text.A('saving game data to file "' + fileName + '" done')

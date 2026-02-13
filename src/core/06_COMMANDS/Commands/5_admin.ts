@@ -584,16 +584,30 @@ export const initExecuteCommandMax = () => {
         name: 'saveMapInCache',
         alias: ['smic'],
         group: 'max',
-        argDescription: '',
-        description: 'Saves the map in cache',
-        cb: ({ noParam, param1, nbParam }, escaper) => {
-            if (nbParam > 1) {
+        argDescription: '[<outputFilename> [multi|solo]]',
+        description:
+            'Saves the map in cache for usage with mec-smic-loader. If you specify "solo" as second parameter, the data except about terrain will be loadable in a future game with -loadMapFromCache, but this -smic command will probably trigger an instant player desync in the current game.',
+        cb: ({ noParam, param1, param2, nbParam }, escaper) => {
+            if (nbParam > 2) {
                 Text.erP(escaper.getPlayer(), 'Wrong command parameters')
             }
+
+            let mode: 'solo' | 'multi' = 'multi'
+            if (nbParam === 2) {
+                if (param2 !== 'multi' && param2 !== 'solo') {
+                    Text.erP(
+                        escaper.getPlayer(),
+                        'Wrong command parameters, second parameter should be "multi" or "solo"'
+                    )
+                    return true
+                }
+                mode = param2
+            }
+
             if (noParam) {
-                SaveMapInCache.smic(escaper.getPlayer())
+                SaveMapInCache.smic(escaper.getPlayer(), mode)
             } else {
-                SaveMapInCache.smic(escaper.getPlayer(), `MEC/mec-smic-data-custom_${param1}.txt`)
+                SaveMapInCache.smic(escaper.getPlayer(), mode, `MEC/mec-smic-data-custom_${param1}.txt`)
             }
             return true
         },
