@@ -47,7 +47,7 @@ import { ExchangeTerrains } from '../../07_TRIGGERS/Triggers_to_modify_terrains/
 import { RandomizeTerrains } from '../../07_TRIGGERS/Triggers_to_modify_terrains/Randomize_terrains'
 import { CmdParam } from '../Helpers/Command_functions'
 import { IsHeroCollisionSizeValid } from '../../04_STRUCTURES/Escaper/Escaper'
-import { adaptMonstersImmolation, snapPatrolsToSlideOffsetMap, snapPointToSlide } from './commands-helpers'
+import { adaptMonstersImmolation, snapPatrolsToSlideOffsetMap, snapPointToSlide } from '../Helpers/commands-helpers'
 import { MakeMonsterSpawnKind } from '../../05_MAKE_STRUCTURES/Make_monster_spawn/MakeMonsterSpawn'
 import { MonsterDirectionMode } from '../../04_STRUCTURES/MonsterSpawn/MonsterSpawn'
 import { MakeMECRegionMode } from '../../05_MAKE_STRUCTURES/Make_create_region/MakeMECRegion'
@@ -2314,7 +2314,7 @@ export const initExecuteCommandMake = () => {
         group: 'make',
         argDescription: '<label> straight||random',
         description:
-            'Set the monster direction mode for spawned monsters (straight or random) => doesn\'t work for line zones',
+            "Set the monster direction mode for spawned monsters (straight or random) => doesn't work for line zones",
         cb: ({ nbParam, param1, param2 }, escaper) => {
             if (nbParam !== 2) {
                 Text.erP(
