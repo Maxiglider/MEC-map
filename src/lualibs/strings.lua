@@ -18,4 +18,12 @@ function strings.escapeDoubleQuotes(str)
   return strings:replaceAll("\"", "\\\"", str)
 end
 
+function strings.replaceBackslahsesInLinks(str)
+    return str:gsub("\\+", "/")
+end
+
+function strings.stringContainsChar(str, char)
+  return str:find(char, 1, true) ~= nil
+end
+
 return strings

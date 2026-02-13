@@ -7,7 +7,7 @@ import { udg_colorCode } from '../../01_libraries/Init_colorCodes'
 import { Level } from '../Level/Level'
 import { IMMOLATION_SKILLS } from './Immolation_skills'
 import { Natives } from '../../wc3_natives_unsecured/Natives'
-import { Round32 } from '../../01_libraries/Basic_functions'
+import { ReplaceBackslahsesInLinks, Round32 } from '../../01_libraries/Basic_functions'
 
 export class MonsterType {
     label: string
@@ -211,7 +211,7 @@ export class MonsterType {
     }
 
     setKillingEffectStr = (effectStr: string): MonsterType => {
-        this.killingEffectStr = effectStr
+        this.killingEffectStr = ReplaceBackslahsesInLinks(effectStr)
         return this
     }
 

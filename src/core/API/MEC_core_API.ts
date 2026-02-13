@@ -31,6 +31,7 @@ import { MecHook } from './MecHook'
 import { NewImmobileMonster, NewPatrolMonster } from '../04_STRUCTURES/Monster/Monster_functions'
 import { Monster } from '../04_STRUCTURES/Monster/Monster'
 import { e2e } from '../Test/e2e-tests/base/e2e-tests-base'
+import { ReplaceBackslahsesInLinks } from '../01_libraries/Basic_functions'
 
 export type IMEC_core_API = typeof MEC_core_API
 
@@ -184,7 +185,7 @@ export const MEC_core_API = {
     setWanderExtraTime: (time: number) => (globals.wanderExtraTime = time),
     setForceReviveAtStart: (b: boolean) => (globals.forceReviveAtStart = b),
     setKillAfkHeroes: (b: boolean) => (globals.killAfkHeroes = b),
-    setWanderEffect: (effect: string) => (globals.wanderEffectStr = effect),
+    setWanderEffect: (effect: string) => (globals.wanderEffectStr = ReplaceBackslahsesInLinks(effect)),
     setWanderEffectFacing: (b: boolean) => (globals.wanderEffectFacing = b),
     setScoreboardLabel: (label: string) => (globals.scoreboardLabel = label),
 

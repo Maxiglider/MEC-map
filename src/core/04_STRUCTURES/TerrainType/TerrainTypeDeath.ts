@@ -4,11 +4,12 @@ import { Text } from '../../01_libraries/Text'
 import type { Escaper } from '../Escaper/Escaper'
 import { DISPLAY_SPACE, TerrainType } from './TerrainType'
 import { KillingTimers } from './TerrainTypeDeath_KillingTimers'
+import { ReplaceBackslahsesInLinks } from '../../01_libraries/Basic_functions'
 
 export const DEATH_TERRAIN_MAX_TOLERANCE = 50
 
 export class TerrainTypeDeath extends TerrainType {
-    private killingEffectStr: string
+    private killingEffectStr: string = ''
     private timeToKill: number
     private killingTimers: KillingTimers
     private toleranceDist: number
@@ -22,14 +23,14 @@ export class TerrainTypeDeath extends TerrainType {
     ) {
         super(label, terrainTypeId, null, 'death', 0, 1)
 
-        this.killingEffectStr = killingEffectStr
+        this.setKillingEffectStr(killingEffectStr)
         this.timeToKill = timeToKill
         this.killingTimers = new KillingTimers()
         this.toleranceDist = toleranceDist
     }
 
     setKillingEffectStr = (killingEffectStr: string) => {
-        this.killingEffectStr = killingEffectStr
+        this.killingEffectStr = ReplaceBackslahsesInLinks(killingEffectStr)
     }
 
     getKillingEffectStr = (): string => {
