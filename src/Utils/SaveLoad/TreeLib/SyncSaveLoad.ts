@@ -6,7 +6,7 @@ import { Natives } from '../../../core/wc3_natives_unsecured/Natives'
 
 const BASE_64_DEFAULT = true
 const ESCAPE_DOUBLE_QUOTES_FOR_JSON_CHAR = '#DQ#'
-const CHUNK_SIZE = 150
+const CHUNK_SIZE = 230
 
 const syncPrefix = 'S_TIO'
 const syncPrefixFinish = 'S_TIOF'
@@ -105,7 +105,6 @@ export const SyncSaveLoad = () => {
             toCompile = strings().replaceAll('"', ESCAPE_DOUBLE_QUOTES_FOR_JSON_CHAR, rawData)
         }
 
-        let assemble = ''
         const noOfChunks = math.ceil(toCompile.length / CHUNK_SIZE)
 
         Logger.verbose('rawData.length: ', rawData.length)
