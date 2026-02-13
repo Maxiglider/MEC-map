@@ -2600,12 +2600,8 @@ export class Escaper {
     /**
      * Display or not collision landmark for all players according to their choice, and resize it according to collision size
      */
-    refreshCollisionLandmark = (onlyForEscaper?: Escaper) => {
+    refreshCollisionLandmark = () => {
         const localEscaper = getUdgEscapers().get(GetPlayerId(Natives.UGetLocalPlayer()))
-        if (onlyForEscaper && localEscaper !== onlyForEscaper) {
-            return
-        }
-
         const displayCollisionLandmark = localEscaper?.displayCollisionLandmarks ?? false
 
         if (this.collisionLandmarkEffect) {
@@ -2614,7 +2610,7 @@ export class Escaper {
             delete this.collisionLandmarkEffect
         }
 
-        if (displayCollisionLandmark && this.hero) {
+        if (this.hero) {
             this.collisionLandmarkEffect = AddSpecialEffect(
                 Constants.COLLISION_LANDMARK_MODEL,
                 GetUnitX(this.hero),
@@ -2625,6 +2621,10 @@ export class Escaper {
             }
             const scale = this.collisionSize / Constants.COLLISION_LANDMARK_MODEL_BASE_RADIUS
             BlzSetSpecialEffectScale(this.collisionLandmarkEffect, scale)
+
+            if (!displayCollisionLandmark) {
+                BlzSetSpecialEffectAlpha(this.collisionLandmarkEffect, 0)
+            }
         }
     }
 
@@ -2646,10 +2646,10 @@ export class Escaper {
         this.displayCollisionLandmarks = flag
 
         getUdgEscapers().forMainEscapers(escaper => {
-            escaper.refreshCollisionLandmark(this)
+            escaper.refreshCollisionLandmark()
         })
         for (const [_, monster] of pairs(udg_monsters)) {
-            monster.refreshCollisionLandmark(this)
+            monster.refreshCollisionLandmark()
         }
 
         refreshTrigMoveCollisionLandmarks()

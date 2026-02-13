@@ -307,12 +307,8 @@ export abstract class Monster {
         this.refreshCollisionLandmark()
     }
 
-    refreshCollisionLandmark = (onlyForEscaper?: Escaper) => {
+    refreshCollisionLandmark = () => {
         const localEscaper = getUdgEscapers().get(GetPlayerId(Natives.UGetLocalPlayer()))
-        if (onlyForEscaper && localEscaper !== onlyForEscaper) {
-            return
-        }
-
         const displayCollisionLandmark = localEscaper?.getDisplayCollisionLandmarks() ?? false
 
         if (this.collisionLandmarkEffect) {
@@ -321,14 +317,7 @@ export abstract class Monster {
             delete this.collisionLandmarkEffect
         }
 
-        if (
-            displayCollisionLandmark &&
-            this.u &&
-            IsUnitAliveBJ(this.u) &&
-            !this.isDisabledB &&
-            !this.isDeleted() &&
-            !IsUnitHidden(this.u)
-        ) {
+        if (this.u && IsUnitAliveBJ(this.u) && !this.isDisabledB && !this.isDeleted() && !IsUnitHidden(this.u)) {
             this.collisionLandmarkEffect = AddSpecialEffect(
                 Constants.COLLISION_LANDMARK_MODEL,
                 GetUnitX(this.u),
@@ -340,6 +329,10 @@ export abstract class Monster {
             // const scale = 1024 / Constants.COLLISION_LANDMARK_MODEL_BASE_RADIUS
             const scale = (this.mt?.getImmolationRadius() ?? 0) / Constants.COLLISION_LANDMARK_MODEL_BASE_RADIUS
             BlzSetSpecialEffectScale(this.collisionLandmarkEffect, scale)
+
+            if (!displayCollisionLandmark) {
+                BlzSetSpecialEffectAlpha(this.collisionLandmarkEffect, 0)
+            }
         }
     }
 
