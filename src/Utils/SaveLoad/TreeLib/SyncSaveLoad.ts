@@ -6,7 +6,7 @@ import { Natives } from '../../../core/wc3_natives_unsecured/Natives'
 
 const BASE_64_DEFAULT = true
 const ESCAPE_DOUBLE_QUOTES_FOR_JSON_CHAR = '#DQ#'
-const CHUNK_SIZE = 220
+const CHUNK_SIZE = 200
 
 const syncPrefix = 'S_TIO'
 const syncPrefixFinish = 'S_TIOF'
