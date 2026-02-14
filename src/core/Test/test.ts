@@ -18,7 +18,7 @@ export const init_Test = () => {
                 "-va, news slide 'Nsnw', setta slide s, news reverse 5 -400, setta reverse rev, newd death 1 Abilities\\Spells\\NightElf\\EntanglingRoots\\EntanglingRootsTarget.mdl, setta death d, neww walk 97, setta walk w, crh"
             )
 
-            ExecuteCommand(escaper, "-newm caisse 'cais' 5, newm naga 'nnsw' 25, newm peon 'opeo' 5")
+            ExecuteCommand(escaper, "-newm peasant 'hpea' 5, newm naga 'nnsw' 25, newm peon 'opeo' 5")
             ExecuteCommand(escaper, '-newCaster c naga peon')
 
             progressionUtils.init()
