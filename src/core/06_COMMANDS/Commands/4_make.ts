@@ -2168,21 +2168,26 @@ export const initExecuteCommandMake = () => {
         alias: ['setmsfso'],
         group: 'make',
         argDescription: '<label> <offset>',
-        description: 'Distance between each spawn (0-16384, 0 disables)',
-        cb: ({ param1, param2 }, escaper) => {
-            const monsterSpawn = escaper.getMakingLevel().monsterSpawns.getByLabel(param1)
+        description:
+            'Distance between each spawn (0-16384, 0 disables), or "auto" to distribute mosnters evenly in the spawn zone (useful with spawnAmount > 1).',
+        cb: ({ param1, param2, nbParam }, escaper) => {
+            if (nbParam !== 2) {
+                Text.erP(escaper.getPlayer(), 'setMonsterSpawnFixedSpawnOffset: wrong number of parameters')
+                return true
+            }
 
+            const monsterSpawn = escaper.getMakingLevel().monsterSpawns.getByLabel(param1)
             if (!monsterSpawn) {
                 Text.erP(escaper.getPlayer(), 'unknown monster spawn "' + param1 + '" in this level')
                 return true
             }
 
-            if (S2I(param2) !== 0 && !(S2I(param2) > 0 && S2I(param2) <= 16384)) {
-                Text.erP(escaper.getPlayer(), 'Offset must be > 0 and <= 16384')
+            if (param2 !== 'auto' && S2I(param2) !== 0 && !(S2I(param2) > 0 && S2I(param2) <= 16384)) {
+                Text.erP(escaper.getPlayer(), 'Offset must be > 0 and <= 16384, or "auto"')
                 return true
             }
 
-            monsterSpawn.setFixedSpawnOffset(S2I(param2) === 0 ? undefined : S2I(param2))
+            monsterSpawn.setFixedSpawnOffset(param2 === 'auto' ? param2 : S2I(param2) === 0 ? undefined : S2I(param2))
             Text.mkP(escaper.getPlayer(), 'fixedSpawnOffset changed')
             return true
         },

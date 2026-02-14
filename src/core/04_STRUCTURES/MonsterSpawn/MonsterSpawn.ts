@@ -18,6 +18,7 @@ import { MECRegion, StartAndEndPoints } from '../Region/MECRegion'
 import { arrayPush } from '../../01_libraries/Basic_functions'
 
 export type MonsterDirectionMode = 'straight' | 'random'
+type FixedSpawnOffset = number | 'auto' | undefined
 
 const MAXIMUM_SPANWED_MONSTERS_SIMULTANEOUSLY = 500
 const HIDE_REGION_DEBUG_COLOR = 'green'
@@ -137,7 +138,7 @@ export class MonsterSpawn {
     private initialDelay = 0
     private timedUnspawn: number | undefined
     private monsterDirectionMode: MonsterDirectionMode
-    private fixedSpawnOffset: number | undefined
+    private fixedSpawnOffset: FixedSpawnOffset
     private spawnOffset = 0
     private fixedSpawnOffsetBounce = false
     private fixedSpawnOffsetMirrored = false
@@ -508,7 +509,7 @@ export class MonsterSpawn {
     }
 
     getFixedSpawnOffset = () => this.fixedSpawnOffset
-    setFixedSpawnOffset = (fixedSpawnOffset: number | undefined) => {
+    setFixedSpawnOffset = (fixedSpawnOffset: FixedSpawnOffset) => {
         this.fixedSpawnOffset = fixedSpawnOffset
     }
 

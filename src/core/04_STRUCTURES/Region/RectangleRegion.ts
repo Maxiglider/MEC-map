@@ -273,10 +273,6 @@ export class RectangleRegion extends MECRegion {
 
     private calcValOffset = (monsterSpawn: MonsterSpawn) => {
         const lastSpawnVal = monsterSpawn.getLastSpawnVal() ?? 0
-        const fixedSpawnOffset = monsterSpawn.getFixedSpawnOffset()
-        if (fixedSpawnOffset === undefined) {
-            throw new Error('fixedSpawnOffset is required for RectangleRegion calcValOffset')
-        }
 
         const spawnOffset = monsterSpawn.getSpawnOffset()
         const spawnIndex = monsterSpawn.getSpawnIndex()
@@ -330,24 +326,37 @@ export class RectangleRegion extends MECRegion {
         }
 
         let newSpawnVal
-        if (monsterSpawn.getSpawnOffset() === 0 || monsterSpawn.getSpawnIndex() === 0) {
-            newSpawnVal = lastSpawnVal + fixedSpawnOffset * (monsterSpawn.getBouncing() ? -1 : 1)
-        } else {
-            newSpawnVal =
-                lastSpawnVal +
-                monsterSpawn.getSpawnOffset() *
-                    monsterSpawn.getSpawnIndex() *
-                    (monsterSpawn.getBouncing() ? -1 : 1) *
-                    (monsterSpawn.getFixedSpawnOffsetMirrored() ? 0.5 : 1)
-        }
+        if (fixedSpawnOffset === 'auto') {
+            const spawnAmount = monsterSpawn.getSpawnAmount()
 
-        if (this.isSpawnValOutOfBounds(newSpawnVal)) {
-            newSpawnVal = this.loopSpawnValToBounds(newSpawnVal, monsterSpawn.getFixedSpawnOffsetBounce())
-            if (
-                monsterSpawn.getFixedSpawnOffsetBounce() &&
-                (monsterSpawn.getSpawnOffset() === 0 || monsterSpawn.getSpawnIndex() === 0)
-            ) {
-                monsterSpawn.setBouncing(!monsterSpawn.getBouncing())
+            if (spawnAmount === 1) {
+                // One monster, always centered
+                newSpawnVal = this.startLineLength / 2
+            } else {
+                // More than one monster, evenly distibuted on the line, with the first one on the start and the last one on the end
+                const distanceBetweenMonsters = this.startLineLength / (spawnAmount - 1)
+                newSpawnVal = monsterSpawn.getSpawnIndex() * distanceBetweenMonsters
+            }
+        } else {
+            if (monsterSpawn.getSpawnOffset() === 0 || monsterSpawn.getSpawnIndex() === 0) {
+                newSpawnVal = lastSpawnVal + fixedSpawnOffset * (monsterSpawn.getBouncing() ? -1 : 1)
+            } else {
+                newSpawnVal =
+                    lastSpawnVal +
+                    monsterSpawn.getSpawnOffset() *
+                        monsterSpawn.getSpawnIndex() *
+                        (monsterSpawn.getBouncing() ? -1 : 1) *
+                        (monsterSpawn.getFixedSpawnOffsetMirrored() ? 0.5 : 1)
+            }
+
+            if (this.isSpawnValOutOfBounds(newSpawnVal)) {
+                newSpawnVal = this.loopSpawnValToBounds(newSpawnVal, monsterSpawn.getFixedSpawnOffsetBounce())
+                if (
+                    monsterSpawn.getFixedSpawnOffsetBounce() &&
+                    (monsterSpawn.getSpawnOffset() === 0 || monsterSpawn.getSpawnIndex() === 0)
+                ) {
+                    monsterSpawn.setBouncing(!monsterSpawn.getBouncing())
+                }
             }
         }
 
