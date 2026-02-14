@@ -552,6 +552,7 @@ export class Escaper {
         delete globals.heroToEscaperHandles[GetHandleId(this.hero)]
         RemoveUnit(this.hero)
         delete this.hero
+        this.refreshCollisionLandmark()
 
         if (this.invisUnit) {
             RemoveUnit(this.invisUnit)
