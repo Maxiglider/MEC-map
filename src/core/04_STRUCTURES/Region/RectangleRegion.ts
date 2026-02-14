@@ -15,7 +15,7 @@ function dot(x1: number, y1: number, x2: number, y2: number): number {
     return x1 * x2 + y1 * y2
 }
 
-const RECTANGLE_REGION_MINIMUM_WIDTH = 31 // LINE_REGION_WIDTH is 32 but because of float imprecision we need to set it a bit lower than 32
+const RECTANGLE_REGION_MINIMUM_SIZE = 31 // LINE_REGION_WIDTH is 32 but because of float imprecision we need to set it a bit lower than 32
 
 export class RectangleRegionWidthTooSmallError extends Error {
     private backupLineRegion: LineRegion
@@ -87,8 +87,9 @@ export class RectangleRegion extends MECRegion {
         this.deltaX2X1 = this.x2 - this.x1
         this.deltaY2Y1 = this.y2 - this.y1
 
+        // Make sur the region has a minimal width, or fallbacks to a line region
         const rectangleWidth = Math.sqrt(this.deltaX2X1 * this.deltaX2X1 + this.deltaY2Y1 * this.deltaY2Y1)
-        if (rectangleWidth < RECTANGLE_REGION_MINIMUM_WIDTH) {
+        if (rectangleWidth < RECTANGLE_REGION_MINIMUM_SIZE) {
             const middleX2X1 = (this.x1 + this.x2) / 2
             const middleY2Y1 = (this.y1 + this.y2) / 2
             const backupLineRegion = ServiceManager.getService('MECRegionService').newLineRegion(
@@ -99,14 +100,13 @@ export class RectangleRegion extends MECRegion {
             )
 
             throw new RectangleRegionWidthTooSmallError(
-                `RectangleRegion: The width of the rectangle region is too small (width: ${rectangleWidth}, minimum: ${RECTANGLE_REGION_MINIMUM_WIDTH}) ; use LineRegion instead`,
+                `RectangleRegion: The width of the rectangle region is too small (width: ${rectangleWidth}, minimum: ${RECTANGLE_REGION_MINIMUM_SIZE}) ; use LineRegion instead`,
                 backupLineRegion
             )
         }
 
         const deltaX3X1 = this.x3 - this.x1
         const deltaY3Y1 = this.y3 - this.y1
-
         this.points1_2_denominator = this.deltaX2X1 * this.deltaX2X1 + this.deltaY2Y1 * this.deltaY2Y1
         if (this.points1_2_denominator === 0) {
             // Points 1 and 2 at the same spot
@@ -121,7 +121,18 @@ export class RectangleRegion extends MECRegion {
             this.vectorY = this.y3 - Yproj3to1_2
         }
 
-        const vectorLength = Math.sqrt(this.vectorX * this.vectorX + this.vectorY * this.vectorY)
+        // Make sure the Region has a minimal length
+        let vectorLength = Math.sqrt(this.vectorX * this.vectorX + this.vectorY * this.vectorY)
+        if (vectorLength < 1) {
+            vectorLength = RECTANGLE_REGION_MINIMUM_SIZE
+            const angle = Rad2Deg(Math.atan2(this.deltaY2Y1, this.deltaX2X1)) + 90
+            this.vectorX = Math.cos(Deg2Rad(angle)) * vectorLength
+            this.vectorY = Math.sin(Deg2Rad(angle)) * vectorLength
+        } else if (vectorLength < RECTANGLE_REGION_MINIMUM_SIZE) {
+            this.vectorX = (this.vectorX * RECTANGLE_REGION_MINIMUM_SIZE) / vectorLength
+            this.vectorY = (this.vectorY * RECTANGLE_REGION_MINIMUM_SIZE) / vectorLength
+            vectorLength = RECTANGLE_REGION_MINIMUM_SIZE
+        }
 
         this.vectorXforEndPoint = (this.vectorX * (vectorLength + END_POINT_OFFSET_AFTER_END_OF_REGION)) / vectorLength
         this.vectorYforEndPoint = (this.vectorY * (vectorLength + END_POINT_OFFSET_AFTER_END_OF_REGION)) / vectorLength
@@ -453,7 +464,7 @@ export class RectangleRegion extends MECRegion {
 
     toText(detailled = false) {
         const width = this.getWidth()
-        const isLine = width <= RECTANGLE_REGION_MINIMUM_WIDTH
+        const isLine = width <= RECTANGLE_REGION_MINIMUM_SIZE
         return (
             super.toText() +
             (detailled
