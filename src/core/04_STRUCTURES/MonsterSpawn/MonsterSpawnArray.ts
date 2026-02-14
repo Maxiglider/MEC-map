@@ -67,9 +67,9 @@ export class MonsterSpawnArray extends BaseArray<MonsterSpawn> {
                 monsterSpawn.setSpawnAmount(ms.spawnAmount || 1)
                 monsterSpawn.setInitialDelay(ms.initialDelay || 0)
 
-                if (ms.timedUnspawn !== undefined){
+                if (ms.timedUnspawn !== undefined) {
                     let timedUnspawn = S2R(ms.timedUnspawn)
-                    if(oldMecRegionFormat){
+                    if (oldMecRegionFormat) {
                         timedUnspawn -= 0.5 // handle old DELAY_BETWEEN_SPAWN_AND_MOVEMENT
                     }
                     monsterSpawn.setTimedUnspawn(timedUnspawn)
@@ -193,7 +193,8 @@ export class MonsterSpawnArray extends BaseArray<MonsterSpawn> {
                 break
             }
             case 'region':
-            default: { // spwawnShape was not defined with old MEC versions
+            default: {
+                // spwawnShape was not defined with old MEC versions
                 // HorizontalRegion or RectangleRegion depending on the direction angle
                 if (direction) {
                     mecRegion = new HorizontalRegion(ms.minX, ms.minY, ms.maxX, ms.maxY, direction)
@@ -264,18 +265,18 @@ export class MonsterSpawnArray extends BaseArray<MonsterSpawn> {
         return true
     }
 
-    displayPaginatedForPlayer = (p: player, cmd: string) => {
+    displayPaginatedForPlayer = (p: player, cmd: string, detailled = false) => {
         const { searchTerms, pageNum } = handlePaginationArgs(cmd)
         const searchTerm = searchTerms.join(' ')
 
         if (searchTerm.length !== 0) {
             if (this.getByLabel(searchTerm)) {
-                this.getByLabel(searchTerm)?.displayForPlayer(p)
+                this.getByLabel(searchTerm)?.displayForPlayer(p, detailled)
             } else {
                 Text.erP(p, `unknown monster spawn`)
             }
         } else {
-            const pag = handlePaginationObj(this.getAll(), pageNum)
+            const pag = handlePaginationObj(this.getAll(), pageNum, detailled)
 
             if (pag.cmds.length === 0) {
                 Text.erP(p, `no monster spawn for this level`)

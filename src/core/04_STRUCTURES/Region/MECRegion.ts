@@ -270,4 +270,8 @@ export abstract class MECRegion {
         output.type = this.constructor.name
         return output
     }
+
+    toText(detailled = false): string {
+        return this.constructor.name
+    }
 }

@@ -2428,6 +2428,19 @@ export const initExecuteCommandMake = () => {
         },
     })
 
+    //-displayMonsterSpawns(dms) [<monsterSpawnLabel>] [page]
+    registerCommand({
+        name: 'displayMonsterSpawnsDetailled',
+        alias: ['dmsd'],
+        group: 'make',
+        argDescription: '[<monsterSpawnLabel>] [page]',
+        description: 'Displays the monster spawns for this level',
+        cb: ({ cmd }, escaper) => {
+            escaper.getMakingLevel().monsterSpawns.displayPaginatedForPlayer(escaper.getPlayer(), cmd, true)
+            return true
+        },
+    })
+
     //-deleteMonsterSpawn(delms) <monsterSpawnLabel>
     registerCommand({
         name: 'deleteMonsterSpawn',

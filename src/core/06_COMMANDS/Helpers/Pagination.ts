@@ -6,14 +6,15 @@ const MIN_LINE_LENGTH = 80
 
 export const handlePaginationObj = (
     filtered: {
-        [x: number]: { toText?: () => string }
+        [x: number]: { toText?: (parameterForToText: any) => string }
     },
-    pageNum: number
+    pageNum: number,
+    parameterForToText?: any
 ) => {
     const arr = MemoryHandler.getEmptyArray<string>()
 
     for (const [_, v] of pairs(filtered)) {
-        arrayPush(arr, v.toText?.())
+        arrayPush(arr, v.toText?.(parameterForToText))
     }
 
     const r = handlePagination(arr, pageNum)

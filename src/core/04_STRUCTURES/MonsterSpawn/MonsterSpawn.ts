@@ -466,27 +466,51 @@ export class MonsterSpawn {
         return this.monsterDirectionMode
     }
 
-    toText = (): string => {
-        // todo rework the toText method
+    toText = (detailled = false): string => {
         let text =
-            udg_colorCode[Constants.GREY] +
+            udg_colorCode[Constants.RED] +
             this.label +
-            ' : ' +
+            udg_colorCode[Constants.GREY] +
+            ' : monster(' +
             this.mt.label +
-            '   ' +
-            // convertAngleToDirection(this.rotation) +
-            '   ' +
-            R2S(this.frequency)
+            ') zone(' +
+            this.mecRegion?.toText(detailled) +
+            ') freq(' +
+            R2S(this.frequency) +
+            ')'
 
-        if (this.timedUnspawn !== undefined) {
-            text = text + '   unspawn:' + R2S(this.timedUnspawn) + 's'
+        if (this.spawnAmount !== 1) {
+            text = text + ' spawnAmount(' + this.spawnAmount + ')'
+        }
+
+        if (detailled) {
+            text += '\n    '
+            if (this.initialDelay !== 0) {
+                text = text + ' initialDelay(' + R2S(this.initialDelay) + 's)'
+            }
+            if (this.timedUnspawn !== undefined) {
+                text = text + ' unspawn(' + R2S(this.timedUnspawn) + 's)'
+            }
+            text += ' dirMode(' + this.monsterDirectionMode + ')'
+            if (this.fixedSpawnOffset !== undefined) {
+                text = text + ' fixedSpawnOffset(' + this.fixedSpawnOffset + ')'
+            }
+            if (this.spawnOffset !== 0) {
+                text = text + ' spawnOffset(' + this.spawnOffset + ')'
+            }
+            if (this.fixedSpawnOffsetBounce) {
+                text = text + ' boucing'
+            }
+            if (this.fixedSpawnOffsetMirrored) {
+                text = text + ' mirroring'
+            }
         }
 
         return text
     }
 
-    displayForPlayer = (p: player) => {
-        Text.P_timed(p, Constants.TERRAIN_DATA_DISPLAY_TIME, this.toText())
+    displayForPlayer = (p: player, detailled = false) => {
+        Text.P_timed(p, Constants.TERRAIN_DATA_DISPLAY_TIME, this.toText(detailled))
     }
 
     getForcedDistance = () => this.forcedDistance

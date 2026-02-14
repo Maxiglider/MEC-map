@@ -51,4 +51,8 @@ export class CircleRegion extends MECRegion {
 
         return output
     }
+
+    toText(detailled = false) {
+        return super.toText() + (detailled ? ': radius(' + this.radius + ')' : '')
+    }
 }

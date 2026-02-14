@@ -13,6 +13,8 @@ function dot(x1: number, y1: number, x2: number, y2: number): number {
     return x1 * x2 + y1 * y2
 }
 
+const RECTANGLE_REGION_MINIMUM_WIDTH = 32
+
 export class RectangleRegion extends MECRegion {
     private x1: number
     private y1: number
@@ -403,5 +405,34 @@ export class RectangleRegion extends MECRegion {
         output.y3 = R2I(this.y3)
 
         return output
+    }
+
+    getLength() {
+        return Math.round(Math.sqrt(this.vectorX * this.vectorX + this.vectorY * this.vectorY))
+    }
+
+    getWidth() {
+        return Math.round(Math.sqrt(this.deltaX2X1 * this.deltaX2X1 + this.deltaY2Y1 * this.deltaY2Y1))
+    }
+
+    getDirectionAngleDegrees() {
+        return Math.round(Rad2Deg(Math.atan2(this.vectorY, this.vectorX)))
+    }
+
+    toText(detailled = false) {
+        const width = this.getWidth()
+        const isLine = width <= RECTANGLE_REGION_MINIMUM_WIDTH
+        return (
+            super.toText() +
+            (detailled
+                ? ': len(' +
+                  this.getLength() +
+                  ')' +
+                  (!isLine ? ' wid(' + width + ')' : '') +
+                  ' dir(' +
+                  this.getDirectionAngleDegrees() +
+                  '°)'
+                : '')
+        )
     }
 }
