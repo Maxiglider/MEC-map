@@ -1,10 +1,14 @@
 import { Make } from 'core/05_MAKE_STRUCTURES/Make/Make'
 import { LandmarkForMake } from './LandmarkForMake'
+import { MemoryHandler } from '../../../Utils/MemoryHandler'
+import { DrawLine } from '../../01_libraries/Draw_lines'
+import { arrayPush } from '../../01_libraries/Basic_functions'
 
 export abstract class MakeBySeveralClicks extends Make {
     protected savedX: number[] = []
     protected savedY: number[] = []
     protected currentMakingLocIndex = -1
+    private landmarkLines: lightning[] = MemoryHandler.getEmptyArray()
 
     private landmarkForMake?: LandmarkForMake
 
@@ -28,12 +32,35 @@ export abstract class MakeBySeveralClicks extends Make {
             this.landmarkForMake = new LandmarkForMake(this.escaper, x, y)
         }
 
+        this.drawLastLankmarkLine()
+
         this.escaper.destroyCancelledActions()
+    }
+
+    drawLastLankmarkLine = () => {
+        if (this.currentMakingLocIndex >= 1) {
+            arrayPush(
+                this.landmarkLines,
+                DrawLine(
+                    this.savedX[this.currentMakingLocIndex - 1],
+                    this.savedY[this.currentMakingLocIndex - 1],
+                    this.savedX[this.currentMakingLocIndex],
+                    this.savedY[this.currentMakingLocIndex],
+                    'white',
+                    1
+                )
+            )
+        }
     }
 
     unsaveLoc = () => {
         if (this.currentMakingLocIndex < 0) {
             return false
+        }
+
+        if (this.currentMakingLocIndex >= 1) {
+            DestroyLightning(this.landmarkLines[this.landmarkLines.length - 1])
+            this.landmarkLines.pop()
         }
 
         this.currentMakingLocIndex--
@@ -58,6 +85,11 @@ export abstract class MakeBySeveralClicks extends Make {
         this.currentMakingLocIndex = -1
         this.landmarkForMake && this.landmarkForMake.destroy()
         delete this.landmarkForMake
+
+        for (let i = 0; i < this.landmarkLines.length; i++) {
+            DestroyLightning(this.landmarkLines[i])
+        }
+        this.landmarkLines.length = 0
     }
 
     cancelLastAction = () => {
@@ -87,7 +119,6 @@ export abstract class MakeBySeveralClicks extends Make {
     destroy = () => {
         super.destroy()
 
-        this.landmarkForMake && this.landmarkForMake.destroy()
-        delete this.landmarkForMake
+        this.unsaveLocsDefinitely()
     }
 }
