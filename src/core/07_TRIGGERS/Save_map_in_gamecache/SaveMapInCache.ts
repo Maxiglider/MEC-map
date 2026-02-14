@@ -64,19 +64,14 @@ export class SaveMapInCache {
 
     private static smicStringObj = { str: '' }
 
-    public static smic = (p: player | null = null, mode: 'solo' | 'multi' = 'multi', fileName?: string) => {
+    public static smic = (p: player | null = null, withTerrain = true, fileName?: string) => {
         if (p === null || GetLocalPlayer() == p) {
             const startTime = os.clock()
-            const multi = mode === 'multi'
 
-            SaveMapInCache.smicStringObj.str = SaveMapInCache.gameAsJsonString(multi)
+            SaveMapInCache.smicStringObj.str = SaveMapInCache.gameAsJsonString(withTerrain)
             fileName = fileName || Constants.MEC_SMIC_DATA_FILE_DATE_TPL.replace('[date]', os.date('%Y-%m-%d_%H-%M-%S'))
 
-            if (multi) {
-                SaveLoad.saveFileWithoutPossibleLoading(fileName, p, SaveMapInCache.smicStringObj.str, false)
-            } else {
-                SaveLoad.saveFile(fileName, p, SaveMapInCache.smicStringObj.str, false)
-            }
+            SaveLoad.saveFile(fileName, p, SaveMapInCache.smicStringObj.str, false)
 
             SaveMapInCache.lastSaveFile = fileName
 

@@ -6,6 +6,7 @@ import type { MonsterType } from './src/core/04_STRUCTURES/Monster/MonsterType'
 import type { MonsterTypeArray } from './src/core/04_STRUCTURES/Monster/MonsterTypeArray'
 import type { TerrainTypeArray } from './src/core/04_STRUCTURES/TerrainType/TerrainTypeArray'
 import { Constants } from './src/core/01_libraries/Constants'
+import { Natives } from './src/core/wc3_natives_unsecured/Natives'
 
 //GLOBALS
 
@@ -18,10 +19,15 @@ export const globals: {
     coopModeActive?: boolean
     autoreviveDelay?: number
     logStrings: string[]
+
+    // Map rects data
     MAP_MIN_X: number
     MAP_MAX_X: number
     MAP_MIN_Y: number
     MAP_MAX_Y: number
+    ENTIRE_MAP_RECT?: rect
+    WORLD_BOUNDS_RECT?: rect
+
     CAN_TURN_IN_AIR: boolean
     USE_VTOTO_SLIDE_LOGIC: boolean
     coopCircles: boolean
@@ -39,10 +45,15 @@ export const globals: {
     heroBaseScale?: number // hero base scale from unit type ID (Worleditor value)
 } = {
     logStrings: [],
+
+    // Map rects data
     MAP_MIN_X: 0,
     MAP_MAX_X: 0,
     MAP_MIN_Y: 0,
     MAP_MAX_Y: 0,
+    ENTIRE_MAP_RECT: undefined,
+    WORLD_BOUNDS_RECT: undefined,
+
     coopModeActive: true,
     CAN_TURN_IN_AIR: false,
     USE_VTOTO_SLIDE_LOGIC: false,
@@ -64,6 +75,11 @@ export const globals: {
     // For other maps, those smiced on the version of the add of heroBaseCollisionSize or later, the value set by MEC_core.setGameData will be used
     heroBaseCollisionSize: Constants.RECOMMANDED_HERO_BASE_COLLISION_SIZE,
     heroBaseScale: undefined,
+}
+
+export const init_globals = () => {
+    globals.ENTIRE_MAP_RECT = Natives.UGetEntireMapRect()
+    globals.WORLD_BOUNDS_RECT = Natives.UGetWorldBounds()
 }
 
 //SETTERS - GETTERS

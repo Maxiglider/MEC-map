@@ -119,8 +119,12 @@ const SaveTerrain = (json: { [x: string]: any }) => {
 }
 
 const SaveBoundsInfo = (json: { [x: string]: any }) => {
-    const worldBoundsMinX = GetRectMinX(Natives.UGetWorldBounds())
-    const worldBoundsMinY = GetRectMinY(Natives.UGetWorldBounds())
+    if (!globals.WORLD_BOUNDS_RECT || !bj_mapInitialPlayableArea) {
+        return
+    }
+
+    const worldBoundsMinX = GetRectMinX(globals.WORLD_BOUNDS_RECT)
+    const worldBoundsMinY = GetRectMinY(globals.WORLD_BOUNDS_RECT)
 
     json.boundsInfo = {
         playableAreaMinTileX: R2I((GetRectMinX(bj_mapInitialPlayableArea!) - worldBoundsMinX) / 128),

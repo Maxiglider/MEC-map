@@ -30,8 +30,10 @@ import { init_dataFromWorleditor } from './init_dataFromWorleditor'
 import { init_DetectNullHeroCollisionAtStart } from '../07_TRIGGERS/CollisionLandmarks/DetectNullHeroCollisionAtStart'
 import { init_MECRegions } from '../04_STRUCTURES/Region/MECRegion'
 import { init_E2ETests } from '../Test/e2e-tests/base/e2e-tests-registering'
+import { init_globals } from '../../../globals'
 
 export const initializers = () => {
+    init_globals()
     init_dataFromWorleditor()
     init_terrain_limit_variables()
     initArrays()

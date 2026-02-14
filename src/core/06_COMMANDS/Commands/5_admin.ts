@@ -584,30 +584,27 @@ export const initExecuteCommandMax = () => {
         name: 'saveMapInCache',
         alias: ['smic'],
         group: 'max',
-        argDescription: '[<outputFilename> [multi|solo]]',
+        argDescription: '[<outputFilename> [withoutTerrain|wt]]',
         description:
-            'Saves the map in cache for usage with mec-smic-loader. If you specify "solo" as second parameter, the data except about terrain will be loadable in a future game with -loadMapFromCache, but this -smic command will probably trigger an instant player desync in the current game.',
+            'Saves the map in cache for usage with mec-smic-loader. If you specify "withoutTerrain" as second parameter, the data will be lighter but not usable with smic-loader, only with -lmfc command.',
         cb: ({ noParam, param1, param2, nbParam }, escaper) => {
             if (nbParam > 2) {
                 Text.erP(escaper.getPlayer(), 'Wrong command parameters')
             }
 
-            let mode: 'solo' | 'multi' = 'multi'
+            let withTerrain = true
             if (nbParam === 2) {
-                if (param2 !== 'multi' && param2 !== 'solo') {
-                    Text.erP(
-                        escaper.getPlayer(),
-                        'Wrong command parameters, second parameter should be "multi" or "solo"'
-                    )
+                if (param2 !== 'withoutTerrain' && param2 !== 'wt') {
+                    Text.erP(escaper.getPlayer(), 'smic: wrong command parameters')
                     return true
                 }
-                mode = param2
+                withTerrain = false
             }
 
             if (noParam) {
-                SaveMapInCache.smic(escaper.getPlayer(), mode)
+                SaveMapInCache.smic(escaper.getPlayer(), withTerrain)
             } else {
-                SaveMapInCache.smic(escaper.getPlayer(), mode, `MEC/mec-smic-data-custom_${param1}.txt`)
+                SaveMapInCache.smic(escaper.getPlayer(), withTerrain, `MEC/mec-smic-data-custom_${param1}.txt`)
             }
             return true
         },
