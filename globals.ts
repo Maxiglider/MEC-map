@@ -43,6 +43,7 @@ export const globals: {
     scoreboardLabel: string
     heroBaseCollisionSize: number
     heroBaseScale?: number // hero base scale from unit type ID (Worleditor value)
+    debugLongDistanceMoves: boolean
 } = {
     logStrings: [],
 
@@ -75,6 +76,7 @@ export const globals: {
     // For other maps, those smiced on the version of the add of heroBaseCollisionSize or later, the value set by MEC_core.setGameData will be used
     heroBaseCollisionSize: Constants.RECOMMANDED_HERO_BASE_COLLISION_SIZE,
     heroBaseScale: undefined,
+    debugLongDistanceMoves: false,
 }
 
 export const init_globals = () => {

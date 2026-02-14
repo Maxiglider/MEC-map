@@ -2,6 +2,7 @@ import { Constants } from 'core/01_libraries/Constants'
 import { MemoryHandler } from '../../../Utils/MemoryHandler'
 import { arrayPush } from '../../01_libraries/Basic_functions'
 import { HorizontalRegion } from '../Region/HorizontalRegion'
+import { globals } from '../../../../globals'
 
 function OnNextWaypointReached(this: any, unit: unit) {
     const longDistanceMoveOrder = LongDistanceMoveOrder.unitToLongDistanceMoveOrder[GetHandleId(unit)]
@@ -88,6 +89,9 @@ export class LongDistanceMoveOrder {
 
         // this.nextWaypointRegion = new HorizontalRegion(0, 0, 64, 64)
         this.nextWaypointRegion = MemoryHandler.getEmptyClass(HorizontalRegion, 0, 0, 64, 64)
+        if (globals.debugLongDistanceMoves) {
+            this.nextWaypointRegion.debugRects(true)
+        }
 
         this.nextWaypointRegion.watchUnit(this.unit)
         this.nextWaypointRegion.onUnitEnters(OnNextWaypointReached)

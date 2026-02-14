@@ -1161,4 +1161,25 @@ export const initExecuteCommandMax = () => {
             return true
         },
     })
+
+    //-debugLongDistanceMoves
+    registerCommand({
+        name: 'debugLongDistanceMoves',
+        alias: [],
+        group: 'max',
+        argDescription: '<boolean>',
+        description: 'Disables all effects',
+        cb: ({ param1, nbParam }, escaper) => {
+            const usageMsg = 'e2e: bad command usage'
+            if (nbParam != 1 || !IsBoolString(param1)) {
+                Text.erP(escaper.getPlayer(), 'debugLongDistanceMove: bad parameters')
+                return true
+            }
+
+            globals.debugLongDistanceMoves = S2B(param1)
+            Text.mkP(escaper.getPlayer(), 'debugLongDistanceMoves set to ' + param1)
+
+            return true
+        },
+    })
 }

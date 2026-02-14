@@ -170,8 +170,7 @@ export class RectangleRegion extends MECRegion {
 
         this.redefineZone()
 
-        // this.debugRects(false)
-        // this.debugRects(true)
+        this.refreshDebuggingRects()
     }
 
     areCoordsInRegion(x: number, y: number) {
