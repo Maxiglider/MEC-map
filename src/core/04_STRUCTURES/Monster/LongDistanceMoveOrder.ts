@@ -87,7 +87,6 @@ export class LongDistanceMoveOrder {
 
         LongDistanceMoveOrder.unitToLongDistanceMoveOrder[GetHandleId(this.unit)] = this
 
-        // this.nextWaypointRegion = new HorizontalRegion(0, 0, 64, 64)
         this.nextWaypointRegion = MemoryHandler.getEmptyClass(HorizontalRegion, 0, 0, 64, 64)
         if (globals.debugLongDistanceMoves) {
             this.nextWaypointRegion.debugRects(true)

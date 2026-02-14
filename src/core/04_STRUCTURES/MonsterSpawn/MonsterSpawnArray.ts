@@ -7,12 +7,12 @@ import { BaseArray } from '../BaseArray'
 import type { Level } from '../Level/Level'
 import { MonsterSpawn } from './MonsterSpawn'
 import { MECRegion } from '../Region/MECRegion'
-import { HorizontalRegion, HorizontalRegionDirection } from '../Region/HorizontalRegion'
+import { HorizontalRegionDirection } from '../Region/HorizontalRegion'
 import { LineRegion } from '../Region/LineRegion'
-import { RectangleRegion } from '../Region/RectangleRegion'
 import { MemoryHandler } from '../../../Utils/MemoryHandler'
 import { createPoint } from '../../../Utils/Point'
 import { CircleRegion } from '../Region/CircleRegion'
+import { ServiceManager } from '../../../Services'
 
 export class MonsterSpawnArray extends BaseArray<MonsterSpawn> {
     private level: Level
@@ -93,12 +93,14 @@ export class MonsterSpawnArray extends BaseArray<MonsterSpawn> {
     }
 
     getMECRegionFromJson(mecRegionJson: any): MECRegion {
+        const mecRegionService = ServiceManager.getService('MECRegionService')
+
         let mecRegion: MECRegion
 
         switch (mecRegionJson.type) {
             case 'HorizontalRegion': {
                 const { x1, y1, x2, y2, direction } = mecRegionJson
-                mecRegion = new HorizontalRegion(x1, y1, x2, y2, direction)
+                mecRegion = mecRegionService.newHorizontalRegionBackupToLine(x1, y1, x2, y2, direction)
                 break
             }
             case 'LineRegion': {
@@ -108,7 +110,7 @@ export class MonsterSpawnArray extends BaseArray<MonsterSpawn> {
             }
             case 'RectangleRegion': {
                 const { x1, y1, x2, y2, x3, y3 } = mecRegionJson
-                mecRegion = new RectangleRegion(x1, y1, x2, y2, x3, y3)
+                mecRegion = mecRegionService.newRectangleRegionBackupToLine(x1, y1, x2, y2, x3, y3)
                 break
             }
             case 'CircleRegion': {
@@ -129,6 +131,8 @@ export class MonsterSpawnArray extends BaseArray<MonsterSpawn> {
      * @param ms The monster spawn data in the old json format
      */
     generateMecRegionFromOldJsonFormat(ms: any): MECRegion {
+        const mecRegionService = ServiceManager.getService('MECRegionService')
+
         let mecRegion: MECRegion | null = null
 
         const directionAngle = ForceAngleBetween0And360(
@@ -166,13 +170,13 @@ export class MonsterSpawnArray extends BaseArray<MonsterSpawn> {
                     x2 += p1p2_dist * CosBJ(directionAngle)
                     y2 += p1p2_dist * SinBJ(directionAngle)
 
-                    mecRegion = new HorizontalRegion(x1, y1, x2, y2, direction)
+                    mecRegion = mecRegionService.newHorizontalRegionBackupToLine(x1, y1, x2, y2, direction)
                 } else {
                     // RectangleRegion
                     const x3 = x2 + p1p2_dist * CosBJ(directionAngle)
                     const y3 = y2 + p1p2_dist * SinBJ(directionAngle)
 
-                    mecRegion = new RectangleRegion(x1, y1, x2, y2, x3, y3)
+                    mecRegion = mecRegionService.newRectangleRegionBackupToLine(x1, y1, x2, y2, x3, y3)
                 }
 
                 break
@@ -197,7 +201,13 @@ export class MonsterSpawnArray extends BaseArray<MonsterSpawn> {
                 // spwawnShape was not defined with old MEC versions
                 // HorizontalRegion or RectangleRegion depending on the direction angle
                 if (direction) {
-                    mecRegion = new HorizontalRegion(ms.minX, ms.minY, ms.maxX, ms.maxY, direction)
+                    mecRegion = mecRegionService.newHorizontalRegionBackupToLine(
+                        ms.minX,
+                        ms.minY,
+                        ms.maxX,
+                        ms.maxY,
+                        direction
+                    )
                 } else {
                     const anchorX = (ms.minX + ms.maxX) / 2
                     const anchorY = (ms.minY + ms.maxY) / 2
@@ -206,7 +216,7 @@ export class MonsterSpawnArray extends BaseArray<MonsterSpawn> {
                     const p2 = ApplyRotation(anchorX, anchorY, directionAngle, createPoint(ms.minX, ms.maxY))
                     const p3 = ApplyRotation(anchorX, anchorY, directionAngle, createPoint(ms.maxX, ms.minY))
 
-                    mecRegion = new RectangleRegion(p1.x, p1.y, p2.x, p2.y, p3.x, p3.y)
+                    mecRegion = mecRegionService.newRectangleRegionBackupToLine(p1.x, p1.y, p2.x, p2.y, p3.x, p3.y)
 
                     MemoryHandler.destroyObject(p1)
                     MemoryHandler.destroyObject(p2)

@@ -8,12 +8,26 @@ import { arrayPush } from '../../01_libraries/Basic_functions'
 import { DrawLine } from '../../01_libraries/Draw_lines'
 import { MemoryHandler } from '../../../Utils/MemoryHandler'
 import { MonsterSpawn } from '../MonsterSpawn/MonsterSpawn'
+import { LineRegion } from './LineRegion'
+import { ServiceManager } from '../../../Services'
 
 function dot(x1: number, y1: number, x2: number, y2: number): number {
     return x1 * x2 + y1 * y2
 }
 
-const RECTANGLE_REGION_MINIMUM_WIDTH = 32
+const RECTANGLE_REGION_MINIMUM_WIDTH = 31 // LINE_REGION_WIDTH is 32 but because of float imprecision we need to set it a bit lower than 32
+
+export class RectangleRegionWidthTooSmallError extends Error {
+    private backupLineRegion: LineRegion
+    constructor(message: string, lineRegion: LineRegion) {
+        super(message)
+        this.backupLineRegion = lineRegion
+    }
+
+    getBackupLineRegion() {
+        return this.backupLineRegion
+    }
+}
 
 export class RectangleRegion extends MECRegion {
     private x1: number
@@ -72,6 +86,24 @@ export class RectangleRegion extends MECRegion {
     redefineZone() {
         this.deltaX2X1 = this.x2 - this.x1
         this.deltaY2Y1 = this.y2 - this.y1
+
+        const rectangleWidth = Math.sqrt(this.deltaX2X1 * this.deltaX2X1 + this.deltaY2Y1 * this.deltaY2Y1)
+        if (rectangleWidth < RECTANGLE_REGION_MINIMUM_WIDTH) {
+            const middleX2X1 = (this.x1 + this.x2) / 2
+            const middleY2Y1 = (this.y1 + this.y2) / 2
+            const backupLineRegion = ServiceManager.getService('MECRegionService').newLineRegion(
+                middleX2X1,
+                middleY2Y1,
+                this.x3,
+                this.y3
+            )
+
+            throw new RectangleRegionWidthTooSmallError(
+                `RectangleRegion: The width of the rectangle region is too small (width: ${rectangleWidth}, minimum: ${RECTANGLE_REGION_MINIMUM_WIDTH}) ; use LineRegion instead`,
+                backupLineRegion
+            )
+        }
+
         const deltaX3X1 = this.x3 - this.x1
         const deltaY3Y1 = this.y3 - this.y1
 

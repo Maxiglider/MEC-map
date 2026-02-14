@@ -1,10 +1,10 @@
 import { MakeBySeveralClicks } from '../Make/MakeBySeveralClicks'
 import { MECRegion } from '../../04_STRUCTURES/Region/MECRegion'
-import { HorizontalRegion, HorizontalRegionDirection } from '../../04_STRUCTURES/Region/HorizontalRegion'
+import { HorizontalRegionDirection } from '../../04_STRUCTURES/Region/HorizontalRegion'
 import { Text } from '../../01_libraries/Text'
-import { RectangleRegion } from '../../04_STRUCTURES/Region/RectangleRegion'
 import { CircleRegion } from '../../04_STRUCTURES/Region/CircleRegion'
 import { LineRegion } from '../../04_STRUCTURES/Region/LineRegion'
+import { ServiceManager } from '../../../Services'
 
 export type MakeMECRegionMode = 'horizontal' | 'diagonal' | 'circle' | 'line'
 
@@ -26,10 +26,12 @@ export abstract class MakeMECRegion extends MakeBySeveralClicks {
             this.saveLoc(this.orderX, this.orderY)
 
             if (this.currentMakingLocIndex === this.requiredLocsNumber - 1) {
+                const mecRegionService = ServiceManager.getService('MECRegionService')
+
                 let mecRegion: MECRegion
 
                 if (this.mode === 'horizontal') {
-                    mecRegion = new HorizontalRegion(
+                    mecRegion = mecRegionService.newHorizontalRegionBackupToLine(
                         this.savedX[0],
                         this.savedY[0],
                         this.savedX[1],
@@ -37,7 +39,7 @@ export abstract class MakeMECRegion extends MakeBySeveralClicks {
                         this.directionForHorizontal
                     )
                 } else if (this.mode === 'diagonal') {
-                    mecRegion = new RectangleRegion(
+                    mecRegion = mecRegionService.newRectangleRegionBackupToLine(
                         this.savedX[0],
                         this.savedY[0],
                         this.savedX[1],

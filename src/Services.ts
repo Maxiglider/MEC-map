@@ -4,6 +4,7 @@ import { IRenderInterface } from './App/renderInterface'
 import { ICommandExecution } from './core/06_COMMANDS/Helpers/Command_execution'
 import { IMEC_core_API } from './core/API/MEC_core_API'
 import { IInvisUnit_is_getting_damage } from './core/08_GAME/Death/InvisUnit_is_getting_damage'
+import { IMECRegionService } from './core/04_STRUCTURES/Region/MECRegion_service'
 
 const initServiceManager = <TServices extends { [K in string]: TServices[K] }>() => {
     const services: TServices = {} as any
@@ -36,4 +37,5 @@ export const ServiceManager = initServiceManager<{
     React: IRenderInterface
     MEC_core_API: IMEC_core_API
     InvisUnit_is_getting_damage: IInvisUnit_is_getting_damage
+    MECRegionService: IMECRegionService
 }>()
