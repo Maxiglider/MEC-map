@@ -1,4 +1,4 @@
-import { createTimer, errorHandler } from 'Utils/mapUtils'
+import { errorHandler } from 'Utils/mapUtils'
 import { EncodingBase64 } from './EncodingBase64'
 import { EncodingHex } from './EncodingHex'
 import { Logger } from './Logger'
@@ -6,7 +6,7 @@ import { Natives } from '../../../core/wc3_natives_unsecured/Natives'
 
 const BASE_64_DEFAULT = true
 const ESCAPE_DOUBLE_QUOTES_FOR_JSON_CHAR = '#DQ#'
-const CHUNK_SIZE = 230
+const CHUNK_SIZE = 220
 
 const syncPrefix = 'S_TIO'
 const syncPrefixFinish = 'S_TIOF'
