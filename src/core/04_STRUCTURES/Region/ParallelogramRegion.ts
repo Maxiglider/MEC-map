@@ -34,8 +34,8 @@ export class MECZoneWidthTooSmallError extends Error {
 }
 
 export class ParallelogramRegion extends MECRegion {
-    private x1: number
-    private y1: number
+    protected x1: number
+    protected y1: number
     private x2: number
     private y2: number
     private x3: number
@@ -51,8 +51,8 @@ export class ParallelogramRegion extends MECRegion {
     private deltaY2Y1forStartLine: number = 0
     private startLineLength: number = 0
 
-    private deltaX2X1: number = 0
-    private deltaY2Y1: number = 0
+    protected deltaX2X1: number = 0
+    protected deltaY2Y1: number = 0
     private points1_2_denominator: number = 0
 
     private vectorX: number = 0
@@ -72,6 +72,12 @@ export class ParallelogramRegion extends MECRegion {
     protected directionAngleSine: number = 0
 
     private area: number = 0
+
+    // For Rectangle performant areCoordsInRegion pre-calculations
+    protected deltaP4X1: number = 0
+    protected deltaP4Y1: number = 0
+    protected dotP1P2: number = 0
+    protected dotP4: number = 0
 
     constructor(x1: number, y1: number, x2: number, y2: number, x3: number, y3: number) {
         super()
@@ -186,9 +192,15 @@ export class ParallelogramRegion extends MECRegion {
         const P4y = this.y1 + this.vectorY
 
         // Pre-calculate values for areCoordsInRegion
+        this.deltaP4X1 = P4x - this.x1
+        this.deltaP4Y1 = P4y - this.y1
+
+        this.dotP1P2 = dot(this.deltaX2X1, this.deltaY2Y1, this.deltaX2X1, this.deltaY2Y1)
+        this.dotP4 = dot(this.deltaP4X1, this.deltaP4Y1, this.deltaP4X1, this.deltaP4Y1)
+
+        // Area pre-calculation
         const xCenter = this.getCenterX()
         const yCenter = this.getCenterY()
-
         this.area =
             GetTriangleArea(this.x1, this.y1, this.x2, this.y2, xCenter, yCenter) +
             GetTriangleArea(this.x2, this.y2, this.x4, this.y4, xCenter, yCenter) +

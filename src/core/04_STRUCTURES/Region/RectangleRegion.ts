@@ -1,5 +1,9 @@
 import { ParallelogramRegion } from './ParallelogramRegion'
 
+function dot(x1: number, y1: number, x2: number, y2: number): number {
+    return x1 * x2 + y1 * y2
+}
+
 export class RectangleRegion extends ParallelogramRegion {
     constructor(x1: number, y1: number, x2: number, y2: number, x3: number, y3: number) {
         // Get Parallelogramm Point3 so that the Parallelogram will be a Rectangle
@@ -24,5 +28,16 @@ export class RectangleRegion extends ParallelogramRegion {
         }
 
         super(x1, y1, x2, y2, parallelogramX3, parallelogramY3)
+    }
+
+    areCoordsInRegion(x: number, y: number) {
+        // Let's say (x, y) is point P
+        const deltaPxX1 = x - this.x1
+        const deltaPyY1 = y - this.y1
+
+        const u = dot(deltaPxX1, deltaPyY1, this.deltaX2X1, this.deltaY2Y1) / this.dotP1P2
+        const v = dot(deltaPxX1, deltaPyY1, this.deltaP4X1, this.deltaP4Y1) / this.dotP4
+
+        return u >= 0 && u <= 1 && v >= 0 && v <= 1
     }
 }
