@@ -10,6 +10,9 @@ import { initCommandAll } from '../Commands/1_all'
 import { initExecuteCommandRed } from '../Commands/2_first_player'
 import { initExecuteCommandCheat } from '../Commands/3_cheat'
 import { initExecuteCommandMake } from '../Commands/4_make'
+import { initExecuteCommandMake_monsters } from '../Commands/4_make_monsters'
+import { initExecuteCommandMake_spawns } from '../Commands/4_make_spawns'
+import { initExecuteCommandMake_terrain } from '../Commands/4_make_terrain'
 import { initExecuteCommandMax } from '../Commands/5_admin'
 import { initExecuteCommandTrueMax } from '../Commands/6_superadmin'
 import { CmdName, CmdParam, IsCmd, NbParam, NoParam } from './Command_functions'
@@ -308,11 +311,25 @@ export const initCommandExecution = () => {
     }
 
     const initCommands = () => {
+        // Commands All
         initCommandAll()
+
+        // Commands first player
         initExecuteCommandRed()
+
+        // Commands Cheat
         initExecuteCommandCheat()
+
+        // Commands Make
         initExecuteCommandMake()
+        initExecuteCommandMake_monsters()
+        initExecuteCommandMake_spawns()
+        initExecuteCommandMake_terrain()
+
+        // Commands Admin
         initExecuteCommandMax()
+
+        // Commands Superadmin
         initExecuteCommandTrueMax()
 
         registerCommand({
