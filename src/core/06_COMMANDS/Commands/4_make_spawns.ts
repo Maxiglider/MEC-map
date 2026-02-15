@@ -17,7 +17,7 @@ export const initExecuteCommandMake_spawns = () => {
         group,
         argDescription: '<monsterSpawnLabel> <monsterLabel> <kind> [<frequency>] [straight||random]',
         description:
-            'Kind must be "up", "down", "left", "right", "line" or "diagonal". Default frequency is 2, minimum is 0.1, maximum is 30',
+            'Kind must be "up", "down", "left", "right", "line", "diagonal" or "parallelogram". Default frequency is 2, minimum is 0.1, maximum is 30',
         cb: ({ nbParam, param1, param2, param3, param4, param5 }, escaper) => {
             if (!(nbParam >= 3 && nbParam <= 5)) {
                 Text.erP(escaper.getPlayer(), 'uncorrect number of parameters')
@@ -38,7 +38,7 @@ export const initExecuteCommandMake_spawns = () => {
             }
 
             let kind: MakeMonsterSpawnKind = 'up'
-            if (!['up', 'down', 'left', 'right', 'line', 'diagonal'].includes(param3)) {
+            if (!['up', 'down', 'left', 'right', 'line', 'diagonal', 'parallelogram'].includes(param3)) {
                 Text.erP(escaper.getPlayer(), 'createMonsterSpawn: wrong kind')
                 return true
             } else {
@@ -145,7 +145,7 @@ export const initExecuteCommandMake_spawns = () => {
             }
 
             let kind: MakeMonsterSpawnKind = 'up'
-            if (!['up', 'down', 'left', 'right', 'line', 'diagonal'].includes(param2)) {
+            if (!['up', 'down', 'left', 'right', 'line', 'diagonal', 'parallelogram'].includes(param2)) {
                 Text.erP(escaper.getPlayer(), 'createMonsterSpawn: wrong kind')
                 return true
             } else {
@@ -452,7 +452,7 @@ export const initExecuteCommandMake_spawns = () => {
 
             let makeMecRegionMode: MakeMECRegionMode = 'horizontal'
             if (nbParam === 2) {
-                if (!['horizontal', 'diagonal', 'circle', 'line'].includes(param2)) {
+                if (!['horizontal', 'diagonal', 'parallelogram', 'circle', 'line'].includes(param2)) {
                     Text.erP(escaper.getPlayer(), 'createMonsterSpawnDeadZone: wrong arguments')
                     return true
                 }

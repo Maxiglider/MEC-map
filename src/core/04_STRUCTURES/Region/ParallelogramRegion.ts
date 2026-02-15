@@ -235,7 +235,7 @@ export class ParallelogramRegion extends MECRegion {
             GetTriangleArea(this.x4, this.y4, this.x3, this.y3, x, y) +
             GetTriangleArea(this.x3, this.y3, this.x1, this.y1, x, y)
 
-        return Math.abs(areaIfPWouldBeIn - this.area) < 1 // allow some margin of error because of float imprecision
+        return Math.abs(areaIfPWouldBeIn - this.area) < 10 // allow some margin of error because of float imprecision
     }
 
     generateDebugLightnings(): lightning[] {
