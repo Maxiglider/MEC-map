@@ -98,7 +98,9 @@ export class Escaper extends EscaperMake {
     private lastTerrainType?: TerrainType
     private controler: Escaper
 
+    // todo check if we could remove this
     public slidingMode: 'normal' | 'max' = 'max'
+
     public rotationTimeForMaximumSpeed = HERO_ROTATION_TIME_FOR_MAXIMUM_SPEED
     public tClickWhereYouAre: Timer | null = null
 

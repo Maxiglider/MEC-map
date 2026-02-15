@@ -27,12 +27,13 @@ import { adaptMonstersImmolation, snapPatrolsToSlideOffsetMap, snapPointToSlide 
 
 export const initExecuteCommandMake = () => {
     const { registerCommand } = ServiceManager.getService('Cmd')
+    const group = 'make'
 
     //-createRegion(crr) <regionLabel>
     registerCommand({
         name: 'createRegion',
         alias: ['crr'],
-        group: 'make',
+        group,
         argDescription: '<regionLabel>',
         description: 'Create a region',
         cb: ({ param1 }, escaper) => {
@@ -56,7 +57,7 @@ export const initExecuteCommandMake = () => {
     registerCommand({
         name: 'moveRegionPoint',
         alias: ['mrp'],
-        group: 'make',
+        group,
         argDescription: '',
         description: 'Move a region point',
         cb: ({ noParam }, escaper) => {
@@ -73,7 +74,7 @@ export const initExecuteCommandMake = () => {
     registerCommand({
         name: 'displayRegions',
         alias: ['drs'],
-        group: 'make',
+        group,
         argDescription: '[<regionLabel>] [page]',
         description: 'Displays the regions for this level',
         cb: ({ cmd }, escaper) => {
@@ -86,7 +87,7 @@ export const initExecuteCommandMake = () => {
     registerCommand({
         name: 'getRegionAtPoint',
         alias: ['getr', 'getrap'],
-        group: 'make',
+        group,
         argDescription: '',
         description: '',
         cb: ({ noParam }, escaper) => {
@@ -103,7 +104,7 @@ export const initExecuteCommandMake = () => {
     registerCommand({
         name: 'deleteRegion',
         alias: ['delr'],
-        group: 'make',
+        group,
         argDescription: '<regionLabel>',
         description: '',
         cb: ({ nbParam, param1 }, escaper) => {
@@ -123,7 +124,7 @@ export const initExecuteCommandMake = () => {
     registerCommand({
         name: 'setRegionFlag',
         alias: ['setrf'],
-        group: 'make',
+        group,
         argDescription: '<regionLabel> <flag> <boolean>',
         description: '',
         cb: ({ nbParam, param1, param2, param3 }, escaper) => {
@@ -154,7 +155,7 @@ export const initExecuteCommandMake = () => {
     registerCommand({
         name: 'createKey',
         alias: ['crk'],
-        group: 'make',
+        group,
         argDescription: '',
         description: 'Create meteors used to kill clickable monsters',
         cb: ({ noParam }, escaper) => {
@@ -170,7 +171,7 @@ export const initExecuteCommandMake = () => {
     registerCommand({
         name: 'deleteKeysBetweenPoints',
         alias: ['delkbp'],
-        group: 'make',
+        group,
         argDescription: '',
         description: 'Delete meteors in a rectangle formed with two clicks',
         cb: ({ noParam }, escaper) => {
@@ -186,7 +187,7 @@ export const initExecuteCommandMake = () => {
     registerCommand({
         name: 'deleteKey',
         alias: ['delk'],
-        group: 'make',
+        group,
         argDescription: '',
         description: 'Delete the meteors clicked by the player',
         cb: ({ noParam }, escaper) => {
@@ -202,7 +203,7 @@ export const initExecuteCommandMake = () => {
     registerCommand({
         name: 'createStart',
         alias: ['crs'],
-        group: 'make',
+        group,
         argDescription: '[current(c)|next(n)] [facing]',
         description:
             'create the start (a rectangle formed with two clicks) of the current level or the next one if specified',
@@ -233,7 +234,7 @@ export const initExecuteCommandMake = () => {
     registerCommand({
         name: 'createEnd',
         alias: ['cre'],
-        group: 'make',
+        group,
         argDescription: '',
         description: 'Create the end (a rectangle formed with two clicks) of the current level',
         cb: ({ noParam }, escaper) => {
@@ -250,7 +251,7 @@ export const initExecuteCommandMake = () => {
     registerCommand({
         name: 'createTpForEnd',
         alias: ['crtpfe'],
-        group: 'make',
+        group,
         argDescription: '',
         description:
             'Create the (facultative) TP for end (a rectangle formed with two clicks) of the current level => the hero will teleported to center of end rect',
@@ -268,7 +269,7 @@ export const initExecuteCommandMake = () => {
     registerCommand({
         name: 'getMakingLevel',
         alias: ['getmkl'],
-        group: 'make',
+        group,
         argDescription: '',
         description: 'Displays the id of the level the player is creating (the first one is id 0)',
         cb: ({ noParam }, escaper) => {
@@ -295,7 +296,7 @@ export const initExecuteCommandMake = () => {
     registerCommand({
         name: 'setMakingLevel',
         alias: ['setmkl'],
-        group: 'make',
+        group,
         argDescription: '<levelId> | current(c)',
         description: 'Sets the level the players chose to continue creating',
         cb: ({ nbParam, param1 }, escaper) => {
@@ -348,7 +349,7 @@ export const initExecuteCommandMake = () => {
     registerCommand({
         name: 'newLevel',
         alias: ['newl'],
-        group: 'make',
+        group,
         argDescription: '',
         description: 'Creates a new level after the last one',
         cb: ({ noParam }, escaper) => {
@@ -367,7 +368,7 @@ export const initExecuteCommandMake = () => {
     registerCommand({
         name: 'copyLevel',
         alias: [],
-        group: 'make',
+        group,
         argDescription: '',
         description: 'Creates a new level after the last one by copying the current make level',
         cb: ({ noParam }, escaper) => {
@@ -389,7 +390,7 @@ export const initExecuteCommandMake = () => {
     registerCommand({
         name: 'copyLevelPatrol',
         alias: ['clp'],
-        group: 'make',
+        group,
         argDescription: '<targetLvl>',
         description: '',
         cb: ({ param1 }, escaper) => {
@@ -410,7 +411,7 @@ export const initExecuteCommandMake = () => {
     registerCommand({
         name: 'copyLevelPatrolBetweenPoints',
         alias: ['clpbp'],
-        group: 'make',
+        group,
         argDescription: '<targetLvl>',
         description: '',
         cb: ({ param1 }, escaper) => {
@@ -431,7 +432,7 @@ export const initExecuteCommandMake = () => {
     registerCommand({
         name: 'setLivesEarned',
         alias: ['setle'],
-        group: 'make',
+        group,
         argDescription: '<livesNumber> [<levelID>]',
         description: 'The number of lives earned at the specified level',
         cb: ({ nbParam, param1, param2 }, escaper) => {
@@ -477,7 +478,7 @@ export const initExecuteCommandMake = () => {
     registerCommand({
         name: 'createVisibility',
         alias: ['crv'],
-        group: 'make',
+        group,
         argDescription: '',
         description: 'Create visibility rectangles for the current level',
         cb: ({ noParam }, escaper) => {
@@ -493,7 +494,7 @@ export const initExecuteCommandMake = () => {
     registerCommand({
         name: 'setLevelResetVisibilities',
         alias: ['setlrv'],
-        group: 'make',
+        group,
         argDescription: '<boolean> [<levelId>]',
         description:
             'Set whether visibilities are reset when re-entering the level (applies a total black mask on the map when true)',
@@ -534,7 +535,7 @@ export const initExecuteCommandMake = () => {
     registerCommand({
         name: 'removeVisibilities',
         alias: ['remv'],
-        group: 'make',
+        group,
         argDescription: '[<levelId>]',
         description: 'Remove all visibility rectangles made for the current level',
         cb: ({ noParam, nbParam, param1, param2 }, escaper) => {
@@ -568,7 +569,7 @@ export const initExecuteCommandMake = () => {
     registerCommand({
         name: 'setStartMessage',
         alias: ['setsm'],
-        group: 'make',
+        group,
         argDescription: '[<message>]',
         description: 'Sets the start message of the current level (spaces allowed)',
         cb: ({ cmd }, escaper) => {
@@ -585,7 +586,7 @@ export const initExecuteCommandMake = () => {
     registerCommand({
         name: 'getStartMessage',
         alias: ['getsm'],
-        group: 'make',
+        group,
         argDescription: '',
         description: 'Displays the start message of the current level',
         cb: ({}, escaper) => {
@@ -609,7 +610,7 @@ export const initExecuteCommandMake = () => {
     registerCommand({
         name: 'cancel',
         alias: ['z'],
-        group: 'make',
+        group,
         argDescription: '',
         description: 'Cancel the last action made on the map',
         cb: ({ noParam }, escaper) => {
@@ -626,7 +627,7 @@ export const initExecuteCommandMake = () => {
     registerCommand({
         name: 'redo',
         alias: ['y'],
-        group: 'make',
+        group,
         argDescription: '',
         description: 'Redo the last action cancelled',
         cb: ({ noParam }, escaper) => {
@@ -643,7 +644,7 @@ export const initExecuteCommandMake = () => {
     registerCommand({
         name: 'nbLevels',
         alias: ['nbl'],
-        group: 'make',
+        group,
         argDescription: '',
         description: 'Display the number of levels that are currently in the map',
         cb: ({ noParam }, escaper) => {
@@ -664,7 +665,7 @@ export const initExecuteCommandMake = () => {
     registerCommand({
         name: 'createStaticSlide',
         alias: ['crss'],
-        group: 'make',
+        group,
         argDescription: '<angle> <speed>',
         description: '',
         cb: ({ param1, param2 }, escaper) => {
@@ -692,7 +693,7 @@ export const initExecuteCommandMake = () => {
     registerCommand({
         name: 'deleteStaticSlide',
         alias: ['delss'],
-        group: 'make',
+        group,
         argDescription: '',
         description: '',
         cb: ({ noParam }, escaper) => {
@@ -709,7 +710,7 @@ export const initExecuteCommandMake = () => {
     registerCommand({
         name: 'getStaticSlideInfo',
         alias: ['gssi', 'getssi'],
-        group: 'make',
+        group,
         argDescription: '',
         description: '',
         cb: ({ noParam }, escaper) => {
@@ -726,7 +727,7 @@ export const initExecuteCommandMake = () => {
     registerCommand({
         name: 'setStaticSlideSpeed',
         alias: ['setsss'],
-        group: 'make',
+        group,
         argDescription: '<speed>',
         description: '',
         cb: ({ param1 }, escaper) => {
@@ -745,7 +746,7 @@ export const initExecuteCommandMake = () => {
     registerCommand({
         name: 'setStaticSlideAngle',
         alias: ['setssa'],
-        group: 'make',
+        group,
         argDescription: '<angle>',
         description: '',
         cb: ({ param1 }, escaper) => {
@@ -766,7 +767,7 @@ export const initExecuteCommandMake = () => {
     registerCommand({
         name: 'setStaticSlideCanTurnAngle',
         alias: ['setsscta'],
-        group: 'make',
+        group,
         argDescription: '<angle>',
         description: '',
         cb: ({ param1 }, escaper) => {
@@ -780,7 +781,7 @@ export const initExecuteCommandMake = () => {
     registerCommand({
         name: 'debugRegions',
         alias: ['dr'],
-        group: 'make',
+        group,
         argDescription: '<active> [monsters]',
         description: '',
         cb: ({ param1, param2 }, escaper) => {
@@ -814,7 +815,7 @@ export const initExecuteCommandMake = () => {
     registerCommand({
         name: 'createPortalMob',
         alias: ['crpm'],
-        group: 'make',
+        group,
         argDescription: '<freezeDuration> [<portalEffect> [<portalEffectDuration>]]',
         description: 'Create a portal mob',
         cb: ({ nbParam, param1, param2, param3 }, escaper) => {
@@ -850,7 +851,7 @@ export const initExecuteCommandMake = () => {
     registerCommand({
         name: 'deletePortalMob',
         alias: ['delpm'],
-        group: 'make',
+        group,
         argDescription: '',
         description: 'Delete the portal mob',
         cb: ({ noParam }, escaper) => {
@@ -867,7 +868,7 @@ export const initExecuteCommandMake = () => {
     registerCommand({
         name: 'setPortalMobFreezeDuration',
         alias: ['setpmfd'],
-        group: 'make',
+        group,
         argDescription: '<freezeDuration>',
         description: 'Set the freeze duration of the portal mob',
         cb: ({ nbParam, param1 }, escaper) => {
@@ -895,7 +896,7 @@ export const initExecuteCommandMake = () => {
     registerCommand({
         name: 'setPortalMobEffect',
         alias: ['setpme'],
-        group: 'make',
+        group,
         argDescription: '<portalEffect>',
         description: 'Set the portal effect of the portal mob',
         cb: ({ nbParam, param1 }, escaper) => {
@@ -913,7 +914,7 @@ export const initExecuteCommandMake = () => {
     registerCommand({
         name: 'setPortalMobEffectDuration',
         alias: ['setpmed'],
-        group: 'make',
+        group,
         argDescription: '<portalEffectDuration>',
         description: 'Set the portal effect duration of the portal mob',
         cb: ({ param1 }, escaper) => {
@@ -934,7 +935,7 @@ export const initExecuteCommandMake = () => {
     registerCommand({
         name: 'getTerrainCliffClass',
         alias: ['gettcc'],
-        group: 'make',
+        group,
         argDescription: '<terrainLabel>',
         description: 'Get the cliff class of the terrain',
         cb: ({ nbParam, param1 }, escaper) => {
@@ -961,7 +962,7 @@ export const initExecuteCommandMake = () => {
     registerCommand({
         name: 'getMainTileset',
         alias: [],
-        group: 'make',
+        group,
         argDescription: '',
         description: 'Get the main tileset',
         cb: ({ noParam }, escaper) => {
@@ -987,7 +988,7 @@ export const initExecuteCommandMake = () => {
     registerCommand({
         name: 'setHeroBaseCollisionSize',
         alias: ['sethbcs'],
-        group: 'make',
+        group,
         argDescription: '<value>',
         description:
             'Sets the base hero collision size. Persistent between "smiced" games. Value between 0 and 200, by steps of 5.',
@@ -1016,7 +1017,7 @@ export const initExecuteCommandMake = () => {
     registerCommand({
         name: 'patchImmo',
         alias: [],
-        group: 'make',
+        group,
         argDescription: '[<heroBaseCollisionSize>]',
         description:
             'Change the hero base collision size to the given value (between 0 and 200, by steps of 5, default 25) and change all monsters immolation to keep the same gameplay.',
@@ -1061,7 +1062,7 @@ export const initExecuteCommandMake = () => {
     registerCommand({
         name: 'setClickGrid',
         alias: ['setcg', 'snapClicks'],
-        group: 'make',
+        group,
         argDescription: '<value>',
         description: 'Snap clicks to nearest <value>',
         cb: ({ nbParam, param1 }, escaper) => {
@@ -1083,7 +1084,7 @@ export const initExecuteCommandMake = () => {
     registerCommand({
         name: 'snapPatrolsToGrid',
         alias: ['sptg'],
-        group: 'make',
+        group,
         argDescription: '<value>',
         description: 'Snap all patrols to nearest <value>',
         cb: ({ nbParam, param1 }, escaper) => {
@@ -1127,7 +1128,7 @@ export const initExecuteCommandMake = () => {
     registerCommand({
         name: 'snapPatrolsToSlideOffset',
         alias: ['sptso'],
-        group: 'make',
+        group,
         argDescription: '[<mt> <angle> <offset>]',
         description: '',
         cb: ({ nbParam, param1, param2, param3 }, escaper) => {
@@ -1173,7 +1174,7 @@ export const initExecuteCommandMake = () => {
     registerCommand({
         name: 'snapPatrolsToSlide',
         alias: ['spts'],
-        group: 'make',
+        group,
         argDescription: '<value> [boolean fixStartOnSlidePatrols]',
         description: 'Snap all patrols to nearest slide terrain with an offset of <value>',
         cb: ({ nbParam, param1, param2 }, escaper) => {

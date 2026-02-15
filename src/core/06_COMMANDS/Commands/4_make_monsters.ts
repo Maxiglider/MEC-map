@@ -21,12 +21,13 @@ import { CmdParam } from '../Helpers/Command_functions'
 
 export const initExecuteCommandMake_monsters = () => {
     const { registerCommand } = ServiceManager.getService('Cmd')
+    const group = 'make'
 
     //-newMonster(newm) <label> <unitTypeId> [<immolationRadius> [<speed> [<scale> [<isClickable>]]]]
     registerCommand({
         name: 'newMonster',
         alias: ['newm'],
-        group: 'make',
+        group,
         argDescription: '<label> <unitTypeId> [<immolationRadius> [<speed> [<scale> [<isClickable>]]]]',
         description: 'Add a new monster',
         cb: ({ cmd, nbParam, param1, param2, param3 }, escaper) => {
@@ -125,7 +126,7 @@ export const initExecuteCommandMake_monsters = () => {
     registerCommand({
         name: 'setMonsterLabel',
         alias: ['setml'],
-        group: 'make',
+        group,
         argDescription: '<oldMonsterLabel> <newMonsterLabel>',
         description: 'Change the label of a monster',
         cb: ({ nbParam, param1, param2 }, escaper) => {
@@ -150,7 +151,7 @@ export const initExecuteCommandMake_monsters = () => {
     registerCommand({
         name: 'setMonsterAlias',
         alias: ['setma'],
-        group: 'make',
+        group,
         argDescription: '<monsterLabel> <alias>',
         description: 'Change the alias of a monster',
         cb: ({ nbParam, param1, param2 }, escaper) => {
@@ -175,7 +176,7 @@ export const initExecuteCommandMake_monsters = () => {
     registerCommand({
         name: 'setMonsterUnit',
         alias: ['setmu'],
-        group: 'make',
+        group,
         argDescription: '<monsterLabel> <unitType>',
         description: 'Change the unit type of a monster',
         cb: ({ nbParam, param1, param2 }, escaper) => {
@@ -211,7 +212,7 @@ export const initExecuteCommandMake_monsters = () => {
     registerCommand({
         name: 'setMonsterImmolation',
         alias: ['setmi'],
-        group: 'make',
+        group,
         argDescription: '<monsterLabel> <immolationRadius>',
         description: 'Change the immolation radius of a monster',
         cb: ({ nbParam, param1, param2 }, escaper) => {
@@ -245,7 +246,7 @@ export const initExecuteCommandMake_monsters = () => {
     registerCommand({
         name: 'setMonsterMoveSpeed',
         alias: ['setmms'],
-        group: 'make',
+        group,
         argDescription: '<monsterLabel> <speed>',
         description: 'Change the move speed of a monster',
         cb: ({ nbParam, param1, param2 }, escaper) => {
@@ -275,7 +276,7 @@ export const initExecuteCommandMake_monsters = () => {
     registerCommand({
         name: 'setMonsterScale',
         alias: ['setms'],
-        group: 'make',
+        group,
         argDescription: '<monsterLabel> <scale>',
         description: 'Change the scale of a monster',
         cb: ({ nbParam, param1, param2 }, escaper) => {
@@ -313,7 +314,7 @@ export const initExecuteCommandMake_monsters = () => {
     registerCommand({
         name: 'setMonsterCreateTerrain',
         alias: ['setmct'],
-        group: 'make',
+        group,
         argDescription: '<monsterLabel> <terrainLabel>',
         description: 'Change the scale of a monster',
         cb: ({ nbParam, param1, param2 }, escaper) => {
@@ -346,7 +347,7 @@ export const initExecuteCommandMake_monsters = () => {
     registerCommand({
         name: 'setMonsterClickable',
         alias: ['setmc'],
-        group: 'make',
+        group,
         argDescription: '<monsterLabel> <boolean clickable>',
         description: 'Sets if locust or not for this kind of monster',
         cb: ({ nbParam, param1, param2 }, escaper) => {
@@ -384,7 +385,7 @@ export const initExecuteCommandMake_monsters = () => {
     registerCommand({
         name: 'setMonsterKillEffect',
         alias: ['setmke'],
-        group: 'make',
+        group,
         argDescription: '<monsterLabel> <killingEffect>',
         description: 'Sets the killing effect of a monster',
         cb: ({ nbParam, param1, param2 }, escaper) => {
@@ -406,7 +407,7 @@ export const initExecuteCommandMake_monsters = () => {
     registerCommand({
         name: 'setMonsterMeteorsToKill',
         alias: ['setmmtk'],
-        group: 'make',
+        group,
         argDescription: '<monsterLabel> <meteorNumber>',
         description: 'Sets the number of meteors to kill for this monster type',
         cb: ({ nbParam, param1, param2 }, escaper) => {
@@ -433,7 +434,7 @@ export const initExecuteCommandMake_monsters = () => {
     registerCommand({
         name: 'setMonsterHeight',
         alias: ['setmh'],
-        group: 'make',
+        group,
         argDescription: '<monsterLabel> <height>|default|d',
         description: 'Sets the height of a monster',
         cb: ({ nbParam, param1, param2 }, escaper) => {
@@ -470,7 +471,7 @@ export const initExecuteCommandMake_monsters = () => {
     registerCommand({
         name: 'setMonsterKillRectDimensions',
         alias: ['setmkrd'],
-        group: 'make',
+        group,
         argDescription: '<monsterLabel> <width> <height>',
         description:
             'Sets dimensions of a monster to apply a rectangle kill zone (applies only to non immobile monsters ; use when circle kill zone is not adapted)',
@@ -507,7 +508,7 @@ export const initExecuteCommandMake_monsters = () => {
     registerCommand({
         name: 'setMonsterLifeBonus',
         alias: ['setmlb'],
-        group: 'make',
+        group,
         argDescription: '<monsterLabel> <enabled> [<nbLivesEarned = 1> [<minimumSurviveTime = 0>]]',
         description:
             'Enables or disables the life bonus characteristic for a monster type. If enabled, a monster will gives lives when a hero touches them and survives the required time.',
@@ -563,7 +564,7 @@ export const initExecuteCommandMake_monsters = () => {
     registerCommand({
         name: 'removeMonsterKillRectDimensions',
         alias: ['remmkrd'],
-        group: 'make',
+        group,
         argDescription: '<monsterLabel>',
         description:
             'Remove kill rectangle dimensions of a monster (the corresponding monster units will no longer kills through a rectangle zone)',
@@ -595,7 +596,7 @@ export const initExecuteCommandMake_monsters = () => {
     registerCommand({
         name: 'createMonsterImmobile',
         alias: ['crmi'],
-        group: 'make',
+        group,
         argDescription: '<monsterLabel> [<facingAngle>]',
         description:
             'creates a monster at the current location, facing the specified angle (or random if not specified)',
@@ -634,7 +635,7 @@ export const initExecuteCommandMake_monsters = () => {
     registerCommand({
         name: 'createMonster',
         alias: ['crm'],
-        group: 'make',
+        group,
         argDescription: '<monsterLabel>',
         description: 'Creates a monster at the current location, patrolling between 2 locations',
         cb: ({ nbParam, param1 }, escaper) => {
@@ -659,7 +660,7 @@ export const initExecuteCommandMake_monsters = () => {
     registerCommand({
         name: 'createMonsterString',
         alias: ['crms'],
-        group: 'make',
+        group,
         argDescription: '<monsterLabel>',
         description:
             'creates a monster at the current location, patrolling between 2 locations, where the second loc of a monster is the first loc of the next one',
@@ -685,7 +686,7 @@ export const initExecuteCommandMake_monsters = () => {
     registerCommand({
         name: 'createMonsterAuto',
         alias: ['crma'],
-        group: 'make',
+        group,
         argDescription: '<monsterLabel> [angle]',
         description:
             'creates a monster at the current location, patrolling between 2 locations, created with only one click (click on a slide terrain)',
@@ -719,7 +720,7 @@ export const initExecuteCommandMake_monsters = () => {
     registerCommand({
         name: 'setAutoDistOnTerrain',
         alias: ['setadot'],
-        group: 'make',
+        group,
         argDescription: '<newDist>',
         description: 'For patrol monsters created in one click, distance between locations and slide terrain',
         cb: ({ nbParam, param1 }, escaper) => {
@@ -743,7 +744,7 @@ export const initExecuteCommandMake_monsters = () => {
     registerCommand({
         name: 'createMonsterMultiPatrols',
         alias: ['crmmp'],
-        group: 'make',
+        group,
         argDescription: '<monsterLabel>',
         description: 'Creates a monster at the current location, patrolling between 2 locations, until 20 locations',
         cb: ({ nbParam, param1 }, escaper) => {
@@ -768,7 +769,7 @@ export const initExecuteCommandMake_monsters = () => {
     registerCommand({
         name: 'createMonsterMultiPatrolsString',
         alias: ['crmmps'],
-        group: 'make',
+        group,
         argDescription: '<monsterLabel>',
         description:
             'creates a monster at the current location, patrolling between 2 locations, until 20 locations, with come back at last location',
@@ -793,7 +794,7 @@ export const initExecuteCommandMake_monsters = () => {
     registerCommand({
         name: 'createMonsterTeleport',
         alias: ['crmt'],
-        group: 'make',
+        group,
         argDescription: '<monsterLabel> <period> <angle>',
         description: 'Creates a monster at the current location, patrolling between 2 locations, until 20 locations',
         cb: ({ nbParam, param1, param2, param3 }, escaper) => {
@@ -835,7 +836,7 @@ export const initExecuteCommandMake_monsters = () => {
     registerCommand({
         name: 'createMonsterTeleportStrings',
         alias: ['crmts'],
-        group: 'make',
+        group,
         argDescription: '<monsterLabel> <period> <angle>',
         description: 'Creates a monster at the current location, patrolling between 2 locations, until 20 locations',
         cb: ({ nbParam, param1, param2, param3 }, escaper) => {
@@ -877,7 +878,7 @@ export const initExecuteCommandMake_monsters = () => {
     registerCommand({
         name: 'next',
         alias: ['n'],
-        group: 'make',
+        group,
         argDescription: '',
         description: 'Finalize the current multi patrols or teleport monster and start the next one',
         cb: ({ noParam }, escaper) => {
@@ -897,7 +898,7 @@ export const initExecuteCommandMake_monsters = () => {
     registerCommand({
         name: 'monsterTeleportWait',
         alias: ['mtw'],
-        group: 'make',
+        group,
         argDescription: '',
         description: 'A wait period for the monster teleport being created',
         cb: ({ noParam }, escaper) => {
@@ -917,7 +918,7 @@ export const initExecuteCommandMake_monsters = () => {
     registerCommand({
         name: 'monsterTeleportHide',
         alias: ['mth'],
-        group: 'make',
+        group,
         argDescription: '',
         description: 'A hide period for the monster teleport being created',
         cb: ({ noParam }, escaper) => {
@@ -937,7 +938,7 @@ export const initExecuteCommandMake_monsters = () => {
     registerCommand({
         name: 'setUnitTeleportPeriod',
         alias: ['setutp'],
-        group: 'make',
+        group,
         argDescription: '<period>',
         description: 'Set the period for the unit teleport being created',
         cb: ({ nbParam, param1 }, escaper) => {
@@ -967,7 +968,7 @@ export const initExecuteCommandMake_monsters = () => {
     registerCommand({
         name: 'setUnitTeleportPeriodBetweenPoints',
         alias: ['setutpbp'],
-        group: 'make',
+        group,
         argDescription: '<period>',
         description: 'Set the period for the unit teleport being created',
         cb: ({ nbParam, param1 }, escaper) => {
@@ -997,7 +998,7 @@ export const initExecuteCommandMake_monsters = () => {
     registerCommand({
         name: 'getUnitTeleportPeriod',
         alias: ['getutp'],
-        group: 'make',
+        group,
         argDescription: '',
         description: 'Displays the period of any teleporting unit you click',
         cb: ({ noParam }, escaper) => {
@@ -1015,7 +1016,7 @@ export const initExecuteCommandMake_monsters = () => {
     registerCommand({
         name: 'setUnitMonsterType',
         alias: ['setumt'],
-        group: 'make',
+        group,
         argDescription: '<monsterLabel>',
         description: '',
         cb: ({ nbParam, param1 }, escaper) => {
@@ -1039,7 +1040,7 @@ export const initExecuteCommandMake_monsters = () => {
     registerCommand({
         name: 'setUnitMonsterTypeBetweenPoints',
         alias: ['setumtbp'],
-        group: 'make',
+        group,
         argDescription: '<monsterLabel>',
         description: '',
         cb: ({ nbParam, param1 }, escaper) => {
@@ -1063,7 +1064,7 @@ export const initExecuteCommandMake_monsters = () => {
     registerCommand({
         name: 'displayMonsters',
         alias: ['dm'],
-        group: 'make',
+        group,
         argDescription: '[<monsterLabel>] [page]',
         description: 'Displays the characteristics of the kinds of monsters added by the maker(s)',
         cb: ({ cmd }, escaper) => {
@@ -1076,7 +1077,7 @@ export const initExecuteCommandMake_monsters = () => {
     registerCommand({
         name: 'deleteMonstersBetweenPoints',
         alias: ['delmbp'],
-        group: 'make',
+        group,
         argDescription: '[<deleteMode>]',
         description: 'Delete monsters in a rectangle formed with two clicks',
         cb: ({ nbParam, param1 }, escaper) => {
@@ -1122,7 +1123,7 @@ export const initExecuteCommandMake_monsters = () => {
     registerCommand({
         name: 'deleteMonster',
         alias: ['delm'],
-        group: 'make',
+        group,
         argDescription: '',
         description: 'Delete the monsters clicked by the player',
         cb: ({ noParam }, escaper) => {
@@ -1138,7 +1139,7 @@ export const initExecuteCommandMake_monsters = () => {
     registerCommand({
         name: 'setMonsterWanderable',
         alias: ['setmw'],
-        group: 'make',
+        group,
         argDescription: '<monsterLabel> <boolean clickable>',
         description: '',
         cb: ({ nbParam, param1, param2 }, escaper) => {
@@ -1176,7 +1177,7 @@ export const initExecuteCommandMake_monsters = () => {
     registerCommand({
         name: 'newCaster',
         alias: ['newc'],
-        group: 'make',
+        group,
         argDescription:
             '<label> <casterMonsterType> <projectileMonsterType> [<range> [<projectileSpeed> [<loadTime>]]]',
         description: 'Create a new caster monster',
@@ -1269,7 +1270,7 @@ export const initExecuteCommandMake_monsters = () => {
     registerCommand({
         name: 'setCasterLabel',
         alias: ['setcl'],
-        group: 'make',
+        group,
         argDescription: '<oldCasterLabel> <newCasterLabel>',
         description: 'Change the label of a caster monster',
         cb: ({ nbParam, param1, param2 }, escaper) => {
@@ -1294,7 +1295,7 @@ export const initExecuteCommandMake_monsters = () => {
     registerCommand({
         name: 'setCasterAlias',
         alias: ['setca'],
-        group: 'make',
+        group,
         argDescription: '<casterLabel> <alias>',
         description: 'Change the alias of a caster monster',
         cb: ({ nbParam, param1, param2 }, escaper) => {
@@ -1319,7 +1320,7 @@ export const initExecuteCommandMake_monsters = () => {
     registerCommand({
         name: 'setCasterCaster',
         alias: ['setcc'],
-        group: 'make',
+        group,
         argDescription: '<casterLabel> <casterMonsterType>',
         description: 'Change the caster monster type of a caster monster',
         cb: ({ nbParam, param1, param2 }, escaper) => {
@@ -1348,7 +1349,7 @@ export const initExecuteCommandMake_monsters = () => {
     registerCommand({
         name: 'setCasterProjectile',
         alias: ['setcp'],
-        group: 'make',
+        group,
         argDescription: '<casterLabel> <projectileMonsterType>',
         description: 'Change the projectile monster type of a caster monster',
         cb: ({ nbParam, param1, param2 }, escaper) => {
@@ -1377,7 +1378,7 @@ export const initExecuteCommandMake_monsters = () => {
     registerCommand({
         name: 'setCasterRange',
         alias: ['setcr'],
-        group: 'make',
+        group,
         argDescription: '<casterLabel> <range>',
         description: 'Change the range of a caster monster',
         cb: ({ nbParam, param1, param2 }, escaper) => {
@@ -1405,7 +1406,7 @@ export const initExecuteCommandMake_monsters = () => {
     registerCommand({
         name: 'setCasterSpeed',
         alias: ['setcs'],
-        group: 'make',
+        group,
         argDescription: '<casterLabel> <projectileSpeed>',
         description: 'Change the speed of a caster monster',
         cb: ({ nbParam, param1, param2 }, escaper) => {
@@ -1436,7 +1437,7 @@ export const initExecuteCommandMake_monsters = () => {
     registerCommand({
         name: 'setCasterLoadTime',
         alias: ['setclt'],
-        group: 'make',
+        group,
         argDescription: '<casterLabel> <loadTime>',
         description: 'Change the load time of a caster monster',
         cb: ({ nbParam, param1, param2 }, escaper) => {
@@ -1467,7 +1468,7 @@ export const initExecuteCommandMake_monsters = () => {
     registerCommand({
         name: 'setCasterAnimation',
         alias: ['setcan'],
-        group: 'make',
+        group,
         argDescription: '<casterLabel> <animation>',
         description: 'Change the animation of a caster monster',
         cb: ({ nbParam, param1, param2 }, escaper) => {
@@ -1490,7 +1491,7 @@ export const initExecuteCommandMake_monsters = () => {
     registerCommand({
         name: 'createCaster',
         alias: ['crc'],
-        group: 'make',
+        group,
         argDescription: '<casterLabel> [<facingAngle>]',
         description: 'Create a caster monster',
         cb: ({ nbParam, param1, param2 }, escaper) => {
@@ -1527,7 +1528,7 @@ export const initExecuteCommandMake_monsters = () => {
     registerCommand({
         name: 'deleteCastersBetweenPoints',
         alias: ['delcbp'],
-        group: 'make',
+        group,
         argDescription: '',
         description: 'Delete casters in a rectangle formed with two clicks',
         cb: ({ noParam }, escaper) => {
@@ -1543,7 +1544,7 @@ export const initExecuteCommandMake_monsters = () => {
     registerCommand({
         name: 'deleteCaster',
         alias: ['delc'],
-        group: 'make',
+        group,
         argDescription: '',
         description: 'Delete the casters clicked by the player',
         cb: ({ noParam }, escaper) => {
@@ -1559,7 +1560,7 @@ export const initExecuteCommandMake_monsters = () => {
     registerCommand({
         name: 'displayCasters',
         alias: ['dc'],
-        group: 'make',
+        group,
         argDescription: '[<casterLabel>] [page]',
         description: 'Display the casters of the map',
         cb: ({ cmd }, escaper) => {
@@ -1572,7 +1573,7 @@ export const initExecuteCommandMake_monsters = () => {
     registerCommand({
         name: 'createClearMob',
         alias: ['crcm'],
-        group: 'make',
+        group,
         argDescription: '<disableDuration>',
         description: 'Create a clear mob',
         cb: ({ nbParam, param1 }, escaper) => {
@@ -1600,7 +1601,7 @@ export const initExecuteCommandMake_monsters = () => {
     registerCommand({
         name: 'deleteClearMob',
         alias: ['delcm'],
-        group: 'make',
+        group,
         argDescription: '',
         description: 'Delete the clear mob',
         cb: ({ noParam }, escaper) => {
@@ -1617,7 +1618,7 @@ export const initExecuteCommandMake_monsters = () => {
     registerCommand({
         name: 'setClearMobEffect',
         alias: ['setcme'],
-        group: 'make',
+        group,
         argDescription: '<effectPath>',
         description: 'Set special effect to play when stepping on clear mob trigger',
         cb: ({ nbParam, param1 }, escaper) => {
@@ -1634,7 +1635,7 @@ export const initExecuteCommandMake_monsters = () => {
     registerCommand({
         name: 'setBlockMobEffect',
         alias: ['setbme', 'setClearMobBlockMobEffect', 'setcmbme'],
-        group: 'make',
+        group,
         argDescription: '<effectPath>',
         description: 'Set special effect to play on block mobs when clear mob is triggered',
         cb: ({ nbParam, param1 }, escaper) => {
@@ -1651,7 +1652,7 @@ export const initExecuteCommandMake_monsters = () => {
     registerCommand({
         name: 'setClearMobDisableDuration',
         alias: ['setcmdd'],
-        group: 'make',
+        group,
         argDescription: '<disableDuration>',
         description: 'Set the disable duration of the clear mob',
         cb: ({ nbParam, param1 }, escaper) => {
@@ -1679,7 +1680,7 @@ export const initExecuteCommandMake_monsters = () => {
     registerCommand({
         name: 'createCircleMob',
         alias: ['crcim'],
-        group: 'make',
+        group,
         argDescription: '[<speed> [<direction> [<facing [<radius>]]]]',
         description: '',
         cb: ({ param1, param2, param3, param4 }, escaper) => {
@@ -1722,7 +1723,7 @@ export const initExecuteCommandMake_monsters = () => {
     registerCommand({
         name: 'deleteCircleMob',
         alias: ['delcim'],
-        group: 'make',
+        group,
         argDescription: '',
         description: '',
         cb: ({ noParam }, escaper) => {
@@ -1739,7 +1740,7 @@ export const initExecuteCommandMake_monsters = () => {
     registerCommand({
         name: 'setCircleMobSpeed',
         alias: ['setcims'],
-        group: 'make',
+        group,
         argDescription: '<speed>',
         description: '',
         cb: ({ param1 }, escaper) => {
@@ -1758,7 +1759,7 @@ export const initExecuteCommandMake_monsters = () => {
     registerCommand({
         name: 'setCircleMobDirection',
         alias: ['setcimd'],
-        group: 'make',
+        group,
         argDescription: 'cw | ccw',
         description: 'Clockwise of counter-clockwise',
         cb: ({ param1 }, escaper) => {
@@ -1778,7 +1779,7 @@ export const initExecuteCommandMake_monsters = () => {
     registerCommand({
         name: 'setCircleMobFacing',
         alias: ['setcimf'],
-        group: 'make',
+        group,
         argDescription: 'cw | ccw | in | out',
         description: 'In or out of the circle',
         cb: ({ param1 }, escaper) => {
@@ -1798,7 +1799,7 @@ export const initExecuteCommandMake_monsters = () => {
     registerCommand({
         name: 'setCircleMobShape',
         alias: ['setcimsh'],
-        group: 'make',
+        group,
         argDescription:
             'circle | square | triangle | pentagon | hexagon | octagon | eight | star | spiral | heart | infinity | rose | butterfly',
         description: 'Shape of the CircleMob formation',
@@ -1837,7 +1838,7 @@ export const initExecuteCommandMake_monsters = () => {
     registerCommand({
         name: 'setCircleMobInitialAngle',
         alias: ['setcimia'],
-        group: 'make',
+        group,
         argDescription: '<angle>',
         description: '',
         cb: ({ param1 }, escaper) => {
@@ -1858,7 +1859,7 @@ export const initExecuteCommandMake_monsters = () => {
     registerCommand({
         name: 'setCircleMobRadius',
         alias: ['setcimr'],
-        group: 'make',
+        group,
         argDescription: '<radius>',
         description: '',
         cb: ({ param1 }, escaper) => {
@@ -1877,7 +1878,7 @@ export const initExecuteCommandMake_monsters = () => {
     registerCommand({
         name: 'setMonsterJumpPad',
         alias: ['setmjp'],
-        group: 'make',
+        group,
         argDescription: '<jumpPadZ>',
         description: '',
         cb: ({ param1 }, escaper) => {
@@ -1897,7 +1898,7 @@ export const initExecuteCommandMake_monsters = () => {
     registerCommand({
         name: 'setMonsterJumpPadEffect',
         alias: ['setmjpe'],
-        group: 'make',
+        group,
         argDescription: '[jumpPadEffect]',
         description: '',
         cb: ({ param1 }, escaper) => {
@@ -1912,7 +1913,7 @@ export const initExecuteCommandMake_monsters = () => {
     registerCommand({
         name: 'setMonsterAttackGround',
         alias: ['setmag'],
-        group: 'make',
+        group,
         argDescription: '[<delay>]',
         description: 'Set monster to attack ground with optional delay',
         cb: ({ param1 }, escaper) => {

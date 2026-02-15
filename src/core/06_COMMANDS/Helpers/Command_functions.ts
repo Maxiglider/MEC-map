@@ -1,10 +1,13 @@
+import { getUdgEscapers, getUdgLevels } from '../../../../globals'
 import { MemoryHandler } from '../../../Utils/MemoryHandler'
-import { forRange } from '../../../Utils/mapUtils'
-import { arrayPush, stringReplaceAll } from '../../01_libraries/Basic_functions'
+import { forRange, runInTrigger } from '../../../Utils/mapUtils'
+import { arrayPush, IsBoolString, S2B, stringReplaceAll } from '../../01_libraries/Basic_functions'
 import { Constants } from '../../01_libraries/Constants'
 import { ColorString2Id } from '../../01_libraries/Init_colorCodes'
 import { Escaper } from '../../04_STRUCTURES/Escaper/Escaper'
-import { getUdgEscapers } from '../../../../globals'
+import { TerrainTypeWalk } from '../../04_STRUCTURES/TerrainType/TerrainTypeWalk'
+import { HERO_START_ANGLE } from '../../08_GAME/Init_game/Heroes'
+import { DeplacementHeroHorsDeathPath } from '../../08_GAME/Mode_coop/deplacement_heros_hors_death_path'
 import { Natives } from '../../wc3_natives_unsecured/Natives'
 
 export const rawPlayerNames: string[] = []
@@ -258,4 +261,109 @@ export const resolvePlayerIds = (arg: string, cb: (targetPlayer: Escaper) => voi
     }
 
     escapers.__destroy()
+}
+
+export const reviveCb = (escaper: Escaper) => escaper.reviveAtStart()
+
+export const revivePositionCb = (escaper: Escaper) => {
+    const hero = escaper.getHero()
+
+    if (!hero) {
+        return
+    }
+
+    if (!escaper.isAlive()) {
+        DeplacementHeroHorsDeathPath.DeplacementHeroHorsDeathPath(hero)
+        runInTrigger(escaper.coopReviveHero)
+    }
+}
+
+export const skinCb = (escaper: Escaper, skin: string) => {
+    const hero = escaper.getHero()
+
+    if (!hero) {
+        return
+    }
+
+    const oldSkin = escaper.getSkin()
+
+    if (IsBoolString(skin) && !S2B(skin)) {
+        escaper.setSkin(undefined)
+    } else {
+        escaper.setSkin(FourCC(skin))
+    }
+
+    if (oldSkin !== escaper.getSkin()) {
+        const x =
+            escaper.getLastTerrainType() instanceof TerrainTypeWalk
+                ? GetUnitX(hero)
+                : getUdgLevels().getCurrentLevel(this).getStartRandomX()
+
+        const y =
+            escaper.getLastTerrainType() instanceof TerrainTypeWalk
+                ? GetUnitY(hero)
+                : getUdgLevels().getCurrentLevel(this).getStartRandomY()
+
+        const a = escaper.getLastTerrainType() instanceof TerrainTypeWalk ? GetUnitFacing(hero) : HERO_START_ANGLE
+
+        escaper.removeHero()
+        escaper.createHero(x, y, a)
+    }
+}
+
+export const abilityCb = (escaper: Escaper, abilityId: string) => {
+    const hero = escaper.getHero()
+
+    if (!hero) {
+        return
+    }
+
+    if (GetUnitAbilityLevel(hero, FourCC(abilityId)) > 0) {
+        UnitRemoveAbility(hero, FourCC(abilityId))
+    } else {
+        UnitAddAbility(hero, FourCC(abilityId))
+    }
+}
+
+export const scaleCb = (escaper: Escaper, scale: string) => {
+    const hero = escaper.getHero()
+
+    if (!hero) {
+        return
+    }
+
+    const oldScale = escaper.getScale()
+
+    if (IsBoolString(scale) && !S2R(scale)) {
+        escaper.setScale(undefined)
+    } else {
+        escaper.setScale(S2R(scale))
+    }
+
+    if (oldScale !== escaper.getScale()) {
+        const x =
+            escaper.getLastTerrainType() instanceof TerrainTypeWalk
+                ? GetUnitX(hero)
+                : getUdgLevels().getCurrentLevel(this).getStartRandomX()
+
+        const y =
+            escaper.getLastTerrainType() instanceof TerrainTypeWalk
+                ? GetUnitY(hero)
+                : getUdgLevels().getCurrentLevel(this).getStartRandomY()
+
+        const a = escaper.getLastTerrainType() instanceof TerrainTypeWalk ? GetUnitFacing(hero) : HERO_START_ANGLE
+
+        escaper.removeHero()
+        escaper.createHero(x, y, a)
+    }
+}
+
+export const glowCb = (escaper: Escaper, glow: boolean) => {
+    const hero = escaper.getHero()
+
+    if (!hero) {
+        return
+    }
+
+    escaper.setGlow(glow)
 }

@@ -12,6 +12,7 @@ import { MAX_DEGREE_ON_WHICH_SPEED_TABLE_TAKES_CONTROL, SPEED_AT_LEAST_THAN_50_D
 
 const tmpLoc = Location(0, 0)
 
+// todo check if we could remove this
 const escaperTurnForOnePeriod = (escaper: Escaper | null) => {
     if (!escaper) return
 

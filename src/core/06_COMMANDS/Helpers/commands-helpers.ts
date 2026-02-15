@@ -1,7 +1,7 @@
 // For -snapPatrolsToSlideOffset and -snapPatrolsToSlide commands
-import { MonsterType } from '../../04_STRUCTURES/Monster/MonsterType'
 import { getUdgMonsterTypes, getUdgTerrainTypes } from '../../../../globals'
 import { createPoint } from '../../../Utils/Point'
+import { MonsterType } from '../../04_STRUCTURES/Monster/MonsterType'
 
 export const snapPatrolsToSlideOffsetMap: { [mt: string]: { angle: number; offset: number } | null } = {}
 const snappedHistoryMap: { [historyId: string]: { x: number | undefined; y: number | undefined } } = {}
@@ -94,4 +94,18 @@ export const adaptMonstersImmolation = (delta: number) => {
         const newImmolationRadius = Math.max(5, Math.min(400, monsterType.getImmolationRadius() + delta))
         monsterType.setImmolation(newImmolationRadius)
     })
+}
+
+export const cameraFieldMap: { [x: string]: camerafield } = {
+    TARGET_DISTANCE: CAMERA_FIELD_TARGET_DISTANCE,
+    FARZ: CAMERA_FIELD_FARZ,
+    ANGLE_OF_ATTACK: CAMERA_FIELD_ANGLE_OF_ATTACK,
+    FIELD_OF_VIEW: CAMERA_FIELD_FIELD_OF_VIEW,
+    ROLL: CAMERA_FIELD_ROLL,
+    ROTATION: CAMERA_FIELD_ROTATION,
+    ZOFFSET: CAMERA_FIELD_ZOFFSET,
+    NEARZ: CAMERA_FIELD_NEARZ,
+    LOCAL_PITCH: CAMERA_FIELD_LOCAL_PITCH,
+    LOCAL_YAW: CAMERA_FIELD_LOCAL_YAW,
+    LOCAL_ROLL: CAMERA_FIELD_LOCAL_ROLL,
 }

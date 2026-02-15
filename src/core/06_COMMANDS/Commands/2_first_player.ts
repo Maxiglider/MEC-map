@@ -1,3 +1,4 @@
+import { getUdgEscapers, getUdgLevels, getUdgTerrainTypes, globals } from '../../../../globals'
 import { ServiceManager } from '../../../Services'
 import { ThemeUtils } from '../../../Utils/ThemeUtils'
 import { IsBoolString, S2B } from '../../01_libraries/Basic_functions'
@@ -6,17 +7,17 @@ import { Text } from '../../01_libraries/Text'
 import { TerrainTypeFromString } from '../../07_TRIGGERS/Modify_terrain_Functions/Terrain_type_from_string'
 import { ReinitTerrainsPositions } from '../../07_TRIGGERS/Triggers_to_modify_terrains/Reinit_terrains_position_Change_variations_and_ut_at_beginning'
 import { Globals } from '../../09_From_old_Worldedit_triggers/globals_variables_and_triggers'
-import { getUdgEscapers, getUdgLevels, getUdgTerrainTypes, globals } from '../../../../globals'
 import { isPlayerId, resolvePlayerId, resolvePlayerIds, resolvePlayerIdsArray } from '../Helpers/Command_functions'
 
 export const initExecuteCommandRed = () => {
     const { registerCommand } = ServiceManager.getService('Cmd')
+    const group = 'red'
 
     //-kill(kl) <Pcolor>   --> kills a hero
     registerCommand({
         name: 'kill',
         alias: ['kl'],
-        group: 'red',
+        group,
         argDescription: '<Pcolor>',
         description: 'Kills a hero',
         cb: ({ nbParam, param1 }, escaper) => {
@@ -54,7 +55,7 @@ export const initExecuteCommandRed = () => {
     registerCommand({
         name: 'kick',
         alias: ['kc'],
-        group: 'red',
+        group,
         argDescription: '<Pcolor>',
         description: 'Kicks a player',
         cb: ({ nbParam, param1 }, escaper) => {
@@ -103,7 +104,7 @@ export const initExecuteCommandRed = () => {
     registerCommand({
         name: 'restart',
         alias: [],
-        group: 'red',
+        group,
         argDescription: '',
         description: 'Restarts the game',
         cb: ({ noParam }) => {
@@ -118,7 +119,7 @@ export const initExecuteCommandRed = () => {
     registerCommand({
         name: 'restartLevel',
         alias: [],
-        group: 'red',
+        group,
         argDescription: '',
         description: 'Restarts the level',
         cb: ({ noParam }, escaper) => {
@@ -133,7 +134,7 @@ export const initExecuteCommandRed = () => {
     registerCommand({
         name: 'noobedit',
         alias: ['ne'],
-        group: 'red',
+        group,
         argDescription: '<active>',
         description: '',
         cb: ({ nbParam, param1, param2 }, escaper) => {
@@ -183,7 +184,7 @@ export const initExecuteCommandRed = () => {
     registerCommand({
         name: 'speededit',
         alias: ['se'],
-        group: 'red',
+        group,
         argDescription: '<active> [player]',
         description: '',
         cb: ({ nbParam, param1, param2 }, escaper) => {
@@ -225,7 +226,7 @@ export const initExecuteCommandRed = () => {
     registerCommand({
         name: 'setLevelProgression',
         alias: ['setlp'],
-        group: 'red',
+        group,
         argDescription: '<all|allied|solo> [player]',
         description: '',
         cb: ({ param1 }, escaper) => {
@@ -244,7 +245,7 @@ export const initExecuteCommandRed = () => {
     registerCommand({
         name: 'setPointsEnabled',
         alias: ['setpe'],
-        group: 'red',
+        group,
         argDescription: '<bool>',
         description: '',
         cb: ({ param1 }, escaper) => {
@@ -263,7 +264,7 @@ export const initExecuteCommandRed = () => {
     registerCommand({
         name: 'setPointsEarnedOnLevelCompletion',
         alias: ['setpeolc'],
-        group: 'red',
+        group,
         argDescription: '<number>',
         description: '',
         enabled: () => ServiceManager.getService('Multiboard').arePointsEnabled(),
@@ -279,7 +280,7 @@ export const initExecuteCommandRed = () => {
     registerCommand({
         name: 'setPointsEarnedOnMeteorCompletion',
         alias: ['setpeomc'],
-        group: 'red',
+        group,
         argDescription: '<number>',
         description: '',
         enabled: () => ServiceManager.getService('Multiboard').arePointsEnabled(),
@@ -295,7 +296,7 @@ export const initExecuteCommandRed = () => {
     registerCommand({
         name: 'setPointsEarnedOnMeteorCompletionMaxPerLevel',
         alias: ['setpeomcmpl'],
-        group: 'red',
+        group,
         argDescription: '<number>',
         description: '',
         enabled: () => ServiceManager.getService('Multiboard').arePointsEnabled(),
@@ -311,7 +312,7 @@ export const initExecuteCommandRed = () => {
     registerCommand({
         name: 'adjustPlayerPoints',
         alias: ['adjustpp'],
-        group: 'red',
+        group,
         argDescription: '<playerId> <points>',
         description: '',
         cb: ({ param1, param2 }, escaper) => {
@@ -330,7 +331,7 @@ export const initExecuteCommandRed = () => {
     registerCommand({
         name: 'setPlayerPoints',
         alias: ['setpp'],
-        group: 'red',
+        group,
         argDescription: '<playerId> <points>',
         description: '',
         cb: ({ param1, param2 }, escaper) => {
@@ -349,7 +350,7 @@ export const initExecuteCommandRed = () => {
     registerCommand({
         name: 'setGameTheme',
         alias: [],
-        group: 'red',
+        group,
         argDescription: '<theme|off> <units|rocks|terrain|all>',
         description: '',
         cb: ({ nbParam, param1, param2 }, escaper) => {
@@ -512,7 +513,7 @@ export const initExecuteCommandRed = () => {
     registerCommand({
         name: 'setMonsterSkin',
         alias: [],
-        group: 'red',
+        group,
         argDescription: '<unitId|off>',
         description: 'Change monster skin',
         cb: ({ param1 }, escaper) => {
@@ -564,7 +565,7 @@ export const initExecuteCommandRed = () => {
     registerCommand({
         name: 'overrideCommandAccess',
         alias: ['oca'],
-        group: 'red',
+        group,
         argDescription: '<view | grant | revoke> <cmd> <player|all>',
         description: 'Override command access',
         cb: ({ param1, param2, param3 }, escaper) => {
@@ -634,7 +635,7 @@ export const initExecuteCommandRed = () => {
     registerCommand({
         name: 'day',
         alias: [],
-        group: 'red',
+        group,
         argDescription: '',
         description: '',
         cb: () => {
@@ -648,7 +649,7 @@ export const initExecuteCommandRed = () => {
     registerCommand({
         name: 'night',
         alias: [],
-        group: 'red',
+        group,
         argDescription: '',
         description: '',
         cb: () => {

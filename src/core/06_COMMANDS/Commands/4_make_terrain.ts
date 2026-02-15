@@ -17,12 +17,13 @@ import { RandomizeTerrains } from '../../07_TRIGGERS/Triggers_to_modify_terrains
 
 export const initExecuteCommandMake_terrain = () => {
     const { registerCommand } = ServiceManager.getService('Cmd')
+    const group = 'make'
 
     //-newWalk(neww) <label> <terrainType> [<walkSpeed>]   --> add a new kind of walk terrain
     registerCommand({
         name: 'newWalk',
         alias: ['neww'],
-        group: 'make',
+        group,
         argDescription: '<label> <terrainType> [<walkSpeed>]',
         description: 'Add a new kind of walk terrain',
         cb: ({ nbParam, param1, param2, param3 }, escaper) => {
@@ -54,7 +55,7 @@ export const initExecuteCommandMake_terrain = () => {
     registerCommand({
         name: 'newDeath',
         alias: ['newd'],
-        group: 'make',
+        group,
         argDescription: '<label> <terrainType> [<killingEffect> [<terrainTimeToKill>]]',
         description: 'Add a new kind of death terrain',
         cb: ({ nbParam, param1, param2, param3, param4 }, escaper) => {
@@ -97,7 +98,7 @@ export const initExecuteCommandMake_terrain = () => {
     registerCommand({
         name: 'newSlide',
         alias: ['news'],
-        group: 'make',
+        group,
         argDescription: '<label> <terrainType> [<slideSpeed> [<canTurn>]]',
         description: 'Add a new kind of slide terrain',
         cb: ({ nbParam, param1, param2, param3, param4 }, escaper) => {
@@ -144,7 +145,7 @@ export const initExecuteCommandMake_terrain = () => {
     registerCommand({
         name: 'setTerrainLabel',
         alias: ['settl'],
-        group: 'make',
+        group,
         argDescription: '<oldTerrainLabel> <newTerrainLabel>',
         description: 'Change the label of a terrain type',
         cb: ({ nbParam, param1, param2 }, escaper) => {
@@ -169,7 +170,7 @@ export const initExecuteCommandMake_terrain = () => {
     registerCommand({
         name: 'setTerrainAlias',
         alias: ['setta'],
-        group: 'make',
+        group,
         argDescription: '<terrainLabel> <alias>',
         description: 'An alias is a shortcut which can be used like a label',
         cb: ({ nbParam, param1, param2 }, escaper) => {
@@ -194,7 +195,7 @@ export const initExecuteCommandMake_terrain = () => {
     registerCommand({
         name: 'setTerrainWalkSpeed',
         alias: ['settws'],
-        group: 'make',
+        group,
         argDescription: '<walkTerrainLabel> <walkSpeed>',
         description: 'Max walk speed : 522',
         cb: ({ nbParam, param1, param2 }, escaper) => {
@@ -224,7 +225,7 @@ export const initExecuteCommandMake_terrain = () => {
     registerCommand({
         name: 'setTerrainKillEffect',
         alias: ['settke'],
-        group: 'make',
+        group,
         argDescription: '<deathTerrainLabel> <killingEffect>',
         description: 'Special effect appearing when a hero touch the death terrain',
         cb: ({ nbParam, param1, param2 }, escaper) => {
@@ -250,7 +251,7 @@ export const initExecuteCommandMake_terrain = () => {
     registerCommand({
         name: 'setTerrainKillDelay',
         alias: ['settkd'],
-        group: 'make',
+        group,
         argDescription: '<deathTerrainLabel> <killingDelay>',
         description: 'Time before which the hero dies when he touch the death terrain',
         cb: ({ nbParam, param1, param2 }, escaper) => {
@@ -280,7 +281,7 @@ export const initExecuteCommandMake_terrain = () => {
     registerCommand({
         name: 'setTerrainKillTolerance',
         alias: ['settkt'],
-        group: 'make',
+        group,
         argDescription: '<deathTerrainLabel> <tolerance dist>',
         description: "max distance to the closest non death terrain, where heroes won't die",
         cb: ({ nbParam, param1, param2 }, escaper) => {
@@ -313,7 +314,7 @@ export const initExecuteCommandMake_terrain = () => {
     registerCommand({
         name: 'setTerrainSlideSpeed',
         alias: ['settss'],
-        group: 'make',
+        group,
         argDescription: '<slideTerrainLabel> <slideSpeed>',
         description: 'Max slide speed : 522',
         cb: ({ nbParam, param1, param2 }, escaper) => {
@@ -343,7 +344,7 @@ export const initExecuteCommandMake_terrain = () => {
     registerCommand({
         name: 'setTerrainRotationSpeed',
         alias: ['settrs'],
-        group: 'make',
+        group,
         argDescription: '<slideTerrainLabel> <rotationSpeed>',
         description:
             'You have to specify rounds per second. Example : 1.3. Normal speed is 1; You can specify "default" | "d".',
@@ -381,7 +382,7 @@ export const initExecuteCommandMake_terrain = () => {
     registerCommand({
         name: 'setTerrainGravity',
         alias: ['settg'],
-        group: 'make',
+        group,
         argDescription: '<terrainLabel> <gravity>',
         description: '',
         cb: ({ nbParam, param1, param2 }, escaper) => {
@@ -406,7 +407,7 @@ export const initExecuteCommandMake_terrain = () => {
     registerCommand({
         name: 'setTerrainCanTurn',
         alias: ['settct'],
-        group: 'make',
+        group,
         argDescription: '<slideTerrainLabel> <canTurn>',
         description: 'Can the hero turn when he slide on the terrain',
         cb: ({ nbParam, param1, param2 }, escaper) => {
@@ -447,7 +448,7 @@ export const initExecuteCommandMake_terrain = () => {
     registerCommand({
         name: 'changeTerrain',
         alias: ['cht'],
-        group: 'make',
+        group,
         argDescription: '<terrainLabel> <newTerrainType>',
         description: "change the terrain type of a terrain, examples of terrain types : 'Nice', 46",
         cb: ({ nbParam, param1, param2 }, escaper) => {
@@ -469,7 +470,7 @@ export const initExecuteCommandMake_terrain = () => {
     registerCommand({
         name: 'changeAllTerrains',
         alias: ['chat'],
-        group: 'make',
+        group,
         argDescription: '[known(k)|notKnown(nk)]',
         description: 'Change all terrains to a random terrain type, or to a terrain type known to the player',
         cb: ({ noParam, nbParam, param1 }, escaper) => {
@@ -501,7 +502,7 @@ export const initExecuteCommandMake_terrain = () => {
     registerCommand({
         name: 'changeAllTerrainsAtRevive',
         alias: ['chatar'],
-        group: 'make',
+        group,
         argDescription: '<boolean change>',
         description: 'Change all terrains to a random terrain type',
         cb: ({ nbParam, param1 }, escaper) => {
@@ -521,7 +522,7 @@ export const initExecuteCommandMake_terrain = () => {
     registerCommand({
         name: 'exchangeTerrains',
         alias: ['excht'],
-        group: 'make',
+        group,
         argDescription: '[<terrainLabelA> <terrainLabelB>]',
         description: 'Exchange two terrains, without parameter, click on the terrains to exchange them',
         cb: ({ noParam, nbParam, param1, param2 }, escaper) => {
@@ -546,7 +547,7 @@ export const initExecuteCommandMake_terrain = () => {
     registerCommand({
         name: 'randomizeTerrains',
         alias: ['rdmt'],
-        group: 'make',
+        group,
         argDescription: '',
         description: 'Randomize terrains',
         cb: ({ noParam }) => {
@@ -561,7 +562,7 @@ export const initExecuteCommandMake_terrain = () => {
     registerCommand({
         name: 'createTerrain',
         alias: ['crt'],
-        group: 'make',
+        group,
         argDescription: '<terrainLabel> [<brushSize> [<shape>]',
         description: 'Create the terrain on the map, by clicking',
         cb: ({ nbParam, param1, param2, param3 }, escaper) => {
@@ -600,7 +601,7 @@ export const initExecuteCommandMake_terrain = () => {
     registerCommand({
         name: 'setBrushSize',
         alias: ['setbs'],
-        group: 'make',
+        group,
         argDescription: '<brushSize>',
         description: 'Sets the brush size',
         cb: ({ nbParam, param1 }, escaper) => {
@@ -624,7 +625,7 @@ export const initExecuteCommandMake_terrain = () => {
     registerCommand({
         name: 'setGumTerrain',
         alias: ['setgt'],
-        group: 'make',
+        group,
         argDescription: '<terrainLabel>',
         description: 'Sets the gum terrain',
         cb: ({ nbParam, param1 }, escaper) => {
@@ -648,7 +649,7 @@ export const initExecuteCommandMake_terrain = () => {
     registerCommand({
         name: 'setGumBrushSize',
         alias: ['setgbs'],
-        group: 'make',
+        group,
         argDescription: '<brushSize>',
         description: 'Set the gum brush size',
         cb: ({ nbParam, param1 }, escaper) => {
@@ -672,7 +673,7 @@ export const initExecuteCommandMake_terrain = () => {
     registerCommand({
         name: 'copyPasteTerrain',
         alias: ['cpt'],
-        group: 'make',
+        group,
         argDescription: '',
         description: 'Copy paste a rectangle of terrain on the map',
         cb: ({ noParam }, escaper) => {
@@ -688,7 +689,7 @@ export const initExecuteCommandMake_terrain = () => {
     registerCommand({
         name: 'verticalSymmetryTerrain',
         alias: ['vst'],
-        group: 'make',
+        group,
         argDescription: '',
         description: 'Transform a rectangle of terrain by a vertical symmetry',
         cb: ({ noParam }, escaper) => {
@@ -704,7 +705,7 @@ export const initExecuteCommandMake_terrain = () => {
     registerCommand({
         name: 'horizontalSymmetryTerrain',
         alias: ['hst'],
-        group: 'make',
+        group,
         argDescription: '',
         description: 'Transform a rectangle of terrain by an horizontal symmetry',
         cb: ({ noParam }, escaper) => {
@@ -720,7 +721,7 @@ export const initExecuteCommandMake_terrain = () => {
     registerCommand({
         name: 'terrainHeight',
         alias: ['th'],
-        group: 'make',
+        group,
         argDescription: ' [<terrainRadius> [<height>]]',
         description: 'Apply a terrain height at chosen places ; default radius 100, default height 100',
         cb: ({ nbParam, param1, param2 }, escaper) => {
@@ -767,7 +768,7 @@ export const initExecuteCommandMake_terrain = () => {
     registerCommand({
         name: 'displayTerrains',
         alias: ['dt'],
-        group: 'make',
+        group,
         argDescription: ' [<terrainLabel>] [page]',
         description: 'Displays the characteristics of the terrains added by the maker(s)',
         cb: ({ cmd }, escaper) => {

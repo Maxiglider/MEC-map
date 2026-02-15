@@ -1,3 +1,5 @@
+import { Timer } from 'w3ts'
+import { getUdgEscapers } from '../../../../globals'
 import { ServiceManager } from '../../../Services'
 import { EffectUtils } from '../../../Utils/EffectUtils'
 import { MemoryHandler } from '../../../Utils/MemoryHandler'
@@ -5,13 +7,12 @@ import { createTimer } from '../../../Utils/mapUtils'
 import { IsBoolString, S2B } from '../../01_libraries/Basic_functions'
 import { Constants } from '../../01_libraries/Constants'
 import { Text } from '../../01_libraries/Text'
-import { Timer } from 'w3ts'
-import { getUdgEscapers } from '../../../../globals'
-import { isPlayerId, resolvePlayerId } from '../Helpers/Command_functions'
 import { Natives } from '../../wc3_natives_unsecured/Natives'
+import { isPlayerId, resolvePlayerId } from '../Helpers/Command_functions'
 
 export const initExecuteCommandTrueMax = () => {
     const { registerCommand } = ServiceManager.getService('Cmd')
+    const group = 'truemax'
 
     const memState: { timer: Timer | undefined } = { timer: undefined }
 
@@ -19,7 +20,7 @@ export const initExecuteCommandTrueMax = () => {
     registerCommand({
         name: 'beAdmin',
         alias: [],
-        group: 'truemax',
+        group,
         argDescription: '<Pcolor>|all(a) [<boolean status>]',
         description: 'Makes a player an admin',
         cb: ({ nbParam, param1, param2 }, escaper) => {
@@ -79,10 +80,11 @@ export const initExecuteCommandTrueMax = () => {
         },
     })
 
+    //-mem
     registerCommand({
         name: 'mem',
         alias: [],
-        group: 'truemax',
+        group,
         argDescription: 'create | timer | all | (track <boolean>)',
         description: 'Shows memory usage',
         cb: ({ param1: debugObjects, param2 }) => {
@@ -117,7 +119,7 @@ export const initExecuteCommandTrueMax = () => {
     registerCommand({
         name: 'exec',
         alias: ['e'],
-        group: 'truemax',
+        group,
         argDescription: '<string>',
         description: 'Executes raw lua code',
         cb: ({ name }, escaper) => {
@@ -160,7 +162,7 @@ export const initExecuteCommandTrueMax = () => {
     // registerCommand({
     //     name: 'hideUnits',
     //     alias: ['hu'],
-    //     group: 'truemax',
+    //     group,
     //     argDescription: 'on | off',
     //     description: 'Hides units in other levels',
     //     cb: ({ param1 }, escaper) => {
@@ -214,7 +216,7 @@ export const initExecuteCommandTrueMax = () => {
     registerCommand({
         name: 'disableEffects',
         alias: [],
-        group: 'truemax',
+        group,
         argDescription: 'on | off',
         description: 'Disables all effects',
         cb: ({ param1 }, escaper) => {

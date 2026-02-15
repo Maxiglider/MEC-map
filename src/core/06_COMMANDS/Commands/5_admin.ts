@@ -1,16 +1,3 @@
-import { IsBoolString, IsEscaperInGame, jsonDecode, jsonEncode, S2B } from '../../01_libraries/Basic_functions'
-import { Constants } from '../../01_libraries/Constants'
-import { Text } from '../../01_libraries/Text'
-import { Escaper } from '../../04_STRUCTURES/Escaper/Escaper'
-import { GetMirrorEscaper } from '../../04_STRUCTURES/Escaper/Escaper_functions'
-import { SaveLoad } from '../../04_STRUCTURES/Escaper/Escaper_StartCommands'
-import { ReinitTerrains } from '../../07_TRIGGERS/Triggers_to_modify_terrains/Reinit_terrains'
-import { ReinitTerrainsPositions } from '../../07_TRIGGERS/Triggers_to_modify_terrains/Reinit_terrains_position_Change_variations_and_ut_at_beginning'
-import { AfkMode } from '../../08_GAME/Afk_mode/Afk_mode'
-import { Globals } from '../../09_From_old_Worldedit_triggers/globals_variables_and_triggers'
-import { udg_doubleHeroesEnabled } from '../../Double_heroes/double_heroes_config'
-import { ServiceManager } from '../../../Services'
-import { progressionUtils } from '../../../Utils/ProgressionUtils'
 import {
     getUdgCasterTypes,
     getUdgEscapers,
@@ -19,27 +6,41 @@ import {
     getUdgTerrainTypes,
     globals,
 } from '../../../../globals'
+import { ServiceManager } from '../../../Services'
+import { progressionUtils } from '../../../Utils/ProgressionUtils'
+import { IsBoolString, IsEscaperInGame, jsonDecode, jsonEncode, S2B } from '../../01_libraries/Basic_functions'
+import { Constants } from '../../01_libraries/Constants'
 import { IsPositiveInteger } from '../../01_libraries/Functions_on_numbers'
+import { Text } from '../../01_libraries/Text'
+import { Escaper } from '../../04_STRUCTURES/Escaper/Escaper'
+import { GetMirrorEscaper } from '../../04_STRUCTURES/Escaper/Escaper_functions'
+import { SaveLoad } from '../../04_STRUCTURES/Escaper/Escaper_StartCommands'
+import { HorizontalRegionDirection } from '../../04_STRUCTURES/Region/HorizontalRegion'
+import { MakeMECRegionMode } from '../../05_MAKE_STRUCTURES/Make_create_region/MakeMECRegion'
 import { SaveMapInCache } from '../../07_TRIGGERS/Save_map_in_gamecache/SaveMapInCache'
+import { ReinitTerrains } from '../../07_TRIGGERS/Triggers_to_modify_terrains/Reinit_terrains'
+import { ReinitTerrainsPositions } from '../../07_TRIGGERS/Triggers_to_modify_terrains/Reinit_terrains_position_Change_variations_and_ut_at_beginning'
 import { SaveLoadTerrain } from '../../07_TRIGGERS/Triggers_to_modify_terrains/Save_load_terrain'
+import { AfkMode } from '../../08_GAME/Afk_mode/Afk_mode'
+import { Globals } from '../../09_From_old_Worldedit_triggers/globals_variables_and_triggers'
 import { MEC_core_API } from '../../API/MEC_core_API'
+import { udg_doubleHeroesEnabled } from '../../Double_heroes/double_heroes_config'
 import { flushLogs } from '../../Log/log'
+import { CollisionTest } from '../../Test/collision-test'
+import { e2e } from '../../Test/e2e-tests/base/e2e-tests-base'
+import { Natives } from '../../wc3_natives_unsecured/Natives'
 import { CmdParam, isPlayerId, resolvePlayerId } from '../Helpers/Command_functions'
 import { ActivateTeleport, DisableTeleport } from '../Helpers/Teleport'
-import { Natives } from '../../wc3_natives_unsecured/Natives'
-import { CollisionTest } from '../../Test/collision-test'
-import { MakeMECRegionMode } from '../../05_MAKE_STRUCTURES/Make_create_region/MakeMECRegion'
-import { HorizontalRegionDirection } from '../../04_STRUCTURES/Region/HorizontalRegion'
-import { e2e } from '../../Test/e2e-tests/base/e2e-tests-base'
 
 export const initExecuteCommandMax = () => {
     const { registerCommand } = ServiceManager.getService('Cmd')
+    const group = 'max'
 
     //-reinitTerrains(rit)   --> rekinds of terrain
     registerCommand({
         name: 'reinitTerrains',
         alias: ['rit'],
-        group: 'max',
+        group,
         argDescription: '',
         description: 'ReinitTerrains(<nb>): reinitializes terrains type with <nb> terrains',
         cb: ({ noParam }) => {
@@ -54,7 +55,7 @@ export const initExecuteCommandMax = () => {
     registerCommand({
         name: 'reinitTerrainsPosition',
         alias: ['ritp'],
-        group: 'max',
+        group,
         argDescription: '',
         description: 'Reinitializes the terrain on the map as it was at start of the game',
         cb: ({ noParam }) => {
@@ -69,7 +70,7 @@ export const initExecuteCommandMax = () => {
     registerCommand({
         name: 'saveTerrain',
         alias: ['st'],
-        group: 'max',
+        group,
         argDescription: '<slotName>',
         description: 'Saves terrain in <slotName>',
         cb: ({ cmd, noParam }) => {
@@ -86,7 +87,7 @@ export const initExecuteCommandMax = () => {
     registerCommand({
         name: 'loadTerrain',
         alias: ['lt'],
-        group: 'max',
+        group,
         argDescription: '<slotName>',
         description: 'Loads terrain in <slotName>',
         cb: ({ cmd, noParam }, escaper) => {
@@ -105,7 +106,7 @@ export const initExecuteCommandMax = () => {
     registerCommand({
         name: 'deleteTerrainSave',
         alias: ['delts'],
-        group: 'max',
+        group,
         argDescription: '<slotName>',
         description: 'Deletes terrain save in <slotName>',
         cb: ({ cmd, noParam }, escaper) => {
@@ -125,7 +126,7 @@ export const initExecuteCommandMax = () => {
     registerCommand({
         name: 'control',
         alias: ['cl'],
-        group: 'max',
+        group,
         argDescription: '<Pcolor1>|all(a) [<Pcolor2>]',
         description: 'Gives the control of a hero to player <Pcolor2>',
         cb: ({ nbParam, param1, param2 }, escaper) => {
@@ -187,7 +188,7 @@ export const initExecuteCommandMax = () => {
     registerCommand({
         name: 'resetOwners',
         alias: ['ro'],
-        group: 'max',
+        group,
         argDescription: '',
         description: 'Gives back the control of heroes to their owner',
         cb: ({ noParam }, escaper) => {
@@ -210,7 +211,7 @@ export const initExecuteCommandMax = () => {
     registerCommand({
         name: 'setlives',
         alias: ['setl'],
-        group: 'max',
+        group,
         argDescription: '<nbLives>',
         description: 'Sets the number of lives',
         cb: ({ nbParam, param1 }) => {
@@ -226,7 +227,7 @@ export const initExecuteCommandMax = () => {
     registerCommand({
         name: 'teleport',
         alias: ['t'],
-        group: 'max',
+        group,
         argDescription: '<boolean status>',
         description: 'Enables or disables teleport trigger',
         cb: ({ nbParam, param1 }, escaper) => {
@@ -256,7 +257,7 @@ export const initExecuteCommandMax = () => {
     registerCommand({
         name: 'redRights',
         alias: ['redr'],
-        group: 'max',
+        group,
         argDescription: '<boolean status>',
         description: 'Enables or disables red rights',
         cb: ({ nbParam, param1 }, escaper) => {
@@ -277,7 +278,7 @@ export const initExecuteCommandMax = () => {
     registerCommand({
         name: 'autorevive',
         alias: ['ar'],
-        group: 'max',
+        group,
         argDescription: '<boolean status> [<Pcolor>|all(a)]',
         description: 'Enables or disables autorevive',
         cb: ({ noParam, nbParam, param1, param2 }, escaper) => {
@@ -343,7 +344,7 @@ export const initExecuteCommandMax = () => {
     registerCommand({
         name: 'createHero',
         alias: ['crh'],
-        group: 'max',
+        group,
         argDescription: '<Pcolor>|all(a)',
         description: 'Creates a hero for the player',
         cb: ({ noParam, nbParam, param1 }, escaper) => {
@@ -409,7 +410,7 @@ export const initExecuteCommandMax = () => {
     registerCommand({
         name: 'deleteHero',
         alias: ['delh'],
-        group: 'max',
+        group,
         argDescription: '<Pcolor>|all(a)',
         description: 'Deletes a hero for the player',
         cb: ({ noParam, nbParam, param1 }, escaper) => {
@@ -469,7 +470,7 @@ export const initExecuteCommandMax = () => {
     registerCommand({
         name: 'canCheat',
         alias: ['cc'],
-        group: 'max',
+        group,
         argDescription: '<Pcolor>|all(a) [<boolean status>]',
         description: 'Sets the canCheat status for the player',
         cb: ({ nbParam, param1, param2 }, escaper) => {
@@ -542,7 +543,7 @@ export const initExecuteCommandMax = () => {
     registerCommand({
         name: 'setAfkTime',
         alias: ['setafkt'],
-        group: 'max',
+        group,
         argDescription: '<time>',
         description: 'Sets the afk time',
         cb: ({ nbParam, param1 }, escaper) => {
@@ -560,7 +561,7 @@ export const initExecuteCommandMax = () => {
     registerCommand({
         name: 'setAutoreviveDelay',
         alias: ['setard'],
-        group: 'max',
+        group,
         argDescription: '<time>',
         description: 'Sets the autorevive delay, maximum 15 seconds',
         cb: ({ nbParam, param1 }, escaper) => {
@@ -583,7 +584,7 @@ export const initExecuteCommandMax = () => {
     registerCommand({
         name: 'saveMapInCache',
         alias: ['smic'],
-        group: 'max',
+        group,
         argDescription: '[<outputFilename> [withoutTerrain|wt]]',
         description:
             'Saves the map in cache for usage with mec-smic-loader. If you specify "withoutTerrain" as second parameter, the data will be lighter but not usable with smic-loader, only with -lmfc command.',
@@ -614,7 +615,7 @@ export const initExecuteCommandMax = () => {
     registerCommand({
         name: 'loadMapFromCache',
         alias: ['lmfc'],
-        group: 'max',
+        group,
         argDescription: '[<smicName>]',
         description:
             'Loads the specified map from cache created with -smic. If no parameter, loads the last cache saved during this game.',
@@ -650,7 +651,7 @@ export const initExecuteCommandMax = () => {
     registerCommand({
         name: 'removeTerrain',
         alias: ['remt'],
-        group: 'max',
+        group,
         argDescription: '<terrainLabel>',
         description: 'Removes a terrain from the map',
         cb: ({ nbParam, param1 }, escaper) => {
@@ -670,7 +671,7 @@ export const initExecuteCommandMax = () => {
     registerCommand({
         name: 'removeMonster',
         alias: ['remm'],
-        group: 'max',
+        group,
         argDescription: '<monsterLabel>',
         description: 'Removes a monster from the map',
         cb: ({ nbParam, param1 }, escaper) => {
@@ -690,7 +691,7 @@ export const initExecuteCommandMax = () => {
     registerCommand({
         name: 'removeLastLevel',
         alias: ['remll'],
-        group: 'max',
+        group,
         argDescription: '',
         description: 'Removes the last level from the map',
         cb: ({ noParam }, escaper) => {
@@ -712,7 +713,7 @@ export const initExecuteCommandMax = () => {
     registerCommand({
         name: 'removeCaster',
         alias: ['remc'],
-        group: 'max',
+        group,
         argDescription: '<casterLabel>',
         description: 'Removes a caster from the map',
         cb: ({ nbParam, param1 }, escaper) => {
@@ -735,7 +736,7 @@ export const initExecuteCommandMax = () => {
     registerCommand({
         name: 'setTerrainsOrder',
         alias: ['setto'],
-        group: 'max',
+        group,
         argDescription: '<terrainLabels>',
         description: 'Sets the order of the terrains',
         cb: ({ cmd }, escaper) => {
@@ -755,7 +756,7 @@ export const initExecuteCommandMax = () => {
     registerCommand({
         name: 'setTerrainCliffClass',
         alias: ['settcc'],
-        group: 'max',
+        group,
         argDescription: '<terrainLabel> <cliffClass>',
         description: 'Sets the cliff class of a terrain',
         cb: ({ nbParam, param1, param2 }, escaper) => {
@@ -782,7 +783,7 @@ export const initExecuteCommandMax = () => {
     registerCommand({
         name: 'setMainTileset',
         alias: [],
-        group: 'max',
+        group,
         argDescription: '<tileset>',
         description: 'Sets the main tileset',
         cb: ({ nbParam, param1 }, escaper) => {
@@ -843,7 +844,7 @@ export const initExecuteCommandMax = () => {
     registerCommand({
         name: 'logs',
         alias: [],
-        group: 'max',
+        group,
         argDescription: '',
         description: '',
         cb: ({ noParam }) => {
@@ -859,7 +860,7 @@ export const initExecuteCommandMax = () => {
     registerCommand({
         name: 'clickWhereYouAre',
         alias: ['cwya'],
-        group: 'max',
+        group,
         argDescription: '[<boolean status> [<Pcolor>|all(a)]]',
         description: 'Toggles or sets click where you are feature',
         cb: ({ noParam, nbParam, param1, param2 }, escaper) => {
@@ -943,7 +944,7 @@ export const initExecuteCommandMax = () => {
     registerCommand({
         name: 'reinitProgressionMap',
         alias: [],
-        group: 'max',
+        group,
         argDescription: "['level' | 'distance' | 'bfs' | 'segment']",
         description: '',
         cb: ({ param1 }, escaper) => {
@@ -969,7 +970,7 @@ export const initExecuteCommandMax = () => {
     registerCommand({
         name: 'collisionSizeTest',
         alias: [],
-        group: 'max',
+        group,
         argDescription: '<monsterTypeLabel> <radius <mobOffset> <triggerFrequency></triggerFrequency>',
         description: '',
         cb: ({ param1, param2, param3, param4, nbParam }, escaper) => {
@@ -1008,7 +1009,7 @@ export const initExecuteCommandMax = () => {
     registerCommand({
         name: 'setSelectionCircleBaseHeight',
         alias: [],
-        group: 'max',
+        group,
         argDescription: '',
         description: '<value>',
         cb: ({ param1, nbParam }, escaper) => {
@@ -1028,7 +1029,7 @@ export const initExecuteCommandMax = () => {
     registerCommand({
         name: 'setSelectionCircleBaseRadius',
         alias: [],
-        group: 'max',
+        group,
         argDescription: '',
         description: '<value>',
         cb: ({ param1, nbParam }, escaper) => {
@@ -1052,7 +1053,7 @@ export const initExecuteCommandMax = () => {
     registerCommand({
         name: 'createDebugMecRegion',
         alias: ['crdebmr'],
-        group: 'max',
+        group,
         argDescription: '[<mode> [<directionForHorizontal>]]',
         description:
             'Mode can be "horizontal", "diagonal", "circle" or "line" (defaults to "horizontal"). Direction for horizontal can be "up", "down", "left" or "right" (defaults to "up")',
@@ -1094,7 +1095,7 @@ export const initExecuteCommandMax = () => {
     registerCommand({
         name: 'e2e',
         alias: [],
-        group: 'max',
+        group,
         argDescription: '[run] <testName> | speed <percentage> | stop | pause | resume',
         description: 'Disables all effects',
         cb: ({ param1, param2, nbParam }, escaper) => {
@@ -1166,7 +1167,7 @@ export const initExecuteCommandMax = () => {
     registerCommand({
         name: 'debugLongDistanceMoves',
         alias: [],
-        group: 'max',
+        group,
         argDescription: '<boolean>',
         description: 'Disables all effects',
         cb: ({ param1, nbParam }, escaper) => {

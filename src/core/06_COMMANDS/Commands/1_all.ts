@@ -8,6 +8,7 @@ import { creepData } from '../../../creeps'
 import { canPlayerControlUnit, ClearTextForPlayer, IsBoolString, S2B } from '../../01_libraries/Basic_functions'
 import { Constants } from '../../01_libraries/Constants'
 import { IsInteger, PercentageStringOrX2Integer } from '../../01_libraries/Functions_on_numbers'
+import { checkOpacityValue, DrawGrid, SetGridOpacity, SetGridOpacityForAllGrids } from '../../01_libraries/Grid'
 import { ColorString2Id, udg_colorCode, udg_colorStrings } from '../../01_libraries/Init_colorCodes'
 import { Text } from '../../01_libraries/Text'
 import { Escaper } from '../../04_STRUCTURES/Escaper/Escaper'
@@ -29,43 +30,20 @@ import { Cpm } from '../../08_GAME/Apm_clics_par_minute/Cpm'
 import { Globals } from '../../09_From_old_Worldedit_triggers/globals_variables_and_triggers'
 import { PRESS_TIME_TO_ENABLE_FOLLOW_MOUSE } from '../../Follow_mouse/Follow_mouse'
 import { GetStringAssignedFromCommand, KeyboardShortcut } from '../../Keyboard_shortcuts/KeyboardShortcut'
-import { isPlayerId, resolvePlayerId, resolvePlayerIds } from '../Helpers/Command_functions'
 import { Natives } from '../../wc3_natives_unsecured/Natives'
-import { checkOpacityValue, DrawGrid, SetGridOpacity, SetGridOpacityForAllGrids } from '../../01_libraries/Grid'
-
-const cameraFieldMap: { [x: string]: camerafield } = {
-    TARGET_DISTANCE: CAMERA_FIELD_TARGET_DISTANCE,
-    FARZ: CAMERA_FIELD_FARZ,
-    ANGLE_OF_ATTACK: CAMERA_FIELD_ANGLE_OF_ATTACK,
-    FIELD_OF_VIEW: CAMERA_FIELD_FIELD_OF_VIEW,
-    ROLL: CAMERA_FIELD_ROLL,
-    ROTATION: CAMERA_FIELD_ROTATION,
-    ZOFFSET: CAMERA_FIELD_ZOFFSET,
-    NEARZ: CAMERA_FIELD_NEARZ,
-    LOCAL_PITCH: CAMERA_FIELD_LOCAL_PITCH,
-    LOCAL_YAW: CAMERA_FIELD_LOCAL_YAW,
-    LOCAL_ROLL: CAMERA_FIELD_LOCAL_ROLL,
-}
+import { glowCb, isPlayerId, resolvePlayerId, resolvePlayerIds } from '../Helpers/Command_functions'
+import { cameraFieldMap } from '../Helpers/commands-helpers'
 
 export const initCommandAll = () => {
     const { registerCommand } = ServiceManager.getService('Cmd')
-
-    const glowCb = (escaper: Escaper, glow: boolean) => {
-        const hero = escaper.getHero()
-
-        if (!hero) {
-            return
-        }
-
-        escaper.setGlow(glow)
-    }
+    const group = 'all'
 
     for (const { name, alias } of udg_colorStrings) {
         //-<color>   --> change the base color of the hero
         registerCommand({
             name,
             alias,
-            group: 'all',
+            group,
             argDescription: '',
             description: '',
             cb: ({ noParam, nbParam, param1 }, escaper) => {
@@ -85,7 +63,7 @@ export const initCommandAll = () => {
     registerCommand({
         name: 'vertexColor',
         alias: ['vc', 'wild'],
-        group: 'all',
+        group,
         argDescription: '[ <red> <green> <blue> [<transparency>] ]',
         description: 'Without parameter takes a random vertex color without changing transparency',
         cb: ({ noParam, nbParam, param1, param2, param3, param4 }, escaper) => {
@@ -146,7 +124,7 @@ export const initCommandAll = () => {
     registerCommand({
         name: 'vertexColorRed',
         alias: ['vcr'],
-        group: 'all',
+        group,
         argDescription: '[<red>]',
         description: 'Changes the red part of the vertex color only',
         cb: ({ noParam, nbParam, param1 }, escaper) => {
@@ -174,7 +152,7 @@ export const initCommandAll = () => {
     registerCommand({
         name: 'vertexColorGreen',
         alias: ['vcg'],
-        group: 'all',
+        group,
         argDescription: '[<Green>]',
         description: 'Changes the green part of the vertex color only',
         cb: ({ noParam, nbParam, param1 }, escaper) => {
@@ -202,7 +180,7 @@ export const initCommandAll = () => {
     registerCommand({
         name: 'vertexColorBlue',
         alias: ['vcb'],
-        group: 'all',
+        group,
         argDescription: '[<Blue>]',
         description: 'Changes the blue part of the vertex color only',
         cb: ({ noParam, nbParam, param1 }, escaper) => {
@@ -230,7 +208,7 @@ export const initCommandAll = () => {
     registerCommand({
         name: 'vertexColorTransparency',
         alias: ['vct'],
-        group: 'all',
+        group,
         argDescription: '[<transparency>]',
         description: 'Changes the transparency of the hero',
         cb: ({ noParam, nbParam, param1 }, escaper) => {
@@ -258,7 +236,7 @@ export const initCommandAll = () => {
     registerCommand({
         name: 'noVertex',
         alias: ['nv'],
-        group: 'all',
+        group,
         argDescription: '',
         description: 'Put normal vertex color : RGB(100, 100, 100) with 0 transparency',
         cb: ({ noParam, nbParam, param1 }, escaper) => {
@@ -291,7 +269,7 @@ export const initCommandAll = () => {
     registerCommand({
         name: 'colorInfo',
         alias: ['ci'],
-        group: 'all',
+        group,
         argDescription: '[<Pcolor>]',
         description: 'Displays base color and vertex color of a hero',
         cb: ({ noParam, nbParam, param1 }, escaper) => {
@@ -312,7 +290,7 @@ export const initCommandAll = () => {
     registerCommand({
         name: 'effect',
         alias: ['ef'],
-        group: 'all',
+        group,
         argDescription: '<effect>',
         description: 'Adds an effect on each hand of the hero',
         cb: ({ nbParam, param1, param2 }, escaper) => {
@@ -347,7 +325,7 @@ export const initCommandAll = () => {
     registerCommand({
         name: 'customEffect',
         alias: ['ce'],
-        group: 'all',
+        group,
         argDescription: '<effect> <body_part>',
         description: 'Adds an effect on a body part of the hero',
         cb: ({ nbParam, param1, param2 }, escaper) => {
@@ -375,7 +353,7 @@ export const initCommandAll = () => {
     registerCommand({
         name: 'effectsEverywhere',
         alias: ['efe'],
-        group: 'all',
+        group,
         argDescription: '<effect>',
         description: 'Adds the same effect to each body part of the hero',
         cb: ({ nbParam, param1, param2 }, escaper) => {
@@ -415,7 +393,7 @@ export const initCommandAll = () => {
     registerCommand({
         name: 'deleteEffects',
         alias: ['de'],
-        group: 'all',
+        group,
         argDescription: '[<numberOfEffectsToRemove>]',
         description: 'Delete a specified effect of the hero or all effects if not specified',
         cb: ({ noParam, nbParam, param1 }, escaper) => {
@@ -459,7 +437,7 @@ export const initCommandAll = () => {
     registerCommand({
         name: 'cameraField',
         alias: ['cf'],
-        group: 'all',
+        group,
         argDescription: 'x',
         description: 'Changes the camera field (height), default is 2500',
         cb: ({ nbParam, param1, param2 }, escaper) => {
@@ -488,7 +466,7 @@ export const initCommandAll = () => {
     registerCommand({
         name: 'debugCameraField',
         alias: ['dcf'],
-        group: 'all',
+        group,
         argDescription: '',
         description: '',
         cb: (_, escaper) => {
@@ -517,7 +495,7 @@ export const initCommandAll = () => {
     registerCommand({
         name: 'resetCamera',
         alias: ['rc'],
-        group: 'all',
+        group,
         argDescription: '',
         description: 'Put the camera back like chosen field',
         cb: ({ noParam }, escaper) => {
@@ -533,7 +511,7 @@ export const initCommandAll = () => {
     registerCommand({
         name: 'resetCameraInit',
         alias: ['rci'],
-        group: 'all',
+        group,
         argDescription: '',
         description: 'Changes the camera field back to its default value (2500)',
         cb: ({ noParam }, escaper) => {
@@ -549,7 +527,7 @@ export const initCommandAll = () => {
     registerCommand({
         name: 'animation',
         alias: ['an'],
-        group: 'all',
+        group,
         argDescription: '<string>',
         description: 'Makes your hero doing an animation',
         cb: ({ cmd, noParam, param1 }, escaper) => {
@@ -582,7 +560,7 @@ export const initCommandAll = () => {
     registerCommand({
         name: 'mapNbMonsters',
         alias: ['mnbm'],
-        group: 'all',
+        group,
         argDescription: '[moving(m)|all(a)|notMoving(nm)]',
         description: '"moving" is the default value',
         cb: ({ noParam, nbParam, param1 }, escaper) => {
@@ -620,7 +598,7 @@ export const initCommandAll = () => {
     registerCommand({
         name: 'levelNbMonsters',
         alias: ['lnbm'],
-        group: 'all',
+        group,
         argDescription: '[moving(m)|all(a)|notMoving(nm)|bookOfLife(bol)]',
         description: '"moving" is the default value',
         cb: ({ noParam, nbParam, param1 }, escaper) => {
@@ -672,7 +650,7 @@ export const initCommandAll = () => {
     registerCommand({
         name: 'kill',
         alias: ['kl'],
-        group: 'all',
+        group,
         argDescription: '',
         description: 'Kills your hero',
         enabled: ({ noParam }) => noParam,
@@ -688,7 +666,7 @@ export const initCommandAll = () => {
     registerCommand({
         name: 'kick',
         alias: ['kc'],
-        group: 'all',
+        group,
         argDescription: '',
         description: 'Kicks yourself',
         enabled: ({ noParam }) => noParam,
@@ -709,7 +687,7 @@ export const initCommandAll = () => {
     registerCommand({
         name: 'getTerrainInfo',
         alias: ['gti'],
-        group: 'all',
+        group,
         argDescription: '[ <terrain> | <lowInteger> <upInteger> ]',
         description: '',
         cb: ({ noParam, nbParam, param1, param2 }, escaper) => {
@@ -763,7 +741,7 @@ export const initCommandAll = () => {
     registerCommand({
         name: 'getMonsterInfo',
         alias: ['gmi'],
-        group: 'all',
+        group,
         argDescription: '',
         description: 'Click on a monster to get its info',
         cb: ({ noParam }, escaper) => {
@@ -780,7 +758,7 @@ export const initCommandAll = () => {
     registerCommand({
         name: 'stop',
         alias: ['s'],
-        group: 'all',
+        group,
         argDescription: '',
         description: 'Stop creating monsters or terrain or stop getTerrainInfoMode or getMonsterInfoMode',
         cb: ({ noParam }, escaper) => {
@@ -800,7 +778,7 @@ export const initCommandAll = () => {
     registerCommand({
         name: 'disco',
         alias: ['d'],
-        group: 'all',
+        group,
         argDescription: '[off|1~30]',
         description:
             'choose the number of color changes in ten seconds, or stop color changing (without parameter once a second)',
@@ -851,7 +829,7 @@ export const initCommandAll = () => {
     registerCommand({
         name: 'clearText',
         alias: ['clr'],
-        group: 'all',
+        group,
         argDescription: '',
         description: 'Remove the text on the screen',
         cb: ({ noParam }, escaper) => {
@@ -866,7 +844,7 @@ export const initCommandAll = () => {
     registerCommand({
         name: 'usedTerrains',
         alias: ['ut'],
-        group: 'all',
+        group,
         argDescription: '',
         description: 'Display the terrains already used (onto the map) during this game (16 is the maximum possible !)',
         cb: ({ noParam }, escaper) => {
@@ -897,7 +875,7 @@ export const initCommandAll = () => {
     registerCommand({
         name: 'drunk',
         alias: [],
-        group: 'all',
+        group,
         argDescription: '<real drunkValue>',
         description: 'Value between 5 and 60',
         cb: ({ noParam, nbParam, param1 }, escaper) => {
@@ -961,7 +939,7 @@ export const initCommandAll = () => {
     registerCommand({
         name: 'noDrunk',
         alias: [],
-        group: 'all',
+        group,
         argDescription: '',
         description: 'Stop drunk mode',
         cb: ({ noParam }, escaper) => {
@@ -980,7 +958,7 @@ export const initCommandAll = () => {
     registerCommand({
         name: 'autoContinueAfterSliding',
         alias: ['acas'],
-        group: 'all',
+        group,
         argDescription: '<boolean status>',
         description: '',
         cb: ({ nbParam, param1 }, escaper) => {
@@ -1008,7 +986,7 @@ export const initCommandAll = () => {
     registerCommand({
         name: 'apm',
         alias: [],
-        group: 'all',
+        group,
         argDescription: '[all|a]',
         description: 'Displays apm on slide of everybody or just yourself',
         cb: ({ noParam, nbParam, param1 }, escaper) => {
@@ -1028,7 +1006,7 @@ export const initCommandAll = () => {
     registerCommand({
         name: 'cpm',
         alias: [],
-        group: 'all',
+        group,
         argDescription: '[all|a]',
         description: 'Displays cpm on slide of everybody or just yourself',
         cb: ({ noParam, nbParam, param1 }, escaper) => {
@@ -1048,7 +1026,7 @@ export const initCommandAll = () => {
     registerCommand({
         name: 'assign',
         alias: ['as'],
-        group: 'all',
+        group,
         argDescription: '[<modifier>]<key> <command>',
         description:
             'puts a command into any alphanumeric key with of without modifiers ctrl (C) or shift (S) or both (CS)',
@@ -1073,7 +1051,7 @@ export const initCommandAll = () => {
     registerCommand({
         name: 'unassign',
         alias: ['uas'],
-        group: 'all',
+        group,
         argDescription: '[<modifier>]<key>',
         description: 'Removes the command put into a key',
         cb: ({ nbParam, param1 }, escaper) => {
@@ -1095,7 +1073,7 @@ export const initCommandAll = () => {
     registerCommand({
         name: 'displayShortcuts',
         alias: ['ds'],
-        group: 'all',
+        group,
         argDescription: '',
         description: 'Displays the commands associated to your shortcuts',
         cb: ({ noParam }, escaper) => {
@@ -1110,7 +1088,7 @@ export const initCommandAll = () => {
     registerCommand({
         name: 'saveCommand',
         alias: ['sc'],
-        group: 'all',
+        group,
         argDescription: '<commandLabel> <command>',
         description: 'Save a command into a name of your choice',
         cb: ({ cmd, nbParam, param1 }, escaper) => {
@@ -1127,7 +1105,7 @@ export const initCommandAll = () => {
     registerCommand({
         name: 'executeCommand',
         alias: ['ec'],
-        group: 'all',
+        group,
         argDescription: '<commandLabel>',
         description: 'Execute a command you saved with "saveCommand"',
         cb: ({ nbParam, param1 }, escaper) => {
@@ -1145,7 +1123,7 @@ export const initCommandAll = () => {
     registerCommand({
         name: 'getCurrentLevel',
         alias: ['getcl'],
-        group: 'all',
+        group,
         argDescription: '[player]',
         description: 'Displays the number of the current level (first one is number 0)',
         cb: ({ nbParam, param1 }, escaper) => {
@@ -1176,7 +1154,7 @@ export const initCommandAll = () => {
     registerCommand({
         name: 'leaderboard',
         alias: ['ldb'],
-        group: 'all',
+        group,
         argDescription: 'on | off | mb|multiboard||reset | classic | global | current | speedrun',
         description: 'Displays the leaderboard',
         cb: ({ nbParam, param1 }, escaper) => {
@@ -1212,7 +1190,7 @@ export const initCommandAll = () => {
     registerCommand({
         name: 'firstPersonCam',
         alias: ['fpc'],
-        group: 'all',
+        group,
         argDescription: 'on | off',
         description: 'Displays the first person camera',
         cb: ({ nbParam, param1 }, escaper) => {
@@ -1229,7 +1207,7 @@ export const initCommandAll = () => {
     registerCommand({
         name: 'lockCam',
         alias: ['lc', 'spectate'],
-        group: 'all',
+        group,
         argDescription: '[<player> | on | off]',
         description: 'Locks the camera',
         cb: ({ noParam, nbParam, param1 }, escaper) => {
@@ -1267,7 +1245,7 @@ export const initCommandAll = () => {
     registerCommand({
         name: 'lockCamRotation',
         alias: ['lcr'],
-        group: 'all',
+        group,
         argDescription: 'on | off',
         description: '',
         cb: ({ nbParam, param1 }, escaper) => {
@@ -1285,7 +1263,7 @@ export const initCommandAll = () => {
     registerCommand({
         name: 'lockCamHeight',
         alias: ['lch'],
-        group: 'all',
+        group,
         argDescription: 'on | off',
         description: '',
         cb: ({ nbParam, param1 }, escaper) => {
@@ -1303,7 +1281,7 @@ export const initCommandAll = () => {
     registerCommand({
         name: 'spinCam',
         alias: [],
-        group: 'all',
+        group,
         argDescription: '[speed | off]',
         description: 'Spins the camera',
         cb: ({ nbParam, param1 }, escaper) => {
@@ -1323,7 +1301,7 @@ export const initCommandAll = () => {
     registerCommand({
         name: 'followMouse',
         alias: ['fm'],
-        group: 'all',
+        group,
         argDescription: '[<boolean>]',
         description: 'Toggle or set follow mouse mode (active while holding right mouse button)',
         cb: ({ noParam, nbParam, param1 }, escaper) => {
@@ -1360,7 +1338,7 @@ export const initCommandAll = () => {
     registerCommand({
         name: 'followMouseMax',
         alias: [],
-        group: 'all',
+        group,
         argDescription: '<boolean> [neverDisable|nd]',
         description: 'Follows the mouse',
         cb: ({ nbParam, param1, param2 }, escaper) => {
@@ -1391,7 +1369,7 @@ export const initCommandAll = () => {
     registerCommand({
         name: 'mirror',
         alias: ['m', 'reverse'],
-        group: 'all',
+        group,
         argDescription: '<boolean>',
         description: 'Mirrors the camera',
         cb: ({ nbParam, param1 }, escaper) => {
@@ -1424,7 +1402,7 @@ export const initCommandAll = () => {
     registerCommand({
         name: 'ignoreDeathMessages',
         alias: ['idm'],
-        group: 'all',
+        group,
         argDescription: '<boolean>',
         description: 'Ignores death messages',
         cb: ({ nbParam, param1 }, escaper) => {
@@ -1452,7 +1430,7 @@ export const initCommandAll = () => {
     registerCommand({
         name: 'panCameraOnRevive',
         alias: ['pcor'],
-        group: 'all',
+        group,
         argDescription: '<coop | all | none> [width] [height]',
         description: 'Pan camera on revive, default width = 2048; height = 1536',
         cb: ({ param1, param2, param3 }, escaper) => {
@@ -1485,7 +1463,7 @@ export const initCommandAll = () => {
     registerCommand({
         name: 'panCameraOnPortal',
         alias: ['pcop'],
-        group: 'all',
+        group,
         argDescription: '<boolean>',
         description: 'Pan camera on portal',
         cb: ({ param1 }, escaper) => {
@@ -1505,7 +1483,7 @@ export const initCommandAll = () => {
     registerCommand({
         name: 'showNames',
         alias: ['sn'],
-        group: 'all',
+        group,
         argDescription: '<boolean>',
         description: '',
         cb: ({ nbParam, param1 }, escaper) => {
@@ -1533,7 +1511,7 @@ export const initCommandAll = () => {
     registerCommand({
         name: 'othersTransparency',
         alias: ['ot'],
-        group: 'all',
+        group,
         argDescription: '<number | off | reset> [all | unallied | allied | player]',
         description: '',
         cb: ({ nbParam, param1, param2 }, escaper) => {
@@ -1615,7 +1593,7 @@ export const initCommandAll = () => {
     registerCommand({
         name: 'shadow',
         alias: [],
-        group: 'all',
+        group,
         argDescription: '<boolean | reset> [all | unallied | allied | player | monsters]',
         description: '',
         cb: ({ nbParam, param1, param2 }, escaper) => {
@@ -1727,7 +1705,7 @@ export const initCommandAll = () => {
     registerCommand({
         name: 'myStartCommands',
         alias: ['msc'],
-        group: 'all',
+        group,
         argDescription:
             '[ list [player] | add <command> | del <commandNumber> | ec <commandNumber> | set <commandNumber> <command> | delall ]',
         description: 'Run commands on start of the game',
@@ -1816,7 +1794,7 @@ export const initCommandAll = () => {
     registerCommand({
         name: 'userInterface',
         alias: ['ui'],
-        group: 'all',
+        group,
         argDescription: 'off | on | map',
         description: 'Disable partly or totally the graphical user interface',
         cb: ({ nbParam, param1 }, escaper) => {
@@ -1870,7 +1848,7 @@ export const initCommandAll = () => {
     registerCommand({
         name: 'ally',
         alias: [],
-        group: 'all',
+        group,
         argDescription: 'player',
         description: 'Ally people, lets you revive them',
         cb: ({ param1 }, escaper) => {
@@ -1883,7 +1861,7 @@ export const initCommandAll = () => {
     registerCommand({
         name: 'unally',
         alias: [],
-        group: 'all',
+        group,
         argDescription: 'player',
         description: 'Unally people, prevents you from reviving them',
         cb: ({ param1 }, escaper) => {
@@ -1896,7 +1874,7 @@ export const initCommandAll = () => {
     registerCommand({
         name: 'hideChat',
         alias: ['hc', 'monk'],
-        group: 'all',
+        group,
         argDescription: 'on | off',
         description: 'Hides the chat',
         cb: ({ param1 }, escaper) => {
@@ -1920,7 +1898,7 @@ export const initCommandAll = () => {
     registerCommand({
         name: 'glow',
         alias: [],
-        group: 'all',
+        group,
         argDescription: '<boolean> [player]',
         description: 'Change your slider glow',
         cb: ({ param1, param2 }, escaper) => {
@@ -1946,7 +1924,7 @@ export const initCommandAll = () => {
     registerCommand({
         name: 'progression',
         alias: ['prog'],
-        group: 'all',
+        group,
         argDescription: '[player]',
         description: '',
         cb: ({ nbParam, param1 }, escaper) => {
@@ -1969,7 +1947,7 @@ export const initCommandAll = () => {
     registerCommand({
         name: 'autoCircle',
         alias: [],
-        group: 'all',
+        group,
         argDescription: '[<boolean status>]',
         description: 'Toggle auto circle for current player',
         cb: ({ noParam, nbParam, param1 }, escaper) => {
@@ -2003,7 +1981,7 @@ export const initCommandAll = () => {
     registerCommand({
         name: 'monsterDatabase',
         alias: ['mdb', 'monsterdb'],
-        group: 'all',
+        group,
         argDescription: '<search>',
         description: 'Lookup monsters by id, name, or comment',
         cb: ({ nbParam, param1 }, escaper) => {
@@ -2048,7 +2026,7 @@ export const initCommandAll = () => {
     registerCommand({
         name: 'heroStopAction',
         alias: [],
-        group: 'all',
+        group,
         argDescription: '',
         description: 'Use the basic Stop action from WC3 for your selected units',
         cb: ({ noParam }, escaper) => {
@@ -2075,7 +2053,7 @@ export const initCommandAll = () => {
     registerCommand({
         name: 'grid',
         alias: [],
-        group: 'all',
+        group,
         argDescription: '[<falsyBoolean>|1|2|3]',
         description: 'Toggle grid. Best usage is without parameter to switch between all modes.',
         cb: ({ param1, noParam, nbParam }, escaper) => {
@@ -2110,7 +2088,7 @@ export const initCommandAll = () => {
     registerCommand({
         name: 'setGridOpacity',
         alias: ['setgo'],
-        group: 'all',
+        group,
         argDescription: '<opacity>|(<opacityGrid1> <opacityGrid2> <opacityGrid3>)',
         description:
             'Set the grid opacity in percentage. You can choose values between 5, 10, 15, 25, 50, 75, and 100. Default opacities are 50%, 50%, 25%.',
@@ -2151,7 +2129,7 @@ export const initCommandAll = () => {
     registerCommand({
         name: 'debugCollisions',
         alias: ['debc'],
-        group: 'all',
+        group,
         argDescription: '<boolean>',
         description: 'Enable of debug collisions for yourself. Shows collisions circles around units.',
         cb: ({ param1, nbParam }, escaper) => {
@@ -2162,6 +2140,31 @@ export const initCommandAll = () => {
 
             escaper.setDisplayCollisionLandmarks(S2B(param1))
             Text.mkP(escaper.getPlayer(), `Debug collisions ${S2B(param1) ? 'enabled' : 'disabled'}`)
+
+            return true
+        },
+    })
+
+    // todo check if we could remove this
+    registerCommand({
+        name: 'slidingMode',
+        alias: [],
+        group,
+        argDescription: '[normal] | [max] | []',
+        description: 'Run commands on start of the game',
+        cb: ({ cmd, nbParam, param1 }, escaper) => {
+            if (nbParam == 0) {
+                Text.mkP(escaper.getPlayer(), 'your sliding mode is ' + escaper.slidingMode)
+            }
+
+            if (nbParam == 1) {
+                if (param1 == 'max' || param1 == 'normal') {
+                    escaper.slidingMode = param1
+                    Text.mkP(escaper.getPlayer(), 'changed sliding mode')
+                } else {
+                    Text.erP(escaper.getPlayer(), 'wrong sliding mode')
+                }
+            }
 
             return true
         },

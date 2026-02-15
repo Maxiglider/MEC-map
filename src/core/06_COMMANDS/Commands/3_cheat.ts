@@ -1,4 +1,6 @@
+import { getUdgEscapers, getUdgLevels, globals } from '../../../../globals'
 import { ServiceManager } from '../../../Services'
+import { runInTrigger } from '../../../Utils/mapUtils'
 import { pathingBlockerUtils } from '../../../Utils/PathingBlockerUtils'
 import { progressionUtils } from '../../../Utils/ProgressionUtils'
 import { SlideAfterDarkUtils } from '../../../Utils/SlideAfterDarkUtils'
@@ -6,124 +8,33 @@ import { IsBoolString, S2B } from '../../01_libraries/Basic_functions'
 import { Constants } from '../../01_libraries/Constants'
 import { IsInteger, IsPositiveInteger } from '../../01_libraries/Functions_on_numbers'
 import { Text } from '../../01_libraries/Text'
-import { Escaper } from '../../04_STRUCTURES/Escaper/Escaper'
+import { getUdgViewAll } from '../../03_view_all_hide_all/View_all_hide_all'
 import { GetMirrorEscaper } from '../../04_STRUCTURES/Escaper/Escaper_functions'
 import { METEOR_CHEAT } from '../../04_STRUCTURES/Meteor/Meteor'
-import { TerrainTypeWalk } from '../../04_STRUCTURES/TerrainType/TerrainTypeWalk'
-import { Gravity } from '../../07_TRIGGERS/Slide_and_CheckTerrain_triggers/Gravity'
-import { getUdgEscapers, getUdgLevels, globals } from '../../../../globals'
-import { runInTrigger } from '../../../Utils/mapUtils'
-import { getUdgViewAll } from '../../03_view_all_hide_all/View_all_hide_all'
 import { MeteorFunctions } from '../../04_STRUCTURES/Meteor/Meteor_functions'
-import { HERO_START_ANGLE } from '../../08_GAME/Init_game/Heroes'
+import { Gravity } from '../../07_TRIGGERS/Slide_and_CheckTerrain_triggers/Gravity'
 import { DeplacementHeroHorsDeathPath } from '../../08_GAME/Mode_coop/deplacement_heros_hors_death_path'
-import { isPlayerId, resolvePlayerId, resolvePlayerIds } from '../Helpers/Command_functions'
+import {
+    abilityCb,
+    isPlayerId,
+    resolvePlayerId,
+    resolvePlayerIds,
+    reviveCb,
+    revivePositionCb,
+    scaleCb,
+    skinCb,
+} from '../Helpers/Command_functions'
 import { ActivateTeleport } from '../Helpers/Teleport'
-import { Natives } from '../../wc3_natives_unsecured/Natives'
 
 export const initExecuteCommandCheat = () => {
     const { registerCommand } = ServiceManager.getService('Cmd')
-
-    const reviveCb = (escaper: Escaper) => escaper.reviveAtStart()
-
-    const revivePositionCb = (escaper: Escaper) => {
-        const hero = escaper.getHero()
-
-        if (!hero) {
-            return
-        }
-
-        if (!escaper.isAlive()) {
-            DeplacementHeroHorsDeathPath.DeplacementHeroHorsDeathPath(hero)
-            runInTrigger(escaper.coopReviveHero)
-        }
-    }
-
-    const skinCb = (escaper: Escaper, skin: string) => {
-        const hero = escaper.getHero()
-
-        if (!hero) {
-            return
-        }
-
-        const oldSkin = escaper.getSkin()
-
-        if (IsBoolString(skin) && !S2B(skin)) {
-            escaper.setSkin(undefined)
-        } else {
-            escaper.setSkin(FourCC(skin))
-        }
-
-        if (oldSkin !== escaper.getSkin()) {
-            const x =
-                escaper.getLastTerrainType() instanceof TerrainTypeWalk
-                    ? GetUnitX(hero)
-                    : getUdgLevels().getCurrentLevel(this).getStartRandomX()
-
-            const y =
-                escaper.getLastTerrainType() instanceof TerrainTypeWalk
-                    ? GetUnitY(hero)
-                    : getUdgLevels().getCurrentLevel(this).getStartRandomY()
-
-            const a = escaper.getLastTerrainType() instanceof TerrainTypeWalk ? GetUnitFacing(hero) : HERO_START_ANGLE
-
-            escaper.removeHero()
-            escaper.createHero(x, y, a)
-        }
-    }
-
-    const abilityCb = (escaper: Escaper, abilityId: string) => {
-        const hero = escaper.getHero()
-
-        if (!hero) {
-            return
-        }
-
-        if (GetUnitAbilityLevel(hero, FourCC(abilityId)) > 0) {
-            UnitRemoveAbility(hero, FourCC(abilityId))
-        } else {
-            UnitAddAbility(hero, FourCC(abilityId))
-        }
-    }
-
-    const scaleCb = (escaper: Escaper, scale: string) => {
-        const hero = escaper.getHero()
-
-        if (!hero) {
-            return
-        }
-
-        const oldScale = escaper.getScale()
-
-        if (IsBoolString(scale) && !S2R(scale)) {
-            escaper.setScale(undefined)
-        } else {
-            escaper.setScale(S2R(scale))
-        }
-
-        if (oldScale !== escaper.getScale()) {
-            const x =
-                escaper.getLastTerrainType() instanceof TerrainTypeWalk
-                    ? GetUnitX(hero)
-                    : getUdgLevels().getCurrentLevel(this).getStartRandomX()
-
-            const y =
-                escaper.getLastTerrainType() instanceof TerrainTypeWalk
-                    ? GetUnitY(hero)
-                    : getUdgLevels().getCurrentLevel(this).getStartRandomY()
-
-            const a = escaper.getLastTerrainType() instanceof TerrainTypeWalk ? GetUnitFacing(hero) : HERO_START_ANGLE
-
-            escaper.removeHero()
-            escaper.createHero(x, y, a)
-        }
-    }
+    const group = 'cheat'
 
     //-slideSpeed(ss) <speed>   --> changes the slide speed of your hero, ignoring terrains
     registerCommand({
         name: 'setSlideSpeed',
         alias: ['ss'],
-        group: 'cheat',
+        group,
         argDescription: '<speed>',
         description: 'Changes the slide speed of your hero, ignoring terrains',
         cb: ({ nbParam, param1, param2 }, escaper) => {
@@ -165,7 +76,7 @@ export const initExecuteCommandCheat = () => {
     registerCommand({
         name: 'normalSlideSpeed',
         alias: ['nss'],
-        group: 'cheat',
+        group,
         argDescription: '',
         description: 'Puts the slide speed back to normal (respecting terrains)',
         cb: ({ noParam, nbParam, param1 }, escaper) => {
@@ -203,7 +114,7 @@ export const initExecuteCommandCheat = () => {
     registerCommand({
         name: 'rotationSpeed',
         alias: ['rs'],
-        group: 'cheat',
+        group,
         argDescription: '<roundsPerSecond>',
         description: 'Changes the rotation speed of your hero, ignoring terrains',
         cb: ({ nbParam, param1, param2 }, escaper) => {
@@ -246,7 +157,7 @@ export const initExecuteCommandCheat = () => {
     registerCommand({
         name: 'normalRotationSpeed',
         alias: ['nrs'],
-        group: 'cheat',
+        group,
         argDescription: '',
         description: 'Puts the rotation speed back to normal (respecting terrains)',
         cb: ({ noParam, nbParam, param1 }, escaper) => {
@@ -284,7 +195,7 @@ export const initExecuteCommandCheat = () => {
     registerCommand({
         name: 'setWalkSpeed',
         alias: ['ws'],
-        group: 'cheat',
+        group,
         argDescription: '<speed>',
         description: 'Changes the walk speed of your hero, ignoring terrains',
         cb: ({ nbParam, param1, param2 }, escaper) => {
@@ -326,7 +237,7 @@ export const initExecuteCommandCheat = () => {
     registerCommand({
         name: 'normalWalkSpeed',
         alias: ['nws'],
-        group: 'cheat',
+        group,
         argDescription: '',
         description: 'Puts the walk speed back to normal (respecting terrains)',
         cb: ({ noParam, nbParam, param1 }, escaper) => {
@@ -364,7 +275,7 @@ export const initExecuteCommandCheat = () => {
     registerCommand({
         name: 'teleport',
         alias: ['t'],
-        group: 'cheat',
+        group,
         argDescription: '',
         description: 'Teleports your hero at the next clic',
         enabled: ({ noParam, nbParam, param1 }) => {
@@ -390,7 +301,7 @@ export const initExecuteCommandCheat = () => {
     registerCommand({
         name: 'revive',
         alias: ['r'],
-        group: 'cheat',
+        group,
         argDescription: '',
         description: 'Revives your hero',
         cb: ({ noParam, nbParam, param1 }, escaper) => {
@@ -412,7 +323,7 @@ export const initExecuteCommandCheat = () => {
     registerCommand({
         name: 'revivePosition',
         alias: ['rpos'],
-        group: 'cheat',
+        group,
         argDescription: '',
         description: 'Revives your hero',
         cb: ({ noParam, nbParam, param1 }, escaper) => {
@@ -434,7 +345,7 @@ export const initExecuteCommandCheat = () => {
     registerCommand({
         name: 'skin',
         alias: [],
-        group: 'cheat',
+        group,
         argDescription: '<skinId> [player]',
         description: 'Change your slider unit',
         cb: ({ param1, param2 }, escaper) => {
@@ -460,7 +371,7 @@ export const initExecuteCommandCheat = () => {
     registerCommand({
         name: 'ability',
         alias: [],
-        group: 'cheat',
+        group,
         argDescription: '<abilityId> [player]',
         description: 'Add ability to your unit',
         cb: ({ param1, param2 }, escaper) => {
@@ -486,7 +397,7 @@ export const initExecuteCommandCheat = () => {
     registerCommand({
         name: 'scale',
         alias: [],
-        group: 'cheat',
+        group,
         argDescription: '<scale> [player]',
         description: 'Change your slider unit scale',
         cb: ({ param1, param2 }, escaper) => {
@@ -512,7 +423,7 @@ export const initExecuteCommandCheat = () => {
     registerCommand({
         name: 'back',
         alias: ['b'],
-        group: 'cheat',
+        group,
         argDescription: '',
         description: 'Teleports you to your previous location',
         cb: ({ noParam }, escaper) => {
@@ -536,7 +447,7 @@ export const initExecuteCommandCheat = () => {
     registerCommand({
         name: 'reviveTo',
         alias: ['rto', 'rposto'],
-        group: 'cheat',
+        group,
         argDescription: '<Pcolor>',
         description: 'Revives your hero to an other hero, with the same facing angle',
         cb: ({ nbParam, param1 }, escaper) => {
@@ -581,7 +492,7 @@ export const initExecuteCommandCheat = () => {
     registerCommand({
         name: 'summon',
         alias: ['smn'],
-        group: 'cheat',
+        group,
         argDescription: '<Pcolor>',
         description: 'Revives another hero to yours, with the same facing angle',
         cb: ({ nbParam, param1 }, escaper) => {
@@ -627,7 +538,7 @@ export const initExecuteCommandCheat = () => {
     registerCommand({
         name: 'getInfiniteMeteors',
         alias: ['gim'],
-        group: 'cheat',
+        group,
         argDescription: '',
         description: "Puts in your inventory a meteor that doesn't disapear after being used",
         cb: ({ noParam }, escaper) => {
@@ -651,7 +562,7 @@ export const initExecuteCommandCheat = () => {
     registerCommand({
         name: 'deleteInfiniteMeteors',
         alias: ['dim'],
-        group: 'cheat',
+        group,
         argDescription: '',
         description: 'Remove the infinite meteor from your inventory if you have one',
         cb: ({ noParam }, escaper) => {
@@ -676,7 +587,7 @@ export const initExecuteCommandCheat = () => {
     registerCommand({
         name: 'endLevel',
         alias: ['el'],
-        group: 'cheat',
+        group,
         argDescription: '',
         description: 'Go to the end of the current level',
         cb: ({ noParam }, escaper) => {
@@ -691,7 +602,7 @@ export const initExecuteCommandCheat = () => {
     registerCommand({
         name: 'goToLevel',
         alias: ['gotl'],
-        group: 'cheat',
+        group,
         argDescription: '<levelId>',
         description: 'Go to the specified level',
         cb: ({ nbParam, param1 }, escaper) => {
@@ -725,7 +636,7 @@ export const initExecuteCommandCheat = () => {
     registerCommand({
         name: 'viewAll',
         alias: ['va'],
-        group: 'cheat',
+        group,
         argDescription: '',
         description: 'Displays the whole map',
         cb: ({ noParam }) => {
@@ -740,7 +651,7 @@ export const initExecuteCommandCheat = () => {
     registerCommand({
         name: 'hideAll',
         alias: ['ha'],
-        group: 'cheat',
+        group,
         argDescription: '',
         description: 'Puts the map view back to normal',
         cb: ({ noParam }) => {
@@ -755,7 +666,7 @@ export const initExecuteCommandCheat = () => {
     registerCommand({
         name: 'setGodMode',
         alias: ['setgm'],
-        group: 'cheat',
+        group,
         argDescription: '<boolean status>',
         description: 'Activate or desactivate god mode for your hero',
         cb: ({ nbParam, param1, param2 }, escaper) => {
@@ -824,7 +735,7 @@ export const initExecuteCommandCheat = () => {
     registerCommand({
         name: 'setGodModeKills',
         alias: ['setgmk'],
-        group: 'cheat',
+        group,
         argDescription: '<boolean status>',
         description: 'If activated, monsters will be killed by your hero',
         cb: ({ nbParam, param1, param2 }, escaper) => {
@@ -896,7 +807,7 @@ export const initExecuteCommandCheat = () => {
     registerCommand({
         name: 'setGravity',
         alias: ['setg'],
-        group: 'cheat',
+        group,
         argDescription: 'x',
         description: 'Set the gravity of the game',
         cb: ({ nbParam, param1 }, escaper) => {
@@ -913,7 +824,7 @@ export const initExecuteCommandCheat = () => {
     registerCommand({
         name: 'getGravity',
         alias: ['getg'],
-        group: 'cheat',
+        group,
         argDescription: '',
         description: 'Get the gravity of the game',
         cb: ({ noParam }, escaper) => {
@@ -928,7 +839,7 @@ export const initExecuteCommandCheat = () => {
     registerCommand({
         name: 'setVTOTODiagonalSlideLogic',
         alias: ['setvtoto'],
-        group: 'cheat',
+        group,
         argDescription: '<boolean status>',
         description: 'Allows you to slide diagonally',
         cb: ({ nbParam, param1 }, escaper) => {
@@ -952,7 +863,7 @@ export const initExecuteCommandCheat = () => {
     registerCommand({
         name: 'getVTOTODiagonalSlideLogic',
         alias: ['getvtoto'],
-        group: 'cheat',
+        group,
         argDescription: '',
         description: '',
         cb: ({ noParam }, escaper) => {
@@ -967,7 +878,7 @@ export const initExecuteCommandCheat = () => {
     registerCommand({
         name: 'setCoopCircles',
         alias: [],
-        group: 'cheat',
+        group,
         argDescription: '<boolean status>',
         description: 'Disables coop circles',
         cb: ({ nbParam, param1 }, escaper) => {
@@ -991,7 +902,7 @@ export const initExecuteCommandCheat = () => {
     registerCommand({
         name: 'getCoopCircles',
         alias: [],
-        group: 'cheat',
+        group,
         argDescription: '',
         description: '',
         cb: ({ noParam }, escaper) => {
@@ -1006,7 +917,7 @@ export const initExecuteCommandCheat = () => {
     registerCommand({
         name: 'setCanTurnInAir',
         alias: [],
-        group: 'cheat',
+        group,
         argDescription: '<boolean status>',
         description: 'Allows you to turn in air',
         cb: ({ nbParam, param1 }, escaper) => {
@@ -1030,7 +941,7 @@ export const initExecuteCommandCheat = () => {
     registerCommand({
         name: 'getCanTurnInAir',
         alias: [],
-        group: 'cheat',
+        group,
         argDescription: '',
         description: '',
         cb: ({ noParam }, escaper) => {
@@ -1045,7 +956,7 @@ export const initExecuteCommandCheat = () => {
     registerCommand({
         name: 'setCanSlideOverPathingBlockers',
         alias: [],
-        group: 'cheat',
+        group,
         argDescription: '<boolean status>',
         description: '',
         cb: ({ nbParam, param1 }, escaper) => {
@@ -1072,7 +983,7 @@ export const initExecuteCommandCheat = () => {
     registerCommand({
         name: 'getCanSlideOverPathingBlockers',
         alias: [],
-        group: 'cheat',
+        group,
         argDescription: '',
         description: '',
         cb: ({ noParam }, escaper) => {
@@ -1091,7 +1002,7 @@ export const initExecuteCommandCheat = () => {
     registerCommand({
         name: 'setAnimOnRevive',
         alias: [],
-        group: 'cheat',
+        group,
         argDescription: '<anim>',
         description: '',
         cb: ({ nbParam, param1 }, escaper) => {
@@ -1110,7 +1021,7 @@ export const initExecuteCommandCheat = () => {
     registerCommand({
         name: 'getAnimOnRevive',
         alias: [],
-        group: 'cheat',
+        group,
         argDescription: '',
         description: '',
         cb: ({ noParam }, escaper) => {
@@ -1125,7 +1036,7 @@ export const initExecuteCommandCheat = () => {
     registerCommand({
         name: 'setWanderTimes',
         alias: [],
-        group: 'cheat',
+        group,
         argDescription: '<min> <extra>',
         description: '',
         cb: ({ nbParam, param1, param2 }, escaper) => {
@@ -1155,7 +1066,7 @@ export const initExecuteCommandCheat = () => {
     registerCommand({
         name: 'getWanderTimes',
         alias: [],
-        group: 'cheat',
+        group,
         argDescription: '',
         description: '',
         cb: ({ noParam }, escaper) => {
@@ -1177,7 +1088,7 @@ export const initExecuteCommandCheat = () => {
     registerCommand({
         name: 'setHeight',
         alias: ['seth'],
-        group: 'cheat',
+        group,
         argDescription: '',
         description: 'Set the height of the game',
         cb: ({ nbParam, param1 }, escaper) => {
@@ -1199,7 +1110,7 @@ export const initExecuteCommandCheat = () => {
     registerCommand({
         name: 'setTailleUnit',
         alias: ['settu'],
-        group: 'cheat',
+        group,
         argDescription: '',
         description: 'Set the size of the units',
         cb: ({ nbParam, param1 }) => {
@@ -1217,7 +1128,7 @@ export const initExecuteCommandCheat = () => {
     registerCommand({
         name: 'instantTurn',
         alias: ['it'],
-        group: 'cheat',
+        group,
         argDescription: '',
         description: 'Instant turn',
         cb: ({ nbParam, param1 }, escaper) => {
@@ -1235,35 +1146,11 @@ export const initExecuteCommandCheat = () => {
         },
     })
 
-    registerCommand({
-        name: 'slidingMode',
-        alias: [],
-        group: 'all',
-        argDescription: '[normal] | [max] | []',
-        description: 'Run commands on start of the game',
-        cb: ({ cmd, nbParam, param1 }, escaper) => {
-            if (nbParam == 0) {
-                Text.mkP(escaper.getPlayer(), 'your sliding mode is ' + escaper.slidingMode)
-            }
-
-            if (nbParam == 1) {
-                if (param1 == 'max' || param1 == 'normal') {
-                    escaper.slidingMode = param1
-                    Text.mkP(escaper.getPlayer(), 'changed sliding mode')
-                } else {
-                    Text.erP(escaper.getPlayer(), 'wrong sliding mode')
-                }
-            }
-
-            return true
-        },
-    })
-
     //-slideAfterDark   --> randomly changes monster skins every 1-10 seconds
     registerCommand({
         name: 'slideAfterDark',
         alias: [],
-        group: 'cheat',
+        group,
         argDescription: '[on|off]',
         description: 'Randomly changes monster skins every 1-10 seconds',
         cb: ({ noParam, nbParam, param1 }, escaper) => {

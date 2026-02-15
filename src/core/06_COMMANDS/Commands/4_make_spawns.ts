@@ -8,12 +8,13 @@ import { MakeMonsterSpawnKind } from '../../05_MAKE_STRUCTURES/Make_monster_spaw
 
 export const initExecuteCommandMake_spawns = () => {
     const { registerCommand } = ServiceManager.getService('Cmd')
+    const group = 'make'
 
     //-createMonsterSpawn(crmsp) <monsterSpawnLabel> <monsterLabel> <direction> [<frequency>]   --> default frequency is 2, minimum is 0.1, maximum is 30
     registerCommand({
         name: 'createMonsterSpawn',
         alias: ['crmsp'],
-        group: 'make',
+        group,
         argDescription: '<monsterSpawnLabel> <monsterLabel> <kind> [<frequency>] [straight||random]',
         description:
             'Kind must be "up", "down", "left", "right", "line" or "diagonal". Default frequency is 2, minimum is 0.1, maximum is 30',
@@ -78,7 +79,7 @@ export const initExecuteCommandMake_spawns = () => {
     registerCommand({
         name: 'setMonsterSpawnLabel',
         alias: ['setmsl'],
-        group: 'make',
+        group,
         argDescription: '<oldMonsterSpawnLabel> <newMonsterSpawnLabel>',
         description: 'Change the label of an existing monster spawn',
         cb: ({ nbParam, param1, param2 }, escaper) => {
@@ -98,7 +99,7 @@ export const initExecuteCommandMake_spawns = () => {
     registerCommand({
         name: 'setMonsterSpawnMonster',
         alias: ['setmsm'],
-        group: 'make',
+        group,
         argDescription: '<monsterSpawnLabel> <monsterLabel>',
         description: 'Change which monster type a monster spawn will create',
         cb: ({ nbParam, param1, param2 }, escaper) => {
@@ -128,7 +129,7 @@ export const initExecuteCommandMake_spawns = () => {
     registerCommand({
         name: 'setMonsterSpawnZone',
         alias: ['setmsz'],
-        group: 'make',
+        group,
         argDescription: '<monsterSpawnLabel> <kind>',
         description: 'Kind must be "up", "down", "left", "right", "line" or "diagonal".',
         cb: ({ param1, param2, nbParam }, escaper) => {
@@ -167,7 +168,7 @@ export const initExecuteCommandMake_spawns = () => {
     registerCommand({
         name: 'setMonsterSpawnFrequency',
         alias: ['setmsf'],
-        group: 'make',
+        group,
         argDescription: '<monsterSpawnLabel> <frequency>',
         description: 'Set how often monsters spawn (frequency between 0.1 and 30)',
         cb: ({ nbParam, param1, param2 }, escaper) => {
@@ -196,7 +197,7 @@ export const initExecuteCommandMake_spawns = () => {
     registerCommand({
         name: 'setMonsterSpawnAmount',
         alias: ['setmsa'],
-        group: 'make',
+        group,
         argDescription: '<label> <amount>',
         description: 'Set how many monsters spawn simultaneously per spawn cycle (1-500)',
         cb: ({ param1, param2 }, escaper) => {
@@ -222,7 +223,7 @@ export const initExecuteCommandMake_spawns = () => {
     registerCommand({
         name: 'setMonsterSpawnOffset',
         alias: ['setmso'],
-        group: 'make',
+        group,
         argDescription: '<label> <offset>',
         description: 'Distance between each individual monster when spawnAmount > 1 (0-16384, 0 disables)',
         cb: ({ param1, param2 }, escaper) => {
@@ -248,7 +249,7 @@ export const initExecuteCommandMake_spawns = () => {
     registerCommand({
         name: 'setMonsterSpawnFixedSpawnOffset',
         alias: ['setmsfso'],
-        group: 'make',
+        group,
         argDescription: '<label> <offset>',
         description:
             'Distance between each spawn (0-16384, 0 disables), or "auto" to distribute mosnters evenly in the spawn zone (useful with spawnAmount > 1).',
@@ -279,7 +280,7 @@ export const initExecuteCommandMake_spawns = () => {
     registerCommand({
         name: 'setMonsterSpawnFixedSpawnOffsetBounce',
         alias: ['setmsfsob'],
-        group: 'make',
+        group,
         argDescription: '<label> <bounce>',
         description: 'Toggle whether fixed spawn offset bounces back and forth (requires fixedSpawnOffset enabled)',
         cb: ({ param1, param2 }, escaper) => {
@@ -310,7 +311,7 @@ export const initExecuteCommandMake_spawns = () => {
     registerCommand({
         name: 'setMonsterSpawnFixedSpawnOffsetMirrored',
         alias: ['setmsfsom'],
-        group: 'make',
+        group,
         argDescription: '<label> <mirrored>',
         description: 'Toggle whether fixed spawn offset mirrors on opposite side (requires fixedSpawnOffset enabled)',
         cb: ({ param1, param2 }, escaper) => {
@@ -341,7 +342,7 @@ export const initExecuteCommandMake_spawns = () => {
     registerCommand({
         name: 'setMonsterSpawnInitialDelay',
         alias: ['setmsid'],
-        group: 'make',
+        group,
         argDescription: '<label> <delay>',
         description: 'Set delay in seconds before monster spawn starts spawning (1-10)',
         cb: ({ param1, param2 }, escaper) => {
@@ -367,7 +368,7 @@ export const initExecuteCommandMake_spawns = () => {
     registerCommand({
         name: 'setMonsterSpawnTimedUnspawn',
         alias: ['setmstu'],
-        group: 'make',
+        group,
         argDescription: '<label> <time>',
         description:
             'Set time in seconds after which spawned monsters will automatically despawn (0 to disable). If enabled, replace the automatic despawn when monster leaves the spawn zone.',
@@ -398,7 +399,7 @@ export const initExecuteCommandMake_spawns = () => {
     registerCommand({
         name: 'setMonsterSpawnMonsterDirectionMode',
         alias: ['setmsmdm'],
-        group: 'make',
+        group,
         argDescription: '<label> straight||random',
         description:
             "Set the monster direction mode for spawned monsters (straight or random) => doesn't work for line zones",
@@ -433,7 +434,7 @@ export const initExecuteCommandMake_spawns = () => {
     registerCommand({
         name: 'createMonsterSpawnDeadZone',
         alias: ['crmsdz'],
-        group: 'make',
+        group,
         argDescription: '<monsterSpawnLabel> [<deadZoneShape>]',
         description:
             'Add one or several dead zones to a monster spawn (spawned monsters will be hidden in that zone and non lethal). deadZoneShape can be "horizontal", "diagonal", "circle" or "line". Default is "horizontal". Stop creating dead zones with -stop.',
@@ -474,7 +475,7 @@ export const initExecuteCommandMake_spawns = () => {
     registerCommand({
         name: 'deleteMonsterSpawnDeadZones',
         alias: ['delmsdz'],
-        group: 'make',
+        group,
         argDescription: '<monsterSpawnLabel> [clicks|all]',
         description:
             'Remove dead zones of a monster spawn. With "clicks", remove them one by one with clicks (priority on region with the lowest area). With "all" or no argument, remove them all at once (defaults to "clicks").',
@@ -515,7 +516,7 @@ export const initExecuteCommandMake_spawns = () => {
     registerCommand({
         name: 'displayMonsterSpawns',
         alias: ['dms'],
-        group: 'make',
+        group,
         argDescription: '[<monsterSpawnLabel>] [page]',
         description: 'Displays the monster spawns for this level',
         cb: ({ cmd }, escaper) => {
@@ -528,7 +529,7 @@ export const initExecuteCommandMake_spawns = () => {
     registerCommand({
         name: 'displayMonsterSpawnsDetailled',
         alias: ['dmsd'],
-        group: 'make',
+        group,
         argDescription: '[<monsterSpawnLabel>] [page]',
         description: 'Displays the monster spawns for this level',
         cb: ({ cmd }, escaper) => {
@@ -541,7 +542,7 @@ export const initExecuteCommandMake_spawns = () => {
     registerCommand({
         name: 'deleteMonsterSpawn',
         alias: ['delms'],
-        group: 'make',
+        group,
         argDescription: '<monsterSpawnLabel>',
         description: '',
         cb: ({ nbParam, param1 }, escaper) => {
