@@ -2393,10 +2393,11 @@ export const initExecuteCommandMake = () => {
         name: 'deleteMonsterSpawnDeadZones',
         alias: ['delmsdz'],
         group: 'make',
-        argDescription: '<monsterSpawnLabel>',
-        description: 'Remove all dead zones of a monster spawn.',
+        argDescription: '<monsterSpawnLabel> [clicks|all]',
+        description:
+            'Remove dead zones of a monster spawn. With "clicks", remove them one by one with clicks (priority on region with the lowest area). With "all" or no argument, remove them all at once (defaults to "clicks").',
         cb: ({ nbParam, param1, param2 }, escaper) => {
-            if (nbParam !== 1) {
+            if (nbParam < 1 || nbParam > 2) {
                 Text.erP(escaper.getPlayer(), 'deleteMonsterSpawnDeadZones: wrong arguments')
                 return true
             }
@@ -2407,9 +2408,22 @@ export const initExecuteCommandMake = () => {
                 return true
             }
 
-            monsterSpawn.removeAllHideRegions()
+            let mode: 'clicks' | 'all' = 'clicks'
+            if (nbParam === 2) {
+                if (!['clicks', 'all'].includes(param2)) {
+                    Text.erP(escaper.getPlayer(), 'deleteMonsterSpawnDeadZones: wrong arguments')
+                    return true
+                }
+                mode = param2 as 'clicks' | 'all'
+            }
 
-            Text.mkP(escaper.getPlayer(), `Removed all dead zones for monster spawn "${monsterSpawn.getLabel()}"`)
+            if (mode === 'all') {
+                monsterSpawn.removeAllHideRegions()
+                Text.mkP(escaper.getPlayer(), `Removed all dead zones for monster spawn "${monsterSpawn.getLabel()}"`)
+            } else {
+                escaper.makeMonsterSpawnRemoveHideRegion(monsterSpawn)
+                Text.mkP(escaper.getPlayer(), `Click on dead zones to remove (end with -stop)`)
+            }
 
             return true
         },

@@ -3,16 +3,12 @@ import { Make } from 'core/05_MAKE_STRUCTURES/Make/Make'
 import { Ascii2String } from '../../01_libraries/Ascii'
 import { udg_colorCode } from '../../01_libraries/Init_colorCodes'
 import { Text } from '../../01_libraries/Text'
-import { Escaper } from '../../04_STRUCTURES/Escaper/Escaper'
 import { MonsterSpawn } from '../../04_STRUCTURES/MonsterSpawn/MonsterSpawn'
 import { MONSTER_NEAR_DIFF_MAX } from '../../04_STRUCTURES/Monster/MonsterArray'
 
 export class MakeGetMonsterInfo extends Make {
-    public escaper: Escaper
-
-    constructor(maker: unit, escaper: Escaper) {
+    constructor(maker: unit) {
         super(maker, 'getMonsterInfo', false)
-        this.escaper = escaper
     }
 
     doActions = () => {

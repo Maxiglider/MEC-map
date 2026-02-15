@@ -201,7 +201,7 @@ export class MonsterSpawn {
         this._active && this.refresh()
     }
 
-    // remove monster unit with destroying it but just hiding it with the simpleUnitRecycler
+    // remove monster unit without destroying it but just hiding it with the simpleUnitRecycler
     removeMonsterUnit(monsterUnit: unit) {
         this.monsters && GroupRemoveUnit(this.monsters, monsterUnit)
 
@@ -350,12 +350,6 @@ export class MonsterSpawn {
 
             for (const [_, hideRegion] of pairs(this.hideRegions)) {
                 hideRegion.watchUnit(monster)
-
-                if (hideRegion.isUnitInRegion(monster)) {
-                    ShowUnit(monster, false)
-                    UnitRemoveAbility(monster, FourCC('Aloc'))
-                    break
-                }
             }
         }
 
@@ -439,6 +433,23 @@ export class MonsterSpawn {
         for (const [_, hideRegion] of pairs(this.hideRegions)) {
             hideRegion.debugRects(enable)
         }
+    }
+
+    getMostLittleHideRegionAtPosition(x: number, y: number): MECRegion | null {
+        let mostLittleHideRegion: MECRegion | null = null
+        let mostLittleArea = -1
+
+        for (const [_, hideRegion] of pairs(this.hideRegions)) {
+            if (hideRegion.areCoordsInRegion(x, y)) {
+                const area = hideRegion.getArea()
+                if (mostLittleArea === -1 || area < mostLittleArea) {
+                    mostLittleHideRegion = hideRegion
+                    mostLittleArea = area
+                }
+            }
+        }
+
+        return mostLittleHideRegion
     }
 
     setLabel = (newLabel: string) => {

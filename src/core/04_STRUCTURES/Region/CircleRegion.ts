@@ -42,6 +42,18 @@ export class CircleRegion extends MECRegion {
         return this.debugEffects
     }
 
+    getArea() {
+        return Math.PI * this.radiusSquare
+    }
+
+    getCenterX(): number {
+        return this.centerX
+    }
+
+    getCenterY(): number {
+        return this.centerY
+    }
+
     toJson(): any {
         const output = super.toJson()
 

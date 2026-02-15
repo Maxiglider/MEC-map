@@ -462,6 +462,18 @@ export class RectangleRegion extends MECRegion {
         return Math.round(Rad2Deg(Math.atan2(this.vectorY, this.vectorX)))
     }
 
+    getArea(): number {
+        return this.getLength() * this.getWidth()
+    }
+
+    getCenterX(): number {
+        return this.x1 + this.deltaX2X1 / 2 + this.vectorX / 2
+    }
+
+    getCenterY(): number {
+        return this.y1 + this.deltaY2Y1 / 2 + this.vectorY / 2
+    }
+
     toText(detailled = false) {
         const width = this.getWidth()
         const isLine = width <= RECTANGLE_REGION_MINIMUM_SIZE

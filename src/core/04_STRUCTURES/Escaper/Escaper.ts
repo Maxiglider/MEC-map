@@ -2059,7 +2059,7 @@ export class Escaper {
 
     makeGetMonsterInfo = () => {
         this.destroyMake()
-        if (this.hero) this.make = new Makes.MakeGetMonsterInfo(this.hero, this)
+        if (this.hero) this.make = new Makes.MakeGetMonsterInfo(this.hero)
     }
 
     makeExchangeTerrains = () => {
@@ -2090,6 +2090,13 @@ export class Escaper {
     makeCreateDebugMECRegions = (mode: MakeMECRegionMode, directionForHorizontal: HorizontalRegionDirection = 'up') => {
         this.destroyMake()
         if (this.hero) this.make = new Makes.MakeDebugMECRegion(this.hero, mode, directionForHorizontal)
+    }
+
+    makeMonsterSpawnRemoveHideRegion = (monsterSpawn: MonsterSpawn) => {
+        this.destroyMake()
+        if (this.hero) {
+            this.make = new Makes.MakeMonsterSpawnRemoveHideRegion(this.hero, monsterSpawn)
+        }
     }
 
     cancelLastAction = () => {

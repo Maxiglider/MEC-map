@@ -1,5 +1,4 @@
 import { MonsterType } from 'core/04_STRUCTURES/Monster/MonsterType'
-import { MakeOneByOneOrTwoClicks } from 'core/05_MAKE_STRUCTURES/Make/MakeOneByOneOrTwoClicks'
 import { Text } from '../../01_libraries/Text'
 import { MonsterDirectionMode, MonsterSpawn } from '../../04_STRUCTURES/MonsterSpawn/MonsterSpawn'
 import { MakeMECRegion, MakeMECRegionMode } from '../Make_create_region/MakeMECRegion'

@@ -57,6 +57,7 @@ import { MakeSetClearMobEffect } from '../Make_monster_properties/MakeSetClearMo
 import { MakeDebugMECRegion } from '../Make_create_region/MakeDebugMECRegion'
 import { MakeSetMonsterSpawnZone } from '../Make_monster_spawn/MakeSetMonsterSpawnZone'
 import { MakeMonsterSpawnHideRegion } from '../Make_monster_spawn/MakeMonsterSpawnHideRegion'
+import { MakeMonsterSpawnRemoveHideRegion } from '../Make_monster_spawn/MakeMonsterSpawnRemoveHideRegion'
 
 export const Makes = {
     MakePropertyChange,
@@ -118,4 +119,5 @@ export const Makes = {
     MakeDebugMECRegion,
     MakeSetMonsterSpawnZone,
     MakeMonsterSpawnHideRegion,
+    MakeMonsterSpawnRemoveHideRegion,
 }

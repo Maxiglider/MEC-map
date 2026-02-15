@@ -76,21 +76,25 @@ export abstract class MECRegion {
         }
 
         for (const [_, unit] of pairs(this.watchedUnits)) {
-            const unitId = GetHandleId(unit)
-            const wasInRegion = this.unitsConsideredInRegion[unitId] !== undefined
-            const isInRegion = this.isUnitInRegion(unit)
+            this.watchForEventsOneUnit(unit)
+        }
+    }
 
-            if (wasInRegion !== isInRegion) {
-                if (isInRegion) {
-                    this.unitsConsideredInRegion[unitId] = unit
-                    for (const [_, callback] of pairs(this.unitEntersCallbacks)) {
-                        callback(unit)
-                    }
-                } else {
-                    delete this.unitsConsideredInRegion[unitId]
-                    for (const [_, callback] of pairs(this.unitLeavesCallbacks)) {
-                        callback(unit)
-                    }
+    watchForEventsOneUnit(unit: unit): void {
+        const unitId = GetHandleId(unit)
+        const wasInRegion = this.unitsConsideredInRegion[unitId] !== undefined
+        const isInRegion = this.isUnitInRegion(unit)
+
+        if (wasInRegion !== isInRegion) {
+            if (isInRegion) {
+                this.unitsConsideredInRegion[unitId] = unit
+                for (const [_, callback] of pairs(this.unitEntersCallbacks)) {
+                    callback(unit)
+                }
+            } else {
+                delete this.unitsConsideredInRegion[unitId]
+                for (const [_, callback] of pairs(this.unitLeavesCallbacks)) {
+                    callback(unit)
                 }
             }
         }
@@ -166,6 +170,7 @@ export abstract class MECRegion {
         if (initiallyIn) {
             this.unitsConsideredInRegion[GetHandleId(unit)] = unit
         }
+        this.watchForEventsOneUnit(unit)
     }
 
     unwatchUnit(unit: unit): void {
@@ -264,6 +269,12 @@ export abstract class MECRegion {
     getId(): number {
         return this.id
     }
+
+    abstract getArea(): number
+
+    abstract getCenterX(): number
+
+    abstract getCenterY(): number
 
     toJson() {
         const output = MemoryHandler.getEmptyObject<any>()
