@@ -14,6 +14,7 @@ import { getUdgEscapers, getUdgLevels, getUdgTerrainTypes, globals, udg_monsters
 import { EncodingBase64 } from '../../../Utils/SaveLoad/TreeLib/EncodingBase64'
 import { createEvent, createTimer, runInTrigger } from '../../../Utils/mapUtils'
 import { BlzColor2Id, removeHash } from '../../06_COMMANDS/Helpers/Command_functions'
+import { refreshTrigMoveCollisionLandmarks } from '../../07_TRIGGERS/CollisionLandmarks/MoveCollisionLandmarks'
 import { CheckTerrainTrigger } from '../../07_TRIGGERS/Slide_and_CheckTerrain_triggers/CheckTerrain'
 import { SlideTrigger } from '../../07_TRIGGERS/Slide_and_CheckTerrain_triggers/Slide'
 import {
@@ -24,35 +25,24 @@ import { reviveTrigManager } from '../../08_GAME/Death/A_hero_dies_check_if_all_
 import { HERO_START_ANGLE } from '../../08_GAME/Init_game/Heroes'
 import { MessageHeroDies } from '../../08_GAME/Init_game/Message_heroDies'
 import { RunCoopSoundOnHero } from '../../08_GAME/Mode_coop/coop_init_sounds'
+import { hooks } from '../../API/GeneralHooks'
 import { DisableInterface, EnableInterface } from '../../DisablingInterface/EnableDisableInterface'
 import { FollowMouse } from '../../Follow_mouse/Follow_mouse'
 import { SimpleFollowMouse } from '../../Follow_mouse/Follow_mouse_simple'
 import { KeyboardShortcutArray } from '../../Keyboard_shortcuts/KeyboardShortcutArray'
-import type { CasterType } from '../Caster/CasterType'
+import { Natives } from '../../wc3_natives_unsecured/Natives'
 import { Level } from '../Level/Level'
-import { IsLevelBeingMade } from '../Level/Level_functions'
 import { DEPART_PAR_DEFAUT } from '../Level/StartAndEnd'
 import { StaticSlide } from '../Level/StaticSlide'
 import { METEOR_CHEAT, METEOR_NORMAL, udg_meteors } from '../Meteor/Meteor'
-import type { MonsterType } from '../Monster/MonsterType'
 import { isDeathTerrain, type TerrainType } from '../TerrainType/TerrainType'
 import { TerrainTypeSlide } from '../TerrainType/TerrainTypeSlide'
 import { TerrainTypeWalk } from '../TerrainType/TerrainTypeWalk'
 import { EscaperEffectArray } from './EscaperEffectArray'
+import { EscaperMake } from './EscaperMake'
 import { EscaperStartCommands } from './Escaper_StartCommands'
 import { EscaperFirstPerson } from './Escaper_firstPerson'
 import { ColorInfo, GetMirrorEscaper } from './Escaper_functions'
-import { Natives } from '../../wc3_natives_unsecured/Natives'
-import { hooks } from '../../API/GeneralHooks'
-import { Makes } from '../../05_MAKE_STRUCTURES/Make/Makes'
-import { MakeAction } from '../../05_MAKE_STRUCTURES/MakeLastActions/MakeAction'
-import { MakeLastActions } from '../../05_MAKE_STRUCTURES/MakeLastActions/MakeLastActions'
-import { Make } from '../../05_MAKE_STRUCTURES/Make/Make'
-import { refreshTrigMoveCollisionLandmarks } from '../../07_TRIGGERS/CollisionLandmarks/MoveCollisionLandmarks'
-import { MakeMECRegionMode } from '../../05_MAKE_STRUCTURES/Make_create_region/MakeMECRegion'
-import { HorizontalRegionDirection } from '../Region/HorizontalRegion'
-import { MakeMonsterSpawnKind } from '../../05_MAKE_STRUCTURES/Make_monster_spawn/MakeMonsterSpawn'
-import { MonsterSpawn } from '../MonsterSpawn/MonsterSpawn'
 
 const SHOW_REVIVE_EFFECTS = false
 
@@ -89,12 +79,7 @@ export function IsHeroCollisionSizeValid(collisionSize: number): boolean {
     return (collisionSize >= 0 && collisionSize <= 200) || collisionSize % 5 === 0
 }
 
-export class Escaper {
-    private escaperId: number
-    private playerId: number
-
-    private p: player
-    private hero?: unit
+export class Escaper extends EscaperMake {
     private invisUnit?: unit
     private collisionSize: number
     private collisionLandmarkEffect?: effect
@@ -142,9 +127,9 @@ export class Escaper {
 
     public cmdAccessMap: { [cmd: string]: boolean } = {}
 
-    private make?: Make
-    private makeLastActions: MakeLastActions
-    private makingLevel?: Level
+    private gumTerrain?: TerrainType
+    private gumBrushSize = 1
+    private brushSize = 1
 
     private lastZ: number = 0
     private oldDiffZ: number = 0
@@ -186,11 +171,6 @@ export class Escaper {
     private followMouse?: FollowMouse
     private simpleFollowMouse?: SimpleFollowMouse
 
-    //make
-    private gumTerrain?: TerrainType
-    private gumBrushSize = 1
-    private brushSize = 1
-
     private ignoreDeathMessages = false
     private textTag: texttag | null = null
     private textTagTimer: Timer | null = null
@@ -212,7 +192,7 @@ export class Escaper {
     alliedState: { [escaperId: number]: boolean } = {}
 
     private canClick: boolean
-    private canClickTrigger: trigger
+    private readonly canClickTrigger: trigger
 
     public moveCamDistanceWidth = 2048
     public moveCamDistanceHeight = 1536
@@ -310,10 +290,8 @@ export class Escaper {
      * Constructor
      */
     constructor(escaperId: number) {
-        this.playerId = escaperId >= Constants.NB_PLAYERS_MAX ? escaperId - 12 : escaperId
+        super(escaperId)
 
-        this.escaperId = escaperId
-        this.p = Natives.UPlayer(this.playerId)
         this.walkSpeed = Constants.HERO_WALK_SPEED
         this.slideSpeed = Constants.HERO_SLIDE_SPEED
         this.rotationSpeed = HERO_ROTATION_SPEED
@@ -332,8 +310,6 @@ export class Escaper {
         this.vcGreen = 100
         this.vcBlue = 100
         this.vcTransparency = escaperId >= Constants.NB_PLAYERS_MAX ? 50 : 0
-
-        this.makeLastActions = new MakeLastActions(this)
 
         this.godMode = false
         this.godModeKills = false
@@ -560,8 +536,7 @@ export class Escaper {
         }
 
         delete this.lastTerrainType
-        this.make?.destroy()
-        delete this.make
+        this.destroyMake()
         this.effects.hideEffects()
 
         const staticSliding = this.staticSliding
@@ -614,6 +589,9 @@ export class Escaper {
         DestroyTrigger(this.canClickTrigger)
 
         this.lastPos?.__destroy()
+
+        this.destroyMake()
+        this.destroyMakeLastActions()
     }
 
     //getId method
@@ -1468,672 +1446,6 @@ export class Escaper {
         this.hasAutoreviveB = hasAutorevive
     }
 
-    //make methods
-    getMake = () => {
-        return this.make
-    }
-
-    destroyMakeIfForSpecificLevel = () => {
-        if (this.make && this.make.forSpecificLevel) {
-            this.destroyMake()
-        }
-    }
-
-    setMakingLevel(level: Level | null) {
-        if (this.makingLevel == level) {
-            return false
-        }
-
-        const oldMakingLevel = this.makingLevel
-        this.destroyMakeIfForSpecificLevel()
-
-        delete this.makingLevel
-
-        if (oldMakingLevel && !IsLevelBeingMade(oldMakingLevel)) {
-            oldMakingLevel.activate(false)
-        }
-
-        if (level) {
-            Level.earningLivesActivated = false
-            level && level.activate(true)
-            Level.earningLivesActivated = true
-            this.makingLevel = level
-        }
-
-        getUdgLevels().refreshVisibilities()
-
-        return true
-    }
-
-    getMakingLevel(): Level {
-        if (this.makingLevel) {
-            return this.makingLevel
-        } else {
-            return getUdgLevels().getCurrentLevel(this)
-        }
-    }
-
-    isMakingCurrentLevel = () => {
-        return !!this.makingLevel
-    }
-
-    destroyMake = () => {
-        if (!this.make) {
-            return false
-        }
-
-        this.make && this.make.destroy()
-        delete this.make
-
-        if (!this.isEscaperSecondary()) {
-            createTimer(0, false, () => {
-                //prevent secondary hero from moving at end of make
-                const hero = GetMirrorEscaper(this)?.hero
-                if (hero) {
-                    StopUnit(hero)
-                }
-            })
-        }
-
-        return true
-    }
-
-    makeDoNothing = () => {
-        this.destroyMake()
-        if (this.hero) this.make = new Makes.MakeDoNothing(this.hero)
-    }
-
-    makeCreateNoMoveMonsters(mt: MonsterType, facingAngle: number) {
-        //mode : noMove
-        this.destroyMake()
-        if (this.hero) this.make = new Makes.MakeMonsterNoMove(this.hero, mt, facingAngle)
-    }
-
-    makeCreateSimplePatrolMonsters(mode: string, mt: MonsterType, angle?: number) {
-        this.destroyMake()
-        //modes : normal, string, auto
-        if (mode == 'normal' || mode == 'string' || mode == 'auto') {
-            if (this.hero) this.make = new Makes.MakeMonsterSimplePatrol(this.hero, mode, mt, angle)
-        }
-    }
-
-    makeCreateMultiplePatrolsMonsters(mode: string, mt: MonsterType) {
-        this.destroyMake()
-        //modes : normal, string
-        if (mode == 'normal' || mode == 'string') {
-            if (this.hero) this.make = new Makes.MakeMonsterMultiplePatrols(this.hero, mode, mt)
-        }
-    }
-
-    makeCreateTeleportMonsters(mode: string, mt: MonsterType, period: number, angle: number) {
-        this.destroyMake()
-        //modes : normal, string
-        if (mode == 'normal' || mode == 'string') {
-            if (this.hero) this.make = new Makes.MakeMonsterTeleport(this.hero, mode, mt, period, angle)
-        }
-    }
-
-    makeMmpOrMtNext = () => {
-        if (!this.make) {
-            return false
-        }
-
-        if (this.make instanceof Makes.MakeMonsterMultiplePatrols || this.make instanceof Makes.MakeMonsterTeleport) {
-            this.make.nextMonster()
-        } else {
-            return false
-        }
-
-        return true
-    }
-
-    makeMonsterTeleportWait = () => {
-        if (!this.make || !(this.make instanceof Makes.MakeMonsterTeleport)) {
-            return false
-        }
-        return this.make.addWaitPeriod()
-    }
-
-    makeMonsterTeleportHide = () => {
-        if (!this.make || !(this.make instanceof Makes.MakeMonsterTeleport)) {
-            return false
-        }
-        return this.make.addHidePeriod()
-    }
-
-    makeCreateMonsterSpawn(
-        label: string,
-        mt: MonsterType,
-        kind: MakeMonsterSpawnKind,
-        frequency: number,
-        monsterDirectionMode: 'straight' | 'random'
-    ) {
-        this.destroyMake()
-        if (this.hero) {
-            const makeMonsterSpawn = new Makes.MakeMonsterSpawn(
-                this.hero,
-                label,
-                mt,
-                kind,
-                frequency,
-                monsterDirectionMode
-            )
-            this.make = makeMonsterSpawn
-            return makeMonsterSpawn
-        }
-
-        return null
-    }
-
-    makeSetMonsterSpawnZone(monsterSpawn: MonsterSpawn, kind: MakeMonsterSpawnKind) {
-        this.destroyMake()
-        if (this.hero) {
-            const makeSetMonsterSpawnZone = new Makes.MakeSetMonsterSpawnZone(this.hero, monsterSpawn, kind)
-            this.make = makeSetMonsterSpawnZone
-            return makeSetMonsterSpawnZone
-        }
-
-        return null
-    }
-
-    makeMonsterSpawnHideRegion(monsterSpawn: MonsterSpawn, mecRegionMode: MakeMECRegionMode) {
-        this.destroyMake()
-        if (this.hero) {
-            const makeMonsterSpawnHideRegion = new Makes.MakeMonsterSpawnHideRegion(
-                this.hero,
-                monsterSpawn,
-                mecRegionMode
-            )
-            this.make = makeMonsterSpawnHideRegion
-            return makeMonsterSpawnHideRegion
-        }
-
-        return null
-    }
-
-    makeCreateRegion(label: string) {
-        this.destroyMake()
-        if (this.hero) this.make = new Makes.MakeRegion(this.hero, label)
-    }
-
-    makeGetRegionAtPoint = () => {
-        this.destroyMake()
-        if (this.hero) this.make = new Makes.MakeGetRegion(this.hero)
-    }
-
-    makeMoveRegionPoint = () => {
-        this.destroyMake()
-        if (this.hero) this.make = new Makes.MakeMoveRegionPoint(this.hero)
-    }
-
-    makeCopyLevelPatrol = (targetLevel: Level, mode: string) => {
-        this.destroyMake()
-        if (this.hero) this.make = new Makes.MakeCopyLevelPatrol(this.hero, mode, targetLevel)
-    }
-
-    makeDeleteMonsters(mode: string) {
-        this.destroyMake()
-
-        try {
-            if (this.hero) this.make = new Makes.MakeDeleteMonsters(this.hero, mode)
-        } catch (error) {
-            if (typeof error == 'string') {
-                Text.erP(this.p, error)
-            }
-        }
-    }
-
-    makeSetUnitTeleportPeriod(mode: string, period: number) {
-        this.destroyMake()
-
-        try {
-            if (this.hero) this.make = new Makes.MakeSetUnitTeleportPeriod(this.hero, mode, period)
-        } catch (error) {
-            if (typeof error == 'string') {
-                Text.erP(this.p, error)
-            }
-        }
-    }
-
-    makeGetUnitTeleportPeriod = () => {
-        this.destroyMake()
-        if (this.hero) this.make = new Makes.MakeGetUnitTeleportPeriod(this.hero)
-    }
-
-    makeSetUnitMonsterType(mode: string, mt: MonsterType) {
-        this.destroyMake()
-
-        try {
-            if (this.hero) this.make = new Makes.MakeSetUnitMonsterType(this.hero, mode, mt)
-        } catch (error) {
-            if (typeof error == 'string') {
-                Text.erP(this.p, error)
-            }
-        }
-    }
-
-    makeCreateMeteor = () => {
-        this.destroyMake()
-        if (this.hero) this.make = new Makes.MakeMeteor(this.hero)
-    }
-
-    makeDeleteMeteors(mode: string) {
-        this.destroyMake()
-
-        try {
-            if (this.hero) this.make = new Makes.MakeDeleteMeteors(this.hero, mode)
-        } catch (error) {
-            if (typeof error == 'string') {
-                Text.erP(this.p, error)
-            }
-        }
-    }
-
-    makeCreateCaster(casterType: CasterType, angle: number) {
-        this.destroyMake()
-        if (this.hero) this.make = new Makes.MakeCaster(this.hero, casterType, angle)
-    }
-
-    makeDeleteCasters(mode: string) {
-        this.destroyMake()
-
-        try {
-            if (this.hero) this.make = new Makes.MakeDeleteCasters(this.hero, mode)
-        } catch (error) {
-            if (typeof error == 'string') {
-                Text.erP(this.p, error)
-            }
-        }
-    }
-
-    makeCreateClearMobs(disableDuration: number) {
-        this.destroyMake()
-        if (this.hero) this.make = new Makes.MakeClearMob(this.hero, disableDuration)
-    }
-
-    makeDeleteClearMobs = () => {
-        this.destroyMake()
-        if (this.hero) this.make = new Makes.MakeDeleteClearMob(this.hero)
-    }
-
-    makeSetClearMobEffect = (effectPath: string) => {
-        this.destroyMake()
-        if (this.hero) this.make = new Makes.MakeSetClearMobEffect(this.hero, effectPath)
-    }
-
-    makeSetBlockMobEffect = (effectPath: string) => {
-        this.destroyMake()
-        if (this.hero) this.make = new Makes.MakeSetBlockMobEffect(this.hero, effectPath)
-    }
-
-    makeSetClearMobDisableDuration(disableDuration: number) {
-        this.destroyMake()
-        if (this.hero) {
-            this.make = new Makes.MakePropertyChange(
-                this.hero,
-                'disableDuration',
-                disableDuration,
-                (x, y) => this.getMakingLevel().monsters.getMonsterNear(x, y)?.getClearMob(),
-                clearMob => clearMob.getDisableDuration(),
-                (clearMob, disableDuration) => clearMob.setDisableDuration(disableDuration)
-            )
-        }
-    }
-
-    makeCreatePortalMobs(freezeDuration: number, portalEffect: string | null, portalEffectDuration: number | null) {
-        this.destroyMake()
-        if (this.hero)
-            this.make = new Makes.MakePortalMob(this.hero, freezeDuration, portalEffect, portalEffectDuration)
-    }
-
-    makeDeletePortalMobs = () => {
-        this.destroyMake()
-        if (this.hero) this.make = new Makes.MakeDeletePortalMob(this.hero)
-    }
-
-    makeCreateCircleMob(
-        speed: number | null,
-        direction: 'cw' | 'ccw' | null,
-        facing: 'cw' | 'ccw' | 'in' | 'out' | null,
-        radius: number | null
-    ) {
-        this.destroyMake()
-        if (this.hero) this.make = new Makes.MakeCircleMob(this.hero, speed, direction, facing, radius)
-    }
-
-    makeDeleteCircleMob = () => {
-        this.destroyMake()
-        if (this.hero) this.make = new Makes.MakeDeleteCircleMob(this.hero)
-    }
-
-    makeCreateStaticSlide(angle: number, speed: number) {
-        this.destroyMake()
-        if (this.hero) this.make = new Makes.MakeStaticSlide(this.hero, angle, speed)
-    }
-
-    makeDeleteStaticSlide = () => {
-        this.destroyMake()
-        if (this.hero) this.make = new Makes.MakeDeleteStaticSlide(this.hero)
-    }
-
-    makeStaticSlideInfo = () => {
-        this.destroyMake()
-        if (this.hero) this.make = new Makes.MakeStaticSlideInfo(this.hero)
-    }
-
-    makeSetPortalMobFreezeDuration(freezeDuration: number) {
-        this.destroyMake()
-        if (this.hero) {
-            this.make = new Makes.MakePropertyChange(
-                this.hero,
-                'freezeDuration',
-                freezeDuration,
-                (x, y) => this.getMakingLevel().monsters.getMonsterNear(x, y)?.getPortalMob(),
-                monster => monster.getFreezeDuration(),
-                (monster, freezeDuration) => monster.setFreezeDuration(freezeDuration)
-            )
-        }
-    }
-
-    makeSetPortalMobPortalEffect(portalEffect: string | null) {
-        this.destroyMake()
-        if (this.hero) {
-            this.make = new Makes.MakePropertyChange(
-                this.hero,
-                'portalEffect',
-                portalEffect,
-                (x, y) => this.getMakingLevel().monsters.getMonsterNear(x, y)?.getPortalMob(),
-                monster => monster.getPortalEffect(),
-                (monster, portalEffect) => monster.setPortalEffect(portalEffect)
-            )
-        }
-    }
-
-    makeSetPortalMobPortalEffectDuration(portalEffectDuration: number | null) {
-        this.destroyMake()
-        if (this.hero) {
-            this.make = new Makes.MakePropertyChange(
-                this.hero,
-                'portalEffectDuration',
-                portalEffectDuration,
-                (x, y) => this.getMakingLevel().monsters.getMonsterNear(x, y)?.getPortalMob(),
-                monster => monster.getPortalEffectDuration(),
-                (monster, portalEffectDuration) => monster.setPortalEffectDuration(portalEffectDuration)
-            )
-        }
-    }
-
-    makeSetCircleMobSpeed(speed: number) {
-        this.destroyMake()
-        if (this.hero) {
-            this.make = new Makes.MakePropertyChange(
-                this.hero,
-                'speed',
-                speed,
-                (x, y) => this.getMakingLevel().monsters.getMonsterNear(x, y)?.getCircleMob(),
-                monster => monster.getSpeed(),
-                (monster, speed) => monster.setSpeed(speed)
-            )
-        }
-    }
-
-    makeSetCircleMobDirection(direction: 'cw' | 'ccw') {
-        this.destroyMake()
-        if (this.hero) {
-            this.make = new Makes.MakePropertyChange(
-                this.hero,
-                'direction',
-                direction,
-                (x, y) => this.getMakingLevel().monsters.getMonsterNear(x, y)?.getCircleMob(),
-                monster => monster.getDirection(),
-                (monster, direction) => monster.setDirection(direction)
-            )
-        }
-    }
-
-    makeSetCircleMobFacing(facing: 'cw' | 'ccw' | 'in' | 'out') {
-        this.destroyMake()
-        if (this.hero) {
-            this.make = new Makes.MakePropertyChange(
-                this.hero,
-                'facing',
-                facing,
-                (x, y) => this.getMakingLevel().monsters.getMonsterNear(x, y)?.getCircleMob(),
-                monster => monster.getFacing(),
-                (monster, facing) => monster.setFacing(facing)
-            )
-        }
-    }
-
-    makeSetCircleMobShape(shape: 'circle' | 'square' | 'triangle' | 'pentagon' | 'hexagon' | 'octagon' | 'eight') {
-        this.destroyMake()
-        if (this.hero) {
-            this.make = new Makes.MakePropertyChange(
-                this.hero,
-                'shape',
-                shape,
-                (x, y) => this.getMakingLevel().monsters.getMonsterNear(x, y)?.getCircleMob(),
-                monster => monster.getShape(),
-                (monster, shape) => monster.setShape(shape)
-            )
-        }
-    }
-
-    makeSetCircleMobInitialAngle(initialAngle: number) {
-        this.destroyMake()
-        if (this.hero) {
-            this.make = new Makes.MakePropertyChange(
-                this.hero,
-                'initialAngle',
-                initialAngle,
-                (x, y) => this.getMakingLevel().monsters.getMonsterNear(x, y)?.getCircleMob(),
-                monster => monster.getInitialAngle(),
-                (monster, initialAngle) => monster.setInitialAngle(initialAngle)
-            )
-        }
-    }
-
-    makeSetCircleMobRadius(radius: number) {
-        this.destroyMake()
-        if (this.hero) {
-            this.make = new Makes.MakePropertyChange(
-                this.hero,
-                'radius',
-                radius,
-                (x, y) => this.getMakingLevel().monsters.getMonsterNear(x, y)?.getCircleMob(),
-                monster => monster.getRadius(),
-                (monster, radius) => monster.setRadius(radius)
-            )
-        }
-    }
-
-    makeSetStaticSlideSpeed(speed: number) {
-        this.destroyMake()
-        if (this.hero) {
-            this.make = new Makes.MakePropertyChange(
-                this.hero,
-                'speed',
-                speed,
-                (x, y) => this.getMakingLevel().staticSlides.getStaticSlideFromPoint(x, y),
-                staticSlide => staticSlide.getSpeed(),
-                (staticSlide, speed) => staticSlide.setSpeed(speed)
-            )
-        }
-    }
-
-    makeSetStaticSlideAngle(angle: number) {
-        this.destroyMake()
-        if (this.hero) {
-            this.make = new Makes.MakePropertyChange(
-                this.hero,
-                'angle',
-                angle,
-                (x, y) => this.getMakingLevel().staticSlides.getStaticSlideFromPoint(x, y),
-                staticSlide => staticSlide.getAngle(),
-                (staticSlide, angle) => staticSlide.setAngle(angle)
-            )
-        }
-    }
-
-    makeSetStaticSlideCanTurnAngle(canTurnAngle: number | undefined) {
-        this.destroyMake()
-        if (this.hero) {
-            this.make = new Makes.MakePropertyChange(
-                this.hero,
-                'canTurnAngle',
-                canTurnAngle,
-                (x, y) => this.getMakingLevel().staticSlides.getStaticSlideFromPoint(x, y),
-                staticSlide => staticSlide.getCanTurnAngle(),
-                (staticSlide, canTurnAngle) => staticSlide.setCanTurnAngle(canTurnAngle)
-            )
-        }
-    }
-
-    makeSetMonsterJumpPad(jumpPad: number | undefined) {
-        this.destroyMake()
-        if (this.hero) {
-            this.make = new Makes.MakePropertyChange(
-                this.hero,
-                'jumpPad',
-                jumpPad,
-                (x, y) => this.getMakingLevel().monsters.getMonsterNear(x, y),
-                monster => monster.getJumpPad(),
-                (monster, jumpPad) => monster.setJumpPad(jumpPad)
-            )
-        }
-    }
-
-    makeSetMonsterJumpPadEffect(jumpPadEffect: string | undefined) {
-        this.destroyMake()
-        if (this.hero) {
-            this.make = new Makes.MakePropertyChange(
-                this.hero,
-                'jumpPadEffect',
-                jumpPadEffect,
-                (x, y) => this.getMakingLevel().monsters.getMonsterNear(x, y),
-                monster => monster.getJumpPadEffect(),
-                (monster, jumpPadEffect) => monster.setJumpPadEffect(jumpPadEffect)
-            )
-        }
-    }
-
-    makeSetMonsterAttackGroundOrder(delay: number = 0) {
-        this.destroyMake()
-        if (this.hero) this.make = new Makes.MakeMonsterAttackGroundOrder(this.hero, delay)
-    }
-
-    makeCreateTerrain(terrainType: TerrainType) {
-        this.destroyMake()
-        if (this.hero) this.make = new Makes.MakeTerrainCreate(this.hero, terrainType)
-    }
-
-    makeCreateTerrainBrush(terrainType: TerrainType, brushSize: number, shape: 'square' | 'circle' = 'square') {
-        this.destroyMake()
-        this.make = new Makes.MakeTerrainCreateBrush(this, terrainType, brushSize, shape)
-    }
-
-    makeTerrainCopyPaste = () => {
-        this.destroyMake()
-        if (this.hero) this.make = new Makes.MakeTerrainCopyPaste(this.hero)
-    }
-
-    makeTerrainVerticalSymmetry = () => {
-        this.destroyMake()
-        if (this.hero) this.make = new Makes.MakeTerrainVerticalSymmetry(this.hero)
-    }
-
-    makeTerrainHorizontalSymmetry = () => {
-        this.destroyMake()
-        if (this.hero) this.make = new Makes.MakeTerrainHorizontalSymmetry(this.hero)
-    }
-
-    makeTerrainHeight(radius: number, height: number) {
-        this.destroyMake()
-        if (this.hero) this.make = new Makes.MakeTerrainHeight(this.hero, radius, height)
-    }
-
-    makeGetTerrainType = () => {
-        this.destroyMake()
-        if (this.hero) this.make = new Makes.MakeGetTerrainType(this.hero)
-    }
-
-    makeGetMonsterInfo = () => {
-        this.destroyMake()
-        if (this.hero) this.make = new Makes.MakeGetMonsterInfo(this.hero)
-    }
-
-    makeExchangeTerrains = () => {
-        this.destroyMake()
-        if (this.hero) this.make = new Makes.MakeExchangeTerrains(this.hero)
-    }
-
-    makeCreateStart(forNext: boolean, facing?: number) {
-        this.destroyMake()
-        if (this.hero) this.make = new Makes.MakeStart(this.hero, forNext, facing)
-    }
-
-    makeCreateEnd = () => {
-        this.destroyMake()
-        if (this.hero) this.make = new Makes.MakeEnd(this.hero)
-    }
-
-    makeCreateTpForEnd = () => {
-        this.destroyMake()
-        if (this.hero) this.make = new Makes.MakeTpForEnd(this.hero)
-    }
-
-    makeCreateVisibilityModifier = () => {
-        this.destroyMake()
-        if (this.hero) this.make = new Makes.MakeVisibilityModifier(this.hero)
-    }
-
-    makeCreateDebugMECRegions = (mode: MakeMECRegionMode, directionForHorizontal: HorizontalRegionDirection = 'up') => {
-        this.destroyMake()
-        if (this.hero) this.make = new Makes.MakeDebugMECRegion(this.hero, mode, directionForHorizontal)
-    }
-
-    makeMonsterSpawnRemoveHideRegion = (monsterSpawn: MonsterSpawn) => {
-        this.destroyMake()
-        if (this.hero) {
-            this.make = new Makes.MakeMonsterSpawnRemoveHideRegion(this.hero, monsterSpawn)
-        }
-    }
-
-    cancelLastAction = () => {
-        if (this.make) {
-            if (this.make.cancelLastAction()) {
-                return true
-            }
-        }
-        return this.makeLastActions.cancelLastAction()
-    }
-
-    redoLastAction = () => {
-        if (this.makeLastActions.redoLastAction()) {
-            return true
-        }
-        if (this.make) {
-            return this.make.redoLastAction()
-        }
-        return false
-    }
-
-    deleteSpecificActionsForLevel(level: Level) {
-        this.makeLastActions.deleteSpecificActionsForLevel(level)
-    }
-
-    newAction(action: MakeAction) {
-        return this.makeLastActions.newAction(action)
-    }
-
-    destroyAllSavedActions = () => {
-        this.makeLastActions.destroyAllActions()
-    }
-
-    destroyCancelledActions = () => {
-        this.makeLastActions.destroyCancelledActions()
-    }
-
     //for gravity gestion
     getLastZ = () => {
         return this.lastZ
@@ -2229,10 +1541,6 @@ export class Escaper {
             SetUnitPosition(this.powerCircle, GetUnitX(this.hero), GetUnitY(this.hero))
             SetUnitPosition(this.dummyPowerCircle, GetUnitX(this.hero), GetUnitY(this.hero))
         }
-    }
-
-    isEscaperSecondary = () => {
-        return this.escaperId >= Constants.NB_PLAYERS_MAX
     }
 
     isPortalCooldown = () => this.portalCooldown
