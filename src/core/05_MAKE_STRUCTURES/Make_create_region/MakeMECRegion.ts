@@ -1,12 +1,12 @@
-import { MakeBySeveralClicks } from '../Make/MakeBySeveralClicks'
-import { MECRegion } from '../../04_STRUCTURES/Region/MECRegion'
-import { HorizontalRegionDirection } from '../../04_STRUCTURES/Region/HorizontalRegion'
+import { ServiceManager } from '../../../Services'
 import { Text } from '../../01_libraries/Text'
 import { CircleRegion } from '../../04_STRUCTURES/Region/CircleRegion'
+import { HorizontalRegionDirection } from '../../04_STRUCTURES/Region/HorizontalRegion'
 import { LineRegion } from '../../04_STRUCTURES/Region/LineRegion'
-import { ServiceManager } from '../../../Services'
+import { MECRegion } from '../../04_STRUCTURES/Region/MECRegion'
+import { MakeBySeveralClicks } from '../Make/MakeBySeveralClicks'
 
-export type MakeMECRegionMode = 'horizontal' | 'diagonal' | 'circle' | 'line'
+export type MakeMECRegionMode = 'horizontal' | 'diagonal' | 'parallelogram' | 'circle' | 'line'
 
 export abstract class MakeMECRegion extends MakeBySeveralClicks {
     protected mode: MakeMECRegionMode
@@ -17,7 +17,7 @@ export abstract class MakeMECRegion extends MakeBySeveralClicks {
         super(maker, 'mecRegionCreate')
 
         this.mode = mode
-        this.requiredLocsNumber = this.mode === 'diagonal' ? 3 : 2
+        this.requiredLocsNumber = ['diagonal', 'parallelogram'].includes(this.mode) ? 3 : 2
         this.directionForHorizontal = directionForHorizontal
     }
 
@@ -40,6 +40,15 @@ export abstract class MakeMECRegion extends MakeBySeveralClicks {
                     )
                 } else if (this.mode === 'diagonal') {
                     mecRegion = mecRegionService.newRectangleRegionBackupToLine(
+                        this.savedX[0],
+                        this.savedY[0],
+                        this.savedX[1],
+                        this.savedY[1],
+                        this.savedX[2],
+                        this.savedY[2]
+                    )
+                } else if (this.mode === 'parallelogram') {
+                    mecRegion = mecRegionService.newParallelogramRegionBackupToLine(
                         this.savedX[0],
                         this.savedY[0],
                         this.savedX[1],

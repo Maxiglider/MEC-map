@@ -17,8 +17,12 @@ function dot(x1: number, y1: number, x2: number, y2: number): number {
 
 const RECTANGLE_REGION_MINIMUM_SIZE = 31 // LINE_REGION_WIDTH is 32 but because of float imprecision we need to set it a bit lower than 32
 
-export class RectangleRegionWidthTooSmallError extends Error {
-    private backupLineRegion: LineRegion
+function GetTriangleArea(x1: number, y1: number, x2: number, y2: number, x3: number, y3: number): number {
+    return Math.abs((x1 * (y2 - y3) + x2 * (y3 - y1) + x3 * (y1 - y2)) / 2)
+}
+
+export class MECZoneWidthTooSmallError extends Error {
+    private readonly backupLineRegion: LineRegion
     constructor(message: string, lineRegion: LineRegion) {
         super(message)
         this.backupLineRegion = lineRegion
@@ -29,13 +33,15 @@ export class RectangleRegionWidthTooSmallError extends Error {
     }
 }
 
-export class ReParallelogramRegion extends MECRegion {
+export class ParallelogramRegion extends MECRegion {
     private x1: number
     private y1: number
     private x2: number
     private y2: number
     private x3: number
     private y3: number
+    private x4: number = 0
+    private y4: number = 0
 
     private x1forStartLine: number = 0
     private y1forStartLine: number = 0
@@ -65,10 +71,7 @@ export class ReParallelogramRegion extends MECRegion {
     protected directionAngleCos: number = 0
     protected directionAngleSine: number = 0
 
-    private deltaP4X1: number = 0
-    private deltaP4Y1: number = 0
-    private dotP1P2: number = 0
-    private dotP4: number = 0
+    private area: number = 0
 
     constructor(x1: number, y1: number, x2: number, y2: number, x3: number, y3: number) {
         super()
@@ -87,9 +90,11 @@ export class ReParallelogramRegion extends MECRegion {
         this.deltaX2X1 = this.x2 - this.x1
         this.deltaY2Y1 = this.y2 - this.y1
 
-        // Make sur the region has a minimal width, or fallbacks to a line region
-        const rectangleWidth = Math.sqrt(this.deltaX2X1 * this.deltaX2X1 + this.deltaY2Y1 * this.deltaY2Y1)
-        if (rectangleWidth < RECTANGLE_REGION_MINIMUM_SIZE) {
+        this.points1_2_denominator = this.deltaX2X1 * this.deltaX2X1 + this.deltaY2Y1 * this.deltaY2Y1
+
+        // Make sure the region has a minimal width, or fallbacks to a line region
+        const zoneWidth = Math.sqrt(this.deltaX2X1 * this.deltaX2X1 + this.deltaY2Y1 * this.deltaY2Y1)
+        if (zoneWidth < RECTANGLE_REGION_MINIMUM_SIZE) {
             const middleX2X1 = (this.x1 + this.x2) / 2
             const middleY2Y1 = (this.y1 + this.y2) / 2
             const backupLineRegion = ServiceManager.getService('MECRegionService').newLineRegion(
@@ -99,27 +104,16 @@ export class ReParallelogramRegion extends MECRegion {
                 this.y3
             )
 
-            throw new RectangleRegionWidthTooSmallError(
-                `RectangleRegion: The width of the rectangle region is too small (width: ${rectangleWidth}, minimum: ${RECTANGLE_REGION_MINIMUM_SIZE}) ; use LineRegion instead`,
+            throw new MECZoneWidthTooSmallError(
+                `ParallelogramRegion: The width of the zone region is too small (width: ${zoneWidth}, minimum: ${RECTANGLE_REGION_MINIMUM_SIZE}) ; use LineRegion instead`,
                 backupLineRegion
             )
         }
 
-        const deltaX3X1 = this.x3 - this.x1
-        const deltaY3Y1 = this.y3 - this.y1
-        this.points1_2_denominator = this.deltaX2X1 * this.deltaX2X1 + this.deltaY2Y1 * this.deltaY2Y1
-        if (this.points1_2_denominator === 0) {
-            // Points 1 and 2 at the same spot
-            this.vectorX = deltaX3X1
-            this.vectorY = deltaY3Y1
-        } else {
-            const t = (deltaX3X1 * this.deltaX2X1 + deltaY3Y1 * this.deltaY2Y1) / this.points1_2_denominator
-            const Xproj3to1_2 = this.x1 + t * this.deltaX2X1
-            const Yproj3to1_2 = this.y1 + t * this.deltaY2Y1
-
-            this.vectorX = this.x3 - Xproj3to1_2
-            this.vectorY = this.y3 - Yproj3to1_2
-        }
+        this.vectorX = this.x3 - this.x1
+        this.vectorY = this.y3 - this.y1
+        this.x4 = this.x2 + this.vectorX
+        this.y4 = this.y2 + this.vectorY
 
         // Make sure the Region has a minimal length
         let vectorLength = Math.sqrt(this.vectorX * this.vectorX + this.vectorY * this.vectorY)
@@ -192,11 +186,14 @@ export class ReParallelogramRegion extends MECRegion {
         const P4y = this.y1 + this.vectorY
 
         // Pre-calculate values for areCoordsInRegion
-        this.deltaP4X1 = P4x - this.x1
-        this.deltaP4Y1 = P4y - this.y1
+        const xCenter = this.getCenterX()
+        const yCenter = this.getCenterY()
 
-        this.dotP1P2 = dot(this.deltaX2X1, this.deltaY2Y1, this.deltaX2X1, this.deltaY2Y1)
-        this.dotP4 = dot(this.deltaP4X1, this.deltaP4Y1, this.deltaP4X1, this.deltaP4Y1)
+        this.area =
+            GetTriangleArea(this.x1, this.y1, this.x2, this.y2, xCenter, yCenter) +
+            GetTriangleArea(this.x2, this.y2, this.x4, this.y4, xCenter, yCenter) +
+            GetTriangleArea(this.x4, this.y4, this.x3, this.y3, xCenter, yCenter) +
+            GetTriangleArea(this.x3, this.y3, this.x1, this.y1, xCenter, yCenter)
     }
 
     moveTo(newCenterX: number, newCenterY: number): void {
@@ -220,13 +217,13 @@ export class ReParallelogramRegion extends MECRegion {
 
     areCoordsInRegion(x: number, y: number) {
         // Let's say (x, y) is point P
-        const deltaPxX1 = x - this.x1
-        const deltaPyY1 = y - this.y1
+        const areaIfPWouldBeIn =
+            GetTriangleArea(this.x1, this.y1, this.x2, this.y2, x, y) +
+            GetTriangleArea(this.x2, this.y2, this.x4, this.y4, x, y) +
+            GetTriangleArea(this.x4, this.y4, this.x3, this.y3, x, y) +
+            GetTriangleArea(this.x3, this.y3, this.x1, this.y1, x, y)
 
-        const u = dot(deltaPxX1, deltaPyY1, this.deltaX2X1, this.deltaY2Y1) / this.dotP1P2
-        const v = dot(deltaPxX1, deltaPyY1, this.deltaP4X1, this.deltaP4Y1) / this.dotP4
-
-        return u >= 0 && u <= 1 && v >= 0 && v <= 1
+        return Math.abs(areaIfPWouldBeIn - this.area) < 1 // allow some margin of error because of float imprecision
     }
 
     generateDebugLightnings(): lightning[] {
@@ -463,7 +460,7 @@ export class ReParallelogramRegion extends MECRegion {
     }
 
     getArea(): number {
-        return this.getLength() * this.getWidth()
+        return this.area
     }
 
     getCenterX(): number {
