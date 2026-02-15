@@ -6,4 +6,5 @@ module.exports = {
     tabWidth: 4,
     trailingComma: 'es5',
     printWidth: 120,
+    plugins: ['prettier-plugin-organize-imports'],
 }
