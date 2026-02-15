@@ -4,8 +4,8 @@ import { Ascii2String } from '../../01_libraries/Ascii'
 import { udg_colorCode } from '../../01_libraries/Init_colorCodes'
 import { Text } from '../../01_libraries/Text'
 import { Escaper } from '../../04_STRUCTURES/Escaper/Escaper'
-
-const MONSTER_MAX_RANGE = 256
+import { MonsterSpawn } from '../../04_STRUCTURES/MonsterSpawn/MonsterSpawn'
+import { MONSTER_NEAR_DIFF_MAX } from '../../04_STRUCTURES/Monster/MonsterArray'
 
 export class MakeGetMonsterInfo extends Make {
     public escaper: Escaper
@@ -21,7 +21,12 @@ export class MakeGetMonsterInfo extends Make {
             const monster = level.monsters.getMonsterNear(this.orderX, this.orderY)
 
             if (!monster || !monster.u) {
-                Text.erP(this.makerOwner, 'No monster found near click location (max range: ' + MONSTER_MAX_RANGE + ')')
+                if (!this.findAndDisplayMonsterSpawnInfo()) {
+                    Text.erP(
+                        this.makerOwner,
+                        'No monster found near click location (max range: ' + MONSTER_NEAR_DIFF_MAX + ')'
+                    )
+                }
                 return
             }
 
@@ -164,5 +169,26 @@ export class MakeGetMonsterInfo extends Make {
             const className = udg_colorCode[Constants.GREY] + 'Class: ' + monster.constructor.name
             Text.P_timed(this.makerOwner, Constants.TERRAIN_DATA_DISPLAY_TIME, className)
         }
+    }
+
+    findAndDisplayMonsterSpawnInfo = () => {
+        const monsterUnit = this.escaper
+            .getMakingLevel()
+            .monsterSpawns.getActiveMonsterUnitNear(this.orderX, this.orderY)
+        if (monsterUnit) {
+            const monsterSpawn = MonsterSpawn.anyMonsterUnitId2MonsterSpawn.get(GetHandleId(monsterUnit))
+            if (monsterSpawn) {
+                Text.P_timed(
+                    this.makerOwner,
+                    Constants.TERRAIN_DATA_DISPLAY_TIME,
+                    udg_colorCode[Constants.TEAL] + '--- Monster belongs to a monster spawn ---'
+                )
+
+                monsterSpawn.displayForPlayer(this.makerOwner, true)
+                return true
+            }
+        }
+
+        return false
     }
 }

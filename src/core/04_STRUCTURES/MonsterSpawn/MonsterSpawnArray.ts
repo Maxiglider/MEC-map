@@ -302,4 +302,15 @@ export class MonsterSpawnArray extends BaseArray<MonsterSpawn> {
             }
         }
     }
+
+    getActiveMonsterUnitNear = (x: number, y: number): unit | null => {
+        for (const [_, ms] of pairs(this.data)) {
+            const u = ms.getActiveMonsterUnitNear(x, y)
+            if (u) {
+                return u
+            }
+        }
+
+        return null
+    }
 }

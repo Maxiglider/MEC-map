@@ -16,6 +16,7 @@ import { Natives } from '../../wc3_natives_unsecured/Natives'
 import { IssueMoveOrderForLongDistance, LongDistanceMoveOrder } from '../Monster/LongDistanceMoveOrder'
 import { MECRegion, StartAndEndPoints } from '../Region/MECRegion'
 import { arrayPush } from '../../01_libraries/Basic_functions'
+import { MONSTER_NEAR_DIFF_MAX } from '../Monster/MonsterArray'
 
 export type MonsterDirectionMode = 'straight' | 'random'
 type FixedSpawnOffset = number | 'auto' | undefined
@@ -583,6 +584,29 @@ export class MonsterSpawn {
         this.deactivate()
         this.simpleUnitRecycler.reinit()
         this.activate()
+    }
+
+    getActiveMonsterUnitNear = (x: number, y: number): unit | null => {
+        if (!this.monsters) {
+            return null
+        }
+
+        let foundUnit: unit | null = null
+        ForGroup(this.monsters, () => {
+            if (foundUnit) return
+
+            const monsterUnit = Natives.UGetEnumUnit()
+            if (IsUnitHidden(monsterUnit)) return
+
+            const xMob = GetUnitX(monsterUnit)
+            const yMob = GetUnitY(monsterUnit)
+
+            if (RAbsBJ(x - xMob) < MONSTER_NEAR_DIFF_MAX && RAbsBJ(y - yMob) < MONSTER_NEAR_DIFF_MAX) {
+                foundUnit = monsterUnit
+            }
+        })
+
+        return foundUnit
     }
 
     toJson = () => {
