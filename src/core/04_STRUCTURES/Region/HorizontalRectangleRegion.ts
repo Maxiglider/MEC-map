@@ -1,9 +1,9 @@
-import { RectangleRegion } from './RectangleRegion'
 import { MemoryHandler } from '../../../Utils/MemoryHandler'
+import { RectangleRegion } from './RectangleRegion'
 
 export type HorizontalRegionDirection = 'up' | 'down' | 'left' | 'right'
 
-export class HorizontalRegion extends RectangleRegion {
+export class HorizontalRectangleRegion extends RectangleRegion {
     private minX: number
     private minY: number
     private maxX: number

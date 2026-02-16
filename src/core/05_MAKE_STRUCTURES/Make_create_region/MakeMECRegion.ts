@@ -1,12 +1,12 @@
 import { ServiceManager } from '../../../Services'
 import { Text } from '../../01_libraries/Text'
 import { CircleRegion } from '../../04_STRUCTURES/Region/CircleRegion'
-import { HorizontalRegionDirection } from '../../04_STRUCTURES/Region/HorizontalRegion'
+import { HorizontalRegionDirection } from '../../04_STRUCTURES/Region/HorizontalRectangleRegion'
 import { LineRegion } from '../../04_STRUCTURES/Region/LineRegion'
 import { MECRegion } from '../../04_STRUCTURES/Region/MECRegion'
 import { MakeBySeveralClicks } from '../Make/MakeBySeveralClicks'
 
-export type MakeMECRegionMode = 'horizontal' | 'diagonal' | 'parallelogram' | 'circle' | 'line'
+export type MakeMECRegionMode = 'horizRect' | 'rect' | 'parallelogram' | 'circle' | 'line'
 
 export abstract class MakeMECRegion extends MakeBySeveralClicks {
     protected mode: MakeMECRegionMode
@@ -17,7 +17,7 @@ export abstract class MakeMECRegion extends MakeBySeveralClicks {
         super(maker, 'mecRegionCreate')
 
         this.mode = mode
-        this.requiredLocsNumber = ['diagonal', 'parallelogram'].includes(this.mode) ? 3 : 2
+        this.requiredLocsNumber = ['rect', 'parallelogram'].includes(this.mode) ? 3 : 2
         this.directionForHorizontal = directionForHorizontal
     }
 
@@ -30,7 +30,7 @@ export abstract class MakeMECRegion extends MakeBySeveralClicks {
 
                 let mecRegion: MECRegion
 
-                if (this.mode === 'horizontal') {
+                if (this.mode === 'horizRect') {
                     mecRegion = mecRegionService.newHorizontalRegionBackupToLine(
                         this.savedX[0],
                         this.savedY[0],
@@ -38,7 +38,7 @@ export abstract class MakeMECRegion extends MakeBySeveralClicks {
                         this.savedY[1],
                         this.directionForHorizontal
                     )
-                } else if (this.mode === 'diagonal') {
+                } else if (this.mode === 'rect') {
                     mecRegion = mecRegionService.newRectangleRegionBackupToLine(
                         this.savedX[0],
                         this.savedY[0],

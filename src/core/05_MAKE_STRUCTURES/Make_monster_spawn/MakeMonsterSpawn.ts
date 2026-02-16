@@ -1,20 +1,20 @@
 import { MonsterType } from 'core/04_STRUCTURES/Monster/MonsterType'
 import { Text } from '../../01_libraries/Text'
 import { MonsterDirectionMode, MonsterSpawn } from '../../04_STRUCTURES/MonsterSpawn/MonsterSpawn'
-import { HorizontalRegionDirection } from '../../04_STRUCTURES/Region/HorizontalRegion'
+import { HorizontalRegionDirection } from '../../04_STRUCTURES/Region/HorizontalRectangleRegion'
 import { MECRegion } from '../../04_STRUCTURES/Region/MECRegion'
 import { MakeMECRegion, MakeMECRegionMode } from '../Make_create_region/MakeMECRegion'
 
-export type MakeMonsterSpawnKind = HorizontalRegionDirection | 'line' | 'diagonal' | 'parallelogram'
+export type MakeMonsterSpawnKind = HorizontalRegionDirection | 'line' | 'rect' | 'parallelogram'
 
 export function MakeMonsterSpawnKind2MakeMECRegionMode(kind: MakeMonsterSpawnKind): MakeMECRegionMode {
     let mode: MakeMECRegionMode = 'line'
     if (['up', 'down', 'left', 'right'].includes(kind)) {
-        mode = 'horizontal'
+        mode = 'horizRect'
     } else if (kind === 'line') {
         mode = 'line'
-    } else if (kind === 'diagonal') {
-        mode = 'diagonal'
+    } else if (kind === 'rect') {
+        mode = 'rect'
     } else if (kind === 'parallelogram') {
         mode = 'parallelogram'
     }

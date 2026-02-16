@@ -1,4 +1,4 @@
-import { HorizontalRegion, HorizontalRegionDirection } from './HorizontalRegion'
+import { HorizontalRectangleRegion, HorizontalRegionDirection } from './HorizontalRectangleRegion'
 import { LineRegion } from './LineRegion'
 import { MECZoneWidthTooSmallError, ParallelogramRegion } from './ParallelogramRegion'
 import { RectangleRegion } from './RectangleRegion'
@@ -48,9 +48,9 @@ export const init_MECRegion_service = () => {
             y2: number,
             direction: HorizontalRegionDirection = 'up'
         ) => {
-            let mecRegion: HorizontalRegion | LineRegion
+            let mecRegion: HorizontalRectangleRegion | LineRegion
             try {
-                mecRegion = new HorizontalRegion(x1, y1, x2, y2, direction)
+                mecRegion = new HorizontalRectangleRegion(x1, y1, x2, y2, direction)
             } catch (e: any) {
                 if (e instanceof MECZoneWidthTooSmallError) {
                     mecRegion = e.getBackupLineRegion()

@@ -1,8 +1,8 @@
 import { Constants } from 'core/01_libraries/Constants'
+import { globals } from '../../../../globals'
 import { MemoryHandler } from '../../../Utils/MemoryHandler'
 import { arrayPush } from '../../01_libraries/Basic_functions'
-import { HorizontalRegion } from '../Region/HorizontalRegion'
-import { globals } from '../../../../globals'
+import { HorizontalRectangleRegion } from '../Region/HorizontalRectangleRegion'
 
 function OnNextWaypointReached(this: any, unit: unit) {
     const longDistanceMoveOrder = LongDistanceMoveOrder.unitToLongDistanceMoveOrder[GetHandleId(unit)]
@@ -71,7 +71,7 @@ export class LongDistanceMoveOrder {
     private destinationY: number
     private waypointsX = MemoryHandler.getEmptyArray<number>()
     private waypointsY = MemoryHandler.getEmptyArray<number>()
-    private nextWaypointRegion: HorizontalRegion
+    private nextWaypointRegion: HorizontalRectangleRegion
     private currentWaypointIndex: number
     private automaticallyDestroyAtEndOfMvt: boolean
 
@@ -87,7 +87,7 @@ export class LongDistanceMoveOrder {
 
         LongDistanceMoveOrder.unitToLongDistanceMoveOrder[GetHandleId(this.unit)] = this
 
-        this.nextWaypointRegion = MemoryHandler.getEmptyClass(HorizontalRegion, 0, 0, 64, 64)
+        this.nextWaypointRegion = MemoryHandler.getEmptyClass(HorizontalRectangleRegion, 0, 0, 64, 64)
         if (globals.debugLongDistanceMoves) {
             this.nextWaypointRegion.debugRects(true)
         }
