@@ -4,19 +4,19 @@ import { Constants } from 'core/01_libraries/Constants'
 import { CombineHooks } from 'core/API/MecHookArray'
 import { Timer } from 'w3ts'
 import { udg_spawned_monsters } from '../../../../globals'
+import { arrayPush } from '../../01_libraries/Basic_functions'
 import { udg_colorCode } from '../../01_libraries/Init_colorCodes'
 import { Text } from '../../01_libraries/Text'
 import { hooks } from '../../API/GeneralHooks'
+import { Natives } from '../../wc3_natives_unsecured/Natives'
 import { Level } from '../Level/Level'
+import { IssueMoveOrderForLongDistance, LongDistanceMoveOrder } from '../Monster/LongDistanceMoveOrder'
 import { Monster } from '../Monster/Monster'
+import { MONSTER_NEAR_DIFF_MAX } from '../Monster/MonsterArray'
 import { MonsterType } from '../Monster/MonsterType'
 import { NewImmobileMonster } from '../Monster/Monster_functions'
-import { initSimpleUnitRecycler } from './SimpleUnitRecycler'
-import { Natives } from '../../wc3_natives_unsecured/Natives'
-import { IssueMoveOrderForLongDistance, LongDistanceMoveOrder } from '../Monster/LongDistanceMoveOrder'
 import { MECRegion, StartAndEndPoints } from '../Region/MECRegion'
-import { arrayPush } from '../../01_libraries/Basic_functions'
-import { MONSTER_NEAR_DIFF_MAX } from '../Monster/MonsterArray'
+import { initSimpleUnitRecycler } from './SimpleUnitRecycler'
 
 export type MonsterDirectionMode = 'straight' | 'random'
 type FixedSpawnOffset = number | 'auto' | undefined
@@ -329,8 +329,6 @@ export class MonsterSpawn {
             if (forceUnitTypeId > 0) {
                 Monster.forceUnitTypeIdForNextMonster = forceUnitTypeId
             }
-
-            // print(`Creating unit at (${startAndEndPoints.startX}, ${startAndEndPoints.startY})`)
             monster = NewImmobileMonster(this.mt, startAndEndPoints.startX, startAndEndPoints.startY, spawnAngle)
         } else {
             // todo the forceUnitTypeId should be taken into account and change the unit type of the existing unit without recreating it

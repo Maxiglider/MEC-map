@@ -1,10 +1,9 @@
 import { GetCurrentMonsterPlayer } from 'core/01_libraries/Basic_functions'
 import { Constants } from 'core/01_libraries/Constants'
 import { getUdgEscapers } from '../../../../globals'
+import { Natives } from '../../wc3_natives_unsecured/Natives'
 import { Monster } from './Monster'
 import { MonsterType } from './MonsterType'
-import { Natives } from '../../wc3_natives_unsecured/Natives'
-import { LongDistanceMoveOrder } from './LongDistanceMoveOrder'
 
 let monster: unit
 const ATTACK_SKILL = FourCC('Aatk')
@@ -13,7 +12,6 @@ const ABILITY_10_LIFE = FourCC('ABV2')
 const ABILITY_100_LIFE = FourCC('ABV3')
 const ABILITY_1000_LIFE = FourCC('ABV4')
 const ABILITY_10000_LIFE = FourCC('ABV5')
-export const ABILITY_ANNULER_VISION = FourCC('A0AV')
 const ABILITY_FORME_CORBEAU = FourCC('Amrf')
 
 export const UnitAddRemoveLifeAbility = (u: unit, lifeAbility: number) => {
@@ -92,11 +90,13 @@ export const NewImmobileMonsterForPlayer = (
     }
 
     SetUnitUseFood(monster, false)
+
+    BlzSetUnitRealField(monster, UNIT_RF_SIGHT_RADIUS, -999999999999999) // with a negative sight the sight is reduced faster to null
+
     if (mt.isClickable()) {
         SetUnitMaxLife(monster, mt.getMaxLife())
     } else {
         UnitAddAbility(monster, FourCC('Aloc'))
-        UnitAddAbility(monster, ABILITY_ANNULER_VISION)
     }
 
     SetUnitPathing(monster, false)
