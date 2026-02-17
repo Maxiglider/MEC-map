@@ -34,7 +34,7 @@ import { Natives } from '../../wc3_natives_unsecured/Natives'
 import { Level } from '../Level/Level'
 import { DEPART_PAR_DEFAUT } from '../Level/StartAndEnd'
 import { StaticSlide } from '../Level/StaticSlide'
-import { METEOR_CHEAT, METEOR_NORMAL, udg_meteors } from '../Meteor/Meteor'
+import { METEOR_NORMAL, udg_meteors } from '../Meteor/Meteor'
 import { isDeathTerrain, type TerrainType } from '../TerrainType/TerrainType'
 import { TerrainTypeSlide } from '../TerrainType/TerrainTypeSlide'
 import { TerrainTypeWalk } from '../TerrainType/TerrainTypeWalk'
@@ -194,7 +194,7 @@ export class Escaper extends EscaperMake {
     alliedState: { [escaperId: number]: boolean } = {}
 
     private canClick: boolean
-    private readonly canClickTrigger: trigger
+    private readonly cantClickTrigger: trigger
 
     public moveCamDistanceWidth = 2048
     public moveCamDistanceHeight = 1536
@@ -355,7 +355,7 @@ export class Escaper extends EscaperMake {
         }
 
         this.canClick = true
-        this.canClickTrigger = this.createCanClickTrigger()
+        this.cantClickTrigger = this.createCantClickTrigger()
         this.setCanClick(true)
 
         this.collisionSize = globals.heroBaseCollisionSize
@@ -588,7 +588,7 @@ export class Escaper extends EscaperMake {
         this.portalCooldownTimer?.destroy()
         this.portalCooldownTimer = null
 
-        DestroyTrigger(this.canClickTrigger)
+        DestroyTrigger(this.cantClickTrigger)
 
         this.lastPos?.__destroy()
 
@@ -1819,7 +1819,7 @@ export class Escaper extends EscaperMake {
     }
 
     // Prevent clicks
-    createCanClickTrigger = () => {
+    createCantClickTrigger = () => {
         return createEvent({
             events: [
                 t => TriggerRegisterAnyUnitEventBJ(t, EVENT_PLAYER_UNIT_ISSUED_POINT_ORDER),
@@ -1827,16 +1827,10 @@ export class Escaper extends EscaperMake {
             ],
             actions: [
                 () => {
-                    if (this.getPlayer() === Natives.UGetTriggerPlayer() && !this.canClick) {
-                        if (
-                            !IsIssuedOrder('smart') ||
-                            GetItemTypeId(Natives.UGetOrderTargetItem()) === METEOR_NORMAL ||
-                            GetItemTypeId(Natives.UGetOrderTargetItem()) === METEOR_CHEAT
-                        ) {
-                            return
+                    if (this.getHero() === Natives.UGetTriggerUnit() && !this.canClick) {
+                        if (IsIssuedOrder('smart')) {
+                            StopUnit(Natives.UGetTriggerUnit())
                         }
-
-                        StopUnit(Natives.UGetTriggerUnit())
                     }
                 },
             ],
@@ -1847,9 +1841,9 @@ export class Escaper extends EscaperMake {
         this.canClick = canClick
 
         if (canClick) {
-            DisableTrigger(this.canClickTrigger)
+            DisableTrigger(this.cantClickTrigger)
         } else {
-            EnableTrigger(this.canClickTrigger)
+            EnableTrigger(this.cantClickTrigger)
         }
     }
 
