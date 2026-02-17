@@ -1056,7 +1056,7 @@ export const initExecuteCommandMax = () => {
         group,
         argDescription: '[<mode> [<directionForHorizontal>]]',
         description:
-            'Mode can be "horizRect", "rect", "parallelogram", "circle" or "line" (defaults to "horizRect"). Direction for horizRect can be "up", "down", "left" or "right" (defaults to "up")',
+            'Mode can be "horizRect", "rect", "parallelogram", "trapeze", "circle" or "line" (defaults to "horizRect"). Direction for horizRect can be "up", "down", "left" or "right" (defaults to "up")',
         cb: ({ param1, param2, nbParam }, escaper) => {
             const usageMsg = 'createDebugMecRegion: wrong parameters'
             if (nbParam > 2) {
@@ -1071,7 +1071,8 @@ export const initExecuteCommandMax = () => {
                     param1 === 'rect' ||
                     param1 === 'circle' ||
                     param1 === 'line' ||
-                    param1 == 'parallelogram'
+                    param1 == 'parallelogram' ||
+                    param1 == 'trapeze'
                 ) {
                     mode = param1
                 } else {
@@ -1177,7 +1178,6 @@ export const initExecuteCommandMax = () => {
         argDescription: '<boolean>',
         description: 'Disables all effects',
         cb: ({ param1, nbParam }, escaper) => {
-            const usageMsg = 'e2e: bad command usage'
             if (nbParam != 1 || !IsBoolString(param1)) {
                 Text.erP(escaper.getPlayer(), 'debugLongDistanceMove: bad parameters')
                 return true

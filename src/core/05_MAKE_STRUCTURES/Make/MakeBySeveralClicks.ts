@@ -1,8 +1,8 @@
 import { Make } from 'core/05_MAKE_STRUCTURES/Make/Make'
-import { LandmarkForMake } from './LandmarkForMake'
 import { MemoryHandler } from '../../../Utils/MemoryHandler'
-import { DrawLine } from '../../01_libraries/Draw_lines'
 import { arrayPush } from '../../01_libraries/Basic_functions'
+import { DrawLine } from '../../01_libraries/Draw_lines'
+import { LandmarkForMake } from './LandmarkForMake'
 
 export abstract class MakeBySeveralClicks extends Make {
     protected savedX: number[] = []
@@ -37,15 +37,18 @@ export abstract class MakeBySeveralClicks extends Make {
         this.escaper.destroyCancelledActions()
     }
 
-    drawLastLankmarkLine = () => {
+    drawLastLankmarkLine(indexP1?: number, indexP2?: number) {
+        if (indexP1 === undefined) indexP1 = this.currentMakingLocIndex - 1
+        if (indexP2 === undefined) indexP2 = this.currentMakingLocIndex
+
         if (this.currentMakingLocIndex >= 1) {
             arrayPush(
                 this.landmarkLines,
                 DrawLine(
-                    this.savedX[this.currentMakingLocIndex - 1],
-                    this.savedY[this.currentMakingLocIndex - 1],
-                    this.savedX[this.currentMakingLocIndex],
-                    this.savedY[this.currentMakingLocIndex],
+                    this.savedX[indexP1],
+                    this.savedY[indexP1],
+                    this.savedX[indexP2],
+                    this.savedY[indexP2],
                     'white',
                     1
                 )

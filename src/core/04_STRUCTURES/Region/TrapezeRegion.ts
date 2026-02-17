@@ -1,5 +1,5 @@
 import { ServiceManager } from '../../../Services'
-import { MemoryHandler } from '../../../Utils/MemoryHandler'
+import { IDestroyable, MemoryHandler } from '../../../Utils/MemoryHandler'
 import { arrayPush } from '../../01_libraries/Basic_functions'
 import { DrawLine } from '../../01_libraries/Draw_lines'
 import { MonsterSpawn } from '../MonsterSpawn/MonsterSpawn'
@@ -10,10 +10,6 @@ import {
     OFFSET_FOR_START_LINE_NOT_SPAWNED_MONSTERS_TO_BE_CONSIDERED_OUT,
     StartAndEndPoints,
 } from './MECRegion'
-
-function dot(x1: number, y1: number, x2: number, y2: number): number {
-    return x1 * x2 + y1 * y2
-}
 
 const RECTANGLE_REGION_MINIMUM_SIZE = 31 // LINE_REGION_WIDTH is 32 but because of float imprecision we need to set it a bit lower than 32
 
@@ -36,30 +32,42 @@ export class MECZoneWidthTooSmallError extends Error {
 export class TrapezeRegion extends MECRegion {
     protected x1: number
     protected y1: number
-    private x2: number
-    private y2: number
-    private x3: number
-    private y3: number
+    protected x2: number
+    protected y2: number
+    protected x3: number
+    protected y3: number
     private x4: number = 0
     private y4: number = 0
 
-    private x1forStartLine: number = 0
-    private y1forStartLine: number = 0
-    private x2forStartLine: number = 0
-    private y2forStartLine: number = 0
-    private deltaX2X1forStartLine: number = 0
-    private deltaY2Y1forStartLine: number = 0
+    private distanceP3P4: number
+
+    private middleP1P2x = 0
+    private middleP1P2y = 0
+    private middleP3P4x = 0
+    private middleP3P4y = 0
+    protected middleVectorX = 0
+    protected middleVectorY = 0
+    private middleSidesVectorX = 0
+    private middleSidesVectorY = 0
+
+    private startLineX1: number = 0
+    private startLineY1: number = 0
+    private startLineX2: number = 0
+    private startLineY2: number = 0
+    private startLineDeltaX: number = 0
+    private startLineDeltaY: number = 0
     private startLineLength: number = 0
 
     protected deltaX2X1: number = 0
     protected deltaY2Y1: number = 0
     private points1_2_denominator: number = 0
 
-    private vectorX: number = 0
-    private vectorY: number = 0
-
-    private vectorXforEndPoint: number = 0
-    private vectorYforEndPoint: number = 0
+    private vectorStartX = 0
+    private vectorStartY = 0
+    private vectorStartLength = 0
+    private vectorEndX = 0
+    private vectorEndY = 0
+    private vectorEndLength = 0
 
     private endLineX1: number = 0
     private endLineY1: number = 0
@@ -67,19 +75,15 @@ export class TrapezeRegion extends MECRegion {
     private endLineY2: number = 0
     private endLineDeltaX: number = 0
     private endLineDeltaY: number = 0
-
-    protected directionAngleCos: number = 0
-    protected directionAngleSine: number = 0
+    private endLineLength = 0
 
     private area: number = 0
 
-    // For Rectangle performant areCoordsInRegion pre-calculations
-    protected deltaP4X1: number = 0
-    protected deltaP4Y1: number = 0
+    // For rect calculations preparation
     protected dotP1P2: number = 0
-    protected dotP4: number = 0
+    protected dotP1P4: number = 0
 
-    constructor(x1: number, y1: number, x2: number, y2: number, x3: number, y3: number) {
+    constructor(x1: number, y1: number, x2: number, y2: number, x3: number, y3: number, distanceP3P4: number) {
         super()
 
         this.x1 = x1
@@ -88,6 +92,12 @@ export class TrapezeRegion extends MECRegion {
         this.y2 = y2
         this.x3 = x3
         this.y3 = y3
+        this.distanceP3P4 = distanceP3P4
+
+        const angle = Math.atan2(this.y2 - this.y1, this.x2 - this.x1)
+        const minimalDistanceToP3 = Math.max(distanceP3P4, RECTANGLE_REGION_MINIMUM_SIZE)
+        this.x4 = this.x3 + Math.cos(angle) * minimalDistanceToP3
+        this.y4 = this.y3 + Math.sin(angle) * minimalDistanceToP3
 
         this.redefineZone()
     }
@@ -98,7 +108,7 @@ export class TrapezeRegion extends MECRegion {
 
         this.points1_2_denominator = this.deltaX2X1 * this.deltaX2X1 + this.deltaY2Y1 * this.deltaY2Y1
 
-        // Make sure the region has a minimal width, or fallbacks to a line region
+        // Make sure the region has a minimal start width, or fallbacks to a line region
         const zoneWidth = Math.sqrt(this.deltaX2X1 * this.deltaX2X1 + this.deltaY2Y1 * this.deltaY2Y1)
         if (zoneWidth < RECTANGLE_REGION_MINIMUM_SIZE) {
             const middleX2X1 = (this.x1 + this.x2) / 2
@@ -116,88 +126,132 @@ export class TrapezeRegion extends MECRegion {
             )
         }
 
-        this.vectorX = this.x3 - this.x1
-        this.vectorY = this.y3 - this.y1
-        this.x4 = this.x2 + this.vectorX
-        this.y4 = this.y2 + this.vectorY
+        // Make sure the region has a minimal length
+        this.vectorStartX = this.x3 - this.x1
+        this.vectorStartY = this.y3 - this.y1
+        this.vectorStartLength = Math.sqrt(
+            this.vectorStartX * this.vectorStartX + this.vectorStartY * this.vectorStartY
+        )
+        this.vectorEndX = this.x4 - this.x2
+        this.vectorEndY = this.y4 - this.y2
+        this.vectorEndLength = Math.sqrt(this.vectorEndX * this.vectorEndX + this.vectorEndY * this.vectorEndY)
 
-        // Make sure the Region has a minimal length
-        let vectorLength = Math.sqrt(this.vectorX * this.vectorX + this.vectorY * this.vectorY)
-        if (vectorLength < 1) {
-            vectorLength = RECTANGLE_REGION_MINIMUM_SIZE
-            const angle = Rad2Deg(Math.atan2(this.deltaY2Y1, this.deltaX2X1)) + 90
-            this.vectorX = Math.cos(Deg2Rad(angle)) * vectorLength
-            this.vectorY = Math.sin(Deg2Rad(angle)) * vectorLength
-        } else if (vectorLength < RECTANGLE_REGION_MINIMUM_SIZE) {
-            this.vectorX = (this.vectorX * RECTANGLE_REGION_MINIMUM_SIZE) / vectorLength
-            this.vectorY = (this.vectorY * RECTANGLE_REGION_MINIMUM_SIZE) / vectorLength
-            vectorLength = RECTANGLE_REGION_MINIMUM_SIZE
+        const multiplierToHaveMinimumLength = Math.max(
+            Math.min(1, RECTANGLE_REGION_MINIMUM_SIZE / this.vectorStartLength),
+            Math.min(1, RECTANGLE_REGION_MINIMUM_SIZE / this.vectorEndLength)
+        )
+
+        if (multiplierToHaveMinimumLength > 1) {
+            this.vectorStartLength = this.vectorStartLength * multiplierToHaveMinimumLength
+            this.vectorEndLength = this.vectorEndLength * multiplierToHaveMinimumLength
+            this.vectorStartX = this.vectorStartX * multiplierToHaveMinimumLength
+            this.vectorStartY = this.vectorStartY * multiplierToHaveMinimumLength
+            this.vectorEndX = this.vectorEndX * multiplierToHaveMinimumLength
+            this.vectorEndY = this.vectorEndY * multiplierToHaveMinimumLength
+            this.x3 = this.x1 + this.vectorStartX
+            this.y3 = this.y1 + this.vectorStartY
+            this.x4 = this.x2 + this.vectorEndX
+            this.y4 = this.y2 + this.vectorEndY
         }
 
-        this.vectorXforEndPoint = (this.vectorX * (vectorLength + END_POINT_OFFSET_AFTER_END_OF_REGION)) / vectorLength
-        this.vectorYforEndPoint = (this.vectorY * (vectorLength + END_POINT_OFFSET_AFTER_END_OF_REGION)) / vectorLength
+        // Calculate middle vectors
+        this.middleP1P2x = (this.x1 + this.x2) / 2
+        this.middleP1P2y = (this.y1 + this.y2) / 2
+        this.middleP3P4x = (this.x3 + this.x4) / 2
+        this.middleP3P4y = (this.y3 + this.y4) / 2
+        this.middleVectorX = this.middleP3P4x - this.middleP1P2x
+        this.middleVectorY = this.middleP3P4y - this.middleP1P2y
 
-        this.endLineX1 = this.x1 + this.vectorXforEndPoint
-        this.endLineY1 = this.y1 + this.vectorYforEndPoint
-        this.endLineX2 = this.x2 + this.vectorXforEndPoint
-        this.endLineY2 = this.y2 + this.vectorYforEndPoint
-        this.endLineDeltaX = this.endLineX2 - this.endLineX1
-        this.endLineDeltaY = this.endLineY2 - this.endLineY1
+        const middleSidesP1P3x = (this.x1 + this.x3) / 2
+        const middleSidesP1P3y = (this.y1 + this.y3) / 2
+        const middleSidesP2P4x = (this.x2 + this.x4) / 2
+        const middleSidesP2P4y = (this.y2 + this.y4) / 2
+        this.middleSidesVectorX = middleSidesP2P4x - middleSidesP1P3x
+        this.middleSidesVectorY = middleSidesP2P4y - middleSidesP1P3y
 
+        this.calculateStartAndEndLine()
+
+        this.areCoordsInRegionPreCalculation()
+    }
+
+    private calculateStartAndEndLine() {
         const dist1_2 = Math.sqrt(this.points1_2_denominator)
 
+        /**
+         * Calculate start line
+         */
         // start line reduced a little for edge spawn monsters not to instantly disapear because of considered out of the region
-        this.x1forStartLine =
+        this.startLineX1 =
             this.x1 + (OFFSET_FOR_START_LINE_NOT_SPAWNED_MONSTERS_TO_BE_CONSIDERED_OUT * this.deltaX2X1) / dist1_2
-        this.y1forStartLine =
+        this.startLineY1 =
             this.y1 + (OFFSET_FOR_START_LINE_NOT_SPAWNED_MONSTERS_TO_BE_CONSIDERED_OUT * this.deltaY2Y1) / dist1_2
-        this.x2forStartLine =
+        this.startLineX2 =
             this.x2 - (OFFSET_FOR_START_LINE_NOT_SPAWNED_MONSTERS_TO_BE_CONSIDERED_OUT * this.deltaX2X1) / dist1_2
-        this.y2forStartLine =
+        this.startLineY2 =
             this.y2 - (OFFSET_FOR_START_LINE_NOT_SPAWNED_MONSTERS_TO_BE_CONSIDERED_OUT * this.deltaY2Y1) / dist1_2
 
         // start line moved a little towards the end line for edge spawn monsters not to instantly disapear because of considered out of the region
-        this.x1forStartLine =
-            this.x1forStartLine +
-            (OFFSET_FOR_START_LINE_NOT_SPAWNED_MONSTERS_TO_BE_CONSIDERED_OUT * this.vectorX) / vectorLength
-        this.y1forStartLine =
-            this.y1forStartLine +
-            (OFFSET_FOR_START_LINE_NOT_SPAWNED_MONSTERS_TO_BE_CONSIDERED_OUT * this.vectorY) / vectorLength
-        this.x2forStartLine =
-            this.x2forStartLine +
-            (OFFSET_FOR_START_LINE_NOT_SPAWNED_MONSTERS_TO_BE_CONSIDERED_OUT * this.vectorX) / vectorLength
-        this.y2forStartLine =
-            this.y2forStartLine +
-            (OFFSET_FOR_START_LINE_NOT_SPAWNED_MONSTERS_TO_BE_CONSIDERED_OUT * this.vectorY) / vectorLength
+        this.startLineX1 =
+            this.startLineX1 +
+            (OFFSET_FOR_START_LINE_NOT_SPAWNED_MONSTERS_TO_BE_CONSIDERED_OUT * this.vectorStartX) /
+                this.vectorStartLength
+        this.startLineY1 =
+            this.startLineY1 +
+            (OFFSET_FOR_START_LINE_NOT_SPAWNED_MONSTERS_TO_BE_CONSIDERED_OUT * this.vectorStartY) /
+                this.vectorStartLength
+        this.startLineX2 =
+            this.startLineX2 +
+            (OFFSET_FOR_START_LINE_NOT_SPAWNED_MONSTERS_TO_BE_CONSIDERED_OUT * this.vectorEndX) / this.vectorEndLength
+        this.startLineY2 =
+            this.startLineY2 +
+            (OFFSET_FOR_START_LINE_NOT_SPAWNED_MONSTERS_TO_BE_CONSIDERED_OUT * this.vectorEndY) / this.vectorEndLength
 
-        this.deltaX2X1forStartLine = this.x2forStartLine - this.x1forStartLine
-        this.deltaY2Y1forStartLine = this.y2forStartLine - this.y1forStartLine
+        this.startLineDeltaX = this.startLineX2 - this.startLineX1
+        this.startLineDeltaY = this.startLineY2 - this.startLineY1
         this.startLineLength = Math.sqrt(
-            this.deltaX2X1forStartLine * this.deltaX2X1forStartLine +
-                this.deltaY2Y1forStartLine * this.deltaY2Y1forStartLine
+            this.startLineDeltaX * this.startLineDeltaX + this.startLineDeltaY * this.startLineDeltaY
         )
 
-        const directionAngle = Math.atan2(this.vectorY, this.vectorX)
-        this.directionAngleCos = Math.cos(directionAngle)
-        this.directionAngleSine = Math.sin(directionAngle)
+        /**
+         * Calculate end line
+         */
+        const dist3_4 = Math.sqrt((this.x4 - this.x3) ** 2 + (this.y4 - this.y3) ** 2)
 
-        this.areCoordsInRegionPreCalculation()
+        // end line reduced a little for edge spawn monsters not to instantly disapear because of considered out of the region
+        this.endLineX1 =
+            this.x3 + (OFFSET_FOR_START_LINE_NOT_SPAWNED_MONSTERS_TO_BE_CONSIDERED_OUT * this.deltaX2X1) / dist3_4
+        this.endLineY1 =
+            this.y3 + (OFFSET_FOR_START_LINE_NOT_SPAWNED_MONSTERS_TO_BE_CONSIDERED_OUT * this.deltaY2Y1) / dist3_4
+        this.endLineX2 =
+            this.x4 - (OFFSET_FOR_START_LINE_NOT_SPAWNED_MONSTERS_TO_BE_CONSIDERED_OUT * this.deltaX2X1) / dist3_4
+        this.endLineY2 =
+            this.y4 - (OFFSET_FOR_START_LINE_NOT_SPAWNED_MONSTERS_TO_BE_CONSIDERED_OUT * this.deltaY2Y1) / dist3_4
+
+        this.endLineDeltaX = this.endLineX2 - this.endLineX1
+        this.endLineDeltaY = this.endLineY2 - this.endLineY1
+
+        this.endLineLength = Math.sqrt(
+            this.endLineDeltaX * this.endLineDeltaX + this.endLineDeltaY * this.endLineDeltaY
+        )
+
+        // Offset set endline outside of the region for spawned monsters to leave the region at the end of their movement and dispear correctly
+        const startToEndLineDeltaX1 = this.endLineX1 - this.startLineX1
+        const startToEndLineDeltaY1 = this.endLineY1 - this.startLineY1
+        const angleStartToEndLineP1 = Math.atan2(startToEndLineDeltaY1, startToEndLineDeltaX1)
+        this.endLineX1 = this.endLineX1 + Math.cos(angleStartToEndLineP1) * END_POINT_OFFSET_AFTER_END_OF_REGION
+        this.endLineY1 = this.endLineY1 + Math.sin(angleStartToEndLineP1) * END_POINT_OFFSET_AFTER_END_OF_REGION
+
+        const startToEndLineDeltaX2 = this.endLineX2 - this.startLineX2
+        const startToEndLineDeltaY2 = this.endLineY2 - this.startLineY2
+        const angleStartToEndLineP2 = Math.atan2(startToEndLineDeltaY2, startToEndLineDeltaX2)
+        this.endLineX2 = this.endLineX2 + Math.cos(angleStartToEndLineP2) * END_POINT_OFFSET_AFTER_END_OF_REGION
+        this.endLineY2 = this.endLineY2 + Math.sin(angleStartToEndLineP2) * END_POINT_OFFSET_AFTER_END_OF_REGION
     }
 
     /**
      * Pre-calculations for areCoordsInRegion best performance
      */
-    private areCoordsInRegionPreCalculation() {
-        const P4x = this.x1 + this.vectorX
-        const P4y = this.y1 + this.vectorY
-
-        // Pre-calculate values for areCoordsInRegion
-        this.deltaP4X1 = P4x - this.x1
-        this.deltaP4Y1 = P4y - this.y1
-
-        this.dotP1P2 = dot(this.deltaX2X1, this.deltaY2Y1, this.deltaX2X1, this.deltaY2Y1)
-        this.dotP4 = dot(this.deltaP4X1, this.deltaP4Y1, this.deltaP4X1, this.deltaP4Y1)
-
+    protected areCoordsInRegionPreCalculation() {
         // Area pre-calculation
         const xCenter = this.getCenterX()
         const yCenter = this.getCenterY()
@@ -209,11 +263,8 @@ export class TrapezeRegion extends MECRegion {
     }
 
     moveTo(newCenterX: number, newCenterY: number): void {
-        const currentCenterX = (this.x1 + this.x2) / 2 + this.vectorX / 2
-        const currentCenterY = (this.y1 + this.y2) / 2 + this.vectorY / 2
-
-        const deltaX = newCenterX - currentCenterX
-        const deltaY = newCenterY - currentCenterY
+        const deltaX = newCenterX - this.getCenterX()
+        const deltaY = newCenterY - this.getCenterY()
 
         this.x1 += deltaX
         this.y1 += deltaY
@@ -223,7 +274,6 @@ export class TrapezeRegion extends MECRegion {
         this.y3 += deltaY
 
         this.redefineZone()
-
         this.refreshDebuggingRects()
     }
 
@@ -239,88 +289,65 @@ export class TrapezeRegion extends MECRegion {
     }
 
     generateDebugLightnings(): lightning[] {
-        const x3 = this.x2 + this.vectorX
-        const y3 = this.y2 + this.vectorY
-        const x4 = this.x1 + this.vectorX
-        const y4 = this.y1 + this.vectorY
-
         this.defineDebugLineTypeForStart()
         arrayPush(this.debugLightnings, DrawLine(this.x1, this.y1, this.x2, this.y2))
 
         this.defineDebugLineType()
-        arrayPush(this.debugLightnings, DrawLine(this.x2, this.y2, x3, y3))
-        arrayPush(this.debugLightnings, DrawLine(x4, y4, this.x1, this.y1))
+        arrayPush(this.debugLightnings, DrawLine(this.x2, this.y2, this.x4, this.y4))
+        arrayPush(this.debugLightnings, DrawLine(this.x3, this.y3, this.x1, this.y1))
 
         if (this.isLeaveZoneEnabled) {
             this.defineDebugLineTypeForEnd()
-            arrayPush(this.debugLightnings, DrawLine(x3, y3, x4, y4))
+            arrayPush(this.debugLightnings, DrawLine(this.x3, this.y3, this.x4, this.y4))
         }
 
         return this.debugLightnings
     }
 
     generateStartAndEndPoints(monsterSpawn?: MonsterSpawn) {
+        let startAndEndPoints: StartAndEndPoints & IDestroyable
         if (monsterSpawn?.getFixedSpawnOffset() !== undefined) {
-            return this.generateStartAndEndPointsWithFixedSpawnOffset(monsterSpawn)
-        }
-
-        const startAndEndPoints = MemoryHandler.getEmptyObject<StartAndEndPoints>()
-
-        const randomOffsetValue = GetRandomReal(0, 1)
-
-        startAndEndPoints.startX = this.x1forStartLine + randomOffsetValue * this.deltaX2X1forStartLine
-        startAndEndPoints.startY = this.y1forStartLine + randomOffsetValue * this.deltaY2Y1forStartLine
-
-        const forcedDistance = monsterSpawn?.getForcedDistance()
-        if (forcedDistance === undefined) {
-            if (monsterSpawn?.getMonsterDirectionMode() === 'random') {
-                const randomReal = GetRandomReal(0, 1)
-                startAndEndPoints.endX = this.endLineX1 + randomReal * this.endLineDeltaX
-                startAndEndPoints.endY = this.endLineY1 + randomReal * this.endLineDeltaY
-            } else {
-                startAndEndPoints.endX = startAndEndPoints.startX + this.vectorXforEndPoint
-                startAndEndPoints.endY = startAndEndPoints.startY + this.vectorYforEndPoint
-            }
+            startAndEndPoints = this.generateStartAndEndPointsWithFixedSpawnOffset(monsterSpawn)
         } else {
-            let directionAngleCos = this.directionAngleCos
-            let directionAngleSine = this.directionAngleSine
-            if (monsterSpawn?.getMonsterDirectionMode() === 'random') {
-                const randomReal = GetRandomReal(0, 1)
-                const baseEndX = this.endLineX1 + randomReal * this.endLineDeltaX
-                const baseEndY = this.endLineY1 + randomReal * this.endLineDeltaY
-                const directionAngle = Math.atan2(
-                    baseEndY - startAndEndPoints.startY,
-                    baseEndX - startAndEndPoints.startX
-                )
-                directionAngleCos = Math.cos(directionAngle)
-                directionAngleSine = Math.sin(directionAngle)
-            }
-            startAndEndPoints.endX = startAndEndPoints.startX + directionAngleCos * forcedDistance
-            startAndEndPoints.endY = startAndEndPoints.startY + directionAngleSine * forcedDistance
+            startAndEndPoints = MemoryHandler.getEmptyObject<StartAndEndPoints>()
+
+            const randomOffsetValueStartLine = GetRandomReal(0, 1)
+
+            startAndEndPoints.startX = this.startLineX1 + randomOffsetValueStartLine * this.startLineDeltaX
+            startAndEndPoints.startY = this.startLineY1 + randomOffsetValueStartLine * this.startLineDeltaY
+
+            const randomOffsetValueEndLine =
+                monsterSpawn?.getMonsterDirectionMode() === 'random' ? GetRandomReal(0, 1) : randomOffsetValueStartLine
+            startAndEndPoints.endX = this.endLineX1 + randomOffsetValueEndLine * this.endLineDeltaX
+            startAndEndPoints.endY = this.endLineY1 + randomOffsetValueEndLine * this.endLineDeltaY
         }
 
+        // Handle forced distance
+        const forcedDistance = monsterSpawn?.getForcedDistance()
+        if (forcedDistance !== undefined) {
+            const directionAngle = Math.atan2(
+                startAndEndPoints.endY - startAndEndPoints.startY,
+                startAndEndPoints.endX - startAndEndPoints.startX
+            )
+            startAndEndPoints.endX = startAndEndPoints.startX + Math.cos(directionAngle) * forcedDistance
+            startAndEndPoints.endY = startAndEndPoints.startY + Math.sin(directionAngle) * forcedDistance
+        }
+
+        // Set startAndEndPoints as ephemeral
         startAndEndPoints.ephemeral = true
 
         return startAndEndPoints
     }
 
     private generateStartAndEndPointsWithFixedSpawnOffset(monsterSpawn: MonsterSpawn) {
-        const spawnVal = this.calcValOffset(monsterSpawn)
+        const spawnValStartLine = this.calcValOffset(monsterSpawn)
+        const spawnValEndLine = (spawnValStartLine * this.endLineLength) / this.startLineLength
 
         const startAndEndPoints = MemoryHandler.getEmptyObject<StartAndEndPoints>()
-        startAndEndPoints.startX = this.x1forStartLine + (spawnVal / this.startLineLength) * this.deltaX2X1forStartLine
-        startAndEndPoints.startY = this.y1forStartLine + (spawnVal / this.startLineLength) * this.deltaY2Y1forStartLine
-
-        const forcedDistance = monsterSpawn?.getForcedDistance()
-        if (forcedDistance === undefined) {
-            startAndEndPoints.endX = startAndEndPoints.startX + this.vectorXforEndPoint
-            startAndEndPoints.endY = startAndEndPoints.startY + this.vectorYforEndPoint
-        } else {
-            startAndEndPoints.endX = startAndEndPoints.startX + this.directionAngleCos * forcedDistance
-            startAndEndPoints.endY = startAndEndPoints.startY + this.directionAngleSine * forcedDistance
-        }
-
-        startAndEndPoints.ephemeral = true
+        startAndEndPoints.startX = this.startLineX1 + (spawnValStartLine / this.startLineLength) * this.startLineDeltaX
+        startAndEndPoints.startY = this.startLineY1 + (spawnValStartLine / this.startLineLength) * this.startLineDeltaY
+        startAndEndPoints.endX = this.endLineX1 + (spawnValEndLine / this.endLineLength) * this.endLineDeltaX
+        startAndEndPoints.endY = this.endLineY1 + (spawnValEndLine / this.endLineLength) * this.endLineDeltaY
 
         return startAndEndPoints
     }
@@ -455,20 +482,30 @@ export class TrapezeRegion extends MECRegion {
         output.y2 = R2I(this.y2)
         output.x3 = R2I(this.x3)
         output.y3 = R2I(this.y3)
+        output.distanceP3P4 = R2I(this.distanceP3P4)
 
         return output
     }
 
+    /**
+     * In trapeze region we consider the length as the distance between the middle of the start line and the middle of the end line
+     */
     getLength() {
-        return Math.round(Math.sqrt(this.vectorX * this.vectorX + this.vectorY * this.vectorY))
+        return Math.round(Math.sqrt(this.middleVectorX ** 2 + this.middleVectorY ** 2))
     }
 
+    /**
+     * In trapeze region we consider the width as the distance between the middle of side lines
+     */
     getWidth() {
-        return Math.round(Math.sqrt(this.deltaX2X1 * this.deltaX2X1 + this.deltaY2Y1 * this.deltaY2Y1))
+        return Math.round(Math.sqrt(this.middleSidesVectorX ** 2 + this.middleSidesVectorY ** 2))
     }
 
+    /**
+     * In trapeze region we consider the direction angle as the angle between the middle of the start line and the middle of the end line
+     */
     getDirectionAngleDegrees() {
-        return Math.round(Rad2Deg(Math.atan2(this.vectorY, this.vectorX)))
+        return Math.round((Math.atan2(this.middleVectorY, this.middleVectorX) * 180) / Math.PI)
     }
 
     getArea(): number {
@@ -476,11 +513,11 @@ export class TrapezeRegion extends MECRegion {
     }
 
     getCenterX(): number {
-        return this.x1 + this.deltaX2X1 / 2 + this.vectorX / 2
+        return this.middleP1P2x + this.middleVectorX / 2
     }
 
     getCenterY(): number {
-        return this.y1 + this.deltaY2Y1 / 2 + this.vectorY / 2
+        return this.middleP1P2y + this.middleVectorY / 2
     }
 
     toText(detailled = false) {

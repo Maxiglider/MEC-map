@@ -30,13 +30,24 @@ export class RectangleRegion extends ParallelogramRegion {
         super(x1, y1, x2, y2, parallelogramX3, parallelogramY3)
     }
 
+    /**
+     * Pre-calculations for areCoordsInRegion best performance
+     */
+    protected areCoordsInRegionPreCalculation() {
+        super.areCoordsInRegionPreCalculation()
+
+        // Important note: dotP1P2 and dotP1P4 ahve to be declared in root class or they will be set to 0 after areCoordsInRegionPreCalculation call
+        this.dotP1P2 = dot(this.deltaX2X1, this.deltaY2Y1, this.deltaX2X1, this.deltaY2Y1)
+        this.dotP1P4 = dot(this.middleVectorX, this.middleVectorY, this.middleVectorX, this.middleVectorY)
+    }
+
     areCoordsInRegion(x: number, y: number) {
         // Let's say (x, y) is point P
         const deltaPxX1 = x - this.x1
         const deltaPyY1 = y - this.y1
 
         const u = dot(deltaPxX1, deltaPyY1, this.deltaX2X1, this.deltaY2Y1) / this.dotP1P2
-        const v = dot(deltaPxX1, deltaPyY1, this.deltaP4X1, this.deltaP4Y1) / this.dotP4
+        const v = dot(deltaPxX1, deltaPyY1, this.middleVectorX, this.middleVectorY) / this.dotP1P4
 
         return u >= 0 && u <= 1 && v >= 0 && v <= 1
     }

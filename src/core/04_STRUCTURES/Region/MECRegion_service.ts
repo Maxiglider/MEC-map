@@ -2,11 +2,33 @@ import { HorizontalRectangleRegion, HorizontalRegionDirection } from './Horizont
 import { LineRegion } from './LineRegion'
 import { MECZoneWidthTooSmallError, ParallelogramRegion } from './ParallelogramRegion'
 import { RectangleRegion } from './RectangleRegion'
+import { TrapezeRegion } from './TrapezeRegion'
 
 export const init_MECRegion_service = () => {
     return {
         newLineRegion: (x1: number, y1: number, x2: number, y2: number) => {
             return new LineRegion(x1, y1, x2, y2)
+        },
+        newTrapezeRegionBackupToLine: (
+            x1: number,
+            y1: number,
+            x2: number,
+            y2: number,
+            x3: number,
+            y3: number,
+            distanceP3P4: number
+        ) => {
+            let mecRegion: TrapezeRegion | LineRegion
+            try {
+                mecRegion = new TrapezeRegion(x1, y1, x2, y2, x3, y3, distanceP3P4)
+            } catch (e: any) {
+                if (e instanceof MECZoneWidthTooSmallError) {
+                    mecRegion = e.getBackupLineRegion()
+                } else {
+                    throw e
+                }
+            }
+            return mecRegion
         },
         newParallelogramRegionBackupToLine: (
             x1: number,
@@ -16,7 +38,7 @@ export const init_MECRegion_service = () => {
             x3: number,
             y3: number
         ) => {
-            let mecRegion: RectangleRegion | LineRegion
+            let mecRegion: ParallelogramRegion | LineRegion
             try {
                 mecRegion = new ParallelogramRegion(x1, y1, x2, y2, x3, y3)
             } catch (e: any) {

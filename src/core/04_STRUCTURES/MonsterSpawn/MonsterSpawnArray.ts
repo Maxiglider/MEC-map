@@ -98,9 +98,9 @@ export class MonsterSpawnArray extends BaseArray<MonsterSpawn> {
         let mecRegion: MECRegion
 
         switch (mecRegionJson.type) {
-            case 'HorizontalRegion': {
-                const { x1, y1, x2, y2, direction } = mecRegionJson
-                mecRegion = mecRegionService.newHorizontalRegionBackupToLine(x1, y1, x2, y2, direction)
+            case 'CircleRegion': {
+                const { centerY, radius, centerX } = mecRegionJson
+                mecRegion = new CircleRegion(centerX, centerY, radius)
                 break
             }
             case 'LineRegion': {
@@ -108,14 +108,25 @@ export class MonsterSpawnArray extends BaseArray<MonsterSpawn> {
                 mecRegion = new LineRegion(originalX1, originalY1, originalX2, originalY2)
                 break
             }
+            case 'HorizontalRectangleRegion':
+            case 'HorizontalRegion' /* old name */: {
+                const { x1, y1, x2, y2, direction } = mecRegionJson
+                mecRegion = mecRegionService.newHorizontalRegionBackupToLine(x1, y1, x2, y2, direction)
+                break
+            }
             case 'RectangleRegion': {
                 const { x1, y1, x2, y2, x3, y3 } = mecRegionJson
                 mecRegion = mecRegionService.newRectangleRegionBackupToLine(x1, y1, x2, y2, x3, y3)
                 break
             }
-            case 'CircleRegion': {
-                const { centerY, radius, centerX } = mecRegionJson
-                mecRegion = new CircleRegion(centerX, centerY, radius)
+            case 'ParallelogramRegion': {
+                const { x1, y1, x2, y2, x3, y3 } = mecRegionJson
+                mecRegion = mecRegionService.newParallelogramRegionBackupToLine(x1, y1, x2, y2, x3, y3)
+                break
+            }
+            case 'TrapezeRegion': {
+                const { x1, y1, x2, y2, x3, y3, distanceP3P4 } = mecRegionJson
+                mecRegion = mecRegionService.newTrapezeRegionBackupToLine(x1, y1, x2, y2, x3, y3, distanceP3P4)
                 break
             }
             default: {

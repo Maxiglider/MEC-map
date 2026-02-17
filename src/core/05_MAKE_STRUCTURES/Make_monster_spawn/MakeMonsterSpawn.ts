@@ -5,7 +5,7 @@ import { HorizontalRegionDirection } from '../../04_STRUCTURES/Region/Horizontal
 import { MECRegion } from '../../04_STRUCTURES/Region/MECRegion'
 import { MakeMECRegion, MakeMECRegionMode } from '../Make_create_region/MakeMECRegion'
 
-export type MakeMonsterSpawnKind = HorizontalRegionDirection | 'line' | 'rect' | 'parallelogram'
+export type MakeMonsterSpawnKind = HorizontalRegionDirection | 'line' | 'rect' | 'parallelogram' | 'trapeze'
 
 export function MakeMonsterSpawnKind2MakeMECRegionMode(kind: MakeMonsterSpawnKind): MakeMECRegionMode {
     let mode: MakeMECRegionMode = 'line'
@@ -17,6 +17,8 @@ export function MakeMonsterSpawnKind2MakeMECRegionMode(kind: MakeMonsterSpawnKin
         mode = 'rect'
     } else if (kind === 'parallelogram') {
         mode = 'parallelogram'
+    } else if (kind === 'trapeze') {
+        mode = 'trapeze'
     }
 
     return mode

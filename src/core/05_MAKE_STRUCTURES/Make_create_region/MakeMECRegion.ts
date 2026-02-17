@@ -6,7 +6,7 @@ import { LineRegion } from '../../04_STRUCTURES/Region/LineRegion'
 import { MECRegion } from '../../04_STRUCTURES/Region/MECRegion'
 import { MakeBySeveralClicks } from '../Make/MakeBySeveralClicks'
 
-export type MakeMECRegionMode = 'horizRect' | 'rect' | 'parallelogram' | 'circle' | 'line'
+export type MakeMECRegionMode = 'horizRect' | 'rect' | 'parallelogram' | 'trapeze' | 'circle' | 'line'
 
 export abstract class MakeMECRegion extends MakeBySeveralClicks {
     protected mode: MakeMECRegionMode
@@ -17,8 +17,23 @@ export abstract class MakeMECRegion extends MakeBySeveralClicks {
         super(maker, 'mecRegionCreate')
 
         this.mode = mode
-        this.requiredLocsNumber = ['rect', 'parallelogram'].includes(this.mode) ? 3 : 2
+
+        if (mode === 'trapeze') this.requiredLocsNumber = 4
+        else if (['rect', 'parallelogram'].includes(this.mode)) {
+            this.requiredLocsNumber = 3
+        } else {
+            this.requiredLocsNumber = 2
+        }
+
         this.directionForHorizontal = directionForHorizontal
+    }
+
+    drawLastLankmarkLine = () => {
+        if (this.mode === 'trapeze' && this.currentMakingLocIndex === 2) {
+            super.drawLastLankmarkLine(0, 2)
+        } else {
+            super.drawLastLankmarkLine()
+        }
     }
 
     doActions = () => {
@@ -55,6 +70,20 @@ export abstract class MakeMECRegion extends MakeBySeveralClicks {
                         this.savedY[1],
                         this.savedX[2],
                         this.savedY[2]
+                    )
+                } else if (this.mode === 'trapeze') {
+                    const distanceP3P4 = Math.sqrt(
+                        (this.savedX[3] - this.savedX[2]) ** 2 + (this.savedY[3] - this.savedY[2]) ** 2
+                    )
+
+                    mecRegion = mecRegionService.newTrapezeRegionBackupToLine(
+                        this.savedX[0],
+                        this.savedY[0],
+                        this.savedX[1],
+                        this.savedY[1],
+                        this.savedX[2],
+                        this.savedY[2],
+                        distanceP3P4
                     )
                 } else if (this.mode === 'circle') {
                     const centerX = this.savedX[0]
