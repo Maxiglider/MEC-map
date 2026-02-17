@@ -46,7 +46,7 @@ export abstract class MakeMECRegion extends MakeBySeveralClicks {
                 let mecRegion: MECRegion
 
                 if (this.mode === 'horizRect') {
-                    mecRegion = mecRegionService.newHorizontalRegionBackupToLine(
+                    mecRegion = mecRegionService.newHorizontalRectangleRegionBackupToLine(
                         this.savedX[0],
                         this.savedY[0],
                         this.savedX[1],

@@ -1,8 +1,8 @@
 import { HorizontalRectangleRegion, HorizontalRegionDirection } from './HorizontalRectangleRegion'
 import { LineRegion } from './LineRegion'
-import { MECZoneWidthTooSmallError, ParallelogramRegion } from './ParallelogramRegion'
+import { ParallelogramRegion } from './ParallelogramRegion'
 import { RectangleRegion } from './RectangleRegion'
-import { TrapezeRegion } from './TrapezeRegion'
+import { MECZoneWidthTooSmallError, TrapezeRegion } from './TrapezeRegion'
 
 export const init_MECRegion_service = () => {
     return {
@@ -63,7 +63,7 @@ export const init_MECRegion_service = () => {
             }
             return mecRegion
         },
-        newHorizontalRegionBackupToLine: (
+        newHorizontalRectangleRegionBackupToLine: (
             x1: number,
             y1: number,
             x2: number,

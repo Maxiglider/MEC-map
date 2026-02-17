@@ -1,23 +1,7 @@
 import { MemoryHandler } from '../../../Utils/MemoryHandler'
-import { LineRegion } from './LineRegion'
 import { TrapezeRegion } from './TrapezeRegion'
 
-export class MECZoneWidthTooSmallError extends Error {
-    private readonly backupLineRegion: LineRegion
-    constructor(message: string, lineRegion: LineRegion) {
-        super(message)
-        this.backupLineRegion = lineRegion
-    }
-
-    getBackupLineRegion() {
-        return this.backupLineRegion
-    }
-}
-
 export class ParallelogramRegion extends TrapezeRegion {
-    protected directionAngleCos: number = 0
-    protected directionAngleSine: number = 0
-
     constructor(x1: number, y1: number, x2: number, y2: number, x3: number, y3: number) {
         // In a parallelogram, the distance between P3 and P4 is the same as the distance between P1 and P2
         const distanceP3P4 = Math.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2)

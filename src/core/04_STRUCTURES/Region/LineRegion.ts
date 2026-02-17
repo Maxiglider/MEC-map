@@ -1,11 +1,7 @@
-import { RectangleRegion } from './RectangleRegion'
-import {
-    END_POINT_OFFSET_AFTER_END_OF_REGION,
-    OFFSET_FOR_START_LINE_NOT_SPAWNED_MONSTERS_TO_BE_CONSIDERED_OUT,
-    StartAndEndPoints,
-} from './MECRegion'
 import { IDestroyable, MemoryHandler } from '../../../Utils/MemoryHandler'
 import { MonsterSpawn } from '../MonsterSpawn/MonsterSpawn'
+import { StartAndEndPoints } from './MECRegion'
+import { RectangleRegion } from './RectangleRegion'
 
 const LINE_REGION_WIDTH = 32
 
@@ -33,17 +29,12 @@ export class LineRegion extends RectangleRegion {
 
         super(diagX1, diagY1, diagX2, diagY2, diagX3, diagY3)
 
-        // End point has to be outside of the region
-        const endX = x2 + Math.cos(Deg2Rad(directionAngle)) * END_POINT_OFFSET_AFTER_END_OF_REGION
-        const endY = y2 + Math.sin(Deg2Rad(directionAngle)) * END_POINT_OFFSET_AFTER_END_OF_REGION
-
+        // Prepare the constant start and end points
         this.startAndEndPoints = MemoryHandler.getEmptyObject<StartAndEndPoints>()
-        this.startAndEndPoints.startX =
-            x1 + OFFSET_FOR_START_LINE_NOT_SPAWNED_MONSTERS_TO_BE_CONSIDERED_OUT * Math.cos(Deg2Rad(directionAngle))
-        this.startAndEndPoints.startY =
-            y1 + OFFSET_FOR_START_LINE_NOT_SPAWNED_MONSTERS_TO_BE_CONSIDERED_OUT * Math.sin(Deg2Rad(directionAngle))
-        this.startAndEndPoints.endX = endX
-        this.startAndEndPoints.endY = endY
+        this.startAndEndPoints.startX = (this.startLineX1 + this.startLineX2) / 2
+        this.startAndEndPoints.startY = (this.startLineY1 + this.startLineY2) / 2
+        this.startAndEndPoints.endX = (this.endLineX1 + this.endLineX2) / 2
+        this.startAndEndPoints.endY = (this.endLineY1 + this.endLineY2) / 2
         this.startAndEndPoints.ephemeral = false
 
         this.originalX1 = x1

@@ -111,7 +111,7 @@ export class MonsterSpawnArray extends BaseArray<MonsterSpawn> {
             case 'HorizontalRectangleRegion':
             case 'HorizontalRegion' /* old name */: {
                 const { x1, y1, x2, y2, direction } = mecRegionJson
-                mecRegion = mecRegionService.newHorizontalRegionBackupToLine(x1, y1, x2, y2, direction)
+                mecRegion = mecRegionService.newHorizontalRectangleRegionBackupToLine(x1, y1, x2, y2, direction)
                 break
             }
             case 'RectangleRegion': {
@@ -146,95 +146,99 @@ export class MonsterSpawnArray extends BaseArray<MonsterSpawn> {
 
         let mecRegion: MECRegion | null = null
 
-        const directionAngle = ForceAngleBetween0And360(
-            typeof ms.sens === 'string' ? convertTextToAngle(ms.sens) : ms.sens
-        )
+        try {
+            const directionAngle = ForceAngleBetween0And360(
+                typeof ms.sens === 'string' ? convertTextToAngle(ms.sens) : ms.sens
+            )
 
-        let direction: HorizontalRegionDirection | null = null
-        switch (directionAngle) {
-            case 0:
-                direction = 'right'
-                break
-            case 90:
-                direction = 'up'
-                break
-            case 180:
-                direction = 'left'
-                break
-            case 270:
-                direction = 'down'
-                break
-        }
+            let direction: HorizontalRegionDirection | null = null
+            switch (directionAngle) {
+                case 0:
+                    direction = 'right'
+                    break
+                case 90:
+                    direction = 'up'
+                    break
+                case 180:
+                    direction = 'left'
+                    break
+                case 270:
+                    direction = 'down'
+                    break
+            }
 
-        switch (ms.spawnShape) {
-            case 'line': {
-                const x1 = ms.clickX1
-                const y1 = ms.clickY1
-                let x2 = ms.clickX2
-                let y2 = ms.clickY2
+            switch (ms.spawnShape) {
+                case 'line': {
+                    const x1 = ms.clickX1
+                    const y1 = ms.clickY1
+                    let x2 = ms.clickX2
+                    let y2 = ms.clickY2
 
-                // With old format, on case of line spanw, the unspanwn is determined only by a timer, there is no rect, so we arbitraryly generate a square region
-                const p1p2_dist = Math.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2)
+                    // With old format, on case of line spanw, the unspanwn is determined only by a timer, there is no rect, so we arbitraryly generate a square region
+                    const p1p2_dist = Math.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2)
 
-                if (direction) {
-                    // HorizontalRegion
-                    x2 += p1p2_dist * CosBJ(directionAngle)
-                    y2 += p1p2_dist * SinBJ(directionAngle)
+                    if (direction) {
+                        // HorizontalRegion
+                        x2 += p1p2_dist * CosBJ(directionAngle)
+                        y2 += p1p2_dist * SinBJ(directionAngle)
 
-                    mecRegion = mecRegionService.newHorizontalRegionBackupToLine(x1, y1, x2, y2, direction)
-                } else {
-                    // RectangleRegion
-                    const x3 = x2 + p1p2_dist * CosBJ(directionAngle)
-                    const y3 = y2 + p1p2_dist * SinBJ(directionAngle)
+                        mecRegion = mecRegionService.newHorizontalRectangleRegionBackupToLine(x1, y1, x2, y2, direction)
+                    } else {
+                        // RectangleRegion
+                        const x3 = x2 + p1p2_dist * CosBJ(directionAngle)
+                        const y3 = y2 + p1p2_dist * SinBJ(directionAngle)
 
-                    mecRegion = mecRegionService.newRectangleRegionBackupToLine(x1, y1, x2, y2, x3, y3)
+                        mecRegion = mecRegionService.newRectangleRegionBackupToLine(x1, y1, x2, y2, x3, y3)
+                    }
+
+                    break
                 }
+                case 'point': {
+                    // LineRegion
 
-                break
-            }
-            case 'point': {
-                // LineRegion
+                    // With old format, on case of point spawn, the unspanwn is determined only by a timer, there is no rect, so we arbitraryly choose the region length
+                    const regionLength = 800
 
-                // With old format, on case of point spawn, the unspanwn is determined only by a timer, there is no rect, so we arbitraryly choose the region length
-                const regionLength = 800
+                    const x1 = ms.clickX1
+                    const y1 = ms.clickY1
+                    let x2 = x1 + regionLength * CosBJ(directionAngle)
+                    let y2 = y1 + regionLength * SinBJ(directionAngle)
 
-                const x1 = ms.clickX1
-                const y1 = ms.clickY1
-                let x2 = x1 + regionLength * CosBJ(directionAngle)
-                let y2 = y1 + regionLength * SinBJ(directionAngle)
+                    mecRegion = new LineRegion(x1, y1, x2, y2)
 
-                mecRegion = new LineRegion(x1, y1, x2, y2)
-
-                break
-            }
-            case 'region':
-            default: {
-                // spwawnShape was not defined with old MEC versions
-                // HorizontalRegion or RectangleRegion depending on the direction angle
-                if (direction) {
-                    mecRegion = mecRegionService.newHorizontalRegionBackupToLine(
-                        ms.minX,
-                        ms.minY,
-                        ms.maxX,
-                        ms.maxY,
-                        direction
-                    )
-                } else {
-                    const anchorX = (ms.minX + ms.maxX) / 2
-                    const anchorY = (ms.minY + ms.maxY) / 2
-
-                    const p1 = ApplyRotation(anchorX, anchorY, directionAngle, createPoint(ms.minX, ms.minY))
-                    const p2 = ApplyRotation(anchorX, anchorY, directionAngle, createPoint(ms.minX, ms.maxY))
-                    const p3 = ApplyRotation(anchorX, anchorY, directionAngle, createPoint(ms.maxX, ms.minY))
-
-                    mecRegion = mecRegionService.newRectangleRegionBackupToLine(p1.x, p1.y, p2.x, p2.y, p3.x, p3.y)
-
-                    MemoryHandler.destroyObject(p1)
-                    MemoryHandler.destroyObject(p2)
-                    MemoryHandler.destroyObject(p3)
+                    break
                 }
-                break
+                case 'region':
+                default: {
+                    // spwawnShape was not defined with old MEC versions
+                    // HorizontalRegion or RectangleRegion depending on the direction angle
+                    if (direction) {
+                        mecRegion = mecRegionService.newHorizontalRectangleRegionBackupToLine(
+                            ms.minX,
+                            ms.minY,
+                            ms.maxX,
+                            ms.maxY,
+                            direction
+                        )
+                    } else {
+                        const anchorX = (ms.minX + ms.maxX) / 2
+                        const anchorY = (ms.minY + ms.maxY) / 2
+
+                        const p1 = ApplyRotation(anchorX, anchorY, directionAngle, createPoint(ms.minX, ms.minY))
+                        const p2 = ApplyRotation(anchorX, anchorY, directionAngle, createPoint(ms.minX, ms.maxY))
+                        const p3 = ApplyRotation(anchorX, anchorY, directionAngle, createPoint(ms.maxX, ms.minY))
+
+                        mecRegion = mecRegionService.newRectangleRegionBackupToLine(p1.x, p1.y, p2.x, p2.y, p3.x, p3.y)
+
+                        MemoryHandler.destroyObject(p1)
+                        MemoryHandler.destroyObject(p2)
+                        MemoryHandler.destroyObject(p3)
+                    }
+                    break
+                }
             }
+        } catch (e: any) {
+            Text.erA('SPAWN REGION OLD JSON FORMAT ERROR: ' + e?.message)
         }
 
         if (!mecRegion) {

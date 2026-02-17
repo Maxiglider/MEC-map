@@ -50,10 +50,10 @@ export class TrapezeRegion extends MECRegion {
     private middleSidesVectorX = 0
     private middleSidesVectorY = 0
 
-    private startLineX1: number = 0
-    private startLineY1: number = 0
-    private startLineX2: number = 0
-    private startLineY2: number = 0
+    protected startLineX1: number = 0
+    protected startLineY1: number = 0
+    protected startLineX2: number = 0
+    protected startLineY2: number = 0
     private startLineDeltaX: number = 0
     private startLineDeltaY: number = 0
     private startLineLength: number = 0
@@ -69,17 +69,21 @@ export class TrapezeRegion extends MECRegion {
     private vectorEndY = 0
     private vectorEndLength = 0
 
-    private endLineX1: number = 0
-    private endLineY1: number = 0
-    private endLineX2: number = 0
-    private endLineY2: number = 0
+    protected endLineX1: number = 0
+    protected endLineY1: number = 0
+    protected endLineX2: number = 0
+    protected endLineY2: number = 0
     private endLineDeltaX: number = 0
     private endLineDeltaY: number = 0
     private endLineLength = 0
 
     private area: number = 0
 
-    // For rect calculations preparation
+    // For parallelogram calculations preparation, but has to be declared here
+    protected directionAngleCos: number = 0
+    protected directionAngleSine: number = 0
+
+    // For rect calculations preparation, but has to be declared here
     protected dotP1P2: number = 0
     protected dotP1P4: number = 0
 
