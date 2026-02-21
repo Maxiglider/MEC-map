@@ -2718,7 +2718,8 @@ export const initExecuteCommandMake = () => {
         alias: ['setlrv'],
         group: 'make',
         argDescription: '<boolean> [<levelId>]',
-        description: 'Set whether visibilities are reset when re-entering the level (applies a total black mask on the map when true)',
+        description:
+            'Set whether visibilities are reset when re-entering the level (applies a total black mask on the map when true)',
         cb: ({ nbParam, param1, param2 }, escaper) => {
             if (nbParam > 2 || !IsBoolString(param1)) {
                 Text.erP(escaper.getPlayer(), 'Usage: -setLevelResetVisibilities <boolean> [<levelId>]')
@@ -2734,8 +2735,11 @@ export const initExecuteCommandMake = () => {
 
             const doReset = S2B(param1)
 
-            if(level.getResetVisiblitiesAtStart() === doReset) {
-                Text.erP(escaper.getPlayer(), `Level ${levelNum} already has reset visibilities at start set to ${param1}`)
+            if (level.getResetVisiblitiesAtStart() === doReset) {
+                Text.erP(
+                    escaper.getPlayer(),
+                    `Level ${levelNum} already has reset visibilities at start set to ${param1}`
+                )
                 return true
             }
 
@@ -2746,7 +2750,7 @@ export const initExecuteCommandMake = () => {
             )
 
             return true
-        }
+        },
     })
 
     //-removeVisibilities(remv) [<levelId>]   --> remove all visibility rectangles made for the current level
@@ -3192,6 +3196,38 @@ export const initExecuteCommandMake = () => {
             //apply command
             getUdgCasterTypes().getByLabel(param1)?.setAnimation(str)
             Text.mkP(escaper.getPlayer(), 'caster animation changed')
+            return true
+        },
+    })
+
+    //-setCasterTargeting(setct) <casterLabel> on/off/<boolean>   --> use predictive targeting (predict hero movement) or shoot straight ahead
+    registerCommand({
+        name: 'setCasterTargeting',
+        alias: ['setct'],
+        group: 'make',
+        argDescription: '<casterLabel> on/off/<boolean>',
+        description:
+            'Toggle predictive targeting for a caster type (on = predict hero movement, off = shoot straight ahead)',
+        cb: ({ nbParam, param1, param2 }, escaper) => {
+            if (nbParam !== 2) {
+                return true
+            }
+            //checkParam 1
+            if (!getUdgCasterTypes().isLabelAlreadyUsed(param1)) {
+                Text.erP(escaper.getPlayer(), 'unknown caster type "' + param1 + '"')
+                return true
+            }
+            //checkParam 2
+            if (!IsBoolString(param2)) {
+                Text.erP(escaper.getPlayer(), 'the targeting value must be a boolean (on/off/true/false)')
+                return true
+            }
+            //apply command
+            getUdgCasterTypes().getByLabel(param1)?.setUsePredictiveTargeting(S2B(param2))
+            Text.mkP(
+                escaper.getPlayer(),
+                S2B(param2) ? 'caster targeting set to predictive (on)' : 'caster targeting set to straight ahead (off)'
+            )
             return true
         },
     })

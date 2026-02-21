@@ -162,71 +162,78 @@ const CasterTryToShoot = () => {
                 nbRemainingEscapersToShoot = nbRemainingEscapersToShoot - 1
             } else {
                 //tir si possible
-                if (escaper.isSliding()) {
-                    sliderSpeed = escaper.getSlideSpeed()
-                } else if (GetUnitCurrentOrder(hero) != 0) {
-                    sliderSpeed = escaper.getWalkSpeed()
-                } else {
-                    sliderSpeed = 0
-                }
-                if (sliderSpeed === 0) {
-                    xHero = x1
-                    yHero = y1
+                if (!caster.getCasterType().getUsePredictiveTargeting()) {
+                    // Non-predictive mode: shoot straight ahead at the caster's configured angle
+                    xHero = x3 + CosBJ(caster.getAngle())
+                    yHero = y3 + SinBJ(caster.getAngle())
                     tirOk = true
                 } else {
-                    CalculerPointsIntersections()
-                    if (sliderSpeed < 0) {
-                        sliderSpeed = -sliderSpeed
-                    }
-                    if (k1 === 0 && k2 === 0) {
-                        return
-                    }
-
-                    //sens points
-                    if (CosBJ(angleSlider) !== 0) {
-                        sensPoint1positif = (Xk1 - x1) * CosBJ(angleSlider) > 0
-                        sensPoint2positif = (Xk2 - x1) * CosBJ(angleSlider) > 0
+                    if (escaper.isSliding()) {
+                        sliderSpeed = escaper.getSlideSpeed()
+                    } else if (GetUnitCurrentOrder(hero) != 0) {
+                        sliderSpeed = escaper.getWalkSpeed()
                     } else {
-                        sensPoint1positif = (Yk1 - y1) * SinBJ(angleSlider) > 0
-                        sensPoint2positif = (Yk2 - y1) * SinBJ(angleSlider) > 0
+                        sliderSpeed = 0
                     }
-
-                    //déterminer lequel des deux points d'intersection est devant le héros
-                    if (sensPoint1positif === sensPoint2positif) {
-                        //calcul du temps pour chaque point pour trouver le plus éloigné qui est le bon
-                        tempsPoint1 = SquareRoot((x1 - Xk1) * (x1 - Xk1) + (y1 - Yk1) * (y1 - Yk1)) / sliderSpeed
-                        tempsPoint2 = SquareRoot((x1 - Xk2) * (x1 - Xk2) + (y1 - Yk2) * (y1 - Yk2)) / sliderSpeed
-                        if (tempsPoint1 > tempsPoint2) {
-                            XintersectionDevantHeros = Xk1
-                            YintersectionDevantHeros = Yk1
-                            tempsMax = tempsPoint1
-                        } else {
-                            XintersectionDevantHeros = Xk2
-                            YintersectionDevantHeros = Yk2
-                            tempsMax = tempsPoint2
-                        }
-                    } else {
-                        if (sensPoint1positif) {
-                            XintersectionDevantHeros = Xk1
-                            YintersectionDevantHeros = Yk1
-                            tempsMax = SquareRoot((x1 - Xk1) * (x1 - Xk1) + (y1 - Yk1) * (y1 - Yk1)) / sliderSpeed
-                        } else {
-                            XintersectionDevantHeros = Xk2
-                            YintersectionDevantHeros = Yk2
-                            tempsMax = SquareRoot((x1 - Xk2) * (x1 - Xk2) + (y1 - Yk2) * (y1 - Yk2)) / sliderSpeed
-                        }
-                    }
-
-                    //trouver temps idéal
-                    if (IsOnGround(hero)) {
-                        tempsIdeal = TrouverTempsIdeal(tempsMax)
-                    } else {
-                        tempsIdeal = -1
-                    }
-                    if (tempsIdeal !== -1) {
-                        xHero = x1 + sliderSpeed * CosBJ(angleSlider) * tempsIdeal
-                        yHero = y1 + sliderSpeed * SinBJ(angleSlider) * tempsIdeal
+                    if (sliderSpeed === 0) {
+                        xHero = x1
+                        yHero = y1
                         tirOk = true
+                    } else {
+                        CalculerPointsIntersections()
+                        if (sliderSpeed < 0) {
+                            sliderSpeed = -sliderSpeed
+                        }
+                        if (k1 === 0 && k2 === 0) {
+                            return
+                        }
+
+                        //sens points
+                        if (CosBJ(angleSlider) !== 0) {
+                            sensPoint1positif = (Xk1 - x1) * CosBJ(angleSlider) > 0
+                            sensPoint2positif = (Xk2 - x1) * CosBJ(angleSlider) > 0
+                        } else {
+                            sensPoint1positif = (Yk1 - y1) * SinBJ(angleSlider) > 0
+                            sensPoint2positif = (Yk2 - y1) * SinBJ(angleSlider) > 0
+                        }
+
+                        //déterminer lequel des deux points d'intersection est devant le héros
+                        if (sensPoint1positif === sensPoint2positif) {
+                            //calcul du temps pour chaque point pour trouver le plus éloigné qui est le bon
+                            tempsPoint1 = SquareRoot((x1 - Xk1) * (x1 - Xk1) + (y1 - Yk1) * (y1 - Yk1)) / sliderSpeed
+                            tempsPoint2 = SquareRoot((x1 - Xk2) * (x1 - Xk2) + (y1 - Yk2) * (y1 - Yk2)) / sliderSpeed
+                            if (tempsPoint1 > tempsPoint2) {
+                                XintersectionDevantHeros = Xk1
+                                YintersectionDevantHeros = Yk1
+                                tempsMax = tempsPoint1
+                            } else {
+                                XintersectionDevantHeros = Xk2
+                                YintersectionDevantHeros = Yk2
+                                tempsMax = tempsPoint2
+                            }
+                        } else {
+                            if (sensPoint1positif) {
+                                XintersectionDevantHeros = Xk1
+                                YintersectionDevantHeros = Yk1
+                                tempsMax = SquareRoot((x1 - Xk1) * (x1 - Xk1) + (y1 - Yk1) * (y1 - Yk1)) / sliderSpeed
+                            } else {
+                                XintersectionDevantHeros = Xk2
+                                YintersectionDevantHeros = Yk2
+                                tempsMax = SquareRoot((x1 - Xk2) * (x1 - Xk2) + (y1 - Yk2) * (y1 - Yk2)) / sliderSpeed
+                            }
+                        }
+
+                        //trouver temps idéal
+                        if (IsOnGround(hero)) {
+                            tempsIdeal = TrouverTempsIdeal(tempsMax)
+                        } else {
+                            tempsIdeal = -1
+                        }
+                        if (tempsIdeal !== -1) {
+                            xHero = x1 + sliderSpeed * CosBJ(angleSlider) * tempsIdeal
+                            yHero = y1 + sliderSpeed * SinBJ(angleSlider) * tempsIdeal
+                            tirOk = true
+                        }
                     }
                 }
 
@@ -331,6 +338,10 @@ export class Caster extends Monster {
 
     getY = (): number => {
         return this.y
+    }
+
+    getAngle = (): number => {
+        return this.angle
     }
 
     getRange = (): number => {

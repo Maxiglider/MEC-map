@@ -22,6 +22,7 @@ export class CasterType {
     private projectileSpeed: number
     private loadTime: number
     private animation: string
+    private usePredictiveTargeting: boolean = true
 
     constructor(
         label: string,
@@ -152,6 +153,14 @@ export class CasterType {
         this.animation = animation
     }
 
+    getUsePredictiveTargeting = (): boolean => {
+        return this.usePredictiveTargeting
+    }
+
+    setUsePredictiveTargeting = (val: boolean) => {
+        this.usePredictiveTargeting = val
+    }
+
     toText = (): string => {
         let space = '   '
         const aliasDisplay = this.theAlias ? ' ' + this.theAlias : ''
@@ -173,7 +182,10 @@ export class CasterType {
             'loadTime: ' +
             R2S(this.loadTime) +
             space +
-            this.animation
+            this.animation +
+            space +
+            'targeting: ' +
+            (this.usePredictiveTargeting ? 'on' : 'off')
         return display
     }
 
@@ -192,6 +204,7 @@ export class CasterType {
         output['projectileSpeed'] = this.projectileSpeed
         output['loadTime'] = this.loadTime
         output['animation'] = this.animation
+        output['usePredictiveTargeting'] = this.usePredictiveTargeting
 
         return output
     }

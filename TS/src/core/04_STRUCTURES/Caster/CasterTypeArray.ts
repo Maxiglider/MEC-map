@@ -73,6 +73,9 @@ export class CasterTypeArray extends BaseArray<CasterType> {
                 if (ct.alias) {
                     casterType?.setAlias(ct.alias)
                 }
+                if (ct.usePredictiveTargeting !== undefined) {
+                    casterType?.setUsePredictiveTargeting(ct.usePredictiveTargeting)
+                }
             }
         }
     }
