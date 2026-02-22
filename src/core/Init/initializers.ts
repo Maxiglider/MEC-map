@@ -1,10 +1,13 @@
 import { init_Cpm } from 'core/08_GAME/Apm_clics_par_minute/Cpm'
+import { init_globals } from '../../../globals'
 import { init_terrain_limit_variables } from '../01_libraries/Init_terrain_limit_variables'
 import { initViewAllHideAll } from '../03_view_all_hide_all/View_all_hide_all'
 import { initFirstPerson } from '../04_STRUCTURES/Escaper/Escaper_firstPerson'
 import { init_StartAndEnd } from '../04_STRUCTURES/Level/StartAndEnd'
+import { init_LongDistanceMoveOrder_garbageCollector } from '../04_STRUCTURES/Monster/LongDistanceMoveOrder'
 import { initMonsterSimplePatrol } from '../04_STRUCTURES/Monster/MonsterSimplePatrol'
 import { init_TrigMonstersClickableSetLife } from '../04_STRUCTURES/Monster/trig_Monsters_clickable_set_life'
+import { init_MECRegions } from '../04_STRUCTURES/Region/MECRegion'
 import { initTrig_Autorevive } from '../06_COMMANDS/Helpers/Autorevive'
 import { initCachedPlayerNames } from '../06_COMMANDS/Helpers/Command_functions'
 import { init_StopSecondIfMake } from '../07_TRIGGERS/Handling_secondary_hero/Stop_second_if_make'
@@ -22,15 +25,11 @@ import { initSelectUnit } from '../08_GAME/select_unit'
 import { init_customUI } from '../DisablingInterface/EnableDisableInterface'
 import { init_doubleKill } from '../Double_heroes/double_kill'
 import { init_shortcurt_cancelRedo } from '../Keyboard_shortcuts/Cancel_redo'
+import { init_E2ETests } from '../Test/e2e-tests/base/e2e-tests-registering'
 import { init_Test } from '../Test/test'
 import { initArrays } from './initArrays'
-import { initOldTriggers } from './init_old_triggers'
-import { init_LongDistanceMoveOrder_garbageCollector } from '../04_STRUCTURES/Monster/LongDistanceMoveOrder'
 import { init_dataFromWorleditor } from './init_dataFromWorleditor'
-import { init_DetectNullHeroCollisionAtStart } from '../07_TRIGGERS/CollisionLandmarks/DetectNullHeroCollisionAtStart'
-import { init_MECRegions } from '../04_STRUCTURES/Region/MECRegion'
-import { init_E2ETests } from '../Test/e2e-tests/base/e2e-tests-registering'
-import { init_globals } from '../../../globals'
+import { initOldTriggers } from './init_old_triggers'
 
 export const initializers = () => {
     init_globals()
@@ -60,7 +59,6 @@ export const initializers = () => {
     init_startFirstLevel()
     init_cameraPositionAtStart()
     init_LongDistanceMoveOrder_garbageCollector()
-    init_DetectNullHeroCollisionAtStart()
     init_MECRegions()
     init_E2ETests()
 
