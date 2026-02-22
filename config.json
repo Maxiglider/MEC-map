@@ -5,5 +5,5 @@
     "outputFolder": "./dist/bin",
     "launchArgs": ["-launch", "-windowmode", "windowed"],
     "winePrefix": "~/Games/battlenet",
-    "winePath": "~/.local/share/Steam/steamapps/common/Proton\\ -\\ Experimental/files/bin/wine"
+    "winePath": "wine"
 }
