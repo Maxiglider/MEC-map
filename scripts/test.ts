@@ -1,4 +1,5 @@
 import { execFile, execSync } from 'child_process'
+import 'dotenv/config'
 import { compileMap, IProjectConfig, loadJsonFile, logger } from './utils'
 
 function main() {
@@ -19,7 +20,7 @@ function main() {
 
         logger.info(`Launching map "${filename.replace(/\\/g, '/')}"...`)
 
-        if (config.winePath) {
+        if (config.winePath && process.env.PLATFORM === 'linux') {
             const wineFilename = `"Z:${filename}"`
             const prefix = config.winePrefix ? `WINEPREFIX=${config.winePrefix}` : ''
             execSync(
