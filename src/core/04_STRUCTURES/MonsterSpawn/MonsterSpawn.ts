@@ -330,6 +330,7 @@ export class MonsterSpawn {
                 Monster.forceUnitTypeIdForNextMonster = forceUnitTypeId
             }
             monster = NewImmobileMonster(this.mt, startAndEndPoints.startX, startAndEndPoints.startY, spawnAngle)
+            print('New spawn monster')
         } else {
             // todo the forceUnitTypeId should be taken into account and change the unit type of the existing unit without recreating it
             BlzSetUnitFacingEx(monster, spawnAngle)
