@@ -2198,6 +2198,43 @@ export const initExecuteCommandMake = () => {
         },
     })
 
+    //-setMonsterSpawnCasterType(setmsct) <monsterSpawnLabel> <casterTypeLabel|none>
+    registerCommand({
+        name: 'setMonsterSpawnCasterType',
+        alias: ['setmsct'],
+        group: 'make',
+        argDescription: '<monsterSpawnLabel> <casterTypeLabel|none>',
+        description:
+            'Set a caster type on a monster spawn so it spawns moving casters instead of regular monsters. Use "none" to remove.',
+        cb: ({ nbParam, param1, param2 }, escaper) => {
+            if (!(nbParam === 2)) {
+                return true
+            }
+
+            const monsterSpawn = escaper.getMakingLevel().monsterSpawns.getByLabel(param1)
+            if (!monsterSpawn) {
+                Text.erP(escaper.getPlayer(), 'unknown monster spawn "' + param1 + '" in this level')
+                return true
+            }
+
+            if (param2.toLowerCase() === 'none') {
+                monsterSpawn.setCasterType(undefined)
+                Text.mkP(escaper.getPlayer(), 'caster type removed from monster spawn')
+                return true
+            }
+
+            const casterType = getUdgCasterTypes().getByLabel(param2)
+            if (!casterType) {
+                Text.erP(escaper.getPlayer(), 'unknown caster type "' + param2 + '"')
+                return true
+            }
+
+            monsterSpawn.setCasterType(casterType)
+            Text.mkP(escaper.getPlayer(), 'caster type "' + param2 + '" set on monster spawn')
+            return true
+        },
+    })
+
     //-displayMonsterSpawns(dms) [<monsterSpawnLabel>] [page]
     registerCommand({
         name: 'displayMonsterSpawns',

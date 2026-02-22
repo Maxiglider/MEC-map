@@ -9,6 +9,8 @@ import { GetCurrentMonsterPlayer, arrayPush, convertAngleToDirection } from '../
 import { udg_colorCode } from '../../01_libraries/Init_colorCodes'
 import { Text } from '../../01_libraries/Text'
 import { hooks } from '../../API/GeneralHooks'
+import { Caster } from '../Caster/Caster'
+import { CasterType } from '../Caster/CasterType'
 import { Level } from '../Level/Level'
 import { Monster } from '../Monster/Monster'
 import { MonsterType } from '../Monster/MonsterType'
@@ -49,6 +51,7 @@ export class MonsterSpawn {
     static anyUnit2TimedUnspawnTimer = new Map<number, timer>()
     static anyTimedUnspawnTimerId2Unit = new Map<number, unit>()
     static anyTimedUnspawnTimerId2MonsterSpawn = new Map<number, MonsterSpawn>()
+    static anyUnitId2MovingCaster = new Map<number, Caster>()
     private static lastInstanceId = -1
 
     public static getNextId = () => {
@@ -98,6 +101,8 @@ export class MonsterSpawn {
     private fixedSpawnOffsetBounce = false
     private fixedSpawnOffsetMirrored = false
     private lastSpawnVal: number | undefined
+
+    private casterType: CasterType | undefined = undefined
     private lastSpawnValMirrored: number | undefined
 
     private bouncing = false
@@ -204,6 +209,11 @@ export class MonsterSpawn {
                     MonsterSpawn.anyTimedUnspawnTimerId2MonsterSpawn.delete(GetHandleId(timer))
                     MonsterSpawn.anyUnit2TimedUnspawnTimer.delete(GetHandleId(u))
                     DestroyTimer(timer)
+                }
+                const movingCaster = MonsterSpawn.anyUnitId2MovingCaster.get(GetHandleId(u))
+                if (movingCaster) {
+                    movingCaster.detachFromUnit()
+                    MonsterSpawn.anyUnitId2MovingCaster.delete(GetHandleId(u))
                 }
                 this.simpleUnitRecycler.removeUnit(u)
                 udg_spawned_monsters[GetHandleId(u)] = null
@@ -497,6 +507,12 @@ export class MonsterSpawn {
 
                     if (spawnAmount !== undefined) {
                         ms.startMobMovement(mobUnit, ms, spawnIndex, spawnAmount)
+                        // Attach moving caster shooting logic if this spawn uses a caster type
+                        if (ms.casterType) {
+                            const movingCaster = new Caster(ms.casterType, 0, 0, 0)
+                            movingCaster.attachToUnit(mobUnit)
+                            MonsterSpawn.anyUnitId2MovingCaster.set(GetHandleId(mobUnit), movingCaster)
+                        }
                         UnitAddAbility(mobUnit, FourCC('Aloc'))
                         DestroyTimer(mobTimer)
                     }
@@ -589,6 +605,12 @@ export class MonsterSpawn {
                     MonsterSpawn.anyUnit2TimedUnspawnTimer.delete(GetHandleId(u))
                     DestroyTimer(timer)
                 }
+                // Clean up moving caster logic if present
+                const movingCaster = MonsterSpawn.anyUnitId2MovingCaster.get(GetHandleId(u))
+                if (movingCaster) {
+                    movingCaster.detachFromUnit()
+                    MonsterSpawn.anyUnitId2MovingCaster.delete(GetHandleId(u))
+                }
                 GroupRemoveUnit(ms.monsters, u)
                 this.simpleUnitRecycler.removeUnit(u)
                 udg_spawned_monsters[GetHandleId(u)] = null
@@ -616,6 +638,13 @@ export class MonsterSpawn {
             MonsterSpawn.anyTimedUnspawnTimerId2MonsterSpawn.delete(GetHandleId(unspawnTimer))
             MonsterSpawn.anyUnit2TimedUnspawnTimer.delete(GetHandleId(u))
             DestroyTimer(unspawnTimer)
+
+            // Clean up moving caster logic if present
+            const movingCaster = MonsterSpawn.anyUnitId2MovingCaster.get(GetHandleId(u))
+            if (movingCaster) {
+                movingCaster.detachFromUnit()
+                MonsterSpawn.anyUnitId2MovingCaster.delete(GetHandleId(u))
+            }
 
             GroupRemoveUnit(ms.monsters, u)
             ms.simpleUnitRecycler.removeUnit(u)
@@ -933,8 +962,11 @@ export class MonsterSpawn {
             }
             MemoryHandler.destroyArray(hookArray)
 
+            // Use the caster's monster type for unit creation when a caster type is set
+            const spawnMonsterType = this.casterType ? this.casterType.getCasterMonsterType() : this.mt
+
             monster = NewImmobileMonsterForPlayer(
-                this.mt,
+                spawnMonsterType,
                 Constants.ENNEMY_PLAYER,
                 (this.minX + this.maxX) / 2,
                 (this.minY + this.maxY) / 2,
@@ -995,7 +1027,9 @@ export class MonsterSpawn {
             udg_colorCode[Constants.GREY] +
             this.label +
             ' : ' +
-            this.mt.label +
+            (this.casterType
+                ? '[caster:' + this.casterType.label + '] ' + this.casterType.getCasterMonsterType().label
+                : this.mt.label) +
             '   ' +
             convertAngleToDirection(this.rotation) +
             '   ' +
@@ -1049,6 +1083,12 @@ export class MonsterSpawn {
     getTimedUnspawn = () => this.timedUnspawn
     setTimedUnspawn = (timedUnspawn: number | undefined) => {
         this.timedUnspawn = timedUnspawn
+        this._active && this.refresh()
+    }
+
+    getCasterType = () => this.casterType
+    setCasterType = (casterType: CasterType | undefined) => {
+        this.casterType = casterType
         this._active && this.refresh()
     }
 
@@ -1115,6 +1155,7 @@ export class MonsterSpawn {
 
         output['label'] = this.label
         output['monsterTypeLabel'] = this.mt.label
+        output['casterTypeLabel'] = this.casterType?.label
         output['sens'] = this.rotation
         output['frequence'] = this.frequence
         output['spawnAmount'] = this.spawnAmount

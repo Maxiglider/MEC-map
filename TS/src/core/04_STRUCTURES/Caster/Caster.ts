@@ -1,4 +1,5 @@
 import { animUtils } from 'Utils/AnimUtils'
+import { udg_monsters } from '../../../../globals'
 import { errorHandler } from '../../../Utils/mapUtils'
 import { IsOnGround } from '../../01_libraries/Basic_functions'
 import { Escaper } from '../Escaper/Escaper'
@@ -311,6 +312,7 @@ export class Caster extends Monster {
     public canShoot: boolean
     public t?: timer
     private enabled: boolean
+    private isMoving: boolean = false
 
     static anyTriggerWithinRangeId2Caster = new Map<number, Caster>()
     static anyTimerId2Caster = new Map<number, Caster>()
@@ -333,10 +335,16 @@ export class Caster extends Monster {
     }
 
     getX = (): number => {
+        if (this.isMoving && this.u) {
+            return GetUnitX(this.u)
+        }
         return this.x
     }
 
     getY = (): number => {
+        if (this.isMoving && this.u) {
+            return GetUnitY(this.u)
+        }
         return this.y
     }
 
@@ -401,6 +409,40 @@ export class Caster extends Monster {
             DestroyTimer(this.t)
             delete this.t
         }
+    }
+
+    /**
+     * Attach shooting logic to an already-created unit (used by MonsterSpawn for moving casters).
+     * The unit is NOT owned by this Caster—MonsterSpawn manages its lifecycle.
+     */
+    attachToUnit = (u: unit) => {
+        this.isMoving = true
+        this.u = u
+        this.nbEscapersInRange = 0
+        this.canShoot = true
+        this.escapersInRange = []
+
+        this.trg_unitWithinRange = CreateTrigger()
+        TriggerRegisterUnitInRangeSimple(this.trg_unitWithinRange, this.casterType.getRange(), this.u)
+        TriggerAddAction(this.trg_unitWithinRange, errorHandler(CasterUnitWithinRange_Actions))
+        Caster.anyTriggerWithinRangeId2Caster.set(GetHandleId(this.trg_unitWithinRange), this)
+
+        this.t = CreateTimer()
+        Caster.anyTimerId2Caster.set(GetHandleId(this.t), this)
+
+        this.enabled = true
+    }
+
+    /**
+     * Detach shooting logic from the unit WITHOUT removing/destroying the unit.
+     * Used when MonsterSpawn recycles the unit (unit reached end of path).
+     */
+    detachFromUnit = () => {
+        this.enabled = false
+        this.destroyTriggers()
+        delete this.u
+        // Clean up the Monster registry entry since this moving caster is no longer needed
+        delete udg_monsters[this.id]
     }
 
     removeUnit = () => {

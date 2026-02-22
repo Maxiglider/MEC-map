@@ -1,7 +1,7 @@
 import { convertTextToAngle } from 'core/01_libraries/Basic_functions'
 import { Constants } from 'core/01_libraries/Constants'
 import { Text } from 'core/01_libraries/Text'
-import { getUdgMonsterTypes } from '../../../../globals'
+import { getUdgCasterTypes, getUdgMonsterTypes } from '../../../../globals'
 import { handlePaginationArgs, handlePaginationObj } from '../../06_COMMANDS/Helpers/Pagination'
 import { BaseArray } from '../BaseArray'
 import type { Level } from '../Level/Level'
@@ -64,6 +64,16 @@ export class MonsterSpawnArray extends BaseArray<MonsterSpawn> {
                 monsterSpawn.setFixedSpawnOffsetMirrored(ms.fixedSpawnOffsetMirrored)
                 monsterSpawn.setTimedUnspawn(ms.timedUnspawn)
                 if (ms.spawnShape !== undefined) monsterSpawn.setSpawnShape(ms.spawnShape)
+                if (ms.casterTypeLabel !== undefined) {
+                    const ct = getUdgCasterTypes().getByLabel(ms.casterTypeLabel)
+                    if (ct) {
+                        monsterSpawn.setCasterType(ct)
+                    } else {
+                        Text.erA(
+                            'Caster type "' + ms.casterTypeLabel + '" unknown for monster spawn "' + ms.label + '"'
+                        )
+                    }
+                }
                 this.new(monsterSpawn, false)
             }
         }
