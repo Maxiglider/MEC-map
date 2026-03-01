@@ -83,7 +83,11 @@ const MonsterSpawn_Actions = errorHandler(() => {
 })
 
 const MonsterUnspawn = errorHandler(() => {
-    const unspawnTimer = Natives.UGetExpiredTimer()
+    const unspawnTimer = GetExpiredTimer()
+    if (!unspawnTimer) {
+        return
+    }
+
     const mobUnit = MonsterSpawn.anyTimedUnspawnTimerId2Unit.get(GetHandleId(unspawnTimer))
 
     if (mobUnit) {
