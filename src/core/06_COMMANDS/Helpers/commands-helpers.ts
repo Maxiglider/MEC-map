@@ -91,8 +91,12 @@ export const snapPointToSlide = (
 // For command -patchImmo
 export const adaptMonstersImmolation = (delta: number) => {
     getUdgMonsterTypes().forAll(monsterType => {
-        const newImmolationRadius = Math.max(5, Math.min(400, monsterType.getImmolationRadius() + delta))
-        monsterType.setImmolation(newImmolationRadius)
+        const previousImmolationRadius = monsterType.getImmolationRadius()
+        if (previousImmolationRadius > 0) {
+            // if immolation is null, we keep it null
+            const newImmolationRadius = Math.max(5, Math.min(400, monsterType.getImmolationRadius() + delta))
+            monsterType.setImmolation(newImmolationRadius)
+        }
     })
 }
 
