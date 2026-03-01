@@ -1,6 +1,6 @@
 <?php
 /**
- * Cr�� avec PhpStorm.
+ * Créé avec PhpStorm.
  * Auteur: Max
  * Date: 26/03/2022
  * Heure: 00:57
@@ -8,11 +8,8 @@
 
 
 
-//const DATA_FILE = __DIR__."/mec_data.txt";
-//const DATA_FILE = "C:\SaveSurDrive\OneDrive\Documents\Warcraft III\CustomMapData\MEC_log.txt";
-//const OUT_FILE = __DIR__."/MEC_outLog.txt";
-const DATA_FILE = "C:\SaveSurDrive\OneDrive\Documents\Warcraft III\CustomMapData\MEC\mec-smic-data.txt";
-const OUT_FILE = __DIR__."/mec_data.json.js";
+const DATA_FILE = __DIR__."/mec_data.txt";
+const OUT_FILE = __DIR__."/mec_data.json";
 const GAME_DATA_OUT_FILE = __DIR__."/mec_game_data.txt";
 
 
@@ -26,13 +23,13 @@ $content = file_get_contents(DATA_FILE);
 
 preg_match_all('/call BlzSendSyncData\(".*?",".{16}(.+?)"/', $content, $matches, PREG_SET_ORDER);
 
-$base64 = "";
+$content = "";
 foreach($matches as $match) {
-    $base64 .= $match[1];
+    $content .= $match[1];
 }
 
-$uncodedContent = base64_decode($base64);
-
+// $uncodedContent = base64_decode($base64);
+$uncodedContent = str_replace('#DQ#', '"', $content);
 
 file_put_contents(OUT_FILE, $uncodedContent);
 

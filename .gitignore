@@ -10,6 +10,8 @@ node_modules
 /bin/*.json
 /bin/*.md
 /bin/mec_data.json.js
+/bin/mec_data.json
+/bin/extractedMaps
 
 /maps/map-worldeditor.w3x
 
