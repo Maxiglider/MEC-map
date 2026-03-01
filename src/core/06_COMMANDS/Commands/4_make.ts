@@ -984,7 +984,7 @@ export const initExecuteCommandMake = () => {
         },
     })
 
-    // -setHeroCollisionSize <value> [<player>|all]
+    // -setHeroCollisionSize <value>
     registerCommand({
         name: 'setHeroBaseCollisionSize',
         alias: ['sethbcs'],
@@ -1008,6 +1008,26 @@ export const initExecuteCommandMake = () => {
             setHeroBaseCollisionSize(value)
 
             Text.mkP(escaper.getPlayer(), 'Hero base collision size set to ' + I2S(value))
+
+            return true
+        },
+    })
+
+    // -getHeroCollisionSize
+    registerCommand({
+        name: 'getHeroBaseCollisionSize',
+        alias: ['gethbcs'],
+        group,
+        argDescription: '',
+        description: 'Displays the base hero collision size.',
+        cb: ({ nbParam }, escaper) => {
+            const usageMessage = 'getBaseHeroCollisionSize: no parameter required.'
+            if (nbParam !== 0) {
+                Text.erP(escaper.getPlayer(), usageMessage)
+                return true
+            }
+
+            Text.mkP(escaper.getPlayer(), 'Hero base collision size currently is ' + globals.heroBaseCollisionSize)
 
             return true
         },
