@@ -26,7 +26,6 @@ import { Globals } from '../../09_From_old_Worldedit_triggers/globals_variables_
 import { MEC_core_API } from '../../API/MEC_core_API'
 import { udg_doubleHeroesEnabled } from '../../Double_heroes/double_heroes_config'
 import { flushLogs } from '../../Log/log'
-import { CollisionTest } from '../../Test/collision-test'
 import { e2e } from '../../Test/e2e-tests/base/e2e-tests-base'
 import { Natives } from '../../wc3_natives_unsecured/Natives'
 import { CmdParam, isPlayerId, resolvePlayerId } from '../Helpers/Command_functions'
@@ -966,89 +965,6 @@ export const initExecuteCommandMax = () => {
         },
     })
 
-    //-collisionSizeTest <monsterTypeLabel> <radius <mobOffset>
-    registerCommand({
-        name: 'collisionSizeTest',
-        alias: [],
-        group,
-        argDescription: '<monsterTypeLabel> <radius <mobOffset> <triggerFrequency></triggerFrequency>',
-        description: '',
-        cb: ({ param1, param2, param3, param4, nbParam }, escaper) => {
-            if (nbParam !== 4) {
-                Text.erP(escaper.getPlayer(), 'Three parameters are required: <monsterTypeLabel> <radius> <mobOffset>')
-                return true
-            }
-
-            const monsterType = getUdgMonsterTypes().getByLabel(param1)
-            if (!monsterType) {
-                Text.erP(escaper.getPlayer(), `Unknown monster type label: ${param1}`)
-                return true
-            }
-
-            const radius = S2R(param2)
-            const mobOffset = S2R(param3)
-            if (isNaN(radius) || isNaN(mobOffset) || radius <= 0 || mobOffset < 0) {
-                Text.erP(escaper.getPlayer(), 'Radius and mobOffset must be positive numbers')
-                return true
-            }
-
-            const triggerFrequency = S2R(param4)
-            if (isNaN(triggerFrequency) || triggerFrequency <= 0) {
-                Text.erP(escaper.getPlayer(), 'triggerFrequency must be a positive number')
-                return true
-            }
-
-            new CollisionTest(escaper, monsterType, radius, mobOffset, triggerFrequency).start()
-
-            Text.P(escaper.getPlayer(), 'Collision size test started')
-            return true
-        },
-    })
-
-    //-setSelectionCircleBaseHeight
-    registerCommand({
-        name: 'setSelectionCircleBaseHeight',
-        alias: [],
-        group,
-        argDescription: '',
-        description: '<value>',
-        cb: ({ param1, nbParam }, escaper) => {
-            if (nbParam !== 1) {
-                Text.erP(escaper.getPlayer(), 'One parameter is required: <value>')
-                return true
-            }
-
-            Constants.COLLISION_LANDMARK_MODEL_BASE_HEIGHT = S2R(param1)
-
-            Text.P(escaper.getPlayer(), 'Selection circle base height set to ' + S2R(param1))
-            return true
-        },
-    })
-
-    //-setSelectionCircleBaseRadius
-    registerCommand({
-        name: 'setSelectionCircleBaseRadius',
-        alias: [],
-        group,
-        argDescription: '',
-        description: '<value>',
-        cb: ({ param1, nbParam }, escaper) => {
-            if (nbParam !== 1) {
-                Text.erP(escaper.getPlayer(), 'One parameter is required: <value>')
-                return true
-            }
-
-            Constants.COLLISION_LANDMARK_MODEL_BASE_RADIUS = S2R(param1)
-
-            getUdgEscapers().forAll(escaper => {
-                escaper.refreshCollisionLandmark()
-            })
-
-            Text.P(escaper.getPlayer(), 'Selection circle base height set to ' + S2R(param1))
-            return true
-        },
-    })
-
     //-createDebugMecRegion(crdebmr)
     registerCommand({
         name: 'createDebugMecRegion',
@@ -1104,7 +1020,7 @@ export const initExecuteCommandMax = () => {
         alias: [],
         group,
         argDescription: '[run] <testName> | speed <percentage> | stop | pause | resume',
-        description: 'Disables all effects',
+        description: 'Handles the e2e tests.',
         cb: ({ param1, param2, nbParam }, escaper) => {
             const usageMsg = 'e2e: bad command usage'
             if (nbParam > 2 || nbParam === 0) {

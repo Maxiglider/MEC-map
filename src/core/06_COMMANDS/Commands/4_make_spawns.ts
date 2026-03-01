@@ -525,7 +525,7 @@ export const initExecuteCommandMake_spawns = () => {
         },
     })
 
-    //-displayMonsterSpawns(dms) [<monsterSpawnLabel>] [page]
+    //-displayMonsterSpawnsDetailled(dmsd) [<monsterSpawnLabel>] [page]
     registerCommand({
         name: 'displayMonsterSpawnsDetailled',
         alias: ['dmsd'],
