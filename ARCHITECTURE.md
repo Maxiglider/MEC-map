@@ -59,7 +59,7 @@ The chat-command system (`-command` syntax) is detailed in [docs/COMMANDS_SYSTEM
 
 ### MEC Regions
 
-`core/04_STRUCTURES/Region/` — a shape-abstraction hierarchy (`HorizontalRectangleRegion`, `RectangleRegion` (diagonal-capable), `LineRegion`, `CircleRegion`, `ParallelogramRegion`, `TrapezeRegion`), backed by `MECRegion_service.ts` (registered as `MECRegionService`). Used across features that need an arbitrary zone: TP end-zones, monster kill rects, monster spawn dead zones.
+`core/04_STRUCTURES/Region/` — a shape-abstraction hierarchy (`HorizontalRectangleRegion`, `RectangleRegion` (diagonal-capable), `LineRegion`, `CircleRegion`, `ParallelogramRegion`, `TrapezeRegion`), backed by `MECRegion_service.ts` (registered as `MECRegionService`). Used across features that need an arbitrary zone: TP end-zones, monster kill rects, monster spawn dead zones. See [docs/TERRAIN.md](./docs/TERRAIN.md) for how terrain code does (and mostly doesn't yet) interact with this abstraction.
 
 ### Monsters and spawns
 
