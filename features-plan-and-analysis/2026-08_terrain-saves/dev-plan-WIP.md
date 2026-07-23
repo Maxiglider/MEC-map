@@ -17,18 +17,18 @@ New file `src/core/04_STRUCTURES/TerrainSave/TerrainSave.ts`.
 
 **Terrain data** (Phase 1 scope, matches today's `-saveTerrain`/`-loadTerrain` capability — no heights/cliffs/ramps/tileset, that gap is explicitly out of scope, see `docs/TERRAIN.md`):
 - `zone: HorizontalRectangleRegion | null` — `null` means whole map. Phase 1 supports `horizRect` only (matches the spec's primary wording; the "Potential improvements" note about arbitrary `mecRegionShape` is deferred).
-- `capturedTerrain`: a dense grid (`(number | null)[][]`, row-major, storing **raw `terrainTypeId` values**, not `TerrainType` object references — the current `SaveLoadTerrain` stores live references, which isn't serializable) + `originX/originY/width/height` (tile-index units, converted via `Constants.LARGEUR_CASE`), bounds sourced from `zone.getMinX()/getMaxX()/getMinY()/getMaxY()` or `globals.MAP_MIN_X/MAX_X/MIN_Y/MAX_Y` for whole-map.
+- `capturedTerrain`: a dense grid (`TerrainType[]`, row-major (an array with one dimension only), storing TerrainType values**, not `terrainTypeId` values — the current `SaveLoadTerrain` stores live references, which isn't serializable => it's not a problem : the toJson() method will convert to terrainTypeId values which are serializable, and newFromJson() will make the oppposite conversion at start of the game) + `originX/originY/width/height` (tile-index units, converted via `Constants.LARGEUR_CASE`), bounds sourced from `zone.getMinX()/getMaxX()/getMinY()/getMaxY()` or `globals.MAP_MIN_X/MAX_X/MIN_Y/MAX_Y` for whole-map.
 - `previousTerrain`: same shape, **runtime-only, never persisted** — see apply/unapply semantics below.
 - `applied: boolean` — runtime-only, never persisted (a reloaded save always starts unapplied).
-- `minimapEnabled: boolean` — persisted; pure flag, see [Minimap flag](#minimap-flag) below.
+- `minimapEnabled: boolean` — persisted; pure flag, see [Minimap flag](#minimap-flag) below (this will be rethink and then implemented on last step of the implementation if the user still want it).
 - `events: TerrainSaveEventArray` — owned events, see [Events](#terrainsaveevent).
 
 **Methods**:
-- `captureTerrain()` — (re)reads live terrain over `zone`/whole-map into `capturedTerrain` via `getUdgTerrainTypes().getTerrainType(x, y)?.getTerrainTypeId()`. Used by `saveTerrain` (initial) and `updateTerrainSave` (re-capture).
+- `captureTerrain()` — (re)reads live terrain over `zone`/whole-map into `capturedTerrain` via `getUdgTerrainTypes().getTerrainType(x, y)`. Used by `saveTerrain` (initial) and `updateTerrainSave` (re-capture), except we get TerrainType and not terrainTypeIds this time. On terrainSave creation or zone update, if we don't find a TerrainType at some position, we'll throw an error and cancel the creation / update.
 - `apply(): boolean` — **agreed semantics**: if `applied === false` (rising edge), first snapshot the *current* live terrain into `previousTerrain` (same grid-walk). Then, **unconditionally** (whether this was a rising edge or not), write `capturedTerrain` onto the map via `ChangeTerrainType`. Set `applied = true`. This means: calling `apply()` while already applied re-paints the saved content (useful if something else touched those tiles since), but never clobbers the true pre-first-apply snapshot in `previousTerrain`.
 - `unapply(): boolean` — no-op (`false`) if `applied === false`. Otherwise writes `previousTerrain` back via `ChangeTerrainType`, sets `applied = false`, clears `previousTerrain`.
 - `getLabel()`, `setLabel()`, `getLevel()`, `setLevel(level: Level | null)` (used by `setTerrainSaveLevel`, re-checks the exclusivity rule), `getZone()`, `isWholeMap()`, `isApplied()`, `isMinimapEnabled()`, `setMinimapEnabled(b)`.
-- `toJson()` / reconstruction — serializes `label`, `level` (as a level number or `null`), `zone` (via `HorizontalRectangleRegion.toJson()`, already exists at `HorizontalRectangleRegion.ts:87-98`), `capturedTerrain`, `minimapEnabled`, and nested `events`. **Not** `applied`/`previousTerrain`.
+- `toJson()` / reconstruction — serializes `label`, `level` (as a level number or `null`), `zone` (via `HorizontalRectangleRegion.toJson()`, already exists at `HorizontalRectangleRegion.ts:87-98`), `capturedTerrain` (TerrainTypes converted to terrain type ids), `minimapEnabled`, and nested `events`. **Not** `applied`/`previousTerrain`.
 - `destroy()` — destroys `zone` (if any), destroys all owned `TerrainSaveEvent`s (unregistering their hooks/timers), per spec's "remove the terrain save and their associated events".
 
 ## `TerrainSaveArray`
@@ -51,7 +51,7 @@ New file `src/core/04_STRUCTURES/TerrainSave/TerrainSaveArray.ts`. `extends Base
 
 # Commands
 
-All in `src/core/06_COMMANDS/Commands/5_admin.ts`, `group = 'max'` (confirmed existing tier for this file, matches today's `saveTerrain`/`loadTerrain`/`deleteTerrainSave`).
+All in `src/core/06_COMMANDS/Commands/4_make_terrain_saves.ts`, `group = 'make'` (unlike today's `saveTerrain`/`loadTerrain`/`deleteTerrainSave` which will be moved from 5_admin.ts).
 
 - **`saveTerrain` (`st`) `<label> [all|rect] [global|g]`** — replaces the registration at `5_admin.ts:69-83`. No zone param = `all` (backward compatible). `rect` kicks off a `MakeMECRegion`-based click flow (new `MakeTerrainSaveZone` class in `src/core/05_MAKE_STRUCTURES/Make_terrain_save/`, subclassing `MakeMECRegion` like `MakeMonsterSpawn.ts` does) that creates the `TerrainSave` on `onMECRegionCreated` and calls `captureTerrain()`. Defaults to the escaper's current making level unless `global`/`g` is passed. **Errors if the label already exists** at the target (label, level) key, or violates the global/level exclusivity rule — no silent overwrite (use `updateTerrainSave` instead).
 - **`loadTerrain` (`lt`) `<label>`** — replaces `5_admin.ts:87-101`. Zone is now intrinsic to the `TerrainSave`. Body: `TerrainSaveArray.resolveLabel(label, currentLevel)?.apply()`. Preserve "doesn't exist" error text.
@@ -62,7 +62,7 @@ All in `src/core/06_COMMANDS/Commands/5_admin.ts`, `group = 'max'` (confirmed ex
   - A label (with optional `x-` prefix): detailed view — label, level (or "global"), whole-map or zone bounds text, applied state, minimap-enabled flag, event count; move camera to zone center via `zone.getCenterX()/getCenterY()` (confirmed to exist, `MECRegion.ts:275,277` abstract, implemented up the `TrapezeRegion`→...→`HorizontalRectangleRegion` chain) unless whole-map; show `zone.debugRects(true)` timed like `MonsterSpawn.displayForPlayer`.
 - **`updateTerrainSave` (`uts`) `<label> [all|rect]`** — new command. Resolves label, errors if not found. No 2nd param or `all`: re-`captureTerrain()` in place (same zone). `rect`: same `MakeTerrainSaveZone` click flow as `saveTerrain`, but replaces the existing `zone` (destroying the old one) before re-capturing.
 - **`deleteTerrainSave` (`delts`) `<label>`** — replaces `5_admin.ts:104-122`. Resolves label; if `isApplied()`, **force `unapply()` first** (restores `previousTerrain`) before `.destroy()` + `getUdgTerrainSaves().destroyOne(id)`. Preserve success/error text conventions.
-- **`setTerrainSaveLevel` (`stsl`) `<label> <levelNum>|global|g`** — new command. Re-checks the global/level exclusivity rule at the *new* target before applying `setLevel(...)`.
+- **`setTerrainSaveLevel` (`stsl`) `<label> <levelNum>|global|g|current|c`** — new command. Re-checks the global/level exclusivity rule at the *new* target before applying `setLevel(...)`.
 - **`terrainSaveEnableMinimap` `all|<label> <boolean>`** — new command, see [Minimap flag](#minimap-flag).
 
 # `-smic` persistence
@@ -79,15 +79,15 @@ New files `src/core/04_STRUCTURES/TerrainSave/TerrainSaveEvent.ts` + `TerrainSav
 ```ts
 type TerrainSaveEventTriggerKind = 'levelStart' | 'levelEnd' | 'monsterTouch'
 type TerrainSaveEventTrigger =
-  | { kind: 'levelStart' | 'levelEnd'; levelNum: number }
+  | { kind: 'levelStart' | 'levelEnd'; levelNum: number } 
   | { kind: 'monsterTouch'; monsterId: number }   // hand-placed Monster only, see below
 type TerrainSaveEventAction = 'apply' | 'unapply'
 
 class TerrainSaveEvent {
-  private static lastId = -1        // global counter -> ids are globally unique, satisfying "absolute ids" for displayTerrainSaveEvent
+  private static lastId = 0        // global counter -> ids are globally unique (starting by "1"), satisfying "absolute ids" for displayTerrainSaveEvent
   id: number
   terrainSave: TerrainSave           // owner back-reference
-  trigger: TerrainSaveEventTrigger
+  trigger: TerrainSaveEventTrigger // "trigger" is confusing with triggers in WC3. Please find an other name
   action: TerrainSaveEventAction
   delay?: number                     // seconds, one-shot before first firing
   periodicInterval?: number          // seconds; after the (optional) delay, toggle apply/unapply every interval indefinitely. Can combine with delay.
@@ -128,14 +128,13 @@ This means: a monster with **only** a terrain event (no lifeBonus) never kills t
 
 # Commands for events
 
-Also in `5_admin.ts`, `group = 'max'`:
+Also in `4_terrain_saves.ts`, `group = 'make'`:
 
-- **`createTerrainSaveEvent` (`ctse`) `<terrainSaveLabel> <apply|unapply> <levelStart|levelEnd> <levelNum> [delay=<seconds>] [periodic=<seconds>]`** — for level triggers, fully synchronous (no click needed, level numbers are typed directly like `MEC_core_API.onStartLevel(levelNum, ...)` already does elsewhere).
-  **`createTerrainSaveEvent (ctse) <terrainSaveLabel> <apply|unapply> monsterTouch [delay=<seconds>] [periodic=<seconds>]`** — kicks off the `MakeSelectMonsterForEvent` click flow; event is finalized on click.
-- **`removeTerrainSaveEvent` (`rtse`) `<terrainSaveLabel> <eventId>`** — resolves the owning `TerrainSave` by label, `.removeEvent(eventId)` (destroy + unregister).
+- **`createTerrainSaveEvent` (`ctse`) `<terrainSaveLabel> <apply|unapply> <levelStart|levelEnd|monsterTouch> [delay=<seconds>] [periodic=<seconds>]`** — for level triggers fully synchronous (no click needed, level numbers are automatically detected (as number of the terrainSave level if not global, otherwise the currentMakingLevel of the player) and used directly like `MEC_core_API.onStartLevel(levelNum, ...)` already does elsewhere) — for monster touching, kicks off the `MakeSelectMonsterForEvent` click flow; event is finalized on click on a matching monster.
+- **`removeTerrainSaveEvent` (`rtse`) `<eventId>`** — resolves the event globally by its id, then its owning `TerrainSave`, and call `terrainSave.removeEvent(eventId)` (destroy + unregister).
 - **`changeEventTerrainSave` (`cets`) `<eventId> <newTerrainSaveLabel>`** — moves an event to a *different* `TerrainSave` (needs a global-scan helper, `TerrainSaveArray.findEventById(eventId)`, since the event isn't looked up via its current owner's label). Updates the `terrainSave` back-reference; no need to `unregister()`/`register()` again (trigger wiring is independent of which `TerrainSave` it targets).
-- **`editTerrainSaveEvent` (`etse`) `<eventId> <field> [<value>]`** — general-purpose edit, per the user's explicit request ("n'importe quel paramètre"). Fields: `action` (`apply|unapply`), `delay` (`<seconds>|none`), `periodic` (`<seconds>|none`), `level` (levelStart/levelEnd events only, `<levelNum>`), `target` (**monsterTouch events only — always kicks off the click flow, silently ignores any typed value**, per the hard constraint that a monster id must never be typed). Changing `delay`/`periodic`/`action` while the event is registered means `unregister()` + re-`register()`/`fire()` bookkeeping as appropriate.
-- **`displayTerrainSaveEvent` (`dtse`) `<terrainSaveLabel> [<eventId>]`** — no id: paginated list of that save's events (trigger kind, action, delay/periodic, global id). With id: detail view + orange warning if `monsterTouch` target no longer resolves + move camera to the target monster's position if it still exists.
+- **`editTerrainSaveEvent` (`etse`) `<eventId> <field> [<value>]`** — general-purpose edit, per the user's explicit request ("n'importe quel paramètre"). Fields: `action` (`apply|unapply`), `delay` (`<seconds>|none`), `periodic` (`<seconds>|none`), `level` (levelStart/levelEnd events only, `<levelNum>|current|c` (for current making level of the player typing the command)), `target` (**monsterTouch events only — always kicks off the click flow, silently ignores any typed value**, per the hard constraint that a monster id must never be typed). Changing `delay`/`periodic`/`action` while the event is registered means `unregister()` + re-`register()`/`fire()` bookkeeping as appropriate.
+- **`displayTerrainSaveEvent` (`dtse`) `[<terrainSaveLabel>|<eventId>]`** — with a terrainSaveLabel: paginated list of that save's events (trigger kind, action, delay/periodic, global id, and orange warning if this is the case). With id: detail view + orange warning if `monsterTouch` target no longer resolves + move camera to the target monster's position if it still exists. Wihtout any parameter, same as the paginated list but for all events of the game and we prefix each event with the terrainSaveLAbel.
 
 # Minimap flag
 
@@ -143,7 +142,7 @@ Also in `5_admin.ts`, `group = 'max'`:
 
 # Process
 
-**Implementation proceeds one step at a time, from the numbered list below.** After each step: stop, let the user review the code, then wait for them to test in-game (`yarn test-launch`) and explicitly validate before starting the next step. Do not batch multiple steps together or continue past a step without that go-ahead.
+**Implementation proceeds one step at a time, from the numbered list below.** After each step: check "tsc --noEmit" produces no error, stop, let the user review the code, then wait for them to test in-game (`yarn test-launch`) and explicitly validate before starting the next step. Make a commit at the end of each step (be sure to be on branch "feat/terrain-saves"). Do not batch multiple steps together or continue past a step without that go-ahead.
 
 # Implementation order
 
@@ -173,3 +172,8 @@ No automated test suite exists for game logic (see `CLAUDE.md`). Verification is
 - `-smic` export + reload (`LoadMapFromCache`) preserves all of the above, including nested events, and that level-scoped saves correctly re-resolve their `Level` after reload.
 - Event system: level-start/level-end triggers firing at the right time with delay/periodic combinations; `monsterTouch` — touching a targeted monster applies/unapplies without killing the hero, a life-bonus + terrain-event monster does both, godMode/clearMob/portalMob/circleMob/jumpPad monsters are unaffected by the new branch, deleting the targeted monster leaves the event intact with an orange warning in `-dtse`.
 - `yarn generate-help` picks up all new commands correctly for `bin/commands-help.md`.
+
+# Other wanted changes of the plan by the user
+
+- We misunderstood each other about book of life. At final I wanted book of life property of a mob to be the one triggering. If there is an event on the monster too, it would be ignored. Like other exclusive cases before "death" of the hero.
+
