@@ -1,5 +1,7 @@
 import { EstChiffre } from 'core/01_libraries/Functions_on_numbers'
+import { errorHandler } from 'Utils/mapUtils'
 import { getUdgLevels } from '../../../../globals'
+import { Text } from '../../01_libraries/Text'
 import { BaseArray } from '../BaseArray'
 import type { Level } from '../Level/Level'
 import { HorizontalRectangleRegion } from '../Region/HorizontalRectangleRegion'
@@ -98,25 +100,39 @@ export class TerrainSaveArray extends BaseArray<TerrainSave> {
 
     newFromJson = (terrainSavesJson: { [x: string]: any }[]) => {
         for (const terrainSaveJson of terrainSavesJson) {
-            const level = terrainSaveJson.level !== null ? getUdgLevels().get(terrainSaveJson.level) : null
+            let terrainSave: TerrainSave | undefined = undefined
 
-            let zone: HorizontalRectangleRegion | null = null
-            if (terrainSaveJson.zone !== null && terrainSaveJson.zone !== undefined) {
-                const z = terrainSaveJson.zone
-                zone = new HorizontalRectangleRegion(z.x1, z.y1, z.x2, z.y2, z.direction)
-            }
+            errorHandler(
+                () => {
+                    const level = terrainSaveJson.level !== null ? getUdgLevels().get(terrainSaveJson.level) : null
 
-            const terrainSave = this.new(terrainSaveJson.label, level, zone)
+                    let zone: HorizontalRectangleRegion | null = null
+                    if (terrainSaveJson.zone !== null && terrainSaveJson.zone !== undefined) {
+                        const z = terrainSaveJson.zone
+                        zone = new HorizontalRectangleRegion(z.x1, z.y1, z.x2, z.y2, z.direction)
+                    }
 
-            terrainSave.loadCapturedTerrainFromJson(
-                terrainSaveJson.originX,
-                terrainSaveJson.originY,
-                terrainSaveJson.width,
-                terrainSaveJson.height,
-                terrainSaveJson.capturedTerrain
-            )
+                    terrainSave = this.new(terrainSaveJson.label, level, zone)
 
-            terrainSave.setMinimapEnabled(!!terrainSaveJson.minimapEnabled)
+                    terrainSave.loadCapturedTerrainFromJson(
+                        terrainSaveJson.originX,
+                        terrainSaveJson.originY,
+                        terrainSaveJson.width,
+                        terrainSaveJson.height,
+                        terrainSaveJson.capturedTerrain
+                    )
+                },
+                e => {
+                    // roll back a partially-created entry so we don't leave a TerrainSave with no captured data
+                    if (terrainSave !== undefined) {
+                        this.remove(terrainSave)
+                        terrainSave = undefined
+                    }
+                    Text.erA(
+                        `TerrainSave "${terrainSaveJson.label}" failed to load: ${typeof e === 'string' ? e : e?.message}`
+                    )
+                }
+            )()
         }
     }
 }

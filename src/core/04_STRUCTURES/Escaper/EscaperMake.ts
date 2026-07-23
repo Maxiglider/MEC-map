@@ -52,6 +52,8 @@ import { MakeTerrainCreateBrush } from '../../05_MAKE_STRUCTURES/Make_terrain/Ma
 import { MakeTerrainHorizontalSymmetry } from '../../05_MAKE_STRUCTURES/Make_terrain/MakeTerrainHorizontalSymmetry'
 import { MakeTerrainVerticalSymmetry } from '../../05_MAKE_STRUCTURES/Make_terrain/MakeTerrainVerticalSymmetry'
 import { MakeTerrainHeight } from '../../05_MAKE_STRUCTURES/Make_terrain_height/MakeTerrainHeight'
+import { MakeTerrainSaveZone } from '../../05_MAKE_STRUCTURES/Make_terrain_save/MakeTerrainSaveZone'
+import { MakeUpdateTerrainSaveZone } from '../../05_MAKE_STRUCTURES/Make_terrain_save/MakeUpdateTerrainSaveZone'
 import { MakeAction } from '../../05_MAKE_STRUCTURES/MakeLastActions/MakeAction'
 import { MakeLastActions } from '../../05_MAKE_STRUCTURES/MakeLastActions/MakeLastActions'
 import { Natives } from '../../wc3_natives_unsecured/Natives'
@@ -61,6 +63,7 @@ import { IsLevelBeingMade } from '../Level/Level_functions'
 import { MonsterType } from '../Monster/MonsterType'
 import { MonsterSpawn } from '../MonsterSpawn/MonsterSpawn'
 import { HorizontalRegionDirection } from '../Region/HorizontalRectangleRegion'
+import type { TerrainSave } from '../TerrainSave/TerrainSave'
 import type { TerrainType } from '../TerrainType/TerrainType'
 import { Escaper } from './Escaper'
 import { GetMirrorEscaper } from './Escaper_functions'
@@ -282,6 +285,28 @@ export abstract class EscaperMake {
             const makeMonsterSpawnHideRegion = new MakeMonsterSpawnHideRegion(this.hero, monsterSpawn, mecRegionMode)
             this.make = makeMonsterSpawnHideRegion
             return makeMonsterSpawnHideRegion
+        }
+
+        return null
+    }
+
+    makeSaveTerrainZone(label: string, level: Level | null) {
+        this.destroyMake()
+        if (this.hero) {
+            const makeTerrainSaveZone = new MakeTerrainSaveZone(this.hero, label, level)
+            this.make = makeTerrainSaveZone
+            return makeTerrainSaveZone
+        }
+
+        return null
+    }
+
+    makeUpdateTerrainSaveZone(terrainSave: TerrainSave) {
+        this.destroyMake()
+        if (this.hero) {
+            const makeUpdateTerrainSaveZone = new MakeUpdateTerrainSaveZone(this.hero, terrainSave)
+            this.make = makeUpdateTerrainSaveZone
+            return makeUpdateTerrainSaveZone
         }
 
         return null

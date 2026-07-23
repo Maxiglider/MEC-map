@@ -1,7 +1,9 @@
-import { DefineDrawLineType } from '../../01_libraries/Draw_lines'
+import { globals } from '../../../../globals'
 import { IDestroyable, MemoryHandler } from '../../../Utils/MemoryHandler'
-import type { MonsterSpawn } from '../MonsterSpawn/MonsterSpawn'
 import { emptyOject } from '../../01_libraries/Basic_functions'
+import { Constants } from '../../01_libraries/Constants'
+import { DefineDrawLineType } from '../../01_libraries/Draw_lines'
+import type { MonsterSpawn } from '../MonsterSpawn/MonsterSpawn'
 
 export const OFFSET_FOR_START_LINE_NOT_SPAWNED_MONSTERS_TO_BE_CONSIDERED_OUT = 4
 export const END_POINT_OFFSET_AFTER_END_OF_REGION = 200 // to be sure the monster ends their movement out of the region and doesn't reach the end point
@@ -271,6 +273,26 @@ export abstract class MECRegion {
     }
 
     abstract getArea(): number
+
+    // Surface in tiles (integer). Not every region shape has a clean tile-grid reading - defaults to 0
+    // ("not available" for this region type) unless overridden by a subclass.
+    getSurface(): number {
+        return 0
+    }
+
+    // Percentage of the whole map's surface this region covers, rounded to one digit after the comma.
+    // Derived from getSurface(), so only that needs overriding per-shape, not this one.
+    getSurfacePercent(): number {
+        const mapWidthTiles = Math.floor((globals.MAP_MAX_X - globals.MAP_MIN_X) / Constants.LARGEUR_CASE) + 1
+        const mapHeightTiles = Math.floor((globals.MAP_MAX_Y - globals.MAP_MIN_Y) / Constants.LARGEUR_CASE) + 1
+        const totalMapTiles = mapWidthTiles * mapHeightTiles
+
+        if (totalMapTiles === 0) {
+            return 0
+        }
+
+        return Math.round((this.getSurface() / totalMapTiles) * 1000) / 10
+    }
 
     abstract getCenterX(): number
 

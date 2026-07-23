@@ -30,8 +30,6 @@
   - remove the terrain save and its associated events. Does **not** touch the live terrain, even if the save is currently applied — the map is left exactly as it looks at the moment of deletion.
 - `setTerrainSaveLevel` (`settsl`) `<label> <levelNum>|global|g|current|c`
   - move a terrain save between levels, or to/from global — subject to the same exclusivity rule as creation.
-- `terrainSaveEnableMinimap` `all|<label> <boolean>` — **tentative, may be dropped**
-  - if minimap is enabled for a terrain save, will generate a minimap blp with `mec-smic-loader` for it, that will be applied/unapplied at the same time of the terrain save
 
 ## Events to apply terrain saves during the game
 
@@ -69,3 +67,4 @@ A terrain save could be unapplied only after being applied (an application of it
 
 - Terrain saves only capture terrain *type* per tile — no heights, cliffs, ramps, or tileset changes (matches today's `-saveTerrain`/`-loadTerrain` capability; see `docs/TERRAIN.md` for the gap analysis against the richer `-smic` terrain export).
 - Zone shape is restricted to `horizRect`; arbitrary `MECRegion` shapes are a possible future extension, not built now.
+- The `mec-smic-loader` minimap-generation tie-in (`terrainSaveEnableMinimap`) has been **dropped**, not just deferred — not part of this feature.

@@ -1,7 +1,9 @@
 import { MemoryHandler } from 'Utils/MemoryHandler'
 import { Constants } from 'core/01_libraries/Constants'
 import { getUdgTerrainSaves, getUdgTerrainTypes, globals } from '../../../../globals'
+import { Ascii2String } from '../../01_libraries/Ascii'
 import { ChangeTerrainType } from '../../07_TRIGGERS/Modify_terrain_Functions/Modify_terrain_functions'
+import { TerrainTypeMax } from '../../07_TRIGGERS/Modify_terrain_Functions/Terrain_type_max'
 import type { Level } from '../Level/Level'
 import { HorizontalRectangleRegion } from '../Region/HorizontalRectangleRegion'
 import type { TerrainType } from '../TerrainType/TerrainType'
@@ -21,8 +23,6 @@ export class TerrainSave {
 
     private previousTerrain: TerrainType[] | null = null
     private applied = false
-
-    private minimapEnabled = false
 
     constructor(label: string, level: Level | null, zone: HorizontalRectangleRegion | null) {
         this.label = label
@@ -46,22 +46,30 @@ export class TerrainSave {
     }
 
     getZone = (): HorizontalRectangleRegion | null => this.zone
+
+    // Only swaps the reference - does not destroy the old zone. Callers that redraw a zone (updateTerrainSave)
+    // need to keep the old one alive until captureTerrain() over the new one succeeds, so they can revert
+    // (setZone back to it) without a dangling reference if the capture fails.
+    setZone = (newZone: HorizontalRectangleRegion | null) => {
+        this.zone = newZone
+    }
+
     isWholeMap = (): boolean => this.zone === null
 
     isApplied = (): boolean => this.applied
 
-    isMinimapEnabled = (): boolean => this.minimapEnabled
-    setMinimapEnabled = (enabled: boolean) => {
-        this.minimapEnabled = enabled
-    }
-
     private getBounds(): Bounds {
         if (this.zone) {
+            // The zone's own minX/maxX/minY/maxY are true tile edges (see MakeTerrainSaveZoneBase), so
+            // they always exactly edge the tiles they cover - but the capture loop below (like every other
+            // tile-grid sample point in this codebase, e.g. MAP_MIN_X/MAP_MAX_X below) expects tile
+            // *centers*. Shift each edge inward by half a tile to get back to that convention.
+            const half = Constants.LARGEUR_CASE / 2
             return {
-                minX: this.zone.getMinX(),
-                maxX: this.zone.getMaxX(),
-                minY: this.zone.getMinY(),
-                maxY: this.zone.getMaxY(),
+                minX: this.zone.getMinX() + half,
+                maxX: this.zone.getMaxX() - half,
+                minY: this.zone.getMinY() + half,
+                maxY: this.zone.getMaxY() - half,
             }
         }
 
@@ -162,17 +170,21 @@ export class TerrainSave {
     }
 
     // Used by TerrainSaveArray.newFromJson to restore a saved grid without reading live terrain.
+    // terrainTypeIds are ASCII-string encoded (e.g. "Nsnw"), matching TerrainType.toJson()'s own convention -
+    // going through TerrainTypeMax's tables here (like TerrainTypeArray.newFromJson does), not a raw numeric
+    // id, since raw ids aren't guaranteed stable across a terrain-type catalog reload (see toJson() below).
     loadCapturedTerrainFromJson = (
         originX: number,
         originY: number,
         width: number,
         height: number,
-        terrainTypeIds: number[]
+        terrainTypeIds: string[]
     ) => {
         const newCapturedTerrain: TerrainType[] = []
 
         for (let i = 0; i < terrainTypeIds.length; i++) {
-            const terrainType = getUdgTerrainTypes().getByTerrainTypeId(terrainTypeIds[i])
+            const terrainTypeId = TerrainTypeMax.TerrainTypeAsciiString2TerrainTypeId(terrainTypeIds[i])
+            const terrainType = getUdgTerrainTypes().getByTerrainTypeId(terrainTypeId)
             if (terrainType === null) {
                 throw `TerrainSave: loadCapturedTerrainFromJson: unknown terrainTypeId "${terrainTypeIds[i]}"`
             }
@@ -198,13 +210,11 @@ export class TerrainSave {
         output.width = this.width
         output.height = this.height
 
-        const terrainTypeIds: number[] = []
+        const terrainTypeIds: string[] = []
         for (let i = 0; i < this.capturedTerrain.length; i++) {
-            terrainTypeIds[i] = this.capturedTerrain[i].getTerrainTypeId()
+            terrainTypeIds[i] = Ascii2String(this.capturedTerrain[i].getTerrainTypeId())
         }
         output.capturedTerrain = terrainTypeIds
-
-        output.minimapEnabled = this.minimapEnabled
 
         return output
     }

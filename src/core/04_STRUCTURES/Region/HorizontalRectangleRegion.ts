@@ -1,4 +1,5 @@
 import { MemoryHandler } from '../../../Utils/MemoryHandler'
+import { Constants } from '../../01_libraries/Constants'
 import { RectangleRegion } from './RectangleRegion'
 
 export type HorizontalRegionDirection = 'up' | 'down' | 'left' | 'right'
@@ -86,6 +87,15 @@ export class HorizontalRectangleRegion extends RectangleRegion {
 
     getMaxY(): number {
         return this.maxY
+    }
+
+    // minX/maxX/minY/maxY are true tile edges for terrain-save zones (see MakeTerrainSaveZoneBase), so the
+    // span is always an exact multiple of the tile size - no +1 fencepost needed here (unlike center-to-center
+    // measurements, e.g. TerrainSave's capture loop / MAP_MIN_X..MAP_MAX_X).
+    getSurface(): number {
+        const widthTiles = Math.round((this.maxX - this.minX) / Constants.LARGEUR_CASE)
+        const heightTiles = Math.round((this.maxY - this.minY) / Constants.LARGEUR_CASE)
+        return widthTiles * heightTiles
     }
 
     moveTo(newCenterX: number, newCenterY: number) {

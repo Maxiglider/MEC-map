@@ -1,7 +1,6 @@
 // For -snapPatrolsToSlideOffset and -snapPatrolsToSlide commands
 import { getUdgMonsterTypes, getUdgTerrainTypes } from '../../../../globals'
 import { createPoint } from '../../../Utils/Point'
-import { EstChiffre } from '../../01_libraries/Functions_on_numbers'
 import { MonsterType } from '../../04_STRUCTURES/Monster/MonsterType'
 
 export const snapPatrolsToSlideOffsetMap: { [mt: string]: { angle: number; offset: number } | null } = {}
@@ -99,16 +98,6 @@ export const adaptMonstersImmolation = (delta: number) => {
             monsterType.setImmolation(newImmolationRadius)
         }
     })
-}
-
-// For -saveTerrain
-export const isNewTerrainSaveLabelValid = (label: string): boolean => {
-    if (label.length === 0) {
-        return false
-    }
-
-    const firstChar = SubString(label, 0, 1) ?? ''
-    return !EstChiffre(firstChar) && firstChar !== '-'
 }
 
 export const cameraFieldMap: { [x: string]: camerafield } = {
