@@ -146,6 +146,8 @@ Also in `4_make_terrain_saves.ts`, `group = 'make'`:
 
 # Process
 
+**Pre-flight check (done)**: none of the new command names or aliases (`displayTerrainSave`/`dts`, `updateTerrainSave`/`uts`, `setTerrainSaveLevel`/`stsl`, `terrainSaveEnableMinimap`, `createTerrainSaveEvent`/`ctse`, `removeTerrainSaveEvent`/`rtse`, `changeEventTerrainSave`/`cets`, `editTerrainSaveEvent`/`etse`, `displayTerrainSaveEvent`/`dtse`) collide with any of the 315 existing command names or 282 existing aliases across `src/core/06_COMMANDS/Commands/*.ts`. `saveTerrain`/`st`, `loadTerrain`/`lt`, `deleteTerrainSave`/`delts` are reused as-is (same commands, relocated), not new collisions.
+
 **Implementation proceeds one step at a time, from the numbered list below.** Work happens on branch `feat/terrain-saves` (create it before step 1 if it doesn't exist yet). After each step:
 1. Run `tsc --noEmit` and confirm it's clean.
 2. Commit the step's changes.
