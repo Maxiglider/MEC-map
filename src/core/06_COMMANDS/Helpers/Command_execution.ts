@@ -13,6 +13,7 @@ import { initExecuteCommandMake } from '../Commands/4_make'
 import { initExecuteCommandMake_monsters } from '../Commands/4_make_monsters'
 import { initExecuteCommandMake_spawns } from '../Commands/4_make_spawns'
 import { initExecuteCommandMake_terrain } from '../Commands/4_make_terrain'
+import { initExecuteCommandMake_terrain_saves } from '../Commands/4_make_terrain_saves'
 import { initExecuteCommandMax } from '../Commands/5_admin'
 import { initExecuteCommandTrueMax } from '../Commands/6_superadmin'
 import { CmdName, CmdParam, IsCmd, NbParam, NoParam } from './Command_functions'
@@ -325,6 +326,7 @@ export const initCommandExecution = () => {
         initExecuteCommandMake_monsters()
         initExecuteCommandMake_spawns()
         initExecuteCommandMake_terrain()
+        initExecuteCommandMake_terrain_saves()
 
         // Commands Admin
         initExecuteCommandMax()

@@ -71,6 +71,20 @@ export class TerrainSaveArray extends BaseArray<TerrainSave> {
         return this.getByLabelAndLevel(rawLabel, null) ?? this.getByLabelAndLevel(rawLabel, currentLevel)
     }
 
+    // Removes a TerrainSave by object reference (BaseArray only exposes destroyOne(id), and this array
+    // doesn't track ids on the instances themselves - manageIds=true just uses an internal counter as key).
+    remove = (terrainSave: TerrainSave): boolean => {
+        for (const [id, ts] of pairs(this.data)) {
+            if (ts === terrainSave) {
+                ts.destroy()
+                delete this.data[id]
+                return true
+            }
+        }
+
+        return false
+    }
+
     new = (label: string, level: Level | null, zone: HorizontalRectangleRegion | null): TerrainSave => {
         if (!this.canAssignLevel(label, level)) {
             throw `TerrainSave: label "${label}" already used for this level/global scope`

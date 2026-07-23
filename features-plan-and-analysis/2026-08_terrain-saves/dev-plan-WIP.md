@@ -56,14 +56,15 @@ All in a **new file** `src/core/06_COMMANDS/Commands/4_make_terrain_saves.ts`, `
 
 - **`saveTerrain` (`st`) `<label> [all|rect] [global|g]`** — no zone param = `all` (backward compatible with today's whole-map-only behavior). `rect` kicks off a `MakeMECRegion`-based click flow (new `MakeTerrainSaveZone` class in `src/core/05_MAKE_STRUCTURES/Make_terrain_save/`, subclassing `MakeMECRegion` like `MakeMonsterSpawn.ts` does) that creates the `TerrainSave` on `onMECRegionCreated` and calls `captureTerrain()`. Defaults to the escaper's current making level unless `global`/`g` is passed. **Errors if the label already exists** at the target (label, level) key, or violates the global/level exclusivity rule — no silent overwrite (use `updateTerrainSave` instead).
 - **`loadTerrain` (`lt`) `<label>`** — zone is now intrinsic to the `TerrainSave`. Body: `TerrainSaveArray.resolveLabel(label, currentLevel)?.apply()`. Preserve "doesn't exist" error text.
+- **`unloadTerrain` (`ult`) `<label>`** — the counterpart to `loadTerrain`: `TerrainSaveArray.resolveLabel(label, currentLevel)?.unapply()`, restoring the terrain to its pre-apply state. Errors if not currently applied (`unapply()` returns `false` in that case). This is also the only way to reach `unapply()` before events (step 4/5) exist, and is being kept permanently rather than just for testing.
 - **`displayTerrainSave` (`dts`) `[<label>|<levelNum>|global|g|current|c] [page]`**:
   - No param: show **global saves, then current-level saves**, paginated (reuse `handlePaginationArgs`/`handlePaginationObj`, same convention as `displayMonsterSpawns` — a unified pagination overhaul across the whole command system is explicitly out of scope/future work).
   - A bare number as first param: show **only that level's** saves (not combined with globals).
   - `global`/`g`: only global saves. `current`/`c`: only current-level saves.
   - A label (with optional `x-` prefix): detailed view — label, level (or "global"), whole-map or zone bounds text, applied state, minimap-enabled flag, event count; move camera to zone center via `zone.getCenterX()/getCenterY()` (confirmed to exist, `MECRegion.ts:275,277` abstract, implemented up the `TrapezeRegion`→...→`HorizontalRectangleRegion` chain) unless whole-map; show `zone.debugRects(true)` timed like `MonsterSpawn.displayForPlayer`.
 - **`updateTerrainSave` (`uts`) `<label> [all|rect]`** — resolves label, errors if not found. No 2nd param or `all`: re-`captureTerrain()` in place (same zone). `rect`: same `MakeTerrainSaveZone` click flow as `saveTerrain`, but replaces the existing `zone` (destroying the old one) before re-capturing.
-- **`deleteTerrainSave` (`delts`) `<label>`** — resolves label; if `isApplied()`, **force `unapply()` first** (restores `previousTerrain`) before `.destroy()` + `getUdgTerrainSaves().destroyOne(id)`. Preserve success/error text conventions.
-- **`setTerrainSaveLevel` (`stsl`) `<label> <levelNum>|global|g|current|c`** — re-checks the global/level exclusivity rule at the *new* target before applying `setLevel(...)`.
+- **`deleteTerrainSave` (`delts`) `<label>`** — resolves label, `.destroy()` + `getUdgTerrainSaves().destroyOne(id)`. Does **not** unapply first, even if `isApplied()` — the live terrain is left untouched, whatever it currently looks like. Preserve success/error text conventions.
+- **`setTerrainSaveLevel` (`settsl`) `<label> <levelNum>|global|g|current|c`** — re-checks the global/level exclusivity rule at the *new* target before applying `setLevel(...)`.
 - **`terrainSaveEnableMinimap` `all|<label> <boolean>`** — see [Minimap flag](#minimap-flag). Tentative, may be dropped.
 
 # `-smic` persistence
@@ -146,7 +147,7 @@ Also in `4_make_terrain_saves.ts`, `group = 'make'`:
 
 # Process
 
-**Pre-flight check (done)**: none of the new command names or aliases (`displayTerrainSave`/`dts`, `updateTerrainSave`/`uts`, `setTerrainSaveLevel`/`stsl`, `terrainSaveEnableMinimap`, `createTerrainSaveEvent`/`ctse`, `removeTerrainSaveEvent`/`rtse`, `changeEventTerrainSave`/`cets`, `editTerrainSaveEvent`/`etse`, `displayTerrainSaveEvent`/`dtse`) collide with any of the 315 existing command names or 282 existing aliases across `src/core/06_COMMANDS/Commands/*.ts`. `saveTerrain`/`st`, `loadTerrain`/`lt`, `deleteTerrainSave`/`delts` are reused as-is (same commands, relocated), not new collisions.
+**Pre-flight check (done)**: none of the new command names or aliases (`displayTerrainSave`/`dts`, `updateTerrainSave`/`uts`, `setTerrainSaveLevel`/`settsl`, `unloadTerrain`/`ult`, `terrainSaveEnableMinimap`, `createTerrainSaveEvent`/`ctse`, `removeTerrainSaveEvent`/`rtse`, `changeEventTerrainSave`/`cets`, `editTerrainSaveEvent`/`etse`, `displayTerrainSaveEvent`/`dtse`) collide with any of the 315 existing command names or 282 existing aliases across `src/core/06_COMMANDS/Commands/*.ts`. `saveTerrain`/`st`, `loadTerrain`/`lt`, `deleteTerrainSave`/`delts` are reused as-is (same commands, relocated), not new collisions.
 
 **Implementation proceeds one step at a time, from the numbered list below.** Work happens on branch `feat/terrain-saves` (create it before step 1 if it doesn't exist yet). After each step:
 1. Run `tsc --noEmit` and confirm it's clean.
@@ -158,7 +159,7 @@ Do not batch multiple steps together or continue past a step without that go-ahe
 # Implementation order
 
 1. **Core class + persistence**: `TerrainSave`, `TerrainSaveArray` (whole-map + global/level model, no zone-scoping yet), global wiring, `-smic` export/import wiring. Validate round-trip with a whole-map, level-scoped, and global save via `-smic`/reload before touching commands.
-2. **Whole-map commands on the new class**: `saveTerrain`/`loadTerrain`/`deleteTerrainSave`/`setTerrainSaveLevel` (`all` only), in the new `4_make_terrain_saves.ts`, removed from `5_admin.ts`. Retire `Save_load_terrain.ts` once unreferenced. Shippable checkpoint: persistent, restorable terrain saves with level/global scoping — already a real improvement over today.
+2. **Whole-map commands on the new class**: `saveTerrain`/`loadTerrain`/`unloadTerrain`/`deleteTerrainSave`/`setTerrainSaveLevel` (`all` only), in the new `4_make_terrain_saves.ts`, removed from `5_admin.ts`. Retire `Save_load_terrain.ts` once unreferenced. Shippable checkpoint: persistent, restorable terrain saves with level/global scoping — already a real improvement over today.
 3. **Zone-scoped saves**: `MakeTerrainSaveZone` click flow, `updateTerrainSave`, `displayTerrainSave` (list/detail/camera/debugRects/pagination).
 4. **Events — level conditions first** (simpler, direct `Level.hooks_onStart/onEnd` reuse): `TerrainSaveEvent`/`TerrainSaveEventArray`, `createTerrainSaveEvent`/`removeTerrainSaveEvent`/`changeEventTerrainSave`/`editTerrainSaveEvent`/`displayTerrainSaveEvent` for `levelStart`/`levelEnd` only.
 5. **Events — `monsterTouch`**: `MakeSelectMonsterForEvent` click flow, the `onEscaperTouchingMonster` branch insertion (highest-risk change — touches core hero-death logic, test thoroughly against clearMob/portalMob/circleMob/jumpPad/lifeBonus/godMode monsters too, not just plain kills), orphan-target warning display.
@@ -179,7 +180,7 @@ Do not batch multiple steps together or continue past a step without that go-ahe
 # Verification
 
 No automated test suite exists for game logic (see `CLAUDE.md`). Verification is manual, via `yarn test-launch` (see `docs/BUILD_AND_RELEASE.md`), plus `tsc --noEmit` per step (see Process):
-- `-saveTerrain`/`-loadTerrain`/`-deleteTerrainSave` round-trip (whole-map, then zone-scoped), including re-apply-while-applied and unapply restoring the true original state.
+- `-saveTerrain`/`-loadTerrain`/`-unloadTerrain`/`-deleteTerrainSave` round-trip (whole-map, then zone-scoped), including re-apply-while-applied and `-unloadTerrain` restoring the true original state. `-deleteTerrainSave` must **not** alter live terrain regardless of applied state.
 - Level vs global scoping: same label at two different levels + a global one, verify `-dts` filtering (default, level-number, `global`/`g`, `current`/`c`) and `x-label` addressing all resolve correctly, and that the cross-exclusivity rule rejects a conflicting `saveTerrain`.
 - `-smic` export + reload (`LoadMapFromCache`) preserves all of the above, including nested events, and that level-scoped saves correctly re-resolve their `Level` after reload.
 - Event system: level-start/level-end conditions firing at the right time with delay/periodic combinations; `monsterTouch` — touching a targeted monster applies/unapplies without killing the hero; a life-bonus monster that also has an event attached only ever gives lives, the event never fires; godMode/clearMob/portalMob/circleMob/jumpPad monsters are unaffected by the new branch; deleting the targeted monster leaves the event intact with an orange warning in `-dtse`.

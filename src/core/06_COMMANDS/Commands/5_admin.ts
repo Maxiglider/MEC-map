@@ -20,7 +20,6 @@ import { MakeMECRegionMode } from '../../05_MAKE_STRUCTURES/Make_create_region/M
 import { SaveMapInCache } from '../../07_TRIGGERS/Save_map_in_gamecache/SaveMapInCache'
 import { ReinitTerrains } from '../../07_TRIGGERS/Triggers_to_modify_terrains/Reinit_terrains'
 import { ReinitTerrainsPositions } from '../../07_TRIGGERS/Triggers_to_modify_terrains/Reinit_terrains_position_Change_variations_and_ut_at_beginning'
-import { SaveLoadTerrain } from '../../07_TRIGGERS/Triggers_to_modify_terrains/Save_load_terrain'
 import { AfkMode } from '../../08_GAME/Afk_mode/Afk_mode'
 import { Globals } from '../../09_From_old_Worldedit_triggers/globals_variables_and_triggers'
 import { MEC_core_API } from '../../API/MEC_core_API'
@@ -28,7 +27,7 @@ import { udg_doubleHeroesEnabled } from '../../Double_heroes/double_heroes_confi
 import { flushLogs } from '../../Log/log'
 import { e2e } from '../../Test/e2e-tests/base/e2e-tests-base'
 import { Natives } from '../../wc3_natives_unsecured/Natives'
-import { CmdParam, isPlayerId, resolvePlayerId } from '../Helpers/Command_functions'
+import { isPlayerId, resolvePlayerId } from '../Helpers/Command_functions'
 import { ActivateTeleport, DisableTeleport } from '../Helpers/Teleport'
 
 export const initExecuteCommandMax = () => {
@@ -60,62 +59,6 @@ export const initExecuteCommandMax = () => {
         cb: ({ noParam }) => {
             if (noParam) {
                 ReinitTerrainsPositions.ReinitTerrainsPosition()
-            }
-            return true
-        },
-    })
-
-    //-saveTerrain(st) [<slotName>]   --> spaces allowed for slotName
-    registerCommand({
-        name: 'saveTerrain',
-        alias: ['st'],
-        group,
-        argDescription: '<slotName>',
-        description: 'Saves terrain in <slotName>',
-        cb: ({ cmd, noParam }) => {
-            if (noParam) {
-                SaveLoadTerrain.SaveTerrain('')
-            } else {
-                SaveLoadTerrain.SaveTerrain(CmdParam(cmd, 0))
-            }
-            return true
-        },
-    })
-
-    //-loadTerrain(lt) [<slotName>]
-    registerCommand({
-        name: 'loadTerrain',
-        alias: ['lt'],
-        group,
-        argDescription: '<slotName>',
-        description: 'Loads terrain in <slotName>',
-        cb: ({ cmd, noParam }, escaper) => {
-            if (noParam) {
-                SaveLoadTerrain.LoadTerrain('')
-            } else {
-                if (!SaveLoadTerrain.LoadTerrain(CmdParam(cmd, 0))) {
-                    Text.erP(escaper.getPlayer(), "this terrain save doesn't exist")
-                }
-            }
-            return true
-        },
-    })
-
-    //-deleteTerrainSave(delts) [<slotName>]
-    registerCommand({
-        name: 'deleteTerrainSave',
-        alias: ['delts'],
-        group,
-        argDescription: '<slotName>',
-        description: 'Deletes terrain save in <slotName>',
-        cb: ({ cmd, noParam }, escaper) => {
-            if (noParam) {
-                return true
-            }
-            if (SaveLoadTerrain.DeleteTerrainSave(CmdParam(cmd, 0))) {
-                Text.mkP(escaper.getPlayer(), 'terrain save deleted')
-            } else {
-                Text.erP(escaper.getPlayer(), "this terrain save doesn't exist")
             }
             return true
         },

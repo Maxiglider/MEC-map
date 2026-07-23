@@ -18,6 +18,8 @@
   - save the whole terrain or a terrain zone (MECRegion of type `horizRect`) into a name. Defaults to the current level unless `global`/`g` is passed. Errors if the label already exists for that (label, level) pair, or violates the global/level exclusivity rule.
 - `loadTerrain` (`lt`) `<label>`
   - apply the terrain `<label>` (zone is intrinsic to the terrain save, no longer a parameter)
+- `unloadTerrain` (`ult`) `<label>`
+  - unapply the terrain save `<label>`, restoring the terrain to what it was right before it was applied. Error if not currently applied.
 - `displayTerrainSave` (`dts`) `[<label>|<levelNum>|global|g|current|c] [page]`
   - without parameter, displays global terrain saves then the current level's, paginated
   - a plain number shows only that level's terrain saves; `global`/`g` or `current`/`c` filter accordingly
@@ -25,8 +27,8 @@
 - `updateTerrainSave` (`uts`) `<label> [all|rect]`
   - update the terrain data according to the specified zone (redraw the zone if the second parameter is present and different than "all")
 - `deleteTerrainSave` (`delts`) `<label>`
-  - remove the terrain save and its associated events. If currently applied, the terrain is restored to its pre-application state first.
-- `setTerrainSaveLevel` (`stsl`) `<label> <levelNum>|global|g|current|c`
+  - remove the terrain save and its associated events. Does **not** touch the live terrain, even if the save is currently applied — the map is left exactly as it looks at the moment of deletion.
+- `setTerrainSaveLevel` (`settsl`) `<label> <levelNum>|global|g|current|c`
   - move a terrain save between levels, or to/from global — subject to the same exclusivity rule as creation.
 - `terrainSaveEnableMinimap` `all|<label> <boolean>` — **tentative, may be dropped**
   - if minimap is enabled for a terrain save, will generate a minimap blp with `mec-smic-loader` for it, that will be applied/unapplied at the same time of the terrain save
