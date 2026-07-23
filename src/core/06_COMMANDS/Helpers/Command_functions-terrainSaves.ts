@@ -58,7 +58,7 @@ export const displayTerrainSaveDetail = (terrainSave: TerrainSave, p: player) =>
 
     if (zone !== null) {
         SetCameraPositionForPlayer(p, zone.getCenterX(), zone.getCenterY())
-        zone.debugRects(true)
+        zone.debugRects(true, true)
         createTimer(Constants.TERRAIN_DATA_DISPLAY_TIME, false, () => zone.debugRects(false))
     }
 }

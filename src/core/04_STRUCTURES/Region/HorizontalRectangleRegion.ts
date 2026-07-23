@@ -1,5 +1,6 @@
 import { MemoryHandler } from '../../../Utils/MemoryHandler'
 import { Constants } from '../../01_libraries/Constants'
+import { DrawLine } from '../../01_libraries/Draw_lines'
 import { RectangleRegion } from './RectangleRegion'
 
 export type HorizontalRegionDirection = 'up' | 'down' | 'left' | 'right'
@@ -96,6 +97,18 @@ export class HorizontalRectangleRegion extends RectangleRegion {
         const widthTiles = Math.round((this.maxX - this.minX) / Constants.LARGEUR_CASE)
         const heightTiles = Math.round((this.maxY - this.minY) / Constants.LARGEUR_CASE)
         return widthTiles * heightTiles
+    }
+
+    protected generateDebugCross(): void {
+        const diagonal1 = DrawLine(this.minX, this.minY, this.maxX, this.maxY)
+        if (diagonal1) {
+            this.debugLightnings.push(diagonal1)
+        }
+
+        const diagonal2 = DrawLine(this.maxX, this.minY, this.minX, this.maxY)
+        if (diagonal2) {
+            this.debugLightnings.push(diagonal2)
+        }
     }
 
     moveTo(newCenterX: number, newCenterY: number) {

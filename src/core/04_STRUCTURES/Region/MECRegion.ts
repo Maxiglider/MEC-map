@@ -2,7 +2,7 @@ import { globals } from '../../../../globals'
 import { IDestroyable, MemoryHandler } from '../../../Utils/MemoryHandler'
 import { emptyOject } from '../../01_libraries/Basic_functions'
 import { Constants } from '../../01_libraries/Constants'
-import { DefineDrawLineType } from '../../01_libraries/Draw_lines'
+import { DefineDrawLineType, DrawLine } from '../../01_libraries/Draw_lines'
 import type { MonsterSpawn } from '../MonsterSpawn/MonsterSpawn'
 
 export const OFFSET_FOR_START_LINE_NOT_SPAWNED_MONSTERS_TO_BE_CONSIDERED_OUT = 4
@@ -143,7 +143,27 @@ export abstract class MECRegion {
         return this.debugEffects
     }
 
-    debugRects(enable: boolean): void {
+    // Default: a small "+" at the center. Reimplement in children that have a natural set of corners (e.g.
+    // HorizontalRectangleRegion overrides this to draw an X corner-to-corner instead).
+    protected generateDebugCross(): void {
+        const centerX = this.getCenterX()
+        const centerY = this.getCenterY()
+        const armLength = Constants.LARGEUR_CASE / 4
+
+        const horizontal = DrawLine(centerX - armLength, centerY, centerX + armLength, centerY)
+        if (horizontal) {
+            this.debugLightnings.push(horizontal)
+        }
+
+        const vertical = DrawLine(centerX, centerY - armLength, centerX, centerY + armLength)
+        if (vertical) {
+            this.debugLightnings.push(vertical)
+        }
+    }
+
+    // withCenterCross is opt-in (default off) and, for now, only ever passed by displayTerrainSaveDetail -
+    // other debugRects() callers elsewhere in the codebase are unaffected.
+    debugRects(enable: boolean, withCenterCross = false): void {
         if (enable === this.currentlyDebugging) {
             return
         }
@@ -153,6 +173,10 @@ export abstract class MECRegion {
             this.defineDebugLineType()
             this.generateDebugLightnings()
             this.generateDebugEffects()
+
+            if (withCenterCross) {
+                this.generateDebugCross()
+            }
         } else {
             for (const lightning of this.debugLightnings) {
                 DestroyLightning(lightning)
