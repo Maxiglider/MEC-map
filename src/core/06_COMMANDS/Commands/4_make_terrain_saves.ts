@@ -6,11 +6,11 @@ import { IsPositiveInteger } from '../../01_libraries/Functions_on_numbers'
 import { Text } from '../../01_libraries/Text'
 import type { Level } from '../../04_STRUCTURES/Level/Level'
 import type { TerrainSave } from '../../04_STRUCTURES/TerrainSave/TerrainSave'
+import { USAGE } from '../Helpers/Command_functions'
 import {
     displayTerrainSaveDetail,
     formatTerrainSaveSummaryLine,
     isNewTerrainSaveLabelValid,
-    usageMessage,
 } from '../Helpers/Command_functions-terrainSaves'
 import { handlePagination } from '../Helpers/Pagination'
 
@@ -19,7 +19,6 @@ export const initExecuteCommandMake_terrain_saves = () => {
     const group = 'make'
 
     //-saveTerrain(st) <label> [all|rect] [global|g]
-    const saveTerrainUsage = usageMessage('saveTerrain', '<label> [all|rect] [global|g]')
     registerCommand({
         name: 'saveTerrain',
         alias: ['st'],
@@ -29,8 +28,7 @@ export const initExecuteCommandMake_terrain_saves = () => {
             'Saves the whole terrain or a clicked zone into a name, associated to the current level unless "global"/"g" is passed',
         cb: ({ nbParam, param1, param2, param3 }, escaper) => {
             if (nbParam < 1 || nbParam > 3) {
-                Text.erP(escaper.getPlayer(), saveTerrainUsage)
-                return true
+                return USAGE
             }
 
             const label = param1
@@ -40,15 +38,13 @@ export const initExecuteCommandMake_terrain_saves = () => {
             }
 
             if (nbParam >= 2 && param2 !== 'all' && param2 !== 'rect') {
-                Text.erP(escaper.getPlayer(), saveTerrainUsage)
-                return true
+                return USAGE
             }
 
             let level: Level | null = escaper.getMakingLevel()
             if (nbParam === 3) {
                 if (param3 !== 'global' && param3 !== 'g') {
-                    Text.erP(escaper.getPlayer(), saveTerrainUsage)
-                    return true
+                    return USAGE
                 }
                 level = null
             }
@@ -95,7 +91,6 @@ export const initExecuteCommandMake_terrain_saves = () => {
     })
 
     //-loadTerrain(lt) <label>
-    const loadTerrainUsage = usageMessage('loadTerrain', '<label>')
     registerCommand({
         name: 'loadTerrain',
         alias: ['lt'],
@@ -104,8 +99,7 @@ export const initExecuteCommandMake_terrain_saves = () => {
         description: 'Applies the terrain save <label>',
         cb: ({ nbParam, param1 }, escaper) => {
             if (nbParam !== 1) {
-                Text.erP(escaper.getPlayer(), loadTerrainUsage)
-                return true
+                return USAGE
             }
 
             const terrainSave = getUdgTerrainSaves().resolveLabel(param1, escaper.getMakingLevel())
@@ -121,7 +115,6 @@ export const initExecuteCommandMake_terrain_saves = () => {
     })
 
     //-unloadTerrain(ult) <label>
-    const unloadTerrainUsage = usageMessage('unloadTerrain', '<label>')
     registerCommand({
         name: 'unloadTerrain',
         alias: ['ult'],
@@ -130,8 +123,7 @@ export const initExecuteCommandMake_terrain_saves = () => {
         description: 'Unapplies the terrain save <label>, restoring the terrain from before it was applied',
         cb: ({ nbParam, param1 }, escaper) => {
             if (nbParam !== 1) {
-                Text.erP(escaper.getPlayer(), unloadTerrainUsage)
-                return true
+                return USAGE
             }
 
             const terrainSave = getUdgTerrainSaves().resolveLabel(param1, escaper.getMakingLevel())
@@ -150,7 +142,6 @@ export const initExecuteCommandMake_terrain_saves = () => {
     })
 
     //-displayTerrainSave(dts) [<label>|<levelNum>|global|g|current|c] [page]
-    const displayTerrainSaveUsage = usageMessage('displayTerrainSave', '[<label>|<levelNum>|global|g|current|c] [page]')
     registerCommand({
         name: 'displayTerrainSave',
         alias: ['dts'],
@@ -159,8 +150,7 @@ export const initExecuteCommandMake_terrain_saves = () => {
         description: 'Displays terrain saves - a label shows details, otherwise lists them, filterable and paginated',
         cb: ({ nbParam, param1, param2 }, escaper) => {
             if (nbParam > 2) {
-                Text.erP(escaper.getPlayer(), displayTerrainSaveUsage)
-                return true
+                return USAGE
             }
 
             const currentLevel = escaper.getMakingLevel()
@@ -175,8 +165,7 @@ export const initExecuteCommandMake_terrain_saves = () => {
 
             if (!isSelector) {
                 if (nbParam > 1) {
-                    Text.erP(escaper.getPlayer(), displayTerrainSaveUsage)
-                    return true
+                    return USAGE
                 }
 
                 const terrainSave = getUdgTerrainSaves().resolveLabel(param1, currentLevel)
@@ -206,8 +195,7 @@ export const initExecuteCommandMake_terrain_saves = () => {
             }
 
             if (nbParam === 2 && !IsPositiveInteger(param2)) {
-                Text.erP(escaper.getPlayer(), displayTerrainSaveUsage)
-                return true
+                return USAGE
             }
             const pageNum = nbParam === 2 ? S2I(param2) : 1
 
@@ -250,7 +238,6 @@ export const initExecuteCommandMake_terrain_saves = () => {
     })
 
     //-updateTerrainSave(uts) <label> [all|rect]
-    const updateTerrainSaveUsage = usageMessage('updateTerrainSave', '<label> [all|rect]')
     registerCommand({
         name: 'updateTerrainSave',
         alias: ['uts'],
@@ -260,13 +247,11 @@ export const initExecuteCommandMake_terrain_saves = () => {
             'Re-captures the terrain data for <label>. With "rect", redraws the zone first; otherwise re-captures in place',
         cb: ({ nbParam, param1, param2 }, escaper) => {
             if (nbParam < 1 || nbParam > 2) {
-                Text.erP(escaper.getPlayer(), updateTerrainSaveUsage)
-                return true
+                return USAGE
             }
 
             if (nbParam === 2 && param2 !== 'all' && param2 !== 'rect') {
-                Text.erP(escaper.getPlayer(), updateTerrainSaveUsage)
-                return true
+                return USAGE
             }
 
             const terrainSave = getUdgTerrainSaves().resolveLabel(param1, escaper.getMakingLevel())
@@ -292,7 +277,6 @@ export const initExecuteCommandMake_terrain_saves = () => {
     })
 
     //-deleteTerrainSave(delts) <label>
-    const deleteTerrainSaveUsage = usageMessage('deleteTerrainSave', '<label>')
     registerCommand({
         name: 'deleteTerrainSave',
         alias: ['delts'],
@@ -301,8 +285,7 @@ export const initExecuteCommandMake_terrain_saves = () => {
         description: 'Deletes a terrain save and its associated events',
         cb: ({ nbParam, param1 }, escaper) => {
             if (nbParam !== 1) {
-                Text.erP(escaper.getPlayer(), deleteTerrainSaveUsage)
-                return true
+                return USAGE
             }
 
             const terrainSave = getUdgTerrainSaves().resolveLabel(param1, escaper.getMakingLevel())
@@ -318,7 +301,6 @@ export const initExecuteCommandMake_terrain_saves = () => {
     })
 
     //-setTerrainSaveLevel(settsl) <label> <levelNum>|global|g|current|c
-    const setTerrainSaveLevelUsage = usageMessage('setTerrainSaveLevel', '<label> <levelNum>|global|g|current|c')
     registerCommand({
         name: 'setTerrainSaveLevel',
         alias: ['settsl'],
@@ -327,8 +309,7 @@ export const initExecuteCommandMake_terrain_saves = () => {
         description: 'Moves a terrain save to another level, or to/from global',
         cb: ({ nbParam, param1, param2 }, escaper) => {
             if (nbParam !== 2) {
-                Text.erP(escaper.getPlayer(), setTerrainSaveLevelUsage)
-                return true
+                return USAGE
             }
 
             const terrainSave = getUdgTerrainSaves().resolveLabel(param1, escaper.getMakingLevel())
@@ -350,8 +331,7 @@ export const initExecuteCommandMake_terrain_saves = () => {
                 }
                 newLevel = level
             } else {
-                Text.erP(escaper.getPlayer(), setTerrainSaveLevelUsage)
-                return true
+                return USAGE
             }
 
             if (terrainSave.setLevel(newLevel)) {

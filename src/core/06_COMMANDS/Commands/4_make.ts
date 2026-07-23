@@ -22,7 +22,7 @@ import { MonsterMultiplePatrols } from '../../04_STRUCTURES/Monster/MonsterMulti
 import { MonsterNoMove } from '../../04_STRUCTURES/Monster/MonsterNoMove'
 import { MonsterSimplePatrol } from '../../04_STRUCTURES/Monster/MonsterSimplePatrol'
 import { PORTAL_MOB_MAX_FREEZE_DURATION } from '../../04_STRUCTURES/Monster_properties/PortalMob'
-import { CmdParam } from '../Helpers/Command_functions'
+import { CmdParam, USAGE } from '../Helpers/Command_functions'
 import { adaptMonstersImmolation, snapPatrolsToSlideOffsetMap, snapPointToSlide } from '../Helpers/commands-helpers'
 
 export const initExecuteCommandMake = () => {
@@ -500,8 +500,7 @@ export const initExecuteCommandMake = () => {
             'Set whether visibilities are reset when re-entering the level (applies a total black mask on the map when true)',
         cb: ({ nbParam, param1, param2 }, escaper) => {
             if (nbParam > 2 || !IsBoolString(param1)) {
-                Text.erP(escaper.getPlayer(), 'Usage: -setLevelResetVisibilities <boolean> [<levelId>]')
-                return true
+                return USAGE
             }
 
             const levelNum = nbParam == 2 ? S2I(param2) : escaper.getMakingLevel().getId()
@@ -993,16 +992,13 @@ export const initExecuteCommandMake = () => {
         description:
             'Sets the base hero collision size. Persistent between "smiced" games. Value between 0 and 200, by steps of 5.',
         cb: ({ nbParam, param1 }, escaper) => {
-            const usageMessage = 'setBaseHeroCollisionSize: you must provide a value between 0 and 200, by steps of 5.'
             if (nbParam !== 1) {
-                Text.erP(escaper.getPlayer(), usageMessage)
-                return true
+                return USAGE
             }
 
             const value = S2I(param1)
             if (!IsHeroCollisionSizeValid(value)) {
-                Text.erP(escaper.getPlayer(), usageMessage)
-                return true
+                return USAGE
             }
 
             setHeroBaseCollisionSize(value)
@@ -1021,10 +1017,8 @@ export const initExecuteCommandMake = () => {
         argDescription: '',
         description: 'Displays the base hero collision size.',
         cb: ({ nbParam }, escaper) => {
-            const usageMessage = 'getBaseHeroCollisionSize: no parameter required.'
             if (nbParam !== 0) {
-                Text.erP(escaper.getPlayer(), usageMessage)
-                return true
+                return USAGE
             }
 
             Text.mkP(escaper.getPlayer(), 'Hero base collision size currently is ' + globals.heroBaseCollisionSize)
@@ -1042,19 +1036,15 @@ export const initExecuteCommandMake = () => {
         description:
             'Change the hero base collision size to the given value (between 0 and 200, by steps of 5, default 25) and change all monsters immolation to keep the same gameplay.',
         cb: ({ nbParam, param1, param2 }, escaper) => {
-            const usageMessage = `patchImmo usage : -patchImmo [<heroBaseCollisionSize>] where <heroBaseCollisionSize> is an integer between 0 and 200, by steps of 5.`
-
             if (nbParam > 1) {
-                Text.erP(escaper.getPlayer(), usageMessage)
-                return true
+                return USAGE
             }
 
             let newHeroBaseCollisionSize = Constants.RECOMMANDED_HERO_BASE_COLLISION_SIZE
             if (nbParam === 1) {
                 newHeroBaseCollisionSize = S2I(param1)
                 if (!IsHeroCollisionSizeValid(newHeroBaseCollisionSize)) {
-                    Text.erP(escaper.getPlayer(), usageMessage)
-                    return true
+                    return USAGE
                 }
             }
 

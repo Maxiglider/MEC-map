@@ -10,6 +10,14 @@ import { HERO_START_ANGLE } from '../../08_GAME/Init_game/Heroes'
 import { DeplacementHeroHorsDeathPath } from '../../08_GAME/Mode_coop/deplacement_heros_hors_death_path'
 import { Natives } from '../../wc3_natives_unsecured/Natives'
 
+// A command's cb can return this instead of true when the parameters are wrong, instead of building/printing
+// its own "wrong parameters"/usage text - ExecuteCommandSingle (Command_execution.ts) then displays a generic
+// "Usage: -name argDescription" message using the command's own registered fields, so it can never drift out
+// of sync with argDescription and every command gets consistent wording for free.
+// Deliberately defined here, not in Command_execution.ts: that file imports every Commands/*.ts module, so a
+// command file importing USAGE back from it would be a circular require - this file has no such back-edge.
+export const USAGE = 'USAGE' as const
+
 export const rawPlayerNames: string[] = []
 
 const cachedPlayerNames: { [x: string]: number } = {}

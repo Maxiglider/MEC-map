@@ -17,7 +17,7 @@ import { IMMOLATION_SKILLS } from '../../04_STRUCTURES/Monster/Immolation_skills
 import { MONSTER_TELEPORT_PERIOD_MAX, MONSTER_TELEPORT_PERIOD_MIN } from '../../04_STRUCTURES/Monster/MonsterTeleport'
 import { CLEAR_MOB_MAX_DURATION, FRONT_MONTANT_DURATION } from '../../04_STRUCTURES/Monster_properties/ClearMob'
 import { MakeMonsterSimplePatrol } from '../../05_MAKE_STRUCTURES/Make_create_monsters/MakeMonsterSimplePatrol'
-import { CmdParam } from '../Helpers/Command_functions'
+import { CmdParam, USAGE } from '../Helpers/Command_functions'
 
 export const initExecuteCommandMake_monsters = () => {
     const { registerCommand } = ServiceManager.getService('Cmd')
@@ -477,8 +477,7 @@ export const initExecuteCommandMake_monsters = () => {
             'Sets dimensions of a monster to apply a rectangle kill zone (applies only to non immobile monsters ; use when circle kill zone is not adapted)',
         cb: ({ nbParam, param1, param2, param3 }, escaper) => {
             if (nbParam !== 3) {
-                Text.erP(escaper.getPlayer(), 'wrong number of parameters')
-                return true
+                return USAGE
             }
 
             //checkParam1
@@ -514,8 +513,7 @@ export const initExecuteCommandMake_monsters = () => {
             'Enables or disables the life bonus characteristic for a monster type. If enabled, a monster will gives lives when a hero touches them and survives the required time.',
         cb: ({ nbParam, param1, param2, param3, param4 }, escaper) => {
             if (nbParam < 2 || nbParam > 4) {
-                Text.erP(escaper.getPlayer(), 'wrong parameters')
-                return true
+                return USAGE
             }
 
             //checkParam1
@@ -527,8 +525,7 @@ export const initExecuteCommandMake_monsters = () => {
 
             //checkParam2
             if (!IsBoolString(param2)) {
-                Text.erP(escaper.getPlayer(), 'wrong parameters')
-                return true
+                return USAGE
             }
             const enabling = S2B(param2)
 
@@ -536,8 +533,7 @@ export const initExecuteCommandMake_monsters = () => {
             let nbLivesEarned: number | undefined
             if (nbParam >= 3) {
                 if (!IsPositiveInteger(param3)) {
-                    Text.erP(escaper.getPlayer(), 'wrong parameters')
-                    return true
+                    return USAGE
                 }
                 nbLivesEarned = S2I(param3)
             }
@@ -546,8 +542,7 @@ export const initExecuteCommandMake_monsters = () => {
             let minimumSurviveTime: number | undefined
             if (nbParam >= 4) {
                 if (S2R(param4) < 0) {
-                    Text.erP(escaper.getPlayer(), 'wrong parameters')
-                    return true
+                    return USAGE
                 }
                 minimumSurviveTime = S2R(param4)
             }
@@ -704,8 +699,7 @@ export const initExecuteCommandMake_monsters = () => {
             const angle = nbParam === 2 ? convertTextToAngle(param2) : undefined
 
             if (nbParam === 2 && angle === undefined) {
-                Text.erP(escaper.getPlayer(), 'wrong angle value')
-                return true
+                return USAGE
             }
 
             const monsterType = getUdgMonsterTypes().getByLabel(param1)

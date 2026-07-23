@@ -7,7 +7,13 @@ import { Text } from '../../01_libraries/Text'
 import { TerrainTypeFromString } from '../../07_TRIGGERS/Modify_terrain_Functions/Terrain_type_from_string'
 import { ReinitTerrainsPositions } from '../../07_TRIGGERS/Triggers_to_modify_terrains/Reinit_terrains_position_Change_variations_and_ut_at_beginning'
 import { Globals } from '../../09_From_old_Worldedit_triggers/globals_variables_and_triggers'
-import { isPlayerId, resolvePlayerId, resolvePlayerIds, resolvePlayerIdsArray } from '../Helpers/Command_functions'
+import {
+    isPlayerId,
+    resolvePlayerId,
+    resolvePlayerIds,
+    resolvePlayerIdsArray,
+    USAGE,
+} from '../Helpers/Command_functions'
 
 export const initExecuteCommandRed = () => {
     const { registerCommand } = ServiceManager.getService('Cmd')
@@ -364,8 +370,7 @@ export const initExecuteCommandRed = () => {
 
             // Validate parameters
             if (nbParam !== 2) {
-                Text.P(escaper.getPlayer(), 'Usage: -setGameTheme <theme|off> <units|rocks|terrain|all>')
-                return true
+                return USAGE
             }
 
             if (param1 !== 'fullskill' && param1 !== 'murloc' && param1 !== 'rkr') {

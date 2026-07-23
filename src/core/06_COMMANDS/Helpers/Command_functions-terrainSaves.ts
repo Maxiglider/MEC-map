@@ -5,16 +5,6 @@ import { udg_colorCode } from '../../01_libraries/Init_colorCodes'
 import { Text } from '../../01_libraries/Text'
 import type { TerrainSave } from '../../04_STRUCTURES/TerrainSave/TerrainSave'
 
-// WC3 chat text interprets "|" as the start of a color code (e.g. "|r" resets color) - a literal "|" must
-// be doubled ("||") to display as-is. strings().replaceAll runs on Lua's string.gsub, a single pass over the
-// original string, so (unlike a naive replace-and-loop) it never re-matches the "|" it just inserted.
-const escapePipes = (str: string): string => strings().replaceAll('|', '||', str)
-
-// Builds a "Usage: -commandName <argDescription>" error message from the same argDescription string passed
-// to registerCommand, so the two can never drift out of sync.
-export const usageMessage = (commandName: string, argDescription: string): string =>
-    `Usage: -${commandName} ${escapePipes(argDescription)}`
-
 // For -saveTerrain
 export const isNewTerrainSaveLabelValid = (label: string): boolean => {
     if (label.length === 0) {

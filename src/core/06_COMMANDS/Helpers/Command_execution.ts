@@ -1,6 +1,7 @@
 import { getUdgEscapers } from '../../../../globals'
 import { MemoryHandler } from '../../../Utils/MemoryHandler'
 import { createEvent, forRange } from '../../../Utils/mapUtils'
+import { escapePipes } from '../../01_libraries/Basic_functions'
 import { Constants } from '../../01_libraries/Constants'
 import { Text } from '../../01_libraries/Text'
 import { Escaper } from '../../04_STRUCTURES/Escaper/Escaper'
@@ -16,7 +17,7 @@ import { initExecuteCommandMake_terrain } from '../Commands/4_make_terrain'
 import { initExecuteCommandMake_terrain_saves } from '../Commands/4_make_terrain_saves'
 import { initExecuteCommandMax } from '../Commands/5_admin'
 import { initExecuteCommandTrueMax } from '../Commands/6_superadmin'
-import { CmdName, CmdParam, IsCmd, NbParam, NoParam } from './Command_functions'
+import { CmdName, CmdParam, IsCmd, NbParam, NoParam, USAGE } from './Command_functions'
 import { handlePagination, handlePaginationArgs } from './Pagination'
 
 export type ICommandExecution = ReturnType<typeof initCommandExecution>
@@ -28,7 +29,7 @@ export type ICommand = {
     argDescription: string
     description: string
     enabled?: (cmd: IParsedCmdContext, escaper: Escaper) => boolean
-    cb: (cmd: IParsedCmdContext, escaper: Escaper) => true
+    cb: (cmd: IParsedCmdContext, escaper: Escaper) => true | typeof USAGE
 }
 
 type IParsedCmdContext = ReturnType<typeof parseCmdContext>
@@ -159,7 +160,14 @@ export const initCommandExecution = () => {
             const parsedContext = parseCmdContext(cmd)
             const targetCmd = findTargetCommand(commands, parsedContext, escaper)
 
-            targetCmd?.cb(parsedContext, escaper)
+            const result = targetCmd?.cb(parsedContext, escaper)
+            if (result === USAGE && targetCmd) {
+                const aliasText = targetCmd.alias.length > 0 ? ` (${escapePipes(targetCmd.alias.join(' | '))})` : ''
+                Text.erP(
+                    escaper.getPlayer(),
+                    `Usage: -${targetCmd.name}${aliasText} ${escapePipes(targetCmd.argDescription)}`
+                )
+            }
 
             MemoryHandler.destroyObject(parsedContext)
 
@@ -297,11 +305,11 @@ export const initCommandExecution = () => {
         let line = '|cffffcc00-' + cmd.name + '|r'
 
         if (cmd.alias.length > 0) {
-            line += '|cffcccccc(' + cmd.alias.join(' | ') + ')|r'
+            line += '|cffcccccc(' + escapePipes(cmd.alias.join(' | ')) + ')|r'
         }
 
         if (cmd.argDescription.length > 0) {
-            line += ' |cff88ccff' + cmd.argDescription + '|r'
+            line += ' |cff88ccff' + escapePipes(cmd.argDescription) + '|r'
         }
 
         if (cmd.description.length > 0) {

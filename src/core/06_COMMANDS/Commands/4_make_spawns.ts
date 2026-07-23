@@ -5,6 +5,7 @@ import { Text } from '../../01_libraries/Text'
 import { MonsterDirectionMode } from '../../04_STRUCTURES/MonsterSpawn/MonsterSpawn'
 import { MakeMECRegionMode } from '../../05_MAKE_STRUCTURES/Make_create_region/MakeMECRegion'
 import { MakeMonsterSpawnKind } from '../../05_MAKE_STRUCTURES/Make_monster_spawn/MakeMonsterSpawn'
+import { USAGE } from '../Helpers/Command_functions'
 
 export const initExecuteCommandMake_spawns = () => {
     const { registerCommand } = ServiceManager.getService('Cmd')
@@ -15,13 +16,12 @@ export const initExecuteCommandMake_spawns = () => {
         name: 'createMonsterSpawn',
         alias: ['crmsp'],
         group,
-        argDescription: '<monsterSpawnLabel> <monsterLabel> <kind> [<frequency>] [straight||random]',
+        argDescription: '<monsterSpawnLabel> <monsterLabel> <kind> [<frequency>] [straight|random]',
         description:
             'Kind must be "up", "down", "left", "right", "line", "rect", "parallelogram" or "trapeze". Default frequency is 2, minimum is 0.1, maximum is 30',
         cb: ({ nbParam, param1, param2, param3, param4, param5 }, escaper) => {
             if (!(nbParam >= 3 && nbParam <= 5)) {
-                Text.erP(escaper.getPlayer(), 'uncorrect number of parameters')
-                return true
+                return USAGE
             }
             if (escaper.getMakingLevel().monsterSpawns.getByLabel(param1)) {
                 Text.erP(
@@ -134,19 +134,21 @@ export const initExecuteCommandMake_spawns = () => {
         description: 'Kind must be "up", "down", "left", "right", "line", "rect", "parallelogram" or "trapeze".',
         cb: ({ param1, param2, nbParam }, escaper) => {
             if (nbParam !== 2) {
-                Text.erP(escaper.getPlayer(), 'setMonsterSpawnZone: wrong number of parameters')
-                return true
+                return USAGE
             }
 
             const monsterSpawn = escaper.getMakingLevel().monsterSpawns.getByLabel(param1)
             if (!monsterSpawn) {
-                Text.erP(escaper.getPlayer(), 'unknown monster spawn "' + param1 + '" in this level')
+                Text.erP(
+                    escaper.getPlayer(),
+                    'setMonsterSpawnZone: unknown monster spawn "' + param1 + '" in this level'
+                )
                 return true
             }
 
             let kind: MakeMonsterSpawnKind = 'up'
             if (!['up', 'down', 'left', 'right', 'line', 'rect', 'parallelogram', 'trapeze'].includes(param2)) {
-                Text.erP(escaper.getPlayer(), 'createMonsterSpawn: wrong kind')
+                Text.erP(escaper.getPlayer(), 'setMonsterSpawnZone: wrong kind')
                 return true
             } else {
                 kind = param2 as MakeMonsterSpawnKind
@@ -255,8 +257,7 @@ export const initExecuteCommandMake_spawns = () => {
             'Distance between each spawn (0-16384, 0 disables), or "auto" to distribute mosnters evenly in the spawn zone (useful with spawnAmount > 1).',
         cb: ({ param1, param2, nbParam }, escaper) => {
             if (nbParam !== 2) {
-                Text.erP(escaper.getPlayer(), 'setMonsterSpawnFixedSpawnOffset: wrong number of parameters')
-                return true
+                return USAGE
             }
 
             const monsterSpawn = escaper.getMakingLevel().monsterSpawns.getByLabel(param1)
@@ -400,16 +401,12 @@ export const initExecuteCommandMake_spawns = () => {
         name: 'setMonsterSpawnMonsterDirectionMode',
         alias: ['setmsmdm'],
         group,
-        argDescription: '<label> straight||random',
+        argDescription: '<label> straight|random',
         description:
             "Set the monster direction mode for spawned monsters (straight or random) => doesn't work for line zones",
         cb: ({ nbParam, param1, param2 }, escaper) => {
             if (nbParam !== 2) {
-                Text.erP(
-                    escaper.getPlayer(),
-                    'Incorrect arguments. Usage: -setMonsterSpawnMonsterDirectionMode <label> straight||random'
-                )
-                return true
+                return USAGE
             }
 
             const monsterSpawn = escaper.getMakingLevel().monsterSpawns.getByLabel(param1)
@@ -440,8 +437,7 @@ export const initExecuteCommandMake_spawns = () => {
             'Add one or several dead zones to a monster spawn (spawned monsters will be hidden in that zone and non lethal). deadZoneShape can be "horizRect", "rect", "circle" or "line". Default is "horizRect". Stop creating dead zones with -stop.',
         cb: ({ nbParam, param1, param2 }, escaper) => {
             if (nbParam < 1 || nbParam > 2) {
-                Text.erP(escaper.getPlayer(), 'createMonsterSpawnDeadZone: wrong arguments')
-                return true
+                return USAGE
             }
 
             const monsterSpawn = escaper.getMakingLevel().monsterSpawns.getByLabel(param1)
@@ -453,8 +449,7 @@ export const initExecuteCommandMake_spawns = () => {
             let makeMecRegionMode: MakeMECRegionMode = 'horizRect'
             if (nbParam === 2) {
                 if (!['horizRect', 'rect', 'parallelogram', 'trapeze', 'circle', 'line'].includes(param2)) {
-                    Text.erP(escaper.getPlayer(), 'createMonsterSpawnDeadZone: wrong arguments')
-                    return true
+                    return USAGE
                 }
                 makeMecRegionMode = param2 as MakeMECRegionMode
             }
@@ -481,8 +476,7 @@ export const initExecuteCommandMake_spawns = () => {
             'Remove dead zones of a monster spawn. With "clicks", remove them one by one with clicks (priority on region with the lowest area). With "all" or no argument, remove them all at once (defaults to "clicks").',
         cb: ({ nbParam, param1, param2 }, escaper) => {
             if (nbParam < 1 || nbParam > 2) {
-                Text.erP(escaper.getPlayer(), 'deleteMonsterSpawnDeadZones: wrong arguments')
-                return true
+                return USAGE
             }
 
             const monsterSpawn = escaper.getMakingLevel().monsterSpawns.getByLabel(param1)
@@ -494,8 +488,7 @@ export const initExecuteCommandMake_spawns = () => {
             let mode: 'clicks' | 'all' = 'clicks'
             if (nbParam === 2) {
                 if (!['clicks', 'all'].includes(param2)) {
-                    Text.erP(escaper.getPlayer(), 'deleteMonsterSpawnDeadZones: wrong arguments')
-                    return true
+                    return USAGE
                 }
                 mode = param2 as 'clicks' | 'all'
             }

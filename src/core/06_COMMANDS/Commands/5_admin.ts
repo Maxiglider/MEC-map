@@ -27,7 +27,7 @@ import { udg_doubleHeroesEnabled } from '../../Double_heroes/double_heroes_confi
 import { flushLogs } from '../../Log/log'
 import { e2e } from '../../Test/e2e-tests/base/e2e-tests-base'
 import { Natives } from '../../wc3_natives_unsecured/Natives'
-import { isPlayerId, resolvePlayerId } from '../Helpers/Command_functions'
+import { isPlayerId, resolvePlayerId, USAGE } from '../Helpers/Command_functions'
 import { ActivateTeleport, DisableTeleport } from '../Helpers/Teleport'
 
 export const initExecuteCommandMax = () => {
@@ -490,8 +490,7 @@ export const initExecuteCommandMax = () => {
         description: 'Sets the afk time',
         cb: ({ nbParam, param1 }, escaper) => {
             if (nbParam !== 1 || S2I(param1) <= 0) {
-                Text.erP(escaper.getPlayer(), 'there must be one param which is an integer higher than 0')
-                return true
+                return USAGE
             }
             AfkMode.timeMinAfk = S2R(param1)
             Text.P(escaper.getPlayer(), 'afk time to ' + param1)
@@ -508,8 +507,7 @@ export const initExecuteCommandMax = () => {
         description: 'Sets the autorevive delay, maximum 15 seconds',
         cb: ({ nbParam, param1 }, escaper) => {
             if (!(nbParam === 1 && (S2R(param1) > 0 || param1 === '0') && S2R(param1) <= 15)) {
-                Text.erP(escaper.getPlayer(), 'there must be one param positive real (maximum 15)')
-                return true
+                return USAGE
             }
             let x = S2R(param1)
             globals.autoreviveDelay = x
@@ -532,14 +530,13 @@ export const initExecuteCommandMax = () => {
             'Saves the map in cache for usage with mec-smic-loader. If you specify "withoutTerrain" as second parameter, the data will be lighter but not usable with smic-loader, only with -lmfc command.',
         cb: ({ noParam, param1, param2, nbParam }, escaper) => {
             if (nbParam > 2) {
-                Text.erP(escaper.getPlayer(), 'Wrong command parameters')
+                return USAGE
             }
 
             let withTerrain = true
             if (nbParam === 2) {
                 if (param2 !== 'withoutTerrain' && param2 !== 'wt') {
-                    Text.erP(escaper.getPlayer(), 'smic: wrong command parameters')
-                    return true
+                    return USAGE
                 }
                 withTerrain = false
             }
@@ -563,8 +560,7 @@ export const initExecuteCommandMax = () => {
             'Loads the specified map from cache created with -smic. If no parameter, loads the last cache saved during this game.',
         cb: ({ noParam, nbParam, param1 }, escaper) => {
             if (nbParam > 1) {
-                Text.erP(escaper.getPlayer(), 'Wrong command parameters')
-                return true
+                return USAGE
             }
 
             if (noParam && SaveMapInCache.lastSaveFile === '') {
@@ -917,10 +913,8 @@ export const initExecuteCommandMax = () => {
         description:
             'Mode can be "horizRect", "rect", "parallelogram", "trapeze", "circle" or "line" (defaults to "horizRect"). Direction for horizRect can be "up", "down", "left" or "right" (defaults to "up")',
         cb: ({ param1, param2, nbParam }, escaper) => {
-            const usageMsg = 'createDebugMecRegion: wrong parameters'
             if (nbParam > 2) {
-                Text.erP(escaper.getPlayer(), usageMsg)
-                return true
+                return USAGE
             }
 
             let mode: MakeMECRegionMode = 'horizRect'
@@ -935,16 +929,14 @@ export const initExecuteCommandMax = () => {
                 ) {
                     mode = param1
                 } else {
-                    Text.erP(escaper.getPlayer(), usageMsg)
-                    return true
+                    return USAGE
                 }
             }
 
             let directionForHorizontal: HorizontalRegionDirection = 'up'
             if (nbParam === 2) {
                 if (!['up', 'down', 'left', 'right'].includes(param2)) {
-                    Text.erP(escaper.getPlayer(), usageMsg)
-                    return true
+                    return USAGE
                 } else {
                     directionForHorizontal = param2 as HorizontalRegionDirection
                 }
@@ -965,25 +957,21 @@ export const initExecuteCommandMax = () => {
         argDescription: '[run] <testName> | speed <percentage> | stop | pause | resume',
         description: 'Handles the e2e tests.',
         cb: ({ param1, param2, nbParam }, escaper) => {
-            const usageMsg = 'e2e: bad command usage'
             if (nbParam > 2 || nbParam === 0) {
-                Text.erP(escaper.getPlayer(), usageMsg)
-                return true
+                return USAGE
             }
 
             switch (param1) {
                 case 'stop':
                     if (nbParam !== 1) {
-                        Text.erP(escaper.getPlayer(), usageMsg)
-                        return true
+                        return USAGE
                     }
                     e2e.stop()
                     break
 
                 case 'speed':
                     if (nbParam !== 2) {
-                        Text.erP(escaper.getPlayer(), usageMsg)
-                        return true
+                        return USAGE
                     }
                     const speed = Number(param2)
                     e2e.setSpeed(speed)
@@ -991,32 +979,28 @@ export const initExecuteCommandMax = () => {
 
                 case 'pause':
                     if (nbParam !== 1) {
-                        Text.erP(escaper.getPlayer(), usageMsg)
-                        return true
+                        return USAGE
                     }
                     e2e.pause()
                     break
 
                 case 'resume':
                     if (nbParam !== 1) {
-                        Text.erP(escaper.getPlayer(), usageMsg)
-                        return true
+                        return USAGE
                     }
                     e2e.resume()
                     break
 
                 case 'nextStep':
                     if (nbParam !== 1) {
-                        Text.erP(escaper.getPlayer(), usageMsg)
-                        return true
+                        return USAGE
                     }
                     e2e.nextStep()
                     break
 
                 case 'run':
                     if (nbParam !== 2) {
-                        Text.erP(escaper.getPlayer(), usageMsg)
-                        return true
+                        return USAGE
                     }
                     e2e.startTest(param2)
                     break
@@ -1038,8 +1022,7 @@ export const initExecuteCommandMax = () => {
         description: 'Disables all effects',
         cb: ({ param1, nbParam }, escaper) => {
             if (nbParam != 1 || !IsBoolString(param1)) {
-                Text.erP(escaper.getPlayer(), 'debugLongDistanceMove: bad parameters')
-                return true
+                return USAGE
             }
 
             globals.debugLongDistanceMoves = S2B(param1)

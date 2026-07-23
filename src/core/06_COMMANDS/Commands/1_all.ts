@@ -31,7 +31,7 @@ import { Globals } from '../../09_From_old_Worldedit_triggers/globals_variables_
 import { PRESS_TIME_TO_ENABLE_FOLLOW_MOUSE } from '../../Follow_mouse/Follow_mouse'
 import { GetStringAssignedFromCommand, KeyboardShortcut } from '../../Keyboard_shortcuts/KeyboardShortcut'
 import { Natives } from '../../wc3_natives_unsecured/Natives'
-import { glowCb, isPlayerId, resolvePlayerId, resolvePlayerIds } from '../Helpers/Command_functions'
+import { glowCb, isPlayerId, resolvePlayerId, resolvePlayerIds, USAGE } from '../Helpers/Command_functions'
 import { cameraFieldMap } from '../Helpers/commands-helpers'
 
 export const initCommandAll = () => {
@@ -1155,7 +1155,7 @@ export const initCommandAll = () => {
         name: 'leaderboard',
         alias: ['ldb'],
         group,
-        argDescription: 'on | off | mb|multiboard||reset | classic | global | current | speedrun',
+        argDescription: 'on | off | mb|multiboard|reset | classic | global | current | speedrun',
         description: 'Displays the leaderboard',
         cb: ({ nbParam, param1 }, escaper) => {
             if (nbParam === 1) {
@@ -1179,7 +1179,7 @@ export const initCommandAll = () => {
 
                 Text.mkP(escaper.getPlayer(), 'Leaderboard updated for yourself')
             } else {
-                Text.erP(escaper.getPlayer(), 'Leaderboard: wrong command parameters')
+                return USAGE
             }
 
             return true
@@ -1756,8 +1756,7 @@ export const initCommandAll = () => {
                 Text.P(escaper.getPlayer(), `Added command: '${targetCmd}'`)
             } else if (param1 === 'set') {
                 if (nbParam < 3) {
-                    Text.erP(escaper.getPlayer(), 'Usage: -msc set <commandNumber> <command>')
-                    return true
+                    return USAGE
                 }
 
                 if (S2I(param2) === 0) {
@@ -1799,8 +1798,7 @@ export const initCommandAll = () => {
         description: 'Disable partly or totally the graphical user interface',
         cb: ({ nbParam, param1 }, escaper) => {
             if (nbParam != 1) {
-                Text.erP(escaper.getPlayer(), 'wrong command parameters')
-                return true
+                return USAGE
             }
 
             let enable = false
@@ -1811,8 +1809,7 @@ export const initCommandAll = () => {
             } else if (IsBoolString(param1)) {
                 enable = S2B(param1)
             } else {
-                Text.erP(escaper.getPlayer(), 'wrong command parameters')
-                return true
+                return USAGE
             }
 
             if (!escaper.enableInterface(enable, showMinimap)) {
@@ -1986,8 +1983,7 @@ export const initCommandAll = () => {
         description: 'Lookup monsters by id, name, or comment',
         cb: ({ nbParam, param1 }, escaper) => {
             if (nbParam !== 1) {
-                Text.erP(escaper.getPlayer(), 'usage: -mdb <search>')
-                return true
+                return USAGE
             }
 
             const searchTerm = param1.toLowerCase()
@@ -2059,10 +2055,7 @@ export const initCommandAll = () => {
         cb: ({ param1, noParam, nbParam }, escaper) => {
             if (GetLocalPlayer() === escaper.getPlayer()) {
                 if (nbParam > 1) {
-                    Text.erP(
-                        escaper.getPlayer(),
-                        'grid: you can provide no parameter, or one parameter: boolean false, 1, 2 or 3'
-                    )
+                    return USAGE
                 } else if (noParam) {
                     DrawGrid()
                 } else {
@@ -2075,7 +2068,7 @@ export const initCommandAll = () => {
                     } else if (param1 === '3') {
                         DrawGrid(32)
                     } else {
-                        Text.erP(escaper.getPlayer(), `Invalid parameter. Use no parameter, boolean false, 1, 2 or 3.`)
+                        return USAGE
                     }
                 }
             }
@@ -2094,13 +2087,12 @@ export const initCommandAll = () => {
             'Set the grid opacity in percentage. You can choose values between 5, 10, 15, 25, 50, 75, and 100. Default opacities are 50%, 50%, 25%.',
         cb: ({ param1, param2, param3, nbParam }, escaper) => {
             if (GetLocalPlayer() === escaper.getPlayer()) {
-                const argumentsErrorMsg = 'setGridOpacity: you must provide a parameter: 25, 50, 75 or 100'
                 if (nbParam !== 1 && nbParam !== 3) {
-                    Text.erP(escaper.getPlayer(), argumentsErrorMsg)
+                    return USAGE
                 } else if (nbParam === 1) {
                     const opacity = S2I(param1)
                     if (!checkOpacityValue(opacity)) {
-                        Text.erP(escaper.getPlayer(), argumentsErrorMsg)
+                        return USAGE
                     } else if (SetGridOpacity(opacity)) {
                         Text.mkP(escaper.getPlayer(), `Grid opacity set to ${opacity}%`)
                     } else {
@@ -2112,7 +2104,7 @@ export const initCommandAll = () => {
                     const opacity3 = S2I(param3)
 
                     if (!checkOpacityValue(opacity1) || !checkOpacityValue(opacity2) || !checkOpacityValue(opacity3)) {
-                        Text.erP(escaper.getPlayer(), argumentsErrorMsg)
+                        return USAGE
                     } else if (SetGridOpacityForAllGrids(opacity1, opacity2, opacity3)) {
                         Text.mkP(escaper.getPlayer(), `Grid opacities set to ${opacity1}%, ${opacity2}%, ${opacity3}%`)
                     } else {
@@ -2134,8 +2126,7 @@ export const initCommandAll = () => {
         description: 'Enable of debug collisions for yourself. Shows collisions circles around units.',
         cb: ({ param1, nbParam }, escaper) => {
             if (nbParam !== 1 || !IsBoolString(param1)) {
-                Text.erP(escaper.getPlayer(), 'debugCollisions: you must provide one boolean parameter: true or false')
-                return true
+                return USAGE
             }
 
             escaper.setDisplayCollisionLandmarks(S2B(param1))
@@ -2150,8 +2141,8 @@ export const initCommandAll = () => {
         name: 'slidingMode',
         alias: [],
         group,
-        argDescription: '[normal] | [max] | []',
-        description: 'Run commands on start of the game',
+        argDescription: '[normal|max]',
+        description: 'Change your sliding mode',
         cb: ({ cmd, nbParam, param1 }, escaper) => {
             if (nbParam == 0) {
                 Text.mkP(escaper.getPlayer(), 'your sliding mode is ' + escaper.slidingMode)
@@ -2162,7 +2153,7 @@ export const initCommandAll = () => {
                     escaper.slidingMode = param1
                     Text.mkP(escaper.getPlayer(), 'changed sliding mode')
                 } else {
-                    Text.erP(escaper.getPlayer(), 'wrong sliding mode')
+                    return USAGE
                 }
             }
 
