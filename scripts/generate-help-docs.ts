@@ -120,6 +120,25 @@ class CommandParser {
     }
 
     /**
+     * If the enclosing function declares a shared `const group = '...'` before this registerCommand call
+     * (this codebase's convention for command files), return that line so it can be prepended to the
+     * extracted block - the isolated eval below wouldn't otherwise see it.
+     */
+    private getGroupDeclaration(lines: string[], startLine: number): string {
+        // Value must be a quoted string literal ('all', 'make', ...) - this excludes unrelated same-named
+        // locals inside a command's own callback body (e.g. `const group = Natives.UCreateGroup()`).
+        const groupDeclarationRegex = /^\s*const group = (['"]).*\1\s*$/
+
+        for (let i = startLine - 1; i >= 0; i--) {
+            if (groupDeclarationRegex.test(lines[i])) {
+                return lines[i] + '\n'
+            }
+        }
+
+        return ''
+    }
+
+    /**
      * Extract command information from registerCommand call
      */
     private extractCommandInfo(content: string, startLine: number, filePath: string) {
@@ -149,9 +168,11 @@ class CommandParser {
                 i++
             }
 
+            const preamble = this.getGroupDeclaration(lines, startLine)
+
             const nbRegisteredCommandsBefore = this.commands.length
 
-            const commandBlockJS = tsToJs(commandBlock)
+            const commandBlockJS = tsToJs(preamble + commandBlock)
             eval(commandBlockJS)
 
             if (this.commands.length === nbRegisteredCommandsBefore) {
