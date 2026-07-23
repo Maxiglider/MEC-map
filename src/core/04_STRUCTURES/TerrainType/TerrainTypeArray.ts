@@ -79,6 +79,16 @@ export class TerrainTypeArray extends BaseArray<TerrainType> {
         return null
     }
 
+    getByTerrainTypeId = (terrainTypeId: number): TerrainType | null => {
+        for (const [_, terrainType] of pairs(this.data)) {
+            if (terrainType.getTerrainTypeId() === terrainTypeId) {
+                return terrainType
+            }
+        }
+
+        return null
+    }
+
     isTerrainTypeIdAlreadyUsed = (terrainTypeId: number) => {
         for (const [_, terrainType] of pairs(this.data)) {
             if (terrainType.getTerrainTypeId() === terrainTypeId) {

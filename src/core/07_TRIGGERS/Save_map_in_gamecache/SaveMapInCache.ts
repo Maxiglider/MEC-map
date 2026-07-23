@@ -1,8 +1,14 @@
 import { MemoryHandler } from 'Utils/MemoryHandler'
 import { Constants } from 'core/01_libraries/Constants'
 import { SaveLoad } from 'core/04_STRUCTURES/Escaper/Escaper_StartCommands'
-import { getUdgCasterTypes, getUdgLevels, getUdgMonsterTypes, getUdgTerrainTypes, globals } from '../../../../globals'
-import { PROD } from '../../../env'
+import {
+    getUdgCasterTypes,
+    getUdgLevels,
+    getUdgMonsterTypes,
+    getUdgTerrainSaves,
+    getUdgTerrainTypes,
+    globals,
+} from '../../../../globals'
 import { jsonEncode } from '../../01_libraries/Basic_functions'
 import { Text } from '../../01_libraries/Text'
 import { Gravity } from '../Slide_and_CheckTerrain_triggers/Gravity'
@@ -50,6 +56,10 @@ export class SaveMapInCache {
         //save levels
         jsonGameData.levels = getUdgLevels().toJson()
         Text.A('levels saved')
+
+        //terrain saves
+        jsonGameData.terrainSaves = getUdgTerrainSaves().toJson()
+        Text.A('terrain saves saved')
 
         //output
         const objData = MemoryHandler.getEmptyObject<{ [x: string]: any }>()

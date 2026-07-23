@@ -4,12 +4,14 @@ import {
     setUdgEscapers,
     setUdgLevels,
     setUdgMonsterTypes,
+    setUdgTerrainSaves,
     setUdgTerrainTypes,
 } from '../../../globals'
-import { LevelArray } from '../04_STRUCTURES/Level/LevelArray'
-import { TerrainTypeArray } from '../04_STRUCTURES/TerrainType/TerrainTypeArray'
-import { MonsterTypeArray } from '../04_STRUCTURES/Monster/MonsterTypeArray'
 import { CasterTypeArray } from '../04_STRUCTURES/Caster/CasterTypeArray'
+import { LevelArray } from '../04_STRUCTURES/Level/LevelArray'
+import { MonsterTypeArray } from '../04_STRUCTURES/Monster/MonsterTypeArray'
+import { TerrainSaveArray } from '../04_STRUCTURES/TerrainSave/TerrainSaveArray'
+import { TerrainTypeArray } from '../04_STRUCTURES/TerrainType/TerrainTypeArray'
 
 //Escapers
 const initEscapers = () => {
@@ -36,6 +38,11 @@ export const initCasterTypes = () => {
     setUdgCasterTypes(new CasterTypeArray())
 }
 
+//Terrain saves
+export const initTerrainSaves = () => {
+    setUdgTerrainSaves(new TerrainSaveArray())
+}
+
 //Init all arrays
 export const initArrays = () => {
     initEscapers()
@@ -43,4 +50,5 @@ export const initArrays = () => {
     initTerrainTypes()
     initMonsterTypes()
     initCasterTypes()
+    initTerrainSaves()
 }

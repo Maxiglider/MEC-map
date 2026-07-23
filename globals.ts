@@ -1,11 +1,12 @@
+import { Constants } from './src/core/01_libraries/Constants'
 import type { CasterTypeArray } from './src/core/04_STRUCTURES/Caster/CasterTypeArray'
 import type { EscaperArray } from './src/core/04_STRUCTURES/Escaper/EscaperArray'
 import type { LevelArray } from './src/core/04_STRUCTURES/Level/LevelArray'
 import type { Monster } from './src/core/04_STRUCTURES/Monster/Monster'
 import type { MonsterType } from './src/core/04_STRUCTURES/Monster/MonsterType'
 import type { MonsterTypeArray } from './src/core/04_STRUCTURES/Monster/MonsterTypeArray'
+import type { TerrainSaveArray } from './src/core/04_STRUCTURES/TerrainSave/TerrainSaveArray'
 import type { TerrainTypeArray } from './src/core/04_STRUCTURES/TerrainType/TerrainTypeArray'
-import { Constants } from './src/core/01_libraries/Constants'
 import { Natives } from './src/core/wc3_natives_unsecured/Natives'
 
 //GLOBALS
@@ -16,6 +17,7 @@ export const globals: {
     terrainTypes?: TerrainTypeArray
     casterTypes?: CasterTypeArray
     monsterTypes?: MonsterTypeArray
+    terrainSaves?: TerrainSaveArray
     coopModeActive?: boolean
     autoreviveDelay?: number
     logStrings: string[]
@@ -139,6 +141,17 @@ export const setUdgMonsterTypes = (mta: MonsterTypeArray) => {
 export const getUdgMonsterTypes = (): MonsterTypeArray => {
     //print('called getUdgMonsterTypes')
     return <MonsterTypeArray>globals.monsterTypes
+}
+
+//Terrain saves
+export const setUdgTerrainSaves = (tsa: TerrainSaveArray) => {
+    //print('called setUdgTerrainSaves')
+    globals.terrainSaves = tsa
+}
+
+export const getUdgTerrainSaves = (): TerrainSaveArray => {
+    //print('called getUdgTerrainSaves')
+    return <TerrainSaveArray>globals.terrainSaves
 }
 
 //Monsters

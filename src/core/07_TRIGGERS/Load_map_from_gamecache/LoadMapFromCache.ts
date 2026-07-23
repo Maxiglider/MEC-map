@@ -2,14 +2,21 @@ import {
     getUdgCasterTypes,
     getUdgLevels,
     getUdgMonsterTypes,
+    getUdgTerrainSaves,
     getUdgTerrainTypes,
     globals,
     setHeroBaseCollisionSize,
 } from '../../../../globals'
 import { jsonDecode } from '../../01_libraries/Basic_functions'
 import { Text } from '../../01_libraries/Text'
+import {
+    initCasterTypes,
+    initLevels,
+    initMonsterTypes,
+    initTerrainSaves,
+    initTerrainTypes,
+} from '../../Init/initArrays'
 import { Gravity } from '../Slide_and_CheckTerrain_triggers/Gravity'
-import { initCasterTypes, initLevels, initMonsterTypes, initTerrainTypes } from '../../Init/initArrays'
 
 export class LoadMapFromCache {
     public static gameDataJsonString: string | null = null
@@ -29,10 +36,12 @@ export class LoadMapFromCache {
                     getUdgCasterTypes().destroy()
                     getUdgMonsterTypes().destroy()
                     getUdgTerrainTypes().destroy()
+                    getUdgTerrainSaves().destroy()
                     initTerrainTypes()
                     initMonsterTypes()
                     initCasterTypes()
                     initLevels()
+                    initTerrainSaves()
                 }
 
                 // game properties
@@ -92,6 +101,11 @@ export class LoadMapFromCache {
                 //levels
                 if (gameData.levels) {
                     getUdgLevels().newFromJson(gameData.levels)
+                }
+
+                //terrain saves - must run after levels, since level-scoped terrain saves resolve their Level by id
+                if (gameData.terrainSaves) {
+                    getUdgTerrainSaves().newFromJson(gameData.terrainSaves)
                 }
 
                 if (!currentlyOnGameStart) {
