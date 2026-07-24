@@ -5,8 +5,15 @@ export const GetNbCaseBetween = (minX: number, minY: number, maxX: number, maxY:
     return R2I((maxX - minX) / Constants.LARGEUR_CASE) * R2I((maxY - minY) / Constants.LARGEUR_CASE)
 }
 
-export const ChangeTerrainType = (x: number, y: number, terrainTypeId: number) => {
-    SetTerrainType(x, y, terrainTypeId, -1, 1, 0)
+export const ChangeTerrainType = (x: number, y: number, terrainTypeId: number, forceVariationUpdate = false) => {
+    let doUpdate = forceVariationUpdate
+    if (!forceVariationUpdate) {
+        doUpdate = terrainTypeId !== GetTerrainType(x, y)
+    }
+
+    if (doUpdate) {
+        SetTerrainType(x, y, terrainTypeId, -1, 1, 0)
+    }
 }
 
 export const ChangeTerrainBetween = (terrainType: number, x1: number, y1: number, x2: number, y2: number): boolean => {

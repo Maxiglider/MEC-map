@@ -26,7 +26,7 @@ const initReinitTerrainsPositions = () => {
                     //mise à jour used terrain (-ut)
                     AddNewTerrain(terrainType)
                     //changer variations
-                    ChangeTerrainType(x, y, terrainType)
+                    ChangeTerrainType(x, y, terrainType, true)
                     //sauvegarde du terrain
                     TERRAIN_SAVE[terrainSave_id] = TerrainTypeId2TerrainType(terrainType)
                     terrainSave_id = terrainSave_id + 1
