@@ -1,3 +1,4 @@
+import { udg_monsters } from '../../../../globals'
 import { createTimer } from '../../../Utils/mapUtils'
 import { Constants } from '../../01_libraries/Constants'
 import { EstChiffre } from '../../01_libraries/Functions_on_numbers'
@@ -70,8 +71,13 @@ export const formatTerrainSaveEventConditionText = (condition: TerrainSaveEventC
         case 'levelStart':
         case 'levelEnd':
             return `${condition.kind} (level ${condition.levelNum})`
-        case 'monsterTouch':
-            return `monsterTouch (monster #${condition.monsterId})`
+        case 'monsterTouch': {
+            let text = `monsterTouch (monster #${condition.monsterId})`
+            if (!udg_monsters[condition.monsterId]) {
+                text += udg_colorCode[Constants.ORANGE] + ' [target monster no longer exists]|r'
+            }
+            return text
+        }
     }
 }
 
@@ -109,4 +115,11 @@ export const displayTerrainSaveEventDetail = (event: TerrainSaveEvent, p: player
     text += `    periodic: ${event.periodicInterval !== undefined ? event.periodicInterval + 's' : 'none'}`
 
     Text.P_timed(p, Constants.TERRAIN_DATA_DISPLAY_TIME, text)
+
+    if (event.condition.kind === 'monsterTouch') {
+        const monster = udg_monsters[event.condition.monsterId]
+        if (monster?.u) {
+            SetCameraPositionForPlayer(p, GetUnitX(monster.u), GetUnitY(monster.u))
+        }
+    }
 }

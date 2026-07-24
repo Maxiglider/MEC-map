@@ -6,9 +6,9 @@ import { createEvent } from 'Utils/mapUtils'
 import { Constants } from 'core/01_libraries/Constants'
 import { Monster } from 'core/04_STRUCTURES/Monster/Monster'
 import { hooks } from 'core/API/GeneralHooks'
-import { getUdgEscapers, udg_monsters, udg_spawned_monsters } from '../../../../globals'
-import { Natives } from '../../wc3_natives_unsecured/Natives'
+import { getUdgEscapers, getUdgTerrainSaves, udg_monsters, udg_spawned_monsters } from '../../../../globals'
 import type { Escaper } from '../../04_STRUCTURES/Escaper/Escaper'
+import { Natives } from '../../wc3_natives_unsecured/Natives'
 
 const InitTrig_InvisUnit_is_getting_damage = () => {
     let TAILLE_UNITE = 100
@@ -132,6 +132,18 @@ const onEscaperTouchingMonster = (escaper: Escaper, killingUnit: unit) => {
     if (lifeBonus) {
         monster?.onEscaperReachingThisLifeBonus(escaper)
         return
+    }
+
+    // A monster that's both a "book of life" and a monsterTouch event target only ever behaves as the book
+    // of life (handled above) - this branch is only reached when it has no life bonus.
+    if (monster) {
+        const monsterTouchEvents = getUdgTerrainSaves().findMonsterTouchEventsByMonsterId(monster.getId())
+        if (monsterTouchEvents.length > 0) {
+            for (const event of monsterTouchEvents) {
+                event.fire()
+            }
+            return
+        }
     }
 
     if (escaper.isGodModeOn()) {

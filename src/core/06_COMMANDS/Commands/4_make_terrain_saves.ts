@@ -351,15 +351,15 @@ export const initExecuteCommandMake_terrain_saves = () => {
         },
     })
 
-    //-createTerrainSaveEvent(ctse) <terrainSaveLabel> <apply|unapply> <levelStart|levelEnd> [delay=<seconds>] [periodic=<seconds>]
+    //-createTerrainSaveEvent(ctse) <terrainSaveLabel> <apply|unapply> <levelStart|levelEnd|monsterTouch> [delay=<seconds>] [periodic=<seconds>]
     registerCommand({
         name: 'createTerrainSaveEvent',
         alias: ['ctse'],
         group,
         argDescription:
-            '<terrainSaveLabel> <apply|unapply> <levelStart|levelEnd> [delay=<seconds>] [periodic=<seconds>]',
+            '<terrainSaveLabel> <apply|unapply> <levelStart|levelEnd|monsterTouch> [delay=<seconds>] [periodic=<seconds>]',
         description:
-            "Creates an event that automatically applies/unapplies a terrain save. For levelStart/levelEnd, the level used is the terrain save's own level if it has one, otherwise your current making level",
+            "Creates an event that automatically applies/unapplies a terrain save. For levelStart/levelEnd, the level used is the terrain save's own level if it has one, otherwise your current making level. For monsterTouch, click on a hand-placed monster to target it",
         cb: ({ nbParam, param1, param2, param3, param4, param5 }, escaper) => {
             if (nbParam < 3 || nbParam > 5) {
                 return USAGE
@@ -375,7 +375,7 @@ export const initExecuteCommandMake_terrain_saves = () => {
                 return USAGE
             }
 
-            if (param3 !== 'levelStart' && param3 !== 'levelEnd') {
+            if (param3 !== 'levelStart' && param3 !== 'levelEnd' && param3 !== 'monsterTouch') {
                 return USAGE
             }
 
@@ -403,6 +403,21 @@ export const initExecuteCommandMake_terrain_saves = () => {
                 } else {
                     return USAGE
                 }
+            }
+
+            if (param3 === 'monsterTouch') {
+                const make = escaper.makeSelectMonsterForEvent(monsterId => {
+                    const condition: TerrainSaveEventCondition = { kind: 'monsterTouch', monsterId }
+                    const event = terrainSave.addEvent(condition, param2, delay, periodic)
+                    Text.mkP(escaper.getPlayer(), `terrain save event #${event.getId()} created`)
+                })
+
+                if (make) {
+                    Text.mkP(escaper.getPlayer(), make.getMakingMessage())
+                } else {
+                    Text.erP(escaper.getPlayer(), 'failed to initiate the creation of the terrain save event')
+                }
+                return true
             }
 
             const levelNum = terrainSave.getLevel()?.id ?? escaper.getMakingLevel().id
@@ -475,16 +490,16 @@ export const initExecuteCommandMake_terrain_saves = () => {
         },
     })
 
-    //-editTerrainSaveEvent(etse) <eventId> <action|delay|periodic|level> <value>
+    //-editTerrainSaveEvent(etse) <eventId> <action|delay|periodic|level|target> [<value>]
     registerCommand({
         name: 'editTerrainSaveEvent',
         alias: ['etse'],
         group,
-        argDescription: '<eventId> <action|delay|periodic|level> <value>',
+        argDescription: '<eventId> <action|delay|periodic|level|target> [<value>]',
         description:
-            'Edits a terrain save event. action: apply|unapply. delay/periodic: <seconds>|none. level (levelStart/levelEnd events only): <levelNum>|current|c',
+            'Edits a terrain save event. action: apply|unapply. delay/periodic: <seconds>|none. level (levelStart/levelEnd events only): <levelNum>|current|c. target (monsterTouch events only): click on a hand-placed monster to retarget, no value typed',
         cb: ({ nbParam, param1, param2, param3 }, escaper) => {
-            if (nbParam !== 3 || !IsPositiveInteger(param1)) {
+            if (nbParam < 2 || nbParam > 3 || !IsPositiveInteger(param1)) {
                 return USAGE
             }
 
@@ -495,6 +510,29 @@ export const initExecuteCommandMake_terrain_saves = () => {
             }
 
             const field = param2
+
+            if (field === 'target') {
+                if (event.condition.kind !== 'monsterTouch') {
+                    Text.erP(escaper.getPlayer(), 'the "target" field only applies to monsterTouch events')
+                    return true
+                }
+
+                const make = escaper.makeSelectMonsterForEvent(monsterId => {
+                    event.condition = { kind: 'monsterTouch', monsterId }
+                    Text.mkP(escaper.getPlayer(), `terrain save event #${event.getId()} retargeted`)
+                })
+
+                if (make) {
+                    Text.mkP(escaper.getPlayer(), make.getMakingMessage())
+                } else {
+                    Text.erP(escaper.getPlayer(), 'failed to initiate the retargeting of the terrain save event')
+                }
+                return true
+            }
+
+            if (nbParam !== 3) {
+                return USAGE
+            }
 
             if (field === 'action') {
                 if (param3 !== 'apply' && param3 !== 'unapply') {

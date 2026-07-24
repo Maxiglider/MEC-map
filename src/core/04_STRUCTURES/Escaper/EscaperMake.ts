@@ -52,6 +52,7 @@ import { MakeTerrainCreateBrush } from '../../05_MAKE_STRUCTURES/Make_terrain/Ma
 import { MakeTerrainHorizontalSymmetry } from '../../05_MAKE_STRUCTURES/Make_terrain/MakeTerrainHorizontalSymmetry'
 import { MakeTerrainVerticalSymmetry } from '../../05_MAKE_STRUCTURES/Make_terrain/MakeTerrainVerticalSymmetry'
 import { MakeTerrainHeight } from '../../05_MAKE_STRUCTURES/Make_terrain_height/MakeTerrainHeight'
+import { MakeSelectMonsterForEvent } from '../../05_MAKE_STRUCTURES/Make_terrain_save/MakeSelectMonsterForEvent'
 import { MakeTerrainSaveZone } from '../../05_MAKE_STRUCTURES/Make_terrain_save/MakeTerrainSaveZone'
 import { MakeUpdateTerrainSaveZone } from '../../05_MAKE_STRUCTURES/Make_terrain_save/MakeUpdateTerrainSaveZone'
 import { MakeAction } from '../../05_MAKE_STRUCTURES/MakeLastActions/MakeAction'
@@ -307,6 +308,17 @@ export abstract class EscaperMake {
             const makeUpdateTerrainSaveZone = new MakeUpdateTerrainSaveZone(this.hero, terrainSave)
             this.make = makeUpdateTerrainSaveZone
             return makeUpdateTerrainSaveZone
+        }
+
+        return null
+    }
+
+    makeSelectMonsterForEvent(onSelected: (this: void, monsterId: number) => void) {
+        this.destroyMake()
+        if (this.hero) {
+            const makeSelectMonsterForEvent = new MakeSelectMonsterForEvent(this.hero, onSelected)
+            this.make = makeSelectMonsterForEvent
+            return makeSelectMonsterForEvent
         }
 
         return null

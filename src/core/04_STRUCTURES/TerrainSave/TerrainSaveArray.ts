@@ -87,6 +87,22 @@ export class TerrainSaveArray extends BaseArray<TerrainSave> {
         return null
     }
 
+    // Global scan for every monsterTouch event targeting a given monster - used by onEscaperTouchingMonster.
+    // A linear scan is fine here: total terrain saves/events on a map is small, unlike per-frame hot loops.
+    findMonsterTouchEventsByMonsterId = (monsterId: number): TerrainSaveEvent[] => {
+        const result: TerrainSaveEvent[] = []
+
+        for (const [_, terrainSave] of pairs(this.data)) {
+            terrainSave.getEvents().forAll(event => {
+                if (event.condition.kind === 'monsterTouch' && event.condition.monsterId === monsterId) {
+                    result.push(event)
+                }
+            })
+        }
+
+        return result
+    }
+
     // Removes a TerrainSave by object reference (BaseArray only exposes destroyOne(id), and this array
     // doesn't track ids on the instances themselves - manageIds=true just uses an internal counter as key).
     remove = (terrainSave: TerrainSave): boolean => {
