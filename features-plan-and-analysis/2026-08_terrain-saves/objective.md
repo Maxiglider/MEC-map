@@ -21,7 +21,7 @@
 - `unloadTerrain` (`ult`) `<label>`
   - unapply the terrain save `<label>`, restoring the terrain to what it was right before it was applied. Error if not currently applied.
 - `displayTerrainSave` (`dts`) `[<label>|<levelNum>|global|g|current|c] [page]`
-  - without parameter, displays global terrain saves then the current level's, paginated
+  - without parameter, displays every terrain save regardless of level/global, paginated
   - a plain number shows only that level's terrain saves; `global`/`g` or `current`/`c` filter accordingly
   - with a label, displays name, level (or "global"), "whole map" or MECRegion detailled text + move camera to the center of the zone (except if whole map) and displays debugRects of the mecRegion
 - `updateTerrainSave` (`uts`) `<label> [all|rect]`
@@ -49,15 +49,19 @@ Events will be stored in the `TerrainSave` class.
 
 A terrain save could be unapplied only after being applied (an application of it will save the previous terrain state to be able to unapply). Re-applying an already-applied terrain save re-paints its content without touching the saved "previous state" snapshot, so the original state is never lost as long as at least one `apply()` happened since the last `unapply()`.
 
+An event can also have a `duration`: independently of `periodic`, once the (possibly delayed) configured action has fired, waiting `duration` seconds then automatically performing the opposite action once (e.g. apply, then auto-unapply after `duration` seconds) — useful for a temporary terrain change.
+
+An event can also have an `onLvlEnd` (only valid, and only ever fires, for an event whose terrain save isn't global): `apply`/`unapply` forces that action when the terrain save's own level ends, regardless of the event's own delay/periodic/duration state; `stop` just cancels any currently-running delay/periodic timer without applying or unapplying anything.
+
 ### Commands to manage terrain saves events
 
-- `createTerrainSaveEvent` (`ctse`) `<terrainSaveLabel> <apply|unapply> <levelStart|levelEnd|monsterTouch> [delay=<seconds>] [periodic=<seconds>]`
+- `createTerrainSaveEvent` (`ctse`) `<terrainSaveLabel> <apply|unapply> <levelStart|levelEnd|monsterTouch> [delay=<seconds>] [periodic=<seconds>] [duration=<seconds>] [onLvlEnd=apply|unapply|stop]`
   - for `levelStart`/`levelEnd`, the level is deduced automatically (the terrain save's own level, or the current level if the terrain save is global) — not typed.
   - for `monsterTouch`, starts a click-to-target flow; the event is created once a matching monster is clicked.
 - `removeTerrainSaveEvent` (`rtse`) `<eventId>`
 - `changeEventTerrainSave` (`cets`) `<eventId> <newTerrainSaveLabel>` (change the terrain save associated to an event)
 - `editTerrainSaveEvent` (`etse`) `<eventId> <field> [<value>]`
-  - edits any parameter of an existing event (`action`, `delay`, `periodic`, `level` for level-based events, `target` for monster-touch events). Retargeting a monster always goes through the click flow, never a typed id.
+  - edits any parameter of an existing event (`action`, `delay`, `periodic`, `duration`, `onLvlEnd`, `level` for level-based events, `target` for monster-touch events). Retargeting a monster always goes through the click flow, never a typed id.
 - `displayTerrainSaveEvent` (`dtse`) `[<terrainSaveLabel>|<eventId>]`
   - without any parameter, displays every event in the game (paginated), each prefixed by its owning terrain save's label
   - with a terrain save label, displays that save's events only, with an id for each (id absolute, not relative to the terrain save)

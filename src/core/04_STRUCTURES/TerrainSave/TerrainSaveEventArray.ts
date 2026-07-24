@@ -1,6 +1,11 @@
 import { BaseArray } from '../BaseArray'
 import type { TerrainSave } from './TerrainSave'
-import { TerrainSaveEvent, TerrainSaveEventAction, TerrainSaveEventCondition } from './TerrainSaveEvent'
+import {
+    TerrainSaveEvent,
+    TerrainSaveEventAction,
+    TerrainSaveEventCondition,
+    TerrainSaveEventOnLvlEnd,
+} from './TerrainSaveEvent'
 
 // One instance per TerrainSave (owned, not a global collection). manageIds=false since each TerrainSaveEvent
 // already owns a globally-unique id (TerrainSaveEvent.getNextId()), same mode as MonsterSpawnArray.
@@ -14,9 +19,11 @@ export class TerrainSaveEventArray extends BaseArray<TerrainSaveEvent> {
         condition: TerrainSaveEventCondition,
         action: TerrainSaveEventAction,
         delay?: number,
-        periodicInterval?: number
+        periodicInterval?: number,
+        duration?: number,
+        onLvlEnd?: TerrainSaveEventOnLvlEnd
     ): TerrainSaveEvent => {
-        const event = new TerrainSaveEvent(terrainSave, condition, action, delay, periodicInterval)
+        const event = new TerrainSaveEvent(terrainSave, condition, action, delay, periodicInterval, duration, onLvlEnd)
         this._new(event)
         event.register()
 
@@ -25,7 +32,15 @@ export class TerrainSaveEventArray extends BaseArray<TerrainSaveEvent> {
 
     newFromJson = (terrainSave: TerrainSave, eventsJson: { [x: string]: any }[]) => {
         for (const eventJson of eventsJson) {
-            this.new(terrainSave, eventJson.condition, eventJson.action, eventJson.delay, eventJson.periodicInterval)
+            this.new(
+                terrainSave,
+                eventJson.condition,
+                eventJson.action,
+                eventJson.delay,
+                eventJson.periodicInterval,
+                eventJson.duration,
+                eventJson.onLvlEnd
+            )
         }
     }
 

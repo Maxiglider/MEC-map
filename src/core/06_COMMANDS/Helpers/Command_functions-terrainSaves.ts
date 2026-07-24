@@ -17,12 +17,34 @@ export const isNewTerrainSaveLabelValid = (label: string): boolean => {
     return !EstChiffre(firstChar) && firstChar !== '-'
 }
 
+// Global first, then by level id ascending, then alphabetically by label - used by displayTerrainSave's list view
+export const compareTerrainSavesForDisplay = (a: TerrainSave, b: TerrainSave): number => {
+    const levelA = a.getLevel()
+    const levelB = b.getLevel()
+
+    if (levelA === null && levelB !== null) {
+        return -1
+    }
+    if (levelA !== null && levelB === null) {
+        return 1
+    }
+    if (levelA !== null && levelB !== null && levelA.id !== levelB.id) {
+        return levelA.id - levelB.id
+    }
+
+    const labelA = a.getLabel()
+    const labelB = b.getLabel()
+    return labelA < labelB ? -1 : labelA > labelB ? 1 : 0
+}
+
 export const formatTerrainSaveSummaryLine = (terrainSave: TerrainSave): string => {
     const level = terrainSave.getLevel()
     const levelText = level === null ? 'global' : `level ${level.id}`
     const zoneText = terrainSave.isWholeMap() ? 'whole map' : 'zone'
+    const levelPrefix = level !== null ? udg_colorCode[Constants.PINK] + `${level.id}-` : ''
 
     return (
+        levelPrefix +
         udg_colorCode[Constants.RED] +
         terrainSave.getLabel() +
         udg_colorCode[Constants.GREY] +
@@ -33,19 +55,16 @@ export const formatTerrainSaveSummaryLine = (terrainSave: TerrainSave): string =
 export const displayTerrainSaveDetail = (terrainSave: TerrainSave, p: player) => {
     const level = terrainSave.getLevel()
     const levelText = level === null ? 'global' : `level ${level.id}`
+    const grey = udg_colorCode[Constants.GREY]
+    const makeColor = Text.MAKE_TEXT_COLORCODE
 
-    let text =
-        udg_colorCode[Constants.RED] + terrainSave.getLabel() + udg_colorCode[Constants.GREY] + ` (${levelText})|r\n`
+    let text = udg_colorCode[Constants.RED] + terrainSave.getLabel() + grey + ` (${levelText})|r\n`
 
     const zone = terrainSave.getZone()
-    if (zone === null) {
-        text += '    whole map\n'
-    } else {
-        text += `    ${zone.getSurface()} tiles (${zone.getSurfacePercent()}%)\n`
-    }
+    text += `${grey}    surface: |r${makeColor}${zone === null ? 'whole map' : `${zone.getSurface()} tiles (${zone.getSurfacePercent()}%)`}|r\n`
 
-    text += `    applied: ${terrainSave.isApplied() ? 'yes' : 'no'}\n`
-    text += `    events: ${terrainSave.getEvents().count()}`
+    text += `${grey}    applied: |r${makeColor}${terrainSave.isApplied() ? 'yes' : 'no'}|r\n`
+    text += `${grey}    events: |r${makeColor}${terrainSave.getEvents().count()}|r`
 
     Text.P_timed(p, Constants.TERRAIN_DATA_DISPLAY_TIME, text)
 
@@ -82,7 +101,24 @@ const formatTerrainSaveEventTimingText = (event: TerrainSaveEvent): string => {
     if (event.periodicInterval !== undefined) {
         text += `, period ${event.periodicInterval}s`
     }
+    if (event.duration !== undefined) {
+        text += `, duration ${event.duration}s`
+    }
+    if (event.onLvlEnd !== undefined) {
+        text += `, onLvlEnd ${event.onLvlEnd}`
+    }
     return text
+}
+
+// Grouped by owning TerrainSave (same order as displayTerrainSave's list), then by event id descending
+// (newest first) within each TerrainSave - used by displayTerrainSaveEvent's list view
+export const compareTerrainSaveEventsForDisplay = (a: TerrainSaveEvent, b: TerrainSaveEvent): number => {
+    const terrainSaveComparison = compareTerrainSavesForDisplay(a.terrainSave, b.terrainSave)
+    if (terrainSaveComparison !== 0) {
+        return terrainSaveComparison
+    }
+
+    return b.getId() - a.getId()
 }
 
 // withOwnerLabel: the "all events in the game" list prefixes each line with its owning TerrainSave's label;
@@ -91,6 +127,10 @@ export const formatTerrainSaveEventSummaryLine = (event: TerrainSaveEvent, withO
     let text = udg_colorCode[Constants.GREY] + `#${event.getId()}|r `
 
     if (withOwnerLabel) {
+        const level = event.terrainSave.getLevel()
+        if (level !== null) {
+            text += udg_colorCode[Constants.PINK] + `${level.id}-`
+        }
         text += udg_colorCode[Constants.RED] + event.terrainSave.getLabel() + udg_colorCode[Constants.GREY] + ' - |r'
     }
 
@@ -100,12 +140,20 @@ export const formatTerrainSaveEventSummaryLine = (event: TerrainSaveEvent, withO
 }
 
 export const displayTerrainSaveEventDetail = (event: TerrainSaveEvent, p: player) => {
-    let text = udg_colorCode[Constants.GREY] + `Event #${event.getId()}|r\n`
-    text += `    terrain save: ${event.terrainSave.getLabel()}\n`
-    text += `    condition: ${formatTerrainSaveEventConditionText(event.condition)}\n`
-    text += `    action: ${event.action}\n`
-    text += `    delay: ${event.delay !== undefined ? event.delay + 's' : 'none'}\n`
-    text += `    period: ${event.periodicInterval !== undefined ? event.periodicInterval + 's' : 'none'}`
+    const level = event.terrainSave.getLevel()
+    const levelPrefix = level !== null ? udg_colorCode[Constants.PINK] + `${level.id}-` : ''
+    const grey = udg_colorCode[Constants.GREY]
+
+    const makeColor = Text.MAKE_TEXT_COLORCODE
+
+    let text = `Event #${makeColor}${event.getId()}|r\n`
+    text += `${grey}    terrain save: |r${levelPrefix}${udg_colorCode[Constants.RED]}${event.terrainSave.getLabel()}|r\n`
+    text += `${grey}    condition: |r${makeColor}${formatTerrainSaveEventConditionText(event.condition)}|r\n`
+    text += `${grey}    action: |r${makeColor}${event.action}|r\n`
+    text += `${grey}    delay: |r${makeColor}${event.delay !== undefined ? event.delay + 's' : 'none'}|r\n`
+    text += `${grey}    period: |r${makeColor}${event.periodicInterval !== undefined ? event.periodicInterval + 's' : 'none'}|r\n`
+    text += `${grey}    duration: |r${makeColor}${event.duration !== undefined ? event.duration + 's' : 'none'}|r\n`
+    text += `${grey}    onLvlEnd: |r${makeColor}${event.onLvlEnd ?? 'none'}|r`
 
     Text.P_timed(p, Constants.TERRAIN_DATA_DISPLAY_TIME, text)
 

@@ -7,11 +7,15 @@ import { Text } from '../../01_libraries/Text'
 import type { Level } from '../../04_STRUCTURES/Level/Level'
 import type { TerrainSave } from '../../04_STRUCTURES/TerrainSave/TerrainSave'
 import type {
+    TerrainSaveEvent,
     TerrainSaveEventAction,
     TerrainSaveEventCondition,
+    TerrainSaveEventOnLvlEnd,
 } from '../../04_STRUCTURES/TerrainSave/TerrainSaveEvent'
 import { parseKeyValueParam, USAGE } from '../Helpers/Command_functions'
 import {
+    compareTerrainSaveEventsForDisplay,
+    compareTerrainSavesForDisplay,
     displayTerrainSaveDetail,
     displayTerrainSaveEventDetail,
     formatTerrainSaveEventSummaryLine,
@@ -110,7 +114,7 @@ export const initExecuteCommandMake_terrain_saves = () => {
 
             const terrainSave = getUdgTerrainSaves().resolveLabel(param1, escaper.getMakingLevel())
             if (terrainSave === null) {
-                Text.erP(escaper.getPlayer(), "this terrain save doesn't exist")
+                Text.erP(escaper.getPlayer(), "this terrain save doesn't exist, or at least not on your current level")
                 return true
             }
 
@@ -134,7 +138,7 @@ export const initExecuteCommandMake_terrain_saves = () => {
 
             const terrainSave = getUdgTerrainSaves().resolveLabel(param1, escaper.getMakingLevel())
             if (terrainSave === null) {
-                Text.erP(escaper.getPlayer(), "this terrain save doesn't exist")
+                Text.erP(escaper.getPlayer(), "this terrain save doesn't exist, or at least not on your current level")
                 return true
             }
 
@@ -153,7 +157,8 @@ export const initExecuteCommandMake_terrain_saves = () => {
         alias: ['dts'],
         group,
         argDescription: '[<label>|<levelNum>|global|g|current|c] [page]',
-        description: 'Displays terrain saves - a label shows details, otherwise lists them, filterable and paginated',
+        description:
+            'Displays terrain saves - a label shows details, otherwise lists them (defaults to every terrain save), filterable and paginated',
         cb: ({ nbParam, param1, param2 }, escaper) => {
             if (nbParam > 2) {
                 return USAGE
@@ -176,7 +181,10 @@ export const initExecuteCommandMake_terrain_saves = () => {
 
                 const terrainSave = getUdgTerrainSaves().resolveLabel(param1, currentLevel)
                 if (terrainSave === null) {
-                    Text.erP(escaper.getPlayer(), "this terrain save doesn't exist")
+                    Text.erP(
+                        escaper.getPlayer(),
+                        "this terrain save doesn't exist, or at least not on your current level"
+                    )
                     return true
                 }
 
@@ -184,7 +192,7 @@ export const initExecuteCommandMake_terrain_saves = () => {
                 return true
             }
 
-            let filterLevel: Level | null | 'both' = 'both'
+            let filterLevel: Level | null | 'all' = 'all'
             if (nbParam >= 1 && param1 !== '') {
                 if (param1 === 'global' || param1 === 'g') {
                     filterLevel = null
@@ -205,25 +213,21 @@ export const initExecuteCommandMake_terrain_saves = () => {
             }
             const pageNum = nbParam === 2 ? S2I(param2) : 1
 
-            const lines: string[] = []
-            if (filterLevel === 'both') {
+            const matchingTerrainSaves: TerrainSave[] = []
+            if (filterLevel === 'all') {
                 getUdgTerrainSaves().forAll(ts => {
-                    if (ts.getLevel() === null) {
-                        lines.push(formatTerrainSaveSummaryLine(ts))
-                    }
-                })
-                getUdgTerrainSaves().forAll(ts => {
-                    if (ts.getLevel() === currentLevel) {
-                        lines.push(formatTerrainSaveSummaryLine(ts))
-                    }
+                    matchingTerrainSaves.push(ts)
                 })
             } else {
                 getUdgTerrainSaves().forAll(ts => {
                     if (ts.getLevel() === filterLevel) {
-                        lines.push(formatTerrainSaveSummaryLine(ts))
+                        matchingTerrainSaves.push(ts)
                     }
                 })
             }
+            matchingTerrainSaves.sort((a, b) => compareTerrainSavesForDisplay(a, b))
+
+            const lines = matchingTerrainSaves.map(ts => formatTerrainSaveSummaryLine(ts))
 
             const pag = handlePagination(lines, pageNum)
 
@@ -262,7 +266,7 @@ export const initExecuteCommandMake_terrain_saves = () => {
 
             const terrainSave = getUdgTerrainSaves().resolveLabel(param1, escaper.getMakingLevel())
             if (terrainSave === null) {
-                Text.erP(escaper.getPlayer(), "this terrain save doesn't exist")
+                Text.erP(escaper.getPlayer(), "this terrain save doesn't exist, or at least not on your current level")
                 return true
             }
 
@@ -296,7 +300,7 @@ export const initExecuteCommandMake_terrain_saves = () => {
 
             const terrainSave = getUdgTerrainSaves().resolveLabel(param1, escaper.getMakingLevel())
             if (terrainSave === null) {
-                Text.erP(escaper.getPlayer(), "this terrain save doesn't exist")
+                Text.erP(escaper.getPlayer(), "this terrain save doesn't exist, or at least not on your current level")
                 return true
             }
 
@@ -320,7 +324,7 @@ export const initExecuteCommandMake_terrain_saves = () => {
 
             const terrainSave = getUdgTerrainSaves().resolveLabel(param1, escaper.getMakingLevel())
             if (terrainSave === null) {
-                Text.erP(escaper.getPlayer(), "this terrain save doesn't exist")
+                Text.erP(escaper.getPlayer(), "this terrain save doesn't exist, or at least not on your current level")
                 return true
             }
 
@@ -353,22 +357,23 @@ export const initExecuteCommandMake_terrain_saves = () => {
         },
     })
 
-    //-createTerrainSaveEvent(crtse) <terrainSaveLabel> apply|a|unapply|u lvlStart|lvlEnd|mob [delay=<seconds>] [period=<seconds>]
+    //-createTerrainSaveEvent(crtse) <terrainSaveLabel> apply|a|unapply|u lvlStart|lvlEnd|mob [delay=<seconds>] [period=<seconds>] [duration=<seconds>] [onLvlEnd=apply|unapply|stop]
     registerCommand({
         name: 'createTerrainSaveEvent',
         alias: ['crtse'],
         group,
-        argDescription: '<terrainSaveLabel> apply|a|unapply|u lvlStart|lvlEnd|mob [delay=<seconds>] [period=<seconds>]',
+        argDescription:
+            '<terrainSaveLabel> apply|a|unapply|u lvlStart|lvlEnd|mob [delay=<seconds>] [period=<seconds>] [duration=<seconds>] [onLvlEnd=apply|unapply|stop]',
         description:
-            'Creates an event that automatically applies/unapplies a terrain save. For lvlStart/lvlEnd, the level used is the terrain save\'s own level if it has one, otherwise your current making level. For monsterTouch ("mob"), click on a hand-placed monster to target it',
-        cb: ({ nbParam, param1, param2, param3, param4, param5 }, escaper) => {
-            if (nbParam < 3 || nbParam > 5) {
+            "Creates an event that automatically applies/unapplies a terrain save. For lvlStart/lvlEnd, the level used is the terrain save's own level if it has one, otherwise your current making level. For monsterTouch (\"mob\"), click on a hand-placed monster to target it. Duration auto-reverts the action once, independently of period, that many seconds after it (first) fires. onLvlEnd runs when the terrain save's own level ends (only for a terrain save that isn't global): apply/unapply forces that action, stop just cancels any running delay/period timer without applying or unapplying",
+        cb: ({ nbParam, param1, param2, param3, param4, param5, param6, param7 }, escaper) => {
+            if (nbParam < 3 || nbParam > 7) {
                 return USAGE
             }
 
             const terrainSave = getUdgTerrainSaves().resolveLabel(param1, escaper.getMakingLevel())
             if (terrainSave === null) {
-                Text.erP(escaper.getPlayer(), "this terrain save doesn't exist")
+                Text.erP(escaper.getPlayer(), "this terrain save doesn't exist, or at least not on your current level")
                 return true
             }
 
@@ -394,7 +399,9 @@ export const initExecuteCommandMake_terrain_saves = () => {
 
             let delay: number | undefined
             let periodic: number | undefined
-            for (const rawParam of [param4, param5]) {
+            let duration: number | undefined
+            let onLvlEnd: TerrainSaveEventOnLvlEnd | undefined
+            for (const rawParam of [param4, param5, param6, param7]) {
                 if (rawParam === '') {
                     continue
                 }
@@ -402,6 +409,22 @@ export const initExecuteCommandMake_terrain_saves = () => {
                 const parsed = parseKeyValueParam(rawParam)
                 if (parsed === null) {
                     return USAGE
+                }
+
+                if (parsed.key === 'onLvlEnd') {
+                    const value = parsed.value.toLowerCase()
+                    if (value !== 'apply' && value !== 'unapply' && value !== 'stop') {
+                        return USAGE
+                    }
+                    if (terrainSave.getLevel() === null) {
+                        Text.erP(
+                            escaper.getPlayer(),
+                            'onLvlEnd requires the terrain save to be level-scoped, not global'
+                        )
+                        return true
+                    }
+                    onLvlEnd = value
+                    continue
                 }
 
                 const value = S2R(parsed.value)
@@ -413,6 +436,8 @@ export const initExecuteCommandMake_terrain_saves = () => {
                     delay = value
                 } else if (parsed.key === 'period') {
                     periodic = value
+                } else if (parsed.key === 'duration') {
+                    duration = value
                 } else {
                     return USAGE
                 }
@@ -421,7 +446,7 @@ export const initExecuteCommandMake_terrain_saves = () => {
             if (kind === 'monsterTouch') {
                 const make = escaper.makeSelectMonsterForEvent(monsterId => {
                     const condition: TerrainSaveEventCondition = { kind, monsterId }
-                    const event = terrainSave.addEvent(condition, action, delay, periodic)
+                    const event = terrainSave.addEvent(condition, action, delay, periodic, duration, onLvlEnd)
                     Text.mkP(escaper.getPlayer(), `terrain save event #${event.getId()} created`)
                 })
 
@@ -436,7 +461,7 @@ export const initExecuteCommandMake_terrain_saves = () => {
             const levelNum = terrainSave.getLevel()?.id ?? escaper.getMakingLevel().id
             const condition: TerrainSaveEventCondition = { kind, levelNum }
 
-            const event = terrainSave.addEvent(condition, action, delay, periodic)
+            const event = terrainSave.addEvent(condition, action, delay, periodic, duration, onLvlEnd)
             Text.mkP(escaper.getPlayer(), `terrain save event #${event.getId()} created`)
             return true
         },
@@ -486,7 +511,7 @@ export const initExecuteCommandMake_terrain_saves = () => {
 
             const newTerrainSave = getUdgTerrainSaves().resolveLabel(param2, escaper.getMakingLevel())
             if (newTerrainSave === null) {
-                Text.erP(escaper.getPlayer(), "this terrain save doesn't exist")
+                Text.erP(escaper.getPlayer(), "this terrain save doesn't exist, or at least not on your current level")
                 return true
             }
 
@@ -503,14 +528,14 @@ export const initExecuteCommandMake_terrain_saves = () => {
         },
     })
 
-    //-editTerrainSaveEvent(etse) <eventId> action|delay|period|lvl|mob [<value>]
+    //-editTerrainSaveEvent(etse) <eventId> action|delay|period|duration|onLvlEnd|lvl|mob [<value>]
     registerCommand({
         name: 'editTerrainSaveEvent',
         alias: ['etse'],
         group,
-        argDescription: '<eventId> action|delay|period|lvl|mob [<value>]',
+        argDescription: '<eventId> action|delay|period|duration|onLvlEnd|lvl|mob [<value>]',
         description:
-            'Edits a terrain save event. action: apply|a|unapply|u. delay/period: <seconds>|none. lvl (levelStart/levelEnd events only): <levelNum>|current|c. mob (monsterTouch events only): click on a hand-placed monster to retarget, no value typed',
+            "Edits a terrain save event. action: apply|a|unapply|u. delay/period/duration: <seconds>|none. onLvlEnd: apply|unapply|stop|none, runs when the terrain save's own level ends (only for a terrain save that isn't global; stop just cancels any running delay/period timer). lvl (levelStart/levelEnd events only): <levelNum>|current|c. mob (monsterTouch events only): click on a hand-placed monster to retarget, no value typed",
         cb: ({ nbParam, param1, param2, param3 }, escaper) => {
             if (nbParam < 2 || nbParam > 3 || !IsPositiveInteger(param1)) {
                 return USAGE
@@ -555,7 +580,7 @@ export const initExecuteCommandMake_terrain_saves = () => {
                 } else {
                     return USAGE
                 }
-            } else if (field === 'delay' || field === 'period') {
+            } else if (field === 'delay' || field === 'period' || field === 'duration') {
                 let value: number | undefined
                 if (param3 !== 'none') {
                     value = S2R(param3)
@@ -567,9 +592,31 @@ export const initExecuteCommandMake_terrain_saves = () => {
                 event.unregister()
                 if (field === 'delay') {
                     event.delay = value
-                } else {
+                } else if (field === 'period') {
                     event.periodicInterval = value
+                } else {
+                    event.duration = value
                 }
+                event.register()
+            } else if (field === 'onLvlEnd') {
+                let value: TerrainSaveEventOnLvlEnd | undefined
+                if (param3 !== 'none') {
+                    const lower = param3.toLowerCase()
+                    if (lower !== 'apply' && lower !== 'unapply' && lower !== 'stop') {
+                        return USAGE
+                    }
+                    if (event.terrainSave.getLevel() === null) {
+                        Text.erP(
+                            escaper.getPlayer(),
+                            'onLvlEnd requires the terrain save to be level-scoped, not global'
+                        )
+                        return true
+                    }
+                    value = lower
+                }
+
+                event.unregister()
+                event.onLvlEnd = value
                 event.register()
             } else if (field === 'lvl') {
                 if (event.condition.kind !== 'levelStart' && event.condition.kind !== 'levelEnd') {
@@ -631,7 +678,10 @@ export const initExecuteCommandMake_terrain_saves = () => {
             if (nbParam >= 1 && param1 !== '') {
                 terrainSave = getUdgTerrainSaves().resolveLabel(param1, escaper.getMakingLevel())
                 if (terrainSave === null) {
-                    Text.erP(escaper.getPlayer(), "this terrain save doesn't exist")
+                    Text.erP(
+                        escaper.getPlayer(),
+                        "this terrain save doesn't exist, or at least not on your current level"
+                    )
                     return true
                 }
             }
@@ -641,18 +691,22 @@ export const initExecuteCommandMake_terrain_saves = () => {
             }
             const pageNum = nbParam === 2 ? S2I(param2) : 1
 
-            const lines: string[] = []
+            const matchingEvents: TerrainSaveEvent[] = []
+            const withOwnerLabel = terrainSave === null
             if (terrainSave !== null) {
                 terrainSave.getEvents().forAll(event => {
-                    lines.push(formatTerrainSaveEventSummaryLine(event, false))
+                    matchingEvents.push(event)
                 })
             } else {
                 getUdgTerrainSaves().forAll(ts => {
                     ts.getEvents().forAll(event => {
-                        lines.push(formatTerrainSaveEventSummaryLine(event, true))
+                        matchingEvents.push(event)
                     })
                 })
             }
+            matchingEvents.sort((a, b) => compareTerrainSaveEventsForDisplay(a, b))
+
+            const lines = matchingEvents.map(event => formatTerrainSaveEventSummaryLine(event, withOwnerLabel))
 
             const pag = handlePagination(lines, pageNum)
 

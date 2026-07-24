@@ -7,7 +7,12 @@ import { TerrainTypeMax } from '../../07_TRIGGERS/Modify_terrain_Functions/Terra
 import type { Level } from '../Level/Level'
 import { HorizontalRectangleRegion } from '../Region/HorizontalRectangleRegion'
 import type { TerrainType } from '../TerrainType/TerrainType'
-import type { TerrainSaveEvent, TerrainSaveEventAction, TerrainSaveEventCondition } from './TerrainSaveEvent'
+import type {
+    TerrainSaveEvent,
+    TerrainSaveEventAction,
+    TerrainSaveEventCondition,
+    TerrainSaveEventOnLvlEnd,
+} from './TerrainSaveEvent'
 import { TerrainSaveEventArray } from './TerrainSaveEventArray'
 
 type Bounds = { minX: number; maxX: number; minY: number; maxY: number }
@@ -68,8 +73,10 @@ export class TerrainSave {
         condition: TerrainSaveEventCondition,
         action: TerrainSaveEventAction,
         delay?: number,
-        periodicInterval?: number
-    ): TerrainSaveEvent => this.events.new(this, condition, action, delay, periodicInterval)
+        periodicInterval?: number,
+        duration?: number,
+        onLvlEnd?: TerrainSaveEventOnLvlEnd
+    ): TerrainSaveEvent => this.events.new(this, condition, action, delay, periodicInterval, duration, onLvlEnd)
 
     removeEvent = (eventId: number): boolean => this.events.destroyOne(eventId)
 
