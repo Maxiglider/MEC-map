@@ -56,24 +56,17 @@ export const displayTerrainSaveDetail = (terrainSave: TerrainSave, p: player) =>
     }
 }
 
-// For -createTerrainSaveEvent/-editTerrainSaveEvent's "delay=<seconds>"/"periodic=<seconds>" optional params.
-export const parseKeyValueParam = (param: string): { key: string; value: string } | null => {
-    const eqIndex = param.indexOf('=')
-    if (eqIndex <= 0) {
-        return null
-    }
-
-    return { key: param.substring(0, eqIndex), value: param.substring(eqIndex + 1) }
-}
-
 export const formatTerrainSaveEventConditionText = (condition: TerrainSaveEventCondition): string => {
     switch (condition.kind) {
         case 'levelStart':
         case 'levelEnd':
             return `${condition.kind} (level ${condition.levelNum})`
         case 'monsterTouch': {
-            let text = `monsterTouch (monster #${condition.monsterId})`
-            if (!udg_monsters[condition.monsterId]) {
+            let text = 'monsterTouch'
+            const monster = udg_monsters[condition.monsterId]
+            if (monster?.getMonsterType()) {
+                text += ` (${monster.getMonsterType()?.getLabel()})`
+            } else if (!monster) {
                 text += udg_colorCode[Constants.ORANGE] + ' [target monster no longer exists]|r'
             }
             return text
@@ -87,7 +80,7 @@ const formatTerrainSaveEventTimingText = (event: TerrainSaveEvent): string => {
         text += `, delay ${event.delay}s`
     }
     if (event.periodicInterval !== undefined) {
-        text += `, periodic ${event.periodicInterval}s`
+        text += `, period ${event.periodicInterval}s`
     }
     return text
 }
@@ -112,7 +105,7 @@ export const displayTerrainSaveEventDetail = (event: TerrainSaveEvent, p: player
     text += `    condition: ${formatTerrainSaveEventConditionText(event.condition)}\n`
     text += `    action: ${event.action}\n`
     text += `    delay: ${event.delay !== undefined ? event.delay + 's' : 'none'}\n`
-    text += `    periodic: ${event.periodicInterval !== undefined ? event.periodicInterval + 's' : 'none'}`
+    text += `    period: ${event.periodicInterval !== undefined ? event.periodicInterval + 's' : 'none'}`
 
     Text.P_timed(p, Constants.TERRAIN_DATA_DISPLAY_TIME, text)
 

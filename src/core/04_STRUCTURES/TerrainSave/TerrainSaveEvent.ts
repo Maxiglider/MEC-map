@@ -4,8 +4,6 @@ import { getUdgLevels } from '../../../../globals'
 import { createTimer } from '../../../Utils/mapUtils'
 import type { TerrainSave } from './TerrainSave'
 
-// Named "condition", not "trigger" - this codebase's "trigger" already means a native WC3 trigger, so reusing
-// that word here for something conceptually different (an event's activation condition) would be confusing.
 export type TerrainSaveEventCondition =
     | { kind: 'levelStart' | 'levelEnd'; levelNum: number }
     | { kind: 'monsterTouch'; monsterId: number }

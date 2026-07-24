@@ -105,6 +105,8 @@ const onEscaperTouchingMonster = (escaper: Escaper, killingUnit: unit) => {
         const portalMob = monster.getPortalMob()
         const circleMob = monster.getCircleMob()
         const jumpPad = monster.getJumpPad()
+        const lifeBonus = monster.getMonsterType()?.getLifeBonus()
+        const monsterTouchEvents = getUdgTerrainSaves().findMonsterTouchEventsByMonsterId(monster.getId())
 
         if (clearMob) {
             clearMob.activate()
@@ -125,20 +127,10 @@ const onEscaperTouchingMonster = (escaper: Escaper, killingUnit: unit) => {
             }
 
             return
-        }
-    }
-
-    const lifeBonus = monster?.getMonsterType()?.getLifeBonus()
-    if (lifeBonus) {
-        monster?.onEscaperReachingThisLifeBonus(escaper)
-        return
-    }
-
-    // A monster that's both a "book of life" and a monsterTouch event target only ever behaves as the book
-    // of life (handled above) - this branch is only reached when it has no life bonus.
-    if (monster) {
-        const monsterTouchEvents = getUdgTerrainSaves().findMonsterTouchEventsByMonsterId(monster.getId())
-        if (monsterTouchEvents.length > 0) {
+        } else if (lifeBonus) {
+            monster?.onEscaperReachingThisLifeBonus(escaper)
+            return
+        } else if (monsterTouchEvents.length > 0) {
             for (const event of monsterTouchEvents) {
                 event.fire()
             }

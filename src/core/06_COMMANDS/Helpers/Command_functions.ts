@@ -375,3 +375,13 @@ export const glowCb = (escaper: Escaper, glow: boolean) => {
 
     escaper.setGlow(glow)
 }
+
+// For example for -createTerrainSaveEvent/-editTerrainSaveEvent's "delay=<seconds>"/"periodic=<seconds>" optional params.
+export const parseKeyValueParam = (param: string): { key: string; value: string } | null => {
+    const eqIndex = param.indexOf('=')
+    if (eqIndex <= 0) {
+        return null
+    }
+
+    return { key: param.substring(0, eqIndex), value: param.substring(eqIndex + 1) }
+}
