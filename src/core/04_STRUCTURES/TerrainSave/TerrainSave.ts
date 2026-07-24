@@ -7,6 +7,8 @@ import { TerrainTypeMax } from '../../07_TRIGGERS/Modify_terrain_Functions/Terra
 import type { Level } from '../Level/Level'
 import { HorizontalRectangleRegion } from '../Region/HorizontalRectangleRegion'
 import type { TerrainType } from '../TerrainType/TerrainType'
+import type { TerrainSaveEvent, TerrainSaveEventAction, TerrainSaveEventCondition } from './TerrainSaveEvent'
+import { TerrainSaveEventArray } from './TerrainSaveEventArray'
 
 type Bounds = { minX: number; maxX: number; minY: number; maxY: number }
 
@@ -23,6 +25,8 @@ export class TerrainSave {
 
     private previousTerrain: TerrainType[] | null = null
     private applied = false
+
+    private events: TerrainSaveEventArray = new TerrainSaveEventArray()
 
     constructor(label: string, level: Level | null, zone: HorizontalRectangleRegion | null) {
         this.label = label
@@ -57,6 +61,17 @@ export class TerrainSave {
     isWholeMap = (): boolean => this.zone === null
 
     isApplied = (): boolean => this.applied
+
+    getEvents = (): TerrainSaveEventArray => this.events
+
+    addEvent = (
+        condition: TerrainSaveEventCondition,
+        action: TerrainSaveEventAction,
+        delay?: number,
+        periodicInterval?: number
+    ): TerrainSaveEvent => this.events.new(this, condition, action, delay, periodicInterval)
+
+    removeEvent = (eventId: number): boolean => this.events.destroyOne(eventId)
 
     private getBounds(): Bounds {
         if (this.zone) {
@@ -198,6 +213,11 @@ export class TerrainSave {
         this.capturedTerrain = newCapturedTerrain
     }
 
+    // Used by TerrainSaveArray.newFromJson - registers each reconstructed event (re-hooks level conditions).
+    loadEventsFromJson = (eventsJson: { [x: string]: any }[]) => {
+        this.events.newFromJson(this, eventsJson)
+    }
+
     toJson = () => {
         const output = MemoryHandler.getEmptyObject<any>()
 
@@ -215,11 +235,13 @@ export class TerrainSave {
             terrainTypeIds[i] = Ascii2String(this.capturedTerrain[i].getTerrainTypeId())
         }
         output.capturedTerrain = terrainTypeIds
+        output.events = this.events.toJson()
 
         return output
     }
 
     destroy = () => {
         this.zone?.destroy()
+        this.events.destroy()
     }
 }

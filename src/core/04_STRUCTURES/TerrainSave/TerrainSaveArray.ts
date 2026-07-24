@@ -6,6 +6,7 @@ import { BaseArray } from '../BaseArray'
 import type { Level } from '../Level/Level'
 import { HorizontalRectangleRegion } from '../Region/HorizontalRectangleRegion'
 import { TerrainSave } from './TerrainSave'
+import type { TerrainSaveEvent } from './TerrainSaveEvent'
 
 export class TerrainSaveArray extends BaseArray<TerrainSave> {
     constructor() {
@@ -73,6 +74,19 @@ export class TerrainSaveArray extends BaseArray<TerrainSave> {
         return this.getByLabelAndLevel(rawLabel, null) ?? this.getByLabelAndLevel(rawLabel, currentLevel)
     }
 
+    // Global scan across every owned TerrainSaveEventArray - events are id-addressed independently of which
+    // TerrainSave owns them (removeTerrainSaveEvent/changeEventTerrainSave/editTerrainSaveEvent/displayTerrainSaveEvent).
+    findEventById = (eventId: number): TerrainSaveEvent | null => {
+        for (const [_, terrainSave] of pairs(this.data)) {
+            const event = terrainSave.getEvents().get(eventId)
+            if (event !== null) {
+                return event
+            }
+        }
+
+        return null
+    }
+
     // Removes a TerrainSave by object reference (BaseArray only exposes destroyOne(id), and this array
     // doesn't track ids on the instances themselves - manageIds=true just uses an internal counter as key).
     remove = (terrainSave: TerrainSave): boolean => {
@@ -121,6 +135,10 @@ export class TerrainSaveArray extends BaseArray<TerrainSave> {
                         terrainSaveJson.height,
                         terrainSaveJson.capturedTerrain
                     )
+
+                    if (terrainSaveJson.events) {
+                        terrainSave.loadEventsFromJson(terrainSaveJson.events)
+                    }
                 },
                 e => {
                     // roll back a partially-created entry so we don't leave a TerrainSave with no captured data
