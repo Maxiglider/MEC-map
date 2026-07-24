@@ -2,22 +2,22 @@ import { Constants } from 'core/01_libraries/Constants'
 import { MemoryHandler } from 'Utils/MemoryHandler'
 import { Timer } from 'w3ts'
 import { getUdgEscapers, udg_monsters } from '../../../../globals'
+import { ServiceManager } from '../../../Services'
+import { GetUnitZEx } from '../../../Utils/LocationUtils'
+import { createTimer } from '../../../Utils/mapUtils'
 import { ColorString2Id } from '../../01_libraries/Init_colorCodes'
+import { RunSoundOnUnit } from '../../02_bibliotheques_externes/SoundUtils'
 import { IsColorString } from '../../06_COMMANDS/Helpers/Command_functions'
 import { hooks } from '../../API/GeneralHooks'
 import { CombineHooks } from '../../API/MecHookArray'
+import { Natives } from '../../wc3_natives_unsecured/Natives'
+import { Escaper } from '../Escaper/Escaper'
 import { Level } from '../Level/Level'
 import { CircleMob } from '../Monster_properties/CircleMob'
 import { ClearMob } from '../Monster_properties/ClearMob'
 import { PortalMob } from '../Monster_properties/PortalMob'
 import { MonsterType } from './MonsterType'
 import { monstersClickable } from './trig_Monsters_clickable_set_life'
-import { Natives } from '../../wc3_natives_unsecured/Natives'
-import { Escaper } from '../Escaper/Escaper'
-import { ServiceManager } from '../../../Services'
-import { createTimer } from '../../../Utils/mapUtils'
-import { RunSoundOnUnit } from '../../02_bibliotheques_externes/SoundUtils'
-import { GetUnitZEx } from '../../../Utils/LocationUtils'
 const LIVES_EARNED_SOUND_PATH = 'Sound/Interface/SecretFound.wav'
 const LIVES_EARNED_SOUND_DURATION = 2525
 
@@ -446,6 +446,13 @@ export abstract class Monster {
         this.vcBlue = vcBlue
         if (this.u !== null) {
             this.u && SetUnitVertexColorBJ(this.u, vcRed, vcGreen, vcBlue, this.vcTransparency)
+        }
+    }
+
+    // transparency: 0 (opaque) to 100 (fully invisible). Keeps the current RGB tint.
+    setUnitTransparency = (transparency: number) => {
+        if (this.u) {
+            SetUnitVertexColorBJ(this.u, this.vcRed, this.vcGreen, this.vcBlue, transparency)
         }
     }
 

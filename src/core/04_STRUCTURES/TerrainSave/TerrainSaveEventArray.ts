@@ -21,9 +21,19 @@ export class TerrainSaveEventArray extends BaseArray<TerrainSaveEvent> {
         delay?: number,
         periodicInterval?: number,
         duration?: number,
-        onLvlEnd?: TerrainSaveEventOnLvlEnd
+        onLvlEnd?: TerrainSaveEventOnLvlEnd,
+        enabled = true
     ): TerrainSaveEvent => {
-        const event = new TerrainSaveEvent(terrainSave, condition, action, delay, periodicInterval, duration, onLvlEnd)
+        const event = new TerrainSaveEvent(
+            terrainSave,
+            condition,
+            action,
+            delay,
+            periodicInterval,
+            duration,
+            onLvlEnd,
+            enabled
+        )
         this._new(event)
         event.register()
 
@@ -39,7 +49,8 @@ export class TerrainSaveEventArray extends BaseArray<TerrainSaveEvent> {
                 eventJson.delay,
                 eventJson.periodicInterval,
                 eventJson.duration,
-                eventJson.onLvlEnd
+                eventJson.onLvlEnd,
+                eventJson.enabled
             )
         }
     }

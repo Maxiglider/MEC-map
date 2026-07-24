@@ -124,7 +124,8 @@ export const compareTerrainSaveEventsForDisplay = (a: TerrainSaveEvent, b: Terra
 // withOwnerLabel: the "all events in the game" list prefixes each line with its owning TerrainSave's label;
 // a per-TerrainSave list doesn't need to repeat it.
 export const formatTerrainSaveEventSummaryLine = (event: TerrainSaveEvent, withOwnerLabel: boolean): string => {
-    let text = udg_colorCode[Constants.GREY] + `#${event.getId()}|r `
+    let text = event.isEnabled() ? '' : udg_colorCode[Constants.RED] + 'dis|r '
+    text += udg_colorCode[Constants.GREY] + `#${event.getId()}|r `
 
     if (withOwnerLabel) {
         const level = event.terrainSave.getLevel()
@@ -146,7 +147,8 @@ export const displayTerrainSaveEventDetail = (event: TerrainSaveEvent, p: player
 
     const makeColor = Text.MAKE_TEXT_COLORCODE
 
-    let text = `Event #${makeColor}${event.getId()}|r\n`
+    const disabledPrefix = event.isEnabled() ? '' : udg_colorCode[Constants.RED] + 'dis|r '
+    let text = `${disabledPrefix}Event #${makeColor}${event.getId()}|r\n`
     text += `${grey}    terrain save: |r${levelPrefix}${udg_colorCode[Constants.RED]}${event.terrainSave.getLabel()}|r\n`
     text += `${grey}    condition: |r${makeColor}${formatTerrainSaveEventConditionText(event.condition)}|r\n`
     text += `${grey}    action: |r${makeColor}${event.action}|r\n`

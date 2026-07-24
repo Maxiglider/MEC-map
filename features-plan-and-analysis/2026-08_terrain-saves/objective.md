@@ -51,7 +51,7 @@ A terrain save could be unapplied only after being applied (an application of it
 
 An event can also have a `duration`: independently of `periodic`, once the (possibly delayed) configured action has fired, waiting `duration` seconds then automatically performing the opposite action once (e.g. apply, then auto-unapply after `duration` seconds) — useful for a temporary terrain change.
 
-An event can also have an `onLvlEnd` (only valid, and only ever fires, for an event whose terrain save isn't global): `apply`/`unapply` forces that action when the terrain save's own level ends, regardless of the event's own delay/periodic/duration state; `stop` just cancels any currently-running delay/periodic timer without applying or unapplying anything.
+An event can also have an `onLvlEnd` (only valid, and only ever fires, when there's a level to hook into: the terrain save's own level if it's level-scoped, otherwise the event's own level if its condition is `levelStart`/`levelEnd`): `apply`/`unapply` forces that action when that level ends, regardless of the event's own delay/periodic/duration state; `stop` just cancels any currently-running delay/periodic timer without applying or unapplying anything.
 
 ### Commands to manage terrain saves events
 
@@ -62,9 +62,11 @@ An event can also have an `onLvlEnd` (only valid, and only ever fires, for an ev
 - `changeEventTerrainSave` (`cets`) `<eventId> <newTerrainSaveLabel>` (change the terrain save associated to an event)
 - `editTerrainSaveEvent` (`etse`) `<eventId> <field> [<value>]`
   - edits any parameter of an existing event (`action`, `delay`, `periodic`, `duration`, `onLvlEnd`, `level` for level-based events, `target` for monster-touch events). Retargeting a monster always goes through the click flow, never a typed id.
-- `displayTerrainSaveEvent` (`dtse`) `[<terrainSaveLabel>|<eventId>]`
+  - `enable`/`disable` (no value): disabling freezes the event - cancels any running delay/periodic/duration timer without forcing an apply/unapply - and makes it ignore its trigger condition entirely until re-enabled. `displayTerrainSaveEvent` shows a disabled event with a red "dis" prefix.
+- `displayTerrainSaveEvent` (`dtse`) `[<terrainSaveLabel>|current|c|lvl<number>|<eventId>]`
   - without any parameter, displays every event in the game (paginated), each prefixed by its owning terrain save's label
   - with a terrain save label, displays that save's events only, with an id for each (id absolute, not relative to the terrain save)
+  - with `lvl<number>`, displays every event of every terrain save at that level (paginated, prefixed the same way as the no-parameter case); `current`/`c` is shorthand for your current making level
   - with an eventId, displays info of that specific event and moves the camera to the linked monster if it still exists (orange warning if it no longer does)
 
 ## Out of scope for this iteration

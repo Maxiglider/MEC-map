@@ -365,7 +365,7 @@ export const initExecuteCommandMake_terrain_saves = () => {
         argDescription:
             '<terrainSaveLabel> apply|a|unapply|u lvlStart|lvlEnd|mob [delay=<seconds>] [period=<seconds>] [duration=<seconds>] [onLvlEnd=apply|unapply|stop]',
         description:
-            "Creates an event that automatically applies/unapplies a terrain save. For lvlStart/lvlEnd, the level used is the terrain save's own level if it has one, otherwise your current making level. For monsterTouch (\"mob\"), click on a hand-placed monster to target it. Duration auto-reverts the action once, independently of period, that many seconds after it (first) fires. onLvlEnd runs when the terrain save's own level ends (only for a terrain save that isn't global): apply/unapply forces that action, stop just cancels any running delay/period timer without applying or unapplying",
+            'Creates an event that automatically applies/unapplies a terrain save. For lvlStart/lvlEnd, the level used is the terrain save\'s own level if it has one, otherwise your current making level. For monsterTouch ("mob"), click on a hand-placed monster to target it. Duration auto-reverts the action once, independently of period, that many seconds after it (first) fires. onLvlEnd (requires the terrain save to be level-scoped or the event to trigger on some level start or end) runs when that level ends: apply/unapply forces that action, stop just cancels any running delay/period timer without applying or unapplying',
         cb: ({ nbParam, param1, param2, param3, param4, param5, param6, param7 }, escaper) => {
             if (nbParam < 3 || nbParam > 7) {
                 return USAGE
@@ -411,15 +411,15 @@ export const initExecuteCommandMake_terrain_saves = () => {
                     return USAGE
                 }
 
-                if (parsed.key === 'onLvlEnd') {
+                if (parsed.key.toLowerCase() === 'onlvlend') {
                     const value = parsed.value.toLowerCase()
                     if (value !== 'apply' && value !== 'unapply' && value !== 'stop') {
                         return USAGE
                     }
-                    if (terrainSave.getLevel() === null) {
+                    if (terrainSave.getLevel() === null && kind !== 'levelStart' && kind !== 'levelEnd') {
                         Text.erP(
                             escaper.getPlayer(),
-                            'onLvlEnd requires the terrain save to be level-scoped, not global'
+                            'onLvlEnd requires the terrain save to be level-scoped or the event to trigger on some level start or end'
                         )
                         return true
                     }
@@ -528,14 +528,14 @@ export const initExecuteCommandMake_terrain_saves = () => {
         },
     })
 
-    //-editTerrainSaveEvent(etse) <eventId> action|delay|period|duration|onLvlEnd|lvl|mob [<value>]
+    //-editTerrainSaveEvent(etse) <eventId> action|delay|period|duration|onLvlEnd|lvl|mob|enable|disable [<value>]
     registerCommand({
         name: 'editTerrainSaveEvent',
         alias: ['etse'],
         group,
-        argDescription: '<eventId> action|delay|period|duration|onLvlEnd|lvl|mob [<value>]',
+        argDescription: '<eventId> action|delay|period|duration|onLvlEnd|lvl|mob|enable|disable [<value>]',
         description:
-            "Edits a terrain save event. action: apply|a|unapply|u. delay/period/duration: <seconds>|none. onLvlEnd: apply|unapply|stop|none, runs when the terrain save's own level ends (only for a terrain save that isn't global; stop just cancels any running delay/period timer). lvl (levelStart/levelEnd events only): <levelNum>|current|c. mob (monsterTouch events only): click on a hand-placed monster to retarget, no value typed",
+            'Edits a terrain save event. action: apply|a|unapply|u. delay/period/duration: <seconds>|none. onLvlEnd: apply|unapply|stop|none (requires the terrain save to be level-scoped or the event to trigger on some level start or end; stop just cancels any running delay/period timer). lvl (levelStart/levelEnd events only): <levelNum>|current|c. mob (monsterTouch events only): click on a hand-placed monster to retarget, no value typed. enable/disable: no value typed - disable freezes the event (cancels any running delay/period/duration timer without applying/unapplying), enable just resumes listening for the next trigger',
         cb: ({ nbParam, param1, param2, param3 }, escaper) => {
             if (nbParam < 2 || nbParam > 3 || !IsPositiveInteger(param1)) {
                 return USAGE
@@ -548,6 +548,18 @@ export const initExecuteCommandMake_terrain_saves = () => {
             }
 
             const field = param2
+
+            if (field === 'enable') {
+                event.enable()
+                Text.mkP(escaper.getPlayer(), `terrain save event #${event.getId()} enabled`)
+                return true
+            }
+
+            if (field === 'disable') {
+                event.disable()
+                Text.mkP(escaper.getPlayer(), `terrain save event #${event.getId()} disabled`)
+                return true
+            }
 
             if (field === 'mob') {
                 if (event.condition.kind !== 'monsterTouch') {
@@ -598,17 +610,21 @@ export const initExecuteCommandMake_terrain_saves = () => {
                     event.duration = value
                 }
                 event.register()
-            } else if (field === 'onLvlEnd') {
+            } else if (field.toLowerCase() === 'onlvlend') {
                 let value: TerrainSaveEventOnLvlEnd | undefined
                 if (param3 !== 'none') {
                     const lower = param3.toLowerCase()
                     if (lower !== 'apply' && lower !== 'unapply' && lower !== 'stop') {
                         return USAGE
                     }
-                    if (event.terrainSave.getLevel() === null) {
+                    if (
+                        event.terrainSave.getLevel() === null &&
+                        event.condition.kind !== 'levelStart' &&
+                        event.condition.kind !== 'levelEnd'
+                    ) {
                         Text.erP(
                             escaper.getPlayer(),
-                            'onLvlEnd requires the terrain save to be level-scoped, not global'
+                            'onLvlEnd requires the terrain save to be level-scoped or the event to trigger on some level start or end'
                         )
                         return true
                     }
@@ -646,14 +662,14 @@ export const initExecuteCommandMake_terrain_saves = () => {
         },
     })
 
-    //-displayTerrainSaveEvent(dtse) [<terrainSaveLabel>|<eventId>] [page]
+    //-displayTerrainSaveEvent(dtse) [<terrainSaveLabel>|current|c|lvl<number>|<eventId>] [page]
     registerCommand({
         name: 'displayTerrainSaveEvent',
         alias: ['dtse'],
         group,
-        argDescription: '[<terrainSaveLabel>|<eventId>] [page]',
+        argDescription: '[<terrainSaveLabel>|current|c|lvl<number>|<eventId>] [page]',
         description:
-            "Displays terrain save events - an eventId shows details, a label lists that save's events, no param lists every event",
+            "Displays terrain save events - an eventId shows details, a label lists that terrainSave's events, lvl<number> lists every event at that level, current/c is shorthand for your current making level, no param lists every event",
         cb: ({ nbParam, param1, param2 }, escaper) => {
             if (nbParam > 2) {
                 return USAGE
@@ -675,14 +691,25 @@ export const initExecuteCommandMake_terrain_saves = () => {
             }
 
             let terrainSave: TerrainSave | null = null
+            let filterLevel: Level | null = null
             if (nbParam >= 1 && param1 !== '') {
-                terrainSave = getUdgTerrainSaves().resolveLabel(param1, escaper.getMakingLevel())
-                if (terrainSave === null) {
-                    Text.erP(
-                        escaper.getPlayer(),
-                        "this terrain save doesn't exist, or at least not on your current level"
-                    )
-                    return true
+                if (param1 === 'current' || param1 === 'c') {
+                    filterLevel = escaper.getMakingLevel()
+                } else if (param1.toLowerCase().startsWith('lvl') && IsPositiveInteger(param1.substring(3))) {
+                    filterLevel = getUdgLevels().get(S2I(param1.substring(3)))
+                    if (filterLevel === null) {
+                        Text.erP(escaper.getPlayer(), 'unknown level')
+                        return true
+                    }
+                } else {
+                    terrainSave = getUdgTerrainSaves().resolveLabel(param1, escaper.getMakingLevel())
+                    if (terrainSave === null) {
+                        Text.erP(
+                            escaper.getPlayer(),
+                            "this terrain save doesn't exist, or at least not on your current level"
+                        )
+                        return true
+                    }
                 }
             }
 
@@ -696,6 +723,14 @@ export const initExecuteCommandMake_terrain_saves = () => {
             if (terrainSave !== null) {
                 terrainSave.getEvents().forAll(event => {
                     matchingEvents.push(event)
+                })
+            } else if (filterLevel !== null) {
+                getUdgTerrainSaves().forAll(ts => {
+                    if (ts.getLevel() === filterLevel) {
+                        ts.getEvents().forAll(event => {
+                            matchingEvents.push(event)
+                        })
+                    }
                 })
             } else {
                 getUdgTerrainSaves().forAll(ts => {

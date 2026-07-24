@@ -37,11 +37,11 @@ export const errorHandler = (cb: () => void, errorCb?: (e: any) => void) => {
         const [a, b] = pcall(cb)
 
         if (!a) {
-            if (typeof b == 'string') {
+            if (errorCb) {
+                errorCb(b)
+            } else if (typeof b == 'string') {
                 print('Error caught: ' + b)
             }
-
-            errorCb && errorCb(b)
         }
     }
 }
