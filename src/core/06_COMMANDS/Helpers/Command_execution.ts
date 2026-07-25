@@ -164,6 +164,13 @@ export const initCommandExecution = () => {
             const parsedContext = parseCmdContext(cmd)
             const targetCmd = findTargetCommand(commands, parsedContext, escaper)
 
+            // "-<commandName> /?" shows that single command's own -help entry instead of running it.
+            if (targetCmd && parsedContext.nbParam === 1 && parsedContext.param1 === '/?') {
+                Text.P(escaper.getPlayer(), getCmdMessage(targetCmd))
+                MemoryHandler.destroyObject(parsedContext)
+                return
+            }
+
             const result = targetCmd?.cb(parsedContext, escaper)
             if (result === USAGE && targetCmd) {
                 const aliasText = targetCmd.alias.length > 0 ? ` (${escapePipes(targetCmd.alias.join(' | '))})` : ''
