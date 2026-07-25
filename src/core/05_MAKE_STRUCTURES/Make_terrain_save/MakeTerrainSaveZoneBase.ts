@@ -10,7 +10,7 @@ const HALF_TILE = Constants.LARGEUR_CASE / 2
 // Save_terrain.ts's "centerOffsetX/Y") refer to the CENTER of a tile, not its corner. So the center of the
 // tile containing `value` is the nearest point on that grid at or below it, and its edges are +/-64 from there.
 const tileCenter = (value: number, origin: number): number =>
-    origin + Math.floor((value - origin) / Constants.LARGEUR_CASE) * Constants.LARGEUR_CASE
+    origin + Math.round((value - origin) / Constants.LARGEUR_CASE) * Constants.LARGEUR_CASE
 
 export abstract class MakeTerrainSaveZoneBase extends MakeMECRegion {
     private clickX: number[] = []
