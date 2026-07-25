@@ -5,6 +5,7 @@ import {
     TerrainSaveEventAction,
     TerrainSaveEventCondition,
     TerrainSaveEventOnLvlEnd,
+    TerrainSaveEventPeriodicInterval,
 } from './TerrainSaveEvent'
 
 // One instance per TerrainSave (owned, not a global collection). manageIds=false since each TerrainSaveEvent
@@ -19,7 +20,7 @@ export class TerrainSaveEventArray extends BaseArray<TerrainSaveEvent> {
         condition: TerrainSaveEventCondition,
         action: TerrainSaveEventAction,
         delay?: number,
-        periodicInterval?: number,
+        periodicInterval?: TerrainSaveEventPeriodicInterval,
         duration?: number,
         onLvlEnd?: TerrainSaveEventOnLvlEnd,
         enabled = true

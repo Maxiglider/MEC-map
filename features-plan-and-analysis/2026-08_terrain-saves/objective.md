@@ -51,11 +51,13 @@ A terrain save could be unapplied only after being applied (an application of it
 
 An event can also have a `duration`: independently of `periodic`, once the (possibly delayed) configured action has fired, waiting `duration` seconds then automatically performing the opposite action once (e.g. apply, then auto-unapply after `duration` seconds) — useful for a temporary terrain change.
 
+`periodic` also accepts an asymmetric `<time1>-<time2>` value instead of a single number: the toggle alternates between `time2` seconds in the action-matching state (e.g. applied, if the event's action is apply) and `time1` seconds in the opposite state, instead of the same duration each way. A plain `<seconds>` value N is shorthand for `<N/2>-<N/2>`. Implementation-wise this is two periodic timers sharing interval `time1 + time2`, the second one started `time1` seconds after the first via a one-shot delay timer, so their interleaved firings alternate `time1`/`time2` apart - the very first firing (at `time1 + time2`) is the one exception, always arriving later than the steady-state cadence.
+
 An event can also have an `onLvlEnd` (only valid, and only ever fires, when there's a level to hook into: the terrain save's own level if it's level-scoped, otherwise the event's own level if its condition is `levelStart`/`levelEnd`): `apply`/`unapply` forces that action when that level ends, regardless of the event's own delay/periodic/duration state; `stop` just cancels any currently-running delay/periodic timer without applying or unapplying anything.
 
 ### Commands to manage terrain saves events
 
-- `createTerrainSaveEvent` (`ctse`) `<terrainSaveLabel> <apply|unapply> <levelStart|levelEnd|monsterTouch> [delay=<seconds>] [periodic=<seconds>] [duration=<seconds>] [onLvlEnd=apply|unapply|stop]`
+- `createTerrainSaveEvent` (`ctse`) `<terrainSaveLabel> <apply|unapply> <levelStart|levelEnd|monsterTouch> [delay=<seconds>] [periodic=<seconds>|<time1>-<time2>] [duration=<seconds>] [onLvlEnd=apply|unapply|stop]`
   - for `levelStart`/`levelEnd`, the level is deduced automatically (the terrain save's own level, or the current level if the terrain save is global) — not typed.
   - for `monsterTouch`, starts a click-to-target flow; the event is created once a matching monster is clicked.
 - `removeTerrainSaveEvent` (`rtse`) `<eventId>`

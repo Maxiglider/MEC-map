@@ -12,6 +12,7 @@ import type {
     TerrainSaveEventAction,
     TerrainSaveEventCondition,
     TerrainSaveEventOnLvlEnd,
+    TerrainSaveEventPeriodicInterval,
 } from './TerrainSaveEvent'
 import { TerrainSaveEventArray } from './TerrainSaveEventArray'
 
@@ -73,7 +74,7 @@ export class TerrainSave {
         condition: TerrainSaveEventCondition,
         action: TerrainSaveEventAction,
         delay?: number,
-        periodicInterval?: number,
+        periodicInterval?: TerrainSaveEventPeriodicInterval,
         duration?: number,
         onLvlEnd?: TerrainSaveEventOnLvlEnd
     ): TerrainSaveEvent => this.events.new(this, condition, action, delay, periodicInterval, duration, onLvlEnd)

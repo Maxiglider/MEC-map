@@ -23,6 +23,11 @@ export type TerrainSaveEventAction = 'apply' | 'unapply'
 // event - see getOnLvlEndLevel().
 export type TerrainSaveEventOnLvlEnd = 'apply' | 'unapply' | 'stop'
 
+// A plain number N is shorthand for { time1: N / 2, time2: N / 2 } (a symmetric toggle). time1 is how long the
+// "opposite of action" state lasts (e.g. unapplied, if action === 'apply') before switching to the
+// action-matching state, time2 is how long the action-matching state (e.g. applied) lasts before switching back.
+export type TerrainSaveEventPeriodicInterval = number | { time1: number; time2: number }
+
 export class TerrainSaveEvent {
     private static lastId = 0
     private static getNextId = (): number => ++TerrainSaveEvent.lastId
@@ -32,16 +37,24 @@ export class TerrainSaveEvent {
     condition: TerrainSaveEventCondition
     action: TerrainSaveEventAction
     delay?: number
-    periodicInterval?: number
+    periodicInterval?: TerrainSaveEventPeriodicInterval
     // Seconds after the (first) fire to automatically perform the opposite action once, independently of period.
     duration?: number
     onLvlEnd?: TerrainSaveEventOnLvlEnd
 
     private hookId: number | null = null
+    // Only used for the one-shot wait before fire()'s initial action (the `delay` field).
     private timer: Timer | null = null
     // Separate from `timer`: duration's revert fires once, independently, alongside a periodic loop, so it
     // can't share the same slot as the delay/periodic timer without the two clobbering each other.
     private durationTimer: Timer | null = null
+    // The periodic toggle is two periodic timers sharing the same interval (time1 + time2), one delayed by
+    // time1 relative to the other via a third one-shot timer - see startPeriodic(). Both timers just call
+    // toggleApplyUnapply() (state-flip, not a fixed direction), so their interleaved firings naturally produce
+    // an alternating time1/time2 cadence without needing to track which state each one is "supposed" to reach.
+    private periodicTimerA: Timer | null = null
+    private periodicTimerB: Timer | null = null
+    private periodicDelayTimer: Timer | null = null
     // Only set when onLvlEnd is defined - hooks into getOnLvlEndLevel()'s hooks_onEnd.
     private onLvlEndHookId: number | null = null
     // True from fire() until the event's cycle has fully played out (the delayed action has fired and there's
@@ -58,7 +71,7 @@ export class TerrainSaveEvent {
         condition: TerrainSaveEventCondition,
         action: TerrainSaveEventAction,
         delay?: number,
-        periodicInterval?: number,
+        periodicInterval?: TerrainSaveEventPeriodicInterval,
         duration?: number,
         onLvlEnd?: TerrainSaveEventOnLvlEnd,
         enabled = true
@@ -155,13 +168,20 @@ export class TerrainSaveEvent {
         this.setRunning(false)
     }
 
-    // Destroys any timer already running for this event before starting a new one. Without this, calling
-    // fire() again while a previous delay/periodic timer is still active (very possible for monsterTouch,
-    // which can be re-triggered on every touch) would silently overwrite `this.timer`, orphaning the old
-    // handle - it keeps running forever, since unregister() can then only ever see the newest one.
+    // Destroys any timer already running for this event before starting a new one - the delay timer and all
+    // three periodic-toggle timers. Without this, calling fire() again while a previous delay/periodic timer is
+    // still active (very possible for monsterTouch, which can be re-triggered on every touch) would silently
+    // orphan the old handle(s) - they'd keep running forever, since unregister() can then only ever see the
+    // newest ones.
     private destroyTimer = (): void => {
         this.timer?.destroy()
         this.timer = null
+        this.periodicTimerA?.destroy()
+        this.periodicTimerA = null
+        this.periodicTimerB?.destroy()
+        this.periodicTimerB = null
+        this.periodicDelayTimer?.destroy()
+        this.periodicDelayTimer = null
     }
 
     private destroyDurationTimer = (): void => {
@@ -253,13 +273,33 @@ export class TerrainSaveEvent {
         }
     }
 
+    // Two periodic timers, both with interval (time1 + time2), timer B's start offset by a one-shot time1
+    // delay relative to timer A - so their firings interleave as A, B, A, B, ... spaced time1 then time2 apart.
+    // Both just toggle (state-flip), so no per-timer direction bookkeeping is needed. The one-shot delay also
+    // re-affirms the action-matching state (applyOrUnapply()) right as it hands off to timer B, matching what
+    // fire()'s own initial applyOrUnapply() already set. Note the very first toggle (timer A, at
+    // t = time1 + time2) always arrives later than a plain time1 or time2 wait would - only the steady-state
+    // cadence after that is a clean time1/time2 alternation.
     startPeriodic = (): void => {
-        if (this.periodicInterval === undefined) {
+        const periodicInterval = this.periodicInterval
+        if (periodicInterval === undefined) {
             return
         }
 
         this.destroyTimer()
-        this.timer = createTimer(this.periodicInterval, true, () => this.toggleApplyUnapply())
+
+        const { time1, time2 } =
+            typeof periodicInterval === 'number'
+                ? { time1: periodicInterval / 2, time2: periodicInterval / 2 }
+                : periodicInterval
+        const cycleLength = time1 + time2
+
+        this.periodicTimerA = createTimer(cycleLength, true, () => this.toggleApplyUnapply())
+        this.periodicDelayTimer = createTimer(time1, false, () => {
+            this.toggleApplyUnapply()
+            this.periodicDelayTimer = null
+            this.periodicTimerB = createTimer(cycleLength, true, () => this.toggleApplyUnapply())
+        })
     }
 
     applyOrUnapply = (): void => {

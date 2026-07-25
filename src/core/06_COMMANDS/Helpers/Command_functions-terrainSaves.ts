@@ -5,7 +5,11 @@ import { EstChiffre } from '../../01_libraries/Functions_on_numbers'
 import { udg_colorCode } from '../../01_libraries/Init_colorCodes'
 import { Text } from '../../01_libraries/Text'
 import type { TerrainSave } from '../../04_STRUCTURES/TerrainSave/TerrainSave'
-import type { TerrainSaveEvent, TerrainSaveEventCondition } from '../../04_STRUCTURES/TerrainSave/TerrainSaveEvent'
+import type {
+    TerrainSaveEvent,
+    TerrainSaveEventCondition,
+    TerrainSaveEventPeriodicInterval,
+} from '../../04_STRUCTURES/TerrainSave/TerrainSaveEvent'
 
 // For -saveTerrain
 export const isNewTerrainSaveLabelValid = (label: string): boolean => {
@@ -93,13 +97,35 @@ export const formatTerrainSaveEventConditionText = (condition: TerrainSaveEventC
     }
 }
 
+// For createTerrainSaveEvent/editTerrainSaveEvent's period=/period field. Either a plain "<seconds>", or
+// "<time1>-<time2>" for an asymmetric toggle (see TerrainSaveEventPeriodicInterval) - null on invalid input.
+export const parsePeriodicIntervalValue = (value: string): TerrainSaveEventPeriodicInterval | null => {
+    const dashIndex = value.indexOf('-')
+    if (dashIndex === -1) {
+        const seconds = S2R(value)
+        return seconds > 0 ? seconds : null
+    }
+
+    const time1 = S2R(value.substring(0, dashIndex))
+    const time2 = S2R(value.substring(dashIndex + 1))
+    if (time1 <= 0 || time2 <= 0) {
+        return null
+    }
+    return { time1, time2 }
+}
+
+const formatPeriodicIntervalValue = (periodicInterval: TerrainSaveEventPeriodicInterval): string =>
+    typeof periodicInterval === 'number'
+        ? `${periodicInterval}s`
+        : `${periodicInterval.time1}s-${periodicInterval.time2}s`
+
 const formatTerrainSaveEventTimingText = (event: TerrainSaveEvent): string => {
     let text = ''
     if (event.delay !== undefined) {
         text += `, delay ${event.delay}s`
     }
     if (event.periodicInterval !== undefined) {
-        text += `, period ${event.periodicInterval}s`
+        text += `, period ${formatPeriodicIntervalValue(event.periodicInterval)}`
     }
     if (event.duration !== undefined) {
         text += `, duration ${event.duration}s`
@@ -153,7 +179,7 @@ export const displayTerrainSaveEventDetail = (event: TerrainSaveEvent, p: player
     text += `${grey}    condition: |r${makeColor}${formatTerrainSaveEventConditionText(event.condition)}|r\n`
     text += `${grey}    action: |r${makeColor}${event.action}|r\n`
     text += `${grey}    delay: |r${makeColor}${event.delay !== undefined ? event.delay + 's' : 'none'}|r\n`
-    text += `${grey}    period: |r${makeColor}${event.periodicInterval !== undefined ? event.periodicInterval + 's' : 'none'}|r\n`
+    text += `${grey}    period: |r${makeColor}${event.periodicInterval !== undefined ? formatPeriodicIntervalValue(event.periodicInterval) : 'none'}|r\n`
     text += `${grey}    duration: |r${makeColor}${event.duration !== undefined ? event.duration + 's' : 'none'}|r\n`
     text += `${grey}    onLvlEnd: |r${makeColor}${event.onLvlEnd ?? 'none'}|r`
 

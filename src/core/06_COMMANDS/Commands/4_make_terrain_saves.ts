@@ -11,6 +11,7 @@ import type {
     TerrainSaveEventAction,
     TerrainSaveEventCondition,
     TerrainSaveEventOnLvlEnd,
+    TerrainSaveEventPeriodicInterval,
 } from '../../04_STRUCTURES/TerrainSave/TerrainSaveEvent'
 import { parseKeyValueParam, USAGE } from '../Helpers/Command_functions'
 import {
@@ -21,6 +22,7 @@ import {
     formatTerrainSaveEventSummaryLine,
     formatTerrainSaveSummaryLine,
     isNewTerrainSaveLabelValid,
+    parsePeriodicIntervalValue,
 } from '../Helpers/Command_functions-terrainSaves'
 import { handlePagination } from '../Helpers/Pagination'
 
@@ -357,15 +359,15 @@ export const initExecuteCommandMake_terrain_saves = () => {
         },
     })
 
-    //-createTerrainSaveEvent(crtse) <terrainSaveLabel> apply|a|unapply|u lvlStart|lvlEnd|mob [delay=<seconds>] [period=<seconds>] [duration=<seconds>] [onLvlEnd=apply|unapply|stop]
+    //-createTerrainSaveEvent(crtse) <terrainSaveLabel> apply|a|unapply|u lvlStart|lvlEnd|mob [delay=<seconds>] [period=<seconds>|<time1>-<time2>] [duration=<seconds>] [onLvlEnd=apply|unapply|stop]
     registerCommand({
         name: 'createTerrainSaveEvent',
         alias: ['crtse'],
         group,
         argDescription:
-            '<terrainSaveLabel> apply|a|unapply|u lvlStart|lvlEnd|mob [delay=<seconds>] [period=<seconds>] [duration=<seconds>] [onLvlEnd=apply|unapply|stop]',
+            '<terrainSaveLabel> apply|a|unapply|u lvlStart|lvlEnd|mob [delay=<seconds>] [period=<seconds>|<time1>-<time2>] [duration=<seconds>] [onLvlEnd=apply|unapply|stop]',
         description:
-            'Creates an event that automatically applies/unapplies a terrain save. For lvlStart/lvlEnd, the level used is the terrain save\'s own level if it has one, otherwise your current making level. For monsterTouch ("mob"), click on a hand-placed monster to target it. Duration auto-reverts the action once, independently of period, that many seconds after it (first) fires. onLvlEnd (requires the terrain save to be level-scoped or the event to trigger on some level start or end) runs when that level ends: apply/unapply forces that action, stop just cancels any running delay/period timer without applying or unapplying',
+            'Creates an event that automatically applies/unapplies a terrain save. For lvlStart/lvlEnd, the level used is the terrain save\'s own level if it has one, otherwise your current making level. For monsterTouch ("mob"), click on a hand-placed monster to target it. Period toggles apply/unapply repeatedly: <time1>-<time2> toggles asymmetrically - time1 seconds in the non-action state, time2 seconds in the action-matching state (e.g. applied, if action is apply); a plain number N is shorthand for N/2-N/2. Duration auto-reverts the action once, independently of period, that many seconds after it (first) fires. onLvlEnd (requires the terrain save to be level-scoped or the event to trigger on some level start or end) runs when that level ends: apply/unapply forces that action, stop just cancels any running delay/period timer without applying or unapplying',
         cb: ({ nbParam, param1, param2, param3, param4, param5, param6, param7 }, escaper) => {
             if (nbParam < 3 || nbParam > 7) {
                 return USAGE
@@ -398,7 +400,7 @@ export const initExecuteCommandMake_terrain_saves = () => {
             }
 
             let delay: number | undefined
-            let periodic: number | undefined
+            let periodic: TerrainSaveEventPeriodicInterval | undefined
             let duration: number | undefined
             let onLvlEnd: TerrainSaveEventOnLvlEnd | undefined
             for (const rawParam of [param4, param5, param6, param7]) {
@@ -427,6 +429,15 @@ export const initExecuteCommandMake_terrain_saves = () => {
                     continue
                 }
 
+                if (parsed.key === 'period') {
+                    const parsedPeriod = parsePeriodicIntervalValue(parsed.value)
+                    if (parsedPeriod === null) {
+                        return USAGE
+                    }
+                    periodic = parsedPeriod
+                    continue
+                }
+
                 const value = S2R(parsed.value)
                 if (value <= 0) {
                     return USAGE
@@ -434,8 +445,6 @@ export const initExecuteCommandMake_terrain_saves = () => {
 
                 if (parsed.key === 'delay') {
                     delay = value
-                } else if (parsed.key === 'period') {
-                    periodic = value
                 } else if (parsed.key === 'duration') {
                     duration = value
                 } else {
@@ -535,7 +544,7 @@ export const initExecuteCommandMake_terrain_saves = () => {
         group,
         argDescription: '<eventId> action|delay|period|duration|onLvlEnd|lvl|mob|enable|disable [<value>]',
         description:
-            'Edits a terrain save event. action: apply|a|unapply|u. delay/period/duration: <seconds>|none. onLvlEnd: apply|unapply|stop|none (requires the terrain save to be level-scoped or the event to trigger on some level start or end; stop just cancels any running delay/period timer). lvl (levelStart/levelEnd events only): <levelNum>|current|c. mob (monsterTouch events only): click on a hand-placed monster to retarget, no value typed. enable/disable: no value typed - disable freezes the event (cancels any running delay/period/duration timer without applying/unapplying), enable just resumes listening for the next trigger',
+            'Edits a terrain save event. action: apply|a|unapply|u. delay/duration: <seconds>|none. period: <seconds>|<time1>-<time2>|none (see createTerrainSaveEvent for the asymmetric <time1>-<time2> semantics). onLvlEnd: apply|unapply|stop|none (requires the terrain save to be level-scoped or the event to trigger on some level start or end; stop just cancels any running delay/period timer). lvl (levelStart/levelEnd events only): <levelNum>|current|c. mob (monsterTouch events only): click on a hand-placed monster to retarget, no value typed. enable/disable: no value typed - disable freezes the event (cancels any running delay/period/duration timer without applying/unapplying), enable just resumes listening for the next trigger',
         cb: ({ nbParam, param1, param2, param3 }, escaper) => {
             if (nbParam < 2 || nbParam > 3 || !IsPositiveInteger(param1)) {
                 return USAGE
@@ -592,7 +601,7 @@ export const initExecuteCommandMake_terrain_saves = () => {
                 } else {
                     return USAGE
                 }
-            } else if (field === 'delay' || field === 'period' || field === 'duration') {
+            } else if (field === 'delay' || field === 'duration') {
                 let value: number | undefined
                 if (param3 !== 'none') {
                     value = S2R(param3)
@@ -604,11 +613,22 @@ export const initExecuteCommandMake_terrain_saves = () => {
                 event.unregister()
                 if (field === 'delay') {
                     event.delay = value
-                } else if (field === 'period') {
-                    event.periodicInterval = value
                 } else {
                     event.duration = value
                 }
+                event.register()
+            } else if (field === 'period') {
+                let value: TerrainSaveEventPeriodicInterval | undefined
+                if (param3 !== 'none') {
+                    const parsedPeriod = parsePeriodicIntervalValue(param3)
+                    if (parsedPeriod === null) {
+                        return USAGE
+                    }
+                    value = parsedPeriod
+                }
+
+                event.unregister()
+                event.periodicInterval = value
                 event.register()
             } else if (field.toLowerCase() === 'onlvlend') {
                 let value: TerrainSaveEventOnLvlEnd | undefined
