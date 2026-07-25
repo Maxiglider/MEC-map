@@ -359,6 +359,39 @@ export const initExecuteCommandMake_terrain_saves = () => {
         },
     })
 
+    //-renameTerrainSave(rents) <label> <newLabel>
+    registerCommand({
+        name: 'renameTerrainSave',
+        alias: ['rents'],
+        group,
+        argDescription: '<label> <newLabel>',
+        description: 'Renames a terrain save',
+        cb: ({ nbParam, param1, param2 }, escaper) => {
+            if (nbParam !== 2) {
+                return USAGE
+            }
+
+            const terrainSave = getUdgTerrainSaves().resolveLabel(param1, escaper.getMakingLevel())
+            if (terrainSave === null) {
+                Text.erP(escaper.getPlayer(), "this terrain save doesn't exist, or at least not on your current level")
+                return true
+            }
+
+            const newLabel = param2
+            if (!isNewTerrainSaveLabelValid(newLabel)) {
+                Text.erP(escaper.getPlayer(), 'terrain save label cannot start with a digit or with "-"')
+                return true
+            }
+
+            if (terrainSave.setLabel(newLabel)) {
+                Text.mkP(escaper.getPlayer(), `terrain save renamed to "${newLabel}"`)
+            } else {
+                Text.erP(escaper.getPlayer(), 'this label is already used for this level/global scope')
+            }
+            return true
+        },
+    })
+
     //-createTerrainSaveEvent(crtse) <terrainSaveLabel> apply|a|unapply|u lvlStart|lvlEnd|mob [delay=<seconds>] [period=<seconds>|<time1>-<time2>] [duration=<seconds>] [onLvlEnd=apply|unapply|stop]
     registerCommand({
         name: 'createTerrainSaveEvent',

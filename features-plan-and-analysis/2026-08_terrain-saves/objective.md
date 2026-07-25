@@ -30,6 +30,8 @@
   - remove the terrain save and its associated events. Does **not** touch the live terrain, even if the save is currently applied — the map is left exactly as it looks at the moment of deletion.
 - `setTerrainSaveLevel` (`settsl`) `<label> <levelNum>|global|g|current|c`
   - move a terrain save between levels, or to/from global — subject to the same exclusivity rule as creation.
+- `renameTerrainSave` (`rents`) `<label> <newLabel>`
+  - rename a terrain save. Same label validity rule as creation (can't start with a digit or `-`), and same (label, level) uniqueness/exclusivity rule as `setTerrainSaveLevel`.
 
 ## Events to apply terrain saves during the game
 

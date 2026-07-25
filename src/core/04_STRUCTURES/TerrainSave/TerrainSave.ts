@@ -41,8 +41,14 @@ export class TerrainSave {
     }
 
     getLabel = (): string => this.label
-    setLabel = (newLabel: string) => {
+    // false if newLabel is already used at this TerrainSave's own (label, level) scope by a different save.
+    setLabel = (newLabel: string): boolean => {
+        if (!getUdgTerrainSaves().canAssignLevel(newLabel, this.level, this)) {
+            return false
+        }
+
         this.label = newLabel
+        return true
     }
 
     getLevel = (): Level | null => this.level
