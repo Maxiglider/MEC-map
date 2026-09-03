@@ -3,12 +3,14 @@ import { progressionUtils } from 'Utils/ProgressionUtils'
 import { PROD } from 'env'
 import { getUdgEscapers } from '../../../globals'
 import { makingRightsToAll } from '../06_COMMANDS/Rights/manage_rights'
+import { init_HeroEffect } from './hero-effect'
 
 export const init_Test = () => {
     const { ExecuteCommand } = ServiceManager.getService('Cmd')
 
     if (!PROD) {
         makingRightsToAll()
+        init_HeroEffect()
 
         const escaper = getUdgEscapers().get(0)
 

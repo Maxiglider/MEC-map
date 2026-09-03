@@ -1,5 +1,5 @@
 const loc = Location(0, 0)
-const GetLocZ = (x: number, y: number) => {
+export const GetLocZ = (x: number, y: number) => {
     MoveLocation(loc, x, y)
     return GetLocationZ(loc)
 }
