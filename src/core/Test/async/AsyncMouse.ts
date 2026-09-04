@@ -56,6 +56,15 @@ const FLICKER_DELAY = 0.025
  * costs the hover reads the lattice lives on.
  */
 const MAX_VISIBLE_TICKS = 0
+
+/**
+ * The lattice only hides itself so that it stops swallowing the clicks. When nothing needs a
+ * click to reach the game any more, which is what AUTO_ORDERS_MODE is about, it can stay visible
+ * for good: that spares 416 visibility calls per cycle, so more ticks per second, so a faster
+ * convergence. It does not lower the floor, which is the delay a moved tile needs before its
+ * hover state can be trusted (FLICKER_DELAY).
+ */
+const KEEP_TRACKER_VISIBLE = false
 const SCREEN_SIZE_CHECK_PERIOD_TICKS = 512
 const ERROR_BOUND = 0.15
 /** The tiles must stay above anything they share the screen with, or they get no cursor at all */
@@ -206,7 +215,10 @@ const updateTracker = () => {
     // Every tooltip is wiped, not only the one that hit: a flag left visible would be found by
     // every later scan, and the lattice would keep recentering on that one tile.
     clearTooltips()
-    setTrackerVisible(false)
+
+    if (!KEEP_TRACKER_VISIBLE) {
+        setTrackerVisible(false)
+    }
 
     state.hitCount++
     state.hitsPerLevel[hit.level]++

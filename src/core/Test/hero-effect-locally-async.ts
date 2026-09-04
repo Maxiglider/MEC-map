@@ -4,6 +4,7 @@ import { arrayPush } from '../01_libraries/Basic_functions'
 import { getAsyncMousePosition, initAsyncMouse } from './async/AsyncMouse'
 import { getFullScreenFrameParent, getScreenWidth } from './async/FrameParent'
 import { initScreen2World, screen2World } from './async/Screen2World'
+import { AUTO_TURN_MODE } from './hero-effect-auto-turn'
 import {
     getLocalMousePosition,
     initHeroEffect,
@@ -333,7 +334,7 @@ const initAfterMapStart = () => {
         initScreen2World()
     }
 
-    if (!ENABLE_CLICK_CATCHER) {
+    if (!ENABLE_CLICK_CATCHER || AUTO_TURN_MODE) {
         debugPrint('click catcher disabled, only the asynchronous mouse is running.')
         return
     }

@@ -1,6 +1,7 @@
 import { createEvent } from 'Utils/mapUtils'
 import { getUdgEscapers } from '../../../globals'
 import { Natives } from '../wc3_natives_unsecured/Natives'
+import { AUTO_TURN_MODE, startAutoTurn, stopAutoTurn } from './hero-effect-auto-turn'
 import { initHeroEffect, LOG_CLICKS, setHeroEffectPosition, takeLastLocalClickTime } from './hero-effect-common'
 
 /**
@@ -60,7 +61,18 @@ export const init_HeroEffectOnNetwork = () => {
                     // given from a synchronized event, hence on every machine at once.
                     // "hero-effect-locally-async" gives it earlier than this, but on one machine
                     // only, which is why it is solo only.
-                    const hero = getUdgEscapers().get(GetPlayerId(Natives.UGetTriggerPlayer()))?.getHero()
+                    const escaperId = GetPlayerId(Natives.UGetTriggerPlayer())
+                    const hero = getUdgEscapers().get(escaperId)?.getHero()
+
+                    if (AUTO_TURN_MODE) {
+                        // the right click still orders the hero, and switches the steering on:
+                        // one is for the ground one walks on, the other for the ice one slides on
+                        if (isRightClick) {
+                            startAutoTurn(escaperId)
+                        } else {
+                            stopAutoTurn()
+                        }
+                    }
 
                     if (!isRightClick) {
                         return // the left click only moves the effect through the asynchronous path
