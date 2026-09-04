@@ -41,9 +41,18 @@ export type AutoTurnMode = 'off' | 'sync' | 'async'
 export const AUTO_TURN_MODES: AutoTurnMode[] = ['off', 'sync', 'async']
 
 const modes: { [escaperId: number]: AutoTurnMode } = {}
+/** The mode says where the cursor is read, this says whether the hero is being steered right now */
+const steering: { [escaperId: number]: boolean } = {}
 const state = { timer: undefined as Timer | undefined }
 
 export const getAutoTurnMode = (escaperId: number) => modes[escaperId] ?? 'off'
+
+export const isSteering = (escaperId: number) => getAutoTurnMode(escaperId) !== 'off' && steering[escaperId] === true
+
+/** The right click hands the steering to the mouse, the left click gives it back */
+export const setAutoTurnSteering = (escaperId: number, isOn: boolean) => {
+    steering[escaperId] = isOn
+}
 
 /** Where that player points, according to the mode they chose */
 const getCursorWorldPosition = (escaperId: number) => {
@@ -89,7 +98,7 @@ const startAutoTurnTimer = () => {
 
     state.timer = createTimer(AUTO_TURN_PERIOD, true, () => {
         getUdgEscapers().forAll(escaper => {
-            if (getAutoTurnMode(escaper.getId()) !== 'off') {
+            if (isSteering(escaper.getId())) {
                 turnSliderTowardsCursor(escaper.getId())
             }
         })
@@ -98,6 +107,9 @@ const startAutoTurnTimer = () => {
 
 export const setAutoTurnMode = (escaperId: number, mode: AutoTurnMode) => {
     modes[escaperId] = mode
+
+    // steering right away, so the mode can be tried without having to right click first
+    steering[escaperId] = mode !== 'off'
 
     if (mode !== 'off') {
         startAutoTurnTimer()

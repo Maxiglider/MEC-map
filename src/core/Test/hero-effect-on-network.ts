@@ -1,6 +1,7 @@
 import { createEvent } from 'Utils/mapUtils'
 import { getUdgEscapers } from '../../../globals'
 import { Natives } from '../wc3_natives_unsecured/Natives'
+import { getAutoTurnMode, setAutoTurnSteering } from './hero-effect-auto-turn'
 import { isTestingLeftClicks, takeLastLocalClickTime } from './hero-effect-common'
 
 /**
@@ -60,6 +61,12 @@ export const init_HeroEffectOnNetwork = () => {
                     // only, which is why it is solo only.
                     const escaperId = GetPlayerId(Natives.UGetTriggerPlayer())
                     const hero = getUdgEscapers().get(escaperId)?.getHero()
+
+                    // while a steering mode is chosen, the buttons hand the hero over to the mouse
+                    // and take it back, rather than each click being an order of its own
+                    if (getAutoTurnMode(escaperId) !== 'off') {
+                        setAutoTurnSteering(escaperId, isRightClick)
+                    }
 
                     if (!isRightClick) {
                         return // the left click only moves the effect through the asynchronous path

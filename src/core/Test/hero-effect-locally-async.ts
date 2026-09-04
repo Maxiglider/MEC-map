@@ -94,13 +94,13 @@ const TEAL = '|cff1ce6b9'
 
 const debugPrint = (message: string) => {
     if (DEBUG) {
-        print('hero-effect-locally-async: ' + message)
+        print(message)
     }
 }
 
 /** The local click, in teal, to tell it apart from its synchronized counterpart at a glance */
 const printLocalClick = (message: string) => {
-    print(TEAL + 'hero-effect-locally-async: ' + message + '|r')
+    print(TEAL + message + '|r')
 }
 
 type CatcherBounds = { left: number; bottom: number; right: number; top: number }
@@ -194,9 +194,20 @@ const getPushBackdrop = (button: framehandle) => {
     return pushBackdrop
 }
 
+/**
+ * A clicked button keeps the keyboard focus: it then eats the arrow keys, and the enter key
+ * activates it again, which reads as a click that was never made. Disabling and enabling it back
+ * drops that focus. Same trick as DefocusFrame in scripts/AsyncButtons.lua.
+ */
+const defocusCatcher = (button: framehandle) => {
+    BlzFrameSetEnable(button, false)
+    BlzFrameSetEnable(button, true)
+}
+
 const onPressDetected = (button: framehandle) => {
     if (SILENCE_CLICK_SOUND) {
-        // a disabled button is not activated on release, so the game plays no sound for it
+        // a disabled button is not activated on release, so the game plays no sound for it, and
+        // it loses the keyboard focus on the way
         BlzFrameSetEnable(button, false)
         createTimer(SILENCE_REENABLE_DELAY, false, () => {
             // the test may have been turned off in between, and the catcher must stay quiet then
@@ -204,6 +215,8 @@ const onPressDetected = (button: framehandle) => {
                 BlzFrameSetEnable(button, true)
             }
         })
+    } else {
+        defocusCatcher(button)
     }
 
     const mouse = getAsyncMousePosition()
