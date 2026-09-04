@@ -5,7 +5,7 @@ import { EffectUtils } from '../../../Utils/EffectUtils'
 import { progressionUtils } from '../../../Utils/ProgressionUtils'
 import { createTimer, runInTrigger } from '../../../Utils/mapUtils'
 import { creepData } from '../../../creeps'
-import { canPlayerControlUnit, ClearTextForPlayer, IsBoolString, S2B } from '../../01_libraries/Basic_functions'
+import { B2S, canPlayerControlUnit, ClearTextForPlayer, IsBoolString, S2B } from '../../01_libraries/Basic_functions'
 import { Constants } from '../../01_libraries/Constants'
 import { IsInteger, PercentageStringOrX2Integer } from '../../01_libraries/Functions_on_numbers'
 import { checkOpacityValue, DrawGrid, SetGridOpacity, SetGridOpacityForAllGrids } from '../../01_libraries/Grid'
@@ -30,6 +30,9 @@ import { Cpm } from '../../08_GAME/Apm_clics_par_minute/Cpm'
 import { Globals } from '../../09_From_old_Worldedit_triggers/globals_variables_and_triggers'
 import { PRESS_TIME_TO_ENABLE_FOLLOW_MOUSE } from '../../Follow_mouse/Follow_mouse'
 import { GetStringAssignedFromCommand, KeyboardShortcut } from '../../Keyboard_shortcuts/KeyboardShortcut'
+import { AUTO_TURN_MODES, AutoTurnMode, getAutoTurnMode, setAutoTurnMode } from '../../Test/hero-effect-auto-turn'
+import { isTestingLeftClicks, setTestLeftClicks } from '../../Test/hero-effect-common'
+import { setClickCatcherEnabled } from '../../Test/hero-effect-locally-async'
 import { Natives } from '../../wc3_natives_unsecured/Natives'
 import { glowCb, isPlayerId, resolvePlayerId, resolvePlayerIds, USAGE } from '../Helpers/Command_functions'
 import { cameraFieldMap } from '../Helpers/commands-helpers'
@@ -1863,6 +1866,62 @@ export const initCommandAll = () => {
         description: 'Unally people, prevents you from reviving them',
         cb: ({ param1 }, escaper) => {
             resolvePlayerIds(param1, target => setAlliedState(escaper, target, false))
+            return true
+        },
+    })
+
+    //-autoTurn(at) async|sync|off   --> steers the hero towards the mouse while sliding
+    registerCommand({
+        name: 'autoTurn',
+        alias: ['at'],
+        group,
+        argDescription: 'async | sync | off',
+        description: 'Turns the hero towards the mouse while sliding: async is instant, sync goes through the network',
+        cb: ({ param1 }, escaper) => {
+            if (param1.length === 0) {
+                Text.mkP(escaper.getPlayer(), `Auto turn is ${getAutoTurnMode(escaper.getId())}`)
+                return true
+            }
+
+            if (AUTO_TURN_MODES.indexOf(param1 as AutoTurnMode) < 0) {
+                Text.erP(escaper.getPlayer(), USAGE + '-autoTurn async|sync|off')
+                return true
+            }
+
+            setAutoTurnMode(escaper.getId(), param1 as AutoTurnMode)
+            Text.mkP(escaper.getPlayer(), `Auto turn ${param1}`)
+
+            return true
+        },
+    })
+
+    //-testLeftClicks(tlc) <boolean>   --> compares the local and the network left click
+    registerCommand({
+        name: 'testLeftClicks',
+        alias: ['tlc'],
+        group,
+        argDescription: '<boolean>',
+        description: 'Left click moves an effect locally and logs how much earlier it is than the network click',
+        cb: ({ param1 }, escaper) => {
+            if (param1.length === 0) {
+                param1 = B2S(!isTestingLeftClicks(escaper.getId()))
+            }
+
+            if (!IsBoolString(param1)) {
+                Text.erP(escaper.getPlayer(), USAGE + '-testLeftClicks <boolean>')
+                return true
+            }
+
+            setTestLeftClicks(escaper.getId(), S2B(param1))
+
+            // the catcher is what reads the local click, and it only listens on the machine of
+            // the player testing: enabling it for everybody would steal their left clicks
+            if (GetLocalPlayer() === escaper.getPlayer()) {
+                setClickCatcherEnabled(S2B(param1))
+            }
+
+            Text.mkP(escaper.getPlayer(), `Left click test ${S2B(param1) ? 'on' : 'off'}`)
+
             return true
         },
     })

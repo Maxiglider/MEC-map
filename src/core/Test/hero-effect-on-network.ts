@@ -1,8 +1,7 @@
 import { createEvent } from 'Utils/mapUtils'
 import { getUdgEscapers } from '../../../globals'
 import { Natives } from '../wc3_natives_unsecured/Natives'
-import { AUTO_TURN_MODE, startAutoTurn, stopAutoTurn } from './hero-effect-auto-turn'
-import { initHeroEffect, LOG_CLICKS, setHeroEffectPosition, takeLastLocalClickTime } from './hero-effect-common'
+import { isTestingLeftClicks, takeLastLocalClickTime } from './hero-effect-common'
 
 /**
  * Right click moves the shared effect for everybody: EVENT_PLAYER_MOUSE_DOWN is a synchronized
@@ -17,8 +16,6 @@ import { initHeroEffect, LOG_CLICKS, setHeroEffectPosition, takeLastLocalClickTi
 const CYAN = '|cff1ce6b9'
 
 export const init_HeroEffectOnNetwork = () => {
-    initHeroEffect()
-
     getUdgEscapers().forAll(escaper => {
         createEvent({
             events: [t => TriggerRegisterPlayerEvent(t, escaper.getPlayer(), EVENT_PLAYER_MOUSE_DOWN)],
@@ -38,7 +35,7 @@ export const init_HeroEffectOnNetwork = () => {
                     // the two is the latency the local path saves
                     const localClickTime = isRightClick ? undefined : takeLastLocalClickTime()
 
-                    if (LOG_CLICKS && !isRightClick) {
+                    if (!isRightClick && isTestingLeftClicks(GetPlayerId(Natives.UGetTriggerPlayer()))) {
                         const delay =
                             localClickTime === undefined
                                 ? `${CYAN}(no local click to compare to)|r`
@@ -64,23 +61,11 @@ export const init_HeroEffectOnNetwork = () => {
                     const escaperId = GetPlayerId(Natives.UGetTriggerPlayer())
                     const hero = getUdgEscapers().get(escaperId)?.getHero()
 
-                    if (AUTO_TURN_MODE) {
-                        // the right click still orders the hero, and switches the steering on:
-                        // one is for the ground one walks on, the other for the ice one slides on
-                        if (isRightClick) {
-                            startAutoTurn(escaperId)
-                        } else {
-                            stopAutoTurn()
-                        }
-                    }
-
                     if (!isRightClick) {
                         return // the left click only moves the effect through the asynchronous path
                     }
 
                     hero && IssuePointOrder(hero, 'smart', x, y)
-
-                    setHeroEffectPosition(x, y)
                 },
             ],
         })

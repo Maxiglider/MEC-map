@@ -5,7 +5,7 @@ import { Constants } from '../01_libraries/Constants'
 import { TurnOnSlide } from '../07_TRIGGERS/Slide_and_CheckTerrain_triggers/To_turn_on_slide'
 import { getAsyncMousePosition } from './async/AsyncMouse'
 import { screen2World } from './async/Screen2World'
-import { getLocalMousePosition } from './hero-effect-common'
+import { getLocalMousePosition, getMousePosition } from './hero-effect-common'
 
 /**
  * Made for the slide: on ice the hero is carried along whatever the player does, and all that is
@@ -29,48 +29,77 @@ export const AUTO_TURN_MODE = true
  */
 const AUTO_TURN_PERIOD = Constants.SLIDE_PERIOD
 
-const state = {
-    timer: undefined as Timer | undefined,
-    escaperId: -1,
+/**
+ * off:   nothing is steered, the game behaves as it always did,
+ * sync:  the cursor comes from the synchronized mouse event, the same on every machine, and as
+ *        late as the network is. No divergence between players,
+ * async: the cursor comes from the asynchronous lattice: instant, but only known on the machine
+ *        of the player pointing, so it differs from one machine to another.
+ */
+export type AutoTurnMode = 'off' | 'sync' | 'async'
+
+export const AUTO_TURN_MODES: AutoTurnMode[] = ['off', 'sync', 'async']
+
+const modes: { [escaperId: number]: AutoTurnMode } = {}
+const state = { timer: undefined as Timer | undefined }
+
+export const getAutoTurnMode = (escaperId: number) => modes[escaperId] ?? 'off'
+
+/** Where that player points, according to the mode they chose */
+const getCursorWorldPosition = (escaperId: number) => {
+    // the lattice only knows about the cursor of this machine, so it can only serve its own player
+    if (getAutoTurnMode(escaperId) === 'async' && escaperId === GetPlayerId(GetLocalPlayer()!)) {
+        const asyncMouse = getAsyncMousePosition()
+        const asyncWorld = asyncMouse && screen2World(asyncMouse.x, asyncMouse.y)
+
+        return asyncWorld ?? getLocalMousePosition()
+    }
+
+    return getMousePosition(escaperId)
 }
 
-/** The cursor of the local player: the asynchronous position first, the synchronized one as a fallback */
-const getCursorWorldPosition = () => {
-    const asyncMouse = getAsyncMousePosition()
-    const asyncWorld = asyncMouse && screen2World(asyncMouse.x, asyncMouse.y)
+const turnSliderTowardsCursor = (escaperId: number) => {
+    const escaper = getUdgEscapers().get(escaperId)
+    const hero = escaper?.getHero()
 
-    return asyncWorld ?? getLocalMousePosition()
+    // only while sliding: on normal ground the hero is ordered around, not steered
+    if (!escaper || !hero || !escaper.isSliding()) {
+        return
+    }
+
+    const target = getCursorWorldPosition(escaperId)
+
+    if (!target) {
+        return
+    }
+
+    const angle = Atan2(target.y - GetUnitY(hero), target.x - GetUnitX(hero)) * bj_RADTODEG
+
+    // not SetUnitFacing, which turns progressively, and not BlzSetUnitFacingEx either: this is
+    // what the map itself uses, and it honours what the terrain allows (canTurn, canTurnAngle,
+    // drunk mode, secondary heroes)
+    TurnOnSlide.turnSliderToDirection(escaper, angle)
 }
 
-export const startAutoTurn = (escaperId: number) => {
-    stopAutoTurn()
+/** One timer for everybody: it is created once and never destroyed, so no handle comes and goes */
+const startAutoTurnTimer = () => {
+    if (state.timer) {
+        return
+    }
 
-    state.escaperId = escaperId
     state.timer = createTimer(AUTO_TURN_PERIOD, true, () => {
-        const escaper = getUdgEscapers().get(state.escaperId)
-        const hero = escaper?.getHero()
-
-        // only while sliding: on normal ground the hero is ordered around, not steered
-        if (!escaper || !hero || !escaper.isSliding()) {
-            return
-        }
-
-        const target = getCursorWorldPosition()
-
-        if (!target) {
-            return
-        }
-
-        const angle = Atan2(target.y - GetUnitY(hero), target.x - GetUnitX(hero)) * bj_RADTODEG
-
-        // not SetUnitFacing, which turns progressively, and not BlzSetUnitFacingEx either: this
-        // is what the map itself uses, and it honours what the terrain allows (canTurn,
-        // canTurnAngle, drunk mode, secondary heroes)
-        TurnOnSlide.turnSliderToDirection(escaper, angle)
+        getUdgEscapers().forAll(escaper => {
+            if (getAutoTurnMode(escaper.getId()) !== 'off') {
+                turnSliderTowardsCursor(escaper.getId())
+            }
+        })
     })
 }
 
-export const stopAutoTurn = () => {
-    state.timer?.destroy()
-    state.timer = undefined
+export const setAutoTurnMode = (escaperId: number, mode: AutoTurnMode) => {
+    modes[escaperId] = mode
+
+    if (mode !== 'off') {
+        startAutoTurnTimer()
+    }
 }

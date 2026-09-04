@@ -4,14 +4,12 @@ import { arrayPush } from '../01_libraries/Basic_functions'
 import { getAsyncMousePosition, initAsyncMouse } from './async/AsyncMouse'
 import { getFullScreenFrameParent, getScreenWidth } from './async/FrameParent'
 import { initScreen2World, screen2World } from './async/Screen2World'
-import { AUTO_TURN_MODE } from './hero-effect-auto-turn'
 import {
     getLocalMousePosition,
-    initHeroEffect,
-    LOG_CLICKS,
+    isTestingLeftClicks,
     setHeroEffectPosition,
     setLastLocalClickTime,
-    trackLocalMousePosition,
+    trackMousePositions,
 } from './hero-effect-common'
 
 /**
@@ -101,13 +99,25 @@ const debugPrint = (message: string) => {
 }
 
 /** The local click, in teal, to tell it apart from its synchronized counterpart at a glance */
-const debugPrintLocalClick = (message: string) => {
-    if (LOG_CLICKS) {
-        print(TEAL + 'hero-effect-locally-async: ' + message + '|r')
-    }
+const printLocalClick = (message: string) => {
+    print(TEAL + 'hero-effect-locally-async: ' + message + '|r')
 }
 
 type CatcherBounds = { left: number; bottom: number; right: number; top: number }
+
+/**
+ * The catchers are created for everybody, since a handle creation may never be local only, but
+ * they start disabled: a disabled button takes no mouse, so it swallows no click and plays no
+ * sound. "-testLeftClicks" enables them, on the machine of the player running the test only,
+ * which is safe as a frame is pure interface and belongs to no shared state.
+ */
+const catcherButtons: framehandle[] = []
+
+export const setClickCatcherEnabled = (isEnabled: boolean) => {
+    for (const button of catcherButtons) {
+        BlzFrameSetEnable(button, isEnabled)
+    }
+}
 
 /**
  * The parts of the screen the clicks are caught on: the 3D view, plus the two bottom corners of
@@ -156,6 +166,7 @@ const createCatcherButton = (bounds: CatcherBounds) => {
     BlzFrameSetAbsPoint(button, FRAMEPOINT_BOTTOMLEFT, bounds.left, bounds.bottom)
     BlzFrameSetAbsPoint(button, FRAMEPOINT_TOPRIGHT, bounds.right, bounds.top)
     BlzFrameSetAlpha(button, CATCHER_ALPHA)
+    BlzFrameSetEnable(button, false)
 
     return button
 }
@@ -187,7 +198,12 @@ const onPressDetected = (button: framehandle) => {
     if (SILENCE_CLICK_SOUND) {
         // a disabled button is not activated on release, so the game plays no sound for it
         BlzFrameSetEnable(button, false)
-        createTimer(SILENCE_REENABLE_DELAY, false, () => BlzFrameSetEnable(button, true))
+        createTimer(SILENCE_REENABLE_DELAY, false, () => {
+            // the test may have been turned off in between, and the catcher must stay quiet then
+            if (isTestingLeftClicks(GetPlayerId(GetLocalPlayer()!))) {
+                BlzFrameSetEnable(button, true)
+            }
+        })
     }
 
     const mouse = getAsyncMousePosition()
@@ -207,20 +223,22 @@ const onPressDetected = (button: framehandle) => {
     const clickTime = os.clock()
     setLastLocalClickTime(clickTime)
 
-    if (LOG_CLICKS) {
+    // the effect and the two log lines only exist for whoever asked for the test, the order below
+    // is what the click really does
+    if (isTestingLeftClicks(GetPlayerId(GetLocalPlayer()!))) {
         // the synchronized position is the true one, so the gap is what the screen to world
         // conversion (and the lattice feeding it) costs in accuracy
         const syncedMouse = getLocalMousePosition()
         const errorX = syncedMouse && math.floor(world.x - syncedMouse.x)
         const errorY = syncedMouse && math.floor(world.y - syncedMouse.y)
 
-        debugPrintLocalClick(
+        printLocalClick(
             `LOCAL left click at ${math.floor(world.x)}, ${math.floor(world.y)} ` +
                 `(t = ${math.floor(clickTime * 1000)} ms, ecart ${errorX}, ${errorY})`
         )
-    }
 
-    setHeroEffectPosition(world.x, world.y)
+        setHeroEffectPosition(world.x, world.y)
+    }
 
     if (ISSUE_ORDER_LOCALLY) {
         const hero = getUdgEscapers().get(GetPlayerId(GetLocalPlayer()!))?.getHero()
@@ -293,6 +311,7 @@ const initClickCatcher = () => {
         }
 
         arrayPush(catchers, { button, pushBackdrop, wasPushed: BlzFrameIsVisible(pushBackdrop) })
+        arrayPush(catcherButtons, button)
     }
 
     debugPrint(`polling the pushed backdrop of ${catchers.length} catchers...`)
@@ -334,7 +353,7 @@ const initAfterMapStart = () => {
         initScreen2World()
     }
 
-    if (!ENABLE_CLICK_CATCHER || AUTO_TURN_MODE) {
+    if (!ENABLE_CLICK_CATCHER) {
         debugPrint('click catcher disabled, only the asynchronous mouse is running.')
         return
     }
@@ -343,9 +362,7 @@ const initAfterMapStart = () => {
 }
 
 export const init_HeroEffectLocallyAsync = () => {
-    initHeroEffect()
-
-    trackLocalMousePosition() // for the debug comparison only
+    trackMousePositions() // the network mode of the auto turn needs them, and the debug lines too
 
     createTimer(INIT_DELAY, false, initAfterMapStart)
 }

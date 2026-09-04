@@ -5,50 +5,54 @@ import { getUdgEscapers } from '../../../globals'
 import { EscaperEffectFunctions } from '../04_STRUCTURES/Escaper/EscaperEffect_functions'
 import { Natives } from '../wc3_natives_unsecured/Natives'
 
-const SPAWN_TIME = 3 // game time, in seconds
-export const LOG_CLICKS = false
-
 /**
- * The one effect every variant moves, so that the ways of catching a click can be compared on
+ * The effect the left click test moves, so that the ways of catching a click can be compared on
  * the same object: whichever one just moved it is the one that reacted.
  *
- * It is created on every machine (a handle creation may never be local only), and only its
- * position is allowed to diverge afterwards.
+ * It is created on demand, by the "-testLeftClicks" command, and on every machine: a handle
+ * creation may never be local only. Only its position is allowed to diverge afterwards.
  */
 const heroEffect = {
     effect: undefined as effect | undefined,
-    isSpawnRegistered: false,
 }
 
-/** Spawns, at SPAWN_TIME, the model of the "-effect light" command on the hero of the first player */
-export const initHeroEffect = () => {
-    if (heroEffect.isSpawnRegistered) {
+/** Per player, as each one turns the test on for themselves */
+const testLeftClicks: { [escaperId: number]: boolean } = {}
+
+export const isTestingLeftClicks = (escaperId: number) => testLeftClicks[escaperId] === true
+
+/**
+ * Creates the model of the "-effect light" command on the hero of that player, and destroys it
+ * when the test is turned off. Called from a chat command, hence from a synchronized event,
+ * hence on every machine at the same moment: the handle comes and goes for everybody at once.
+ */
+export const setTestLeftClicks = (escaperId: number, isTesting: boolean) => {
+    testLeftClicks[escaperId] = isTesting
+
+    if (!isTesting) {
+        // as long as somebody else is still testing, the effect has to stay
+        for (const [_id, isSomeoneTesting] of pairs(testLeftClicks)) {
+            if (isSomeoneTesting) {
+                return
+            }
+        }
+
+        EffectUtils.destroyEffect(heroEffect.effect)
+        heroEffect.effect = undefined
+
         return
     }
 
-    heroEffect.isSpawnRegistered = true
+    if (heroEffect.effect) {
+        return
+    }
 
-    createEvent({
-        events: [t => TriggerRegisterTimerEventSingle(t, SPAWN_TIME)],
-        actions: [
-            () => {
-                const hero = getUdgEscapers().get(0)?.getHero()
+    const hero = getUdgEscapers().get(escaperId)?.getHero()
+    const modelName = EscaperEffectFunctions.String2EffectStr('light')
 
-                if (!hero) {
-                    print("hero-effect: the first player doesn't have a hero.")
-                    return
-                }
-
-                const modelName = EscaperEffectFunctions.String2EffectStr('light')
-
-                if (!modelName) {
-                    return
-                }
-
-                heroEffect.effect = EffectUtils.addSpecialEffect(modelName, GetUnitX(hero), GetUnitY(hero))
-            },
-        ],
-    })
+    if (hero && modelName) {
+        heroEffect.effect = EffectUtils.addSpecialEffect(modelName, GetUnitX(hero), GetUnitY(hero))
+    }
 }
 
 /** Teleports the effect, on the terrain surface. Creates no handle: local only calls are safe. */
@@ -63,18 +67,23 @@ export const setHeroEffectPosition = (x: number, y: number) => {
  * Local only: every machine writes the position of its own player, so it may never be read by
  * synced logic. The mouse move event does keep giving terrain coordinates over a frame.
  */
-const localMouse = {
-    x: 0,
-    y: 0,
-    isTracked: false,
-}
+/**
+ * Last position of the mouse of every player, tracked apart because neither a frame event nor a
+ * key event carries coordinates.
+ *
+ * The mouse move event is synchronized, so every machine knows where every player points: these
+ * positions are the same everywhere and can feed synced logic, unlike the asynchronous lattice.
+ * They are just as late as the network is.
+ */
+const mousePositions: { [escaperId: number]: { x: number; y: number } } = {}
+const tracker = { isTracked: false }
 
-export const trackLocalMousePosition = () => {
-    if (localMouse.isTracked) {
+export const trackMousePositions = () => {
+    if (tracker.isTracked) {
         return
     }
 
-    localMouse.isTracked = true
+    tracker.isTracked = true
 
     getUdgEscapers().forAll(escaper => {
         createEvent({
@@ -89,27 +98,18 @@ export const trackLocalMousePosition = () => {
                         return
                     }
 
-                    // from here on: local player only, and no handle operation
-                    if (GetLocalPlayer() !== Natives.UGetTriggerPlayer()) {
-                        return
-                    }
-
-                    localMouse.x = x
-                    localMouse.y = y
+                    mousePositions[GetPlayerId(Natives.UGetTriggerPlayer())] = { x, y }
                 },
             ],
         })
     })
 }
 
-/** Undefined until the mouse has been over the terrain at least once */
-export const getLocalMousePosition = () => {
-    if (localMouse.x === 0 && localMouse.y === 0) {
-        return undefined
-    }
+/** Undefined until that player has had their mouse over the terrain at least once */
+export const getMousePosition = (escaperId: number) => mousePositions[escaperId]
 
-    return localMouse
-}
+/** Same thing for the player sitting in front of this machine */
+export const getLocalMousePosition = () => getMousePosition(GetPlayerId(GetLocalPlayer()!))
 
 /**
  * os.clock() of the last click caught by the asynchronous path, so that the synchronized one can
