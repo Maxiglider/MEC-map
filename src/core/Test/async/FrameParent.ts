@@ -1,17 +1,30 @@
 import { Natives } from '../../wc3_natives_unsecured/Natives'
 
 /**
- * Frames parented to the game UI cannot leave the 4:3 center of the screen: they get malformed
- * past that border, which is why the click catcher never covered the side bands of a wide screen,
- * and why the mouse lattice could not track the cursor there either.
+ * Which parent the lattice and the catchers hang from. It decides two things at once:
  *
- * Parenting them to "ConsoleUIBackdrop" lifts that limitation. The price is a lower layer, below
- * the simple frames, which costs nothing here as none is used any more.
+ *  - 'gameUi': the safe one, but its children cannot leave the 4:3 center of the screen, so the
+ *    side bands of a wide screen are out of reach ("The Big UI-Frame Tutorial" by Tasyen,
+ *    section "4:3 Limitation"),
+ *  - 'consoleUiBackdrop': no 4:3 limit, but the "-ui" command hides that frame
+ *    (EnableDisableInterface.ts), and a hidden parent hides its children: the tracker goes blind,
+ *  - 'worldFrame': the 3D view, which "-ui" leaves alone. Whether its children receive the mouse
+ *    is what this constant is here to find out.
  *
- * Source: "The Big UI-Frame Tutorial" by Tasyen, section "4:3 Limitation".
+ * A frame cannot be re-parented once created, hence a constant rather than a runtime switch.
  */
+const PARENT = 'worldFrame' as 'gameUi' | 'consoleUiBackdrop' | 'worldFrame'
+
 export const getFullScreenFrameParent = () => {
-    return BlzGetFrameByName('ConsoleUIBackdrop', 0) ?? Natives.UBlzGetOriginFrame(ORIGIN_FRAME_GAME_UI, 0)
+    if (PARENT === 'consoleUiBackdrop') {
+        return BlzGetFrameByName('ConsoleUIBackdrop', 0) ?? Natives.UBlzGetOriginFrame(ORIGIN_FRAME_GAME_UI, 0)
+    }
+
+    if (PARENT === 'worldFrame') {
+        return Natives.UBlzGetOriginFrame(ORIGIN_FRAME_WORLD_FRAME, 0)
+    }
+
+    return Natives.UBlzGetOriginFrame(ORIGIN_FRAME_GAME_UI, 0)
 }
 
 /** Screen width in frame coordinates: 0.8 on a 4:3 screen, more on a wider one */
