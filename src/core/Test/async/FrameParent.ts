@@ -1,3 +1,4 @@
+import { getFullscreenParent } from '../../DisablingInterface/EnableDisableInterface'
 import { Natives } from '../../wc3_natives_unsecured/Natives'
 
 /**
@@ -8,14 +9,23 @@ import { Natives } from '../../wc3_natives_unsecured/Natives'
  *    section "4:3 Limitation"),
  *  - 'consoleUiBackdrop': no 4:3 limit, but the "-ui" command hides that frame
  *    (EnableDisableInterface.ts), and a hidden parent hides its children: the tracker goes blind,
- *  - 'worldFrame': the 3D view, which "-ui" leaves alone. Whether its children receive the mouse
- *    is what this constant is here to find out.
+ *  - 'worldFrame': the 3D view, which "-ui" leaves alone, but its children are bounded to the
+ *    4:3 center just the same,
+ *  - 'leaderboard': the parent MEC already builds for that very purpose in
+ *    DisablingInterface/EnableDisableInterface.ts ("Frame parent to allow above 4:3"): a
+ *    Leaderboard, sized to nothing, with its backdrop and title hidden. It escapes the 4:3 limit
+ *    and "-ui" does not touch it. It only exists two seconds into the game, which is before
+ *    anything here is created.
  *
  * A frame cannot be re-parented once created, hence a constant rather than a runtime switch.
  */
-const PARENT = 'worldFrame' as 'gameUi' | 'consoleUiBackdrop' | 'worldFrame'
+const PARENT = 'leaderboard' as 'gameUi' | 'consoleUiBackdrop' | 'worldFrame' | 'leaderboard'
 
 export const getFullScreenFrameParent = () => {
+    if (PARENT === 'leaderboard') {
+        return getFullscreenParent() ?? Natives.UBlzGetOriginFrame(ORIGIN_FRAME_GAME_UI, 0)
+    }
+
     if (PARENT === 'consoleUiBackdrop') {
         return BlzGetFrameByName('ConsoleUIBackdrop', 0) ?? Natives.UBlzGetOriginFrame(ORIGIN_FRAME_GAME_UI, 0)
     }

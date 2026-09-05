@@ -56,6 +56,13 @@ export const init_customUI = function () {
     })
 }
 
+/**
+ * The Leaderboard created above as a parent, the one frame that both escapes the 4:3 center of
+ * the screen and survives "-ui", which hides ConsoleUIBackdrop and ConsoleUI but not this.
+ * Undefined until init_customUI has run, two seconds into the game.
+ */
+export const getFullscreenParent = () => parentFullscreen
+
 export const DisableInterface = function (showMinimap: boolean = true) {
     if (showMinimap) {
         BlzHideOriginFrames(false)
