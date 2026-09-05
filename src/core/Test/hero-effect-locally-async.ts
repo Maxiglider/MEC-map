@@ -107,14 +107,17 @@ type CatcherBounds = { left: number; bottom: number; right: number; top: number 
 
 /**
  * The catchers are created for everybody, since a handle creation may never be local only, but
- * they start disabled: a disabled button takes no mouse, so it swallows no click and plays no
- * sound. "-testLeftClicks" enables them, on the machine of the player running the test only,
- * which is safe as a frame is pure interface and belongs to no shared state.
+ * they start hidden. Disabling them is not enough: a disabled frame still takes up the screen and
+ * still swallows the clicks that land on it, which cost the right click of the whole game.
+ *
+ * "-testLeftClicks" shows them, on the machine of the player running the test only, which is safe
+ * as a frame is pure interface and belongs to no shared state.
  */
 const catcherButtons: framehandle[] = []
 
 export const setClickCatcherEnabled = (isEnabled: boolean) => {
     for (const button of catcherButtons) {
+        BlzFrameSetVisible(button, isEnabled)
         BlzFrameSetEnable(button, isEnabled)
     }
 }
@@ -166,6 +169,7 @@ const createCatcherButton = (bounds: CatcherBounds) => {
     BlzFrameSetAbsPoint(button, FRAMEPOINT_BOTTOMLEFT, bounds.left, bounds.bottom)
     BlzFrameSetAbsPoint(button, FRAMEPOINT_TOPRIGHT, bounds.right, bounds.top)
     BlzFrameSetAlpha(button, CATCHER_ALPHA)
+    BlzFrameSetVisible(button, false)
     BlzFrameSetEnable(button, false)
 
     return button

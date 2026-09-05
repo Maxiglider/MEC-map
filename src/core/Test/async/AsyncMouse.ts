@@ -91,6 +91,8 @@ const tiles: { button: framehandle; tooltip: framehandle }[] = []
 
 const state = {
     isRunning: false,
+    /** Nothing reads the cursor most of the time, and a visible tile swallows the clicks it covers */
+    isActive: false,
     // position of the cursor, relative to the center of the screen
     rawX: 0,
     rawY: 0,
@@ -115,6 +117,33 @@ const state = {
 }
 
 /** Center of the screen is (0.4, 0.3), so this is what Screen2World expects */
+/**
+ * The lattice only earns its cost while something reads it: "-testLeftClicks" and the async mode
+ * of "-autoTurn". The rest of the time its tiles are hidden and its loop does nothing, so the
+ * clicks reach the game untouched, and nothing is scanned 800 times per second for no one.
+ */
+export const setAsyncMouseActive = (isActive: boolean) => {
+    if (!state.isRunning || state.isActive === isActive) {
+        return
+    }
+
+    state.isActive = isActive
+
+    if (!isActive) {
+        setTrackerVisible(false)
+        return
+    }
+
+    // The estimate is wherever it was left, which costs a few cycles of convergence and nothing
+    // more: the coarse levels span the whole screen, so a tile sits under the cursor wherever it
+    // is, and moving them all here is what refreshes their hover state. No need to drag the
+    // cursor back to the center, as the original does on its own start.
+    moveTracker(0, 0)
+    clearTooltips()
+    setTrackerVisible(true)
+    state.flickerTime = os.clock() + FLICKER_DELAY
+}
+
 export const getAsyncMousePosition = () => (state.isRunning ? { x: state.frameX, y: state.frameY } : undefined)
 
 /** Walks the lattice once, skipping its hollow center, where the finer level already sits */
@@ -361,11 +390,6 @@ export const initAsyncMouse = () => {
     state.isRunning = true
     state.tickRateStartTime = os.clock()
 
-    // The lattice only learns where the cursor is by moving tiles under it, so it cannot recover
-    // from a wrong guess while the cursor stands still: the cursor is put where the lattice
-    // starts instead, as the original does.
-    BlzSetMousePos(math.floor(state.screenWidth / 2), math.floor(BlzGetLocalClientHeight() / 2))
-
     if (DEBUG) {
         print(`AsyncMouse: ${tiles.length} tiles created.`)
 
@@ -434,9 +458,13 @@ export const initAsyncMouse = () => {
     }
 
     moveTracker(0, 0)
-    setTrackerVisible(true)
+    setTrackerVisible(false)
 
     createTimer(TICK, true, () => {
+        if (!state.isActive) {
+            return
+        }
+
         state.globalTick++
 
         if (os.clock() < state.flickerTime) {

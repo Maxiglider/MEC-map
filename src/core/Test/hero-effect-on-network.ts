@@ -60,7 +60,6 @@ export const init_HeroEffectOnNetwork = () => {
                     // "hero-effect-locally-async" gives it earlier than this, but on one machine
                     // only, which is why it is solo only.
                     const escaperId = GetPlayerId(Natives.UGetTriggerPlayer())
-                    const hero = getUdgEscapers().get(escaperId)?.getHero()
 
                     // while a steering mode is chosen, the buttons hand the hero over to the mouse
                     // and take it back, rather than each click being an order of its own
@@ -68,11 +67,10 @@ export const init_HeroEffectOnNetwork = () => {
                         setAutoTurnSteering(escaperId, isRightClick)
                     }
 
-                    if (!isRightClick) {
-                        return // the left click only moves the effect through the asynchronous path
-                    }
-
-                    hero && IssuePointOrder(hero, 'smart', x, y)
+                    // No order is given from here any more. The game gives its own for a right
+                    // click that reaches the world, and its own knows what was clicked: a
+                    // destructible, a unit, an item. A point order written here would replace that
+                    // with a plain move to the ground, and the target would be lost.
                 },
             ],
         })

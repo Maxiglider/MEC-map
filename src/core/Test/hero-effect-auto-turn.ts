@@ -3,9 +3,9 @@ import { Timer } from 'w3ts'
 import { getUdgEscapers } from '../../../globals'
 import { Constants } from '../01_libraries/Constants'
 import { TurnOnSlide } from '../07_TRIGGERS/Slide_and_CheckTerrain_triggers/To_turn_on_slide'
-import { getAsyncMousePosition } from './async/AsyncMouse'
+import { getAsyncMousePosition, setAsyncMouseActive } from './async/AsyncMouse'
 import { screen2World } from './async/Screen2World'
-import { getLocalMousePosition, getMousePosition } from './hero-effect-common'
+import { getLocalMousePosition, getMousePosition, isTestingLeftClicks } from './hero-effect-common'
 
 /**
  * Made for the slide: on ice the hero is carried along whatever the player does, and all that is
@@ -90,6 +90,22 @@ const turnSliderTowardsCursor = (escaperId: number) => {
     TurnOnSlide.turnSliderToDirection(escaper, angle)
 }
 
+/**
+ * The lattice covers the cursor with frames, and those swallow the clicks they cover. But on ice
+ * the hero is carried along and nobody clicks, while on walkable ground clicking is everything
+ * and the cursor needs no local reading. So the lattice only runs while the hero of this machine
+ * is actually sliding, which costs no click at all.
+ *
+ * The left click test is the exception: it is there to be clicked on, wherever the hero stands.
+ */
+const updateAsyncMouseNeed = () => {
+    const localEscaperId = GetPlayerId(GetLocalPlayer()!)
+    const isSlidingWithAsyncTurn =
+        getAutoTurnMode(localEscaperId) === 'async' && getUdgEscapers().get(localEscaperId)?.isSliding() === true
+
+    setAsyncMouseActive(isTestingLeftClicks(localEscaperId) || isSlidingWithAsyncTurn)
+}
+
 /** One timer for everybody: it is created once and never destroyed, so no handle comes and goes */
 const startAutoTurnTimer = () => {
     if (state.timer) {
@@ -97,6 +113,8 @@ const startAutoTurnTimer = () => {
     }
 
     state.timer = createTimer(AUTO_TURN_PERIOD, true, () => {
+        updateAsyncMouseNeed()
+
         getUdgEscapers().forAll(escaper => {
             if (isSteering(escaper.getId())) {
                 turnSliderTowardsCursor(escaper.getId())
