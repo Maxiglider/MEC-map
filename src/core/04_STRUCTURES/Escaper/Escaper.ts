@@ -30,7 +30,7 @@ import { DisableInterface, EnableInterface } from '../../DisablingInterface/Enab
 import { FollowMouse } from '../../Follow_mouse/Follow_mouse'
 import { SimpleFollowMouse } from '../../Follow_mouse/Follow_mouse_simple'
 import { KeyboardShortcutArray } from '../../Keyboard_shortcuts/KeyboardShortcutArray'
-import { HeroMovementState, sendAsyncHeroDeath } from '../../Test/async/AsyncHeroSync'
+import { HeroMovementState, sendAsyncHeroDeath, sendAsyncTerrainChange } from '../../Test/async/AsyncHeroSync'
 import { Natives } from '../../wc3_natives_unsecured/Natives'
 import { Level } from '../Level/Level'
 import { DEPART_PAR_DEFAUT } from '../Level/StartAndEnd'
@@ -838,6 +838,11 @@ export class Escaper extends EscaperMake {
      * happens for real in applyAsyncDeath, once they all agree.
      */
     kill = () => {
+        if (this.isAsyncControlledElsewhere()) {
+            // not this machine to say: its owner will tell where it died
+            return true
+        }
+
         if (this.isHeroEffectActive && !this.isHeroEffectFrozen && this.isAlive()) {
             this.isHeroEffectFrozen = true
 
@@ -1970,6 +1975,34 @@ export class Escaper extends EscaperMake {
     }
 
     isHeroAsEffect = () => this.isHeroEffectActive
+
+    /** This machine owns the hero and decides for it: it is the only one knowing where it is */
+    isAsyncControlledHere = () => this.isHeroEffectActive && GetLocalPlayer() === this.p
+
+    /** Another machine decides for this hero: this one only replays what it is told */
+    isAsyncControlledElsewhere = () => this.isHeroEffectActive && GetLocalPlayer() !== this.p
+
+    /** Announces a terrain change, so the others run the same check at the same place */
+    sendAsyncTerrainChangeIfNeeded = () => {
+        this.isAsyncControlledHere() && sendAsyncTerrainChange(this.escaperId, this.getHeroMovementState())
+    }
+
+    /**
+     * The terrain changed under the hero of another machine: this one puts it where that change
+     * happened and runs its own check there. Same position and same map, so same conclusions:
+     * slide started, slide terrain changed, or walkable ground reached.
+     */
+    applyAsyncTerrainChange = (sequence: number, movement: HeroMovementState) => {
+        if (sequence <= this.lastAsyncSequence || !this.isAsyncControlledElsewhere()) {
+            return
+        }
+
+        this.lastAsyncSequence = sequence
+        this.applyHeroMovementState(movement)
+        this.updateHeroEffect()
+
+        CheckTerrainTrigger.CheckTerrainActions(this.escaperId)
+    }
 
     /**
      * Hands the hero over to its effect, or takes it back.

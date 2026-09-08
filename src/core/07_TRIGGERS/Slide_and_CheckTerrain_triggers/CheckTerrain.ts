@@ -100,6 +100,14 @@ const initCheckTerrainTrigger = () => {
             return
         }
 
+        // While a hero slides as an effect, only the machine of its player knows where it really
+        // is: it is the one deciding what terrain it stands on, and it tells the others, which
+        // replay this very check at the position it sends. Reading the terrain under a position
+        // that only approximates the truth would take contradictory decisions.
+        if (escaper.isAsyncControlledElsewhere()) {
+            return
+        }
+
         const hero = escaper.getHero()
 
         if (!hero) {
@@ -128,6 +136,9 @@ const initCheckTerrainTrigger = () => {
             ) {
                 return
             }
+
+            // the others replay this check where it happened, and reach the same conclusions
+            escaper.sendAsyncTerrainChangeIfNeeded()
 
             escaper.setLastTerrainType(currentTerrainType)
 
@@ -215,7 +226,7 @@ const initCheckTerrainTrigger = () => {
         return checkTerrainTrigger
     }
 
-    return { CreateCheckTerrainTrigger }
+    return { CreateCheckTerrainTrigger, CheckTerrainActions }
 }
 
 export const CheckTerrainTrigger = initCheckTerrainTrigger()

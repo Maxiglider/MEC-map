@@ -10,15 +10,17 @@ import { Natives } from '../../wc3_natives_unsecured/Natives'
  * replay. BlzSendSyncData carries the decision, and the event it raises fires on every machine in
  * the same game turn, which is what turns a local truth into synchronized state.
  *
- * Two kinds of packets so far:
+ * Three kinds of packets:
  *  - POSITION, ten times a second, so the others keep a true picture,
- *  - DEATH, the moment this machine sees the hero die, so it dies at the same spot everywhere.
- *
- * Still to come, in the same shape: the start of a slide, a change of slide terrain, and reaching
- * walkable ground.
+ *  - DEATH, the moment this machine sees the hero die, so it dies at the same spot everywhere,
+ *  - TERRAIN, whenever the terrain under the hero changes. It carries no terrain of its own: the
+ *    others run the very same check at the position it carries, and the map being the same for
+ *    everybody, they reach the same conclusion. That one packet therefore covers the start of a
+ *    slide, a change of slide terrain and the return to walkable ground alike.
  */
 const POSITION_PREFIX = 'MEC_AHP'
 const DEATH_PREFIX = 'MEC_AHD'
+const TERRAIN_PREFIX = 'MEC_AHT'
 const FIELD_SEPARATOR = '|'
 
 /** Ten a second: the packets travel at network speed whatever the rate, so a higher one would only
@@ -137,6 +139,12 @@ export const initAsyncHeroSync = () => {
         packet && getUdgEscapers().get(packet.escaperId)?.applyAsyncPosition(packet.sequence, packet.movement)
     })
 
+    registerSyncEvent(TERRAIN_PREFIX, data => {
+        const packet = decode(data)
+
+        packet && getUdgEscapers().get(packet.escaperId)?.applyAsyncTerrainChange(packet.sequence, packet.movement)
+    })
+
     registerSyncEvent(DEATH_PREFIX, data => {
         const packet = decode(data)
 
@@ -144,6 +152,13 @@ export const initAsyncHeroSync = () => {
     })
 
     createTimer(POSITION_PERIOD, true, sendLocalHeroPosition)
+}
+
+/** Tells the others where the terrain changed, so they can see it change at the same place */
+export const sendAsyncTerrainChange = (escaperId: number, movement: HeroMovementState) => {
+    state.sequence++
+
+    BlzSendSyncData(TERRAIN_PREFIX, encode(escaperId, state.sequence, movement))
 }
 
 /** Only the player owning that hero sends it: they are the only one knowing where it stopped */
