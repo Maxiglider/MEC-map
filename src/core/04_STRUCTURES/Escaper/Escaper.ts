@@ -101,6 +101,8 @@ export class Escaper extends EscaperMake {
     private isHeroEffectFrozen = false
     /** Sequence of the last packet applied, so that a late one cannot undo a newer one */
     private lastAsyncSequence = 0
+    /** Set by the "-autoTurn async" mode: this hero slides as an effect */
+    private isAsyncSlideEnabled = false
 
     private invisUnit?: unit
     private collisionSize: number
@@ -659,6 +661,8 @@ export class Escaper extends EscaperMake {
             this.setSlideCurrentTurnPerPeriod(0)
         }
 
+        this.updateHeroEffectMode()
+
         return true
     }
 
@@ -913,6 +917,10 @@ export class Escaper extends EscaperMake {
         this.setHeroAsEffect(false)
         this.isHeroEffectFrozen = false
 
+        // Killed before the slide is turned back on: enabling it hands a sliding hero over to its
+        // effect again, which a dead one must not be.
+        this.killNow()
+
         // The slide may well be off here: it is turned on and off by the terrain under the hero,
         // and in async mode every machine reads that under its own position. Without it the body
         // would stop in mid air instead of finishing its flight.
@@ -921,8 +929,6 @@ export class Escaper extends EscaperMake {
         // after enableSlide, which samples the terrain height itself and would overwrite them
         this.setLastZ(movement.lastZ)
         this.setOldDiffZ(movement.oldDiffZ)
-
-        this.killNow()
     }
 
     /** Kills the hero for real, wherever its unit stands */
@@ -1975,6 +1981,27 @@ export class Escaper extends EscaperMake {
     }
 
     isHeroAsEffect = () => this.isHeroEffectActive
+
+    /**
+     * Whether this hero is meant to slide as an effect, which the "-autoTurn async" mode decides.
+     * Kept here rather than read from that mode, so that the hand over belongs to the sliding
+     * state itself and happens wherever that state changes.
+     */
+    setAsyncSlideEnabled = (isEnabled: boolean) => {
+        this.isAsyncSlideEnabled = isEnabled
+        this.updateHeroEffectMode()
+    }
+
+    /**
+     * Hands the hero over to its effect, or takes it back, following the sliding state. Called
+     * from enableSlide, so it happens at the very moment that state changes, on every machine:
+     * a timer noticing it later would flip each machine at a different point of the slide.
+     */
+    private updateHeroEffectMode = () => {
+        // a dead hero stays a unit: its body is carried by the slide, and every machine watches
+        // the same one fall
+        this.setHeroAsEffect(this.isAsyncSlideEnabled && this.isSliding() && this.isAlive() === true)
+    }
 
     /** This machine owns the hero and decides for it: it is the only one knowing where it is */
     isAsyncControlledHere = () => this.isHeroEffectActive && GetLocalPlayer() === this.p
