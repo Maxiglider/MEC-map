@@ -1,7 +1,6 @@
 import { ServiceManager } from 'Services'
 import { createTimer } from 'Utils/mapUtils'
 import { getUdgEscapers, getUdgLevels, udg_spawned_monster_units, udg_spawned_monsters } from '../../../../globals'
-import { arrayPush } from '../../01_libraries/Basic_functions'
 import { Escaper } from '../../04_STRUCTURES/Escaper/Escaper'
 
 /**
@@ -19,8 +18,6 @@ import { Escaper } from '../../04_STRUCTURES/Escaper/Escaper'
  */
 const CONTACT_CHECK_PERIOD = 0.02
 
-/** Where each hero was at the previous check, to sweep the step rather than test a single point */
-const lastCheckedPositions: { [escaperId: number]: { x: number; y: number } } = {}
 const state = { isInitialized: false }
 
 /**
@@ -58,8 +55,43 @@ type ContactContext = {
      * All of them, not the first one found: the immolation fired the handler once per monster
      * burning the hero, so touching a jump pad and a monster at the same instant, or two life
      * bonuses at once, must still count twice.
+     *
+     * Filled up to touchedCount and never emptied: a table dropped fifty times a second is a leak
+     * in the Lua of Warcraft III. It settles on the largest number of contacts ever seen at once.
      */
     touched: unit[]
+    touchedCount: number
+}
+
+/**
+ * One context per hero, kept for the whole game: everything the check needs is written into it
+ * rather than built again at every turn.
+ */
+const contexts: { [escaperId: number]: ContactContext } = {}
+
+const getContext = (escaper: Escaper) => {
+    const existing = contexts[escaper.getId()]
+
+    if (existing) {
+        return existing
+    }
+
+    const x = escaper.getHeroX()
+    const y = escaper.getHeroY()
+    const context: ContactContext = {
+        escaper,
+        fromX: x,
+        fromY: y,
+        toX: x,
+        toY: y,
+        heroRadius: 0,
+        touched: [],
+        touchedCount: 0,
+    }
+
+    contexts[escaper.getId()] = context
+
+    return context
 }
 
 /** Cheapest tests first: a monster that cannot burn, or one that is gone, costs almost nothing */
@@ -86,7 +118,8 @@ const testCandidate = (context: ContactContext, candidate: unit | undefined, con
     }
 
     if (squaredDistanceToStep(context.fromX, context.fromY, context.toX, context.toY, x, y) <= reach * reach) {
-        arrayPush(context.touched, candidate)
+        context.touched[context.touchedCount] = candidate
+        context.touchedCount++
     }
 }
 
@@ -128,21 +161,15 @@ const testPowerCircles = (context: ContactContext) => {
 }
 
 const checkEscaperContacts = (escaper: Escaper) => {
-    const toX = escaper.getHeroX()
-    const toY = escaper.getHeroY()
-    const from = lastCheckedPositions[escaper.getId()] ?? { x: toX, y: toY }
+    const context = getContext(escaper)
 
-    lastCheckedPositions[escaper.getId()] = { x: toX, y: toY }
-
-    const context: ContactContext = {
-        escaper,
-        fromX: from.x,
-        fromY: from.y,
-        toX,
-        toY,
-        heroRadius: escaper.getHeroCollisionSize(),
-        touched: [],
-    }
+    // where it was at the previous check, so that the step is swept rather than its arrival tested
+    context.fromX = context.toX
+    context.fromY = context.toY
+    context.toX = escaper.getHeroX()
+    context.toY = escaper.getHeroY()
+    context.heroRadius = escaper.getHeroCollisionSize()
+    context.touchedCount = 0
 
     testLevelMonsters(context)
     testSpawnedMonsters(context)
@@ -152,8 +179,8 @@ const checkEscaperContacts = (escaper: Escaper) => {
     // can kill a monster, which takes it out of the very tables being read. The handler is the one
     // the immolation called, so that a contact keeps meaning exactly what it meant, and it turns
     // down whatever comes after the hero died by itself.
-    for (const touched of context.touched) {
-        ServiceManager.getService('InvisUnit_is_getting_damage').onEscaperTouchingUnit(escaper, touched, 0)
+    for (let i = 0; i < context.touchedCount; i++) {
+        ServiceManager.getService('InvisUnit_is_getting_damage').onEscaperTouchingUnit(escaper, context.touched[i], 0)
     }
 }
 
