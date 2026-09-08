@@ -159,6 +159,7 @@ const onEscaperTouchingMonster = (escaper: Escaper, killingUnit: unit, damage: n
     }
 
     if (!escaper.isCoopInvul()) {
+        // todo find a solution for mortars with async slide control
         if (monster?.hasAttackGroundPos()) {
             SetWidgetLife(hero, GetWidgetLife(hero) - damage)
         }
