@@ -1,6 +1,7 @@
 import { ServiceManager } from 'Services'
 import { createTimer } from 'Utils/mapUtils'
 import { getUdgEscapers, getUdgLevels, udg_spawned_monster_units, udg_spawned_monsters } from '../../../../globals'
+import { arrayPush } from '../../01_libraries/Basic_functions'
 import { Escaper } from '../../04_STRUCTURES/Escaper/Escaper'
 
 /**
@@ -53,12 +54,17 @@ type ContactContext = {
     toX: number
     toY: number
     heroRadius: number
-    touched?: unit
+    /**
+     * All of them, not the first one found: the immolation fired the handler once per monster
+     * burning the hero, so touching a jump pad and a monster at the same instant, or two life
+     * bonuses at once, must still count twice.
+     */
+    touched: unit[]
 }
 
 /** Cheapest tests first: a monster that cannot burn, or one that is gone, costs almost nothing */
 const testCandidate = (context: ContactContext, candidate: unit | undefined, contactRadius: number) => {
-    if (context.touched || !candidate || contactRadius <= 0) {
+    if (!candidate || contactRadius <= 0) {
         return
     }
 
@@ -80,14 +86,14 @@ const testCandidate = (context: ContactContext, candidate: unit | undefined, con
     }
 
     if (squaredDistanceToStep(context.fromX, context.fromY, context.toX, context.toY, x, y) <= reach * reach) {
-        context.touched = candidate
+        arrayPush(context.touched, candidate)
     }
 }
 
 /** Every monster of every active level: several of them can be running at once */
 const testLevelMonsters = (context: ContactContext) => {
     getUdgLevels().forAll(level => {
-        if (context.touched || !level.isActivated()) {
+        if (!level.isActivated()) {
             return
         }
 
@@ -104,10 +110,6 @@ const testLevelMonsters = (context: ContactContext) => {
  */
 const testSpawnedMonsters = (context: ContactContext) => {
     for (const [handleId, spawned] of pairs(udg_spawned_monster_units)) {
-        if (context.touched) {
-            return
-        }
-
         spawned && testCandidate(context, spawned, udg_spawned_monsters[handleId]?.getImmolationRadius() ?? 0)
     }
 }
@@ -115,7 +117,7 @@ const testSpawnedMonsters = (context: ContactContext) => {
 /** The circle a dead ally leaves behind, which revives them when touched */
 const testPowerCircles = (context: ContactContext) => {
     getUdgEscapers().forAll(other => {
-        if (context.touched || other === context.escaper) {
+        if (other === context.escaper) {
             return
         }
 
@@ -139,15 +141,20 @@ const checkEscaperContacts = (escaper: Escaper) => {
         toX,
         toY,
         heroRadius: escaper.getHeroCollisionSize(),
+        touched: [],
     }
 
     testLevelMonsters(context)
     testSpawnedMonsters(context)
     testPowerCircles(context)
 
-    // the handler of the immolation, so that a contact keeps meaning exactly what it meant
-    context.touched &&
-        ServiceManager.getService('InvisUnit_is_getting_damage').onEscaperTouchingUnit(escaper, context.touched, 0)
+    // Handled once everything has been walked, rather than as each contact is found: a handler
+    // can kill a monster, which takes it out of the very tables being read. The handler is the one
+    // the immolation called, so that a contact keeps meaning exactly what it meant, and it turns
+    // down whatever comes after the hero died by itself.
+    for (const touched of context.touched) {
+        ServiceManager.getService('InvisUnit_is_getting_damage').onEscaperTouchingUnit(escaper, touched, 0)
+    }
 }
 
 export const initAsyncContactCheck = () => {
