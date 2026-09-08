@@ -59,7 +59,7 @@ export const SetMeteorEffect = (newEffect: string) => {
 
 function GetInvisUnitTypeFromCollisionSize(collisionSize: number): number {
     if (!IsHeroCollisionSizeValid(collisionSize)) {
-        throw 'GetInvisUnitTypeFromCollisionSize: collisionSize must be between 4 and 200 and multiple of 5'
+        throw 'GetInvisUnitTypeFromCollisionSize: collisionSize must be between 5 and 200 and multiple of 5'
     }
 
     if (collisionSize === 0) {
@@ -88,7 +88,7 @@ const PARKED_HERO_EFFECT_Z = -1000
 const ASYNC_SILENCE_TIMEOUT = 0.5
 
 export function IsHeroCollisionSizeValid(collisionSize: number): boolean {
-    return (collisionSize >= 0 && collisionSize <= 200) || collisionSize % 5 === 0
+    return collisionSize >= 0 && collisionSize <= 200 && collisionSize % 5 === 0
 }
 
 export class Escaper extends EscaperMake {
@@ -803,11 +803,11 @@ export class Escaper extends EscaperMake {
     }
 
     /**
-     * The radius the game itself used to decide a contact, read on the invisible unit rather than
-     * computed back from the collision size: the unit types behind it (Einv, Ei00..Ei40) hold what
-     * the editor gave them, in steps of five.
+     * The radius a contact is decided on. The invisible unit is built from it, through unit types
+     * kept in steps of five, and IsHeroCollisionSizeValid holds it to those steps: the two agree,
+     * so this is the reach the game itself used.
      */
-    getInvisUnitCollisionSize = () => (this.invisUnit ? BlzGetUnitCollisionSize(this.invisUnit) : 0)
+    getHeroCollisionSize = () => this.collisionSize
 
     getDummyPowerCircle = () => this.dummyPowerCircle
 

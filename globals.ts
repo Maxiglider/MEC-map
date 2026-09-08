@@ -159,6 +159,24 @@ export const udg_monsters: { [x: number]: Monster } = {}
 
 export const udg_spawned_monsters: { [x: number]: MonsterType | null } = {}
 
+/**
+ * The units behind udg_spawned_monsters, which only holds their type: a handle id cannot be
+ * turned back into a unit, and the contact check of the async slide has to walk them all,
+ * wherever they come from. Both tables are written by the two functions below so that they
+ * cannot drift apart, and udg_spawned_monsters keeps the shape the public API exposes.
+ */
+export const udg_spawned_monster_units: { [x: number]: unit | null } = {}
+
+export const registerSpawnedMonster = (monsterUnit: unit, monsterType: MonsterType) => {
+    udg_spawned_monsters[GetHandleId(monsterUnit)] = monsterType
+    udg_spawned_monster_units[GetHandleId(monsterUnit)] = monsterUnit
+}
+
+export const unregisterSpawnedMonster = (monsterUnit: unit) => {
+    udg_spawned_monsters[GetHandleId(monsterUnit)] = null
+    udg_spawned_monster_units[GetHandleId(monsterUnit)] = null
+}
+
 export const setHeroBaseCollisionSize = (newCollisionSize: number) => {
     globals.heroBaseCollisionSize = newCollisionSize
     getUdgEscapers().forAll(escaper => {

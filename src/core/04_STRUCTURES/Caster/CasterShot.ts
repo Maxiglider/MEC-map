@@ -1,6 +1,6 @@
-import { globals, udg_spawned_monsters } from '../../../../globals'
 import { createTimer } from 'Utils/mapUtils'
 import { Timer } from 'w3ts'
+import { globals, registerSpawnedMonster, unregisterSpawnedMonster } from '../../../../globals'
 import { MonsterType } from '../Monster/MonsterType'
 import { NewImmobileMonster } from '../Monster/Monster_functions'
 
@@ -22,7 +22,7 @@ export class CasterShot {
         this.diffY = speed * SinBJ(angle) * PERIOD
         this.nbTeleportationsRestantes = R2I(portee / speed / PERIOD)
         this.unite = NewImmobileMonster(monsterType, Xdep, Ydep, angle)
-        udg_spawned_monsters[GetHandleId(this.unite)] = monsterType
+        registerSpawnedMonster(this.unite, monsterType)
 
         const shot = this
 
@@ -43,7 +43,7 @@ export class CasterShot {
     }
 
     destroy = () => {
-        udg_spawned_monsters[GetHandleId(this.unite)] = null
+        unregisterSpawnedMonster(this.unite)
         RemoveUnit(this.unite)
         ;(this.unite as any) = null
         this.trig.destroy()

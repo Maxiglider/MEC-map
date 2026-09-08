@@ -3,7 +3,7 @@ import { createTimer, errorHandler } from 'Utils/mapUtils'
 import { Constants } from 'core/01_libraries/Constants'
 import { CombineHooks } from 'core/API/MecHookArray'
 import { Timer } from 'w3ts'
-import { udg_spawned_monsters } from '../../../../globals'
+import { registerSpawnedMonster, unregisterSpawnedMonster } from '../../../../globals'
 import { arrayPush } from '../../01_libraries/Basic_functions'
 import { udg_colorCode } from '../../01_libraries/Init_colorCodes'
 import { Text } from '../../01_libraries/Text'
@@ -216,7 +216,7 @@ export class MonsterSpawn {
 
         UnitRemoveAbility(monsterUnit, FourCC('Aloc'))
         this.simpleUnitRecycler.removeUnit(monsterUnit)
-        udg_spawned_monsters[GetHandleId(monsterUnit)] = null
+        unregisterSpawnedMonster(monsterUnit)
 
         const timer = MonsterSpawn.anyUnit2TimedUnspawnTimer.get(GetHandleId(monsterUnit))
         if (timer) {
@@ -341,7 +341,7 @@ export class MonsterSpawn {
             UnitAddAbility(monster, FourCC('Aloc'))
         }
 
-        udg_spawned_monsters[GetHandleId(monster)] = this.mt
+        registerSpawnedMonster(monster, this.mt)
         if (this.monsters) {
             GroupAddUnit(this.monsters, monster)
             MonsterSpawn.anyMonsterUnitId2MonsterSpawn.set(GetHandleId(monster), this)

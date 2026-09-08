@@ -1,6 +1,6 @@
 import { ServiceManager } from 'Services'
 import { createTimer } from 'Utils/mapUtils'
-import { getUdgEscapers, getUdgLevels, udg_spawned_monsters } from '../../../../globals'
+import { getUdgEscapers, getUdgLevels, udg_spawned_monster_units, udg_spawned_monsters } from '../../../../globals'
 import { Escaper } from '../../04_STRUCTURES/Escaper/Escaper'
 
 /**
@@ -10,6 +10,8 @@ import { Escaper } from '../../04_STRUCTURES/Escaper/Escaper'
  * the monsters has nothing to burn: the contact has to be looked for. Only the machine owning the
  * hero looks, since it is the only one knowing where it really is, and what it finds goes to the
  * very same handler the immolation used to call, so every consequence stays where it was written.
+ *
+ * The reach is the collision size of the hero, which the invisible unit was built from.
  *
  * Monsters carry the ability Locust to be unclickable, and the enumeration natives ignore those,
  * so the engine cannot be asked: the candidates come from what MEC itself keeps track of.
@@ -60,7 +62,7 @@ const testCandidate = (context: ContactContext, candidate: unit | undefined, con
         return
     }
 
-    if (!IsUnitAliveBJ(candidate) || IsUnitHidden(candidate)) {
+    if (GetUnitTypeId(candidate) === 0 || !IsUnitAliveBJ(candidate) || IsUnitHidden(candidate)) {
         return
     }
 
@@ -92,23 +94,22 @@ const testLevelMonsters = (context: ContactContext) => {
         level.monsters.forAll(monster => {
             testCandidate(context, monster.u, monster.getMonsterType()?.getImmolationRadius() ?? 0)
         })
-
-        // the temporary monsters of the spawns, held in a group as the enumeration natives would
-        // not see them either
-        level.monsterSpawns.forAll(spawn => {
-            spawn.monsters &&
-                ForGroup(spawn.monsters, () => {
-                    const spawned = GetEnumUnit()
-
-                    spawned &&
-                        testCandidate(
-                            context,
-                            spawned,
-                            udg_spawned_monsters[GetHandleId(spawned)]?.getImmolationRadius() ?? 0
-                        )
-                })
-        })
     })
+}
+
+/**
+ * The temporary monsters, whatever spawned them: a monster spawn, the shot of a caster, or
+ * whatever comes next. They are walked from their own registry rather than from what created
+ * them, so a new source of them needs nothing here.
+ */
+const testSpawnedMonsters = (context: ContactContext) => {
+    for (const [handleId, spawned] of pairs(udg_spawned_monster_units)) {
+        if (context.touched) {
+            return
+        }
+
+        spawned && testCandidate(context, spawned, udg_spawned_monsters[handleId]?.getImmolationRadius() ?? 0)
+    }
 }
 
 /** The circle a dead ally leaves behind, which revives them when touched */
@@ -137,10 +138,11 @@ const checkEscaperContacts = (escaper: Escaper) => {
         fromY: from.y,
         toX,
         toY,
-        heroRadius: escaper.getInvisUnitCollisionSize(),
+        heroRadius: escaper.getHeroCollisionSize(),
     }
 
     testLevelMonsters(context)
+    testSpawnedMonsters(context)
     testPowerCircles(context)
 
     // the handler of the immolation, so that a contact keeps meaning exactly what it meant
