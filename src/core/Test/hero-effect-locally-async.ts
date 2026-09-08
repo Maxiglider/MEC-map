@@ -1,6 +1,7 @@
 import { createTimer } from 'Utils/mapUtils'
 import { getUdgEscapers } from '../../../globals'
 import { arrayPush } from '../01_libraries/Basic_functions'
+import { initAsyncContactCheck } from './async/AsyncContactCheck'
 import { initAsyncHeroSync } from './async/AsyncHeroSync'
 import { getAsyncMousePosition, initAsyncMouse } from './async/AsyncMouse'
 import { getFullScreenFrameParent, getScreenWidth } from './async/FrameParent'
@@ -381,6 +382,7 @@ const initAfterMapStart = () => {
 
 export const init_HeroEffectLocallyAsync = () => {
     initAsyncHeroSync() // ready before any hero can die
+    initAsyncContactCheck() // an effect cannot be immolated, so its contacts are looked for
     trackMousePositions() // the network mode of the auto turn needs them, and the debug lines too
 
     createTimer(INIT_DELAY, false, initAfterMapStart)

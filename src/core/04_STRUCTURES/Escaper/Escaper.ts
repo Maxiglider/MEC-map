@@ -802,6 +802,15 @@ export class Escaper extends EscaperMake {
         SetUnitFlyHeight(this.hero, height, rate)
     }
 
+    /**
+     * The radius the game itself used to decide a contact, read on the invisible unit rather than
+     * computed back from the collision size: the unit types behind it (Einv, Ei00..Ei40) hold what
+     * the editor gave them, in steps of five.
+     */
+    getInvisUnitCollisionSize = () => (this.invisUnit ? BlzGetUnitCollisionSize(this.invisUnit) : 0)
+
+    getDummyPowerCircle = () => this.dummyPowerCircle
+
     moveInvisUnit(x: number, y: number) {
         if (this.invisUnit) {
             SetUnitX(this.invisUnit, x)

@@ -1,14 +1,14 @@
 import { ChangeTerrainType } from 'core/07_TRIGGERS/Modify_terrain_Functions/Modify_terrain_functions'
 import { Timer } from 'w3ts'
 import { getUdgTerrainTypes, globals, udg_monsters } from '../../../../globals'
+import { ServiceManager } from '../../../Services'
+import { createEvent } from '../../../Utils/mapUtils'
+import { ForceAngleBetween0And360, Round32 } from '../../01_libraries/Basic_functions'
+import { Natives } from '../../wc3_natives_unsecured/Natives'
+import { Hero2Escaper } from '../Escaper/Escaper_functions'
 import { Monster } from './Monster'
 import { MonsterType } from './MonsterType'
 import { NewImmobileMonster } from './Monster_functions'
-import { createEvent } from '../../../Utils/mapUtils'
-import { Hero2Escaper } from '../Escaper/Escaper_functions'
-import { ServiceManager } from '../../../Services'
-import { Natives } from '../../wc3_natives_unsecured/Natives'
-import { ForceAngleBetween0And360, Round32 } from '../../01_libraries/Basic_functions'
 
 export class MonsterNoMove extends Monster {
     x: number
@@ -214,7 +214,11 @@ export class MonsterNoMove extends Monster {
                         return
                     }
 
-                    ServiceManager.getService('InvisUnit_is_getting_damage').onEscaperTouchingMonster(escaper, this.u)
+                    ServiceManager.getService('InvisUnit_is_getting_damage').onEscaperTouchingMonster(
+                        escaper,
+                        this.u,
+                        0
+                    )
                 },
             ],
         })

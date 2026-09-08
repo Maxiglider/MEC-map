@@ -13,6 +13,54 @@ import { Natives } from '../../wc3_natives_unsecured/Natives'
 const InitTrig_InvisUnit_is_getting_damage = () => {
     let TAILLE_UNITE = 100
 
+    /**
+     * What happens when the hero touches something, whether the game told us through the
+     * immolation of a monster or our own contact check found it. An effect cannot be immolated,
+     * so an async slide has to look for its contacts by hand, and both roads end up here.
+     */
+    const onEscaperTouchingUnit = (escaper: Escaper, touchedUnit: unit, damage: number) => {
+        const hero = escaper.getHero()
+
+        if (!hero || !escaper.isAlive()) {
+            return
+        }
+
+        const hauteurHero = escaper.getHeroZ()
+        const hauteurKillingUnit = BlzGetUnitZ(touchedUnit) + GetUnitFlyHeight(touchedUnit)
+
+        if (RAbsBJ(hauteurHero - hauteurKillingUnit) >= TAILLE_UNITE) {
+            return
+        }
+
+        if (GetUnitTypeId(touchedUnit) === Constants.DUMMY_POWER_CIRCLE) {
+            const targetPlayer = GetUnitUserData(touchedUnit)
+
+            if (escaper.alliedState[targetPlayer]) {
+                const targetEscaper = getUdgEscapers().get(targetPlayer)
+
+                if (!escaper.isEscaperSecondary()) {
+                    ServiceManager.getService('Multiboard').increasePlayerScore(
+                        GetPlayerId(escaper.getPlayer()),
+                        'saves'
+                    )
+
+                    if (targetEscaper && hooks.hooks_onCoopHeroRevive) {
+                        for (const hook of hooks.hooks_onCoopHeroRevive.getHooks()) {
+                            hook.execute2(escaper, targetEscaper)
+                        }
+                    }
+                }
+
+                targetEscaper?.coopReviveHero()
+            }
+
+            return
+        }
+
+        // TODO; monsterSpawn mobs are null here, need a reference somehow as they're not in udg_monsters
+        onEscaperTouchingMonster(escaper, touchedUnit, damage)
+    }
+
     const gg_trg_InvisUnit_is_getting_damage = createEvent({
         events: [],
         actions: [
@@ -22,60 +70,14 @@ const InitTrig_InvisUnit_is_getting_damage = () => {
                 }
 
                 const invisUnit = Natives.UGetTriggerUnit()
-                const n = GetUnitUserData(invisUnit)
-                const escaper = getUdgEscapers().get(n)
-
-                if (!escaper) {
-                    return
-                }
-
+                const escaper = getUdgEscapers().get(GetUnitUserData(invisUnit))
                 const killingUnit = GetEventDamageSource()
-                if (!killingUnit) {
+
+                if (!escaper || !killingUnit) {
                     return
                 }
 
-                const hero = escaper.getHero()
-
-                if (!hero) {
-                    return
-                }
-
-                const hauteurHero = escaper.getHeroZ()
-                const hauteurKillingUnit = BlzGetUnitZ(killingUnit) + GetUnitFlyHeight(killingUnit)
-
-                if (!escaper.isAlive()) {
-                    return
-                }
-
-                if (RAbsBJ(hauteurHero - hauteurKillingUnit) < TAILLE_UNITE) {
-                    if (GetUnitTypeId(killingUnit) === Constants.DUMMY_POWER_CIRCLE) {
-                        const targetPlayer = GetUnitUserData(killingUnit)
-
-                        if (escaper.alliedState[targetPlayer]) {
-                            const targetEscaper = getUdgEscapers().get(targetPlayer)
-
-                            if (!escaper.isEscaperSecondary()) {
-                                ServiceManager.getService('Multiboard').increasePlayerScore(
-                                    GetPlayerId(escaper.getPlayer()),
-                                    'saves'
-                                )
-
-                                if (targetEscaper && hooks.hooks_onCoopHeroRevive) {
-                                    for (const hook of hooks.hooks_onCoopHeroRevive.getHooks()) {
-                                        hook.execute2(escaper, targetEscaper)
-                                    }
-                                }
-                            }
-
-                            targetEscaper?.coopReviveHero()
-                        }
-
-                        return
-                    } else {
-                        // TODO; monsterSpawn mobs are null here, need a reference somehow as they're not in udg_monsters
-                        onEscaperTouchingMonster(escaper, killingUnit)
-                    }
-                }
+                onEscaperTouchingUnit(escaper, killingUnit, GetEventDamage())
             },
         ],
     })
@@ -84,10 +86,10 @@ const InitTrig_InvisUnit_is_getting_damage = () => {
         TAILLE_UNITE = newSize
     }
 
-    return { TAILLE_UNITE, gg_trg_InvisUnit_is_getting_damage, setTailleUnite }
+    return { TAILLE_UNITE, gg_trg_InvisUnit_is_getting_damage, onEscaperTouchingUnit, setTailleUnite }
 }
 
-const onEscaperTouchingMonster = (escaper: Escaper, killingUnit: unit) => {
+const onEscaperTouchingMonster = (escaper: Escaper, killingUnit: unit, damage: number) => {
     const hero = escaper.getHero()
 
     if (!hero) {
@@ -158,13 +160,10 @@ const onEscaperTouchingMonster = (escaper: Escaper, killingUnit: unit) => {
 
     if (!escaper.isCoopInvul()) {
         if (monster?.hasAttackGroundPos()) {
-            SetWidgetLife(hero, GetWidgetLife(hero) - GetEventDamage())
+            SetWidgetLife(hero, GetWidgetLife(hero) - damage)
         }
 
-        if (
-            !monster?.hasAttackGroundPos() ||
-            (monster.hasAttackGroundPos() && GetWidgetLife(hero) - GetEventDamage() <= 0.405)
-        ) {
+        if (!monster?.hasAttackGroundPos() || (monster.hasAttackGroundPos() && GetWidgetLife(hero) - damage <= 0.405)) {
             escaper.kill()
         }
 
@@ -183,7 +182,11 @@ const onEscaperTouchingMonster = (escaper: Escaper, killingUnit: unit) => {
 const Trig_InvisUnit_is_getting_damage = InitTrig_InvisUnit_is_getting_damage()
 
 export const init_InvisUnit_is_getting_damage = () => {
-    return { onEscaperTouchingMonster, Trig_InvisUnit_is_getting_damage }
+    return {
+        onEscaperTouchingMonster,
+        onEscaperTouchingUnit: Trig_InvisUnit_is_getting_damage.onEscaperTouchingUnit,
+        Trig_InvisUnit_is_getting_damage,
+    }
 }
 
 export type IInvisUnit_is_getting_damage = ReturnType<typeof init_InvisUnit_is_getting_damage>
