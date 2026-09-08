@@ -1,6 +1,7 @@
 import { createTimer } from 'Utils/mapUtils'
 import { getUdgEscapers } from '../../../globals'
 import { arrayPush } from '../01_libraries/Basic_functions'
+import { initAsyncHeroSync } from './async/AsyncHeroSync'
 import { getAsyncMousePosition, initAsyncMouse } from './async/AsyncMouse'
 import { getFullScreenFrameParent, getScreenWidth } from './async/FrameParent'
 import { initScreen2World, screen2World } from './async/Screen2World'
@@ -379,6 +380,7 @@ const initAfterMapStart = () => {
 }
 
 export const init_HeroEffectLocallyAsync = () => {
+    initAsyncHeroSync() // ready before any hero can die
     trackMousePositions() // the network mode of the auto turn needs them, and the debug lines too
 
     createTimer(INIT_DELAY, false, initAfterMapStart)

@@ -1,7 +1,7 @@
 import { StopUnit } from 'core/01_libraries/Basic_functions'
 import { getUdgTerrainTypes } from '../../../../globals'
+import { Hero2Escaper } from '../Escaper/Escaper_functions'
 import { METEOR_CHEAT, METEOR_NORMAL } from './Meteor'
-import { Natives } from '../../wc3_natives_unsecured/Natives'
 
 const initMeteorFunctions = () => {
     const HeroAddCheatMeteor = (hero: unit) => {
@@ -10,7 +10,12 @@ const initMeteorFunctions = () => {
             throw new Error('HeroAddCheatMeteor: Failed to add meteor item to hero')
         }
 
-        if (getUdgTerrainTypes().getTerrainType(GetUnitX(hero), GetUnitY(hero))?.getKind() == 'slide') {
+        const escaper = Hero2Escaper(hero)
+
+        if (
+            escaper &&
+            getUdgTerrainTypes().getTerrainType(escaper.getHeroX(), escaper.getHeroY())?.getKind() == 'slide'
+        ) {
             SetItemDroppable(meteor, false)
         }
 

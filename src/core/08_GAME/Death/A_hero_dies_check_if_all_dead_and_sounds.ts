@@ -5,11 +5,10 @@ import { Constants } from 'core/01_libraries/Constants'
 import { IsHero } from 'core/04_STRUCTURES/Escaper/Escaper_functions'
 import { sameLevelProgression } from 'core/04_STRUCTURES/Level/LevelProgression'
 import { getUdgEscapers, getUdgTerrainTypes, globals } from '../../../../globals'
-import { Globals } from '../../09_From_old_Worldedit_triggers/globals_variables_and_triggers'
+import { Natives } from '../../wc3_natives_unsecured/Natives'
 import { AfkMode } from '../Afk_mode/Afk_mode'
 import { DeplacementHeroHorsDeathPath } from '../Mode_coop/deplacement_heros_hors_death_path'
 import { loseALifeAndRes } from './Lose_a_life_and_res'
-import { Natives } from '../../wc3_natives_unsecured/Natives'
 
 const initReviveTrigManager = () => {
     const groups: number[][] = []
@@ -138,7 +137,12 @@ export const InitTrig_A_hero_dies_check_if_all_dead_and_sounds = () => {
 
                         //déplacement du héros si mort sur le death path
                         if (
-                            getUdgTerrainTypes().getTerrainType(GetUnitX(hero2), GetUnitY(hero2))?.getKind() === 'death'
+                            getUdgTerrainTypes()
+                                .getTerrainType(
+                                    getUdgEscapers().get(n)?.getHeroX() ?? 0,
+                                    getUdgEscapers().get(n)?.getHeroY() ?? 0
+                                )
+                                ?.getKind() === 'death'
                         ) {
                             DeplacementHeroHorsDeathPath.DeplacementHeroHorsDeathPath(hero2)
                         }
@@ -153,8 +157,12 @@ export const InitTrig_A_hero_dies_check_if_all_dead_and_sounds = () => {
                                         continue
                                     }
 
-                                    const diffX = GetUnitX(h1) - GetUnitX(hero2)
-                                    const diffY = GetUnitY(h1) - GetUnitY(hero2)
+                                    const diffX =
+                                        (getUdgEscapers().get(i)?.getHeroX() ?? 0) -
+                                        (getUdgEscapers().get(n)?.getHeroX() ?? 0)
+                                    const diffY =
+                                        (getUdgEscapers().get(i)?.getHeroY() ?? 0) -
+                                        (getUdgEscapers().get(n)?.getHeroY() ?? 0)
 
                                     if (SquareRoot(diffX * diffX + diffY * diffY) < Constants.COOP_REVIVE_DIST) {
                                         getUdgEscapers().get(n)?.coopReviveHero()

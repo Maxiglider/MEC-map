@@ -1,6 +1,7 @@
 import { animUtils } from 'Utils/AnimUtils'
 import { errorHandler } from '../../../Utils/mapUtils'
 import { IsOnGround } from '../../01_libraries/Basic_functions'
+import { Natives } from '../../wc3_natives_unsecured/Natives'
 import { Escaper } from '../Escaper/Escaper'
 import { Hero2Escaper } from '../Escaper/Escaper_functions'
 import { Monster } from '../Monster/Monster'
@@ -8,7 +9,6 @@ import { MonsterType } from '../Monster/MonsterType'
 import { NewImmobileMonster } from '../Monster/Monster_functions'
 import { CasterShot } from './CasterShot'
 import { CasterType } from './CasterType'
-import { Natives } from '../../wc3_natives_unsecured/Natives'
 
 let escaper: Escaper
 let caster: Caster | undefined
@@ -45,9 +45,9 @@ const CalculerPointsIntersections = () => {
         if (!hero) return
 
         if (sliderSpeed >= 0) {
-            angleSlider = GetUnitFacing(hero)
+            angleSlider = escaper.getHeroFacing()
         } else {
-            angleSlider = GetUnitFacing(hero) + 180
+            angleSlider = escaper.getHeroFacing() + 180
         }
 
         x2 = x1 + decalSurX
@@ -144,8 +144,8 @@ const CasterTryToShoot = () => {
             //vérification que l'escaper est shootable (vivant et à portée de tir)
             estShootable = false
             if (escaper.isAlive()) {
-                x1 = GetUnitX(hero)
-                y1 = GetUnitY(hero)
+                x1 = escaper.getHeroX()
+                y1 = escaper.getHeroY()
                 x3 = caster.getX()
                 y3 = caster.getY()
 

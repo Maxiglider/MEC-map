@@ -21,7 +21,7 @@ const escaperTurnForOnePeriod = (escaper: Escaper | null) => {
 
     const remainingDegrees = escaper.getRemainingDegreesToTurn()
     if (remainingDegrees != 0) {
-        const currentAngle = GetUnitFacing(hero)
+        const currentAngle = escaper.getHeroFacing()
 
         let diffToApplyAbs = RMinBJ(RAbsBJ(remainingDegrees), RAbsBJ(escaper.getMaxSlideTurnPerPeriod()))
 
@@ -76,7 +76,7 @@ const escaperTurnForOnePeriod = (escaper: Escaper | null) => {
 
             //turn
             const newAngle = currentAngle + diffToApply
-            BlzSetUnitFacingEx(hero, newAngle)
+            escaper.setHeroFacing(newAngle)
         }
     }
 }
@@ -100,13 +100,13 @@ const initSlideTrigger = () => {
         if (!hero) return
 
         //offset of the hero position
-        const oldX = GetUnitX(hero)
-        const oldY = GetUnitY(hero)
+        const oldX = escaper.getHeroX()
+        const oldY = escaper.getHeroY()
 
         const lastZ = escaper.getLastZ()
         const speedZ = escaper.getSpeedZ()
         const oldDiffZ = escaper.getOldDiffZ()
-        let height = GetUnitFlyHeight(hero)
+        let height = escaper.getHeroFlyHeight()
         MoveLocation(tmpLoc, oldX, oldY)
         const z = GetLocationZ(tmpLoc)
 
@@ -114,7 +114,7 @@ const initSlideTrigger = () => {
         const allowTurning = escaper.getRotationSpeed() != 0 && (height < 1 || globals.CAN_TURN_IN_AIR)
 
         let oldAngle = escaper.oldAngle // Get the old angle before calculating the new one.
-        let newAngle = Deg2Rad(GetUnitFacing(hero))
+        let newAngle = Deg2Rad(escaper.getHeroFacing())
         let currentTime = os.clock()
 
         if (allowTurning && escaper.slidingMode == 'max') {
@@ -190,7 +190,7 @@ const initSlideTrigger = () => {
                 if (height < 0) {
                     height = 0
                 }
-                SetUnitFlyHeight(hero, height, 0)
+                escaper.setHeroFlyHeight(height, 0)
 
                 //coop
                 escaper.refreshCerclePosition()
@@ -198,11 +198,11 @@ const initSlideTrigger = () => {
                 delta = diffZ - oldDiffZ
                 if (delta < gravity) {
                     escaper.setSpeedZ(oldDiffZ + gravity)
-                    SetUnitFlyHeight(hero, -diffZ + escaper.getSpeedZ(), 0)
+                    escaper.setHeroFlyHeight(-diffZ + escaper.getSpeedZ(), 0)
 
                     // Stop turning if a click has been made just before
                     if (!globals.CAN_TURN_IN_AIR) {
-                        SetUnitFacing(hero, GetUnitFacing(hero))
+                        escaper.setHeroFacing(escaper.getHeroFacing())
                     }
                 } else if (!escaper.isAlive()) {
                     // The dead hero touches the ground, slide is deactivated

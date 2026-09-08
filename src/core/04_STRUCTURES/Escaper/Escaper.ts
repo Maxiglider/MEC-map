@@ -1,10 +1,10 @@
 import { ServiceManager } from 'Services'
 import { animUtils } from 'Utils/AnimUtils'
 import { EffectUtils } from 'Utils/EffectUtils'
-import { GetUnitZEx } from 'Utils/LocationUtils'
+import { GetLocZ, GetUnitZEx } from 'Utils/LocationUtils'
 import { IPoint, createPoint } from 'Utils/Point'
 import { progressionUtils } from 'Utils/ProgressionUtils'
-import { ForceAngleBetween0And360, IsIssuedOrder, StopUnit } from 'core/01_libraries/Basic_functions'
+import { AnglesDiff, ForceAngleBetween0And360, IsIssuedOrder, StopUnit } from 'core/01_libraries/Basic_functions'
 import { Constants } from 'core/01_libraries/Constants'
 import { udg_colorCode } from 'core/01_libraries/Init_colorCodes'
 import { SUCCESS_TEXT_COLORCODE, Text } from 'core/01_libraries/Text'
@@ -30,6 +30,7 @@ import { DisableInterface, EnableInterface } from '../../DisablingInterface/Enab
 import { FollowMouse } from '../../Follow_mouse/Follow_mouse'
 import { SimpleFollowMouse } from '../../Follow_mouse/Follow_mouse_simple'
 import { KeyboardShortcutArray } from '../../Keyboard_shortcuts/KeyboardShortcutArray'
+import { HeroMovementState, sendAsyncHeroDeath } from '../../Test/async/AsyncHeroSync'
 import { Natives } from '../../wc3_natives_unsecured/Natives'
 import { Level } from '../Level/Level'
 import { DEPART_PAR_DEFAUT } from '../Level/StartAndEnd'
@@ -75,11 +76,32 @@ function GetInvisUnitTypeFromCollisionSize(collisionSize: number): number {
     }
 }
 
+/** Where the hero effect waits while the hero is a unit: far under the map, out of sight */
+const PARKED_HERO_EFFECT_Z = -1000
+
 export function IsHeroCollisionSizeValid(collisionSize: number): boolean {
     return (collisionSize >= 0 && collisionSize <= 200) || collisionSize % 5 === 0
 }
 
 export class Escaper extends EscaperMake {
+    // On async slide mode, hero unit is converted to a hero effect
+    private heroEffect?: effect
+    private isHeroEffectActive = false
+
+    /**
+     * Where the hero really is while its effect stands in for it. The unit is parked out of the
+     * map then, and cannot be asked anything: it would answer the corner it sits in.
+     *
+     * Facing and fly height are mirrored too, and for the same reason as the position: in async
+     * mode they are computed from a cursor only this machine knows, so writing them on the unit
+     * would move a synchronized object with a local value.
+     */
+    private heroPos = { x: 0, y: 0, facing: 0, flyHeight: 0 }
+    /** Between the moment this machine sees the hero die and the moment every machine agrees on it */
+    private isHeroEffectFrozen = false
+    /** Sequence of the last packet applied, so that a late one cannot undo a newer one */
+    private lastAsyncSequence = 0
+
     private invisUnit?: unit
     private collisionSize: number
     private collisionLandmarkEffect?: effect
@@ -464,6 +486,8 @@ export class Escaper extends EscaperMake {
         this.refreshInvisUnit()
         this.refreshCollisionLandmark()
 
+        this.createHeroEffect()
+
         this.effects.showEffects(this.hero)
         delete this.lastTerrainType
         TimerStart(AfkMode.afkModeTimers[this.escaperId], AfkMode.timeMinAfk, false, () =>
@@ -616,12 +640,12 @@ export class Escaper extends EscaperMake {
 
             if (this.hero) {
                 StopUnit(this.hero)
-                this.setLastZ(BlzGetUnitZ(this.hero) + GetUnitFlyHeight(this.hero))
+                this.setLastZ(this.getHeroZ())
 
                 //follow mouse
                 if (this.followMouse) {
                     //be sure we aren't on reverse
-                    const tt = getUdgTerrainTypes().getTerrainType(GetUnitX(this.hero), GetUnitY(this.hero))
+                    const tt = getUdgTerrainTypes().getTerrainType(this.getHeroX(), this.getHeroY())
                     if (tt instanceof TerrainTypeSlide && tt.getSlideSpeed() >= 0) {
                         this.followMouse.startFollowingMouse()
                     }
@@ -669,8 +693,8 @@ export class Escaper extends EscaperMake {
     setLastPos = () => {
         if (!this.hero) return
 
-        const lastX = GetUnitX(this.hero)
-        const lastY = GetUnitY(this.hero)
+        const lastX = this.getHeroX()
+        const lastY = this.getHeroY()
 
         if (!this.lastPos || (this.lastPos.x !== lastX && this.lastPos.y !== lastY)) {
             this.lastPos?.__destroy()
@@ -679,15 +703,89 @@ export class Escaper extends EscaperMake {
     }
 
     //move methods
-    moveHero(x: number, y: number, updateLast = true) {
-        if (this.hero) {
-            if (updateLast) {
-                this.setLastPos()
-            }
 
-            SetUnitX(this.hero, x)
-            SetUnitY(this.hero, y)
+    /**
+     * Everything about where the hero is and where it looks goes through these, rather than
+     * through GetUnitX and friends: during an async slide the unit is parked out of the map and
+     * the effect is the hero, so asking the unit would give the corner it waits in.
+     */
+    getHeroX = () => (this.isHeroEffectActive ? this.heroPos.x : this.hero ? GetUnitX(this.hero) : 0)
+
+    getHeroY = () => (this.isHeroEffectActive ? this.heroPos.y : this.hero ? GetUnitY(this.hero) : 0)
+
+    getHeroFacing = () => (this.isHeroEffectActive ? this.heroPos.facing : this.hero ? GetUnitFacing(this.hero) : 0)
+
+    getHeroFlyHeight = () =>
+        this.isHeroEffectActive ? this.heroPos.flyHeight : this.hero ? GetUnitFlyHeight(this.hero) : 0
+
+    /** Terrain height at the hero position, plus how high above it the hero flies */
+    getHeroZ = () => GetLocZ(this.getHeroX(), this.getHeroY()) + this.getHeroFlyHeight()
+
+    moveHero(x: number, y: number, updateLast = true) {
+        if (!this.hero) {
+            return
         }
+
+        if (updateLast) {
+            this.setLastPos()
+        }
+
+        if (this.isHeroEffectActive && this.isHeroEffectFrozen) {
+            return // waiting for every machine to agree on where it died
+        }
+
+        this.heroPos.x = x
+        this.heroPos.y = y
+
+        if (this.isHeroEffectActive) {
+            this.updateHeroEffect()
+
+            return
+        }
+
+        SetUnitX(this.hero, x)
+        SetUnitY(this.hero, y)
+    }
+
+    /** Turns the hero on the spot, without the progressive rotation of SetUnitFacing */
+    setHeroFacing(angle: number) {
+        if (!this.hero) {
+            return
+        }
+
+        if (this.isHeroEffectActive && this.isHeroEffectFrozen) {
+            return // waiting for every machine to agree on where it died
+        }
+
+        this.heroPos.facing = angle
+
+        if (this.isHeroEffectActive) {
+            this.updateHeroEffect()
+
+            return
+        }
+
+        BlzSetUnitFacingEx(this.hero, angle)
+    }
+
+    setHeroFlyHeight(height: number, rate: number) {
+        if (!this.hero) {
+            return
+        }
+
+        if (this.isHeroEffectActive && this.isHeroEffectFrozen) {
+            return // waiting for every machine to agree on where it died
+        }
+
+        this.heroPos.flyHeight = height
+
+        if (this.isHeroEffectActive) {
+            this.updateHeroEffect()
+
+            return
+        }
+
+        SetUnitFlyHeight(this.hero, height, rate)
     }
 
     moveInvisUnit(x: number, y: number) {
@@ -734,7 +832,96 @@ export class Escaper extends EscaperMake {
         }
     }
 
+    /**
+     * While the hero is an effect, only this machine knows where it is, so it cannot die here and
+     * now: the effect freezes on the spot, and every machine is told where it stopped. The death
+     * happens for real in applyAsyncDeath, once they all agree.
+     */
     kill = () => {
+        if (this.isHeroEffectActive && !this.isHeroEffectFrozen && this.isAlive()) {
+            this.isHeroEffectFrozen = true
+
+            sendAsyncHeroDeath(this.escaperId, this.getHeroMovementState())
+
+            return true
+        }
+
+        return this.killNow()
+    }
+
+    /** Everything the other machines need to carry on the movement of this hero themselves */
+    getHeroMovementState = (): HeroMovementState => ({
+        x: this.heroPos.x,
+        y: this.heroPos.y,
+        facing: this.heroPos.facing,
+        // absolute rather than the degrees left to turn, which would drift from packet to packet
+        targetAngle: this.heroPos.facing + this.getRemainingDegreesToTurn(),
+        flyHeight: this.heroPos.flyHeight,
+        speedZ: this.getSpeedZ(),
+        lastZ: this.getLastZ(),
+        oldDiffZ: this.getOldDiffZ(),
+        slideMovePerPeriod: this.getSlideMovePerPeriod(),
+        turnPerPeriod: this.getSlideCurrentTurnPerPeriod(),
+    })
+
+    /** Puts this hero exactly where the machine of its player says it is */
+    private applyHeroMovementState = (movement: HeroMovementState) => {
+        this.heroPos.x = movement.x
+        this.heroPos.y = movement.y
+        this.heroPos.facing = movement.facing
+        this.heroPos.flyHeight = movement.flyHeight
+
+        this.setRemainingDegreesToTurn(AnglesDiff(movement.targetAngle, movement.facing))
+        this.setSlideCurrentTurnPerPeriod(movement.turnPerPeriod)
+        this.setSpeedZ(movement.speedZ)
+        this.setLastZ(movement.lastZ)
+        this.setOldDiffZ(movement.oldDiffZ)
+        this.setSlideMovePerPeriodOnResync(movement.slideMovePerPeriod)
+    }
+
+    /**
+     * A snapshot from the machine owning this hero. Between two of them the slide of every machine
+     * carries the movement on by itself, which is why the angle asked for and the angular speed
+     * travel along: the same numbers in, the same path out.
+     *
+     * The sender applies nothing here: it is already ahead of what it just sent.
+     */
+    applyAsyncPosition = (sequence: number, movement: HeroMovementState) => {
+        if (sequence <= this.lastAsyncSequence || GetLocalPlayer() === this.p || !this.isHeroEffectActive) {
+            return
+        }
+
+        this.lastAsyncSequence = sequence
+        this.applyHeroMovementState(movement)
+        this.updateHeroEffect()
+    }
+
+    /**
+     * The death everybody agreed on: the unit takes back the place, the facing and the fly height
+     * the effect had reached, and dies there. Dying in the air needs nothing special: the slide
+     * keeps carrying a dead hero until it lands, and only then stops.
+     */
+    applyAsyncDeath = (sequence: number, movement: HeroMovementState) => {
+        this.lastAsyncSequence = sequence
+        this.applyHeroMovementState(movement)
+
+        this.setHeroAsEffect(false)
+        this.isHeroEffectFrozen = false
+
+        // The slide may well be off here: it is turned on and off by the terrain under the hero,
+        // and in async mode every machine reads that under its own position. Without it the body
+        // would stop in mid air instead of finishing its flight.
+        this.enableSlide(true)
+
+        // after enableSlide, which samples the terrain height itself and would overwrite them
+        this.setLastZ(movement.lastZ)
+        this.setOldDiffZ(movement.oldDiffZ)
+
+        this.killNow()
+    }
+
+    /** Kills the hero for real, wherever its unit stands */
+    killNow = () => {
         if (this.isAlive()) {
             if (this.hero) {
                 KillUnit(this.hero)
@@ -780,7 +967,7 @@ export class Escaper extends EscaperMake {
                 SetUnitY(this.hero, y)
             }
         } else {
-            const angle = GetUnitFacing(this.hero)
+            const angle = this.getHeroFacing()
 
             this.removeHero()
             this.createHero(x, y, angle)
@@ -846,8 +1033,8 @@ export class Escaper extends EscaperMake {
             return
         }
 
-        const xHero = GetUnitX(this.hero)
-        const yHero = GetUnitY(this.hero)
+        const xHero = this.getHeroX()
+        const yHero = this.getHeroY()
 
         const minX = GetCameraTargetPositionX() - this.moveCamDistanceWidth / 2
         const minY = GetCameraTargetPositionY() - this.moveCamDistanceHeight / 2
@@ -874,13 +1061,32 @@ export class Escaper extends EscaperMake {
     }
 
     turnInstantly(angle: number) {
-        this.hero && BlzSetUnitFacingEx(this.hero, angle)
+        this.setHeroFacing(angle)
+    }
+
+    /**
+     * The slow turn of a unit, at its own turn rate. An effect has no such thing, so it turns on
+     * the spot instead: while sliding in async mode the angle comes from the cursor anyway, and
+     * the slide applies its own rotation speed on top.
+     */
+    turnProgressively(angle: number) {
+        if (!this.hero) {
+            return
+        }
+
+        if (this.isHeroEffectActive) {
+            this.setHeroFacing(angle)
+
+            return
+        }
+
+        SetUnitFacing(this.hero, angle)
     }
 
     reverse = () => {
         if (!this.hero) return
 
-        const angle: number = GetUnitFacing(this.hero) + 180
+        const angle: number = this.getHeroFacing() + 180
         this.turnInstantly(angle)
         if (this.slideLastAngleOrder != -1) {
             this.slideLastAngleOrder = this.slideLastAngleOrder + 180
@@ -986,6 +1192,16 @@ export class Escaper extends EscaperMake {
         this.slideMovePerPeriod = ss * Constants.SLIDE_PERIOD
     }
 
+    /**
+     * Forces how far the hero travels each period, as it was on the machine that saw it die. The
+     * temporary speed is dropped: its timer cannot be transmitted, and the hero is dead anyway,
+     * so this speed only has to last until it lands.
+     */
+    setSlideMovePerPeriodOnResync(movePerPeriod: number) {
+        this.disableSlideSpeedTemporarily()
+        this.slideMovePerPeriod = movePerPeriod
+    }
+
     disableSlideSpeedTemporarily() {
         if (this.tempSlideSpeedTimer) {
             this.tempSlideSpeedEffect && DestroyEffect(this.tempSlideSpeedEffect)
@@ -1076,7 +1292,7 @@ export class Escaper extends EscaperMake {
             this.slideSpeedAbsolute = false
 
             if (this.hero && this.isAlive()) {
-                const currentTerrainType = getUdgTerrainTypes().getTerrainType(GetUnitX(this.hero), GetUnitY(this.hero))
+                const currentTerrainType = getUdgTerrainTypes().getTerrainType(this.getHeroX(), this.getHeroY())
 
                 if (currentTerrainType instanceof TerrainTypeSlide) {
                     this.setSlideSpeed((this.getSlideMirror() ? -1 : 1) * currentTerrainType.getSlideSpeed())
@@ -1116,7 +1332,7 @@ export class Escaper extends EscaperMake {
             this.rotationSpeedAbsolute = false
 
             if (this.hero && this.isAlive()) {
-                const currentTerrainType = getUdgTerrainTypes().getTerrainType(GetUnitX(this.hero), GetUnitY(this.hero))
+                const currentTerrainType = getUdgTerrainTypes().getTerrainType(this.getHeroX(), this.getHeroY())
                 if (currentTerrainType instanceof TerrainTypeSlide) {
                     this.setRotationSpeed(currentTerrainType.getRotationSpeed())
                 }
@@ -1145,7 +1361,7 @@ export class Escaper extends EscaperMake {
         if (this.walkSpeedAbsolute) {
             this.walkSpeedAbsolute = false
             if (this.hero && this.isAlive()) {
-                const currentTerrainType = getUdgTerrainTypes().getTerrainType(GetUnitX(this.hero), GetUnitY(this.hero))
+                const currentTerrainType = getUdgTerrainTypes().getTerrainType(this.getHeroX(), this.getHeroY())
                 if (currentTerrainType instanceof TerrainTypeWalk) {
                     this.setWalkSpeed(currentTerrainType.getWalkSpeed())
                 }
@@ -1479,8 +1695,8 @@ export class Escaper extends EscaperMake {
         const mirrorHero = mirrorEscaper?.getHero()
 
         if (this.hero) {
-            const xHero = GetUnitX(this.hero)
-            const yHero = GetUnitY(this.hero)
+            const xHero = this.getHeroX()
+            const yHero = this.getHeroY()
 
             if (!this.revive(xHero, yHero, 'coop')) {
                 if (this.hero && (this.panCameraOnRevive === 'all' || this.panCameraOnRevive === 'coop')) {
@@ -1531,13 +1747,17 @@ export class Escaper extends EscaperMake {
         if (this.hero) {
             ShowUnit(this.powerCircle, true)
             SetUnitPathing(this.powerCircle, false)
-            SetUnitPosition(this.powerCircle, GetUnitX(this.hero), GetUnitY(this.hero))
+            SetUnitPosition(this.powerCircle, this.getHeroX(), this.getHeroY())
             ShowUnit(this.dummyPowerCircle, true)
             SetUnitPathing(this.dummyPowerCircle, false)
-            SetUnitPosition(this.dummyPowerCircle, GetUnitX(this.hero), GetUnitY(this.hero))
+            SetUnitPosition(this.dummyPowerCircle, this.getHeroX(), this.getHeroY())
         }
     }
 
+    /**
+     * The power circle only serves once the hero is dead, so it follows the unit rather than the
+     * effect: it has nothing to do while the hero slides.
+     */
     refreshCerclePosition = () => {
         if (!IsUnitHidden(this.powerCircle) && this.hero) {
             SetUnitPosition(this.powerCircle, GetUnitX(this.hero), GetUnitY(this.hero))
@@ -1603,8 +1823,7 @@ export class Escaper extends EscaperMake {
 
         if (lockCamRotation) {
             this.lockCamRotation = createTimer(0.001, true, () => {
-                this.hero &&
-                    SetCameraFieldForPlayer(this.getPlayer(), CAMERA_FIELD_ROTATION, GetUnitFacing(this.hero), 0)
+                this.hero && SetCameraFieldForPlayer(this.getPlayer(), CAMERA_FIELD_ROTATION, this.getHeroFacing(), 0)
             })
         }
     }
@@ -1691,7 +1910,7 @@ export class Escaper extends EscaperMake {
             return
         }
 
-        SetTextTagPos(this.textTag, GetUnitX(this.hero) - 64, GetUnitY(this.hero) + 192, 0)
+        SetTextTagPos(this.textTag, this.getHeroX() - 64, this.getHeroY() + 192, 0)
     }
 
     getTextTag = () => this.textTag
@@ -1723,6 +1942,126 @@ export class Escaper extends EscaperMake {
                 }
             }
         }
+    }
+
+    /**
+     * The effect stands in for the hero unit in async slide mode. It is created with the hero, on
+     * every machine at once as a handle demands, and never destroyed: it simply waits under the
+     * map when the hero is a unit, so that no handle ever appears or disappears mid game.
+     */
+    private createHeroEffect = () => {
+        if (this.heroEffect || !this.hero) {
+            return
+        }
+
+        this.heroEffect = EffectUtils.addSpecialEffect(Constants.HERO_MODEL_PATH, this.getHeroX(), this.getHeroY())
+
+        if (!this.heroEffect) {
+            return
+        }
+
+        BlzSetSpecialEffectColorByPlayer(this.heroEffect, Natives.UPlayer(this.baseColorId))
+        this.parkHeroEffect()
+    }
+
+    /** Sends the effect under the map, where nobody sees it */
+    private parkHeroEffect = () => {
+        this.heroEffect && BlzSetSpecialEffectPosition(this.heroEffect, 0, 0, PARKED_HERO_EFFECT_Z)
+    }
+
+    isHeroAsEffect = () => this.isHeroEffectActive
+
+    /**
+     * Hands the hero over to its effect, or takes it back.
+     *
+     * While the effect stands in, the unit is parked in the corner of the map, which is enough to
+     * hide it: its look is left alone. It must not move, because in async mode its position would
+     * be computed from a cursor only this machine knows, and moving a synchronized unit with a
+     * local value is what gets a player kicked. It still answers the orders of its player, which
+     * is what keeps the illusion of controlling it.
+     *
+     * The effect only takes over while sliding: back on walkable ground, or dead, the unit is put
+     * back where the effect had brought it and takes its part again.
+     */
+    setHeroAsEffect = (isEffect: boolean) => {
+        if (!this.hero || isEffect === this.isHeroEffectActive) {
+            return
+        }
+
+        if (isEffect) {
+            // the unit knows where it is for the last time here
+            this.heroPos.x = this.getHeroX()
+            this.heroPos.y = this.getHeroY()
+            this.heroPos.facing = this.getHeroFacing()
+            this.heroPos.flyHeight = this.getHeroFlyHeight()
+
+            this.isHeroEffectActive = true
+
+            // the native lock would drag the camera to the corner the unit waits in
+            this.releaseLockedCameraFromUnit()
+            this.updateHeroEffect()
+
+            return
+        }
+
+        this.isHeroEffectActive = false
+        this.parkHeroEffect()
+
+        // the unit takes back the place the effect had led it to
+        SetUnitX(this.hero, this.heroPos.x)
+        SetUnitY(this.hero, this.heroPos.y)
+        BlzSetUnitFacingEx(this.hero, this.heroPos.facing)
+        SetUnitFlyHeight(this.hero, this.heroPos.flyHeight, 0)
+
+        // the unit is back where it belongs, the native lock can hold it again
+        const viewer = getUdgEscapers().get(GetPlayerId(GetLocalPlayer()!))
+
+        viewer?.lockCamTarget === this && viewer.resetCamera()
+    }
+
+    /** Detaches the camera from the unit, without moving it: the effect takes over from here */
+    private releaseLockedCameraFromUnit = () => {
+        const viewer = getUdgEscapers().get(GetPlayerId(GetLocalPlayer()!))
+
+        if (viewer?.lockCamTarget !== this) {
+            return
+        }
+
+        ResetToGameCameraForPlayer(GetLocalPlayer()!, 0)
+        SetCameraPosition(this.heroPos.x, this.heroPos.y)
+    }
+
+    /**
+     * Draws the effect where the hero is, and keeps the unit in its corner: the player keeps
+     * ordering it around, and an order would otherwise walk it back into the map.
+     */
+    updateHeroEffect = () => {
+        if (!this.heroEffect || !this.hero || !this.isHeroEffectActive) {
+            return
+        }
+
+        BlzSetSpecialEffectPosition(this.heroEffect, this.heroPos.x, this.heroPos.y, this.getHeroZ())
+        BlzSetSpecialEffectYaw(this.heroEffect, Deg2Rad(this.heroPos.facing))
+
+        SetUnitX(this.hero, globals.MAP_MIN_X)
+        SetUnitY(this.hero, globals.MAP_MIN_Y)
+
+        this.updateLockedCamera()
+    }
+
+    /**
+     * A camera locked on the hero follows its unit, which now waits in a corner of the map, so it
+     * has to be carried by hand. Done here rather than on a timer of its own, so that the camera
+     * moves at the very moment the effect does, which is what keeps it smooth.
+     */
+    private updateLockedCamera = () => {
+        const viewer = getUdgEscapers().get(GetPlayerId(GetLocalPlayer()!))
+
+        if (viewer?.lockCamTarget !== this) {
+            return
+        }
+
+        SetCameraPosition(this.heroPos.x, this.heroPos.y)
     }
 
     updateUnitVertexColor = () => {
@@ -1775,8 +2114,8 @@ export class Escaper extends EscaperMake {
         }
 
         if (b && this.hero) {
-            const x = GetUnitX(this.hero)
-            const y = GetUnitY(this.hero)
+            const x = this.getHeroX()
+            const y = this.getHeroY()
 
             const clickWhereYouAre_Action = () => {
                 this.hero && this.isSliding() && IssuePointOrder(this.hero, 'smart', x, y)
@@ -1892,6 +2231,9 @@ export class Escaper extends EscaperMake {
 
         const invisUnitUnitTypeId = GetInvisUnitTypeFromCollisionSize(this.collisionSize)
 
+        // The invisible unit tells when the hero touches a monster, through the immolation of the
+        // monsters, which an effect cannot trigger: it stays on the unit, and the effect will need
+        // a contact check computed by hand.
         this.invisUnit = Natives.UCreateUnit(
             Constants.PLAYER_INVIS_UNIT,
             invisUnitUnitTypeId,
@@ -1925,8 +2267,8 @@ export class Escaper extends EscaperMake {
         if (this.hero) {
             this.collisionLandmarkEffect = AddSpecialEffect(
                 Constants.COLLISION_LANDMARK_MODEL,
-                GetUnitX(this.hero),
-                GetUnitY(this.hero)
+                this.getHeroX(),
+                this.getHeroY()
             )
             if (!this.collisionLandmarkEffect) {
                 throw new Error("Couldn't create collision landmark effect")
@@ -1946,7 +2288,7 @@ export class Escaper extends EscaperMake {
                 GetUnitZEx(this.hero) -
                 (Constants.COLLISION_LANDMARK_MODEL_BASE_HEIGHT * this.collisionSize) /
                     Constants.COLLISION_LANDMARK_MODEL_BASE_RADIUS
-            BlzSetSpecialEffectPosition(this.collisionLandmarkEffect, GetUnitX(this.hero), GetUnitY(this.hero), z)
+            BlzSetSpecialEffectPosition(this.collisionLandmarkEffect, this.getHeroX(), this.getHeroY(), z)
         }
     }
 

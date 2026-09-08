@@ -514,11 +514,11 @@ export const initExecuteCommandCheat = () => {
                 return true
             }
 
-            const x = GetUnitX(hero)
-            const y = GetUnitY(hero)
+            const x = escaper.getHeroX()
+            const y = escaper.getHeroY()
 
             targetEscaper.moveHero(x, y)
-            targetEscaper.turnInstantly(GetUnitFacing(hero))
+            targetEscaper.turnInstantly(escaper.getHeroFacing())
             runInTrigger(targetEscaper.coopReviveHero)
 
             const escaperSecond = GetMirrorEscaper(targetEscaper)

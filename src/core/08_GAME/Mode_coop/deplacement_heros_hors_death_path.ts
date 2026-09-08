@@ -1,4 +1,5 @@
 import { getUdgTerrainTypes } from '../../../../globals'
+import { Hero2Escaper } from '../../04_STRUCTURES/Escaper/Escaper_functions'
 
 const initDeplacementHeroHorsDeathPath = () => {
     const GRADUATION_ANGLE = 5
@@ -11,8 +12,9 @@ const initDeplacementHeroHorsDeathPath = () => {
         let y: number
         let xDecal: number
         let yDecal: number
-        let xHero = GetUnitX(hero)
-        let yHero = GetUnitY(hero)
+        const escaper = Hero2Escaper(hero)
+        let xHero = escaper ? escaper.getHeroX() : GetUnitX(hero)
+        let yHero = escaper ? escaper.getHeroY() : GetUnitY(hero)
         let nbPointsNonDeath: number
         let anglesCumules: number
         let premierAngleNonDeath = 0

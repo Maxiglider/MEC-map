@@ -19,8 +19,8 @@ import { TerrainTypeSlide } from 'core/04_STRUCTURES/TerrainType/TerrainTypeSlid
 import { Apm } from 'core/08_GAME/Apm_clics_par_minute/Apm'
 import { udg_symmetryAngle } from 'core/Double_heroes/double_heroes_config'
 import { globals } from '../../../../globals'
-import { AutoContinueAfterSliding } from './Auto_continue_after_sliding'
 import { Natives } from '../../wc3_natives_unsecured/Natives'
+import { AutoContinueAfterSliding } from './Auto_continue_after_sliding'
 
 const initTurnOnSlide = () => {
     //turn variables
@@ -133,15 +133,15 @@ const initTurnOnSlide = () => {
             } else {
                 //turn normally
                 if (escaper.slidingMode == 'max') {
-                    const currentAngle = GetUnitFacing(slider)
+                    const currentAngle = escaper.getHeroFacing()
                     escaper.setRemainingDegreesToTurn(AnglesDiff(angle, currentAngle))
                 } else {
-                    SetUnitFacing(slider, angle)
+                    escaper.turnProgressively(angle)
                 }
 
                 const h1 = escaperSecond?.getHero()
                 if (escaperSecond?.isSliding() && h1) {
-                    escaperSecond.setRemainingDegreesToTurn(AnglesDiff(angleSecond, GetUnitFacing(h1)))
+                    escaperSecond.setRemainingDegreesToTurn(AnglesDiff(angleSecond, escaperSecond.getHeroFacing()))
                 }
             }
             escaper.setSlideLastAngleOrder(angle)
@@ -170,8 +170,8 @@ const initTurnOnSlide = () => {
         //init variables
         slider = Natives.UGetTriggerUnit()
         n = GetUnitUserData(slider)
-        sliderX = GetUnitX(slider)
-        sliderY = GetUnitY(slider)
+        sliderX = escaper.getHeroX()
+        sliderY = escaper.getHeroY()
 
         if (triggerIsToLocation) {
             orderX = GetOrderPointX()

@@ -7,13 +7,13 @@ import { udg_colorCode } from 'core/01_libraries/Init_colorCodes'
 import { Escaper } from 'core/04_STRUCTURES/Escaper/Escaper'
 import { MonsterMultiplePatrols } from 'core/04_STRUCTURES/Monster/MonsterMultiplePatrols'
 import { MonsterNoMove } from 'core/04_STRUCTURES/Monster/MonsterNoMove'
-import { playerId2colorId } from '../core/06_COMMANDS/Helpers/Command_functions'
 import { PROD } from 'env'
 import { getUdgLevels, getUdgTerrainTypes, globals } from '../../globals'
 import { MonsterSimplePatrol } from '../core/04_STRUCTURES/Monster/MonsterSimplePatrol'
+import { playerId2colorId } from '../core/06_COMMANDS/Helpers/Command_functions'
+import { Natives } from '../core/wc3_natives_unsecured/Natives'
 import { pathingBlockerUtils } from './PathingBlockerUtils'
 import { IPoint, createPoint } from './Point'
-import { Natives } from '../core/wc3_natives_unsecured/Natives'
 
 type Point = { x: number; y: number }
 type ITileMap = { [x: number]: { [y: number]: number } }
@@ -495,8 +495,8 @@ const initProgressionUtils = () => {
             return -1
         }
 
-        const xHero = Math.floor(GetUnitX(hero) / Constants.LARGEUR_CASE) * Constants.LARGEUR_CASE
-        const yHero = Math.floor(GetUnitY(hero) / Constants.LARGEUR_CASE) * Constants.LARGEUR_CASE
+        const xHero = Math.floor(escaper.getHeroX() / Constants.LARGEUR_CASE) * Constants.LARGEUR_CASE
+        const yHero = Math.floor(escaper.getHeroY() / Constants.LARGEUR_CASE) * Constants.LARGEUR_CASE
 
         const heroProgression = progressionMap[xHero]?.[yHero]
 

@@ -5,8 +5,8 @@ import { AfkMode } from 'core/08_GAME/Afk_mode/Afk_mode'
 import { Timer } from 'w3ts'
 import { getUdgEscapers, globals } from '../../../../globals'
 import { createEvent, createTimer, forRange } from '../../../Utils/mapUtils'
-import { Escaper } from './Escaper'
 import { Natives } from '../../wc3_natives_unsecured/Natives'
+import { Escaper } from './Escaper'
 type IKeys = 'UP' | 'DOWN' | 'LEFT' | 'RIGHT'
 
 const FIRSTPERSON_SPEED_PER_PERIOD = 0.2
@@ -47,7 +47,7 @@ export class EscaperFirstPerson {
                                 !(this.isKeyDownState('LEFT') && this.isKeyDownState('RIGHT')) &&
                                 (this.isKeyDownState('LEFT') || this.isKeyDownState('RIGHT'))
                             ) {
-                                let angle = GetUnitFacing(hero)
+                                let angle = this.escaper.getHeroFacing()
 
                                 if (this.isKeyDownState('LEFT')) {
                                     angle += FIRSTPERSON_ANGLE_PER_PERIOD
@@ -62,7 +62,7 @@ export class EscaperFirstPerson {
                                 !(this.isKeyDownState('UP') && this.isKeyDownState('DOWN')) &&
                                 (this.isKeyDownState('UP') || this.isKeyDownState('DOWN'))
                             ) {
-                                const angle = math.rad(GetUnitFacing(hero))
+                                const angle = math.rad(this.escaper.getHeroFacing())
                                 let fwd = 0
 
                                 if (this.isKeyDownState('UP')) {
@@ -71,8 +71,8 @@ export class EscaperFirstPerson {
                                     fwd -= FIRSTPERSON_SPEED_PER_PERIOD * (this.escaper.isSliding() ? 1 : 3)
                                 }
 
-                                const newX = GetUnitX(hero) + fwd * Cos(angle)
-                                const newY = GetUnitY(hero) + fwd * Sin(angle)
+                                const newX = this.escaper.getHeroX() + fwd * Cos(angle)
+                                const newY = this.escaper.getHeroY() + fwd * Sin(angle)
                                 let preventMove = false
 
                                 if (!globals.canSlideOverPathingBlockers) {
@@ -97,7 +97,7 @@ export class EscaperFirstPerson {
                             SetCameraTargetControllerNoZForPlayer(player, hero, 0, 0, true)
                             SetCameraFieldForPlayer(player, CAMERA_FIELD_ANGLE_OF_ATTACK, 310, 0)
                             SetCameraFieldForPlayer(player, CAMERA_FIELD_FIELD_OF_VIEW, 1500, 0)
-                            SetCameraFieldForPlayer(player, CAMERA_FIELD_ROTATION, GetUnitFacing(hero), 0) // Using the duration argument can bug out the camera and gets it stuck to keep turning..
+                            SetCameraFieldForPlayer(player, CAMERA_FIELD_ROTATION, this.escaper.getHeroFacing(), 0) // Using the duration argument can bug out the camera and gets it stuck to keep turning..
                             SetCameraFieldForPlayer(player, CAMERA_FIELD_ZOFFSET, offsetZ + (isNormal ? 100 : -200), 0)
                         }
                     }

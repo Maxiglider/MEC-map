@@ -14,9 +14,10 @@ const initAutoContinueAfterSliding = () => {
     const ECART_MAX_ANGLE = 45
 
     const AutoContinueAfterSliding = (n: number) => {
-        const hero = getUdgEscapers().get(n)?.getHero()
+        const escaper = getUdgEscapers().get(n)
+        const hero = escaper?.getHero()
 
-        if (!hero) {
+        if (!escaper || !hero) {
             return
         }
 
@@ -25,8 +26,9 @@ const initAutoContinueAfterSliding = () => {
         }
 
         //vérification de l'angle
-        let angleHero2Target = Atan2(lastClickedY[n] - GetUnitY(hero), lastClickedX[n] - GetUnitX(hero)) * bj_RADTODEG
-        let diffAngle = RAbsBJ(angleHero2Target - GetUnitFacing(hero))
+        let angleHero2Target =
+            Atan2(lastClickedY[n] - escaper.getHeroY(), lastClickedX[n] - escaper.getHeroX()) * bj_RADTODEG
+        let diffAngle = RAbsBJ(angleHero2Target - escaper.getHeroFacing())
         if (diffAngle > ECART_MAX_ANGLE && diffAngle < 360 - ECART_MAX_ANGLE) {
             return
         }

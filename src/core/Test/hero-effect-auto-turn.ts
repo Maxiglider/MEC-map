@@ -116,6 +116,12 @@ const startAutoTurnTimer = () => {
         updateAsyncMouseNeed()
 
         getUdgEscapers().forAll(escaper => {
+            // The hero becomes an effect while it slides in async mode. Mode and sliding are both
+            // synchronized, so every machine creates and destroys that effect at the same moment,
+            // which a handle demands.
+            escaper.setHeroAsEffect(getAutoTurnMode(escaper.getId()) === 'async' && escaper.isSliding())
+            escaper.updateHeroEffect()
+
             if (isSteering(escaper.getId())) {
                 turnSliderTowardsCursor(escaper.getId())
             }

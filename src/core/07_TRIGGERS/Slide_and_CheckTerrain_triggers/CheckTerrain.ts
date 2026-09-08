@@ -106,8 +106,8 @@ const initCheckTerrainTrigger = () => {
             return
         }
 
-        const x = GetUnitX(hero)
-        const y = GetUnitY(hero)
+        const x = escaper.getHeroX()
+        const y = escaper.getHeroY()
         const lastTerrainType = escaper.getLastTerrainType()
         const currentTerrainType = getUdgTerrainTypes().getTerrainType(x, y)
 

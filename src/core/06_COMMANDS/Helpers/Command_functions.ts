@@ -304,15 +304,15 @@ export const skinCb = (escaper: Escaper, skin: string) => {
     if (oldSkin !== escaper.getSkin()) {
         const x =
             escaper.getLastTerrainType() instanceof TerrainTypeWalk
-                ? GetUnitX(hero)
+                ? escaper.getHeroX()
                 : getUdgLevels().getCurrentLevel(this).getStartRandomX()
 
         const y =
             escaper.getLastTerrainType() instanceof TerrainTypeWalk
-                ? GetUnitY(hero)
+                ? escaper.getHeroY()
                 : getUdgLevels().getCurrentLevel(this).getStartRandomY()
 
-        const a = escaper.getLastTerrainType() instanceof TerrainTypeWalk ? GetUnitFacing(hero) : HERO_START_ANGLE
+        const a = escaper.getLastTerrainType() instanceof TerrainTypeWalk ? escaper.getHeroFacing() : HERO_START_ANGLE
 
         escaper.removeHero()
         escaper.createHero(x, y, a)
@@ -351,15 +351,15 @@ export const scaleCb = (escaper: Escaper, scale: string) => {
     if (oldScale !== escaper.getScale()) {
         const x =
             escaper.getLastTerrainType() instanceof TerrainTypeWalk
-                ? GetUnitX(hero)
+                ? escaper.getHeroX()
                 : getUdgLevels().getCurrentLevel(this).getStartRandomX()
 
         const y =
             escaper.getLastTerrainType() instanceof TerrainTypeWalk
-                ? GetUnitY(hero)
+                ? escaper.getHeroY()
                 : getUdgLevels().getCurrentLevel(this).getStartRandomY()
 
-        const a = escaper.getLastTerrainType() instanceof TerrainTypeWalk ? GetUnitFacing(hero) : HERO_START_ANGLE
+        const a = escaper.getLastTerrainType() instanceof TerrainTypeWalk ? escaper.getHeroFacing() : HERO_START_ANGLE
 
         escaper.removeHero()
         escaper.createHero(x, y, a)

@@ -40,7 +40,7 @@ const InitTrig_InvisUnit_is_getting_damage = () => {
                     return
                 }
 
-                const hauteurHero = BlzGetUnitZ(hero) + GetUnitFlyHeight(hero)
+                const hauteurHero = escaper.getHeroZ()
                 const hauteurKillingUnit = BlzGetUnitZ(killingUnit) + GetUnitFlyHeight(killingUnit)
 
                 if (!escaper.isAlive()) {
@@ -174,7 +174,7 @@ const onEscaperTouchingMonster = (escaper: Escaper, killingUnit: unit) => {
 
         //effet de tuation du héros par le monstre, suivant le type du monstre
         if (effectStr) {
-            const eff = EffectUtils.addSpecialEffect(effectStr, GetUnitX(hero), GetUnitY(hero))
+            const eff = EffectUtils.addSpecialEffect(effectStr, escaper.getHeroX(), escaper.getHeroY())
             EffectUtils.destroyEffect(eff)
         }
     }

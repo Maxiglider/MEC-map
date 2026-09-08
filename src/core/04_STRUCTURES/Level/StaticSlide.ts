@@ -2,10 +2,10 @@ import { MemoryHandler } from 'Utils/MemoryHandler'
 import { createEvent } from 'Utils/mapUtils'
 import { AnglesDiff, arrayPush } from 'core/01_libraries/Basic_functions'
 import { getUdgEscapers } from '../../../../globals'
+import { createDiagonalRegions } from '../../01_libraries/Regions_functions'
+import { Natives } from '../../wc3_natives_unsecured/Natives'
 import { Hero2Escaper, IsHero } from '../Escaper/Escaper_functions'
 import { Level } from './Level'
-import { Natives } from '../../wc3_natives_unsecured/Natives'
-import { createDiagonalRegions } from '../../01_libraries/Regions_functions'
 
 export class StaticSlide {
     private x1: number
@@ -124,7 +124,7 @@ export class StaticSlide {
                                 escaper.setStaticSliding(this)
 
                                 if (this.canTurnAngle) {
-                                    const currentAngle = GetUnitFacing(hero)
+                                    const currentAngle = escaper.getHeroFacing()
                                     escaper.setRemainingDegreesToTurn(AnglesDiff(this.angle, currentAngle))
                                 } else {
                                     escaper.setRemainingDegreesToTurn(0)

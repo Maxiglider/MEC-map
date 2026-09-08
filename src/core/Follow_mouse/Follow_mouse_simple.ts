@@ -113,8 +113,8 @@ export class SimpleFollowMouse {
             const slider = dis.escaper.getHero()
 
             if (slider) {
-                const sliderX = GetUnitX(slider)
-                const sliderY = GetUnitY(slider)
+                const sliderX = dis.escaper.getHeroX()
+                const sliderY = dis.escaper.getHeroY()
                 const orderX = dis.escaper.mouseX
                 const orderY = dis.escaper.mouseY
                 dis.angle = Atan2(orderY - sliderY, orderX - sliderX) * bj_RADTODEG
