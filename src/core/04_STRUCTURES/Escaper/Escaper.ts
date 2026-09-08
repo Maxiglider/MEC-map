@@ -79,6 +79,14 @@ function GetInvisUnitTypeFromCollisionSize(collisionSize: number): number {
 /** Where the hero effect waits while the hero is a unit: far under the map, out of sight */
 const PARKED_HERO_EFFECT_Z = -1000
 
+/**
+ * How long a machine carries on the movement of a hero it does not own before giving up. Its
+ * owner sends ten packets a second, so half a second of silence means it stopped talking:
+ * dropped, frozen, or gone. Carrying on any further would send the effect somewhere its player
+ * never went.
+ */
+const ASYNC_SILENCE_TIMEOUT = 0.5
+
 export function IsHeroCollisionSizeValid(collisionSize: number): boolean {
     return (collisionSize >= 0 && collisionSize <= 200) || collisionSize % 5 === 0
 }
@@ -103,6 +111,8 @@ export class Escaper extends EscaperMake {
     private lastAsyncSequence = 0
     /** Set by the "-autoTurn async" mode: this hero slides as an effect */
     private isAsyncSlideEnabled = false
+    /** os.clock() of the last packet received about this hero, to notice its owner going quiet */
+    private lastAsyncPacketTime = 0
 
     private invisUnit?: unit
     private collisionSize: number
@@ -734,8 +744,8 @@ export class Escaper extends EscaperMake {
             this.setLastPos()
         }
 
-        if (this.isHeroEffectActive && this.isHeroEffectFrozen) {
-            return // waiting for every machine to agree on where it died
+        if (this.isHeroEffectMovementBlocked()) {
+            return
         }
 
         this.heroPos.x = x
@@ -757,8 +767,8 @@ export class Escaper extends EscaperMake {
             return
         }
 
-        if (this.isHeroEffectActive && this.isHeroEffectFrozen) {
-            return // waiting for every machine to agree on where it died
+        if (this.isHeroEffectMovementBlocked()) {
+            return
         }
 
         this.heroPos.facing = angle
@@ -777,8 +787,8 @@ export class Escaper extends EscaperMake {
             return
         }
 
-        if (this.isHeroEffectActive && this.isHeroEffectFrozen) {
-            return // waiting for every machine to agree on where it died
+        if (this.isHeroEffectMovementBlocked()) {
+            return
         }
 
         this.heroPos.flyHeight = height
@@ -901,6 +911,7 @@ export class Escaper extends EscaperMake {
         }
 
         this.lastAsyncSequence = sequence
+        this.lastAsyncPacketTime = os.clock()
         this.applyHeroMovementState(movement)
         this.updateHeroEffect()
     }
@@ -912,6 +923,7 @@ export class Escaper extends EscaperMake {
      */
     applyAsyncDeath = (sequence: number, movement: HeroMovementState) => {
         this.lastAsyncSequence = sequence
+        this.lastAsyncPacketTime = os.clock()
         this.applyHeroMovementState(movement)
 
         this.setHeroAsEffect(false)
@@ -2003,6 +2015,23 @@ export class Escaper extends EscaperMake {
         this.setHeroAsEffect(this.isAsyncSlideEnabled && this.isSliding() && this.isAlive() === true)
     }
 
+    /**
+     * Two reasons to leave the effect where it is: this machine saw the hero die and waits for the
+     * others to agree on the spot, or it stopped hearing from the machine that owns it. Carrying
+     * the movement on would be inventing a path its player never took.
+     */
+    private isHeroEffectMovementBlocked = () => {
+        if (!this.isHeroEffectActive) {
+            return false
+        }
+
+        return this.isHeroEffectFrozen || this.isAsyncOwnerSilent()
+    }
+
+    /** Purely local: each machine decides for itself whether it is still being told anything */
+    isAsyncOwnerSilent = () =>
+        this.isAsyncControlledElsewhere() && os.clock() - this.lastAsyncPacketTime > ASYNC_SILENCE_TIMEOUT
+
     /** This machine owns the hero and decides for it: it is the only one knowing where it is */
     isAsyncControlledHere = () => this.isHeroEffectActive && GetLocalPlayer() === this.p
 
@@ -2025,6 +2054,7 @@ export class Escaper extends EscaperMake {
         }
 
         this.lastAsyncSequence = sequence
+        this.lastAsyncPacketTime = os.clock()
         this.applyHeroMovementState(movement)
         this.updateHeroEffect()
 
@@ -2056,6 +2086,7 @@ export class Escaper extends EscaperMake {
             this.heroPos.flyHeight = this.getHeroFlyHeight()
 
             this.isHeroEffectActive = true
+            this.lastAsyncPacketTime = os.clock()
 
             // the native lock would drag the camera to the corner the unit waits in
             this.releaseLockedCameraFromUnit()
