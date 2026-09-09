@@ -32,7 +32,7 @@ import { PRESS_TIME_TO_ENABLE_FOLLOW_MOUSE } from '../../Follow_mouse/Follow_mou
 import { GetStringAssignedFromCommand, KeyboardShortcut } from '../../Keyboard_shortcuts/KeyboardShortcut'
 import { setAsyncMouseActive } from '../../Test/async/AsyncMouse'
 import { AUTO_TURN_MODES, AutoTurnMode, getAutoTurnMode, setAutoTurnMode } from '../../Test/hero-effect-auto-turn'
-import { isTestingLeftClicks, setTestLeftClicks } from '../../Test/hero-effect-common'
+import { isTestingLeftClicks, setMouseTrackingEnabled, setTestLeftClicks } from '../../Test/hero-effect-common'
 import { setClickCatcherEnabled } from '../../Test/hero-effect-locally-async'
 import { Natives } from '../../wc3_natives_unsecured/Natives'
 import { glowCb, isPlayerId, resolvePlayerId, resolvePlayerIds, USAGE } from '../Helpers/Command_functions'
@@ -43,6 +43,17 @@ import { cameraFieldMap } from '../Helpers/commands-helpers'
  * cover, so it only runs while this machine actually reads it: for the left click test, or for
  * the asynchronous mode of the auto turn.
  */
+const updateAsyncNeeds = (escaper: Escaper) => {
+    // The mouse of a player only travels the network while something reads it, on every machine
+    // alike: both modes steer with it, and the left click test measures against it.
+    setMouseTrackingEnabled(
+        escaper.getId(),
+        getAutoTurnMode(escaper.getId()) !== 'off' || isTestingLeftClicks(escaper.getId())
+    )
+
+    updateAsyncMouseNeed(escaper)
+}
+
 const updateAsyncMouseNeed = (escaper: Escaper) => {
     if (GetLocalPlayer() !== escaper.getPlayer()) {
         return
@@ -1903,7 +1914,7 @@ export const initCommandAll = () => {
             }
 
             setAutoTurnMode(escaper.getId(), param1 as AutoTurnMode)
-            updateAsyncMouseNeed(escaper)
+            updateAsyncNeeds(escaper)
             Text.mkP(escaper.getPlayer(), `Auto turn ${param1}`)
 
             return true
@@ -1928,7 +1939,7 @@ export const initCommandAll = () => {
             }
 
             setTestLeftClicks(escaper.getId(), S2B(param1))
-            updateAsyncMouseNeed(escaper)
+            updateAsyncNeeds(escaper)
 
             // the catcher is what reads the local click, and it only listens on the machine of
             // the player testing: enabling it for everybody would steal their left clicks

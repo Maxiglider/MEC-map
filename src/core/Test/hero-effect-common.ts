@@ -74,8 +74,14 @@ export const setHeroEffectPosition = (x: number, y: number) => {
  * The mouse move event is synchronized, so every machine knows where every player points: these
  * positions are the same everywhere and can feed synced logic, unlike the asynchronous lattice.
  * They are just as late as the network is.
+ *
+ * That is also what makes it costly: the mouse of every player travels to every machine, through
+ * the same queue as the orders, and the game waits for the slowest of them. So the triggers are
+ * created disabled and only listen for a player who needs them, the way Follow_mouse only listens
+ * while it follows. A player who never asks for any of this costs nothing.
  */
 const mousePositions: { [escaperId: number]: { x: number; y: number } } = {}
+const mouseTriggers: { [escaperId: number]: trigger } = {}
 const tracker = { isTracked: false }
 
 export const trackMousePositions = () => {
@@ -86,7 +92,7 @@ export const trackMousePositions = () => {
     tracker.isTracked = true
 
     getUdgEscapers().forAll(escaper => {
-        createEvent({
+        const mouseTrigger = createEvent({
             events: [t => TriggerRegisterPlayerEvent(t, escaper.getPlayer(), EVENT_PLAYER_MOUSE_MOVE)],
             actions: [
                 () => {
@@ -102,7 +108,30 @@ export const trackMousePositions = () => {
                 },
             ],
         })
+
+        DisableTrigger(mouseTrigger)
+        mouseTriggers[escaper.getId()] = mouseTrigger
     })
+}
+
+/**
+ * Whether the mouse of that player is worth carrying over the network. Decided from what the
+ * commands set, which every machine knows alike, so they all listen to the same players.
+ */
+export const setMouseTrackingEnabled = (escaperId: number, isEnabled: boolean) => {
+    const mouseTrigger = mouseTriggers[escaperId]
+
+    if (!mouseTrigger) {
+        return
+    }
+
+    if (isEnabled) {
+        EnableTrigger(mouseTrigger)
+
+        return
+    }
+
+    DisableTrigger(mouseTrigger)
 }
 
 /** Undefined until that player has had their mouse over the terrain at least once */
