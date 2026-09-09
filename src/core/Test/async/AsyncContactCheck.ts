@@ -1,5 +1,6 @@
 import { createTimer } from 'Utils/mapUtils'
 import { getUdgEscapers, getUdgLevels, udg_spawned_monster_units, udg_spawned_monsters } from '../../../../globals'
+import { Constants } from '../../01_libraries/Constants'
 import { Escaper } from '../../04_STRUCTURES/Escaper/Escaper'
 import { CONTACT_KIND, sendAsyncContact } from './AsyncHeroSync'
 
@@ -172,7 +173,11 @@ const testSpawnedMonsters = (context: ContactContext) => {
     }
 }
 
-/** The circle a dead ally leaves behind, which revives them when touched */
+/**
+ * The circle a dead ally leaves behind, which revives them when touched. Its reach is the revive
+ * distance rather than its collision size: the circle is a dummy unit, whose collision is nothing,
+ * and it is its immolation that used to catch the hero.
+ */
 const testPowerCircles = (context: ContactContext) => {
     getUdgEscapers().forAll(other => {
         if (other === context.escaper) {
@@ -181,13 +186,7 @@ const testPowerCircles = (context: ContactContext) => {
 
         const circle = other.getDummyPowerCircle()
 
-        testCandidate(
-            context,
-            circle,
-            circle !== undefined ? BlzGetUnitCollisionSize(circle) : 0,
-            CONTACT_KIND.powerCircle,
-            other.getId()
-        )
+        testCandidate(context, circle, Constants.COOP_REVIVE_DIST, CONTACT_KIND.powerCircle, other.getId())
     })
 }
 
