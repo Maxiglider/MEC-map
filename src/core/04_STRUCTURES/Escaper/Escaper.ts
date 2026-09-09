@@ -863,21 +863,25 @@ export class Escaper extends EscaperMake {
      * happens for real in applyAsyncDeath, once they all agree.
      */
     kill = () => {
-        if (this.isAsyncControlledElsewhere()) {
-            // not this machine to say: its owner will tell where it died
-            return true
-        }
+        if (this.isHeroEffectActive) {
+            // Never here, whoever asks: while the hero is an effect its death belongs to the packet
+            // its owner sends, and to nothing else. The owner keeps being asked while it waits for
+            // that packet to come back, as whatever killed it is still there, and killing on the
+            // second ask would be killing on one machine alone.
+            if (this.isAsyncControlledHere() && !this.isHeroEffectFrozen && this.isAlive()) {
+                this.isHeroEffectFrozen = true
 
-        if (this.isHeroEffectActive && !this.isHeroEffectFrozen && this.isAlive()) {
-            this.isHeroEffectFrozen = true
-
-            sendAsyncHeroDeath(this.escaperId, this.getHeroMovementState())
+                sendAsyncHeroDeath(this.escaperId, this.getHeroMovementState())
+            }
 
             return true
         }
 
         return this.killNow()
     }
+
+    /** Its death was seen and told, and every machine is about to hear about it */
+    isAsyncDeathPending = () => this.isHeroEffectFrozen
 
     /** Everything the other machines need to carry on the movement of this hero themselves */
     getHeroMovementState = (): HeroMovementState => ({

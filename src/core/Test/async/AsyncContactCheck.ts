@@ -223,8 +223,10 @@ export const initAsyncContactCheck = () => {
 
     createTimer(CONTACT_CHECK_PERIOD, true, () => {
         getUdgEscapers().forAll(escaper => {
-            // only the machine owning the hero, and only while its effect carries it
-            if (escaper.isAsyncControlledHere() && escaper.isAlive()) {
+            // Only the machine owning the hero, and only while its effect carries it. A hero
+            // whose death is already told is left alone: whatever killed it is still there, and
+            // announcing it again would tell every machine to handle the same contact twice.
+            if (escaper.isAsyncControlledHere() && escaper.isAlive() && !escaper.isAsyncDeathPending()) {
                 checkEscaperContacts(escaper)
             }
         })
