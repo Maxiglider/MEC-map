@@ -47,11 +47,11 @@ export const setTestLeftClicks = (escaperId: number, isTesting: boolean) => {
         return
     }
 
-    const hero = getUdgEscapers().get(escaperId)?.getHero()
+    const escaper = getUdgEscapers().get(escaperId)
     const modelName = EscaperEffectFunctions.String2EffectStr('light')
 
-    if (hero && modelName) {
-        heroEffect.effect = EffectUtils.addSpecialEffect(modelName, GetUnitX(hero), GetUnitY(hero))
+    if (escaper?.getHero() && modelName) {
+        heroEffect.effect = EffectUtils.addSpecialEffect(modelName, escaper.getHeroX(), escaper.getHeroY())
     }
 }
 

@@ -82,7 +82,8 @@ const turnSliderTowardsCursor = (escaperId: number) => {
         return
     }
 
-    const angle = Atan2(target.y - GetUnitY(hero), target.x - GetUnitX(hero)) * bj_RADTODEG
+    // from where the hero really is: its unit waits in a corner of the map while it slides
+    const angle = Atan2(target.y - escaper.getHeroY(), target.x - escaper.getHeroX()) * bj_RADTODEG
 
     // not SetUnitFacing, which turns progressively, and not BlzSetUnitFacingEx either: this is
     // what the map itself uses, and it honours what the terrain allows (canTurn, canTurnAngle,
