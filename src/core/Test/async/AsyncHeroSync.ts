@@ -52,6 +52,7 @@ export type HeroMovementState = {
 
 const state = { isInitialized: false, sequence: 0 }
 
+// todo check for leaks and find solutions if needed
 const encode = (escaperId: number, sequence: number, movement: HeroMovementState) =>
     string.format(
         `%d${FIELD_SEPARATOR}%d${FIELD_SEPARATOR}%.2f${FIELD_SEPARATOR}%.2f${FIELD_SEPARATOR}%.2f` +
