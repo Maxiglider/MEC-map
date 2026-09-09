@@ -124,16 +124,21 @@ export const cameraFieldMap: { [x: string]: camerafield } = {
 /**
  * What the asynchronous slide costs, switched on and off with the modes that ask for it.
  *
- * The mouse of a player only travels the network while something reads it, moves and clicks
- * alike, and that is decided on every machine: both steering modes aim with it, and the left click
- * test measures against it. Whether the lattice runs, on the other hand, only concerns the machine
- * reading its own cursor.
+ * What crosses the network is kept to what is read, and that is decided on every machine alike.
+ * Whether the lattice runs, on the other hand, only concerns the machine reading its own cursor.
  */
 export const updateAsyncNeeds = (escaper: Escaper) => {
-    const isListening = getAutoTurnMode(escaper.getId()) !== 'off' || isTestingLeftClicks(escaper.getId())
+    const mode = getAutoTurnMode(escaper.getId())
+    const isTesting = isTestingLeftClicks(escaper.getId())
 
-    setMouseTrackingEnabled(escaper.getId(), isListening)
-    setNetworkClickListeningEnabled(escaper.getId(), isListening)
+    // Where the mouse of a player points only has to cross the network for the sync mode, which
+    // aims with it. The async mode reads its own cursor on its own machine and tells the others
+    // where its hero looks, so nobody needs the mouse itself.
+    setMouseTrackingEnabled(escaper.getId(), mode === 'sync' || isTesting)
+
+    // The clicks are another matter: both modes hand the hero over to the mouse and take it back
+    // with them.
+    setNetworkClickListeningEnabled(escaper.getId(), mode !== 'off' || isTesting)
 
     updateAsyncMouseNeed(escaper)
 }

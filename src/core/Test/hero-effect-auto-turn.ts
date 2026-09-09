@@ -5,7 +5,7 @@ import { Constants } from '../01_libraries/Constants'
 import { TurnOnSlide } from '../07_TRIGGERS/Slide_and_CheckTerrain_triggers/To_turn_on_slide'
 import { getAsyncMousePosition, setAsyncMouseActive } from './async/AsyncMouse'
 import { screen2World } from './async/Screen2World'
-import { getLocalMousePosition, getMousePosition, isTestingLeftClicks } from './hero-effect-common'
+import { getMousePosition, isTestingLeftClicks } from './hero-effect-common'
 
 /**
  * Made for the slide: on ice the hero is carried along whatever the player does, and all that is
@@ -56,12 +56,18 @@ export const setAutoTurnSteering = (escaperId: number, isOn: boolean) => {
 
 /** Where that player points, according to the mode they chose */
 const getCursorWorldPosition = (escaperId: number) => {
-    // the lattice only knows about the cursor of this machine, so it can only serve its own player
-    if (getAutoTurnMode(escaperId) === 'async' && escaperId === GetPlayerId(GetLocalPlayer()!)) {
-        const asyncMouse = getAsyncMousePosition()
-        const asyncWorld = asyncMouse && screen2World(asyncMouse.x, asyncMouse.y)
+    if (getAutoTurnMode(escaperId) === 'async') {
+        // The lattice only knows about the cursor of this machine, and nothing else is needed:
+        // where an async hero looks is told to the others ten times a second, so they have nothing
+        // to aim for it. Their own guess would fight the packets, and the mouse of that player
+        // would have to cross the network for nothing.
+        if (escaperId !== GetPlayerId(GetLocalPlayer()!)) {
+            return undefined
+        }
 
-        return asyncWorld ?? getLocalMousePosition()
+        const asyncMouse = getAsyncMousePosition()
+
+        return asyncMouse && screen2World(asyncMouse.x, asyncMouse.y)
     }
 
     return getMousePosition(escaperId)
