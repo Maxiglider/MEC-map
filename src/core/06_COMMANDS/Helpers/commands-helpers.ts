@@ -1,7 +1,11 @@
 // For -snapPatrolsToSlideOffset and -snapPatrolsToSlide commands
 import { getUdgMonsterTypes, getUdgTerrainTypes } from '../../../../globals'
 import { createPoint } from '../../../Utils/Point'
+import { Escaper } from '../../04_STRUCTURES/Escaper/Escaper'
 import { MonsterType } from '../../04_STRUCTURES/Monster/MonsterType'
+import { setAsyncMouseActive } from '../../Test/async/AsyncMouse'
+import { getAutoTurnMode } from '../../Test/hero-effect-auto-turn'
+import { isTestingLeftClicks, setMouseTrackingEnabled } from '../../Test/hero-effect-common'
 
 export const snapPatrolsToSlideOffsetMap: { [mt: string]: { angle: number; offset: number } | null } = {}
 const snappedHistoryMap: { [historyId: string]: { x: number | undefined; y: number | undefined } } = {}
@@ -112,4 +116,36 @@ export const cameraFieldMap: { [x: string]: camerafield } = {
     LOCAL_PITCH: CAMERA_FIELD_LOCAL_PITCH,
     LOCAL_YAW: CAMERA_FIELD_LOCAL_YAW,
     LOCAL_ROLL: CAMERA_FIELD_LOCAL_ROLL,
+}
+
+// For -autoTurn and -testLeftClicks commands
+
+/**
+ * What the asynchronous slide costs, switched on and off with the modes that ask for it.
+ *
+ * The mouse of a player only travels the network while something reads it, and that is decided on
+ * every machine alike: both steering modes aim with it, and the left click test measures against
+ * it. Whether the lattice runs, on the other hand, only concerns the machine reading its own
+ * cursor.
+ */
+export const updateAsyncNeeds = (escaper: Escaper) => {
+    setMouseTrackingEnabled(
+        escaper.getId(),
+        getAutoTurnMode(escaper.getId()) !== 'off' || isTestingLeftClicks(escaper.getId())
+    )
+
+    updateAsyncMouseNeed(escaper)
+}
+
+/**
+ * The asynchronous mouse lattice covers the cursor with frames, which swallow the clicks they
+ * cover, so it only runs while this machine actually reads it: for the left click test, or for the
+ * asynchronous mode of the auto turn.
+ */
+const updateAsyncMouseNeed = (escaper: Escaper) => {
+    if (GetLocalPlayer() !== escaper.getPlayer()) {
+        return
+    }
+
+    setAsyncMouseActive(isTestingLeftClicks(escaper.getId()) || getAutoTurnMode(escaper.getId()) === 'async')
 }

@@ -30,37 +30,12 @@ import { Cpm } from '../../08_GAME/Apm_clics_par_minute/Cpm'
 import { Globals } from '../../09_From_old_Worldedit_triggers/globals_variables_and_triggers'
 import { PRESS_TIME_TO_ENABLE_FOLLOW_MOUSE } from '../../Follow_mouse/Follow_mouse'
 import { GetStringAssignedFromCommand, KeyboardShortcut } from '../../Keyboard_shortcuts/KeyboardShortcut'
-import { setAsyncMouseActive } from '../../Test/async/AsyncMouse'
 import { AUTO_TURN_MODES, AutoTurnMode, getAutoTurnMode, setAutoTurnMode } from '../../Test/hero-effect-auto-turn'
-import { isTestingLeftClicks, setMouseTrackingEnabled, setTestLeftClicks } from '../../Test/hero-effect-common'
+import { isTestingLeftClicks, setTestLeftClicks } from '../../Test/hero-effect-common'
 import { setClickCatcherEnabled } from '../../Test/hero-effect-locally-async'
 import { Natives } from '../../wc3_natives_unsecured/Natives'
 import { glowCb, isPlayerId, resolvePlayerId, resolvePlayerIds, USAGE } from '../Helpers/Command_functions'
-import { cameraFieldMap } from '../Helpers/commands-helpers'
-
-/**
- * The asynchronous mouse lattice covers the cursor with frames, which swallow the clicks they
- * cover, so it only runs while this machine actually reads it: for the left click test, or for
- * the asynchronous mode of the auto turn.
- */
-const updateAsyncNeeds = (escaper: Escaper) => {
-    // The mouse of a player only travels the network while something reads it, on every machine
-    // alike: both modes steer with it, and the left click test measures against it.
-    setMouseTrackingEnabled(
-        escaper.getId(),
-        getAutoTurnMode(escaper.getId()) !== 'off' || isTestingLeftClicks(escaper.getId())
-    )
-
-    updateAsyncMouseNeed(escaper)
-}
-
-const updateAsyncMouseNeed = (escaper: Escaper) => {
-    if (GetLocalPlayer() !== escaper.getPlayer()) {
-        return
-    }
-
-    setAsyncMouseActive(isTestingLeftClicks(escaper.getId()) || getAutoTurnMode(escaper.getId()) === 'async')
-}
+import { cameraFieldMap, updateAsyncNeeds } from '../Helpers/commands-helpers'
 
 export const initCommandAll = () => {
     const { registerCommand } = ServiceManager.getService('Cmd')
