@@ -74,7 +74,8 @@ const encode = (escaperId: number, sequence: number, movement: HeroMovementState
 const decode = (data: string) => {
     const fields: number[] = []
 
-    for (const field of string.gmatch(data, `[^${FIELD_SEPARATOR}]+`)) {
+    // gmatch hands its captures back as a multiple return, which has to be destructured
+    for (const [field] of string.gmatch(data, `[^${FIELD_SEPARATOR}]+`)) {
         fields[fields.length] = tonumber(field) ?? 0
     }
 

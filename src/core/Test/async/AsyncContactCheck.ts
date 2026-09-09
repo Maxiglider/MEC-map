@@ -72,7 +72,7 @@ const contexts: { [escaperId: number]: ContactContext } = {}
 const getContext = (escaper: Escaper) => {
     const existing = contexts[escaper.getId()]
 
-    if (existing) {
+    if (existing !== undefined) {
         return existing
     }
 
@@ -156,7 +156,7 @@ const testPowerCircles = (context: ContactContext) => {
 
         const circle = other.getDummyPowerCircle()
 
-        testCandidate(context, circle, circle ? BlzGetUnitCollisionSize(circle) : 0)
+        testCandidate(context, circle, circle !== undefined ? BlzGetUnitCollisionSize(circle) : 0)
     })
 }
 
