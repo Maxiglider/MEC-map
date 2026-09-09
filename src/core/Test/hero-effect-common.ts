@@ -76,62 +76,60 @@ export const setHeroEffectPosition = (x: number, y: number) => {
  * They are just as late as the network is.
  *
  * That is also what makes it costly: the mouse of every player travels to every machine, through
- * the same queue as the orders, and the game waits for the slowest of them. So the triggers are
- * created disabled and only listen for a player who needs them, the way Follow_mouse only listens
- * while it follows. A player who never asks for any of this costs nothing.
+ * the same queue as the orders, and the game waits for the slowest of them. The trigger of a
+ * player is therefore created when something starts reading their mouse and destroyed when
+ * nothing does any more. Disabling it is not enough: the game sends the mouse over because the
+ * event is registered, not because the trigger acts on it, which is why Follow_mouse destroys its
+ * own rather than turning it off.
  */
 const mousePositions: { [escaperId: number]: { x: number; y: number } } = {}
 const mouseTriggers: { [escaperId: number]: trigger } = {}
-const tracker = { isTracked: false }
 
-export const trackMousePositions = () => {
-    if (tracker.isTracked) {
+const createMouseTrigger = (escaperId: number) => {
+    const escaper = getUdgEscapers().get(escaperId)
+
+    if (!escaper) {
         return
     }
 
-    tracker.isTracked = true
+    mouseTriggers[escaperId] = createEvent({
+        events: [t => TriggerRegisterPlayerEvent(t, escaper.getPlayer(), EVENT_PLAYER_MOUSE_MOVE)],
+        actions: [
+            () => {
+                const x = BlzGetTriggerPlayerMouseX()
+                const y = BlzGetTriggerPlayerMouseY()
 
-    getUdgEscapers().forAll(escaper => {
-        const mouseTrigger = createEvent({
-            events: [t => TriggerRegisterPlayerEvent(t, escaper.getPlayer(), EVENT_PLAYER_MOUSE_MOVE)],
-            actions: [
-                () => {
-                    const x = BlzGetTriggerPlayerMouseX()
-                    const y = BlzGetTriggerPlayerMouseY()
+                if (x === 0 && y === 0) {
+                    // the mouse is not over the terrain (UI, minimap...)
+                    return
+                }
 
-                    if (x === 0 && y === 0) {
-                        // the mouse is not over the terrain (UI, minimap...)
-                        return
-                    }
-
-                    mousePositions[GetPlayerId(Natives.UGetTriggerPlayer())] = { x, y }
-                },
-            ],
-        })
-
-        DisableTrigger(mouseTrigger)
-        mouseTriggers[escaper.getId()] = mouseTrigger
+                mousePositions[GetPlayerId(Natives.UGetTriggerPlayer())] = { x, y }
+            },
+        ],
     })
 }
 
 /**
  * Whether the mouse of that player is worth carrying over the network. Decided from what the
- * commands set, which every machine knows alike, so they all listen to the same players.
+ * commands set, which every machine knows alike, so they all listen to the same players and their
+ * handles come and go together.
  */
 export const setMouseTrackingEnabled = (escaperId: number, isEnabled: boolean) => {
-    const mouseTrigger = mouseTriggers[escaperId]
+    const existing = mouseTriggers[escaperId]
 
-    if (!mouseTrigger) {
+    if (isEnabled === (existing !== undefined)) {
         return
     }
 
-    if (isEnabled) {
-        EnableTrigger(mouseTrigger)
+    if (!isEnabled) {
+        DestroyTrigger(existing)
+        delete mouseTriggers[escaperId]
 
         return
     }
 
-    DisableTrigger(mouseTrigger)
+    createMouseTrigger(escaperId)
 }
 
 /** Undefined until that player has had their mouse over the terrain at least once */

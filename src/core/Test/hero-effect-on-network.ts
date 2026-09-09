@@ -16,9 +16,35 @@ import { isTestingLeftClicks, takeLastLocalClickTime } from './hero-effect-commo
 /** The same teal as the local click line, so both halves of a click read as one pair */
 const CYAN = '|cff1ce6b9'
 
-export const init_HeroEffectOnNetwork = () => {
-    getUdgEscapers().forAll(escaper => {
-        createEvent({
+/**
+ * Listened to for a player who chose a steering mode or is testing left clicks, and for nobody
+ * else. Created and destroyed rather than turned on and off, as the game carries the mouse of a
+ * player over the network because the event is registered, not because a trigger acts on it.
+ */
+const clickTriggers: { [escaperId: number]: trigger } = {}
+
+export const setNetworkClickListeningEnabled = (escaperId: number, isEnabled: boolean) => {
+    const existing = clickTriggers[escaperId]
+
+    if (isEnabled === (existing !== undefined)) {
+        return
+    }
+
+    if (!isEnabled) {
+        DestroyTrigger(existing)
+        delete clickTriggers[escaperId]
+
+        return
+    }
+
+    const escaper = getUdgEscapers().get(escaperId)
+
+    if (!escaper) {
+        return
+    }
+
+    {
+        clickTriggers[escaperId] = createEvent({
             events: [t => TriggerRegisterPlayerEvent(t, escaper.getPlayer(), EVENT_PLAYER_MOUSE_DOWN)],
             actions: [
                 () => {
@@ -74,5 +100,5 @@ export const init_HeroEffectOnNetwork = () => {
                 },
             ],
         })
-    })
+    }
 }

@@ -6,6 +6,7 @@ import { MonsterType } from '../../04_STRUCTURES/Monster/MonsterType'
 import { setAsyncMouseActive } from '../../Test/async/AsyncMouse'
 import { getAutoTurnMode } from '../../Test/hero-effect-auto-turn'
 import { isTestingLeftClicks, setMouseTrackingEnabled } from '../../Test/hero-effect-common'
+import { setNetworkClickListeningEnabled } from '../../Test/hero-effect-on-network'
 
 export const snapPatrolsToSlideOffsetMap: { [mt: string]: { angle: number; offset: number } | null } = {}
 const snappedHistoryMap: { [historyId: string]: { x: number | undefined; y: number | undefined } } = {}
@@ -123,16 +124,16 @@ export const cameraFieldMap: { [x: string]: camerafield } = {
 /**
  * What the asynchronous slide costs, switched on and off with the modes that ask for it.
  *
- * The mouse of a player only travels the network while something reads it, and that is decided on
- * every machine alike: both steering modes aim with it, and the left click test measures against
- * it. Whether the lattice runs, on the other hand, only concerns the machine reading its own
- * cursor.
+ * The mouse of a player only travels the network while something reads it, moves and clicks
+ * alike, and that is decided on every machine: both steering modes aim with it, and the left click
+ * test measures against it. Whether the lattice runs, on the other hand, only concerns the machine
+ * reading its own cursor.
  */
 export const updateAsyncNeeds = (escaper: Escaper) => {
-    setMouseTrackingEnabled(
-        escaper.getId(),
-        getAutoTurnMode(escaper.getId()) !== 'off' || isTestingLeftClicks(escaper.getId())
-    )
+    const isListening = getAutoTurnMode(escaper.getId()) !== 'off' || isTestingLeftClicks(escaper.getId())
+
+    setMouseTrackingEnabled(escaper.getId(), isListening)
+    setNetworkClickListeningEnabled(escaper.getId(), isListening)
 
     updateAsyncMouseNeed(escaper)
 }

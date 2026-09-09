@@ -11,7 +11,6 @@ import {
     isTestingLeftClicks,
     setHeroEffectPosition,
     setLastLocalClickTime,
-    trackMousePositions,
 } from './hero-effect-common'
 
 /**
@@ -383,7 +382,6 @@ const initAfterMapStart = () => {
 export const init_HeroEffectLocallyAsync = () => {
     initAsyncHeroSync() // ready before any hero can die
     initAsyncContactCheck() // an effect cannot be immolated, so its contacts are looked for
-    trackMousePositions() // the network mode of the auto turn needs them, and the debug lines too
 
     createTimer(INIT_DELAY, false, initAfterMapStart)
 }
