@@ -1,5 +1,6 @@
+import { ServiceManager } from 'Services'
 import { createEvent, createTimer } from 'Utils/mapUtils'
-import { getUdgEscapers } from '../../../../globals'
+import { getUdgEscapers, udg_monsters, udg_spawned_monster_units } from '../../../../globals'
 import { Constants } from '../../01_libraries/Constants'
 import { Natives } from '../../wc3_natives_unsecured/Natives'
 
@@ -13,6 +14,8 @@ import { Natives } from '../../wc3_natives_unsecured/Natives'
  * Three kinds of packets:
  *  - POSITION, ten times a second, so the others keep a true picture,
  *  - DEATH, the moment this machine sees the hero die, so it dies at the same spot everywhere,
+ *  - CONTACT, whenever the hero touches something. Its consequences change the game itself, from
+ *    a score to a revived ally, so they cannot be drawn by the machine that noticed alone,
  *  - TERRAIN, whenever the terrain under the hero changes. It carries no terrain of its own: the
  *    others run the very same check at the position it carries, and the map being the same for
  *    everybody, they reach the same conclusion. That one packet therefore covers the start of a
@@ -21,6 +24,7 @@ import { Natives } from '../../wc3_natives_unsecured/Natives'
 const POSITION_PREFIX = 'MEC_AHP'
 const DEATH_PREFIX = 'MEC_AHD'
 const TERRAIN_PREFIX = 'MEC_AHT'
+const CONTACT_PREFIX = 'MEC_AHC'
 const FIELD_SEPARATOR = '|'
 
 /** Ten a second: the packets travel at network speed whatever the rate, so a higher one would only
@@ -102,6 +106,26 @@ const decode = (data: string) => {
     }
 }
 
+/**
+ * How the thing a hero touched is named from one machine to another. A unit handle cannot travel,
+ * so what travels is where to find it again: monsters of a level and power circles carry an
+ * identifier in their user data, the temporary monsters are held by their handle id, which every
+ * machine agrees on as long as they create their handles in step.
+ */
+export const CONTACT_KIND = { levelMonster: 0, spawnedMonster: 1, powerCircle: 2 }
+
+const findContactUnit = (kind: number, id: number) => {
+    if (kind === CONTACT_KIND.levelMonster) {
+        return udg_monsters[id]?.u
+    }
+
+    if (kind === CONTACT_KIND.spawnedMonster) {
+        return udg_spawned_monster_units[id] ?? undefined
+    }
+
+    return getUdgEscapers().get(id)?.getDummyPowerCircle()
+}
+
 const registerSyncEvent = (prefix: string, onPacket: (data: string) => void) => {
     createEvent({
         events: [
@@ -147,6 +171,25 @@ export const initAsyncHeroSync = () => {
         packet && getUdgEscapers().get(packet.escaperId)?.applyAsyncTerrainChange(packet.sequence, packet.movement)
     })
 
+    registerSyncEvent(CONTACT_PREFIX, data => {
+        const fields: number[] = []
+
+        for (const [field] of string.gmatch(data, `[^${FIELD_SEPARATOR}]+`)) {
+            fields[fields.length] = tonumber(field) ?? 0
+        }
+
+        if (fields.length < 3) {
+            return
+        }
+
+        const escaper = getUdgEscapers().get(fields[0])
+        const touched = findContactUnit(fields[1], fields[2])
+
+        escaper &&
+            touched &&
+            ServiceManager.getService('InvisUnit_is_getting_damage').onEscaperTouchingUnit(escaper, touched, 0)
+    })
+
     registerSyncEvent(DEATH_PREFIX, data => {
         const packet = decode(data)
 
@@ -154,6 +197,14 @@ export const initAsyncHeroSync = () => {
     })
 
     createTimer(POSITION_PERIOD, true, sendLocalHeroPosition)
+}
+
+/**
+ * Tells every machine what the hero touched, this one included: what follows a contact belongs to
+ * the game, so it has to happen everywhere, on the same turn.
+ */
+export const sendAsyncContact = (escaperId: number, kind: number, id: number) => {
+    BlzSendSyncData(CONTACT_PREFIX, string.format(`%d${FIELD_SEPARATOR}%d${FIELD_SEPARATOR}%d`, escaperId, kind, id))
 }
 
 /** Tells the others where the terrain changed, so they can see it change at the same place */

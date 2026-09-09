@@ -101,10 +101,13 @@ const initCheckTerrainTrigger = () => {
         }
 
         // While a hero slides as an effect, only the machine of its player knows where it really
-        // is: it is the one deciding what terrain it stands on, and it tells the others, which
-        // replay this very check at the position it sends. Reading the terrain under a position
-        // that only approximates the truth would take contradictory decisions.
-        if (escaper.isAsyncControlledElsewhere()) {
+        // is. That machine announces where the terrain changed and every machine, itself included,
+        // replays this check there: they all conclude the same thing, on the same turn. Reading
+        // the terrain under a position that only approximates the truth, or acting on it before
+        // the others do, is what tore the game apart.
+        if (escaper.shouldSkipTerrainCheck()) {
+            escaper.sendAsyncTerrainChangeIfNeeded()
+
             return
         }
 
@@ -136,9 +139,6 @@ const initCheckTerrainTrigger = () => {
             ) {
                 return
             }
-
-            // the others replay this check where it happened, and reach the same conclusions
-            escaper.sendAsyncTerrainChangeIfNeeded()
 
             escaper.setLastTerrainType(currentTerrainType)
 

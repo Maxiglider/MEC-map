@@ -1,15 +1,17 @@
-import { ServiceManager } from 'Services'
 import { createTimer } from 'Utils/mapUtils'
 import { getUdgEscapers, getUdgLevels, udg_spawned_monster_units, udg_spawned_monsters } from '../../../../globals'
 import { Escaper } from '../../04_STRUCTURES/Escaper/Escaper'
+import { CONTACT_KIND, sendAsyncContact } from './AsyncHeroSync'
 
 /**
  * Finds what the hero of an async player touches, by hand.
  *
  * A hero sliding as an effect no longer carries its invisible unit around, so the immolation of
  * the monsters has nothing to burn: the contact has to be looked for. Only the machine owning the
- * hero looks, since it is the only one knowing where it really is, and what it finds goes to the
- * very same handler the immolation used to call, so every consequence stays where it was written.
+ * hero looks, since it is the only one knowing where it really is. It only looks, though: what
+ * follows a contact belongs to the game, from a score to a revived ally, so it is announced and
+ * every machine runs the very same handler the immolation used to call, on the same turn. Every
+ * consequence therefore stays where it was written, and happens everywhere at once.
  *
  * The reach is the collision size of the hero, which the invisible unit was built from.
  *
@@ -56,10 +58,12 @@ type ContactContext = {
      * burning the hero, so touching a jump pad and a monster at the same instant, or two life
      * bonuses at once, must still count twice.
      *
+     * What is kept is how to name them to the other machines rather than the units themselves.
      * Filled up to touchedCount and never emptied: a table dropped fifty times a second is a leak
      * in the Lua of Warcraft III. It settles on the largest number of contacts ever seen at once.
      */
-    touched: unit[]
+    touchedKinds: number[]
+    touchedIds: number[]
     touchedCount: number
 }
 
@@ -85,7 +89,8 @@ const getContext = (escaper: Escaper) => {
         toX: x,
         toY: y,
         heroRadius: 0,
-        touched: [],
+        touchedKinds: [],
+        touchedIds: [],
         touchedCount: 0,
     }
 
@@ -95,7 +100,13 @@ const getContext = (escaper: Escaper) => {
 }
 
 /** Cheapest tests first: a monster that cannot burn, or one that is gone, costs almost nothing */
-const testCandidate = (context: ContactContext, candidate: unit | undefined, contactRadius: number) => {
+const testCandidate = (
+    context: ContactContext,
+    candidate: unit | undefined,
+    contactRadius: number,
+    kind: number,
+    id: number
+) => {
     if (!candidate || contactRadius <= 0) {
         return
     }
@@ -118,7 +129,8 @@ const testCandidate = (context: ContactContext, candidate: unit | undefined, con
     }
 
     if (squaredDistanceToStep(context.fromX, context.fromY, context.toX, context.toY, x, y) <= reach * reach) {
-        context.touched[context.touchedCount] = candidate
+        context.touchedKinds[context.touchedCount] = kind
+        context.touchedIds[context.touchedCount] = id
         context.touchedCount++
     }
 }
@@ -131,7 +143,13 @@ const testLevelMonsters = (context: ContactContext) => {
         }
 
         level.monsters.forAll(monster => {
-            testCandidate(context, monster.u, monster.getMonsterType()?.getImmolationRadius() ?? 0)
+            testCandidate(
+                context,
+                monster.u,
+                monster.getMonsterType()?.getImmolationRadius() ?? 0,
+                CONTACT_KIND.levelMonster,
+                monster.getId()
+            )
         })
     })
 }
@@ -143,7 +161,14 @@ const testLevelMonsters = (context: ContactContext) => {
  */
 const testSpawnedMonsters = (context: ContactContext) => {
     for (const [handleId, spawned] of pairs(udg_spawned_monster_units)) {
-        spawned && testCandidate(context, spawned, udg_spawned_monsters[handleId]?.getImmolationRadius() ?? 0)
+        spawned &&
+            testCandidate(
+                context,
+                spawned,
+                udg_spawned_monsters[handleId]?.getImmolationRadius() ?? 0,
+                CONTACT_KIND.spawnedMonster,
+                handleId
+            )
     }
 }
 
@@ -156,7 +181,13 @@ const testPowerCircles = (context: ContactContext) => {
 
         const circle = other.getDummyPowerCircle()
 
-        testCandidate(context, circle, circle !== undefined ? BlzGetUnitCollisionSize(circle) : 0)
+        testCandidate(
+            context,
+            circle,
+            circle !== undefined ? BlzGetUnitCollisionSize(circle) : 0,
+            CONTACT_KIND.powerCircle,
+            other.getId()
+        )
     })
 }
 
@@ -175,12 +206,11 @@ const checkEscaperContacts = (escaper: Escaper) => {
     testSpawnedMonsters(context)
     testPowerCircles(context)
 
-    // Handled once everything has been walked, rather than as each contact is found: a handler
-    // can kill a monster, which takes it out of the very tables being read. The handler is the one
-    // the immolation called, so that a contact keeps meaning exactly what it meant, and it turns
-    // down whatever comes after the hero died by itself.
+    // Announced once everything has been walked, rather than as each contact is found: what a
+    // machine reads must not change under it while it reads. Nothing is acted upon here, only
+    // told: every machine, this one included, handles it when the packet lands.
     for (let i = 0; i < context.touchedCount; i++) {
-        ServiceManager.getService('InvisUnit_is_getting_damage').onEscaperTouchingUnit(escaper, context.touched[i], 0)
+        sendAsyncContact(escaper.getId(), context.touchedKinds[i], context.touchedIds[i])
     }
 }
 

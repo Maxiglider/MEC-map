@@ -113,6 +113,8 @@ export class Escaper extends EscaperMake {
     private isAsyncSlideEnabled = false
     /** os.clock() of the last packet received about this hero, to notice its owner going quiet */
     private lastAsyncPacketTime = 0
+    /** While replaying a terrain packet, so that the replay does not announce itself again */
+    private isApplyingAsyncTerrain = false
 
     private invisUnit?: unit
     private collisionSize: number
@@ -904,7 +906,10 @@ export class Escaper extends EscaperMake {
         this.setSpeedZ(movement.speedZ)
         this.setLastZ(movement.lastZ)
         this.setOldDiffZ(movement.oldDiffZ)
-        this.setSlideMovePerPeriodOnResync(movement.slideMovePerPeriod)
+        // a plain field: this runs on the receiving machines only, ten times a second, so it must
+        // not create nor destroy a handle. Their sequences would drift apart, and MEC keys tables
+        // on handle ids.
+        this.slideMovePerPeriod = movement.slideMovePerPeriod
     }
 
     /**
@@ -950,6 +955,11 @@ export class Escaper extends EscaperMake {
         // after enableSlide, which samples the terrain height itself and would overwrite them
         this.setLastZ(movement.lastZ)
         this.setOldDiffZ(movement.oldDiffZ)
+
+        // Every machine runs this on the same turn, so dropping the temporary speed here is
+        // symmetric. Its timer could not be transmitted anyway, and the hero is dead: the speed
+        // only has to carry the body until it lands.
+        this.disableSlideSpeedTemporarily()
     }
 
     /** Kills the hero for real, wherever its unit stands */
@@ -1222,16 +1232,6 @@ export class Escaper extends EscaperMake {
     setSlideSpeed(ss: number) {
         this.slideSpeed = ss
         this.slideMovePerPeriod = ss * Constants.SLIDE_PERIOD
-    }
-
-    /**
-     * Forces how far the hero travels each period, as it was on the machine that saw it die. The
-     * temporary speed is dropped: its timer cannot be transmitted, and the hero is dead anyway,
-     * so this speed only has to last until it lands.
-     */
-    setSlideMovePerPeriodOnResync(movePerPeriod: number) {
-        this.disableSlideSpeedTemporarily()
-        this.slideMovePerPeriod = movePerPeriod
     }
 
     disableSlideSpeedTemporarily() {
@@ -2047,9 +2047,42 @@ export class Escaper extends EscaperMake {
     /** Another machine decides for this hero: this one only replays what it is told */
     isAsyncControlledElsewhere = () => this.isHeroEffectActive && GetLocalPlayer() !== this.p
 
-    /** Announces a terrain change, so the others run the same check at the same place */
+    /**
+     * A hero sliding as an effect only has its terrain read when its own packet says so, whichever
+     * machine is asking: they all act on the same turn that way. The replay itself is let through.
+     */
+    shouldSkipTerrainCheck = () => this.isHeroEffectActive && !this.isApplyingAsyncTerrain
+
+    /**
+     * Announces a terrain change and asks the caller to stop there.
+     *
+     * The machine owning the hero does not act on it either: it waits for its own packet like
+     * everybody else. Acting at once would start the slide, and its timer, turns before the other
+     * machines do the same, and handles created out of step is what a desync is made of.
+     */
     sendAsyncTerrainChangeIfNeeded = () => {
-        this.isAsyncControlledHere() && sendAsyncTerrainChange(this.escaperId, this.getHeroMovementState())
+        if (!this.isAsyncControlledHere() || this.isApplyingAsyncTerrain) {
+            return
+        }
+
+        // The same conditions the check itself applies, so that a packet only goes out when it
+        // would have done something: on the ground, on a terrain it was not already on, and on a
+        // deadly one every time, as its tolerance is measured again at each pass.
+        if (this.getHeroFlyHeight() >= 1) {
+            return
+        }
+
+        const currentTerrainType = getUdgTerrainTypes().getTerrainType(this.getHeroX(), this.getHeroY())
+
+        if (!currentTerrainType) {
+            return
+        }
+
+        if (currentTerrainType === this.getLastTerrainType() && currentTerrainType.getKind() !== 'death') {
+            return
+        }
+
+        sendAsyncTerrainChange(this.escaperId, this.getHeroMovementState())
     }
 
     /**
@@ -2058,7 +2091,7 @@ export class Escaper extends EscaperMake {
      * slide started, slide terrain changed, or walkable ground reached.
      */
     applyAsyncTerrainChange = (sequence: number, movement: HeroMovementState) => {
-        if (sequence <= this.lastAsyncSequence || !this.isAsyncControlledElsewhere()) {
+        if (sequence <= this.lastAsyncSequence || !this.isHeroEffectActive) {
             return
         }
 
@@ -2067,7 +2100,10 @@ export class Escaper extends EscaperMake {
         this.applyHeroMovementState(movement)
         this.updateHeroEffect()
 
+        // the flag keeps the check from announcing again the very change it is replaying
+        this.isApplyingAsyncTerrain = true
         CheckTerrainTrigger.CheckTerrainActions(this.escaperId)
+        this.isApplyingAsyncTerrain = false
     }
 
     /**
