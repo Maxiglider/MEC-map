@@ -95,6 +95,7 @@ export class Escaper extends EscaperMake {
     // On async slide mode, hero unit is converted to a hero effect
     private heroEffect?: effect
     private isHeroEffectActive = false
+    private heroEffectDummyUnit?: unit // a unit without model following the syncly the hero effect to keep a dot on the minimap
 
     /**
      * Where the hero really is while its effect stands in for it. The unit is parked out of the
@@ -501,6 +502,7 @@ export class Escaper extends EscaperMake {
         this.refreshCollisionLandmark()
 
         this.createHeroEffect()
+        this.createHeroEffectDummyUnit()
 
         this.effects.showEffects(this.hero)
         delete this.lastTerrainType
@@ -573,6 +575,11 @@ export class Escaper extends EscaperMake {
         if (this.invisUnit) {
             RemoveUnit(this.invisUnit)
             delete this.invisUnit
+        }
+
+        if (this.heroEffectDummyUnit) {
+            RemoveUnit(this.heroEffectDummyUnit)
+            delete this.heroEffectDummyUnit
         }
 
         delete this.lastTerrainType
@@ -907,6 +914,7 @@ export class Escaper extends EscaperMake {
 
         this.setRemainingDegreesToTurn(AnglesDiff(movement.targetAngle, movement.facing))
         this.setSlideCurrentTurnPerPeriod(movement.turnPerPeriod)
+        this.moveHeroEffectDummyUnit(movement.x, movement.y)
         this.setSpeedZ(movement.speedZ)
         this.setLastZ(movement.lastZ)
         this.setOldDiffZ(movement.oldDiffZ)
@@ -924,12 +932,21 @@ export class Escaper extends EscaperMake {
      * The sender applies nothing here: it is already ahead of what it just sent.
      */
     applyAsyncPosition = (sequence: number, movement: HeroMovementState) => {
-        if (sequence <= this.lastAsyncSequence || GetLocalPlayer() === this.p || !this.isHeroEffectActive) {
+        if (sequence <= this.lastAsyncSequence || !this.isHeroEffectActive) {
             return
         }
 
         this.lastAsyncSequence = sequence
         this.lastAsyncPacketTime = os.clock()
+
+        // The machine that sent this is already ahead of it and has nothing to learn, save for the
+        // dot: that one is a unit, so it moves from the packet everywhere, itself included.
+        if (GetLocalPlayer() === this.p) {
+            this.moveHeroEffectDummyUnit(movement.x, movement.y)
+
+            return
+        }
+
         this.applyHeroMovementState(movement)
         this.updateHeroEffect()
     }
@@ -2000,6 +2017,54 @@ export class Escaper extends EscaperMake {
         this.parkHeroEffect()
     }
 
+    /**
+     * A hero effect draws nothing on the minimap, and the unit it stands in for waits in a corner
+     * of the map: without this the player would lose their own dot for the whole slide.
+     *
+     * It is the invisible unit type, which happens to be a hero one, so the dot looks like the dot
+     * of any other slider. Locust keeps the monsters from acquiring and burning it, and keeps it
+     * unclickable, while showing and hiding it gives it back its dot and its selectability. The
+     * hero interface icon is turned off, or the player would grow a second hero in the corner of
+     * their screen.
+     */
+    private createHeroEffectDummyUnit = () => {
+        if (this.heroEffectDummyUnit || !this.hero) {
+            return
+        }
+
+        const dummy = Natives.UCreateUnit(
+            this.p,
+            Constants.INVIS_UNIT_TYPE_ID,
+            GetUnitX(this.hero),
+            GetUnitY(this.hero),
+            0
+        )
+
+        this.heroEffectDummyUnit = dummy
+
+        SetUnitPathing(dummy, false)
+        SetUnitInvulnerable(dummy, true)
+        UnitAddAbility(dummy, FourCC('Aloc'))
+        BlzSetUnitBooleanField(dummy, UNIT_BF_HERO_HIDE_HERO_INTERFACE_ICON, true)
+        BlzSetUnitBooleanField(dummy, UNIT_BF_HERO_HIDE_HERO_DEATH_MESSAGE, true)
+        SetUnitColor(dummy, Natives.UConvertPlayerColor(this.baseColorId))
+        ShowUnit(dummy, false)
+    }
+
+    /**
+     * Follows the effect, but only from what the packets say: a unit belongs to the game, so its
+     * position has to be the same on every machine. The dot is therefore one latency behind the
+     * effect its own player sees, which is the price of it being in the right place for everybody.
+     */
+    private moveHeroEffectDummyUnit = (x: number, y: number) => {
+        if (!this.heroEffectDummyUnit) {
+            return
+        }
+
+        SetUnitX(this.heroEffectDummyUnit, x)
+        SetUnitY(this.heroEffectDummyUnit, y)
+    }
+
     /** Sends the effect under the map, where nobody sees it */
     private parkHeroEffect = () => {
         this.heroEffect && BlzSetSpecialEffectPosition(this.heroEffect, 0, 0, PARKED_HERO_EFFECT_Z)
@@ -2137,6 +2202,17 @@ export class Escaper extends EscaperMake {
             this.isHeroEffectActive = true
             this.lastAsyncPacketTime = os.clock()
 
+            if (this.heroEffectDummyUnit) {
+                this.moveHeroEffectDummyUnit(this.heroPos.x, this.heroPos.y)
+
+                // shown after being hidden, which is what gives a locust unit its dot back
+                ShowUnit(this.heroEffectDummyUnit, false)
+                ShowUnit(this.heroEffectDummyUnit, true)
+            }
+
+            // the unit waits in a corner of the map, and its dot has no business being there
+            BlzSetUnitBooleanField(this.hero, UNIT_BF_HERO_HIDE_HERO_MINIMAP_DISPLAY, true)
+
             // the native lock would drag the camera to the corner the unit waits in
             this.releaseLockedCameraFromUnit()
             this.updateHeroEffect()
@@ -2146,6 +2222,9 @@ export class Escaper extends EscaperMake {
 
         this.isHeroEffectActive = false
         this.parkHeroEffect()
+
+        this.heroEffectDummyUnit && ShowUnit(this.heroEffectDummyUnit, false)
+        BlzSetUnitBooleanField(this.hero, UNIT_BF_HERO_HIDE_HERO_MINIMAP_DISPLAY, false)
 
         // the unit takes back the place the effect had led it to
         SetUnitX(this.hero, this.heroPos.x)
