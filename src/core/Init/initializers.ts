@@ -4,6 +4,7 @@ import { init_terrain_limit_variables } from '../01_libraries/Init_terrain_limit
 import { initViewAllHideAll } from '../03_view_all_hide_all/View_all_hide_all'
 import { initFirstPerson } from '../04_STRUCTURES/Escaper/Escaper_firstPerson'
 import { init_StartAndEnd } from '../04_STRUCTURES/Level/StartAndEnd'
+import { initContactChunks } from '../04_STRUCTURES/Monster/ContactChunks'
 import { init_LongDistanceMoveOrder_garbageCollector } from '../04_STRUCTURES/Monster/LongDistanceMoveOrder'
 import { initMonsterSimplePatrol } from '../04_STRUCTURES/Monster/MonsterSimplePatrol'
 import { init_TrigMonstersClickableSetLife } from '../04_STRUCTURES/Monster/trig_Monsters_clickable_set_life'
@@ -35,6 +36,7 @@ export const initializers = () => {
     init_globals()
     init_dataFromWorleditor()
     init_terrain_limit_variables()
+    initContactChunks() // before any monster unit exists: each of them registers itself as it appears
     initArrays()
     init_StartAndEnd()
     initViewAllHideAll()

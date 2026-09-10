@@ -6,6 +6,7 @@ import { createEvent } from '../../../Utils/mapUtils'
 import { ForceAngleBetween0And360, Round32 } from '../../01_libraries/Basic_functions'
 import { Natives } from '../../wc3_natives_unsecured/Natives'
 import { Hero2Escaper } from '../Escaper/Escaper_functions'
+import type { ContactAreaBuilder } from './ContactChunks'
 import { Monster } from './Monster'
 import { MonsterType } from './MonsterType'
 import { NewImmobileMonster } from './Monster_functions'
@@ -77,6 +78,26 @@ export class MonsterNoMove extends Monster {
         this.killRectTrigger && DestroyTrigger(this.killRectTrigger)
     }
 
+    /** The region a wanderable monster roams in, which is also everywhere it can be touched */
+    private getWanderRegion = () => {
+        if (!this.level || !this.mt?.isWanderable()) {
+            return undefined
+        }
+
+        return this.level.regions.getRegionAtWithFlag(this.x, this.y, 'wanderable')
+    }
+
+    protected describeOwnContactArea(area: ContactAreaBuilder) {
+        const wanderRegion = this.getWanderRegion()
+
+        if (wanderRegion) {
+            area.addRect(wanderRegion.getMinX(), wanderRegion.getMinY(), wanderRegion.getMaxX(), wanderRegion.getMaxY())
+            return
+        }
+
+        area.addPoint(this.x, this.y)
+    }
+
     wander = () => {
         const targetUnit = this.u
 
@@ -88,7 +109,7 @@ export class MonsterNoMove extends Monster {
             return
         }
 
-        const region = this.level.regions.getRegionAtWithFlag(this.x, this.y, 'wanderable')
+        const region = this.getWanderRegion()
 
         if (!region) {
             return

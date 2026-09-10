@@ -1,7 +1,12 @@
 import { createTimer } from 'Utils/mapUtils'
-import { getUdgEscapers, getUdgLevels, udg_spawned_monster_units, udg_spawned_monsters } from '../../../../globals'
+import { getUdgEscapers, udg_spawned_monster_units, udg_spawned_monsters } from '../../../../globals'
 import { Constants } from '../../01_libraries/Constants'
 import { Escaper } from '../../04_STRUCTURES/Escaper/Escaper'
+import {
+    getContactChunkBucket,
+    getContactChunkTierCount,
+    MAX_SWEPT_STEP,
+} from '../../04_STRUCTURES/Monster/ContactChunks'
 import { applyContact, CONTACT_KIND, sendAsyncContact } from './AsyncHeroSync'
 
 /**
@@ -22,7 +27,8 @@ import { applyContact, CONTACT_KIND, sendAsyncContact } from './AsyncHeroSync'
  * The reach is the collision size of the hero, which the invisible unit was built from.
  *
  * Monsters carry the ability Locust to be unclickable, and the enumeration natives ignore those,
- * so the engine cannot be asked: the candidates come from what MEC itself keeps track of.
+ * so the engine cannot be asked what stands nearby: the candidates come from MEC's own index, the
+ * contact chunks, which answer with the monsters of the one chunk the hero stands in per tier.
  */
 const CONTACT_CHECK_PERIOD = 0.02
 
@@ -36,12 +42,6 @@ const CONTACT_CHECK_PERIOD = 0.02
  * on the spot by every machine need.
  */
 const CONTACT_REPEAT_CHECKS = Math.floor(1 / CONTACT_CHECK_PERIOD)
-
-/**
- * Beyond such a step the hero did not move: it was revived, teleported or taken to another level,
- * and sweeping that step would touch everything standing on the way.
- */
-const MAX_SWEPT_STEP = 2 * Constants.LARGEUR_CASE
 
 /** Names one thing touched with a single number. No handle id ever comes close to it. */
 const CONTACT_KEY_KIND_FACTOR = 0x100000000
@@ -145,7 +145,12 @@ const getContext = (escaper: Escaper) => {
     return context
 }
 
-/** Cheapest tests first: a monster that cannot burn, or one that is gone, costs almost nothing */
+/**
+ * Arithmetic first, the engine last. Reading a position is one native; asking whether a monster
+ * exists, is alive and is shown is three more, and almost every candidate is going to be rejected
+ * on distance anyway - those three natives per monster are what made this check too expensive to
+ * give to every hero.
+ */
 const testCandidate = (
     context: ContactContext,
     candidate: unit | undefined,
@@ -154,10 +159,6 @@ const testCandidate = (
     id: number
 ) => {
     if (!candidate || contactRadius <= 0) {
-        return
-    }
-
-    if (GetUnitTypeId(candidate) === 0 || !IsUnitAliveBJ(candidate) || IsUnitHidden(candidate)) {
         return
     }
 
@@ -174,30 +175,50 @@ const testCandidate = (
         return
     }
 
-    if (squaredDistanceToStep(context.fromX, context.fromY, context.toX, context.toY, x, y) <= reach * reach) {
-        context.touchedKinds[context.touchedCount] = kind
-        context.touchedIds[context.touchedCount] = id
-        context.touchedCount++
+    if (squaredDistanceToStep(context.fromX, context.fromY, context.toX, context.toY, x, y) > reach * reach) {
+        return
     }
+
+    // a removed unit reads as a position of 0, 0, so this still has to be asked before it counts
+    if (GetUnitTypeId(candidate) === 0 || !IsUnitAliveBJ(candidate) || IsUnitHidden(candidate)) {
+        return
+    }
+
+    context.touchedKinds[context.touchedCount] = kind
+    context.touchedIds[context.touchedCount] = id
+    context.touchedCount++
 }
 
-/** Every monster of every active level: several of them can be running at once */
+/**
+ * The monsters of the chunk the hero stands in, at every tier: whichever level they belong to,
+ * since a monster is in the index for as long as its unit stands on the map, and however far the
+ * others are, since they are in other chunks and are never heard of.
+ */
 const testLevelMonsters = (context: ContactContext) => {
-    getUdgLevels().forAll(level => {
-        if (!level.isActivated()) {
-            return
+    const tierCount = getContactChunkTierCount()
+
+    for (let tierIndex = 0; tierIndex < tierCount; tierIndex++) {
+        const bucket = getContactChunkBucket(tierIndex, context.toX, context.toY)
+
+        if (bucket === undefined) {
+            continue
         }
 
-        level.monsters.forAll(monster => {
-            testCandidate(
-                context,
-                monster.u,
-                monster.getMonsterType()?.getImmolationRadius() ?? 0,
-                CONTACT_KIND.levelMonster,
-                monster.getId()
-            )
-        })
-    })
+        for (let i = 0; i < bucket.count; i++) {
+            const monster = bucket.monsters[i]
+
+            // a temporarily disabled monster had its immolation taken away: it burns nobody either
+            monster &&
+                !monster.isDisabled() &&
+                testCandidate(
+                    context,
+                    monster.u,
+                    monster.getMonsterType()?.getImmolationRadius() ?? 0,
+                    CONTACT_KIND.levelMonster,
+                    monster.getId()
+                )
+        }
+    }
 }
 
 /**

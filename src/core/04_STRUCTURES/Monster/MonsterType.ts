@@ -3,11 +3,12 @@ import { Constants } from 'core/01_libraries/Constants'
 import { Text } from 'core/01_libraries/Text'
 import { getUdgEscapers, getUdgLevels } from '../../../../globals'
 import { Ascii2String } from '../../01_libraries/Ascii'
-import { udg_colorCode } from '../../01_libraries/Init_colorCodes'
-import { Level } from '../Level/Level'
-import { IMMOLATION_SKILLS } from './Immolation_skills'
-import { Natives } from '../../wc3_natives_unsecured/Natives'
 import { ReplaceBackslahsesInLinks, Round32 } from '../../01_libraries/Basic_functions'
+import { udg_colorCode } from '../../01_libraries/Init_colorCodes'
+import { Natives } from '../../wc3_natives_unsecured/Natives'
+import { Level } from '../Level/Level'
+import { requestContactChunksRebuild } from './ContactChunks'
+import { IMMOLATION_SKILLS } from './Immolation_skills'
 
 export class MonsterType {
     label: string
@@ -166,6 +167,7 @@ export class MonsterType {
         this.immolationRadius = immolationRadius
         this.immolationSkill = IMMOLATION_SKILLS[immolationRadius]
         this.refresh()
+        requestContactChunksRebuild()
         return true
     }
 

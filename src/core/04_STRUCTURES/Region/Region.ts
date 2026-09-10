@@ -5,9 +5,10 @@ import { Constants } from 'core/01_libraries/Constants'
 import { hooks } from 'core/API/GeneralHooks'
 import { udg_colorCode } from '../../01_libraries/Init_colorCodes'
 import { Text } from '../../01_libraries/Text'
+import { Natives } from '../../wc3_natives_unsecured/Natives'
 import { Hero2Escaper } from '../Escaper/Escaper_functions'
 import { Level } from '../Level/Level'
-import { Natives } from '../../wc3_natives_unsecured/Natives'
+import { requestContactChunksRebuild } from '../Monster/ContactChunks'
 
 export class Region {
     private static lastInstanceId = -1
@@ -158,6 +159,7 @@ export class Region {
 
     setFlags = (flags: string[]) => {
         this.flags = flags
+        requestContactChunksRebuild() // a wanderable region is how far the monsters inside it roam
     }
 
     hasFlag = (flag: string) => {
@@ -165,6 +167,8 @@ export class Region {
     }
 
     setFlag = (flag: string, b: boolean) => {
+        requestContactChunksRebuild()
+
         if (b) {
             if (!this.flags.includes(flag)) {
                 this.flags.push(flag)

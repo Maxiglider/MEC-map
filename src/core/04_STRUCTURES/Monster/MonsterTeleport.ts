@@ -1,9 +1,11 @@
 import { udg_monsters } from '../../../../globals'
+import { arrayValuesRound } from '../../01_libraries/Basic_functions'
+import { Natives } from '../../wc3_natives_unsecured/Natives'
+import type { ContactAreaBuilder } from './ContactChunks'
+import { requestContactChunksRebuild } from './ContactChunks'
 import { Monster } from './Monster'
 import { MonsterType } from './MonsterType'
 import { NewImmobileMonster } from './Monster_functions'
-import { arrayValuesRound } from '../../01_libraries/Basic_functions'
-import { Natives } from '../../wc3_natives_unsecured/Natives'
 
 export const WAIT = 1000000
 export const HIDE = 2000000
@@ -178,6 +180,18 @@ export class MonsterTeleport extends Monster {
         }
     }
 
+    protected describeOwnContactArea(area: ContactAreaBuilder) {
+        for (let i = 0; i < this.x.length; i++) {
+            const x = this.x[i]
+            const y = this.y[i]
+
+            // WAIT and HIDE are orders rather than places: the monster does not go there
+            if (x !== WAIT && x !== HIDE && y !== WAIT && y !== HIDE) {
+                area.addPoint(x, y)
+            }
+        }
+    }
+
     getX = (id: number): number => {
         return this.x[id]
     }
@@ -189,6 +203,7 @@ export class MonsterTeleport extends Monster {
     addNewLocAt = (id: number, x: number, y: number) => {
         this.x[id] = x
         this.y[id] = y
+        requestContactChunksRebuild() // one more place it can be touched at
     }
 
     addNewLoc = (x: number, y: number): boolean => {
@@ -216,6 +231,7 @@ export class MonsterTeleport extends Monster {
 
         delete this.x[lastLocInd]
         delete this.y[lastLocInd]
+        requestContactChunksRebuild()
 
         return true
     }

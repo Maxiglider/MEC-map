@@ -1,7 +1,11 @@
 # Replacing the Warcraft III immolation with MEC's own contact check
 
-Status: **designed, partly implemented.** The runtime switches and the e2e tests exist; the chunk
-indexing described in [The decided design](#the-decided-design-chunks) does not yet.
+Status: **implemented for the monsters of the levels.** The runtime switches, the e2e tests and the
+chunk index all exist (`src/core/04_STRUCTURES/Monster/ContactChunks.ts`, driven by `-cc`). Still
+open: the monster spawns and the casters, which the check still walks in full, and the default value
+of `IMMOLATION_SYSTEM_ENABLED`.
+
+Not measured in game yet: the numbers in [Why](#why) are the ones this replaces.
 
 ## Why
 
@@ -48,11 +52,22 @@ Two reasons to replace it:
   ones), temporarily disabled monsters excepted. Two call sites read the flag:
   `NewImmobileMonsterForPlayer` (so monsters born later get none) and `Monster.temporarilyEnable`.
 - **`AsyncContactCheck.ts`** (`src/core/Test/async/`) — the check itself, every
-  `CONTACT_CHECK_PERIOD` (0.02 s): swept-segment distance against the level monsters of the active
-  levels, the spawned monsters, and the power circles of the other heroes
+  `CONTACT_CHECK_PERIOD` (0.02 s): swept-segment distance against the monsters of the chunks the
+  hero stands in, the spawned monsters, and the power circles of the other heroes
   (`Constants.COOP_REVIVE_DIST`). One permanent `ContactContext` per hero, so nothing is allocated
   per tick. `setContactCheckEnabledForEveryHero(enabled)` widens it from the async heroes to all of
-  them.
+  them. A monster whose immolation was temporarily taken away (a disabled clear mob) is skipped, as
+  the immolation itself would be.
+- **`ContactChunks.ts`** (`src/core/04_STRUCTURES/Monster/`) — the index: the tier ladder, the
+  registration, the query, the rebuild and its logs, the stats and the audit. A monster joins its
+  chunks in `Monster.createUnit` and leaves them in `Monster.removeUnit`, so the index holds exactly
+  the monster units standing on the map, whatever level they belong to.
+- **`Monster.describeContactArea`** — how a monster says where it can be found. The base class
+  answers for a circle mob (carried around its trigger mob) and otherwise defers to
+  `describeOwnContactArea`, reimplemented by `MonsterNoMove` (its point, or its whole wanderable
+  region), `MonsterSimplePatrol` (its line), `MonsterMultiplePatrols` (its polyline, closed in
+  `normal` mode) and `MonsterTeleport` (its stops, `WAIT` and `HIDE` skipped).
+- **`-cc`** (`-contactChunks`, admin) — `stats`, `audit`, `rebuild`, `tiers <size> [<size> ...]`.
 - **`applyContact(escaperId, kind, id)`** (`src/core/Test/async/AsyncHeroSync.ts`) — what a contact
   does, which is the handler the immolation used to call. Both roads lead to it.
 - **e2e tests** (`src/core/Test/e2e-tests/`): `immolationOff` / `immolationOn`,
@@ -94,7 +109,7 @@ can only touch that monster if the hero's own position is inside that padded are
 of those chunks. So the query is: **the single chunk containing the hero's point, at each tier.**
 One integer key per tier, no neighbour scan, nothing missed.
 
-### Registration, once per monster
+### Registration, once per monster unit
 
 1. Compute the **cells the movement actually visits**, not the bounding box of it: the two points of
    a simple patrol, the segments of `MonsterMultiplePatrols`, the target cells of `MonsterTeleport`
@@ -108,6 +123,11 @@ One integer key per tier, no neighbour scan, nothing missed.
    entries is nothing), going up a tier while the count is over it. `1x1` is mandatory as the last
    fallback: a monster patrolling the whole map on its own has to live somewhere.
 4. Register the monster in each of those chunks.
+
+The geometry was brute-forced offline before being trusted: 60k random monsters (points, long
+diagonals, polylines, rects) against 700k hero positions drawn around them, checking that every
+hero within the padding of a monster finds it in its own chunk. Zero misses, 6.4 chunks per monster
+on average.
 
 Because entries are cheap and paths are rasterized, almost everything fits a fine tier. The tier
 ladder exists only to bound the entry count, so **three tiers** (something fine, something middling,
@@ -135,9 +155,21 @@ last element rather than a hole or a hash walk.
 
 ### Re-registration triggers
 
-All deterministic and rare: movement edits while making a level, `-setMonsterImmolation` and
-`-patchImmo` (the padding depends on the radius), and a hero collision size change (the padding
-depends on the largest hero radius in play).
+All deterministic and rare, and all going through `requestContactChunksRebuild()`, which waits
+`REBUILD_REQUEST_DELAY` for the rest of the burst that asked for it (a single command changes the
+immolation of every monster type, or the collision size of every hero):
+
+- `MonsterType.setImmolation` — `-setMonsterImmolation`, `-patchImmo`: the padding is built on the
+  reach.
+- `Escaper.setHeroCollisionSize` — and `setHeroBaseCollisionSize` through it: the padding covers the
+  largest hero in play.
+- `MonsterTeleport.addNewLocAt` / `destroyLastLoc` and `MonsterMultiplePatrols.addNewLocAt` /
+  `setLocAt` / `destroyLastLoc` — a path is filled point by point, well after the unit exists.
+- `Region.setFlag` / `setFlags` — a `wanderable` region is how far the monsters inside it roam.
+
+Anything else that moves a monster in a way its movement class does not describe is a missed
+contact, which is what `-cc audit` is for: it checks that every registered monster unit really
+stands in one of its own chunks, and names those that do not.
 
 ### Monster spawns
 
@@ -253,10 +285,11 @@ and 9M natives today.
 
 ## Order of work
 
-1. The two orthogonal optimizations above (they help whatever the indexing does).
-2. The chunk index for level monsters, `contactCheckOn` + `immolationOff` measured against the
-   table at the top.
-3. Monster spawns.
+1. ~~The candidate test reordered~~ done. The per-tick position cache was dropped on purpose: with
+   the index, a monster is seen by few heroes, so there is nothing left to share.
+2. ~~The chunk index for the level monsters~~ done. Left to do: measure `contactCheckOn` +
+   `immolationOff` against the table at the top, and tune the ladder with `-cc tiers`.
+3. Monster spawns (still walked in full, which is cheap while they are few).
 4. Casters.
 5. Only then: `IMMOLATION_SYSTEM_ENABLED` flipped to `false` by default, and the immolation
    abilities dropped from the monster types.

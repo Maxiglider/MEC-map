@@ -16,9 +16,14 @@ import { Level } from '../Level/Level'
 import { CircleMob } from '../Monster_properties/CircleMob'
 import { ClearMob } from '../Monster_properties/ClearMob'
 import { PortalMob } from '../Monster_properties/PortalMob'
+import type { ContactAreaBuilder } from './ContactChunks'
+import { forgetMonsterInChunks, registerMonsterInChunks, unregisterMonsterFromChunks } from './ContactChunks'
 import { isImmolationSystemEnabled } from './Immolation_system'
 import { MonsterType } from './MonsterType'
 import { monstersClickable } from './trig_Monsters_clickable_set_life'
+
+/** Some circle mob shapes reach well past their radius, so the circle is taken generously */
+const CIRCLE_MOB_REACH_FACTOR = 5
 
 const LIVES_EARNED_SOUND_PATH = 'Sound/Interface/SecretFound.wav'
 const LIVES_EARNED_SOUND_DURATION = 2525
@@ -181,6 +186,7 @@ export abstract class Monster {
 
     removeUnit() {
         if (this.u) {
+            unregisterMonsterFromChunks(this)
             GroupRemoveUnit(monstersClickable, this.u)
             RemoveUnit(this.u)
             this.refreshCollisionLandmark()
@@ -307,6 +313,35 @@ export abstract class Monster {
         this.lifeBonusLivesEarned = false
 
         this.refreshCollisionLandmark()
+        registerMonsterInChunks(this)
+    }
+
+    /**
+     * Tells the contact chunks every place this monster's unit can be found during its life, so
+     * that a hero standing far from all of them never has to hear about it.
+     *
+     * A circle mob is answered for here: whatever it is otherwise, it is carried around its
+     * trigger mob and can be anywhere in the circle.
+     */
+    describeContactArea(area: ContactAreaBuilder) {
+        const circleMobParent = this.circleMobParent
+        const triggerUnit = circleMobParent?.getTriggerMob().u
+
+        if (circleMobParent && triggerUnit) {
+            const reach = circleMobParent.getRadius() * CIRCLE_MOB_REACH_FACTOR
+            const centerX = GetUnitX(triggerUnit)
+            const centerY = GetUnitY(triggerUnit)
+
+            area.addRect(centerX - reach, centerY - reach, centerX + reach, centerY + reach)
+            return
+        }
+
+        this.describeOwnContactArea(area)
+    }
+
+    /** Reimplement in children that move on their own. By default a monster stays where it stands. */
+    protected describeOwnContactArea(area: ContactAreaBuilder) {
+        this.u && area.addPoint(GetUnitX(this.u), GetUnitY(this.u))
     }
 
     refreshCollisionLandmark = () => {
@@ -594,6 +629,8 @@ export abstract class Monster {
         if (this.circleMobParent) {
             this.circleMobParent.removeMob(this.id)
         }
+
+        forgetMonsterInChunks(this)
 
         delete udg_monsters[this.id]
 

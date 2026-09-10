@@ -2,11 +2,13 @@ import { arrayValuesRound, GetLocDist } from 'core/01_libraries/Basic_functions'
 import { Constants } from 'core/01_libraries/Constants'
 import { udg_monsters } from '../../../../globals'
 import { errorHandler } from '../../../Utils/mapUtils'
+import { Natives } from '../../wc3_natives_unsecured/Natives'
 import { IsHero } from '../Escaper/Escaper_functions'
+import type { ContactAreaBuilder } from './ContactChunks'
+import { requestContactChunksRebuild } from './ContactChunks'
 import { Monster } from './Monster'
 import { NewPatrolMonster } from './Monster_functions'
 import { MonsterType } from './MonsterType'
-import { Natives } from '../../wc3_natives_unsecured/Natives'
 
 const NewRegion = (x: number, y: number): region => {
     let r = Rect(x - 16, y - 16, x + 16, y + 16)
@@ -97,6 +99,21 @@ export class MonsterMultiplePatrols extends Monster {
         MonsterMultiplePatrols.Y = []
     }
 
+    protected describeOwnContactArea(area: ContactAreaBuilder) {
+        for (let i = 0; i < this.x.length; i++) {
+            if (i === 0) {
+                area.addPoint(this.x[i], this.y[i])
+            } else {
+                area.addSegment(this.x[i - 1], this.y[i - 1], this.x[i], this.y[i])
+            }
+        }
+
+        // the last leg, walked back to the first point in "normal" mode
+        if (this.sens === 0 && this.x.length > 2) {
+            area.addSegment(this.x[this.x.length - 1], this.y[this.y.length - 1], this.x[0], this.y[0])
+        }
+    }
+
     getCurrentTrigger = () => {
         return this.currentTrigger
     }
@@ -177,6 +194,7 @@ export class MonsterMultiplePatrols extends Monster {
         delete this.r[lastLocInd]
         delete this.x[lastLocInd]
         delete this.y[lastLocInd]
+        requestContactChunksRebuild()
 
         if (lastLocInd === 1) {
             this.removeUnit()
@@ -198,6 +216,7 @@ export class MonsterMultiplePatrols extends Monster {
         DisableTrigger(this.t[id])
         TriggerAddAction(this.t[id], errorHandler(MonsterMultiplePatrols_move_Actions))
         TriggerRegisterEnterRegionSimple(this.t[id], this.r[id])
+        requestContactChunksRebuild() // one more leg it can be touched along
     }
 
     setLocAt(id: number, x: number, y: number) {
@@ -210,6 +229,7 @@ export class MonsterMultiplePatrols extends Monster {
         DisableTrigger(this.t[id])
         TriggerAddAction(this.t[id], errorHandler(MonsterMultiplePatrols_move_Actions))
         TriggerRegisterEnterRegionSimple(this.t[id], this.r[id])
+        requestContactChunksRebuild()
     }
 
     addNewLoc(x: number, y: number) {

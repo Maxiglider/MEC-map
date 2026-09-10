@@ -1,11 +1,12 @@
 import { createTimer } from 'Utils/mapUtils'
 import { udg_monsters } from '../../../../globals'
+import { Constants } from '../../01_libraries/Constants'
+import { Natives } from '../../wc3_natives_unsecured/Natives'
+import type { ContactAreaBuilder } from './ContactChunks'
 import { Monster } from './Monster'
 import { MonsterMultiplePatrols } from './MonsterMultiplePatrols'
 import { MonsterType } from './MonsterType'
 import { NewPatrolMonster } from './Monster_functions'
-import { Natives } from '../../wc3_natives_unsecured/Natives'
-import { Constants } from '../../01_libraries/Constants'
 
 export const initMonsterSimplePatrol = () => {
     //vérification que les monstres multi-patrouilles patrouillent bien
@@ -58,6 +59,10 @@ export class MonsterSimplePatrol extends Monster {
         }
 
         return n
+    }
+
+    protected describeOwnContactArea(area: ContactAreaBuilder) {
+        area.addSegment(this.x1, this.y1, this.x2, this.y2)
     }
 
     removeUnit() {

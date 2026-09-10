@@ -15,6 +15,13 @@ import { Text } from '../../01_libraries/Text'
 import { Escaper } from '../../04_STRUCTURES/Escaper/Escaper'
 import { GetMirrorEscaper } from '../../04_STRUCTURES/Escaper/Escaper_functions'
 import { SaveLoad } from '../../04_STRUCTURES/Escaper/Escaper_StartCommands'
+import {
+    auditContactChunks,
+    getContactChunkStats,
+    getContactChunkTierSizes,
+    rebuildContactChunks,
+    setContactChunkTierSizes,
+} from '../../04_STRUCTURES/Monster/ContactChunks'
 import { HorizontalRegionDirection } from '../../04_STRUCTURES/Region/HorizontalRectangleRegion'
 import { MakeMECRegionMode } from '../../05_MAKE_STRUCTURES/Make_create_region/MakeMECRegion'
 import { SaveMapInCache } from '../../07_TRIGGERS/Save_map_in_gamecache/SaveMapInCache'
@@ -945,6 +952,98 @@ export const initExecuteCommandMax = () => {
             escaper.makeCreateDebugMECRegions(mode, directionForHorizontal)
 
             Text.mkP(escaper.getPlayer(), 'MakeCreateDebugMECRegions enabled')
+            return true
+        },
+    })
+
+    //-contactChunks(cc) [stats | audit | rebuild | tiers <chunkSize> [<chunkSize> ...]]
+    registerCommand({
+        name: 'contactChunks',
+        alias: ['cc'],
+        group,
+        argDescription: '[stats | audit | rebuild | tiers <chunkSize> [<chunkSize> ...]]',
+        description:
+            "Reads or retunes the contact chunks, the index MEC's own contact check finds the monsters of a hero with. " +
+            'Chunk sizes are given in units, from the finest up; a tier holding the whole map is always added on top of them.',
+        cb: ({ nbParam, param1, param2, param3, param4, param5, param6, param7 }, escaper) => {
+            const p = escaper.getPlayer()
+
+            if (nbParam === 0 || param1 === 'stats') {
+                if (nbParam > 1) {
+                    return USAGE
+                }
+
+                for (const line of getContactChunkStats()) {
+                    Text.mkP(p, line)
+                }
+
+                return true
+            }
+
+            if (param1 === 'audit') {
+                if (nbParam !== 1) {
+                    return USAGE
+                }
+
+                const offenders = auditContactChunks()
+
+                if (offenders.length === 0) {
+                    Text.mkP(p, 'Contact chunks audit: every registered monster stands in its own chunks.')
+                    return true
+                }
+
+                Text.erP(p, `Contact chunks audit: ${offenders.length} monsters outside their chunks:`)
+
+                for (const line of offenders) {
+                    Text.erP(p, line)
+                }
+
+                return true
+            }
+
+            if (param1 === 'rebuild') {
+                if (nbParam !== 1) {
+                    return USAGE
+                }
+
+                rebuildContactChunks()
+                return true
+            }
+
+            if (param1 !== 'tiers') {
+                return USAGE
+            }
+
+            if (nbParam < 2) {
+                Text.mkP(p, `Contact chunk tiers: ${getContactChunkTierSizes().join(', ')} units`)
+                return true
+            }
+
+            const tierSizes: number[] = []
+
+            for (const param of [param2, param3, param4, param5, param6, param7]) {
+                if (param === '') {
+                    break
+                }
+
+                const chunkSize = S2I(param)
+
+                if (!IsPositiveInteger(param) || chunkSize < Constants.LARGEUR_CASE) {
+                    Text.erP(p, `Wrong chunk size "${param}": at least ${Constants.LARGEUR_CASE} units expected.`)
+                    return true
+                }
+
+                if (tierSizes.length > 0 && chunkSize <= tierSizes[tierSizes.length - 1]) {
+                    Text.erP(p, 'The chunk sizes have to be given from the finest up.')
+                    return true
+                }
+
+                tierSizes[tierSizes.length] = chunkSize
+            }
+
+            setContactChunkTierSizes(tierSizes)
+            Text.mkP(p, `Contact chunk tiers set to ${tierSizes.join(', ')} units.`)
+
             return true
         },
     })
