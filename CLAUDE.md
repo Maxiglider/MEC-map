@@ -12,32 +12,33 @@ A separate, sibling repository (`mec.maxslid.com`, a Laravel site — not part o
 
 - Node version is pinned via `.nvmrc` (24).
 - Copy `.env.example` to `.env` and set:
-  - `PROJECT_ROOT_DIR` — absolute path to this repo. **Required**: `tsconfig.js`/`build-tsconfig.ts` throws without it, which means `yarn prepare`, `yarn build`, and `yarn test` all fail until it's set.
-  - `PLATFORM` — `"windows"` or `"linux"`. Gates the Wine-launch branch in `scripts/test.ts`.
-  - `RELEASE_TEST_TARGET_DIR` / `DEPLOY_TARGET_FILE` — only needed for `yarn release-test*` / `yarn deploy`.
+    - `PROJECT_ROOT_DIR` — absolute path to this repo. **Required**: `tsconfig.js`/`build-tsconfig.ts` throws without it, which means `yarn prepare`, `yarn build`, and `yarn test` all fail until it's set.
+    - `PLATFORM` — `"windows"` or `"linux"`. Gates the Wine-launch branch in `scripts/test.ts`.
+    - `RELEASE_TEST_TARGET_DIR` / `DEPLOY_TARGET_FILE` — only needed for `yarn release-test*` / `yarn deploy`.
 - On Linux, also edit `config.json`: set `gameExecutable` to your Wine-mapped path, and `winePrefix`/`winePath` (default assumes `~/Games/battlenet` and a `wine` binary on PATH).
 - `yarn install` runs `yarn prepare` (`build-tsconfig` + `husky`) automatically — this is what generates `tsconfig.json` from `tsconfig.js`.
 
 ## Commands
 
-| Command | What it does |
-|---|---|
-| `yarn build` | Compiles `src/` to Lua (tstl), merges it with `src/lualibs/*.lua` and the World Editor map's own `war3map.lua`, applies build-time Lua patches, packages `dist/${mapFolder}` into a `.w3x` at `outputFolder` (`config.json`). |
-| `yarn test` | Compiles (unless `--no-launch`) and launches the actual Warcraft III client to manually play-test the map. **This is not an automated test suite** — see [Testing](#testing) below. |
-| `yarn test-launch` / `yarn test-no-launch` | `yarn test --launch` / `yarn test --no-launch`. |
-| `yarn release` | `yarn build` then `php ./bin/wrapLUAforWE.php` — packages the compiled bundle into the injectable `bin/MEC_core.lua`. |
-| `yarn release-test` | Builds, then splices the freshly built `bin/MEC_core.lua` into every test map under `RELEASE_TEST_TARGET_DIR` (an external, git-tracked folder outside this repo). |
-| `yarn release-test-publish` | Same, plus commits and pushes inside `RELEASE_TEST_TARGET_DIR`. |
-| `yarn deploy` | Deploys the built map to `DEPLOY_TARGET_FILE`. |
-| `yarn generate-help` | Statically scans `src/` for `registerCommand(...)` call sites (no game runtime needed) and writes `bin/commands-help.md`, `bin/commands-help.txt`, `bin/commands-data.json`. Prefer this over hand-editing a command list. |
-| `yarn build-tsconfig` | Regenerates `tsconfig.json` from `tsconfig.js`. Runs automatically via `yarn prepare`. |
-| `yarn prettier-staged-files` | Formats staged files; this is what the husky `pre-commit` hook runs. |
+| Command                                    | What it does                                                                                                                                                                                                                  |
+| ------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `yarn build`                               | Compiles `src/` to Lua (tstl), merges it with `src/lualibs/*.lua` and the World Editor map's own `war3map.lua`, applies build-time Lua patches, packages `dist/${mapFolder}` into a `.w3x` at `outputFolder` (`config.json`). |
+| `yarn test`                                | Compiles (unless `--no-launch`) and launches the actual Warcraft III client to manually play-test the map. **This is not an automated test suite** — see [Testing](#testing) below.                                           |
+| `yarn test-launch` / `yarn test-no-launch` | `yarn test --launch` / `yarn test --no-launch`.                                                                                                                                                                               |
+| `yarn release`                             | `yarn build` then `php ./bin/wrapLUAforWE.php` — packages the compiled bundle into the injectable `bin/MEC_core.lua`.                                                                                                         |
+| `yarn release-test`                        | Builds, then splices the freshly built `bin/MEC_core.lua` into every test map under `RELEASE_TEST_TARGET_DIR` (an external, git-tracked folder outside this repo).                                                            |
+| `yarn release-test-publish`                | Same, plus commits and pushes inside `RELEASE_TEST_TARGET_DIR`.                                                                                                                                                               |
+| `yarn deploy`                              | Deploys the built map to `DEPLOY_TARGET_FILE`.                                                                                                                                                                                |
+| `yarn generate-help`                       | Statically scans `src/` for `registerCommand(...)` call sites (no game runtime needed) and writes `bin/commands-help.md`, `bin/commands-help.txt`, `bin/commands-data.json`. Prefer this over hand-editing a command list.    |
+| `yarn build-tsconfig`                      | Regenerates `tsconfig.json` from `tsconfig.js`. Runs automatically via `yarn prepare`.                                                                                                                                        |
+| `yarn prettier-staged-files`               | Formats staged files; this is what the husky `pre-commit` hook runs.                                                                                                                                                          |
 
 ### Testing
 
 There is no headless/CI-runnable automated test suite for game logic. `yarn test` compiles the map and launches Warcraft III (via Wine on Linux) for manual play-testing.
 
 The closest thing to "run a single test" is the in-game e2e framework under `src/core/Test/e2e-tests/`, exposed as `MEC_core.e2e` and driven at runtime via the `-e2e` chat command inside a launched client:
+
 ```
 -e2e run <testName>
 -e2e speed <percentage>
@@ -54,6 +55,7 @@ See [ARCHITECTURE.md](./ARCHITECTURE.md) for the full directory tour and runtime
 - [docs/TERRAIN.md](./docs/TERRAIN.md) — how terrain is read/mutated at runtime, and the gap between the primitive session-only `-saveTerrain`/`-loadTerrain` commands and the richer, one-directional `-smic` terrain export.
 - [docs/SMIC_PIPELINE.md](./docs/SMIC_PIPELINE.md) — the `-smic` (Save Map In Cache) level-export pipeline, why it's desync-sensitive, and the full round trip through the separate `mec-smic-loader` tool.
 - [docs/MEMORY_HANDLER.md](./docs/MEMORY_HANDLER.md) — the object-pooling allocator used in hot paths to avoid Lua GC pressure.
+- [docs/MEC_CONTACT_CHECK_TO_REPLACE_IMMOLATION.md](./docs/MEC_CONTACT_CHECK_TO_REPLACE_IMMOLATION.md) — why and how MEC's own hero/monster contact check is meant to replace the Warcraft III immolation: measured costs, the chunk indexing decided for it, and the rejected alternatives.
 
 ## Key gotchas
 
