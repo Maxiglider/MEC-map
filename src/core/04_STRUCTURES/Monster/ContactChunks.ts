@@ -91,6 +91,7 @@ const state = {
     walk: 0,
     lastRebuildDuration: 0,
     isRebuildRequested: false,
+    isFirstRegistrationDone: false,
 }
 
 /**
@@ -433,7 +434,8 @@ const buildTiers = () => {
 const refreshMaxHeroCollisionSize = () => {
     let maxCollisionSize = globals.heroBaseCollisionSize
 
-    getUdgEscapers().forAll(escaper => {
+    // the escapers may not be there yet, early in the initialization
+    getUdgEscapers()?.forAll(escaper => {
         const collisionSize = escaper.getHeroCollisionSize()
 
         if (collisionSize > maxCollisionSize) {
@@ -454,9 +456,9 @@ export const rebuildContactChunks = () => {
 
     print('Starting monsters contact check registration...')
 
-    state.isInitialized = true
     refreshMaxHeroCollisionSize()
     buildTiers()
+    state.isInitialized = true
 
     state.memberships = {}
     state.monsterCount = 0
@@ -467,10 +469,13 @@ export const rebuildContactChunks = () => {
     }
 
     state.lastRebuildDuration = os.clock() - startTime
+    state.isFirstRegistrationDone = true
 
     print(
-        `Monsters contact check registration done. ${state.monsterCount} monsters, ${state.entryCount} entries ` +
-            `in ${state.tiers.length} tiers, ${Math.floor(state.lastRebuildDuration * 1000 + 0.5)} ms`
+        `Monsters contact check registration done. ${state.monsterCount} monster units on the map, ` +
+            `${state.entryCount} entries in ${state.tiers.length} tiers, ` +
+            `${Math.floor(state.lastRebuildDuration * 1000 + 0.5)} ms. ` +
+            `The monsters of a level to come register as it starts.`
     )
 }
 
@@ -478,9 +483,12 @@ export const rebuildContactChunks = () => {
  * Asks for a rebuild instead of doing one: a single command can change the immolation of every
  * monster type in a row, or the collision size of every hero, and the index only has to be right
  * once such a burst has settled.
+ *
+ * One rebuild is pending at a time, and anything asked for before the first registration of the
+ * game is answered by that one - which registers everything anyway, and is the only one to say so.
  */
 export const requestContactChunksRebuild = () => {
-    if (state.isRebuildRequested || !state.isInitialized) {
+    if (state.isRebuildRequested || !state.isFirstRegistrationDone) {
         return
     }
 
@@ -517,19 +525,39 @@ export const initContactChunks = () => {
         return
     }
 
-    state.isInitialized = true
     refreshMaxHeroCollisionSize()
     buildTiers()
+    state.isInitialized = true
 
-    // from here on every monster unit created registers itself; this only tells what came of it
+    // From here on every monster unit created registers itself; this only tells what came of it,
+    // once the first level has had the time to put its own monsters on the map.
     createTimer(INITIAL_REGISTRATION_DELAY, false, rebuildContactChunks)
 }
 
 export const getContactChunkStats = () => {
     const lines: string[] = []
 
+    let definedMonsters = 0
+    let monstersWithUnit = 0
+    let untouchableMonsters = 0
+
+    for (const [_, monster] of pairs(udg_monsters)) {
+        definedMonsters++
+
+        if (monster.u !== undefined) {
+            monstersWithUnit++
+
+            if ((monster.getMonsterType()?.getImmolationRadius() ?? 0) <= 0) {
+                untouchableMonsters++
+            }
+        }
+    }
+
     lines[0] =
-        `Tiers: ${state.tiers.length}, monsters: ${state.monsterCount}, entries: ${state.entryCount}, ` +
+        `Monsters: ${state.monsterCount} registered, ${monstersWithUnit} with a unit on the map ` +
+        `(${untouchableMonsters} of them without immolation, so untouchable), ${definedMonsters} defined in all`
+    lines[1] =
+        `Tiers: ${state.tiers.length}, entries: ${state.entryCount}, ` +
         `hero padding: ${state.maxHeroCollisionSize} + ${MAX_SWEPT_STEP}, ` +
         `last rebuild: ${Math.floor(state.lastRebuildDuration * 1000 + 0.5)} ms`
 

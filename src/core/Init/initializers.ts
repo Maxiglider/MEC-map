@@ -36,8 +36,8 @@ export const initializers = () => {
     init_globals()
     init_dataFromWorleditor()
     init_terrain_limit_variables()
-    initContactChunks() // before any monster unit exists: each of them registers itself as it appears
     initArrays()
+    initContactChunks() // before any monster unit exists: each of them registers itself as it appears
     init_StartAndEnd()
     initViewAllHideAll()
     initNoSelectionCircle()

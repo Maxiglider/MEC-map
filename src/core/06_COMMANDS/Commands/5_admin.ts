@@ -956,10 +956,10 @@ export const initExecuteCommandMax = () => {
         },
     })
 
-    //-contactChunks(cc) [stats | audit | rebuild | tiers <chunkSize> [<chunkSize> ...]]
+    //-contactChunks [stats | audit | rebuild | tiers <chunkSize> [<chunkSize> ...]]
     registerCommand({
         name: 'contactChunks',
-        alias: ['cc'],
+        alias: [],
         group,
         argDescription: '[stats | audit | rebuild | tiers <chunkSize> [<chunkSize> ...]]',
         description:
