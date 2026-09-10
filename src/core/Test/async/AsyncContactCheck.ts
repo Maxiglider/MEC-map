@@ -2,11 +2,8 @@ import { createTimer } from 'Utils/mapUtils'
 import { getUdgEscapers, udg_spawned_monster_units, udg_spawned_monsters } from '../../../../globals'
 import { Constants } from '../../01_libraries/Constants'
 import { Escaper } from '../../04_STRUCTURES/Escaper/Escaper'
-import {
-    getContactChunkBucket,
-    getContactChunkTierCount,
-    MAX_SWEPT_STEP,
-} from '../../04_STRUCTURES/Monster/ContactChunks'
+import { forEachMonsterAround, MAX_SWEPT_STEP } from '../../04_STRUCTURES/Monster/ContactChunks'
+import type { Monster } from '../../04_STRUCTURES/Monster/Monster'
 import { applyContact, CONTACT_KIND, sendAsyncContact } from './AsyncHeroSync'
 
 /**
@@ -190,35 +187,36 @@ const testCandidate = (
 }
 
 /**
- * The monsters of the chunk the hero stands in, at every tier: whichever level they belong to,
- * since a monster is in the index for as long as its unit stands on the map, and however far the
- * others are, since they are in other chunks and are never heard of.
+ * The hero whose contacts the chunks are currently being asked about. Held here rather than passed
+ * along, so that the very same function can be given to the index at every tick of every hero
+ * instead of a new one each time.
+ */
+const queried = { context: undefined as ContactContext | undefined }
+
+const testChunkMonster = (monster: Monster) => {
+    // a temporarily disabled monster had its immolation taken away: it burns nobody either
+    if (queried.context === undefined || monster.isDisabled()) {
+        return
+    }
+
+    testCandidate(
+        queried.context,
+        monster.u,
+        monster.getMonsterType()?.getImmolationRadius() ?? 0,
+        CONTACT_KIND.levelMonster,
+        monster.getId()
+    )
+}
+
+/**
+ * The monsters of the chunks the hero's step went through, at every tier: whichever level they
+ * belong to, since a monster is in the index for as long as its unit stands on the map, and however
+ * far the others are, since they are in other chunks and are never heard of.
  */
 const testLevelMonsters = (context: ContactContext) => {
-    const tierCount = getContactChunkTierCount()
+    queried.context = context
 
-    for (let tierIndex = 0; tierIndex < tierCount; tierIndex++) {
-        const bucket = getContactChunkBucket(tierIndex, context.toX, context.toY)
-
-        if (bucket === undefined) {
-            continue
-        }
-
-        for (let i = 0; i < bucket.count; i++) {
-            const monster = bucket.monsters[i]
-
-            // a temporarily disabled monster had its immolation taken away: it burns nobody either
-            monster &&
-                !monster.isDisabled() &&
-                testCandidate(
-                    context,
-                    monster.u,
-                    monster.getMonsterType()?.getImmolationRadius() ?? 0,
-                    CONTACT_KIND.levelMonster,
-                    monster.getId()
-                )
-        }
-    }
+    forEachMonsterAround(context.fromX, context.fromY, context.toX, context.toY, context.heroRadius, testChunkMonster)
 }
 
 /**

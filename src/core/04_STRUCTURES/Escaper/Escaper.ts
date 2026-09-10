@@ -36,7 +36,6 @@ import { Level } from '../Level/Level'
 import { DEPART_PAR_DEFAUT } from '../Level/StartAndEnd'
 import { StaticSlide } from '../Level/StaticSlide'
 import { METEOR_NORMAL, udg_meteors } from '../Meteor/Meteor'
-import { requestContactChunksRebuild } from '../Monster/ContactChunks'
 import { isDeathTerrain, type TerrainType } from '../TerrainType/TerrainType'
 import { TerrainTypeSlide } from '../TerrainType/TerrainTypeSlide'
 import { TerrainTypeWalk } from '../TerrainType/TerrainTypeWalk'
@@ -2436,7 +2435,6 @@ export class Escaper extends EscaperMake {
     setHeroCollisionSize = (collisionSize: number) => {
         GetInvisUnitTypeFromCollisionSize(collisionSize) // throws if collision size is invalid
         this.collisionSize = collisionSize
-        requestContactChunksRebuild() // the contact chunks pad the monsters with the largest hero
         this.refreshInvisUnit()
         this.refreshCollisionLandmark()
     }

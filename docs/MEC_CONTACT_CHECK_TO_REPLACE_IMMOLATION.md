@@ -1,11 +1,10 @@
 # Replacing the Warcraft III immolation with MEC's own contact check
 
-Status: **implemented for the monsters of the levels.** The runtime switches, the e2e tests and the
-chunk index all exist (`src/core/04_STRUCTURES/Monster/ContactChunks.ts`, driven by `-cc`). Still
-open: the monster spawns and the casters, which the check still walks in full, and the default value
-of `IMMOLATION_SYSTEM_ENABLED`.
-
-Not measured in game yet: the numbers in [Why](#why) are the ones this replaces.
+Status: **implemented and measured for the monsters of the levels.** The runtime switches, the e2e
+tests and the chunk index all exist (`src/core/04_STRUCTURES/Monster/ContactChunks.ts`, driven by
+`-contactChunks`), and the check now costs **~10 fps where the immolation costs 60** (see
+[Why](#why)). Still open: the monster spawns and the casters, which the check still walks in full,
+and the default value of `IMMOLATION_SYSTEM_ENABLED`.
 
 ## Why
 
@@ -25,23 +24,34 @@ Two reasons to replace it:
 
     | Monsters | Heroes | Detection                  | fps  |
     | -------- | ------ | -------------------------- | ---- |
+    | 0        | 0      | none                       | ~200 |
+    | 1518     | 0      | none                       | ~160 |
+    | 1518     | 3      | none                       | ~160 |
+    | 1518     | 24     | none                       | ~140 |
     | 1518     | 0      | immolation                 | ~120 |
     | 1518     | 3      | immolation                 | ~110 |
     | 1518     | 24     | immolation                 | ~80  |
-    | 1518     | 0      | none                       | ~160 |
-    | 1518     | 3      | none                       | ~160 |
-    | 1518     | 24     | none                       | ~120 |
-    | 0        | 0      | none                       | ~200 |
-    | 1518     | 1      | contact check, unoptimized | ~120 |
-    | 1518     | 3      | contact check, unoptimized | ~80  |
-    | 1518     | 24     | contact check, unoptimized | ~0.1 |
+    | 1518     | 1      | contact check, no index    | ~120 |
+    | 1518     | 3      | contact check, no index    | ~80  |
+    | 1518     | 24     | contact check, no index    | ~0.1 |
+    | 1518     | 1      | contact check, chunk index | ~160 |
+    | 1518     | 3      | contact check, chunk index | ~160 |
+    | 1518     | 24     | contact check, chunk index | ~130 |
 
-    So the immolation costs ~40 fps with no hero at all, and ~40 more for 24 heroes. **That is the
-    budget to beat**: 24 heroes above ~80 fps beats the engine, above ~120 fps beats an idle map.
-
-    The unoptimized contact check collapses because it is `O(heroes x monsters)` with natives in the
-    inner loop: `24 x 1518 x 50/s` is 1.8M candidate tests per second, each calling
-    `GetUnitTypeId`, `IsUnitAliveBJ`, `IsUnitHidden`, `GetUnitX`, `GetUnitY`.
+    The in-game fps reading moves around, so these are the orders of magnitude rather than exact
+    figures - `scripts/fps-average.py` reads a 20-second average off MangoHud's per-frame log for
+    the comparisons that need to be closer than that. What they say:
+    - **the immolation costs ~40 fps with nobody to burn** (160 -> 120), and ~60 fps with 24 heroes
+      (140 -> 80). It is paid whether or not anyone is near a monster;
+    - **the chunk index costs nothing up to 3 heroes** (160, which is the no-detection reading) and
+      **~10 fps with 24** (140 -> 130) - about six times cheaper than the engine's own immolation,
+      and it is only paid where heroes actually are;
+    - the same check **without** the index goes from 120 fps for a single hero to a frozen game at
+      24, because it is `O(heroes x monsters)` with natives in the inner loop: `24 x 1518 x 50/s` is
+      1.8M candidate tests a second, each calling `GetUnitTypeId`, `IsUnitAliveBJ`, `IsUnitHidden`,
+      `GetUnitX`, `GetUnitY`. With the index a hero sees a handful of candidates instead of 1518 -
+      on Mumu's map-wide last level, 780 monster units spread over 776 chunks means 3.1 candidates
+      per chunk and 14 in the worst one.
 
 ## What exists today
 
@@ -67,7 +77,7 @@ Two reasons to replace it:
   `describeOwnContactArea`, reimplemented by `MonsterNoMove` (its point, or its whole wanderable
   region), `MonsterSimplePatrol` (its line), `MonsterMultiplePatrols` (its polyline, closed in
   `normal` mode) and `MonsterTeleport` (its stops, `WAIT` and `HIDE` skipped).
-- **`-cc`** (`-contactChunks`, admin) — `stats`, `audit`, `rebuild`, `tiers <size> [<size> ...]`.
+- **`-contactChunks`** (admin) — `stats`, `audit`, `rebuild`, `tiers <size> [<size> ...]`.
 - **`applyContact(escaperId, kind, id)`** (`src/core/Test/async/AsyncHeroSync.ts`) — what a contact
   does, which is the handler the immolation used to call. Both roads lead to it.
 - **e2e tests** (`src/core/Test/e2e-tests/`): `immolationOff` / `immolationOn`,
@@ -104,10 +114,25 @@ Two reasons to replace it:
 
 ### The invariant
 
-A monster is registered in **every chunk its padded movement area overlaps**, at one tier. A hero
-can only touch that monster if the hero's own position is inside that padded area, hence inside one
-of those chunks. So the query is: **the single chunk containing the hero's point, at each tier.**
-One integer key per tier, no neighbour scan, nothing missed.
+**Each side pays for its own size.** A monster is registered in every chunk its **own reach**
+overlaps around everywhere it can stand. A hero asks for the chunks its **step** went through,
+widened by its **own collision size**. For any real contact, the point lying at the monster's reach
+from it towards the hero belongs to both areas, so one chunk holds the monster and is asked for:
+nothing can be missed.
+
+That split is the whole performance argument. Padding is read at every tick of every hero, while a
+query is the business of the one hero making it:
+
+- folding `MAX_SWEPT_STEP` (256) into the padding, as the first version did, cost 8.3 chunks per
+  monster on Murloc Slide - where the hero collision size is 0 and the immolations are small -
+  against 1 to 4 for the same monsters once it moved to the query;
+- folding the hero's collision size in meant taking the **largest hero in play** and padding every
+  monster with it, so one hero at 256 would degrade the index for the 23 others, and every size
+  change would mean a full rebuild. In the query it costs only the hero it belongs to, and a hero
+  growing during the game costs the index nothing at all.
+
+In practice that is one integer key per tier when the step and the hero fit inside a chunk, two to
+four when they cross a boundary.
 
 ### Registration, once per monster unit
 
@@ -115,19 +140,19 @@ One integer key per tier, no neighbour scan, nothing missed.
    a simple patrol, the segments of `MonsterMultiplePatrols`, the target cells of `MonsterTeleport`
    (whose bbox is huge and whose path is two dots), the single cell of `MonsterNoMove`. This is
    what keeps a long diagonal patrol in a fine tier instead of collapsing it into `1x1`.
-2. **Pad** those cells by the monster's own reach (its immolation radius) plus the hero side of the
-   contact (the largest hero collision size in play) plus `MAX_SWEPT_STEP`. Padding the monster
-   rather than the query is what allows the query to be a single point: if the swept segment came
-   within reach, its arrival point is within `reach + step`.
+2. **Pad** those cells by the monster's own reach (its immolation radius), and by nothing else: the
+   hero's collision size and the step it took are the query's business.
 3. Choose the **finest tier whose overlapped-chunk count stays under a cap** (generous — 16 to 32
    entries is nothing), going up a tier while the count is over it. `1x1` is mandatory as the last
    fallback: a monster patrolling the whole map on its own has to live somewhere.
 4. Register the monster in each of those chunks.
 
 The geometry was brute-forced offline before being trusted: 60k random monsters (points, long
-diagonals, polylines, rects) against 700k hero positions drawn around them, checking that every
-hero within the padding of a monster finds it in its own chunk. Zero misses, 6.4 chunks per monster
-on average.
+diagonals, polylines, rects) against 720k real contacts drawn around them - a monster position on
+its own area, a touching point within reach of it, and a swept step of up to `MAX_SWEPT_STEP`
+through that point - checking that the query finds the monster every time. Hero collision sizes were
+drawn from 0, 25, 100 and 256, the range a future MEC would vary them over. Zero misses, 4.3 chunks
+per monster, 2.15 chunk lookups per tier.
 
 Because entries are cheap and paths are rasterized, almost everything fits a fine tier. The tier
 ladder exists only to bound the entry count, so **three tiers** (something fine, something middling,
@@ -135,7 +160,8 @@ and `1x1`) should do what six were for — and each hero then costs 3 lookups pe
 
 ### The query, 50 times per second, per hero
 
-1. Per tier, compute the key of the chunk containing the hero's arrival point.
+1. Per tier, walk the chunks of the step's bounding box, widened by the hero's collision size -
+   usually one.
 2. Test the hero against the monsters of those chunks, cheapest first: cached position arithmetic
    before any native.
 3. Test the hero against the chunk of each **active monster spawn** (see below).
@@ -161,14 +187,12 @@ immolation of every monster type, or the collision size of every hero):
 
 - `MonsterType.setImmolation` — `-setMonsterImmolation`, `-patchImmo`: the padding is built on the
   reach.
-- `Escaper.setHeroCollisionSize` — and `setHeroBaseCollisionSize` through it: the padding covers the
-  largest hero in play.
 - `MonsterTeleport.addNewLocAt` / `destroyLastLoc` and `MonsterMultiplePatrols.addNewLocAt` /
   `setLocAt` / `destroyLastLoc` — a path is filled point by point, well after the unit exists.
 - `Region.setFlag` / `setFlags` — a `wanderable` region is how far the monsters inside it roam.
 
 Anything else that moves a monster in a way its movement class does not describe is a missed
-contact, which is what `-cc audit` is for: it checks that every registered monster unit really
+contact, which is what `-contactChunks audit` is for: it checks that every registered monster unit really
 stands in one of its own chunks, and names those that do not.
 
 ### Monster spawns
@@ -205,7 +229,7 @@ Three things keep the retuning to one command instead of a rebuild:
 2. **One rebuild entry point**, `rebuildContactChunks()`, walking the live monster units and the
    spawns. 1518 monsters at about 4 entries each is some 6k table writes, a millisecond: a ladder
    change applies in game, with no `yarn build` and no relaunch between two measurements.
-3. **A command and a stats readout** - `-cc tiers 512, 4096` and `-cc stats` (entries per tier,
+3. **A command and a stats readout** - `-contactChunks tiers 512 4096` and `-contactChunks stats` (entries per tier,
    monsters per tier, worst chunk occupancy, average candidates per hero per tick). The tuning loop
    is then: `activateAllLevels`, `immolationOff`, `contactCheckOn`, read fps and stats, retype the
    ladder, again.
@@ -234,7 +258,7 @@ Starting monsters contact check registration...
 Monsters contact check registration done. 1518 monsters, 5964 entries in 3 tiers, 14 ms
 ```
 
-The same pair frames every later rebuild (a `-cc tiers` retune, a level being made), so the cost of
+The same pair frames every later rebuild (a `-contactChunks tiers` retune, a level being made), so the cost of
 a rebuild is never a guess. The elapsed time is read from `os.clock()`, which is fine here: it is
 displayed, never used to decide anything.
 
@@ -287,8 +311,9 @@ and 9M natives today.
 
 1. ~~The candidate test reordered~~ done. The per-tick position cache was dropped on purpose: with
    the index, a monster is seen by few heroes, so there is nothing left to share.
-2. ~~The chunk index for the level monsters~~ done. Left to do: measure `contactCheckOn` +
-   `immolationOff` against the table at the top, and tune the ladder with `-cc tiers`.
+2. ~~The chunk index for the level monsters, measured against the table at the top~~ done. The
+   ladder needed no tuning: on Mumu every monster fits tier 0 (512 units), nothing is promoted, and
+   the worst chunk holds 14 of the 780 units of the heaviest level.
 3. Monster spawns (still walked in full, which is cheap while they are few).
 4. Casters.
 5. Only then: `IMMOLATION_SYSTEM_ENABLED` flipped to `false` by default, and the immolation

@@ -1,5 +1,5 @@
 import { createTimer } from 'Utils/mapUtils'
-import { getUdgEscapers, globals, udg_monsters } from '../../../../globals'
+import { globals, udg_monsters } from '../../../../globals'
 import { Constants } from '../../01_libraries/Constants'
 import type { Monster } from './Monster'
 
@@ -11,11 +11,16 @@ import type { Monster } from './Monster'
  * Warcraft III machine survives - so each monster is registered once in the chunks of a grid it
  * can be found in, and a hero only ever looks at the chunk it stands in.
  *
- * The invariant that makes a single lookup per tier enough: a monster is registered in EVERY chunk
- * its padded movement area overlaps, and the padding covers everything that separates the hero's
- * position from a contact - the monster's own reach, the hero's collision size, and the longest
- * step a hero can take between two checks. So if the hero is close enough to touch the monster,
- * the hero's own position is inside that padded area, hence inside one of those chunks.
+ * The invariant that makes so few lookups enough: a monster is registered in EVERY chunk its own
+ * reach overlaps around everywhere it can stand, and a hero asks for the chunks its step went
+ * through, widened by its own collision size. Whatever the two sizes are, the point lying at the
+ * monster's reach from it, towards the hero, belongs to both - so one chunk holds the monster and
+ * is asked for, and no contact can be missed.
+ *
+ * Each side is therefore paid for by the one it belongs to: the monster pads with its reach, the
+ * hero widens its own query with its own size, and the step it took is asked for rather than padded
+ * in. Padding is read at every tick of every hero, while a query is only ever the business of the
+ * one hero making it - which also means a hero growing during the game costs the index nothing.
  *
  * The index is only an accelerator over synced state: as long as it stays exact, the contacts
  * found do not depend on the tier sizes, which makes them a pure performance knob (see
@@ -25,7 +30,7 @@ import type { Monster } from './Monster'
 /**
  * The longest step a hero can take between two contact checks. A step longer than this is not a
  * step at all - a revive, a teleport, a level change - and the check treats it as a landing, so
- * this is a real bound and the padding built on it is exact.
+ * this is a real bound, and a step is never wider than one chunk of the finest tier.
  */
 export const MAX_SWEPT_STEP = 2 * Constants.LARGEUR_CASE
 
@@ -85,7 +90,6 @@ const state = {
     tierSizes: DEFAULT_TIER_SIZES,
     tiers: [] as ChunkTier[],
     memberships: {} as { [monsterId: number]: Membership },
-    maxHeroCollisionSize: 0,
     monsterCount: 0,
     entryCount: 0,
     walk: 0,
@@ -377,7 +381,7 @@ export const registerMonsterInChunks = (monster: Monster) => {
     }
 
     shape.count = 0
-    shape.padding = reach + state.maxHeroCollisionSize + MAX_SWEPT_STEP
+    shape.padding = reach
     monster.describeContactArea(areaBuilder)
 
     if (shape.count === 0) {
@@ -430,33 +434,16 @@ const buildTiers = () => {
     pushTier(mapSpan + 1)
 }
 
-/** The largest hero the padding has to account for, whatever hero the check ends up asking about */
-const refreshMaxHeroCollisionSize = () => {
-    let maxCollisionSize = globals.heroBaseCollisionSize
-
-    // the escapers may not be there yet, early in the initialization
-    getUdgEscapers()?.forAll(escaper => {
-        const collisionSize = escaper.getHeroCollisionSize()
-
-        if (collisionSize > maxCollisionSize) {
-            maxCollisionSize = collisionSize
-        }
-    })
-
-    state.maxHeroCollisionSize = maxCollisionSize
-}
-
 /**
  * Registers every monster unit standing on the map again, from nothing. Cheap enough to be the
- * answer to anything the index cannot follow on its own - a changed immolation radius, a changed
- * hero collision size, a new tier ladder.
+ * answer to anything the index cannot follow on its own - a changed immolation radius, a patrol
+ * edited while making a level, a new tier ladder.
  */
 export const rebuildContactChunks = () => {
     const startTime = os.clock()
 
     print('Starting monsters contact check registration...')
 
-    refreshMaxHeroCollisionSize()
     buildTiers()
     state.isInitialized = true
 
@@ -509,7 +496,7 @@ export const getContactChunkTierSizes = () => state.tierSizes
 
 export const getContactChunkTierCount = () => state.tiers.length
 
-/** The monsters a hero standing there may touch, at one tier. Every tier has to be asked. */
+/** The monsters registered in one chunk of one tier, taken by the position of the chunk */
 export const getContactChunkBucket = (tierIndex: number, x: number, y: number) => {
     const tier = state.tiers[tierIndex]
 
@@ -520,12 +507,53 @@ export const getContactChunkBucket = (tierIndex: number, x: number, y: number) =
     return tier.buckets[rowOf(tier, y) * tier.cols + colOf(tier, x)]
 }
 
+/**
+ * Every monster a hero going from one point to the other may have touched: the ones registered in
+ * the chunks that step went through, widened by the hero's own collision size, at every tier.
+ * Nothing else is ever heard of.
+ *
+ * A monster registered in two of those chunks is visited twice, which costs one more distance test
+ * and nothing else - the contact it may report is told once, since the same one cannot be told
+ * twice in the same check.
+ */
+export const forEachMonsterAround = (
+    fromX: number,
+    fromY: number,
+    toX: number,
+    toY: number,
+    heroRadius: number,
+    visit: (monster: Monster) => void
+) => {
+    for (let tierIndex = 0; tierIndex < state.tiers.length; tierIndex++) {
+        const tier = state.tiers[tierIndex]
+        const firstCol = colOf(tier, RMinBJ(fromX, toX) - heroRadius)
+        const lastCol = colOf(tier, RMaxBJ(fromX, toX) + heroRadius)
+        const firstRow = rowOf(tier, RMinBJ(fromY, toY) - heroRadius)
+        const lastRow = rowOf(tier, RMaxBJ(fromY, toY) + heroRadius)
+
+        for (let col = firstCol; col <= lastCol; col++) {
+            for (let row = firstRow; row <= lastRow; row++) {
+                const bucket = tier.buckets[row * tier.cols + col]
+
+                if (bucket === undefined) {
+                    continue
+                }
+
+                for (let i = 0; i < bucket.count; i++) {
+                    const monster = bucket.monsters[i]
+
+                    monster && visit(monster)
+                }
+            }
+        }
+    }
+}
+
 export const initContactChunks = () => {
     if (state.isInitialized) {
         return
     }
 
-    refreshMaxHeroCollisionSize()
     buildTiers()
     state.isInitialized = true
 
@@ -558,7 +586,7 @@ export const getContactChunkStats = () => {
         `(${untouchableMonsters} of them without immolation, so untouchable), ${definedMonsters} defined in all`
     lines[1] =
         `Tiers: ${state.tiers.length}, entries: ${state.entryCount}, ` +
-        `hero padding: ${state.maxHeroCollisionSize} + ${MAX_SWEPT_STEP}, ` +
+        `padded with their reach only (the hero size and its ${MAX_SWEPT_STEP} step are asked for), ` +
         `last rebuild: ${Math.floor(state.lastRebuildDuration * 1000 + 0.5)} ms`
 
     for (let tierIndex = 0; tierIndex < state.tiers.length; tierIndex++) {
