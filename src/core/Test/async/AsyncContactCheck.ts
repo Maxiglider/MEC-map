@@ -2,17 +2,22 @@ import { createTimer } from 'Utils/mapUtils'
 import { getUdgEscapers, getUdgLevels, udg_spawned_monster_units, udg_spawned_monsters } from '../../../../globals'
 import { Constants } from '../../01_libraries/Constants'
 import { Escaper } from '../../04_STRUCTURES/Escaper/Escaper'
-import { CONTACT_KIND, sendAsyncContact } from './AsyncHeroSync'
+import { applyContact, CONTACT_KIND, sendAsyncContact } from './AsyncHeroSync'
 
 /**
- * Finds what the hero of an async player touches, by hand.
+ * Finds what a hero touches, by hand: the hero of an async player, and every hero of the game once
+ * setContactCheckEnabledForEveryHero() is told to.
  *
  * A hero sliding as an effect no longer carries its invisible unit around, so the immolation of
- * the monsters has nothing to burn: the contact has to be looked for. Only the machine owning the
- * hero looks, since it is the only one knowing where it really is. It only looks, though: what
- * follows a contact belongs to the game, from a score to a revived ally, so it is announced and
- * every machine runs the very same handler the immolation used to call, on the same turn. Every
- * consequence therefore stays where it was written, and happens everywhere at once.
+ * the monsters has nothing to burn: the contact has to be looked for. Only the machine owning that
+ * hero looks, since it is the only one knowing where it really is, and it only looks: what follows
+ * a contact belongs to the game, from a score to a revived ally, so it is announced and every
+ * machine runs the very same handler the immolation used to call, on the same turn.
+ *
+ * Any other hero stands on every machine at once, so every machine looks for its contacts itself
+ * and handles them on the spot, telling nothing: everything read is synced state, so the same
+ * contacts are found everywhere on the same turn, and a packet per machine per contact would
+ * multiply what one machine alone has to say.
  *
  * The reach is the collision size of the hero, which the invisible unit was built from.
  *
@@ -21,7 +26,39 @@ import { CONTACT_KIND, sendAsyncContact } from './AsyncHeroSync'
  */
 const CONTACT_CHECK_PERIOD = 0.02
 
-const state = { isInitialized: false }
+/**
+ * How long the same thing waits before counting again, while the hero keeps standing on it. The
+ * immolation burned at its own pace rather than at every frame, and a hero resting on a jump pad or
+ * on a harmless monster has to be as quiet: fifty contacts a second would be handled for nothing.
+ *
+ * Counted in checks rather than in seconds: the clock of a machine is its own, while the ticks of a
+ * timer started at the same turn everywhere are the same for everyone, which the contacts handled
+ * on the spot by every machine need.
+ */
+const CONTACT_REPEAT_CHECKS = Math.floor(1 / CONTACT_CHECK_PERIOD)
+
+/**
+ * Beyond such a step the hero did not move: it was revived, teleported or taken to another level,
+ * and sweeping that step would touch everything standing on the way.
+ */
+const MAX_SWEPT_STEP = 2 * Constants.LARGEUR_CASE
+
+/** Names one thing touched with a single number. No handle id ever comes close to it. */
+const CONTACT_KEY_KIND_FACTOR = 0x100000000
+
+const state = { isInitialized: false, isEnabledForEveryHero: false, checkCount: 0 }
+
+/**
+ * Gives the check every hero rather than the ones an effect carries, for good: the contacts of a
+ * hero walking as a unit are looked for the same way, on every machine, even though the immolation
+ * of the monsters could have burned its invisible unit.
+ *
+ * The immolation is left running: turn it off (e2e test "immolationOff") to have this check alone
+ * decide, or both roads lead to the same handler and every contact is handled twice.
+ */
+export const setContactCheckEnabledForEveryHero = (enabled: boolean) => {
+    state.isEnabledForEveryHero = enabled
+}
 
 /**
  * Squared distance from a point to the segment the hero travelled. Tested against the segment
@@ -66,6 +103,11 @@ type ContactContext = {
     touchedKinds: number[]
     touchedIds: number[]
     touchedCount: number
+    /** At which check each thing touched last counted, so a lasting contact counts at its own pace */
+    lastContactChecks: { [contactKey: number]: number }
+    /** Which check looked at this hero last, and whether it was the machine of an effect telling */
+    lastCheck: number
+    wasTold: boolean
 }
 
 /**
@@ -93,6 +135,9 @@ const getContext = (escaper: Escaper) => {
         touchedKinds: [],
         touchedIds: [],
         touchedCount: 0,
+        lastContactChecks: {},
+        lastCheck: -1,
+        wasTold: false,
     }
 
     contexts[escaper.getId()] = context
@@ -190,8 +235,16 @@ const testPowerCircles = (context: ContactContext) => {
     })
 }
 
+/**
+ * A hero carried by an effect is only known to the machine of its player, which has to tell the
+ * others what it touched. Any other hero is on every machine, which all find the very same
+ * contacts: they are handled where they are found, and the network hears nothing.
+ */
+const isToldOverTheNetwork = (escaper: Escaper) => escaper.isHeroAsEffect()
+
 const checkEscaperContacts = (escaper: Escaper) => {
     const context = getContext(escaper)
+    const isTold = isToldOverTheNetwork(escaper)
 
     // where it was at the previous check, so that the step is swept rather than its arrival tested
     context.fromX = context.toX
@@ -201,16 +254,65 @@ const checkEscaperContacts = (escaper: Escaper) => {
     context.heroRadius = escaper.getHeroCollisionSize()
     context.touchedCount = 0
 
+    const stepX = context.toX - context.fromX
+    const stepY = context.toY - context.fromY
+
+    // A step is only a step if it follows the previous check, taken the same way: a hero coming
+    // back from an async slide, or one this machine had stopped looking at, seems to have crossed
+    // the map since. And a step that long was not walked either - revived, teleported or taken to
+    // another level - so nothing standing on the way was touched: only where it landed counts.
+    if (
+        context.lastCheck !== state.checkCount - 1 ||
+        context.wasTold !== isTold ||
+        stepX * stepX + stepY * stepY > MAX_SWEPT_STEP * MAX_SWEPT_STEP
+    ) {
+        context.fromX = context.toX
+        context.fromY = context.toY
+    }
+
+    context.lastCheck = state.checkCount
+    context.wasTold = isTold
+
     testLevelMonsters(context)
     testSpawnedMonsters(context)
     testPowerCircles(context)
 
-    // Announced once everything has been walked, rather than as each contact is found: what a
-    // machine reads must not change under it while it reads. Nothing is acted upon here, only
-    // told: every machine, this one included, handles it when the packet lands.
+    // Handled once everything has been walked, rather than as each contact is found: what is read
+    // must not change under the reader. What follows a contact belongs to the game, so it has to
+    // happen on every machine on the same turn - either because every machine just found it too,
+    // or because the only machine that could find it tells them all, this one included.
     for (let i = 0; i < context.touchedCount; i++) {
-        sendAsyncContact(escaper.getId(), context.touchedKinds[i], context.touchedIds[i])
+        const kind = context.touchedKinds[i]
+        const id = context.touchedIds[i]
+        const contactKey = kind * CONTACT_KEY_KIND_FACTOR + id
+        const lastContactCheck = context.lastContactChecks[contactKey]
+
+        // the same thing again, so soon: the hero has not left it yet, nothing new happened
+        if (lastContactCheck !== undefined && state.checkCount - lastContactCheck < CONTACT_REPEAT_CHECKS) {
+            continue
+        }
+
+        context.lastContactChecks[contactKey] = state.checkCount
+
+        if (isTold) {
+            sendAsyncContact(escaper.getId(), kind, id)
+        } else {
+            applyContact(escaper.getId(), kind, id)
+        }
     }
+}
+
+/**
+ * Every hero of the game once the check is given all of them, and the one this machine carries as
+ * an effect in any case. The hero an effect carries elsewhere is left to its own machine: this one
+ * only believes it where the last packet put it.
+ */
+const isCheckedHere = (escaper: Escaper) => {
+    if (escaper.isHeroAsEffect()) {
+        return escaper.isAsyncControlledHere()
+    }
+
+    return state.isEnabledForEveryHero
 }
 
 export const initAsyncContactCheck = () => {
@@ -221,11 +323,12 @@ export const initAsyncContactCheck = () => {
     state.isInitialized = true
 
     createTimer(CONTACT_CHECK_PERIOD, true, () => {
+        state.checkCount++
+
         getUdgEscapers().forAll(escaper => {
-            // Only the machine owning the hero, and only while its effect carries it. A hero
-            // whose death is already told is left alone: whatever killed it is still there, and
-            // announcing it again would tell every machine to handle the same contact twice.
-            if (escaper.isAsyncControlledHere() && escaper.isAlive() && !escaper.isAsyncDeathPending()) {
+            // A hero whose death is already told is left alone: whatever killed it is still there,
+            // and announcing it again would tell every machine to handle the same contact twice.
+            if (isCheckedHere(escaper) && escaper.isAlive() && !escaper.isAsyncDeathPending()) {
                 checkEscaperContacts(escaper)
             }
         })

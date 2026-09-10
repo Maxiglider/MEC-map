@@ -2,6 +2,7 @@ import { GetCurrentMonsterPlayer } from 'core/01_libraries/Basic_functions'
 import { Constants } from 'core/01_libraries/Constants'
 import { getUdgEscapers } from '../../../../globals'
 import { Natives } from '../../wc3_natives_unsecured/Natives'
+import { isImmolationSystemEnabled } from './Immolation_system'
 import { Monster } from './Monster'
 import { MonsterType } from './MonsterType'
 
@@ -103,7 +104,7 @@ export const NewImmobileMonsterForPlayer = (
 
     const immoSkill = mt.getImmolationSkill() || 0
 
-    immoSkill > 0 && UnitAddAbility(monster, immoSkill)
+    immoSkill > 0 && isImmolationSystemEnabled() && UnitAddAbility(monster, immoSkill)
 
     scale = mt.getScale()
     if (scale !== -1) {

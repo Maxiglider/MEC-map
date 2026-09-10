@@ -16,8 +16,10 @@ import { Level } from '../Level/Level'
 import { CircleMob } from '../Monster_properties/CircleMob'
 import { ClearMob } from '../Monster_properties/ClearMob'
 import { PortalMob } from '../Monster_properties/PortalMob'
+import { isImmolationSystemEnabled } from './Immolation_system'
 import { MonsterType } from './MonsterType'
 import { monstersClickable } from './trig_Monsters_clickable_set_life'
+
 const LIVES_EARNED_SOUND_PATH = 'Sound/Interface/SecretFound.wav'
 const LIVES_EARNED_SOUND_DURATION = 2525
 
@@ -410,7 +412,7 @@ export abstract class Monster {
         if (this.disablingTimer === disablingTimer) {
             const immoSkill = this.mt?.getImmolationSkill() || 0
 
-            this.u && immoSkill > 0 && UnitAddAbility(this.u, immoSkill)
+            this.u && immoSkill > 0 && isImmolationSystemEnabled() && UnitAddAbility(this.u, immoSkill)
             this.u && SetUnitVertexColorBJ(this.u, this.vcRed, this.vcGreen, this.vcBlue, 0)
             this.vcTransparency = 0
             this.isDisabledB = false

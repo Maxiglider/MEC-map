@@ -182,12 +182,7 @@ export const initAsyncHeroSync = () => {
             return
         }
 
-        const escaper = getUdgEscapers().get(fields[0])
-        const touched = findContactUnit(fields[1], fields[2])
-
-        escaper &&
-            touched &&
-            ServiceManager.getService('InvisUnit_is_getting_damage').onEscaperTouchingUnit(escaper, touched, 0)
+        applyContact(fields[0], fields[1], fields[2])
     })
 
     registerSyncEvent(DEATH_PREFIX, data => {
@@ -197,6 +192,20 @@ export const initAsyncHeroSync = () => {
     })
 
     createTimer(POSITION_PERIOD, true, sendLocalHeroPosition)
+}
+
+/**
+ * What a contact does, wherever the news comes from: a packet told by the machine of a hero only it
+ * can see, or the check of this machine for a hero every machine can see. This is the very handler
+ * the immolation of the monsters used to call.
+ */
+export const applyContact = (escaperId: number, kind: number, id: number) => {
+    const escaper = getUdgEscapers().get(escaperId)
+    const touched = findContactUnit(kind, id)
+
+    escaper &&
+        touched &&
+        ServiceManager.getService('InvisUnit_is_getting_damage').onEscaperTouchingUnit(escaper, touched, 0)
 }
 
 /**
