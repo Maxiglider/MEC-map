@@ -1,6 +1,5 @@
 import { animUtils } from 'Utils/AnimUtils'
 import { errorHandler } from '../../../Utils/mapUtils'
-import { IsOnGround } from '../../01_libraries/Basic_functions'
 import { Natives } from '../../wc3_natives_unsecured/Natives'
 import { Escaper } from '../Escaper/Escaper'
 import { Hero2Escaper } from '../Escaper/Escaper_functions'
@@ -219,7 +218,7 @@ const CasterTryToShoot = () => {
                     }
 
                     //trouver temps idéal
-                    if (IsOnGround(hero)) {
+                    if (escaper.getHeroFlyHeight() < 1) {
                         tempsIdeal = TrouverTempsIdeal(tempsMax)
                     } else {
                         tempsIdeal = -1

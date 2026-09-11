@@ -40,6 +40,7 @@ export class SaveMapInCache {
         jsonGameData.gameData.wanderExtraTime = globals.wanderExtraTime
         jsonGameData.gameData.gravity = Gravity.GetRealGravity()
         jsonGameData.gameData.heroBaseCollisionSize = globals.heroBaseCollisionSize
+        jsonGameData.gameData.heroModelPath = globals.heroModelPath
 
         //terrain config
         jsonGameData.terrainTypesMec = getUdgTerrainTypes().toJson()

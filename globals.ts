@@ -44,6 +44,7 @@ export const globals: {
     wanderEffectFacing: boolean
     scoreboardLabel: string
     heroBaseCollisionSize: number
+    heroModelPath: string
     heroBaseScale?: number // hero base scale from unit type ID (Worleditor value)
     debugLongDistanceMoves: boolean
 } = {
@@ -77,6 +78,10 @@ export const globals: {
     // Very new maps won't have a MEC_core.setGameData call, so heroBaseCollisionSize will be kept to the value bellow
     // For other maps, those smiced on the version of the add of heroBaseCollisionSize or later, the value set by MEC_core.setGameData will be used
     heroBaseCollisionSize: Constants.RECOMMANDED_HERO_BASE_COLLISION_SIZE,
+
+    // The model the hero is drawn with while an effect stands in for its unit. A map saved before
+    // this was saved with it keeps the model of the engine, which is the hero's own.
+    heroModelPath: Constants.HERO_MODEL_PATH,
     heroBaseScale: undefined,
     debugLongDistanceMoves: false,
 }
@@ -175,6 +180,18 @@ export const registerSpawnedMonster = (monsterUnit: unit, monsterType: MonsterTy
 export const unregisterSpawnedMonster = (monsterUnit: unit) => {
     udg_spawned_monsters[GetHandleId(monsterUnit)] = null
     udg_spawned_monster_units[GetHandleId(monsterUnit)] = null
+}
+
+/**
+ * The hero effect of every escaper is drawn again, so that the new model is seen at once rather
+ * than at the next game. Called from a command, which reaches every machine on the same turn.
+ */
+export const setHeroModelPath = (newModelPath: string) => {
+    globals.heroModelPath = newModelPath
+
+    getUdgEscapers()?.forAll(escaper => {
+        escaper.refreshHeroEffectModel()
+    })
 }
 
 export const setHeroBaseCollisionSize = (newCollisionSize: number) => {

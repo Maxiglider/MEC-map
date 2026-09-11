@@ -2008,7 +2008,7 @@ export class Escaper extends EscaperMake {
             return
         }
 
-        this.heroEffect = EffectUtils.addSpecialEffect(Constants.HERO_MODEL_PATH, this.getHeroX(), this.getHeroY())
+        this.heroEffect = EffectUtils.addSpecialEffect(globals.heroModelPath, this.getHeroX(), this.getHeroY())
 
         if (!this.heroEffect) {
             return
@@ -2016,6 +2016,25 @@ export class Escaper extends EscaperMake {
 
         BlzSetSpecialEffectColorByPlayer(this.heroEffect, Natives.UPlayer(this.baseColorId))
         this.parkHeroEffect()
+    }
+
+    /**
+     * Draws the hero effect again with whatever model is now asked for. The effect is otherwise made
+     * once and kept for the whole game, so this is the only place a handle of it comes and goes -
+     * which is why it belongs to a command, heard by every machine on the same turn.
+     */
+    refreshHeroEffectModel = () => {
+        if (!this.heroEffect) {
+            return
+        }
+
+        EffectUtils.destroyEffect(this.heroEffect)
+        delete this.heroEffect
+
+        this.createHeroEffect()
+
+        // it was standing in for the hero: the new one has to take the place of the old at once
+        this.isHeroEffectActive && this.updateHeroEffect()
     }
 
     /**
@@ -2209,6 +2228,11 @@ export class Escaper extends EscaperMake {
                 // shown after being hidden, which is what gives a locust unit its dot back
                 ShowUnit(this.heroEffectDummyUnit, false)
                 ShowUnit(this.heroEffectDummyUnit, true)
+
+                // What the engine watches is a unit, and the hero's own waits in a corner: ranges
+                // and rects would never see it. The dummy walks where the hero is seen, so it is
+                // the one that answers for this escaper until the unit takes its part again.
+                globals.heroToEscaperHandles[GetHandleId(this.heroEffectDummyUnit)] = this.escaperId
             }
 
             // the unit waits in a corner of the map, and its dot has no business being there
@@ -2224,7 +2248,10 @@ export class Escaper extends EscaperMake {
         this.isHeroEffectActive = false
         this.parkHeroEffect()
 
-        this.heroEffectDummyUnit && ShowUnit(this.heroEffectDummyUnit, false)
+        if (this.heroEffectDummyUnit) {
+            ShowUnit(this.heroEffectDummyUnit, false)
+            delete globals.heroToEscaperHandles[GetHandleId(this.heroEffectDummyUnit)]
+        }
         BlzSetUnitBooleanField(this.hero, UNIT_BF_HERO_HIDE_HERO_MINIMAP_DISPLAY, false)
 
         // the unit takes back the place the effect had led it to

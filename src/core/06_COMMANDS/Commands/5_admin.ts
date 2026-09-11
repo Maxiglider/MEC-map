@@ -5,6 +5,7 @@ import {
     getUdgMonsterTypes,
     getUdgTerrainTypes,
     globals,
+    setHeroModelPath,
 } from '../../../../globals'
 import { ServiceManager } from '../../../Services'
 import { progressionUtils } from '../../../Utils/ProgressionUtils'
@@ -954,6 +955,35 @@ export const initExecuteCommandMax = () => {
             escaper.makeCreateDebugMECRegions(mode, directionForHorizontal)
 
             Text.mkP(escaper.getPlayer(), 'MakeCreateDebugMECRegions enabled')
+            return true
+        },
+    })
+
+    //-setHeroModelPath(shmp) [<modelPath>]
+    registerCommand({
+        name: 'setHeroModelPath',
+        alias: [],
+        group,
+        argDescription: '[<modelPath>]',
+        description:
+            'Sets the model the hero is drawn with while an effect stands in for its unit, during an async slide. ' +
+            'Persistent between "smiced" games. Without an argument, tells the one in use.',
+        cb: ({ nbParam, param1 }, escaper) => {
+            const p = escaper.getPlayer()
+
+            if (nbParam === 0) {
+                Text.mkP(p, `Hero model path: ${globals.heroModelPath}`)
+                return true
+            }
+
+            if (nbParam !== 1) {
+                return USAGE
+            }
+
+            setHeroModelPath(param1)
+
+            Text.mkP(p, `Hero model path set to "${param1}"`)
+
             return true
         },
     })

@@ -6,6 +6,7 @@ import {
     getUdgTerrainTypes,
     globals,
     setHeroBaseCollisionSize,
+    setHeroModelPath,
 } from '../../../../globals'
 import { jsonDecode } from '../../01_libraries/Basic_functions'
 import { Text } from '../../01_libraries/Text'
@@ -81,6 +82,11 @@ export class LoadMapFromCache {
                     // For old maps retrocompatibility, the MEC_core.setGameData applied won't contain an heroBaseCollisionSize value,
                     //    this will be detected and set heroBaseCollisionSize to 0 to keep the same behavior as before
                     setHeroBaseCollisionSize(gameData.gameData.heroBaseCollisionSize ?? 0)
+
+                    // a map saved before this was saved keeps the model of the engine
+                    if (gameData.gameData.heroModelPath) {
+                        setHeroModelPath(gameData.gameData.heroModelPath)
+                    }
                 }
 
                 //terrain types MEC
