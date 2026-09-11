@@ -6,7 +6,6 @@ import { ServiceManager } from '../../../Services'
 import { GetUnitZEx } from '../../../Utils/LocationUtils'
 import { createTimer } from '../../../Utils/mapUtils'
 import { ColorString2Id } from '../../01_libraries/Init_colorCodes'
-import { RunSoundOnUnit } from '../../02_bibliotheques_externes/SoundUtils'
 import { IsColorString } from '../../06_COMMANDS/Helpers/Command_functions'
 import { hooks } from '../../API/GeneralHooks'
 import { CombineHooks } from '../../API/MecHookArray'
@@ -628,8 +627,7 @@ export abstract class Monster {
         }
         this.lifeBonusLivesEarned = true
 
-        const heroUnit = escaper.getHero()
-        heroUnit && RunSoundOnUnit(LIVES_EARNED_SOUND_PATH, LIVES_EARNED_SOUND_DURATION, heroUnit)
+        escaper.runSoundOnHero(LIVES_EARNED_SOUND_PATH, LIVES_EARNED_SOUND_DURATION)
 
         escaper.addLives(lifeBonus.nbLivesEarned)
 

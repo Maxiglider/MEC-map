@@ -25,3 +25,11 @@ export const RunSoundOnUnit = (path: string, duration: number, u: unit) => {
     StartSound(sd)
     KillSoundWhenDone(sd)
 }
+
+/** For what is seen somewhere without a unit standing there - an effect, for instance */
+export const RunSoundAtPoint = (path: string, duration: number, x: number, y: number, z = 0) => {
+    const sd = SoundPlay3DUnit(path, duration)
+    SetSoundPosition(sd, x, y, z)
+    StartSound(sd)
+    KillSoundWhenDone(sd)
+}

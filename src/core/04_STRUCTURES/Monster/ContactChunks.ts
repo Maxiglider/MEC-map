@@ -598,11 +598,14 @@ const buildTiers = () => {
  * Registers every monster unit standing on the map again, from nothing. Cheap enough to be the
  * answer to anything the index cannot follow on its own - a changed immolation radius, a patrol
  * edited while making a level, a new tier ladder.
+ *
+ * Says what came of it only when somebody asked for it by hand: the ones the game triggers by
+ * itself would be talking to nobody, and `-contactChunks stats` tells the same at any time.
  */
-export const rebuildContactChunks = () => {
+export const rebuildContactChunks = (isAsked = false) => {
     const startTime = os.clock()
 
-    print('Starting monsters contact check registration...')
+    isAsked && print('Starting monsters contact check registration...')
 
     buildTiers()
     state.isInitialized = true
@@ -644,12 +647,13 @@ export const rebuildContactChunks = () => {
     state.lastRebuildDuration = os.clock() - startTime
     state.isFirstRegistrationDone = true
 
-    print(
-        `Monsters contact check registration done. ${state.monsterCount} monster units on the map ` +
-            `and ${state.spawnedCount} spawned ones, ${state.entryCount} entries in ` +
-            `${state.tiers.length} tiers, ${Math.floor(state.lastRebuildDuration * 1000 + 0.5)} ms. ` +
-            `The monsters of a level to come register as it starts.`
-    )
+    isAsked &&
+        print(
+            `Monsters contact check registration done. ${state.monsterCount} monster units on the map ` +
+                `and ${state.spawnedCount} spawned ones, ${state.entryCount} entries in ` +
+                `${state.tiers.length} tiers, ${Math.floor(state.lastRebuildDuration * 1000 + 0.5)} ms. ` +
+                `The monsters of a level to come register as it starts.`
+        )
 }
 
 /**
@@ -675,7 +679,7 @@ export const requestContactChunksRebuild = () => {
 
 export const setContactChunkTierSizes = (tierSizes: number[]) => {
     state.tierSizes = tierSizes
-    rebuildContactChunks()
+    rebuildContactChunks(true)
 }
 
 export const getContactChunkTierSizes = () => state.tierSizes

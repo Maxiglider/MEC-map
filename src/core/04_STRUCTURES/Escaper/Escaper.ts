@@ -13,6 +13,7 @@ import { Timer } from 'w3ts'
 import { getUdgEscapers, getUdgLevels, getUdgTerrainTypes, globals, udg_monsters } from '../../../../globals'
 import { EncodingBase64 } from '../../../Utils/SaveLoad/TreeLib/EncodingBase64'
 import { createEvent, createTimer, runInTrigger } from '../../../Utils/mapUtils'
+import { RunSoundAtPoint, RunSoundOnUnit } from '../../02_bibliotheques_externes/SoundUtils'
 import { BlzColor2Id, removeHash } from '../../06_COMMANDS/Helpers/Command_functions'
 import { refreshTrigMoveCollisionLandmarks } from '../../07_TRIGGERS/CollisionLandmarks/MoveCollisionLandmarks'
 import { CheckTerrainTrigger } from '../../07_TRIGGERS/Slide_and_CheckTerrain_triggers/CheckTerrain'
@@ -2238,6 +2239,20 @@ export class Escaper extends EscaperMake {
         viewer?.lockCamTarget === this && viewer.resetCamera()
     }
 
+    /**
+     * Plays a sound where the hero is seen. Its unit is parked in a corner of the map while an
+     * effect stands in for it, and a 3D sound attached to that unit is cut off by distance long
+     * before it reaches anybody's ears.
+     */
+    runSoundOnHero = (path: string, duration: number) => {
+        if (this.isHeroEffectActive) {
+            RunSoundAtPoint(path, duration, this.getHeroX(), this.getHeroY(), this.getHeroZ())
+            return
+        }
+
+        this.hero && RunSoundOnUnit(path, duration, this.hero)
+    }
+
     /** Detaches the camera from the unit, without moving it: the effect takes over from here */
     private releaseLockedCameraFromUnit = () => {
         const viewer = getUdgEscapers().get(GetPlayerId(GetLocalPlayer()!))
@@ -2246,7 +2261,12 @@ export class Escaper extends EscaperMake {
             return
         }
 
+        // Letting go of the unit takes the whole camera back to what Warcraft III likes, so the
+        // distance MEC keeps has to be given back - exactly as resetCamera() does at the other end
+        // of the slide, when the unit takes its part again.
         ResetToGameCameraForPlayer(GetLocalPlayer()!, 0)
+        SetCameraFieldForPlayer(GetLocalPlayer()!, CAMERA_FIELD_TARGET_DISTANCE, viewer.getCameraField(), 0)
+
         SetCameraPosition(this.heroPos.x, this.heroPos.y)
     }
 

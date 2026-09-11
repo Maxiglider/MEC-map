@@ -19,73 +19,81 @@ Two reasons to replace it:
 1. **A hero sliding in async mode is an effect**, and nothing can immolate an effect. That is why
    `src/core/Test/async/AsyncContactCheck.ts` already exists: it measures the very same radii by
    hand for those heroes.
-2. **The immolation is expensive**, even with nobody to burn. Measured on the whole Mumu map
-   (1518 monsters):
+2. **The immolation is expensive**, even with nobody to burn - and the check that replaces it is
+   cheaper, as the measurements below say.
 
-    | Monsters | Heroes | Detection                      | fps  |
-    | -------- | ------ | ------------------------------ | ---- |
-    | 0        | 0      | none                           | ~200 |
-    | 1518     | 0      | none                           | ~160 |
-    | 1518     | 3      | none                           | ~160 |
-    | 1518     | 24     | none                           | ~140 |
-    | 1518     | 0      | immolation                     | ~120 |
-    | 1518     | 3      | immolation                     | ~110 |
-    | 1518     | 24     | immolation                     | ~80  |
-    | 1518     | 1      | MEC contact check - basic code | ~120 |
-    | 1518     | 3      | MEC contact check - basic code | ~80  |
-    | 1518     | 24     | MEC contact check - basic code | ~0.1 |
-    | 1518     | 1      | MEC contact check - optimized  | ~160 |
-    | 1518     | 3      | MEC contact check - optimized  | ~160 |
-    | 1518     | 24     | MEC contact check - optimized  | ~130 |
+### Precise results with MangoHud: average fps of 1min of gametime
 
-    ### Precise results with MangoHud: average fps of 1min of gametime
+One MangoHud recording per mode. Mumu is played with every level activated, so all of its
+monsters are on the map at once; Clowny is measured where its monster spawns are heaviest.
 
-    Mumu with every level activated, one MangoHud recording per mode, kept in `mangohud-results/`:
+| Map    | Monsters    | Heroes | Detection                                                       | Average fps                              | 1% min | 0.1% min | Average frame time |
+| ------ | ----------- | ------ | --------------------------------------------------------------- | ---------------------------------------- | ------ | -------- | ------------------ |
+| Mumu   | 1518        | 5      | <span style="color: teal">none</span>                           | <span style="color: teal">153.1</span>   | 58.2   | 43.9     | 6.5 ms             |
+| Mumu   | 1518        | 5      | <span style="color: orange">immolation</span>                   | <span style="color: orange">117.9</span> | 42.0   | 32.4     | 8.5 ms             |
+| Mumu   | 1518        | 5      | <span style="color: green">MEC contact check - optimized</span> | <span style="color: green">148.9</span>  | 56.3   | 43.0     | 6.7 ms             |
+| Mumu   | 1518        | 24     | <span style="color: teal">none</span>                           | <span style="color: teal">125.4</span>   | 52.1   | 42.4     | 8.0 ms             |
+| Mumu   | 1518        | 24     | <span style="color: orange">immolation</span>                   | <span style="color: orange">94.1</span>  | 39.2   | 30.8     | 10.6 ms            |
+| Mumu   | 1518        | 24     | <span style="color: green">MEC contact check - optimized</span> | <span style="color: green">116.5</span>  | 47.7   | 37.5     | 8.6 ms             |
+| Mumu   | 1518        | 3      | <span style="color: red">MEC contact check - basic code</span>  | <span style="color: red">~80</span>      |        |          |                    |
+| Mumu   | 1518        | 24     | <span style="color: red">MEC contact check - basic code</span>  | <span style="color: red">~0.1</span>     |        |          |                    |
+| Clowny | 722 spawned | 5      | <span style="color: orange">immolation</span>                   | <span style="color: orange">105.2</span> | 38.3   | 30.4     | 9.5 ms             |
+| Clowny | 722 spawned | 5      | <span style="color: green">MEC contact check - optimized</span> | <span style="color: green">146.9</span>  | 51.4   | 40.9     | 6.8 ms             |
 
-    | Monsters | Heroes | Detection                                                       | Average fps                              | 1% min | 0.1% min | Average frame time |
-    | -------- | ------ | --------------------------------------------------------------- | ---------------------------------------- | ------ | -------- | ------------------ |
-    | 1518     | 5      | <span style="color: teal">none</span>                           | <span style="color: teal">153.1</span>   | 58.2   | 43.9     | 6.5 ms             |
-    | 1518     | 3      | <span style="color: red">MEC contact check - basic code</span>  | <span style="color: red">~80</span>      |        |          |                    |
-    | 1518     | 5      | <span style="color: orange">immolation</span>                   | <span style="color: orange">117.9</span> | 42.0   | 32.4     | 8.5 ms             |
-    | 1518     | 5      | <span style="color: green">MEC contact check - optimized</span> | <span style="color: green">148.9</span>  | 56.3   | 43.0     | 6.7 ms             |
-    | 1518     | 24     | <span style="color: teal">none</span>                           | <span style="color: teal">125.4</span>   | 52.1   | 42.4     | 8.0 ms             |
-    | 1518     | 24     | <span style="color: red">MEC contact check - basic code</span>  | <span style="color: red">~0.1</span>     |        |          |                    |
-    | 1518     | 24     | <span style="color: orange">immolation</span>                   | <span style="color: orange">94.1</span>  | 39.2   | 30.8     | 10.6 ms            |
-    | 1518     | 24     | <span style="color: green">MEC contact check - optimized</span> | <span style="color: green">116.5</span>  | 47.7   | 37.5     | 8.6 ms             |
+The two basic-code rows are read off the in-game counter rather than MangoHud: at 0.1 fps there
+is nothing left to record. Clowny has no "none" recording, so its two rows compare only with
+each other: **the check costs 2.7 ms per frame less than the immolation** there (6.8 against
+9.5), on a map whose load is made of spawned monsters rather than monsters written in its
+levels - 722 of them walking their lines at once.
 
-    The two basic-code rows are read off the in-game counter rather than MangoHud: at 0.1 fps there
-    is nothing left to record.
+Read in frame time, which is the metric that adds up. Against detecting nothing at all:
 
-    Read in frame time, which is the metric that adds up. Against detecting nothing at all:
+| Heroes | Immolation | Contact check | Ratio |
+| ------ | ---------- | ------------- | ----- |
+| 5      | +2.0 ms    | +0.2 ms       | 10x   |
+| 24     | +2.6 ms    | +0.6 ms       | 4x    |
 
-    | Heroes | Immolation | Contact check | Ratio |
-    | ------ | ---------- | ------------- | ----- |
-    | 5      | +2.0 ms    | +0.2 ms       | 10x   |
-    | 24     | +2.6 ms    | +0.6 ms       | 4x    |
+Two things that says. The **immolation's bill barely moves with the number of heroes** (2.0 to
+2.6 ms), because it is mostly paid per monster whether anyone is near it or not. The **check's
+bill grows with the heroes** (0.2 to 0.6 ms), as it should, since it is the only thing it is paid
+for - and it stays four to ten times under the engine's, while keeping better lows (47.7 against
+39.2 at the 1% with 24 heroes, 37.5 against 30.8 at the 0.1%).
 
-    Two things that says. The **immolation's bill barely moves with the number of heroes** (2.0 to
-    2.6 ms), because it is mostly paid per monster whether anyone is near it or not. The **check's
-    bill grows with the heroes** (0.2 to 0.6 ms), as it should, since it is the only thing it is paid
-    for - and it stays four to ten times under the engine's, while keeping better lows (47.7 against
-    39.2 at the 1% with 24 heroes, 37.5 against 30.8 at the 0.1%).
+### Rougher readings, from the in-game counter
 
-    The rougher readings below, taken off the in-game counter, tell the same story with less
-    precision:
+On the whole Mumu map (1518 monsters), with every level activated:
 
-    The in-game fps reading moves around, so these are the orders of magnitude rather than exact
-    figures - `scripts/fps-average.py` reads a 20-second average off MangoHud's per-frame log for
-    the comparisons that need to be closer than that. What they say:
-    - **the immolation costs ~40 fps with nobody to burn** (160 -> 120), and ~60 fps with 24 heroes
-      (140 -> 80). It is paid whether or not anyone is near a monster;
-    - **the chunk index costs nothing up to 3 heroes** (160, which is the no-detection reading) and
-      **~10 fps with 24** (140 -> 130) - about six times cheaper than the engine's own immolation,
-      and it is only paid where heroes actually are;
-    - the same check **without** the index goes from 120 fps for a single hero to a frozen game at
-      24, because it is `O(heroes x monsters)` with natives in the inner loop: `24 x 1518 x 50/s` is
-      1.8M candidate tests a second, each calling `GetUnitTypeId`, `IsUnitAliveBJ`, `IsUnitHidden`,
-      `GetUnitX`, `GetUnitY`. With the index a hero sees a handful of candidates instead of 1518 -
-      on Mumu's map-wide last level, 780 monster units spread over 776 chunks means 3.1 candidates
-      per chunk and 14 in the worst one.
+| Monsters | Heroes | Detection                      | fps  |
+| -------- | ------ | ------------------------------ | ---- |
+| 0        | 0      | none                           | ~200 |
+| 1518     | 0      | none                           | ~160 |
+| 1518     | 3      | none                           | ~160 |
+| 1518     | 24     | none                           | ~140 |
+| 1518     | 0      | immolation                     | ~120 |
+| 1518     | 3      | immolation                     | ~110 |
+| 1518     | 24     | immolation                     | ~80  |
+| 1518     | 1      | MEC contact check - basic code | ~120 |
+| 1518     | 3      | MEC contact check - basic code | ~80  |
+| 1518     | 24     | MEC contact check - basic code | ~0.1 |
+| 1518     | 1      | MEC contact check - optimized  | ~160 |
+| 1518     | 3      | MEC contact check - optimized  | ~160 |
+| 1518     | 24     | MEC contact check - optimized  | ~130 |
+
+The in-game fps reading moves around, so these are the orders of magnitude rather than exact
+figures - `scripts/fps-average.py` reads a 20-second average off MangoHud's per-frame log for
+the comparisons that need to be closer than that. What they say:
+
+- **the immolation costs ~40 fps with nobody to burn** (160 -> 120), and ~60 fps with 24 heroes
+  (140 -> 80). It is paid whether or not anyone is near a monster;
+- **the chunk index costs nothing up to 3 heroes** (160, which is the no-detection reading) and
+  **~10 fps with 24** (140 -> 130) - about six times cheaper than the engine's own immolation,
+  and it is only paid where heroes actually are;
+- the same check **without** the index goes from 120 fps for a single hero to a frozen game at
+  24, because it is `O(heroes x monsters)` with natives in the inner loop: `24 x 1518 x 50/s` is
+  1.8M candidate tests a second, each calling `GetUnitTypeId`, `IsUnitAliveBJ`, `IsUnitHidden`,
+  `GetUnitX`, `GetUnitY`. With the index a hero sees a handful of candidates instead of 1518 -
+  on Mumu's map-wide last level, 780 monster units spread over 776 chunks means 3.1 candidates
+  per chunk and 14 in the worst one.
 
 ## What exists today
 

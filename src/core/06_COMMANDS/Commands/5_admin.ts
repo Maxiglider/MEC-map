@@ -1032,7 +1032,7 @@ export const initExecuteCommandMax = () => {
                     return USAGE
                 }
 
-                rebuildContactChunks()
+                rebuildContactChunks(true)
                 return true
             }
 
