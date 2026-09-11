@@ -35,11 +35,12 @@ const DEBUG = false
  * Orders the hero from here, as soon as the click is read, rather than waiting for the
  * synchronized event: the hero starts moving one latency earlier.
  *
- * SOLO ONLY. An order changes the state of the game, so giving it on one machine only makes the
- * simulations diverge and desyncs a multiplayer game within seconds. "hero-effect-on-network"
- * gives the same order for everybody, and skips the left click while this is on.
+ * SOLO ONLY, and off for that reason. An order changes the state of the game, so giving it on one
+ * machine only makes the simulations diverge and desyncs a multiplayer game within seconds.
+ * "hero-effect-on-network" gives the same order for everybody, and skips the left click while this
+ * is on. Turn it on to measure what a latency of advance feels like, alone.
  */
-const ISSUE_ORDER_LOCALLY = true
+const ISSUE_ORDER_LOCALLY = false
 
 const INIT_DELAY = 3
 const ENABLE_ASYNC_MOUSE = true
@@ -337,8 +338,31 @@ const initClickCatcher = () => {
     }
 
     let lastPressTime = 0
+    let wasListening = false
 
     createTimer(POLL_INTERVAL, true, () => {
+        // Two hundred readings a second, for a press only whoever asked for it has any use of:
+        // nothing else reads a locally caught click, so nobody else pays for it. The frames stay,
+        // since creating them mid game is what crashed the map.
+        const isListening = isTestingLeftClicks(GetPlayerId(GetLocalPlayer()!))
+
+        if (!isListening) {
+            wasListening = false
+            return
+        }
+
+        if (!wasListening) {
+            // nothing was read while nobody was listening: what the frames show now is the ground
+            // to compare against, not a press that just happened
+            wasListening = true
+
+            for (const catcher of catchers) {
+                catcher.wasPushed = BlzFrameIsVisible(catcher.pushBackdrop)
+            }
+
+            return
+        }
+
         for (const catcher of catchers) {
             const isPushed = BlzFrameIsVisible(catcher.pushBackdrop)
 
