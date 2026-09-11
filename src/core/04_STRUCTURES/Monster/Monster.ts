@@ -324,15 +324,37 @@ export abstract class Monster {
      * trigger mob and can be anywhere in the circle.
      */
     describeContactArea(area: ContactAreaBuilder) {
+        // Where it stands right now, whatever its kind says below. A map can put a monster
+        // somewhere else than where its level had it - the onBeforeCreateMonsterUnit hook is given
+        // the chance to force a position - and a monster is only ever registered once its unit is
+        // there, so this is the one thing that cannot be wrong.
+        this.u && area.addPoint(GetUnitX(this.u), GetUnitY(this.u))
+
         const circleMobParent = this.circleMobParent
-        const triggerUnit = circleMobParent?.getTriggerMob().u
 
-        if (circleMobParent && triggerUnit) {
+        if (circleMobParent) {
             const reach = circleMobParent.getRadius() * CIRCLE_MOB_REACH_FACTOR
-            const centerX = GetUnitX(triggerUnit)
-            const centerY = GetUnitY(triggerUnit)
+            const triggerUnit = circleMobParent.getTriggerMob().u
 
-            area.addRect(centerX - reach, centerY - reach, centerX + reach, centerY + reach)
+            if (triggerUnit) {
+                // the circle is drawn around the mob at its centre, which the circle itself hides
+                const centerX = GetUnitX(triggerUnit)
+                const centerY = GetUnitY(triggerUnit)
+
+                area.addRect(centerX - reach, centerY - reach, centerX + reach, centerY + reach)
+            }
+
+            if (this.u) {
+                // And the circle as seen from this mob, in case the one at the centre has no unit
+                // to be asked yet: wherever this one stands on the circle, the whole of it is
+                // within twice the reach of here.
+                const aroundHere = reach * 2
+                const x = GetUnitX(this.u)
+                const y = GetUnitY(this.u)
+
+                area.addRect(x - aroundHere, y - aroundHere, x + aroundHere, y + aroundHere)
+            }
+
             return
         }
 
@@ -342,6 +364,11 @@ export abstract class Monster {
     /** Reimplement in children that move on their own. By default a monster stays where it stands. */
     protected describeOwnContactArea(area: ContactAreaBuilder) {
         this.u && area.addPoint(GetUnitX(this.u), GetUnitY(this.u))
+    }
+
+    /** How the contact chunks name this kind of monster when they report on themselves */
+    getContactAreaLabel(): string {
+        return this.circleMobParent ? 'circleMob' : 'monster'
     }
 
     refreshCollisionLandmark = () => {

@@ -19,7 +19,9 @@ import {
     auditContactChunks,
     getContactChunkStats,
     getContactChunkTierSizes,
+    isContactChunksAuditWatched,
     rebuildContactChunks,
+    setContactChunksAuditWatch,
     setContactChunkTierSizes,
 } from '../../04_STRUCTURES/Monster/ContactChunks'
 import { HorizontalRegionDirection } from '../../04_STRUCTURES/Region/HorizontalRectangleRegion'
@@ -961,7 +963,7 @@ export const initExecuteCommandMax = () => {
         name: 'contactChunks',
         alias: [],
         group,
-        argDescription: '[stats | audit | rebuild | tiers <chunkSize> [<chunkSize> ...]]',
+        argDescription: '[stats | audit | auditWatch | auditUnwatch | rebuild | tiers <chunkSize> [<chunkSize> ...]]',
         description:
             "Reads or retunes the contact chunks, the index MEC's own contact check finds the monsters of a hero with. " +
             'Chunk sizes are given in units, from the finest up; a tier holding the whole map is always added on top of them.',
@@ -997,6 +999,30 @@ export const initExecuteCommandMax = () => {
                 for (const line of offenders) {
                     Text.erP(p, line)
                 }
+
+                return true
+            }
+
+            if (param1 === 'auditWatch' || param1 === 'auditUnwatch') {
+                if (nbParam !== 1) {
+                    return USAGE
+                }
+
+                const isWatching = param1 === 'auditWatch'
+
+                if (isWatching === isContactChunksAuditWatched()) {
+                    Text.erP(p, `The contact chunks audit is already ${isWatching ? 'watched' : 'unwatched'}.`)
+                    return true
+                }
+
+                setContactChunksAuditWatch(isWatching)
+
+                Text.mkP(
+                    p,
+                    isWatching
+                        ? 'Contact chunks audited every second. Nothing is said while nothing is wrong.'
+                        : 'Contact chunks no longer audited.'
+                )
 
                 return true
             }

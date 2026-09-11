@@ -1,9 +1,9 @@
 import { createTimer } from 'Utils/mapUtils'
-import { getUdgEscapers, udg_spawned_monster_units, udg_spawned_monsters } from '../../../../globals'
+import { getUdgEscapers } from '../../../../globals'
 import { Constants } from '../../01_libraries/Constants'
 import { Escaper } from '../../04_STRUCTURES/Escaper/Escaper'
+import type { ChunkEntry } from '../../04_STRUCTURES/Monster/ContactChunks'
 import { forEachMonsterAround, MAX_SWEPT_STEP } from '../../04_STRUCTURES/Monster/ContactChunks'
-import type { Monster } from '../../04_STRUCTURES/Monster/Monster'
 import { applyContact, CONTACT_KIND, sendAsyncContact } from './AsyncHeroSync'
 
 /**
@@ -193,48 +193,25 @@ const testCandidate = (
  */
 const queried = { context: undefined as ContactContext | undefined }
 
-const testChunkMonster = (monster: Monster) => {
+const testChunkEntry = (entry: ChunkEntry) => {
     // a temporarily disabled monster had its immolation taken away: it burns nobody either
-    if (queried.context === undefined || monster.isDisabled()) {
+    if (queried.context === undefined || entry.monster?.isDisabled()) {
         return
     }
 
-    testCandidate(
-        queried.context,
-        monster.u,
-        monster.getMonsterType()?.getImmolationRadius() ?? 0,
-        CONTACT_KIND.levelMonster,
-        monster.getId()
-    )
+    testCandidate(queried.context, entry.unit, entry.reach, entry.kind, entry.id)
 }
 
 /**
- * The monsters of the chunks the hero's step went through, at every tier: whichever level they
- * belong to, since a monster is in the index for as long as its unit stands on the map, and however
- * far the others are, since they are in other chunks and are never heard of.
+ * Everything in the chunks the hero's step went through, at every tier: the monsters of any level,
+ * since one is in the index for as long as its unit stands on the map, and the spawned ones, each
+ * held by the line it was told to walk. However far the others are, they sit in other chunks and
+ * are never heard of.
  */
-const testLevelMonsters = (context: ContactContext) => {
+const testMonstersAround = (context: ContactContext) => {
     queried.context = context
 
-    forEachMonsterAround(context.fromX, context.fromY, context.toX, context.toY, context.heroRadius, testChunkMonster)
-}
-
-/**
- * The temporary monsters, whatever spawned them: a monster spawn, the shot of a caster, or
- * whatever comes next. They are walked from their own registry rather than from what created
- * them, so a new source of them needs nothing here.
- */
-const testSpawnedMonsters = (context: ContactContext) => {
-    for (const [handleId, spawned] of pairs(udg_spawned_monster_units)) {
-        spawned &&
-            testCandidate(
-                context,
-                spawned,
-                udg_spawned_monsters[handleId]?.getImmolationRadius() ?? 0,
-                CONTACT_KIND.spawnedMonster,
-                handleId
-            )
-    }
+    forEachMonsterAround(context.fromX, context.fromY, context.toX, context.toY, context.heroRadius, testChunkEntry)
 }
 
 /**
@@ -292,8 +269,7 @@ const checkEscaperContacts = (escaper: Escaper) => {
     context.lastCheck = state.checkCount
     context.wasTold = isTold
 
-    testLevelMonsters(context)
-    testSpawnedMonsters(context)
+    testMonstersAround(context)
     testPowerCircles(context)
 
     // Handled once everything has been walked, rather than as each contact is found: what is read

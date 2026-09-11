@@ -362,6 +362,15 @@ export class Caster extends Monster {
         return this.casterType.getAnimation()
     }
 
+    /**
+     * A caster has no monster type of its own, but its unit is built from the one its caster type
+     * shoots from - immolation included. Anything asking what this unit is has to hear that one, or
+     * a hero touching a caster dies by the immolation of the engine and by nothing else.
+     */
+    getMonsterType = () => {
+        return this.casterType.getCasterMonsterType()
+    }
+
     createUnit = () => {
         this.nbEscapersInRange = 0
         this.canShoot = true

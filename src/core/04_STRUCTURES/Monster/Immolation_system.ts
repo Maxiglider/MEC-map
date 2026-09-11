@@ -49,7 +49,7 @@ export const setImmolationSystemEnabled = (enabled: boolean): number => {
     let nbChangedUnits = 0
 
     for (const [_, monster] of pairs(udg_monsters)) {
-        if (monster.u && !monster.isDisabled() && applyImmolationOnUnit(monster.u, monster.mt, enabled)) {
+        if (monster.u && !monster.isDisabled() && applyImmolationOnUnit(monster.u, monster.getMonsterType(), enabled)) {
             nbChangedUnits++
         }
     }

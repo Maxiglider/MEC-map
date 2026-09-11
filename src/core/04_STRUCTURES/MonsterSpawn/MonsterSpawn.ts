@@ -10,6 +10,7 @@ import { Text } from '../../01_libraries/Text'
 import { hooks } from '../../API/GeneralHooks'
 import { Natives } from '../../wc3_natives_unsecured/Natives'
 import { Level } from '../Level/Level'
+import { registerSpawnedUnitInChunks, unregisterSpawnedUnitFromChunks } from '../Monster/ContactChunks'
 import { IssueMoveOrderForLongDistance, LongDistanceMoveOrder } from '../Monster/LongDistanceMoveOrder'
 import { Monster } from '../Monster/Monster'
 import { MONSTER_NEAR_DIFF_MAX } from '../Monster/MonsterArray'
@@ -56,6 +57,24 @@ const MonsterSpawn_Actions = errorHandler(() => {
         const mobUnit = monsterSpawn.createMob(startAndEndPoints)
 
         if (mobUnit) {
+            // Everywhere it can be touched, told once: it never leaves the line it is about to walk
+            const walkEnd = clampWalkToSpawnRegion(
+                mecRegion,
+                startAndEndPoints.startX,
+                startAndEndPoints.startY,
+                startAndEndPoints.endX,
+                startAndEndPoints.endY
+            )
+
+            registerSpawnedUnitInChunks(
+                mobUnit,
+                monsterSpawn.getMonsterType().getImmolationRadius(),
+                startAndEndPoints.startX,
+                startAndEndPoints.startY,
+                walkEnd.x,
+                walkEnd.y
+            )
+
             // Make the unit move
             const moveOrder = IssueMoveOrderForLongDistance(
                 mobUnit,
@@ -95,6 +114,55 @@ const MonsterUnspawn = errorHandler(() => {
         monsterSpawn?.removeMonsterUnit(mobUnit)
     }
 })
+
+/**
+ * How far past the zone a mob is allowed to be remembered walking. It is removed as it leaves, but
+ * the zone is only watched every few frames, so it always gets a step or two further.
+ */
+const SPAWN_EXIT_MARGIN = Constants.LARGEUR_CASE
+
+/** The end of the walk, reused for every mob rather than given back to the garbage collector */
+const clampedEnd = { x: 0, y: 0 }
+
+/**
+ * The part of the line a mob was told to walk that it can really be found on. A mob is removed as
+ * soon as it leaves the zone of its spawn, and the order it is given reaches well past it - by the
+ * offset that guarantees it does leave, and by much more when a timed unspawn sends it towards a
+ * point it never reaches.
+ *
+ * The zones are convex, so what stays inside is a single stretch: its far end is worth finding.
+ */
+const clampWalkToSpawnRegion = (mecRegion: MECRegion, startX: number, startY: number, endX: number, endY: number) => {
+    clampedEnd.x = endX
+    clampedEnd.y = endY
+
+    if (mecRegion.areCoordsInRegion(endX, endY) || !mecRegion.areCoordsInRegion(startX, startY)) {
+        return clampedEnd
+    }
+
+    const deltaX = endX - startX
+    const deltaY = endY - startY
+    let insideRatio = 0
+    let outsideRatio = 1
+
+    for (let i = 0; i < 12; i++) {
+        const middleRatio = (insideRatio + outsideRatio) / 2
+
+        if (mecRegion.areCoordsInRegion(startX + deltaX * middleRatio, startY + deltaY * middleRatio)) {
+            insideRatio = middleRatio
+        } else {
+            outsideRatio = middleRatio
+        }
+    }
+
+    const length = SquareRoot(deltaX * deltaX + deltaY * deltaY)
+    const ratio = length > 0 ? RMinBJ(1, insideRatio + SPAWN_EXIT_MARGIN / length) : insideRatio
+
+    clampedEnd.x = startX + deltaX * ratio
+    clampedEnd.y = startY + deltaY * ratio
+
+    return clampedEnd
+}
 
 const OnMonsterUnitLeavesSpawnRegion = function (this: any, monsterUnit: unit) {
     const monsterSpawn = MonsterSpawn.anyMonsterUnitId2MonsterSpawn.get(GetHandleId(monsterUnit))
@@ -217,6 +285,7 @@ export class MonsterSpawn {
         UnitRemoveAbility(monsterUnit, FourCC('Aloc'))
         this.simpleUnitRecycler.removeUnit(monsterUnit)
         unregisterSpawnedMonster(monsterUnit)
+        unregisterSpawnedUnitFromChunks(monsterUnit)
 
         const timer = MonsterSpawn.anyUnit2TimedUnspawnTimer.get(GetHandleId(monsterUnit))
         if (timer) {

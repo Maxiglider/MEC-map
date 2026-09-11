@@ -1,10 +1,10 @@
 # Replacing the Warcraft III immolation with MEC's own contact check
 
-Status: **implemented and measured for the monsters of the levels.** The runtime switches, the e2e
-tests and the chunk index all exist (`src/core/04_STRUCTURES/Monster/ContactChunks.ts`, driven by
-`-contactChunks`), and with 24 heroes on Mumu the check costs **+0.6 ms per frame where the
-immolation costs +2.6 ms** - four times cheaper, with better lows (see [Why](#why)). Still open: the monster spawns and the casters, which the check still walks in full,
-and the default value of `IMMOLATION_SYSTEM_ENABLED`.
+Status: **implemented and measured.** The runtime switches, the e2e tests and the chunk index all
+exist (`src/core/04_STRUCTURES/Monster/ContactChunks.ts`, driven by `-contactChunks`), monsters of
+the levels, spawned monsters and caster shots alike. With 24 heroes on Mumu the check costs **+0.6 ms
+per frame where the immolation costs +2.6 ms** - four times cheaper, with better lows (see
+[Why](#why)). Still open: the default value of `IMMOLATION_SYSTEM_ENABLED`.
 
 ## Why
 
@@ -229,23 +229,28 @@ Anything else that moves a monster in a way its movement class does not describe
 contact, which is what `-contactChunks audit` is for: it checks that every registered monster unit really
 stands in one of its own chunks, and names those that do not.
 
-### Monster spawns
+### Monster spawns and caster shots
 
-Spawns are few, so a linear scan over the active ones is fine. Each spawn gets **one custom chunk**:
-the smallest square containing any position its spawned monsters can reach during the spawn's life
-(region plus travel). A hero inside that square is tested against that spawn's units.
+A spawned monster moves without pause, but it **never leaves the line it was told to walk**: the
+waypoints `LongDistanceMoveOrder` computes all sit on the straight segment to its destination, and a
+caster shot flies straight to the end of its range. So a spawned unit is registered exactly like a
+monster of a level, once, with that segment as its area - no per-tick tracking of anything.
 
-Keep a **dense per-spawn array of its live units** rather than reaching into
-`udg_spawned_monster_units` or the spawn's `group`: a plain Lua loop over ten units beats any group
-enumeration.
+- a monster spawn registers its mob where it issues the move order, in `MonsterSpawn`'s spawn
+  handler, and takes it out of the chunks in `removeMonsterUnit`. Since the unit is hidden and handed
+  back to its recycler rather than removed, its bookkeeping is kept for the next time it comes back
+  under the same handle;
+- a caster shot registers its flight in the `CasterShot` constructor and is forgotten in `destroy`,
+  where the unit really is removed;
+- **the segment is clamped to the spawn's zone** (`clampWalkToSpawnRegion`, a binary search over the
+  convex zone plus one tile of margin for the few frames the watcher takes to notice). The order a
+  mob is given reaches past the zone on purpose, and a timed unspawn sends it towards a point it
+  never reaches - registering that would stretch its area over the whole map for nothing.
 
-The caveat is a spawn whose region plus travel covers the map — its chunk is then the map, and all
-its units are tested by every hero.
-
-### Casters
-
-`CasterShot` creates temporary monsters that fly across the map for a second or two. Not decided
-yet; probably the same shape as a spawn — a per-caster list with the flight's bbox as its chunk.
+An earlier plan gave each _spawn_ one chunk covering everywhere its mobs can go, and walked its
+units from there. That falls apart on a spawn with a wide zone and a lot of mobs, which is common:
+every hero inside the zone would walk all of them. Registering the units themselves keeps the cost
+where it belongs.
 
 ## Tuning the ladder in game
 
@@ -348,7 +353,6 @@ and 9M natives today.
 2. ~~The chunk index for the level monsters, measured against the table at the top~~ done. The
    ladder needed no tuning: on Mumu every monster fits tier 0 (512 units), nothing is promoted, and
    the worst chunk holds 14 of the 780 units of the heaviest level.
-3. Monster spawns (still walked in full, which is cheap while they are few).
-4. Casters.
-5. Only then: `IMMOLATION_SYSTEM_ENABLED` flipped to `false` by default, and the immolation
+3. ~~Monster spawns and caster shots~~ done, on the line each mob is told to walk.
+4. Only then: `IMMOLATION_SYSTEM_ENABLED` flipped to `false` by default, and the immolation
    abilities dropped from the monster types.

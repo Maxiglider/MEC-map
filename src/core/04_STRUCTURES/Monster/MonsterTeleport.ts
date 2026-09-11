@@ -180,6 +180,10 @@ export class MonsterTeleport extends Monster {
         }
     }
 
+    getContactAreaLabel(): string {
+        return this.circleMobParent ? super.getContactAreaLabel() : 'teleport'
+    }
+
     protected describeOwnContactArea(area: ContactAreaBuilder) {
         for (let i = 0; i < this.x.length; i++) {
             const x = this.x[i]

@@ -1,8 +1,9 @@
 import { createTimer } from 'Utils/mapUtils'
 import { Timer } from 'w3ts'
 import { globals, registerSpawnedMonster, unregisterSpawnedMonster } from '../../../../globals'
-import { MonsterType } from '../Monster/MonsterType'
+import { forgetSpawnedUnitInChunks, registerSpawnedUnitInChunks } from '../Monster/ContactChunks'
 import { NewImmobileMonster } from '../Monster/Monster_functions'
+import { MonsterType } from '../Monster/MonsterType'
 
 const PERIOD = 0.01
 
@@ -24,6 +25,17 @@ export class CasterShot {
         this.unite = NewImmobileMonster(monsterType, Xdep, Ydep, angle)
         registerSpawnedMonster(this.unite, monsterType)
 
+        // the whole of its flight, told once: it is destroyed at the end of its range
+        registerSpawnedUnitInChunks(
+            this.unite,
+            monsterType.getImmolationRadius(),
+            Xdep,
+            Ydep,
+            Xdep + portee * CosBJ(angle),
+            Ydep + portee * SinBJ(angle),
+            'casterShot'
+        )
+
         const shot = this
 
         this.trig = createTimer(PERIOD, true, () => {
@@ -44,6 +56,7 @@ export class CasterShot {
 
     destroy = () => {
         unregisterSpawnedMonster(this.unite)
+        forgetSpawnedUnitInChunks(this.unite)
         RemoveUnit(this.unite)
         ;(this.unite as any) = null
         this.trig.destroy()

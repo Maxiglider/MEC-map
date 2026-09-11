@@ -99,6 +99,10 @@ export class MonsterMultiplePatrols extends Monster {
         MonsterMultiplePatrols.Y = []
     }
 
+    getContactAreaLabel(): string {
+        return this.circleMobParent ? super.getContactAreaLabel() : 'multiplePatrol'
+    }
+
     protected describeOwnContactArea(area: ContactAreaBuilder) {
         for (let i = 0; i < this.x.length; i++) {
             if (i === 0) {

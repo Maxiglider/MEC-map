@@ -4,6 +4,7 @@ import { MemoryHandler } from 'Utils/MemoryHandler'
 import { Timer } from 'w3ts'
 import { globals } from '../../../../globals'
 import { Level } from '../Level/Level'
+import { requestContactChunksRebuild } from '../Monster/ContactChunks'
 import { Monster } from '../Monster/Monster'
 
 const TIMER_PERIOD = 0.02
@@ -90,6 +91,7 @@ export class CircleMob {
     setShape = (shape: CircleMobShape) => {
         this.shape = shape
         this.reactivate()
+        requestContactChunksRebuild()
     }
 
     getRadius = () => this.radius
@@ -97,6 +99,7 @@ export class CircleMob {
     setRadius = (radius: number) => {
         this.radius = radius
         this.reactivate()
+        requestContactChunksRebuild() // the circle its mobs are found on just changed size
     }
 
     getInitialAngle = () => this.initialAngle
@@ -125,6 +128,7 @@ export class CircleMob {
 
         arrayPush(this.mobs, monster.getId())
         monster.setCircleMobParent(this)
+        requestContactChunksRebuild() // its area is the circle now, not where it was standing
 
         return true
     }
@@ -139,6 +143,7 @@ export class CircleMob {
 
     removeMob = (monsterId: number) => {
         this.mobs.splice(this.mobs.indexOf(monsterId), 1)
+        requestContactChunksRebuild()
     }
 
     destroy = () => {
@@ -167,6 +172,10 @@ export class CircleMob {
     activate = (activ: boolean) => {
         this.circleTimer?.destroy()
         this.circleTimer = null
+
+        // The mobs of a level are created before its circles are told to turn, so they were put in
+        // the chunks of wherever they stood. Now that the circle is there, they belong to it.
+        requestContactChunksRebuild()
 
         if (activ) {
             this.triggerMob.u && ShowUnit(this.triggerMob.u, false)

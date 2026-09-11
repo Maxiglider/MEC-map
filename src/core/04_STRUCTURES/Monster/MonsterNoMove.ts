@@ -87,6 +87,14 @@ export class MonsterNoMove extends Monster {
         return this.level.regions.getRegionAtWithFlag(this.x, this.y, 'wanderable')
     }
 
+    getContactAreaLabel(): string {
+        if (this.circleMobParent) {
+            return super.getContactAreaLabel()
+        }
+
+        return this.getWanderRegion() ? 'wanderingMob' : 'immobileMob'
+    }
+
     protected describeOwnContactArea(area: ContactAreaBuilder) {
         const wanderRegion = this.getWanderRegion()
 

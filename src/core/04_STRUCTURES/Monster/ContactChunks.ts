@@ -1,5 +1,5 @@
 import { createTimer } from 'Utils/mapUtils'
-import { globals, udg_monsters } from '../../../../globals'
+import { globals, udg_monsters, udg_spawned_monsters } from '../../../../globals'
 import { Constants } from '../../01_libraries/Constants'
 import type { Monster } from './Monster'
 
@@ -45,8 +45,12 @@ const DEFAULT_TIER_SIZES = [512, 4096]
 /**
  * How many chunks of a tier a single monster may occupy before it is moved up to a coarser tier.
  * It has to promote rather than drop: a monster missing from the index is a contact never found.
+ *
+ * Generous on purpose. An entry is a table slot, while a promotion multiplies by four the ground
+ * over which every hero has to hear about that monster - a monster spawn walking its mobs across
+ * the map is exactly the case that would suffer from a tight cap.
  */
-const MAX_CHUNKS_PER_MONSTER = 16
+const MAX_CHUNKS_PER_MONSTER = 48
 
 /** A circle mob is carried around its trigger mob; some of its shapes reach well past the radius */
 const CIRCLE_MOB_REACH_FACTOR = 5
@@ -63,9 +67,28 @@ const REBUILD_REQUEST_DELAY = 0.1
 const SHAPE_RECT = 0
 const SHAPE_SEGMENT = 1
 
+/** The same numbers as CONTACT_KIND in AsyncHeroSync, which is what a contact travels as */
+const CONTACT_KIND_LEVEL_MONSTER = 0
+const CONTACT_KIND_SPAWNED_MONSTER = 1
+
+/**
+ * What a chunk holds: everything the check needs about one thing that can be touched, so that
+ * testing a candidate reads Lua fields rather than asking the engine again. One entry per monster,
+ * shared by every chunk it sits in and reused when it registers again.
+ */
+export type ChunkEntry = {
+    unit: unit
+    reach: number
+    kind: number
+    id: number
+    /** A monster of a level, whose immolation can be taken away for a while. Absent for a spawned one. */
+    monster?: Monster
+    membership: Membership
+}
+
 type ChunkBucket = {
-    monsters: (Monster | undefined)[]
-    /** Filled up to here; the slots beyond are free for the next monster to take */
+    entries: (ChunkEntry | undefined)[]
+    /** Filled up to here; the slots beyond are free for the next entry to take */
     count: number
 }
 
@@ -80,9 +103,20 @@ type ChunkTier = {
 
 /** Where one monster sits, so that removing it costs no search */
 type Membership = {
+    entry?: ChunkEntry
     buckets: (ChunkBucket | undefined)[]
     indices: number[]
     count: number
+    /**
+     * The line a spawned monster was told to walk, kept so that a rebuild can put it back: a
+     * monster of a level describes its own area again instead.
+     */
+    spawnedX1: number
+    spawnedY1: number
+    spawnedX2: number
+    spawnedY2: number
+    /** How the audit names it: a monster of a level is asked, a spawned one is told at registration */
+    spawnedLabel: string
 }
 
 const state = {
@@ -90,7 +124,9 @@ const state = {
     tierSizes: DEFAULT_TIER_SIZES,
     tiers: [] as ChunkTier[],
     memberships: {} as { [monsterId: number]: Membership },
+    spawnedMemberships: {} as { [handleId: number]: Membership },
     monsterCount: 0,
+    spawnedCount: 0,
     entryCount: 0,
     walk: 0,
     lastRebuildDuration: 0,
@@ -279,28 +315,72 @@ const collectTierChunks = (tier: ChunkTier) => {
     return collected.count > 0
 }
 
-const getMembership = (monsterId: number) => {
+const newMembership = (): Membership => ({
+    buckets: [],
+    indices: [],
+    count: 0,
+    spawnedX1: 0,
+    spawnedY1: 0,
+    spawnedX2: 0,
+    spawnedY2: 0,
+    spawnedLabel: 'spawnMob',
+})
+
+const getMonsterMembership = (monsterId: number) => {
     const existing = state.memberships[monsterId]
 
     if (existing !== undefined) {
         return existing
     }
 
-    const membership: Membership = { buckets: [], indices: [], count: 0 }
+    const membership = newMembership()
     state.memberships[monsterId] = membership
 
     return membership
 }
 
-const addToChunk = (tier: ChunkTier, chunkIndex: number, monster: Monster, membership: Membership) => {
+const getSpawnedMembership = (handleId: number) => {
+    const existing = state.spawnedMemberships[handleId]
+
+    if (existing !== undefined) {
+        return existing
+    }
+
+    const membership = newMembership()
+    state.spawnedMemberships[handleId] = membership
+
+    return membership
+}
+
+/** One entry per monster, reused every time it registers again rather than made anew */
+const getEntry = (membership: Membership, unit: unit, reach: number, kind: number, id: number, monster?: Monster) => {
+    const existing = membership.entry
+
+    if (existing !== undefined) {
+        existing.unit = unit
+        existing.reach = reach
+        existing.kind = kind
+        existing.id = id
+        existing.monster = monster
+
+        return existing
+    }
+
+    const entry: ChunkEntry = { unit, reach, kind, id, monster, membership }
+    membership.entry = entry
+
+    return entry
+}
+
+const addToChunk = (tier: ChunkTier, chunkIndex: number, entry: ChunkEntry, membership: Membership) => {
     let bucket = tier.buckets[chunkIndex]
 
     if (bucket === undefined) {
-        bucket = { monsters: [], count: 0 }
+        bucket = { entries: [], count: 0 }
         tier.buckets[chunkIndex] = bucket
     }
 
-    bucket.monsters[bucket.count] = monster
+    bucket.entries[bucket.count] = entry
     membership.buckets[membership.count] = bucket
     membership.indices[membership.count] = bucket.count
     bucket.count++
@@ -308,25 +388,21 @@ const addToChunk = (tier: ChunkTier, chunkIndex: number, monster: Monster, membe
     state.entryCount++
 }
 
-/** Swaps the last monster of the chunk into the hole, and tells it where it now sits */
-const removeFromChunk = (bucket: ChunkBucket, index: number, monster: Monster) => {
+/** Swaps the last entry of the chunk into the hole, and tells it where it now sits */
+const removeFromChunk = (bucket: ChunkBucket, index: number, entry: ChunkEntry) => {
     const lastIndex = bucket.count - 1
-    const moved = bucket.monsters[lastIndex]
+    const moved = bucket.entries[lastIndex]
 
-    bucket.monsters[index] = moved
-    bucket.monsters[lastIndex] = undefined
+    bucket.entries[index] = moved
+    bucket.entries[lastIndex] = undefined
     bucket.count = lastIndex
     state.entryCount--
 
-    if (moved === undefined || moved === monster) {
+    if (moved === undefined || moved === entry) {
         return
     }
 
-    const movedMembership = state.memberships[moved.getId()]
-
-    if (movedMembership === undefined) {
-        return
-    }
+    const movedMembership = moved.membership
 
     for (let i = 0; i < movedMembership.count; i++) {
         if (movedMembership.buckets[i] === bucket && movedMembership.indices[i] === lastIndex) {
@@ -336,24 +412,62 @@ const removeFromChunk = (bucket: ChunkBucket, index: number, monster: Monster) =
     }
 }
 
-export const unregisterMonsterFromChunks = (monster: Monster) => {
-    const membership = state.memberships[monster.getId()]
-
-    if (membership === undefined || membership.count === 0) {
-        return
+const leaveChunks = (membership: Membership) => {
+    if (membership.count === 0) {
+        return false
     }
+
+    const entry = membership.entry
 
     for (let i = 0; i < membership.count; i++) {
         const bucket = membership.buckets[i]
 
-        if (bucket !== undefined) {
-            removeFromChunk(bucket, membership.indices[i], monster)
-            membership.buckets[i] = undefined
+        if (bucket !== undefined && entry !== undefined) {
+            removeFromChunk(bucket, membership.indices[i], entry)
         }
+
+        membership.buckets[i] = undefined
     }
 
     membership.count = 0
-    state.monsterCount--
+
+    return true
+}
+
+/**
+ * Puts one thing in every chunk of the finest tier that can hold the area just described in
+ * `shape`. Nothing that cannot be touched is indexed at all.
+ */
+const joinChunks = (membership: Membership, unit: unit, reach: number, kind: number, id: number, monster?: Monster) => {
+    if (shape.count === 0) {
+        return false
+    }
+
+    for (let tierIndex = 0; tierIndex < state.tiers.length; tierIndex++) {
+        const tier = state.tiers[tierIndex]
+
+        if (!collectTierChunks(tier)) {
+            continue
+        }
+
+        const entry = getEntry(membership, unit, reach, kind, id, monster)
+
+        for (let i = 0; i < collected.count; i++) {
+            addToChunk(tier, collected.indices[i], entry, membership)
+        }
+
+        return true
+    }
+
+    return false
+}
+
+export const unregisterMonsterFromChunks = (monster: Monster) => {
+    const membership = state.memberships[monster.getId()]
+
+    if (membership !== undefined && leaveChunks(membership)) {
+        state.monsterCount--
+    }
 }
 
 /** For a monster that is gone for good: its chunks are left, and its own bookkeeping dropped */
@@ -363,8 +477,8 @@ export const forgetMonsterInChunks = (monster: Monster) => {
 }
 
 /**
- * Puts a monster in the chunks it can be found in, at the finest tier that can hold it. Called
- * whenever its unit appears; a monster nothing can touch is left out of the index entirely.
+ * Puts a monster of a level in the chunks it can be found in. Called whenever its unit appears; a
+ * monster nothing can touch is left out of the index entirely.
  */
 export const registerMonsterInChunks = (monster: Monster) => {
     unregisterMonsterFromChunks(monster)
@@ -384,27 +498,73 @@ export const registerMonsterInChunks = (monster: Monster) => {
     shape.padding = reach
     monster.describeContactArea(areaBuilder)
 
-    if (shape.count === 0) {
-        return
-    }
+    const membership = getMonsterMembership(monster.getId())
 
-    for (let tierIndex = 0; tierIndex < state.tiers.length; tierIndex++) {
-        const tier = state.tiers[tierIndex]
-
-        if (!collectTierChunks(tier)) {
-            continue
-        }
-
-        const membership = getMembership(monster.getId())
-
-        for (let i = 0; i < collected.count; i++) {
-            addToChunk(tier, collected.indices[i], monster, membership)
-        }
-
+    if (joinChunks(membership, monster.u, reach, CONTACT_KIND_LEVEL_MONSTER, monster.getId(), monster)) {
         state.monsterCount++
+    }
+}
 
+/**
+ * Puts a spawned monster in the chunks of the line it was just told to walk - the whole of its
+ * life, since it is removed at the end of it, and since the waypoints of a long move all sit on
+ * that very line.
+ *
+ * Told at the moment it is spawned rather than followed tick by tick: a spawned monster moves
+ * without pause, but never off the line, which is all the index needs to know.
+ */
+export const registerSpawnedUnitInChunks = (
+    spawnedUnit: unit,
+    reach: number,
+    x1: number,
+    y1: number,
+    x2: number,
+    y2: number,
+    label = 'spawnMob'
+) => {
+    const handleId = GetHandleId(spawnedUnit)
+    const membership = getSpawnedMembership(handleId)
+
+    if (leaveChunks(membership)) {
+        state.spawnedCount--
+    }
+
+    if (!state.isInitialized || reach <= 0) {
         return
     }
+
+    membership.spawnedX1 = x1
+    membership.spawnedY1 = y1
+    membership.spawnedX2 = x2
+    membership.spawnedY2 = y2
+    membership.spawnedLabel = label
+
+    shape.count = 0
+    shape.padding = reach
+    areaBuilder.addSegment(x1, y1, x2, y2)
+
+    if (joinChunks(membership, spawnedUnit, reach, CONTACT_KIND_SPAWNED_MONSTER, handleId, undefined)) {
+        state.spawnedCount++
+    }
+}
+
+/**
+ * Takes a spawned monster out of the chunks, keeping what is known about it: the unit of a monster
+ * spawn is hidden and handed back to its recycler rather than removed, and comes back under the
+ * very same handle at the next spawn.
+ */
+export const unregisterSpawnedUnitFromChunks = (spawnedUnit: unit) => {
+    const membership = state.spawnedMemberships[GetHandleId(spawnedUnit)]
+
+    if (membership !== undefined && leaveChunks(membership)) {
+        state.spawnedCount--
+    }
+}
+
+/** For a spawned unit that is really removed, a caster shot at the end of its flight: nothing kept */
+export const forgetSpawnedUnitInChunks = (spawnedUnit: unit) => {
+    unregisterSpawnedUnitFromChunks(spawnedUnit)
+    delete state.spawnedMemberships[GetHandleId(spawnedUnit)]
 }
 
 const buildTiers = () => {
@@ -447,21 +607,47 @@ export const rebuildContactChunks = () => {
     buildTiers()
     state.isInitialized = true
 
-    state.memberships = {}
+    // the chunks they sat in are gone with the old tiers, so every membership starts over
+    for (const [_, membership] of pairs(state.memberships)) {
+        membership.count = 0
+    }
+
+    for (const [_, membership] of pairs(state.spawnedMemberships)) {
+        membership.count = 0
+    }
+
     state.monsterCount = 0
+    state.spawnedCount = 0
     state.entryCount = 0
 
     for (const [_, monster] of pairs(udg_monsters)) {
         registerMonsterInChunks(monster)
     }
 
+    // a spawned monster cannot describe itself: what it was told to walk is kept for this moment
+    for (const [_, membership] of pairs(state.spawnedMemberships)) {
+        const entry = membership.entry
+
+        if (entry !== undefined) {
+            registerSpawnedUnitInChunks(
+                entry.unit,
+                udg_spawned_monsters[entry.id]?.getImmolationRadius() ?? entry.reach,
+                membership.spawnedX1,
+                membership.spawnedY1,
+                membership.spawnedX2,
+                membership.spawnedY2,
+                membership.spawnedLabel
+            )
+        }
+    }
+
     state.lastRebuildDuration = os.clock() - startTime
     state.isFirstRegistrationDone = true
 
     print(
-        `Monsters contact check registration done. ${state.monsterCount} monster units on the map, ` +
-            `${state.entryCount} entries in ${state.tiers.length} tiers, ` +
-            `${Math.floor(state.lastRebuildDuration * 1000 + 0.5)} ms. ` +
+        `Monsters contact check registration done. ${state.monsterCount} monster units on the map ` +
+            `and ${state.spawnedCount} spawned ones, ${state.entryCount} entries in ` +
+            `${state.tiers.length} tiers, ${Math.floor(state.lastRebuildDuration * 1000 + 0.5)} ms. ` +
             `The monsters of a level to come register as it starts.`
     )
 }
@@ -522,7 +708,7 @@ export const forEachMonsterAround = (
     toX: number,
     toY: number,
     heroRadius: number,
-    visit: (monster: Monster) => void
+    visit: (entry: ChunkEntry) => void
 ) => {
     for (let tierIndex = 0; tierIndex < state.tiers.length; tierIndex++) {
         const tier = state.tiers[tierIndex]
@@ -540,9 +726,9 @@ export const forEachMonsterAround = (
                 }
 
                 for (let i = 0; i < bucket.count; i++) {
-                    const monster = bucket.monsters[i]
+                    const entry = bucket.entries[i]
 
-                    monster && visit(monster)
+                    entry && visit(entry)
                 }
             }
         }
@@ -582,9 +768,11 @@ export const getContactChunkStats = () => {
     }
 
     lines[0] =
-        `Monsters: ${state.monsterCount} registered, ${monstersWithUnit} with a unit on the map ` +
-        `(${untouchableMonsters} of them without immolation, so untouchable), ${definedMonsters} defined in all`
-    lines[1] =
+        `Monsters: ${state.monsterCount} registered = ${monstersWithUnit} with a unit on the map - ` +
+        `${untouchableMonsters} untouchable (no immolation, so no contact to find), ` +
+        `out of ${definedMonsters} defined in all the levels`
+    lines[1] = `Spawned monsters: ${state.spawnedCount} registered, on the line each was told to walk`
+    lines[2] =
         `Tiers: ${state.tiers.length}, entries: ${state.entryCount}, ` +
         `padded with their reach only (the hero size and its ${MAX_SWEPT_STEP} step are asked for), ` +
         `last rebuild: ${Math.floor(state.lastRebuildDuration * 1000 + 0.5)} ms`
@@ -619,38 +807,179 @@ export const getContactChunkStats = () => {
  * uses it at runtime: it is there to catch a monster moved in a way its movement class does not
  * describe, which is the one mistake that would cost a contact.
  */
+/** Whether the unit of a registered thing really stands in one of the chunks it was put in */
+const isStandingInItsOwnChunks = (membership: Membership) => {
+    const entry = membership.entry
+
+    if (entry === undefined || membership.count === 0 || GetUnitTypeId(entry.unit) === 0) {
+        return true
+    }
+
+    const x = GetUnitX(entry.unit)
+    const y = GetUnitY(entry.unit)
+
+    for (let tierIndex = 0; tierIndex < state.tiers.length; tierIndex++) {
+        const bucket = getContactChunkBucket(tierIndex, x, y)
+
+        if (bucket === undefined) {
+            continue
+        }
+
+        for (let i = 0; i < bucket.count; i++) {
+            if (bucket.entries[i] === entry) {
+                return true
+            }
+        }
+    }
+
+    return false
+}
+
+const AUDIT_WATCH_PERIOD = 1
+
+const auditWatch = {
+    isOn: false,
+    isTimerStarted: false,
+    /** How many offenders of each kind, refilled at every pass */
+    counts: {} as { [label: string]: number },
+    labels: [] as string[],
+    labelCount: 0,
+}
+
+const countOffender = (label: string) => {
+    if (auditWatch.counts[label] === undefined) {
+        auditWatch.counts[label] = 0
+        auditWatch.labels[auditWatch.labelCount] = label
+        auditWatch.labelCount++
+    }
+
+    auditWatch.counts[label]++
+}
+
+/**
+ * Puts a spawned monster back in the chunks, from the line it was told to walk AND from where it
+ * really stands: whatever moved it there is not something this index knows how to follow.
+ */
+const repairSpawnedUnit = (membership: Membership) => {
+    const entry = membership.entry
+
+    if (entry === undefined || GetUnitTypeId(entry.unit) === 0) {
+        return
+    }
+
+    if (leaveChunks(membership)) {
+        state.spawnedCount--
+    }
+
+    shape.count = 0
+    shape.padding = entry.reach
+    areaBuilder.addSegment(membership.spawnedX1, membership.spawnedY1, membership.spawnedX2, membership.spawnedY2)
+    areaBuilder.addPoint(GetUnitX(entry.unit), GetUnitY(entry.unit))
+
+    if (joinChunks(membership, entry.unit, entry.reach, entry.kind, entry.id, undefined)) {
+        state.spawnedCount++
+    }
+}
+
+/** How many things are not standing in their own chunks, counted by kind into auditWatch */
+const countOffenders = (repair: boolean) => {
+    for (let i = 0; i < auditWatch.labelCount; i++) {
+        auditWatch.counts[auditWatch.labels[i]] = 0
+    }
+
+    let total = 0
+
+    for (const [_, monster] of pairs(udg_monsters)) {
+        const membership = state.memberships[monster.getId()]
+
+        if (monster.u !== undefined && membership !== undefined && !isStandingInItsOwnChunks(membership)) {
+            countOffender(monster.getContactAreaLabel())
+            total++
+
+            // its own position is part of what it describes, so registering it again is the repair
+            repair && registerMonsterInChunks(monster)
+        }
+    }
+
+    for (const [_, membership] of pairs(state.spawnedMemberships)) {
+        if (!isStandingInItsOwnChunks(membership)) {
+            countOffender(membership.spawnedLabel)
+            total++
+
+            repair && repairSpawnedUnit(membership)
+        }
+    }
+
+    return total
+}
+
+const watchPass = () => {
+    if (!auditWatch.isOn) {
+        return
+    }
+
+    const total = countOffenders(true)
+
+    // nothing is said while nothing is wrong: this runs for a whole game
+    if (total === 0) {
+        return
+    }
+
+    let byKind = ''
+
+    for (let i = 0; i < auditWatch.labelCount; i++) {
+        const label = auditWatch.labels[i]
+
+        if (auditWatch.counts[label] > 0) {
+            byKind =
+                byKind === ''
+                    ? `${label} ${auditWatch.counts[label]}`
+                    : `${byKind}, ${label} ${auditWatch.counts[label]}`
+        }
+    }
+
+    print(`Contact chunks audit: ${total} monsters outside their chunks (${byKind}), put back in`)
+}
+
+/**
+ * Watches the index instead of being asked once: every second, and only when something is wrong,
+ * it tells how many monsters are not standing in their own chunks and of what kind - and puts them
+ * back in, so that whatever moved them costs at most one second of a wrong area rather than a hole
+ * for the whole game. Meant to be left on for a whole game while playing every level of a map.
+ */
+export const setContactChunksAuditWatch = (enabled: boolean) => {
+    auditWatch.isOn = enabled
+
+    if (enabled && !auditWatch.isTimerStarted) {
+        auditWatch.isTimerStarted = true
+        createTimer(AUDIT_WATCH_PERIOD, true, watchPass)
+    }
+}
+
+export const isContactChunksAuditWatched = () => auditWatch.isOn
+
 export const auditContactChunks = () => {
     const offenders: string[] = []
 
     for (const [_, monster] of pairs(udg_monsters)) {
         const membership = state.memberships[monster.getId()]
 
-        if (monster.u === undefined || membership === undefined || membership.count === 0) {
-            continue
-        }
-
-        const x = GetUnitX(monster.u)
-        const y = GetUnitY(monster.u)
-        let isFound = false
-
-        for (let tierIndex = 0; tierIndex < state.tiers.length && !isFound; tierIndex++) {
-            const bucket = getContactChunkBucket(tierIndex, x, y)
-
-            if (bucket === undefined) {
-                continue
-            }
-
-            for (let i = 0; i < bucket.count; i++) {
-                if (bucket.monsters[i] === monster) {
-                    isFound = true
-                    break
-                }
-            }
-        }
-
-        if (!isFound) {
+        if (monster.u !== undefined && membership !== undefined && !isStandingInItsOwnChunks(membership)) {
             offenders[offenders.length] =
-                `  monster ${monster.getId()} (${monster.constructor.name}) at ${Math.floor(x)}, ${Math.floor(y)}`
+                `  monster ${monster.getId()} (${monster.constructor.name}) at ` +
+                `${Math.floor(GetUnitX(monster.u))}, ${Math.floor(GetUnitY(monster.u))}`
+        }
+    }
+
+    for (const [handleId, membership] of pairs(state.spawnedMemberships)) {
+        if (!isStandingInItsOwnChunks(membership)) {
+            const entry = membership.entry
+
+            offenders[offenders.length] =
+                `  spawned monster ${handleId} at ` +
+                `${Math.floor(GetUnitX(entry!.unit))}, ${Math.floor(GetUnitY(entry!.unit))}, told to walk ` +
+                `${Math.floor(membership.spawnedX1)}, ${Math.floor(membership.spawnedY1)} -> ` +
+                `${Math.floor(membership.spawnedX2)}, ${Math.floor(membership.spawnedY2)}`
         }
     }
 
