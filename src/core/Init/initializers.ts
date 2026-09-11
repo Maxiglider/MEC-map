@@ -25,6 +25,7 @@ import { init_Trig_Allways_day } from '../08_GAME/Init_game/Allways_day'
 import { init_Heroes } from '../08_GAME/Init_game/Heroes'
 import { initNoSelectionCircle } from '../08_GAME/Init_game/No_selection_circle'
 import { initSelectUnit } from '../08_GAME/select_unit'
+import { initAsyncSlideInput } from '../Async_slide/AsyncSlideInput'
 import { init_customUI } from '../DisablingInterface/EnableDisableInterface'
 import { init_doubleKill } from '../Double_heroes/double_kill'
 import { init_shortcurt_cancelRedo } from '../Keyboard_shortcuts/Cancel_redo'
@@ -42,6 +43,7 @@ export const initializers = () => {
     initContactChunks() // before any monster unit exists: each of them registers itself as it appears
     initAsyncHeroSync() // the channel a contact is told through, ready before any hero can touch one
     initContactCheck() // what finds the contacts of every hero, the immolation being gone
+    initAsyncSlideInput() // the local cursor and click an async slide is steered with
     init_StartAndEnd()
     initViewAllHideAll()
     initNoSelectionCircle()

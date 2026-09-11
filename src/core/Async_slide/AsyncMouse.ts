@@ -1,9 +1,9 @@
 import { GetLocZ } from 'Utils/LocationUtils'
 import { createTimer } from 'Utils/mapUtils'
-import { arrayPush } from '../../01_libraries/Basic_functions'
-import { Natives } from '../../wc3_natives_unsecured/Natives'
-import { getLocalMousePosition } from '../hero-effect-common'
+import { arrayPush } from '../01_libraries/Basic_functions'
+import { Natives } from '../wc3_natives_unsecured/Natives'
 import { getFullScreenFrameParent, getScreenWidth } from './FrameParent'
+import { getLocalMousePosition } from './HeroEffect'
 import { world2Screen } from './Screen2World'
 
 /**

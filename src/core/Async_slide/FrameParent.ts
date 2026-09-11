@@ -1,5 +1,5 @@
-import { getFullscreenParent } from '../../DisablingInterface/EnableDisableInterface'
-import { Natives } from '../../wc3_natives_unsecured/Natives'
+import { getFullscreenParent } from '../DisablingInterface/EnableDisableInterface'
+import { Natives } from '../wc3_natives_unsecured/Natives'
 
 /**
  * Which parent the lattice and the catchers hang from. It decides two things at once:

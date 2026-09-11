@@ -3,9 +3,9 @@ import { Timer } from 'w3ts'
 import { getUdgEscapers } from '../../../globals'
 import { Constants } from '../01_libraries/Constants'
 import { TurnOnSlide } from '../07_TRIGGERS/Slide_and_CheckTerrain_triggers/To_turn_on_slide'
-import { getAsyncMousePosition, setAsyncMouseActive } from './async/AsyncMouse'
-import { screen2World } from './async/Screen2World'
-import { getMousePosition, isTestingLeftClicks } from './hero-effect-common'
+import { getAsyncMousePosition, setAsyncMouseActive } from './AsyncMouse'
+import { getMousePosition, isTestingLeftClicks } from './HeroEffect'
+import { screen2World } from './Screen2World'
 
 /**
  * Made for the slide: on ice the hero is carried along whatever the player does, and all that is

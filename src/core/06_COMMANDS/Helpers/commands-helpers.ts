@@ -3,10 +3,10 @@ import { getUdgMonsterTypes, getUdgTerrainTypes } from '../../../../globals'
 import { createPoint } from '../../../Utils/Point'
 import { Escaper } from '../../04_STRUCTURES/Escaper/Escaper'
 import { MonsterType } from '../../04_STRUCTURES/Monster/MonsterType'
-import { setAsyncMouseActive } from '../../Test/async/AsyncMouse'
-import { getAutoTurnMode } from '../../Test/hero-effect-auto-turn'
-import { isTestingLeftClicks, setMouseTrackingEnabled } from '../../Test/hero-effect-common'
-import { setNetworkClickListeningEnabled } from '../../Test/hero-effect-on-network'
+import { setAsyncMouseActive } from '../../Async_slide/AsyncMouse'
+import { getAutoTurnMode } from '../../Async_slide/AutoTurn'
+import { isTestingLeftClicks, setMouseTrackingEnabled } from '../../Async_slide/HeroEffect'
+import { setNetworkClickListeningEnabled } from '../../Async_slide/NetworkClick'
 
 export const snapPatrolsToSlideOffsetMap: { [mt: string]: { angle: number; offset: number } | null } = {}
 const snappedHistoryMap: { [historyId: string]: { x: number | undefined; y: number | undefined } } = {}

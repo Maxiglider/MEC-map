@@ -1,8 +1,8 @@
 import { createEvent } from 'Utils/mapUtils'
 import { getUdgEscapers } from '../../../globals'
 import { Natives } from '../wc3_natives_unsecured/Natives'
-import { getAutoTurnMode, setAutoTurnSteering } from './hero-effect-auto-turn'
-import { isTestingLeftClicks, takeLastLocalClickTime } from './hero-effect-common'
+import { getAutoTurnMode, setAutoTurnSteering } from './AutoTurn'
+import { isTestingLeftClicks, takeLastLocalClickTime } from './HeroEffect'
 
 /**
  * Right click moves the shared effect for everybody: EVENT_PLAYER_MOUSE_DOWN is a synchronized

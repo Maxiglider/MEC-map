@@ -1,15 +1,10 @@
 import { createTimer } from 'Utils/mapUtils'
 import { getUdgEscapers } from '../../../globals'
 import { arrayPush } from '../01_libraries/Basic_functions'
-import { getAsyncMousePosition, initAsyncMouse } from './async/AsyncMouse'
-import { getFullScreenFrameParent, getScreenWidth } from './async/FrameParent'
-import { initScreen2World, screen2World } from './async/Screen2World'
-import {
-    getLocalMousePosition,
-    isTestingLeftClicks,
-    setHeroEffectPosition,
-    setLastLocalClickTime,
-} from './hero-effect-common'
+import { getAsyncMousePosition, initAsyncMouse } from './AsyncMouse'
+import { getFullScreenFrameParent, getScreenWidth } from './FrameParent'
+import { getLocalMousePosition, isTestingLeftClicks, setHeroEffectPosition, setLastLocalClickTime } from './HeroEffect'
+import { initScreen2World, screen2World } from './Screen2World'
 
 /**
  * Clicking moves this effect instantly, on the screen of the clicking player only. Fully
@@ -401,7 +396,7 @@ const initAfterMapStart = () => {
     createTimer(STEP_DELAY, false, initClickCatcher)
 }
 
-export const init_HeroEffectLocallyAsync = () => {
+export const initAsyncSlideInput = () => {
     // what tells the contacts and finds them is started by initializers(): it is what a game runs
     // on now, not a test of one
     createTimer(INIT_DELAY, false, initAfterMapStart)
