@@ -7,8 +7,8 @@ import { forEachMonsterAround, MAX_SWEPT_STEP } from '../../04_STRUCTURES/Monste
 import { applyContact, CONTACT_KIND, sendAsyncContact } from './AsyncHeroSync'
 
 /**
- * Finds what a hero touches, by hand: the hero of an async player, and every hero of the game once
- * setContactCheckEnabledForEveryHero() is told to.
+ * Finds what a hero touches, by hand, which is how a contact is found at all: the monsters carry no
+ * immolation any more (see IMMOLATION_SYSTEM_ENABLED), so this answers for every hero of the game.
  *
  * A hero sliding as an effect no longer carries its invisible unit around, so the immolation of
  * the monsters has nothing to burn: the contact has to be looked for. Only the machine owning that
@@ -43,15 +43,16 @@ const CONTACT_REPEAT_CHECKS = Math.floor(1 / CONTACT_CHECK_PERIOD)
 /** Names one thing touched with a single number. No handle id ever comes close to it. */
 const CONTACT_KEY_KIND_FACTOR = 0x100000000
 
-const state = { isInitialized: false, isEnabledForEveryHero: false, checkCount: 0 }
+const state = { isInitialized: false, isEnabledForEveryHero: true, checkCount: 0 }
 
 /**
- * Gives the check every hero rather than the ones an effect carries, for good: the contacts of a
- * hero walking as a unit are looked for the same way, on every machine, even though the immolation
- * of the monsters could have burned its invisible unit.
+ * Whether the check answers for every hero or only for the ones an effect carries. It answers for
+ * all of them, which is how a game runs now that the monsters carry no immolation - see
+ * IMMOLATION_SYSTEM_ENABLED.
  *
- * The immolation is left running: turn it off (e2e test "immolationOff") to have this check alone
- * decide, or both roads lead to the same handler and every contact is handled twice.
+ * Turning it off leaves the walking heroes to the immolation of the engine, which has to be handed
+ * out again (e2e test "immolationOn") or nothing will find their contacts at all. Both on at once
+ * lead to the same handler, and every contact is then handled twice.
  */
 export const setContactCheckEnabledForEveryHero = (enabled: boolean) => {
     state.isEnabledForEveryHero = enabled
@@ -310,7 +311,7 @@ const isCheckedHere = (escaper: Escaper) => {
     return state.isEnabledForEveryHero
 }
 
-export const initAsyncContactCheck = () => {
+export const initContactCheck = () => {
     if (state.isInitialized) {
         return
     }

@@ -1,6 +1,6 @@
 import { Text } from '../../01_libraries/Text'
 import { setImmolationSystemEnabled } from '../../04_STRUCTURES/Monster/Immolation_system'
-import { setContactCheckEnabledForEveryHero } from '../async/AsyncContactCheck'
+import { setContactCheckEnabledForEveryHero } from '../../08_GAME/Contact/ContactCheck'
 import { E2EAction, E2ETest } from './base/e2e-tests-base'
 
 /**

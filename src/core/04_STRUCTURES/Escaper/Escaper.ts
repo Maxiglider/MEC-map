@@ -22,6 +22,7 @@ import {
     HERO_ROTATION_SPEED,
     HERO_ROTATION_TIME_FOR_MAXIMUM_SPEED,
 } from '../../07_TRIGGERS/Slide_and_CheckTerrain_triggers/SlidingMax'
+import { HeroMovementState, sendAsyncHeroDeath, sendAsyncTerrainChange } from '../../08_GAME/Contact/AsyncHeroSync'
 import { reviveTrigManager } from '../../08_GAME/Death/A_hero_dies_check_if_all_dead_and_sounds'
 import { HERO_START_ANGLE } from '../../08_GAME/Init_game/Heroes'
 import { MessageHeroDies } from '../../08_GAME/Init_game/Message_heroDies'
@@ -31,7 +32,6 @@ import { DisableInterface, EnableInterface } from '../../DisablingInterface/Enab
 import { FollowMouse } from '../../Follow_mouse/Follow_mouse'
 import { SimpleFollowMouse } from '../../Follow_mouse/Follow_mouse_simple'
 import { KeyboardShortcutArray } from '../../Keyboard_shortcuts/KeyboardShortcutArray'
-import { HeroMovementState, sendAsyncHeroDeath, sendAsyncTerrainChange } from '../../Test/async/AsyncHeroSync'
 import { Natives } from '../../wc3_natives_unsecured/Natives'
 import { Level } from '../Level/Level'
 import { DEPART_PAR_DEFAUT } from '../Level/StartAndEnd'

@@ -19,6 +19,8 @@ import { ReinitTerrains } from '../07_TRIGGERS/Triggers_to_modify_terrains/Reini
 import { ReinitTerrainsPositions } from '../07_TRIGGERS/Triggers_to_modify_terrains/Reinit_terrains_position_Change_variations_and_ut_at_beginning'
 import { init_Apm } from '../08_GAME/Apm_clics_par_minute/Apm'
 import { init_cameraPositionAtStart } from '../08_GAME/Camera_reset/Camera_position_at_start'
+import { initAsyncHeroSync } from '../08_GAME/Contact/AsyncHeroSync'
+import { initContactCheck } from '../08_GAME/Contact/ContactCheck'
 import { init_Trig_Allways_day } from '../08_GAME/Init_game/Allways_day'
 import { init_Heroes } from '../08_GAME/Init_game/Heroes'
 import { initNoSelectionCircle } from '../08_GAME/Init_game/No_selection_circle'
@@ -38,6 +40,8 @@ export const initializers = () => {
     init_terrain_limit_variables()
     initArrays()
     initContactChunks() // before any monster unit exists: each of them registers itself as it appears
+    initAsyncHeroSync() // the channel a contact is told through, ready before any hero can touch one
+    initContactCheck() // what finds the contacts of every hero, the immolation being gone
     init_StartAndEnd()
     initViewAllHideAll()
     initNoSelectionCircle()

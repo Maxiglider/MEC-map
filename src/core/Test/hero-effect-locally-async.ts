@@ -1,8 +1,6 @@
 import { createTimer } from 'Utils/mapUtils'
 import { getUdgEscapers } from '../../../globals'
 import { arrayPush } from '../01_libraries/Basic_functions'
-import { initAsyncContactCheck } from './async/AsyncContactCheck'
-import { initAsyncHeroSync } from './async/AsyncHeroSync'
 import { getAsyncMousePosition, initAsyncMouse } from './async/AsyncMouse'
 import { getFullScreenFrameParent, getScreenWidth } from './async/FrameParent'
 import { initScreen2World, screen2World } from './async/Screen2World'
@@ -380,8 +378,7 @@ const initAfterMapStart = () => {
 }
 
 export const init_HeroEffectLocallyAsync = () => {
-    initAsyncHeroSync() // ready before any hero can die
-    initAsyncContactCheck() // an effect cannot be immolated, so its contacts are looked for
-
+    // what tells the contacts and finds them is started by initializers(): it is what a game runs
+    // on now, not a test of one
     createTimer(INIT_DELAY, false, initAfterMapStart)
 }

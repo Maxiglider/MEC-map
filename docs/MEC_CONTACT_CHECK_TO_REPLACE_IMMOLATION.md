@@ -1,10 +1,18 @@
 # Replacing the Warcraft III immolation with MEC's own contact check
 
-Status: **implemented and measured.** The runtime switches, the e2e tests and the chunk index all
-exist (`src/core/04_STRUCTURES/Monster/ContactChunks.ts`, driven by `-contactChunks`), monsters of
-the levels, spawned monsters and caster shots alike. With 24 heroes on Mumu the check costs **+0.6 ms
-per frame where the immolation costs +2.6 ms** - four times cheaper, with better lows (see
-[Why](#why)). Still open: the default value of `IMMOLATION_SYSTEM_ENABLED`.
+Status: **done, and the way a game runs.** The monsters carry no immolation ability any more
+(`IMMOLATION_SYSTEM_ENABLED` is `false`) and MEC's own check answers for every hero, sliding or
+walking, through the chunk index of `src/core/04_STRUCTURES/Monster/ContactChunks.ts` (driven by
+`-contactChunks`). With 24 heroes on Mumu it costs **+0.6 ms per frame where the immolation cost
++2.6 ms** - four times cheaper, with better lows (see [Why](#why)).
+
+The two systems can still be swapped at runtime to compare them: the e2e tests `immolationOn` /
+`immolationOff` hand the ability out or take it back, and `contactCheckOn` / `contactCheckOff` widen
+or narrow what the check answers for. Running both at once means every contact is handled twice.
+
+Left over, now that nothing burns: the invisible unit that followed the hero exists only to have
+been burnt, and `InvisUnit_is_getting_damage`'s damage event no longer fires - only the handler it
+carries is still called, by the check. Neither is in anybody's way, so neither has been removed yet.
 
 ## Why
 
@@ -17,7 +25,7 @@ bonus, a cleared mob, a terrain-save event.
 Two reasons to replace it:
 
 1. **A hero sliding in async mode is an effect**, and nothing can immolate an effect. That is why
-   `src/core/Test/async/AsyncContactCheck.ts` already exists: it measures the very same radii by
+   `src/core/08_GAME/Contact/ContactCheck.ts` already existed for them: it measures the very same radii by
    hand for those heroes.
 2. **The immolation is expensive**, even with nobody to burn - and the check that replaces it is
    cheaper, as the measurements below say.
@@ -103,7 +111,7 @@ the comparisons that need to be closer than that. What they say:
   unit on the map (`udg_monsters` for the levels, `udg_spawned_monster_units` for the spawned
   ones), temporarily disabled monsters excepted. Two call sites read the flag:
   `NewImmobileMonsterForPlayer` (so monsters born later get none) and `Monster.temporarilyEnable`.
-- **`AsyncContactCheck.ts`** (`src/core/Test/async/`) — the check itself, every
+- **`ContactCheck.ts`** (`src/core/08_GAME/Contact/`) — the check itself, every
   `CONTACT_CHECK_PERIOD` (0.02 s): swept-segment distance against the monsters of the chunks the
   hero stands in, the spawned monsters, and the power circles of the other heroes
   (`Constants.COOP_REVIVE_DIST`). One permanent `ContactContext` per hero, so nothing is allocated
@@ -120,7 +128,7 @@ the comparisons that need to be closer than that. What they say:
   region), `MonsterSimplePatrol` (its line), `MonsterMultiplePatrols` (its polyline, closed in
   `normal` mode) and `MonsterTeleport` (its stops, `WAIT` and `HIDE` skipped).
 - **`-contactChunks`** (admin) — `stats`, `audit`, `rebuild`, `tiers <size> [<size> ...]`.
-- **`applyContact(escaperId, kind, id)`** (`src/core/Test/async/AsyncHeroSync.ts`) — what a contact
+- **`applyContact(escaperId, kind, id)`** (`src/core/08_GAME/Contact/AsyncHeroSync.ts`) — what a contact
   does, which is the handler the immolation used to call. Both roads lead to it.
 - **e2e tests** (`src/core/Test/e2e-tests/`): `immolationOff` / `immolationOn`,
   `contactCheckOn` / `contactCheckOff`, plus `activateAllLevels` / `activateFirstLevelOnly` to load
@@ -362,5 +370,12 @@ and 9M natives today.
    ladder needed no tuning: on Mumu every monster fits tier 0 (512 units), nothing is promoted, and
    the worst chunk holds 14 of the 780 units of the heaviest level.
 3. ~~Monster spawns and caster shots~~ done, on the line each mob is told to walk.
-4. Only then: `IMMOLATION_SYSTEM_ENABLED` flipped to `false` by default, and the immolation
-   abilities dropped from the monster types.
+4. ~~`IMMOLATION_SYSTEM_ENABLED` flipped to `false` by default~~ done, together with the check
+   answering for every hero by default. What starts it also moved out of `init_Test` into
+   `initializers()`: it is what finds the contacts of a game now, not a test of one.
+5. ~~Moved out of `Test`~~ done: the check and the channel it tells a contact through live in
+   `src/core/08_GAME/Contact/`, and the check is named for what it does rather than for the async
+   slide it was born in. What stays under `Test/async/` is the input experiment - the mouse lattice,
+   the screen-to-world projection - which is one.
+6. Left for later: the invisible unit of the hero and the damage event it was built for, which
+   nothing burns any more.

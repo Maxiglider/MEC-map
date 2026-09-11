@@ -2,15 +2,17 @@ import { udg_monsters, udg_spawned_monster_units, udg_spawned_monsters } from '.
 import type { MonsterType } from './MonsterType'
 
 /**
- * The immolation is how the engine notices that a hero touched a monster: every monster unit
- * carries an immolation ability whose radius is the collision radius of its monster type, and the
- * invisible unit following the hero takes the damage (see InvisUnit_is_getting_damage).
+ * The immolation is how the engine used to notice that a hero touched a monster: every monster unit
+ * carried an immolation ability whose radius is the collision radius of its monster type, and the
+ * invisible unit following the hero took the damage (see InvisUnit_is_getting_damage).
  *
- * This is the state a normal game runs in. A hero sliding in async mode is an effect, which nothing
- * can immolate, so AsyncContactCheck measures the very same radii by hand instead - the e2e tests
- * "immolationOff" / "immolationOn" flip the system at runtime to compare both.
+ * MEC finds its contacts itself now (ContactCheck), so no monster is given that ability any
+ * more: an immolation radius is a number MEC reads to know how big a monster is, not something the
+ * engine applies. The e2e tests "immolationOn" / "immolationOff" hand it out again at runtime, to
+ * compare the two - they are what the measurements of
+ * docs/MEC_CONTACT_CHECK_TO_REPLACE_IMMOLATION.md were taken with.
  */
-export const IMMOLATION_SYSTEM_ENABLED = true
+export const IMMOLATION_SYSTEM_ENABLED = false
 
 let isEnabled = IMMOLATION_SYSTEM_ENABLED
 
