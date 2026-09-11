@@ -7,25 +7,30 @@ import { Natives } from '../../wc3_natives_unsecured/Natives'
 /**
  * What the machine of an async player tells the others about its hero.
  *
- * While the hero is an effect, only that machine knows where it really is: it decides, the others
- * replay. BlzSendSyncData carries the decision, and the event it raises fires on every machine in
- * the same game turn, which is what turns a local truth into synchronized state.
+ * While the hero is an effect, only that machine knows where it really is, and it moves it alone:
+ * the slide never waits for the network. The others replay. BlzSendSyncData carries what they need,
+ * and the event it raises fires on every machine in the same game turn, which is what turns a local
+ * truth into synchronized state.
  *
- * Three kinds of packets:
- *  - POSITION, ten times a second, so the others keep a true picture,
+ * The kinds of packets:
+ *  - POSITION, ten times a second: everything the others need to carry the movement on by
+ *    themselves, slide speed and rotation speed included. A slide terrain or a static slide
+ *    changes nothing else, so they travel no other way,
+ *  - TERRAIN, the one moment the slide waits: where it ends on walkable ground or on a death
+ *    terrain that does not forgive. It carries no conclusion: every machine, the sender included,
+ *    runs the very same check at the position and with the state it carries, and the map being
+ *    the same for everybody, they reach the same conclusion,
  *  - DEATH, the moment this machine sees the hero die, so it dies at the same spot everywhere,
  *  - CONTACT, whenever the hero touches something. Its consequences change the game itself, from
  *    a score to a revived ally, so they cannot be drawn by the machine that noticed alone,
- *  - TERRAIN, whenever the terrain under the hero changes. It carries no terrain of its own: the
- *    others run the very same check at the position it carries, and the map being the same for
- *    everybody, they reach the same conclusion. That one packet therefore covers the start of a
- *    slide, a change of slide terrain and the return to walkable ground alike.
+ *  - EVENT, what the others should see or hear about without it deciding anything: the hooks of a
+ *    terrain change, an effect of the god mode.
  */
 const POSITION_PREFIX = 'MEC_AHP'
 const DEATH_PREFIX = 'MEC_AHD'
 const TERRAIN_PREFIX = 'MEC_AHT'
 const CONTACT_PREFIX = 'MEC_AHC'
-const STATIC_SLIDE_PREFIX = 'MEC_AHS'
+const EVENT_PREFIX = 'MEC_AHE'
 const FIELD_SEPARATOR = '|'
 
 /** Ten a second: the packets travel at network speed whatever the rate, so a higher one would only
@@ -40,7 +45,11 @@ const POSITION_PERIOD = 0.1
  *    relative value would drift, an absolute one corrects itself at every packet,
  *  - turnPerPeriod, the current angular speed. The slide accelerates its turns, so without it a
  *    receiver would restart that acceleration from its own value and draw another curve,
- *  - the vertical state and the distance travelled per period, as for a death.
+ *  - the vertical state, as for a death,
+ *  - slideSpeed and rotationSpeed, which the terrain and the static slides under the hero change
+ *    on its own machine only,
+ *  - terrainTypeId, the terrain the hero was last seen on (0 for none): its gravity and whether it
+ *    lets the hero turn, and the state a replayed check starts from.
  */
 export type HeroMovementState = {
     x: number
@@ -51,8 +60,10 @@ export type HeroMovementState = {
     speedZ: number
     lastZ: number
     oldDiffZ: number
-    slideMovePerPeriod: number
+    slideSpeed: number
+    rotationSpeed: number
     turnPerPeriod: number
+    terrainTypeId: number
 }
 
 const state = { isInitialized: false, sequence: 0 }
@@ -62,7 +73,8 @@ const encode = (escaperId: number, sequence: number, movement: HeroMovementState
     string.format(
         `%d${FIELD_SEPARATOR}%d${FIELD_SEPARATOR}%.2f${FIELD_SEPARATOR}%.2f${FIELD_SEPARATOR}%.2f` +
             `${FIELD_SEPARATOR}%.2f${FIELD_SEPARATOR}%.2f${FIELD_SEPARATOR}%.4f${FIELD_SEPARATOR}%.2f` +
-            `${FIELD_SEPARATOR}%.4f${FIELD_SEPARATOR}%.4f${FIELD_SEPARATOR}%.4f`,
+            `${FIELD_SEPARATOR}%.4f${FIELD_SEPARATOR}%.2f${FIELD_SEPARATOR}%.4f${FIELD_SEPARATOR}%.4f` +
+            `${FIELD_SEPARATOR}%d`,
         escaperId,
         sequence,
         movement.x,
@@ -73,11 +85,13 @@ const encode = (escaperId: number, sequence: number, movement: HeroMovementState
         movement.speedZ,
         movement.lastZ,
         movement.oldDiffZ,
-        movement.slideMovePerPeriod,
-        movement.turnPerPeriod
+        movement.slideSpeed,
+        movement.rotationSpeed,
+        movement.turnPerPeriod,
+        movement.terrainTypeId
     )
 
-const decode = (data: string) => {
+const decodeNumbers = (data: string) => {
     const fields: number[] = []
 
     // gmatch hands its captures back as a multiple return, which has to be destructured
@@ -85,7 +99,13 @@ const decode = (data: string) => {
         fields[fields.length] = tonumber(field) ?? 0
     }
 
-    if (fields.length < 12) {
+    return fields
+}
+
+const decode = (data: string) => {
+    const fields = decodeNumbers(data)
+
+    if (fields.length < 14) {
         return undefined
     }
 
@@ -101,8 +121,10 @@ const decode = (data: string) => {
             speedZ: fields[7],
             lastZ: fields[8],
             oldDiffZ: fields[9],
-            slideMovePerPeriod: fields[10],
-            turnPerPeriod: fields[11],
+            slideSpeed: fields[10],
+            rotationSpeed: fields[11],
+            turnPerPeriod: fields[12],
+            terrainTypeId: fields[13],
         },
     }
 }
@@ -114,6 +136,14 @@ const decode = (data: string) => {
  * machine agrees on as long as they create their handles in step.
  */
 export const CONTACT_KIND = { levelMonster: 0, spawnedMonster: 1, powerCircle: 2 }
+
+/** What a hero sliding as an effect lets the others see or hear about */
+export const ASYNC_HERO_EVENT = {
+    /** the hooks of a terrain change, which belong to whoever wrote them and may touch the game */
+    terrainChanged: 0,
+    godModeTouchedDeathTerrain: 1,
+    godModeLeftStaticSlide: 2,
+}
 
 const findContactUnit = (kind: number, id: number) => {
     if (kind === CONTACT_KIND.levelMonster) {
@@ -173,11 +203,7 @@ export const initAsyncHeroSync = () => {
     })
 
     registerSyncEvent(CONTACT_PREFIX, data => {
-        const fields: number[] = []
-
-        for (const [field] of string.gmatch(data, `[^${FIELD_SEPARATOR}]+`)) {
-            fields[fields.length] = tonumber(field) ?? 0
-        }
+        const fields = decodeNumbers(data)
 
         if (fields.length < 3) {
             return
@@ -186,20 +212,14 @@ export const initAsyncHeroSync = () => {
         applyContact(fields[0], fields[1], fields[2])
     })
 
-    registerSyncEvent(STATIC_SLIDE_PREFIX, data => {
-        const packet = decode(data)
-        const trailing = decodeTrailingNumbers(data)
+    registerSyncEvent(EVENT_PREFIX, data => {
+        const fields = decodeNumbers(data)
 
-        packet &&
-            trailing &&
-            getUdgEscapers()
-                .get(packet.escaperId)
-                ?.applyAsyncStaticSlideChange(
-                    packet.sequence,
-                    packet.movement,
-                    trailing.staticSlideId,
-                    trailing.isEntering
-                )
+        if (fields.length < 6) {
+            return
+        }
+
+        getUdgEscapers().get(fields[0])?.applyAsyncHeroEvent(fields[1], fields[2], fields[3], fields[4], fields[5])
     })
 
     registerSyncEvent(DEATH_PREFIX, data => {
@@ -233,51 +253,40 @@ export const sendAsyncContact = (escaperId: number, kind: number, id: number) =>
     BlzSendSyncData(CONTACT_PREFIX, string.format(`%d${FIELD_SEPARATOR}%d${FIELD_SEPARATOR}%d`, escaperId, kind, id))
 }
 
-/** The two fields a static slide packet carries past its movement state */
-const decodeTrailingNumbers = (data: string) => {
-    const fields: number[] = []
-
-    for (const [field] of string.gmatch(data, `[^${FIELD_SEPARATOR}]+`)) {
-        fields[fields.length] = tonumber(field) ?? 0
-    }
-
-    if (fields.length < 14) {
-        return undefined
-    }
-
-    return { staticSlideId: fields[12], isEntering: fields[13] === 1 }
-}
-
 /**
- * Tells the others which static slide took the hero or let it go, and where it was when that
- * happened. The regions the engine watches only ever see the dummy, which moves at the pace of the
- * position packets: a start laid on a death terrain would kill the hero several checks before its
- * region fires, and an end seen too late lets the slide carry it out of its own lane - where the
- * slide kills whoever leaves.
+ * Tells every machine, this one included, where the slide of the hero ends: they all read the
+ * terrain there, from the state it carries, and hand the hero back to its unit on the same turn.
  */
-export const sendAsyncStaticSlideChange = (
-    escaperId: number,
-    movement: HeroMovementState,
-    staticSlideId: number,
-    isEntering: boolean
-) => {
-    state.sequence++
-
-    BlzSendSyncData(
-        STATIC_SLIDE_PREFIX,
-        encode(escaperId, state.sequence, movement) +
-            FIELD_SEPARATOR +
-            string.format('%d', staticSlideId) +
-            FIELD_SEPARATOR +
-            (isEntering ? '1' : '0')
-    )
-}
-
-/** Tells the others where the terrain changed, so they can see it change at the same place */
 export const sendAsyncTerrainChange = (escaperId: number, movement: HeroMovementState) => {
     state.sequence++
 
     BlzSendSyncData(TERRAIN_PREFIX, encode(escaperId, state.sequence, movement))
+}
+
+/**
+ * Tells every machine, this one included, something to show or to call about the hero. It carries
+ * no movement: the hero goes on exactly as its own machine decided.
+ */
+export const sendAsyncHeroEvent = (
+    escaperId: number,
+    event: number,
+    x: number,
+    y: number,
+    terrainTypeId: number,
+    lastTerrainTypeId: number
+) => {
+    BlzSendSyncData(
+        EVENT_PREFIX,
+        string.format(
+            `%d${FIELD_SEPARATOR}%d${FIELD_SEPARATOR}%.2f${FIELD_SEPARATOR}%.2f${FIELD_SEPARATOR}%d${FIELD_SEPARATOR}%d`,
+            escaperId,
+            event,
+            x,
+            y,
+            terrainTypeId,
+            lastTerrainTypeId
+        )
+    )
 }
 
 /** Only the player owning that hero sends it: they are the only one knowing where it stopped */

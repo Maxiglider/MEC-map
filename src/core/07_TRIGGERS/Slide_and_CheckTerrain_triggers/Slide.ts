@@ -7,6 +7,7 @@ import { Cpm } from 'core/08_GAME/Apm_clics_par_minute/Cpm'
 import { getUdgEscapers, globals } from '../../../../globals'
 import { Escaper } from '../../04_STRUCTURES/Escaper/Escaper'
 import { GetMirrorEscaper } from '../../04_STRUCTURES/Escaper/Escaper_functions'
+import { ASYNC_HERO_EVENT } from '../../08_GAME/Contact/AsyncHeroSync'
 import { GRAVITY_EVERY_N_PERIOD, Gravity } from './Gravity'
 import { MAX_DEGREE_ON_WHICH_SPEED_TABLE_TAKES_CONTROL, SPEED_AT_LEAST_THAN_50_DEGREES } from './SlidingMax'
 
@@ -151,6 +152,9 @@ const initSlideTrigger = () => {
             newY >= globals.MAP_MIN_Y &&
             newY <= globals.MAP_MAX_Y
         ) {
+            // before the static slide below reads it: taken along, or let go, right where it happens
+            escaper.followStaticSlidesOfAsyncHero(newX, newY)
+
             const staticSliding = escaper.getStaticSliding()
 
             if (staticSliding) {
@@ -160,16 +164,14 @@ const initSlideTrigger = () => {
                     if (!escaper.isAlive()) {
                         escaper.refreshCerclePosition()
                     }
-                } else if (escaper.isAsyncStaticSlideChangePending()) {
-                    // Its own machine has already said it reached the end of the lane, and is
-                    // waiting for that word to come back: the slide carries it a little further
-                    // rather than killing it for being out of a lane it is being let out of.
-                    escaper.moveHero(newX, newY, false)
                 } else {
                     staticSliding.removePlayer(escaper.getId())
 
                     if (!escaper.isGodModeOn()) {
                         escaper.kill()
+                    } else if (escaper.isHeroAsEffect()) {
+                        // only its own machine got here: the effect is shown through every machine
+                        escaper.announceAsyncHeroEvent(ASYNC_HERO_EVENT.godModeLeftStaticSlide, newX, newY)
                     } else {
                         EffectUtils.destroyEffect(EffectUtils.addSpecialEffect(Constants.GM_KILLING_EFFECT, newX, newY))
                     }

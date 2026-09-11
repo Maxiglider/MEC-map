@@ -23,9 +23,10 @@ import {
     HERO_ROTATION_TIME_FOR_MAXIMUM_SPEED,
 } from '../../07_TRIGGERS/Slide_and_CheckTerrain_triggers/SlidingMax'
 import {
+    ASYNC_HERO_EVENT,
     HeroMovementState,
     sendAsyncHeroDeath,
-    sendAsyncStaticSlideChange,
+    sendAsyncHeroEvent,
     sendAsyncTerrainChange,
 } from '../../08_GAME/Contact/AsyncHeroSync'
 import { reviveTrigManager } from '../../08_GAME/Death/A_hero_dies_check_if_all_dead_and_sounds'
@@ -93,6 +94,9 @@ const PARKED_HERO_EFFECT_Z = -1000
  */
 const ASYNC_SILENCE_TIMEOUT = 0.5
 
+/** The god mode effects of an async hero are told at most this often: the check seeing them runs fifty times a second */
+const ASYNC_HERO_EVENT_MIN_INTERVAL = 0.1
+
 export function IsHeroCollisionSizeValid(collisionSize: number): boolean {
     return collisionSize >= 0 && collisionSize <= 200 && collisionSize % 5 === 0
 }
@@ -120,10 +124,12 @@ export class Escaper extends EscaperMake {
     private isAsyncSlideEnabled = false
     /** os.clock() of the last packet received about this hero, to notice its owner going quiet */
     private lastAsyncPacketTime = 0
-    /** While replaying a terrain packet, so that the replay does not announce itself again */
+    /** While replaying a terrain packet: the synchronized check reads the hero, just this once */
     private isApplyingAsyncTerrain = false
-    /** One announcement of a static slide entry at a time, the check running fifty times a second */
-    private isAsyncStaticSlidePending = false
+    /** Between the moment this machine stops the hero where its slide ends and the moment every machine agrees on it */
+    private isHeroHandBackPending = false
+    /** os.clock() of the last event of each kind this machine told about its hero */
+    private lastAsyncHeroEventTimes: number[] = []
 
     private invisUnit?: unit
     private collisionSize: number
@@ -883,7 +889,14 @@ export class Escaper extends EscaperMake {
             // its owner sends, and to nothing else. The owner keeps being asked while it waits for
             // that packet to come back, as whatever killed it is still there, and killing on the
             // second ask would be killing on one machine alone.
-            if (this.isAsyncControlledHere() && !this.isHeroEffectFrozen && this.isAlive()) {
+            // Nor while its slide ends: the hero is about to be a unit again on every machine, and
+            // whatever kills it finds that unit there.
+            if (
+                this.isAsyncControlledHere() &&
+                !this.isHeroEffectFrozen &&
+                !this.isHeroHandBackPending &&
+                this.isAlive()
+            ) {
                 this.isHeroEffectFrozen = true
 
                 sendAsyncHeroDeath(this.escaperId, this.getHeroMovementState())
@@ -909,8 +922,10 @@ export class Escaper extends EscaperMake {
         speedZ: this.getSpeedZ(),
         lastZ: this.getLastZ(),
         oldDiffZ: this.getOldDiffZ(),
-        slideMovePerPeriod: this.getSlideMovePerPeriod(),
+        slideSpeed: this.slideSpeed,
+        rotationSpeed: this.rotationSpeed,
         turnPerPeriod: this.getSlideCurrentTurnPerPeriod(),
+        terrainTypeId: this.lastTerrainType?.getTerrainTypeId() ?? 0,
     })
 
     /** Puts this hero exactly where the machine of its player says it is */
@@ -926,10 +941,12 @@ export class Escaper extends EscaperMake {
         this.setSpeedZ(movement.speedZ)
         this.setLastZ(movement.lastZ)
         this.setOldDiffZ(movement.oldDiffZ)
-        // a plain field: this runs on the receiving machines only, ten times a second, so it must
-        // not create nor destroy a handle. Their sequences would drift apart, and MEC keys tables
-        // on handle ids.
-        this.slideMovePerPeriod = movement.slideMovePerPeriod
+        // plain fields only: this runs on the receiving machines ten times a second, so it must not
+        // create nor destroy a handle. Their sequences would drift apart, and MEC keys tables on
+        // handle ids.
+        this.setSlideSpeed(movement.slideSpeed)
+        this.setRotationSpeed(movement.rotationSpeed)
+        this.lastTerrainType = getUdgTerrainTypes().getByTerrainTypeId(movement.terrainTypeId) ?? undefined
     }
 
     /**
@@ -1161,7 +1178,11 @@ export class Escaper extends EscaperMake {
         this.turnInstantly(angle)
         if (this.slideLastAngleOrder != -1) {
             this.slideLastAngleOrder = this.slideLastAngleOrder + 180
-            SetUnitFacing(this.hero, this.slideLastAngleOrder)
+
+            // not the unit of a hero sliding as an effect, which only its own machine turns now
+            if (!this.isHeroEffectActive) {
+                SetUnitFacing(this.hero, this.slideLastAngleOrder)
+            }
         }
     }
 
@@ -2139,16 +2160,16 @@ export class Escaper extends EscaperMake {
     }
 
     /**
-     * Two reasons to leave the effect where it is: this machine saw the hero die and waits for the
-     * others to agree on the spot, or it stopped hearing from the machine that owns it. Carrying
-     * the movement on would be inventing a path its player never took.
+     * Two reasons to leave the effect where it is: this machine saw the hero die, or its slide end,
+     * and waits for the others to agree on the spot; or it stopped hearing from the machine that
+     * owns it. Carrying the movement on would be inventing a path its player never took.
      */
     private isHeroEffectMovementBlocked = () => {
         if (!this.isHeroEffectActive) {
             return false
         }
 
-        return this.isHeroEffectFrozen || this.isAsyncOwnerSilent()
+        return this.isHeroEffectFrozen || this.isHeroHandBackPending || this.isAsyncOwnerSilent()
     }
 
     /** Purely local: each machine decides for itself whether it is still being told anything */
@@ -2162,148 +2183,130 @@ export class Escaper extends EscaperMake {
     isAsyncControlledElsewhere = () => this.isHeroEffectActive && GetLocalPlayer() !== this.p
 
     /**
-     * A hero sliding as an effect only has its terrain read when its own packet says so, whichever
-     * machine is asking: they all act on the same turn that way. The replay itself is let through.
+     * The synchronized check leaves a hero sliding as an effect alone: the machine of its player
+     * reads the terrain under it by itself, and every machine reads it again only where that
+     * machine hands the hero back. The replay itself is let through.
      */
     shouldSkipTerrainCheck = () => this.isHeroEffectActive && !this.isApplyingAsyncTerrain
 
+    /** Whether this machine stopped the hero where its slide ends, and waits for every machine to agree */
+    isAsyncHandBackPending = () => this.isHeroHandBackPending
+
     /**
-     * Announces a terrain change and asks the caller to stop there.
+     * Stops the hero where its slide ends - on walkable ground, or on a death terrain that does not
+     * forgive - and tells every machine to read the terrain there, this one included.
      *
-     * The machine owning the hero does not act on it either: it waits for its own packet like
-     * everybody else. Acting at once would start the slide, and its timer, turns before the other
-     * machines do the same, and handles created out of step is what a desync is made of.
+     * The one moment the slide waits for the network: what follows belongs to the game (the unit
+     * takes its place back, a death terrain starts its timer), so it has to happen on every machine
+     * on the same turn. Standing still meanwhile, the hero is found there by the packet rather than
+     * dragged back to it.
+     *
+     * To be called before the check changes anything: the packet carries the state the check
+     * started from, which is the one every machine starts its own from.
      */
-    sendAsyncTerrainChangeIfNeeded = () => {
-        if (!this.isAsyncControlledHere() || this.isApplyingAsyncTerrain) {
+    announceAsyncHandBack = () => {
+        if (!this.isAsyncControlledHere() || this.isHeroEffectFrozen || this.isHeroHandBackPending) {
             return
         }
 
-        // What the check itself does first of all: a static slide decides everything under it, so
-        // there is nothing to tell about a terrain nobody is going to read - and every packet
-        // would put the hero back where it was when it left, a round trip earlier.
-        if (this.isStaticSliding()) {
-            return
-        }
-
-        // The same conditions the check itself applies, so that a packet only goes out when it
-        // would have done something: on the ground, on a terrain it was not already on, and on a
-        // deadly one every time, as its tolerance is measured again at each pass.
-        if (this.getHeroFlyHeight() >= 1) {
-            return
-        }
-
-        const currentTerrainType = getUdgTerrainTypes().getTerrainType(this.getHeroX(), this.getHeroY())
-
-        if (!currentTerrainType) {
-            return
-        }
-
-        if (currentTerrainType === this.getLastTerrainType() && currentTerrainType.getKind() !== 'death') {
-            return
-        }
+        this.isHeroHandBackPending = true
 
         sendAsyncTerrainChange(this.escaperId, this.getHeroMovementState())
     }
 
     /**
-     * Whether this machine has told the others that the hero got into a static slide or out of it,
-     * and is waiting for that word to come back. The slide keeps carrying the hero meanwhile, and
-     * must not kill it for leaving a lane it has already asked to be let out of.
+     * Follows the static slides for a hero only this machine knows the place of: the regions the
+     * engine watches only see units, and waiting for the network would carry the hero past the
+     * start of a lane. Nothing is told to the others: a static slide only changes how the hero
+     * moves, and the movement packets carry that.
      */
-    isAsyncStaticSlideChangePending = () => this.isAsyncStaticSlidePending
-
-    /**
-     * Announces the static slide the hero has just slid into, if any.
-     *
-     * The region that grabs a hero is watched by the engine on a unit, and while an effect stands
-     * in, that unit is the dummy - which only moves when a position packet lands. A start laid on
-     * the death terrain it carries the hero over would kill it several checks before the region
-     * ever fires. So the machine owning the hero looks for that area itself, at the pace of the
-     * terrain check, and tells the others where it was when it got in.
-     *
-     * Returns whether the tick belongs to that announcement, in which case the terrain must not be
-     * announced too: both packets carry the movement state of the hero, and the last one to land
-     * wins - putting back the facing the slide had just snapped to its own lane.
-     */
-    sendAsyncStaticSlideChangeIfNeeded = () => {
-        if (!this.isAsyncControlledHere() || this.isApplyingAsyncTerrain) {
-            return false
-        }
-
-        // one is already on its way: the tick is still its own, until it comes back
-        if (this.isAsyncStaticSlidePending) {
-            return true
-        }
-
-        if (!this.isSliding()) {
-            return false
-        }
-
-        const currentStaticSlide = this.getStaticSliding()
-
-        if (currentStaticSlide) {
-            // the end of the ride: seen too late, the slide carries the hero out of its own lane,
-            // and a hero out of the lane of the static slide carrying it is a hero the slide kills
-            const isAtExit =
-                currentStaticSlide.id !== undefined &&
-                currentStaticSlide.areCoordsInExit(this.getHeroX(), this.getHeroY())
-
-            if (isAtExit) {
-                this.isAsyncStaticSlidePending = true
-                sendAsyncStaticSlideChange(this.escaperId, this.getHeroMovementState(), currentStaticSlide.id!, false)
-
-                return true
-            }
-
-            return false
-        }
-
-        const staticSlide = getUdgLevels()
-            .getCurrentLevel(this)
-            .staticSlides.findEntryAtCoords(this.getHeroX(), this.getHeroY())
-
-        if (!staticSlide || staticSlide.id === undefined) {
-            return false
-        }
-
-        this.isAsyncStaticSlidePending = true
-        sendAsyncStaticSlideChange(this.escaperId, this.getHeroMovementState(), staticSlide.id, true)
-
-        return true
-    }
-
-    /** Every machine takes the hero along, or lets it go, at the place its own machine says so */
-    applyAsyncStaticSlideChange = (
-        sequence: number,
-        movement: HeroMovementState,
-        staticSlideId: number,
-        isEntering: boolean
-    ) => {
-        this.isAsyncStaticSlidePending = false
-
-        if (sequence <= this.lastAsyncSequence || !this.isHeroEffectActive) {
+    followStaticSlidesOfAsyncHero = (x: number, y: number) => {
+        if (!this.isAsyncControlledHere() || this.isHeroEffectMovementBlocked()) {
             return
         }
 
-        this.lastAsyncSequence = sequence
-        this.lastAsyncPacketTime = os.clock()
-        this.applyHeroMovementState(movement)
-        this.updateHeroEffect()
+        const currentStaticSlide = this.staticSliding
 
-        const staticSlide = getUdgLevels().getCurrentLevel(this).staticSlides.get(staticSlideId)
+        if (currentStaticSlide) {
+            currentStaticSlide.areCoordsInExit(x, y) && currentStaticSlide.releaseHero(this)
 
-        if (isEntering) {
-            staticSlide?.takeHero(this)
-        } else {
-            staticSlide?.releaseHero(this)
+            return
+        }
+
+        const staticSlide = getUdgLevels().getCurrentLevel(this).staticSlides.findEntryAtCoords(x, y)
+
+        // entered, as the region of the engine sees it: a hero that started to slide while already
+        // standing in that area is not taken along there either
+        if (staticSlide && !staticSlide.areCoordsInEntry(this.heroPos.x, this.heroPos.y)) {
+            staticSlide.takeHero(this)
         }
     }
 
     /**
-     * The terrain changed under the hero of another machine: this one puts it where that change
-     * happened and runs its own check there. Same position and same map, so same conclusions:
-     * slide started, slide terrain changed, or walkable ground reached.
+     * Tells every machine something to show or to call about the hero, from its own machine only.
+     * The god mode effects are paced: the check that sees them runs fifty times a second.
+     */
+    announceAsyncHeroEvent = (
+        event: number,
+        x: number,
+        y: number,
+        terrainType?: TerrainType,
+        lastTerrainType?: TerrainType
+    ) => {
+        if (!this.isAsyncControlledHere()) {
+            return
+        }
+
+        if (event !== ASYNC_HERO_EVENT.terrainChanged) {
+            const now = os.clock()
+
+            if (now - (this.lastAsyncHeroEventTimes[event] ?? -1) < ASYNC_HERO_EVENT_MIN_INTERVAL) {
+                return
+            }
+
+            this.lastAsyncHeroEventTimes[event] = now
+        }
+
+        sendAsyncHeroEvent(
+            this.escaperId,
+            event,
+            x,
+            y,
+            terrainType?.getTerrainTypeId() ?? 0,
+            lastTerrainType?.getTerrainTypeId() ?? 0
+        )
+    }
+
+    /** What its own machine told about the hero, shown or called on every machine on the same turn */
+    applyAsyncHeroEvent = (event: number, x: number, y: number, terrainTypeId: number, lastTerrainTypeId: number) => {
+        if (event === ASYNC_HERO_EVENT.terrainChanged) {
+            const terrainType = getUdgTerrainTypes().getByTerrainTypeId(terrainTypeId)
+
+            if (!terrainType) {
+                return
+            }
+
+            const lastTerrainType = getUdgTerrainTypes().getByTerrainTypeId(lastTerrainTypeId) ?? undefined
+
+            for (const hook of hooks.hooks_onHeroTerrainChange.getHooks()) {
+                hook.execute3(this, terrainType, lastTerrainType)
+            }
+
+            return
+        }
+
+        const effectPath =
+            event === ASYNC_HERO_EVENT.godModeTouchedDeathTerrain
+                ? Constants.GM_TOUCH_DEATH_TERRAIN_EFFECT_STR
+                : Constants.GM_KILLING_EFFECT
+
+        EffectUtils.destroyEffect(EffectUtils.addSpecialEffect(effectPath, x, y))
+    }
+
+    /**
+     * The machine owning the hero stopped it where its slide ends: every machine puts it there and
+     * runs its own check, from the very state that machine had. Same position, same map, same
+     * state, so same conclusions: back on walkable ground, or caught by a death terrain.
      */
     applyAsyncTerrainChange = (sequence: number, movement: HeroMovementState) => {
         if (sequence <= this.lastAsyncSequence || !this.isHeroEffectActive) {
@@ -2315,10 +2318,12 @@ export class Escaper extends EscaperMake {
         this.applyHeroMovementState(movement)
         this.updateHeroEffect()
 
-        // the flag keeps the check from announcing again the very change it is replaying
         this.isApplyingAsyncTerrain = true
         CheckTerrainTrigger.CheckTerrainActions(this.escaperId)
         this.isApplyingAsyncTerrain = false
+
+        // whatever the check concluded, the hero waits no more
+        this.isHeroHandBackPending = false
     }
 
     /**
@@ -2367,7 +2372,12 @@ export class Escaper extends EscaperMake {
         }
 
         this.isHeroEffectActive = false
-        this.isAsyncStaticSlidePending = false // nothing is waiting for an answer any more
+        this.isHeroHandBackPending = false // nothing is waiting for an answer any more
+
+        // taken along by a static slide of this machine alone, if this one owns the hero: the
+        // others never heard of that ride
+        this.staticSliding?.forgetHero(this)
+
         this.parkHeroEffect()
 
         this.heroEffectDummyUnit && ShowUnit(this.heroEffectDummyUnit, false)

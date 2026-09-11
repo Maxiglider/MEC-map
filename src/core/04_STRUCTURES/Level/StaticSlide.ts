@@ -10,6 +10,26 @@ import { Level } from './Level'
 
 type SlideAreaBox = { x1: number; y1: number; x2: number; y2: number }
 
+/**
+ * A region of the engine is made of cells this size, and a rect added to one brings every cell it
+ * overlaps: a hero is in slightly before reaching the rect itself, and a rect thinner than a step
+ * of the slide is still a whole cell deep.
+ */
+const REGION_CELL_SIZE = 32
+
+/** The cells the engine watches for a rect: widened to the grid, and never less than one cell */
+const toRegionCells = (ax: number, ay: number, bx: number, by: number): SlideAreaBox => {
+    const x1 = Math.floor(Math.min(ax, bx) / REGION_CELL_SIZE) * REGION_CELL_SIZE
+    const y1 = Math.floor(Math.min(ay, by) / REGION_CELL_SIZE) * REGION_CELL_SIZE
+
+    return {
+        x1,
+        y1,
+        x2: Math.max(Math.ceil(Math.max(ax, bx) / REGION_CELL_SIZE) * REGION_CELL_SIZE, x1 + REGION_CELL_SIZE),
+        y2: Math.max(Math.ceil(Math.max(ay, by) / REGION_CELL_SIZE) * REGION_CELL_SIZE, y1 + REGION_CELL_SIZE),
+    }
+}
+
 export class StaticSlide {
     private entryBoxes?: SlideAreaBox[]
     private exitBoxes?: SlideAreaBox[]
@@ -192,9 +212,8 @@ export class StaticSlide {
 
     /**
      * Takes a sliding hero along: it turns towards the slide and takes its speed. Called by the
-     * region the engine watches, and by the packet an async hero's machine sends - the region only
-     * ever sees a dummy moving at the pace of those packets, which is far too late for a start
-     * placed on a death terrain.
+     * region the engine watches, and for a hero sliding as an effect by the machine of its player,
+     * the only one knowing where it is: the regions only ever see units.
      */
     takeHero = (escaper: Escaper) => {
         if (!escaper.isSliding() || escaper.isStaticSliding() || this.slidingPlayers.includes(escaper.getEscaperId())) {
@@ -222,6 +241,11 @@ export class StaticSlide {
      * The boxes one of the two areas is made of - a single rect, or the staircase of rects a
      * diagonal one is cut into. Built once and kept: they never move, and they are asked about
      * fifty times a second for a hero whose machine looks for them itself.
+     *
+     * Cut the way the engine cuts them into cells, rather than to the exact rect: a hero sliding as
+     * an effect is taken along and let go by these, and must be so where the region would do it for
+     * its unit. The exact rect of a thin exit is stepped over, and the slide kills a hero that goes
+     * on past its lane.
      */
     private buildAreaBoxes = (ax: number, ay: number, bx: number, by: number): SlideAreaBox[] => {
         if (this.angle % 90 !== 0) {
@@ -229,12 +253,12 @@ export class StaticSlide {
             const regions = createDiagonalRegions(ax, ay, bx, by, 32)
 
             for (const region of regions) {
-                boxes[boxes.length] = {
-                    x1: Math.min(region.topLeft.x, region.bottomRight.x),
-                    y1: Math.min(region.topLeft.y, region.bottomRight.y),
-                    x2: Math.max(region.topLeft.x, region.bottomRight.x),
-                    y2: Math.max(region.topLeft.y, region.bottomRight.y),
-                }
+                boxes[boxes.length] = toRegionCells(
+                    region.topLeft.x,
+                    region.topLeft.y,
+                    region.bottomRight.x,
+                    region.bottomRight.y
+                )
             }
 
             regions.__destroy(true)
@@ -242,14 +266,7 @@ export class StaticSlide {
             return boxes
         }
 
-        return [
-            {
-                x1: Math.min(ax, bx),
-                y1: Math.min(ay, by),
-                x2: Math.max(ax, bx),
-                y2: Math.max(ay, by),
-            },
-        ]
+        return [toRegionCells(ax, ay, bx, by)]
     }
 
     private areCoordsInBoxes = (boxes: SlideAreaBox[], x: number, y: number) => {
@@ -280,7 +297,7 @@ export class StaticSlide {
         return this.areCoordsInBoxes(this.exitBoxes, x, y)
     }
 
-    /** Lets a hero go, wherever the news came from: the region of the engine, or a packet */
+    /** Lets a hero go, wherever the news came from: the region of the engine, or the machine of its player */
     releaseHero = (escaper: Escaper) => {
         if (escaper.getStaticSliding() !== this) {
             return false
@@ -289,6 +306,23 @@ export class StaticSlide {
         this.removePlayer(escaper.getEscaperId())
 
         return true
+    }
+
+    /**
+     * Drops a hero without giving it anything back, speed nor terrain: for a hero whose machine
+     * was the only one to take it along, when its effect gives way to its unit. The others never
+     * heard of that ride, and a membership nobody else has cannot outlive the effect.
+     */
+    forgetHero = (escaper: Escaper) => {
+        const itemIndex = this.slidingPlayers.indexOf(escaper.getEscaperId())
+
+        if (itemIndex !== -1) {
+            this.slidingPlayers.splice(itemIndex, 1)
+        }
+
+        if (escaper.getStaticSliding() === this) {
+            escaper.setStaticSliding(undefined)
+        }
     }
 
     getX1 = () => this.x1
