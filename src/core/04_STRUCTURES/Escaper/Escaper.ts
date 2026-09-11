@@ -22,7 +22,12 @@ import {
     HERO_ROTATION_SPEED,
     HERO_ROTATION_TIME_FOR_MAXIMUM_SPEED,
 } from '../../07_TRIGGERS/Slide_and_CheckTerrain_triggers/SlidingMax'
-import { HeroMovementState, sendAsyncHeroDeath, sendAsyncTerrainChange } from '../../08_GAME/Contact/AsyncHeroSync'
+import {
+    HeroMovementState,
+    sendAsyncHeroDeath,
+    sendAsyncStaticSlideChange,
+    sendAsyncTerrainChange,
+} from '../../08_GAME/Contact/AsyncHeroSync'
 import { reviveTrigManager } from '../../08_GAME/Death/A_hero_dies_check_if_all_dead_and_sounds'
 import { HERO_START_ANGLE } from '../../08_GAME/Init_game/Heroes'
 import { MessageHeroDies } from '../../08_GAME/Init_game/Message_heroDies'
@@ -117,6 +122,8 @@ export class Escaper extends EscaperMake {
     private lastAsyncPacketTime = 0
     /** While replaying a terrain packet, so that the replay does not announce itself again */
     private isApplyingAsyncTerrain = false
+    /** One announcement of a static slide entry at a time, the check running fifty times a second */
+    private isAsyncStaticSlidePending = false
 
     private invisUnit?: unit
     private collisionSize: number
@@ -2015,7 +2022,20 @@ export class Escaper extends EscaperMake {
         }
 
         BlzSetSpecialEffectColorByPlayer(this.heroEffect, Natives.UPlayer(this.baseColorId))
+        this.refreshHeroEffectScale()
         this.parkHeroEffect()
+    }
+
+    /**
+     * The effect is drawn at the size of the hero it stands in for: the scale of its unit when it
+     * has one of its own, and otherwise the scale the map gave its hero type in the editor.
+     */
+    private refreshHeroEffectScale = () => {
+        const scale = this.scale ?? globals.heroBaseScale
+
+        if (this.heroEffect && scale !== undefined) {
+            BlzSetSpecialEffectScale(this.heroEffect, scale)
+        }
     }
 
     /**
@@ -2040,6 +2060,11 @@ export class Escaper extends EscaperMake {
     /**
      * A hero effect draws nothing on the minimap, and the unit it stands in for waits in a corner
      * of the map: without this the player would lose their own dot for the whole slide.
+     *
+     * It is there for that dot and for nothing else. Nothing may listen to it: it only moves when a
+     * position packet lands, ten times a second, so anything the engine would detect through it -
+     * a range, a rect - would be told far too late and at the wrong place. MEC looks for those
+     * itself, at the pace of the terrain check and from the machine that knows where the hero is.
      *
      * It is the invisible unit type, which happens to be a hero one, so the dot looks like the dot
      * of any other slider. Locust keeps the monsters from acquiring and burning it, and keeps it
@@ -2154,6 +2179,13 @@ export class Escaper extends EscaperMake {
             return
         }
 
+        // What the check itself does first of all: a static slide decides everything under it, so
+        // there is nothing to tell about a terrain nobody is going to read - and every packet
+        // would put the hero back where it was when it left, a round trip earlier.
+        if (this.isStaticSliding()) {
+            return
+        }
+
         // The same conditions the check itself applies, so that a packet only goes out when it
         // would have done something: on the ground, on a terrain it was not already on, and on a
         // deadly one every time, as its tolerance is measured again at each pass.
@@ -2172,6 +2204,100 @@ export class Escaper extends EscaperMake {
         }
 
         sendAsyncTerrainChange(this.escaperId, this.getHeroMovementState())
+    }
+
+    /**
+     * Whether this machine has told the others that the hero got into a static slide or out of it,
+     * and is waiting for that word to come back. The slide keeps carrying the hero meanwhile, and
+     * must not kill it for leaving a lane it has already asked to be let out of.
+     */
+    isAsyncStaticSlideChangePending = () => this.isAsyncStaticSlidePending
+
+    /**
+     * Announces the static slide the hero has just slid into, if any.
+     *
+     * The region that grabs a hero is watched by the engine on a unit, and while an effect stands
+     * in, that unit is the dummy - which only moves when a position packet lands. A start laid on
+     * the death terrain it carries the hero over would kill it several checks before the region
+     * ever fires. So the machine owning the hero looks for that area itself, at the pace of the
+     * terrain check, and tells the others where it was when it got in.
+     *
+     * Returns whether the tick belongs to that announcement, in which case the terrain must not be
+     * announced too: both packets carry the movement state of the hero, and the last one to land
+     * wins - putting back the facing the slide had just snapped to its own lane.
+     */
+    sendAsyncStaticSlideChangeIfNeeded = () => {
+        if (!this.isAsyncControlledHere() || this.isApplyingAsyncTerrain) {
+            return false
+        }
+
+        // one is already on its way: the tick is still its own, until it comes back
+        if (this.isAsyncStaticSlidePending) {
+            return true
+        }
+
+        if (!this.isSliding()) {
+            return false
+        }
+
+        const currentStaticSlide = this.getStaticSliding()
+
+        if (currentStaticSlide) {
+            // the end of the ride: seen too late, the slide carries the hero out of its own lane,
+            // and a hero out of the lane of the static slide carrying it is a hero the slide kills
+            const isAtExit =
+                currentStaticSlide.id !== undefined &&
+                currentStaticSlide.areCoordsInExit(this.getHeroX(), this.getHeroY())
+
+            if (isAtExit) {
+                this.isAsyncStaticSlidePending = true
+                sendAsyncStaticSlideChange(this.escaperId, this.getHeroMovementState(), currentStaticSlide.id!, false)
+
+                return true
+            }
+
+            return false
+        }
+
+        const staticSlide = getUdgLevels()
+            .getCurrentLevel(this)
+            .staticSlides.findEntryAtCoords(this.getHeroX(), this.getHeroY())
+
+        if (!staticSlide || staticSlide.id === undefined) {
+            return false
+        }
+
+        this.isAsyncStaticSlidePending = true
+        sendAsyncStaticSlideChange(this.escaperId, this.getHeroMovementState(), staticSlide.id, true)
+
+        return true
+    }
+
+    /** Every machine takes the hero along, or lets it go, at the place its own machine says so */
+    applyAsyncStaticSlideChange = (
+        sequence: number,
+        movement: HeroMovementState,
+        staticSlideId: number,
+        isEntering: boolean
+    ) => {
+        this.isAsyncStaticSlidePending = false
+
+        if (sequence <= this.lastAsyncSequence || !this.isHeroEffectActive) {
+            return
+        }
+
+        this.lastAsyncSequence = sequence
+        this.lastAsyncPacketTime = os.clock()
+        this.applyHeroMovementState(movement)
+        this.updateHeroEffect()
+
+        const staticSlide = getUdgLevels().getCurrentLevel(this).staticSlides.get(staticSlideId)
+
+        if (isEntering) {
+            staticSlide?.takeHero(this)
+        } else {
+            staticSlide?.releaseHero(this)
+        }
     }
 
     /**
@@ -2228,11 +2354,6 @@ export class Escaper extends EscaperMake {
                 // shown after being hidden, which is what gives a locust unit its dot back
                 ShowUnit(this.heroEffectDummyUnit, false)
                 ShowUnit(this.heroEffectDummyUnit, true)
-
-                // What the engine watches is a unit, and the hero's own waits in a corner: ranges
-                // and rects would never see it. The dummy walks where the hero is seen, so it is
-                // the one that answers for this escaper until the unit takes its part again.
-                globals.heroToEscaperHandles[GetHandleId(this.heroEffectDummyUnit)] = this.escaperId
             }
 
             // the unit waits in a corner of the map, and its dot has no business being there
@@ -2246,12 +2367,10 @@ export class Escaper extends EscaperMake {
         }
 
         this.isHeroEffectActive = false
+        this.isAsyncStaticSlidePending = false // nothing is waiting for an answer any more
         this.parkHeroEffect()
 
-        if (this.heroEffectDummyUnit) {
-            ShowUnit(this.heroEffectDummyUnit, false)
-            delete globals.heroToEscaperHandles[GetHandleId(this.heroEffectDummyUnit)]
-        }
+        this.heroEffectDummyUnit && ShowUnit(this.heroEffectDummyUnit, false)
         BlzSetUnitBooleanField(this.hero, UNIT_BF_HERO_HIDE_HERO_MINIMAP_DISPLAY, false)
 
         // the unit takes back the place the effect had led it to
@@ -2265,6 +2384,13 @@ export class Escaper extends EscaperMake {
 
         viewer?.lockCamTarget === this && viewer.resetCamera()
     }
+
+    /**
+     * Whether the hero is standing on the ground. Asked of the hero rather than of its unit: while
+     * an effect stands in, that unit waits in a corner of the map with the fly height it had when
+     * it was parked, so it reads as grounded for the whole slide however high the hero really is.
+     */
+    isHeroOnGround = () => this.getHeroFlyHeight() < 1
 
     /**
      * Plays a sound where the hero is seen. Its unit is parked in a corner of the map while an
@@ -2462,6 +2588,7 @@ export class Escaper extends EscaperMake {
 
     setScale = (scale: number | undefined) => {
         this.scale = scale
+        this.refreshHeroEffectScale() // the effect standing in for the hero grows with it
     }
 
     setGlow = (glow: boolean) => {

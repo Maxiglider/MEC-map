@@ -4,10 +4,15 @@ import { AnglesDiff, arrayPush } from 'core/01_libraries/Basic_functions'
 import { getUdgEscapers } from '../../../../globals'
 import { createDiagonalRegions } from '../../01_libraries/Regions_functions'
 import { Natives } from '../../wc3_natives_unsecured/Natives'
+import type { Escaper } from '../Escaper/Escaper'
 import { Hero2Escaper, IsHero } from '../Escaper/Escaper_functions'
 import { Level } from './Level'
 
+type SlideAreaBox = { x1: number; y1: number; x2: number; y2: number }
+
 export class StaticSlide {
+    private entryBoxes?: SlideAreaBox[]
+    private exitBoxes?: SlideAreaBox[]
     private x1: number
     private y1: number
     private x2: number
@@ -113,26 +118,8 @@ export class StaticSlide {
                             const hero = Natives.UGetTriggerUnit()
                             const escaper = Hero2Escaper(hero)
 
-                            if (
-                                IsHero(hero) &&
-                                escaper &&
-                                escaper.isSliding() &&
-                                !escaper.isStaticSliding() &&
-                                !this.slidingPlayers.includes(escaper.getEscaperId())
-                            ) {
-                                arrayPush(this.slidingPlayers, escaper.getEscaperId())
-                                escaper.setStaticSliding(this)
-
-                                if (this.canTurnAngle) {
-                                    const currentAngle = escaper.getHeroFacing()
-                                    escaper.setRemainingDegreesToTurn(AnglesDiff(this.angle, currentAngle))
-                                } else {
-                                    escaper.setRemainingDegreesToTurn(0)
-                                    escaper.turnInstantly(this.angle)
-                                }
-
-                                this.slidingPlayerPrevSpeed[escaper.getEscaperId()] = escaper.getSlideSpeed()
-                                escaper.setSlideSpeed(this.speed)
+                            if (IsHero(hero) && escaper) {
+                                this.takeHero(escaper)
                             }
                         },
                     ],
@@ -169,8 +156,9 @@ export class StaticSlide {
                     ],
                     actions: [
                         () => {
-                            const hero = Natives.UGetTriggerUnit()
-                            this.removePlayer(Hero2Escaper(hero)?.getEscaperId() || -1)
+                            const escaper = Hero2Escaper(Natives.UGetTriggerUnit())
+
+                            escaper && this.releaseHero(escaper)
                         },
                     ],
                 })
@@ -188,58 +176,7 @@ export class StaticSlide {
 
     // If the point is in either of the start/end regions
     containsPoint = (x: number, y: number) => {
-        const isDiagonal = this.angle % 90 !== 0
-
-        if (isDiagonal) {
-            // First
-            {
-                const regions = createDiagonalRegions(this.x1, this.y1, this.x2, this.y2, 32)
-
-                for (const region of regions) {
-                    const x1 = Math.min(region.topLeft.x, region.bottomRight.x)
-                    const x2 = Math.max(region.topLeft.x, region.bottomRight.x)
-                    const y1 = Math.min(region.topLeft.y, region.bottomRight.y)
-                    const y2 = Math.max(region.topLeft.y, region.bottomRight.y)
-
-                    if (x >= x1 && x <= x2 && y >= y1 && y <= y2) {
-                        return true
-                    }
-                }
-
-                regions.__destroy(true)
-            }
-
-            // Second
-            {
-                const regions = createDiagonalRegions(this.x3, this.y3, this.x4, this.y4, 32)
-
-                for (const region of regions) {
-                    const x1 = Math.min(region.topLeft.x, region.bottomRight.x)
-                    const x2 = Math.max(region.topLeft.x, region.bottomRight.x)
-                    const y1 = Math.min(region.topLeft.y, region.bottomRight.y)
-                    const y2 = Math.max(region.topLeft.y, region.bottomRight.y)
-
-                    if (x >= x1 && x <= x2 && y >= y1 && y <= y2) {
-                        return true
-                    }
-                }
-
-                regions.__destroy(true)
-            }
-
-            return false
-        } else {
-            const x1 = Math.min(this.x1, this.x2)
-            const x2 = Math.max(this.x1, this.x2)
-            const x3 = Math.min(this.x3, this.x4)
-            const x4 = Math.max(this.x3, this.x4)
-            const y1 = Math.min(this.y1, this.y2)
-            const y2 = Math.max(this.y1, this.y2)
-            const y3 = Math.min(this.y3, this.y4)
-            const y4 = Math.max(this.y3, this.y4)
-
-            return (x >= x1 && x <= x2 && y >= y1 && y <= y2) || (x >= x3 && x <= x4 && y >= y3 && y <= y4)
-        }
+        return this.areCoordsInEntry(x, y) || this.areCoordsInExit(x, y)
     }
 
     // If the point is in the sliding region
@@ -251,6 +188,107 @@ export class StaticSlide {
         const y4 = Math.max(this.y1, this.y2, this.y3, this.y4) + 64
 
         return x >= x1 && x <= x4 && y >= y1 && y <= y4
+    }
+
+    /**
+     * Takes a sliding hero along: it turns towards the slide and takes its speed. Called by the
+     * region the engine watches, and by the packet an async hero's machine sends - the region only
+     * ever sees a dummy moving at the pace of those packets, which is far too late for a start
+     * placed on a death terrain.
+     */
+    takeHero = (escaper: Escaper) => {
+        if (!escaper.isSliding() || escaper.isStaticSliding() || this.slidingPlayers.includes(escaper.getEscaperId())) {
+            return false
+        }
+
+        arrayPush(this.slidingPlayers, escaper.getEscaperId())
+        escaper.setStaticSliding(this)
+
+        if (this.canTurnAngle) {
+            const currentAngle = escaper.getHeroFacing()
+            escaper.setRemainingDegreesToTurn(AnglesDiff(this.angle, currentAngle))
+        } else {
+            escaper.setRemainingDegreesToTurn(0)
+            escaper.turnInstantly(this.angle)
+        }
+
+        this.slidingPlayerPrevSpeed[escaper.getEscaperId()] = escaper.getSlideSpeed()
+        escaper.setSlideSpeed(this.speed)
+
+        return true
+    }
+
+    /**
+     * The boxes one of the two areas is made of - a single rect, or the staircase of rects a
+     * diagonal one is cut into. Built once and kept: they never move, and they are asked about
+     * fifty times a second for a hero whose machine looks for them itself.
+     */
+    private buildAreaBoxes = (ax: number, ay: number, bx: number, by: number): SlideAreaBox[] => {
+        if (this.angle % 90 !== 0) {
+            const boxes: SlideAreaBox[] = []
+            const regions = createDiagonalRegions(ax, ay, bx, by, 32)
+
+            for (const region of regions) {
+                boxes[boxes.length] = {
+                    x1: Math.min(region.topLeft.x, region.bottomRight.x),
+                    y1: Math.min(region.topLeft.y, region.bottomRight.y),
+                    x2: Math.max(region.topLeft.x, region.bottomRight.x),
+                    y2: Math.max(region.topLeft.y, region.bottomRight.y),
+                }
+            }
+
+            regions.__destroy(true)
+
+            return boxes
+        }
+
+        return [
+            {
+                x1: Math.min(ax, bx),
+                y1: Math.min(ay, by),
+                x2: Math.max(ax, bx),
+                y2: Math.max(ay, by),
+            },
+        ]
+    }
+
+    private areCoordsInBoxes = (boxes: SlideAreaBox[], x: number, y: number) => {
+        for (const box of boxes) {
+            if (x >= box.x1 && x <= box.x2 && y >= box.y1 && y <= box.y2) {
+                return true
+            }
+        }
+
+        return false
+    }
+
+    /** The area that grabs a sliding hero, which is what the engine watches with a region */
+    areCoordsInEntry = (x: number, y: number) => {
+        if (!this.entryBoxes) {
+            this.entryBoxes = this.buildAreaBoxes(this.x1, this.y1, this.x2, this.y2)
+        }
+
+        return this.areCoordsInBoxes(this.entryBoxes, x, y)
+    }
+
+    /** The area that lets a hero go again, at the end of the ride */
+    areCoordsInExit = (x: number, y: number) => {
+        if (!this.exitBoxes) {
+            this.exitBoxes = this.buildAreaBoxes(this.x3, this.y3, this.x4, this.y4)
+        }
+
+        return this.areCoordsInBoxes(this.exitBoxes, x, y)
+    }
+
+    /** Lets a hero go, wherever the news came from: the region of the engine, or a packet */
+    releaseHero = (escaper: Escaper) => {
+        if (escaper.getStaticSliding() !== this) {
+            return false
+        }
+
+        this.removePlayer(escaper.getEscaperId())
+
+        return true
     }
 
     getX1 = () => this.x1

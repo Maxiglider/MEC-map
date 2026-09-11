@@ -160,6 +160,11 @@ const initSlideTrigger = () => {
                     if (!escaper.isAlive()) {
                         escaper.refreshCerclePosition()
                     }
+                } else if (escaper.isAsyncStaticSlideChangePending()) {
+                    // Its own machine has already said it reached the end of the lane, and is
+                    // waiting for that word to come back: the slide carries it a little further
+                    // rather than killing it for being out of a lane it is being let out of.
+                    escaper.moveHero(newX, newY, false)
                 } else {
                     staticSliding.removePlayer(escaper.getId())
 

@@ -1,6 +1,5 @@
 import { EffectUtils } from 'Utils/EffectUtils'
 import { createEvent } from 'Utils/mapUtils'
-import { IsOnGround } from 'core/01_libraries/Basic_functions'
 import { Constants } from 'core/01_libraries/Constants'
 import { Escaper } from 'core/04_STRUCTURES/Escaper/Escaper'
 import { GetMirrorEscaper } from 'core/04_STRUCTURES/Escaper/Escaper_functions'
@@ -10,7 +9,7 @@ import { TerrainTypeDeath } from 'core/04_STRUCTURES/TerrainType/TerrainTypeDeat
 import { TerrainTypeSlide } from 'core/04_STRUCTURES/TerrainType/TerrainTypeSlide'
 import { TerrainTypeWalk } from 'core/04_STRUCTURES/TerrainType/TerrainTypeWalk'
 import { hooks } from 'core/API/GeneralHooks'
-import { getUdgEscapers, getUdgTerrainTypes } from '../../../../globals'
+import { getUdgEscapers, getUdgLevels, getUdgTerrainTypes } from '../../../../globals'
 import { AutoContinueAfterSliding } from './Auto_continue_after_sliding'
 
 const TOLERANCE_ANGLE_DIFF = 5
@@ -106,7 +105,12 @@ const initCheckTerrainTrigger = () => {
         // the terrain under a position that only approximates the truth, or acting on it before
         // the others do, is what tore the game apart.
         if (escaper.shouldSkipTerrainCheck()) {
-            escaper.sendAsyncTerrainChangeIfNeeded()
+            // one announcement per tick, and the static slide comes first: it is the one thing the
+            // engine cannot see for itself, and the terrain packet landing after it would put back
+            // the facing the slide had just snapped to its lane
+            if (!escaper.sendAsyncStaticSlideChangeIfNeeded()) {
+                escaper.sendAsyncTerrainChangeIfNeeded()
+            }
 
             return
         }
@@ -132,7 +136,7 @@ const initCheckTerrainTrigger = () => {
             return
         }
 
-        if (IsOnGround(hero)) {
+        if (escaper.isHeroOnGround()) {
             if (
                 !currentTerrainType ||
                 (lastTerrainType === currentTerrainType && currentTerrainType.getKind() !== 'death')
@@ -186,6 +190,23 @@ const initCheckTerrainTrigger = () => {
                         }
 
                         tempRayonTolerance = tempRayonTolerance + TOLERANCE_RAYON_DIFF
+                    }
+                }
+
+                // A static slide carries the hero over the death terrain its two areas often sit
+                // right on, and those areas are rects the engine watches a unit with. While an
+                // effect stands in for that unit, what the engine watches is the dummy, which only
+                // moves when a position packet lands: the hero would be dead several checks before
+                // the static slide takes over, and dead again where it lets go, the packet putting
+                // it back into the area it was let go in. So the death waits as long as the hero is
+                // sliding over an area a static slide owns, at either of its ends.
+                if (touchedByDeathTerrain && escaper.isSliding()) {
+                    const staticSlideArea = getUdgLevels()
+                        .getCurrentLevel(escaper)
+                        .staticSlides.getStaticSlideFromPoint(x, y)
+
+                    if (staticSlideArea) {
+                        return
                     }
                 }
 

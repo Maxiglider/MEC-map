@@ -10,6 +10,17 @@ export class StaticSlideArray extends BaseArray<StaticSlide> {
         this.level = level
     }
 
+    /** The static slide whose entry area holds this point, if the level has one there */
+    findEntryAtCoords = (x: number, y: number) => {
+        for (const [_, staticSlide] of pairs(this.getAll())) {
+            if (staticSlide.areCoordsInEntry(x, y)) {
+                return staticSlide
+            }
+        }
+
+        return undefined
+    }
+
     new = (
         x1: number,
         y1: number,

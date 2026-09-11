@@ -4,7 +4,6 @@ import {
     ApplyAngleSymmetry,
     ForceAngleBetween0And360,
     IsLastOrderPause,
-    IsOnGround,
     StopUnit,
 } from 'core/01_libraries/Basic_functions'
 import { Constants } from 'core/01_libraries/Constants'
@@ -73,7 +72,7 @@ const initTurnOnSlide = () => {
         }
 
         //turn hero
-        if (IsOnGround(slider)) {
+        if (escaper.isHeroOnGround()) {
             const terrainType = escaper.getLastTerrainType()
             if (terrainType instanceof TerrainTypeSlide) {
                 canTurn = terrainType.getCanTurn()

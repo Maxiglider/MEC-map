@@ -25,6 +25,7 @@ const POSITION_PREFIX = 'MEC_AHP'
 const DEATH_PREFIX = 'MEC_AHD'
 const TERRAIN_PREFIX = 'MEC_AHT'
 const CONTACT_PREFIX = 'MEC_AHC'
+const STATIC_SLIDE_PREFIX = 'MEC_AHS'
 const FIELD_SEPARATOR = '|'
 
 /** Ten a second: the packets travel at network speed whatever the rate, so a higher one would only
@@ -185,6 +186,22 @@ export const initAsyncHeroSync = () => {
         applyContact(fields[0], fields[1], fields[2])
     })
 
+    registerSyncEvent(STATIC_SLIDE_PREFIX, data => {
+        const packet = decode(data)
+        const trailing = decodeTrailingNumbers(data)
+
+        packet &&
+            trailing &&
+            getUdgEscapers()
+                .get(packet.escaperId)
+                ?.applyAsyncStaticSlideChange(
+                    packet.sequence,
+                    packet.movement,
+                    trailing.staticSlideId,
+                    trailing.isEntering
+                )
+    })
+
     registerSyncEvent(DEATH_PREFIX, data => {
         const packet = decode(data)
 
@@ -214,6 +231,46 @@ export const applyContact = (escaperId: number, kind: number, id: number) => {
  */
 export const sendAsyncContact = (escaperId: number, kind: number, id: number) => {
     BlzSendSyncData(CONTACT_PREFIX, string.format(`%d${FIELD_SEPARATOR}%d${FIELD_SEPARATOR}%d`, escaperId, kind, id))
+}
+
+/** The two fields a static slide packet carries past its movement state */
+const decodeTrailingNumbers = (data: string) => {
+    const fields: number[] = []
+
+    for (const [field] of string.gmatch(data, `[^${FIELD_SEPARATOR}]+`)) {
+        fields[fields.length] = tonumber(field) ?? 0
+    }
+
+    if (fields.length < 14) {
+        return undefined
+    }
+
+    return { staticSlideId: fields[12], isEntering: fields[13] === 1 }
+}
+
+/**
+ * Tells the others which static slide took the hero or let it go, and where it was when that
+ * happened. The regions the engine watches only ever see the dummy, which moves at the pace of the
+ * position packets: a start laid on a death terrain would kill the hero several checks before its
+ * region fires, and an end seen too late lets the slide carry it out of its own lane - where the
+ * slide kills whoever leaves.
+ */
+export const sendAsyncStaticSlideChange = (
+    escaperId: number,
+    movement: HeroMovementState,
+    staticSlideId: number,
+    isEntering: boolean
+) => {
+    state.sequence++
+
+    BlzSendSyncData(
+        STATIC_SLIDE_PREFIX,
+        encode(escaperId, state.sequence, movement) +
+            FIELD_SEPARATOR +
+            string.format('%d', staticSlideId) +
+            FIELD_SEPARATOR +
+            (isEntering ? '1' : '0')
+    )
 }
 
 /** Tells the others where the terrain changed, so they can see it change at the same place */

@@ -218,7 +218,7 @@ const CasterTryToShoot = () => {
                     }
 
                     //trouver temps idéal
-                    if (escaper.getHeroFlyHeight() < 1) {
+                    if (escaper.isHeroOnGround()) {
                         tempsIdeal = TrouverTempsIdeal(tempsMax)
                     } else {
                         tempsIdeal = -1
