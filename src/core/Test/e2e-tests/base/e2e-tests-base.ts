@@ -1,8 +1,9 @@
 import { getUdgEscapers } from '../../../../../globals'
-import { errorHandler } from '../../../../Utils/mapUtils'
-import { SUCCESS_TEXT_COLORCODE, Text } from '../../../01_libraries/Text'
 import { ServiceManager } from '../../../../Services'
+import { errorHandler } from '../../../../Utils/mapUtils'
 import { ClearText } from '../../../01_libraries/Basic_functions'
+import { SUCCESS_TEXT_COLORCODE, Text } from '../../../01_libraries/Text'
+import type { Escaper } from '../../../04_STRUCTURES/Escaper/Escaper'
 
 const sounds = {
     start: 'Sound/Interface/BattleNetTick.flac',
@@ -133,6 +134,21 @@ function registerTest(test: E2ETest) {
     e2eTests.set(test.shortName, test)
 }
 
+/** Every test that has been registered, named as the -e2e command wants them */
+function listTests(escaper: Escaper) {
+    const p = escaper.getPlayer()
+
+    Text.mkP(p, `E2E tests (-e2e run <name>):`)
+
+    for (const [shortName, test] of e2eTests) {
+        Text.mkP(p, `  ${shortName}|r - ${test.name} (${test.actions.length} steps)`)
+    }
+
+    if (currentTest) {
+        Text.mkP(p, `currently running: ${currentTest.shortName}`)
+    }
+}
+
 function startTest(name: string) {
     const test = e2eTests.get(name)
     if (!test) {
@@ -195,6 +211,7 @@ function nextStep() {
 export const e2e = {
     setSpeed,
     registerTest,
+    listTests,
     startTest,
     stop,
     pause,

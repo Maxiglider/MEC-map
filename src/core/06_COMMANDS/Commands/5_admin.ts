@@ -1053,7 +1053,7 @@ export const initExecuteCommandMax = () => {
         name: 'e2e',
         alias: [],
         group,
-        argDescription: '[run] <testName> | speed <percentage> | stop | pause | resume',
+        argDescription: '[run] <testName> | ls | speed <percentage> | stop | pause | resume',
         description: 'Handles the e2e tests.',
         cb: ({ param1, param2, nbParam }, escaper) => {
             if (nbParam > 2 || nbParam === 0) {
@@ -1061,6 +1061,13 @@ export const initExecuteCommandMax = () => {
             }
 
             switch (param1) {
+                case 'ls':
+                    if (nbParam !== 1) {
+                        return USAGE
+                    }
+                    e2e.listTests(escaper)
+                    break
+
                 case 'stop':
                     if (nbParam !== 1) {
                         return USAGE
