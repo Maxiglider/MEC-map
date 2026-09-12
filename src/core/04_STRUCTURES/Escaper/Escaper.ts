@@ -545,9 +545,9 @@ export class Escaper extends EscaperMake {
     }
 
     addEffectMeteor = () => {
-        if (!this.meteorEffect && this.hero) {
-            this.meteorEffect = EffectUtils.addSpecialEffectTarget(METEOR_EFFECT, this.hero, 'hand right')
-            // made on every machine as well, like the one above: picking a meteor up is heard by all of them
+        if (!this.meteorHandEffect && this.hero) {
+            // on every machine, picking a meteor up being heard by all of them; the one attached to the
+            // hand of the unit is made by refreshMeteorEffects, if the unit is what is seen
             this.meteorHandEffect = EffectUtils.addSpecialEffect(METEOR_EFFECT, 0, 0)
             this.refreshMeteorEffects()
         }
@@ -565,14 +565,32 @@ export class Escaper extends EscaperMake {
         }
     }
 
-    /** Shows the carried meteor on whichever stands for the hero: its unit, or its effect (see meteorHandEffect) */
+    /**
+     * Shows the carried meteor on whichever stands for the hero: its unit, or its effect (see
+     * meteorHandEffect). An effect attached to a unit cannot be made unseen - neither its alpha nor
+     * the transparency of the unit touch it - so the one on the hand of the unit is taken away while
+     * the effect stands in, and made again once the unit is seen. Only called on every machine at once:
+     * a meteor picked up, a hero becoming an effect or a unit again.
+     */
     private refreshMeteorEffects = () => {
-        this.meteorEffect && BlzSetSpecialEffectAlpha(this.meteorEffect, this.isHeroEffectActive ? 0 : 255)
-
         if (this.isHeroEffectActive) {
+            if (this.meteorEffect) {
+                // too small to see its death play out
+                BlzSetSpecialEffectScale(this.meteorEffect, 0)
+                EffectUtils.destroyEffect(this.meteorEffect)
+                delete this.meteorEffect
+            }
+
             this.updateMeteorHandEffect()
-        } else {
-            this.meteorHandEffect && BlzSetSpecialEffectPosition(this.meteorHandEffect, 0, 0, PARKED_HERO_EFFECT_Z)
+
+            return
+        }
+
+        this.meteorHandEffect && BlzSetSpecialEffectPosition(this.meteorHandEffect, 0, 0, PARKED_HERO_EFFECT_Z)
+
+        // still carried: the hand effect lives as long as the meteor does
+        if (this.meteorHandEffect && !this.meteorEffect && this.hero) {
+            this.meteorEffect = EffectUtils.addSpecialEffectTarget(METEOR_EFFECT, this.hero, 'hand right')
         }
     }
 
