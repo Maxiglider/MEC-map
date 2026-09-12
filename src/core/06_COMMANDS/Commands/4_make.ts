@@ -794,17 +794,21 @@ export const initExecuteCommandMake = () => {
                 return true
             }
 
-            escaper
-                .getMakingLevel()
-                .setDebugRegionsVisible(
-                    param2.length > 0
-                        ? S2B(param1) && S2B(param2)
-                            ? 'on_monsters'
-                            : 'off'
-                        : S2B(param1)
-                          ? 'on'
-                          : 'off'
-                )
+            const mode =
+                param2.length > 0 ? (S2B(param1) && S2B(param2) ? 'on_monsters' : 'off') : S2B(param1) ? 'on' : 'off'
+
+            // Kept for every level, so that the next one to start draws its lines too: until now it
+            // was set on the level being made only, which lost it when it ended.
+            Level.debugRegionsMode = mode
+
+            escaper.getMakingLevel().setDebugRegionsVisible(mode)
+
+            for (const [_, level] of pairs(getUdgLevels().getAll())) {
+                if (level.isActivated() && level !== escaper.getMakingLevel()) {
+                    level.setDebugRegionsVisible(mode)
+                }
+            }
+
             Text.mkP(escaper.getPlayer(), `debugRegions ${S2B(param1) ? 'on' : 'off'}`)
             return true
         },

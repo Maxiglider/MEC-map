@@ -461,18 +461,21 @@ export const initExecuteCommandCheat = () => {
                 return true
             }
 
-            const targetHero = getUdgEscapers().get(n)?.getHero()
+            const targetEscaper = getUdgEscapers().get(n)
+            const targetHero = targetEscaper?.getHero()
             const hero = escaper.getHero()
 
-            if (!targetHero || !hero) {
+            if (!targetEscaper || !targetHero || !hero) {
                 return true
             }
 
-            const x = GetUnitX(targetHero)
-            const y = GetUnitY(targetHero)
+            // Where every machine agrees the target is: its unit waits in a corner of the map while it
+            // slides async, and where its effect is seen differs from one machine to another.
+            const x = targetEscaper.getSyncedHeroX()
+            const y = targetEscaper.getSyncedHeroY()
 
             escaper.moveHero(x, y)
-            escaper.turnInstantly(GetUnitFacing(targetHero))
+            escaper.turnInstantly(targetEscaper.getSyncedHeroFacing())
             escaper.coopReviveHero()
 
             const escaperSecond = GetMirrorEscaper(escaper)

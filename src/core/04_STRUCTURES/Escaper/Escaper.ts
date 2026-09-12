@@ -116,6 +116,12 @@ export class Escaper extends EscaperMake {
      * would move a synchronized object with a local value.
      */
     private heroPos = { x: 0, y: 0, facing: 0, flyHeight: 0 }
+    /**
+     * Where the hero sliding as an effect was in the last packet about it: the same on every machine,
+     * its own included, which heroPos is not - its own machine is ahead, the others extrapolate. A
+     * packet period behind, but what anything acting on the game has to read to find the hero.
+     */
+    private syncedHeroPos = { x: 0, y: 0, facing: 0 }
     /** Between the moment this machine sees the hero die and the moment every machine agrees on it */
     private isHeroEffectFrozen = false
     /** Sequence of the last packet applied, so that a late one cannot undo a newer one */
@@ -949,8 +955,30 @@ export class Escaper extends EscaperMake {
         staticSlidePreviousSpeed: this.staticSliding?.getPreviousSlideSpeed(this.escaperId) ?? 0,
     })
 
+    /** Where every machine agrees the hero is, from a packet every machine applies on the same turn */
+    private recordSyncedHeroPos = (movement: HeroMovementState) => {
+        this.syncedHeroPos.x = movement.x
+        this.syncedHeroPos.y = movement.y
+        this.syncedHeroPos.facing = movement.facing
+    }
+
+    /**
+     * Where the hero is for anything acting on the game: the unit when it is one, and the last packet
+     * about the effect when it slides as one. getHeroX is where each machine sees it, which differs
+     * from one machine to another during an async slide, and moving another hero there would move it
+     * to a different place on each of them.
+     */
+    getSyncedHeroX = () => (this.isHeroEffectActive ? this.syncedHeroPos.x : this.hero ? GetUnitX(this.hero) : 0)
+
+    getSyncedHeroY = () => (this.isHeroEffectActive ? this.syncedHeroPos.y : this.hero ? GetUnitY(this.hero) : 0)
+
+    getSyncedHeroFacing = () =>
+        this.isHeroEffectActive ? this.syncedHeroPos.facing : this.hero ? GetUnitFacing(this.hero) : 0
+
     /** Puts this hero exactly where the machine of its player says it is */
     private applyHeroMovementState = (movement: HeroMovementState) => {
+        this.recordSyncedHeroPos(movement)
+
         this.heroPos.x = movement.x
         this.heroPos.y = movement.y
         this.heroPos.facing = movement.facing
@@ -989,6 +1017,7 @@ export class Escaper extends EscaperMake {
         // dot: that one is a unit, so it moves from the packet everywhere, itself included.
         if (GetLocalPlayer() === this.p) {
             this.moveHeroEffectDummyUnit(movement.x, movement.y)
+            this.recordSyncedHeroPos(movement)
 
             return
         }
@@ -2385,6 +2414,11 @@ export class Escaper extends EscaperMake {
             this.heroPos.y = this.getHeroY()
             this.heroPos.facing = this.getHeroFacing()
             this.heroPos.flyHeight = this.getHeroFlyHeight()
+
+            // every machine agrees on it until the first packet
+            this.syncedHeroPos.x = this.heroPos.x
+            this.syncedHeroPos.y = this.heroPos.y
+            this.syncedHeroPos.facing = this.heroPos.facing
 
             this.isHeroEffectActive = true
             this.lastAsyncPacketTime = os.clock()

@@ -8,6 +8,8 @@ import { Text } from 'core/01_libraries/Text'
 import { hooks } from 'core/API/GeneralHooks'
 import { Timer } from 'w3ts'
 import { getUdgEscapers, getUdgLevels, getUdgTerrainTypes } from '../../../../globals'
+import { DefineDrawLineType, DrawLine } from '../../01_libraries/Draw_lines'
+import { createDiagonalRegions } from '../../01_libraries/Regions_functions'
 import { ChangeTerrainType } from '../../07_TRIGGERS/Modify_terrain_Functions/Modify_terrain_functions'
 import { MecHookArray } from '../../API/MecHookArray'
 import type { CasterType } from '../Caster/CasterType'
@@ -15,6 +17,7 @@ import type { Escaper } from '../Escaper/Escaper'
 import { MeteorArray } from '../Meteor/MeteorArray'
 import { MonsterArray } from '../Monster/MonsterArray'
 import { MonsterMultiplePatrols } from '../Monster/MonsterMultiplePatrols'
+import { MonsterNoMove } from '../Monster/MonsterNoMove'
 import { MonsterSimplePatrol } from '../Monster/MonsterSimplePatrol'
 import type { MonsterType } from '../Monster/MonsterType'
 import { MonsterSpawnArray } from '../MonsterSpawn/MonsterSpawnArray'
@@ -28,9 +31,6 @@ import { TriggerArray } from './Triggers'
 import type { VisibilityModifier } from './VisibilityModifier'
 import { VisibilityModifierArray } from './VisibilityModifierArray'
 import { checkPointReviveHeroes } from './checkpointReviveHeroes_function'
-import { MonsterNoMove } from '../Monster/MonsterNoMove'
-import { DefineDrawLineType, DrawLine } from '../../01_libraries/Draw_lines'
-import { createDiagonalRegions } from '../../01_libraries/Regions_functions'
 
 type ITempTerrainTypeMap = {
     [x_y: string]:
@@ -58,6 +58,12 @@ export class Level {
     public id: number = -1
     private lights: lightning[] = []
     debugRegionsVisible: 'on' | 'off' | 'on_monsters' = 'off'
+    /**
+     * What "-debugRegions" last asked for, kept for every level: a level draws its own lines, and
+     * loses them when it ends, so the next one to start draws them again from this - rather than
+     * waiting for the command to be typed again.
+     */
+    static debugRegionsMode: 'on' | 'off' | 'on_monsters' = 'off'
 
     visibilities: VisibilityModifierArray
     private resetVisiblitiesAtStart: boolean // if true, all visibilities from previous levels are disabled at level start
@@ -156,6 +162,12 @@ export class Level {
         }
 
         this.isActivatedB = activ
+
+        // once its monsters stand on the map, which "on_monsters" draws the paths of
+        if (activ) {
+            this.setDebugRegionsVisible(Level.debugRegionsMode)
+        }
+
         ThemeUtils.applyGameTheme()
         SlideAfterDarkUtils.applyToLevel(this.id)
     }
