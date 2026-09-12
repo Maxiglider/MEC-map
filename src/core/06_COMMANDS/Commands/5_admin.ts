@@ -34,6 +34,7 @@ import { AfkMode } from '../../08_GAME/Afk_mode/Afk_mode'
 import { Globals } from '../../09_From_old_Worldedit_triggers/globals_variables_and_triggers'
 import { MEC_core_API } from '../../API/MEC_core_API'
 import { udg_doubleHeroesEnabled } from '../../Double_heroes/double_heroes_config'
+import { setDesyncProbeEnabled } from '../../Log/DesyncProbe'
 import { flushLogs } from '../../Log/log'
 import { e2e } from '../../Test/e2e-tests/base/e2e-tests-base'
 import { Natives } from '../../wc3_natives_unsecured/Natives'
@@ -983,6 +984,33 @@ export const initExecuteCommandMax = () => {
             setHeroModelPath(param1)
 
             Text.mkP(p, `Hero model path set to "${param1}"`)
+
+            return true
+        },
+    })
+
+    //-desyncProbe <boolean>   --> prints, once a second on every machine, what must be the same on all of them
+    registerCommand({
+        name: 'desyncProbe',
+        alias: [],
+        group,
+        argDescription: '<boolean>',
+        description:
+            'Writes, once a second and on every machine, values that must be the same on all of them, to ' +
+            'CustomMapData/MEC/desync_probe_p<player number>.txt. After a desync, every player sends their file: ' +
+            'the first value that differs at the same probe tick shows what diverged.',
+        cb: ({ nbParam, param1 }, escaper) => {
+            if (nbParam !== 1 || !IsBoolString(param1)) {
+                return USAGE
+            }
+
+            setDesyncProbeEnabled(S2B(param1))
+            Text.mkP(
+                escaper.getPlayer(),
+                S2B(param1)
+                    ? 'Desync probe on: every machine writes its last minute to CustomMapData/MEC/desync_probe_p<player number>.txt'
+                    : 'Desync probe off'
+            )
 
             return true
         },

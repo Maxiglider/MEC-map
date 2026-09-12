@@ -56,8 +56,11 @@ export const setImmolationSystemEnabled = (enabled: boolean): number => {
         }
     }
 
-    for (const [handleId, monsterUnit] of pairs(udg_spawned_monster_units)) {
-        if (monsterUnit && applyImmolationOnUnit(monsterUnit, udg_spawned_monsters[handleId], enabled)) {
+    for (const [_, monsterUnit] of pairs(udg_spawned_monster_units)) {
+        if (
+            monsterUnit &&
+            applyImmolationOnUnit(monsterUnit, udg_spawned_monsters[GetHandleId(monsterUnit)], enabled)
+        ) {
             nbChangedUnits++
         }
     }

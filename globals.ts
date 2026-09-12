@@ -169,17 +169,48 @@ export const udg_spawned_monsters: { [x: number]: MonsterType | null } = {}
  * turned back into a unit, and the contact check of the async slide has to walk them all,
  * wherever they come from. Both tables are written by the two functions below so that they
  * cannot drift apart, and udg_spawned_monsters keeps the shape the public API exposes.
+ *
+ * Keyed by the order the units were registered in, which every machine goes through alike - not
+ * by their handle id. Lua recycles handle ids on each machine at the pace of its own garbage
+ * collector, so the same unit soon has another id on another machine, and a contact telling that
+ * id to every machine would name another unit on some of them.
  */
-export const udg_spawned_monster_units: { [x: number]: unit | null } = {}
+export const udg_spawned_monster_units: { [spawnedMonsterId: number]: unit | null } = {}
+
+/** The registration number of every spawned unit, by handle id: looked up on this machine, never walked nor sent */
+const spawnedMonsterIdByHandleId: { [handleId: number]: number } = {}
+const spawnedMonsterIds = { last: 0 }
+
+/** The number every machine knows this spawned unit by, while it is registered */
+export const getSpawnedMonsterId = (monsterUnit: unit): number | undefined =>
+    spawnedMonsterIdByHandleId[GetHandleId(monsterUnit)]
 
 export const registerSpawnedMonster = (monsterUnit: unit, monsterType: MonsterType) => {
-    udg_spawned_monsters[GetHandleId(monsterUnit)] = monsterType
-    udg_spawned_monster_units[GetHandleId(monsterUnit)] = monsterUnit
+    const handleId = GetHandleId(monsterUnit)
+    const previousId = spawnedMonsterIdByHandleId[handleId]
+
+    // a recycled unit comes back under the same handle, and under a new number
+    if (previousId !== undefined) {
+        udg_spawned_monster_units[previousId] = null
+    }
+
+    spawnedMonsterIds.last++
+
+    udg_spawned_monsters[handleId] = monsterType
+    udg_spawned_monster_units[spawnedMonsterIds.last] = monsterUnit
+    spawnedMonsterIdByHandleId[handleId] = spawnedMonsterIds.last
 }
 
 export const unregisterSpawnedMonster = (monsterUnit: unit) => {
-    udg_spawned_monsters[GetHandleId(monsterUnit)] = null
-    udg_spawned_monster_units[GetHandleId(monsterUnit)] = null
+    const handleId = GetHandleId(monsterUnit)
+    const spawnedMonsterId = spawnedMonsterIdByHandleId[handleId]
+
+    udg_spawned_monsters[handleId] = null
+
+    if (spawnedMonsterId !== undefined) {
+        udg_spawned_monster_units[spawnedMonsterId] = null
+        delete spawnedMonsterIdByHandleId[handleId]
+    }
 }
 
 /**

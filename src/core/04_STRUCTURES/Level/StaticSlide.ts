@@ -110,6 +110,13 @@ export class StaticSlide {
 
     activate = (activ: boolean) => {
         if (activ) {
+            // Built here, on every machine at once. Built on demand, they were built by the machine of
+            // an async hero alone, taking tables from the shared pool of MemoryHandler on that machine
+            // only: a pool that differs from one machine to another hands out tables walked in another
+            // order.
+            this.entryBoxes = this.buildAreaBoxes(this.x1, this.y1, this.x2, this.y2)
+            this.exitBoxes = this.buildAreaBoxes(this.x3, this.y3, this.x4, this.y4)
+
             const isDiagonal = this.angle % 90 !== 0
 
             // Start region

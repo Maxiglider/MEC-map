@@ -15,7 +15,7 @@ function OnNextWaypointReached(this: any, unit: unit) {
 export function init_LongDistanceMoveOrder_garbageCollector() {
     const triggerInterval = 10 // 10 seconds
     TimerStart(CreateTimer(), triggerInterval, true, () => {
-        for (const [_, longDistanceMoveOrder] of pairs(LongDistanceMoveOrder.unitToLongDistanceMoveOrder)) {
+        for (const [_, longDistanceMoveOrder] of pairs(LongDistanceMoveOrder.ordersInSequence)) {
             longDistanceMoveOrder.destroyIfObsolete()
         }
     })
@@ -64,7 +64,16 @@ export const IssueMoveOrderForLongDistance = (
 }
 
 export class LongDistanceMoveOrder {
+    /** By handle id of the unit: looked up on this machine, never walked */
     static unitToLongDistanceMoveOrder: { [x: number]: LongDistanceMoveOrder } = {}
+    /**
+     * The same orders, keyed by the order they were made in, which is what is walked: every machine
+     * goes through it alike, unlike handle ids, which Lua recycles on each machine at its own pace.
+     */
+    static ordersInSequence: { [sequence: number]: LongDistanceMoveOrder } = {}
+    private static lastSequence = 0
+
+    private sequence: number
 
     private unit: unit
     private destinationX: number
@@ -86,6 +95,10 @@ export class LongDistanceMoveOrder {
         }
 
         LongDistanceMoveOrder.unitToLongDistanceMoveOrder[GetHandleId(this.unit)] = this
+
+        LongDistanceMoveOrder.lastSequence++
+        this.sequence = LongDistanceMoveOrder.lastSequence
+        LongDistanceMoveOrder.ordersInSequence[this.sequence] = this
 
         this.nextWaypointRegion = MemoryHandler.getEmptyClass(HorizontalRectangleRegion, 0, 0, 64, 64)
         if (globals.debugLongDistanceMoves) {
@@ -144,6 +157,7 @@ export class LongDistanceMoveOrder {
 
     public destroy() {
         delete LongDistanceMoveOrder.unitToLongDistanceMoveOrder[GetHandleId(this.unit)]
+        delete LongDistanceMoveOrder.ordersInSequence[this.sequence]
 
         this.nextWaypointRegion.destroy()
 

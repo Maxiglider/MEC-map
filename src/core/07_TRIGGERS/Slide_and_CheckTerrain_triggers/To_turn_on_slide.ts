@@ -33,7 +33,6 @@ const HALF_TURN_TOLERANCE = 15
 
 const initTurnOnSlide = () => {
     //turn variables
-    let escaperSecond: Escaper | null
     let slider: unit
     let n: number
     let sliderX: number
@@ -42,8 +41,6 @@ const initTurnOnSlide = () => {
     let orderX: number
     let orderY: number
     let angle: number
-    let angleSecond: number
-    let canTurn: boolean
 
     //drunk variables
     let udg_isDrunk: boolean[] = []
@@ -87,7 +84,35 @@ const initTurnOnSlide = () => {
         )
     }
 
-    const turnSliderToDirection = (escaper: Escaper, angle: number, triggerIsToLocation: boolean | null = null) => {
+    /** The way each drunk hero swayed last, for the turns only its own machine asks for */
+    const drunkLocalSways: boolean[] = []
+
+    /**
+     * Which way a drunk hero sways. Drawn from the random generator of the game, which every machine
+     * shares - except for a turn one machine alone asks for, the async auto turn: a draw there would
+     * move that generator on one machine only, and every draw after it would differ from the others.
+     * That machine sways the hero one way, then the other.
+     */
+    const isDrunkSwayPositive = (escaperId: number, isLocalOnly: boolean) => {
+        if (!isLocalOnly) {
+            return GetRandomInt(1, 2) === 1
+        }
+
+        drunkLocalSways[escaperId] = !drunkLocalSways[escaperId]
+
+        return drunkLocalSways[escaperId]
+    }
+
+    /**
+     * isLocalOnly: made by one machine alone (the async auto turn, for the effect it moves by itself).
+     * Such a call may only change what that machine owns: no random draw, no mirror hero.
+     */
+    const turnSliderToDirection = (
+        escaper: Escaper,
+        angle: number,
+        triggerIsToLocation: boolean | null = null,
+        isLocalOnly = false
+    ) => {
         const slider = escaper.getHero()
         if (!slider) return
 
@@ -95,13 +120,14 @@ const initTurnOnSlide = () => {
             return
         }
 
-        escaperSecond = MainEscaperToSecondaryOne(escaper)
+        // a mirror hero is a unit on every machine: never turned by a call only one machine makes
+        const escaperSecond = isLocalOnly ? null : MainEscaperToSecondaryOne(escaper)
 
         const n = escaper.getId()
 
         //drunk mode
         if (udg_isDrunk[n]) {
-            if (GetRandomInt(1, 2) === 1) {
+            if (isDrunkSwayPositive(n, isLocalOnly)) {
                 angle = angle + udg_drunk[n]
             } else {
                 angle = angle - udg_drunk[n]
@@ -109,6 +135,11 @@ const initTurnOnSlide = () => {
         }
 
         //turn hero
+        // A variable of this very call. Shared between calls, it kept whatever the previous one had
+        // left whenever the terrain below said nothing - and that call may have been made by one
+        // machine alone, the async auto turn: a turn order then turned the hero on some machines only.
+        let canTurn = true
+
         if (escaper.isHeroOnGround()) {
             const terrainType = escaper.getLastTerrainType()
             if (terrainType instanceof TerrainTypeSlide) {
@@ -162,7 +193,7 @@ const initTurnOnSlide = () => {
             canTurn = false
         }
 
-        angleSecond = ApplyAngleSymmetry(angle, udg_symmetryAngle)
+        const angleSecond = ApplyAngleSymmetry(angle, udg_symmetryAngle)
 
         if (canTurn) {
             if (escaper.isAbsoluteInstantTurn()) {

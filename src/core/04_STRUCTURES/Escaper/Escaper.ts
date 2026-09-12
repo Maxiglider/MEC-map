@@ -740,10 +740,18 @@ export class Escaper extends EscaperMake {
         const lastX = this.getHeroX()
         const lastY = this.getHeroY()
 
-        if (!this.lastPos || (this.lastPos.x !== lastX && this.lastPos.y !== lastY)) {
-            this.lastPos?.__destroy()
+        // Updated in place rather than taken anew where the hero moved: for a hero sliding as an
+        // effect, where it is differs from one machine to another, and a new point taken on some of
+        // them only would make the shared pool of MemoryHandler differ between machines - a pool that
+        // hands out tables walked in another order.
+        if (!this.lastPos) {
             this.lastPos = createPoint(lastX, lastY)
+
+            return
         }
+
+        this.lastPos.x = lastX
+        this.lastPos.y = lastY
     }
 
     //move methods
@@ -2432,6 +2440,10 @@ export class Escaper extends EscaperMake {
         // nothing is waiting for an answer any more
         this.isHeroEffectFrozen = false
         this.isHeroHandBackPending = false
+
+        // Set by the steering of its own machine alone while it slid: every machine forgets it, or the
+        // next reversal of the unit would turn it towards an angle only one of them remembers.
+        this.slideLastAngleOrder = -1
 
         // taken along by a static slide of this machine alone, if this one owns the hero: the
         // others never heard of that ride

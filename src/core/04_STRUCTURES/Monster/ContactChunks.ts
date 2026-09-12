@@ -1,5 +1,5 @@
 import { createTimer } from 'Utils/mapUtils'
-import { globals, udg_monsters, udg_spawned_monsters } from '../../../../globals'
+import { getSpawnedMonsterId, globals, udg_monsters, udg_spawned_monsters } from '../../../../globals'
 import { Constants } from '../../01_libraries/Constants'
 import type { Monster } from './Monster'
 
@@ -117,6 +117,8 @@ type Membership = {
     spawnedY2: number
     /** How the audit names it: a monster of a level is asked, a spawned one is told at registration */
     spawnedLabel: string
+    /** For a spawned monster, the order its membership was made in: see spawnedMembershipsInOrder */
+    sequence: number
 }
 
 const state = {
@@ -125,6 +127,14 @@ const state = {
     tiers: [] as ChunkTier[],
     memberships: {} as { [monsterId: number]: Membership },
     spawnedMemberships: {} as { [handleId: number]: Membership },
+    /**
+     * The same memberships, keyed by the order they were made in, which is what every loop over them
+     * walks. Walking the table above would follow handle ids, which Lua recycles on each machine at
+     * the pace of its own garbage collector: each machine would rebuild and repair the chunks in an
+     * order of its own, and end up with buckets ordered differently.
+     */
+    spawnedMembershipsInOrder: {} as { [sequence: number]: Membership },
+    lastSpawnedSequence: 0,
     monsterCount: 0,
     spawnedCount: 0,
     entryCount: 0,
@@ -324,6 +334,7 @@ const newMembership = (): Membership => ({
     spawnedX2: 0,
     spawnedY2: 0,
     spawnedLabel: 'spawnMob',
+    sequence: 0,
 })
 
 const getMonsterMembership = (monsterId: number) => {
@@ -348,6 +359,10 @@ const getSpawnedMembership = (handleId: number) => {
 
     const membership = newMembership()
     state.spawnedMemberships[handleId] = membership
+
+    state.lastSpawnedSequence++
+    membership.sequence = state.lastSpawnedSequence
+    state.spawnedMembershipsInOrder[membership.sequence] = membership
 
     return membership
 }
@@ -543,7 +558,10 @@ export const registerSpawnedUnitInChunks = (
     shape.padding = reach
     areaBuilder.addSegment(x1, y1, x2, y2)
 
-    if (joinChunks(membership, spawnedUnit, reach, CONTACT_KIND_SPAWNED_MONSTER, handleId, undefined)) {
+    // named by its registration number rather than its handle: a contact with it travels to every machine
+    const spawnedMonsterId = getSpawnedMonsterId(spawnedUnit) ?? 0
+
+    if (joinChunks(membership, spawnedUnit, reach, CONTACT_KIND_SPAWNED_MONSTER, spawnedMonsterId, undefined)) {
         state.spawnedCount++
     }
 }
@@ -564,7 +582,15 @@ export const unregisterSpawnedUnitFromChunks = (spawnedUnit: unit) => {
 /** For a spawned unit that is really removed, a caster shot at the end of its flight: nothing kept */
 export const forgetSpawnedUnitInChunks = (spawnedUnit: unit) => {
     unregisterSpawnedUnitFromChunks(spawnedUnit)
-    delete state.spawnedMemberships[GetHandleId(spawnedUnit)]
+
+    const handleId = GetHandleId(spawnedUnit)
+    const membership = state.spawnedMemberships[handleId]
+
+    if (membership !== undefined) {
+        delete state.spawnedMembershipsInOrder[membership.sequence]
+    }
+
+    delete state.spawnedMemberships[handleId]
 }
 
 const buildTiers = () => {
@@ -615,7 +641,7 @@ export const rebuildContactChunks = (isAsked = false) => {
         membership.count = 0
     }
 
-    for (const [_, membership] of pairs(state.spawnedMemberships)) {
+    for (const [_, membership] of pairs(state.spawnedMembershipsInOrder)) {
         membership.count = 0
     }
 
@@ -628,13 +654,13 @@ export const rebuildContactChunks = (isAsked = false) => {
     }
 
     // a spawned monster cannot describe itself: what it was told to walk is kept for this moment
-    for (const [_, membership] of pairs(state.spawnedMemberships)) {
+    for (const [_, membership] of pairs(state.spawnedMembershipsInOrder)) {
         const entry = membership.entry
 
         if (entry !== undefined) {
             registerSpawnedUnitInChunks(
                 entry.unit,
-                udg_spawned_monsters[entry.id]?.getImmolationRadius() ?? entry.reach,
+                udg_spawned_monsters[GetHandleId(entry.unit)]?.getImmolationRadius() ?? entry.reach,
                 membership.spawnedX1,
                 membership.spawnedY1,
                 membership.spawnedX2,
@@ -905,7 +931,7 @@ const countOffenders = (repair: boolean) => {
         }
     }
 
-    for (const [_, membership] of pairs(state.spawnedMemberships)) {
+    for (const [_, membership] of pairs(state.spawnedMembershipsInOrder)) {
         if (!isStandingInItsOwnChunks(membership)) {
             countOffender(membership.spawnedLabel)
             total++
@@ -975,12 +1001,12 @@ export const auditContactChunks = () => {
         }
     }
 
-    for (const [handleId, membership] of pairs(state.spawnedMemberships)) {
+    for (const [_, membership] of pairs(state.spawnedMembershipsInOrder)) {
         if (!isStandingInItsOwnChunks(membership)) {
             const entry = membership.entry
 
             offenders[offenders.length] =
-                `  spawned monster ${handleId} at ` +
+                `  spawned monster ${entry!.id} at ` +
                 `${Math.floor(GetUnitX(entry!.unit))}, ${Math.floor(GetUnitY(entry!.unit))}, told to walk ` +
                 `${Math.floor(membership.spawnedX1)}, ${Math.floor(membership.spawnedY1)} -> ` +
                 `${Math.floor(membership.spawnedX2)}, ${Math.floor(membership.spawnedY2)}`

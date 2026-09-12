@@ -108,7 +108,8 @@ const turnSliderTowardsCursor = (escaperId: number) => {
     // not SetUnitFacing, which turns progressively, and not BlzSetUnitFacingEx either: this is
     // what the map itself uses, and it honours what the terrain allows (canTurn, canTurnAngle,
     // drunk mode, secondary heroes)
-    TurnOnSlide.turnSliderToDirection(escaper, angle)
+    // only this machine makes this call in async mode: it must not draw anything the others would not
+    TurnOnSlide.turnSliderToDirection(escaper, angle, null, getAutoTurnMode(escaperId) === 'async')
 }
 
 /**
