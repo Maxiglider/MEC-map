@@ -1,8 +1,10 @@
-import { createTimer } from 'Utils/mapUtils'
+import { createEvent, createTimer } from 'Utils/mapUtils'
 import { Timer } from 'w3ts'
 import { getUdgEscapers } from '../../../globals'
 import { Constants } from '../01_libraries/Constants'
 import { TurnOnSlide } from '../07_TRIGGERS/Slide_and_CheckTerrain_triggers/To_turn_on_slide'
+import { AfkMode } from '../08_GAME/Afk_mode/Afk_mode'
+import { Natives } from '../wc3_natives_unsecured/Natives'
 import { getAsyncMousePosition, isAsyncMousePositionFresh, setAsyncMouseActive } from './AsyncMouse'
 import { getMousePosition, isTestingLeftClicks } from './HeroEffect'
 import { screen2World } from './Screen2World'
@@ -44,6 +46,37 @@ const modes: { [escaperId: number]: AutoTurnMode } = {}
 /** The mode says where the cursor is read, this says whether the hero is being steered right now */
 const steering: { [escaperId: number]: boolean } = {}
 const state = { timer: undefined as Timer | undefined }
+
+/**
+ * A player sliding async steers with the cursor alone, and gives the game none of the orders the afk
+ * mode listens to: they would be taken for afk while playing, and killed with the afk heroes. So once
+ * a second, the machine of that player tells every machine that they are still there, as long as
+ * their cursor moved on the screen since. On the screen rather than in the world: a locked camera
+ * moves the world under a cursor nobody touched.
+ */
+const ACTIVITY_PREFIX = 'MEC_AHK'
+const ACTIVITY_CHECK_TICKS = Math.round(1 / AUTO_TURN_PERIOD)
+
+const activity = { ticks: 0, lastX: -1, lastY: -1 }
+
+const sendActivityIfCursorMoved = () => {
+    const localEscaper = getUdgEscapers().get(GetPlayerId(GetLocalPlayer()!))
+
+    if (!localEscaper?.isAsyncControlledHere() || !isAsyncMousePositionFresh()) {
+        return
+    }
+
+    const cursor = getAsyncMousePosition()
+
+    if (!cursor || (cursor.x === activity.lastX && cursor.y === activity.lastY)) {
+        return
+    }
+
+    activity.lastX = cursor.x
+    activity.lastY = cursor.y
+
+    BlzSendSyncData(ACTIVITY_PREFIX, '1')
+}
 
 export const getAutoTurnMode = (escaperId: number) => modes[escaperId] ?? 'off'
 
@@ -134,8 +167,28 @@ const startAutoTurnTimer = () => {
         return
     }
 
+    // made with the timer, from the command every machine hears: every machine resets the afk timer
+    // of the player who sent it, read from the event itself
+    createEvent({
+        events: [
+            t => {
+                for (let i = 0; i < Constants.NB_PLAYERS_MAX; i++) {
+                    BlzTriggerRegisterPlayerSyncEvent(t, Natives.UPlayer(i), ACTIVITY_PREFIX, false)
+                }
+            },
+        ],
+        actions: [() => AfkMode.resetAfk(GetPlayerId(Natives.UGetTriggerPlayer()))],
+    })
+
     state.timer = createTimer(AUTO_TURN_PERIOD, true, () => {
         updateAsyncMouseNeed()
+
+        activity.ticks++
+
+        if (activity.ticks >= ACTIVITY_CHECK_TICKS) {
+            activity.ticks = 0
+            sendActivityIfCursorMoved()
+        }
 
         getUdgEscapers().forAll(escaper => {
             escaper.updateHeroEffect()
