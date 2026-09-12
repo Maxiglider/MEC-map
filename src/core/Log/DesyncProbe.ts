@@ -80,7 +80,7 @@ const sumMonsterPositions = () => {
     }
 
     for (const [_, u] of pairs(udg_spawned_monster_units)) {
-        if (u) {
+        if (u !== undefined) {
             sum += math.floor(GetUnitX(u)) + math.floor(GetUnitY(u))
         }
     }
