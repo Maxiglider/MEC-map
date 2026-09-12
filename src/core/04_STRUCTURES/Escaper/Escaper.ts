@@ -12,7 +12,7 @@ import { AfkMode } from 'core/08_GAME/Afk_mode/Afk_mode'
 import { Timer } from 'w3ts'
 import { getUdgEscapers, getUdgLevels, getUdgTerrainTypes, globals, udg_monsters } from '../../../../globals'
 import { EncodingBase64 } from '../../../Utils/SaveLoad/TreeLib/EncodingBase64'
-import { createEvent, createTimer, runInTrigger } from '../../../Utils/mapUtils'
+import { createEvent, createTimer, errorHandler, runInTrigger } from '../../../Utils/mapUtils'
 import { RunSoundAtPoint, RunSoundOnUnit } from '../../02_bibliotheques_externes/SoundUtils'
 import { BlzColor2Id, removeHash } from '../../06_COMMANDS/Helpers/Command_functions'
 import { refreshTrigMoveCollisionLandmarks } from '../../07_TRIGGERS/CollisionLandmarks/MoveCollisionLandmarks'
@@ -21,6 +21,8 @@ import { SlideTrigger } from '../../07_TRIGGERS/Slide_and_CheckTerrain_triggers/
 import {
     HERO_ROTATION_SPEED,
     HERO_ROTATION_TIME_FOR_MAXIMUM_SPEED,
+    computeSlideTurnForOnePeriod,
+    slideTurn,
 } from '../../07_TRIGGERS/Slide_and_CheckTerrain_triggers/SlidingMax'
 import {
     ASYNC_HERO_EVENT,
@@ -92,6 +94,12 @@ function GetInvisUnitTypeFromCollisionSize(collisionSize: number): number {
 /** Where the hero effect waits while the hero is a unit: far under the map, out of sight */
 const PARKED_HERO_EFFECT_Z = -1000
 
+/** How often the drawn shadow of a hero follows it when nothing else moves it: as often as its name does */
+const FAKE_SHADOW_PERIOD = 0.01
+
+/** The layer the drawn shadow of a hero is drawn in, among the images: the one of occlusion marks */
+const FAKE_SHADOW_IMAGE_TYPE = 3
+
 /**
  * How long a machine carries on the movement of a hero it does not own before giving up. Its
  * owner sends ten packets a second, so half a second of silence means it stopped talking:
@@ -99,6 +107,23 @@ const PARKED_HERO_EFFECT_Z = -1000
  * never went.
  */
 const ASYNC_SILENCE_TIMEOUT = 0.5
+
+/**
+ * The unit of a hero sliding as an effect is carried on from the last packet by every machine, this
+ * many slide periods at a time: often enough to look smooth, each period turned and moved exactly as
+ * the slide turns and moves the effect, so that the unit stays where the other players see it.
+ */
+const SYNCED_UNIT_STEPS_PER_TICK = 3
+
+const SYNCED_UNIT_PERIOD = Constants.SLIDE_PERIOD * SYNCED_UNIT_STEPS_PER_TICK
+
+/** Carried on no longer than the effect is by the machines that stop hearing about it (see isAsyncOwnerSilent) */
+const SYNCED_UNIT_MAX_TICKS_WITHOUT_PACKET = Math.ceil(
+    ASYNC_SILENCE_TIMEOUT / (Constants.SLIDE_PERIOD * SYNCED_UNIT_STEPS_PER_TICK)
+)
+
+/** How transparent "-luckyLuke on" shows the unit of the own hero of a player sliding as an effect, when no number is given */
+export const LUCKY_LUKE_DEFAULT_TRANSPARENCY = 70
 
 /** The god mode effects of an async hero are told at most this often: the check seeing them runs fifty times a second */
 const ASYNC_HERO_EVENT_MIN_INTERVAL = 0.1
@@ -111,11 +136,10 @@ export class Escaper extends EscaperMake {
     // On async slide mode, hero unit is converted to a hero effect
     private heroEffect?: effect
     private isHeroEffectActive = false
-    private heroEffectDummyUnit?: unit // a unit without model following the syncly the hero effect to keep a dot on the minimap
 
     /**
-     * Where the hero really is while its effect stands in for it. The unit is parked out of the
-     * map then, and cannot be asked anything: it would answer the corner it sits in.
+     * Where the hero really is while its effect stands in for it. The unit only follows it from the
+     * packets then, behind it, and cannot be asked where the hero is now.
      *
      * Facing and fly height are mirrored too, and for the same reason as the position: in async
      * mode they are computed from a cursor only this machine knows, so writing them on the unit
@@ -123,11 +147,27 @@ export class Escaper extends EscaperMake {
      */
     private heroPos = { x: 0, y: 0, facing: 0, flyHeight: 0 }
     /**
-     * Where the hero sliding as an effect was in the last packet about it: the same on every machine,
-     * its own included, which heroPos is not - its own machine is ahead, the others extrapolate. A
-     * packet period behind, but what anything acting on the game has to read to find the hero.
+     * Where the hero sliding as an effect is for every machine, its own included, which heroPos is
+     * not: its own machine is ahead, and turns it from a cursor only it knows. Set from each packet
+     * about it, then carried on by every machine alike from what that packet said only (see
+     * advanceSyncedHeroUnit), which keeps it about where the other players see the effect. What
+     * anything acting on the game has to read to find the hero - and where its unit is kept, for the
+     * triggers of a map to find it (see moveHeroUnitToSyncedPos).
      */
-    private syncedHeroPos = { x: 0, y: 0, facing: 0 }
+    private syncedHeroPos = {
+        x: 0,
+        y: 0,
+        facing: 0,
+        flyHeight: 0,
+        remainingDegrees: 0,
+        turnPerPeriod: 0,
+        slideSpeed: 0,
+        rotationSpeed: 0,
+        ticksWithoutPacket: 0,
+    }
+
+    /** Carries the unit of a hero sliding as an effect on between two packets, and waits stopped otherwise */
+    private syncedUnitTimer: Timer | null = null
     /** Between the moment this machine sees the hero die and the moment every machine agrees on it */
     private isHeroEffectFrozen = false
     /** Sequence of the last packet applied, so that a late one cannot undo a newer one */
@@ -239,6 +279,16 @@ export class Escaper extends EscaperMake {
     private ignoreDeathMessages = false
     private textTag: texttag | null = null
     private textTagTimer: Timer | null = null
+
+    /** A shadow drawn under the hero where its unit cannot show its own: see createFakeShadow */
+    private fakeShadow?: { image: image; centerX: number; centerY: number; isShown: boolean }
+    private fakeShadowTimer: Timer | null = null
+
+    /**
+     * Whether the unit of the hero lost its shadow on this machine, to a switch of skin: see
+     * removeUnitShadowHere. It differs from one machine to another, and only decides what is seen.
+     */
+    private isUnitShadowRemovedHere = false
     private panCameraOnRevive: 'coop' | 'all' | 'none' = 'coop'
     public panCameraOnPortal = true
 
@@ -294,6 +344,27 @@ export class Escaper extends EscaperMake {
     }
 
     public getMonsterShadow = () => this.monsterShadowState
+
+    /** -luckyLuke: the transparency this player sees the unit of its own hero with while it slides as an effect, undefined while off */
+    private luckyLukeTransparency: number | undefined = undefined
+
+    /**
+     * -luckyLuke: how transparent this player sees the unit of its own hero sliding as an effect,
+     * following it where the other players see it, rather than not at all (undefined). The units of
+     * the other heroes stay unseen: on this screen they stand where their effects already are. Kept
+     * by every machine, looked at by the machine of this player only: it decides what is seen.
+     */
+    setLuckyLukeTransparency = (transparency: number | undefined) => {
+        this.luckyLukeTransparency = transparency
+
+        if (getUdgEscapers().get(GetPlayerId(GetLocalPlayer())) !== this) {
+            return
+        }
+
+        this.updateUnitVertexColor()
+    }
+
+    getLuckyLukeTransparency = () => this.luckyLukeTransparency
 
     //user interface
     private uiMode = 'on'
@@ -491,6 +562,9 @@ export class Escaper extends EscaperMake {
             return
         }
 
+        // a new unit comes with its shadow, before anything here may take it away (see updateUnitVertexColor)
+        this.isUnitShadowRemovedHere = false
+
         if (this.skin) {
             UnitRemoveAbility(this.hero, FourCC('Aloc'))
             UnitAddAbility(this.hero, FourCC('Aloc'))
@@ -528,7 +602,10 @@ export class Escaper extends EscaperMake {
         this.refreshCollisionLandmark()
 
         this.createHeroEffect()
-        this.createHeroEffectDummyUnit()
+        this.createFakeShadow()
+
+        // made with the hero on every machine, and only running while it slides as an effect
+        this.syncedUnitTimer = new Timer()
 
         this.effects.showEffects(this.hero)
         delete this.lastTerrainType
@@ -608,11 +685,6 @@ export class Escaper extends EscaperMake {
             delete this.invisUnit
         }
 
-        if (this.heroEffectDummyUnit) {
-            RemoveUnit(this.heroEffectDummyUnit)
-            delete this.heroEffectDummyUnit
-        }
-
         delete this.lastTerrainType
         this.destroyMake()
         this.effects.hideEffects()
@@ -640,6 +712,14 @@ export class Escaper extends EscaperMake {
         this.textTag = null
         this.textTagTimer?.destroy()
         this.textTagTimer = null
+
+        this.fakeShadow && DestroyImage(this.fakeShadow.image)
+        delete this.fakeShadow
+        this.fakeShadowTimer?.destroy()
+        this.fakeShadowTimer = null
+
+        this.syncedUnitTimer?.destroy()
+        this.syncedUnitTimer = null
     }
 
     destroy = () => {
@@ -770,8 +850,9 @@ export class Escaper extends EscaperMake {
 
     /**
      * Everything about where the hero is and where it looks goes through these, rather than
-     * through GetUnitX and friends: during an async slide the unit is parked out of the map and
-     * the effect is the hero, so asking the unit would give the corner it waits in.
+     * through GetUnitX and friends: during an async slide the effect is the hero, and the unit only
+     * follows it from the packets, so asking the unit would give where the hero was a packet ago.
+     * Anything every machine must agree on reads getSyncedHeroX and friends instead.
      */
     getHeroX = () => (this.isHeroEffectActive ? this.heroPos.x : this.hero ? GetUnitX(this.hero) : 0)
 
@@ -860,6 +941,12 @@ export class Escaper extends EscaperMake {
     getHeroCollisionSize = () => this.collisionSize
 
     getDummyPowerCircle = () => this.dummyPowerCircle
+
+    getPowerCircle = () => this.powerCircle
+
+    getInvisUnit = () => this.invisUnit
+
+    getLockCamTarget = () => this.lockCamTarget
 
     moveInvisUnit(x: number, y: number) {
         if (this.invisUnit) {
@@ -967,14 +1054,24 @@ export class Escaper extends EscaperMake {
 
     /** Where every machine agrees the hero is, from a packet every machine applies on the same turn */
     private recordSyncedHeroPos = (movement: HeroMovementState) => {
-        this.syncedHeroPos.x = movement.x
-        this.syncedHeroPos.y = movement.y
-        this.syncedHeroPos.facing = movement.facing
+        const synced = this.syncedHeroPos
+        const remainingDegrees = AnglesDiff(movement.targetAngle, movement.facing)
+
+        synced.x = movement.x
+        synced.y = movement.y
+        synced.facing = movement.facing
+        synced.flyHeight = movement.flyHeight
+        // as setRemainingDegreesToTurn keeps it, so that the unit turns as the effect of the others does
+        synced.remainingDegrees = RAbsBJ(remainingDegrees) < 0.01 ? 0 : remainingDegrees
+        synced.turnPerPeriod = movement.turnPerPeriod
+        synced.slideSpeed = movement.slideSpeed
+        synced.rotationSpeed = movement.rotationSpeed
+        synced.ticksWithoutPacket = 0
     }
 
     /**
-     * Where the hero is for anything acting on the game: the unit when it is one, and the last packet
-     * about the effect when it slides as one. getHeroX is where each machine sees it, which differs
+     * Where the hero is for anything acting on the game: the unit when it is one, and where every
+     * machine carries it on from the last packet about the effect when it slides as one. getHeroX is where each machine sees it, which differs
      * from one machine to another during an async slide, and moving another hero there would move it
      * to a different place on each of them.
      */
@@ -984,6 +1081,83 @@ export class Escaper extends EscaperMake {
 
     getSyncedHeroFacing = () =>
         this.isHeroEffectActive ? this.syncedHeroPos.facing : this.hero ? GetUnitFacing(this.hero) : 0
+
+    /**
+     * The unit of a hero sliding as an effect follows it from the packets, so that the triggers of a
+     * map, and the rects and ranges of the engine, find the hero where every machine agrees it is:
+     * about where the other players see the effect, behind the effect its own player sees, but in the
+     * same place on every machine, which is all a unit may be.
+     */
+    private moveHeroUnitToSyncedPos = () => {
+        if (!this.hero || !this.isHeroEffectActive) {
+            return
+        }
+
+        SetUnitX(this.hero, this.syncedHeroPos.x)
+        SetUnitY(this.hero, this.syncedHeroPos.y)
+        BlzSetUnitFacingEx(this.hero, this.syncedHeroPos.facing)
+        SetUnitFlyHeight(this.hero, this.syncedHeroPos.flyHeight, 0)
+    }
+
+    /**
+     * Carries the unit of a hero sliding as an effect on from the last packet, on every machine alike:
+     * turned and moved period by period as the slide turns and moves the effect on the machines told
+     * about it, from nothing but what that packet said - never from where this machine sees the hero,
+     * which differs from one machine to another. Stops once no packet came for as long as those
+     * machines keep the effect going.
+     */
+    private advanceSyncedHeroUnit: (this: void) => void = () => {
+        const synced = this.syncedHeroPos
+
+        if (
+            !this.hero ||
+            !this.isHeroEffectActive ||
+            synced.ticksWithoutPacket >= SYNCED_UNIT_MAX_TICKS_WITHOUT_PACKET
+        ) {
+            return
+        }
+
+        synced.ticksWithoutPacket++
+
+        // as the slide decides it, from the packet rather than from this machine's own view of the hero
+        const allowTurning =
+            this.slidingMode == 'max' && synced.rotationSpeed != 0 && (synced.flyHeight < 1 || globals.CAN_TURN_IN_AIR)
+        const maxTurnPerPeriod = synced.rotationSpeed * Constants.SLIDE_PERIOD * 360
+        const movePerPeriod = this.tempSlideSpeedPerPeriod || synced.slideSpeed * Constants.SLIDE_PERIOD
+
+        for (let step = 0; step < SYNCED_UNIT_STEPS_PER_TICK; step++) {
+            // moved along the facing it had before this period's turn, as the slide moves it
+            const angle = Deg2Rad(synced.facing)
+
+            if (
+                allowTurning &&
+                computeSlideTurnForOnePeriod(
+                    synced.remainingDegrees,
+                    maxTurnPerPeriod,
+                    synced.turnPerPeriod,
+                    this.rotationTimeForMaximumSpeed
+                )
+            ) {
+                const remainingDegrees = synced.remainingDegrees - slideTurn.diffToApply
+
+                synced.turnPerPeriod = slideTurn.turnPerPeriod
+                synced.remainingDegrees = RAbsBJ(remainingDegrees) < 0.01 ? 0 : remainingDegrees
+                synced.facing = synced.facing + slideTurn.diffToApply
+            }
+
+            const x = synced.x + movePerPeriod * Cos(angle)
+            const y = synced.y + movePerPeriod * Sin(angle)
+
+            if (x >= globals.MAP_MIN_X && x <= globals.MAP_MAX_X && y >= globals.MAP_MIN_Y && y <= globals.MAP_MAX_Y) {
+                synced.x = x
+                synced.y = y
+            }
+        }
+
+        this.moveHeroUnitToSyncedPos()
+    }
+
+    private advanceSyncedHeroUnitSafely = errorHandler(this.advanceSyncedHeroUnit)
 
     /** Puts this hero exactly where the machine of its player says it is */
     private applyHeroMovementState = (movement: HeroMovementState) => {
@@ -996,7 +1170,6 @@ export class Escaper extends EscaperMake {
 
         this.setRemainingDegreesToTurn(AnglesDiff(movement.targetAngle, movement.facing))
         this.setSlideCurrentTurnPerPeriod(movement.turnPerPeriod)
-        this.moveHeroEffectDummyUnit(movement.x, movement.y)
         this.setSpeedZ(movement.speedZ)
         this.setLastZ(movement.lastZ)
         this.setOldDiffZ(movement.oldDiffZ)
@@ -1006,6 +1179,9 @@ export class Escaper extends EscaperMake {
         this.setSlideSpeed(movement.slideSpeed)
         this.setRotationSpeed(movement.rotationSpeed)
         this.lastTerrainType = getUdgTerrainTypes().getByTerrainTypeId(movement.terrainTypeId) ?? undefined
+
+        // last, once all of it is set: moving the unit may fire the triggers of a map
+        this.moveHeroUnitToSyncedPos()
     }
 
     /**
@@ -1024,10 +1200,10 @@ export class Escaper extends EscaperMake {
         this.lastAsyncPacketTime = os.clock()
 
         // The machine that sent this is already ahead of it and has nothing to learn, save for the
-        // dot: that one is a unit, so it moves from the packet everywhere, itself included.
+        // unit: it moves from the packet on every machine, this one included.
         if (GetLocalPlayer() === this.p) {
-            this.moveHeroEffectDummyUnit(movement.x, movement.y)
             this.recordSyncedHeroPos(movement)
+            this.moveHeroUnitToSyncedPos()
 
             return
         }
@@ -1131,6 +1307,9 @@ export class Escaper extends EscaperMake {
 
         if (IsHeroUnitId(GetUnitTypeId(this.hero))) {
             ReviveHero(this.hero, x, y, SHOW_REVIVE_EFFECTS)
+
+            // a revived unit gets its shadow back
+            this.isUnitShadowRemovedHere = false
 
             if (this.skin) {
                 SetUnitPathing(this.hero, false)
@@ -2161,62 +2340,109 @@ export class Escaper extends EscaperMake {
         this.isHeroEffectActive && this.updateHeroEffect()
     }
 
-    /**
-     * A hero effect draws nothing on the minimap, and the unit it stands in for waits in a corner
-     * of the map: without this the player would lose their own dot for the whole slide.
-     *
-     * It is there for that dot and for nothing else. Nothing may listen to it: it only moves when a
-     * position packet lands, ten times a second, so anything the engine would detect through it -
-     * a range, a rect - would be told far too late and at the wrong place. MEC looks for those
-     * itself, at the pace of the terrain check and from the machine that knows where the hero is.
-     *
-     * It is the invisible unit type, which happens to be a hero one, so the dot looks like the dot
-     * of any other slider. Locust keeps the monsters from acquiring and burning it, and keeps it
-     * unclickable, while showing and hiding it gives it back its dot and its selectability. The
-     * hero interface icon is turned off, or the player would grow a second hero in the corner of
-     * their screen.
-     */
-    private createHeroEffectDummyUnit = () => {
-        if (this.heroEffectDummyUnit || !this.hero) {
-            return
-        }
-
-        const dummy = Natives.UCreateUnit(
-            this.p,
-            Constants.INVIS_UNIT_TYPE_ID,
-            GetUnitX(this.hero),
-            GetUnitY(this.hero),
-            0
-        )
-
-        this.heroEffectDummyUnit = dummy
-
-        SetUnitPathing(dummy, false)
-        SetUnitInvulnerable(dummy, true)
-        UnitAddAbility(dummy, FourCC('Aloc'))
-        BlzSetUnitBooleanField(dummy, UNIT_BF_HERO_HIDE_HERO_INTERFACE_ICON, true)
-        BlzSetUnitBooleanField(dummy, UNIT_BF_HERO_HIDE_HERO_DEATH_MESSAGE, true)
-        SetUnitColor(dummy, Natives.UConvertPlayerColor(this.baseColorId))
-        ShowUnit(dummy, false)
-    }
-
-    /**
-     * Follows the effect, but only from what the packets say: a unit belongs to the game, so its
-     * position has to be the same on every machine. The dot is therefore one latency behind the
-     * effect its own player sees, which is the price of it being in the right place for everybody.
-     */
-    private moveHeroEffectDummyUnit = (x: number, y: number) => {
-        if (!this.heroEffectDummyUnit) {
-            return
-        }
-
-        SetUnitX(this.heroEffectDummyUnit, x)
-        SetUnitY(this.heroEffectDummyUnit, y)
-    }
-
     /** Sends the effect under the map, where nobody sees it */
     private parkHeroEffect = () => {
         this.heroEffect && BlzSetSpecialEffectPosition(this.heroEffect, 0, 0, PARKED_HERO_EFFECT_Z)
+    }
+
+    /**
+     * Takes the shadow of the unit away, on this machine: switching its skin back and forth is the one
+     * way known, and nothing but a revival gives it back (the unit has to be made again otherwise).
+     * Only what is seen changes, which is why it may differ from one machine to another.
+     */
+    private removeUnitShadowHere = () => {
+        if (!this.hero) {
+            return
+        }
+
+        const skinId = BlzGetUnitSkin(this.hero)
+
+        BlzSetUnitSkin(this.hero, skinId === FourCC('hpea') ? FourCC('hfoo') : FourCC('hpea'))
+        BlzSetUnitSkin(this.hero, skinId)
+
+        this.isUnitShadowRemovedHere = true
+    }
+
+    /**
+     * A shadow drawn under the hero, the texture and the size of the one of its unit: under the effect
+     * while the hero slides as one, and under the unit while that unit has lost its own, until it is
+     * revived. Made with the hero on every machine at once, then shown and moved by each machine for
+     * what its own player sees: an image is not an agent, and moving it is no business of the game.
+     */
+    private createFakeShadow = () => {
+        if (this.fakeShadow || !this.hero) {
+            return
+        }
+
+        const shadowName = BlzGetUnitStringField(this.hero, UNIT_SF_SHADOW_IMAGE_UNIT)
+        const width = BlzGetUnitRealField(this.hero, UNIT_RF_SHADOW_IMAGE_WIDTH)
+        const height = BlzGetUnitRealField(this.hero, UNIT_RF_SHADOW_IMAGE_HEIGHT)
+
+        // a unit type without shadow, which has nothing to stand in for
+        if (!shadowName || shadowName === '_' || width <= 0 || height <= 0) {
+            return
+        }
+
+        // where the unit stands on its shadow, from the bottom left corner of the image
+        const centerX = BlzGetUnitRealField(this.hero, UNIT_RF_SHADOW_IMAGE_CENTER_X)
+        const centerY = BlzGetUnitRealField(this.hero, UNIT_RF_SHADOW_IMAGE_CENTER_Y)
+
+        const image = CreateImage(
+            `ReplaceableTextures\\Shadows\\${shadowName}.blp`,
+            width,
+            height,
+            0,
+            this.getHeroX() - centerX,
+            this.getHeroY() - centerY,
+            0,
+            0,
+            0,
+            0,
+            FAKE_SHADOW_IMAGE_TYPE
+        )
+
+        if (!image) {
+            return
+        }
+
+        SetImageRenderAlways(image, true)
+        SetImageConstantHeight(image, false, 0)
+        ShowImage(image, false)
+
+        this.fakeShadow = { image, centerX, centerY, isShown: false }
+        this.fakeShadowTimer = createTimer(FAKE_SHADOW_PERIOD, true, this.updateFakeShadow)
+    }
+
+    /** Shows the drawn shadow where it is needed and moves it under the hero, on this machine only */
+    private updateFakeShadow: (this: void) => void = () => {
+        const fakeShadow = this.fakeShadow
+
+        if (!fakeShadow || !this.hero) {
+            return
+        }
+
+        const viewer = getUdgEscapers().get(GetPlayerId(GetLocalPlayer()))
+
+        const isUnderEffect = this.isHeroEffectActive
+        const isShown =
+            (isUnderEffect || this.isUnitShadowRemovedHere) &&
+            viewer?.shadowState[this.escaperId] !== false &&
+            !!this.isAlive() &&
+            !IsUnitHidden(this.hero)
+
+        if (isShown !== fakeShadow.isShown) {
+            ShowImage(fakeShadow.image, isShown)
+            fakeShadow.isShown = isShown
+        }
+
+        if (!isShown) {
+            return
+        }
+
+        const x = isUnderEffect ? this.heroPos.x : GetUnitX(this.hero)
+        const y = isUnderEffect ? this.heroPos.y : GetUnitY(this.hero)
+
+        SetImagePosition(fakeShadow.image, x - fakeShadow.centerX, y - fakeShadow.centerY, 0)
     }
 
     isHeroAsEffect = () => this.isHeroEffectActive
@@ -2412,11 +2638,12 @@ export class Escaper extends EscaperMake {
     /**
      * Hands the hero over to its effect, or takes it back.
      *
-     * While the effect stands in, the unit is parked in the corner of the map, which is enough to
-     * hide it: its look is left alone. It must not move, because in async mode its position would
-     * be computed from a cursor only this machine knows, and moving a synchronized unit with a
-     * local value is what gets a player kicked. It still answers the orders of its player, which
-     * is what keeps the illusion of controlling it.
+     * While the effect stands in, the unit is made transparent and only moves
+     * from the packets, to where every machine agrees the hero is (see moveHeroUnitToSyncedPos):
+     * never from the slide of this machine, because in async mode that position comes from a
+     * cursor only this machine knows, and moving a synchronized unit with a local value is what
+     * gets a player kicked. It still answers the orders of its player, which is what keeps the
+     * illusion of controlling it.
      *
      * The effect only takes over while sliding: back on walkable ground, or dead, the unit is put
      * back where the effect had brought it and takes its part again.
@@ -2440,22 +2667,30 @@ export class Escaper extends EscaperMake {
             this.syncedHeroPos.x = this.heroPos.x
             this.syncedHeroPos.y = this.heroPos.y
             this.syncedHeroPos.facing = this.heroPos.facing
+            this.syncedHeroPos.flyHeight = this.heroPos.flyHeight
+            this.syncedHeroPos.remainingDegrees = this.getRemainingDegreesToTurn()
+            this.syncedHeroPos.turnPerPeriod = this.getSlideCurrentTurnPerPeriod()
+            this.syncedHeroPos.slideSpeed = this.slideSpeed
+            this.syncedHeroPos.rotationSpeed = this.rotationSpeed
+            this.syncedHeroPos.ticksWithoutPacket = 0
 
             this.isHeroEffectActive = true
+
+            // Started again rather than resumed: a periodic timer paused then resumed does not keep
+            // running, and the unit would only move when a packet comes.
+            this.syncedUnitTimer?.start(SYNCED_UNIT_PERIOD, true, this.advanceSyncedHeroUnitSafely)
             this.lastAsyncPacketTime = os.clock()
 
-            if (this.heroEffectDummyUnit) {
-                this.moveHeroEffectDummyUnit(this.heroPos.x, this.heroPos.y)
-
-                // shown after being hidden, which is what gives a locust unit its dot back
-                ShowUnit(this.heroEffectDummyUnit, false)
-                ShowUnit(this.heroEffectDummyUnit, true)
+            // The unit stays on the map and follows the effect from the packets, unseen: transparent,
+            // without team glow (see updateUnitVertexColor), and without the shadow that would trail
+            // behind the effect - one is drawn under the effect instead (see createFakeShadow).
+            if (!this.isUnitShadowRemovedHere) {
+                this.removeUnitShadowHere()
             }
 
-            // the unit waits in a corner of the map, and its dot has no business being there
-            BlzSetUnitBooleanField(this.hero, UNIT_BF_HERO_HIDE_HERO_MINIMAP_DISPLAY, true)
+            this.updateUnitVertexColor()
 
-            // the native lock would drag the camera to the corner the unit waits in
+            // the native lock would follow the unit, a packet behind the effect the player steers
             this.releaseLockedCameraFromUnit()
             this.updateHeroEffect()
 
@@ -2491,6 +2726,7 @@ export class Escaper extends EscaperMake {
         }
 
         this.isHeroEffectActive = false
+        this.syncedUnitTimer?.pause()
 
         // nothing is waiting for an answer any more
         this.isHeroEffectFrozen = false
@@ -2509,21 +2745,20 @@ export class Escaper extends EscaperMake {
 
         this.parkHeroEffect()
 
-        this.heroEffectDummyUnit && ShowUnit(this.heroEffectDummyUnit, false)
-        this.hero && BlzSetUnitBooleanField(this.hero, UNIT_BF_HERO_HIDE_HERO_MINIMAP_DISPLAY, false)
+        // seen again
+        this.updateUnitVertexColor()
+        this.updateFakeShadow()
     }
 
     /**
      * Whether the hero is standing on the ground. Asked of the hero rather than of its unit: while
-     * an effect stands in, that unit waits in a corner of the map with the fly height it had when
-     * it was parked, so it reads as grounded for the whole slide however high the hero really is.
+     * an effect stands in, that unit only gets its fly height from the packets, a packet late.
      */
     isHeroOnGround = () => this.getHeroFlyHeight() < 1
 
     /**
-     * Plays a sound where the hero is seen. Its unit is parked in a corner of the map while an
-     * effect stands in for it, and a 3D sound attached to that unit is cut off by distance long
-     * before it reaches anybody's ears.
+     * Plays a sound where the hero is seen. Its unit only follows the packets while an effect
+     * stands in for it, and a 3D sound attached to that unit would trail behind the hero.
      */
     runSoundOnHero = (path: string, duration: number) => {
         if (this.isHeroEffectActive) {
@@ -2551,10 +2786,7 @@ export class Escaper extends EscaperMake {
         SetCameraPosition(this.heroPos.x, this.heroPos.y)
     }
 
-    /**
-     * Draws the effect where the hero is, and keeps the unit in its corner: the player keeps
-     * ordering it around, and an order would otherwise walk it back into the map.
-     */
+    /** Draws the effect where the hero is. The unit is left to the packets (see moveHeroUnitToSyncedPos) */
     updateHeroEffect = () => {
         if (!this.heroEffect || !this.hero || !this.isHeroEffectActive) {
             return
@@ -2563,15 +2795,14 @@ export class Escaper extends EscaperMake {
         BlzSetSpecialEffectPosition(this.heroEffect, this.heroPos.x, this.heroPos.y, this.getHeroZ())
         BlzSetSpecialEffectYaw(this.heroEffect, Deg2Rad(this.heroPos.facing))
 
-        SetUnitX(this.hero, globals.MAP_MIN_X)
-        SetUnitY(this.hero, globals.MAP_MIN_Y)
-
+        // at the very moment the effect moves, or it would trail behind it
+        this.updateFakeShadow()
         this.updateLockedCamera()
     }
 
     /**
-     * A camera locked on the hero follows its unit, which now waits in a corner of the map, so it
-     * has to be carried by hand. Done here rather than on a timer of its own, so that the camera
+     * A camera locked on the hero follows its unit, which only moves a packet behind the effect, so
+     * it has to be carried by hand. Done here rather than on a timer of its own, so that the camera
      * moves at the very moment the effect does, which is what keeps it smooth.
      */
     private updateLockedCamera = () => {
@@ -2589,16 +2820,28 @@ export class Escaper extends EscaperMake {
             const otherTransparency =
                 getUdgEscapers().get(GetPlayerId(GetLocalPlayer()))?.othersTransparencyState[this.escaperId] || null
 
-            const shadow = getUdgEscapers().get(GetPlayerId(GetLocalPlayer()))?.shadowState[this.escaperId]
+            const viewer = getUdgEscapers().get(GetPlayerId(GetLocalPlayer()))
+            const shadow = viewer?.shadowState[this.escaperId]
+
+            // before the look below is set, which a switch of skin could undo
+            if (shadow === false) {
+                this.removeUnitShadowHere()
+            }
 
             SetUnitVertexColorBJ(
                 this.hero,
                 this.vcRed,
                 this.vcGreen,
                 this.vcBlue,
-                GetLocalPlayer() === this.getPlayer() || otherTransparency === null || this.isEscaperSecondary()
-                    ? this.vcTransparency
-                    : otherTransparency
+                // unseen while its effect stands in for it, or barely, for its own player if they want it
+                // (see setLuckyLukeTransparency)
+                this.isHeroEffectActive
+                    ? viewer === this
+                        ? (this.getLuckyLukeTransparency() ?? 100)
+                        : 100
+                    : GetLocalPlayer() === this.getPlayer() || otherTransparency === null || this.isEscaperSecondary()
+                      ? this.vcTransparency
+                      : otherTransparency
             )
 
             SetUnitVertexColorBJ(
@@ -2611,17 +2854,9 @@ export class Escaper extends EscaperMake {
                     : otherTransparency
             )
 
-            if (shadow === false) {
-                // Force toggle it to update the shadow
-                BlzSetUnitSkin(this.hero, this.skin === FourCC('hpea') ? FourCC('hfoo') : FourCC('hpea'))
-                BlzSetUnitSkin(this.hero, this.skin || Constants.HERO_TYPE_ID)
-            } else {
-                // Unfortunately we can't disable the skin, you'll have to recreate the unit
-            }
-
             // Changing base color with -red will break the teamglow. Thats why we need to reapply it
             BlzShowUnitTeamGlow(this.hero, true)
-            BlzShowUnitTeamGlow(this.hero, this.glow)
+            BlzShowUnitTeamGlow(this.hero, this.glow && !this.isHeroEffectActive)
             BlzShowUnitTeamGlow(this.powerCircle, true)
             BlzShowUnitTeamGlow(this.powerCircle, this.glow)
         }

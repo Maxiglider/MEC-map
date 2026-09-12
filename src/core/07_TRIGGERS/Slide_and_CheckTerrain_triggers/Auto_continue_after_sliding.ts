@@ -68,6 +68,7 @@ const initAutoContinueAfterSliding = () => {
     return {
         lastClickedX,
         lastClickedY,
+        lastClickedWidgets,
         isLastTargetALocation,
         udg_autoContinueAfterSliding,
         AutoContinueAfterSliding,

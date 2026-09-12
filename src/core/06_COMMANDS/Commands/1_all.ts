@@ -11,7 +11,7 @@ import { IsInteger, PercentageStringOrX2Integer } from '../../01_libraries/Funct
 import { checkOpacityValue, DrawGrid, SetGridOpacity, SetGridOpacityForAllGrids } from '../../01_libraries/Grid'
 import { ColorString2Id, udg_colorCode, udg_colorStrings } from '../../01_libraries/Init_colorCodes'
 import { Text } from '../../01_libraries/Text'
-import { Escaper } from '../../04_STRUCTURES/Escaper/Escaper'
+import { Escaper, LUCKY_LUKE_DEFAULT_TRANSPARENCY } from '../../04_STRUCTURES/Escaper/Escaper'
 import { EscaperEffectFunctions } from '../../04_STRUCTURES/Escaper/EscaperEffect_functions'
 import { execute, newCmd } from '../../04_STRUCTURES/Escaper/EscaperSavedCommands'
 import { Disco } from '../../04_STRUCTURES/Escaper/Escaper_disco'
@@ -1698,6 +1698,58 @@ export const initCommandAll = () => {
                 } else {
                     Text.mkP(escaper.getPlayer(), `Showing ${escaper.getDisplayName()} hero without shadow`)
                 }
+            }
+
+            return true
+        },
+    })
+
+    //-luckyLuke <boolean | number>
+    registerCommand({
+        name: 'luckyLuke',
+        alias: [],
+        group,
+        argDescription: '<boolean | number>',
+        description:
+            'While your hero slides async, faintly shows its unit, which follows it where the other players see it: on gives it 70% transparency (instead of 100%), a number from 0 to 100 sets another transparency. Off by default',
+        cb: ({ nbParam, param1 }, escaper) => {
+            if (nbParam !== 1) {
+                return true
+            }
+
+            // a number is a transparency of its own, 0 and 1 included, which IsBoolString takes for off and on
+            if (tostring(S2I(param1)) === param1) {
+                const transparency = S2I(param1)
+
+                if (transparency < 0 || transparency > 100) {
+                    return true
+                }
+
+                escaper.setLuckyLukeTransparency(transparency)
+
+                Text.mkP(
+                    escaper.getPlayer(),
+                    `Lucky Luke on: the unit of your hero sliding async is seen with transparency: ${transparency}`
+                )
+
+                return true
+            }
+
+            if (!IsBoolString(param1)) {
+                return true
+            }
+
+            if (S2B(param1)) {
+                escaper.setLuckyLukeTransparency(LUCKY_LUKE_DEFAULT_TRANSPARENCY)
+
+                Text.mkP(
+                    escaper.getPlayer(),
+                    `Lucky Luke on: the unit of your hero sliding async is seen with transparency: ${LUCKY_LUKE_DEFAULT_TRANSPARENCY}`
+                )
+            } else {
+                escaper.setLuckyLukeTransparency(undefined)
+
+                Text.mkP(escaper.getPlayer(), `Lucky Luke off: the unit of your hero sliding async is not seen`)
             }
 
             return true

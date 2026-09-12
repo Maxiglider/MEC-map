@@ -152,7 +152,10 @@ export class StaticSlide {
                             const hero = Natives.UGetTriggerUnit()
                             const escaper = Hero2Escaper(hero)
 
-                            if (IsHero(hero) && escaper) {
+                            // A hero sliding as an effect is taken along by its own machine, where it
+                            // really is (see Escaper.followStaticSlidesOfAsyncHero): its unit only
+                            // follows the packets, and would be taken a second time, and late.
+                            if (IsHero(hero) && escaper && !escaper.isHeroAsEffect()) {
                                 this.takeHero(escaper)
                             }
                         },
@@ -192,7 +195,10 @@ export class StaticSlide {
                         () => {
                             const escaper = Hero2Escaper(Natives.UGetTriggerUnit())
 
-                            escaper && this.releaseHero(escaper)
+                            // let go by its own machine while it slides as an effect, as it was taken
+                            if (escaper && !escaper.isHeroAsEffect()) {
+                                this.releaseHero(escaper)
+                            }
                         },
                     ],
                 })

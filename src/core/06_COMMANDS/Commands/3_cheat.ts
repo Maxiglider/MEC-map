@@ -469,8 +469,8 @@ export const initExecuteCommandCheat = () => {
                 return true
             }
 
-            // Where every machine agrees the target is: its unit waits in a corner of the map while it
-            // slides async, and where its effect is seen differs from one machine to another.
+            // Where every machine agrees the target is: where its effect is seen while it slides async
+            // differs from one machine to another.
             const x = targetEscaper.getSyncedHeroX()
             const y = targetEscaper.getSyncedHeroY()
 

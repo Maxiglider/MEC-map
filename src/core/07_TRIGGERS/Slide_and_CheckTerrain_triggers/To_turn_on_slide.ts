@@ -227,6 +227,8 @@ const initTurnOnSlide = () => {
             AutoContinueAfterSliding.lastClickedX[n] = orderX
             AutoContinueAfterSliding.lastClickedY[n] = orderY
             AutoContinueAfterSliding.isLastTargetALocation[n] = triggerIsToLocation
+            // what was clicked, for the hero to go and take it once the slide ends: a meteor, say
+            AutoContinueAfterSliding.lastClickedWidgets[n] = triggerIsToLocation ? null : orderWidget
 
             Apm.nbClicsOnSlide[n] = Apm.nbClicsOnSlide[n] + 1
         }

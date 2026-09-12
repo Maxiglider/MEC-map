@@ -135,7 +135,7 @@ const turnSliderTowardsCursor = (escaperId: number) => {
         return
     }
 
-    // from where the hero really is: its unit waits in a corner of the map while it slides
+    // from where the hero really is: its unit only follows the packets, a packet behind, while it slides
     const angle = Atan2(target.y - escaper.getHeroY(), target.x - escaper.getHeroX()) * bj_RADTODEG
 
     // not SetUnitFacing, which turns progressively, and not BlzSetUnitFacingEx either: this is
