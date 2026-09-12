@@ -27,6 +27,7 @@ import {
 import {
     ASYNC_HERO_EVENT,
     HeroMovementState,
+    forgetAwaitedKillingContacts,
     sendAsyncHeroDeath,
     sendAsyncHeroEvent,
     sendAsyncTerrainChange,
@@ -46,11 +47,13 @@ import { DisableInterface, EnableInterface } from '../../DisablingInterface/Enab
 import { FollowMouse } from '../../Follow_mouse/Follow_mouse'
 import { SimpleFollowMouse } from '../../Follow_mouse/Follow_mouse_simple'
 import { KeyboardShortcutArray } from '../../Keyboard_shortcuts/KeyboardShortcutArray'
+import { clearDeathCause, reportHeroDeath, setDeathCauseIfUnknown, setDeathOriginIfUnknown } from '../../Log/DeathCause'
 import { Natives } from '../../wc3_natives_unsecured/Natives'
 import { Level } from '../Level/Level'
 import { DEPART_PAR_DEFAUT } from '../Level/StartAndEnd'
 import { StaticSlide } from '../Level/StaticSlide'
 import { METEOR_NORMAL, udg_meteors } from '../Meteor/Meteor'
+import { isImmolationSystemEnabled } from '../Monster/Immolation_system'
 import { isDeathTerrain, type TerrainType } from '../TerrainType/TerrainType'
 import { TerrainTypeSlide } from '../TerrainType/TerrainTypeSlide'
 import { TerrainTypeWalk } from '../TerrainType/TerrainTypeWalk'
@@ -67,6 +70,15 @@ const VIPs64 = ['V29ybGRFZGl0', 'TWF4aW1heG91IzI4NzI=', 'U3RhbiMyMjM5OQ==', 'c3B
 const VIPs = VIPs64.map(name64 => EncodingBase64.Decode(name64))
 
 let METEOR_EFFECT = 'Abilities\\Weapons\\DemonHunterMissile\\DemonHunterMissile.mdl'
+
+/**
+ * Where the right hand of the hero effect is, from its feet and at scale 1, to hold the meteor it
+ * carries (see updateMeteorHandEffect): an effect has no attachment point to read. Measured on the
+ * default hero model.
+ */
+const METEOR_HAND_FORWARD = 20
+const METEOR_HAND_RIGHT = 35
+const METEOR_HAND_HEIGHT = 60
 
 export const SetMeteorEffect = (newEffect: string) => {
     METEOR_EFFECT = newEffect
@@ -107,6 +119,12 @@ const FAKE_SHADOW_IMAGE_TYPE = 3
  * never went.
  */
 const ASYNC_SILENCE_TIMEOUT = 0.5
+
+/**
+ * The longest the effect of a hero waits where its machine saw a contact that kills it, should that
+ * contact never come back: on the clock of that machine, as only that machine stops it.
+ */
+const CONTACT_STOP_TIMEOUT = 1
 
 /**
  * The unit of a hero sliding as an effect is carried on from the last packet by every machine, this
@@ -170,6 +188,8 @@ export class Escaper extends EscaperMake {
     private syncedUnitTimer: Timer | null = null
     /** Between the moment this machine sees the hero die and the moment every machine agrees on it */
     private isHeroEffectFrozen = false
+    /** When its own machine stopped the effect for a contact that kills it (see stopHeroEffectForContact) */
+    private contactStopTime: number | undefined = undefined
     /** Sequence of the last packet applied, so that a late one cannot undo a newer one */
     private lastAsyncSequence = 0
     /** Set by the "-autoTurn async" mode: this hero slides as an effect */
@@ -218,6 +238,12 @@ export class Escaper extends EscaperMake {
     private terrainKillEffect?: effect
     private portalEffect?: effect
     private meteorEffect?: effect
+    /**
+     * The meteor a hero sliding as an effect is seen carrying: the one attached to its hand is attached
+     * to its unit, unseen and behind the effect, so this one, made with it on every machine, is held
+     * at the right hand of the effect instead - where each machine sees that effect.
+     */
+    private meteorHandEffect?: effect
 
     private godMode: boolean
     private godModeKills: boolean
@@ -521,6 +547,9 @@ export class Escaper extends EscaperMake {
     addEffectMeteor = () => {
         if (!this.meteorEffect && this.hero) {
             this.meteorEffect = EffectUtils.addSpecialEffectTarget(METEOR_EFFECT, this.hero, 'hand right')
+            // made on every machine as well, like the one above: picking a meteor up is heard by all of them
+            this.meteorHandEffect = EffectUtils.addSpecialEffect(METEOR_EFFECT, 0, 0)
+            this.refreshMeteorEffects()
         }
     }
 
@@ -529,6 +558,42 @@ export class Escaper extends EscaperMake {
             EffectUtils.destroyEffect(this.meteorEffect)
             delete this.meteorEffect
         }
+
+        if (this.meteorHandEffect) {
+            EffectUtils.destroyEffect(this.meteorHandEffect)
+            delete this.meteorHandEffect
+        }
+    }
+
+    /** Shows the carried meteor on whichever stands for the hero: its unit, or its effect (see meteorHandEffect) */
+    private refreshMeteorEffects = () => {
+        this.meteorEffect && BlzSetSpecialEffectAlpha(this.meteorEffect, this.isHeroEffectActive ? 0 : 255)
+
+        if (this.isHeroEffectActive) {
+            this.updateMeteorHandEffect()
+        } else {
+            this.meteorHandEffect && BlzSetSpecialEffectPosition(this.meteorHandEffect, 0, 0, PARKED_HERO_EFFECT_Z)
+        }
+    }
+
+    /** Holds the carried meteor at the right hand of the hero effect, where this machine sees that effect */
+    private updateMeteorHandEffect = () => {
+        if (!this.meteorHandEffect || !this.isHeroEffectActive) {
+            return
+        }
+
+        const scale = this.scale ?? globals.heroBaseScale ?? 1
+        const facing = Deg2Rad(this.heroPos.facing)
+        // the right of the hero, a quarter turn clockwise from where it looks
+        const right = facing - bj_PI / 2
+
+        BlzSetSpecialEffectPosition(
+            this.meteorHandEffect,
+            this.heroPos.x + (METEOR_HAND_FORWARD * Cos(facing) + METEOR_HAND_RIGHT * Cos(right)) * scale,
+            this.heroPos.y + (METEOR_HAND_FORWARD * Sin(facing) + METEOR_HAND_RIGHT * Sin(right)) * scale,
+            this.getHeroZ() + METEOR_HAND_HEIGHT * scale
+        )
+        BlzSetSpecialEffectYaw(this.meteorHandEffect, facing)
     }
 
     //select method
@@ -969,6 +1034,9 @@ export class Escaper extends EscaperMake {
     }
 
     private onEscaperDeath = () => {
+        // for -desyncProbe, where the unit is now that it died
+        this.hero && reportHeroDeath(this.escaperId, GetUnitX(this.hero), GetUnitY(this.hero))
+
         this.resetItem()
         delete this.lastTerrainType
         this.invisUnit && ShowUnit(this.invisUnit, false)
@@ -1012,6 +1080,11 @@ export class Escaper extends EscaperMake {
                 this.isAlive()
             ) {
                 this.isHeroEffectFrozen = true
+                // frozen for its death now, rather than stopped for the contact that caused it
+                this.contactStopTime = undefined
+
+                // decided by this machine alone: the others will only hear that it died
+                setDeathOriginIfUnknown(this.escaperId, 'killed by its own machine from')
 
                 sendAsyncHeroDeath(
                     this.escaperId,
@@ -1238,6 +1311,9 @@ export class Escaper extends EscaperMake {
             EffectUtils.destroyEffect(EffectUtils.addSpecialEffectTarget(killingEffectModel, this.hero, 'origin'))
         }
 
+        // why is only known to the machine of its player, which wrote it in its own log
+        setDeathCauseIfUnknown(this.escaperId, 'death told by the machine of its player')
+
         // Killed before the slide is turned back on: enabling it hands a sliding hero over to its
         // effect again, which a dead one must not be.
         this.killNow()
@@ -1271,6 +1347,8 @@ export class Escaper extends EscaperMake {
     killNow = () => {
         if (this.isAlive()) {
             if (this.hero) {
+                setDeathOriginIfUnknown(this.escaperId, 'killed from')
+
                 KillUnit(this.hero)
 
                 for (const hook of hooks.hooks_onEscaperDeath.getHooks()) {
@@ -1299,9 +1377,12 @@ export class Escaper extends EscaperMake {
     revive(x: number, y: number, type: 'coop' | 'other' = 'other') {
         const isAlive = this.isAlive()
 
-        if (!this.hero || !this.invisUnit || isAlive) {
+        if (!this.hero || isAlive) {
             return false
         }
+
+        // whatever was about to kill it before does not explain its next death
+        clearDeathCause(this.escaperId)
 
         this.setLastPos()
 
@@ -1323,9 +1404,12 @@ export class Escaper extends EscaperMake {
             this.createHero(x, y, angle)
         }
 
-        SetUnitX(this.invisUnit, x)
-        SetUnitY(this.invisUnit, y)
-        ShowUnit(this.invisUnit, true)
+        if (this.invisUnit) {
+            SetUnitX(this.invisUnit, x)
+            SetUnitY(this.invisUnit, y)
+            ShowUnit(this.invisUnit, true)
+        }
+
         this.enableCheckTerrain(true)
         this.SpecialIllidan()
         this.selectHero()
@@ -2478,8 +2562,32 @@ export class Escaper extends EscaperMake {
             return false
         }
 
-        return this.isHeroEffectFrozen || this.isHeroHandBackPending || this.isAsyncOwnerSilent()
+        return (
+            this.isHeroEffectFrozen ||
+            this.isHeroHandBackPending ||
+            this.isHeroEffectStoppedForContact() ||
+            this.isAsyncOwnerSilent()
+        )
     }
+
+    /**
+     * Stops the effect where its own machine sees a contact that kills it for sure, until that contact
+     * comes back from the network: the hero dies where it touched, under the killing effect shown there,
+     * rather than a round of the network further. Released by that contact if it did not kill after all
+     * (see releaseHeroEffectContactStop), and after CONTACT_STOP_TIMEOUT whatever happens.
+     */
+    stopHeroEffectForContact = () => {
+        if (this.isAsyncControlledHere()) {
+            this.contactStopTime = os.clock()
+        }
+    }
+
+    releaseHeroEffectContactStop = () => {
+        this.contactStopTime = undefined
+    }
+
+    private isHeroEffectStoppedForContact = () =>
+        this.contactStopTime !== undefined && os.clock() - this.contactStopTime < CONTACT_STOP_TIMEOUT
 
     /** Purely local: each machine decides for itself whether it is still being told anything */
     isAsyncOwnerSilent = () =>
@@ -2690,6 +2798,9 @@ export class Escaper extends EscaperMake {
 
             this.updateUnitVertexColor()
 
+            // the meteor it carries goes from the hand of its unit to the hand of its effect
+            this.refreshMeteorEffects()
+
             // the native lock would follow the unit, a packet behind the effect the player steers
             this.releaseLockedCameraFromUnit()
             this.updateHeroEffect()
@@ -2731,6 +2842,8 @@ export class Escaper extends EscaperMake {
         // nothing is waiting for an answer any more
         this.isHeroEffectFrozen = false
         this.isHeroHandBackPending = false
+        this.contactStopTime = undefined
+        forgetAwaitedKillingContacts(this.escaperId)
 
         // Set by the steering of its own machine alone while it slid: every machine forgets it, or the
         // next reversal of the unit would turn it towards an angle only one of them remembers.
@@ -2748,6 +2861,7 @@ export class Escaper extends EscaperMake {
         // seen again
         this.updateUnitVertexColor()
         this.updateFakeShadow()
+        this.refreshMeteorEffects()
     }
 
     /**
@@ -2795,8 +2909,9 @@ export class Escaper extends EscaperMake {
         BlzSetSpecialEffectPosition(this.heroEffect, this.heroPos.x, this.heroPos.y, this.getHeroZ())
         BlzSetSpecialEffectYaw(this.heroEffect, Deg2Rad(this.heroPos.facing))
 
-        // at the very moment the effect moves, or it would trail behind it
+        // at the very moment the effect moves, or they would trail behind it
         this.updateFakeShadow()
+        this.updateMeteorHandEffect()
         this.updateLockedCamera()
     }
 
@@ -2976,6 +3091,12 @@ export class Escaper extends EscaperMake {
         this.refreshCollisionLandmark()
     }
 
+    /**
+     * The invisible unit is what the immolation of the monsters burns when the hero touches them. MEC
+     * finds its contacts itself now (see ContactCheck), so it only exists while the immolation is
+     * turned on again (see setImmolationSystemEnabled): otherwise it is one more unit to move and to
+     * hide for nothing.
+     */
     refreshInvisUnit = () => {
         if (!this.hero) {
             return
@@ -2983,6 +3104,11 @@ export class Escaper extends EscaperMake {
 
         if (this.invisUnit) {
             RemoveUnit(this.invisUnit)
+            delete this.invisUnit
+        }
+
+        if (!isImmolationSystemEnabled()) {
+            return
         }
 
         const invisUnitUnitTypeId = GetInvisUnitTypeFromCollisionSize(this.collisionSize)
@@ -3005,6 +3131,11 @@ export class Escaper extends EscaperMake {
             this.invisUnit,
             EVENT_UNIT_DAMAGED
         )
+
+        // a dead hero touches nothing, as it is hidden at the death of the hero
+        if (!this.isAlive()) {
+            ShowUnit(this.invisUnit, false)
+        }
     }
 
     /**

@@ -3,9 +3,11 @@
 import { ServiceManager } from 'Services'
 import { EffectUtils } from 'Utils/EffectUtils'
 import { createEvent } from 'Utils/mapUtils'
+import { Ascii2String } from 'core/01_libraries/Ascii'
 import { Constants } from 'core/01_libraries/Constants'
 import { Monster } from 'core/04_STRUCTURES/Monster/Monster'
 import { hooks } from 'core/API/GeneralHooks'
+import { setDeathCause } from 'core/Log/DeathCause'
 import { getUdgEscapers, getUdgTerrainSaves, udg_monsters, udg_spawned_monsters } from '../../../../globals'
 import type { Escaper } from '../../04_STRUCTURES/Escaper/Escaper'
 import { Natives } from '../../wc3_natives_unsecured/Natives'
@@ -93,29 +95,29 @@ const InitTrig_InvisUnit_is_getting_damage = () => {
     }
 
     /**
-     * The killing effect of touching that unit when touching it kills the hero for sure, and nothing
-     * otherwise. Asked by the machine of an async hero the moment it sees the contact, with the very
-     * questions onEscaperTouchingUnit and onEscaperTouchingMonster ask every machine once the contact
-     * reaches them. Whatever a monster does rather than killing gets no answer, and neither does a
-     * mortar, which only kills once its damage adds up; the touch events of a monster are only known
-     * then, so the effect shown for them goes back under the ground (see onEscaperTouchingMonster).
+     * Whether touching that unit kills the hero for sure. Asked by the machine of an async hero the
+     * moment it sees the contact, with the very questions onEscaperTouchingUnit and
+     * onEscaperTouchingMonster ask every machine once the contact reaches them: that machine stops the
+     * effect there, and shows the killing effect. Whatever a monster does rather than killing answers
+     * no, and so does a mortar, which only kills once its damage adds up. The touch events of a monster
+     * are only known then: that machine stopped for one of them lets the effect go when it comes back.
      */
-    const getKillingEffectOfTouch = (escaper: Escaper, touchedUnit: unit, heroZ: number): string | undefined => {
+    const doesTouchKill = (escaper: Escaper, touchedUnit: unit, heroZ: number): boolean => {
         if (!escaper.getHero() || !escaper.isAlive() || escaper.isGodModeOn() || escaper.isCoopInvul()) {
-            return undefined
+            return false
         }
 
         if (RAbsBJ(heroZ - (BlzGetUnitZ(touchedUnit) + GetUnitFlyHeight(touchedUnit))) >= TAILLE_UNITE) {
-            return undefined
+            return false
         }
 
         if (GetUnitTypeId(touchedUnit) === Constants.DUMMY_POWER_CIRCLE) {
-            return undefined
+            return false
         }
 
         const monster = udg_monsters[GetUnitUserData(touchedUnit)] as Monster | undefined
 
-        if (
+        return !(
             monster &&
             (monster.getClearMob() ||
                 monster.getPortalMob() ||
@@ -123,9 +125,16 @@ const InitTrig_InvisUnit_is_getting_damage = () => {
                 monster.getJumpPad() !== undefined ||
                 monster.getMonsterType()?.getLifeBonus() ||
                 monster.hasAttackGroundPos())
-        ) {
+        )
+    }
+
+    /** The killing effect of touching that unit when touching it kills the hero for sure, and nothing otherwise */
+    const getKillingEffectOfTouch = (escaper: Escaper, touchedUnit: unit, heroZ: number): string | undefined => {
+        if (!doesTouchKill(escaper, touchedUnit, heroZ)) {
             return undefined
         }
+
+        const monster = udg_monsters[GetUnitUserData(touchedUnit)] as Monster | undefined
 
         return (
             monster?.getMonsterType()?.getKillingEffectStr() ||
@@ -138,8 +147,33 @@ const InitTrig_InvisUnit_is_getting_damage = () => {
         gg_trg_InvisUnit_is_getting_damage,
         onEscaperTouchingUnit,
         setTailleUnite,
+        doesTouchKill,
         getKillingEffectOfTouch,
     }
+}
+
+/**
+ * The cause of a death by contact, for -desyncProbe: what was touched, where it stood, and how far
+ * from where this machine sees the hero - which, for a hero sliding as an effect, only its own machine
+ * sees right.
+ */
+const describeContactDeath = (escaper: Escaper, killingUnit: unit, monster: Monster | undefined) => {
+    const x = GetUnitX(killingUnit)
+    const y = GetUnitY(killingUnit)
+    const dx = x - escaper.getHeroX()
+    const dy = y - escaper.getHeroY()
+    const what = monster
+        ? `monster ${monster.getId()} (${monster.getMonsterType()?.label ?? '?'})`
+        : `spawned unit (${udg_spawned_monsters[GetHandleId(killingUnit)]?.label ?? '?'})`
+
+    return string.format(
+        'contact with %s, unit type %s, at %d,%d, %d from the hero',
+        what,
+        Ascii2String(GetUnitTypeId(killingUnit)),
+        math.floor(x),
+        math.floor(y),
+        math.floor(SquareRoot(dx * dx + dy * dy))
+    )
 }
 
 /** What touching a monster does, telling whether it went the way that kills */
@@ -233,6 +267,7 @@ const touchMonster = (escaper: Escaper, killingUnit: unit, damage: number): bool
                 rememberKillingEffectOfDeath(escaper.getId(), effectStr)
             }
 
+            setDeathCause(escaper.getId(), describeContactDeath(escaper, killingUnit, monster))
             escaper.kill()
         }
 
@@ -262,6 +297,7 @@ export const init_InvisUnit_is_getting_damage = () => {
     return {
         onEscaperTouchingMonster,
         onEscaperTouchingUnit: Trig_InvisUnit_is_getting_damage.onEscaperTouchingUnit,
+        doesTouchKill: Trig_InvisUnit_is_getting_damage.doesTouchKill,
         getKillingEffectOfTouch: Trig_InvisUnit_is_getting_damage.getKillingEffectOfTouch,
         Trig_InvisUnit_is_getting_damage,
     }

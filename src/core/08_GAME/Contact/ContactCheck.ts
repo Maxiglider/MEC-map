@@ -6,7 +6,7 @@ import { Escaper } from '../../04_STRUCTURES/Escaper/Escaper'
 import type { ChunkEntry } from '../../04_STRUCTURES/Monster/ContactChunks'
 import { forEachMonsterAround, MAX_SWEPT_STEP } from '../../04_STRUCTURES/Monster/ContactChunks'
 import { previewKillingEffect } from '../Death/AsyncKillingEffects'
-import { applyContact, CONTACT_KIND, findContactUnit, sendAsyncContact } from './AsyncHeroSync'
+import { applyContact, awaitKillingContact, CONTACT_KIND, findContactUnit, sendAsyncContact } from './AsyncHeroSync'
 
 /**
  * Finds what a hero touches, by hand, which is how a contact is found at all: the monsters carry no
@@ -143,12 +143,13 @@ const applyContactInItsOwnThread = (escaperId: number, kind: number, id: number)
 }
 
 /**
- * The machine of a hero sliding async shows the killing effect the moment it sees a contact that kills,
- * rather than when that contact comes back from the network. It only moves an effect every machine
- * has (see AsyncKillingEffects), and only for what kills for sure - asked the very questions every
- * machine will ask when the contact reaches them.
+ * The machine of a hero sliding async acts the moment it sees a contact that kills, rather than when
+ * that contact comes back from the network: it stops the effect there, so that the hero dies where it
+ * touched, and shows the killing effect on it. It only stops and moves an effect every machine has
+ * (see AsyncKillingEffects), and only for what kills for sure - asked the very questions every machine
+ * will ask when the contact reaches them. Called before the contact is sent.
  */
-const previewKillingEffectOfContact = (escaper: Escaper, kind: number, id: number, heroZ: number) => {
+const anticipateKillingContact = (escaper: Escaper, kind: number, id: number, heroZ: number) => {
     if (kind === CONTACT_KIND.powerCircle || escaper.isAsyncDeathPending() || escaper.isAsyncHandBackPending()) {
         return
     }
@@ -159,11 +160,15 @@ const previewKillingEffectOfContact = (escaper: Escaper, kind: number, id: numbe
         return
     }
 
-    const model = ServiceManager.getService('InvisUnit_is_getting_damage').getKillingEffectOfTouch(
-        escaper,
-        touched,
-        heroZ
-    )
+    const touches = ServiceManager.getService('InvisUnit_is_getting_damage')
+
+    if (!touches.doesTouchKill(escaper, touched, heroZ)) {
+        return
+    }
+
+    awaitKillingContact(escaper.getId(), kind, id)
+
+    const model = touches.getKillingEffectOfTouch(escaper, touched, heroZ)
 
     model && previewKillingEffect(escaper.getId(), model, escaper.getHeroX(), escaper.getHeroY(), heroZ)
 }
@@ -351,7 +356,7 @@ const checkEscaperContacts = (escaper: Escaper) => {
         if (isTold) {
             const heroZ = escaper.getHeroZ()
 
-            previewKillingEffectOfContact(escaper, kind, id, heroZ)
+            anticipateKillingContact(escaper, kind, id, heroZ)
             sendAsyncContact(escaper.getId(), kind, id, heroZ)
         } else {
             applyContactInItsOwnThread(escaper.getId(), kind, id)

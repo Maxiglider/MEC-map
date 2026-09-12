@@ -1,4 +1,6 @@
 import { EffectUtils } from 'Utils/EffectUtils'
+import { createTimer } from 'Utils/mapUtils'
+import { Timer } from 'w3ts'
 import { getUdgMonsterTypes } from '../../../../globals'
 
 /**
@@ -14,6 +16,16 @@ import { getUdgMonsterTypes } from '../../../../globals'
  */
 const PARKED_Z = -1000
 
+/**
+ * How long, on the clock of this machine, the killing effect it showed on its own hero plays before it
+ * goes back under the ground: the death comes back from the network long before the effect is over,
+ * and taking it away then cut it after a fraction of a second - which looked like no effect at all.
+ */
+const PREVIEW_SHOWN_DURATION = 2
+
+/** How often the effects shown long enough are looked for */
+const PARK_CHECK_PERIOD = 0.1
+
 type KillingEffectPool = {
     /** The killing models the pool was made for, to make it again only when they change */
     signature: string
@@ -27,13 +39,41 @@ const pools: { [escaperId: number]: KillingEffectPool } = {}
 /** The pool effect this machine moved onto its own hero, by escaper id: this machine only */
 const previewedIndexes: { [escaperId: number]: number } = {}
 
+/** Until when that effect plays, on the clock of this machine: this machine only */
+const previewShownUntil: { [escaperId: number]: number } = {}
+
+/** The effects shown for a death that came: left to play to the end, whatever else happens to the hero */
+const isPreviewOfDeath: { [escaperId: number]: boolean } = {}
+
+/**
+ * Puts back under the ground the effects shown long enough. Made on every machine at once, the first
+ * time an async slide starts (see prepareKillingEffects), and only moves effects every machine has.
+ */
+let parkTimer: Timer | undefined
+
 /** The pool effect of what is killing that hero, for its death packet to name: see rememberKillingEffectOfDeath */
 const deathIndexes: { [escaperId: number]: number } = {}
+
+/**
+ * A killing effect is seen as a new effect destroyed at once: the model chosen by the mapper plays its
+ * opening, and its death if it has one. One made in advance has to look just as new when it is shown:
+ * it waits frozen at the start of its animation, and goes back there once shown (see freezeAtStart).
+ */
+const freezeAtStart = (killingEffect: effect) => {
+    // back to the opening, for a model that has one; any other keeps the animation it has
+    BlzPlaySpecialEffect(killingEffect, ANIM_TYPE_BIRTH)
+    BlzSetSpecialEffectTime(killingEffect, 0)
+    BlzSetSpecialEffectTimeScale(killingEffect, 0)
+}
 
 const makeParkedEffect = (model: string) => {
     const killingEffect = EffectUtils.addSpecialEffect(model, 0, 0)
 
-    killingEffect && BlzSetSpecialEffectZ(killingEffect, PARKED_Z)
+    if (killingEffect) {
+        BlzSetSpecialEffectZ(killingEffect, PARKED_Z)
+        // made now, so that the opening of the model is not played out under the ground
+        BlzSetSpecialEffectTimeScale(killingEffect, 0)
+    }
 
     return killingEffect
 }
@@ -60,6 +100,10 @@ const listKillingModels = () => {
  * async. Made again only if the killing models of the monster types changed since.
  */
 export const prepareKillingEffects = (escaperId: number) => {
+    if (!parkTimer) {
+        parkTimer = createTimer(PARK_CHECK_PERIOD, true, parkEffectsShownLongEnough)
+    }
+
     const models = listKillingModels()
     const signature = models.join('\n')
     const existing = pools[escaperId]
@@ -96,6 +140,9 @@ export const getKillingEffectIndex = (escaperId: number, model: string) => {
 export const cancelKillingEffectPreview = (escaperId: number) => {
     const index = previewedIndexes[escaperId]
 
+    delete previewShownUntil[escaperId]
+    delete isPreviewOfDeath[escaperId]
+
     if (index === undefined) {
         return
     }
@@ -104,7 +151,21 @@ export const cancelKillingEffectPreview = (escaperId: number) => {
 
     const killingEffect = pools[escaperId]?.effects[index]
 
-    killingEffect && BlzSetSpecialEffectPosition(killingEffect, 0, 0, PARKED_Z)
+    if (killingEffect) {
+        BlzSetSpecialEffectPosition(killingEffect, 0, 0, PARKED_Z)
+        freezeAtStart(killingEffect)
+    }
+}
+
+/** Only moves effects, in whatever order: nothing here is shared with the other machines */
+const parkEffectsShownLongEnough = () => {
+    const now = os.clock()
+
+    for (const [escaperId, shownUntil] of pairs(previewShownUntil)) {
+        if (now >= shownUntil) {
+            cancelKillingEffectPreview(escaperId)
+        }
+    }
 }
 
 /**
@@ -122,10 +183,15 @@ export const previewKillingEffect = (escaperId: number, model: string, x: number
     cancelKillingEffectPreview(escaperId)
 
     BlzSetSpecialEffectPosition(killingEffect, x, y, z)
-    // most killing effects are seen by being destroyed right after being made, which plays their death
+
+    // As a new effect destroyed at once: its death for a model that has one, from its start, and the
+    // opening it waits frozen at for any other, which asking for a death it has not leaves as it is.
     BlzPlaySpecialEffect(killingEffect, ANIM_TYPE_DEATH)
+    BlzSetSpecialEffectTime(killingEffect, 0)
+    BlzSetSpecialEffectTimeScale(killingEffect, 1)
 
     previewedIndexes[escaperId] = index
+    previewShownUntil[escaperId] = os.clock() + PREVIEW_SHOWN_DURATION
 }
 
 /**
@@ -161,7 +227,12 @@ export const takeKillingEffectModelOfDeath = (escaperId: number, index: number):
     const isValid = pool !== undefined && index >= 0 && index < pool.models.length
     const wasShownHere = isValid && previewedIndexes[escaperId] === index
 
-    cancelKillingEffectPreview(escaperId)
+    if (wasShownHere) {
+        // left to play: it goes back under the ground once shown long enough
+        isPreviewOfDeath[escaperId] = true
+    } else {
+        cancelKillingEffectPreview(escaperId)
+    }
 
     if (!isValid) {
         return undefined
@@ -170,8 +241,14 @@ export const takeKillingEffectModelOfDeath = (escaperId: number, index: number):
     return wasShownHere ? '' : pool.models[index]
 }
 
-/** Nothing shown nor remembered any more for that hero, when it stops sliding as an effect */
+/**
+ * Nothing shown nor remembered any more for that hero, when it stops sliding as an effect - but the
+ * effect of the death that stops it, which plays to the end.
+ */
 export const forgetKillingEffects = (escaperId: number) => {
-    cancelKillingEffectPreview(escaperId)
+    if (!isPreviewOfDeath[escaperId]) {
+        cancelKillingEffectPreview(escaperId)
+    }
+
     delete deathIndexes[escaperId]
 }

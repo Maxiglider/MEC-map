@@ -1,10 +1,11 @@
+import { clearDeathCause, setDeathCause } from 'core/Log/DeathCause'
+import { ReplaceBackslahsesInLinks } from '../../01_libraries/Basic_functions'
 import { Constants } from '../../01_libraries/Constants'
 import { COLOR_TERRAIN_DEATH } from '../../01_libraries/Init_colorCodes'
 import { Text } from '../../01_libraries/Text'
 import type { Escaper } from '../Escaper/Escaper'
 import { DISPLAY_SPACE, TerrainType } from './TerrainType'
 import { KillingTimers } from './TerrainTypeDeath_KillingTimers'
-import { ReplaceBackslahsesInLinks } from '../../01_libraries/Basic_functions'
 
 export const DEATH_TERRAIN_MAX_TOLERANCE = 50
 
@@ -50,6 +51,9 @@ export class TerrainTypeDeath extends TerrainType {
     }
 
     killEscaper = (escaper: Escaper) => {
+        // for -desyncProbe: the death comes once the time to kill has passed, unless it is called off
+        setDeathCause(escaper.getId(), `death terrain ${this.label}`)
+
         escaper.enableCheckTerrain(false)
         escaper.enableSlide(false)
         escaper.pause(true)
@@ -58,6 +62,8 @@ export class TerrainTypeDeath extends TerrainType {
     }
 
     abortKillEscaper = (escaper: Escaper) => {
+        clearDeathCause(escaper.getId())
+
         escaper.destroyTerrainKillEffect()
         this.killingTimers.destroyTimer(escaper.getId())
     }

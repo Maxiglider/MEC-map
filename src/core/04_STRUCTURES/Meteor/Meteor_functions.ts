@@ -12,9 +12,11 @@ const initMeteorFunctions = () => {
 
         const escaper = Hero2Escaper(hero)
 
+        // where every machine agrees the hero is: whether the item may be dropped belongs to the game
         if (
             escaper &&
-            getUdgTerrainTypes().getTerrainType(escaper.getHeroX(), escaper.getHeroY())?.getKind() == 'slide'
+            getUdgTerrainTypes().getTerrainType(escaper.getSyncedHeroX(), escaper.getSyncedHeroY())?.getKind() ==
+                'slide'
         ) {
             SetItemDroppable(meteor, false)
         }

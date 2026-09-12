@@ -4,6 +4,7 @@ import { createTimer } from 'Utils/mapUtils'
 import { Constants } from 'core/01_libraries/Constants'
 import { Apm } from 'core/08_GAME/Apm_clics_par_minute/Apm'
 import { Cpm } from 'core/08_GAME/Apm_clics_par_minute/Cpm'
+import { setDeathCause } from 'core/Log/DeathCause'
 import { getUdgEscapers, globals } from '../../../../globals'
 import { Escaper } from '../../04_STRUCTURES/Escaper/Escaper'
 import { GetMirrorEscaper } from '../../04_STRUCTURES/Escaper/Escaper_functions'
@@ -126,6 +127,15 @@ const initSlideTrigger = () => {
                     staticSliding.removePlayer(escaper.getId())
 
                     if (!escaper.isGodModeOn()) {
+                        setDeathCause(
+                            escaper.getId(),
+                            string.format(
+                                'left static slide %d sideways at %d,%d',
+                                staticSliding.id ?? -1,
+                                math.floor(newX),
+                                math.floor(newY)
+                            )
+                        )
                         escaper.kill()
                     } else if (escaper.isHeroAsEffect()) {
                         // only its own machine got here: the effect is shown through every machine

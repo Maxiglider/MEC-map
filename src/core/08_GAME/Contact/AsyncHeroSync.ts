@@ -219,6 +219,9 @@ export const initAsyncHeroSync = () => {
         }
 
         applyContact(fields[0], fields[1], fields[2], fields[3])
+
+        // after it: a contact that killed the hero has frozen its effect for its death by now
+        settleAwaitedContact(fields[0], fields[1], fields[2])
     })
 
     registerSyncEvent(EVENT_PREFIX, data => {
@@ -245,6 +248,61 @@ export const initAsyncHeroSync = () => {
     })
 
     createTimer(POSITION_PERIOD, true, sendLocalHeroPosition)
+}
+
+/**
+ * The contacts the machine of an async hero stopped its effect for, sure that they kill it: by escaper
+ * id, then by contact. This machine only. Each one is let go when it comes back from the network, and
+ * the effect moves on again once none is left and none of them killed it (see
+ * Escaper.stopHeroEffectForContact). Plain tables made once per hero, never from the shared pool.
+ */
+const awaitedKillingContacts: { [escaperId: number]: { [contactKey: number]: boolean } } = {}
+
+/** Names one contact with a single number, as the contact check does. No id ever comes close to it. */
+const AWAITED_CONTACT_KIND_FACTOR = 0x100000000
+
+/** Stops the effect of that hero until this contact, which its machine is sure kills it, comes back */
+export const awaitKillingContact = (escaperId: number, kind: number, id: number) => {
+    let awaited = awaitedKillingContacts[escaperId]
+
+    if (awaited === undefined) {
+        awaited = {}
+        awaitedKillingContacts[escaperId] = awaited
+    }
+
+    awaited[kind * AWAITED_CONTACT_KIND_FACTOR + id] = true
+
+    getUdgEscapers().get(escaperId)?.stopHeroEffectForContact()
+}
+
+/** A contact came back: once none is awaited any more, an effect it did not kill moves on */
+const settleAwaitedContact = (escaperId: number, kind: number, id: number) => {
+    const awaited = awaitedKillingContacts[escaperId]
+
+    if (awaited === undefined) {
+        return
+    }
+
+    delete awaited[kind * AWAITED_CONTACT_KIND_FACTOR + id]
+
+    for (const [_] of pairs(awaited)) {
+        return
+    }
+
+    getUdgEscapers().get(escaperId)?.releaseHeroEffectContactStop()
+}
+
+/** Nothing awaited any more for that hero, when it stops sliding as an effect */
+export const forgetAwaitedKillingContacts = (escaperId: number) => {
+    const awaited = awaitedKillingContacts[escaperId]
+
+    if (awaited === undefined) {
+        return
+    }
+
+    for (const [contactKey] of pairs(awaited)) {
+        delete awaited[contactKey]
+    }
 }
 
 /**

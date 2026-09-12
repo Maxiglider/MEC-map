@@ -5,6 +5,7 @@ import { SyncSaveLoad } from '../../Utils/SaveLoad/TreeLib/SyncSaveLoad'
 import { Constants } from '../01_libraries/Constants'
 import { AfkMode } from '../08_GAME/Afk_mode/Afk_mode'
 import { Natives } from '../wc3_natives_unsecured/Natives'
+import { setHeroDeathListener } from './DeathCause'
 
 /**
  * What must be the same on every machine, written by each of them five times a second, so that a
@@ -33,6 +34,10 @@ import { Natives } from '../wc3_natives_unsecured/Natives'
  * speed its own machine gives it between two packets: they read "*" for such a hero. Its effect is
  * written all the same, as fx*: different on every machine by design, and what its unit is compared
  * to - the fx of another machine should be close to the unit of the machine of that hero.
+ *
+ * Each death of a hero adds a line of its own, "[probe N death]", with where its unit died and what
+ * killed it (see DeathCause): the cause is written where the death was decided, so for a hero sliding
+ * as an effect only the file of its own machine knows it. Those lines are not compared.
  */
 const PROBE_PERIOD = 0.2
 
@@ -76,9 +81,34 @@ const stopOnPlayerLeaving = () => {
 
     state.timer.destroy()
     state.timer = undefined
+    setHeroDeathListener(undefined)
 }
 
 const flag = (value: boolean | unit | undefined) => (value ? '1' : '0')
+
+/** A line of its own for each death, written at once: a death is what a probe is most often read for */
+const writeHeroDeath = (escaperId: number, x: number, y: number, cause: string) => {
+    if (state.timer === undefined) {
+        return
+    }
+
+    state.lines.push(
+        string.format(
+            '[probe %d death] %d died at %d,%d: %s',
+            state.tick,
+            escaperId,
+            math.floor(x),
+            math.floor(y),
+            cause
+        )
+    )
+
+    if (state.lines.length > PROBE_FILE_LINES) {
+        state.lines.shift()
+    }
+
+    writeProbeFile()
+}
 
 const describeMonsters = () => {
     let positions = 0
@@ -194,6 +224,7 @@ export const setDesyncProbeEnabled = (isEnabled: boolean) => {
     if (!isEnabled) {
         state.timer?.destroy()
         state.timer = undefined
+        setHeroDeathListener(undefined)
 
         return
     }
@@ -217,4 +248,5 @@ export const setDesyncProbeEnabled = (isEnabled: boolean) => {
     // named after the player of this machine, so that two games run on one computer keep both files
     state.fileName = `MEC/desync_probe_p${GetPlayerId(GetLocalPlayer()!) + 1}.txt`
     state.timer = createTimer(PROBE_PERIOD, true, probe)
+    setHeroDeathListener(writeHeroDeath)
 }

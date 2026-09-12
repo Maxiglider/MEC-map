@@ -1,4 +1,4 @@
-import { udg_monsters, udg_spawned_monster_units, udg_spawned_monsters } from '../../../../globals'
+import { getUdgEscapers, udg_monsters, udg_spawned_monster_units, udg_spawned_monsters } from '../../../../globals'
 import type { MonsterType } from './MonsterType'
 
 /**
@@ -64,6 +64,10 @@ export const setImmolationSystemEnabled = (enabled: boolean): number => {
             nbChangedUnits++
         }
     }
+
+    // The invisible unit of a hero is what the immolation burns, and only exists while it does (see
+    // Escaper.refreshInvisUnit). Called by a command, hence on every machine at once, as making units is.
+    getUdgEscapers().forAll(escaper => escaper.refreshInvisUnit())
 
     return nbChangedUnits
 }
