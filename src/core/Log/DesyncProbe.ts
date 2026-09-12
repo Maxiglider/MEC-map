@@ -1,3 +1,4 @@
+import { MemoryHandler } from 'Utils/MemoryHandler'
 import { createEvent, createTimer } from 'Utils/mapUtils'
 import { Timer } from 'w3ts'
 import { getUdgEscapers, udg_monsters, udg_spawned_monster_units } from '../../../globals'
@@ -20,6 +21,14 @@ import { setHeroDeathListener } from './DeathCause'
  *  - hid: the id of a handle made just now, which follows every handle ever made and destroyed,
  *  - mobs: the positions of every monster unit, summed, then their facings (face) and their current
  *    orders (ord), summed,
+ *  - ag: the agents made and unmade on this machine since the probe was turned on, by kind, as
+ *    made/unmade: effects (e), timers (t), units (u), triggers (tr), groups (g), locations (l), rects
+ *    (r), regions (rg), items (i), lightnings (li), forces (f), destructables (d), sounds (s). Every
+ *    native making or unmaking one is counted, whoever calls it (see wrapAgentNatives). An agent made
+ *    by one machine alone is the most common desync, and hid cannot show it: the garbage collector of
+ *    each machine frees handles at its own pace, so hid differs by thousands in a game that holds,
+ *  - mh: the tables of MemoryHandler handed out, given back, and waiting in its pool: a table taken
+ *    or given back by one machine alone makes every table after it differ,
  *  - then per hero: its unit, its facing (f), fly height (h) and life (l), alive (a), sliding as an
  *    effect (e), sliding (s), the static slide taking it along (ss), the terrain it was last on (tt),
  *    its slide speed (sp), whether that speed is absolute (abs), coop invulnerable (inv), whether its
@@ -82,9 +91,129 @@ const stopOnPlayerLeaving = () => {
     state.timer.destroy()
     state.timer = undefined
     setHeroDeathListener(undefined)
+    unwrapAgentNatives()
 }
 
 const flag = (value: boolean | unit | undefined) => (value ? '1' : '0')
+
+type NativeFunction = (this: void, ...args: any[]) => any
+
+/** The kinds of agent counted, in the order they are written */
+const AGENT_KINDS = ['e', 't', 'u', 'tr', 'g', 'l', 'r', 'rg', 'i', 'li', 'f', 'd', 's']
+
+/** The natives making or unmaking an agent, by kind. One missing from this version of the game is skipped */
+const AGENT_NATIVES: { name: string; kind: string; isMade: boolean }[] = [
+    { name: 'AddSpecialEffect', kind: 'e', isMade: true },
+    { name: 'AddSpecialEffectLoc', kind: 'e', isMade: true },
+    { name: 'AddSpecialEffectTarget', kind: 'e', isMade: true },
+    { name: 'AddSpellEffect', kind: 'e', isMade: true },
+    { name: 'AddSpellEffectLoc', kind: 'e', isMade: true },
+    { name: 'AddSpellEffectById', kind: 'e', isMade: true },
+    { name: 'AddSpellEffectByIdLoc', kind: 'e', isMade: true },
+    { name: 'AddSpellEffectTarget', kind: 'e', isMade: true },
+    { name: 'AddSpellEffectTargetById', kind: 'e', isMade: true },
+    { name: 'DestroyEffect', kind: 'e', isMade: false },
+    { name: 'CreateTimer', kind: 't', isMade: true },
+    { name: 'DestroyTimer', kind: 't', isMade: false },
+    { name: 'CreateUnit', kind: 'u', isMade: true },
+    { name: 'CreateUnitByName', kind: 'u', isMade: true },
+    { name: 'CreateUnitAtLoc', kind: 'u', isMade: true },
+    { name: 'CreateUnitAtLocByName', kind: 'u', isMade: true },
+    { name: 'BlzCreateUnitWithSkin', kind: 'u', isMade: true },
+    { name: 'CreateCorpse', kind: 'u', isMade: true },
+    { name: 'RemoveUnit', kind: 'u', isMade: false },
+    { name: 'CreateTrigger', kind: 'tr', isMade: true },
+    { name: 'DestroyTrigger', kind: 'tr', isMade: false },
+    { name: 'CreateGroup', kind: 'g', isMade: true },
+    { name: 'DestroyGroup', kind: 'g', isMade: false },
+    { name: 'Location', kind: 'l', isMade: true },
+    { name: 'RemoveLocation', kind: 'l', isMade: false },
+    { name: 'Rect', kind: 'r', isMade: true },
+    { name: 'RectFromLoc', kind: 'r', isMade: true },
+    { name: 'RemoveRect', kind: 'r', isMade: false },
+    { name: 'CreateRegion', kind: 'rg', isMade: true },
+    { name: 'RemoveRegion', kind: 'rg', isMade: false },
+    { name: 'CreateItem', kind: 'i', isMade: true },
+    { name: 'BlzCreateItemWithSkin', kind: 'i', isMade: true },
+    { name: 'RemoveItem', kind: 'i', isMade: false },
+    { name: 'AddLightning', kind: 'li', isMade: true },
+    { name: 'AddLightningEx', kind: 'li', isMade: true },
+    { name: 'DestroyLightning', kind: 'li', isMade: false },
+    { name: 'CreateForce', kind: 'f', isMade: true },
+    { name: 'DestroyForce', kind: 'f', isMade: false },
+    { name: 'CreateDestructable', kind: 'd', isMade: true },
+    { name: 'CreateDestructableZ', kind: 'd', isMade: true },
+    { name: 'CreateDeadDestructable', kind: 'd', isMade: true },
+    { name: 'CreateDeadDestructableZ', kind: 'd', isMade: true },
+    { name: 'BlzCreateDestructableWithSkin', kind: 'd', isMade: true },
+    { name: 'BlzCreateDestructableZWithSkin', kind: 'd', isMade: true },
+    { name: 'RemoveDestructable', kind: 'd', isMade: false },
+    { name: 'CreateSound', kind: 's', isMade: true },
+    { name: 'CreateSoundFromLabel', kind: 's', isMade: true },
+    { name: 'CreateMIDISound', kind: 's', isMade: true },
+]
+
+const madeAgents: { [kind: string]: number } = {}
+const unmadeAgents: { [kind: string]: number } = {}
+
+/** The natives as they were before the probe wrapped them, by name, to give them back */
+const originalNatives: { [name: string]: NativeFunction | undefined } = {}
+
+/**
+ * Wraps every native of AGENT_NATIVES so that it counts what it makes or unmakes, then does what it
+ * did. On every machine at once, as the probe is turned on by a command, and given back as it stops.
+ * Only counts: nothing else changes, so the game plays the same.
+ */
+const wrapAgentNatives = () => {
+    for (const kind of AGENT_KINDS) {
+        madeAgents[kind] = 0
+        unmadeAgents[kind] = 0
+    }
+
+    for (const native of AGENT_NATIVES) {
+        const original = (_G as any)[native.name] as NativeFunction | undefined
+
+        if (typeof original !== 'function' || originalNatives[native.name] !== undefined) {
+            continue
+        }
+
+        originalNatives[native.name] = original
+
+        const counts = native.isMade ? madeAgents : unmadeAgents
+        const kind = native.kind
+
+        const counted: NativeFunction = (...args: any[]) => {
+            counts[kind] = counts[kind] + 1
+
+            return original(...args)
+        }
+
+        ;(_G as any)[native.name] = counted
+    }
+}
+
+const unwrapAgentNatives = () => {
+    for (const native of AGENT_NATIVES) {
+        const original = originalNatives[native.name]
+
+        if (original !== undefined) {
+            ;(_G as any)[native.name] = original
+            delete originalNatives[native.name]
+        }
+    }
+}
+
+const describeAgents = () => {
+    let line = 'ag'
+
+    for (const kind of AGENT_KINDS) {
+        line += string.format(' %s%d/%d', kind, madeAgents[kind] ?? 0, unmadeAgents[kind] ?? 0)
+    }
+
+    const pool = MemoryHandler.getPoolStats()
+
+    return line + string.format(' mh %d/%d/%d', pool.handedOut, pool.returned, pool.cached)
+}
 
 /** A line of its own for each death, written at once: a death is what a probe is most often read for */
 const writeHeroDeath = (escaperId: number, x: number, y: number, cause: string) => {
@@ -195,12 +324,13 @@ const probe = () => {
 
     state.lines.push(
         string.format(
-            '[probe %d t%.1f] rng %d hid %d %s%s',
+            '[probe %d t%.1f] rng %d hid %d %s %s%s',
             state.tick,
             state.tick * PROBE_PERIOD,
             draw,
             handleId,
             describeMonsters(),
+            describeAgents(),
             describeHeroes()
         )
     )
@@ -225,6 +355,7 @@ export const setDesyncProbeEnabled = (isEnabled: boolean) => {
         state.timer?.destroy()
         state.timer = undefined
         setHeroDeathListener(undefined)
+        unwrapAgentNatives()
 
         return
     }
@@ -249,4 +380,6 @@ export const setDesyncProbeEnabled = (isEnabled: boolean) => {
     state.fileName = `MEC/desync_probe_p${GetPlayerId(GetLocalPlayer()!) + 1}.txt`
     state.timer = createTimer(PROBE_PERIOD, true, probe)
     setHeroDeathListener(writeHeroDeath)
+    // last, so that counting starts from the same point on every machine
+    wrapAgentNatives()
 }

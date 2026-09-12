@@ -1,10 +1,18 @@
 import { arrayPush } from 'core/01_libraries/Basic_functions'
-import { errorHandler } from './mapUtils'
 
 export type IDestroyable = { __destroy: (recursive?: boolean) => void }
 
 const initMemoryHandler = () => {
     let numCreatedObjects = 0
+
+    /**
+     * Tables handed out and given back since the game started, for -desyncProbe. The pool only grows
+     * from what is given back, never from the garbage collector, so these are the same on every machine
+     * as long as no machine hands out or gives back a table the others do not - which is what code
+     * that only one machine runs must never do: the next table each machine hands out would differ.
+     */
+    let numHandedOutObjects = 0
+    let numReturnedObjects = 0
 
     const debugObjects: { [x: string]: number } = {}
     const cachedObjects: any[] = []
@@ -40,6 +48,7 @@ const initMemoryHandler = () => {
 
         purgeObject(self, recursive)
         arrayPush(cachedObjects, self)
+        numReturnedObjects++
     }
 
     const destroyClassObject = (self: any, className: string, recursive = false) => {
@@ -57,6 +66,7 @@ const initMemoryHandler = () => {
             cachedClassObjects.set(className, cachedObjects)
         }
         arrayPush(cachedObjects, self)
+        numReturnedObjects++
     }
 
     const getObjectMeta = (debugName?: string) => {
@@ -173,6 +183,8 @@ const initMemoryHandler = () => {
     }
 
     const getEmptyObject = <T>(debugName?: string, objectClass?: any) => {
+        numHandedOutObjects++
+
         let cachedObjectsToUse: any[] | undefined = cachedObjects
         if (objectClass) {
             cachedObjectsToUse = cachedClassObjects.get(objectClass.prototype.constructor.name)
@@ -236,6 +248,12 @@ const initMemoryHandler = () => {
 
             return newArray
         },
+        /** For -desyncProbe: tables handed out, given back, and waiting in the pool right now */
+        getPoolStats: () => ({
+            handedOut: numHandedOutObjects,
+            returned: numReturnedObjects,
+            cached: cachedObjects.length,
+        }),
         printDebugInfo: () => {
             print('MemoryHandler')
 
