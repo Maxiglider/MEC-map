@@ -154,7 +154,7 @@ export const ASYNC_HERO_EVENT = {
     godModeLeftStaticSlide: 2,
 }
 
-const findContactUnit = (kind: number, id: number) => {
+export const findContactUnit = (kind: number, id: number) => {
     if (kind === CONTACT_KIND.levelMonster) {
         return udg_monsters[id]?.u
     }
@@ -234,7 +234,14 @@ export const initAsyncHeroSync = () => {
     registerSyncEvent(DEATH_PREFIX, data => {
         const packet = decode(data)
 
-        packet && getUdgEscapers().get(packet.escaperId)?.applyAsyncDeath(packet.sequence, packet.movement)
+        // the killing effect the machine of that hero showed, for every machine to destroy (-1 for none)
+        const fields = decodeNumbers(data)
+        const killingEffectIndex = fields.length > 16 ? fields[16] : -1
+
+        packet &&
+            getUdgEscapers()
+                .get(packet.escaperId)
+                ?.applyAsyncDeath(packet.sequence, packet.movement, killingEffectIndex)
     })
 
     createTimer(POSITION_PERIOD, true, sendLocalHeroPosition)
@@ -305,8 +312,11 @@ export const sendAsyncHeroEvent = (
 }
 
 /** Only the player owning that hero sends it: they are the only one knowing where it stopped */
-export const sendAsyncHeroDeath = (escaperId: number, movement: HeroMovementState) => {
+export const sendAsyncHeroDeath = (escaperId: number, movement: HeroMovementState, killingEffectIndex: number) => {
     state.sequence++
 
-    BlzSendSyncData(DEATH_PREFIX, encode(escaperId, state.sequence, movement))
+    BlzSendSyncData(
+        DEATH_PREFIX,
+        encode(escaperId, state.sequence, movement) + FIELD_SEPARATOR + string.format('%d', killingEffectIndex)
+    )
 }

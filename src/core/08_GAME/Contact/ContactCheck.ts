@@ -1,10 +1,12 @@
+import { ServiceManager } from 'Services'
 import { createEvent, createTimer } from 'Utils/mapUtils'
 import { getUdgEscapers } from '../../../../globals'
 import { Constants } from '../../01_libraries/Constants'
 import { Escaper } from '../../04_STRUCTURES/Escaper/Escaper'
 import type { ChunkEntry } from '../../04_STRUCTURES/Monster/ContactChunks'
 import { forEachMonsterAround, MAX_SWEPT_STEP } from '../../04_STRUCTURES/Monster/ContactChunks'
-import { applyContact, CONTACT_KIND, sendAsyncContact } from './AsyncHeroSync'
+import { previewKillingEffect } from '../Death/AsyncKillingEffects'
+import { applyContact, CONTACT_KIND, findContactUnit, sendAsyncContact } from './AsyncHeroSync'
 
 /**
  * Finds what a hero touches, by hand, which is how a contact is found at all: the monsters carry no
@@ -138,6 +140,32 @@ const applyContactInItsOwnThread = (escaperId: number, kind: number, id: number)
     contactThread.id = id
 
     TriggerExecute(contactThread.trigger)
+}
+
+/**
+ * The machine of a hero sliding async shows the killing effect the moment it sees a contact that kills,
+ * rather than when that contact comes back from the network. It only moves an effect every machine
+ * has (see AsyncKillingEffects), and only for what kills for sure - asked the very questions every
+ * machine will ask when the contact reaches them.
+ */
+const previewKillingEffectOfContact = (escaper: Escaper, kind: number, id: number, heroZ: number) => {
+    if (kind === CONTACT_KIND.powerCircle || escaper.isAsyncDeathPending() || escaper.isAsyncHandBackPending()) {
+        return
+    }
+
+    const touched = findContactUnit(kind, id)
+
+    if (!touched) {
+        return
+    }
+
+    const model = ServiceManager.getService('InvisUnit_is_getting_damage').getKillingEffectOfTouch(
+        escaper,
+        touched,
+        heroZ
+    )
+
+    model && previewKillingEffect(escaper.getId(), model, escaper.getHeroX(), escaper.getHeroY(), heroZ)
 }
 
 const getContext = (escaper: Escaper) => {
@@ -321,7 +349,10 @@ const checkEscaperContacts = (escaper: Escaper) => {
         context.lastContactChecks[contactKey] = state.checkCount
 
         if (isTold) {
-            sendAsyncContact(escaper.getId(), kind, id, escaper.getHeroZ())
+            const heroZ = escaper.getHeroZ()
+
+            previewKillingEffectOfContact(escaper, kind, id, heroZ)
+            sendAsyncContact(escaper.getId(), kind, id, heroZ)
         } else {
             applyContactInItsOwnThread(escaper.getId(), kind, id)
         }

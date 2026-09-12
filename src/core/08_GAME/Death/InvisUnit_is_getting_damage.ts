@@ -9,6 +9,7 @@ import { hooks } from 'core/API/GeneralHooks'
 import { getUdgEscapers, getUdgTerrainSaves, udg_monsters, udg_spawned_monsters } from '../../../../globals'
 import type { Escaper } from '../../04_STRUCTURES/Escaper/Escaper'
 import { Natives } from '../../wc3_natives_unsecured/Natives'
+import { cancelKillingEffectPreview, getKillingEffectIndex, rememberKillingEffectOfDeath } from './AsyncKillingEffects'
 
 const InitTrig_InvisUnit_is_getting_damage = () => {
     let TAILLE_UNITE = 100
@@ -91,18 +92,66 @@ const InitTrig_InvisUnit_is_getting_damage = () => {
         TAILLE_UNITE = newSize
     }
 
-    return { TAILLE_UNITE, gg_trg_InvisUnit_is_getting_damage, onEscaperTouchingUnit, setTailleUnite }
+    /**
+     * The killing effect of touching that unit when touching it kills the hero for sure, and nothing
+     * otherwise. Asked by the machine of an async hero the moment it sees the contact, with the very
+     * questions onEscaperTouchingUnit and onEscaperTouchingMonster ask every machine once the contact
+     * reaches them. Whatever a monster does rather than killing gets no answer, and neither does a
+     * mortar, which only kills once its damage adds up; the touch events of a monster are only known
+     * then, so the effect shown for them goes back under the ground (see onEscaperTouchingMonster).
+     */
+    const getKillingEffectOfTouch = (escaper: Escaper, touchedUnit: unit, heroZ: number): string | undefined => {
+        if (!escaper.getHero() || !escaper.isAlive() || escaper.isGodModeOn() || escaper.isCoopInvul()) {
+            return undefined
+        }
+
+        if (RAbsBJ(heroZ - (BlzGetUnitZ(touchedUnit) + GetUnitFlyHeight(touchedUnit))) >= TAILLE_UNITE) {
+            return undefined
+        }
+
+        if (GetUnitTypeId(touchedUnit) === Constants.DUMMY_POWER_CIRCLE) {
+            return undefined
+        }
+
+        const monster = udg_monsters[GetUnitUserData(touchedUnit)] as Monster | undefined
+
+        if (
+            monster &&
+            (monster.getClearMob() ||
+                monster.getPortalMob() ||
+                monster.getCircleMob() ||
+                monster.getJumpPad() !== undefined ||
+                monster.getMonsterType()?.getLifeBonus() ||
+                monster.hasAttackGroundPos())
+        ) {
+            return undefined
+        }
+
+        return (
+            monster?.getMonsterType()?.getKillingEffectStr() ||
+            udg_spawned_monsters[GetHandleId(touchedUnit)]?.getKillingEffectStr()
+        )
+    }
+
+    return {
+        TAILLE_UNITE,
+        gg_trg_InvisUnit_is_getting_damage,
+        onEscaperTouchingUnit,
+        setTailleUnite,
+        getKillingEffectOfTouch,
+    }
 }
 
-const onEscaperTouchingMonster = (escaper: Escaper, killingUnit: unit, damage: number) => {
+/** What touching a monster does, telling whether it went the way that kills */
+const touchMonster = (escaper: Escaper, killingUnit: unit, damage: number): boolean => {
     const hero = escaper.getHero()
 
     if (!hero) {
-        return
+        return false
     }
 
     if (!escaper.isAlive()) {
-        return
+        return false
     }
 
     const monster = udg_monsters[GetUnitUserData(killingUnit)] as Monster | undefined
@@ -117,12 +166,12 @@ const onEscaperTouchingMonster = (escaper: Escaper, killingUnit: unit, damage: n
 
         if (clearMob) {
             clearMob.activate()
-            return
+            return false
         } else if (portalMob) {
             portalMob.activate(monster, escaper, hero)
-            return
+            return false
         } else if (circleMob) {
-            return
+            return false
         } else if (jumpPad !== undefined) {
             escaper.setOldDiffZ(jumpPad)
             const effect = monster.getJumpPadEffect()
@@ -133,15 +182,15 @@ const onEscaperTouchingMonster = (escaper: Escaper, killingUnit: unit, damage: n
                 )
             }
 
-            return
+            return false
         } else if (lifeBonus) {
             monster?.onEscaperReachingThisLifeBonus(escaper)
-            return
+            return false
         } else if (monsterTouchEvents.length > 0) {
             for (const event of monsterTouchEvents) {
                 event.fire()
             }
-            return
+            return false
         }
     }
 
@@ -160,7 +209,7 @@ const onEscaperTouchingMonster = (escaper: Escaper, killingUnit: unit, damage: n
             }
         }
 
-        return
+        return false
     }
 
     if (!escaper.isCoopInvul()) {
@@ -169,19 +218,41 @@ const onEscaperTouchingMonster = (escaper: Escaper, killingUnit: unit, damage: n
             SetWidgetLife(hero, GetWidgetLife(hero) - damage)
         }
 
-        if (!monster?.hasAttackGroundPos() || (monster.hasAttackGroundPos() && GetWidgetLife(hero) - damage <= 0.405)) {
-            escaper.kill()
-        }
-
         const effectStr =
             monster?.getMonsterType()?.getKillingEffectStr() ||
             udg_spawned_monsters[GetHandleId(killingUnit)]?.getKillingEffectStr()
 
+        // A hero sliding async whose pool holds that model has it explode where it dies, on every
+        // machine, named by its death packet (see AsyncKillingEffects) - rather than here, where each
+        // machine sees the hero at a place of its own.
+        const isExplodedAtDeath =
+            !!effectStr && escaper.isHeroAsEffect() && getKillingEffectIndex(escaper.getId(), effectStr) !== -1
+
+        if (!monster?.hasAttackGroundPos() || (monster.hasAttackGroundPos() && GetWidgetLife(hero) - damage <= 0.405)) {
+            if (effectStr && escaper.isHeroAsEffect()) {
+                rememberKillingEffectOfDeath(escaper.getId(), effectStr)
+            }
+
+            escaper.kill()
+        }
+
         //effet de tuation du héros par le monstre, suivant le type du monstre
-        if (effectStr) {
+        if (effectStr && !isExplodedAtDeath) {
             const eff = EffectUtils.addSpecialEffect(effectStr, escaper.getHeroX(), escaper.getHeroY())
             EffectUtils.destroyEffect(eff)
         }
+
+        return true
+    }
+
+    return false
+}
+
+const onEscaperTouchingMonster = (escaper: Escaper, killingUnit: unit, damage: number) => {
+    // the killing effect the machine of an async hero showed at once goes back under the ground,
+    // unless this touch does go the way that kills
+    if (!touchMonster(escaper, killingUnit, damage)) {
+        cancelKillingEffectPreview(escaper.getId())
     }
 }
 
@@ -191,6 +262,7 @@ export const init_InvisUnit_is_getting_damage = () => {
     return {
         onEscaperTouchingMonster,
         onEscaperTouchingUnit: Trig_InvisUnit_is_getting_damage.onEscaperTouchingUnit,
+        getKillingEffectOfTouch: Trig_InvisUnit_is_getting_damage.getKillingEffectOfTouch,
         Trig_InvisUnit_is_getting_damage,
     }
 }

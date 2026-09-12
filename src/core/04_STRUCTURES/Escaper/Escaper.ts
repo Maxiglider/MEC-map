@@ -30,6 +30,12 @@ import {
     sendAsyncTerrainChange,
 } from '../../08_GAME/Contact/AsyncHeroSync'
 import { reviveTrigManager } from '../../08_GAME/Death/A_hero_dies_check_if_all_dead_and_sounds'
+import {
+    forgetKillingEffects,
+    prepareKillingEffects,
+    takeKillingEffectModelOfDeath,
+    takeKillingEffectOfDeath,
+} from '../../08_GAME/Death/AsyncKillingEffects'
 import { HERO_START_ANGLE } from '../../08_GAME/Init_game/Heroes'
 import { MessageHeroDies } from '../../08_GAME/Init_game/Message_heroDies'
 import { RunCoopSoundOnHero } from '../../08_GAME/Mode_coop/coop_init_sounds'
@@ -920,7 +926,11 @@ export class Escaper extends EscaperMake {
             ) {
                 this.isHeroEffectFrozen = true
 
-                sendAsyncHeroDeath(this.escaperId, this.getHeroMovementState())
+                sendAsyncHeroDeath(
+                    this.escaperId,
+                    this.getHeroMovementState(),
+                    takeKillingEffectOfDeath(this.escaperId)
+                )
             }
 
             return true
@@ -1031,11 +1041,14 @@ export class Escaper extends EscaperMake {
      * the effect had reached, and dies there. Dying in the air needs nothing special: the slide
      * keeps carrying a dead hero until it lands, and only then stops.
      */
-    applyAsyncDeath = (sequence: number, movement: HeroMovementState) => {
+    applyAsyncDeath = (sequence: number, movement: HeroMovementState, killingEffectIndex = -1) => {
         // nothing left to kill: the hero was removed while its death was on its way
         if (!this.hero) {
             return
         }
+
+        // read while it still slides as an effect: the machine that showed it forgets that as it stops
+        const killingEffectModel = takeKillingEffectModelOfDeath(this.escaperId, killingEffectIndex)
 
         this.lastAsyncSequence = sequence
         this.lastAsyncPacketTime = os.clock()
@@ -1043,6 +1056,11 @@ export class Escaper extends EscaperMake {
 
         this.setHeroAsEffect(false)
         this.isHeroEffectFrozen = false
+
+        // the killing effect of what killed it, on the unit now standing where every machine agrees it died
+        if (killingEffectModel !== undefined && this.hero) {
+            EffectUtils.destroyEffect(EffectUtils.addSpecialEffectTarget(killingEffectModel, this.hero, 'origin'))
+        }
 
         // Killed before the slide is turned back on: enabling it hands a sliding hero over to its
         // effect again, which a dead one must not be.
@@ -2415,6 +2433,9 @@ export class Escaper extends EscaperMake {
             this.heroPos.facing = this.getHeroFacing()
             this.heroPos.flyHeight = this.getHeroFlyHeight()
 
+            // made on every machine as it starts: its own machine shows one the moment it is killed
+            prepareKillingEffects(this.escaperId)
+
             // every machine agrees on it until the first packet
             this.syncedHeroPos.x = this.heroPos.x
             this.syncedHeroPos.y = this.heroPos.y
@@ -2478,6 +2499,9 @@ export class Escaper extends EscaperMake {
         // Set by the steering of its own machine alone while it slid: every machine forgets it, or the
         // next reversal of the unit would turn it towards an angle only one of them remembers.
         this.slideLastAngleOrder = -1
+
+        // a killing effect shown for a death that did not happen as an effect goes back under the ground
+        forgetKillingEffects(this.escaperId)
 
         // taken along by a static slide of this machine alone, if this one owns the hero: the
         // others never heard of that ride
