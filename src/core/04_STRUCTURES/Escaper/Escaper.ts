@@ -577,6 +577,11 @@ export class Escaper extends EscaperMake {
             return
         }
 
+        // Out of the effect mode first, on every machine alike: the hero dies and goes the way a unit
+        // does, rather than through a death packet its own machine alone would send, and nothing of
+        // that mode outlives it - no position packet sent for ever, no static slide one machine knew.
+        this.leaveHeroEffectMode()
+
         this.resetItem()
 
         this.kill()
@@ -608,6 +613,8 @@ export class Escaper extends EscaperMake {
 
         DisableTrigger(this.checkTerrain)
         this.slide && this.slide.pause().destroy()
+        // or the hero would still be sliding, with a timer already gone
+        delete this.slide
 
         //coop
         ShowUnit(this.powerCircle, false)
@@ -908,8 +915,12 @@ export class Escaper extends EscaperMake {
         return this.killNow()
     }
 
-    /** Its death was seen and told, and every machine is about to hear about it */
-    isAsyncDeathPending = () => this.isHeroEffectFrozen
+    /**
+     * Its death was seen and told, and every machine is about to hear about it. Only while the hero
+     * is an effect: once a unit, every machine checks it alike, and this one skipping it alone would
+     * be this one missing a contact the others handle.
+     */
+    isAsyncDeathPending = () => this.isHeroEffectActive && this.isHeroEffectFrozen
 
     /** Everything the other machines need to carry on the movement of this hero themselves */
     getHeroMovementState = (): HeroMovementState => ({
@@ -926,6 +937,8 @@ export class Escaper extends EscaperMake {
         rotationSpeed: this.rotationSpeed,
         turnPerPeriod: this.getSlideCurrentTurnPerPeriod(),
         terrainTypeId: this.lastTerrainType?.getTerrainTypeId() ?? 0,
+        staticSlideId: this.staticSliding?.id ?? -1,
+        staticSlidePreviousSpeed: this.staticSliding?.getPreviousSlideSpeed(this.escaperId) ?? 0,
     })
 
     /** Puts this hero exactly where the machine of its player says it is */
@@ -982,6 +995,11 @@ export class Escaper extends EscaperMake {
      * keeps carrying a dead hero until it lands, and only then stops.
      */
     applyAsyncDeath = (sequence: number, movement: HeroMovementState) => {
+        // nothing left to kill: the hero was removed while its death was on its way
+        if (!this.hero) {
+            return
+        }
+
         this.lastAsyncSequence = sequence
         this.lastAsyncPacketTime = os.clock()
         this.applyHeroMovementState(movement)
@@ -1001,6 +1019,16 @@ export class Escaper extends EscaperMake {
         // after enableSlide, which samples the terrain height itself and would overwrite them
         this.setLastZ(movement.lastZ)
         this.setOldDiffZ(movement.oldDiffZ)
+
+        // Dead along a static slide its own machine alone had it in: every machine gives the body
+        // back to that lane, which carries it on as it carries any body, rather than letting it
+        // stop where it fell. After enableSlide, which a static slide would refuse.
+        if (movement.staticSlideId >= 0) {
+            getUdgLevels()
+                .getCurrentLevel(this)
+                .staticSlides.get(movement.staticSlideId)
+                ?.carryDeadHero(this, movement.staticSlidePreviousSpeed)
+        }
 
         // Every machine runs this on the same turn, so dropping the temporary speed here is
         // symmetric. Its timer could not be transmitted anyway, and the hero is dead: the speed
@@ -2371,8 +2399,39 @@ export class Escaper extends EscaperMake {
             return
         }
 
+        this.leaveHeroEffectMode()
+
+        // the unit takes back the place the effect had led it to
+        SetUnitX(this.hero, this.heroPos.x)
+        SetUnitY(this.hero, this.heroPos.y)
+        BlzSetUnitFacingEx(this.hero, this.heroPos.facing)
+        SetUnitFlyHeight(this.hero, this.heroPos.flyHeight, 0)
+
+        // The unit is back where it belongs, the native lock can hold it again. Done by hand rather
+        // than through resetCamera, which starts or stops the camera spin: this runs on the machine
+        // of whoever locks their camera on the hero only, and a timer made or destroyed on one
+        // machine alone desyncs the game.
+        const viewer = getUdgEscapers().get(GetPlayerId(GetLocalPlayer()!))
+
+        if (viewer?.lockCamTarget === this) {
+            SetCameraTargetControllerNoZForPlayer(viewer.getPlayer(), this.hero, 0, 0, false)
+        }
+    }
+
+    /**
+     * Everything the effect mode leaves behind, the unit aside: for a hero whose unit takes its place
+     * back, and for one about to be removed, which has no place to take back.
+     */
+    private leaveHeroEffectMode = () => {
+        if (!this.isHeroEffectActive) {
+            return
+        }
+
         this.isHeroEffectActive = false
-        this.isHeroHandBackPending = false // nothing is waiting for an answer any more
+
+        // nothing is waiting for an answer any more
+        this.isHeroEffectFrozen = false
+        this.isHeroHandBackPending = false
 
         // taken along by a static slide of this machine alone, if this one owns the hero: the
         // others never heard of that ride
@@ -2381,18 +2440,7 @@ export class Escaper extends EscaperMake {
         this.parkHeroEffect()
 
         this.heroEffectDummyUnit && ShowUnit(this.heroEffectDummyUnit, false)
-        BlzSetUnitBooleanField(this.hero, UNIT_BF_HERO_HIDE_HERO_MINIMAP_DISPLAY, false)
-
-        // the unit takes back the place the effect had led it to
-        SetUnitX(this.hero, this.heroPos.x)
-        SetUnitY(this.hero, this.heroPos.y)
-        BlzSetUnitFacingEx(this.hero, this.heroPos.facing)
-        SetUnitFlyHeight(this.hero, this.heroPos.flyHeight, 0)
-
-        // the unit is back where it belongs, the native lock can hold it again
-        const viewer = getUdgEscapers().get(GetPlayerId(GetLocalPlayer()!))
-
-        viewer?.lockCamTarget === this && viewer.resetCamera()
+        this.hero && BlzSetUnitBooleanField(this.hero, UNIT_BF_HERO_HIDE_HERO_MINIMAP_DISPLAY, false)
     }
 
     /**

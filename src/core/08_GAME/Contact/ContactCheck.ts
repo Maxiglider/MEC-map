@@ -1,4 +1,4 @@
-import { createTimer } from 'Utils/mapUtils'
+import { createEvent, createTimer } from 'Utils/mapUtils'
 import { getUdgEscapers } from '../../../../globals'
 import { Constants } from '../../01_libraries/Constants'
 import { Escaper } from '../../04_STRUCTURES/Escaper/Escaper'
@@ -113,6 +113,32 @@ type ContactContext = {
  * rather than built again at every turn.
  */
 const contexts: { [escaperId: number]: ContactContext } = {}
+
+/**
+ * Where a contact found here is handled from: a thread a trigger starts, rather than the timer of the
+ * check. What follows a contact may wait - a coop revive does, before giving its hero back its speed
+ * and then its mortality - and a wait ends a timer thread on the spot, which left the revived hero
+ * frozen and immortal. The immolation handed its contacts over through a damage trigger, and the
+ * packet of an async hero comes through a sync one: both threads that may wait.
+ *
+ * One trigger for them all: each execution runs in a thread of its own, and reads what to handle
+ * before anything in it can wait.
+ */
+const contactThread = { trigger: undefined as trigger | undefined, escaperId: 0, kind: 0, id: 0 }
+
+const applyContactInItsOwnThread = (escaperId: number, kind: number, id: number) => {
+    if (!contactThread.trigger) {
+        applyContact(escaperId, kind, id)
+
+        return
+    }
+
+    contactThread.escaperId = escaperId
+    contactThread.kind = kind
+    contactThread.id = id
+
+    TriggerExecute(contactThread.trigger)
+}
 
 const getContext = (escaper: Escaper) => {
     const existing = contexts[escaper.getId()]
@@ -265,6 +291,10 @@ const checkEscaperContacts = (escaper: Escaper) => {
     ) {
         context.fromX = context.toX
         context.fromY = context.toY
+
+        // and nothing touched before still counts as touched: a machine that was not looking then
+        // would handle again what this one takes for the same contact
+        context.lastContactChecks = {}
     }
 
     context.lastCheck = state.checkCount
@@ -291,9 +321,9 @@ const checkEscaperContacts = (escaper: Escaper) => {
         context.lastContactChecks[contactKey] = state.checkCount
 
         if (isTold) {
-            sendAsyncContact(escaper.getId(), kind, id)
+            sendAsyncContact(escaper.getId(), kind, id, escaper.getHeroZ())
         } else {
-            applyContact(escaper.getId(), kind, id)
+            applyContactInItsOwnThread(escaper.getId(), kind, id)
         }
     }
 }
@@ -317,6 +347,11 @@ export const initContactCheck = () => {
     }
 
     state.isInitialized = true
+
+    contactThread.trigger = createEvent({
+        events: [],
+        actions: [() => applyContact(contactThread.escaperId, contactThread.kind, contactThread.id)],
+    })
 
     createTimer(CONTACT_CHECK_PERIOD, true, () => {
         state.checkCount++

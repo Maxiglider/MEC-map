@@ -22,6 +22,16 @@ const testLeftClicks: { [escaperId: number]: boolean } = {}
 export const isTestingLeftClicks = (escaperId: number) => testLeftClicks[escaperId] === true
 
 /**
+ * Made on every machine, as a handle has to be, but only seen by the players testing: the others
+ * would watch it sit where it was made, moved by clicks they cannot see. Only a look, so it may
+ * differ from one machine to another.
+ */
+const refreshHeroEffectVisibility = () => {
+    heroEffect.effect &&
+        BlzSetSpecialEffectAlpha(heroEffect.effect, isTestingLeftClicks(GetPlayerId(GetLocalPlayer()!)) ? 255 : 0)
+}
+
+/**
  * Creates the model of the "-effect light" command on the hero of that player, and destroys it
  * when the test is turned off. Called from a chat command, hence from a synchronized event,
  * hence on every machine at the same moment: the handle comes and goes for everybody at once.
@@ -33,6 +43,8 @@ export const setTestLeftClicks = (escaperId: number, isTesting: boolean) => {
         // as long as somebody else is still testing, the effect has to stay
         for (const [_id, isSomeoneTesting] of pairs(testLeftClicks)) {
             if (isSomeoneTesting) {
+                refreshHeroEffectVisibility()
+
                 return
             }
         }
@@ -43,16 +55,16 @@ export const setTestLeftClicks = (escaperId: number, isTesting: boolean) => {
         return
     }
 
-    if (heroEffect.effect) {
-        return
+    if (!heroEffect.effect) {
+        const escaper = getUdgEscapers().get(escaperId)
+        const modelName = EscaperEffectFunctions.String2EffectStr('light')
+
+        if (escaper?.getHero() && modelName) {
+            heroEffect.effect = EffectUtils.addSpecialEffect(modelName, escaper.getHeroX(), escaper.getHeroY())
+        }
     }
 
-    const escaper = getUdgEscapers().get(escaperId)
-    const modelName = EscaperEffectFunctions.String2EffectStr('light')
-
-    if (escaper?.getHero() && modelName) {
-        heroEffect.effect = EffectUtils.addSpecialEffect(modelName, escaper.getHeroX(), escaper.getHeroY())
-    }
+    refreshHeroEffectVisibility()
 }
 
 /** Teleports the effect, on the terrain surface. Creates no handle: local only calls are safe. */

@@ -150,7 +150,15 @@ export const InitTrig_A_hero_dies_check_if_all_dead_and_sounds = () => {
                         if (globals.coopCircles) {
                             //revive si autre héros (vivant) au même endroit
                             for (let i = 0; i < Constants.NB_ESCAPERS; i++) {
-                                if (i !== n && getUdgEscapers().get(i)?.isAlive()) {
+                                // A hero sliding as an effect is left to the revive circle: each
+                                // machine holds it at a place of its own, and measuring from there
+                                // would revive the dead hero on some machines only. Its own machine
+                                // finds the circle, and tells every machine on the same turn.
+                                if (
+                                    i !== n &&
+                                    getUdgEscapers().get(i)?.isAlive() &&
+                                    !getUdgEscapers().get(i)?.isHeroAsEffect()
+                                ) {
                                     const h1 = getUdgEscapers().get(i)?.getHero()
 
                                     if (!h1) {

@@ -58,11 +58,16 @@ export const setNetworkClickListeningEnabled = (escaperId: number, isEnabled: bo
                     const x = BlzGetTriggerPlayerMouseX()
                     const y = BlzGetTriggerPlayerMouseY()
 
-                    // that same click was caught by the asynchronous path first: the gap between
-                    // the two is the latency the local path saves
-                    const localClickTime = isRightClick ? undefined : takeLastLocalClickTime()
-
-                    if (!isRightClick && isTestingLeftClicks(GetPlayerId(Natives.UGetTriggerPlayer()))) {
+                    // Shown to the player clicking only: this event runs on every machine, and the
+                    // local click it is compared to belongs to the machine of that player alone.
+                    if (
+                        !isRightClick &&
+                        Natives.UGetTriggerPlayer() === GetLocalPlayer() &&
+                        isTestingLeftClicks(GetPlayerId(Natives.UGetTriggerPlayer()))
+                    ) {
+                        // that same click was caught by the asynchronous path first: the gap between
+                        // the two is the latency the local path saves
+                        const localClickTime = takeLastLocalClickTime()
                         const delay =
                             localClickTime === undefined
                                 ? `${CYAN}(no local click to compare to)|r`

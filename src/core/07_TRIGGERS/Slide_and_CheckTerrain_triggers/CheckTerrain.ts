@@ -12,6 +12,7 @@ import { ASYNC_HERO_EVENT } from 'core/08_GAME/Contact/AsyncHeroSync'
 import { hooks } from 'core/API/GeneralHooks'
 import { getUdgEscapers, getUdgTerrainTypes } from '../../../../globals'
 import { AutoContinueAfterSliding } from './Auto_continue_after_sliding'
+import { TurnOnSlide } from './To_turn_on_slide'
 
 const TOLERANCE_ANGLE_DIFF = 5
 const TOLERANCE_RAYON_DIFF = 20
@@ -41,26 +42,40 @@ const initCheckTerrainTrigger = () => {
             escaper.setRotationSpeed(terrainType.getRotationSpeed())
         }
 
+        // the slide turning the hero half a turn: from a normal slide to a reverse one or back, or
+        // straight into a reverse one from walkable ground
+        let hasTurnedHeroHalfATurn = false
+
         if (escaper.getSlideSpeed() < 0) {
             if (wasSliding && !wasReversed && !escaper.getSlideMirror()) {
                 escaper.reverse()
+                hasTurnedHeroHalfATurn = true
             }
 
             if (!wasSliding) {
                 escaper.reverse()
+                hasTurnedHeroHalfATurn = true
             }
 
             if (wasSliding && wasReversed && escaper.getSlideMirror()) {
                 escaper.reverse()
+                hasTurnedHeroHalfATurn = true
             }
         } else {
             if (wasSliding && wasReversed && !escaper.getSlideMirror()) {
                 escaper.reverse()
+                hasTurnedHeroHalfATurn = true
             }
 
             if (wasSliding && !wasReversed && escaper.getSlideMirror()) {
                 escaper.reverse()
+                hasTurnedHeroHalfATurn = true
             }
+        }
+
+        // after the half turn: the orders right behind it must not undo it
+        if (hasTurnedHeroHalfATurn) {
+            TurnOnSlide.markSlideDirectionSwitch(escaper)
         }
     }
 

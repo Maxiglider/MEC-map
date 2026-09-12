@@ -17,15 +17,20 @@ const InitTrig_InvisUnit_is_getting_damage = () => {
      * What happens when the hero touches something, whether the game told us through the
      * immolation of a monster or our own contact check found it. An effect cannot be immolated,
      * so an async slide has to look for its contacts by hand, and both roads end up here.
+     *
+     * heroZ comes from the machine that told the contact of a hero sliding as an effect. Every
+     * machine holds that hero at a place of its own, and each one reading its height there would
+     * have some of them see the contact and the others not: a dead ally revived on some machines
+     * only, which is a desync.
      */
-    const onEscaperTouchingUnit = (escaper: Escaper, touchedUnit: unit, damage: number) => {
+    const onEscaperTouchingUnit = (escaper: Escaper, touchedUnit: unit, damage: number, heroZ = escaper.getHeroZ()) => {
         const hero = escaper.getHero()
 
         if (!hero || !escaper.isAlive()) {
             return
         }
 
-        const hauteurHero = escaper.getHeroZ()
+        const hauteurHero = heroZ
         const hauteurKillingUnit = BlzGetUnitZ(touchedUnit) + GetUnitFlyHeight(touchedUnit)
 
         if (RAbsBJ(hauteurHero - hauteurKillingUnit) >= TAILLE_UNITE) {

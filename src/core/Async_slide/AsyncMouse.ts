@@ -93,6 +93,11 @@ const state = {
     isRunning: false,
     /** Nothing reads the cursor most of the time, and a visible tile swallows the clicks it covers */
     isActive: false,
+    /**
+     * Whether the lattice has found the cursor since it was last turned on. Until then it only
+     * knows where it starts from, the center of the screen, which is not where anybody points.
+     */
+    isPositionFresh: false,
     // position of the cursor, relative to the center of the screen
     rawX: 0,
     rawY: 0,
@@ -134,6 +139,8 @@ export const setAsyncMouseActive = (isActive: boolean) => {
         return
     }
 
+    state.isPositionFresh = false
+
     // The estimate is wherever it was left, which costs a few cycles of convergence and nothing
     // more: the coarse levels span the whole screen, so a tile sits under the cursor wherever it
     // is, and moving them all here is what refreshes their hover state. No need to drag the
@@ -145,6 +152,9 @@ export const setAsyncMouseActive = (isActive: boolean) => {
 }
 
 export const getAsyncMousePosition = () => (state.isRunning ? { x: state.frameX, y: state.frameY } : undefined)
+
+/** Whether the position above is the cursor, rather than where the lattice started from when turned on */
+export const isAsyncMousePositionFresh = () => state.isRunning && state.isActive && state.isPositionFresh
 
 /** Walks the lattice once, skipping its hollow center, where the finer level already sits */
 const buildTilePositions = () => {
@@ -485,6 +495,12 @@ export const initAsyncMouse = () => {
 
         if (updateTracker()) {
             return
+        }
+
+        // Shown since an earlier tick, trusted, and no tile under the cursor: it sits in the hollow
+        // center of the finest level, right where the lattice is. Its position can be read now.
+        if (state.visibleSinceTick < state.globalTick) {
+            state.isPositionFresh = true
         }
 
         // nothing found: rather than staying in the way of the clicks, hide and try again later

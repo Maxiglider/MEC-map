@@ -21,6 +21,16 @@ import { globals } from '../../../../globals'
 import { Natives } from '../../wc3_natives_unsecured/Natives'
 import { AutoContinueAfterSliding } from './Auto_continue_after_sliding'
 
+/**
+ * A slide turning into a reverse one, or back, turns the hero half a turn, and so does a reverse
+ * slide stepped on from walkable ground. For this long afterwards, an order asking for about that
+ * half turn back is ignored: follow mouse and the auto turn send one at once, still aiming where
+ * the hero looked before, and would undo the reversal.
+ */
+const SLIDE_DIRECTION_SWITCH_DURATION = 0.5
+/** How far from an exact half turn an order may be and still count as asking for it */
+const HALF_TURN_TOLERANCE = 15
+
 const initTurnOnSlide = () => {
     //turn variables
     let escaperSecond: Escaper | null
@@ -49,6 +59,33 @@ const initTurnOnSlide = () => {
     //trigger
     let trg_turnToPoint: trigger
     let trg_turnToWidget: trigger
+
+    /**
+     * Game time, the same on every machine: orders are handled on all of them, and one ignoring an
+     * order another obeys would turn the same hero two ways. Created once, with the rest of the init.
+     */
+    let slideClock: timer | undefined
+    /** When the slide last reversed each hero, on that clock, by escaper id */
+    const slideDirectionSwitchTimes: number[] = []
+
+    const getSlideClockTime = () => (slideClock ? TimerGetElapsed(slideClock) : 0)
+
+    /** The slide just turned the hero half a turn: into a reverse slide, or out of one */
+    const markSlideDirectionSwitch = (escaper: Escaper) => {
+        slideDirectionSwitchTimes[escaper.getId()] = getSlideClockTime()
+    }
+
+    const isHalfTurnBackAfterSwitch = (escaper: Escaper, angle: number) => {
+        const switchTime = slideDirectionSwitchTimes[escaper.getId()]
+
+        // without its clock, every time would read the same and the order would be ignored for good
+        return (
+            slideClock !== undefined &&
+            switchTime !== undefined &&
+            getSlideClockTime() - switchTime < SLIDE_DIRECTION_SWITCH_DURATION &&
+            RAbsBJ(AnglesDiff(angle, escaper.getHeroFacing())) >= 180 - HALF_TURN_TOLERANCE
+        )
+    }
 
     const turnSliderToDirection = (escaper: Escaper, angle: number, triggerIsToLocation: boolean | null = null) => {
         const slider = escaper.getHero()
@@ -86,7 +123,8 @@ const initTurnOnSlide = () => {
         if (staticSliding) {
             const canTurnAngle = staticSliding.getCanTurnAngle()
 
-            if (canTurnAngle) {
+            // a lane that lets the hero turn a little first turns it towards itself, to the end
+            if (canTurnAngle && !staticSliding.isAligningHero(escaper)) {
                 const currentAngle = staticSliding.getAngle()
 
                 const minAngle = ForceAngleBetween0And360(currentAngle - canTurnAngle)
@@ -118,6 +156,10 @@ const initTurnOnSlide = () => {
             } else {
                 canTurn = false
             }
+        }
+
+        if (canTurn && isHalfTurnBackAfterSwitch(escaper, angle)) {
+            canTurn = false
         }
 
         angleSecond = ApplyAngleSymmetry(angle, udg_symmetryAngle)
@@ -199,6 +241,9 @@ const initTurnOnSlide = () => {
     }
 
     const init_ToTurnOnSlide = () => {
+        slideClock = CreateTimer()
+        TimerStart(slideClock, 1000000, false, () => {})
+
         //turn to point
         trg_turnToPoint = createEvent({
             events: [t => TriggerRegisterAnyUnitEventBJ(t, EVENT_PLAYER_UNIT_ISSUED_POINT_ORDER)],
@@ -239,6 +284,7 @@ const initTurnOnSlide = () => {
         DRUNK_EFFECTS,
         init_ToTurnOnSlide,
         turnSliderToDirection,
+        markSlideDirectionSwitch,
     }
 }
 

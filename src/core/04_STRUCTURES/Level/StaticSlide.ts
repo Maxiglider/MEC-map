@@ -17,6 +17,9 @@ type SlideAreaBox = { x1: number; y1: number; x2: number; y2: number }
  */
 const REGION_CELL_SIZE = 32
 
+/** How close to the angle of its lane a hero has to be turned before it may turn by itself again */
+const ALIGNED_ANGLE_TOLERANCE = 0.5
+
 /** The cells the engine watches for a rect: widened to the grid, and never less than one cell */
 const toRegionCells = (ax: number, ay: number, bx: number, by: number): SlideAreaBox => {
     const x1 = Math.floor(Math.min(ax, bx) / REGION_CELL_SIZE) * REGION_CELL_SIZE
@@ -50,6 +53,8 @@ export class StaticSlide {
 
     private slidingPlayers: number[] = []
     private slidingPlayerPrevSpeed: number[] = []
+    /** Heroes the lane is still turning towards its own angle, by escaper id */
+    private aligningPlayers: { [escaperId: number]: boolean } = {}
     private triggers: trigger[] = []
 
     constructor(
@@ -82,6 +87,8 @@ export class StaticSlide {
     }
 
     removePlayer = (playerId: number) => {
+        delete this.aligningPlayers[playerId]
+
         const itemIndex = this.slidingPlayers.indexOf(playerId)
 
         if (itemIndex !== -1) {
@@ -226,6 +233,9 @@ export class StaticSlide {
         if (this.canTurnAngle) {
             const currentAngle = escaper.getHeroFacing()
             escaper.setRemainingDegreesToTurn(AnglesDiff(this.angle, currentAngle))
+
+            // turned towards the lane first, and only then free to turn within what it allows
+            this.aligningPlayers[escaper.getEscaperId()] = true
         } else {
             escaper.setRemainingDegreesToTurn(0)
             escaper.turnInstantly(this.angle)
@@ -314,6 +324,8 @@ export class StaticSlide {
      * heard of that ride, and a membership nobody else has cannot outlive the effect.
      */
     forgetHero = (escaper: Escaper) => {
+        delete this.aligningPlayers[escaper.getEscaperId()]
+
         const itemIndex = this.slidingPlayers.indexOf(escaper.getEscaperId())
 
         if (itemIndex !== -1) {
@@ -323,6 +335,53 @@ export class StaticSlide {
         if (escaper.getStaticSliding() === this) {
             escaper.setStaticSliding(undefined)
         }
+    }
+
+    /** The speed this lane gives back to a hero when it lets it go */
+    getPreviousSlideSpeed = (escaperId: number) => this.slidingPlayerPrevSpeed[escaperId] ?? 0
+
+    /**
+     * Carries on with the body of a hero that died along this lane on the one machine taking it
+     * along: every machine gives it back to the lane on the same turn, with the speed and the facing
+     * its death came with, and the speed to give back when the lane lets it go.
+     */
+    carryDeadHero = (escaper: Escaper, previousSlideSpeed: number) => {
+        const escaperId = escaper.getEscaperId()
+
+        if (escaper.isStaticSliding() || this.slidingPlayers.includes(escaperId)) {
+            return
+        }
+
+        arrayPush(this.slidingPlayers, escaperId)
+        escaper.setStaticSliding(this)
+        this.slidingPlayerPrevSpeed[escaperId] = previousSlideSpeed
+    }
+
+    /**
+     * Whether the lane is still turning this hero towards its own angle. Nobody may turn the hero
+     * meanwhile, or the turn the lane started would be replaced by one kept within the angle it
+     * allows, from wherever the hero was looking when it came in.
+     *
+     * Over once the hero looks along the lane, but also as soon as nothing is left to turn it
+     * there - its sliding mode changed, say - so that it is never kept from turning for good.
+     */
+    isAligningHero = (escaper: Escaper) => {
+        const escaperId = escaper.getEscaperId()
+
+        if (!this.aligningPlayers[escaperId]) {
+            return false
+        }
+
+        const isStillTurning =
+            escaper.slidingMode === 'max' &&
+            escaper.getRemainingDegreesToTurn() !== 0 &&
+            RAbsBJ(AnglesDiff(this.angle, escaper.getHeroFacing())) > ALIGNED_ANGLE_TOLERANCE
+
+        if (!isStillTurning) {
+            delete this.aligningPlayers[escaperId]
+        }
+
+        return isStillTurning
     }
 
     getX1 = () => this.x1

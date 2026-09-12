@@ -3,7 +3,7 @@ import { Timer } from 'w3ts'
 import { getUdgEscapers } from '../../../globals'
 import { Constants } from '../01_libraries/Constants'
 import { TurnOnSlide } from '../07_TRIGGERS/Slide_and_CheckTerrain_triggers/To_turn_on_slide'
-import { getAsyncMousePosition, setAsyncMouseActive } from './AsyncMouse'
+import { getAsyncMousePosition, isAsyncMousePositionFresh, setAsyncMouseActive } from './AsyncMouse'
 import { getMousePosition, isTestingLeftClicks } from './HeroEffect'
 import { screen2World } from './Screen2World'
 
@@ -65,6 +65,13 @@ const getCursorWorldPosition = (escaperId: number) => {
             return undefined
         }
 
+        // Turned on as the slide starts, the lattice still sits where it starts from, the center of the
+        // screen - about where the hero is, so aiming there throws it any way. Nothing is steered
+        // until the cursor is found: on a reverse slide, that stray turn sent the hero back out.
+        if (!isAsyncMousePositionFresh()) {
+            return undefined
+        }
+
         const asyncMouse = getAsyncMousePosition()
 
         return asyncMouse && screen2World(asyncMouse.x, asyncMouse.y)
@@ -79,6 +86,13 @@ const turnSliderTowardsCursor = (escaperId: number) => {
 
     // only while sliding: on normal ground the hero is ordered around, not steered
     if (!escaper || !hero || !escaper.isSliding()) {
+        return
+    }
+
+    // The asynchronous cursor only ever steers the effect, which its own machine moves alone. A hero
+    // sliding as a unit - its body carried on after its death, or revived on the ice - is the same
+    // on every machine, and turning it from a cursor only this machine knows desyncs the game.
+    if (getAutoTurnMode(escaperId) === 'async' && !escaper.isHeroAsEffect()) {
         return
     }
 

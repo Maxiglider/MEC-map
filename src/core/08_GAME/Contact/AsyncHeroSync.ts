@@ -49,7 +49,10 @@ const POSITION_PERIOD = 0.1
  *  - slideSpeed and rotationSpeed, which the terrain and the static slides under the hero change
  *    on its own machine only,
  *  - terrainTypeId, the terrain the hero was last seen on (0 for none): its gravity and whether it
- *    lets the hero turn, and the state a replayed check starts from.
+ *    lets the hero turn, and the state a replayed check starts from,
+ *  - staticSlideId (-1 for none) and staticSlidePreviousSpeed, the static slide its own machine has
+ *    it in and the speed that lane gives back. Only read at its death: every machine gives the body
+ *    back to that lane, which carries it on.
  */
 export type HeroMovementState = {
     x: number
@@ -64,6 +67,8 @@ export type HeroMovementState = {
     rotationSpeed: number
     turnPerPeriod: number
     terrainTypeId: number
+    staticSlideId: number
+    staticSlidePreviousSpeed: number
 }
 
 const state = { isInitialized: false, sequence: 0 }
@@ -74,7 +79,7 @@ const encode = (escaperId: number, sequence: number, movement: HeroMovementState
         `%d${FIELD_SEPARATOR}%d${FIELD_SEPARATOR}%.2f${FIELD_SEPARATOR}%.2f${FIELD_SEPARATOR}%.2f` +
             `${FIELD_SEPARATOR}%.2f${FIELD_SEPARATOR}%.2f${FIELD_SEPARATOR}%.4f${FIELD_SEPARATOR}%.2f` +
             `${FIELD_SEPARATOR}%.4f${FIELD_SEPARATOR}%.2f${FIELD_SEPARATOR}%.4f${FIELD_SEPARATOR}%.4f` +
-            `${FIELD_SEPARATOR}%d`,
+            `${FIELD_SEPARATOR}%d${FIELD_SEPARATOR}%d${FIELD_SEPARATOR}%.2f`,
         escaperId,
         sequence,
         movement.x,
@@ -88,7 +93,9 @@ const encode = (escaperId: number, sequence: number, movement: HeroMovementState
         movement.slideSpeed,
         movement.rotationSpeed,
         movement.turnPerPeriod,
-        movement.terrainTypeId
+        movement.terrainTypeId,
+        movement.staticSlideId,
+        movement.staticSlidePreviousSpeed
     )
 
 const decodeNumbers = (data: string) => {
@@ -105,7 +112,7 @@ const decodeNumbers = (data: string) => {
 const decode = (data: string) => {
     const fields = decodeNumbers(data)
 
-    if (fields.length < 14) {
+    if (fields.length < 16) {
         return undefined
     }
 
@@ -125,6 +132,8 @@ const decode = (data: string) => {
             rotationSpeed: fields[11],
             turnPerPeriod: fields[12],
             terrainTypeId: fields[13],
+            staticSlideId: fields[14],
+            staticSlidePreviousSpeed: fields[15],
         },
     }
 }
@@ -205,11 +214,11 @@ export const initAsyncHeroSync = () => {
     registerSyncEvent(CONTACT_PREFIX, data => {
         const fields = decodeNumbers(data)
 
-        if (fields.length < 3) {
+        if (fields.length < 4) {
             return
         }
 
-        applyContact(fields[0], fields[1], fields[2])
+        applyContact(fields[0], fields[1], fields[2], fields[3])
     })
 
     registerSyncEvent(EVENT_PREFIX, data => {
@@ -236,21 +245,27 @@ export const initAsyncHeroSync = () => {
  * can see, or the check of this machine for a hero every machine can see. This is the very handler
  * the immolation of the monsters used to call.
  */
-export const applyContact = (escaperId: number, kind: number, id: number) => {
+export const applyContact = (escaperId: number, kind: number, id: number, heroZ?: number) => {
     const escaper = getUdgEscapers().get(escaperId)
     const touched = findContactUnit(kind, id)
 
     escaper &&
         touched &&
-        ServiceManager.getService('InvisUnit_is_getting_damage').onEscaperTouchingUnit(escaper, touched, 0)
+        ServiceManager.getService('InvisUnit_is_getting_damage').onEscaperTouchingUnit(escaper, touched, 0, heroZ)
 }
 
 /**
  * Tells every machine what the hero touched, this one included: what follows a contact belongs to
  * the game, so it has to happen everywhere, on the same turn.
+ *
+ * The height of the hero travels along: a contact only counts when the hero is at the height of
+ * what it touched, and only the machine sending this knows how high the hero is.
  */
-export const sendAsyncContact = (escaperId: number, kind: number, id: number) => {
-    BlzSendSyncData(CONTACT_PREFIX, string.format(`%d${FIELD_SEPARATOR}%d${FIELD_SEPARATOR}%d`, escaperId, kind, id))
+export const sendAsyncContact = (escaperId: number, kind: number, id: number, heroZ: number) => {
+    BlzSendSyncData(
+        CONTACT_PREFIX,
+        string.format(`%d${FIELD_SEPARATOR}%d${FIELD_SEPARATOR}%d${FIELD_SEPARATOR}%.2f`, escaperId, kind, id, heroZ)
+    )
 }
 
 /**
