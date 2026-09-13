@@ -56,6 +56,7 @@ See [ARCHITECTURE.md](./ARCHITECTURE.md) for the full directory tour and runtime
 - [docs/SMIC_PIPELINE.md](./docs/SMIC_PIPELINE.md) — the `-smic` (Save Map In Cache) level-export pipeline, why it's desync-sensitive, and the full round trip through the separate `mec-smic-loader` tool.
 - [docs/MEMORY_HANDLER.md](./docs/MEMORY_HANDLER.md) — the object-pooling allocator used in hot paths to avoid Lua GC pressure.
 - [docs/MEC_CONTACT_CHECK_TO_REPLACE_IMMOLATION.md](./docs/MEC_CONTACT_CHECK_TO_REPLACE_IMMOLATION.md) — why and how MEC's own hero/monster contact check is meant to replace the Warcraft III immolation: measured costs, the chunk indexing decided for it, and the rejected alternatives.
+- [docs/CAUSES_OF_DESYNCS.md](./docs/CAUSES_OF_DESYNCS.md) — what desyncs a game (agents or random draws on one machine, local values changing the game, handle ids, `pairs` order, the MemoryHandler pool, local clocks), MEC's cases, and how to find one with `-desyncProbe` ([français](./docs/CAUSES_OF_DESYNCS.fr.md)).
 
 ## Key gotchas
 
