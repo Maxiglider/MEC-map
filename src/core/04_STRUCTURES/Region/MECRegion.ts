@@ -1,7 +1,7 @@
-import { DefineDrawLineType } from '../../01_libraries/Draw_lines'
 import { IDestroyable, MemoryHandler } from '../../../Utils/MemoryHandler'
-import type { MonsterSpawn } from '../MonsterSpawn/MonsterSpawn'
 import { emptyOject } from '../../01_libraries/Basic_functions'
+import { DefineDrawLineType } from '../../01_libraries/Draw_lines'
+import type { MonsterSpawn } from '../MonsterSpawn/MonsterSpawn'
 
 export const OFFSET_FOR_START_LINE_NOT_SPAWNED_MONSTERS_TO_BE_CONSIDERED_OUT = 4
 export const END_POINT_OFFSET_AFTER_END_OF_REGION = 200 // to be sure the monster ends their movement out of the region and doesn't reach the end point
@@ -34,7 +34,15 @@ export abstract class MECRegion {
 
     private id: number
     private watchForEventsEnabled = false
-    private watchedUnits: { [x: number]: unit } = MemoryHandler.getEmptyObject()
+    /**
+     * The watched units, keyed by the order they started being watched in: that key decides the
+     * order they are walked in, and so the order their callbacks fire. Every machine goes through
+     * that order alike, unlike handle ids, which Lua recycles on each machine at its own pace.
+     */
+    private watchedUnits: { [watchSequence: number]: unit } = MemoryHandler.getEmptyObject()
+    /** Where each watched unit sits in watchedUnits, by handle id: looked up on this machine, never walked */
+    private watchSequenceByHandleId: { [handleId: number]: number } = MemoryHandler.getEmptyObject()
+    private lastWatchSequence = 0
     private unitsConsideredInRegion: { [x: number]: unit } = MemoryHandler.getEmptyObject()
 
     private unitEntersCallbacks: { [x: number]: (unit: unit) => void } = MemoryHandler.getEmptyObject()
@@ -166,7 +174,16 @@ export abstract class MECRegion {
     }
 
     watchUnit(unit: unit, initiallyIn = false): void {
-        this.watchedUnits[GetHandleId(unit)] = unit
+        const handleId = GetHandleId(unit)
+        let watchSequence = this.watchSequenceByHandleId[handleId]
+
+        if (watchSequence === undefined) {
+            this.lastWatchSequence++
+            watchSequence = this.lastWatchSequence
+            this.watchSequenceByHandleId[handleId] = watchSequence
+        }
+
+        this.watchedUnits[watchSequence] = unit
         if (initiallyIn) {
             this.unitsConsideredInRegion[GetHandleId(unit)] = unit
         }
@@ -175,7 +192,13 @@ export abstract class MECRegion {
 
     unwatchUnit(unit: unit): void {
         const unitId = GetHandleId(unit)
-        delete this.watchedUnits[unitId]
+        const watchSequence = this.watchSequenceByHandleId[unitId]
+
+        if (watchSequence !== undefined) {
+            delete this.watchedUnits[watchSequence]
+            delete this.watchSequenceByHandleId[unitId]
+        }
+
         delete this.unitsConsideredInRegion[unitId]
     }
 
@@ -217,6 +240,8 @@ export abstract class MECRegion {
         this.debugRects(false)
 
         emptyOject(this.watchedUnits)
+        emptyOject(this.watchSequenceByHandleId)
+        this.lastWatchSequence = 0
         emptyOject(this.unitsConsideredInRegion)
         emptyOject(this.unitEntersCallbacks)
         emptyOject(this.unitLeavesCallbacks)
@@ -229,6 +254,7 @@ export abstract class MECRegion {
         MemoryHandler.destroyArray(this.debugEffects)
 
         MemoryHandler.destroyObject(this.watchedUnits)
+        MemoryHandler.destroyObject(this.watchSequenceByHandleId)
         MemoryHandler.destroyObject(this.unitsConsideredInRegion)
         MemoryHandler.destroyObject(this.unitEntersCallbacks)
         MemoryHandler.destroyObject(this.unitLeavesCallbacks)

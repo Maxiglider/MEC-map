@@ -8,24 +8,38 @@ const UNIT_UNAVAILABLE_TIME = 10 // in seconds
 export const initSimpleUnitRecycler = () => {
     const units = MemoryHandler.getEmptyArray<unit>()
 
-    const unavailableUnits: { [x: number]: unit } = MemoryHandler.getEmptyObject()
-    const unitIdToRemainingUnavailableTime: { [x: number]: number } = MemoryHandler.getEmptyObject()
+    /**
+     * The units handed back and not reusable yet, in the order they were handed back, with the
+     * seconds each has left. An order every machine goes through alike: these used to be tables keyed
+     * by handle id, and the order they were walked in decided which unit the next spawn reuses. Lua
+     * recycles handle ids on each machine at the pace of its own garbage collector, so each machine
+     * soon reused another unit for the same spawn, and units stood in different places.
+     */
+    const unavailableUnits = MemoryHandler.getEmptyArray<unit>()
+    const unavailableRemainingTimes = MemoryHandler.getEmptyArray<number>()
+    /** Whether a unit is waiting there already, by handle id: looked up on this machine, never walked */
+    const isUnavailable: { [x: number]: boolean } = MemoryHandler.getEmptyObject()
 
     // During UNIT_UNAVAILABLE_TIME seconds a removed unit is unavailable to be reused, in case of movement effect following the unit
     const unavailableTimeTimer: Timer = createTimer(1, true, () => {
-        for (const [unitId, remainingTime] of pairs(unitIdToRemainingUnavailableTime)) {
-            const newTime = remainingTime - 1
+        let keptCount = 0
+
+        for (let i = 0; i < unavailableUnits.length; i++) {
+            const u = unavailableUnits[i]
+            const newTime = unavailableRemainingTimes[i] - 1
+
             if (newTime <= 0) {
-                delete unitIdToRemainingUnavailableTime[unitId]
-                const u = unavailableUnits[unitId]
-                if (!!u) {
-                    arrayPush(units, u)
-                }
-                delete unavailableUnits[unitId]
+                delete isUnavailable[GetHandleId(u)]
+                arrayPush(units, u)
             } else {
-                unitIdToRemainingUnavailableTime[unitId] = newTime
+                unavailableUnits[keptCount] = u
+                unavailableRemainingTimes[keptCount] = newTime
+                keptCount++
             }
         }
+
+        unavailableUnits.length = keptCount
+        unavailableRemainingTimes.length = keptCount
     })
 
     const reinit = () => {
@@ -34,13 +48,12 @@ export const initSimpleUnitRecycler = () => {
         }
         units.length = 0
 
-        for (const [_, u] of pairs(unavailableUnits)) {
+        for (const u of unavailableUnits) {
+            delete isUnavailable[GetHandleId(u)]
             RemoveUnit(u)
         }
-
-        for (const [unitId, _] of pairs(unitIdToRemainingUnavailableTime)) {
-            delete unitIdToRemainingUnavailableTime[unitId]
-        }
+        unavailableUnits.length = 0
+        unavailableRemainingTimes.length = 0
     }
 
     const destroy = () => {
@@ -49,7 +62,9 @@ export const initSimpleUnitRecycler = () => {
         }
 
         MemoryHandler.destroyArray(units)
-        MemoryHandler.destroyObject(unitIdToRemainingUnavailableTime)
+        MemoryHandler.destroyArray(unavailableUnits)
+        MemoryHandler.destroyArray(unavailableRemainingTimes)
+        MemoryHandler.destroyObject(isUnavailable)
         unavailableTimeTimer.destroy()
     }
 
@@ -65,8 +80,22 @@ export const initSimpleUnitRecycler = () => {
         },
         removeUnit: (u: unit) => {
             ShowUnit(u, false)
-            unavailableUnits[GetHandleId(u)] = u
-            unitIdToRemainingUnavailableTime[GetHandleId(u)] = UNIT_UNAVAILABLE_TIME
+
+            const handleId = GetHandleId(u)
+
+            // handed back again while waiting: its wait starts over, where it already stands in line
+            if (isUnavailable[handleId]) {
+                for (let i = 0; i < unavailableUnits.length; i++) {
+                    if (unavailableUnits[i] === u) {
+                        unavailableRemainingTimes[i] = UNIT_UNAVAILABLE_TIME
+                        return
+                    }
+                }
+            }
+
+            isUnavailable[handleId] = true
+            arrayPush(unavailableUnits, u)
+            arrayPush(unavailableRemainingTimes, UNIT_UNAVAILABLE_TIME)
         },
         reinit,
         destroy,
