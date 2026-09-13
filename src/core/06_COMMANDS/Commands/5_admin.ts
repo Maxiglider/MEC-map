@@ -989,16 +989,18 @@ export const initExecuteCommandMax = () => {
         },
     })
 
-    //-desyncProbe <boolean>   --> prints, once a second on every machine, what must be the same on all of them
+    //-desyncProbe <boolean>   --> writes, on every machine, what must be the same on all of them
     registerCommand({
         name: 'desyncProbe',
         alias: [],
         group,
         argDescription: '<boolean>',
         description:
-            'Writes, once a second and on every machine, values that must be the same on all of them, to ' +
-            'CustomMapData/MEC/desync_probe_p<player number>.txt. After a desync, every player sends their file: ' +
-            'the first value that differs at the same probe tick shows what diverged.',
+            'Writes, five times a second and on every machine, values that must be the same on all of them, to ' +
+            'CustomMapData/MEC/desync_probe_p<player number>.txt (the last minute, written once a second) and ' +
+            'desync_probe_p<player number>_last.txt (the last 5 seconds, written at every probe, which the machine ' +
+            'a desync drops still has). After a desync, every player sends both files: the first value that ' +
+            'differs at the same probe tick shows what diverged.',
         cb: ({ nbParam, param1 }, escaper) => {
             if (nbParam !== 1 || !IsBoolString(param1)) {
                 return USAGE
@@ -1008,7 +1010,7 @@ export const initExecuteCommandMax = () => {
             Text.mkP(
                 escaper.getPlayer(),
                 S2B(param1)
-                    ? 'Desync probe on: every machine writes its last minute to CustomMapData/MEC/desync_probe_p<player number>.txt'
+                    ? 'Desync probe on: every machine writes its last minute to CustomMapData/MEC/desync_probe_p<player number>.txt and its last 5 seconds to desync_probe_p<player number>_last.txt'
                     : 'Desync probe off'
             )
 

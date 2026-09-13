@@ -95,9 +95,12 @@ Utiliser un paquet de synchronisation : `BlzSendSyncData` depuis la machine qui 
 
 ## Trouver une désynchronisation : `-desyncProbe`
 
-`-desyncProbe true` (commande admin, reçue par toutes les machines) fait écrire à chaque machine, cinq fois par seconde, des valeurs qui doivent être identiques partout, dans `Documents/Warcraft III/CustomMapData/MEC/desync_probe_p<N>.txt` (N = numéro du joueur sur cette machine). Le fichier garde la dernière minute et est écrit une fois par seconde ; la probe s'arrête d'elle-même quand un joueur part, pour que le fichier se termine sur la coupure.
+`-desyncProbe true` (commande admin, reçue par toutes les machines) fait écrire à chaque machine, cinq fois par seconde, des valeurs qui doivent être identiques partout, dans deux fichiers de `Documents/Warcraft III/CustomMapData/MEC/` (N = numéro du joueur sur cette machine) :
 
-Après une désynchronisation, récupérer le fichier de **chaque** joueur (y compris les joueurs morts) et comparer les lignes de même numéro de probe. Le premier champ qui diffère indique où chercher.
+- `desync_probe_p<N>.txt` : la dernière minute, écrite une fois par seconde. La probe s'arrête d'elle-même quand un joueur part, pour que les machines restées dans la partie terminent ce fichier sur la coupure. Elles ne la remarquent que quelques secondes après, d'où la minute entière.
+- `desync_probe_p<N>_last.txt` : les 5 dernières secondes, écrites à chaque probe. La machine qu'une désynchronisation éjecte n'est prévenue d'aucun départ : sa partie s'arrête, et elle perd jusqu'à la dernière seconde du premier fichier, celle d'avant sa coupure, qu'elle seule peut montrer.
+
+Après une désynchronisation, récupérer **les deux** fichiers de **chaque** joueur (y compris les joueurs morts) et comparer les lignes de même numéro de probe, en lisant le fichier `_last` de la machine éjectée pour ses dernières probes. Le premier champ qui diffère indique où chercher.
 
 - `rng` : un tirage du générateur aléatoire partagé (cause 2, ou tout ce qui tire au sort en local).
 - `hid` : identifiant d'un handle tout juste créé. **À ignorer** : il varie de plusieurs milliers dans des parties qui ne désynchronisent pas (cause 4).

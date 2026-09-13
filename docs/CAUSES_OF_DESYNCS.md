@@ -95,9 +95,12 @@ Use a sync packet: `BlzSendSyncData` from the machine that knows, `BlzTriggerReg
 
 ## Finding a desync: `-desyncProbe`
 
-`-desyncProbe true` (admin command, heard by every machine) makes each machine write, five times a second, values that must be identical everywhere, to `Documents/Warcraft III/CustomMapData/MEC/desync_probe_p<N>.txt` (N = player number on that machine). The file keeps the last minute and is written once a second; the probe stops by itself when a player leaves, so the file ends with the drop.
+`-desyncProbe true` (admin command, heard by every machine) makes each machine write, five times a second, values that must be identical everywhere, to two files in `Documents/Warcraft III/CustomMapData/MEC/` (N = player number on that machine):
 
-After a desync, collect the file of **every** player (dead players included) and compare the lines with the same probe number. The first field that differs is where to look.
+- `desync_probe_p<N>.txt`: the last minute, written once a second. The probe stops by itself when a player leaves, so the machines still in the game end this file with the drop. They notice it seconds after it happens, which is why they need the whole minute.
+- `desync_probe_p<N>_last.txt`: the last 5 seconds, written at every probe. The machine a desync drops hears of no player leaving: its game just ends, and it loses up to the last second of the first file, the second before its drop, which only it can show.
+
+After a desync, collect **both** files of **every** player (dead players included) and compare the lines with the same probe number, reading the `_last` file of the dropped machine for its final probes. The first field that differs is where to look.
 
 - `rng`: a draw from the shared random generator (cause 2, or anything drawing locally).
 - `hid`: id of a handle just made. **Ignore it**: it drifts by thousands in games that don't desync (cause 4).

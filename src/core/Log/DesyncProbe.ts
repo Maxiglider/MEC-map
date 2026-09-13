@@ -12,9 +12,10 @@ import { setHeroDeathListener } from './DeathCause'
  * What must be the same on every machine, written by each of them five times a second, so that a
  * desync is traced to what diverged first rather than guessed at. A desync drops a player from the
  * game, screen and all, so the lines go to a file of that machine rather than to the screen: after
- * one, every player sends theirs (Documents/Warcraft III/CustomMapData/MEC/desync_probe_p<N>.txt),
- * and the first value that differs at the same probe tick is where to look. It stops by itself the
- * moment a player leaves, so that the files still hold the drop however long the game goes on.
+ * one, every player sends both of theirs (Documents/Warcraft III/CustomMapData/MEC/desync_probe_p<N>.txt
+ * and desync_probe_p<N>_last.txt), and the first value that differs at the same probe tick is where
+ * to look. It stops by itself the moment a player leaves, so that the files still hold the drop
+ * however long the game goes on.
  *
  *  - t: the game time of the probe, in seconds since it was turned on,
  *  - rng: a draw from the random generator of the game, shared by every machine,
@@ -56,16 +57,35 @@ const PROBE_FILE_LINES = 300
 /** The file is written once a second rather than at every probe: writing it is the costly part */
 const PROBES_PER_WRITE = 5
 
+/**
+ * The last five seconds, written again at every probe to a file of their own. The machine a desync
+ * drops hears of no player leaving: its game just ends, and what it probed since its last write of
+ * the whole file is lost - up to a second, the one before its drop, which only that machine can show.
+ * The machines still in the game notice the drop seconds later, which is why they need the whole file.
+ */
+const LAST_PROBES_LINES = 25
+
 const state = {
     timer: undefined as Timer | undefined,
     tick: 0,
     lines: [] as string[],
     fileName: '',
+    lastFileName: '',
     leaveTrigger: undefined as trigger | undefined,
 }
 
 const writeProbeFile = () => {
     SyncSaveLoad().writeFileWithoutPossibleLoading(state.fileName, state.lines.join('\n'), false)
+}
+
+const writeLastProbesFile = () => {
+    const lineCount = state.lines.length
+
+    SyncSaveLoad().writeFileWithoutPossibleLoading(
+        state.lastFileName,
+        table.concat(state.lines, '\n', math.max(1, lineCount - LAST_PROBES_LINES + 1), lineCount),
+        false
+    )
 }
 
 /**
@@ -87,6 +107,7 @@ const stopOnPlayerLeaving = () => {
     )
 
     writeProbeFile()
+    writeLastProbesFile()
 
     state.timer.destroy()
     state.timer = undefined
@@ -339,8 +360,11 @@ const probe = () => {
         state.lines.shift()
     }
 
-    // Written again whole every second, so that the machine dropped by a desync has its last lines on
-    // its disk already. Writing a file only concerns this machine, and makes no handle.
+    // The last seconds at every probe, so that a machine dropped by a desync keeps the probes that led
+    // to its drop; the whole file once a second. Writing a file only concerns this machine, and makes
+    // no handle, and every machine writes at the same probes.
+    writeLastProbesFile()
+
     if (state.tick % PROBES_PER_WRITE === 0) {
         writeProbeFile()
     }
@@ -376,8 +400,10 @@ export const setDesyncProbeEnabled = (isEnabled: boolean) => {
 
     state.tick = 0
     state.lines = []
-    // named after the player of this machine, so that two games run on one computer keep both files
-    state.fileName = `MEC/desync_probe_p${GetPlayerId(GetLocalPlayer()!) + 1}.txt`
+    // named after the player of this machine, so that two games run on one computer keep their files
+    const playerNumber = GetPlayerId(GetLocalPlayer()!) + 1
+    state.fileName = `MEC/desync_probe_p${playerNumber}.txt`
+    state.lastFileName = `MEC/desync_probe_p${playerNumber}_last.txt`
     state.timer = createTimer(PROBE_PERIOD, true, probe)
     setHeroDeathListener(writeHeroDeath)
     // last, so that counting starts from the same point on every machine
