@@ -53,6 +53,7 @@ See [ARCHITECTURE.md](./ARCHITECTURE.md) for the full directory tour and runtime
 - [docs/MONSTER_SPAWNS.md](./docs/MONSTER_SPAWNS.md) — zone-based recurring monster generators: positioning math, long-distance movement, unit recycling, dead zones.
 - [docs/SMIC_PIPELINE.md](./docs/SMIC_PIPELINE.md) — the `-smic` (Save Map In Cache) level-export pipeline, why it's desync-sensitive, and the full round trip through the separate `mec-smic-loader` tool.
 - [docs/MEMORY_HANDLER.md](./docs/MEMORY_HANDLER.md) — the object-pooling allocator used in hot paths to avoid Lua GC pressure.
+- [docs/LUA_PAIRS_AND_MEMORY_HANDLER.md](./docs/LUA_PAIRS_AND_MEMORY_HANDLER.md) ([FR](./docs/LUA_PAIRS_AND_MEMORY_HANDLER.fr.md)) — how `pairs` orders a Lua 5.3 table, why walks keyed by handle ids desync, how the MemoryHandler pool makes the difference last, and the fix of commit `c2d3b80`.
 
 ## Key gotchas
 
