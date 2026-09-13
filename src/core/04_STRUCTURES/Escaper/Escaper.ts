@@ -181,6 +181,8 @@ export class Escaper extends EscaperMake {
         turnPerPeriod: 0,
         slideSpeed: 0,
         rotationSpeed: 0,
+        /** The static slide its own machine takes it along, -1 for none, as the last packet said */
+        staticSlideId: -1,
         ticksWithoutPacket: 0,
     }
 
@@ -1157,6 +1159,7 @@ export class Escaper extends EscaperMake {
         synced.turnPerPeriod = movement.turnPerPeriod
         synced.slideSpeed = movement.slideSpeed
         synced.rotationSpeed = movement.rotationSpeed
+        synced.staticSlideId = movement.staticSlideId
         synced.ticksWithoutPacket = 0
     }
 
@@ -1172,6 +1175,13 @@ export class Escaper extends EscaperMake {
 
     getSyncedHeroFacing = () =>
         this.isHeroEffectActive ? this.syncedHeroPos.facing : this.hero ? GetUnitFacing(this.hero) : 0
+
+    /**
+     * Whether a static slide takes the hero along, as every machine agrees: while it slides as an
+     * effect, only its own machine takes it along a lane, and the others learn it from the packets.
+     */
+    isSyncedStaticSliding = () =>
+        this.isHeroEffectActive ? this.syncedHeroPos.staticSlideId >= 0 : this.isStaticSliding()
 
     /**
      * The unit of a hero sliding as an effect follows it from the packets, so that the triggers of a
@@ -2798,6 +2808,7 @@ export class Escaper extends EscaperMake {
             this.syncedHeroPos.turnPerPeriod = this.getSlideCurrentTurnPerPeriod()
             this.syncedHeroPos.slideSpeed = this.slideSpeed
             this.syncedHeroPos.rotationSpeed = this.rotationSpeed
+            this.syncedHeroPos.staticSlideId = this.staticSliding?.id ?? -1
             this.syncedHeroPos.ticksWithoutPacket = 0
 
             this.isHeroEffectActive = true
@@ -2828,11 +2839,15 @@ export class Escaper extends EscaperMake {
 
         this.leaveHeroEffectMode()
 
-        // the unit takes back the place the effect had led it to
-        SetUnitX(this.hero, this.heroPos.x)
-        SetUnitY(this.hero, this.heroPos.y)
-        BlzSetUnitFacingEx(this.hero, this.heroPos.facing)
-        SetUnitFlyHeight(this.hero, this.heroPos.flyHeight, 0)
+        // The unit takes back the place every machine agrees the effect had led it to. The packet that
+        // ends a slide sets that place on all of them; a hand back no packet brings - a change of
+        // -autoTurn mode, a level restart - leaves the unit where the packets had carried it. Never
+        // heroPos: that is where this machine sees the effect, turned by a cursor its owner alone
+        // knows, and a unit given its facing or its place from it stands differently on each machine.
+        SetUnitX(this.hero, this.syncedHeroPos.x)
+        SetUnitY(this.hero, this.syncedHeroPos.y)
+        BlzSetUnitFacingEx(this.hero, this.syncedHeroPos.facing)
+        SetUnitFlyHeight(this.hero, this.syncedHeroPos.flyHeight, 0)
 
         // The unit is back where it belongs, the native lock can hold it again. Done by hand rather
         // than through resetCamera, which starts or stops the camera spin: this runs on the machine

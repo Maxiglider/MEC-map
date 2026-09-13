@@ -484,8 +484,11 @@ const initProgressionUtils = () => {
     }
 
     // Might be in reversed order since we don't know the slide direction at this point
+    // From where every machine agrees the hero is: the progression decides who gets the ditch effect, an
+    // agent every machine has to make and destroy on the same turn. A hero sliding as an effect is seen
+    // at a place of its own by each machine, and crosses another hero at a different moment on each.
     const calculatePlayerProgression = (escaper: Escaper) => {
-        if (escaper.isStaticSliding()) {
+        if (escaper.isSyncedStaticSliding()) {
             return -1
         }
 
@@ -495,8 +498,8 @@ const initProgressionUtils = () => {
             return -1
         }
 
-        const xHero = Math.floor(escaper.getHeroX() / Constants.LARGEUR_CASE) * Constants.LARGEUR_CASE
-        const yHero = Math.floor(escaper.getHeroY() / Constants.LARGEUR_CASE) * Constants.LARGEUR_CASE
+        const xHero = Math.floor(escaper.getSyncedHeroX() / Constants.LARGEUR_CASE) * Constants.LARGEUR_CASE
+        const yHero = Math.floor(escaper.getSyncedHeroY() / Constants.LARGEUR_CASE) * Constants.LARGEUR_CASE
 
         const heroProgression = progressionMap[xHero]?.[yHero]
 
