@@ -1,10 +1,10 @@
 // For -snapPatrolsToSlideOffset and -snapPatrolsToSlide commands
-import { getUdgMonsterTypes, getUdgTerrainTypes } from '../../../../globals'
+import { getUdgEscapers, getUdgMonsterTypes, getUdgTerrainTypes } from '../../../../globals'
 import { createPoint } from '../../../Utils/Point'
 import { Escaper } from '../../04_STRUCTURES/Escaper/Escaper'
 import { MonsterType } from '../../04_STRUCTURES/Monster/MonsterType'
 import { setAsyncMouseActive } from '../../Async_slide/AsyncMouse'
-import { getAutoTurnMode } from '../../Async_slide/AutoTurn'
+import { DEFAULT_AUTO_TURN_MODE, getAutoTurnMode, setAutoTurnMode } from '../../Async_slide/AutoTurn'
 import { isTestingLeftClicks, setMouseTrackingEnabled } from '../../Async_slide/HeroEffect'
 import { setNetworkClickListeningEnabled } from '../../Async_slide/NetworkClick'
 
@@ -141,6 +141,27 @@ export const updateAsyncNeeds = (escaper: Escaper) => {
     setNetworkClickListeningEnabled(escaper.getId(), mode !== 'off' || isTesting)
 
     updateAsyncMouseNeed(escaper)
+}
+
+/**
+ * Gives every player the default auto turn mode (see DEFAULT_AUTO_TURN_MODE), exactly as "-autoTurn"
+ * would: called at the start of the game, on every machine at once. A player can still change it,
+ * by hand or with their start commands.
+ */
+export const applyDefaultAutoTurnMode = () => {
+    if (DEFAULT_AUTO_TURN_MODE === 'off') {
+        return
+    }
+
+    getUdgEscapers().forAll(escaper => {
+        // a secondary hero follows its main one, which is given the mode
+        if (escaper.isEscaperSecondary()) {
+            return
+        }
+
+        setAutoTurnMode(escaper.getId(), DEFAULT_AUTO_TURN_MODE)
+        updateAsyncNeeds(escaper)
+    })
 }
 
 /**

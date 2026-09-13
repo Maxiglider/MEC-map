@@ -42,6 +42,9 @@ export type AutoTurnMode = 'off' | 'sync' | 'async'
 
 export const AUTO_TURN_MODES: AutoTurnMode[] = ['off', 'sync', 'async']
 
+/** The mode every player starts the game with, as if each had typed "-autoTurn" with it (see applyDefaultAutoTurnMode) */
+export const DEFAULT_AUTO_TURN_MODE: AutoTurnMode = 'async'
+
 const modes: { [escaperId: number]: AutoTurnMode } = {}
 /** The mode says where the cursor is read, this says whether the hero is being steered right now */
 const steering: { [escaperId: number]: boolean } = {}
