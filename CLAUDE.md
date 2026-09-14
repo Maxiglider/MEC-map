@@ -57,6 +57,7 @@ See [ARCHITECTURE.md](./ARCHITECTURE.md) for the full directory tour and runtime
 - [docs/MEMORY_HANDLER.md](./docs/MEMORY_HANDLER.md) — the object-pooling allocator used in hot paths to avoid Lua GC pressure.
 - [docs/MEC_CONTACT_CHECK_TO_REPLACE_IMMOLATION.md](./docs/MEC_CONTACT_CHECK_TO_REPLACE_IMMOLATION.md) — why and how MEC's own hero/monster contact check is meant to replace the Warcraft III immolation: measured costs, the chunk indexing decided for it, and the rejected alternatives.
 - [docs/CAUSES_OF_DESYNCS.md](./docs/CAUSES_OF_DESYNCS.md) — what desyncs a game (agents or random draws on one machine, local values changing the game, handle ids, `pairs` order, the MemoryHandler pool, local clocks), MEC's cases, and how to find one with `-desyncProbe` ([français](./docs/CAUSES_OF_DESYNCS.fr.md)).
+- [docs/SLIDE_TURN.md](./docs/SLIDE_TURN.md) — how a sliding hero turns in the `max` mode: the physical turn (rotation speed, acceleration and braking degrees, inertia), what `SetUnitFacing` was measured to do, the legacy turn, `-debugSlideInertia`, and the setting combinations to stay clear of ([français](./docs/SLIDE_TURN.fr.md)).
 
 ## Key gotchas
 
