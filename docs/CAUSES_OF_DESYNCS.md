@@ -53,8 +53,7 @@ A synced object moved, turned or judged from a local value.
 - **Unit taking back its place from the effect** (`Escaper.setHeroAsEffect`): it used to take `heroPos`, where each machine sees the effect. After a packet that is the same everywhere, but a level restart (`checkpointReviveHeroes_function.ts`) ended the effect with no packet: the synced start position overwrote x and y, not the facing, and the owner's unit faced another way than on the other machines until he walked off and got kicked. The unit now takes `syncedHeroPos`, and a level restart ends the effect mode before it moves and turns the heroes.
 - **Cheat meteor** (`Meteor_functions.ts`): whether it can be dropped now reads the synced position.
 - **Progression and the ditch effect** (`ProgressionUtils.calculatePlayerProgression`, `Multiboard.handleDitchLogic`): the progression was computed from `getHeroX/Y`, and it decides which living hero gets the "talk to me" effect above a dead teammate. A player sliding as an effect around a dead one crossed it at a different moment on each machine, which destroyed and made that effect on different turns (seen as `ag e…/…` differing by one). Progression now reads the synced position and the static slide the packets name, and a hero sliding as an effect is not judged by the terrain its own machine read. `-lockcam progression` reads the same progression.
-- **Still open**:
-    - **Casters** aim from `getHeroX/Y`, which for an async hero is where each machine sees the effect: whether they shoot, and the angle, can differ. Levels with casters are exposed.
+- **Casters** (`Caster.ts`, packet `MEC_AHA`): they aimed from `getHeroX/Y`, where each machine sees the effect of an async hero, so whether they shot, the angle and the reload differed, and a shot unit was made on some machines only. For a hero sliding as an effect, only its own machine now works the shot out, from the effect itself, and tells every machine, which all shoot or not on the same turn. The caster waits for that answer, and gives up after 2 s (its player most likely gone). Heroes that are units are aimed at by every machine alike, as before.
 
 ### 4. Handle ids, which are not synced in Lua
 
@@ -92,7 +91,7 @@ A module variable or a field that a local call writes and a synced call later re
 
 ## How to share local information correctly
 
-Use a sync packet: `BlzSendSyncData` from the machine that knows, `BlzTriggerRegisterPlayerSyncEvent` on every machine. The event fires on the same turn everywhere, **the sender included**, a network round later. Apply everything from the packet's content, not from the local state of the machine applying it. MEC's async slide packets (`AsyncHeroSync.ts`): position `MEC_AHP`, hand-back `MEC_AHT`, death `MEC_AHD`, contact `MEC_AHC`, event `MEC_AHE`, afk activity `MEC_AHK`.
+Use a sync packet: `BlzSendSyncData` from the machine that knows, `BlzTriggerRegisterPlayerSyncEvent` on every machine. The event fires on the same turn everywhere, **the sender included**, a network round later. Apply everything from the packet's content, not from the local state of the machine applying it. MEC's async slide packets (`AsyncHeroSync.ts`): position `MEC_AHP`, hand-back `MEC_AHT`, death `MEC_AHD`, contact `MEC_AHC`, event `MEC_AHE`, caster aim `MEC_AHA`, afk activity `MEC_AHK`.
 
 ## Finding a desync: `-desyncProbe`
 

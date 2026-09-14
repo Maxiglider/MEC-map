@@ -24,13 +24,16 @@ import { Natives } from '../../wc3_natives_unsecured/Natives'
  *  - CONTACT, whenever the hero touches something. Its consequences change the game itself, from
  *    a score to a revived ally, so they cannot be drawn by the machine that noticed alone,
  *  - EVENT, what the others should see or hear about without it deciding anything: the hooks of a
- *    terrain change, an effect of the god mode.
+ *    terrain change, an effect of the god mode,
+ *  - CASTER AIM, what a caster that picked the hero does about it: only the machine of the hero knows
+ *    whether it is in range and where to aim at the effect, and the shot makes a unit.
  */
 const POSITION_PREFIX = 'MEC_AHP'
 const DEATH_PREFIX = 'MEC_AHD'
 const TERRAIN_PREFIX = 'MEC_AHT'
 const CONTACT_PREFIX = 'MEC_AHC'
 const EVENT_PREFIX = 'MEC_AHE'
+const CASTER_AIM_PREFIX = 'MEC_AHA'
 const FIELD_SEPARATOR = '|'
 
 /** Ten a second: the packets travel at network speed whatever the rate, so a higher one would only
@@ -234,6 +237,16 @@ export const initAsyncHeroSync = () => {
         getUdgEscapers().get(fields[0])?.applyAsyncHeroEvent(fields[1], fields[2], fields[3], fields[4], fields[5])
     })
 
+    registerSyncEvent(CASTER_AIM_PREFIX, data => {
+        const fields = decodeNumbers(data)
+
+        if (fields.length < 5) {
+            return
+        }
+
+        casterAimHandler?.(fields[0], fields[1], fields[2], fields[3], fields[4])
+    })
+
     registerSyncEvent(DEATH_PREFIX, data => {
         const packet = decode(data)
 
@@ -365,6 +378,40 @@ export const sendAsyncHeroEvent = (
             y,
             terrainTypeId,
             lastTerrainTypeId
+        )
+    )
+}
+
+type CasterAimHandler = (casterId: number, request: number, escaperId: number, result: number, angle: number) => void
+
+/** Set by the casters (see Caster.ts), which this module cannot import without a cycle */
+let casterAimHandler: CasterAimHandler | undefined
+
+export const setAsyncCasterAimHandler = (handler: CasterAimHandler) => {
+    casterAimHandler = handler
+}
+
+/**
+ * Tells every machine, this one included, what a caster does about the hero of this machine, which only
+ * this machine sees where it is: out of range, no shot, or a shot at that angle. The same numbers, read
+ * from the same text, on every machine.
+ */
+export const sendAsyncCasterAim = (
+    casterId: number,
+    request: number,
+    escaperId: number,
+    result: number,
+    angle: number
+) => {
+    BlzSendSyncData(
+        CASTER_AIM_PREFIX,
+        string.format(
+            `%d${FIELD_SEPARATOR}%d${FIELD_SEPARATOR}%d${FIELD_SEPARATOR}%d${FIELD_SEPARATOR}%.4f`,
+            casterId,
+            request,
+            escaperId,
+            result,
+            angle
         )
     )
 }

@@ -53,8 +53,7 @@ Un objet synchronisé déplacé, tourné ou jugé à partir d'une valeur locale.
 - **Unité qui reprend sa place à l'effet** (`Escaper.setHeroAsEffect`) : elle prenait `heroPos`, l'endroit où chaque machine voit l'effet. Après un paquet, c'est le même partout, mais un redémarrage de niveau (`checkpointReviveHeroes_function.ts`) terminait l'effet sans paquet : la position de départ synchronisée écrasait x et y, pas l'orientation, et l'unité du propriétaire regardait ailleurs que sur les autres machines, jusqu'à ce qu'il se mette à marcher et soit éjecté. L'unité prend maintenant `syncedHeroPos`, et un redémarrage de niveau sort du mode effet avant de déplacer et tourner les héros.
 - **Météore de triche** (`Meteor_functions.ts`) : savoir si elle peut être lâchée lit maintenant la position synchronisée.
 - **Progression et effet « ditch »** (`ProgressionUtils.calculatePlayerProgression`, `Multiboard.handleDitchLogic`) : la progression était calculée depuis `getHeroX/Y`, et elle décide quel héros vivant reçoit l'effet « talk to me » au-dessus d'un coéquipier mort. Un joueur en slide async qui tournait autour d'un mort le croisait à un moment différent sur chaque machine, ce qui détruisait et recréait cet effet à des tours différents (visible comme `ag e…/…` différent d'une unité). La progression lit maintenant la position synchronisée et le static slide nommé par les paquets, et un héros en slide async n'est plus jugé sur le terrain lu par sa seule machine. `-lockcam progression` lit la même progression.
-- **Encore ouvert** :
-    - **Les casters** visent depuis `getHeroX/Y`, qui pour un héros async est l'endroit où chaque machine voit l'effet : le fait de tirer, et l'angle, peuvent différer. Les niveaux avec des casters sont exposés.
+- **Casters** (`Caster.ts`, paquet `MEC_AHA`) : ils visaient depuis `getHeroX/Y`, l'endroit où chaque machine voit l'effet d'un héros async, donc le fait de tirer, l'angle et le rechargement différaient, et un projectile était créé sur certaines machines seulement. Pour un héros en slide async, seule sa machine calcule maintenant le tir, depuis l'effet lui-même, et l'annonce à toutes les machines, qui tirent ou non au même tour. Le caster attend cette réponse, et abandonne au bout de 2 s (son joueur est sans doute parti). Les héros qui sont des unités restent visés de la même façon par toutes les machines.
 
 ### 4. Les identifiants de handles, qui ne sont pas synchronisés en Lua
 
@@ -92,7 +91,7 @@ Une variable de module ou un champ qu'un appel local écrit et qu'un appel synch
 
 ## Partager correctement une information locale
 
-Utiliser un paquet de synchronisation : `BlzSendSyncData` depuis la machine qui sait, `BlzTriggerRegisterPlayerSyncEvent` sur toutes les machines. L'événement se déclenche au même tour partout, **expéditeur compris**, un aller-retour réseau plus tard. Tout appliquer à partir du contenu du paquet, pas de l'état local de la machine qui l'applique. Paquets du slide async de MEC (`AsyncHeroSync.ts`) : position `MEC_AHP`, remise du héros `MEC_AHT`, mort `MEC_AHD`, contact `MEC_AHC`, événement `MEC_AHE`, activité afk `MEC_AHK`.
+Utiliser un paquet de synchronisation : `BlzSendSyncData` depuis la machine qui sait, `BlzTriggerRegisterPlayerSyncEvent` sur toutes les machines. L'événement se déclenche au même tour partout, **expéditeur compris**, un aller-retour réseau plus tard. Tout appliquer à partir du contenu du paquet, pas de l'état local de la machine qui l'applique. Paquets du slide async de MEC (`AsyncHeroSync.ts`) : position `MEC_AHP`, remise du héros `MEC_AHT`, mort `MEC_AHD`, contact `MEC_AHC`, événement `MEC_AHE`, visée d'un caster `MEC_AHA`, activité afk `MEC_AHK`.
 
 ## Trouver une désynchronisation : `-desyncProbe`
 
