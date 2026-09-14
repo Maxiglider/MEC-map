@@ -31,6 +31,7 @@ import { Globals } from '../../09_From_old_Worldedit_triggers/globals_variables_
 import { setClickCatcherEnabled } from '../../Async_slide/AsyncSlideInput'
 import { AUTO_TURN_MODES, AutoTurnMode, getAutoTurnMode, setAutoTurnMode } from '../../Async_slide/AutoTurn'
 import { isTestingLeftClicks, setTestLeftClicks } from '../../Async_slide/HeroEffect'
+import { setSlideTurnDebugEnabled } from '../../Async_slide/SlideTurnDebug'
 import { PRESS_TIME_TO_ENABLE_FOLLOW_MOUSE } from '../../Follow_mouse/Follow_mouse'
 import { GetStringAssignedFromCommand, KeyboardShortcut } from '../../Keyboard_shortcuts/KeyboardShortcut'
 import { Natives } from '../../wc3_natives_unsecured/Natives'
@@ -2244,6 +2245,28 @@ export const initCommandAll = () => {
 
             escaper.setDisplayCollisionLandmarks(S2B(param1))
             Text.mkP(escaper.getPlayer(), `Debug collisions ${S2B(param1) ? 'enabled' : 'disabled'}`)
+
+            return true
+        },
+    })
+
+    // -debugSlideInertia
+    registerCommand({
+        name: 'debugSlideInertia',
+        alias: ['debsi'],
+        group,
+        argDescription: '<boolean>',
+        description:
+            'Shows two rays from your sliding hero, 700 long, the acceleration degrees of -physicalTurn times the inertia on each side of where it heads: ' +
+            'how far your hero turns from no rotation before reaching its maximum rotation speed. Red while your cursor is between them, green otherwise, none while your cursor is not known. ' +
+            'Only you see them. Nothing is shown while -legacySlideInertia is on.',
+        cb: ({ param1, nbParam }, escaper) => {
+            if (nbParam !== 1 || !IsBoolString(param1)) {
+                return USAGE
+            }
+
+            setSlideTurnDebugEnabled(escaper.getId(), S2B(param1))
+            Text.mkP(escaper.getPlayer(), `Debug slide inertia ${S2B(param1) ? 'enabled' : 'disabled'}`)
 
             return true
         },

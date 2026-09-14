@@ -91,7 +91,7 @@ export const setAutoTurnSteering = (escaperId: number, isOn: boolean) => {
 }
 
 /** Where that player points, according to the mode they chose */
-const getCursorWorldPosition = (escaperId: number) => {
+export const getCursorWorldPosition = (escaperId: number) => {
     if (getAutoTurnMode(escaperId) === 'async') {
         // The lattice only knows about the cursor of this machine, and nothing else is needed:
         // where an async hero looks is told to the others ten times a second, so they have nothing
