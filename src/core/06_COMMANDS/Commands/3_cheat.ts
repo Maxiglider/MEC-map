@@ -13,6 +13,7 @@ import { GetMirrorEscaper } from '../../04_STRUCTURES/Escaper/Escaper_functions'
 import { METEOR_CHEAT } from '../../04_STRUCTURES/Meteor/Meteor'
 import { MeteorFunctions } from '../../04_STRUCTURES/Meteor/Meteor_functions'
 import { Gravity } from '../../07_TRIGGERS/Slide_and_CheckTerrain_triggers/Gravity'
+import { slideTurnSettings } from '../../07_TRIGGERS/Slide_and_CheckTerrain_triggers/SlidingMax'
 import { DeplacementHeroHorsDeathPath } from '../../08_GAME/Mode_coop/deplacement_heros_hors_death_path'
 import {
     abilityCb,
@@ -269,6 +270,31 @@ export const initExecuteCommandCheat = () => {
                     Text.P(escaper.getPlayer(), 'slide inertia for player ' + param1 + ' depends now on terrains')
                 }
             }
+            return true
+        },
+    })
+
+    //-legacySlideInertia(lsi) <on|off>   --> slides turn the way they did before the physical braking
+    registerCommand({
+        name: 'legacySlideInertia',
+        alias: ['lsi'],
+        group,
+        argDescription: '<on|off>',
+        description:
+            'On: slides turn the way they did before, slowing down along a table below 51 degrees from the angle asked for, stretched by the slide inertia. Off (default): heroes turn at their maximum rotation speed until they have to brake to stop on that angle',
+        cb: ({ nbParam, param1 }, escaper) => {
+            if (!(nbParam === 1)) {
+                Text.erP(escaper.getPlayer(), 'one param for this command')
+                return true
+            }
+
+            if (!IsBoolString(param1)) {
+                Text.erP(escaper.getPlayer(), 'invalid boolean')
+                return true
+            }
+
+            slideTurnSettings.isLegacyInertia = S2B(param1)
+            Text.A((S2B(param1) ? 'Enabled' : 'Disabled') + ' legacySlideInertia')
             return true
         },
     })

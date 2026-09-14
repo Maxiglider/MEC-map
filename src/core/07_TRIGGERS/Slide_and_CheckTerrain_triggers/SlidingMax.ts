@@ -76,15 +76,20 @@ export const SPEED_AT_LEAST_THAN_50_DEGREES: { [x: number]: number } = {
 export const slideTurn = { diffToApply: 0, turnPerPeriod: 0 }
 
 /**
- * One slide period of the turn in "max" mode, from the degrees left to turn, the most a period may
- * turn, and the turn per period reached so far: it speeds up towards the maximum, and slows down
- * along SPEED_AT_LEAST_THAN_50_DEGREES near the end. Answers whether the hero turns at all, the
- * result being in slideTurn.
- *
- * Nothing but numbers in and out, so that the slide of a hero and the unit of a hero sliding as an
- * effect, which every machine carries on from the last packet, turn alike.
+ * Whether slides turn the way they did before the physical braking (see computeSlideTurnForOnePeriod):
+ * along SPEED_AT_LEAST_THAN_50_DEGREES, stretched by the inertia. Set by -legacySlideInertia, which every
+ * machine hears at once: the unit of a hero sliding as an effect turns through this very function on
+ * all of them.
  */
-export const computeSlideTurnForOnePeriod = (
+export const slideTurnSettings = { isLegacyInertia: false }
+
+/**
+ * One slide period of the turn in "max" mode the way it was before the physical braking: it speeds up
+ * towards the maximum, and below 51 degrees times the inertia slows down along
+ * SPEED_AT_LEAST_THAN_50_DEGREES, read at the degrees left divided by the inertia. A cursor kept at a
+ * steady offset under those degrees never lets the hero reach its maximum rotation speed.
+ */
+const computeLegacySlideTurnForOnePeriod = (
     remainingDegrees: number,
     maxTurnPerPeriod: number,
     currentTurnPerPeriod: number,
@@ -152,6 +157,81 @@ export const computeSlideTurnForOnePeriod = (
 
     slideTurn.diffToApply = diffToApply
     slideTurn.turnPerPeriod = newSlideTurn
+
+    return true
+}
+
+/**
+ * One slide period of the turn in "max" mode, from the degrees left to turn, the most a period may
+ * turn, and the turn per period reached so far. Answers whether the hero turns at all, the result being
+ * in slideTurn.
+ *
+ * The rotation speed changes by at most maxChangePerPeriod each period: from none to the maximum in
+ * rotationTimeForMaximumSpeed times the inertia. It aims at the maximum, unless the hero already has to
+ * brake to stop on the angle asked for: turning s degrees in a period, then s - c, s - 2c... until it
+ * stops covers about s² / 2c + s / 2 degrees, so it aims no faster than the s the degrees left allow.
+ * So the braking starts at the braking distance, about the maximum speed times that time over 2 - near
+ * 19 degrees at the default speed and inertia - and a cursor kept further than that turns the hero at
+ * its maximum speed whatever the inertia. It never turns past that angle.
+ *
+ * Nothing but numbers in and out, so that the slide of a hero and the unit of a hero sliding as an
+ * effect, which every machine carries on from the last packet, turn alike.
+ */
+export const computeSlideTurnForOnePeriod = (
+    remainingDegrees: number,
+    maxTurnPerPeriod: number,
+    currentTurnPerPeriod: number,
+    rotationTimeForMaximumSpeed: number,
+    slideInertia: number
+) => {
+    if (slideTurnSettings.isLegacyInertia) {
+        return computeLegacySlideTurnForOnePeriod(
+            remainingDegrees,
+            maxTurnPerPeriod,
+            currentTurnPerPeriod,
+            rotationTimeForMaximumSpeed,
+            slideInertia
+        )
+    }
+
+    if (remainingDegrees == 0) {
+        return false
+    }
+
+    const diffToApplyAbs = RMinBJ(RAbsBJ(remainingDegrees), RAbsBJ(maxTurnPerPeriod))
+
+    if (diffToApplyAbs <= 0.05) {
+        return false
+    }
+
+    // none, or a negative one, would divide by zero: the normal inertia then
+    const inertia = slideInertia > 0 ? slideInertia : SLIDE_INERTIA_FACTOR
+
+    const sens = remainingDegrees * maxTurnPerPeriod > 0 ? 1 : -1
+    const maxChangePerPeriod = RAbsBJ(
+        (maxTurnPerPeriod * Constants.SLIDE_PERIOD) / (rotationTimeForMaximumSpeed * inertia)
+    )
+
+    // the fastest turn per period from which braking as hard as it can still stops on the angle asked for
+    const brakingTurnPerPeriod =
+        -maxChangePerPeriod / 2 +
+        SquareRoot((maxChangePerPeriod * maxChangePerPeriod) / 4 + 2 * maxChangePerPeriod * RAbsBJ(remainingDegrees))
+
+    const aimedTurnPerPeriod = sens * RMinBJ(RAbsBJ(maxTurnPerPeriod), brakingTurnPerPeriod)
+    const diffSpeed = aimedTurnPerPeriod - currentTurnPerPeriod
+    let newTurnPerPeriod: number
+
+    if (RAbsBJ(diffSpeed) <= maxChangePerPeriod) {
+        newTurnPerPeriod = aimedTurnPerPeriod
+    } else {
+        newTurnPerPeriod = currentTurnPerPeriod + (diffSpeed > 0 ? 1 : -1) * maxChangePerPeriod
+    }
+
+    // never past the angle asked for: a turn still going the other way carries on, as it slows down
+    const diffToApply = sens > 0 ? RMinBJ(newTurnPerPeriod, diffToApplyAbs) : RMaxBJ(newTurnPerPeriod, -diffToApplyAbs)
+
+    slideTurn.diffToApply = diffToApply
+    slideTurn.turnPerPeriod = diffToApply
 
     return true
 }
