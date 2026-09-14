@@ -1,7 +1,32 @@
 import { Constants } from 'core/01_libraries/Constants'
 
-export const HERO_ROTATION_SPEED = 0.9525
+/** Rounds per second: the maximum of SetUnitFacing measured with -measureTurn, 10.3124 degrees per 0.03 s tick */
+export const HERO_ROTATION_SPEED = 0.9549
 export const HERO_ROTATION_TIME_FOR_MAXIMUM_SPEED = 0.11
+
+/**
+ * The physical turn (see computeSlideTurnForOnePeriod), in degrees rather than seconds: the degrees the hero
+ * turns while speeding up from no rotation to the maximum rotation speed, and the degrees braking takes from
+ * the maximum down to none - which is where it starts slowing down before the angle asked for. In degrees,
+ * they keep their meaning whatever the rotation speed of a terrain or a hero: in seconds, a faster rotation
+ * braked over more degrees, and a cursor kept still on a fixed camera circled slower than the maximum.
+ *
+ * Started from how SetUnitFacing turns a unit, measured with -measureTurn (the game brakes far softer than it
+ * speeds up), then tried in the game with -physicalTurn: 25 and 80 degrees are near 0.15 and 0.47 seconds at
+ * the default rotation speed.
+ */
+export const PHYSICAL_ACCELERATION_DEGREES = 25
+export const PHYSICAL_BRAKING_DEGREES = 80
+
+/**
+ * The degrees the physical turn uses, PHYSICAL_ACCELERATION_DEGREES and PHYSICAL_BRAKING_DEGREES by default.
+ * Changed by -physicalTurn to try other ones in the game, which every machine hears at once: the unit of a
+ * hero sliding as an effect turns with them on all of them.
+ */
+export const physicalTurnSettings = {
+    accelerationDegrees: PHYSICAL_ACCELERATION_DEGREES,
+    brakingDegrees: PHYSICAL_BRAKING_DEGREES,
+}
 
 /**
  * How much inertia a hero turns with while sliding, as a factor of the normal one: 2 takes twice as long
@@ -166,13 +191,14 @@ const computeLegacySlideTurnForOnePeriod = (
  * turn, and the turn per period reached so far. Answers whether the hero turns at all, the result being
  * in slideTurn.
  *
- * The rotation speed changes by at most maxChangePerPeriod each period: from none to the maximum in
- * rotationTimeForMaximumSpeed times the inertia. It aims at the maximum, unless the hero already has to
- * brake to stop on the angle asked for: turning s degrees in a period, then s - c, s - 2c... until it
- * stops covers about s² / 2c + s / 2 degrees, so it aims no faster than the s the degrees left allow.
- * So the braking starts at the braking distance, about the maximum speed times that time over 2 - near
- * 19 degrees at the default speed and inertia - and a cursor kept further than that turns the hero at
- * its maximum speed whatever the inertia. It never turns past that angle.
+ * The rotation speed changes by at most maxChangePerPeriod each period, so that speeding up from none to
+ * the maximum turns the hero the acceleration degrees of physicalTurnSettings, times the inertia. It aims at
+ * the maximum, unless the hero already has to brake to stop on the angle asked for, braking softer, over the
+ * braking degrees of physicalTurnSettings times the inertia: turning s degrees in a period, then s - c,
+ * s - 2c... until it stops covers about s² / 2c + s / 2 degrees, so it aims no faster than the s the
+ * degrees left allow. So a cursor further off than the braking degrees - 80 by default - turns the hero at
+ * its maximum speed, whatever that speed, and one kept still on a fixed camera circles at it. It never turns
+ * past that angle.
  *
  * Nothing but numbers in and out, so that the slide of a hero and the unit of a hero sliding as an
  * effect, which every machine carries on from the last packet, turn alike.
@@ -208,14 +234,18 @@ export const computeSlideTurnForOnePeriod = (
     const inertia = slideInertia > 0 ? slideInertia : SLIDE_INERTIA_FACTOR
 
     const sens = remainingDegrees * maxTurnPerPeriod > 0 ? 1 : -1
-    const maxChangePerPeriod = RAbsBJ(
-        (maxTurnPerPeriod * Constants.SLIDE_PERIOD) / (rotationTimeForMaximumSpeed * inertia)
-    )
+    // going from none to the maximum m by c per period turns about m² / 2c degrees
+    const maxTurnSquared = maxTurnPerPeriod * maxTurnPerPeriod
+    const maxChangePerPeriod = maxTurnSquared / (2 * physicalTurnSettings.accelerationDegrees * inertia)
+    const brakingChangePerPeriod = maxTurnSquared / (2 * physicalTurnSettings.brakingDegrees * inertia)
 
-    // the fastest turn per period from which braking as hard as it can still stops on the angle asked for
+    // the fastest turn per period from which braking as the game does still stops on the angle asked for
     const brakingTurnPerPeriod =
-        -maxChangePerPeriod / 2 +
-        SquareRoot((maxChangePerPeriod * maxChangePerPeriod) / 4 + 2 * maxChangePerPeriod * RAbsBJ(remainingDegrees))
+        -brakingChangePerPeriod / 2 +
+        SquareRoot(
+            (brakingChangePerPeriod * brakingChangePerPeriod) / 4 +
+                2 * brakingChangePerPeriod * RAbsBJ(remainingDegrees)
+        )
 
     const aimedTurnPerPeriod = sens * RMinBJ(RAbsBJ(maxTurnPerPeriod), brakingTurnPerPeriod)
     const diffSpeed = aimedTurnPerPeriod - currentTurnPerPeriod

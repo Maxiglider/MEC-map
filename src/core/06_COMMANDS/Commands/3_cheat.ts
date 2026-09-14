@@ -13,7 +13,12 @@ import { GetMirrorEscaper } from '../../04_STRUCTURES/Escaper/Escaper_functions'
 import { METEOR_CHEAT } from '../../04_STRUCTURES/Meteor/Meteor'
 import { MeteorFunctions } from '../../04_STRUCTURES/Meteor/Meteor_functions'
 import { Gravity } from '../../07_TRIGGERS/Slide_and_CheckTerrain_triggers/Gravity'
-import { slideTurnSettings } from '../../07_TRIGGERS/Slide_and_CheckTerrain_triggers/SlidingMax'
+import {
+    PHYSICAL_ACCELERATION_DEGREES,
+    PHYSICAL_BRAKING_DEGREES,
+    physicalTurnSettings,
+    slideTurnSettings,
+} from '../../07_TRIGGERS/Slide_and_CheckTerrain_triggers/SlidingMax'
 import { DeplacementHeroHorsDeathPath } from '../../08_GAME/Mode_coop/deplacement_heros_hors_death_path'
 import {
     abilityCb,
@@ -295,6 +300,51 @@ export const initExecuteCommandCheat = () => {
 
             slideTurnSettings.isLegacyInertia = S2B(param1)
             Text.A((S2B(param1) ? 'Enabled' : 'Disabled') + ' legacySlideInertia')
+            return true
+        },
+    })
+
+    //-physicalTurn(pt) [<accelerationDegrees> <brakingDegrees> | default]   --> tries other values for the physical turn of slides
+    registerCommand({
+        name: 'physicalTurn',
+        alias: ['pt'],
+        group,
+        argDescription: '[<accelerationDegrees> <brakingDegrees> | default]',
+        description:
+            'Tries other values for the physical turn of slides, for every hero: the degrees turned while speeding up to the maximum rotation speed, ' +
+            'and the degrees braking takes from that maximum down to none. Without parameter, shows the current ones; "default" puts back 25 and 80. ' +
+            'Not used while -legacySlideInertia is on.',
+        cb: ({ noParam, nbParam, param1, param2 }, escaper) => {
+            if (noParam) {
+                Text.P(
+                    escaper.getPlayer(),
+                    string.format(
+                        'Physical turn: acceleration over %.1f degrees, braking over %.1f degrees',
+                        physicalTurnSettings.accelerationDegrees,
+                        physicalTurnSettings.brakingDegrees
+                    )
+                )
+                return true
+            }
+
+            if (nbParam === 1 && (param1 === 'default' || param1 === 'd')) {
+                physicalTurnSettings.accelerationDegrees = PHYSICAL_ACCELERATION_DEGREES
+                physicalTurnSettings.brakingDegrees = PHYSICAL_BRAKING_DEGREES
+            } else if (nbParam === 2 && S2R(param1) > 0 && S2R(param2) > 0) {
+                physicalTurnSettings.accelerationDegrees = S2R(param1)
+                physicalTurnSettings.brakingDegrees = S2R(param2)
+            } else {
+                Text.erP(escaper.getPlayer(), 'two positive numbers of degrees, or "default"')
+                return true
+            }
+
+            Text.A(
+                string.format(
+                    'Physical turn: acceleration over %.1f degrees, braking over %.1f degrees',
+                    physicalTurnSettings.accelerationDegrees,
+                    physicalTurnSettings.brakingDegrees
+                )
+            )
             return true
         },
     })
