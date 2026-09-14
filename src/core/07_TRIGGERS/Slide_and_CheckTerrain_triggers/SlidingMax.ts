@@ -3,6 +3,13 @@ import { Constants } from 'core/01_libraries/Constants'
 export const HERO_ROTATION_SPEED = 0.9525
 export const HERO_ROTATION_TIME_FOR_MAXIMUM_SPEED = 0.11
 
+/**
+ * How much inertia a hero turns with while sliding, as a factor of the normal one: 2 takes twice as long
+ * to reach the maximum rotation speed and to brake before the angle asked for, 0.5 half as long. Given
+ * by the slide terrain, or forced for a hero whatever the terrain (see Escaper.absoluteSlideInertia).
+ */
+export const SLIDE_INERTIA_FACTOR = 1
+
 export const MAX_DEGREE_ON_WHICH_SPEED_TABLE_TAKES_CONTROL = 51
 
 export const SPEED_AT_LEAST_THAN_50_DEGREES: { [x: number]: number } = {
@@ -81,7 +88,8 @@ export const computeSlideTurnForOnePeriod = (
     remainingDegrees: number,
     maxTurnPerPeriod: number,
     currentTurnPerPeriod: number,
-    rotationTimeForMaximumSpeed: number
+    rotationTimeForMaximumSpeed: number,
+    slideInertia: number
 ) => {
     if (remainingDegrees == 0) {
         return false
@@ -93,14 +101,24 @@ export const computeSlideTurnForOnePeriod = (
         return false
     }
 
+    // none, or a negative one, would divide by zero: the normal inertia then
+    const inertia = slideInertia > 0 ? slideInertia : SLIDE_INERTIA_FACTOR
+
     //sens
     const sens = remainingDegrees * maxTurnPerPeriod > 0 ? 1 : -1
     const maxIncreaseRotationSpeedPerPeriod = RAbsBJ(
-        (maxTurnPerPeriod * Constants.SLIDE_PERIOD) / rotationTimeForMaximumSpeed
+        (maxTurnPerPeriod * Constants.SLIDE_PERIOD) / (rotationTimeForMaximumSpeed * inertia)
     )
 
-    if (RAbsBJ(remainingDegrees) <= MAX_DEGREE_ON_WHICH_SPEED_TABLE_TAKES_CONTROL) {
-        const tableInd = Math.round(RAbsBJ(remainingDegrees))
+    // The braking starts as much earlier as the speed changes slower, along the same table: braking
+    // steadily, the speed to keep at some degrees from the angle asked for only depends on those degrees
+    // divided by the time to reach the maximum speed. With the table left as it is, a hero with a high
+    // inertia could not brake as fast as it asks, and turned past that angle before coming back.
+    if (RAbsBJ(remainingDegrees) <= MAX_DEGREE_ON_WHICH_SPEED_TABLE_TAKES_CONTROL * inertia) {
+        const tableInd = Math.min(
+            Math.round(RAbsBJ(remainingDegrees) / inertia),
+            MAX_DEGREE_ON_WHICH_SPEED_TABLE_TAKES_CONTROL
+        )
         const aimedSpeedPercentage = SPEED_AT_LEAST_THAN_50_DEGREES[tableInd]
         const aimedNewSpeedPerPeriod = (maxTurnPerPeriod * aimedSpeedPercentage * sens) / 100
         const diffSpeed = aimedNewSpeedPerPeriod - currentTurnPerPeriod

@@ -191,6 +191,88 @@ export const initExecuteCommandCheat = () => {
         },
     })
 
+    //-slideInertia(si) <factor>   --> changes how much inertia your hero turns with while sliding, ignoring terrains
+    registerCommand({
+        name: 'slideInertia',
+        alias: ['si'],
+        group,
+        argDescription: '<factor>',
+        description:
+            'Changes how much inertia your hero turns with while sliding, ignoring terrains: 1 is normal, 2 takes twice as long to speed its turns up and to brake them, 0.5 half as long',
+        cb: ({ nbParam, param1, param2 }, escaper) => {
+            if (S2R(param1) <= 0) {
+                Text.erP(escaper.getPlayer(), 'The slide inertia has to be positive')
+                return true
+            }
+            const inertia = S2R(param1)
+            if (nbParam === 1) {
+                escaper.absoluteSlideInertia(inertia)
+                Text.P(escaper.getPlayer(), 'your slide inertia is set to ' + param1)
+                return true
+            }
+            if (!(nbParam == 2 && escaper.isMaximaxou())) {
+                return true
+            }
+            if (param2 === 'all' || param2 === 'a') {
+                let i = 0
+                while (true) {
+                    if (i >= Constants.NB_ESCAPERS) break
+                    if (getUdgEscapers().get(i) != null) {
+                        getUdgEscapers().get(i)?.absoluteSlideInertia(inertia)
+                    }
+                    i = i + 1
+                }
+                Text.P(escaper.getPlayer(), 'slide inertia for all is set to ' + param1)
+                return true
+            }
+            if (isPlayerId(param2)) {
+                if (getUdgEscapers().get(resolvePlayerId(param2)) != null) {
+                    getUdgEscapers().get(resolvePlayerId(param2))?.absoluteSlideInertia(inertia)
+                    Text.P(escaper.getPlayer(), 'slide inertia for player ' + param2 + ' is set to ' + param1)
+                }
+            }
+            return true
+        },
+    })
+
+    //-normalSlideInertia(nsi)   --> puts the slide inertia back to normal (respecting terrains)
+    registerCommand({
+        name: 'normalSlideInertia',
+        alias: ['nsi'],
+        group,
+        argDescription: '',
+        description: 'Puts the slide inertia back to normal (respecting terrains)',
+        cb: ({ noParam, nbParam, param1 }, escaper) => {
+            if (noParam) {
+                escaper.stopAbsoluteSlideInertia()
+                Text.P(escaper.getPlayer(), 'your slide inertia depends now on terrains')
+                return true
+            }
+            if (!(nbParam == 1 && escaper.isMaximaxou())) {
+                return true
+            }
+            if (param1 === 'all' || param1 === 'a') {
+                let i = 0
+                while (true) {
+                    if (i >= Constants.NB_ESCAPERS) break
+                    if (getUdgEscapers().get(i) != null) {
+                        getUdgEscapers().get(i)?.stopAbsoluteSlideInertia()
+                    }
+                    i = i + 1
+                }
+                Text.P(escaper.getPlayer(), 'slide inertia for all depends now on terrains')
+                return true
+            }
+            if (isPlayerId(param1)) {
+                if (getUdgEscapers().get(resolvePlayerId(param1)) != null) {
+                    getUdgEscapers().get(resolvePlayerId(param1))?.stopAbsoluteSlideInertia()
+                    Text.P(escaper.getPlayer(), 'slide inertia for player ' + param1 + ' depends now on terrains')
+                }
+            }
+            return true
+        },
+    })
+
     //-walkSpeed(ws) <speed>   --> changes the walk speed of your hero, ignoring terrains
     registerCommand({
         name: 'setWalkSpeed',

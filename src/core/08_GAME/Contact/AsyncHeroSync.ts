@@ -49,8 +49,8 @@ const POSITION_PERIOD = 0.1
  *  - turnPerPeriod, the current angular speed. The slide accelerates its turns, so without it a
  *    receiver would restart that acceleration from its own value and draw another curve,
  *  - the vertical state, as for a death,
- *  - slideSpeed and rotationSpeed, which the terrain and the static slides under the hero change
- *    on its own machine only,
+ *  - slideSpeed, rotationSpeed and slideInertia, which the terrain and the static slides under the
+ *    hero change on its own machine only,
  *  - terrainTypeId, the terrain the hero was last seen on (0 for none): its gravity and whether it
  *    lets the hero turn, and the state a replayed check starts from,
  *  - staticSlideId (-1 for none) and staticSlidePreviousSpeed, the static slide its own machine has
@@ -68,6 +68,7 @@ export type HeroMovementState = {
     oldDiffZ: number
     slideSpeed: number
     rotationSpeed: number
+    slideInertia: number
     turnPerPeriod: number
     terrainTypeId: number
     staticSlideId: number
@@ -82,7 +83,7 @@ const encode = (escaperId: number, sequence: number, movement: HeroMovementState
         `%d${FIELD_SEPARATOR}%d${FIELD_SEPARATOR}%.2f${FIELD_SEPARATOR}%.2f${FIELD_SEPARATOR}%.2f` +
             `${FIELD_SEPARATOR}%.2f${FIELD_SEPARATOR}%.2f${FIELD_SEPARATOR}%.4f${FIELD_SEPARATOR}%.2f` +
             `${FIELD_SEPARATOR}%.4f${FIELD_SEPARATOR}%.2f${FIELD_SEPARATOR}%.4f${FIELD_SEPARATOR}%.4f` +
-            `${FIELD_SEPARATOR}%d${FIELD_SEPARATOR}%d${FIELD_SEPARATOR}%.2f`,
+            `${FIELD_SEPARATOR}%d${FIELD_SEPARATOR}%d${FIELD_SEPARATOR}%.2f${FIELD_SEPARATOR}%.4f`,
         escaperId,
         sequence,
         movement.x,
@@ -98,7 +99,8 @@ const encode = (escaperId: number, sequence: number, movement: HeroMovementState
         movement.turnPerPeriod,
         movement.terrainTypeId,
         movement.staticSlideId,
-        movement.staticSlidePreviousSpeed
+        movement.staticSlidePreviousSpeed,
+        movement.slideInertia
     )
 
 const decodeNumbers = (data: string) => {
@@ -115,7 +117,7 @@ const decodeNumbers = (data: string) => {
 const decode = (data: string) => {
     const fields = decodeNumbers(data)
 
-    if (fields.length < 16) {
+    if (fields.length < 17) {
         return undefined
     }
 
@@ -137,6 +139,7 @@ const decode = (data: string) => {
             terrainTypeId: fields[13],
             staticSlideId: fields[14],
             staticSlidePreviousSpeed: fields[15],
+            slideInertia: fields[16],
         },
     }
 }
@@ -252,7 +255,7 @@ export const initAsyncHeroSync = () => {
 
         // the killing effect the machine of that hero showed, for every machine to destroy (-1 for none)
         const fields = decodeNumbers(data)
-        const killingEffectIndex = fields.length > 16 ? fields[16] : -1
+        const killingEffectIndex = fields.length > 17 ? fields[17] : -1
 
         packet &&
             getUdgEscapers()
