@@ -33,6 +33,7 @@ import { ReinitTerrainsPositions } from '../../07_TRIGGERS/Triggers_to_modify_te
 import { AfkMode } from '../../08_GAME/Afk_mode/Afk_mode'
 import { Globals } from '../../09_From_old_Worldedit_triggers/globals_variables_and_triggers'
 import { MEC_core_API } from '../../API/MEC_core_API'
+import { setAutopilotEnabled } from '../../Async_slide/Autopilot'
 import { udg_doubleHeroesEnabled } from '../../Double_heroes/double_heroes_config'
 import { setDesyncProbeEnabled } from '../../Log/DesyncProbe'
 import { flushLogs } from '../../Log/log'
@@ -1013,6 +1014,32 @@ export const initExecuteCommandMax = () => {
                 S2B(param1)
                     ? 'Desync probe on: every machine writes its last minute to CustomMapData/MEC/desync_probe_p<player number>.txt and its last 5 seconds to desync_probe_p<player number>_last.txt'
                     : 'Desync probe off'
+            )
+
+            return true
+        },
+    })
+
+    //-autopilote <on|off>   --> the computer plays your hero towards the end of each level
+    registerCommand({
+        name: 'autopilote',
+        alias: [],
+        group,
+        argDescription: '<on|off>',
+        description:
+            'Lets the computer play your hero towards the end of each level, sliding async: it steers the slides with a virtual cursor ' +
+            'and walks with right clicks, both shown with effects. Avoids death terrains, not monsters yet.',
+        cb: ({ nbParam, param1 }, escaper) => {
+            if (nbParam !== 1 || !IsBoolString(param1)) {
+                return USAGE
+            }
+
+            const isEnabled = S2B(param1)
+
+            setAutopilotEnabled(escaper, isEnabled)
+            Text.mkP(
+                escaper.getPlayer(),
+                isEnabled ? 'Autopilot on: give your hero no order, "-autopilote off" gives it back' : 'Autopilot off'
             )
 
             return true

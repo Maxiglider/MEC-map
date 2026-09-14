@@ -62,8 +62,38 @@ const ACTIVITY_CHECK_TICKS = Math.round(1 / AUTO_TURN_PERIOD)
 
 const activity = { ticks: 0, lastX: -1, lastY: -1 }
 
+/**
+ * The point the autopilot of a player aims at instead of their cursor (see Autopilot.ts), in world
+ * coordinates, so that no camera stands in between. Set on the machine of that player only, like the
+ * cursor it stands for: a plain table of this machine, never walked, never told to anybody.
+ */
+const virtualCursors: { [escaperId: number]: { x: number; y: number } | undefined } = {}
+
+export const setVirtualCursor = (escaperId: number, x: number, y: number) => {
+    const virtualCursor = virtualCursors[escaperId]
+
+    if (virtualCursor) {
+        virtualCursor.x = x
+        virtualCursor.y = y
+    } else {
+        virtualCursors[escaperId] = { x, y }
+    }
+}
+
+export const clearVirtualCursor = (escaperId: number) => {
+    delete virtualCursors[escaperId]
+}
+
 const sendActivityIfCursorMoved = () => {
-    const localEscaper = getUdgEscapers().get(GetPlayerId(GetLocalPlayer()!))
+    const localEscaperId = GetPlayerId(GetLocalPlayer()!)
+
+    // the autopilot moves no cursor: while it plays for this player, it tells the others they are there
+    if (virtualCursors[localEscaperId]) {
+        BlzSendSyncData(ACTIVITY_PREFIX, '1')
+        return
+    }
+
+    const localEscaper = getUdgEscapers().get(localEscaperId)
 
     if (!localEscaper?.isAsyncControlledHere() || !isAsyncMousePositionFresh()) {
         return
@@ -99,6 +129,13 @@ const getCursorWorldPosition = (escaperId: number) => {
         // would have to cross the network for nothing.
         if (escaperId !== GetPlayerId(GetLocalPlayer()!)) {
             return undefined
+        }
+
+        // the autopilot playing for this player points here rather than their cursor
+        const virtualCursor = virtualCursors[escaperId]
+
+        if (virtualCursor) {
+            return virtualCursor
         }
 
         // Turned on as the slide starts, the lattice still sits where it starts from, the center of the
