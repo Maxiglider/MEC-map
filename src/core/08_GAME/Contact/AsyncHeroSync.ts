@@ -26,7 +26,9 @@ import { Natives } from '../../wc3_natives_unsecured/Natives'
  *  - EVENT, what the others should see or hear about without it deciding anything: the hooks of a
  *    terrain change, an effect of the god mode,
  *  - CASTER AIM, what a caster that picked the hero does about it: only the machine of the hero knows
- *    whether it is in range and where to aim at the effect, and the shot makes a unit.
+ *    whether it is in range and where to aim at the effect, and the shot makes a unit,
+ *  - MORTAR HIT, the damage the shell of a mortar does to the hero: only the machine of the hero knows
+ *    how far from the impact it stands (see MortarSplash).
  */
 const POSITION_PREFIX = 'MEC_AHP'
 const DEATH_PREFIX = 'MEC_AHD'
@@ -34,6 +36,7 @@ const TERRAIN_PREFIX = 'MEC_AHT'
 const CONTACT_PREFIX = 'MEC_AHC'
 const EVENT_PREFIX = 'MEC_AHE'
 const CASTER_AIM_PREFIX = 'MEC_AHA'
+const MORTAR_HIT_PREFIX = 'MEC_AHM'
 const FIELD_SEPARATOR = '|'
 
 /** Ten a second: the packets travel at network speed whatever the rate, so a higher one would only
@@ -150,7 +153,8 @@ const decode = (data: string) => {
  * identifier in their user data, the temporary monsters are held by their handle id, which every
  * machine agrees on as long as they create their handles in step.
  */
-export const CONTACT_KIND = { levelMonster: 0, spawnedMonster: 1, powerCircle: 2 }
+/** mortar: the shell of a mortar, by monster id, only ever awaited (see MortarSplash), never touched */
+export const CONTACT_KIND = { levelMonster: 0, spawnedMonster: 1, powerCircle: 2, mortar: 3 }
 
 /** What a hero sliding as an effect lets the others see or hear about */
 export const ASYNC_HERO_EVENT = {
@@ -248,6 +252,19 @@ export const initAsyncHeroSync = () => {
         }
 
         casterAimHandler?.(fields[0], fields[1], fields[2], fields[3], fields[4])
+    })
+
+    registerSyncEvent(MORTAR_HIT_PREFIX, data => {
+        const fields = decodeNumbers(data)
+
+        if (fields.length < 3) {
+            return
+        }
+
+        mortarHitHandler?.(fields[0], fields[1], fields[2])
+
+        // after it: a shell that killed the hero has frozen its effect for its death by now
+        settleAwaitedContact(fields[0], CONTACT_KIND.mortar, fields[1])
     })
 
     registerSyncEvent(DEATH_PREFIX, data => {
@@ -382,6 +399,23 @@ export const sendAsyncHeroEvent = (
             terrainTypeId,
             lastTerrainTypeId
         )
+    )
+}
+
+type MortarHitHandler = (escaperId: number, monsterId: number, damage: number) => void
+
+/** Set by MortarSplash, which this module cannot import without a cycle */
+let mortarHitHandler: MortarHitHandler | undefined
+
+export const setAsyncMortarHitHandler = (handler: MortarHitHandler) => {
+    mortarHitHandler = handler
+}
+
+/** Tells every machine, this one included, the damage the shell of that mortar does to the hero of this machine */
+export const sendAsyncMortarHit = (escaperId: number, monsterId: number, damage: number) => {
+    BlzSendSyncData(
+        MORTAR_HIT_PREFIX,
+        string.format(`%d${FIELD_SEPARATOR}%d${FIELD_SEPARATOR}%.3f`, escaperId, monsterId, damage)
     )
 }
 

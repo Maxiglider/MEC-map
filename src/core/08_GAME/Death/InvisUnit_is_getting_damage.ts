@@ -247,7 +247,7 @@ const touchMonster = (escaper: Escaper, killingUnit: unit, damage: number): bool
     }
 
     if (!escaper.isCoopInvul()) {
-        // todo find a solution for mortars with async slide control
+        // a mortar hurts rather than kills: the damage its shell does (see MortarSplash), and a contact 0
         if (monster?.hasAttackGroundPos()) {
             SetWidgetLife(hero, GetWidgetLife(hero) - damage)
         }
@@ -262,7 +262,8 @@ const touchMonster = (escaper: Escaper, killingUnit: unit, damage: number): bool
         const isExplodedAtDeath =
             !!effectStr && escaper.isHeroAsEffect() && getKillingEffectIndex(escaper.getId(), effectStr) !== -1
 
-        if (!monster?.hasAttackGroundPos() || (monster.hasAttackGroundPos() && GetWidgetLife(hero) - damage <= 0.405)) {
+        // the damage is already taken from the life above: what is left is what decides
+        if (!monster?.hasAttackGroundPos() || GetWidgetLife(hero) <= 0.405) {
             if (effectStr && escaper.isHeroAsEffect()) {
                 rememberKillingEffectOfDeath(escaper.getId(), effectStr)
             }
