@@ -25,7 +25,8 @@ import { setHeroDeathListener } from './DeathCause'
  *    orders (ord), summed,
  *  - ag: the agents made and unmade on this machine since the probe was turned on, by kind, as
  *    made/unmade: effects (e), timers (t), units (u), triggers (tr), groups (g), locations (l), rects
- *    (r), regions (rg), items (i), lightnings (li), forces (f), destructables (d), sounds (s). Every
+ *    (r), regions (rg), items (i), lightnings (li), forces (f), destructables (d), sounds (s), frames
+ *    (fr: agents since Warcraft III 3.0, made in numbers that may depend on the machine). Every
  *    native making or unmaking one is counted, whoever calls it (see wrapAgentNatives). An agent made
  *    by one machine alone is the most common desync, and hid cannot show it: the garbage collector of
  *    each machine frees handles at its own pace, so hid differs by thousands in a game that holds,
@@ -130,7 +131,7 @@ const flag = (value: boolean | unit | undefined) => (value ? '1' : '0')
 type NativeFunction = (this: void, ...args: any[]) => any
 
 /** The kinds of agent counted, in the order they are written */
-const AGENT_KINDS = ['e', 't', 'u', 'tr', 'g', 'l', 'r', 'rg', 'i', 'li', 'f', 'd', 's']
+const AGENT_KINDS = ['e', 't', 'u', 'tr', 'g', 'l', 'r', 'rg', 'i', 'li', 'f', 'd', 's', 'fr']
 
 /** The natives making or unmaking an agent, by kind. One missing from this version of the game is skipped */
 const AGENT_NATIVES: { name: string; kind: string; isMade: boolean }[] = [
@@ -182,6 +183,11 @@ const AGENT_NATIVES: { name: string; kind: string; isMade: boolean }[] = [
     { name: 'CreateSound', kind: 's', isMade: true },
     { name: 'CreateSoundFromLabel', kind: 's', isMade: true },
     { name: 'CreateMIDISound', kind: 's', isMade: true },
+    // frames only became agents with Warcraft III 3.0
+    { name: 'BlzCreateFrame', kind: 'fr', isMade: true },
+    { name: 'BlzCreateSimpleFrame', kind: 'fr', isMade: true },
+    { name: 'BlzCreateFrameByType', kind: 'fr', isMade: true },
+    { name: 'BlzDestroyFrame', kind: 'fr', isMade: false },
 ]
 
 const madeAgents: { [kind: string]: number } = {}
