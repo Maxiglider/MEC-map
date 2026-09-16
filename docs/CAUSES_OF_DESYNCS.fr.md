@@ -16,14 +16,14 @@ La règle qui compte est donc : **tout ce qui modifie la partie doit se produire
 
 Du code tourne légitimement sur une seule machine : tout ce qui est derrière `GetLocalPlayer()`, la grille de souris asynchrone, le slide async d'un héros sur sa propre machine, la caméra, l'interface. Ce code peut **montrer** des choses différentes sur chaque machine, mais ne doit jamais **changer** ce qu'est la partie.
 
-| Sûr sur une seule machine                                                                                                                             | Désynchronise sur une seule machine                                                                                                                 |
-| ----------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Natives de caméra (`SetCameraPosition`, champs)                                                                                                       | Créer ou détruire un agent (effet, unité, timer, déclencheur, groupe, point, rectangle, région, objet, éclair, force, destructible, son)            |
-| Frames / interface, textes flottants, images (pas des agents)                                                                                         | Donner un ordre à une unité, la déplacer, la tuer, la ressusciter, la mettre en pause ; changer sa vie, son propriétaire, ses capacités, ses objets |
-| Déplacer, animer, redimensionner, recolorer un effet **existant** (`BlzSetSpecialEffectPosition`, `BlzPlaySpecialEffect`, alpha, vitesse d'animation) | Tirer dans le générateur aléatoire du jeu (`GetRandomInt`, `GetRandomReal`)                                                                         |
-| Couleur / transparence d'une unité, lueur d'équipe                                                                                                    | Prendre ou rendre une table de la réserve de `MemoryHandler`                                                                                        |
-| Lire n'importe quoi                                                                                                                                   | Écrire un état Lua partagé que du code synchronisé lit ensuite pour agir                                                                            |
-| Envoyer un paquet de synchronisation (`BlzSendSyncData`)                                                                                              | Démarrer, mettre en pause ou détruire un timer, activer un déclencheur                                                                              |
+| Sûr sur une seule machine                                                                                                                             | Désynchronise sur une seule machine                                                                                                                                        |
+| ----------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Natives de caméra (`SetCameraPosition`, champs)                                                                                                       | Créer ou détruire un agent (effet, unité, timer, déclencheur, groupe, point, rectangle, région, objet, éclair, force, destructible, son, et frame depuis Warcraft III 3.0) |
+| Montrer, cacher, déplacer une frame **existante** ; textes flottants, images (pas des agents)                                                         | Donner un ordre à une unité, la déplacer, la tuer, la ressusciter, la mettre en pause ; changer sa vie, son propriétaire, ses capacités, ses objets                        |
+| Déplacer, animer, redimensionner, recolorer un effet **existant** (`BlzSetSpecialEffectPosition`, `BlzPlaySpecialEffect`, alpha, vitesse d'animation) | Tirer dans le générateur aléatoire du jeu (`GetRandomInt`, `GetRandomReal`)                                                                                                |
+| Couleur / transparence d'une unité, lueur d'équipe                                                                                                    | Prendre ou rendre une table de la réserve de `MemoryHandler`                                                                                                               |
+| Lire n'importe quoi                                                                                                                                   | Écrire un état Lua partagé que du code synchronisé lit ensuite pour agir                                                                                                   |
+| Envoyer un paquet de synchronisation (`BlzSendSyncData`)                                                                                              | Démarrer, mettre en pause ou détruire un timer, activer un déclencheur                                                                                                     |
 
 Un **agent** est la famille d'objets du moteur (unités, effets, timers…) que le moteur alloue et suit par identifiant de handle ; voir [le glossaire](#glossaire).
 
@@ -36,6 +36,7 @@ La plus fréquente. La machine a un objet que les autres n'ont pas, les identifi
 - **Effet de mort montré tout de suite sur la machine du joueur en slide async** (`src/core/08_GAME/Death/AsyncKillingEffects.ts`). On ne peut pas y créer un effet seul : au début du slide async, chaque machine crée donc, pour chaque joueur async, un effet par modèle d'effet de mort, rangé sous le sol. La machine du joueur ne fait que _déplacer_ et _rejouer_ l'un d'eux sur le héros au moment du contact. À la mort, chaque machine crée le vrai effet ; celle qui l'a déjà montré en crée un avec un modèle vide (un handle créé partout, rien d'affiché deux fois).
 - **Effet du héros, ombre dessinée, météore à la main de l'effet** : créés avec le héros, ou quand la météore est ramassée, c'est-à-dire à partir d'événements que toutes les machines reçoivent, puis seulement déplacés en local.
 - **Météore attachée pendant que le héros est un effet** (`Escaper.refreshMeteorEffects`) : détruite et recréée seulement quand le héros devient un effet ou redevient une unité, ce que toutes les machines font au même tour.
+- **Frames, agents depuis Warcraft III 3.0** (`type framehandle extends agent` dans son `common.j` ; simples handles avant) : une frame créée ou détruite par une seule machine, sans conséquence jusque-là, désynchronise maintenant la partie. La grille de souris async et les boutons de capture de clic (`src/core/Async_slide/AsyncMouse.ts`, `AsyncSlideInput.ts`) sont créés par toutes les machines, mais il y a 1 ou 3 boutons selon la largeur de l'écran de chaque machine : une différence connue, qui disparaîtra avec les natives de la 3.0 qui lisent la souris (`BlzGetMouseScreenPosX/Y`, `BlzIsMouseButtonPressed`), sans aucune frame. L'historique de commandes de `src/App/Interface.ts` reste désactivé pour avoir désynchronisé.
 
 ### 2. Un tirage aléatoire sur une seule machine
 
@@ -95,6 +96,8 @@ Utiliser un paquet de synchronisation : `BlzSendSyncData` depuis la machine qui 
 
 ## Trouver une désynchronisation : `-desyncProbe`
 
+La probe tourne d'elle-même pendant les 2 premières minutes de chaque partie, démarrée pendant l'initialisation avant l'activation du premier niveau : une désynchronisation tout au début arrive avant que quiconque puisse taper une commande. Pendant ce temps, `-desyncProbe true` la garde sans limite, `-desyncProbe false` l'arrête.
+
 `-desyncProbe true` (commande admin, reçue par toutes les machines) fait écrire à chaque machine, cinq fois par seconde, des valeurs qui doivent être identiques partout, dans deux fichiers de `Documents/Warcraft III/CustomMapData/MEC/` (N = numéro du joueur sur cette machine) :
 
 - `desync_probe_p<N>.txt` : la dernière minute, écrite une fois par seconde. La probe s'arrête d'elle-même quand un joueur part, pour que les machines restées dans la partie terminent ce fichier sur la coupure. Elles ne la remarquent que quelques secondes après, d'où la minute entière.
@@ -105,7 +108,7 @@ Après une désynchronisation, récupérer **les deux** fichiers de **chaque** j
 - `rng` : un tirage du générateur aléatoire partagé (cause 2, ou tout ce qui tire au sort en local).
 - `hid` : identifiant d'un handle tout juste créé. **À ignorer** : il varie de plusieurs milliers dans des parties qui ne désynchronisent pas (cause 4).
 - `mobs … face … ord` : sommes des positions, orientations et ordres des monstres.
-- `ag e…/… t…/… u…/…` : agents créés/détruits par type depuis le démarrage de la probe, comptés en enveloppant chaque native qui en crée ou en détruit, quel que soit l'appelant (cause 1).
+- `ag e…/… t…/… u…/…` : agents créés/détruits par type depuis le démarrage de la probe, comptés en enveloppant chaque native qui en crée ou en détruit, quel que soit l'appelant (cause 1). `fr` compte les frames.
 - `mh <distribuées>/<rendues>/<en réserve>` : compteurs de la réserve de `MemoryHandler` (cause 6).
 - Par héros : position de l'unité, orientation, hauteur de vol, vie, vivant, slide en tant qu'effet (`e`), slide, static slide, terrain, vitesse, invulnérabilité coop, afk, cible de caméra, unité invisible, cercle de résurrection. Pour un héros en slide async, `ss`, `tt` et `sp` valent `*` et `fx*` est l'endroit où cette machine voit l'effet : ces valeurs diffèrent **par conception**.
 - Les lignes `[probe N death]` donnent où un héros est mort et sa cause, notée là où la mort a été décidée (contact, terrain mortel, sortie latérale d'un static slide, ou une pile d'appels). Pour un héros async, seule sa propre machine connaît la cause. Non comparées.
@@ -120,7 +123,7 @@ La probe ne voit que ce qu'elle lit. Une désynchronisation sans aucun champ dif
 
 ## Liste de contrôle pour du code qui ne tourne que sur une machine
 
-- [ ] Aucun agent créé ou détruit (utiliser des effets créés à l'avance et rangés, ou l'astuce du modèle vide).
+- [ ] Aucun agent créé ou détruit, frames comprises (utiliser des effets créés à l'avance et rangés, ou l'astuce du modèle vide).
 - [ ] Aucune unité ordonnée, déplacée, tuée, ressuscitée, mise en pause ; aucun timer démarré, aucun déclencheur activé.
 - [ ] Aucun tirage aléatoire.
 - [ ] Aucune table de `MemoryHandler` prise ou rendue.
@@ -131,6 +134,6 @@ La probe ne voit que ce qu'elle lit. Une désynchronisation sans aucun champ dif
 ## Glossaire
 
 - **Handle** : une référence à un objet du moteur, telle que les scripts la manipulent.
-- **Agent** : les types de handles qui héritent de `agent` dans `common.j` (unités, objets, destructibles, effets, éclairs, sons, timers, déclencheurs, événements, groupes, points, rectangles, régions, forces…). Les joueurs, textes flottants, images et frames sont des handles mais pas des agents.
+- **Agent** : les types de handles qui héritent de `agent` dans `common.j` (unités, objets, destructibles, effets, éclairs, sons, timers, déclencheurs, événements, groupes, points, rectangles, régions, forces…). Les frames sont aussi des agents depuis Warcraft III 3.0. Les joueurs, textes flottants et images sont des handles mais pas des agents.
 - **Table** : la seule structure de données de Lua ; chaque tableau, objet et instance de classe TypeScript est compilé en table.
 - **Paquet de synchronisation** : données envoyées avec `BlzSendSyncData`, reçues par toutes les machines au même tour.

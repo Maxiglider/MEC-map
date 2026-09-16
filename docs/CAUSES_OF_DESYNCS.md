@@ -16,14 +16,14 @@ So the rule that matters is: **whatever changes the game must happen on every ma
 
 Some code legitimately runs on one machine only: anything behind `GetLocalPlayer()`, the async mouse lattice, the async slide of a hero on its own machine, camera handling, UI. That code may **show** different things on each machine, but must never **change** what the game is.
 
-| Safe on one machine only                                                                                                                 | Desync on one machine only                                                                                                                 |
-| ---------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
-| Camera natives (`SetCameraPosition`, fields)                                                                                             | Creating or destroying an agent (effect, unit, timer, trigger, group, location, rect, region, item, lightning, force, destructable, sound) |
-| Frames / UI, text tags, images (not agents)                                                                                              | Ordering, moving, killing, reviving or pausing a unit; changing its life, owner, abilities, items                                          |
-| Moving, animating, scaling, recoloring an **existing** effect (`BlzSetSpecialEffectPosition`, `BlzPlaySpecialEffect`, alpha, time scale) | Drawing from the game's random generator (`GetRandomInt`, `GetRandomReal`)                                                                 |
-| Vertex color / transparency of a unit, team glow                                                                                         | Taking or returning a table of the `MemoryHandler` pool                                                                                    |
-| Reading anything                                                                                                                         | Writing shared Lua state that synced code later reads and acts on                                                                          |
-| Sending a sync packet (`BlzSendSyncData`)                                                                                                | Starting, pausing or destroying a timer, enabling a trigger                                                                                |
+| Safe on one machine only                                                                                                                 | Desync on one machine only                                                                                                                                                   |
+| ---------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Camera natives (`SetCameraPosition`, fields)                                                                                             | Creating or destroying an agent (effect, unit, timer, trigger, group, location, rect, region, item, lightning, force, destructable, sound, and frame since Warcraft III 3.0) |
+| Showing, hiding, moving an **existing** frame; text tags, images (not agents)                                                            | Ordering, moving, killing, reviving or pausing a unit; changing its life, owner, abilities, items                                                                            |
+| Moving, animating, scaling, recoloring an **existing** effect (`BlzSetSpecialEffectPosition`, `BlzPlaySpecialEffect`, alpha, time scale) | Drawing from the game's random generator (`GetRandomInt`, `GetRandomReal`)                                                                                                   |
+| Vertex color / transparency of a unit, team glow                                                                                         | Taking or returning a table of the `MemoryHandler` pool                                                                                                                      |
+| Reading anything                                                                                                                         | Writing shared Lua state that synced code later reads and acts on                                                                                                            |
+| Sending a sync packet (`BlzSendSyncData`)                                                                                                | Starting, pausing or destroying a timer, enabling a trigger                                                                                                                  |
 
 An **agent** is the family of engine objects (units, effects, timers…) that the engine allocates and tracks by handle id; see [the glossary](#glossary).
 
@@ -36,6 +36,7 @@ The most common one. The machine has an object the others don't, handle ids shif
 - **Killing effect shown at once on the async slider's machine** (`src/core/08_GAME/Death/AsyncKillingEffects.ts`). An effect cannot be created there alone, so every machine creates, for each async player, one effect per killing model when the async slide starts, parked under the ground. The player's machine only _moves_ and _replays_ one onto the hero at the moment of the contact. At the death, every machine creates the real effect; the machine that already showed it creates one with an empty model (a handle made everywhere, nothing drawn twice).
 - **Hero effect, drawn shadow, meteor at the hand of the effect**: created with the hero or when the meteor is picked up, i.e. from events every machine hears, and only moved locally afterwards.
 - **Attached meteor while the hero is an effect** (`Escaper.refreshMeteorEffects`): destroyed and made again only when the hero becomes an effect or a unit again, which every machine does on the same turn.
+- **Frames, agents since Warcraft III 3.0** (`type framehandle extends agent` in its `common.j`; plain handles before): a frame made or destroyed by one machine alone, harmless until then, now desyncs the game. The async mouse lattice and the click catchers (`src/core/Async_slide/AsyncMouse.ts`, `AsyncSlideInput.ts`) are made by every machine, but there are 1 or 3 catchers depending on the width of each machine's screen: a known difference, to go away with the 3.0 natives reading the mouse (`BlzGetMouseScreenPosX/Y`, `BlzIsMouseButtonPressed`), which need no frame. The command history of `src/App/Interface.ts` stays disabled for having desynced.
 
 ### 2. A random draw on one machine
 
@@ -95,6 +96,8 @@ Use a sync packet: `BlzSendSyncData` from the machine that knows, `BlzTriggerReg
 
 ## Finding a desync: `-desyncProbe`
 
+The probe runs by itself for the first 2 minutes of every game, started from the initialization before the first level is activated: a desync at the very start comes before anybody can type a command. `-desyncProbe true` meanwhile keeps it on with no limit, `-desyncProbe false` stops it.
+
 `-desyncProbe true` (admin command, heard by every machine) makes each machine write, five times a second, values that must be identical everywhere, to two files in `Documents/Warcraft III/CustomMapData/MEC/` (N = player number on that machine):
 
 - `desync_probe_p<N>.txt`: the last minute, written once a second. The probe stops by itself when a player leaves, so the machines still in the game end this file with the drop. They notice it seconds after it happens, which is why they need the whole minute.
@@ -105,7 +108,7 @@ After a desync, collect **both** files of **every** player (dead players include
 - `rng`: a draw from the shared random generator (cause 2, or anything drawing locally).
 - `hid`: id of a handle just made. **Ignore it**: it drifts by thousands in games that don't desync (cause 4).
 - `mobs … face … ord`: sums of monster positions, facings and orders.
-- `ag e…/… t…/… u…/…`: agents made/unmade by kind since the probe started, counted by wrapping every native that makes or unmakes one, whoever calls it (cause 1).
+- `ag e…/… t…/… u…/…`: agents made/unmade by kind since the probe started, counted by wrapping every native that makes or unmakes one, whoever calls it (cause 1). `fr` counts the frames.
 - `mh <handed out>/<returned>/<cached>`: `MemoryHandler` pool counters (cause 6).
 - Per hero: unit position, facing, fly height, life, alive, sliding as an effect (`e`), sliding, static slide, terrain, speed, coop invulnerability, afk, camera target, invisible unit, power circle. For a hero sliding as an effect, `ss`, `tt` and `sp` read `*` and `fx*` is where that machine sees the effect: those differ **by design**.
 - `[probe N death]` lines give where a hero died and its cause as written where the death was decided (contact, death terrain, static slide left sideways, or a stack trace). For an async hero only its own machine knows the cause. Not compared.
@@ -120,7 +123,7 @@ The probe only sees what it reads. A desync with no differing field before the d
 
 ## Checklist for code that runs on one machine only
 
-- [ ] No agent created or destroyed (use pre-created, parked effects or the empty-model trick).
+- [ ] No agent created or destroyed, frames included (use pre-created, parked effects or the empty-model trick).
 - [ ] No unit ordered, moved, killed, revived, paused; no timer started or trigger enabled.
 - [ ] No random draw.
 - [ ] No `MemoryHandler` table taken or returned.
@@ -131,6 +134,6 @@ The probe only sees what it reads. A desync with no differing field before the d
 ## Glossary
 
 - **Handle**: a reference to an engine object, as scripts manipulate it.
-- **Agent**: the handle types that inherit from `agent` in `common.j` (units, items, destructables, effects, lightnings, sounds, timers, triggers, events, groups, locations, rects, regions, forces…). Players, text tags, images and frames are handles but not agents.
+- **Agent**: the handle types that inherit from `agent` in `common.j` (units, items, destructables, effects, lightnings, sounds, timers, triggers, events, groups, locations, rects, regions, forces…). Frames are agents too since Warcraft III 3.0. Players, text tags and images are handles but not agents.
 - **Table**: Lua's only data structure; every TypeScript array, object and class instance compiles to one.
 - **Sync packet**: data sent with `BlzSendSyncData`, received on every machine on the same turn.
