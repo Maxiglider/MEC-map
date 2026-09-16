@@ -4,7 +4,7 @@ import { createPoint } from '../../../Utils/Point'
 import { Escaper } from '../../04_STRUCTURES/Escaper/Escaper'
 import { MonsterType } from '../../04_STRUCTURES/Monster/MonsterType'
 import { DEFAULT_AUTO_TURN_MODE, getAutoTurnMode, setAutoTurnMode } from '../../Async_slide/AutoTurn'
-import { isTestingLeftClicks, setMouseTrackingEnabled } from '../../Async_slide/HeroEffect'
+import { isTestingAsyncClicks, setMouseTrackingEnabled } from '../../Async_slide/HeroEffect'
 import { setNetworkClickListeningEnabled } from '../../Async_slide/NetworkClick'
 
 export const snapPatrolsToSlideOffsetMap: { [mt: string]: { angle: number; offset: number } | null } = {}
@@ -118,7 +118,7 @@ export const cameraFieldMap: { [x: string]: camerafield } = {
     LOCAL_ROLL: CAMERA_FIELD_LOCAL_ROLL,
 }
 
-// For -autoTurn and -testLeftClicks commands
+// For -autoTurn and -testAsyncClicks commands
 
 /**
  * What the asynchronous slide costs, switched on and off with the modes that ask for it.
@@ -127,7 +127,7 @@ export const cameraFieldMap: { [x: string]: camerafield } = {
  */
 export const updateAsyncNeeds = (escaper: Escaper) => {
     const mode = getAutoTurnMode(escaper.getId())
-    const isTesting = isTestingLeftClicks(escaper.getId())
+    const isTesting = isTestingAsyncClicks(escaper.getId())
 
     // Where the mouse of a player points only has to cross the network for the sync mode, which
     // aims with it. The async mode reads its own cursor on its own machine and tells the others

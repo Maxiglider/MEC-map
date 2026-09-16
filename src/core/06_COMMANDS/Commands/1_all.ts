@@ -29,7 +29,7 @@ import { Apm } from '../../08_GAME/Apm_clics_par_minute/Apm'
 import { Cpm } from '../../08_GAME/Apm_clics_par_minute/Cpm'
 import { Globals } from '../../09_From_old_Worldedit_triggers/globals_variables_and_triggers'
 import { AUTO_TURN_MODES, AutoTurnMode, getAutoTurnMode, setAutoTurnMode } from '../../Async_slide/AutoTurn'
-import { isTestingLeftClicks, setTestLeftClicks } from '../../Async_slide/HeroEffect'
+import { isTestingAsyncClicks, setTestAsyncClicks } from '../../Async_slide/HeroEffect'
 import { setSlideTurnDebugEnabled } from '../../Async_slide/SlideTurnDebug'
 import { PRESS_TIME_TO_ENABLE_FOLLOW_MOUSE } from '../../Follow_mouse/Follow_mouse'
 import { GetStringAssignedFromCommand, KeyboardShortcut } from '../../Keyboard_shortcuts/KeyboardShortcut'
@@ -1948,27 +1948,28 @@ export const initCommandAll = () => {
         },
     })
 
-    //-testLeftClicks(tlc) <boolean>   --> compares the local and the network left click
+    //-testAsyncClicks(tac) <boolean>   --> compares the local and the network clicks, left and right
     registerCommand({
-        name: 'testLeftClicks',
-        alias: ['tlc'],
+        name: 'testAsyncClicks',
+        alias: ['tac'],
         group,
         argDescription: '<boolean>',
-        description: 'Left click moves an effect locally and logs how much earlier it is than the network click',
+        description:
+            'Left and right clicks move an effect at once on your screen, and log how much earlier they are read than the network click. Only you see the effect and the logs',
         cb: ({ param1 }, escaper) => {
             if (param1.length === 0) {
-                param1 = B2S(!isTestingLeftClicks(escaper.getId()))
+                param1 = B2S(!isTestingAsyncClicks(escaper.getId()))
             }
 
             if (!IsBoolString(param1)) {
-                Text.erP(escaper.getPlayer(), USAGE + '-testLeftClicks <boolean>')
+                Text.erP(escaper.getPlayer(), USAGE + '-testAsyncClicks <boolean>')
                 return true
             }
 
-            setTestLeftClicks(escaper.getId(), S2B(param1))
+            setTestAsyncClicks(escaper.getId(), S2B(param1))
             updateAsyncNeeds(escaper)
 
-            Text.mkP(escaper.getPlayer(), `Left click test ${S2B(param1) ? 'on' : 'off'}`)
+            Text.mkP(escaper.getPlayer(), `Async clicks test ${S2B(param1) ? 'on' : 'off'}`)
 
             return true
         },
