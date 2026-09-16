@@ -1922,13 +1922,14 @@ export const initCommandAll = () => {
         },
     })
 
-    //-autoTurn(at) async|sync|off   --> steers the hero towards the mouse while sliding
+    //-autoTurn(at) async|asyncClicks|sync|off   --> steers the hero towards the mouse while sliding
     registerCommand({
         name: 'autoTurn',
         alias: ['at'],
         group,
-        argDescription: 'async | sync | off',
-        description: 'Turns the hero towards the mouse while sliding: async is instant, sync goes through the network',
+        argDescription: 'async | asyncClicks | sync | off',
+        description:
+            'Turns the hero towards the mouse while sliding: async is instant, sync goes through the network. asyncClicks does not follow the mouse: the hero turns towards your right clicks, at once',
         cb: ({ param1 }, escaper) => {
             if (param1.length === 0) {
                 Text.mkP(escaper.getPlayer(), `Auto turn is ${getAutoTurnMode(escaper.getId())}`)
@@ -1936,7 +1937,7 @@ export const initCommandAll = () => {
             }
 
             if (AUTO_TURN_MODES.indexOf(param1 as AutoTurnMode) < 0) {
-                Text.erP(escaper.getPlayer(), USAGE + '-autoTurn async|sync|off')
+                Text.erP(escaper.getPlayer(), USAGE + '-autoTurn async|asyncClicks|sync|off')
                 return true
             }
 

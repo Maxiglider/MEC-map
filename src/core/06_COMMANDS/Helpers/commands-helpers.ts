@@ -3,7 +3,12 @@ import { getUdgEscapers, getUdgMonsterTypes, getUdgTerrainTypes } from '../../..
 import { createPoint } from '../../../Utils/Point'
 import { Escaper } from '../../04_STRUCTURES/Escaper/Escaper'
 import { MonsterType } from '../../04_STRUCTURES/Monster/MonsterType'
-import { DEFAULT_AUTO_TURN_MODE, getAutoTurnMode, setAutoTurnMode } from '../../Async_slide/AutoTurn'
+import {
+    DEFAULT_AUTO_TURN_MODE,
+    getAutoTurnMode,
+    isCursorFollowingAutoTurnMode,
+    setAutoTurnMode,
+} from '../../Async_slide/AutoTurn'
 import { isTestingAsyncClicks, setMouseTrackingEnabled } from '../../Async_slide/HeroEffect'
 import { setNetworkClickListeningEnabled } from '../../Async_slide/NetworkClick'
 
@@ -134,9 +139,10 @@ export const updateAsyncNeeds = (escaper: Escaper) => {
     // where its hero looks, so nobody needs the mouse itself.
     setMouseTrackingEnabled(escaper.getId(), mode === 'sync' || isTesting)
 
-    // The clicks are another matter: both modes hand the hero over to the mouse and take it back
-    // with them.
-    setNetworkClickListeningEnabled(escaper.getId(), mode !== 'off' || isTesting)
+    // The clicks are another matter: the modes following the cursor hand the hero over to the mouse and
+    // take it back with them. asyncClicks reads its clicks on its own machine, and the game turns the
+    // hero from the orders they give as it always did.
+    setNetworkClickListeningEnabled(escaper.getId(), isCursorFollowingAutoTurnMode(mode) || isTesting)
 }
 
 /**

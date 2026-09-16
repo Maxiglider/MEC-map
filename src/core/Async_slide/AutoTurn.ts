@@ -35,11 +35,20 @@ const AUTO_TURN_PERIOD = Constants.SLIDE_PERIOD
  * sync:  the cursor comes from the synchronized mouse event, the same on every machine, and as
  *        late as the network is. No divergence between players,
  * async: the cursor comes from AsyncMouse: instant, but only known on the machine
- *        of the player pointing, so it differs from one machine to another.
+ *        of the player pointing, so it differs from one machine to another,
+ * asyncClicks: the hero slides async too, but does not follow the cursor: it turns towards where the
+ *        player right clicks, read at the press on their own machine (see turnLocalSliderOnAsyncClick),
+ *        a latency before the network hears of that click.
  */
-export type AutoTurnMode = 'off' | 'sync' | 'async'
+export type AutoTurnMode = 'off' | 'sync' | 'async' | 'asyncClicks'
 
-export const AUTO_TURN_MODES: AutoTurnMode[] = ['off', 'sync', 'async']
+export const AUTO_TURN_MODES: AutoTurnMode[] = ['off', 'sync', 'async', 'asyncClicks']
+
+/** The modes where the hero slides as an effect its own machine moves, from a cursor that machine alone reads */
+export const isAsyncAutoTurnMode = (mode: AutoTurnMode) => mode === 'async' || mode === 'asyncClicks'
+
+/** The modes where the hero keeps following the cursor while steering, handed over and taken back by the clicks */
+export const isCursorFollowingAutoTurnMode = (mode: AutoTurnMode) => mode === 'sync' || mode === 'async'
 
 /** The mode every player starts the game with, as if each had typed "-autoTurn" with it (see applyDefaultAutoTurnMode) */
 export const DEFAULT_AUTO_TURN_MODE: AutoTurnMode = 'async'
@@ -82,7 +91,8 @@ const sendActivityIfCursorMoved = () => {
 
 export const getAutoTurnMode = (escaperId: number) => modes[escaperId] ?? 'off'
 
-export const isSteering = (escaperId: number) => getAutoTurnMode(escaperId) !== 'off' && steering[escaperId] === true
+export const isSteering = (escaperId: number) =>
+    isCursorFollowingAutoTurnMode(getAutoTurnMode(escaperId)) && steering[escaperId] === true
 
 /** The right click hands the steering to the mouse, the left click gives it back */
 export const setAutoTurnSteering = (escaperId: number, isOn: boolean) => {
@@ -91,7 +101,7 @@ export const setAutoTurnSteering = (escaperId: number, isOn: boolean) => {
 
 /** Where that player points, according to the mode they chose */
 export const getCursorWorldPosition = (escaperId: number) => {
-    if (getAutoTurnMode(escaperId) === 'async') {
+    if (isAsyncAutoTurnMode(getAutoTurnMode(escaperId))) {
         // The native only knows about the cursor of this machine, and nothing else is needed:
         // where an async hero looks is told to the others ten times a second, so they have nothing
         // to aim for it. Their own guess would fight the packets, and the mouse of that player
@@ -120,7 +130,7 @@ const turnSliderTowardsCursor = (escaperId: number) => {
     // The asynchronous cursor only ever steers the effect, which its own machine moves alone. A hero
     // sliding as a unit - its body carried on after its death, or revived on the ice - is the same
     // on every machine, and turning it from a cursor only this machine knows desyncs the game.
-    if (getAutoTurnMode(escaperId) === 'async' && !escaper.isHeroAsEffect()) {
+    if (isAsyncAutoTurnMode(getAutoTurnMode(escaperId)) && !escaper.isHeroAsEffect()) {
         return
     }
 
@@ -137,7 +147,44 @@ const turnSliderTowardsCursor = (escaperId: number) => {
     // what the map itself uses, and it honours what the terrain allows (canTurn, canTurnAngle,
     // drunk mode, secondary heroes)
     // only this machine makes this call in async mode: it must not draw anything the others would not
-    TurnOnSlide.turnSliderToDirection(escaper, angle, null, getAutoTurnMode(escaperId) === 'async')
+    TurnOnSlide.turnSliderToDirection(escaper, angle, null, isAsyncAutoTurnMode(getAutoTurnMode(escaperId)))
+}
+
+/** Whether the right button was down at the previous period, on this machine: a turn is made at the press only */
+const localRightButton = { wasPressed: false }
+
+/**
+ * The "asyncClicks" mode: the hero of this machine, sliding as the effect this machine moves alone, turns
+ * towards where its player right clicks, at the press, rather than following the cursor. The order that
+ * click gives the hero reaches every machine a latency later, and leaves its turn alone (see TurnOnSlide).
+ */
+const turnLocalSliderOnAsyncClick = () => {
+    const isPressed = BlzIsMouseButtonPressed(MOUSE_BUTTON_TYPE_RIGHT)
+    const isPress = isPressed && !localRightButton.wasPressed
+
+    localRightButton.wasPressed = isPressed
+
+    if (!isPress) {
+        return
+    }
+
+    const escaperId = GetPlayerId(GetLocalPlayer()!)
+    const escaper = getUdgEscapers().get(escaperId)
+
+    // only the effect this machine moves by itself may be turned from here
+    if (!escaper?.getHero() || getAutoTurnMode(escaperId) !== 'asyncClicks' || !escaper.isAsyncControlledHere()) {
+        return
+    }
+
+    const target = getCursorWorldPosition(escaperId)
+
+    if (!target) {
+        return
+    }
+
+    const angle = Atan2(target.y - escaper.getHeroY(), target.x - escaper.getHeroX()) * bj_RADTODEG
+
+    TurnOnSlide.turnSliderToDirection(escaper, angle, null, true)
 }
 
 /** One timer for everybody: it is created once and never destroyed, so no handle comes and goes */
@@ -167,6 +214,8 @@ const startAutoTurnTimer = () => {
             sendActivityIfCursorMoved()
         }
 
+        turnLocalSliderOnAsyncClick()
+
         getUdgEscapers().forAll(escaper => {
             escaper.updateHeroEffect()
 
@@ -189,7 +238,5 @@ export const setAutoTurnMode = (escaperId: number, mode: AutoTurnMode) => {
 
     // The Escaper owns the hand over from there on: it happens wherever the sliding state
     // changes, and the command may well land in the middle of a slide.
-    getUdgEscapers()
-        .get(escaperId)
-        ?.setAsyncSlideEnabled(mode === 'async')
+    getUdgEscapers().get(escaperId)?.setAsyncSlideEnabled(isAsyncAutoTurnMode(mode))
 }

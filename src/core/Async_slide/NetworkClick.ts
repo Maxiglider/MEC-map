@@ -1,7 +1,7 @@
 import { createEvent } from 'Utils/mapUtils'
 import { getUdgEscapers } from '../../../globals'
 import { Natives } from '../wc3_natives_unsecured/Natives'
-import { getAutoTurnMode, setAutoTurnSteering } from './AutoTurn'
+import { getAutoTurnMode, isCursorFollowingAutoTurnMode, setAutoTurnSteering } from './AutoTurn'
 import { isTestingAsyncClicks, takeLastLocalClickTime } from './HeroEffect'
 
 /**
@@ -93,7 +93,7 @@ export const setNetworkClickListeningEnabled = (escaperId: number, isEnabled: bo
 
                     // while a steering mode is chosen, the buttons hand the hero over to the mouse
                     // and take it back, rather than each click being an order of its own
-                    if (getAutoTurnMode(escaperId) !== 'off') {
+                    if (isCursorFollowingAutoTurnMode(getAutoTurnMode(escaperId))) {
                         setAutoTurnSteering(escaperId, isRightClick)
                     }
 
