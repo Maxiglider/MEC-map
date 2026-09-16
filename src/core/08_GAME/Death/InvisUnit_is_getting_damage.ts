@@ -7,8 +7,8 @@ import { Constants } from 'core/01_libraries/Constants'
 import { Monster } from 'core/04_STRUCTURES/Monster/Monster'
 import { hooks } from 'core/API/GeneralHooks'
 import { getUdgEscapers, udg_monsters, udg_spawned_monsters } from '../../../../globals'
-import { Natives } from '../../wc3_natives_unsecured/Natives'
 import type { Escaper } from '../../04_STRUCTURES/Escaper/Escaper'
+import { Natives } from '../../wc3_natives_unsecured/Natives'
 
 const InitTrig_InvisUnit_is_getting_damage = () => {
     let TAILLE_UNITE = 100
@@ -47,7 +47,14 @@ const InitTrig_InvisUnit_is_getting_damage = () => {
                     return
                 }
 
-                if (RAbsBJ(hauteurHero - hauteurKillingUnit) < TAILLE_UNITE) {
+                // A mortar hurts where its shell lands, far from where it stands: its own height says nothing
+                // about the hero it hits, standing on a bridge say. Its splash reached the invisible unit, which
+                // is enough. A power circle is ruled out first: its user data is a player, not a monster.
+                const isMortar =
+                    GetUnitTypeId(killingUnit) !== Constants.DUMMY_POWER_CIRCLE &&
+                    !!(udg_monsters[GetUnitUserData(killingUnit)] as Monster | undefined)?.hasAttackGroundPos()
+
+                if (isMortar || RAbsBJ(hauteurHero - hauteurKillingUnit) < TAILLE_UNITE) {
                     if (GetUnitTypeId(killingUnit) === Constants.DUMMY_POWER_CIRCLE) {
                         const targetPlayer = GetUnitUserData(killingUnit)
 
