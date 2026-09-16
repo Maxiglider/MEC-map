@@ -4,6 +4,7 @@ import { Timer } from 'w3ts'
 import { getUdgEscapers, udg_monsters, udg_spawned_monster_units } from '../../../globals'
 import { SyncSaveLoad } from '../../Utils/SaveLoad/TreeLib/SyncSaveLoad'
 import { Constants } from '../01_libraries/Constants'
+import { Text } from '../01_libraries/Text'
 import { AfkMode } from '../08_GAME/Afk_mode/Afk_mode'
 import { Natives } from '../wc3_natives_unsecured/Natives'
 import { setHeroDeathListener } from './DeathCause'
@@ -38,7 +39,10 @@ import { setHeroDeathListener } from './DeathCause'
  *    and last, while it slides as an effect, where this machine sees that effect (fx).
  *
  * Turned on and off by a command, hence on every machine at once, as it has to be: it draws from the
- * random generator and makes a handle, which is harmless only when every machine does the same.
+ * random generator and makes a handle, which is harmless only when every machine does the same. It also
+ * runs by itself for the first GAME_START_PROBE_DURATION seconds of every game, started from the
+ * initialization every machine runs alike (see startDesyncProbeAtGameStart): a desync at the start of a
+ * game comes before anybody can type a command.
  * Where a hero sliding as an effect is seen is left out: that differs from one machine to another
  * by design, while its unit follows the packets. So do the static slide, the terrain and the slide
  * speed its own machine gives it between two packets: they read "*" for such a hero. Its effect is
@@ -65,6 +69,9 @@ const PROBES_PER_WRITE = 5
  */
 const LAST_PROBES_LINES = 25
 
+/** How long the probe runs by itself at the start of every game, unless it is turned on by hand meanwhile */
+const GAME_START_PROBE_DURATION = 120
+
 const state = {
     timer: undefined as Timer | undefined,
     tick: 0,
@@ -72,6 +79,8 @@ const state = {
     fileName: '',
     lastFileName: '',
     leaveTrigger: undefined as trigger | undefined,
+    /** Running by itself at the start of the game, to stop once GAME_START_PROBE_DURATION is over */
+    isTimeLimited: false,
 }
 
 const writeProbeFile = () => {
@@ -111,6 +120,7 @@ const stopOnPlayerLeaving = () => {
 
     state.timer.destroy()
     state.timer = undefined
+    state.isTimeLimited = false
     setHeroDeathListener(undefined)
     unwrapAgentNatives()
 }
@@ -372,12 +382,18 @@ const probe = () => {
 
 export const setDesyncProbeEnabled = (isEnabled: boolean) => {
     if (isEnabled === (state.timer !== undefined)) {
+        // turned on by hand while it runs for the start of the game: it goes on with no limit
+        if (isEnabled) {
+            state.isTimeLimited = false
+        }
+
         return
     }
 
     if (!isEnabled) {
         state.timer?.destroy()
         state.timer = undefined
+        state.isTimeLimited = false
         setHeroDeathListener(undefined)
         unwrapAgentNatives()
 
@@ -408,4 +424,26 @@ export const setDesyncProbeEnabled = (isEnabled: boolean) => {
     setHeroDeathListener(writeHeroDeath)
     // last, so that counting starts from the same point on every machine
     wrapAgentNatives()
+}
+
+/**
+ * Runs the probe for the first GAME_START_PROBE_DURATION seconds of the game. Called from the
+ * initialization, which every machine runs alike, before the first level is activated: the natives
+ * making agents are counted from the same point everywhere, and a desync at the very start is caught.
+ * Turned on by hand meanwhile, it runs on with no limit; turned off by hand, it stays off.
+ */
+export const startDesyncProbeAtGameStart = () => {
+    setDesyncProbeEnabled(true)
+    state.isTimeLimited = true
+
+    createTimer(GAME_START_PROBE_DURATION, false, () => {
+        if (state.isTimeLimited) {
+            setDesyncProbeEnabled(false)
+        }
+    })
+
+    // what is displayed while the map initializes is never seen
+    createTimer(0, false, () => {
+        Text.A('DesyncProbe activated for 2 minutes')
+    })
 }
