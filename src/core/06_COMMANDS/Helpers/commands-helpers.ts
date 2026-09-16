@@ -3,7 +3,6 @@ import { getUdgEscapers, getUdgMonsterTypes, getUdgTerrainTypes } from '../../..
 import { createPoint } from '../../../Utils/Point'
 import { Escaper } from '../../04_STRUCTURES/Escaper/Escaper'
 import { MonsterType } from '../../04_STRUCTURES/Monster/MonsterType'
-import { setAsyncMouseActive } from '../../Async_slide/AsyncMouse'
 import { DEFAULT_AUTO_TURN_MODE, getAutoTurnMode, setAutoTurnMode } from '../../Async_slide/AutoTurn'
 import { isTestingLeftClicks, setMouseTrackingEnabled } from '../../Async_slide/HeroEffect'
 import { setNetworkClickListeningEnabled } from '../../Async_slide/NetworkClick'
@@ -125,7 +124,6 @@ export const cameraFieldMap: { [x: string]: camerafield } = {
  * What the asynchronous slide costs, switched on and off with the modes that ask for it.
  *
  * What crosses the network is kept to what is read, and that is decided on every machine alike.
- * Whether the lattice runs, on the other hand, only concerns the machine reading its own cursor.
  */
 export const updateAsyncNeeds = (escaper: Escaper) => {
     const mode = getAutoTurnMode(escaper.getId())
@@ -139,8 +137,6 @@ export const updateAsyncNeeds = (escaper: Escaper) => {
     // The clicks are another matter: both modes hand the hero over to the mouse and take it back
     // with them.
     setNetworkClickListeningEnabled(escaper.getId(), mode !== 'off' || isTesting)
-
-    updateAsyncMouseNeed(escaper)
 }
 
 /**
@@ -162,17 +158,4 @@ export const applyDefaultAutoTurnMode = () => {
         setAutoTurnMode(escaper.getId(), DEFAULT_AUTO_TURN_MODE)
         updateAsyncNeeds(escaper)
     })
-}
-
-/**
- * The asynchronous mouse lattice covers the cursor with frames, which swallow the clicks they
- * cover, so it only runs while this machine actually reads it: for the left click test, or for the
- * asynchronous mode of the auto turn.
- */
-const updateAsyncMouseNeed = (escaper: Escaper) => {
-    if (GetLocalPlayer() !== escaper.getPlayer()) {
-        return
-    }
-
-    setAsyncMouseActive(isTestingLeftClicks(escaper.getId()) || getAutoTurnMode(escaper.getId()) === 'async')
 }

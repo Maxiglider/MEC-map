@@ -84,7 +84,7 @@ export const setHeroEffectPosition = (x: number, y: number) => {
  * key event carries coordinates.
  *
  * The mouse move event is synchronized, so every machine knows where every player points: these
- * positions are the same everywhere and can feed synced logic, unlike the asynchronous lattice.
+ * positions are the same everywhere and can feed synced logic, unlike AsyncMouse.
  * They are just as late as the network is.
  *
  * That is also what makes it costly: the mouse of every player travels to every machine, through

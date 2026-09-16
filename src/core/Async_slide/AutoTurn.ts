@@ -5,8 +5,8 @@ import { Constants } from '../01_libraries/Constants'
 import { TurnOnSlide } from '../07_TRIGGERS/Slide_and_CheckTerrain_triggers/To_turn_on_slide'
 import { AfkMode } from '../08_GAME/Afk_mode/Afk_mode'
 import { Natives } from '../wc3_natives_unsecured/Natives'
-import { getAsyncMousePosition, isAsyncMousePositionFresh, setAsyncMouseActive } from './AsyncMouse'
-import { getMousePosition, isTestingLeftClicks } from './HeroEffect'
+import { getAsyncMousePosition } from './AsyncMouse'
+import { getMousePosition } from './HeroEffect'
 import { screen2World } from './Screen2World'
 
 /**
@@ -17,11 +17,10 @@ import { screen2World } from './Screen2World'
  *
  * Right click turns it on, left click turns it off.
  *
- * When this is on, the click catcher of "hero-effect-locally-async" is not created: the clicks
- * are read from the synchronized mouse event, the only one that hears the right button. The
- * cursor, on the other hand, still comes from the asynchronous lattice, so the hero faces where
- * the cursor is now rather than where the network says it was a latency ago. That target differs
- * from one machine to another, hence solo only, like the rest of the asynchronous path.
+ * The clicks are read from the synchronized mouse event. The cursor, on the other hand, comes from
+ * AsyncMouse in async mode, read on this machine at once, so the hero faces where the cursor is now
+ * rather than where the network says it was a latency ago. That target differs from one machine to
+ * another, which is why only the effect of a hero sliding async is steered with it.
  */
 export const AUTO_TURN_MODE = true
 
@@ -35,7 +34,7 @@ const AUTO_TURN_PERIOD = Constants.SLIDE_PERIOD
  * off:   nothing is steered, the game behaves as it always did,
  * sync:  the cursor comes from the synchronized mouse event, the same on every machine, and as
  *        late as the network is. No divergence between players,
- * async: the cursor comes from the asynchronous lattice: instant, but only known on the machine
+ * async: the cursor comes from AsyncMouse: instant, but only known on the machine
  *        of the player pointing, so it differs from one machine to another.
  */
 export type AutoTurnMode = 'off' | 'sync' | 'async'
@@ -65,13 +64,13 @@ const activity = { ticks: 0, lastX: -1, lastY: -1 }
 const sendActivityIfCursorMoved = () => {
     const localEscaper = getUdgEscapers().get(GetPlayerId(GetLocalPlayer()!))
 
-    if (!localEscaper?.isAsyncControlledHere() || !isAsyncMousePositionFresh()) {
+    if (!localEscaper?.isAsyncControlledHere()) {
         return
     }
 
     const cursor = getAsyncMousePosition()
 
-    if (!cursor || (cursor.x === activity.lastX && cursor.y === activity.lastY)) {
+    if (cursor.x === activity.lastX && cursor.y === activity.lastY) {
         return
     }
 
@@ -93,7 +92,7 @@ export const setAutoTurnSteering = (escaperId: number, isOn: boolean) => {
 /** Where that player points, according to the mode they chose */
 export const getCursorWorldPosition = (escaperId: number) => {
     if (getAutoTurnMode(escaperId) === 'async') {
-        // The lattice only knows about the cursor of this machine, and nothing else is needed:
+        // The native only knows about the cursor of this machine, and nothing else is needed:
         // where an async hero looks is told to the others ten times a second, so they have nothing
         // to aim for it. Their own guess would fight the packets, and the mouse of that player
         // would have to cross the network for nothing.
@@ -101,16 +100,9 @@ export const getCursorWorldPosition = (escaperId: number) => {
             return undefined
         }
 
-        // Turned on as the slide starts, the lattice still sits where it starts from, the center of the
-        // screen - about where the hero is, so aiming there throws it any way. Nothing is steered
-        // until the cursor is found: on a reverse slide, that stray turn sent the hero back out.
-        if (!isAsyncMousePositionFresh()) {
-            return undefined
-        }
-
         const asyncMouse = getAsyncMousePosition()
 
-        return asyncMouse && screen2World(asyncMouse.x, asyncMouse.y)
+        return screen2World(asyncMouse.x, asyncMouse.y)
     }
 
     return getMousePosition(escaperId)
@@ -148,22 +140,6 @@ const turnSliderTowardsCursor = (escaperId: number) => {
     TurnOnSlide.turnSliderToDirection(escaper, angle, null, getAutoTurnMode(escaperId) === 'async')
 }
 
-/**
- * The lattice covers the cursor with frames, and those swallow the clicks they cover. But on ice
- * the hero is carried along and nobody clicks, while on walkable ground clicking is everything
- * and the cursor needs no local reading. So the lattice only runs while the hero of this machine
- * is actually sliding, which costs no click at all.
- *
- * The left click test is the exception: it is there to be clicked on, wherever the hero stands.
- */
-const updateAsyncMouseNeed = () => {
-    const localEscaperId = GetPlayerId(GetLocalPlayer()!)
-    const isSlidingWithAsyncTurn =
-        getAutoTurnMode(localEscaperId) === 'async' && getUdgEscapers().get(localEscaperId)?.isSliding() === true
-
-    setAsyncMouseActive(isTestingLeftClicks(localEscaperId) || isSlidingWithAsyncTurn)
-}
-
 /** One timer for everybody: it is created once and never destroyed, so no handle comes and goes */
 const startAutoTurnTimer = () => {
     if (state.timer) {
@@ -184,8 +160,6 @@ const startAutoTurnTimer = () => {
     })
 
     state.timer = createTimer(AUTO_TURN_PERIOD, true, () => {
-        updateAsyncMouseNeed()
-
         activity.ticks++
 
         if (activity.ticks >= ACTIVITY_CHECK_TICKS) {

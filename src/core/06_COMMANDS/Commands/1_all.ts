@@ -28,7 +28,6 @@ import { TurnOnSlide } from '../../07_TRIGGERS/Slide_and_CheckTerrain_triggers/T
 import { Apm } from '../../08_GAME/Apm_clics_par_minute/Apm'
 import { Cpm } from '../../08_GAME/Apm_clics_par_minute/Cpm'
 import { Globals } from '../../09_From_old_Worldedit_triggers/globals_variables_and_triggers'
-import { setClickCatcherEnabled } from '../../Async_slide/AsyncSlideInput'
 import { AUTO_TURN_MODES, AutoTurnMode, getAutoTurnMode, setAutoTurnMode } from '../../Async_slide/AutoTurn'
 import { isTestingLeftClicks, setTestLeftClicks } from '../../Async_slide/HeroEffect'
 import { setSlideTurnDebugEnabled } from '../../Async_slide/SlideTurnDebug'
@@ -1968,12 +1967,6 @@ export const initCommandAll = () => {
 
             setTestLeftClicks(escaper.getId(), S2B(param1))
             updateAsyncNeeds(escaper)
-
-            // the catcher is what reads the local click, and it only listens on the machine of
-            // the player testing: enabling it for everybody would steal their left clicks
-            if (GetLocalPlayer() === escaper.getPlayer()) {
-                setClickCatcherEnabled(S2B(param1))
-            }
 
             Text.mkP(escaper.getPlayer(), `Left click test ${S2B(param1) ? 'on' : 'off'}`)
 
