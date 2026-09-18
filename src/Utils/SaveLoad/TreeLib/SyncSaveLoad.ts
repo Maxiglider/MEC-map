@@ -1,8 +1,8 @@
 import { errorHandler } from 'Utils/mapUtils'
+import { Natives } from '../../../core/wc3_natives_unsecured/Natives'
 import { EncodingBase64 } from './EncodingBase64'
 import { EncodingHex } from './EncodingHex'
 import { Logger } from './Logger'
-import { Natives } from '../../../core/wc3_natives_unsecured/Natives'
 
 const BASE_64_DEFAULT = true
 const ESCAPE_DOUBLE_QUOTES_FOR_JSON_CHAR = '#DQ#'
@@ -60,6 +60,24 @@ const init_syncEventsTrigger = () => {
     )
 }
 
+// Preload escapes backslashes in the written file and truncates too long lines,
+// so each backslash counts twice for a chunk to stay within CHUNK_SIZE once escaped
+const splitInChunks = (toCompile: string) => {
+    const chunks: string[] = []
+    let position = 0
+
+    while (position < toCompile.length) {
+        const candidate = toCompile.substring(position, position + CHUNK_SIZE)
+        const nbBackslashes = candidate.split('\\').length - 1
+        const chunk = candidate.substring(0, Math.max(CHUNK_SIZE - nbBackslashes, CHUNK_SIZE / 2))
+
+        chunks.push(chunk)
+        position += chunk.length
+    }
+
+    return chunks
+}
+
 export const SyncSaveLoad = () => {
     const writeFile = (fileName: string, data: string, base64Encode = BASE_64_DEFAULT) => {
         PreloadGenClear()
@@ -75,14 +93,15 @@ export const SyncSaveLoad = () => {
             toCompile = strings().replaceAll('"', ESCAPE_DOUBLE_QUOTES_FOR_JSON_CHAR, rawData)
         }
 
-        const noOfChunks = math.ceil(toCompile.length / CHUNK_SIZE)
+        const chunks = splitInChunks(toCompile)
+        const noOfChunks = chunks.length
 
         Logger.verbose('rawData.length: ', rawData.length)
         Logger.verbose('toCompile.length: ', toCompile.length)
 
         xpcall(() => {
             for (let i = 0; i < noOfChunks; i++) {
-                const chunk = toCompile.substring(i * CHUNK_SIZE, (i + 1) * CHUNK_SIZE)
+                const chunk = chunks[i]
 
                 const header = EncodingHex.To32BitHexString(noOfChunks) + EncodingHex.To32BitHexString(i + 1)
                 Preload(`")\ncall BlzSendSyncData("${syncPrefix}","${header + chunk}`)
@@ -105,14 +124,13 @@ export const SyncSaveLoad = () => {
             toCompile = strings().replaceAll('"', ESCAPE_DOUBLE_QUOTES_FOR_JSON_CHAR, rawData)
         }
 
-        const noOfChunks = math.ceil(toCompile.length / CHUNK_SIZE)
+        const chunks = splitInChunks(toCompile)
 
         Logger.verbose('rawData.length: ', rawData.length)
         Logger.verbose('toCompile.length: ', toCompile.length)
 
         xpcall(() => {
-            for (let i = 0; i < noOfChunks; i++) {
-                const chunk = toCompile.substring(i * CHUNK_SIZE, (i + 1) * CHUNK_SIZE)
+            for (const chunk of chunks) {
                 Preload(chunk)
             }
         }, Logger.critical)
