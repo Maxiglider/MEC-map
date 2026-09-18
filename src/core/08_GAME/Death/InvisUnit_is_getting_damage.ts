@@ -42,24 +42,30 @@ const InitTrig_InvisUnit_is_getting_damage = () => {
 
         if (GetUnitTypeId(touchedUnit) === Constants.DUMMY_POWER_CIRCLE) {
             const targetPlayer = GetUnitUserData(touchedUnit)
+            const targetEscaper = getUdgEscapers().get(targetPlayer)
+
+            // Two rescuers sliding as effects may each tell their contact with the circle before either
+            // reaches anybody: the second comes back once the hero is up again, and must neither count a
+            // save nor revive it twice. Its life is the same on every machine when a packet is applied.
+            if (!targetEscaper || targetEscaper.isAlive()) {
+                return
+            }
 
             if (escaper.alliedState[targetPlayer]) {
-                const targetEscaper = getUdgEscapers().get(targetPlayer)
-
                 if (!escaper.isEscaperSecondary()) {
                     ServiceManager.getService('Multiboard').increasePlayerScore(
                         GetPlayerId(escaper.getPlayer()),
                         'saves'
                     )
 
-                    if (targetEscaper && hooks.hooks_onCoopHeroRevive) {
+                    if (hooks.hooks_onCoopHeroRevive) {
                         for (const hook of hooks.hooks_onCoopHeroRevive.getHooks()) {
                             hook.execute2(escaper, targetEscaper)
                         }
                     }
                 }
 
-                targetEscaper?.coopReviveHero()
+                targetEscaper.coopReviveHero()
             }
 
             return

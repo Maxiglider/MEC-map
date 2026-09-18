@@ -2196,6 +2196,11 @@ export class Escaper extends EscaperMake {
 
     //coop reviving
     coopReviveHero: (this: void) => void = () => {
+        // revived already, by another rescuer a moment earlier: no second sound, freeze nor invulnerability
+        if (this.isAlive()) {
+            return
+        }
+
         const mirrorEscaper = GetMirrorEscaper(this)
         const mirrorHero = mirrorEscaper?.getHero()
 
