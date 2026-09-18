@@ -16,22 +16,22 @@ import {
     udg_spawned_monsters,
 } from '../../../globals'
 import { errorHandler, runInTrigger } from '../../Utils/mapUtils'
+import { ReplaceBackslahsesInLinks } from '../01_libraries/Basic_functions'
 import { SetMeteorEffect } from '../04_STRUCTURES/Escaper/Escaper'
 import { Hero2Escaper, IsHero } from '../04_STRUCTURES/Escaper/Escaper_functions'
+import { Monster } from '../04_STRUCTURES/Monster/Monster'
 import { MonsterNoMove } from '../04_STRUCTURES/Monster/MonsterNoMove'
 import { MonsterSimplePatrol, createMonsterSmartPatrol } from '../04_STRUCTURES/Monster/MonsterSimplePatrol'
+import { NewImmobileMonster, NewPatrolMonster } from '../04_STRUCTURES/Monster/Monster_functions'
 import { makingRightsToAll } from '../06_COMMANDS/Rights/manage_rights'
 import { LoadMapFromCache } from '../07_TRIGGERS/Load_map_from_gamecache/LoadMapFromCache'
 import { Gravity } from '../07_TRIGGERS/Slide_and_CheckTerrain_triggers/Gravity'
 import { ReinitTerrains } from '../07_TRIGGERS/Triggers_to_modify_terrains/Reinit_terrains'
 import { ReinitTerrainsPositions } from '../07_TRIGGERS/Triggers_to_modify_terrains/Reinit_terrains_position_Change_variations_and_ut_at_beginning'
 import { heroes } from '../08_GAME/Init_game/Heroes'
+import { e2e } from '../Test/e2e-tests/base/e2e-tests-base'
 import { hooks } from './GeneralHooks'
 import { MecHook } from './MecHook'
-import { NewImmobileMonster, NewPatrolMonster } from '../04_STRUCTURES/Monster/Monster_functions'
-import { Monster } from '../04_STRUCTURES/Monster/Monster'
-import { e2e } from '../Test/e2e-tests/base/e2e-tests-base'
-import { ReplaceBackslahsesInLinks } from '../01_libraries/Basic_functions'
 
 export type IMEC_core_API = typeof MEC_core_API
 
@@ -109,7 +109,8 @@ export const MEC_core_API = {
         return hooks.hooks_onEndLevelAny.new(cb)
     },
 
-    onGameWinning: (cb: () => any) => {
+    // if one of the cb for onGameWinning returns false, MEC's end of the game is cancelled: no message, no restart
+    onGameWinning: (cb: () => boolean | void) => {
         return hooks.hooks_onGameWinning.new(cb)
     },
 

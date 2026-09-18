@@ -21,5 +21,5 @@ export const hooks = {
     hooks_onBeforeHeroUsingMeteor: new MecHookArray<
         (escaper: Escaper, targetMonster: Monster, meteor: item) => boolean
     >(),
-    hooks_onGameWinning: new MecHookArray<() => void>(),
+    hooks_onGameWinning: new MecHookArray<() => boolean | void>(),
 }

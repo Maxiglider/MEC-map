@@ -3,10 +3,10 @@ import { MemoryHandler } from 'Utils/MemoryHandler'
 import { createEvent } from 'Utils/mapUtils'
 import { Text } from 'core/01_libraries/Text'
 import { getUdgLevels } from '../../../../globals'
+import { hooks } from '../../API/GeneralHooks'
+import { Natives } from '../../wc3_natives_unsecured/Natives'
 import { Hero2Escaper } from '../Escaper/Escaper_functions'
 import { getSameLevelProgressionPlayers } from './LevelProgression'
-import { Natives } from '../../wc3_natives_unsecured/Natives'
-import { hooks } from '../../API/GeneralHooks'
 
 abstract class RectInterface {
     minX: number
@@ -118,11 +118,21 @@ export class End extends RectInterface {
                         ServiceManager.getService('Multiboard').onPlayerLevelCompleted(finisher)
 
                         DisableTrigger(this.endReaching)
-                        Text.A('Good job ! You have finished the game.')
 
+                        // a hook returning false takes the end of the game over (a map's own ending, say): no
+                        // message, no restart. Every hook is still told the game is won.
+                        let isGameEndCancelled = false
                         for (const hook of hooks.hooks_onGameWinning.getHooks()) {
-                            hook.execute0()
+                            if (hook.execute0() === false) {
+                                isGameEndCancelled = true
+                            }
                         }
+
+                        if (isGameEndCancelled) {
+                            return
+                        }
+
+                        Text.A('Good job ! You have finished the game.')
 
                         TriggerSleepAction(2)
                         Text.A('restart in 10 seconds')
