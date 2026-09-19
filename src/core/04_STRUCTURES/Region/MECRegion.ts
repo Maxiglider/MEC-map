@@ -216,6 +216,14 @@ export abstract class MECRegion {
         this.watchForEventsOneUnit(unit)
     }
 
+    /**
+     * Forgets whether a watched unit was inside: the next check sees it enter if it is inside then. For a region
+     * moved onto a unit already there, which would otherwise never see it enter.
+     */
+    forgetUnitPresence(unit: unit): void {
+        delete this.unitsConsideredInRegion[GetHandleId(unit)]
+    }
+
     unwatchUnit(unit: unit): void {
         const unitId = GetHandleId(unit)
         const watchSequence = this.watchSequenceByHandleId[unitId]

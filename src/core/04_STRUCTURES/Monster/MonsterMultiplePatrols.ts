@@ -1,34 +1,22 @@
 import { arrayValuesRound, GetLocDist } from 'core/01_libraries/Basic_functions'
 import { Constants } from 'core/01_libraries/Constants'
-import { udg_monsters } from '../../../../globals'
-import { errorHandler } from '../../../Utils/mapUtils'
-import { Natives } from '../../wc3_natives_unsecured/Natives'
-import { IsHero } from '../Escaper/Escaper_functions'
+import { globals, udg_monsters } from '../../../../globals'
+import { MemoryHandler } from '../../../Utils/MemoryHandler'
+import { HorizontalRectangleRegion } from '../Region/HorizontalRectangleRegion'
 import type { ContactAreaBuilder } from './ContactChunks'
 import { requestContactChunksRebuild } from './ContactChunks'
 import { Monster } from './Monster'
 import { NewPatrolMonster } from './Monster_functions'
 import { MonsterType } from './MonsterType'
 
-const NewRegion = (x: number, y: number): region => {
-    let r = Rect(x - 16, y - 16, x + 16, y + 16)
-    let R = CreateRegion()
-    RegionAddRect(R, r)
-    RemoveRect(r)
-    return R
-}
+/** The side of the square a waypoint is reached in, as for a long distance move (LongDistanceMoveOrder) */
+const WAYPOINT_SIZE = 64
 
-const MonsterMultiplePatrols_move_Actions = () => {
-    let monster: Monster
-    let MMP: MonsterMultiplePatrols
-    if (IsHero(Natives.UGetTriggerUnit())) {
-        return
-    }
-    monster = udg_monsters[GetUnitUserData(Natives.UGetTriggerUnit())]
-    if (monster instanceof MonsterMultiplePatrols) {
-        if (monster.getCurrentTrigger() == Natives.UGetTriggeringTrigger()) {
-            monster.nextMove()
-        }
+function OnWaypointReached(this: any, unit: unit) {
+    const monster = udg_monsters[GetUnitUserData(unit)]
+
+    if (monster instanceof MonsterMultiplePatrols && monster.u === unit) {
+        monster.nextMove()
     }
 }
 
@@ -41,9 +29,13 @@ export class MonsterMultiplePatrols extends Monster {
 
     x: number[] = []
     y: number[] = []
-    private r: region[] = []
-    private t: trigger[] = []
-    private currentTrigger?: trigger
+    /**
+     * The point the unit walks to, as a MEC region watching it, moved from point to point: its position is
+     * checked every 0.05 s, where a native region only told when a unit crossed into it. A unit already standing
+     * on its next point, or stopping at the edge of a small native region, left a monster standing still for good.
+     */
+    private waypointRegion: HorizontalRectangleRegion | null = null
+    private watchedUnit: unit | null = null
 
     constructor(mt: MonsterType, mode: string, forceId: number | null = null) {
         super(mt, forceId)
@@ -60,15 +52,8 @@ export class MonsterMultiplePatrols extends Monster {
         }
 
         MonsterMultiplePatrols.X.forEach((x, n) => {
-            const y = MonsterMultiplePatrols.Y[n]
-
             this.x[n] = x
-            this.y[n] = y
-            this.r[n] = NewRegion(x, y)
-            this.t[n] = CreateTrigger()
-            DisableTrigger(this.t[n])
-            TriggerAddAction(this.t[n], errorHandler(MonsterMultiplePatrols_move_Actions))
-            TriggerRegisterEnterRegionSimple(this.t[n], this.r[n])
+            this.y[n] = MonsterMultiplePatrols.Y[n]
         })
 
         this.currentMove = -1
@@ -118,23 +103,57 @@ export class MonsterMultiplePatrols extends Monster {
         }
     }
 
-    getCurrentTrigger = () => {
-        return this.currentTrigger
+    /** The waypoint region watching the current unit, made the first time a unit is there */
+    private watchCurrentUnit() {
+        if (!this.u) {
+            return
+        }
+
+        if (!this.waypointRegion) {
+            this.waypointRegion = MemoryHandler.getEmptyClass(
+                HorizontalRectangleRegion,
+                0,
+                0,
+                WAYPOINT_SIZE,
+                WAYPOINT_SIZE
+            )
+            if (globals.debugLongDistanceMoves) {
+                this.waypointRegion.debugRects(true)
+            }
+            this.waypointRegion.onUnitEnters(OnWaypointReached)
+            this.waypointRegion.enableWatchUnits(true)
+        }
+
+        if (this.watchedUnit !== this.u) {
+            this.stopWatchingUnit()
+            this.waypointRegion.watchUnit(this.u)
+            this.watchedUnit = this.u
+        }
     }
 
-    disableTrigger(id: number) {
-        DisableTrigger(this.t[id])
+    private stopWatchingUnit() {
+        if (this.waypointRegion && this.watchedUnit) {
+            this.waypointRegion.unwatchUnit(this.watchedUnit)
+        }
+        this.watchedUnit = null
     }
 
     activateMove(id: number) {
-        EnableTrigger(this.t[id])
-        this.currentTrigger = this.t[id]
-        this.u && IssuePointOrder(this.u, 'move', this.x[id], this.y[id])
+        if (!this.u) {
+            return
+        }
+
+        this.watchCurrentUnit()
+        if (this.waypointRegion) {
+            this.waypointRegion.moveTo(this.x[id], this.y[id])
+            // seen entering at the next check even when it already stands there
+            this.waypointRegion.forgetUnitPresence(this.u)
+        }
+        IssuePointOrder(this.u, 'move', this.x[id], this.y[id])
     }
 
     nextMove = () => {
         const lastLocInd = this.x.length - 1
-        this.disableTrigger(this.currentMove)
 
         if (this.sens === 0 || this.sens === 1) {
             if (this.currentMove >= lastLocInd) {
@@ -172,8 +191,12 @@ export class MonsterMultiplePatrols extends Monster {
         if (this.sens === 2) {
             this.sens = 1
         }
-        EnableTrigger(this.t[1])
-        this.currentTrigger = this.t[1]
+        this.activateMove(1)
+    }
+
+    removeUnit() {
+        this.stopWatchingUnit()
+        super.removeUnit()
     }
 
     getX = (id: number) => {
@@ -191,11 +214,6 @@ export class MonsterMultiplePatrols extends Monster {
             return false
         }
 
-        DestroyTrigger(this.t[lastLocInd])
-        RemoveRegion(this.r[lastLocInd])
-
-        delete this.t[lastLocInd]
-        delete this.r[lastLocInd]
         delete this.x[lastLocInd]
         delete this.y[lastLocInd]
         requestContactChunksRebuild()
@@ -215,24 +233,15 @@ export class MonsterMultiplePatrols extends Monster {
     addNewLocAt(id: number, x: number, y: number) {
         this.x[id] = x
         this.y[id] = y
-        this.r[id] = NewRegion(x, y)
-        this.t[id] = CreateTrigger()
-        DisableTrigger(this.t[id])
-        TriggerAddAction(this.t[id], errorHandler(MonsterMultiplePatrols_move_Actions))
-        TriggerRegisterEnterRegionSimple(this.t[id], this.r[id])
         requestContactChunksRebuild() // one more leg it can be touched along
     }
 
     setLocAt(id: number, x: number, y: number) {
         this.x[id] = x
         this.y[id] = y
-        RemoveRegion(this.r[id])
-        this.r[id] = NewRegion(x, y)
-        DestroyTrigger(this.t[id])
-        this.t[id] = CreateTrigger()
-        DisableTrigger(this.t[id])
-        TriggerAddAction(this.t[id], errorHandler(MonsterMultiplePatrols_move_Actions))
-        TriggerRegisterEnterRegionSimple(this.t[id], this.r[id])
+        if (id === this.currentMove) {
+            this.activateMove(id)
+        }
         requestContactChunksRebuild()
     }
 
@@ -264,6 +273,13 @@ export class MonsterMultiplePatrols extends Monster {
     destroy = () => {
         while (this.destroyLastLoc()) {}
         super.destroy()
+
+        this.stopWatchingUnit()
+        if (this.waypointRegion) {
+            this.waypointRegion.destroy()
+            MemoryHandler.destroyClassObject(this.waypointRegion, this.waypointRegion.constructor.name)
+            this.waypointRegion = null
+        }
     }
 
     toJson() {
