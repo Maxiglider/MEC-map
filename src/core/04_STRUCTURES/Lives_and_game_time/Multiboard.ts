@@ -529,9 +529,23 @@ export const initMultiboard = () => {
 
     const ditchEffects: { [escaperId: number]: effect } = {}
 
+    /** The ditch effects of the players not in that set (all of them without one) taken away */
+    const removeDitchEffectsExcept = (keep?: { [escaperId: string]: Escaper }) => {
+        // by id, in the same order on every machine (not pairs: the handles freed in another order desync)
+        for (let escaperId = 0; escaperId < Constants.NB_ESCAPERS; escaperId++) {
+            const ditchEffect = ditchEffects[escaperId]
+            if (ditchEffect && (!keep || !keep[escaperId])) {
+                DestroyEffect(ditchEffect)
+                delete ditchEffects[escaperId]
+            }
+        }
+    }
+
     // Not really multiboard but w/e
     const handleDitchLogic = () => {
+        // no ditch effect in solo: the ones left from before go (they used to stay over the heroes for good)
         if (getUdgLevels().getLevelProgression() === 'solo') {
+            removeDitchEffectsExcept()
             return
         }
 
@@ -616,16 +630,13 @@ export const initMultiboard = () => {
             }
 
             // Remove ditch effects that are no longer needed
-            for (const [escaperId, ditchEffect] of pairs(ditchEffects)) {
-                if (!ditchEffectPlayers[escaperId]) {
-                    DestroyEffect(ditchEffect)
-                    delete ditchEffects[escaperId]
-                }
-            }
+            removeDitchEffectsExcept(ditchEffectPlayers)
 
             // Create ditch effects that are needed
-            for (const [_, escaper] of pairs(ditchEffectPlayers)) {
-                if (!ditchEffects[escaper.getId()]) {
+            // by id, in the same order on every machine
+            for (let escaperId = 0; escaperId < Constants.NB_ESCAPERS; escaperId++) {
+                const escaper = ditchEffectPlayers[escaperId]
+                if (escaper && !ditchEffects[escaper.getId()]) {
                     const hero = escaper.getHero()
 
                     if (hero) {
@@ -645,6 +656,10 @@ export const initMultiboard = () => {
 
             groupedTargets.__destroy()
             ditchEffectPlayers.__destroy()
+        } else {
+            // fewer than two players to compare (the others walking, afk, auto-reviving, gone): no ditch effect left
+            // standing, where it used to stay over the hero for good
+            removeDitchEffectsExcept()
         }
 
         sortedTargets.__destroy(true)
