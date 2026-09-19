@@ -4,14 +4,23 @@ import { Constants } from '../../01_libraries/Constants'
 import type { Level } from '../Level/Level'
 import { DoorType, KeyForDoorType } from './KeyAndDoorTypes'
 
-/** How near to its door (from the door's kill rect) a hero carrying the key opens it */
-export const DOOR_OPEN_DISTANCE = 128
+/**
+ * How near to its door a hero carrying the key opens it: measured from the door itself (its kill rect), so from its
+ * long side along the door, and from its nearest corner past its ends - not from its centre
+ */
+export const DOOR_OPEN_DISTANCE = 128 * 3
 /** How near to a door or a key a click picks it (to delete it) */
 export const KEY_AND_DOOR_NEAR_DISTANCE = 128
 const CHECK_PERIOD = 0.05
 
 type Rect = { minX: number; minY: number; maxX: number; maxY: number }
 const inside = (r: Rect, x: number, y: number) => x >= r.minX && x <= r.maxX && y >= r.minY && y <= r.maxY
+/** From a point to the nearest point of a rect, 0 inside it */
+const distanceToRect = (r: Rect, x: number, y: number) => {
+    const dx = Math.max(r.minX - x, 0, x - r.maxX)
+    const dy = Math.max(r.minY - y, 0, y - r.maxY)
+    return SquareRoot(dx * dx + dy * dy)
+}
 
 /** The key and door pairs standing on the map, by id: gone through in id order, the same on every machine */
 const standing: { [id: number]: KeyAndDoor } = {}
@@ -59,7 +68,6 @@ export class KeyAndDoor {
     private door: destructable | null = null
     private key: item | null = null
     private killRect: Rect | null = null
-    private openZone: Rect | null = null
     private opened = false
     /** The escaper carrying the key, shown in its hand as a meteor is */
     private carrierId: number | null = null
@@ -109,12 +117,6 @@ export class KeyAndDoor {
             maxX: this.doorX + halfX,
             maxY: this.doorY + halfY,
         }
-        this.openZone = {
-            minX: this.killRect.minX - DOOR_OPEN_DISTANCE,
-            minY: this.killRect.minY - DOOR_OPEN_DISTANCE,
-            maxX: this.killRect.maxX + DOOR_OPEN_DISTANCE,
-            maxY: this.killRect.maxY + DOOR_OPEN_DISTANCE,
-        }
 
         standing[this.id] = this
         if (!checkTimer) {
@@ -144,7 +146,6 @@ export class KeyAndDoor {
         this.door = null
         this.key = null
         this.killRect = null
-        this.openZone = null
         delete standing[this.id]
     }
 
@@ -175,7 +176,7 @@ export class KeyAndDoor {
     }
 
     check = () => {
-        if (this.opened || !this.door || !this.killRect || !this.openZone) {
+        if (this.opened || !this.door || !this.killRect) {
             return
         }
 
@@ -192,7 +193,7 @@ export class KeyAndDoor {
 
                 if (!escaper.isAlive()) {
                     SetItemPosition(this.key, this.keyX, this.keyY)
-                } else if (inside(this.openZone, GetUnitX(hero), GetUnitY(hero))) {
+                } else if (distanceToRect(this.killRect, GetUnitX(hero), GetUnitY(hero)) <= DOOR_OPEN_DISTANCE) {
                     this.open()
                     return
                 } else {
