@@ -183,7 +183,10 @@ export class KeyAndDoor {
 
     /** Made again with what its types say now (after a type changed) */
     refresh = () => {
-        this.isOnMap() && this.create()
+        if (this.isOnMap()) {
+            this.create()
+            this.level?.updateDebugRegions()
+        }
     }
 
     isOpened = () => this.opened
@@ -304,9 +307,11 @@ export class KeyAndDoor {
         return inside(r, this.doorX, this.doorY) || (!!this.keyType && inside(r, this.keyX, this.keyY))
     }
 
+    /** Gone for good: off the map and its level, and its kill rect no longer drawn (-debugRegions) */
     destroy = () => {
         this.remove()
         this.level?.keyAndDoors.removeKeyAndDoor(this.id)
+        this.level?.updateDebugRegions()
     }
 
     toJson = () => {
