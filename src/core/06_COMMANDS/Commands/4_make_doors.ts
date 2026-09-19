@@ -93,6 +93,32 @@ export const initExecuteCommandMake_doors = () => {
         },
     })
 
+    //-displayDoors(ddr) [<doorLabel>] [page]
+    registerCommand({
+        name: 'displayDoors',
+        alias: ['ddr'],
+        group,
+        argDescription: '[<doorLabel>] [page]',
+        description: 'Displays the kinds of doors (-newDoor): destructable and kill rect',
+        cb: ({ cmd }, escaper) => {
+            doorTypes.displayPaginatedForPlayer(escaper.getPlayer(), cmd)
+            return true
+        },
+    })
+
+    //-displayKeys(dk) [<keyForDoorLabel>] [page]
+    registerCommand({
+        name: 'displayKeys',
+        alias: ['dk'],
+        group,
+        argDescription: '[<keyForDoorLabel>] [page]',
+        description: 'Displays the kinds of keys for doors (-newKeyForDoor): their item',
+        cb: ({ cmd }, escaper) => {
+            keyForDoorTypes.displayPaginatedForPlayer(escaper.getPlayer(), cmd)
+            return true
+        },
+    })
+
     //-createKeyAndDoor(crkad) <doorLabel> <keyForDoorLabel> [<doorAngle>]   --> random angles if not specified
     registerCommand({
         name: 'createKeyAndDoor',
