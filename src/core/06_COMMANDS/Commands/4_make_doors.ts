@@ -119,10 +119,10 @@ export const initExecuteCommandMake_doors = () => {
         },
     })
 
-    //-createKeyAndDoor(crkad) <doorLabel> <keyForDoorLabel> [<doorAngle>]   --> random angles if not specified
+    //-createDoorAndKey(crdak) <doorLabel> <keyForDoorLabel> [<doorAngle>]   --> random angles if not specified
     registerCommand({
-        name: 'createKeyAndDoor',
-        alias: ['crkad'],
+        name: 'createDoorAndKey',
+        alias: ['crdak'],
         group,
         argDescription: '<doorLabel> <keyForDoorLabel> [<doorAngle>]',
         description:

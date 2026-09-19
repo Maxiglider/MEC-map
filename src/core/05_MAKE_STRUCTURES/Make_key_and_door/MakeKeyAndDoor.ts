@@ -1,16 +1,18 @@
 import { Text } from '../../01_libraries/Text'
 import { KeyAndDoor } from '../../04_STRUCTURES/KeyAndDoor/KeyAndDoor'
 import { DoorType, KeyForDoorType } from '../../04_STRUCTURES/KeyAndDoor/KeyAndDoorTypes'
-import { MakeOneByOneOrTwoClicks } from '../Make/MakeOneByOneOrTwoClicks'
+import { Make } from '../Make/Make'
 
-/** -createKeyAndDoor: a first click places the door, a second its key; then the next pair */
-export class MakeKeyAndDoor extends MakeOneByOneOrTwoClicks {
+/** -createDoorAndKey: a first click places the door, a second its key; then the next pair */
+export class MakeKeyAndDoor extends Make {
     private doorType: DoorType
     private keyType: KeyForDoorType
     private doorAngle: number
+    /** The door placed by the first click, waiting for its key */
+    private door: KeyAndDoor | null = null
 
     constructor(maker: unit, doorType: DoorType, keyType: KeyForDoorType, doorAngle: number) {
-        super(maker, 'keyAndDoorCreate', 'twoClics', ['twoClics'])
+        super(maker, 'keyAndDoorCreate')
         this.doorType = doorType
         this.keyType = keyType
         this.doorAngle = doorAngle
@@ -18,26 +20,30 @@ export class MakeKeyAndDoor extends MakeOneByOneOrTwoClicks {
 
     doActions = () => {
         if (super.doBaseActions()) {
-            if (!this.isLastLocSavedUsed()) {
-                this.saveLoc(this.orderX, this.orderY)
+            const level = this.escaper.getMakingLevel()
+
+            if (!this.door) {
+                this.door = new KeyAndDoor(this.doorType, null, this.orderX, this.orderY, this.doorAngle, 0, 0)
+                level.keyAndDoors.new(this.door, level.isActivated())
+                level.updateDebugRegions()
                 Text.mkP(this.makerOwner, 'door placed: click where its key goes')
                 return
             }
 
-            const level = this.escaper.getMakingLevel()
-            const keyAndDoor = new KeyAndDoor(
-                this.doorType,
-                this.keyType,
-                this.lastX,
-                this.lastY,
-                this.doorAngle,
-                this.orderX,
-                this.orderY
-            )
-            level.keyAndDoors.new(keyAndDoor, level.isActivated())
-            level.updateDebugRegions()
+            this.door.setKey(this.keyType, this.orderX, this.orderY)
+            this.door = null
             Text.mkP(this.makerOwner, 'key and door created: click where the next door goes')
-            this.unsaveLocDefinitely()
+        }
+    }
+
+    /** Stopped between the two clicks: the door without its key goes */
+    destroy() {
+        super.destroy()
+        if (this.door) {
+            const level = this.door.level
+            this.door.destroy()
+            this.door = null
+            level?.updateDebugRegions()
         }
     }
 }

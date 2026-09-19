@@ -240,11 +240,23 @@ export class KeyAndDoor {
         this.level?.updateDebugRegions()
     }
 
-    /** Where the key lies at start (-moveKey), made again there if it is on the map */
-    moveKey = (x: number, y: number) => {
+    /**
+     * Its key and where it lies at start (-createDoorAndKey's second click, -moveKey): only the key is made again, so
+     * that a door with a random angle keeps the one it has
+     */
+    setKey = (keyType: KeyForDoorType, x: number, y: number) => {
+        this.keyType = keyType
         this.keyX = x
         this.keyY = y
-        this.refresh()
+        if (this.isOnMap() && !this.opened) {
+            this.setCarrier(null)
+            this.key && RemoveItem(this.key)
+            this.key = CreateItem(FourCC(keyType.itemTypeId), x, y) ?? null
+        }
+    }
+
+    moveKey = (x: number, y: number) => {
+        this.keyType && this.setKey(this.keyType, x, y)
     }
 
     isBetweenLocs = (x1: number, y1: number, x2: number, y2: number) => {
