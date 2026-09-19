@@ -569,7 +569,7 @@ export class MonsterSpawn {
         }
 
         if (this.keepAliveForNextLevel) {
-            text = text + ' keepLiveForNextLevel'
+            text = text + ' keepAliveForNextLevel'
         }
 
         if (detailled) {
