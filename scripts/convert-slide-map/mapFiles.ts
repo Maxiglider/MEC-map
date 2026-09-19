@@ -1,0 +1,223 @@
+import MpqArchive from 'mdx-m3-viewer-th/dist/cjs/parsers/mpq/archive'
+
+/** The files a map may hold, for protected maps whose (listfile) is emptied */
+export const KNOWN_MAP_FILES = [
+    'war3map.j',
+    'scripts\\war3map.j',
+    'war3map.lua',
+    'war3map.w3e',
+    'war3map.w3i',
+    'war3map.wts',
+    'war3map.doo',
+    'war3mapUnits.doo',
+    'war3map.w3r',
+    'war3map.w3c',
+    'war3map.w3s',
+    'war3map.wtg',
+    'war3map.wct',
+    'war3map.w3u',
+    'war3map.w3t',
+    'war3map.w3a',
+    'war3map.w3b',
+    'war3map.w3d',
+    'war3map.w3h',
+    'war3map.w3q',
+    'war3mapSkin.w3u',
+    'war3mapSkin.w3t',
+    'war3mapSkin.w3a',
+    'war3mapSkin.w3b',
+    'war3mapSkin.w3d',
+    'war3mapSkin.w3h',
+    'war3mapSkin.w3q',
+    'war3map.shd',
+    'war3map.wpm',
+    'war3map.mmp',
+    'war3map.imp',
+    'war3mapMap.blp',
+    'war3mapMap.b00',
+    'war3mapMap.tga',
+    'war3mapPreview.tga',
+    'war3mapPath.tga',
+    'war3mapMisc.txt',
+    'war3mapSkin.txt',
+    'war3mapExtra.txt',
+    '(listfile)',
+    '(attributes)',
+]
+
+export const readArchive = (buffer: Buffer) => {
+    const archive = new MpqArchive()
+    archive.load(new Uint8Array(buffer), true)
+
+    const names = new Set<string>(KNOWN_MAP_FILES)
+    const listfile = archive.get('(listfile)')?.text()
+    listfile?.split(/\r?\n/).forEach(n => n.trim() !== '' && names.add(n.trim()))
+
+    // the imports file names what a protector left out of the listfile
+    const imp = archive.get('war3map.imp')?.bytes()
+    if (imp) {
+        for (const m of Buffer.from(imp)
+            .toString('latin1')
+            .matchAll(/[\x20-\x7e]{4,}/g)) {
+            names.add(m[0])
+            names.add('war3mapImported\\' + m[0])
+        }
+    }
+
+    const files = new Map<string, Uint8Array>()
+    const unreadable: string[] = []
+
+    for (const name of names) {
+        const file = archive.get(name)
+        if (!file) continue
+
+        try {
+            const bytes = file.bytes()
+            bytes ? files.set(name, bytes) : unreadable.push(name)
+        } catch {
+            unreadable.push(name)
+        }
+    }
+
+    return { files, unreadable }
+}
+
+/** TRIGSTR_n → its text */
+export const parseWts = (text: string) => {
+    const strings: { [key: string]: string } = {}
+
+    for (const m of text
+        .replace(/\r\n?/g, '\n')
+        .matchAll(/STRING\s+(\d+)[^\n]*\n(?:\/\/[^\n]*\n)?\{\n([\s\S]*?)\n\}/g)) {
+        strings['TRIGSTR_' + m[1].padStart(3, '0')] = m[2]
+        strings['TRIGSTR_' + m[1]] = m[2]
+    }
+
+    return strings
+}
+
+/**
+ * The start of war3map.w3i, which every version shares from Reign of Chaos (18) on: enough to rebuild the
+ * map info of the MEC map. The library parser stops on the Reign of Chaos format.
+ */
+export const parseW3iHead = (bytes: Uint8Array) => {
+    const view = new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength)
+    let offset = 0
+    const int = () => {
+        const v = view.getInt32(offset, true)
+        offset += 4
+        return v
+    }
+    const float = () => {
+        const v = view.getFloat32(offset, true)
+        offset += 4
+        return v
+    }
+    const string = () => {
+        const end = bytes.indexOf(0, offset)
+        const s = Buffer.from(bytes.subarray(offset, end)).toString('utf8')
+        offset = end + 1
+        return s
+    }
+
+    const version = int()
+    const saves = int()
+    const editorVersion = int()
+    if (version >= 28) offset += 16 // game version major, minor, patch, build
+    const name = string()
+    const author = string()
+    const description = string()
+    const recommendedPlayers = string()
+    const cameraBounds = Array.from({ length: 8 }, float)
+    const cameraBoundsComplements = Array.from({ length: 4 }, int)
+    const playableWidth = int()
+    const playableHeight = int()
+    const flags = int()
+    const tileset = String.fromCharCode(bytes[offset])
+    offset += 1
+
+    return {
+        version,
+        saves,
+        editorVersion,
+        name,
+        author,
+        description,
+        recommendedPlayers,
+        cameraBounds,
+        cameraBoundsComplements,
+        playableWidth,
+        playableHeight,
+        flags: '0x' + (flags >>> 0).toString(16),
+        tileset,
+    }
+}
+
+/**
+ * The longest map name Warcraft III takes, as stored (color codes included): the longest among 51 old maps the
+ * World Editor saved is 36, and the editor is said to stop at about 35.
+ */
+export const MAP_NAME_MAX_LENGTH = 36
+
+/** A name without its "protected" marks ("-Protected-", "(Prot)", "[P]"…) and what they leave behind */
+export const withoutProtectedMarks = (name: string) =>
+    name
+        .replace(/\[p\]|protected|\bprot\b/gi, '')
+        .replace(/[\s-]+([\])])/g, '$1')
+        .replace(/\[\s*\]|\(\s*\)/g, '')
+        .replace(/(^|\s)-+(?=\s|$)/g, ' ')
+        .replace(/[\s-]+$|^[\s-]+/g, '')
+        .replace(/\s+/g, ' ')
+        .trim()
+
+const COLOR = /\|c[0-9a-fA-F]{8}|\|r/gi
+
+/**
+ * The name of the converted map in the game: the old one without its "protected" marks, its version replaced by
+ * [M2] (or M2), or [M2] added when it has none, within MAP_NAME_MAX_LENGTH. When it doesn't fit, the color codes
+ * after the first go first, then the visible text before the tag is shortened, color codes kept whole.
+ */
+export const mecMapName = (oldName: string, maxLength = MAP_NAME_MAX_LENGTH) => {
+    const fits = (s: string) => s.length <= maxLength
+    // trailing spaces, also before a final |r
+    const trimEnd = (s: string) => s.replace(/\s+(\|r)?$/i, '$1').replace(/\s+$/, '')
+    // protection marks go with their color codes' content only: the codes themselves stay
+    const name = oldName
+        .replace(/[^|]+/g, part => (/\bprot|protected|\[p\]/i.test(part) ? ` ${withoutProtectedMarks(part)} ` : part))
+        .replace(/ {2,}/g, ' ')
+        .trim()
+
+    const bracketed = /\[[^\]]*\d[^\]]*\]/
+    const prefixed = /\b[vV]\s?\d+(\.\d+)+[a-z]?\b/
+    const bare = /\b\d+\.\d+[a-z]?\b/
+    const versioned = [bracketed, prefixed, bare].find(pattern => pattern.test(name))
+    const withTag = (tag: string) => trimEnd(versioned ? name.replace(versioned, tag) : `${trimEnd(name)} ${tag}`)
+
+    for (const tag of ['[M2]', 'M2']) {
+        const s = withTag(tag)
+        if (fits(s)) return s
+        if (fits(s.replace(/ {2,}/g, ' '))) return s.replace(/ {2,}/g, ' ')
+    }
+
+    // the color codes after the first one, from the last
+    let s = withTag('M2').replace(/ {2,}/g, ' ')
+    const codes = [...s.matchAll(COLOR)]
+    for (let k = codes.length - 1; k >= 1 && !fits(s); k--) {
+        const code = codes[k]
+        s = s.substring(0, code.index!) + s.substring(code.index! + code[0].length)
+        codes.splice(k, 1)
+    }
+    if (fits(s)) return s.replace(/ {2,}/g, ' ')
+
+    // then the visible text before the tag, from its end, leaving color codes whole
+    const tag = s.lastIndexOf('M2')
+    let before = s.substring(0, tag).replace(/\s+$/, '')
+    const after = s.substring(tag + 2)
+    while (before.length > 0 && !fits(`${before} M2${after}`)) {
+        before = /(\|c[0-9a-fA-F]{8}|\|r)$/i.test(before)
+            ? before.replace(/(\|c[0-9a-fA-F]{8}|\|r)$/i, '')
+            : before.slice(0, -1)
+        before = before.replace(/\s+$/, '')
+    }
+    return `${before} M2${after}`
+}

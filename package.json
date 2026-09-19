@@ -21,7 +21,11 @@
         "build:defs": "ts-node scripts/dev",
         "build-tsconfig": "ts-node --transpile-only scripts/build-tsconfig.ts",
         "prettier-staged-files": "ts-node --transpile-only scripts/prettier-staged-files.ts",
-        "prepare": "yarn build-tsconfig && husky"
+        "prepare": "yarn build-tsconfig && husky",
+        "convert-slide-map:extract": "ts-node --transpile-only scripts/convert-slide-map/extract.ts",
+        "convert-slide-map:rebase": "ts-node --transpile-only scripts/convert-slide-map/rebase.ts",
+        "convert-slide-map:gamedata": "ts-node --transpile-only scripts/convert-slide-map/gamedata.ts",
+        "convert-slide-map:build": "ts-node --transpile-only scripts/convert-slide-map/build.ts"
     },
     "lint-staged": {
         "*.{js,ts,json}": "prettier --write"
