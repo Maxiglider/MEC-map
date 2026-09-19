@@ -92,6 +92,17 @@ const footprintOf = (before: GroundCross, after: GroundCross) => {
 
 /** The key and door pairs standing on the map, by id: gone through in id order, the same on every machine */
 const standing: { [id: number]: KeyAndDoor } = {}
+
+/**
+ * Whether a destructable is a door standing on the map. A click on a door is taken as a click on the ground there
+ * (a hero doesn't go and "use" it): doors can't be made unselectable without object data.
+ */
+export const isDoor = (d: destructable) => {
+    for (const [_, keyAndDoor] of pairs(standing)) {
+        if (keyAndDoor.isDoorDestructable(d)) return true
+    }
+    return false
+}
 let checkTimer: timer | null = null
 
 const checkAll = () => {
@@ -161,6 +172,8 @@ export class KeyAndDoor {
     getId = () => this.id
 
     isOnMap = () => this.door !== null
+
+    isDoorDestructable = (d: destructable) => this.door === d
 
     create = () => {
         this.remove()

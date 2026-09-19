@@ -18,6 +18,7 @@ import { TerrainTypeSlide } from 'core/04_STRUCTURES/TerrainType/TerrainTypeSlid
 import { Apm } from 'core/08_GAME/Apm_clics_par_minute/Apm'
 import { udg_symmetryAngle } from 'core/Double_heroes/double_heroes_config'
 import { globals } from '../../../../globals'
+import { isDoor } from '../../04_STRUCTURES/KeyAndDoor/KeyAndDoor'
 import { Natives } from '../../wc3_natives_unsecured/Natives'
 import { AutoContinueAfterSliding } from './Auto_continue_after_sliding'
 
@@ -258,6 +259,12 @@ const initTurnOnSlide = () => {
             orderWidget = Natives.UGetOrderTarget()
             orderX = GetWidgetX(orderWidget)
             orderY = GetWidgetY(orderWidget)
+
+            // a door clicked is the ground at its position: the hero doesn't go and take it once the slide ends
+            const targetDestructable = GetOrderTargetDestructable()
+            if (targetDestructable && isDoor(targetDestructable)) {
+                triggerIsToLocation = true
+            }
         }
 
         //stop hero
