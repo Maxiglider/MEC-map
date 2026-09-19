@@ -120,10 +120,10 @@ export const initExecuteCommandMake_doors = () => {
         },
     })
 
-    //-setKeyAlias(setka) <keyForDoorLabel> <alias>
+    //-setKeyForDoorAlias(setkfda) <keyForDoorLabel> <alias>
     registerCommand({
-        name: 'setKeyAlias',
-        alias: ['setka'],
+        name: 'setKeyForDoorAlias',
+        alias: ['setkfda'],
         group,
         argDescription: '<keyForDoorLabel> <alias>',
         description: 'Change the alias of a kind of key',
