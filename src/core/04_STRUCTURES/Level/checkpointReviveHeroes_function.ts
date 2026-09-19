@@ -16,6 +16,12 @@ export const checkPointReviveHeroes = (
         const escaper = getUdgEscapers().get(i)
 
         if (escaper) {
+            // every living hero the checkpoint concerns, the one who reached it included, gets its full life back
+            const hero = escaper.getHero()
+            if (hero && escaper.isAlive() && (!revivingFinisher || sameLevelProgression(revivingFinisher, escaper))) {
+                SetUnitState(hero, UNIT_STATE_LIFE, GetUnitState(hero, UNIT_STATE_MAX_LIFE))
+            }
+
             if (escaper !== revivingFinisher || !finished || globals.forceReviveAtStart) {
                 const unit = escaper.getHero()
 
