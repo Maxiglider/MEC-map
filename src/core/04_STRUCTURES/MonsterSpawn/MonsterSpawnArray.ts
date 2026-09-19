@@ -1,7 +1,7 @@
 import { ApplyRotation, convertTextToAngle, ForceAngleBetween0And360 } from 'core/01_libraries/Basic_functions'
 import { Constants } from 'core/01_libraries/Constants'
 import { Text } from 'core/01_libraries/Text'
-import { getUdgMonsterTypes } from '../../../../globals'
+import { getUdgLevels, getUdgMonsterTypes } from '../../../../globals'
 import { ServiceManager } from '../../../Services'
 import { MemoryHandler } from '../../../Utils/MemoryHandler'
 import { createPoint } from '../../../Utils/Point'
@@ -332,7 +332,22 @@ export class MonsterSpawnArray extends BaseArray<MonsterSpawn> {
                 Text.erP(p, `unknown monster spawn`)
             }
         } else {
-            const pag = handlePaginationObj(this.getAll(), pageNum, detailled)
+            // then the previous level's spawns kept alive into this one (keepAliveForNextLevel), marked as such
+            const lines: { toText: (detailled: boolean) => string }[] = []
+            for (const [_, spawn] of pairs(this.getAll())) {
+                lines.push(spawn)
+            }
+            const previousLevel = getUdgLevels().get(this.level.getId() - 1)
+            for (const [_, spawn] of pairs(previousLevel ? previousLevel.monsterSpawns.getAll() : {})) {
+                if (spawn.getKeepAliveForNextLevel()) {
+                    lines.push({
+                        toText: (detailled: boolean) =>
+                            spawn.toText(detailled) + ' |cffffcc00(from the previous level)|r',
+                    })
+                }
+            }
+
+            const pag = handlePaginationObj(lines, pageNum, detailled)
 
             if (pag.cmds.length === 0) {
                 Text.erP(p, `no monster spawn for this level`)
