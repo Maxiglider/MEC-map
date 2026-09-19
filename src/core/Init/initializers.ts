@@ -30,7 +30,6 @@ import { initAsyncSlideInput } from '../Async_slide/AsyncSlideInput'
 import { init_customUI } from '../DisablingInterface/EnableDisableInterface'
 import { init_doubleKill } from '../Double_heroes/double_kill'
 import { init_shortcurt_cancelRedo } from '../Keyboard_shortcuts/Cancel_redo'
-import { startDesyncProbeAtGameStart } from '../Log/DesyncProbe'
 import { init_E2ETests } from '../Test/e2e-tests/base/e2e-tests-registering'
 import { init_Test } from '../Test/test'
 import { initArrays } from './initArrays'
@@ -39,7 +38,7 @@ import { initOldTriggers } from './init_old_triggers'
 
 export const initializers = () => {
     init_globals()
-    startDesyncProbeAtGameStart() // first: a desync at the start of a game comes before any command
+    // startDesyncProbeAtGameStart() // first: a desync at the start of a game comes before any command
     init_dataFromWorleditor()
     init_terrain_limit_variables()
     initArrays()
