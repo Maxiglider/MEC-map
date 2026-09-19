@@ -535,6 +535,20 @@ export abstract class EscaperMake {
         }
     }
 
+    makeSetPortalMobOneWay(oneWay: boolean) {
+        this.destroyMake()
+        if (this.hero) {
+            this.make = new MakePropertyChange(
+                this.hero,
+                'oneWay',
+                oneWay,
+                (x, y) => this.getMakingLevel().monsters.getMonsterNear(x, y)?.getPortalMob(),
+                monster => monster.isOneWay(),
+                (monster, oneWay) => monster.setOneWay(oneWay)
+            )
+        }
+    }
+
     makeSetCircleMobSpeed(speed: number) {
         this.destroyMake()
         if (this.hero) {

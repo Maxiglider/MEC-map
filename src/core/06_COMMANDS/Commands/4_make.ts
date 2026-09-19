@@ -934,6 +934,25 @@ export const initExecuteCommandMake = () => {
         },
     })
 
+    //-setPortalMobOneWay(setpmow) <boolean>
+    registerCommand({
+        name: 'setPortalMobOneWay',
+        alias: ['setpmow'],
+        group,
+        argDescription: '<boolean>',
+        description:
+            'Set whether the portal mob is one-way: heroes only go from its trigger mob to its target mob, and touching its target mob does nothing',
+        cb: ({ nbParam, param1 }, escaper) => {
+            if (nbParam !== 1 || !IsBoolString(param1)) {
+                return true
+            }
+
+            escaper.makeSetPortalMobOneWay(S2B(param1))
+            Text.mkP(escaper.getPlayer(), 'portal mob one-way setting on')
+            return true
+        },
+    })
+
     //-getTerrainCliffClass(gettcc) <terrainLabel>
     registerCommand({
         name: 'getTerrainCliffClass',

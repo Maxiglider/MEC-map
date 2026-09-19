@@ -92,6 +92,15 @@ export class PortalMob {
 
     getPortalEffectDuration = () => this.portalEffectDuration
 
+    /** A one-way portal only takes heroes from its trigger mob to its target mob: its target mob does nothing */
+    private oneWay = false
+
+    isOneWay = () => this.oneWay
+
+    setOneWay = (oneWay: boolean) => {
+        this.oneWay = oneWay
+    }
+
     setPortalEffectDuration = (portalEffectDuration: number | null) => {
         this.portalEffectDuration = portalEffectDuration || this.freezeDuration || 1
     }
@@ -108,6 +117,10 @@ export class PortalMob {
 
     activate = (monster: Monster, escaper: Escaper, hero: unit) => {
         if (!this.targetMob || escaper.isPortalCooldown()) {
+            return
+        }
+
+        if (this.oneWay && monster !== this.triggerMob) {
             return
         }
 
@@ -171,6 +184,7 @@ export class PortalMob {
         output['freezeDuration'] = this.freezeDuration
         output['portalEffect'] = this.portalEffect
         output['portalEffectDuration'] = this.portalEffectDuration
+        output['oneWay'] = this.oneWay
 
         return output
     }

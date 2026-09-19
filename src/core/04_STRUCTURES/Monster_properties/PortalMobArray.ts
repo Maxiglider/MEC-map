@@ -39,6 +39,8 @@ export class PortalMobArray extends BaseArray<PortalMob> {
             } else {
                 const portalMob = this.new(mt, v.freezeDuration, v.portalEffect, v.portalEffectDuration)
                 portalMob.setTargetMob(this.level.monsters.get(v.targetMobId))
+                // absent from the data saved before it existed: both ways
+                portalMob.setOneWay(v.oneWay === true)
             }
         }
     }
