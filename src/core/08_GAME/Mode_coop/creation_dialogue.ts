@@ -10,6 +10,22 @@ let dialBoutonAppuye: boolean
 const DIAL_TIME_TO_ANSWER = 10
 let dialTimerTempLimite: timer
 
+/** The mode chosen for everybody, told to the hooks */
+const runModeSelectionHooks = () => {
+    if (!!hooks.hooks_onModeSelection) {
+        for (const hook of hooks.hooks_onModeSelection.getHooks()) {
+            hook.execute(globals.coopModeActive ? 'coop' : 'solo')
+        }
+    }
+}
+
+/** -enableCoop: coop or solo from now on, for this game only (not saved by -smic) */
+export const setCoopModeActive = (active: boolean) => {
+    globals.coopModeActive = active
+    DisplayTextToForce(Natives.UGetPlayersAll(), active ? 'Coop mode enabled' : 'Solo mode enabled')
+    runModeSelectionHooks()
+}
+
 export const InitTrig_creation_dialogue = () => {
     createTimer(0, false, () => {
         dialChoixModeCoop = Natives.UDialogCreate()
@@ -61,6 +77,16 @@ export const gg_trg_apparition_dialogue_et_fermeture_automatique = createEvent({
             if (i > Constants.NB_PLAYERS_MAX - 1) {
                 return
             }
+
+            // no choice for the first player (-coopModeChoice off): solo
+            if (!globals.coopModeChoice) {
+                globals.coopModeActive = false
+                DisplayTextToForce(Natives.UGetPlayersAll(), 'Solo mode')
+                runModeSelectionHooks()
+                ServiceManager.getService('Multiboard').resetRoundScores()
+                return
+            }
+
             const udg_joueurDialogue = Natives.UPlayer(i)
             DialogDisplay(udg_joueurDialogue, dialChoixModeCoop, true)
             dialBoutonAppuye = false

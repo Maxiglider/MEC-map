@@ -31,6 +31,7 @@ import { SaveMapInCache } from '../../07_TRIGGERS/Save_map_in_gamecache/SaveMapI
 import { ReinitTerrains } from '../../07_TRIGGERS/Triggers_to_modify_terrains/Reinit_terrains'
 import { ReinitTerrainsPositions } from '../../07_TRIGGERS/Triggers_to_modify_terrains/Reinit_terrains_position_Change_variations_and_ut_at_beginning'
 import { AfkMode } from '../../08_GAME/Afk_mode/Afk_mode'
+import { setCoopModeActive } from '../../08_GAME/Mode_coop/creation_dialogue'
 import { Globals } from '../../09_From_old_Worldedit_triggers/globals_variables_and_triggers'
 import { MEC_core_API } from '../../API/MEC_core_API'
 import { udg_doubleHeroesEnabled } from '../../Double_heroes/double_heroes_config'
@@ -45,6 +46,51 @@ import { ActivateTeleport, DisableTeleport } from '../Helpers/Teleport'
 export const initExecuteCommandMax = () => {
     const { registerCommand } = ServiceManager.getService('Cmd')
     const group = 'max'
+
+    //-coopModeChoice on|off   --> whether the first player chooses coop or solo at the start (saved by -smic)
+    registerCommand({
+        name: 'coopModeChoice',
+        alias: [],
+        group,
+        argDescription: 'on | off',
+        description:
+            'Whether the first player chooses coop or solo at the start of the game (on by default); off: no choice, solo. Saved by -smic',
+        cb: ({ nbParam, param1 }, escaper) => {
+            if (nbParam === 0) {
+                Text.P(escaper.getPlayer(), 'Coop mode choice is ' + (globals.coopModeChoice ? 'on' : 'off'))
+                return true
+            }
+            if (nbParam !== 1 || !IsBoolString(param1)) {
+                Text.erP(escaper.getPlayer(), 'param should be on or off')
+                return true
+            }
+            globals.coopModeChoice = S2B(param1)
+            Text.mkP(
+                escaper.getPlayer(),
+                globals.coopModeChoice
+                    ? 'coop mode choice on: the first player chooses coop or solo at the start'
+                    : 'coop mode choice off: the game starts in solo, without a choice'
+            )
+            return true
+        },
+    })
+
+    //-enableCoop <boolean>   --> coop or solo from now on, for this game only (not saved by -smic)
+    registerCommand({
+        name: 'enableCoop',
+        alias: [],
+        group,
+        argDescription: '<boolean>',
+        description: 'Coop mode (true) or solo mode (false) from now on, for this game only: not saved by -smic',
+        cb: ({ nbParam, param1 }, escaper) => {
+            if (nbParam !== 1 || !IsBoolString(param1)) {
+                Text.erP(escaper.getPlayer(), 'one boolean param for this command')
+                return true
+            }
+            setCoopModeActive(S2B(param1))
+            return true
+        },
+    })
 
     //-reinitTerrains(rit)   --> rekinds of terrain
     registerCommand({

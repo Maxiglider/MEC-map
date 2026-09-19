@@ -63,6 +63,10 @@ export class LoadMapFromCache {
                         globals.coopCircles = gameData.gameData.coopCircles
                     }
 
+                    if (gameData.gameData.coopModeChoice !== undefined) {
+                        globals.coopModeChoice = gameData.gameData.coopModeChoice
+                    }
+
                     if (gameData.gameData.CAN_TURN_IN_AIR !== undefined) {
                         globals.CAN_TURN_IN_AIR = gameData.gameData.CAN_TURN_IN_AIR
                     }

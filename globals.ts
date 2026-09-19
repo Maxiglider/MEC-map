@@ -19,6 +19,8 @@ export const globals: {
     monsterTypes?: MonsterTypeArray
     terrainSaves?: TerrainSaveArray
     coopModeActive?: boolean
+    /** Whether the first player chooses coop or solo at the start (-coopModeChoice, saved by -smic); else solo */
+    coopModeChoice: boolean
     autoreviveDelay?: number
     logStrings: string[]
 
@@ -59,6 +61,7 @@ export const globals: {
     WORLD_BOUNDS_RECT: undefined,
 
     coopModeActive: true,
+    coopModeChoice: true,
     CAN_TURN_IN_AIR: false,
     USE_VTOTO_SLIDE_LOGIC: false,
     coopCircles: true,
