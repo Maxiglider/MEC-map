@@ -568,6 +568,10 @@ export class MonsterSpawn {
             text = text + ' spawnAmount(' + this.spawnAmount + ')'
         }
 
+        if (this.keepAliveForNextLevel) {
+            text = text + ' keepAliveOneLvl'
+        }
+
         if (detailled) {
             text += '\n    '
             if (this.initialDelay !== 0) {
@@ -588,9 +592,6 @@ export class MonsterSpawn {
             }
             if (this.fixedSpawnOffsetMirrored) {
                 text = text + ' mirroring'
-            }
-            if (this.keepAliveForNextLevel) {
-                text = text + ' keepAliveForNextLevel'
             }
         }
 
