@@ -10,8 +10,8 @@ const labelText = (label: string, alias: string) =>
 
 /**
  * A kind of door (-newDoor): the destructable it is, and the rect around it that kills a hero while it stands
- * closed, as a monster's killRectDimensions (width along the door, height across it). Without dimensions (null), each
- * door measures its own where it stands: along it up to the death terrain on both sides, AUTO_KILL_RECT_HEIGHT across.
+ * closed, as a monster's killRectDimensions (width along the door, height across it). Without dimensions (null, "auto"),
+ * each door's kill rect is where it blocks the ground (its pathing), measured where it stands.
  */
 export class DoorType {
     label: string
@@ -39,8 +39,6 @@ export class DoorType {
         this.killRectWidth = isAuto ? null : Round32(width)
         this.killRectHeight = isAuto ? null : Round32(height)
     }
-
-    hasKillRectDimensions = () => this.killRectWidth !== null
 
     toText = () =>
         labelText(this.label, this.alias) +

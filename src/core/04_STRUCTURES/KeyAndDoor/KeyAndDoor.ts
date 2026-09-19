@@ -1,5 +1,5 @@
 import { MemoryHandler } from 'Utils/MemoryHandler'
-import { getUdgEscapers, getUdgTerrainTypes } from '../../../../globals'
+import { getUdgEscapers } from '../../../../globals'
 import { Constants } from '../../01_libraries/Constants'
 import type { Level } from '../Level/Level'
 import { DoorType, KeyForDoorType } from './KeyAndDoorTypes'
@@ -21,16 +21,21 @@ const openZoneOf = (killRect: Rect, runsAlongY: boolean): Rect =>
         ? { ...killRect, minY: killRect.minY - DOOR_OPEN_DISTANCE, maxY: killRect.maxY + DOOR_OPEN_DISTANCE }
         : { ...killRect, minX: killRect.minX - DOOR_OPEN_DISTANCE, maxX: killRect.maxX + DOOR_OPEN_DISTANCE }
 
-/**
- * Which way a door stands, from where it blocks the ground: gates have a fixed rotation (an iron gate stands
- * horizontal or vertical whatever angle it is made with), so doors have no angle of their own. An item put on the
- * ground at a few distances on both sides of the door, along x then along y, is pushed away where the closed door
- * blocks: the door stands along the axis where it blocks the most.
- */
-const PROBE_DISTANCES = [64, 128, 192]
 /** The angle doors are made with: the one the World Editor gives gates (their fixed rotation shows them anyway) */
 const DOOR_FACING = 270
+
+/**
+ * Where a door blocks the ground, from its pathing alone: gates have a fixed rotation (an iron gate stands horizontal
+ * or vertical whatever angle it is made with), so doors have no angle of their own, and the terrain around them
+ * doesn't tell. An item is put on the ground every PROBE_STEP along x and along y through the door's centre, before
+ * the door is made and after: where it is pushed away after only, the door blocks. The door stands along the axis
+ * where it blocks the most, and its footprint gives its kill rect when its kind has no dimensions.
+ */
+const PROBE_STEP = 16
+const PROBE_REACH = 512
 const PROBE_ITEM_TYPE = FourCC('wolg')
+/** The smallest side of a measured kill rect */
+const MIN_KILL_RECT_SIDE = 32
 let probe: item | null = null
 
 const isBlockedGround = (x: number, y: number) => {
@@ -44,34 +49,45 @@ const isBlockedGround = (x: number, y: number) => {
     return dx * dx + dy * dy > 16 * 16
 }
 
-/** true when the door stands along y, false along x (also when its pathing doesn't tell) */
-const doorRunsAlongY = (x: number, y: number) => {
-    let blockedAlongX = 0
-    let blockedAlongY = 0
-    for (const d of PROBE_DISTANCES) {
-        blockedAlongX += (isBlockedGround(x - d, y) ? 1 : 0) + (isBlockedGround(x + d, y) ? 1 : 0)
-        blockedAlongY += (isBlockedGround(x, y - d) ? 1 : 0) + (isBlockedGround(x, y + d) ? 1 : 0)
+type GroundCross = { alongX: boolean[]; alongY: boolean[] }
+
+/** Whether the ground is blocked every PROBE_STEP along x and along y through a point, from -PROBE_REACH */
+const probeCross = (x: number, y: number): GroundCross => {
+    const alongX: boolean[] = []
+    const alongY: boolean[] = []
+    for (let t = -PROBE_REACH; t <= PROBE_REACH; t += PROBE_STEP) {
+        alongX.push(isBlockedGround(x + t, y))
+        alongY.push(isBlockedGround(x, y + t))
     }
-    return blockedAlongY > blockedAlongX
+    return { alongX, alongY }
 }
 
-/**
- * A door's kill rect when its kind has no dimensions: along the door, from its centre to the death terrain on each
- * side (reaching into it, rounded out to 16), AUTO_KILL_RECT_HEIGHT across; AUTO_KILL_RECT_FALLBACK on a side with no
- * death terrain within AUTO_KILL_RECT_REACH, as the slide map conversion measures gates.
- */
-export const AUTO_KILL_RECT_HEIGHT = 96
-const AUTO_KILL_RECT_REACH = 4096
-const AUTO_KILL_RECT_FALLBACK = 256
-const AUTO_KILL_RECT_STEP = 16
-
-const isDeathGround = (x: number, y: number) => getUdgTerrainTypes().getTerrainType(x, y)?.getKind() === 'death'
-
-const reachToDeath = (x: number, y: number, dx: number, dy: number) => {
-    for (let t = 0; t <= AUTO_KILL_RECT_REACH; t += AUTO_KILL_RECT_STEP) {
-        if (isDeathGround(x + dx * t, y + dy * t)) return t
+/** From the door's centre, the farthest offsets it blocks on each side along one axis, and how many points */
+const extentOf = (before: boolean[], after: boolean[]) => {
+    let min = 0
+    let max = 0
+    let count = 0
+    for (let i = 0; i < after.length; i++) {
+        if (after[i] && !before[i]) {
+            const t = -PROBE_REACH + i * PROBE_STEP
+            min = Math.min(min, t)
+            max = Math.max(max, t)
+            count++
+        }
     }
-    return AUTO_KILL_RECT_FALLBACK
+    // at least MIN_KILL_RECT_SIDE, centred on the door when it blocks nothing there
+    if (max - min < MIN_KILL_RECT_SIDE) {
+        const middle = (min + max) / 2
+        min = middle - MIN_KILL_RECT_SIDE / 2
+        max = middle + MIN_KILL_RECT_SIDE / 2
+    }
+    return { min, max, count }
+}
+
+const footprintOf = (before: GroundCross, after: GroundCross) => {
+    const x = extentOf(before.alongX, after.alongX)
+    const y = extentOf(before.alongY, after.alongY)
+    return { runsAlongY: y.count > x.count, x, y }
 }
 
 /** The key and door pairs standing on the map, by id: gone through in id order, the same on every machine */
@@ -149,35 +165,36 @@ export class KeyAndDoor {
     create = () => {
         this.remove()
 
+        const groundBefore = probeCross(this.doorX, this.doorY)
         this.door =
             CreateDestructable(FourCC(this.doorType.destructableTypeId), this.doorX, this.doorY, DOOR_FACING, 1, 0) ??
             null
+        const footprint = footprintOf(groundBefore, probeCross(this.doorX, this.doorY))
         this.key = this.keyType ? (CreateItem(FourCC(this.keyType.itemTypeId), this.keyX, this.keyY) ?? null) : null
         this.opened = false
 
-        // the kill rect along the door (width along it, height across it): the way the door blocks the ground
-        const runsAlongY = doorRunsAlongY(this.doorX, this.doorY)
+        // the kill rect along the door (width along it, height across it), the way the door blocks the ground: the
+        // kind's dimensions centred on it, else the door's own footprint
+        const { runsAlongY } = footprint
         const { killRectWidth, killRectHeight } = this.doorType
-        // along the door: the kind's width centred on it, else up to the death terrain on each side
+        const along = runsAlongY ? footprint.y : footprint.x
+        const across = runsAlongY ? footprint.x : footprint.y
         const [alongMin, alongMax] =
-            killRectWidth !== null
-                ? [-killRectWidth / 2, killRectWidth / 2]
-                : runsAlongY
-                  ? [-reachToDeath(this.doorX, this.doorY, 0, -1), reachToDeath(this.doorX, this.doorY, 0, 1)]
-                  : [-reachToDeath(this.doorX, this.doorY, -1, 0), reachToDeath(this.doorX, this.doorY, 1, 0)]
-        const halfAcross = (killRectHeight ?? AUTO_KILL_RECT_HEIGHT) / 2
+            killRectWidth !== null ? [-killRectWidth / 2, killRectWidth / 2] : [along.min, along.max]
+        const [acrossMin, acrossMax] =
+            killRectHeight !== null ? [-killRectHeight / 2, killRectHeight / 2] : [across.min, across.max]
         this.killRect = runsAlongY
             ? {
-                  minX: this.doorX - halfAcross,
-                  maxX: this.doorX + halfAcross,
+                  minX: this.doorX + acrossMin,
+                  maxX: this.doorX + acrossMax,
                   minY: this.doorY + alongMin,
                   maxY: this.doorY + alongMax,
               }
             : {
                   minX: this.doorX + alongMin,
                   maxX: this.doorX + alongMax,
-                  minY: this.doorY - halfAcross,
-                  maxY: this.doorY + halfAcross,
+                  minY: this.doorY + acrossMin,
+                  maxY: this.doorY + acrossMax,
               }
 
         this.openZone = openZoneOf(this.killRect, runsAlongY)

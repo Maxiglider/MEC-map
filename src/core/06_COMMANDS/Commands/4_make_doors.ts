@@ -41,7 +41,7 @@ export const initExecuteCommandMake_doors = () => {
         group,
         argDescription: '<label> <alias> <destructibleTypeId> [<killRectWidth> <killRectHeight>]',
         description:
-            'Add a kind of door: a destructible (a gate), and the rect around it that kills a hero while it stands closed (width along the door, height across it). Without dimensions, each door gets its own: along it up to the death terrain on both sides, 96 across',
+            "Add a kind of door: a destructible (a gate), and the rect around it that kills a hero while it stands closed (width along the door, height across it). Without dimensions, each door's kill rect is where it blocks the ground (its pathing)",
         cb: ({ nbParam, param1, param2, param3, param4, param5 }, escaper) => {
             if (nbParam !== 3 && nbParam !== 5) {
                 return USAGE
@@ -347,16 +347,17 @@ export const initExecuteCommandMake_doors = () => {
         },
     })
 
-    //-setDoorKillRectDimensions(setdkrd) <doorLabel> <width> <height>
+    //-setDoorKillRectDimensions(setdkrd) <doorLabel> <width> <height> | auto
     registerCommand({
         name: 'setDoorKillRectDimensions',
         alias: ['setdkrd'],
         group,
-        argDescription: '<doorLabel> <width> <height>',
+        argDescription: '<doorLabel> <width> <height> | auto',
         description:
-            'Sets the kill rectangle dimensions of a kind of door (width along the door, height across it), instead of each door measuring its own',
+            'Sets the kill rectangle dimensions of a kind of door (width along the door, height across it), or "auto": each door\'s kill rect is where it blocks the ground (its pathing)',
         cb: ({ nbParam, param1, param2, param3 }, escaper) => {
-            if (nbParam !== 3) {
+            const isAuto = nbParam === 2 && param2 === 'auto'
+            if (nbParam !== 3 && !isAuto) {
                 return USAGE
             }
             const doorType = doorTypes.getByLabel(param1)
@@ -364,45 +365,26 @@ export const initExecuteCommandMake_doors = () => {
                 Text.erP(escaper.getPlayer(), `unknown door "${param1}"`)
                 return true
             }
-            const width = S2I(param2)
-            const height = S2I(param3)
-            if (width < 32 || height < 32) {
-                Text.erP(escaper.getPlayer(), 'the kill rectangle dimensions have to be minimum 32x32')
-                return true
+
+            if (isAuto) {
+                doorType.setKillRectDimensions(null, null)
+            } else {
+                const width = S2I(param2)
+                const height = S2I(param3)
+                if (width < 32 || height < 32) {
+                    Text.erP(escaper.getPlayer(), 'the kill rectangle dimensions have to be minimum 32x32')
+                    return true
+                }
+                doorType.setKillRectDimensions(width, height)
             }
 
-            doorType.setKillRectDimensions(width, height)
             forAllLevels(level => level.keyAndDoors.refreshAllOfDoorType(doorType))
-            Text.mkP(escaper.getPlayer(), 'kill rectangle dimensions changed for this kind of door')
-            return true
-        },
-    })
-
-    //-removeDoorKillRectDimensions(remdkrd) <doorLabel>
-    registerCommand({
-        name: 'removeDoorKillRectDimensions',
-        alias: ['remdkrd'],
-        group,
-        argDescription: '<doorLabel>',
-        description:
-            'Removes the kill rectangle dimensions of a kind of door: each door measures its own again (along it up to the death terrain on both sides, 96 across)',
-        cb: ({ nbParam, param1 }, escaper) => {
-            if (nbParam !== 1) {
-                return USAGE
-            }
-            const doorType = doorTypes.getByLabel(param1)
-            if (!doorType) {
-                Text.erP(escaper.getPlayer(), `unknown door "${param1}"`)
-                return true
-            }
-            if (!doorType.hasKillRectDimensions()) {
-                Text.erP(escaper.getPlayer(), 'this kind of door has no kill rectangle dimensions already')
-                return true
-            }
-
-            doorType.setKillRectDimensions(null, null)
-            forAllLevels(level => level.keyAndDoors.refreshAllOfDoorType(doorType))
-            Text.mkP(escaper.getPlayer(), 'kill rectangle dimensions removed for this kind of door')
+            Text.mkP(
+                escaper.getPlayer(),
+                isAuto
+                    ? "kill rectangle of this kind of door measured from each door's pathing"
+                    : 'kill rectangle dimensions changed for this kind of door'
+            )
             return true
         },
     })
