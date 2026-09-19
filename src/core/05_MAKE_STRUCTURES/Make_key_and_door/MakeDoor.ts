@@ -7,18 +7,16 @@ import { MakeKeyAndDoorAction } from '../MakeLastActions/MakeKeyAndDoorAction'
 /** -createDoor: each click places a door without a key, until -stop */
 export class MakeDoor extends Make {
     private doorType: DoorType
-    private doorAngle: number
 
-    constructor(maker: unit, doorType: DoorType, doorAngle: number) {
+    constructor(maker: unit, doorType: DoorType) {
         super(maker, 'doorCreate')
         this.doorType = doorType
-        this.doorAngle = doorAngle
     }
 
     doActions = () => {
         if (super.doBaseActions()) {
             const level = this.escaper.getMakingLevel()
-            const door = new KeyAndDoor(this.doorType, null, this.orderX, this.orderY, this.doorAngle, 0, 0)
+            const door = new KeyAndDoor(this.doorType, null, this.orderX, this.orderY, 0, 0)
             level.keyAndDoors.new(door, level.isActivated())
             level.updateDebugRegions()
             this.escaper.newAction(new MakeKeyAndDoorAction(level, door))

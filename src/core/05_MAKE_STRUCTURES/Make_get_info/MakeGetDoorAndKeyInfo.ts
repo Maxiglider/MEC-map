@@ -55,9 +55,6 @@ export class MakeGetDoorAndKeyInfo extends Make {
                     'Position: ' +
                     at(kad.doorX, kad.doorY) +
                     space +
-                    'Angle: ' +
-                    (kad.doorAngle === -1 ? 'random' : I2S(R2I(kad.doorAngle))) +
-                    space +
                     (!kad.isOnMap() ? 'Not on the map' : kad.isOpened() ? 'Opened' : 'Closed')
             )
 

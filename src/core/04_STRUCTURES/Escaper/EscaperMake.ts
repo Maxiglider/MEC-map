@@ -396,19 +396,19 @@ export abstract class EscaperMake {
         if (this.hero) this.make = new MakeMeteor(this.hero)
     }
 
-    makeCreateKeyAndDoor(doorType: DoorType, keyType: KeyForDoorType, doorAngle: number) {
+    makeCreateKeyAndDoor(doorType: DoorType, keyType: KeyForDoorType) {
         this.destroyMake()
-        if (this.hero) this.make = new MakeKeyAndDoor(this.hero, doorType, keyType, doorAngle)
+        if (this.hero) this.make = new MakeKeyAndDoor(this.hero, doorType, keyType)
     }
 
-    makeCreateDoor(doorType: DoorType, doorAngle: number) {
+    makeCreateDoor(doorType: DoorType) {
         this.destroyMake()
-        if (this.hero) this.make = new MakeDoor(this.hero, doorType, doorAngle)
+        if (this.hero) this.make = new MakeDoor(this.hero, doorType)
     }
 
-    makeMoveKeyOrDoor(part: 'door' | 'key', doorAngle?: number) {
+    makeMoveKeyOrDoor(part: 'door' | 'key') {
         this.destroyMake()
-        if (this.hero) this.make = new MakeMoveKeyOrDoor(this.hero, part, doorAngle)
+        if (this.hero) this.make = new MakeMoveKeyOrDoor(this.hero, part)
     }
 
     makeDeleteKeyAndDoor(mode: string) {

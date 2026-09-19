@@ -125,19 +125,7 @@ export class KeyAndDoorArray {
                 continue
             }
 
-            this.new(
-                new KeyAndDoor(
-                    doorType,
-                    keyType ?? null,
-                    k.doorX,
-                    k.doorY,
-                    k.doorAngle ?? -1,
-                    k.keyX ?? 0,
-                    k.keyY ?? 0,
-                    k.id
-                ),
-                false
-            )
+            this.new(new KeyAndDoor(doorType, keyType ?? null, k.doorX, k.doorY, k.keyX ?? 0, k.keyY ?? 0, k.id), false)
         }
     }
 }

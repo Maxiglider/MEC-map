@@ -23,10 +23,13 @@ const openZoneOf = (killRect: Rect): Rect =>
 
 /**
  * Which way a door stands, from where it blocks the ground: gates have a fixed rotation (an iron gate stands
- * horizontal or vertical whatever angle it is made with), so the angle given doesn't tell. An item put on the ground
- * past each end of the door, along x then along y, is pushed away where the closed door blocks.
+ * horizontal or vertical whatever angle it is made with), so doors have no angle of their own. An item put on the
+ * ground at a few distances on both sides of the door, along x then along y, is pushed away where the closed door
+ * blocks: the door stands along the axis where it blocks the most.
  */
-const PROBE_DISTANCE = 160
+const PROBE_DISTANCES = [64, 128, 192]
+/** The angle doors are made with: the one the World Editor gives gates (their fixed rotation shows them anyway) */
+const DOOR_FACING = 270
 const PROBE_ITEM_TYPE = FourCC('wolg')
 let probe: item | null = null
 
@@ -41,13 +44,15 @@ const isBlockedGround = (x: number, y: number) => {
     return dx * dx + dy * dy > 16 * 16
 }
 
-/** true when the door stands along y, false along x, undefined when its pathing doesn't tell */
-const doorRunsAlongY = (x: number, y: number): boolean | undefined => {
-    const blockedAlongX =
-        (isBlockedGround(x - PROBE_DISTANCE, y) ? 1 : 0) + (isBlockedGround(x + PROBE_DISTANCE, y) ? 1 : 0)
-    const blockedAlongY =
-        (isBlockedGround(x, y - PROBE_DISTANCE) ? 1 : 0) + (isBlockedGround(x, y + PROBE_DISTANCE) ? 1 : 0)
-    return blockedAlongX === blockedAlongY ? undefined : blockedAlongY > blockedAlongX
+/** true when the door stands along y, false along x (also when its pathing doesn't tell) */
+const doorRunsAlongY = (x: number, y: number) => {
+    let blockedAlongX = 0
+    let blockedAlongY = 0
+    for (const d of PROBE_DISTANCES) {
+        blockedAlongX += (isBlockedGround(x - d, y) ? 1 : 0) + (isBlockedGround(x + d, y) ? 1 : 0)
+        blockedAlongY += (isBlockedGround(x, y - d) ? 1 : 0) + (isBlockedGround(x, y + d) ? 1 : 0)
+    }
+    return blockedAlongY > blockedAlongX
 }
 
 /** The key and door pairs standing on the map, by id: gone through in id order, the same on every machine */
@@ -88,8 +93,6 @@ export class KeyAndDoor {
     keyType: KeyForDoorType | null
     doorX: number
     doorY: number
-    /** -1 for a random angle, drawn each time the door is made */
-    doorAngle: number
     keyX: number
     keyY: number
 
@@ -106,7 +109,6 @@ export class KeyAndDoor {
         keyType: KeyForDoorType | null,
         doorX: number,
         doorY: number,
-        doorAngle: number,
         keyX: number,
         keyY: number,
         forceId: number | null = null
@@ -117,7 +119,6 @@ export class KeyAndDoor {
         this.keyType = keyType
         this.doorX = doorX
         this.doorY = doorY
-        this.doorAngle = doorAngle
         this.keyX = keyX
         this.keyY = keyY
     }
@@ -129,15 +130,14 @@ export class KeyAndDoor {
     create = () => {
         this.remove()
 
-        const angle = this.doorAngle === -1 ? GetRandomReal(0, 360) : this.doorAngle
         this.door =
-            CreateDestructable(FourCC(this.doorType.destructableTypeId), this.doorX, this.doorY, angle, 1, 0) ?? null
+            CreateDestructable(FourCC(this.doorType.destructableTypeId), this.doorX, this.doorY, DOOR_FACING, 1, 0) ??
+            null
         this.key = this.keyType ? (CreateItem(FourCC(this.keyType.itemTypeId), this.keyX, this.keyY) ?? null) : null
         this.opened = false
 
-        // the kill rect along the door (width along it, height across it): the way the door blocks the ground, else
-        // its angle rounded to 90, as a monster's
-        const runsAlongY = doorRunsAlongY(this.doorX, this.doorY) ?? (Math.round(angle / 90) * 90) % 180 === 0
+        // the kill rect along the door (width along it, height across it): the way the door blocks the ground
+        const runsAlongY = doorRunsAlongY(this.doorX, this.doorY)
         const halfX = (runsAlongY ? this.doorType.killRectHeight : this.doorType.killRectWidth) / 2
         const halfY = (runsAlongY ? this.doorType.killRectWidth : this.doorType.killRectHeight) / 2
         this.killRect = {
@@ -274,11 +274,9 @@ export class KeyAndDoor {
     distanceTo = (x: number, y: number) => Math.min(this.distanceToDoor(x, y), this.distanceToKey(x, y))
 
     /** Where the door stands (-moveDoor), made again there if it is on the map */
-    /** angle: the one it gets (-1 random), else it keeps its own */
-    moveDoor = (x: number, y: number, angle?: number) => {
+    moveDoor = (x: number, y: number) => {
         this.doorX = x
         this.doorY = y
-        if (angle !== undefined) this.doorAngle = angle
         this.refresh()
         this.level?.updateDebugRegions()
     }
@@ -321,7 +319,6 @@ export class KeyAndDoor {
         output['keyForDoorTypeLabel'] = this.keyType ? this.keyType.label : null
         output['doorX'] = R2I(this.doorX)
         output['doorY'] = R2I(this.doorY)
-        output['doorAngle'] = this.doorAngle === -1 ? -1 : R2I(this.doorAngle)
         if (this.keyType) {
             output['keyX'] = R2I(this.keyX)
             output['keyY'] = R2I(this.keyY)

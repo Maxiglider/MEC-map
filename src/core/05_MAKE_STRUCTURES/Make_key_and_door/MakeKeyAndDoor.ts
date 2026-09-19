@@ -11,17 +11,15 @@ import { MakeKeyAndDoorAction, putBack, takeOff } from '../MakeLastActions/MakeK
 export class MakeKeyAndDoor extends Make {
     private doorType: DoorType
     private keyType: KeyForDoorType
-    private doorAngle: number
     /** The door placed by the first click, waiting for its key */
     private door: KeyAndDoor | null = null
     /** That door, taken off by -cancel, for -redo */
     private cancelledDoor: KeyAndDoor | null = null
 
-    constructor(maker: unit, doorType: DoorType, keyType: KeyForDoorType, doorAngle: number) {
+    constructor(maker: unit, doorType: DoorType, keyType: KeyForDoorType) {
         super(maker, 'keyAndDoorCreate')
         this.doorType = doorType
         this.keyType = keyType
-        this.doorAngle = doorAngle
     }
 
     private forgetCancelledDoor = () => {
@@ -36,7 +34,7 @@ export class MakeKeyAndDoor extends Make {
             if (!this.door) {
                 this.forgetCancelledDoor()
                 this.escaper.destroyCancelledActions()
-                this.door = new KeyAndDoor(this.doorType, null, this.orderX, this.orderY, this.doorAngle, 0, 0)
+                this.door = new KeyAndDoor(this.doorType, null, this.orderX, this.orderY, 0, 0)
                 putBack(level, this.door)
                 Text.mkP(this.makerOwner, 'door placed: click where its key goes')
                 return

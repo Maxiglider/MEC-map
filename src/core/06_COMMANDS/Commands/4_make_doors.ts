@@ -119,16 +119,15 @@ export const initExecuteCommandMake_doors = () => {
         },
     })
 
-    //-createDoorAndKey(crdak) <doorLabel> <keyForDoorLabel> [<doorAngle>]   --> random angles if not specified
+    //-createDoorAndKey(crdak) <doorLabel> <keyForDoorLabel>
     registerCommand({
         name: 'createDoorAndKey',
         alias: ['crdak'],
         group,
-        argDescription: '<doorLabel> <keyForDoorLabel> [<doorAngle>]',
-        description:
-            'Place doors and their keys: a first click for the door, a second for its key. The door faces the angle given, or a random one',
-        cb: ({ nbParam, param1, param2, param3 }, escaper) => {
-            if (nbParam < 2 || nbParam > 3) {
+        argDescription: '<doorLabel> <keyForDoorLabel>',
+        description: 'Place doors and their keys: a first click for the door, a second for its key',
+        cb: ({ nbParam, param1, param2 }, escaper) => {
+            if (nbParam !== 2) {
                 return USAGE
             }
             const doorType = doorTypes.getByLabel(param1)
@@ -142,31 +141,22 @@ export const initExecuteCommandMake_doors = () => {
                 return true
             }
 
-            let doorAngle = -1
-            if (nbParam === 3) {
-                if (S2R(param3) === 0 && param3 !== '0') {
-                    Text.erP(escaper.getPlayer(), 'wrong angle value ; should be a real (-1 for random angle)')
-                    return true
-                }
-                doorAngle = S2R(param3)
-            }
-
-            escaper.makeCreateKeyAndDoor(doorType, keyType, doorAngle)
+            escaper.makeCreateKeyAndDoor(doorType, keyType)
             Text.mkP(escaper.getPlayer(), 'key and door making on: click where the door goes')
             return true
         },
     })
 
-    //-createDoor(crd) <doorLabel> [<doorAngle>]   --> random angles if not specified
+    //-createDoor(crd) <doorLabel>
     registerCommand({
         name: 'createDoor',
         alias: ['crd'],
         group,
-        argDescription: '<doorLabel> [<doorAngle>]',
+        argDescription: '<doorLabel>',
         description:
-            'Place doors without a key, one per click until -stop: they stay closed until a map trigger opens them. The door faces the angle given, or a random one',
-        cb: ({ nbParam, param1, param2 }, escaper) => {
-            if (nbParam < 1 || nbParam > 2) {
+            'Place doors without a key, one per click until -stop: they stay closed until a map trigger opens them',
+        cb: ({ nbParam, param1 }, escaper) => {
+            if (nbParam !== 1) {
                 return USAGE
             }
             const doorType = doorTypes.getByLabel(param1)
@@ -175,44 +165,25 @@ export const initExecuteCommandMake_doors = () => {
                 return true
             }
 
-            let doorAngle = -1
-            if (nbParam === 2) {
-                if (S2R(param2) === 0 && param2 !== '0') {
-                    Text.erP(escaper.getPlayer(), 'wrong angle value ; should be a real (-1 for random angle)')
-                    return true
-                }
-                doorAngle = S2R(param2)
-            }
-
-            escaper.makeCreateDoor(doorType, doorAngle)
+            escaper.makeCreateDoor(doorType)
             Text.mkP(escaper.getPlayer(), 'door making on: click where each door goes, -stop to end')
             return true
         },
     })
 
-    //-moveDoor(mvdr) [<doorAngle>]   --> click a door, then where it goes
+    //-moveDoor(mvdr)   --> click a door, then where it goes
     registerCommand({
         name: 'moveDoor',
         alias: ['mvdr'],
         group,
-        argDescription: '[<doorAngle>]',
-        description:
-            'Move doors: click a door, then where it goes (its key stays where it is), until -stop. With an angle, the doors moved get it (-1 for random), else they keep theirs',
-        cb: ({ nbParam, param1 }, escaper) => {
-            if (nbParam > 1) {
+        argDescription: '',
+        description: 'Move doors: click a door, then where it goes (its key stays where it is), until -stop',
+        cb: ({ noParam }, escaper) => {
+            if (!noParam) {
                 return USAGE
             }
 
-            let doorAngle: number | undefined = undefined
-            if (nbParam === 1) {
-                if (S2R(param1) === 0 && param1 !== '0') {
-                    Text.erP(escaper.getPlayer(), 'wrong angle value ; should be a real (-1 for random angle)')
-                    return true
-                }
-                doorAngle = S2R(param1)
-            }
-
-            escaper.makeMoveKeyOrDoor('door', doorAngle)
+            escaper.makeMoveKeyOrDoor('door')
             Text.mkP(escaper.getPlayer(), 'door moving on: click a door')
             return true
         },

@@ -9,13 +9,10 @@ import { Make } from '../Make/Make'
 export class MakeMoveKeyOrDoor extends Make {
     private part: 'door' | 'key'
     private target: KeyAndDoor | null = null
-    /** The angle the doors moved get (-1 random), else they keep theirs */
-    private doorAngle?: number
 
-    constructor(maker: unit, part: 'door' | 'key', doorAngle?: number) {
+    constructor(maker: unit, part: 'door' | 'key') {
         super(maker, part === 'door' ? 'doorMove' : 'keyMove')
         this.part = part
-        this.doorAngle = doorAngle
     }
 
     doActions = () => {
@@ -37,7 +34,7 @@ export class MakeMoveKeyOrDoor extends Make {
             }
 
             this.part === 'door'
-                ? this.target.moveDoor(this.orderX, this.orderY, this.doorAngle)
+                ? this.target.moveDoor(this.orderX, this.orderY)
                 : this.target.moveKey(this.orderX, this.orderY)
             this.target = null
             Text.mkP(this.makerOwner, `${this.part} moved: click the next ${this.part}`)
