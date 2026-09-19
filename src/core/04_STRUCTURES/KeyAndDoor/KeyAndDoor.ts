@@ -159,6 +159,9 @@ export class KeyAndDoor {
 
     isOpened = () => this.opened
 
+    /** The escaper carrying the key, if any */
+    getCarrierId = () => this.carrierId
+
     /** The key item on the map (or in a hero's hands), null for a door without a key or off the map */
     getKeyItem = () => this.key
 

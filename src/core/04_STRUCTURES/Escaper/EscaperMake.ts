@@ -24,6 +24,7 @@ import { MakeDeleteCasters } from '../../05_MAKE_STRUCTURES/Make_delete_casters/
 import { MakeDeleteMeteors } from '../../05_MAKE_STRUCTURES/Make_delete_meteors/MakeDeleteMeteors'
 import { MakeDeleteMonsters } from '../../05_MAKE_STRUCTURES/Make_delete_monsters/MakeDeleteMonsters'
 import { MakeExchangeTerrains } from '../../05_MAKE_STRUCTURES/Make_exchange_terrains/MakeExchangeTerrains'
+import { MakeGetDoorAndKeyInfo } from '../../05_MAKE_STRUCTURES/Make_get_info/MakeGetDoorAndKeyInfo'
 import { MakeGetMonsterInfo } from '../../05_MAKE_STRUCTURES/Make_get_info/MakeGetMonsterInfo'
 import { MakeGetTerrainType } from '../../05_MAKE_STRUCTURES/Make_get_info/MakeGetTerrainType'
 import { MakeDeleteKeyAndDoor } from '../../05_MAKE_STRUCTURES/Make_key_and_door/MakeDeleteKeyAndDoor'
@@ -778,6 +779,11 @@ export abstract class EscaperMake {
     makeGetMonsterInfo = () => {
         this.destroyMake()
         if (this.hero) this.make = new MakeGetMonsterInfo(this.hero)
+    }
+
+    makeGetDoorAndKeyInfo = () => {
+        this.destroyMake()
+        if (this.hero) this.make = new MakeGetDoorAndKeyInfo(this.hero)
     }
 
     makeExchangeTerrains = () => {

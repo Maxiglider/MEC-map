@@ -757,6 +757,23 @@ export const initCommandAll = () => {
         },
     })
 
+    //-getDoorAndKeyInfo(gdaki)   --> click on a key, or near a door, to get its info
+    registerCommand({
+        name: 'getDoorAndKeyInfo',
+        alias: ['gdaki'],
+        group,
+        argDescription: '',
+        description: 'Click on a key, or near a door, to get the info of the door and its key',
+        cb: ({ noParam }, escaper) => {
+            if (!noParam) {
+                return true
+            }
+            escaper.makeGetDoorAndKeyInfo()
+            Text.mkP(escaper.getPlayer(), 'Get door and key info mode enabled')
+            return true
+        },
+    })
+
     //-stop(s)   --> stop creating monsters or terrain or stop getTerrainInfoMode or getMonsterInfoMode
     registerCommand({
         name: 'stop',
