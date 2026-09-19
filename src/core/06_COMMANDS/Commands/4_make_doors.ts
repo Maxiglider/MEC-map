@@ -34,61 +34,115 @@ export const initExecuteCommandMake_doors = () => {
     const { registerCommand } = ServiceManager.getService('Cmd')
     const group = 'make'
 
-    //-newDoor(newdr) <label> <alias> <destructibleTypeId> [<killRectWidth> <killRectHeight>]
+    //-newDoor(newdr) <label> <destructibleTypeId> [<killRectWidth> <killRectHeight>]
     registerCommand({
         name: 'newDoor',
         alias: ['newdr'],
         group,
-        argDescription: '<label> <alias> <destructibleTypeId> [<killRectWidth> <killRectHeight>]',
+        argDescription: '<label> <destructibleTypeId> [<killRectWidth> <killRectHeight>]',
         description:
             "Add a kind of door: a destructible (a gate), and the rect around it that kills a hero while it stands closed (width along the door, height across it). Without dimensions, each door's kill rect is where it blocks the ground (its pathing)",
-        cb: ({ nbParam, param1, param2, param3, param4, param5 }, escaper) => {
-            if (nbParam !== 3 && nbParam !== 5) {
+        cb: ({ nbParam, param1, param2, param3, param4 }, escaper) => {
+            if (nbParam !== 2 && nbParam !== 4) {
                 return USAGE
             }
-            if (!isLabelFree(param1) || !isLabelFree(param2)) {
-                Text.erP(escaper.getPlayer(), 'label or alias already used by a door or a key')
+            if (!isLabelFree(param1)) {
+                Text.erP(escaper.getPlayer(), 'label already used by a door or a key')
                 return true
             }
-            if (!isDestructableType(param3)) {
-                Text.erP(escaper.getPlayer(), `unknown destructible type "${param3}"`)
+            if (!isDestructableType(param2)) {
+                Text.erP(escaper.getPlayer(), `unknown destructible type "${param2}"`)
                 return true
             }
-            const width = nbParam === 5 ? S2I(param4) : null
-            const height = nbParam === 5 ? S2I(param5) : null
+            const width = nbParam === 4 ? S2I(param3) : null
+            const height = nbParam === 4 ? S2I(param4) : null
             if (width !== null && height !== null && (width < 32 || height < 32)) {
                 Text.erP(escaper.getPlayer(), 'the kill rectangle dimensions have to be minimum 32x32')
                 return true
             }
 
-            doorTypes.add(new DoorType(param1, param2, param3, width, height))
+            doorTypes.add(new DoorType(param1, '', param2, width, height))
             Text.mkP(escaper.getPlayer(), `door "${param1}" added`)
             return true
         },
     })
 
-    //-newKeyForDoor(newkfd) <label> <alias> <itemTypeId>
+    //-newKeyForDoor(newkfd) <label> <itemTypeId>
     registerCommand({
         name: 'newKeyForDoor',
         alias: ['newkfd'],
         group,
-        argDescription: '<label> <alias> <itemTypeId>',
+        argDescription: '<label> <itemTypeId>',
         description: 'Add a kind of key: the item a hero carries to its door to open it',
-        cb: ({ nbParam, param1, param2, param3 }, escaper) => {
-            if (nbParam !== 3) {
+        cb: ({ nbParam, param1, param2 }, escaper) => {
+            if (nbParam !== 2) {
                 return USAGE
             }
-            if (!isLabelFree(param1) || !isLabelFree(param2)) {
-                Text.erP(escaper.getPlayer(), 'label or alias already used by a door or a key')
+            if (!isLabelFree(param1)) {
+                Text.erP(escaper.getPlayer(), 'label already used by a door or a key')
                 return true
             }
-            if (!isItemType(param3)) {
-                Text.erP(escaper.getPlayer(), `unknown item type "${param3}"`)
+            if (!isItemType(param2)) {
+                Text.erP(escaper.getPlayer(), `unknown item type "${param2}"`)
                 return true
             }
 
-            keyForDoorTypes.add(new KeyForDoorType(param1, param2, param3))
+            keyForDoorTypes.add(new KeyForDoorType(param1, '', param2))
             Text.mkP(escaper.getPlayer(), `key "${param1}" added`)
+            return true
+        },
+    })
+
+    //-setDoorAlias(setdra) <doorLabel> <alias>
+    registerCommand({
+        name: 'setDoorAlias',
+        alias: ['setdra'],
+        group,
+        argDescription: '<doorLabel> <alias>',
+        description: 'Change the alias of a kind of door',
+        cb: ({ nbParam, param1, param2 }, escaper) => {
+            if (nbParam !== 2) {
+                return USAGE
+            }
+            const doorType = doorTypes.getByLabel(param1)
+            if (!doorType) {
+                Text.erP(escaper.getPlayer(), `unknown door "${param1}"`)
+                return true
+            }
+            if (!isLabelFree(param2)) {
+                Text.erP(escaper.getPlayer(), 'alias already used by a door or a key')
+                return true
+            }
+
+            doorType.alias = param2
+            Text.mkP(escaper.getPlayer(), 'alias changed to "' + param2 + '"')
+            return true
+        },
+    })
+
+    //-setKeyAlias(setka) <keyForDoorLabel> <alias>
+    registerCommand({
+        name: 'setKeyAlias',
+        alias: ['setka'],
+        group,
+        argDescription: '<keyForDoorLabel> <alias>',
+        description: 'Change the alias of a kind of key',
+        cb: ({ nbParam, param1, param2 }, escaper) => {
+            if (nbParam !== 2) {
+                return USAGE
+            }
+            const keyType = keyForDoorTypes.getByLabel(param1)
+            if (!keyType) {
+                Text.erP(escaper.getPlayer(), `unknown key "${param1}"`)
+                return true
+            }
+            if (!isLabelFree(param2)) {
+                Text.erP(escaper.getPlayer(), 'alias already used by a door or a key')
+                return true
+            }
+
+            keyType.alias = param2
+            Text.mkP(escaper.getPlayer(), 'alias changed to "' + param2 + '"')
             return true
         },
     })
