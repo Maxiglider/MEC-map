@@ -151,10 +151,10 @@ export const initExecuteCommandMake = () => {
         },
     })
 
-    //-createKey(crk)   --> create meteors used to kill clickable monsters
+    //-createMeteor(crmr)   --> create meteors used to kill clickable monsters
     registerCommand({
-        name: 'createKey',
-        alias: ['crk'],
+        name: 'createMeteor',
+        alias: ['crmr'],
         group,
         argDescription: '',
         description: 'Create meteors used to kill clickable monsters',
@@ -167,10 +167,10 @@ export const initExecuteCommandMake = () => {
         },
     })
 
-    //-deleteKeysBetweenPoints(delkbp)   --> delete meteors in a rectangle formed with two clicks
+    //-deleteMeteorsBetweenPoints(delmrbp)   --> delete meteors in a rectangle formed with two clicks
     registerCommand({
-        name: 'deleteKeysBetweenPoints',
-        alias: ['delkbp'],
+        name: 'deleteMeteorsBetweenPoints',
+        alias: ['delmrbp'],
         group,
         argDescription: '',
         description: 'Delete meteors in a rectangle formed with two clicks',
@@ -183,10 +183,10 @@ export const initExecuteCommandMake = () => {
         },
     })
 
-    //-deleteKey(delk)   --> delete the meteors clicked by the player
+    //-deleteMeteor(delmr)   --> delete the meteors clicked by the player
     registerCommand({
-        name: 'deleteKey',
-        alias: ['delk'],
+        name: 'deleteMeteor',
+        alias: ['delmr'],
         group,
         argDescription: '',
         description: 'Delete the meteors clicked by the player',
