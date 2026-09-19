@@ -43,6 +43,9 @@ export class KeyAndDoorArray {
         return nearest
     }
 
+    /** The pair whose key is that item */
+    getByKeyItem = (keyItem: item): KeyAndDoor | null => this.getAll().find(kad => kad.getKeyItem() === keyItem) ?? null
+
     /** The pair whose door (or key) is nearest to a point, near enough to be the one clicked */
     getNearPart = (part: 'door' | 'key', x: number, y: number): KeyAndDoor | null => {
         const distance = (kad: KeyAndDoor) => (part === 'door' ? kad.distanceToDoor(x, y) : kad.distanceToKey(x, y))

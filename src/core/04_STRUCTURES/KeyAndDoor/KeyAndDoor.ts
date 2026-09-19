@@ -159,6 +159,9 @@ export class KeyAndDoor {
 
     isOpened = () => this.opened
 
+    /** The key item on the map (or in a hero's hands), null for a door without a key or off the map */
+    getKeyItem = () => this.key
+
     /** The rect killing heroes while the door stands closed (-debugRegions draws it), null once opened or off the map */
     getKillRect = () => (this.opened ? null : this.killRect)
 
