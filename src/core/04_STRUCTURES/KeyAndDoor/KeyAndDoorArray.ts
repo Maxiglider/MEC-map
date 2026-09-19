@@ -46,13 +46,12 @@ export class KeyAndDoorArray {
     /** The pair whose key is that item */
     getByKeyItem = (keyItem: item): KeyAndDoor | null => this.getAll().find(kad => kad.getKeyItem() === keyItem) ?? null
 
-    /** The pair whose door (or key) is nearest to a point, near enough to be the one clicked */
-    getNearPart = (part: 'door' | 'key', x: number, y: number): KeyAndDoor | null => {
-        const distance = (kad: KeyAndDoor) => (part === 'door' ? kad.distanceToDoor(x, y) : kad.distanceToKey(x, y))
+    /** The pair whose door is nearest to a point, near enough to be the one clicked */
+    getNearDoor = (x: number, y: number): KeyAndDoor | null => {
         let nearest: KeyAndDoor | null = null
         for (const kad of this.getAll()) {
-            const d = distance(kad)
-            if (d <= KEY_AND_DOOR_NEAR_DISTANCE && (!nearest || d < distance(nearest))) {
+            const d = kad.distanceToDoor(x, y)
+            if (d <= KEY_AND_DOOR_NEAR_DISTANCE && (!nearest || d < nearest.distanceToDoor(x, y))) {
                 nearest = kad
             }
         }

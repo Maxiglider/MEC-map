@@ -3,8 +3,8 @@ import { KeyAndDoor } from '../../04_STRUCTURES/KeyAndDoor/KeyAndDoor'
 import { Make } from '../Make/Make'
 
 /**
- * -moveDoor / -moveKey: a first click picks a door (or a key: clicked itself, or near it), a second one moves it
- * there; then the next one
+ * -moveDoor / -moveKey: a first click picks a door (near it) or a key (itself: a key can always be clicked, since
+ * heroes pick it up), a second one moves it there; then the next one
  */
 export class MakeMoveKeyOrDoor extends Make {
     private part: 'door' | 'key'
@@ -22,11 +22,12 @@ export class MakeMoveKeyOrDoor extends Make {
         if (super.doBaseActions()) {
             if (!this.target) {
                 const keyAndDoors = this.escaper.getMakingLevel().keyAndDoors
-                // a key clicked itself, else the door or key nearest to the click
-                const keyItem = this.part === 'key' ? GetOrderTargetItem() : undefined
-                this.target =
-                    (keyItem && keyAndDoors.getByKeyItem(keyItem)) ||
-                    keyAndDoors.getNearPart(this.part, this.orderX, this.orderY)
+                if (this.part === 'key') {
+                    const keyItem = GetOrderTargetItem()
+                    this.target = keyItem ? keyAndDoors.getByKeyItem(keyItem) : null
+                } else {
+                    this.target = keyAndDoors.getNearDoor(this.orderX, this.orderY)
+                }
                 if (!this.target) {
                     Text.erP(this.makerOwner, `no ${this.part} clicked for your making level`)
                     return
