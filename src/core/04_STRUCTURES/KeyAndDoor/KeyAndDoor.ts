@@ -233,9 +233,11 @@ export class KeyAndDoor {
     distanceTo = (x: number, y: number) => Math.min(this.distanceToDoor(x, y), this.distanceToKey(x, y))
 
     /** Where the door stands (-moveDoor), made again there if it is on the map */
-    moveDoor = (x: number, y: number) => {
+    /** angle: the one it gets (-1 random), else it keeps its own */
+    moveDoor = (x: number, y: number, angle?: number) => {
         this.doorX = x
         this.doorY = y
+        if (angle !== undefined) this.doorAngle = angle
         this.refresh()
         this.level?.updateDebugRegions()
     }

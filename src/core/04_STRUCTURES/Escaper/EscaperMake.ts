@@ -405,9 +405,9 @@ export abstract class EscaperMake {
         if (this.hero) this.make = new MakeDoor(this.hero, doorType, doorAngle)
     }
 
-    makeMoveKeyOrDoor(part: 'door' | 'key') {
+    makeMoveKeyOrDoor(part: 'door' | 'key', doorAngle?: number) {
         this.destroyMake()
-        if (this.hero) this.make = new MakeMoveKeyOrDoor(this.hero, part)
+        if (this.hero) this.make = new MakeMoveKeyOrDoor(this.hero, part, doorAngle)
     }
 
     makeDeleteKeyAndDoor(mode: string) {

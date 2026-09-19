@@ -190,18 +190,29 @@ export const initExecuteCommandMake_doors = () => {
         },
     })
 
-    //-moveDoor(mvdr)   --> click a door, then where it goes
+    //-moveDoor(mvdr) [<doorAngle>]   --> click a door, then where it goes
     registerCommand({
         name: 'moveDoor',
         alias: ['mvdr'],
         group,
-        argDescription: '',
-        description: 'Move doors: click a door, then where it goes (its key stays where it is), until -stop',
-        cb: ({ noParam }, escaper) => {
-            if (!noParam) {
+        argDescription: '[<doorAngle>]',
+        description:
+            'Move doors: click a door, then where it goes (its key stays where it is), until -stop. With an angle, the doors moved get it (-1 for random), else they keep theirs',
+        cb: ({ nbParam, param1 }, escaper) => {
+            if (nbParam > 1) {
                 return USAGE
             }
-            escaper.makeMoveKeyOrDoor('door')
+
+            let doorAngle: number | undefined = undefined
+            if (nbParam === 1) {
+                if (S2R(param1) === 0 && param1 !== '0') {
+                    Text.erP(escaper.getPlayer(), 'wrong angle value ; should be a real (-1 for random angle)')
+                    return true
+                }
+                doorAngle = S2R(param1)
+            }
+
+            escaper.makeMoveKeyOrDoor('door', doorAngle)
             Text.mkP(escaper.getPlayer(), 'door moving on: click a door')
             return true
         },
