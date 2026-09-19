@@ -131,13 +131,46 @@ export const initExecuteCommandMake_doors = () => {
         },
     })
 
+    //-createDoor(crd) <doorLabel> [<doorAngle>]   --> random angles if not specified
+    registerCommand({
+        name: 'createDoor',
+        alias: ['crd'],
+        group,
+        argDescription: '<doorLabel> [<doorAngle>]',
+        description:
+            'Place doors without a key, one per click until -stop: they stay closed until a map trigger opens them. The door faces the angle given, or a random one',
+        cb: ({ nbParam, param1, param2 }, escaper) => {
+            if (nbParam < 1 || nbParam > 2) {
+                return USAGE
+            }
+            const doorType = doorTypes.getByLabel(param1)
+            if (!doorType) {
+                Text.erP(escaper.getPlayer(), `unknown door "${param1}"`)
+                return true
+            }
+
+            let doorAngle = -1
+            if (nbParam === 2) {
+                if (S2R(param2) === 0 && param2 !== '0') {
+                    Text.erP(escaper.getPlayer(), 'wrong angle value ; should be a real (-1 for random angle)')
+                    return true
+                }
+                doorAngle = S2R(param2)
+            }
+
+            escaper.makeCreateDoor(doorType, doorAngle)
+            Text.mkP(escaper.getPlayer(), 'door making on: click where each door goes, -stop to end')
+            return true
+        },
+    })
+
     //-deleteKeyAndDoor(delkad)   --> click a door or its key
     registerCommand({
         name: 'deleteKeyAndDoor',
         alias: ['delkad'],
         group,
         argDescription: '',
-        description: 'Delete a door and its key by clicking one of them',
+        description: 'Delete a door and its key (if it has one) by clicking one of them',
         cb: ({ noParam }, escaper) => {
             if (!noParam) {
                 return USAGE

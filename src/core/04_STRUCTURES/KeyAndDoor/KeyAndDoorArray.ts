@@ -95,18 +95,32 @@ export class KeyAndDoorArray {
 
     toJson = () => this.getAll().map(kad => kad.toJson())
 
+    /** The door standing exactly at a point (as it was made), to open it from a map's trigger */
+    getDoorAt = (x: number, y: number): KeyAndDoor | null =>
+        this.getAll().find(kad => kad.doorX === x && kad.doorY === y) ?? null
+
     newFromJson = (json: { [x: string]: any }[]) => {
         for (const k of json) {
             const doorType = doorTypes.getByLabel(k.doorTypeLabel)
-            const keyType = keyForDoorTypes.getByLabel(k.keyForDoorTypeLabel)
+            // a door without a key has none
+            const keyType = k.keyForDoorTypeLabel ? keyForDoorTypes.getByLabel(k.keyForDoorTypeLabel) : null
 
-            if (!doorType || !keyType) {
+            if (!doorType || (k.keyForDoorTypeLabel && !keyType)) {
                 Text.erA(`key and door ${k.id}: unknown door "${k.doorTypeLabel}" or key "${k.keyForDoorTypeLabel}"`)
                 continue
             }
 
             this.new(
-                new KeyAndDoor(doorType, keyType, k.doorX, k.doorY, k.doorAngle ?? -1, k.keyX, k.keyY, k.id),
+                new KeyAndDoor(
+                    doorType,
+                    keyType ?? null,
+                    k.doorX,
+                    k.doorY,
+                    k.doorAngle ?? -1,
+                    k.keyX ?? 0,
+                    k.keyY ?? 0,
+                    k.id
+                ),
                 false
             )
         }
