@@ -50,7 +50,7 @@ export abstract class Make {
         const targetWidget = GetOrderTarget()
         if (!!targetWidget) {
             this.orderX = GetWidgetX(targetWidget)
-            this.orderY = GetWidgetX(targetWidget)
+            this.orderY = GetWidgetY(targetWidget)
         } else {
             if (!IsIssuedOrder('smart')) {
                 return false
