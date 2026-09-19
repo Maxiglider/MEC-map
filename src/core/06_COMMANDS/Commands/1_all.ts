@@ -757,10 +757,10 @@ export const initCommandAll = () => {
         },
     })
 
-    //-getDoorAndKeyInfo(getdaki)   --> click on a key, or near a door, to get its info
+    //-getDoorAndKeyInfo(gdaki)   --> click on a key, or near a door, to get its info
     registerCommand({
         name: 'getDoorAndKeyInfo',
-        alias: ['getdaki'],
+        alias: ['gdaki'],
         group,
         argDescription: '',
         description: 'Click on a key, or near a door, to get the info of the door and its key',
