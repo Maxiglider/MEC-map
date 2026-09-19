@@ -21,6 +21,11 @@ export const globals: {
     coopModeActive?: boolean
     /** Whether the first player chooses coop or solo at the start (-coopModeChoice, saved by -smic); else solo */
     coopModeChoice: boolean
+    /**
+     * Added to every mortar area as MEC judges the heroes (gameData.mortarAreaShift, saved by -smic): for a map made
+     * for heroes of another collision than MEC's, its shells reach them as far as they used to
+     */
+    mortarAreaShift: number
     autoreviveDelay?: number
     logStrings: string[]
 
@@ -62,6 +67,7 @@ export const globals: {
 
     coopModeActive: true,
     coopModeChoice: true,
+    mortarAreaShift: 0,
     CAN_TURN_IN_AIR: false,
     USE_VTOTO_SLIDE_LOGIC: false,
     coopCircles: true,

@@ -1,6 +1,6 @@
 import { ServiceManager } from 'Services'
 import { createEvent } from 'Utils/mapUtils'
-import { getUdgEscapers, getUdgTerrainSaves, udg_monsters } from '../../../../globals'
+import { getUdgEscapers, getUdgTerrainSaves, globals, udg_monsters } from '../../../../globals'
 import { Constants } from '../../01_libraries/Constants'
 import type { Escaper } from '../../04_STRUCTURES/Escaper/Escaper'
 import type { Monster } from '../../04_STRUCTURES/Monster/Monster'
@@ -64,7 +64,11 @@ const getSplashAreas = (mortarUnit: unit): SplashAreas | undefined => {
     return undefined
 }
 
-/** The share of the damage a hero at that place takes, 0 out of every area */
+/**
+ * The share of the damage a hero at that place takes, 0 out of every area. Every area is shifted by
+ * globals.mortarAreaShift, on MEC's side only: the engine's splash still only has to reach the sensor, at the point
+ * of impact, and the mortar unit's own weapon is left as it is (changed at runtime, its attack broke off).
+ */
 const getDamageFactor = (
     areas: SplashAreas,
     impactX: number,
@@ -75,7 +79,7 @@ const getDamageFactor = (
 ) => {
     const dx = x - impactX
     const dy = y - impactY
-    const distance = SquareRoot(dx * dx + dy * dy) - collision
+    const distance = SquareRoot(dx * dx + dy * dy) - collision - globals.mortarAreaShift
 
     if (distance <= areas.full) {
         return 1

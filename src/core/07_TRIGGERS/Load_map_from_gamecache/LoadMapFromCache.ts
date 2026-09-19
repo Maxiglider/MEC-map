@@ -63,6 +63,10 @@ export class LoadMapFromCache {
                         globals.coopCircles = gameData.gameData.coopCircles
                     }
 
+                    if (gameData.gameData.mortarAreaShift !== undefined) {
+                        globals.mortarAreaShift = gameData.gameData.mortarAreaShift
+                    }
+
                     if (gameData.gameData.coopModeChoice !== undefined) {
                         globals.coopModeChoice = gameData.gameData.coopModeChoice
                     }
