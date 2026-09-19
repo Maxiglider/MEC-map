@@ -156,6 +156,9 @@ export class KeyAndDoor {
 
     isOpened = () => this.opened
 
+    /** The rect killing heroes while the door stands closed (-debugRegions draws it), null once opened or off the map */
+    getKillRect = () => (this.opened ? null : this.killRect)
+
     /** Opens the door as a gate opens (its key, if any, used up): from its key, or from a map's trigger */
     open = () => {
         if (!this.door || this.opened) return
@@ -165,6 +168,7 @@ export class KeyAndDoor {
         this.key && RemoveItem(this.key)
         this.key = null
         this.opened = true
+        this.level?.updateDebugRegions()
 
         const sound = CreateSound('Sound\\Interface\\BattleNetDoorsStereo2.wav', false, true, true, 10, 10, 'SpellsEAX')
         if (sound) {
@@ -233,6 +237,7 @@ export class KeyAndDoor {
         this.doorX = x
         this.doorY = y
         this.refresh()
+        this.level?.updateDebugRegions()
     }
 
     /** Where the key lies at start (-moveKey), made again there if it is on the map */

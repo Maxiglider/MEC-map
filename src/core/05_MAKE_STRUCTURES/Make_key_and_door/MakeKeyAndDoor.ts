@@ -35,6 +35,7 @@ export class MakeKeyAndDoor extends MakeOneByOneOrTwoClicks {
                 this.orderY
             )
             level.keyAndDoors.new(keyAndDoor, level.isActivated())
+            level.updateDebugRegions()
             Text.mkP(this.makerOwner, 'key and door created: click where the next door goes')
             this.unsaveLocDefinitely()
         }

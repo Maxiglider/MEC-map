@@ -19,6 +19,7 @@ export class MakeDoor extends Make {
             const level = this.escaper.getMakingLevel()
             const door = new KeyAndDoor(this.doorType, null, this.orderX, this.orderY, this.doorAngle, 0, 0)
             level.keyAndDoors.new(door, level.isActivated())
+            level.updateDebugRegions()
             Text.mkP(this.makerOwner, 'door created')
         }
     }

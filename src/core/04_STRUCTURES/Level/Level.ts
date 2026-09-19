@@ -394,6 +394,12 @@ export class Level {
                         }
                     }
                 }
+
+                // doors standing closed, as the monsters' kill rects
+                for (const keyAndDoor of this.keyAndDoors.getAll()) {
+                    const killRect = keyAndDoor.getKillRect()
+                    killRect && this.drawRegion(killRect.minX, killRect.minY, killRect.maxX, killRect.maxY)
+                }
             }
         }
     }

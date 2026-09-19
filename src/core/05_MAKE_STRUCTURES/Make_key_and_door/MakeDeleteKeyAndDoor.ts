@@ -18,6 +18,7 @@ export class MakeDeleteKeyAndDoor extends MakeOneByOneOrTwoClicks {
                     return
                 }
                 keyAndDoor.destroy()
+                level.updateDebugRegions()
                 Text.mkP(this.makerOwner, 'key and door removed')
                 return
             }
@@ -31,6 +32,7 @@ export class MakeDeleteKeyAndDoor extends MakeOneByOneOrTwoClicks {
             for (const keyAndDoor of between) {
                 keyAndDoor.destroy()
             }
+            level.updateDebugRegions()
             Text.mkP(this.makerOwner, `${between.length} key(s) and door(s) removed`)
             this.unsaveLocDefinitely()
         }
