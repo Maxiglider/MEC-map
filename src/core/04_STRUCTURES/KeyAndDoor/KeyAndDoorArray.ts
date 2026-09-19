@@ -43,6 +43,19 @@ export class KeyAndDoorArray {
         return nearest
     }
 
+    /** The pair whose door (or key) is nearest to a point, near enough to be the one clicked */
+    getNearPart = (part: 'door' | 'key', x: number, y: number): KeyAndDoor | null => {
+        const distance = (kad: KeyAndDoor) => (part === 'door' ? kad.distanceToDoor(x, y) : kad.distanceToKey(x, y))
+        let nearest: KeyAndDoor | null = null
+        for (const kad of this.getAll()) {
+            const d = distance(kad)
+            if (d <= KEY_AND_DOOR_NEAR_DISTANCE && (!nearest || d < distance(nearest))) {
+                nearest = kad
+            }
+        }
+        return nearest
+    }
+
     getBetweenLocs = (x1: number, y1: number, x2: number, y2: number) =>
         this.getAll().filter(kad => kad.isBetweenLocs(x1, y1, x2, y2))
 

@@ -29,6 +29,7 @@ import { MakeGetTerrainType } from '../../05_MAKE_STRUCTURES/Make_get_info/MakeG
 import { MakeDeleteKeyAndDoor } from '../../05_MAKE_STRUCTURES/Make_key_and_door/MakeDeleteKeyAndDoor'
 import { MakeDoor } from '../../05_MAKE_STRUCTURES/Make_key_and_door/MakeDoor'
 import { MakeKeyAndDoor } from '../../05_MAKE_STRUCTURES/Make_key_and_door/MakeKeyAndDoor'
+import { MakeMoveKeyOrDoor } from '../../05_MAKE_STRUCTURES/Make_key_and_door/MakeMoveKeyOrDoor'
 import { MakeCircleMob } from '../../05_MAKE_STRUCTURES/Make_monster_properties/MakeCircleMob'
 import { MakeClearMob } from '../../05_MAKE_STRUCTURES/Make_monster_properties/MakeClearMob'
 import { MakeDeleteCircleMob } from '../../05_MAKE_STRUCTURES/Make_monster_properties/MakeDeleteCircleMob'
@@ -402,6 +403,11 @@ export abstract class EscaperMake {
     makeCreateDoor(doorType: DoorType, doorAngle: number) {
         this.destroyMake()
         if (this.hero) this.make = new MakeDoor(this.hero, doorType, doorAngle)
+    }
+
+    makeMoveKeyOrDoor(part: 'door' | 'key') {
+        this.destroyMake()
+        if (this.hero) this.make = new MakeMoveKeyOrDoor(this.hero, part)
     }
 
     makeDeleteKeyAndDoor(mode: string) {

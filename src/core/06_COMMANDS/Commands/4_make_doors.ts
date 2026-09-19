@@ -164,6 +164,40 @@ export const initExecuteCommandMake_doors = () => {
         },
     })
 
+    //-moveDoor(mvdr)   --> click a door, then where it goes
+    registerCommand({
+        name: 'moveDoor',
+        alias: ['mvdr'],
+        group,
+        argDescription: '',
+        description: 'Move doors: click a door, then where it goes (its key stays where it is), until -stop',
+        cb: ({ noParam }, escaper) => {
+            if (!noParam) {
+                return USAGE
+            }
+            escaper.makeMoveKeyOrDoor('door')
+            Text.mkP(escaper.getPlayer(), 'door moving on: click a door')
+            return true
+        },
+    })
+
+    //-moveKey(mvk)   --> click a key, then where it goes
+    registerCommand({
+        name: 'moveKey',
+        alias: ['mvk'],
+        group,
+        argDescription: '',
+        description: 'Move the keys of doors: click a key, then where it goes, until -stop',
+        cb: ({ noParam }, escaper) => {
+            if (!noParam) {
+                return USAGE
+            }
+            escaper.makeMoveKeyOrDoor('key')
+            Text.mkP(escaper.getPlayer(), 'key moving on: click a key')
+            return true
+        },
+    })
+
     //-deleteKeyAndDoor(delkad)   --> click a door or its key
     registerCommand({
         name: 'deleteKeyAndDoor',

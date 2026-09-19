@@ -219,11 +219,27 @@ export class KeyAndDoor {
         }
     }
 
-    distanceTo = (x: number, y: number) => {
-        const toDoor = SquareRoot((this.doorX - x) * (this.doorX - x) + (this.doorY - y) * (this.doorY - y))
-        return this.keyType
-            ? Math.min(toDoor, SquareRoot((this.keyX - x) * (this.keyX - x) + (this.keyY - y) * (this.keyY - y)))
-            : toDoor
+    distanceToDoor = (x: number, y: number) =>
+        SquareRoot((this.doorX - x) * (this.doorX - x) + (this.doorY - y) * (this.doorY - y))
+
+    /** Infinite for a door without a key */
+    distanceToKey = (x: number, y: number) =>
+        this.keyType ? SquareRoot((this.keyX - x) * (this.keyX - x) + (this.keyY - y) * (this.keyY - y)) : Infinity
+
+    distanceTo = (x: number, y: number) => Math.min(this.distanceToDoor(x, y), this.distanceToKey(x, y))
+
+    /** Where the door stands (-moveDoor), made again there if it is on the map */
+    moveDoor = (x: number, y: number) => {
+        this.doorX = x
+        this.doorY = y
+        this.refresh()
+    }
+
+    /** Where the key lies at start (-moveKey), made again there if it is on the map */
+    moveKey = (x: number, y: number) => {
+        this.keyX = x
+        this.keyY = y
+        this.refresh()
     }
 
     isBetweenLocs = (x1: number, y1: number, x2: number, y2: number) => {
