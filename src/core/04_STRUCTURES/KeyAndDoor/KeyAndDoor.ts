@@ -1,5 +1,5 @@
 import { MemoryHandler } from 'Utils/MemoryHandler'
-import { getUdgEscapers } from '../../../../globals'
+import { getUdgEscapers, getUdgTerrainTypes } from '../../../../globals'
 import { Constants } from '../../01_libraries/Constants'
 import type { Level } from '../Level/Level'
 import { DoorType, KeyForDoorType } from './KeyAndDoorTypes'
@@ -16,8 +16,8 @@ const CHECK_PERIOD = 0.05
 type Rect = { minX: number; minY: number; maxX: number; maxY: number }
 const inside = (r: Rect, x: number, y: number) => x >= r.minX && x <= r.maxX && y >= r.minY && y <= r.maxY
 /** Where a hero carrying the key opens the door: as long as the door, and DOOR_OPEN_DISTANCE out from its long sides */
-const openZoneOf = (killRect: Rect): Rect =>
-    killRect.maxX - killRect.minX >= killRect.maxY - killRect.minY
+const openZoneOf = (killRect: Rect, runsAlongY: boolean): Rect =>
+    !runsAlongY
         ? { ...killRect, minY: killRect.minY - DOOR_OPEN_DISTANCE, maxY: killRect.maxY + DOOR_OPEN_DISTANCE }
         : { ...killRect, minX: killRect.minX - DOOR_OPEN_DISTANCE, maxX: killRect.maxX + DOOR_OPEN_DISTANCE }
 
@@ -53,6 +53,25 @@ const doorRunsAlongY = (x: number, y: number) => {
         blockedAlongY += (isBlockedGround(x, y - d) ? 1 : 0) + (isBlockedGround(x, y + d) ? 1 : 0)
     }
     return blockedAlongY > blockedAlongX
+}
+
+/**
+ * A door's kill rect when its kind has no dimensions: along the door, from its centre to the death terrain on each
+ * side (reaching into it, rounded out to 16), AUTO_KILL_RECT_HEIGHT across; AUTO_KILL_RECT_FALLBACK on a side with no
+ * death terrain within AUTO_KILL_RECT_REACH, as the slide map conversion measures gates.
+ */
+export const AUTO_KILL_RECT_HEIGHT = 96
+const AUTO_KILL_RECT_REACH = 4096
+const AUTO_KILL_RECT_FALLBACK = 256
+const AUTO_KILL_RECT_STEP = 16
+
+const isDeathGround = (x: number, y: number) => getUdgTerrainTypes().getTerrainType(x, y)?.getKind() === 'death'
+
+const reachToDeath = (x: number, y: number, dx: number, dy: number) => {
+    for (let t = 0; t <= AUTO_KILL_RECT_REACH; t += AUTO_KILL_RECT_STEP) {
+        if (isDeathGround(x + dx * t, y + dy * t)) return t
+    }
+    return AUTO_KILL_RECT_FALLBACK
 }
 
 /** The key and door pairs standing on the map, by id: gone through in id order, the same on every machine */
@@ -138,16 +157,30 @@ export class KeyAndDoor {
 
         // the kill rect along the door (width along it, height across it): the way the door blocks the ground
         const runsAlongY = doorRunsAlongY(this.doorX, this.doorY)
-        const halfX = (runsAlongY ? this.doorType.killRectHeight : this.doorType.killRectWidth) / 2
-        const halfY = (runsAlongY ? this.doorType.killRectWidth : this.doorType.killRectHeight) / 2
-        this.killRect = {
-            minX: this.doorX - halfX,
-            minY: this.doorY - halfY,
-            maxX: this.doorX + halfX,
-            maxY: this.doorY + halfY,
-        }
+        const { killRectWidth, killRectHeight } = this.doorType
+        // along the door: the kind's width centred on it, else up to the death terrain on each side
+        const [alongMin, alongMax] =
+            killRectWidth !== null
+                ? [-killRectWidth / 2, killRectWidth / 2]
+                : runsAlongY
+                  ? [-reachToDeath(this.doorX, this.doorY, 0, -1), reachToDeath(this.doorX, this.doorY, 0, 1)]
+                  : [-reachToDeath(this.doorX, this.doorY, -1, 0), reachToDeath(this.doorX, this.doorY, 1, 0)]
+        const halfAcross = (killRectHeight ?? AUTO_KILL_RECT_HEIGHT) / 2
+        this.killRect = runsAlongY
+            ? {
+                  minX: this.doorX - halfAcross,
+                  maxX: this.doorX + halfAcross,
+                  minY: this.doorY + alongMin,
+                  maxY: this.doorY + alongMax,
+              }
+            : {
+                  minX: this.doorX + alongMin,
+                  maxX: this.doorX + alongMax,
+                  minY: this.doorY - halfAcross,
+                  maxY: this.doorY + halfAcross,
+              }
 
-        this.openZone = openZoneOf(this.killRect)
+        this.openZone = openZoneOf(this.killRect, runsAlongY)
 
         standing[this.id] = this
         if (!checkTimer) {

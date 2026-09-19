@@ -10,32 +10,41 @@ const labelText = (label: string, alias: string) =>
 
 /**
  * A kind of door (-newDoor): the destructable it is, and the rect around it that kills a hero while it stands
- * closed, as a monster's killRectDimensions (width along the door, height across it, turned with its angle).
+ * closed, as a monster's killRectDimensions (width along the door, height across it). Without dimensions (null), each
+ * door measures its own where it stands: along it up to the death terrain on both sides, AUTO_KILL_RECT_HEIGHT across.
  */
 export class DoorType {
     label: string
     alias: string
     destructableTypeId: string
-    killRectWidth: number
-    killRectHeight: number
+    killRectWidth: number | null = null
+    killRectHeight: number | null = null
 
     constructor(
         label: string,
         alias: string,
         destructableTypeId: string,
-        killRectWidth: number,
-        killRectHeight: number
+        killRectWidth: number | null = null,
+        killRectHeight: number | null = null
     ) {
         this.label = label
         this.alias = alias
         this.destructableTypeId = destructableTypeId
-        this.killRectWidth = Round32(killRectWidth)
-        this.killRectHeight = Round32(killRectHeight)
+        this.setKillRectDimensions(killRectWidth, killRectHeight)
     }
+
+    /** null for dimensions measured by each door */
+    setKillRectDimensions = (width: number | null, height: number | null) => {
+        const isAuto = width === null || height === null
+        this.killRectWidth = isAuto ? null : Round32(width)
+        this.killRectHeight = isAuto ? null : Round32(height)
+    }
+
+    hasKillRectDimensions = () => this.killRectWidth !== null
 
     toText = () =>
         labelText(this.label, this.alias) +
-        `destructable('${this.destructableTypeId}') killRect(${this.killRectWidth} x ${this.killRectHeight})`
+        `destructable('${this.destructableTypeId}') killRect(${this.killRectWidth !== null ? `${this.killRectWidth} x ${this.killRectHeight}` : 'auto'})`
 
     toJson = () => {
         const output = MemoryHandler.getEmptyObject<any>()
@@ -142,7 +151,15 @@ export const keyForDoorTypes = new TypeList<KeyForDoorType>('key')
 
 export const doorTypesFromJson = (json: { [x: string]: any }[]) => {
     for (const t of json) {
-        doorTypes.add(new DoorType(t.label, t.alias ?? '', t.destructableTypeId, t.killRectWidth, t.killRectHeight))
+        doorTypes.add(
+            new DoorType(
+                t.label,
+                t.alias ?? '',
+                t.destructableTypeId,
+                t.killRectWidth ?? null,
+                t.killRectHeight ?? null
+            )
+        )
     }
 }
 

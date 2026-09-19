@@ -30,6 +30,9 @@ export class MakeGetDoorAndKeyInfo extends Make {
             const red = udg_colorCode[Constants.RED]
             const space = '   '
             const at = (x: number, y: number) => I2S(R2I(x)) + ' ' + I2S(R2I(y))
+            // the kill rect this door has, where it stands
+            const killRectHere = (r: { minX: number; minY: number; maxX: number; maxY: number } | null) =>
+                r ? ' (here ' + I2S(R2I(r.maxX - r.minX)) + ' x ' + I2S(R2I(r.maxY - r.minY)) + ')' : ''
 
             Text.DisplayLineToPlayer(this.makerOwner)
             show(udg_colorCode[Constants.TEAL] + '--- Door and Key Info ---')
@@ -43,9 +46,8 @@ export class MakeGetDoorAndKeyInfo extends Make {
                     "'" +
                     space +
                     'Kill rect: ' +
-                    door.killRectWidth +
-                    ' x ' +
-                    door.killRectHeight
+                    (door.killRectWidth !== null ? door.killRectWidth + ' x ' + door.killRectHeight : 'auto') +
+                    killRectHere(kad.getKillRect())
             )
             show(
                 grey +
