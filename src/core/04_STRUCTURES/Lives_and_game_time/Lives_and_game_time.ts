@@ -15,7 +15,7 @@ export const initLives = () => {
 
     const initLives = () => {
         createTimer(0, false, () => {
-            nb = getUdgLevels().get(0)?.getNbLives() || Constants.NB_LIVES_AT_BEGINNING
+            nb = getUdgLevels().get(0)?.getNbLives() ?? Constants.NB_LIVES_AT_BEGINNING
             ServiceManager.getService('Multiboard').updateLives(nb)
         })
     }

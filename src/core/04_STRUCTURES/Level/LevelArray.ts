@@ -386,8 +386,8 @@ export class LevelArray extends BaseArray<Level> {
                 level.setStartMessage(levelJson.startMessage)
             }
 
-            //nb lives earned
-            if (levelJson.nbLives) {
+            //nb lives earned: 0 is a value (no life at start, or none earned by the level)
+            if (levelJson.nbLives !== undefined && levelJson.nbLives !== null) {
                 level.setNbLivesEarned(levelJson.nbLives)
             }
 
