@@ -244,6 +244,8 @@ export class Escaper extends EscaperMake {
     private terrainKillEffect?: effect
     private portalEffect?: effect
     private meteorEffect?: effect
+    /** The model of what the hero carries in its hand: a meteor, or a key (see KeyAndDoor) */
+    private carriedEffectModel = METEOR_EFFECT
     /**
      * The meteor a hero sliding as an effect is seen carrying: the one attached to its hand is attached
      * to its unit, unseen and behind the effect, so this one, made with it on every machine, is held
@@ -553,11 +555,13 @@ export class Escaper extends EscaperMake {
         return false
     }
 
-    addEffectMeteor = () => {
+    /** The carried meteor in the hand of the hero, or with a model given, another item carried the same way (a key) */
+    addEffectMeteor = (model?: string) => {
         if (!this.meteorHandEffect && this.hero) {
+            this.carriedEffectModel = model ?? METEOR_EFFECT
             // on every machine, picking a meteor up being heard by all of them; the one attached to the
             // hand of the unit is made by refreshMeteorEffects, if the unit is what is seen
-            this.meteorHandEffect = EffectUtils.addSpecialEffect(METEOR_EFFECT, 0, 0)
+            this.meteorHandEffect = EffectUtils.addSpecialEffect(this.carriedEffectModel, 0, 0)
             this.refreshMeteorEffects()
         }
     }
@@ -599,7 +603,7 @@ export class Escaper extends EscaperMake {
 
         // still carried: the hand effect lives as long as the meteor does
         if (this.meteorHandEffect && !this.meteorEffect && this.hero) {
-            this.meteorEffect = EffectUtils.addSpecialEffectTarget(METEOR_EFFECT, this.hero, 'hand right')
+            this.meteorEffect = EffectUtils.addSpecialEffectTarget(this.carriedEffectModel, this.hero, 'hand right')
         }
     }
 

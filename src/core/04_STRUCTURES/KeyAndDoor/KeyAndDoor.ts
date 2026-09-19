@@ -61,6 +61,8 @@ export class KeyAndDoor {
     private killRect: Rect | null = null
     private openZone: Rect | null = null
     private opened = false
+    /** The escaper carrying the key, shown in its hand as a meteor is */
+    private carrierId: number | null = null
 
     constructor(
         doorType: DoorType,
@@ -121,7 +123,22 @@ export class KeyAndDoor {
         }
     }
 
+    /** The key in the hand of the one carrying it, as a meteor: the key item's own model */
+    private setCarrier = (escaperId: number | null) => {
+        if (escaperId === this.carrierId) return
+
+        const escapers = getUdgEscapers()
+        this.carrierId !== null && escapers.get(this.carrierId)?.removeEffectMeteor()
+        this.carrierId = escaperId
+
+        if (escaperId !== null && this.key) {
+            const model = BlzGetItemStringField(this.key, ITEM_SF_MODEL_USED)
+            model && escapers.get(escaperId)?.addEffectMeteor(model)
+        }
+    }
+
     remove = () => {
+        this.setCarrier(null)
         this.door && RemoveDestructable(this.door)
         this.key && RemoveItem(this.key)
         this.door = null
@@ -143,6 +160,7 @@ export class KeyAndDoor {
         if (!this.door || this.opened) return
 
         ModifyGateBJ(bj_GATEOPERATION_OPEN, this.door)
+        this.setCarrier(null)
         this.key && RemoveItem(this.key)
         this.key = null
         this.opened = true
@@ -163,8 +181,10 @@ export class KeyAndDoor {
 
         const escapers = getUdgEscapers()
 
-        // the key: back where it was when its carrier died, and its door opened when brought near it
+        // the key: in the hand of its carrier, back where it was when its carrier died, and its door opened when
+        // brought near it
         if (this.key) {
+            let carrierId: number | null = null
             for (let id = 0; id < Constants.NB_ESCAPERS; id++) {
                 const escaper = escapers.get(id)
                 const hero = escaper?.getHero()
@@ -175,8 +195,11 @@ export class KeyAndDoor {
                 } else if (inside(this.openZone, GetUnitX(hero), GetUnitY(hero))) {
                     this.open()
                     return
+                } else {
+                    carrierId = id
                 }
             }
+            this.setCarrier(carrierId)
         }
 
         // the closed door kills the heroes in its kill rect
