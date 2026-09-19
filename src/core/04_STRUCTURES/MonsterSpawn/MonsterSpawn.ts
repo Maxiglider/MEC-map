@@ -214,6 +214,8 @@ export class MonsterSpawn {
     private fixedSpawnOffset: FixedSpawnOffset
     private spawnOffset = 0
     private fixedSpawnOffsetBounce = false
+    /** Goes on, with its monsters, through the next level, rather than stopping when its own level ends */
+    private keepAliveForNextLevel = false
     private fixedSpawnOffsetMirrored = false
     private hideRegions: { [x: number]: MECRegion } = MemoryHandler.getEmptyObject()
 
@@ -587,6 +589,9 @@ export class MonsterSpawn {
             if (this.fixedSpawnOffsetMirrored) {
                 text = text + ' mirroring'
             }
+            if (this.keepAliveForNextLevel) {
+                text = text + ' keepAliveForNextLevel'
+            }
         }
 
         return text
@@ -618,6 +623,11 @@ export class MonsterSpawn {
     getFixedSpawnOffset = () => this.fixedSpawnOffset
     setFixedSpawnOffset = (fixedSpawnOffset: FixedSpawnOffset) => {
         this.fixedSpawnOffset = fixedSpawnOffset
+    }
+
+    getKeepAliveForNextLevel = () => this.keepAliveForNextLevel
+    setKeepAliveForNextLevel = (keepAliveForNextLevel: boolean) => {
+        this.keepAliveForNextLevel = keepAliveForNextLevel
     }
 
     getFixedSpawnOffsetBounce = () => this.fixedSpawnOffsetBounce
@@ -705,6 +715,7 @@ export class MonsterSpawn {
         output['fixedSpawnOffset'] = this.fixedSpawnOffset
         output['spawnOffset'] = this.spawnOffset
         output['fixedSpawnOffsetBounce'] = this.fixedSpawnOffsetBounce
+        output['keepAliveForNextLevel'] = this.keepAliveForNextLevel
         output['fixedSpawnOffsetMirrored'] = this.fixedSpawnOffsetMirrored
 
         const hideRegionsJson: any = []

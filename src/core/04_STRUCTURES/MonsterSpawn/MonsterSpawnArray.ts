@@ -14,6 +14,21 @@ import { LineRegion } from '../Region/LineRegion'
 import { MECRegion } from '../Region/MECRegion'
 import { MonsterSpawn } from './MonsterSpawn'
 
+/**
+ * The spawns kept alive from the level that just ended into the next one (keepAliveForNextLevel), in the order they
+ * were carried over: they go on, their monsters with them, until that next level ends, or another level starts.
+ */
+const carriedOver: { spawn: MonsterSpawn; fromLevelId: number }[] = []
+
+const stopCarriedOver = (shouldStop: (fromLevelId: number) => boolean) => {
+    for (let i = carriedOver.length - 1; i >= 0; i--) {
+        if (shouldStop(carriedOver[i].fromLevelId)) {
+            carriedOver[i].spawn.deactivate()
+            carriedOver.splice(i, 1)
+        }
+    }
+}
+
 export class MonsterSpawnArray extends BaseArray<MonsterSpawn> {
     private level: Level
 
@@ -77,6 +92,8 @@ export class MonsterSpawnArray extends BaseArray<MonsterSpawn> {
 
                 monsterSpawn.setFixedSpawnOffset(ms.fixedSpawnOffset)
                 monsterSpawn.setSpawnOffset(ms.spawnOffset || 0)
+                // absent from the data saved before it existed: the spawn stops with its level
+                monsterSpawn.setKeepAliveForNextLevel(ms.keepAliveForNextLevel === true)
                 monsterSpawn.setFixedSpawnOffsetBounce(ms.fixedSpawnOffsetBounce)
                 monsterSpawn.setFixedSpawnOffsetMirrored(ms.fixedSpawnOffsetMirrored)
 
@@ -266,14 +283,28 @@ export class MonsterSpawnArray extends BaseArray<MonsterSpawn> {
     }
 
     activate = () => {
+        // the spawns carried over from the level before this one go on; any other stops (a restart, a level
+        // skipped, their own level starting again, which starts them afresh below)
+        const levelId = this.level.getId()
+        stopCarriedOver(fromLevelId => fromLevelId !== levelId - 1)
+
         for (const [_, ms] of pairs(this.data)) {
             ms.activate()
         }
     }
 
     deactivate = () => {
+        const levelId = this.level.getId()
+
+        // the spawns carried over into this level end with it
+        stopCarriedOver(fromLevelId => fromLevelId === levelId - 1)
+
         for (const [_, ms] of pairs(this.data)) {
-            ms.deactivate()
+            if (ms.getKeepAliveForNextLevel() && ms.isActive()) {
+                carriedOver.push({ spawn: ms, fromLevelId: levelId })
+            } else {
+                ms.deactivate()
+            }
         }
     }
 

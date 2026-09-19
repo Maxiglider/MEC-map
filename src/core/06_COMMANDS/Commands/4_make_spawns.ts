@@ -339,6 +339,33 @@ export const initExecuteCommandMake_spawns = () => {
         },
     })
 
+    //-setMonsterSpawnKeepAliveForNextLevel(setmskafnl) <label> <boolean>
+    registerCommand({
+        name: 'setMonsterSpawnKeepAliveForNextLevel',
+        alias: ['setmskafnl'],
+        group,
+        argDescription: '<label> <boolean>',
+        description:
+            'Keep the spawn going, with its monsters, through the next level, rather than stopping it when its own level ends',
+        cb: ({ param1, param2 }, escaper) => {
+            const monsterSpawn = escaper.getMakingLevel().monsterSpawns.getByLabel(param1)
+
+            if (!monsterSpawn) {
+                Text.erP(escaper.getPlayer(), 'unknown monster spawn "' + param1 + '" in this level')
+                return true
+            }
+
+            if (!IsBoolString(param2)) {
+                Text.erP(escaper.getPlayer(), 'keepAliveForNextLevel must be a boolean')
+                return true
+            }
+
+            monsterSpawn.setKeepAliveForNextLevel(S2B(param2))
+            Text.mkP(escaper.getPlayer(), 'keepAliveForNextLevel changed')
+            return true
+        },
+    })
+
     //-setMonsterSpawnInitialDelay(setmsid) <label> <delay>
     registerCommand({
         name: 'setMonsterSpawnInitialDelay',
