@@ -26,6 +26,8 @@ import { MakeDeleteMonsters } from '../../05_MAKE_STRUCTURES/Make_delete_monster
 import { MakeExchangeTerrains } from '../../05_MAKE_STRUCTURES/Make_exchange_terrains/MakeExchangeTerrains'
 import { MakeGetMonsterInfo } from '../../05_MAKE_STRUCTURES/Make_get_info/MakeGetMonsterInfo'
 import { MakeGetTerrainType } from '../../05_MAKE_STRUCTURES/Make_get_info/MakeGetTerrainType'
+import { MakeDeleteKeyAndDoor } from '../../05_MAKE_STRUCTURES/Make_key_and_door/MakeDeleteKeyAndDoor'
+import { MakeKeyAndDoor } from '../../05_MAKE_STRUCTURES/Make_key_and_door/MakeKeyAndDoor'
 import { MakeCircleMob } from '../../05_MAKE_STRUCTURES/Make_monster_properties/MakeCircleMob'
 import { MakeClearMob } from '../../05_MAKE_STRUCTURES/Make_monster_properties/MakeClearMob'
 import { MakeDeleteCircleMob } from '../../05_MAKE_STRUCTURES/Make_monster_properties/MakeDeleteCircleMob'
@@ -59,6 +61,7 @@ import { MakeAction } from '../../05_MAKE_STRUCTURES/MakeLastActions/MakeAction'
 import { MakeLastActions } from '../../05_MAKE_STRUCTURES/MakeLastActions/MakeLastActions'
 import { Natives } from '../../wc3_natives_unsecured/Natives'
 import { CasterType } from '../Caster/CasterType'
+import type { DoorType, KeyForDoorType } from '../KeyAndDoor/KeyAndDoorTypes'
 import { Level } from '../Level/Level'
 import { IsLevelBeingMade } from '../Level/Level_functions'
 import { MonsterType } from '../Monster/MonsterType'
@@ -388,6 +391,23 @@ export abstract class EscaperMake {
     makeCreateMeteor = () => {
         this.destroyMake()
         if (this.hero) this.make = new MakeMeteor(this.hero)
+    }
+
+    makeCreateKeyAndDoor(doorType: DoorType, keyType: KeyForDoorType, doorAngle: number) {
+        this.destroyMake()
+        if (this.hero) this.make = new MakeKeyAndDoor(this.hero, doorType, keyType, doorAngle)
+    }
+
+    makeDeleteKeyAndDoor(mode: string) {
+        this.destroyMake()
+
+        try {
+            if (this.hero) this.make = new MakeDeleteKeyAndDoor(this.hero, mode)
+        } catch (error) {
+            if (typeof error == 'string') {
+                Text.erP(this.p, error)
+            }
+        }
     }
 
     makeDeleteMeteors(mode: string) {

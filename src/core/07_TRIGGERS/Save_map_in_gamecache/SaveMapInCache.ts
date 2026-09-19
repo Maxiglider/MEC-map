@@ -11,6 +11,7 @@ import {
 } from '../../../../globals'
 import { jsonEncode } from '../../01_libraries/Basic_functions'
 import { Text } from '../../01_libraries/Text'
+import { doorTypes, keyForDoorTypes } from '../../04_STRUCTURES/KeyAndDoor/KeyAndDoorTypes'
 import { Gravity } from '../Slide_and_CheckTerrain_triggers/Gravity'
 import { PushTerrainDataIntoJson } from './Save_terrain'
 
@@ -48,6 +49,10 @@ export class SaveMapInCache {
 
         //monster types
         jsonGameData.monsterTypes = getUdgMonsterTypes().toJson()
+
+        //door and key types
+        jsonGameData.doorTypes = doorTypes.toJson()
+        jsonGameData.keyForDoorTypes = keyForDoorTypes.toJson()
         Text.A('monster types saved')
 
         //caster types

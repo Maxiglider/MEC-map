@@ -11,6 +11,7 @@ import { initCommandAll } from '../Commands/1_all'
 import { initExecuteCommandRed } from '../Commands/2_first_player'
 import { initExecuteCommandCheat } from '../Commands/3_cheat'
 import { initExecuteCommandMake } from '../Commands/4_make'
+import { initExecuteCommandMake_doors } from '../Commands/4_make_doors'
 import { initExecuteCommandMake_monsters } from '../Commands/4_make_monsters'
 import { initExecuteCommandMake_spawns } from '../Commands/4_make_spawns'
 import { initExecuteCommandMake_terrain } from '../Commands/4_make_terrain'
@@ -344,6 +345,7 @@ export const initCommandExecution = () => {
         initExecuteCommandMake()
         initExecuteCommandMake_monsters()
         initExecuteCommandMake_spawns()
+        initExecuteCommandMake_doors()
         initExecuteCommandMake_terrain()
         initExecuteCommandMake_terrain_saves()
 

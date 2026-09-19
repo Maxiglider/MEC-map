@@ -11,6 +11,12 @@ import {
 import { jsonDecode } from '../../01_libraries/Basic_functions'
 import { Text } from '../../01_libraries/Text'
 import {
+    doorTypes,
+    doorTypesFromJson,
+    keyForDoorTypes,
+    keyForDoorTypesFromJson,
+} from '../../04_STRUCTURES/KeyAndDoor/KeyAndDoorTypes'
+import {
     initCasterTypes,
     initLevels,
     initMonsterTypes,
@@ -43,6 +49,8 @@ export class LoadMapFromCache {
                     initCasterTypes()
                     initLevels()
                     initTerrainSaves()
+                    doorTypes.clear()
+                    keyForDoorTypes.clear()
                 }
 
                 // game properties
@@ -102,6 +110,14 @@ export class LoadMapFromCache {
                 //caster types
                 if (gameData.casterTypes) {
                     getUdgCasterTypes().newFromJson(gameData.casterTypes)
+                }
+
+                //door and key types, before the levels whose key and door pairs use them
+                if (gameData.doorTypes) {
+                    doorTypesFromJson(gameData.doorTypes)
+                }
+                if (gameData.keyForDoorTypes) {
+                    keyForDoorTypesFromJson(gameData.keyForDoorTypes)
                 }
 
                 //levels

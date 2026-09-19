@@ -3,7 +3,10 @@ import { Constants } from 'core/01_libraries/Constants'
 import { Text } from 'core/01_libraries/Text'
 import { gg_trg_apparition_dialogue_et_fermeture_automatique } from 'core/08_GAME/Mode_coop/creation_dialogue'
 import { getUdgCasterTypes, getUdgEscapers, getUdgMonsterTypes, getUdgTerrainTypes, globals } from '../../../../globals'
+import { errorHandler } from '../../../Utils/mapUtils'
+import { GetRandomAngle, StopUnit } from '../../01_libraries/Basic_functions'
 import { udg_colorCode } from '../../01_libraries/Init_colorCodes'
+import { Natives } from '../../wc3_natives_unsecured/Natives'
 import { BaseArray } from '../BaseArray'
 import { Caster } from '../Caster/Caster'
 import type { CasterType } from '../Caster/CasterType'
@@ -23,9 +26,6 @@ import { Level } from './Level'
 import { sameLevelProgression } from './LevelProgression'
 import { IsLevelBeingMade } from './Level_functions'
 import type { VisibilityModifierArray } from './VisibilityModifierArray'
-import { Natives } from '../../wc3_natives_unsecured/Natives'
-import { GetRandomAngle, StopUnit } from '../../01_libraries/Basic_functions'
-import { errorHandler } from '../../../Utils/mapUtils'
 
 const MIN_TIME_BETWEEN_GOTNL = 0.05
 
@@ -458,6 +458,11 @@ export class LevelArray extends BaseArray<Level> {
             //regions
             if (levelJson.regions) {
                 level.regions.newFromJson(levelJson.regions)
+            }
+
+            //key and door pairs (their door and key types are loaded before the levels)
+            if (levelJson.keyAndDoors) {
+                level.keyAndDoors.newFromJson(levelJson.keyAndDoors)
             }
         }
     }

@@ -14,6 +14,7 @@ import { ChangeTerrainType } from '../../07_TRIGGERS/Modify_terrain_Functions/Mo
 import { MecHookArray } from '../../API/MecHookArray'
 import type { CasterType } from '../Caster/CasterType'
 import type { Escaper } from '../Escaper/Escaper'
+import { KeyAndDoorArray } from '../KeyAndDoor/KeyAndDoorArray'
 import { MeteorArray } from '../Meteor/MeteorArray'
 import { MonsterArray } from '../Monster/MonsterArray'
 import { MonsterMultiplePatrols } from '../Monster/MonsterMultiplePatrols'
@@ -75,6 +76,7 @@ export class Level {
     circleMobs: CircleMobArray
     staticSlides: StaticSlideArray
     regions: RegionArray
+    keyAndDoors: KeyAndDoorArray
 
     //hooks
     public hooks_onStart = new MecHookArray<(level: Level) => void>()
@@ -92,6 +94,7 @@ export class Level {
         this.circleMobs = new CircleMobArray(this)
         this.staticSlides = new StaticSlideArray(this)
         this.regions = new RegionArray(this)
+        this.keyAndDoors = new KeyAndDoorArray(this)
         this.livesEarnedAtBeginning = 1
         this.isActivatedB = false
         this.startMessage = ''
@@ -118,6 +121,7 @@ export class Level {
             this.circleMobs.activate(true)
             this.staticSlides.activate(true)
             this.regions.activate(true)
+            this.keyAndDoors.activate(true)
             this.removeTempTerrainTypes()
 
             if (getUdgLevels().getLevelProgression() === 'all') {
@@ -144,6 +148,7 @@ export class Level {
             this.circleMobs.activate(false)
             this.staticSlides.activate(false)
             this.regions.activate(false)
+            this.keyAndDoors.activate(false)
             this.removeTempTerrainTypes()
             getUdgEscapers().deleteSpecificActionsForLevel(this)
             this.setDebugRegionsVisible('off')
@@ -247,6 +252,7 @@ export class Level {
         this.triggers.destroy()
         this.monsters.destroy()
         this.monsterSpawns.destroy()
+        this.keyAndDoors.destroy()
         this.destroyDebugRegions()
         this.removeTempTerrainTypes()
     }
@@ -582,6 +588,9 @@ export class Level {
 
         //portalMobs
         json.portalMobs = this.portalMobs.toJson()
+
+        //key and door pairs
+        json.keyAndDoors = this.keyAndDoors.toJson()
 
         //circleMobs
         json.circleMobs = this.circleMobs.toJson()
