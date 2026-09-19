@@ -37,6 +37,11 @@ import { Natives } from '../../wc3_natives_unsecured/Natives'
 import { glowCb, isPlayerId, resolvePlayerId, resolvePlayerIds, USAGE } from '../Helpers/Command_functions'
 import { cameraFieldMap, updateAsyncNeeds } from '../Helpers/commands-helpers'
 
+/** -toggle: the boolean each escaper's commands get next, by command (true the first time) */
+const toggleStates: { [escaperId: number]: { [command: string]: boolean } } = {}
+/** In a -toggle command, where the boolean goes instead of at its end */
+const TOGGLE_PLACEHOLDER = '<bool>'
+
 export const initCommandAll = () => {
     const { registerCommand } = ServiceManager.getService('Cmd')
     const group = 'all'
@@ -1135,6 +1140,39 @@ export const initCommandAll = () => {
             if (!execute(escaper, param1)) {
                 Text.erP(escaper.getPlayer(), 'unknown command name')
             }
+            return true
+        },
+    })
+
+    //-toggle(tgl) <command>   --> execute <command> with a boolean that switches each time: 1 first, then 0, then 1…
+    registerCommand({
+        name: 'toggle',
+        alias: ['tgl'],
+        group,
+        argDescription: '<command>',
+        description:
+            'Execute <command> with a boolean added at its end, 1 the first time, then 0, then 1... (kept for you and that command). If <command> contains "<bool>", each one is replaced by the boolean instead',
+        cb: ({ cmd, noParam }, escaper) => {
+            if (noParam) {
+                return USAGE
+            }
+            let target = cmd.substring(cmd.indexOf(' ') + 1).trim()
+            if (target.substring(0, 1) !== '-') {
+                target = '-' + target
+            }
+
+            const states = (toggleStates[escaper.getEscaperId()] ??= {})
+            const value = states[target] ?? true
+            states[target] = !value
+
+            const bool = value ? '1' : '0'
+            execute(
+                escaper,
+                target.indexOf(TOGGLE_PLACEHOLDER) !== -1
+                    ? target.split(TOGGLE_PLACEHOLDER).join(bool)
+                    : target + ' ' + bool,
+                true
+            )
             return true
         },
     })
