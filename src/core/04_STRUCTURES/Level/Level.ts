@@ -30,7 +30,6 @@ import { VisibilityTileArray } from '../Visibility/VisibilityTileArray'
 import { End, Start, TpForEnd } from './StartAndEnd'
 import { StaticSlideArray } from './StaticSlideArray'
 import { TriggerArray } from './Triggers'
-import type { VisibilityModifier } from './VisibilityModifier'
 import { VisibilityModifierArray } from './VisibilityModifierArray'
 import { checkPointReviveHeroes } from './checkpointReviveHeroes_function'
 
@@ -301,14 +300,6 @@ export class Level {
 
     getNbLives = () => {
         return this.livesEarnedAtBeginning
-    }
-
-    newVisibilityModifier(x1: number, y1: number, x2: number, y2: number) {
-        return this.visibilities.new(x1, y1, x2, y2)
-    }
-
-    newVisibilityModifierFromExisting(vm: VisibilityModifier) {
-        return this.visibilities.newFromExisting(vm)
     }
 
     /**

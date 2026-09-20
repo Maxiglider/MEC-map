@@ -1,7 +1,11 @@
 import { getUdgLevels, getUdgVisibilityTypes } from '../../../../globals'
 import { ServiceManager } from '../../../Services'
 import { arrayPush } from '../../01_libraries/Basic_functions'
+import { Constants } from '../../01_libraries/Constants'
+import { IsPositiveInteger } from '../../01_libraries/Functions_on_numbers'
 import { Text } from '../../01_libraries/Text'
+import { worldToTile } from '../../04_STRUCTURES/Visibility/TileCoordinates'
+import { VisibilityCompositor } from '../../04_STRUCTURES/Visibility/VisibilityCompositor'
 import { VisibilityState, VisibilityType } from '../../04_STRUCTURES/Visibility/VisibilityType'
 import { USAGE } from '../Helpers/Command_functions'
 
@@ -325,6 +329,124 @@ export const initExecuteCommandMake_visibility = () => {
             } else {
                 Text.mkP(p, 'visibility type "' + label + '" deleted')
             }
+
+            return true
+        },
+    })
+
+    //-convertVisibilities(convv) [<levelId>]   --> turn a level's old visibility rectangles into painted tiles
+    registerCommand({
+        name: 'convertVisibilities',
+        alias: ['convv'],
+        group,
+        argDescription: '[<levelId>]',
+        description:
+            "Turn a level's old visibility rectangles into visible tiles, so it can be painted. Their borders snap to the terrain grid, by up to half a tile",
+        cb: ({ noParam, nbParam, param1 }, escaper) => {
+            if (!noParam && nbParam !== 1) {
+                return USAGE
+            }
+
+            const p = escaper.getPlayer()
+            let level = escaper.getMakingLevel()
+
+            if (nbParam === 1) {
+                if (!IsPositiveInteger(param1)) {
+                    Text.erP(p, 'the level number must be a positive integer')
+                    return true
+                }
+
+                const target = getUdgLevels().get(S2I(param1))
+
+                if (!target) {
+                    Text.erP(p, 'level number ' + param1 + " doesn't exist")
+                    return true
+                }
+
+                level = target
+            }
+
+            if (!level.isLegacyVisibility()) {
+                Text.erP(p, 'level ' + I2S(level.getId()) + ' has no old visibility rectangle to convert')
+                return true
+            }
+
+            const visible = getUdgVisibilityTypes().getVisible()
+            let nbRects = 0
+
+            level.visibilities.forAll(vm => {
+                nbRects++
+                level.visibilityTiles.setRect(
+                    worldToTile(vm.getX1()),
+                    worldToTile(vm.getY1()),
+                    worldToTile(vm.getX2()),
+                    worldToTile(vm.getY2()),
+                    visible
+                )
+            })
+
+            level.visibilities.removeAllVisibilityModifiers()
+
+            getUdgLevels().refreshVisibilities()
+
+            Text.mkP(
+                p,
+                I2S(nbRects) +
+                    ' visibility rectangles of level ' +
+                    I2S(level.getId()) +
+                    ' converted into visible tiles - their borders moved onto the terrain grid, by up to ' +
+                    I2S(Constants.LARGEUR_CASE / 2) +
+                    ' units'
+            )
+            Text.mkP(p, 'this one cannot be undone, and -smic now saves this level as tiles')
+
+            return true
+        },
+    })
+
+    //-debugVisibilityZones(dvz) <on|off>   --> outline the fog modifiers the compositor builds
+    registerCommand({
+        name: 'debugVisibilityZones',
+        alias: ['dvz'],
+        group,
+        argDescription: '<on|off>',
+        description:
+            'Outline the zones the visibility compositor turns the painted tiles into, and show how many of them there are and how long the partition took',
+        cb: ({ nbParam, param1 }, escaper) => {
+            if (nbParam !== 1 || (param1 !== 'on' && param1 !== 'off')) {
+                return USAGE
+            }
+
+            const p = escaper.getPlayer()
+
+            VisibilityCompositor.setDebugEnabled(param1 === 'on')
+
+            if (param1 === 'off') {
+                Text.mkP(p, 'visibility zones debug off')
+                return true
+            }
+
+            const visibilityTypes = getUdgVisibilityTypes()
+
+            Text.mkP(p, I2S(VisibilityCompositor.countZones()) + ' visibility zones, one fog modifier each')
+
+            for (let id = 0; id < visibilityTypes.getIdLimit(); id++) {
+                const visibilityType = visibilityTypes.get(id)
+
+                if (!visibilityType) {
+                    continue
+                }
+
+                const n = VisibilityCompositor.countZonesOfType(visibilityType)
+
+                if (n > 0) {
+                    Text.mkP(p, '    ' + visibilityType.toText() + '   ' + I2S(n) + ' zones')
+                }
+            }
+
+            // Measured with os.clock(), which does not read the same on two machines: shown to whoever asked, and
+            // to nobody else, so a local value never becomes something the game depends on
+            Text.mkP(p, 'last partition took ' + R2S(VisibilityCompositor.getLastDurationMs()) + ' ms on your machine')
 
             return true
         },

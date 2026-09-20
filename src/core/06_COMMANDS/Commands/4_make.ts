@@ -552,7 +552,7 @@ export const initExecuteCommandMake = () => {
         group,
         argDescription: '<boolean> [<levelId>]',
         description:
-            'Set whether visibilities are reset when re-entering the level (applies a total black mask on the map when true)',
+            'Set whether the levels below stop contributing to the visibility when this one starts (applies a total black mask on the map when true). Painting "m" tiles with -crv says the same thing per tile, and more precisely',
         cb: ({ nbParam, param1, param2 }, escaper) => {
             if (nbParam > 2 || !IsBoolString(param1)) {
                 return USAGE

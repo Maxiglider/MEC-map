@@ -61,6 +61,10 @@ The chat-command system (`-command` syntax) is detailed in [docs/COMMANDS_SYSTEM
 
 `core/04_STRUCTURES/Region/` — a shape-abstraction hierarchy (`HorizontalRectangleRegion`, `RectangleRegion` (diagonal-capable), `LineRegion`, `CircleRegion`, `ParallelogramRegion`, `TrapezeRegion`), backed by `MECRegion_service.ts` (registered as `MECRegionService`). Used across features that need an arbitrary zone: TP end-zones, monster kill rects, monster spawn dead zones. See [docs/TERRAIN.md](./docs/TERRAIN.md) for how terrain code does (and mostly doesn't yet) interact with this abstraction.
 
+### Visibility
+
+`core/04_STRUCTURES/Visibility/` — what a player sees of the map. Each level says, per terrain tile, which `VisibilityType` applies (`untouched`, `visible`, `masked` or a periodic one); `VisibilityCompositor` resolves the active levels' tiles into one layer, highest level first, partitions what ends up visible into the minimum number of rectangles and turns those into fog modifiers. The older per-level `VisibilityModifier` rectangles are kept read-only beside it, for maps made before. See [docs/VISIBILITY.md](./docs/VISIBILITY.md).
+
 ### Monsters and spawns
 
 `core/04_STRUCTURES/Monster/` (the monster itself — movement strategies like `MonsterNoMove`, `MonsterSimplePatrol`, `MonsterMultiplePatrols`, `MonsterTeleport`, `LongDistanceMoveOrder` for auto-split long patrols) is distinct from `core/04_STRUCTURES/MonsterSpawn/` (spawn-point definitions that *create* Monster instances: direction modes, dead zones, recycling via `SimpleUnitRecycler`). See [docs/MONSTER_SPAWNS.md](./docs/MONSTER_SPAWNS.md) for the full breakdown — notably, spawned monsters bypass the movement-strategy classes entirely and compute their own positioning/movement.

@@ -1,3 +1,5 @@
+> **Status**: the six steps below are implemented, one commit each. What is left is the validation — manual play-testing through `yarn test-launch`, and above all the two-instance LAN test described at the end, which is the only thing that can confirm the partition agrees across machines. The reference documentation now lives in [`docs/VISIBILITY.md`](../../docs/VISIBILITY.md); this file keeps the reasoning that led there.
+
 # Context
 
 MEC's visibility system today is `src/core/04_STRUCTURES/Level/VisibilityModifier.ts` + `VisibilityModifierArray.ts`: plain rectangles, each one a `FOG_OF_WAR_VISIBLE` fog modifier created over a permanent world-bounds black mask (`udg_hideAll`, `src/core/03_view_all_hide_all/View_all_hide_all.ts`). `LevelArray.refreshVisibilities()` (`LevelArray.ts:253`) activates every level's modifiers cumulatively up to the level being played or made, and `resetVisiblitiesAtStart` cuts that stack off by re-applying the full black mask.

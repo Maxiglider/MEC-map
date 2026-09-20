@@ -26,7 +26,6 @@ import { VisibilityCompositor } from '../Visibility/VisibilityCompositor'
 import { Level } from './Level'
 import { sameLevelProgression } from './LevelProgression'
 import { IsLevelBeingMade } from './Level_functions'
-import type { VisibilityModifierArray } from './VisibilityModifierArray'
 
 const MIN_TIME_BETWEEN_GOTNL = 0.05
 
@@ -581,18 +580,6 @@ export class LevelArray extends BaseArray<Level> {
         let i = 0
         while (true) {
             if (i > this.lastInstanceId || this.data[i].meteors == ma) break
-            i = i + 1
-        }
-        if (i > this.lastInstanceId) {
-            return null
-        }
-        return this.data[i]
-    }
-
-    getLevelFromVisibilityModifierArray = (vma: VisibilityModifierArray) => {
-        let i = 0
-        while (true) {
-            if (i > this.lastInstanceId || this.data[i].visibilities == vma) break
             i = i + 1
         }
         if (i > this.lastInstanceId) {

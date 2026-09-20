@@ -1,8 +1,10 @@
 import { errorHandler } from 'Utils/mapUtils'
 import { getUdgVisibilityTypes } from '../../../../globals'
 import { arrayPush } from '../../01_libraries/Basic_functions'
+import { DefineDrawLineType, DrawLine } from '../../01_libraries/Draw_lines'
 import { RefreshHideAllVM } from '../../03_view_all_hide_all/View_all_hide_all'
 import type { Level } from '../Level/Level'
+import { tileToWorldMax, tileToWorldMin } from './TileCoordinates'
 import { partitionTiles } from './VisibilityPartition'
 import { VisibilityTileArray } from './VisibilityTileArray'
 import { VisibilityType } from './VisibilityType'
@@ -42,6 +44,9 @@ class Compositor {
      * else (docs/CAUSES_OF_DESYNCS.md, on local clocks).
      */
     private lastDurationMs = 0
+
+    /** The outlines -debugVisibilityZones draws, destroyed and redrawn at each recomposition while it is on */
+    private debugLines: lightning[] = []
 
     /** @param activeLevelsHighestFirst the levels contributing, highest id first - the order composition depends on */
     refresh = (activeLevelsHighestFirst: Level[]) => {
@@ -85,6 +90,8 @@ class Compositor {
         if (this.debugEnabled) {
             this.lastDurationMs = (os.clock() - startedAt) * 1000
         }
+
+        this.drawDebugZones()
     }
 
     countZones = () => this.zones.count()
@@ -97,6 +104,46 @@ class Compositor {
 
     setDebugEnabled = (enabled: boolean) => {
         this.debugEnabled = enabled
+        this.drawDebugZones()
+    }
+
+    /**
+     * Outlines every zone, one colour per kind of visibility type. This is the visual feedback a maker gets while
+     * painting: it is redrawn at each recomposition, so once per stroke - a maker usually has -va on anyway, which
+     * makes the fog itself show them nothing.
+     */
+    private drawDebugZones = () => {
+        for (const line of this.debugLines) {
+            DestroyLightning(line)
+        }
+
+        this.debugLines = []
+
+        if (!this.debugEnabled) {
+            return
+        }
+
+        this.zones.forAll(zone => {
+            DefineDrawLineType(zone.visibilityType.isPeriodic() ? 'yellow' : 'green', 2)
+
+            const x1 = tileToWorldMin(zone.tx1)
+            const y1 = tileToWorldMin(zone.ty1)
+            const x2 = tileToWorldMax(zone.tx2)
+            const y2 = tileToWorldMax(zone.ty2)
+
+            this.drawDebugLine(x1, y1, x2, y1)
+            this.drawDebugLine(x2, y1, x2, y2)
+            this.drawDebugLine(x2, y2, x1, y2)
+            this.drawDebugLine(x1, y2, x1, y1)
+        })
+    }
+
+    private drawDebugLine = (x1: number, y1: number, x2: number, y2: number) => {
+        const line = DrawLine(x1, y1, x2, y2)
+
+        if (line) {
+            arrayPush(this.debugLines, line)
+        }
     }
 
     /** On -lmfc, the levels are thrown away and rebuilt: the modifiers of the previous game data must go with them */
