@@ -24,10 +24,13 @@ export class VisibilityTypeArray extends BaseArray<VisibilityType> {
         this.visible = new VisibilityType(VISIBLE_LABEL, 'visible', 'v', true)
         this.masked = new VisibilityType(MASKED_LABEL, 'masked', 'm', true)
 
-        this._new(this.untouched)
-        this._new(this.visible)
-        this._new(this.masked)
+        this.untouched.id = this._new(this.untouched)
+        this.visible.id = this._new(this.visible)
+        this.masked.id = this._new(this.masked)
     }
+
+    /** The highest id ever handed out, so a caller can size an array indexed by type id */
+    getIdLimit = () => this.lastInstanceId + 1
 
     getUntouched = () => this.untouched
     getVisible = () => this.visible
@@ -50,7 +53,7 @@ export class VisibilityTypeArray extends BaseArray<VisibilityType> {
         if (visibleTime <= 0 || maskedTime <= 0) throw 'VisibilityType: both times must be greater than zero'
 
         const vt = new VisibilityType(label, 'periodic', null, false, startState, visibleTime, maskedTime)
-        this._new(vt)
+        vt.id = this._new(vt)
 
         return vt
     }

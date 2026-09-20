@@ -530,13 +530,14 @@ export const initExecuteCommandMake = () => {
         },
     })
 
-    //-removeVisibilities(remv) [<levelId>]   --> remove all visibility rectangles made for the current level
+    //-removeVisibilities(remv) [<levelId>]   --> remove everything the level says about visibility
     registerCommand({
         name: 'removeVisibilities',
         alias: ['remv'],
         group,
         argDescription: '[<levelId>]',
-        description: 'Remove all visibility rectangles made for the current level',
+        description:
+            'Remove everything the current level says about visibility: its painted tiles, and the old visibility rectangles if it still has any',
         cb: ({ noParam, nbParam, param1, param2 }, escaper) => {
             if (!(noParam || nbParam === 1)) {
                 return true

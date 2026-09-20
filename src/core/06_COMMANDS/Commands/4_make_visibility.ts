@@ -1,5 +1,6 @@
-import { getUdgVisibilityTypes } from '../../../../globals'
+import { getUdgLevels, getUdgVisibilityTypes } from '../../../../globals'
 import { ServiceManager } from '../../../Services'
+import { arrayPush } from '../../01_libraries/Basic_functions'
 import { Text } from '../../01_libraries/Text'
 import { VisibilityState, VisibilityType } from '../../04_STRUCTURES/Visibility/VisibilityType'
 import { USAGE } from '../Helpers/Command_functions'
@@ -22,6 +23,28 @@ const parsePositiveTime = (str: string): number | null => {
     const time = S2R(str)
 
     return time > 0 ? time : null
+}
+
+const FORCE_FLAG = '--force'
+
+/** How many tiles a visibility type holds, and which levels they are in, for -delvt to say what is at stake */
+const countUsage = (visibilityType: VisibilityType) => {
+    let tiles = 0
+    const levelIds: string[] = []
+
+    getUdgLevels().forAll((level, levelId) => {
+        const n = level.visibilityTiles.countByType(visibilityType)
+
+        if (n > 0) {
+            tiles += n
+            arrayPush(levelIds, I2S(levelId))
+        }
+    })
+
+    return {
+        tiles,
+        levels: levelIds.length === 1 ? 'level ' + levelIds[0] : 'levels ' + levelIds.join(', '),
+    }
 }
 
 export const initExecuteCommandMake_visibility = () => {
@@ -233,15 +256,19 @@ export const initExecuteCommandMake_visibility = () => {
         },
     })
 
-    //-deleteVisibilityType(delvt) <label>
+    //-deleteVisibilityType(delvt) <label> [--force]
     registerCommand({
         name: 'deleteVisibilityType',
         alias: ['delvt'],
         group,
-        argDescription: '<label>',
-        description: 'Delete a visibility type',
-        cb: ({ nbParam, param1 }, escaper) => {
-            if (nbParam !== 1) {
+        argDescription: '<label> [--force]',
+        description: 'Delete a visibility type. --force also deletes every tile painted with it, in every level',
+        cb: ({ nbParam, param1, param2 }, escaper) => {
+            if (nbParam < 1 || nbParam > 2) {
+                return USAGE
+            }
+
+            if (nbParam === 2 && param2 !== FORCE_FLAG) {
                 return USAGE
             }
 
@@ -259,10 +286,45 @@ export const initExecuteCommandMake_visibility = () => {
             }
 
             const label = visibilityType.label
+            const usage = countUsage(visibilityType)
+
+            // Deleting a type used somewhere takes those tiles away from levels the maker may not even be on, so it
+            // asks to be spelled out - and the refusal gives the count first, since there is no undoing it afterwards.
+            if (usage.tiles > 0 && nbParam !== 2) {
+                Text.erP(
+                    p,
+                    'visibility type "' +
+                        label +
+                        '" is used by ' +
+                        I2S(usage.tiles) +
+                        ' tiles in ' +
+                        usage.levels +
+                        ' - add ' +
+                        FORCE_FLAG +
+                        ' to delete it and those tiles'
+                )
+                return true
+            }
+
+            if (usage.tiles > 0) {
+                getUdgLevels().forAll(level => level.visibilityTiles.removeAllOfType(visibilityType))
+            }
 
             getUdgVisibilityTypes().remove(visibilityType)
 
-            Text.mkP(p, 'visibility type "' + label + '" deleted')
+            if (usage.tiles > 0) {
+                Text.mkP(
+                    p,
+                    'visibility type "' +
+                        label +
+                        '" deleted, along with ' +
+                        I2S(usage.tiles) +
+                        ' tiles in ' +
+                        usage.levels
+                )
+            } else {
+                Text.mkP(p, 'visibility type "' + label + '" deleted')
+            }
 
             return true
         },

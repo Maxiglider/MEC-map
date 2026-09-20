@@ -416,6 +416,11 @@ export class LevelArray extends BaseArray<Level> {
             if (levelJson.visibilities) {
                 level.visibilities.newFromJson(levelJson.visibilities)
             }
+
+            //visibility tiles, saved as the rectangles they partition into
+            if (levelJson.visibilityTiles) {
+                level.visibilityTiles.newFromJson(levelJson.visibilityTiles)
+            }
             level.setResetVisiblitiesAtStart(levelJson.resetVisiblitiesAtStart ?? false)
 
             //monsters

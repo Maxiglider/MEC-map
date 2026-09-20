@@ -32,6 +32,9 @@ export class VisibilityType {
     /** The three built-ins can neither be edited nor deleted, not even with --force */
     readonly immutable: boolean
 
+    /** Set by VisibilityTypeArray on insertion, so a type can index a plain array - no table keyed by an object */
+    id: number = -1
+
     /** Only meaningful when kind === 'periodic' */
     private startState: VisibilityState
     /** Only meaningful when kind === 'periodic', in seconds, > 0 */
