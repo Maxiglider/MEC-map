@@ -19,6 +19,7 @@ import ModifiedObject from 'mdx-m3-viewer-th/dist/cjs/parsers/w3x/w3u/modifiedob
 import * as path from 'path'
 import { callArgs } from './jass'
 import { parseWts } from './mapFiles'
+import { readMecOneData } from './mecOneData'
 import { fixObjectDataWriter, isSkinField, variableTypeOf } from './objectData'
 import { addCustomTextTriggers, CustomTextTrigger, hasCategory } from './triggerFiles'
 
@@ -51,6 +52,47 @@ if (path.resolve(outputMap) === path.resolve(baseMapPath))
 
 const warnings: string[] = []
 const warn = (message: string) => warnings.push(message)
+
+// ---------------------------------------------------------------------------------------------- MEC 1 maps
+
+/**
+ * A MEC 1 map writes its own data in its calls: terrain types, monster types, levels and every monster, which a
+ * MEC 2 game data takes over one for one. The spec says `"mecOne": true` and only has to add what the calls don't
+ * hold (the hero, the game data, the quests, the custom triggers), or to override what they do.
+ */
+const mecOne = spec.mecOne ? readMecOneData(oldScript) : undefined
+if (mecOne) {
+    spec.terrainTypes ??= mecOne.terrainTypes
+    spec.monsterTypes ??= mecOne.monsterTypes
+    spec.levels ??= mecOne.levels.map((l, i) => ({
+        start: l.startRegion ?? l.start,
+        // the last level of a MEC 1 map has no end: reaching it is winning the game
+        ...(l.end
+            ? { end: l.end }
+            : i + 1 < mecOne.levels.length
+              ? { end: { stripAt: mecOne.levels[i + 1].start } }
+              : {}),
+        visibilities: l.visibilities,
+        ...(l.nbLives !== undefined ? { nbLives: l.nbLives } : {}),
+    }))
+
+    // visibility rectangles the old map's own triggers ran, which its MEC 1 data doesn't hold: the lights an old
+    // map flashes on a dark level, now MEC's own blinking visibilities (spec extraVisibilities)
+    for (const v of (spec.extraVisibilities ?? []) as Json[]) {
+        if (!spec.levels[v.level]) throw new Error(`extraVisibilities: no level ${v.level}`)
+        const { level: _level, ...visibility } = v
+        spec.levels[v.level].visibilities.push(visibility)
+    }
+}
+
+// monster types the old map's data doesn't hold: the projectiles a caster shoots, say (spec extraMonsterTypes),
+// and the fields to add to the ones it does hold, without writing them all out again (spec monsterTypeOverrides)
+spec.monsterTypes = [...(spec.monsterTypes ?? []), ...(spec.extraMonsterTypes ?? [])]
+for (const [label, fields] of Object.entries((spec.monsterTypeOverrides ?? {}) as Json)) {
+    const type = (spec.monsterTypes as Json[]).find(t => t.label === label)
+    if (!type) throw new Error(`monsterTypeOverrides: unknown monster type ${label}`)
+    Object.assign(type, fields)
+}
 
 // ---------------------------------------------------------------------------------------------- geometry
 
@@ -228,7 +270,21 @@ function range(a: number, b: number) {
 // ---------------------------------------------------------------------------------------------- levels of things
 
 const levels: Json[] = spec.levels
-const levelVisibilities = levels.map(l => (l.visibilities as RectRef[]).map(resolveRect))
+
+/**
+ * A level's visibility rectangles: a region name or a rect, or `{ rect, blinkVisibleTime, blinkHiddenTime }` for one
+ * that shows and hides over and over, as an old map lights a dark maze now and then.
+ */
+type VisibilityRef = RectRef | { rect: RectRef; blinkVisibleTime: number; blinkHiddenTime: number }
+const isBlinking = (v: VisibilityRef): v is { rect: RectRef; blinkVisibleTime: number; blinkHiddenTime: number } =>
+    typeof v === 'object' && 'rect' in v
+const levelVisibilities = levels.map(l =>
+    (l.visibilities as VisibilityRef[]).map(v =>
+        isBlinking(v)
+            ? { rect: resolveRect(v.rect), blinkVisibleTime: v.blinkVisibleTime, blinkHiddenTime: v.blinkHiddenTime }
+            : { rect: resolveRect(v) }
+    )
+)
 // areas whose units and gates belong to a level whatever its visibility says (spec levels[].unitsIn): for a map whose
 // visibility doesn't split the levels (Sliding Bunnys shows the whole map from the start)
 const levelUnitAreas = levels.map(l => ((l.unitsIn ?? []) as RectRef[]).map(resolveRect))
@@ -237,7 +293,7 @@ const levelUnitAreas = levels.map(l => ((l.unitsIn ?? []) as RectRef[]).map(reso
 const levelOfPoint = (x: number, y: number) => {
     const inArea = levelUnitAreas.findIndex(rects => rects.some(r => inside(r, x, y)))
     if (inArea !== -1) return inArea
-    const found = levelVisibilities.findIndex(rects => rects.some(r => inside(r, x, y)))
+    const found = levelVisibilities.findIndex(vms => vms.some(v => inside(v.rect, x, y)))
     return found === -1 ? levels.length - 1 : found
 }
 
@@ -676,6 +732,68 @@ for (const item of facts.items.filter((i: Json) => (spec.meteorsAtItemsOfTypes ?
     levelMeteors[levelOfPoint(item.x, item.y)].push({ x: Math.round(item.x), y: Math.round(item.y) })
 }
 
+// ---------------------------------------------------------------------------------------------- MEC 1 monsters
+
+// A MEC 1 map has no unit placed in the editor, so the blocks above found nothing: its monsters, spawns and meteors
+// are written in its own calls, level by level, and go in as they are.
+if (mecOne) {
+    mecOne.levels.forEach((l, i) => {
+        if (i >= levels.length) {
+            warn(`MEC 1 level ${i + 1} has no level in the spec: its monsters are left out`)
+            return
+        }
+        // the ids are given again here, so that a MEC 1 map and a hand-made one number their monsters the same way
+        l.monsters.forEach(({ id: _mecOneId, ...monster }) =>
+            addMonster(i, { ...monster, monsterTypeLabel: requireMonsterType(monster.monsterTypeLabel) })
+        )
+        l.monsterSpawns.forEach(spawn =>
+            levelSpawns[i].push({ ...spawn, monsterTypeLabel: requireMonsterType(spawn.monsterTypeLabel) })
+        )
+        l.meteors.forEach(meteor => levelMeteors[i].push(meteor))
+    })
+}
+
+// ---------------------------------------------------------------------------------------------- casters
+
+// A caster type shoots a projectile monster type from a caster monster type. `castersFromMonsterTypes` then turns
+// every immobile monster of a type into a caster of the type it names: an old map places its shooting mages as
+// plain monsters, and a trigger of its own makes them fire.
+const casterTypes: Json[] = (spec.casterTypes ?? []).map((ct: Json) => ({
+    label: ct.label,
+    ...(ct.alias ? { alias: ct.alias } : {}),
+    casterMonsterTypeLabel: requireMonsterType(ct.casterMonsterType),
+    projectileMonsterTypeLabel: requireMonsterType(ct.projectileMonsterType),
+    range: ct.range,
+    projectileSpeed: ct.projectileSpeed,
+    loadTime: ct.loadTime,
+    animation: ct.animation ?? 'spell',
+    ...(ct.isBlind ? { isBlind: true } : {}),
+    ...(ct.nbShots > 1
+        ? {
+              nbShots: ct.nbShots,
+              shotAngleStep: ct.shotAngleStep ?? 0,
+              firstShotAngle: ct.firstShotAngle ?? -(((ct.nbShots - 1) * (ct.shotAngleStep ?? 0)) / 2),
+          }
+        : {}),
+}))
+const casterTypeLabels = new Set(casterTypes.map(ct => ct.label))
+
+for (const [monsterTypeLabel, casterTypeLabel] of Object.entries((spec.castersFromMonsterTypes ?? {}) as Json)) {
+    if (!casterTypeLabels.has(casterTypeLabel as string))
+        throw new Error(`castersFromMonsterTypes: unknown caster type ${casterTypeLabel}`)
+
+    let nbTurned = 0
+    levelMonsters.forEach((monsters, i) => {
+        levelMonsters[i] = monsters.map(m => {
+            if (m.monsterClassName !== 'MonsterNoMove' || m.monsterTypeLabel !== monsterTypeLabel) return m
+            nbTurned++
+            return { id: m.id, monsterClassName: 'Caster', casterTypeLabel, x: m.x, y: m.y, angle: m.angle }
+        })
+    })
+
+    if (nbTurned === 0) warn(`castersFromMonsterTypes: no immobile monster of type ${monsterTypeLabel} to turn`)
+}
+
 // ---------------------------------------------------------------------------------------------- the game data
 
 // the model of the effect a hero slides as in async mode: the old hero's own, when it has one (the rebase gives
@@ -809,6 +927,7 @@ const pathPoints = (m: Json): { x: number; y: number }[] => {
     if (m.monsterClassName === 'MonsterNoMove' || m.monsterClassName === 'MonsterTeleport') {
         return m.xArr ? m.xArr.map((x: number, k: number) => ({ x, y: m.yArr[k] })) : [{ x: m.x, y: m.y }]
     }
+    if (m.monsterClassName === 'Caster') return [{ x: m.x, y: m.y }]
     if (m.monsterClassName === 'MonsterSimplePatrol') return line({ x: m.x1, y: m.y1 }, { x: m.x2, y: m.y2 })
     if (m.monsterClassName === 'MonsterMultiplePatrols') {
         const points: Point[] = m.xArr.map((x: number, k: number) => ({ x, y: m.yArr[k] }))
@@ -818,20 +937,23 @@ const pathPoints = (m: Json): { x: number; y: number }[] => {
     }
     return []
 }
+// a caster's unit is built from the monster type its caster type shoots from, immolation included
+const monsterTypeLabelOf = (m: Json): string =>
+    m.monsterClassName === 'Caster'
+        ? casterTypes.find(ct => ct.label === m.casterTypeLabel)?.casterMonsterTypeLabel
+        : m.monsterTypeLabel
+
 safeStarts.forEach((start, i) => {
     for (const m of levelMonsters[i]) {
-        const type = monsterTypes.find(mt => mt.label === m.monsterTypeLabel)
-        if (
-            !type ||
-            type.killRectDimensions ||
-            (m.monsterClassName === 'MonsterNoMove' && /^(plate)$/.test(m.monsterTypeLabel))
-        )
+        const label = monsterTypeLabelOf(m)
+        const type = monsterTypes.find(mt => mt.label === label)
+        if (!type || type.killRectDimensions || (m.monsterClassName === 'MonsterNoMove' && /^(plate)$/.test(label)))
             continue
-        const reach = (type.immolationRadius ?? 0) + 25 + safeMargin
+        const reach = (type.immolationRadius ?? 0) + mecHeroCollision + safeMargin
         const nearest = Math.min(...pathPoints(m).map(p => distanceToRect(p.x, p.y, start)))
         if (nearest < reach) {
             warn(
-                `level ${i + 1}: monster ${m.id} (${m.monsterTypeLabel} ${m.monsterClassName}) comes within ${Math.round(nearest)} of the start (reach ${reach})`
+                `level ${i + 1}: monster ${m.id} (${label} ${m.monsterClassName}) comes within ${Math.round(nearest)} of the start (reach ${reach})`
             )
         }
     }
@@ -840,20 +962,28 @@ safeStarts.forEach((start, i) => {
 const gameData = {
     terrainTypesMec,
     monsterTypes,
-    casterTypes: [],
+    casterTypes,
     levels: levels.map((level, i) => ({
         id: i,
         start: rounded(safeStarts[i]),
-        end: rounded(
-            level.end?.stripAt
-                ? endStrip(resolveRect(level.end.stripAt), resolveRect(level.start), i + 1)
-                : resolveRect(level.end)
-        ),
-        visibilities: levelVisibilities[i].map(r => ({
-            x1: Math.round(r.minX),
-            y1: Math.round(r.minY),
-            x2: Math.round(r.maxX),
-            y2: Math.round(r.maxY),
+        // a level without an end is the last one: reaching it wins the game (MEC 1 maps write no end there)
+        ...(level.end
+            ? {
+                  end: rounded(
+                      level.end.stripAt
+                          ? endStrip(resolveRect(level.end.stripAt), resolveRect(level.start), i + 1)
+                          : resolveRect(level.end)
+                  ),
+              }
+            : {}),
+        visibilities: levelVisibilities[i].map(v => ({
+            x1: Math.round(v.rect.minX),
+            y1: Math.round(v.rect.minY),
+            x2: Math.round(v.rect.maxX),
+            y2: Math.round(v.rect.maxY),
+            ...(v.blinkVisibleTime && v.blinkHiddenTime
+                ? { blinkVisibleTime: v.blinkVisibleTime, blinkHiddenTime: v.blinkHiddenTime }
+                : {}),
         })),
         resetVisiblitiesAtStart: level.resetVisiblitiesAtStart ?? false,
         ...(level.nbLives !== undefined ? { nbLives: level.nbLives } : {}),
@@ -1178,7 +1308,7 @@ fs.writeFileSync(
         '| --- | --- | --- | --- | --- | --- | --- |',
         ...gameData.levels.map(
             (l, i) =>
-                `| ${i + 1} | ${count(l.monsters, m => `${m.monsterTypeLabel} ${m.monsterClassName.replace('Monster', '')}`) || '—'} | ${l.monsterSpawns.length} | ${l.meteors.length} | ${l.keyAndDoors.length} | ${l.clearMobs.length} | ${l.portalMobs.length} |`
+                `| ${i + 1} | ${count(l.monsters, m => `${monsterTypeLabelOf(m)} ${m.monsterClassName.replace('Monster', '')}`) || '—'} | ${l.monsterSpawns.length} | ${l.meteors.length} | ${l.keyAndDoors.length} | ${l.clearMobs.length} | ${l.portalMobs.length} |`
         ),
         '',
         `Monster types: ${monsterTypes.map(mt => mt.label + (mt.killRectDimensions ? ` (kill rect ${mt.killRectDimensions.width}×${mt.killRectDimensions.height})` : '')).join(', ')}.`,
