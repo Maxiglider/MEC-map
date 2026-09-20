@@ -5,6 +5,7 @@ import { Constants } from '../../01_libraries/Constants'
 import { Escaper } from '../../04_STRUCTURES/Escaper/Escaper'
 import { TerrainType } from '../../04_STRUCTURES/TerrainType/TerrainType'
 import { ChangeTerrainType } from '../../07_TRIGGERS/Modify_terrain_Functions/Modify_terrain_functions'
+import { BrushShape, isInBrushShape } from '../Make/BrushShape'
 import { MakeHoldClick } from '../Make/MakeHoldClick'
 import { MakeTerrainCreateBrushAction } from '../MakeLastActions/MakeTerrainCreateBrushAction'
 
@@ -56,56 +57,18 @@ export class MakeTerrainCreateBrush extends MakeHoldClick {
                             const terrainType = getUdgTerrainTypes().getTerrainType(x, y)
                             if (terrainType && terrainType != terrainTypeToApply) {
                                 //remove some tile changes in circle mode
-                                if (shapeToApply == 'circle') {
-                                    const diffXcenter = RAbsBJ(centerX - x)
-                                    const diffYcenter = RAbsBJ(centerY - y)
-
-                                    //remove edges except middles
-                                    if (sizeToApply != 1) {
-                                        if (
-                                            x != centerX &&
-                                            y != centerY &&
-                                            (x == centerX - offset ||
-                                                x == centerX + offset ||
-                                                y == centerY - offset ||
-                                                y == centerY + offset)
-                                        ) {
-                                            continue
-                                        }
-                                    }
-
-                                    //remove 2nd line interior corners, leaving middle and tiles near
-                                    if (sizeToApply >= 4) {
-                                        //up or down
-                                        if (
-                                            y == centerY + offset - Constants.LARGEUR_CASE ||
-                                            y == centerY - offset + Constants.LARGEUR_CASE
-                                        ) {
-                                            if (diffXcenter > Constants.LARGEUR_CASE * 2) {
-                                                continue
-                                            }
-                                        }
-
-                                        //left or right
-                                        if (
-                                            x == centerX + offset - Constants.LARGEUR_CASE ||
-                                            x == centerX - offset + Constants.LARGEUR_CASE
-                                        ) {
-                                            if (diffYcenter > Constants.LARGEUR_CASE * 2) {
-                                                continue
-                                            }
-                                        }
-                                    }
-
-                                    //a little more corner for size 8
-                                    if (sizeToApply == 8) {
-                                        if (
-                                            diffXcenter == Constants.LARGEUR_CASE * 5 &&
-                                            diffYcenter == Constants.LARGEUR_CASE * 5
-                                        ) {
-                                            continue
-                                        }
-                                    }
+                                if (
+                                    !isInBrushShape(
+                                        shapeToApply as BrushShape,
+                                        x,
+                                        y,
+                                        centerX,
+                                        centerY,
+                                        offset,
+                                        sizeToApply
+                                    )
+                                ) {
+                                    continue
                                 }
 
                                 //change tile

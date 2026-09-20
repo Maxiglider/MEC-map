@@ -2,6 +2,7 @@ import {
     getUdgLevels,
     getUdgMonsterTypes,
     getUdgTerrainTypes,
+    getUdgVisibilityTypes,
     globals,
     setHeroBaseCollisionSize,
 } from '../../../../globals'
@@ -22,6 +23,7 @@ import { MonsterMultiplePatrols } from '../../04_STRUCTURES/Monster/MonsterMulti
 import { MonsterNoMove } from '../../04_STRUCTURES/Monster/MonsterNoMove'
 import { MonsterSimplePatrol } from '../../04_STRUCTURES/Monster/MonsterSimplePatrol'
 import { PORTAL_MOB_MAX_FREEZE_DURATION } from '../../04_STRUCTURES/Monster_properties/PortalMob'
+import { BrushShape } from '../../05_MAKE_STRUCTURES/Make/BrushShape'
 import { CmdParam, USAGE } from '../Helpers/Command_functions'
 import { adaptMonstersImmolation, snapPatrolsToSlideOffsetMap, snapPointToSlide } from '../Helpers/commands-helpers'
 
@@ -474,18 +476,71 @@ export const initExecuteCommandMake = () => {
         },
     })
 
-    //-createVisibility(crv)   --> create visibility rectangles for the current level
+    //-createVisibility(crv) <visibilityTypeLabel> [<brushSize> [<shape>]]   --> paint visibility on the terrain tiles
     registerCommand({
         name: 'createVisibility',
         alias: ['crv'],
         group,
-        argDescription: '',
-        description: 'Create visibility rectangles for the current level',
-        cb: ({ noParam }, escaper) => {
+        argDescription: '<visibilityTypeLabel> [<brushSize> [<shape>]]',
+        description:
+            'Paint a visibility type on the terrain tiles of the current level, by clicking two corners or with a brush. Paint "u" (untouched) to erase',
+        cb: ({ noParam, nbParam, param1, param2, param3 }, escaper) => {
+            const p = escaper.getPlayer()
+
+            // Not a USAGE: the parameterless form used to be the whole command, so it has to say what became of it
             if (noParam) {
-                escaper.makeCreateVisibilityModifier()
-                Text.mkP(escaper.getPlayer(), 'visibility making on')
+                Text.erP(p, '-crv no longer creates a visibility rectangle on its own')
+                Text.mkP(
+                    p,
+                    'visibility is now painted per terrain tile, with a visibility type that can mask an area again, not only reveal it'
+                )
+                Text.mkP(p, 'use "-crv <visibilityTypeLabel>" - built in types: u (untouched), v (visible), m (masked)')
+                Text.mkP(p, 'type "-dvt" to list every visibility type, "-newvt" to create one')
+                return true
             }
+
+            if (nbParam > 3) {
+                return USAGE
+            }
+
+            const visibilityType = getUdgVisibilityTypes().getByLabel(param1)
+
+            if (!visibilityType) {
+                Text.erP(p, 'visibility type "' + param1 + '" doesn\'t exist')
+                return true
+            }
+
+            const level = escaper.getMakingLevel()
+
+            // A level holds either the old rectangles or the tiles, never both: they do not compose together
+            if (level.isLegacyVisibility()) {
+                Text.erP(
+                    p,
+                    'level ' +
+                        I2S(level.getId()) +
+                        ' still uses the old visibility rectangles - run -convertVisibilities first, or -remv to clear them'
+                )
+                return true
+            }
+
+            if (nbParam === 1) {
+                escaper.makeCreateVisibility(visibilityType)
+                Text.mkP(p, 'visibility painting on, click two corners')
+                return true
+            }
+
+            const brushSize = S2I(param2)
+
+            if (brushSize < 1 || brushSize > 8) {
+                Text.erP(p, 'brush size has to be between 1 and 8')
+                return true
+            }
+
+            const shape: BrushShape = param3 == 'circle' || param3 == 'c' ? 'circle' : 'square'
+
+            escaper.makeCreateVisibility(visibilityType, brushSize, shape)
+            Text.mkP(p, 'visibility painting on, hold the right button to paint and the left one to erase')
+
             return true
         },
     })
