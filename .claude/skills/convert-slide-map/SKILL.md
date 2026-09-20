@@ -16,6 +16,7 @@ Every old map is hand-made JASS written its own way. The scripts (`scripts/conve
 ## Workflow
 
 1. **Extract**: `yarn convert-slide-map:extract "<path to the old map>"` (`--force` replaces a different copy already in `original-maps/`). It copies the map, makes its cheated copy, extracts every file (protected maps included), and writes `facts.json` and `summary.md`.
+   It first tells what kind of map it is, which decides how it is read and cheated (see [MEC 1 maps](#mec-1-maps)): **MEC 1** (made with the vJass MEC of this repo's `v1-jass` tag, in the World Editor) or **made by hand**. `summary.md` says so.
 2. **Report**: write `report.md` from `summary.md` and `facts.json`, modelled on Polar Escape 3's. Its sections:
    1. how the old map plays;
    2. terrain types;
@@ -40,11 +41,9 @@ Every old map is hand-made JASS written its own way. The scripts (`scripts/conve
 `MAPS_OUTPUT_DIR_FOR_AI_CONVERSION_TO_MEC` (in `.env`) holds:
 
 - `original-maps/`: a copy of each map to convert. Nothing else reads the user's original file.
-- `cheated-original-maps/`: the old map as `<original name>--cheated`, to play it through while converting it:
-  - `-t` (`-teleport`) teleports the hero to the next right-click, once, as MEC's `-t` does;
-  - `-s` (`-stop`) cancels it.
-
-  The cheat is added to the map's own JASS (`cheat.ts`).
+- `cheated-original-maps/`: the old map as `<original name>--cheated`, to play it through while converting it. The cheat is added to the map's own JASS (`cheat.ts`):
+  - a map made by hand gets a teleport of its own: `-t` (`-teleport`) teleports the hero to the next right-click, once, and `-s` (`-stop`) cancels it;
+  - a MEC 1 map gets the making rights instead (`isTrueMaximaxouB` and `canCheatB` true in its escaper constructor, its setters untouched), so every MEC 1 command works, `-t` included.
 - `conversion-work/<map>/`:
   - `extracted/`, `war3map.j` (line breaks restored), `facts.json`, `summary.md`;
   - yours: `report.md`, `conversion.json`, `custom-triggers.lua`;
@@ -166,6 +165,21 @@ Write them in `conversion-work/<map>/custom-triggers.lua` (or several files) and
   - Timer callbacks can't wait: no `TriggerSleepAction`, and no Blizzard function that waits inside. `TransmissionFromUnitTypeWithNameBJ` with its last argument `true` waits for the transmission, and in a timer callback it silently stops the callback there. In Polar Escape 3, that stopped the cinematic on its first line.
   - Count the old waits exactly, including the ones hidden in Blizzard functions: a transmission called with its wait flag (`TransmissionFromUnitTypeWithNameBJ(…, true)`) holds the old trigger for the line's whole duration (`bj_TIMETYPE_ADD`: the given time, plus the sound's length if any). Leaving those out made Polar Escape 3's ending 7 s too short.
   - Give each step its own timer at its absolute time from the start, rather than chaining them, so a step that goes wrong doesn't hold up the next ones and the end of the game.
+
+## MEC 1 maps
+
+A MEC 1 map was made with the vJass MEC of this repo's `v1-jass` tag, from the World Editor, its script compiled to JASS. Its structures keep their names there (`s__Escaper_`, `s__Level_`, `s__TerrainTypeArray_`…), which is what `detectMapKind` looks for (`mecOne.ts`). Such a map splits in three, and `summary.md`'s "MEC 1" section gives each:
+
+- **What MEC 1 is**: its core triggers and its map template's (`MEC_ONE_CORE_TRIGGERS`). Nothing to convert: MEC 2 does it.
+- **The map's data**, written in its init triggers (`Init_terrain_types`, `Init_monster_and_caster_types`, `Init_levels` and the `Init_levelN_partM` behind them) as plain calls, listed with their arguments in `facts.json` (`mecOne.calls`) and counted in the summary. They are what a MEC 2 game data is made of, one for one, so a MEC 1 map needs no guessing about its gameplay:
+  - `TerrainTypeArray.newSlide/newWalk/newDeath(label, tile, speed…)` → `terrainTypes`;
+  - `MonsterTypeArray.new(label, unit, scale, immolation, speed, clickable)` and the `MonsterType.set…` on it → `monsterTypes`;
+  - `Level.newStart` / `newEnd` / `setNbLivesEarned`, `VisibilityModifierArray.new` → the levels;
+  - `MonsterSimplePatrolArray.new`, `MonsterNoMoveArray.new`, `MonsterMultiplePatrols.storeNewLoc` + `MonsterMultiplePatrolsArray.new`, `MonsterSpawnArray.new`, `MeteorArray.new` → the monsters, spawns and meteors of each level;
+  - `CasterTypeArray.new` and the `CasterType.set…` → the casters.
+- **The map's own features**, every other trigger of it (`ownTriggers` in the summary). They are the map's own work (spells, morphs, animations, shadows…): read each one and go through step 3 with the user, as for a map made by hand.
+
+The old data reads in MEC 1's own units (its speeds, its immolation radius…): check each against MEC 2's, where a field changed meaning, rather than copying the number over.
 
 ## Reading an old map: common idioms
 

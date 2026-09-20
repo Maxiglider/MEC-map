@@ -1,4 +1,5 @@
 import MpqArchive from 'mdx-m3-viewer-th/dist/cjs/parsers/mpq/archive'
+import { addMecOneCheat, detectMapKind } from './mecOne'
 
 /**
  * A quick cheat in the old map itself, to play it through while converting it: what MEC's -t does (the hero is
@@ -45,8 +46,14 @@ call TriggerAddAction(cancel,function MecCheat_Stop)
 call TriggerAddAction(order,function MecCheat_Order)
 endfunction`
 
-/** The script with the cheat in it: globals before endglobals, functions before main, their setup at main's end */
+/**
+ * The script with the cheat in it. A MEC 1 map gets the making rights instead (its own commands, `-t` included);
+ * a map made by hand gets the teleport above: globals before endglobals, functions before main, their setup at
+ * main's end.
+ */
 export const addCheatToScript = (script: string) => {
+    if (detectMapKind(script) === 'mec1') return addMecOneCheat(script)
+
     const eol = script.includes('\r\n') ? '\r\n' : script.includes('\r') ? '\r' : '\n'
     const lines = script.split(/\r\n|\r|\n/)
     const trimmed = lines.map(l => l.trim())

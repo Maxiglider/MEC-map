@@ -31,6 +31,7 @@ import {
     parseVisibility,
 } from './jass'
 import { KNOWN_MAP_FILES, parseW3iHead, parseWts, readArchive } from './mapFiles'
+import { detectMapKind, mecOneInventory } from './mecOne'
 
 const outputRoot = process.env.MAPS_OUTPUT_DIR_FOR_AI_CONVERSION_TO_MEC
 const args = process.argv.slice(2)
@@ -118,6 +119,10 @@ const rawScript = text('scripts\\war3map.j') ?? text('war3map.j')
 const luaScript = text('war3map.lua')
 const script = rawScript ? normalizeScript(rawScript) : ''
 script && fs.writeFileSync(path.join(workDir, 'war3map.j'), script)
+
+// MEC 1 (the vJass MEC of the v1-jass tag) or a map made by hand: what the map holds is read differently
+const mapKind = detectMapKind(script)
+const mecOne = mapKind === 'mec1' ? mecOneInventory(script) : undefined
 
 const functions = parseFunctions(script)
 const triggers = parseTriggers(script, functions)
@@ -240,6 +245,13 @@ const facts = {
     info,
     gameInterface,
     upkeep,
+    mapKind,
+    mecOne: mecOne && {
+        counts: mecOne.counts,
+        dataTriggers: mecOne.dataTriggers,
+        ownTriggers: mecOne.ownTriggers,
+        calls: mecOne.calls,
+    },
     scriptLanguage: rawScript ? 'jass' : luaScript ? 'lua' : 'none',
     terrain: w3eBytes
         ? {
@@ -405,6 +417,37 @@ const summary = [
           ]
         : ['None found (emails, "my name is", ages, towns, phone numbers).']),
     '',
+    ...(mecOne
+        ? [
+              '## MEC 1',
+              '',
+              'This map was made with MEC 1 (the vJass MEC): its data is written in its own calls, which a MEC 2 game data takes over, and the triggers of its own are the features to look at.',
+              '',
+              `Data triggers: ${mecOne.dataTriggers.join(', ') || 'none'}.`,
+              '',
+              table([
+                  ['MEC 1 call', 'Times'],
+                  ...Object.entries(mecOne.counts)
+                      .sort((a, b) => b[1] - a[1])
+                      .map(([fn, n]) => [fn, String(n)]),
+              ]),
+              '',
+              'Types (as the map writes them):',
+              '',
+              '```',
+              ...mecOne.calls
+                  .filter(c =>
+                      /^(TerrainTypeArray|MonsterTypeArray|CasterTypeArray|MonsterType|CasterType)\./.test(c.fn)
+                  )
+                  .map(c => c.line),
+              '```',
+              '',
+              `The map's own triggers (its features, to look at): ${mecOne.ownTriggers.join(', ') || 'none'}.`,
+              '',
+              `MEC 1 and its template: ${mecOne.coreTriggers.join(', ') || 'none'}.`,
+              '',
+          ]
+        : []),
     '## Terrain',
     '',
     facts.terrain
