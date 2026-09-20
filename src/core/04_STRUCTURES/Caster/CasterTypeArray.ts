@@ -73,6 +73,12 @@ export class CasterTypeArray extends BaseArray<CasterType> {
                 if (ct.alias) {
                     casterType?.setAlias(ct.alias)
                 }
+                if (ct.nbShots) {
+                    casterType?.setFan(ct.nbShots, ct.shotAngleStep, ct.firstShotAngle)
+                }
+                if (ct.isBlind) {
+                    casterType?.setIsBlind(true)
+                }
             }
         }
     }

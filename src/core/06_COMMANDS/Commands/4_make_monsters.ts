@@ -10,6 +10,7 @@ import {
     DEFAULT_CASTER_LOAD_TIME,
     DEFAULT_CASTER_PROJECTILE_SPEED,
     DEFAULT_CASTER_RANGE,
+    MAX_CASTER_SHOTS,
     MIN_CASTER_LOAD_TIME,
     MIN_CASTER_PROJECTILE_SPEED,
 } from '../../04_STRUCTURES/Caster/CasterType'
@@ -1558,6 +1559,72 @@ export const initExecuteCommandMake_monsters = () => {
             //apply command
             getUdgCasterTypes().getByLabel(param1)?.setAnimation(param2)
             Text.mkP(escaper.getPlayer(), 'caster animation changed')
+            return true
+        },
+    })
+
+    //-setCasterBlind(setcb) <casterLabel> <boolean>
+    registerCommand({
+        name: 'setCasterBlind',
+        alias: ['setcb'],
+        group,
+        argDescription: '<casterLabel> <boolean>',
+        description:
+            'A blind caster shoots every loadTime seconds straight along its angle, without looking for a hero',
+        cb: ({ nbParam, param1, param2 }, escaper) => {
+            if (nbParam !== 2 || !IsBoolString(param2)) {
+                return USAGE
+            }
+            //checkParam 1
+            const casterType = getUdgCasterTypes().getByLabel(param1)
+            if (!casterType) {
+                Text.erP(escaper.getPlayer(), 'unknown caster type "' + param1 + '"')
+                return true
+            }
+            //apply command
+            const isBlind = S2B(param2)
+            if (!casterType.setIsBlind(isBlind)) {
+                Text.erP(escaper.getPlayer(), 'this caster type is already ' + (isBlind ? 'blind' : 'aiming'))
+                return true
+            }
+            Text.mkP(escaper.getPlayer(), 'caster type now ' + (isBlind ? 'shoots blind' : 'aims at heroes'))
+            return true
+        },
+    })
+
+    //-setCasterFan(setcf) <casterLabel> <nbShots> [<angleStep> [<firstAngle>]]
+    registerCommand({
+        name: 'setCasterFan',
+        alias: ['setcf'],
+        group,
+        argDescription: '<casterLabel> <nbShots> [<angleStep> [<firstAngle>]]',
+        description:
+            'One shot of this caster sends <nbShots> projectiles, <angleStep> degrees apart, opening around its angle',
+        cb: ({ nbParam, param1, param2, param3, param4 }, escaper) => {
+            if (nbParam < 2 || nbParam > 4) {
+                return USAGE
+            }
+            //checkParam 1
+            const casterType = getUdgCasterTypes().getByLabel(param1)
+            if (!casterType) {
+                Text.erP(escaper.getPlayer(), 'unknown caster type "' + param1 + '"')
+                return true
+            }
+            //checkParam 2
+            if (!IsPositiveInteger(param2) || S2I(param2) < 1 || S2I(param2) > MAX_CASTER_SHOTS) {
+                Text.erP(escaper.getPlayer(), `the number of shots must be between 1 and ${I2S(MAX_CASTER_SHOTS)}`)
+                return true
+            }
+            //apply command
+            const nbShots = S2I(param2)
+            const angleStep = nbParam >= 3 ? S2R(param3) : 0
+            const firstAngle = nbParam === 4 ? S2R(param4) : undefined
+
+            if (!casterType.setFan(nbShots, angleStep, firstAngle)) {
+                Text.erP(escaper.getPlayer(), 'wrong fan values')
+                return true
+            }
+            Text.mkP(escaper.getPlayer(), 'caster fan changed')
             return true
         },
     })

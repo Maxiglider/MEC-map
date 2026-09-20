@@ -12,6 +12,7 @@ export const DEFAULT_CASTER_RANGE = 1000
 export const MIN_CASTER_LOAD_TIME = 0.2
 export const DEFAULT_CASTER_LOAD_TIME = 1.0
 export const DEFAULT_CASTER_ANIMATION = 'spell'
+export const MAX_CASTER_SHOTS = 24
 
 export class CasterType {
     label: string
@@ -22,6 +23,17 @@ export class CasterType {
     private projectileSpeed: number
     private loadTime: number
     private animation: string
+
+    /**
+     * A blind caster fires on its own, every `loadTime` seconds, straight along the angle it was made with,
+     * whether or not a hero is anywhere near: the rhythm to read of the old hand-made maps, where an aiming
+     * caster is a turret that tracks you.
+     */
+    private isBlindB = false
+    /** how many projectiles one shot sends, and how they open out around the caster's angle */
+    private nbShots = 1
+    private firstShotAngle = 0
+    private shotAngleStep = 0
 
     constructor(
         label: string,
@@ -152,6 +164,51 @@ export class CasterType {
         this.animation = animation
     }
 
+    isBlind = (): boolean => {
+        return this.isBlindB
+    }
+
+    setIsBlind = (isBlind: boolean): boolean => {
+        if (this.isBlindB === isBlind) {
+            return false
+        }
+        this.isBlindB = isBlind
+        this.refresh()
+        return true
+    }
+
+    getNbShots = (): number => {
+        return this.nbShots
+    }
+
+    getFirstShotAngle = (): number => {
+        return this.firstShotAngle
+    }
+
+    getShotAngleStep = (): number => {
+        return this.shotAngleStep
+    }
+
+    /**
+     * One shot sends `nbShots` projectiles, `angleStep` degrees apart. `firstAngle` is where the first one goes,
+     * relative to the caster's angle; left out, the fan opens evenly on both sides of it.
+     */
+    setFan = (nbShots: number, angleStep: number, firstAngle?: number): boolean => {
+        if (nbShots < 1 || nbShots > MAX_CASTER_SHOTS) {
+            return false
+        }
+
+        this.nbShots = nbShots
+        this.shotAngleStep = nbShots === 1 ? 0 : angleStep
+        this.firstShotAngle = firstAngle ?? -((nbShots - 1) * this.shotAngleStep) / 2
+        return true
+    }
+
+    /** The angle of shot number `shotNum` (from 0), relative to the caster's own angle */
+    getShotAngleOffset = (shotNum: number): number => {
+        return this.firstShotAngle + shotNum * this.shotAngleStep
+    }
+
     toText = (): string => {
         let space = '   '
         const aliasDisplay = this.theAlias ? ' ' + this.theAlias : ''
@@ -174,6 +231,20 @@ export class CasterType {
             R2S(this.loadTime) +
             space +
             this.animation
+        if (this.isBlindB) {
+            display = display + space + 'blind'
+        }
+        if (this.nbShots > 1) {
+            display =
+                display +
+                space +
+                'shots: ' +
+                I2S(this.nbShots) +
+                ' from ' +
+                R2S(this.firstShotAngle) +
+                ' every ' +
+                R2S(this.shotAngleStep)
+        }
         return display
     }
 
@@ -192,6 +263,15 @@ export class CasterType {
         output['projectileSpeed'] = this.projectileSpeed
         output['loadTime'] = this.loadTime
         output['animation'] = this.animation
+
+        if (this.isBlindB) {
+            output['isBlind'] = true
+        }
+        if (this.nbShots > 1) {
+            output['nbShots'] = this.nbShots
+            output['firstShotAngle'] = this.firstShotAngle
+            output['shotAngleStep'] = this.shotAngleStep
+        }
 
         return output
     }

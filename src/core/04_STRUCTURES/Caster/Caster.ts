@@ -233,16 +233,46 @@ const shoot = (shooter: Caster, angle: number) => {
     }
 
     SetUnitFacing(shooter.u, angle)
-    animUtils.setAnimation(shooter.u, shooter.getAnimation())
-    new CasterShot(
-        shooter.getProjectileMonsterType(),
-        shooter.getX(),
-        shooter.getY(),
-        angle,
-        shooter.getProjectileSpeed(),
-        shooter.getRange()
-    )
+    fireVolley(shooter, angle)
 }
+
+/**
+ * The projectiles of one shot, around `angle`: one, or the fan its caster type asks for. The caster's facing is
+ * left alone, for a blind caster never turns.
+ */
+const fireVolley = (shooter: Caster, angle: number) => {
+    if (!shooter.isEnabled() || !shooter.u) {
+        return
+    }
+
+    animUtils.setAnimation(shooter.u, shooter.getAnimation())
+
+    const casterType = shooter.getCasterType()
+    const nbShots = casterType.getNbShots()
+
+    for (let i = 0; i < nbShots; i++) {
+        new CasterShot(
+            shooter.getProjectileMonsterType(),
+            shooter.getX(),
+            shooter.getY(),
+            angle + casterType.getShotAngleOffset(i),
+            shooter.getProjectileSpeed(),
+            shooter.getRange()
+        )
+    }
+}
+
+/** A blind caster's shot: straight along the angle it was made with, whoever is around */
+const CasterBlindShoot = () => {
+    const blindCaster = Caster.anyTimerId2Caster.get(GetHandleId(Natives.UGetExpiredTimer()))
+    if (!blindCaster || !blindCaster.u) {
+        return
+    }
+
+    fireVolley(blindCaster, blindCaster.getAngle())
+}
+
+export const errorHandlerCasterBlindShoot = errorHandler(CasterBlindShoot)
 
 /**
  * A hero sliding as an effect is only seen where it really is by its own machine, and the caster aims
@@ -421,6 +451,10 @@ export class Caster extends Monster {
         return this.u
     }
 
+    getAngle = (): number => {
+        return this.angle
+    }
+
     getProjectileMonsterType = (): MonsterType => {
         return this.casterType.getProjectileMonsterType()
     }
@@ -453,15 +487,22 @@ export class Caster extends Monster {
 
         super.createUnit(() => NewImmobileMonster(this.casterType.getCasterMonsterType(), this.x, this.y, this.angle))
 
-        this.trg_unitWithinRange = CreateTrigger()
-        this.u && TriggerRegisterUnitInRangeSimple(this.trg_unitWithinRange, this.casterType.getRange(), this.u)
-        TriggerAddAction(this.trg_unitWithinRange, errorHandler(CasterUnitWithinRange_Actions))
-        Caster.anyTriggerWithinRangeId2Caster.set(GetHandleId(this.trg_unitWithinRange), this)
+        // a blind caster never looks for a hero: nothing has to tell it one came in range
+        if (!this.casterType.isBlind()) {
+            this.trg_unitWithinRange = CreateTrigger()
+            this.u && TriggerRegisterUnitInRangeSimple(this.trg_unitWithinRange, this.casterType.getRange(), this.u)
+            TriggerAddAction(this.trg_unitWithinRange, errorHandler(CasterUnitWithinRange_Actions))
+            Caster.anyTriggerWithinRangeId2Caster.set(GetHandleId(this.trg_unitWithinRange), this)
+        }
 
         this.t = CreateTimer()
         Caster.anyTimerId2Caster.set(GetHandleId(this.t), this)
 
         this.enabled = true
+
+        if (this.casterType.isBlind()) {
+            TimerStart(this.t, this.casterType.getLoadTime(), true, errorHandlerCasterBlindShoot)
+        }
     }
 
     destroyTriggers = () => {
@@ -473,6 +514,8 @@ export class Caster extends Monster {
 
         if (this.t) {
             Caster.anyTimerId2Caster.delete(GetHandleId(this.t))
+            // paused first: a blind caster's timer repeats, and would fire once more on its way out
+            PauseTimer(this.t)
             DestroyTimer(this.t)
             delete this.t
         }
