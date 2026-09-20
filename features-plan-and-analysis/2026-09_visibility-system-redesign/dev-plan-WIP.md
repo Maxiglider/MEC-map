@@ -21,7 +21,7 @@ composed[tile] = visibility type of the highest active level that defines this t
 
 - `untouched` ≠ `masked`. `untouched` lets a lower level's reveal show through; `masked` overrides it. This is precisely the missing capability, and it is why three built-in types are needed rather than two.
 - `resetVisiblitiesAtStart` keeps its meaning: it truncates the composition stack. It becomes largely redundant (an author can paint `m`) but stays for backward compatibility.
-- Legacy `VisibilityModifier` rectangles enter the composition as a `visible` layer beneath the tile stack.
+- Legacy `VisibilityModifier` rectangles stay **outside** the compositor entirely (see [Backward compatibility](#backward-compatibility)).
 
 ## Only `FOG_OF_WAR_VISIBLE` modifiers are ever created
 
@@ -86,7 +86,7 @@ The partition result must be **byte-identical on every machine**. A different bu
 ### Scale adaptations (the POC runs on 32×32 = 1024 cells; a real map is ~256×256 = 65536)
 
 - `emit()` and the reflex scan re-sweep the whole grid **per component**. Add a per-component bounding box and iterate only inside it.
-- `new Uint8Array(N*N)` per component becomes a 65k-entry Lua table per component per recomposition. Use `MemoryHandler` pooling (`docs/MEMORY_HANDLER.md`).
+- `new Uint8Array(N*N)` per component becomes a 65k-entry Lua table per component per recomposition. Replaced by sparse integer-keyed tables holding only the filled tiles, plus a component-number stamp instead of a cleared array — no dense allocation at all, so `MemoryHandler` pooling (`docs/MEMORY_HANDLER.md`) is not needed here. The partition runs on level transitions and on mouse-up, not per frame; if `-dvz` ever shows allocation pressure, pooling is the measured follow-up.
 - Kuhn is O(V·E) with E up to |H|·|V|. Keep Hopcroft–Karp (O(E·√V)) in reserve if measurements demand it.
 - The non-rectangular safety net in `emit()` should never fire with a correct construction. Keep it, but route it through the `Log` module so a real occurrence surfaces instead of silently producing extra modifiers.
 
@@ -107,7 +107,11 @@ Game-wide, `jsonGameData.visibilityTypes` alongside `terrainTypesMec`, loaded **
 
 ## Backward compatibility
 
-Legacy data becomes **read-only**. It loads, renders (as a `visible` layer under the tile stack), and is re-exported by `-smic` unchanged, but nothing in-game can create more of it. A level is never in both modes at once (`Level.isLegacyVisibility()` = `this.visibilities.count() > 0`).
+Legacy data becomes **read-only**. It loads, renders, and is re-exported by `-smic` unchanged, but nothing in-game can create more of it. A level is never in both modes at once (`Level.isLegacyVisibility()` = `this.visibilities.count() > 0`).
+
+**Legacy rectangles stay outside the compositor.** They keep their own fog modifiers, activated exactly as today by `level.activateVisibilities()`, and the tile compositor runs alongside. Feeding them into the per-tile composition would mean rasterizing them onto the grid — they are in arbitrary world coordinates, not tile-aligned — and that would move their borders, which is precisely what "existing maps behave identically" forbids.
+
+The documented cost: **an `m` tile cannot mask over a level left in legacy mode.** Two `FOG_OF_WAR_VISIBLE` modifiers coexist and the legacy one wins. It only bites on mixed maps (one legacy level and one new level in the same map), and the way out is `-convertVisibilities` on that level.
 
 Two ways out of legacy for a level: `-convertVisibilities` (opt-in, warns that borders snap to the grid — **up to 64 units**, half a tile, since `roundCoordinateToCenterOfTile` rounds to the nearest multiple of `Constants.LARGEUR_CASE` = 128) or `-remv` (clear).
 
@@ -235,29 +239,15 @@ Wiring:
 - `src/core/07_TRIGGERS/Load_map_from_gamecache/LoadMapFromCache.ts` — destroy + re-init in the `!currentlyOnGameStart` block, then `newFromJson` **before** `gameData.levels`
 - `src/core/06_COMMANDS/Helpers/Command_execution.ts` — import `initExecuteCommandMake_visibility` (near line 18) and call it (near line 351)
 
-Commands: `newvt`, `setvtl`, `setvta`, `setvts`, `setvtt`, `delvt` (with `--force`), `dvt`.
+Commands: `newvt`, `setvtl`, `setvta`, `setvts`, `setvtt`, `delvt`, `dvt`.
+
+`-delvt` gets no `--force` here: nothing can reference a visibility type before the tiles exist, so there would be nothing to count and nothing to clear. It gains the flag and the usage scan in step 3.
 
 **Verifiable**: create types in game, list them with `-dvt`, `-smic`, reload, they are still there.
 
-## Step 2 — Per-level tiles (still no rendering)
+## Step 2 — The partition
 
-New files:
-
-```
-src/core/04_STRUCTURES/Visibility/VisibilityTile.ts
-src/core/04_STRUCTURES/Visibility/VisibilityTileArray.ts
-```
-
-`VisibilityTileArray`: `set(tx, ty, type)` deleting the entry when the type is `untouched`, `get`, maintained bounding box, `clear`, `countByType`, `toJson` (zones grouped by type, tile coordinates), `newFromJson` (expansion back to tiles). Storage keyed by `tileIndex = ty * tilesPerRow + tx`, iterated by an explicit row-major sweep over the bounding box — never `pairs`.
-
-Changes:
-
-- `src/core/04_STRUCTURES/Level/Level.ts` — `visibilityTiles` field, added to the constructor, `destroy()` and `toJson()` (`json.visibilityTiles`), plus `isLegacyVisibility()`
-- `src/core/04_STRUCTURES/Level/LevelArray.ts` — read `levelJson.visibilityTiles` in `newFromJson` next to the existing `levelJson.visibilities` branch (`:416`)
-
-**Verifiable**: tiles survive a `-smic` round trip; an old map's `visibilities` field is re-exported untouched.
-
-## Step 3 — The partition
+> Swapped with the tiles, which were step 2 in the first draft: `VisibilityTileArray.toJson()` stores zones, so it needs the partition. The partition being a pure function with no dependency, it comes first and the tiles use it straight away, instead of shipping a throwaway compression to be replaced one commit later.
 
 New file:
 
@@ -265,9 +255,31 @@ New file:
 src/core/04_STRUCTURES/Visibility/VisibilityPartition.ts
 ```
 
-Port of the POC with the four corrections listed above: ordered sweeps replacing every `Map`, per-component bounding boxes, `MemoryHandler`-pooled scratch tables, and the `emit()` safety net routed through `Log`.
+Port of the POC with the corrections listed above: ordered sweeps replacing every `Map`, per-component bounding boxes, sparse tables instead of dense per-component arrays, and the `emit()` safety net routed through `Log`.
 
-**Verifiable**: an e2e test under `src/core/Test/e2e-tests/` painting known masks (single rectangle, `H`, comb, ring, disjoint components) and asserting the expected rectangle count. This is the only place in the project where a real assertion is possible, and it is worth having here.
+**Verifiable**: an e2e test under `src/core/Test/e2e-tests/` running known masks (single rectangle, `H`, comb, frame with a hole, staircase, pinwheel, disjoint components) and asserting both the expected rectangle count and an exact cover with no overlap, plus the stability of two runs on the same mask. This is the only place in the project where a real assertion is possible, and it is worth having here.
+
+The port was also checked outside the game before being committed: the module was run under Node against the POC itself on 400 random masks (rectangles painted then holes punched, the way `-crv` produces them), with identical rectangle counts on every one.
+
+## Step 3 — Per-level tiles (still no rendering)
+
+New file:
+
+```
+src/core/04_STRUCTURES/Visibility/VisibilityTileArray.ts
+```
+
+`VisibilityTileArray`: `set(tx, ty, type)` deleting the entry when the type is `untouched`, `get`, maintained bounding box, `clear`, `countByType`, `removeAllOfType`, `toJson` (zones grouped by type, tile coordinates, through `partitionTiles`), `newFromJson` (expansion back to tiles). Storage keyed by a tile index, iterated by an explicit row-major sweep over the bounding box — never `pairs`.
+
+No `VisibilityTile` class: a tile is a `VisibilityType` reference at an index, and one Lua table per painted tile would cost far more than the reference itself for nothing.
+
+Changes:
+
+- `src/core/04_STRUCTURES/Level/Level.ts` — `visibilityTiles` field, added to the constructor, `destroy()` and `toJson()` (`json.visibilityTiles`), plus `isLegacyVisibility()`
+- `src/core/04_STRUCTURES/Level/LevelArray.ts` — read `levelJson.visibilityTiles` in `newFromJson` next to the existing `levelJson.visibilities` branch (`:416`)
+- `-delvt` gains `[--force]` and the usage scan across every level
+
+**Verifiable**: tiles survive a `-smic` round trip; an old map's `visibilities` field is re-exported untouched.
 
 ## Step 4 — The compositor (rendering switches over here)
 
@@ -283,7 +295,7 @@ src/core/04_STRUCTURES/Visibility/VisibilityCompositor.ts
 
 `VisibilityCompositor.refresh()`:
 
-1. Walk the active level stack highest-first, resolving each tile (`untouched` transparent, `resetVisiblitiesAtStart` truncates, legacy modifiers form the bottom layer).
+1. Walk the active level stack highest-first, resolving each tile (`untouched` transparent, `resetVisiblitiesAtStart` truncates). Legacy modifiers are not part of this walk — they keep being driven by `level.activateVisibilities()`.
 2. Drop the `untouched` and `masked` tiles.
 3. Partition each remaining type's mask.
 4. Diff against the current zones; destroy and create only what changed; one `RefreshHideAllVM()` at the end.
