@@ -17,6 +17,7 @@ import {
     keyForDoorTypes,
     keyForDoorTypesFromJson,
 } from '../../04_STRUCTURES/KeyAndDoor/KeyAndDoorTypes'
+import { VisibilityCompositor } from '../../04_STRUCTURES/Visibility/VisibilityCompositor'
 import {
     initCasterTypes,
     initLevels,
@@ -41,6 +42,8 @@ export class LoadMapFromCache {
 
                 if (!currentlyOnGameStart) {
                     //erase previous data from the game
+                    //the fog modifiers first: they belong to the levels about to be thrown away
+                    VisibilityCompositor.destroy()
                     getUdgLevels().destroy()
                     getUdgCasterTypes().destroy()
                     getUdgMonsterTypes().destroy()

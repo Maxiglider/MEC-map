@@ -75,6 +75,32 @@ export class VisibilityTileArray {
         return previous
     }
 
+    /**
+     * Paints a tile only if nothing is there yet. This is how the compositor stacks the levels: it walks them from
+     * the highest active one down, so the first type to claim a tile is the one that wins.
+     */
+    setIfAbsent = (tx: number, ty: number, visibilityType: VisibilityType) => {
+        const index = indexOf(tx, ty)
+
+        if (this.types[index] || visibilityType.isUntouched()) {
+            return
+        }
+
+        this.types[index] = visibilityType
+        this.nbTiles++
+        this.growBox(tx, ty)
+    }
+
+    /**
+     * Walks every painted tile. pairs again: a tile index appears once and only once here, so a caller that treats
+     * each tile on its own - which is all any caller does - cannot depend on the order they arrive in.
+     */
+    forEachTile = (cb: (tx: number, ty: number, visibilityType: VisibilityType) => void) => {
+        for (const [index, visibilityType] of pairs(this.types)) {
+            cb(txOf(index), tyOf(index), visibilityType)
+        }
+    }
+
     setRect = (tx1: number, ty1: number, tx2: number, ty2: number, visibilityType: VisibilityType) => {
         const fromTx = tx1 < tx2 ? tx1 : tx2
         const toTx = tx1 < tx2 ? tx2 : tx1
@@ -229,7 +255,12 @@ export class VisibilityTileArray {
                 continue
             }
 
-            for (const rect of group.rects) {
+            // The annotation is not cosmetic: typescript-to-lua only shifts an index to Lua's 1 based tables when
+            // it knows the value is an array. Read straight off the "any" the json decoder gives, rect[0] would stay
+            // rect[0] in Lua and come back nil.
+            const rects: number[][] = group.rects
+
+            for (const rect of rects) {
                 this.setRect(rect[0], rect[1], rect[2], rect[3], visibilityType)
             }
         }
