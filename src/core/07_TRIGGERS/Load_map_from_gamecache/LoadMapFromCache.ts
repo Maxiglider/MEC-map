@@ -4,6 +4,7 @@ import {
     getUdgMonsterTypes,
     getUdgTerrainSaves,
     getUdgTerrainTypes,
+    getUdgVisibilityTypes,
     globals,
     setHeroBaseCollisionSize,
     setHeroModelPath,
@@ -22,6 +23,7 @@ import {
     initMonsterTypes,
     initTerrainSaves,
     initTerrainTypes,
+    initVisibilityTypes,
 } from '../../Init/initArrays'
 import { Gravity } from '../Slide_and_CheckTerrain_triggers/Gravity'
 
@@ -43,8 +45,10 @@ export class LoadMapFromCache {
                     getUdgCasterTypes().destroy()
                     getUdgMonsterTypes().destroy()
                     getUdgTerrainTypes().destroy()
+                    getUdgVisibilityTypes().destroy()
                     getUdgTerrainSaves().destroy()
                     initTerrainTypes()
+                    initVisibilityTypes()
                     initMonsterTypes()
                     initCasterTypes()
                     initLevels()
@@ -108,6 +112,11 @@ export class LoadMapFromCache {
                 //terrain types MEC
                 if (gameData.terrainTypesMec) {
                     getUdgTerrainTypes().newFromJson(gameData.terrainTypesMec)
+                }
+
+                //visibility types, before the levels whose tiles reference them by label
+                if (gameData.visibilityTypes) {
+                    getUdgVisibilityTypes().newFromJson(gameData.visibilityTypes)
                 }
 
                 //monster types

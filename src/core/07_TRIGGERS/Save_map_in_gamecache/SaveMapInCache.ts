@@ -7,6 +7,7 @@ import {
     getUdgMonsterTypes,
     getUdgTerrainSaves,
     getUdgTerrainTypes,
+    getUdgVisibilityTypes,
     globals,
 } from '../../../../globals'
 import { jsonEncode } from '../../01_libraries/Basic_functions'
@@ -48,6 +49,9 @@ export class SaveMapInCache {
         //terrain config
         jsonGameData.terrainTypesMec = getUdgTerrainTypes().toJson()
         Text.A('MEC terrain configuration saved')
+
+        //visibility types, before the levels whose tiles reference them by label
+        jsonGameData.visibilityTypes = getUdgVisibilityTypes().toJson()
 
         //monster types
         jsonGameData.monsterTypes = getUdgMonsterTypes().toJson()
