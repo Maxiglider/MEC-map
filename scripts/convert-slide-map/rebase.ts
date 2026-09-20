@@ -37,7 +37,7 @@ import Modification from 'mdx-m3-viewer-th/dist/cjs/parsers/w3x/w3u/modification
 import ModifiedObject from 'mdx-m3-viewer-th/dist/cjs/parsers/w3x/w3u/modifiedobject'
 import * as path from 'path'
 import { normalizeScript } from './jass'
-import { mecMapName, parseW3iHead, parseWts, readArchive, withoutProtectedMarks } from './mapFiles'
+import { KNOWN_MAP_FILES, mecMapName, parseW3iHead, parseWts, readArchive, withoutProtectedMarks } from './mapFiles'
 import { fixObjectDataWriter, isSkinField, variableTypeOf } from './objectData'
 
 /** A standard unit's default values in the World Editor (war3-objectdata-th), by the names of its fields */
@@ -360,9 +360,35 @@ if (modes !== undefined) {
 }
 w3i[offset + 4] = oldInfo.tileset.charCodeAt(0)
 
+// the old map's loading screen (user's rule: its custom things are kept): its number (a campaign screen, or -1 with
+// the imported model), model, title, subtitle and text, their old strings resolved. Its strings change length, so the
+// map info is rebuilt around them, last.
+let w3iOut: Buffer = w3i
+const oldScreen = oldInfo.loadingScreen
+const oldString = (s: string) => (/^TRIGSTR_\d+$/.test(s) ? (oldWts[s] ?? '') : s)
+if (oldScreen.number !== -1 || oldScreen.model || oldScreen.text || oldScreen.title || oldScreen.subtitle) {
+    const baseScreen = parseW3iHead(w3i).loadingScreen
+    const screen = [
+        oldScreen.model,
+        oldString(oldScreen.text),
+        oldString(oldScreen.title),
+        oldString(oldScreen.subtitle),
+    ]
+    if (baseInfo.version < 25)
+        throw new Error(`The base map's map info (format ${baseInfo.version}) has no loading screen model`)
+    w3i.writeInt32LE(oldScreen.number, baseScreen.numberAt)
+    w3iOut = Buffer.concat([
+        w3i.subarray(0, baseScreen.stringsAt),
+        ...screen.map(v => Buffer.concat([Buffer.from(v, 'utf8'), Buffer.from([0])])),
+        w3i.subarray(baseScreen.stringsEnd),
+    ])
+    log.push(
+        `- \`war3map.w3i\`: the old loading screen: number ${oldScreen.number}${oldScreen.model ? `, model ${oldScreen.model}` : ''}${screen[2] ? `, title ${JSON.stringify(screen[2])}` : ''}${screen[3] ? `, subtitle ${JSON.stringify(screen[3])}` : ''}${screen[1] ? `, text ${JSON.stringify(screen[1])}` : ''}`
+    )
+}
 set(
     'war3map.w3i',
-    w3i,
+    w3iOut,
     `camera bounds, playable size ${oldInfo.playableWidth}×${oldInfo.playableHeight}, tileset ${oldInfo.tileset}, flags 0x${(flags >>> 0).toString(16)} (fog and waves from the old map)`
 )
 
@@ -596,16 +622,49 @@ if (oldW3uBytes) {
     skipped.length && log.push(`  - not merged: ${skipped.join(', ')}`)
 }
 
-for (const name of [
-    'war3map.w3t',
-    'war3map.w3a',
-    'war3map.w3b',
-    'war3map.w3d',
-    'war3map.w3h',
-    'war3map.w3q',
-    'war3map.imp',
-]) {
+for (const name of ['war3map.w3t', 'war3map.w3a', 'war3map.w3b', 'war3map.w3d', 'war3map.w3h', 'war3map.w3q']) {
     old.has(name) && log.push(`- \`${name}\`: **the old map has one, not merged yet**`)
+}
+
+// 7b. the old map's imported files (user's rule: its custom things are kept, a loading screen say), at their paths,
+// listed in war3map.imp so that the World Editor keeps them (13: a path of its own). A file the base map already
+// has at that path stays the base map's.
+const imports = [...old.keys()].filter(n => !KNOWN_MAP_FILES.some(k => k.toLowerCase() === n.toLowerCase()))
+if (imports.length) {
+    const baseImp = base.get('war3map.imp')?.bytes()
+    const entries: { flag: number; path: string }[] = []
+    if (baseImp) {
+        const b = Buffer.from(baseImp)
+        let o = 8
+        for (let i = 0; i < b.readInt32LE(4); i++) {
+            const flag = b[o]
+            const end = b.indexOf(0, o + 1)
+            entries.push({ flag, path: b.toString('utf8', o + 1, end) })
+            o = end + 1
+        }
+    }
+    const listed = (p: string) =>
+        entries.some(e => (e.flag === 13 ? e.path : 'war3mapImported\\' + e.path).toLowerCase() === p.toLowerCase())
+    const added: string[] = []
+    const kept: string[] = []
+    for (const name of imports) {
+        if (base.get(name) || listed(name)) {
+            kept.push(name)
+            continue
+        }
+        base.set(name, old.get(name)!)
+        entries.push({ flag: 13, path: name })
+        added.push(name)
+    }
+    const imp = Buffer.concat([
+        Buffer.from(Int32Array.of(1, entries.length).buffer),
+        ...entries.map(e => Buffer.concat([Buffer.from([e.flag]), Buffer.from(e.path, 'utf8'), Buffer.from([0])])),
+    ])
+    set(
+        'war3map.imp',
+        imp,
+        `the old map's imports added: ${added.join(', ') || 'none'}${kept.length ? `; kept the base map's own: ${kept.join(', ')}` : ''}`
+    )
 }
 
 // 8. the map file

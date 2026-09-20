@@ -66,20 +66,62 @@ export const readArchive = (buffer: Buffer) => {
 
     const files = new Map<string, Uint8Array>()
     const unreadable: string[] = []
+    const tried = new Set<string>()
 
-    for (const name of names) {
-        const file = archive.get(name)
-        if (!file) continue
+    const tryNames = () => {
+        let found = 0
+        for (const name of names) {
+            if (tried.has(name.toLowerCase())) continue
+            tried.add(name.toLowerCase())
+            const file = archive.get(name)
+            if (!file) continue
 
-        try {
-            const bytes = file.bytes()
-            bytes ? files.set(name, bytes) : unreadable.push(name)
-        } catch {
-            unreadable.push(name)
+            try {
+                const bytes = file.bytes()
+                if (bytes) {
+                    files.set(name, bytes)
+                    found++
+                } else unreadable.push(name)
+            } catch {
+                unreadable.push(name)
+            }
+        }
+        return found
+    }
+
+    // A map without a listfile (Sliding Bunnys) names its imports nowhere: they are found by the paths that use
+    // them, in the map info (the loading screen model), the scripts, the object data, the text files and the
+    // imported models (their textures), until no new file turns up
+    for (let round = 0; round < 10 && tryNames() > 0; round++) {
+        for (const [name, bytes] of files) {
+            if (!/\.(w3i|j|lua|w3u|w3t|w3a|w3b|w3d|w3h|w3q|txt|slk|mdx|mdl|fdf|toc|imp)$/i.test(name)) continue
+            if (name === 'war3map.w3i') {
+                const model = parseW3iHead(bytes).loadingScreen.model
+                model && pathCandidates(model).forEach(c => names.add(c))
+            }
+            for (const m of Buffer.from(bytes)
+                .toString('latin1')
+                .matchAll(/[\x21-\x7e][\x20-\x7e]{2,259}/g)) {
+                const text = m[0].replace(/\\\\/g, '\\').replace(/\//g, '\\')
+                for (const part of text.split(/["|,;]/)) {
+                    const p = part.trim()
+                    if (/\\|\.(mdx|mdl|blp|tga|dds|wav|mp3|flac|txt|slk|fdf|toc)$/i.test(p))
+                        pathCandidates(p).forEach(c => names.add(c))
+                }
+            }
         }
     }
 
-    return { files, unreadable }
+    return { files, unreadable, unnamed: Math.max(0, archive.files.length - files.size - unreadable.length) }
+}
+
+/** The names a path can stand for in an archive: as written, a .mdl as the .mdx the game loads, and with an extension */
+const pathCandidates = (path: string) => {
+    const p = path.replace(/\//g, '\\')
+    const out = [p]
+    if (/\.mdl$/i.test(p)) out.push(p.replace(/\.mdl$/i, '.mdx'))
+    if (!/\.[a-z0-9]{2,4}$/i.test(p)) out.push(p + '.mdx', p + '.mdl', p + '.blp', p + '_portrait.mdx')
+    return out
 }
 
 /** TRIGSTR_n → its text */
@@ -136,6 +178,19 @@ export const parseW3iHead = (bytes: Uint8Array) => {
     const tileset = String.fromCharCode(bytes[offset])
     offset += 1
 
+    // the loading screen: its number (-1 none, else a campaign screen or the imported model), then its model (from
+    // format 25 on), text, title and subtitle. Format 39 (the current editor's) has an int of its own between the
+    // number and the strings (0x80 in MEC's base map, 0x40 in another), found in the bytes, not documented.
+    const loadingScreenNumberAt = offset
+    const loadingScreenNumber = int()
+    if (version >= 39) offset += 4
+    const loadingScreenStringsAt = offset
+    const loadingScreenModel = version >= 25 ? string() : ''
+    const loadingScreenText = string()
+    const loadingScreenTitle = string()
+    const loadingScreenSubtitle = string()
+    const loadingScreenStringsEnd = offset
+
     return {
         version,
         saves,
@@ -150,6 +205,16 @@ export const parseW3iHead = (bytes: Uint8Array) => {
         playableHeight,
         flags: '0x' + (flags >>> 0).toString(16),
         tileset,
+        loadingScreen: {
+            number: loadingScreenNumber,
+            model: loadingScreenModel,
+            text: loadingScreenText,
+            title: loadingScreenTitle,
+            subtitle: loadingScreenSubtitle,
+            numberAt: loadingScreenNumberAt,
+            stringsAt: loadingScreenStringsAt,
+            stringsEnd: loadingScreenStringsEnd,
+        },
     }
 }
 

@@ -30,7 +30,7 @@ import {
     parseTriggers,
     parseVisibility,
 } from './jass'
-import { parseW3iHead, parseWts, readArchive } from './mapFiles'
+import { KNOWN_MAP_FILES, parseW3iHead, parseWts, readArchive } from './mapFiles'
 
 const outputRoot = process.env.MAPS_OUTPUT_DIR_FOR_AI_CONVERSION_TO_MEC
 const args = process.argv.slice(2)
@@ -68,7 +68,8 @@ const extractedDir = path.join(workDir, 'extracted')
 fs.rmSync(extractedDir, { recursive: true, force: true })
 fs.mkdirSync(extractedDir, { recursive: true })
 
-const { files, unreadable } = readArchive(fs.readFileSync(copy))
+const { files, unreadable, unnamed } = readArchive(fs.readFileSync(copy))
+const imports = [...files.keys()].filter(n => !KNOWN_MAP_FILES.some(k => k.toLowerCase() === n.toLowerCase()))
 for (const [name, bytes] of files) {
     const target = path.join(extractedDir, ...name.split('\\'))
     fs.mkdirSync(path.dirname(target), { recursive: true })
@@ -385,6 +386,14 @@ const summary = [
     '',
     `Script: ${facts.scriptLanguage}. Files: ${[...files.keys()].join(', ')}.` +
         (unreadable.length ? ` Unreadable: ${unreadable.join(', ')}.` : ''),
+    '',
+    `Imports (carried over by the rebase): ${imports.join(', ') || 'none'}.` +
+        (unnamed
+            ? ` **${unnamed} file(s) no path in the map names**: not carried over (nothing uses them, or a path to find).`
+            : '') +
+        (info?.loadingScreen && (info.loadingScreen.number !== -1 || info.loadingScreen.model)
+            ? ` Loading screen: ${info.loadingScreen.model || 'campaign screen ' + info.loadingScreen.number}.`
+            : ''),
     '',
     '## Personal data',
     '',
