@@ -89,6 +89,7 @@ if (mecOne) {
 // and the fields to add to the ones it does hold, without writing them all out again (spec monsterTypeOverrides)
 spec.monsterTypes = [...(spec.monsterTypes ?? []), ...(spec.extraMonsterTypes ?? [])]
 for (const [label, fields] of Object.entries((spec.monsterTypeOverrides ?? {}) as Json)) {
+    if (label.startsWith('$')) continue
     const type = (spec.monsterTypes as Json[]).find(t => t.label === label)
     if (!type) throw new Error(`monsterTypeOverrides: unknown monster type ${label}`)
     Object.assign(type, fields)
@@ -168,7 +169,12 @@ const tileAt = (x: number, y: number) => {
  * of the start region first reached walking the non-death terrain from the level's own start, that region
  * being closed.
  */
-const deathTiles = new Set<string>(spec.endStrips?.deathTiles ?? spec.gates?.deathTiles ?? [])
+// the tiles that kill: named in the spec, else the tiles of its death terrain types
+const deathTiles = new Set<string>(
+    spec.endStrips?.deathTiles ??
+        spec.gates?.deathTiles ??
+        (spec.terrainTypes as Json[]).filter(t => t.kind === 'death').map(t => t.tile)
+)
 const cornerX = (x: number) => Math.round((x - offsetX) / 128)
 const cornerY = (y: number) => Math.round((y - offsetY) / 128)
 const isOpenCorner = (i: number, j: number) => {
@@ -779,6 +785,7 @@ const casterTypes: Json[] = (spec.casterTypes ?? []).map((ct: Json) => ({
 const casterTypeLabels = new Set(casterTypes.map(ct => ct.label))
 
 for (const [monsterTypeLabel, casterTypeLabel] of Object.entries((spec.castersFromMonsterTypes ?? {}) as Json)) {
+    if (monsterTypeLabel.startsWith('$')) continue
     if (!casterTypeLabels.has(casterTypeLabel as string))
         throw new Error(`castersFromMonsterTypes: unknown caster type ${casterTypeLabel}`)
 
@@ -877,7 +884,26 @@ const isSafeArea = (minX: number, minY: number, maxX: number, maxY: number) => {
     return true
 }
 
+/**
+ * Whether a start is shrunk onto walk tiles. A hand-made map's starts are guessed from where its script revived the
+ * heroes, so they can reach onto the terrain around; a MEC 1 map's starts are the ones its author made in game and
+ * played on, and they stand on the slide terrain on purpose. Those are kept, and only checked for death tiles.
+ */
+const shrinkStarts: boolean = spec.safeStarts?.shrink ?? !spec.mecOne
+
 const safeStart = (r: Rect, levelNumber: number): Rect => {
+    if (!shrinkStarts) {
+        for (let x = r.minX; x <= r.maxX; x += 16) {
+            for (let y = r.minY; y <= r.maxY; y += 16) {
+                if (deathTiles.has(tileAt(x, y) ?? '')) {
+                    warn(`level ${levelNumber}: its start holds the death tile ${tileAt(x, y)} at ${x}, ${y}`)
+                    return r
+                }
+            }
+        }
+        return r
+    }
+
     const s = { ...r }
     const step = 16
     for (let guard = 0; guard < 400 && !isSafeArea(s.minX, s.minY, s.maxX, s.maxY); guard++) {
@@ -1083,8 +1109,16 @@ end)
 // the old map's quests (spec.legacyQuests): created before MEC's own (onGlobalInit runs before its map
 // initialization triggers), with their text resolved; the ones listed in "drop" (obsolete commands) left out
 const oldWts = parseWts(fs.readFileSync(path.join(workDir, 'extracted', 'war3map.wts'), 'utf8'))
-const jassText = (arg: string) => {
-    const literal = /^"(.*)"$/s.exec(arg.trim())?.[1]
+const jassText = (arg: string): string | undefined => {
+    const written = arg.trim()
+
+    // a map made in the World Editor with GUI quests writes their text in a constant (every MEC 1 map does)
+    if (/^[A-Za-z_]\w*$/.test(written)) {
+        const constant = new RegExp(`constant string ${written}=("(?:[^"\\\\]|\\\\.)*")`, 's').exec(oldScript)
+        return constant ? jassText(constant[1]) : undefined
+    }
+
+    const literal = /^"(.*)"$/s.exec(written)?.[1]
     if (literal === undefined) return undefined
     const raw = literal.replace(/\\(.)/g, '$1')
     return raw.replace(/^TRIGSTR_\d+$/, key => oldWts[key] ?? key)
@@ -1321,7 +1355,13 @@ fs.writeFileSync(
         '',
         '## Starts',
         '',
-        ...(startNotes.length ? startNotes.map(n => `- ${n}`) : ['All level starts stand on walk tiles only.']),
+        ...(startNotes.length
+            ? startNotes.map(n => `- ${n}`)
+            : [
+                  shrinkStarts
+                      ? 'All level starts stand on walk tiles only.'
+                      : "The level starts are the old map's own, kept as they are, and none of them holds a death tile.",
+              ]),
         '',
         '## Warnings',
         '',
