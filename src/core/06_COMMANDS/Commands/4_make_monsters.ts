@@ -15,6 +15,7 @@ import {
 } from '../../04_STRUCTURES/Caster/CasterType'
 import { IMMOLATION_SKILLS } from '../../04_STRUCTURES/Monster/Immolation_skills'
 import { MONSTER_TELEPORT_PERIOD_MAX, MONSTER_TELEPORT_PERIOD_MIN } from '../../04_STRUCTURES/Monster/MonsterTeleport'
+import { MAX_IDLE_PERIOD, MIN_IDLE_PERIOD } from '../../04_STRUCTURES/Monster/MonsterType'
 import { CLEAR_MOB_MAX_DURATION, FRONT_MONTANT_DURATION } from '../../04_STRUCTURES/Monster_properties/ClearMob'
 import { MakeMonsterSimplePatrol } from '../../05_MAKE_STRUCTURES/Make_create_monsters/MakeMonsterSimplePatrol'
 import { CmdParam, USAGE } from '../Helpers/Command_functions'
@@ -399,6 +400,86 @@ export const initExecuteCommandMake_monsters = () => {
             }
             getUdgMonsterTypes().getByLabel(param1)?.setKillingEffectStr(param2)
             Text.mkP(escaper.getPlayer(), 'kill effect changed for this monster type')
+            return true
+        },
+    })
+
+    //-setMonsterColor(setmc) <monsterLabel> <color>|none
+    registerCommand({
+        name: 'setMonsterColor',
+        alias: ['setmc'],
+        group,
+        argDescription: '<monsterLabel> <color>|none',
+        description: 'Sets the color every unit of this monster type wears, or none to keep its owner color',
+        cb: ({ nbParam, param1, param2 }, escaper) => {
+            if (!(nbParam === 2)) {
+                return USAGE
+            }
+            //checkParam1
+            const monsterType = getUdgMonsterTypes().getByLabel(param1)
+            if (!monsterType) {
+                Text.erP(escaper.getPlayer(), 'unknown monster type')
+                return true
+            }
+            //checkParam2
+            if (param2 === 'none' || param2 === 'n') {
+                monsterType.removeBaseColor()
+                Text.mkP(escaper.getPlayer(), 'color removed for this monster type')
+                return true
+            }
+            if (!monsterType.setBaseColor(param2)) {
+                Text.erP(escaper.getPlayer(), 'unknown color')
+                return true
+            }
+            Text.mkP(escaper.getPlayer(), 'color changed for this monster type')
+            return true
+        },
+    })
+
+    //-setMonsterIdle(setmi) <monsterLabel> <period>|none [<animation> [<effect>]]
+    registerCommand({
+        name: 'setMonsterIdle',
+        alias: ['setmi'],
+        group,
+        argDescription: '<monsterLabel> <period>|none [<animation> [<effect>]]',
+        description:
+            'Makes every unit of this monster type play an animation, and an effect over its head, every <period> seconds',
+        cb: ({ nbParam, param1, param2, param3, param4 }, escaper) => {
+            if (nbParam < 2 || nbParam > 4) {
+                return USAGE
+            }
+            //checkParam1
+            const monsterType = getUdgMonsterTypes().getByLabel(param1)
+            if (!monsterType) {
+                Text.erP(escaper.getPlayer(), 'unknown monster type')
+                return true
+            }
+            //checkParam2
+            if (param2 === 'none' || param2 === 'n') {
+                monsterType.setIdle(0)
+                Text.mkP(escaper.getPlayer(), 'idle animation removed for this monster type')
+                return true
+            }
+            const period = S2R(param2)
+            if (period < MIN_IDLE_PERIOD || period > MAX_IDLE_PERIOD) {
+                Text.erP(
+                    escaper.getPlayer(),
+                    `the period must be between ${R2S(MIN_IDLE_PERIOD)} and ${R2S(MAX_IDLE_PERIOD)} seconds`
+                )
+                return true
+            }
+            //checkParam3 and checkParam4: at least one of them
+            if (nbParam === 2) {
+                Text.erP(escaper.getPlayer(), 'give an animation, an effect, or both')
+                return true
+            }
+            const animation = param3 === 'none' || param3 === 'n' ? undefined : param3
+            const effect = nbParam === 4 ? param4 : undefined
+            if (!monsterType.setIdle(period, animation, effect)) {
+                Text.erP(escaper.getPlayer(), 'wrong idle values')
+                return true
+            }
+            Text.mkP(escaper.getPlayer(), 'idle animation changed for this monster type')
             return true
         },
     })

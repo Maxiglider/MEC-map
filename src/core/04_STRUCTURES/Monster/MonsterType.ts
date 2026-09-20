@@ -2,13 +2,18 @@ import { MemoryHandler } from 'Utils/MemoryHandler'
 import { Constants } from 'core/01_libraries/Constants'
 import { Text } from 'core/01_libraries/Text'
 import { getUdgEscapers, getUdgLevels } from '../../../../globals'
+import { errorHandler } from '../../../Utils/mapUtils'
 import { Ascii2String } from '../../01_libraries/Ascii'
 import { ReplaceBackslahsesInLinks, Round32 } from '../../01_libraries/Basic_functions'
-import { udg_colorCode } from '../../01_libraries/Init_colorCodes'
+import { ColorString2Id, udg_colorCode } from '../../01_libraries/Init_colorCodes'
 import { Natives } from '../../wc3_natives_unsecured/Natives'
 import { Level } from '../Level/Level'
 import { requestContactChunksRebuild } from './ContactChunks'
 import { IMMOLATION_SKILLS } from './Immolation_skills'
+
+/** Under this, an idle animation would be played too often to be seen, and would cost for nothing */
+export const MIN_IDLE_PERIOD = 0.5
+export const MAX_IDLE_PERIOD = 600
 
 export class MonsterType {
     label: string
@@ -29,6 +34,16 @@ export class MonsterType {
     private lifeBonusEnabled = false
     private lifeBonusNbLivesEarned = 0
     private lifeBonusMinimumSurviveTime = 0
+
+    /** the colour every unit of this type wears, as the player colour id it maps to; -1 leaves the owner's colour */
+    private baseColorId = -1
+    private baseColorStr?: string
+
+    /** what every unit of this type plays on its own, every `idlePeriod` seconds; 0 plays nothing */
+    private idlePeriod = 0
+    private idleAnimation?: string
+    private idleEffect?: string
+    private idleTimer?: timer
 
     constructor(
         label: string,
@@ -82,12 +97,13 @@ export class MonsterType {
         return this
     }
 
-    refresh = () => {
+    /** The levels whose monsters are standing right now: the one being played, and the ones escapers are making */
+    private forEachLiveLevel = (cb: (level: Level) => void) => {
         let levelsMaking: Level[] = []
         let levelAlreadyChecked: boolean
         let nbLevelsMaking = 0
         const currentLevel = getUdgLevels().getCurrentLevel()
-        currentLevel.recreateMonstersUnitsOfType(this)
+        cb(currentLevel)
 
         for (let i = 0; i < Constants.NB_ESCAPERS; i++) {
             let escaper = getUdgEscapers().get(i)
@@ -109,11 +125,20 @@ export class MonsterType {
         }
 
         for (let i = 0; i < nbLevelsMaking; i++) {
-            levelsMaking[i].recreateMonstersUnitsOfType(this)
+            cb(levelsMaking[i])
         }
     }
 
+    refresh = () => {
+        this.forEachLiveLevel(level => level.recreateMonstersUnitsOfType(this))
+    }
+
     destroy = () => {
+        if (this.idleTimer) {
+            PauseTimer(this.idleTimer)
+            DestroyTimer(this.idleTimer)
+            this.idleTimer = undefined
+        }
         getUdgLevels().clearMonstersOfType(this)
     }
 
@@ -292,6 +317,82 @@ export class MonsterType {
         }
     }
 
+    getBaseColorId = (): number => {
+        return this.baseColorId
+    }
+
+    getBaseColorStr = (): string | undefined => {
+        return this.baseColorStr
+    }
+
+    /** Gives every unit of this type a colour of its own, whatever player owns it. An unknown colour changes nothing. */
+    setBaseColor = (colorString: string): boolean => {
+        const colorId = ColorString2Id(colorString)
+        if (colorId < 0 || colorId > Constants.NB_PLAYERS_MAX) {
+            return false
+        }
+        this.baseColorId = colorId
+        this.baseColorStr = colorString
+        this.refresh()
+        return true
+    }
+
+    /** Back to the colour of the player owning the units */
+    removeBaseColor = (): void => {
+        this.baseColorId = -1
+        this.baseColorStr = undefined
+        this.refresh()
+    }
+
+    getIdlePeriod = (): number => {
+        return this.idlePeriod
+    }
+
+    getIdleAnimation = (): string | undefined => {
+        return this.idleAnimation
+    }
+
+    getIdleEffect = (): string | undefined => {
+        return this.idleEffect
+    }
+
+    /**
+     * Makes every unit of this type play an animation, an effect over its head, or both, every `period` seconds
+     * on its own - what many old maps do to their monsters to keep them alive on the screen. A period of 0, or
+     * neither an animation nor an effect, stops it.
+     */
+    setIdle = (period: number, animation?: string, effect?: string): boolean => {
+        if (period < 0 || period > MAX_IDLE_PERIOD) {
+            return false
+        }
+
+        this.idlePeriod = period
+        this.idleAnimation = animation
+        this.idleEffect = effect ? ReplaceBackslahsesInLinks(effect) : undefined
+
+        if (period < MIN_IDLE_PERIOD || (!this.idleAnimation && !this.idleEffect)) {
+            this.idlePeriod = 0
+            this.idleTimer && PauseTimer(this.idleTimer)
+            return true
+        }
+
+        if (!this.idleTimer) {
+            this.idleTimer = CreateTimer()
+        }
+        TimerStart(
+            this.idleTimer,
+            this.idlePeriod,
+            true,
+            errorHandler(() => this.playIdle())
+        )
+        return true
+    }
+
+    /** Plays the idle animation and effect on every unit of this type standing right now */
+    private playIdle = () => {
+        this.forEachLiveLevel(level => level.playIdleOfMonsterType(this))
+    }
+
     getLifeBonus = (): { nbLivesEarned: number; minimumSurviveTime: number } | undefined => {
         if (!this.lifeBonusEnabled) {
             return undefined
@@ -342,6 +443,14 @@ export class MonsterType {
         if (this.isWanderableB) {
             display = display + space + 'wanderable'
         }
+        if (this.baseColorStr) {
+            display = display + space + 'color_' + udg_colorCode[this.baseColorId] + this.baseColorStr + '|r'
+        }
+        if (this.idlePeriod > 0) {
+            display = display + space + 'idle_' + R2S(this.idlePeriod) + 's'
+            this.idleAnimation && (display = display + '_' + this.idleAnimation)
+            this.idleEffect && (display = display + '_' + this.idleEffect)
+        }
         if (this.killRectDimensions) {
             display =
                 display +
@@ -387,6 +496,13 @@ export class MonsterType {
         output['nbMeteorsToKill'] = this.maxLife / 10000
         output['height'] = R2I(this.height)
         output['createTerrainLabel'] = this.createTerrainLabel
+        output['color'] = this.baseColorStr
+
+        if (this.idlePeriod > 0) {
+            output['idlePeriod'] = this.idlePeriod
+            output['idleAnimation'] = this.idleAnimation
+            output['idleEffect'] = this.idleEffect
+        }
 
         if (this.killRectDimensions) {
             output['killRectDimensions'] = {

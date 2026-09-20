@@ -261,6 +261,10 @@ export class Level {
         this.monsters.recreateMonstersUnitsOfType(mt)
     }
 
+    playIdleOfMonsterType(mt: MonsterType) {
+        this.monsters.playIdleOfMonsterType(mt)
+    }
+
     clearMonstersOfType(mt: MonsterType) {
         this.monsters.clearMonstersOfType(mt)
     }

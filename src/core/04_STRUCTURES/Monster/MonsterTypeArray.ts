@@ -59,6 +59,12 @@ export class MonsterTypeArray extends BaseArray<MonsterType> {
             if (mt.createTerrainLabel) {
                 monsterType.setCreateTerrainLabel(mt.createTerrainLabel)
             }
+            if (mt.color) {
+                monsterType.setBaseColor(mt.color)
+            }
+            if (mt.idlePeriod) {
+                monsterType.setIdle(mt.idlePeriod, mt.idleAnimation, mt.idleEffect)
+            }
             if (mt.killRectDimensions) {
                 monsterType.setKillRectDimensions(mt.killRectDimensions.width, mt.killRectDimensions.height)
             }

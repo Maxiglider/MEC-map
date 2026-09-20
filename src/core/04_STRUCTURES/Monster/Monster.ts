@@ -271,6 +271,16 @@ export abstract class Monster {
             this.setMonsterSkin(this.monsterSkin)
         }
 
+        // the colour of the monster type, which the monster's own colour below overrides when it has one
+        if (this.u && this.baseColorId === -1 && this.mt) {
+            const typeColorId = this.mt.getBaseColorId()
+            if (typeColorId === 0) {
+                SetUnitColor(this.u, PLAYER_COLOR_RED)
+            } else if (typeColorId > 0) {
+                SetUnitColor(this.u, Natives.UConvertPlayerColor(typeColorId))
+            }
+        }
+
         if (this.mt && this.mt.isClickable()) {
             this.life = this.mt.getMaxLife()
             this.u && GroupAddUnit(monstersClickable, this.u)

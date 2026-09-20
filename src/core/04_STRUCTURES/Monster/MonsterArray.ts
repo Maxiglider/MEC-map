@@ -137,6 +137,27 @@ export class MonsterArray extends BaseArray<Monster> {
         }
     }
 
+    /** Plays what the monster type does on its own on every unit of it: an animation, an effect over its head, or both */
+    playIdleOfMonsterType = (mt: MonsterType) => {
+        const animation = mt.getIdleAnimation()
+        const effect = mt.getIdleEffect()
+
+        for (const [_, monster] of pairs(this.data)) {
+            if (monster.getMonsterType() !== mt) {
+                continue
+            }
+            const u = monster.u
+            if (!u || monster.isDisabled() || !IsUnitAliveBJ(u)) {
+                continue
+            }
+            animation && SetUnitAnimation(u, animation)
+            if (effect) {
+                const e = AddSpecialEffectTarget(effect, u, 'overhead')
+                e && DestroyEffect(e)
+            }
+        }
+    }
+
     //Destroy one monster
     clearMonster = (monsterId: number) => {
         if (this.data[monsterId]) {
