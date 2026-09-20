@@ -82,6 +82,11 @@ Region names are the old ones without `gg_rct_`. Model a new spec on Polar Escap
 - `trains`: units sent one after another on a loop, placed where each would be once the last is in.
 - `spawns`: MEC monster spawns (start and end regions, direction, frequency, `level`). `keepAliveForNextLevel: true` (core `c9aa321`) keeps it and its monsters going through the next level: for a spawn the old map starts in one level and plays in the next.
 - `decor`: create the decor units (`decor.json`). `frozenTypes`: types whose animation stops. `unclickableTypes`: types that get the locust ability (`Aloc`), so they can't be selected nor clicked (Polar Escape 3's circles of power); locust units are also left out of `GroupEnumUnitsInRect`, so don't give it to units a custom trigger looks for that way.
+- `mecOne`: `true` for a map made with MEC 1 (see [MEC 1 maps](#mec-1-maps)): its terrain types, monster types, levels, monsters, spawns and meteors are read from its own calls, and the spec only adds the rest.
+- `extraMonsterTypes` and `monsterTypeOverrides`: monster types to add (a caster's projectile, say), and fields to set on the ones already read (`color`, `idlePeriod`/`idleAnimation`/`idleEffect`…) without writing them all out again.
+- `casterTypes` and `castersFromMonsterTypes`: the caster types (`casterMonsterType`, `projectileMonsterType`, `range`, `projectileSpeed`, `loadTime`, `animation`, `isBlind`, `nbShots`/`shotAngleStep`/`firstShotAngle`), and every immobile monster of a type turned into a caster of the type it names. `isBlind` shoots every `loadTime` seconds along the caster's own angle, without looking for a hero: what an old map's mages do, where MEC's aiming caster is a turret that tracks you.
+- `extraVisibilities`: `{ level, rect, blinkVisibleTime, blinkHiddenTime }`, a visibility rectangle the old map's own triggers ran. A visibility with both blink times shows and hides over and over while its level is played, which is how old maps light a dark maze.
+- `safeStarts.shrink`: `false` keeps the level starts as they are (the default for a MEC 1 map), checking only that none holds a death tile.
 - `customTriggers`: the Lua files to bake.
 - `legacyQuests`: `{ "drop": [titles] }`: the old map's quests (its `CreateQuestBJ` calls, texts resolved), in the trigger "Original map legacy quests", created before MEC's own (in `onGlobalInit`, which runs before MEC's map initialization triggers). Drop what is obsolete in MEC, such as quests listing the old map's commands. `replaceText`: `{ title: new text }`, for a quest whose text holds personal data the user chose to take out (see step 3).
 - `gameData`: overrides of the base map's game data settings. `coopModeChoice: false` (core `8da3d1f4`): no coop or solo popup at the start, the game is solo (Polar Escape 3 requires solo).
@@ -181,6 +186,17 @@ A MEC 1 map was made with the vJass MEC of this repo's `v1-jass` tag, from the W
 
 The old data reads in MEC 1's own units (its speeds, its immolation radius…): check each against MEC 2's, where a field changed meaning, rather than copying the number over.
 
+### Converting one
+
+`mecOneData.ts` reads all of that data; the spec says `"mecOne": true` and only writes what those calls don't hold. The game data step then takes the terrain types, monster types, levels, monsters, spawns and meteors from it, and the blocks that infer a hand-made map's monsters from its units find nothing (a MEC 1 map has no unit placed in the editor).
+
+- **Immolation** (user's decision, Slide Is Magic, 2026-09-20): MEC 1 killed with the engine's immolation ability, measured to the edge of the hero's collision circle. So the old kill distance is `radius + the old hero's collision`, and MEC 2's is `radius + heroBaseCollisionSize`. Keep the radii untouched and set `gameData.heroBaseCollisionSize` to the old hero's collision (0 for a hero with `ucol` 0): the old game exactly, and it is what MEC already does for a game data without the field. `-patchImmo` turns the map to 25 later, in game. Shifting every radius by −25 instead would drop the 5-radius types to 0 and stop them killing at all.
+- **Starts**: a MEC 1 map's starts are the ones its author made in game and played on, and they stand on the slide terrain on purpose. They are kept as they are (`safeStarts.shrink` defaults to false for a MEC 1 map), and only checked for a death tile.
+- **The last level has no end**: reaching it wins the game. It is written without one.
+- **Quests**: a map made in the World Editor writes its quest texts in a JASS constant (`constant string MapDescription="…"`), which `jassText` follows. MEC 1's map template adds six command quests (`Commands 1`, `Commands 2`, `Colors`, `Effects`, `Red commands`, `Command shortcuts`), obsolete in MEC 2: drop them, keep the map's own.
+- **Slides**: MEC 1's `newSlide` has no "cannot turn", so every slide terrain gets `canTurn: true`.
+- **The map's own triggers** are where all the work is. Slide Is Magic's 62 of them were: mages that shoot (two became blind casters, one an instant line in a custom trigger), mages that morph into animals, zones lit 2 s every 5 s, a level played at night, a colour and an animation per family, and floating level names.
+
 ## Reading an old map: common idioms
 
 | Old-map idiom | How it shows in `facts.json` | MEC |
@@ -205,6 +221,10 @@ The old data reads in MEC 1's own units (its speeds, its immolation radius…): 
 | Gates opened by a switch plate (a hero steps on a small region, often on a circle of power) | same, filtered on the hero type, no item | MEC door without a key, opened by a custom trigger when a hero enters the plate's region (user's choice over a clear mob, so that the kill rect comes from the door's pathing); the circle stays decor |
 | Hero teleporters | "hero enters region → `SetUnitPosition` to another region" | one-way MEC portal mob (`oneWay: true`) |
 | Items enabling steering (ice skates) | the turn trigger checks `UnitHasItemOfType` | slide terrain starts `canTurn: false`; a custom trigger switches it per level |
+| Mages firing on a timer, straight ahead | a periodic trigger ordering a spell, and a spell trigger creating a projectile unit that a 0.03 s loop moves and that kills within N | a blind caster type (`isBlind`), with `nbShots` for a fan; the projectile is a monster type whose immolation radius is that N |
+| Monsters animating on their own | a periodic trigger walking a unit group: `SetUnitAnimation(u, "spell")`, or an effect over the head | a monster type's `idlePeriod` + `idleAnimation` + `idleEffect` |
+| Monsters recoloured by kind | "unit of type X enters the map → `SetUnitColor`" | a monster type's `color` |
+| A zone lit now and then on a dark level | a periodic trigger starting a `FOG_OF_WAR_VISIBLE` modifier, waiting, stopping it | a level visibility with `blinkVisibleTime` and `blinkHiddenTime` |
 
 Old maps number orders: 851986 move, 851990 patrol, 851984 attackground, 851983 attack (`ORDER_NAMES` in `jass.ts`).
 
