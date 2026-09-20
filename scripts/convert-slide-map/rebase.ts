@@ -33,11 +33,20 @@ import * as fs from 'fs'
 import War3MapDoo from 'mdx-m3-viewer-th/dist/cjs/parsers/w3x/doo/file'
 import War3Map from 'mdx-m3-viewer-th/dist/cjs/parsers/w3x/map'
 import War3MapW3u from 'mdx-m3-viewer-th/dist/cjs/parsers/w3x/w3u/file'
+import Modification from 'mdx-m3-viewer-th/dist/cjs/parsers/w3x/w3u/modification'
 import ModifiedObject from 'mdx-m3-viewer-th/dist/cjs/parsers/w3x/w3u/modifiedobject'
 import * as path from 'path'
 import { normalizeScript } from './jass'
 import { mecMapName, parseW3iHead, parseWts, readArchive, withoutProtectedMarks } from './mapFiles'
-import { fixObjectDataWriter, isSkinField } from './objectData'
+import { fixObjectDataWriter, isSkinField, variableTypeOf } from './objectData'
+
+/** A standard unit's default values in the World Editor (war3-objectdata-th), by the names of its fields */
+const unitDefaults = (id: string): { [field: string]: string | number } | undefined =>
+    (
+        JSON.parse(
+            fs.readFileSync(require.resolve('war3-objectdata-th/dist/cjs/generated/unitsdata.json'), 'utf8')
+        ) as { [id: string]: { [field: string]: string | number } }
+    )[id]
 
 fixObjectDataWriter()
 
@@ -350,6 +359,7 @@ if (modes !== undefined) {
     log.push(`- \`war3map.w3i\`: supported graphics modes ${before} → ${modes} (1 SD, 2 HD, 3 both)`)
 }
 w3i[offset + 4] = oldInfo.tileset.charCodeAt(0)
+
 set(
     'war3map.w3i',
     w3i,
@@ -399,10 +409,17 @@ for (const native of [
 }
 lua = lua.substring(0, mainStart) + main + lua.substring(mainEnd)
 
+// every start location (where the camera starts) at the centre of level 1's start when the spec names an old region
+// for it (Sliding Bunnys' player 1 start stood in the middle of the map, its script panning to the heroes at once),
+// else at the old player 1 start
+const levelOneStart = typeof spec.levels?.[0]?.start === 'string' ? spec.levels[0].start : undefined
+const levelOneRect =
+    levelOneStart &&
+    new RegExp(`gg_rct_${levelOneStart}=Rect\\(([-\\d.]+),([-\\d.]+),([-\\d.]+),([-\\d.]+)\\)`).exec(oldScript)
 const start = /DefineStartLocation\(0,\s*([-\d.]+),\s*([-\d.]+)\)/.exec(oldScript)
-if (!start) throw new Error('No start location for player 1 in the old map')
-const startX = Number(start[1])
-const startY = Number(start[2])
+if (!levelOneRect && !start) throw new Error('No start location for player 1 in the old map')
+const startX = levelOneRect ? (Number(levelOneRect[1]) + Number(levelOneRect[3])) / 2 : Number(start![1])
+const startY = levelOneRect ? (Number(levelOneRect[2]) + Number(levelOneRect[4])) / 2 : Number(start![2])
 lua = lua.replace(
     /DefineStartLocation\((\d+), [-\d.]+, [-\d.]+\)/g,
     (_, i) => `DefineStartLocation(${i}, ${startX.toFixed(1)}, ${startY.toFixed(1)})`
@@ -516,13 +533,47 @@ if (oldW3uBytes) {
         if (/^[A-Z]/.test(u.typeId) && player && Number(player[1]) < 12)
             heroCounts[u.typeId] = (heroCounts[u.typeId] ?? 0) + 1
     }
-    const heroType = Object.entries(heroCounts).sort((a, b) => b[1] - a[1])[0]?.[0]
+    // the players' unit: a hero type, the most common among players 1 to 12, or the spec's hero.unitType (an old map
+    // whose players move a plain unit, such as Sliding Bunnys' n000)
+    const heroType: string | undefined =
+        spec.hero?.unitType ?? Object.entries(heroCounts).sort((a, b) => b[1] - a[1])[0]?.[0]
     const oldHero =
         heroType &&
         (oldW3u.customTable.objects.find(o => o.newId === heroType) ??
             oldW3u.originalTable.objects.find(o => o.oldId === heroType))
     const heroBase = oldHero ? oldHero.oldId : heroType
     const looks = oldHero ? oldHero.modifications.filter(m => isSkinField(m.id)) : []
+    const addLook = (id: string, value: string | number) => {
+        if (looks.some(m => m.id === id)) return
+        const look = new Modification()
+        look.id = id
+        look.value = value
+        look.variableType = variableTypeOf(id, value)
+        looks.push(look)
+    }
+    // the model the spec gives (hero.model), over the base unit's
+    spec.hero?.model && addLook('umdl', spec.hero.model)
+    // a hero based on another unit than MEC's Demon Hunter: that unit's own looks, where the old map keeps them
+    // (Sliding Bunnys' Bunny, a Rabbit): its model, scale, selection circle and shadow, from the World Editor's defaults
+    if (heroBase && heroBase !== 'Edem') {
+        const defaults = unitDefaults(heroBase)
+        if (defaults) {
+            const fromDefaults: [string, string][] = [
+                ['umdl', 'modelFile'],
+                ['usca', 'scalingValueundefined'],
+                ['ussc', 'selectionScale'],
+                ['ushu', 'shadowImageUnit'],
+                ['ushw', 'shadowImageWidth'],
+                ['ushh', 'shadowImageHeight'],
+                ['ushx', 'shadowImageCenterX'],
+                ['ushy', 'shadowImageCenterY'],
+            ]
+            for (const [id, key] of fromDefaults) {
+                const value = defaults[key]
+                if (value !== undefined && value !== '') addLook(id, value)
+            }
+        }
+    }
 
     if (heroType) {
         for (const mecHero of ['E000', 'D001']) {
@@ -601,7 +652,7 @@ fs.writeFileSync(
         '',
         ...log,
         '',
-        'Not done yet: the game data (the base map’s own still runs), the custom triggers, the gate unit types.',
+        'Not done yet: the game data (the base map’s own still runs), the custom triggers.',
         '',
     ].join('\n')
 )

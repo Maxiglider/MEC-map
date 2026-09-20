@@ -229,9 +229,14 @@ function range(a: number, b: number) {
 
 const levels: Json[] = spec.levels
 const levelVisibilities = levels.map(l => (l.visibilities as RectRef[]).map(resolveRect))
+// areas whose units and gates belong to a level whatever its visibility says (spec levels[].unitsIn): for a map whose
+// visibility doesn't split the levels (Sliding Bunnys shows the whole map from the start)
+const levelUnitAreas = levels.map(l => ((l.unitsIn ?? []) as RectRef[]).map(resolveRect))
 
 /** The first level whose visibility holds the point, or the last level */
 const levelOfPoint = (x: number, y: number) => {
+    const inArea = levelUnitAreas.findIndex(rects => rects.some(r => inside(r, x, y)))
+    if (inArea !== -1) return inArea
     const found = levelVisibilities.findIndex(rects => rects.some(r => inside(r, x, y)))
     return found === -1 ? levels.length - 1 : found
 }
@@ -509,7 +514,8 @@ facts.units.forEach((u: Json, index: number) => {
     const key = unitKey(u, index)
     if (consumed.has(key)) return
     if (ignored.has(u.typeId)) {
-        u.typeId !== spec.heroUnitType &&
+        // the players' unit (a hero type, or the spec's hero.unitType) isn't decor: MEC has its own heroes
+        u.typeId !== (spec.hero?.unitType ?? spec.heroUnitType) &&
             !/^[A-Z]/.test(u.typeId) &&
             decor.push({ typeId: u.typeId, x: u.x, y: u.y, facing: u.facing, owner: u.owner })
         return
@@ -674,16 +680,28 @@ for (const item of facts.items.filter((i: Json) => (spec.meteorsAtItemsOfTypes ?
 
 // the model of the effect a hero slides as in async mode: the old hero's own, when it has one (the rebase gives
 // its looks to MEC's hero units)
-const heroType = (facts.units as Json[]).find(
-    u => /^[A-Z]/.test(u.typeId) && /^Player\((\d|1[01])\)$/.test(u.owner)
-)?.typeId
+const heroType =
+    spec.hero?.unitType ??
+    (facts.units as Json[]).find(u => /^[A-Z]/.test(u.typeId) && /^Player\((\d|1[01])\)$/.test(u.owner))?.typeId
 const oldUnitObjects: Json[] = [
     ...(facts.objectData['war3map.w3u']?.changedStandard ?? []),
     ...(facts.objectData['war3map.w3u']?.custom ?? []),
 ]
 const heroModelMod = oldUnitObjects.find(o => o.newId === heroType || (!o.newId && o.oldId === heroType))?.modifications
     ?.umdl
-const heroModel = heroModelMod ? { heroModelPath: heroModelMod } : {}
+// a hero based on another unit than the Demon Hunter keeps that unit's model (World Editor defaults), as the rebase
+// gives MEC's heroes
+const heroBaseType = oldUnitObjects.find(o => o.newId === heroType)?.oldId ?? heroType
+const baseModel =
+    heroBaseType && heroBaseType !== 'Edem'
+        ? (
+              JSON.parse(
+                  fs.readFileSync(require.resolve('war3-objectdata-th/dist/cjs/generated/unitsdata.json'), 'utf8')
+              ) as Json
+          )[heroBaseType]?.modelFile
+        : undefined
+const heroModelPath = heroModelMod ?? spec.hero?.model ?? baseModel
+const heroModel = heroModelPath ? { heroModelPath } : {}
 
 const terrainTypesMec = (spec.terrainTypes as Json[]).map((t, orderId) => {
     const common = {
@@ -712,6 +730,14 @@ const blockEnd = lua.indexOf('onGlobalInit(setGameData)', blockStart)
 if (blockStart === -1 || blockEnd === -1) throw new Error('No setGameData block in the base map’s war3map.lua')
 const baseJson = /MEC_core\.setGameData\((".*")\)/.exec(lua.substring(blockStart, blockEnd))
 const baseGameData = baseJson ? JSON.parse(JSON.parse(baseJson[1])).gameData : {}
+
+// the mortars' areas, for MEC's hero collision (user's rule: MEC's hero collision stays): a shell's areas reach to
+// the edge of a hero's collision circle, in the engine as in MEC (MortarSplash), so with MEC's collision in place of the
+// old hero's (spec.hero.collision), MEC's judgment of the areas is shifted by the difference (gameData.mortarAreaShift,
+// core 5fd68cef): the shells reach the heroes as far as in the old map. Not by changing the mortar units'
+// weapons at runtime: their attack broke off (user's test)
+const mecHeroCollision = Number({ ...baseGameData, ...(spec.gameData ?? {}) }.heroBaseCollisionSize ?? 25)
+const mortarAreaShift = spec.hero?.collision !== undefined ? Number(spec.hero.collision) - mecHeroCollision : 0
 
 // ---------------------------------------------------------------------------------------------- safe starts
 
@@ -844,7 +870,12 @@ const gameData = {
     })),
     doorTypes,
     keyForDoorTypes,
-    gameData: { ...baseGameData, ...heroModel, ...(spec.gameData ?? {}) },
+    gameData: {
+        ...baseGameData,
+        ...heroModel,
+        ...(mortarAreaShift !== 0 ? { mortarAreaShift } : {}),
+        ...(spec.gameData ?? {}),
+    },
 }
 
 const gameDataString = JSON.stringify(gameData)
@@ -962,6 +993,7 @@ if (versionLog) {
         icon: 'ReplaceableTextures\\CommandButtons\\BTNTomeBrown.blp',
     })
 }
+
 const questsCode = legacyQuests.length
     ? `-- the old map's quests, created before MEC's own; the obsolete ones (commands MEC doesn't have) left out
 onGlobalInit(function()

@@ -60,6 +60,7 @@ The MEC base map is only read: the scripts refuse to write over it.
 
 Region names are the old ones without `gg_rct_`. Model a new spec on Polar Escape 3's.
 
+- `hero`: `{ "unitType", "model", "collision" }`. `collision`: the old hero's collision size, for the mortars' areas (see [Hero collision](#conversion-rules)). `unitType`: for a map whose players move a plain unit rather than a hero (Sliding Bunnys' `n000`, based on `necr`, the Rabbit); without it, the players' hero type is found from the units. `model`: a model to force, rarely needed (see Hero looks).
 - `terrainTypes`: label, alias, tile, kind (`walk`, `slide`, `death`), speeds, `canTurn`, and the death settings (`killingEffect`, `timeToKill`, `toleranceDist`).
 - `unitTypes`: new unit types (id, base, fields). The gate unit is one of them.
 - `monsterTypes`: MEC monster types (label, unit type, speed, `immolationRadius`, scale `-1` for the unit's own…).
@@ -69,6 +70,8 @@ Region names are the old ones without `gg_rct_`. Model a new spec on Polar Escap
   - `start` and `end`: a region name, `{ "aroundUnitsOfType": "Edem", "padding": 128 }`, or a rect. For the end, use `{ "stripAt": <next level's start> }` (see [Level ends](#conversion-rules)).
   - `visibilities`: region names, or `playable`.
   - `removedBy`: the checkpoint trigger whose `RemoveUnit` calls tell which units belong to the level. Other units go to the first level whose visibility holds them.
+  - `unitsIn`: rects whose units and gates belong to the level, checked before the visibilities: for a map whose visibility doesn't split the levels (Sliding Bunnys shows the whole map from the start).
+  - `nbLives`: the lives the level gives (level 0: the lives at start). 0 is a value (core `1c4c9cc7`): Sliding Bunnys has 0 everywhere, so the game restarts when all heroes are dead, as the old map ended in defeat.
 - `safeStarts`: `margin` (48), how far around a start must be walk ground.
 - `endStrips`: death tiles, `thickness` (64), `depth` (128), `overflow` (256).
 - `gates`: the gate doodad types (`"DTg5": "x"`) and `levels` to force a gate's level. These doodads are removed from the map and become MEC doors (see `keyAndDoors`); add other types to `removeDoodadTypes`.
@@ -82,7 +85,7 @@ Region names are the old ones without `gg_rct_`. Model a new spec on Polar Escap
 - `decor`: create the decor units (`decor.json`). `frozenTypes`: types whose animation stops. `unclickableTypes`: types that get the locust ability (`Aloc`), so they can't be selected nor clicked (Polar Escape 3's circles of power); locust units are also left out of `GroupEnumUnitsInRect`, so don't give it to units a custom trigger looks for that way.
 - `customTriggers`: the Lua files to bake.
 - `legacyQuests`: `{ "drop": [titles] }`: the old map's quests (its `CreateQuestBJ` calls, texts resolved), in the trigger "Original map legacy quests", created before MEC's own (in `onGlobalInit`, which runs before MEC's map initialization triggers). Drop what is obsolete in MEC, such as quests listing the old map's commands. `replaceText`: `{ title: new text }`, for a quest whose text holds personal data the user chose to take out (see step 3).
-- `gameData`: overrides of the base map's game data settings.
+- `gameData`: overrides of the base map's game data settings. `coopModeChoice: false` (core `8da3d1f4`): no coop or solo popup at the start, the game is solo (Polar Escape 3 requires solo).
 - `graphicsModes`: `"SD"`, `"HD"` or `"both"`, the graphics the map supports. By default a map made before Reforged (map info format below 31) is set to SD only, as it was made for: its models may play differently in HD (Polar Escape 3's bridges toggle in HD).
 
 How units move comes from their first order in the old script:
@@ -93,25 +96,29 @@ How units move comes from their first order in the old script:
 
 ## Conversion rules
 
+- **Default values**: never guess a standard object's value (a unit's speed, collision or weapon areas, a destructable's fixed rotation…). When the old object data doesn't change it, read it in the World Editor's defaults that `war3-objectdata-th` ships, in `node_modules/war3-objectdata-th/dist/cjs/generated/` (see [Default values of standard objects](#default-values-of-standard-objects)). Polar Escape 3's Ice Troll Warlords (`nitw`) move at 320, not the 270 first assumed: at 270 its train of 8 trolls bunched up instead of going round its loop evenly (user's report).
 - **Terrain**: terrain types come from the tiles under the old kill and safe regions. Walk terrains take the speed of the old hero unit, from its object editor value (`umvs`), else its default (Demon Hunter 300). `summary.md` lists the heroes, their speed and the script's `SetUnitMoveSpeed` on them. Only a trace in the old map saying otherwise changes that.
 - **Level ends**: never the next level's start region itself. Write `end: { "stripAt": <next start> }`, and the end becomes a thin strip:
   - `thickness` 64, `depth` 128 inside the next start, on the side heroes come in from, so heroes are partly inside the next start when it fires;
   - across the whole start region and `overflow` 256 into the death terrain on both ends, so it can't be walked around (a classic flaw of these maps).
 
   The side heroes come in from is found by walking the non-death terrain from the level's start, through the portals, with the next start closed. An old end that is already thin and wide (a final region) can be kept.
-- **Start**: the base map's start region `gg_rct_departLvl_0` is moved onto level 1's start (in `war3map.lua` and `war3map.w3r`): MEC starts the heroes and the camera there.
+- **Start**: the base map's start region `gg_rct_departLvl_0` is moved onto level 1's start (in `war3map.lua` and `war3map.w3r`): MEC starts the heroes and the camera there. The start locations (where the camera starts) go to the centre of level 1's start when the spec names an old region for it, else to the old player 1 start (Sliding Bunnys' stood in the middle of the map, its script panning to the heroes at once).
 - **Safe starts**, checked on every build:
   - Heroes appear anywhere in a level's start. So every start is shrunk, side by side, until it and a margin around it (`safeStarts.margin`, 48) stand on walk tiles only. A start reaching onto a death tile kills a hero as it appears; one on a slide tile sends it off at once.
   - Monsters whose path comes within contact reach of a start (`immolationRadius` + hero 25 + the margin) are listed in `gamedata.md`'s warnings.
   - This caught Polar Escape 3's level 1: the padding around the old hero spawns reached past the pad onto the snow.
 - **Gates**:
+  - MEC slides move heroes with `SetUnitX/Y`, which ignores pathing: an old map sliding its heroes with `SetUnitPosition` (Sliding Bunnys) had its gates stop them, where a plain gate would be crossed in MEC. Hence MEC doors, deadly while closed (user's choice for Sliding Bunnys too).
   - Old gate destructables all become MEC doors (keyed or keyless), and their doodads are removed. Doors have no angle: gates have a fixed rotation (an iron gate stands horizontal or vertical whatever angle it is made with).
   - **Never compute a kill rect from the terrain textures** (user's rule): only from pathing or collision. MEC doors get no kill rect dimensions, so each door's kill rect is where it blocks the ground, measured by MEC core where it stands (core `534c630`). A monster has no pathing to measure, which is why gates are not made monsters (Polar Escape 3's plate gates were clear mobs first, then doors).
   - A gate closing the start of a level stands in the previous level's visibility too: force its level in `gates.levels`.
 - **Angles**: MEC reads a monster angle of 0 as "no angle", so east is written 360.
-- **Contact**: MEC kills at `immolationRadius + hero collision` (25 in the base map), so an old "unit within 75" becomes 50.
+- **Hero collision**: MEC's own (`heroBaseCollisionSize`, 25 in the base map) stays (user's rule): don't set the old hero's, adapt the rest to it so the game plays as the old map did.
+  - **Contact**: MEC kills at `immolationRadius + heroBaseCollisionSize`, so an old "unit within 75" becomes 50. Contact radii must be one of MEC's immolation abilities (`Immolation_skills.ts`).
+  - **Mortars**: a shell's areas reach to the edge of a hero's collision circle, in the engine as in MEC (`MortarSplash.ts`). Give the old hero's collision in `hero.collision` (its `ucol`, else its default): the game data step sets `gameData.mortarAreaShift` (core `5fd68cef`) to the difference, which MEC adds to the areas as it judges the heroes. Polar Escape 3's hero had a collision of 0.01, so its shells reached 25 too far until then (user's report); shift −25. Never change the mortar units' weapons at runtime (`BlzSetUnitWeaponRealField` on their areas): their attack broke off without firing (user's test).
 - **Visibility**: each checkpoint's fog reveals become the next level's `visibilities`, cumulative (`resetVisiblitiesAtStart: false`) when the old map never hides them again.
-- **Hero looks**: the rebase copies the old hero's skin fields (model, scale, selection scale, tint…) onto MEC's hero units `E000` and `D001`. An old hero model of its own (`umdl`) also becomes the game data's `heroModelPath`, the effect a hero slides as in async mode. An old hero based on another unit than the Demon Hunter, with no model in the object data, needs its model set by hand: the rebase says so.
+- **Hero looks**: the rebase copies the old hero's skin fields (model, scale, selection scale, tint…) onto MEC's hero units `E000` and `D001`. An old hero based on another unit than the Demon Hunter also gets that unit's own model, scale, selection circle and shadow, from the World Editor's defaults, wherever the old map keeps them (Sliding Bunnys' Bunny, a Rabbit). Check what a base unit id is in the defaults, never from its look: `necr` is the Rabbit, not the Necromancer (`unec`), which first gave Sliding Bunnys a Necromancer for a hero. An old hero model of its own (`umdl`) also becomes the game data's `heroModelPath`, the effect a hero slides as in async mode. An old hero based on another unit than the Demon Hunter, with no model in the object data, needs its model set by hand: the rebase says so.
 - **Description**: the old one, followed by `Powered by Max Escape Creation v<version> - <date> <time>` for the core the map holds, as `mec-core-upgrade` writes it (`../mec-core-upgrade/Program.cs`). A version already in the description is replaced; an empty description becomes that line. The line has no color of its own (as in the 145 maps `mec-core-upgrade` has done), so a color the old description leaves open (a `|c` code with no `|r` after it) is closed before it; otherwise it would run on over the line.
 - **Upkeep text** (top right): if the old map keeps the default, it shows the old author, in the base map's `UPKEEP_NONE` string. If the old map changed it, its `UPKEEP_*` values are copied.
 - **Name in the game** (`mecMapName` in `mapFiles.ts`):
@@ -122,6 +129,7 @@ How units move comes from their first order in the old script:
 - **Base map placeholders**: the welcome message ("Welcome to: Your map", "Created by: You") gets the old name (without its color codes) and author, in the base map's colors. Name, author, description and players go in through the map info's strings.
 - **MEC's own quest** (user's rule, every map): the base map's "This map was made with Max Escape Creation 2." becomes "This map was converted to Max Escape Creation 2 with help of AI."; its other lines and its links stay. Its title, "MapDescription" in the base map, becomes "To MEC conversion". The rebase does both (`rebase.md` says so, or that the line wasn't found).
 - **Conversion note** (user's rule, every map): the quests must say `<yyyy-mm-dd> Map converted to MEC by Maximaxou with help of AI`, dated from the build. The game data step appends it to the old map's version log quest (a title with "version", "changelog", "history", "updates"…), else adds a quest "Conversion to MEC" of its own. Check `gamedata.md` for where it went.
+- **Lives** (user's rule): an old map without lives, where all heroes dead is a defeat (Polar Escape 3's Game_Over, Sliding Bunnys' Death), gets `nbLives: 0` on every level. MEC's default lives (5 at start, 1 per level) would let the heroes wipe out and retry; with 0, MEC says "You have no more lives!" and restarts the game. Look for the old game-over trigger (`CustomDefeatBJ` once all heroes are dead) in every map.
 - **Quests and commands**: keep the author's credit quests; drop the old `-kick`, name spoofers and leaver messages (MEC has its own). These maps belong to their authors.
 - **Old mechanics MEC has no equivalent for**: never drop them, and ask the user whether to reproduce them with a custom trigger or by evolving MEC core (step 3). A custom trigger reproduces the old trigger's behavior as it is.
 - **Reproduce, don't fix**: keep the old code's values even when they look like a bug, since what players saw came from them. Polar Escape 3's bridges were restored with `GetDestructableMaxLife(bj_lastCreatedDestructable)`, which nothing set, so 0 life. Point out such a quirk to the user rather than silently changing it; the user may then choose otherwise. For Polar Escape 3, the bridges stayed a plain toggle in the MEC map either way (placed from the file or created by script, with 0 life or full life), so the user chose full life, and a bridge deadly all the time it is down.
@@ -198,12 +206,28 @@ Old maps number orders: 851986 move, 851990 patrol, 851984 attackground, 851983 
 | `war3map.w3r` | MEC's, `departLvl 0` moved. The old regions are only read. |
 | `w3c`, `w3s`, `wtg`, misc | MEC's. |
 
+## Default values of standard objects
+
+`node_modules/war3-objectdata-th/dist/cjs/generated/` holds the World Editor's default values of every standard object, one JSON file per kind, keyed by object id:
+
+| File | Objects | What it gives, for example |
+|---|---|---|
+| `unitsdata.json` | 864 units | `speedBase`, `collisionSize`, life, armor, attacks (damage, range, cooldown, `attack1AreaOfEffectFullDamage`/`Medium`/`Small` and their damage factors), model, scale, abilities |
+| `abilitiesdata.json` | 832 abilities | levels, durations, areas, effects |
+| `destructablesdata.json` | 336 destructables | name and editor suffix, life, `fixedRotation` (-1 when it turns freely), `pathingTexture`, `selectableInGame`, `targetedAs` |
+| `doodadsdata.json` | 568 doodads | name, model, pathing |
+| `itemsdata.json` | 283 items | model, abilities, stats |
+| `buffsdata.json` | 237 buffs | effects, icons |
+| `upgradesdata.json` | 90 upgrades | effects per level |
+
+Read them whenever a conversion needs a value the old object data doesn't set: a monster type's speed, the old hero's collision (`hero.collision`), a mortar's areas, whether a gate has a fixed rotation (Sliding Bunnys' `LTg3` "Gate (Vertical)" is fixed at 0, `DTg5` at 270, `DTg7` at 0), what an unknown id is (`DTfx` is the "Foot Switch"). An old map's own changes (`facts.json`'s object data) come first. The values follow a game version before the 2.0 patches, which suits old maps; a recent rebalance may be missing.
+
 ## MEC API from hand-written Lua
 
 - `MEC_core` functions use a dot: `MEC_core.onStartLevelAny(function(level) ... end)`, `MEC_core.getEscapers()`, `MEC_core.newMonsterSimplePatrol(...)`.
 - Hook callbacks receive their arguments directly.
 - Methods on MEC objects use a colon: `level:getId()`, `MEC_core.getTerrainTypes():getByLabel("slide")`, `slide:setCanTurn(true)`, `monster:killUnit()`, `escapers:get(id)`, `escaper:kill()`. Check a method you haven't used yet in the compiled `bin/MEC_core.lua`: `self.x = function(____, …)` takes the object, `self.x = function()` doesn't mind it.
-- Useful hooks: `onStartLevelAny`, `onEndLevelAny`, `onStartLevel(n, cb)` (only once levels exist), `onAfterCreateMonsterUnit(monster)`, `onHeroEnterRegion(escaper, region)`, `onEscaperDeath`, `onGameWinning` (return `false` to cancel MEC's end of the game), `onBeforeHeroUsingMeteor`.
+- Useful hooks: `onStartLevelAny`, `onEndLevelAny`, `onStartLevel(n, cb)` (only once levels exist), `onAfterCreateMonsterUnit(monster)` (for a spawn's unit it gets a bare `{ mt, u }`, with no methods: calling `monster:someMethod()` there throws, as it did on Polar Escape 3's flood), `onHeroEnterRegion(escaper, region)`, `onEscaperDeath`, `onGameWinning` (return `false` to cancel MEC's end of the game), `onBeforeHeroUsingMeteor`.
 - When a level changes, MEC removes the old level's monster units, runs its end hooks, creates the new level's monster units, then runs its start hooks. Restarting a level after the heroes all die is not a level change.
 
 ### Staying synced
