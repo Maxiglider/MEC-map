@@ -300,7 +300,9 @@ src/core/04_STRUCTURES/Visibility/VisibilityCompositor.ts
 1. Walk the active level stack highest-first, resolving each tile (`untouched` transparent, `resetVisiblitiesAtStart` truncates). Legacy modifiers are not part of this walk — they keep being driven by `level.activateVisibilities()`.
 2. Drop the `untouched` and `masked` tiles.
 3. Partition each remaining type's mask.
-4. Diff against the current zones; destroy and create only what changed. No `RefreshHideAllVM()`: the legacy `VisibilityModifier` rebuilds the world mask on every rectangle it creates, but that is a 2019 JASS workaround with no recorded reason, and it cannot be about priority since it runs after the visible modifier it would otherwise hide. Harmless once per authored rectangle, not harmless on every recomposition. To be confirmed in game — it is the first thing to put back if a painted area fails to light up.
+4. Diff against the current zones; destroy and create only what changed; `RefreshHideAllVM()` at the end when a zone was created.
+
+   That last call was removed at one point on the reasoning that it could not be about priority, since it runs *after* the visible modifier it would otherwise hide. The in-game test said otherwise: without it the map stays black for good. **Warcraft III gives precedence to the older fog modifier**, so `udg_hideAll`, created at init, wins over every zone unless it is destroyed and created again to become the youngest. The 2019 JASS line had the right reason and no comment; it now has both. See [`docs/VISIBILITY.md`](../../docs/VISIBILITY.md#the-older-fog-modifier-wins).
 5. One timer per periodic type, started when the type gains its first zone, stopped when it loses its last.
 
 `LevelArray.refreshVisibilities()` (`:253`) delegates to the compositor. Its five callers stay untouched: `LevelArray.ts:155`, `LevelArray.ts:197`, `Level.ts:553`, `EscaperMake.ts:130`, `start_first_level.ts:8`.

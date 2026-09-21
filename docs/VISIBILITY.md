@@ -54,7 +54,18 @@ A fog modifier per tile would be unusable, so each type's composed tiles are par
 
 `VisibilityZoneArray.applyRequests()` diffs rather than rebuilds: a recomposition usually leaves most rectangles where they were. It is worth knowing that the partition is deterministic but not *stable*: painting one tile can change the chords the matching picks and reshuffle a whole connected component, so a small edit can still move many rectangles. What bounds it is that components are partitioned independently, so an edit never disturbs a disjoint area.
 
-The compositor does **not** call `RefreshHideAllVM()`, unlike the legacy `VisibilityModifier`, which rebuilds the world bounds black mask every time it creates a rectangle. That call comes from the 2019 JASS version with no explanation, and it cannot have been about priority — it runs *after* creating a visible modifier and the rectangle still shows, so `VISIBLE` beats `MASKED` whatever the creation order. It reads as a "make the fog redraw" workaround of the 1.26 era. Harmless once per authored rectangle, not harmless on every recomposition. If a freshly painted area ever fails to light up, or an erased one to go black, until something else touches the fog, that call is the first thing to put back.
+### The older fog modifier wins
+
+This is the single least obvious thing about the whole system, and it carried no explanation from the 2019 JASS version until it was measured the hard way.
+
+**Warcraft III gives precedence to the fog modifier created first.** `udg_hideAll` — `FOG_OF_WAR_MASKED` over `GetWorldBounds()` — is created at init, so it is older than every zone that will ever be built, and it wins over all of them: the map stays black for good, whatever visible modifiers are created afterwards.
+
+That is why `RefreshHideAllVM()` exists. It destroys the world mask and creates it again, making it the *youngest* modifier and therefore the weakest, so everything created before it shows through. The legacy `VisibilityModifier` calls it from its own constructor, right after creating its rectangle; the compositor calls it at the end of a recomposition.
+
+Two consequences to keep in mind when touching this:
+
+- Any new zone must be created **before** the mask is rebuilt. A `FOG_OF_WAR_VISIBLE` modifier created after the last `RefreshHideAllVM()` would be younger than the mask, and stay black.
+- It is only needed when a zone was actually **created**. A recomposition that merely destroyed some — erasing with the left button — leaves the mask already younger than every survivor, so `applyRequests()` reports creations and destructions apart and the rebuild is skipped.
 
 All the zones of a periodic type share **one** timer, so they blink in step, and a zone born of a later recomposition joins the cycle where the others already are. Two zones in opposite phase are two types with opposite `startState`, not a per-zone setting.
 

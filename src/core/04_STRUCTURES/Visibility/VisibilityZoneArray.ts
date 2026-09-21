@@ -50,9 +50,10 @@ export class VisibilityZoneArray {
      * leaves most rectangles exactly where they were, and destroying then recreating them all would churn handles and
      * make the fog blink for nothing.
      *
-     * Gives back whether anything changed, so the caller only refreshes the world mask when it has to.
+     * Gives back how many zones were created and how many were destroyed, which the caller needs apart: only a
+     * creation makes the world black mask have to be rebuilt after it (see VisibilityCompositor).
      */
-    applyRequests = (requests: ZoneRequest[]): boolean => {
+    applyRequests = (requests: ZoneRequest[]): { created: number; destroyed: number } => {
         const keyOf = (typeId: number, rect: TileRect) =>
             typeId + ':' + rect.tx1 + ',' + rect.ty1 + ',' + rect.tx2 + ',' + rect.ty2
 
@@ -71,7 +72,8 @@ export class VisibilityZoneArray {
         }
 
         const next: VisibilityZone[] = []
-        let changed = false
+        let created = 0
+        let destroyed = 0
 
         for (const request of requests) {
             const index = existing[keyOf(request.visibilityType.id, request.rect)]
@@ -92,20 +94,20 @@ export class VisibilityZoneArray {
                     request.visibilityType
                 )
             )
-            changed = true
+            created++
         }
 
         // By index, so the order the modifiers are destroyed in is the same everywhere
         for (let i = 0; i < this.zones.length; i++) {
             if (!kept[i]) {
                 this.zones[i].destroy()
-                changed = true
+                destroyed++
             }
         }
 
         this.zones = next
 
-        return changed
+        return { created, destroyed }
     }
 
     destroy = () => {

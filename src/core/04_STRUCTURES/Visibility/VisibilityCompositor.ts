@@ -2,6 +2,7 @@ import { errorHandler } from 'Utils/mapUtils'
 import { getUdgVisibilityTypes } from '../../../../globals'
 import { arrayPush } from '../../01_libraries/Basic_functions'
 import { DefineDrawLineType, DrawLine } from '../../01_libraries/Draw_lines'
+import { RefreshHideAllVM } from '../../03_view_all_hide_all/View_all_hide_all'
 import type { Level } from '../Level/Level'
 import { tileToWorldMax, tileToWorldMin } from './TileCoordinates'
 import { partitionTiles } from './VisibilityPartition'
@@ -77,34 +78,31 @@ class Compositor {
             }
         }
 
-        const changed = this.zones.applyRequests(requests)
+        const applied = this.zones.applyRequests(requests)
 
         this.refreshPhases()
+
+        // Warcraft III gives precedence to the OLDER fog modifier, which is the whole reason the 2019 JASS code
+        // rebuilt the world mask after every rectangle it created - a line that carried no explanation and was
+        // measured the hard way: take it out and udg_hideAll, created at init and older than everything, wins over
+        // every zone, leaving the map black for good.
+        //
+        // So the world bounds mask has to be made younger than anything that must show through it, and that is only
+        // ever needed when a zone was actually created. A recomposition that merely destroyed some - erasing with
+        // the left button - leaves the mask already younger than all the survivors.
+        if (applied.created > 0) {
+            RefreshHideAllVM()
+        }
 
         if (this.debugEnabled) {
             this.lastDurationMs = (os.clock() - startedAt) * 1000
         }
 
         // The outlines only move when the rectangles do, and this runs up to ten times a second under a brush
-        if (changed) {
+        if (applied.created > 0 || applied.destroyed > 0) {
             this.drawDebugZones()
         }
     }
-
-    /*
-     * No RefreshHideAllVM() here, unlike the old VisibilityModifier which rebuilt the world bounds black mask on
-     * every rectangle it created. That call dates from the 2019 JASS version with no explanation, and it cannot have
-     * been about priority: it ran *after* creating a visible modifier and the rectangle still showed, so VISIBLE
-     * beats MASKED whatever the creation order. It looks like a "make the fog redraw" workaround from the 1.26 days.
-     *
-     * Harmless when it ran once per authored rectangle; not harmless here, where a recomposition happens on every
-     * level change and up to ten times a second under a brush - destroying and recreating a modifier covering
-     * GetWorldBounds() at that rate. The legacy path still calls it from its own constructor, so maps made before
-     * behave exactly as they did.
-     *
-     * If a freshly painted area ever fails to light up, or an erased one to go black, until something else touches
-     * the fog, this is the first thing to put back.
-     */
 
     countZones = () => this.zones.count()
 
