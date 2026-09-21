@@ -8,11 +8,19 @@ import * as path from 'path'
  * it, and nothing in the map points at that import: the game goes by the path alone. Trying them all is what finds
  * those imports on a protected map, and a hit is proof, an MPQ being keyed by the hash of the path.
  */
-const war3FilePaths = (): string[] =>
+export const war3FilePaths = (): string[] =>
     fs
         .readFileSync(path.join(__dirname, 'war3FilePaths.txt'), 'latin1')
         .split('\n')
         .filter(line => line !== '')
+
+let war3FilePathSet: Set<string> | undefined
+
+/** Whether a path is one of the game's own, which means an import at it replaces what the game ships there */
+export const isWar3FilePath = (name: string) => {
+    war3FilePathSet ??= new Set(war3FilePaths().map(p => p.toLowerCase()))
+    return war3FilePathSet.has(name.toLowerCase())
+}
 
 /** The files a map may hold, for protected maps whose (listfile) is emptied */
 export const KNOWN_MAP_FILES = [

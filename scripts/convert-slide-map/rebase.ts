@@ -37,7 +37,15 @@ import Modification from 'mdx-m3-viewer-th/dist/cjs/parsers/w3x/w3u/modification
 import ModifiedObject from 'mdx-m3-viewer-th/dist/cjs/parsers/w3x/w3u/modifiedobject'
 import * as path from 'path'
 import { normalizeScript } from './jass'
-import { KNOWN_MAP_FILES, mecMapName, parseW3iHead, parseWts, readArchive, withoutProtectedMarks } from './mapFiles'
+import {
+    isWar3FilePath,
+    KNOWN_MAP_FILES,
+    mecMapName,
+    parseW3iHead,
+    parseWts,
+    readArchive,
+    withoutProtectedMarks,
+} from './mapFiles'
 import { fixObjectDataWriter, isSkinField, variableTypeOf } from './objectData'
 import { TERRAIN_TEXTURE_PATHS } from './terrainTextures'
 
@@ -679,7 +687,7 @@ const remappedTextures = new Set(
  * today - and importing it would put that old table back over the current one, MEC's own immolation abilities
  * (`ANpi`) included.
  */
-const MEC_ONE_LEGACY_IMPORTS = ['Units\\AbilityData.slk']
+const MEC_ONE_LEGACY_IMPORTS = ['Units\\AbilityData.slk', 'Units\\CommandStrings.txt', 'Units\\CommandFunc.txt']
 
 const excludedImports = new Set(
     [...(spec.mecOne ? MEC_ONE_LEGACY_IMPORTS : []), ...((spec.excludeImports ?? []) as string[])].map(p =>
@@ -696,6 +704,7 @@ const imports = [...old.keys()].filter(
 
 const dropped = [...old.keys()].filter(n => excludedImports.has(n.toLowerCase()))
 if (dropped.length > 0) log.push(`- imports left out, of the game and out of date: ${dropped.join(', ')}`)
+
 if (remappedTextures.size > 0)
     log.push(
         `- the terrain textures of the renamed tiles are not imported, their new ids carry the look: ${[...remappedTextures].join(', ')}`
@@ -730,6 +739,14 @@ if (imports.length) {
         Buffer.from(Int32Array.of(1, entries.length).buffer),
         ...entries.map(e => Buffer.concat([Buffer.from([e.flag]), Buffer.from(e.path, 'utf8'), Buffer.from([0])])),
     ])
+    // what the map really puts over a file of the game: worth a look, since an out of date copy of one puts that old
+    // version back over the current one (a MEC 1 map's ability table did)
+    const replacingGame = added.filter(isWar3FilePath)
+    if (replacingGame.length > 0)
+        log.push(
+            `- **imports replacing a file of the game**, kept - check they are meant to: ${replacingGame.join(', ')}`
+        )
+
     set(
         'war3map.imp',
         imp,
