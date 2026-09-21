@@ -88,7 +88,7 @@ The partition result must be **byte-identical on every machine**. A different bu
 ### Scale adaptations (the POC runs on 32×32 = 1024 cells; a real map is ~256×256 = 65536)
 
 - `emit()` and the reflex scan re-sweep the whole grid **per component**. Add a per-component bounding box and iterate only inside it.
-- `new Uint8Array(N*N)` per component becomes a 65k-entry Lua table per component per recomposition. Replaced by sparse integer-keyed tables holding only the filled tiles, plus a component-number stamp instead of a cleared array — no dense allocation at all, so `MemoryHandler` pooling (`docs/MEMORY_HANDLER.md`) is not needed here. The partition runs on level transitions and on mouse-up, not per frame; if `-debvz` ever shows allocation pressure, pooling is the measured follow-up.
+- `new Uint8Array(N*N)` per component becomes a 65k-entry Lua table per component per recomposition. Replaced by sparse integer-keyed tables holding only the filled tiles, plus a component-number stamp instead of a cleared array — no dense allocation at all, so `MemoryHandler` pooling (`docs/MEMORY_HANDLER.md`) is not needed here. The partition runs on level transitions and at most ten times a second under a brush, not per frame; if `-debvz` ever shows allocation pressure, pooling is the measured follow-up.
 - Kuhn is O(V·E) with E up to |H|·|V|. Keep Hopcroft–Karp (O(E·√V)) in reserve if measurements demand it.
 - The non-rectangular safety net in `emit()` should never fire with a correct construction. Keep it, but route it through the `Log` module so a real occurrence surfaces instead of silently producing extra modifiers.
 
@@ -124,7 +124,7 @@ No automatic conversion on load: the requirement is that existing maps behave id
 `MakeHoldClick` has `MIN_TIME_BETWEEN_ACTIONS = null`, so `doMouseMoveActions` runs on every `EVENT_PLAYER_MOUSE_MOVE`. Recomposing on each of those would stall.
 
 - Real-time feedback while painting comes from `DrawLine` overlays (the mechanism `-debugRegions` already uses in `Level.ts`), one colour per visibility type. A maker almost always has `-va` on anyway, so real fog feedback would show them nothing.
-- The fog recomposition runs once per stroke, in `doUnpressActions`, and diffs the zone list so only changed modifiers are destroyed/created, with a single `RefreshHideAllVM()` at the end.
+- The fog recomposition follows the brush at a bounded rate — at most every 0.1 s, and only when new tiles were actually painted — plus once more in `doUnpressActions`. It diffs the zone list so only changed modifiers are destroyed/created, with a single `RefreshHideAllVM()` at the end. (First written as "once per stroke, on release": that stopped one step short. The reason not to recompose on every mouse event is the missing throttle, and the answer to a missing throttle is a bounded rate, not a debounce to the end. The elapsed time has to come from a Warcraft III timer, `os.clock()` being local.)
 
 An incremental recomposition (re-partitioning only the affected types inside a dilated bounding box) is deliberately deferred: it reintroduces merges across the box border for little gain over the debounce.
 
@@ -317,7 +317,7 @@ src/core/05_MAKE_STRUCTURES/Make_visibility/MakeVisibilityBrush.ts   // extends 
 src/core/05_MAKE_STRUCTURES/MakeLastActions/MakeVisibilityTileAction.ts
 ```
 
-`MakeVisibilityTileAction` records the previous type per tile, on the model of `ChangingTile` in `MakeTerrainCreateBrush.ts` — the current `MakeVisibilityModifierAction` only stores the created object, which is not enough for tile painting. `DrawLine` overlay while painting, single recomposition in `doUnpressActions`.
+`MakeVisibilityTileAction` records the previous type per tile, on the model of `ChangingTile` in `MakeTerrainCreateBrush.ts` — the current `MakeVisibilityModifierAction` only stores the created object, which is not enough for tile painting. `DrawLine` overlay while painting, recomposition bounded to ten times a second plus one on release.
 
 `EscaperMake.makeCreateVisibility(visibilityType, brushSize?, shape?)` replaces `makeCreateVisibilityModifier()` (`EscaperMake.ts:809`). `-crv` rewritten with its three paths.
 

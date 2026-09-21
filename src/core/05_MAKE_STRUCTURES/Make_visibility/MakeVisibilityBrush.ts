@@ -10,18 +10,33 @@ import { MakeHoldClick } from '../Make/MakeHoldClick'
 import { ChangingVisibilityTile, MakeVisibilityTileAction } from '../MakeLastActions/MakeVisibilityTileAction'
 import { paintVisibilityTile } from './paintVisibilityTiles'
 
+/** How often the fog is allowed to follow the brush, in seconds */
+const REFRESH_PERIOD = 0.1
+
+/** Long enough that no stroke outlives it, the timer only being read for its elapsed time */
+const STROKE_TIMER_DURATION = 3600
+
 /**
  * Paints a visibility type by holding the mouse down, as -crt does with a terrain. Right button paints the type,
  * left button erases - the gum, here always the "untouched" type.
  *
- * The fog is recomposed once, when the button is released, not on every mouse move: EVENT_PLAYER_MOUSE_MOVE fires
+ * The fog follows the brush, but at a bounded rate rather than on every mouse move: EVENT_PLAYER_MOUSE_MOVE fires
  * with no throttle at all (MIN_TIME_BETWEEN_ACTIONS is null in MakeHoldClick), and a full recomposition on each of
- * those would stall. One per stroke is imperceptible.
+ * those would stall. Ten times a second is imperceptible on the cost side and live on the eye's side, and the
+ * release recomposes once more so the last tiles of a stroke are never left out.
+ *
+ * The elapsed time comes from a Warcraft III timer, not from os.clock(): a local clock would have the machines of a
+ * same game recompose a different number of times, and their fog modifier handle ids drift apart. What this does
+ * rely on - as the terrain brush already does - is the mouse events themselves reaching every machine alike.
  */
 export class MakeVisibilityBrush extends MakeHoldClick {
     private visibilityType: VisibilityType
     private shape: BrushShape
     private changes?: ChangingVisibilityTile[]
+
+    private strokeTimer?: timer
+    private lastRefreshAt = 0
+    private nbChangesAtLastRefresh = 0
 
     constructor(escaper: Escaper, visibilityType: VisibilityType, brushSize: number, shape: BrushShape = 'square') {
         super(escaper, 'visibilityCreateBrush', true)
@@ -71,11 +86,18 @@ export class MakeVisibilityBrush extends MakeHoldClick {
             }
         }
 
+        this.refreshIfDue()
+
         return true
     }
 
     doPressActions() {
         this.changes = MemoryHandler.getEmptyArray()
+
+        this.strokeTimer = CreateTimer()
+        TimerStart(this.strokeTimer, STROKE_TIMER_DURATION, false, DoNothing)
+        this.lastRefreshAt = 0
+        this.nbChangesAtLastRefresh = 0
 
         super.doPressActions()
     }
@@ -90,9 +112,38 @@ export class MakeVisibilityBrush extends MakeHoldClick {
 
         this.changes && MemoryHandler.destroyArray(this.changes)
         delete this.changes
+
+        this.destroyStrokeTimer()
     }
 
     destroy() {
         super.destroy()
+
+        this.destroyStrokeTimer()
+    }
+
+    /** Lets the fog catch up with the brush, at most every REFRESH_PERIOD and only if new tiles were painted */
+    private refreshIfDue = () => {
+        if (!this.changes || !this.strokeTimer || this.changes.length === this.nbChangesAtLastRefresh) {
+            return
+        }
+
+        const elapsed = TimerGetElapsed(this.strokeTimer)
+
+        if (elapsed - this.lastRefreshAt < REFRESH_PERIOD) {
+            return
+        }
+
+        this.lastRefreshAt = elapsed
+        this.nbChangesAtLastRefresh = this.changes.length
+
+        getUdgLevels().refreshVisibilities()
+    }
+
+    private destroyStrokeTimer = () => {
+        if (this.strokeTimer) {
+            DestroyTimer(this.strokeTimer)
+            delete this.strokeTimer
+        }
     }
 }

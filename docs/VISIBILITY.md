@@ -108,7 +108,7 @@ Note for the Lua side: `typescript-to-lua` only shifts an index to Lua's 1 based
 | `-setLevelResetVisibilities <boolean> [<levelId>]` | `setlrv` | Still truncates the composition stack. Largely superseded by painting `m` |
 | `-viewAll` / `-hideAll` | `va` / `ha` | Untouched: a cheat-tier override sitting above all of this |
 
-`-debvz` is also the visual feedback while painting: it redraws at each recomposition, which is once per stroke. The fog itself is recomposed then too — never on a mouse move, `EVENT_PLAYER_MOUSE_MOVE` firing with no throttle at all.
+`-debvz` redraws at each recomposition, so it follows the brush too. It is what shows a maker what they are painting, since with `-va` on — which a maker almost always has — the fog itself shows them nothing.
 
 ## Testing
 
