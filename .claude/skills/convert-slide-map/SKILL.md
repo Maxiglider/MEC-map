@@ -184,7 +184,9 @@ A MEC 1 map was made with the vJass MEC of this repo's `v1-jass` tag, from the W
   - `CasterTypeArray.new` and the `CasterType.set…` → the casters.
 - **The map's own features**, every other trigger of it (`ownTriggers` in the summary). They are the map's own work (spells, morphs, animations, shadows…): read each one and go through step 3 with the user, as for a map made by hand.
 
-The old data reads in MEC 1's own units (its speeds, its immolation radius…): check each against MEC 2's, where a field changed meaning, rather than copying the number over.
+The old data reads in MEC 1's own units (its speeds, its immolation radius…): check each against MEC 2's, where a field changed meaning, rather than copying the number over. The way to settle one is to read MEC 1's own `NewImmobileMonsterForPlayer` in the old script and MEC 2's `NewImmobileMonster` (`Monster_functions.ts`) side by side: they match field for field, and the differences show up at once.
+
+**Scale is such a field, and it is handled** (`mecTwoScale` in `mecOneData.ts`). MEC 1 writes `if (scale != 1) SetUnitScale(...)`, so its 1 is "leave the unit's own scale alone"; MEC 2 writes that -1 and takes 1 for a real scale of 1. Every MEC 1 type declares 1, so copying it over forced all of them to 1 and lost their unit's `usca`: Slide Is Magic's eight "Giant" mages, made at `usca` 2, showed at half their size, and its "Little tree" at 0.5 showed at twice (user's report, 2026-09-21).
 
 ### Converting one
 

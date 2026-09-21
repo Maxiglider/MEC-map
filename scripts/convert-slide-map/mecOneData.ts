@@ -94,6 +94,16 @@ const monsterTypeArg = (arg: string) => /"([^"]+)"/.exec(arg)?.[1]
 
 const KNOWN_TERRAIN_KINDS = { newSlide: 'slide', newWalk: 'walk', newDeath: 'death' } as const
 
+/**
+ * The one field whose meaning changed between the two MECs.
+ *
+ * MEC 1 creates a monster with `if (scale != 1) SetUnitScale(...)`, so 1 is its "leave the unit's own scale alone";
+ * MEC 2 writes that as -1 and takes 1 for a real scale of 1. Copied over as written, every type of a MEC 1 map -
+ * they all declare 1 - would be forced to 1 and lose its unit's `usca`: Slide Is Magic's eight "Giant" mages, made
+ * at `usca` 2, showed at half their size (user's report, 2026-09-21).
+ */
+const mecTwoScale = (mecOneScale: number) => (mecOneScale === 1 ? -1 : mecOneScale)
+
 export const readMecOneData = (script: string): MecOneData => {
     const terrainTypes: Json[] = []
     const monsterTypes: Json[] = []
@@ -161,7 +171,7 @@ export const readMecOneData = (script: string): MecOneData => {
             monsterTypes.push({
                 label: /"([^"]*)"/.exec(newType[1])?.[1] ?? '',
                 unitTypeId: /'(....)'/.exec(newType[2])?.[1] ?? '',
-                scale: num(newType[3]),
+                scale: mecTwoScale(num(newType[3])),
                 immolationRadius: num(newType[4]),
                 speed: Math.round(num(newType[5])),
                 isClickable: newType[6] === 'true',
