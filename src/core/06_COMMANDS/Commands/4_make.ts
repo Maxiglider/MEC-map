@@ -990,16 +990,12 @@ export const initExecuteCommandMake = () => {
             }
 
             const delta = globals.heroBaseCollisionSize - newHeroBaseCollisionSize
-            const nbLost = adaptMonstersImmolation(delta)
+            adaptMonstersImmolation(delta)
             setHeroBaseCollisionSize(newHeroBaseCollisionSize)
 
             Text.mkP(
                 escaper.getPlayer(),
-                `Hero base collision size set to ${newHeroBaseCollisionSize} and all monsters immolation radius adapted accordingly.` +
-                    // a radius the new collision swallows whole has no smaller value to fall back on, so it goes
-                    (nbLost > 0
-                        ? ` ${nbLost} monster type${nbLost > 1 ? 's' : ''} lost their immolation: the hero alone now reaches further than they ever did.`
-                        : '')
+                `Hero base collision size set to ${newHeroBaseCollisionSize} and all monsters immolation radius adapted accordingly.`
             )
             return true
         },
