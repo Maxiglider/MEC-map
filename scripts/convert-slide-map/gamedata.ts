@@ -808,6 +808,16 @@ const baseModel =
 const heroModelPath = heroModelMod ?? spec.hero?.model ?? baseModel
 const heroModel = heroModelPath ? { heroModelPath } : {}
 
+// what the old map's own data says about a terrain type, corrected (spec terrainTypeOverrides: label -> fields).
+// The tile is the one MEC reads the ground with, so changing it moves which ground is walk, slide or death - it
+// repaints nothing: the terrain itself is the old map's war3map.w3e, carried over untouched.
+for (const [label, fields] of Object.entries((spec.terrainTypeOverrides ?? {}) as Json)) {
+    if (label.startsWith('$')) continue
+    const terrainType = (spec.terrainTypes as Json[]).find(t => t.label === label)
+    if (!terrainType) throw new Error(`terrainTypeOverrides: unknown terrain type ${label}`)
+    Object.assign(terrainType, fields)
+}
+
 const terrainTypesMec = (spec.terrainTypes as Json[]).map((t, orderId) => {
     const common = {
         terrainTypeId: t.tile,

@@ -1,4 +1,5 @@
 import MpqArchive from 'mdx-m3-viewer-th/dist/cjs/parsers/mpq/archive'
+import { TERRAIN_TEXTURE_PATHS } from './terrainTextures'
 
 /** The files a map may hold, for protected maps whose (listfile) is emptied */
 export const KNOWN_MAP_FILES = [
@@ -50,6 +51,12 @@ export const readArchive = (buffer: Buffer) => {
     archive.load(new Uint8Array(buffer), true)
 
     const names = new Set<string>(KNOWN_MAP_FILES)
+
+    // A map re-skins a terrain tile by importing a file over the path the game loads that tile's texture from.
+    // Nothing in the map points at it - the game goes from the tile id alone - so it is invisible to the walk
+    // below, which only follows paths the map writes down. Every one of them is tried instead: an MPQ is keyed by
+    // the hash of the path, so a hit is proof the file is there, and a miss costs nothing.
+    Object.values(TERRAIN_TEXTURE_PATHS).forEach(path => names.add(path))
     const listfile = archive.get('(listfile)')?.text()
     listfile?.split(/\r?\n/).forEach(n => n.trim() !== '' && names.add(n.trim()))
 
