@@ -160,6 +160,7 @@ Write them in `conversion-work/<map>/custom-triggers.lua` (or several files) and
 - refuses to run twice on the same map: the build (rebase + game data) always starts from the base map.
 
 - Wrap each in `onGlobalInit(function() … end)`, so it runs after MEC core and the game data.
+- **A local function does not see itself**: `local f = function() … f … end` reads that `f` as a global, since the local only enters scope once the statement is over. A timer callback that re-arms itself that way fires once and then stops on a nil - Slide Is Magic's morph mages turned into animals and never came back. Write `local f` on its own line, then `f = function() … end`.
 - Use the old regions' coordinates (`Rect(minX, minY, maxX, maxY)`): the old `gg_rct_` names don't exist in the MEC map.
 - Start a mechanic at the start of the level the old map starts it in (`MEC_core.onStartLevelAny`, level ids from 0), not on an old region a hero enters, and only once.
 - **Steering switched per level** (items like ice skates): `MEC_core.getTerrainTypes():getByLabel("slide")`, then `:setCanTurn(b)` and `:setRotationSpeed(b and 0.9549 or 0)` on `onStartLevelAny`. `setCanTurn(true)` doesn't restore the rotation speed of a slide terrain made without turning.
