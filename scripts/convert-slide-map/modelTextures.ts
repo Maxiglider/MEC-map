@@ -3,14 +3,14 @@
  *
  * Model authors of the day borrowed textures from wherever the game had them, the campaign glue screens included.
  * Reforged redid those screens and dropped their files, so a model that draws its body with one of them now shows
- * nothing at all - only the shadow, which is a ground decal of the unit, not of the model. Slide Is Magic's
- * footman (`Frost_Fury_v1.1.mdx`, on `UI\Glues\SinglePlayer\HumanCampaign3D\HumanCampaignFootman.blp`) and its
- * crow (`Raven.mdx`) are in that case: they worked for years, then stopped, without the map changing.
+ * nothing at all - only the shadow, which is a ground decal of the unit, not of the model. Slide Is Magic's crow
+ * (`Raven.mdx`, on `UI\Glues\SinglePlayer\OrcCampaign3D\Raven.blp`) is in that case: it worked for years, then
+ * stopped, without the map changing.
  *
- * What the game still ships cannot be known from here - its files are in CASC, not in an MPQ we can read - and
- * guessing at which folders Reforged rebuilt only fixed some of them: the footman also draws with
- * `Textures\Ice3b.blp`, at the root of the old generic art, and stayed invisible. So every texture a model draws
- * with and the map does not hold is taken from a Warcraft III Legacy install and imported at its own path.
+ * What the game still ships cannot be known from here - its files are in CASC, not in an MPQ we can read - so
+ * every texture a model draws with and the map does not hold is taken from a Warcraft III Legacy install and
+ * imported at its own path. It is not a cure for every invisible model: Slide Is Magic's footman
+ * (`Frost_Fury_v1.1.mdx`) stayed invisible with all of its textures in, and was replaced (spec unitTypeOverrides).
  *
  * It costs about 2 MB on Slide Is Magic, and it pins those textures to their classic version. For a map converted
  * as SD only, which is what a map made before Reforged gets, that is what it would be served anyway.

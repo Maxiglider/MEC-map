@@ -660,11 +660,34 @@ if (oldW3uBytes) {
         }
     }
 
+    /**
+     * Fields the spec sets on an old unit type (unitTypeOverrides: id -> { field: value }), over what the old map
+     * gives it: a model that no longer shows in the current game, replaced by another (Slide Is Magic's footman).
+     */
+    const overridden = new Set<string>()
+    const overrideFields = (source: ModifiedObject, id: string) => {
+        const fields = (spec.unitTypeOverrides ?? {})[id] as { [field: string]: string | number } | undefined
+        if (!fields) return
+        for (const [field, value] of Object.entries(fields)) {
+            if (field.startsWith('$')) continue
+            let modification = source.modifications.find(m => m.id === field)
+            if (!modification) {
+                modification = new Modification()
+                modification.id = field
+                source.modifications.push(modification)
+            }
+            modification.value = value
+            modification.variableType = variableTypeOf(field, value)
+            overridden.add(`${id}.${field} = ${JSON.stringify(value)}`)
+        }
+    }
+
     const add = (table: 'originalTable' | 'customTable', source: ModifiedObject) => {
         const id = table === 'customTable' ? source.newId : source.oldId
         const baseId = source.oldId
 
         pointAtTheFileThatExists(source)
+        overrideFields(source, id)
 
         if (!standardUnits.has(baseId)) {
             skipped.push(`${id} (not a unit: an item or else)`)
@@ -701,6 +724,12 @@ if (oldW3uBytes) {
 
     if (modelsRepointed.size > 0)
         log.push(`- models named after a file that is not there, repointed: ${[...modelsRepointed].join(', ')}`)
+    const notOverridden = Object.keys(spec.unitTypeOverrides ?? {}).filter(
+        id => !id.startsWith('$') && ![...overridden].some(o => o.startsWith(id + '.'))
+    )
+    if (notOverridden.length > 0)
+        throw new Error(`unitTypeOverrides: ${notOverridden.join(', ')} not among the old map's modified unit types`)
+    if (overridden.size > 0) log.push(`- unit type fields set by the spec: ${[...overridden].join(', ')}`)
 
     // the old hero's looks on MEC's heroes: its skin fields, over theirs
     const facts = JSON.parse(fs.readFileSync(path.join(workDir, 'facts.json'), 'utf8'))
@@ -824,7 +853,17 @@ if (remappedTextures.size > 0)
     log.push(
         `- the terrain textures of the renamed tiles are not imported, their new ids carry the look: ${[...remappedTextures].join(', ')}`
     )
-if (imports.length) {
+// files of the work folder the spec imports (extraImports: path in the map -> file in the work folder): art the old
+// map never had, put in for one it has that the current game no longer shows (Slide Is Magic's footman)
+const extraImports = Object.entries((spec.extraImports ?? {}) as { [mapPath: string]: string })
+    .filter(([mapPath]) => !mapPath.startsWith('$'))
+    .map(([mapPath, file]) => {
+        const full = path.join(workDir, file)
+        if (!fs.existsSync(full)) throw new Error(`extraImports: ${file} is not in the work folder`)
+        return [mapPath, new Uint8Array(fs.readFileSync(full))] as const
+    })
+
+if (imports.length || extraImports.length) {
     const baseImp = base.get('war3map.imp')?.bytes()
     const entries: { flag: number; path: string }[] = []
     if (baseImp) {
@@ -867,7 +906,11 @@ if (imports.length) {
         )
     // twice what will be in it: an MPQ looks a name up by probing from its hash, so a table filled to the brim
     // has no empty slot to end a failed search on, and every lookup that should miss goes wrong instead
-    if (!base.resizeHashtable((base.getFileNames().length + imports.length + rescued.taken.size) * 2))
+    if (
+        !base.resizeHashtable(
+            (base.getFileNames().length + imports.length + rescued.taken.size + extraImports.length) * 2
+        )
+    )
         throw new Error('the base map’s hashtable could not be grown to hold the old map’s imports')
 
     for (const name of imports) {
@@ -879,6 +922,13 @@ if (imports.length) {
         entries.push({ flag: 13, path: name })
         added.push(name)
     }
+    for (const [mapPath, bytes] of extraImports) {
+        if (!base.set(mapPath, bytes)) throw new Error(`${mapPath} could not be added to the converted map`)
+        if (!listed(mapPath)) entries.push({ flag: 13, path: mapPath })
+        added.push(mapPath)
+    }
+    if (extraImports.length > 0)
+        log.push(`- imported from the work folder (extraImports): ${extraImports.map(([p]) => p).join(', ')}`)
     for (const [texture, bytes] of rescued.taken) {
         if (base.get(texture) || listed(texture)) continue
         if (!base.set(texture, bytes)) throw new Error(`${texture} could not be added to the converted map`)
