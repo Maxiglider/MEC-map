@@ -7,6 +7,23 @@ import { BaseArray } from '../BaseArray'
 import { MASKED_LABEL, UNTOUCHED_LABEL, VISIBLE_LABEL, VisibilityState, VisibilityType } from './VisibilityType'
 
 /**
+ * The colours a periodic type gets, in turn, so two of them are never outlined the same by -debugVisibilityZones.
+ * Yellow comes first, which is what the only periodic type of a simple map used to be. The three colours of the
+ * built-ins are left out, so the legend stays unambiguous.
+ */
+const PERIODIC_COLOR_INDEXES = [
+    Constants.YELLOW,
+    Constants.ORANGE,
+    Constants.PURPLE,
+    Constants.TEAL,
+    Constants.PINK,
+    Constants.LIGHTBLUE,
+    Constants.BLUE,
+    Constants.BROWN,
+    Constants.DARKGREEN,
+]
+
+/**
  * The visibility types of the whole game - not of a level, unlike the tiles that reference them.
  *
  * Always holds the three built-ins, recreated by the constructor on every load: "untouched" (the implicit state of
@@ -17,12 +34,19 @@ export class VisibilityTypeArray extends BaseArray<VisibilityType> {
     private visible: VisibilityType
     private masked: VisibilityType
 
+    /**
+     * How many periodic types have been created, which picks the next colour. Not serialized: newFromJson recreates
+     * them in the order they were saved, which is the order they were created in, so every machine lands on the same
+     * colours without having to store them.
+     */
+    private nbPeriodicCreated = 0
+
     constructor() {
         super(true)
 
-        this.untouched = new VisibilityType(UNTOUCHED_LABEL, 'untouched', 'u', true)
-        this.visible = new VisibilityType(VISIBLE_LABEL, 'visible', 'v', true)
-        this.masked = new VisibilityType(MASKED_LABEL, 'masked', 'm', true)
+        this.untouched = new VisibilityType(UNTOUCHED_LABEL, 'untouched', 'u', true, Constants.GREY)
+        this.visible = new VisibilityType(VISIBLE_LABEL, 'visible', 'v', true, Constants.GREEN)
+        this.masked = new VisibilityType(MASKED_LABEL, 'masked', 'm', true, Constants.RED)
 
         this.untouched.id = this._new(this.untouched)
         this.visible.id = this._new(this.visible)
@@ -52,7 +76,10 @@ export class VisibilityTypeArray extends BaseArray<VisibilityType> {
         if (this.isLabelAlreadyUsed(label)) throw `VisibilityType label already used: "${label}"`
         if (visibleTime <= 0 || maskedTime <= 0) throw 'VisibilityType: both times must be greater than zero'
 
-        const vt = new VisibilityType(label, 'periodic', null, false, startState, visibleTime, maskedTime)
+        const colorIndex = PERIODIC_COLOR_INDEXES[this.nbPeriodicCreated % PERIODIC_COLOR_INDEXES.length]
+        this.nbPeriodicCreated++
+
+        const vt = new VisibilityType(label, 'periodic', null, false, colorIndex, startState, visibleTime, maskedTime)
         vt.id = this._new(vt)
 
         return vt

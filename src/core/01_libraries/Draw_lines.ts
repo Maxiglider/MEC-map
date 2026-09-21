@@ -42,6 +42,26 @@ const colorNameToColorNumber = {
     peanut: 81,
 }
 
+/**
+ * The twelve Warcraft III player colours, in the order of Constants.RED (0) to Constants.BROWN (11) - so the same
+ * index names a colour here and in udg_colorCode. Anything that has to be both written in the chat and drawn on the
+ * ground can then hold one index instead of a colour name and a colour code that would drift apart.
+ */
+export const PLAYER_COLOR_NAMES = [
+    'red',
+    'blue',
+    'teal',
+    'purple',
+    'yellow',
+    'orange',
+    'green',
+    'pink',
+    'grey',
+    'lightblue',
+    'darkgreen',
+    'brown',
+]
+
 let currentColor = 0
 let currentWidth = 1
 

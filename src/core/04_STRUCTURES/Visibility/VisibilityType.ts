@@ -1,5 +1,6 @@
 import { MemoryHandler } from 'Utils/MemoryHandler'
 import { Constants } from '../../01_libraries/Constants'
+import { PLAYER_COLOR_NAMES } from '../../01_libraries/Draw_lines'
 import { udg_colorCode } from '../../01_libraries/Init_colorCodes'
 import { Text } from '../../01_libraries/Text'
 
@@ -35,6 +36,13 @@ export class VisibilityType {
     /** Set by VisibilityTypeArray on insertion, so a type can index a plain array - no table keyed by an object */
     id: number = -1
 
+    /**
+     * One of the Constants player colours, which names how this type is written in the chat AND how its zones are
+     * outlined by -debugVisibilityZones. A single index rather than a colour code on one side and a line colour name
+     * on the other, which would sooner or later disagree.
+     */
+    readonly colorIndex: number
+
     /** Only meaningful when kind === 'periodic' */
     private startState: VisibilityState
     /** Only meaningful when kind === 'periodic', in seconds, > 0 */
@@ -47,6 +55,7 @@ export class VisibilityType {
         kind: VisibilityTypeKind,
         theAlias: string | null,
         immutable: boolean,
+        colorIndex: number,
         startState: VisibilityState = 'visible',
         visibleTime: number = 0,
         maskedTime: number = 0
@@ -55,6 +64,7 @@ export class VisibilityType {
         this.kind = kind
         this.theAlias = theAlias
         this.immutable = immutable
+        this.colorIndex = colorIndex
         this.startState = startState
         this.visibleTime = visibleTime
         this.maskedTime = maskedTime
@@ -95,21 +105,11 @@ export class VisibilityType {
         this.theAlias = theAlias
     }
 
-    getColor = () => {
-        switch (this.kind) {
-            case 'untouched':
-                return udg_colorCode[Constants.GREY]
+    /** How the type is written in the chat */
+    getColor = () => udg_colorCode[this.colorIndex]
 
-            case 'visible':
-                return udg_colorCode[Constants.GREEN]
-
-            case 'masked':
-                return udg_colorCode[Constants.RED]
-
-            default:
-                return udg_colorCode[Constants.YELLOW]
-        }
-    }
+    /** How its zones are outlined on the ground, the same colour under another name */
+    getLineColorName = () => PLAYER_COLOR_NAMES[this.colorIndex]
 
     toText = () => {
         let display =

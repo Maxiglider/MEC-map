@@ -108,7 +108,8 @@ class Compositor {
     }
 
     /**
-     * Outlines every zone, one colour per kind of visibility type. This is the visual feedback a maker gets while
+     * Outlines every zone in its own type's colour - the very one -dvt writes that type in, so the chat legend reads
+     * as the map does, and two periodic types are never confused for each other. This is the visual feedback a maker gets while
      * painting: it is redrawn at each recomposition, so once per stroke - a maker usually has -va on anyway, which
      * makes the fog itself show them nothing.
      */
@@ -124,7 +125,7 @@ class Compositor {
         }
 
         this.zones.forAll(zone => {
-            DefineDrawLineType(zone.visibilityType.isPeriodic() ? 'yellow' : 'green', 2)
+            DefineDrawLineType(zone.visibilityType.getLineColorName(), 2)
 
             const x1 = tileToWorldMin(zone.tx1)
             const y1 = tileToWorldMin(zone.ty1)
