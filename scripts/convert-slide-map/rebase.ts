@@ -356,8 +356,8 @@ const CONVERSION_QUEST_TITLE = 'To MEC conversion'
 
 // A MEC 1 map drops that quest altogether (user's rule): its own quests already say it was made with MEC, and the
 // version quest carries the conversion note and MEC's link - a third quest would only say it all again. It is created
-// by an action of the base map's F9 trigger, so that action is disabled in war3map.wtg, where the World Editor keeps
-// it greyed out, and its line removed from war3map.lua, which the editor would write without it.
+// by an action of the base map's F9 trigger, so that action is removed from war3map.wtg and its line from
+// war3map.lua.
 const mecQuestTitleRef = /STRING (\d+)\r?\n(?:\/\/[^\n]*\n)?\{\r?\nMapDescription\r?\n\}/.exec(wts)?.[1]
 const droppedQuestRef = spec.mecOne && mecQuestTitleRef ? `TRIGSTR_${mecQuestTitleRef.padStart(3, '0')}` : undefined
 if (spec.mecOne && !droppedQuestRef) {
@@ -365,15 +365,39 @@ if (spec.mecOne && !droppedQuestRef) {
 }
 if (droppedQuestRef) {
     const wtg = baseBytes('war3map.wtg')
-    const at = wtg.indexOf(Buffer.from(droppedQuestRef + '\0', 'latin1'))
     const name = Buffer.from('CreateQuestBJ\0', 'latin1')
-    const action = at === -1 ? -1 : wtg.lastIndexOf(name, at)
-    // an action is its type, its name, then whether it is enabled: the flag sits right after the name
-    if (action === -1 || wtg.readUInt32LE(action + name.length) !== 1) {
-        throw new Error(`No enabled CreateQuestBJ of ${droppedQuestRef} in the base map's war3map.wtg`)
+    const at = wtg.indexOf(Buffer.from(droppedQuestRef + '\0', 'latin1'))
+    const nameAt = at === -1 ? -1 : wtg.lastIndexOf(name, at)
+    const f9 = nameAt === -1 ? -1 : wtg.lastIndexOf(Buffer.from('F9\0', 'latin1'), nameAt)
+    // the action is the F9 trigger's first, so its action count is the int right before it
+    if (nameAt === -1 || f9 === -1 || nameAt - f9 > 64) {
+        throw new Error(`No CreateQuestBJ of ${droppedQuestRef} opening the F9 trigger of the base map's war3map.wtg`)
     }
-    wtg.writeUInt32LE(0, action + name.length)
-    set('war3map.wtg', wtg, `MEC's own quest (${droppedQuestRef}) disabled in the F9 trigger (MEC 1 map)`)
+    // an action: its type, its name, whether it is enabled, its 4 parameters - each a type, a value, whether it has
+    // sub parameters and whether it is an array - then its count of child actions
+    const actionStart = nameAt - 4
+    let end = nameAt + name.length + 4
+    for (let param = 0; param < 4; param++) {
+        end = wtg.indexOf(0, end + 4) + 1
+        if (wtg.readUInt32LE(end) !== 0 || wtg.readUInt32LE(end + 4) !== 0) {
+            throw new Error(
+                `CreateQuestBJ of ${droppedQuestRef}: a parameter with sub parameters, not the action expected`
+            )
+        }
+        end += 8
+    }
+    if (wtg.readUInt32LE(end) !== 0) throw new Error(`CreateQuestBJ of ${droppedQuestRef}: child actions, not expected`)
+    end += 4
+    const countAt = actionStart - 4
+    const count = wtg.readUInt32LE(countAt)
+    // what follows is the next action, or the next trigger when this one was alone
+    if (count < 1 || count > 1000) throw new Error(`F9 trigger: no action count before ${droppedQuestRef}`)
+    wtg.writeUInt32LE(count - 1, countAt)
+    set(
+        'war3map.wtg',
+        Buffer.concat([wtg.subarray(0, actionStart), wtg.subarray(end)]),
+        `MEC's own quest (${droppedQuestRef}) removed from the F9 trigger (MEC 1 map)`
+    )
 }
 
 if (spec.mecOne) {
