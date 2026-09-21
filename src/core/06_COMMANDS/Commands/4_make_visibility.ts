@@ -499,73 +499,97 @@ export const initExecuteCommandMake_visibility = () => {
         },
     })
 
-    //-convertVisibilities(convv) [<levelId>|current|c]   --> turn a level's old visibility rectangles into painted tiles
+    //-convertVisibilities(convv) <levelId>|current|c|all   --> turn a level's old visibility rectangles into painted tiles
     registerCommand({
         name: 'convertVisibilities',
         alias: ['convv'],
         group,
-        argDescription: '[<levelId>|current|c]',
+        argDescription: '<levelId>|current|c|all',
         description:
             "Turn a level's old visibility rectangles into visible tiles, so it can be painted. Their borders snap to the terrain grid, by up to half a tile",
-        cb: ({ noParam, nbParam, param1 }, escaper) => {
-            if (!noParam && nbParam !== 1) {
+        cb: ({ nbParam, param1 }, escaper) => {
+            if (nbParam !== 1) {
                 return USAGE
             }
 
             const p = escaper.getPlayer()
-            let level = escaper.getMakingLevel()
+            const levels: Level[] = []
 
-            // "current"/"c" names the making level explicitly, as the terrain save commands use it - the same level
-            // the command takes with no parameter at all
-            if (nbParam === 1 && param1 !== 'current' && param1 !== 'c') {
-                if (!IsPositiveInteger(param1)) {
-                    Text.erP(p, 'the level number must be a positive integer, or "current" ("c")')
+            if (param1 === 'all') {
+                // By id rather than through forAll, whose pairs order would have the fog modifiers destroyed in a
+                // different order on each machine, and their handle ids drift apart
+                for (let levelId = 0; levelId <= getUdgLevels().getLastLevelId(); levelId++) {
+                    const level = getUdgLevels().get(levelId)
+
+                    if (level && level.isLegacyVisibility()) {
+                        arrayPush(levels, level)
+                    }
+                }
+
+                if (levels.length === 0) {
+                    Text.erP(p, 'no level has an old visibility rectangle to convert')
+                    return true
+                }
+            } else {
+                // "current"/"c" names the making level explicitly, as the terrain save commands use it
+                let level = escaper.getMakingLevel()
+
+                if (param1 !== 'current' && param1 !== 'c') {
+                    if (!IsPositiveInteger(param1)) {
+                        Text.erP(p, 'the level number must be a positive integer, or "current" ("c"), or "all"')
+                        return true
+                    }
+
+                    const target = getUdgLevels().get(S2I(param1))
+
+                    if (!target) {
+                        Text.erP(p, 'level number ' + param1 + " doesn't exist")
+                        return true
+                    }
+
+                    level = target
+                }
+
+                if (!level.isLegacyVisibility()) {
+                    Text.erP(p, 'level ' + I2S(level.getId()) + ' has no old visibility rectangle to convert')
                     return true
                 }
 
-                const target = getUdgLevels().get(S2I(param1))
-
-                if (!target) {
-                    Text.erP(p, 'level number ' + param1 + " doesn't exist")
-                    return true
-                }
-
-                level = target
-            }
-
-            if (!level.isLegacyVisibility()) {
-                Text.erP(p, 'level ' + I2S(level.getId()) + ' has no old visibility rectangle to convert')
-                return true
+                arrayPush(levels, level)
             }
 
             const visible = getUdgVisibilityTypes().getVisible()
             let nbRects = 0
 
-            level.visibilities.forAll(vm => {
-                nbRects++
-                level.visibilityTiles.setRect(
-                    worldToTile(vm.getX1()),
-                    worldToTile(vm.getY1()),
-                    worldToTile(vm.getX2()),
-                    worldToTile(vm.getY2()),
-                    visible
-                )
-            })
+            for (const level of levels) {
+                level.visibilities.forAll(vm => {
+                    nbRects++
+                    level.visibilityTiles.setRect(
+                        worldToTile(vm.getX1()),
+                        worldToTile(vm.getY1()),
+                        worldToTile(vm.getX2()),
+                        worldToTile(vm.getY2()),
+                        visible
+                    )
+                })
 
-            level.visibilities.removeAllVisibilityModifiers()
+                level.visibilities.removeAllVisibilityModifiers()
+            }
 
             getUdgLevels().refreshVisibilities()
+
+            const where = levels.length === 1 ? 'level ' + I2S(levels[0].getId()) : I2S(levels.length) + ' levels'
 
             Text.mkP(
                 p,
                 I2S(nbRects) +
-                    ' visibility rectangles of level ' +
-                    I2S(level.getId()) +
+                    ' visibility rectangles of ' +
+                    where +
                     ' converted into visible tiles - their borders moved onto the terrain grid, by up to ' +
                     I2S(Constants.LARGEUR_CASE / 2) +
                     ' units'
             )
-            Text.mkP(p, 'this one cannot be undone, and -smic now saves this level as tiles')
+            Text.mkP(p, 'this one cannot be undone, and -smic now saves ' + where + ' as tiles')
 
             return true
         },
