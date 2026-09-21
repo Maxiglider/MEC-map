@@ -13,7 +13,9 @@ import { LevelArray } from '../04_STRUCTURES/Level/LevelArray'
 import { MonsterTypeArray } from '../04_STRUCTURES/Monster/MonsterTypeArray'
 import { TerrainSaveArray } from '../04_STRUCTURES/TerrainSave/TerrainSaveArray'
 import { TerrainTypeArray } from '../04_STRUCTURES/TerrainType/TerrainTypeArray'
+import { setPartitionWarningHandler } from '../04_STRUCTURES/Visibility/VisibilityPartition'
 import { VisibilityTypeArray } from '../04_STRUCTURES/Visibility/VisibilityTypeArray'
+import { log } from '../Log/log'
 
 //Escapers
 const initEscapers = () => {
@@ -32,6 +34,9 @@ export const initTerrainTypes = () => {
 
 //Visibility types
 export const initVisibilityTypes = () => {
+    // the partition keeps no import of its own, so that the conversion tooling can run it too: its safety net is
+    // wired to the game's log from here
+    setPartitionWarningHandler(log)
     setUdgVisibilityTypes(new VisibilityTypeArray())
 }
 

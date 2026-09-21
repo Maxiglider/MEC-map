@@ -1,5 +1,21 @@
-import { arrayPush } from '../../01_libraries/Basic_functions'
-import { log } from '../../Log/log'
+/**
+ * This module is deliberately free of any import: it is the one piece of MEC the conversion tooling runs too, so that
+ * a converted map's game data is partitioned exactly as the game would partition it, rather than by a second
+ * algorithm that would disagree. Node cannot load the game's own modules (Constants.ts is UTF-16, log reaches into
+ * globals), hence the local push and the injectable warning below.
+ */
+
+/** `arr.push` as tstl compiles it best, inlined here rather than imported from Basic_functions */
+const push = <T>(arr: T[], value: T) => {
+    arr[arr.length] = value
+}
+
+/** Where the safety net below reports. The game wires it to `log`; the conversion tooling leaves it silent. */
+let warn: (message: string) => void = () => {}
+
+export const setPartitionWarningHandler = (handler: (message: string) => void) => {
+    warn = handler
+}
 
 /** Tile coordinates, both ends included */
 export type TileRect = {
@@ -109,8 +125,8 @@ const partitionComponent = (
     let by2 = startTy
 
     componentOf[indexOf(startTx, startTy)] = componentId
-    arrayPush(cellsX, startTx)
-    arrayPush(cellsY, startTy)
+    push(cellsX, startTx)
+    push(cellsY, startTy)
 
     // Index based walk over the growing lists: no stack object, and a fixed visiting order
     let read = 0
@@ -141,8 +157,8 @@ const partitionComponent = (
             }
 
             componentOf[indexOf(nx, ny)] = componentId
-            arrayPush(cellsX, nx)
-            arrayPush(cellsY, ny)
+            push(cellsX, nx)
+            push(cellsY, ny)
         }
     }
 
@@ -175,7 +191,7 @@ const partitionComponent = (
                 continue
             }
 
-            arrayPush(reflex, { px, py, dir: !topLeft || !topRight ? 1 : -1, used: false })
+            push(reflex, { px, py, dir: !topLeft || !topRight ? 1 : -1, used: false })
             reflexAt[pointKey(px, py)] = reflex.length
         }
     }
@@ -207,7 +223,7 @@ const partitionComponent = (
         }
 
         if (inside) {
-            arrayPush(horizontal, { at: a.py, from: a.px, to: b.px, a, b })
+            push(horizontal, { at: a.py, from: a.px, to: b.px, a, b })
         }
     }
 
@@ -233,7 +249,7 @@ const partitionComponent = (
                 }
 
                 if (inside) {
-                    arrayPush(vertical, { at: px, from: previous.py, to: current.py, a: previous, b: current })
+                    push(vertical, { at: px, from: previous.py, to: current.py, a: previous, b: current })
                 }
             }
 
@@ -252,11 +268,11 @@ const partitionComponent = (
             const other = vertical[v]
 
             if (chord.from <= other.at && other.at <= chord.to && other.from <= chord.at && chord.at <= other.to) {
-                arrayPush(crossed, v)
+                push(crossed, v)
             }
         }
 
-        arrayPush(adjacency, crossed)
+        push(adjacency, crossed)
     }
 
     const matchH: number[] = []
@@ -307,7 +323,7 @@ const partitionComponent = (
     for (let h = 0; h < horizontal.length; h++) {
         if (matchH[h] === -1) {
             inZH[h] = true
-            arrayPush(queue, h)
+            push(queue, h)
         }
     }
 
@@ -332,7 +348,7 @@ const partitionComponent = (
 
             if (matched !== -1 && !inZH[matched]) {
                 inZH[matched] = true
-                arrayPush(queue, matched)
+                push(queue, matched)
             }
         }
     }
@@ -430,8 +446,8 @@ const emit = (
         const pieceY: number[] = []
 
         pieceOf[pointKey(cellsX[c], cellsY[c])] = pieceCount
-        arrayPush(pieceX, cellsX[c])
-        arrayPush(pieceY, cellsY[c])
+        push(pieceX, cellsX[c])
+        push(pieceY, cellsY[c])
 
         let x1 = cellsX[c]
         let x2 = cellsX[c]
@@ -467,20 +483,20 @@ const emit = (
                 }
 
                 pieceOf[pointKey(nx, ny)] = pieceCount
-                arrayPush(pieceX, nx)
-                arrayPush(pieceY, ny)
+                push(pieceX, nx)
+                push(pieceY, ny)
             }
         }
 
         if (pieceX.length === (x2 - x1 + 1) * (y2 - y1 + 1)) {
-            arrayPush(out, { tx1: x1, ty1: y1, tx2: x2, ty2: y2 })
+            push(out, { tx1: x1, ty1: y1, tx2: x2, ty2: y2 })
             continue
         }
 
         // A correct construction leaves no concave vertex, so this never runs. It is kept as a net - producing a few
         // extra fog modifiers beats producing a hole - but it is logged, so a real case can be looked into instead of
         // passing silently.
-        log(
+        warn(
             `VisibilityPartition: non rectangular piece of ${pieceX.length} tiles in [${x1},${y1}]-[${x2},${y2}], sliced into rows`
         )
 
@@ -493,7 +509,7 @@ const emit = (
                 if (inPiece && runStart === null) {
                     runStart = tx
                 } else if (!inPiece && runStart !== null) {
-                    arrayPush(out, { tx1: runStart, ty1: ty, tx2: tx - 1, ty2: ty })
+                    push(out, { tx1: runStart, ty1: ty, tx2: tx - 1, ty2: ty })
                     runStart = null
                 }
             }
