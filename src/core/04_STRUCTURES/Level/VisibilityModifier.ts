@@ -1,7 +1,7 @@
 import { MemoryHandler } from 'Utils/MemoryHandler'
 import { RefreshHideAllVM } from '../../03_view_all_hide_all/View_all_hide_all'
-import { Level } from './Level'
 import { Natives } from '../../wc3_natives_unsecured/Natives'
+import { Level } from './Level'
 
 export class VisibilityModifier {
     private isActive = false
@@ -44,9 +44,10 @@ export class VisibilityModifier {
         this.isActive = activ
     }
 
-    copy = (): VisibilityModifier => {
-        return new VisibilityModifier(this.x1, this.y1, this.x2, this.y2)
-    }
+    getX1 = () => this.x1
+    getY1 = () => this.y1
+    getX2 = () => this.x2
+    getY2 = () => this.y2
 
     toJson = () => {
         const output = MemoryHandler.getEmptyObject<any>()

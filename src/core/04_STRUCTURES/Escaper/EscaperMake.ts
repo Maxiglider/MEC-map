@@ -3,6 +3,7 @@ import { createTimer } from '../../../Utils/mapUtils'
 import { StopUnit } from '../../01_libraries/Basic_functions'
 import { Constants } from '../../01_libraries/Constants'
 import { Text } from '../../01_libraries/Text'
+import { BrushShape } from '../../05_MAKE_STRUCTURES/Make/BrushShape'
 import { Make } from '../../05_MAKE_STRUCTURES/Make/Make'
 import { MakePropertyChange } from '../../05_MAKE_STRUCTURES/Make/MakePropertyChange'
 import { MakeCopyLevelPatrol } from '../../05_MAKE_STRUCTURES/Make_copy_paste/MakeCopyLevelPatrol'
@@ -50,7 +51,6 @@ import { MakeSetUnitTeleportPeriod } from '../../05_MAKE_STRUCTURES/Make_set_uni
 import { MakeEnd } from '../../05_MAKE_STRUCTURES/Make_start_end_visibilityModifier/MakeEnd'
 import { MakeStart } from '../../05_MAKE_STRUCTURES/Make_start_end_visibilityModifier/MakeStart'
 import { MakeTpForEnd } from '../../05_MAKE_STRUCTURES/Make_start_end_visibilityModifier/MakeTpForEnd'
-import { MakeVisibilityModifier } from '../../05_MAKE_STRUCTURES/Make_start_end_visibilityModifier/MakeVisibilityModifier'
 import { MakeTerrainCopyPaste } from '../../05_MAKE_STRUCTURES/Make_terrain/MakeTerrainCopyPaste'
 import { MakeTerrainCreate } from '../../05_MAKE_STRUCTURES/Make_terrain/MakeTerrainCreate'
 import { MakeTerrainCreateBrush } from '../../05_MAKE_STRUCTURES/Make_terrain/MakeTerrainCreateBrush'
@@ -60,6 +60,8 @@ import { MakeTerrainHeight } from '../../05_MAKE_STRUCTURES/Make_terrain_height/
 import { MakeSelectMonsterForEvent } from '../../05_MAKE_STRUCTURES/Make_terrain_save/MakeSelectMonsterForEvent'
 import { MakeTerrainSaveZone } from '../../05_MAKE_STRUCTURES/Make_terrain_save/MakeTerrainSaveZone'
 import { MakeUpdateTerrainSaveZone } from '../../05_MAKE_STRUCTURES/Make_terrain_save/MakeUpdateTerrainSaveZone'
+import { MakeVisibility } from '../../05_MAKE_STRUCTURES/Make_visibility/MakeVisibility'
+import { MakeVisibilityBrush } from '../../05_MAKE_STRUCTURES/Make_visibility/MakeVisibilityBrush'
 import { MakeAction } from '../../05_MAKE_STRUCTURES/MakeLastActions/MakeAction'
 import { MakeLastActions } from '../../05_MAKE_STRUCTURES/MakeLastActions/MakeLastActions'
 import { Natives } from '../../wc3_natives_unsecured/Natives'
@@ -72,6 +74,7 @@ import { MonsterSpawn } from '../MonsterSpawn/MonsterSpawn'
 import { HorizontalRegionDirection } from '../Region/HorizontalRectangleRegion'
 import type { TerrainSave } from '../TerrainSave/TerrainSave'
 import type { TerrainType } from '../TerrainType/TerrainType'
+import { VisibilityType } from '../Visibility/VisibilityType'
 import { Escaper } from './Escaper'
 import { GetMirrorEscaper } from './Escaper_functions'
 
@@ -806,9 +809,15 @@ export abstract class EscaperMake {
         if (this.hero) this.make = new MakeTpForEnd(this.hero)
     }
 
-    makeCreateVisibilityModifier = () => {
+    makeCreateVisibility = (visibilityType: VisibilityType, brushSize?: number, shape: BrushShape = 'square') => {
         this.destroyMake()
-        if (this.hero) this.make = new MakeVisibilityModifier(this.hero)
+
+        if (brushSize) {
+            this.make = new MakeVisibilityBrush(this as unknown as Escaper, visibilityType, brushSize, shape)
+            return
+        }
+
+        if (this.hero) this.make = new MakeVisibility(this.hero, visibilityType)
     }
 
     makeCreateDebugMECRegions = (mode: MakeMECRegionMode, directionForHorizontal: HorizontalRegionDirection = 'up') => {

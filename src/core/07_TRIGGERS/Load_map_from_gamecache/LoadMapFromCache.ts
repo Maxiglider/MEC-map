@@ -4,6 +4,7 @@ import {
     getUdgMonsterTypes,
     getUdgTerrainSaves,
     getUdgTerrainTypes,
+    getUdgVisibilityTypes,
     globals,
     setHeroBaseCollisionSize,
     setHeroModelPath,
@@ -16,12 +17,14 @@ import {
     keyForDoorTypes,
     keyForDoorTypesFromJson,
 } from '../../04_STRUCTURES/KeyAndDoor/KeyAndDoorTypes'
+import { VisibilityCompositor } from '../../04_STRUCTURES/Visibility/VisibilityCompositor'
 import {
     initCasterTypes,
     initLevels,
     initMonsterTypes,
     initTerrainSaves,
     initTerrainTypes,
+    initVisibilityTypes,
 } from '../../Init/initArrays'
 import { Gravity } from '../Slide_and_CheckTerrain_triggers/Gravity'
 
@@ -39,12 +42,16 @@ export class LoadMapFromCache {
 
                 if (!currentlyOnGameStart) {
                     //erase previous data from the game
+                    //the fog modifiers first: they belong to the levels about to be thrown away
+                    VisibilityCompositor.destroy()
                     getUdgLevels().destroy()
                     getUdgCasterTypes().destroy()
                     getUdgMonsterTypes().destroy()
                     getUdgTerrainTypes().destroy()
+                    getUdgVisibilityTypes().destroy()
                     getUdgTerrainSaves().destroy()
                     initTerrainTypes()
+                    initVisibilityTypes()
                     initMonsterTypes()
                     initCasterTypes()
                     initLevels()
@@ -108,6 +115,11 @@ export class LoadMapFromCache {
                 //terrain types MEC
                 if (gameData.terrainTypesMec) {
                     getUdgTerrainTypes().newFromJson(gameData.terrainTypesMec)
+                }
+
+                //visibility types, before the levels whose tiles reference them by label
+                if (gameData.visibilityTypes) {
+                    getUdgVisibilityTypes().newFromJson(gameData.visibilityTypes)
                 }
 
                 //monster types

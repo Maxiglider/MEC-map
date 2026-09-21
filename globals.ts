@@ -7,6 +7,7 @@ import type { MonsterType } from './src/core/04_STRUCTURES/Monster/MonsterType'
 import type { MonsterTypeArray } from './src/core/04_STRUCTURES/Monster/MonsterTypeArray'
 import type { TerrainSaveArray } from './src/core/04_STRUCTURES/TerrainSave/TerrainSaveArray'
 import type { TerrainTypeArray } from './src/core/04_STRUCTURES/TerrainType/TerrainTypeArray'
+import type { VisibilityTypeArray } from './src/core/04_STRUCTURES/Visibility/VisibilityTypeArray'
 import { Natives } from './src/core/wc3_natives_unsecured/Natives'
 
 //GLOBALS
@@ -15,6 +16,7 @@ export const globals: {
     escapers?: EscaperArray
     levels?: LevelArray
     terrainTypes?: TerrainTypeArray
+    visibilityTypes?: VisibilityTypeArray
     casterTypes?: CasterTypeArray
     monsterTypes?: MonsterTypeArray
     terrainSaves?: TerrainSaveArray
@@ -133,6 +135,15 @@ export const setUdgTerrainTypes = (tta: TerrainTypeArray) => {
 export const getUdgTerrainTypes = (): TerrainTypeArray => {
     //print('called getUdgTerrainTypes')
     return <TerrainTypeArray>globals.terrainTypes
+}
+
+//Visibility types
+export const setUdgVisibilityTypes = (vta: VisibilityTypeArray) => {
+    globals.visibilityTypes = vta
+}
+
+export const getUdgVisibilityTypes = (): VisibilityTypeArray => {
+    return <VisibilityTypeArray>globals.visibilityTypes
 }
 
 //Caster types

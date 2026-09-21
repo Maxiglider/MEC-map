@@ -4,7 +4,7 @@ import { Text } from 'core/01_libraries/Text'
 import { gg_trg_apparition_dialogue_et_fermeture_automatique } from 'core/08_GAME/Mode_coop/creation_dialogue'
 import { getUdgCasterTypes, getUdgEscapers, getUdgMonsterTypes, getUdgTerrainTypes, globals } from '../../../../globals'
 import { errorHandler } from '../../../Utils/mapUtils'
-import { GetRandomAngle, StopUnit } from '../../01_libraries/Basic_functions'
+import { GetRandomAngle, StopUnit, arrayPush } from '../../01_libraries/Basic_functions'
 import { udg_colorCode } from '../../01_libraries/Init_colorCodes'
 import { Natives } from '../../wc3_natives_unsecured/Natives'
 import { BaseArray } from '../BaseArray'
@@ -22,10 +22,10 @@ import type { MonsterType } from '../Monster/MonsterType'
 import type { MonsterSpawnArray } from '../MonsterSpawn/MonsterSpawnArray'
 import type { ClearMobArray } from '../Monster_properties/ClearMobArray'
 import { isDeathTerrain } from '../TerrainType/TerrainType'
+import { VisibilityCompositor } from '../Visibility/VisibilityCompositor'
 import { Level } from './Level'
 import { sameLevelProgression } from './LevelProgression'
 import { IsLevelBeingMade } from './Level_functions'
-import type { VisibilityModifierArray } from './VisibilityModifierArray'
 
 const MIN_TIME_BETWEEN_GOTNL = 0.05
 
@@ -249,24 +249,35 @@ export class LevelArray extends BaseArray<Level> {
 
     /**
      * Applies the visibilities of the current level, recursively activating all previous levels' visibilities as well.
+     *
+     * Two systems run side by side here. The old rectangles are activated level by level exactly as they always were,
+     * so an existing map renders identically. The tiles of those same active levels are handed to the compositor,
+     * highest level first, which resolves them per tile and rebuilds the fog modifiers - see VisibilityCompositor.
      */
     refreshVisibilities = () => {
         const highestLevelBeingPlayedOrMade = this.getHighestLevelBeingPlayedOrMade()
+
+        // forAllReversed walks the ids downwards, which is the order the compositor needs: the highest level wins
+        const activeLevelsHighestFirst: Level[] = []
 
         let blackMaskActivated = false
         this.forAllReversed((level: Level, levelId: number) => {
             if (IsLevelBeingMade(level) || this.hasPlayersInLevel(levelId)) {
                 level.activateVisibilities(true)
+                arrayPush(activeLevelsHighestFirst, level)
                 blackMaskActivated = level.getResetVisiblitiesAtStart()
             } else if (levelId > highestLevelBeingPlayedOrMade.id || blackMaskActivated) {
                 level.activateVisibilities(false)
             } else if (levelId <= highestLevelBeingPlayedOrMade.id) {
                 level.activateVisibilities(true)
+                arrayPush(activeLevelsHighestFirst, level)
                 if (level.getResetVisiblitiesAtStart()) {
                     blackMaskActivated = true
                 }
             }
         })
+
+        VisibilityCompositor.refresh(activeLevelsHighestFirst)
     }
 
     getHighestLevelBeingPlayedOrMade = () => {
@@ -416,6 +427,11 @@ export class LevelArray extends BaseArray<Level> {
             if (levelJson.visibilities) {
                 level.visibilities.newFromJson(levelJson.visibilities)
             }
+
+            //visibility tiles, saved as the rectangles they partition into
+            if (levelJson.visibilityTiles) {
+                level.visibilityTiles.newFromJson(levelJson.visibilityTiles)
+            }
             level.setResetVisiblitiesAtStart(levelJson.resetVisiblitiesAtStart ?? false)
 
             //monsters
@@ -564,18 +580,6 @@ export class LevelArray extends BaseArray<Level> {
         let i = 0
         while (true) {
             if (i > this.lastInstanceId || this.data[i].meteors == ma) break
-            i = i + 1
-        }
-        if (i > this.lastInstanceId) {
-            return null
-        }
-        return this.data[i]
-    }
-
-    getLevelFromVisibilityModifierArray = (vma: VisibilityModifierArray) => {
-        let i = 0
-        while (true) {
-            if (i > this.lastInstanceId || this.data[i].visibilities == vma) break
             i = i + 1
         }
         if (i > this.lastInstanceId) {

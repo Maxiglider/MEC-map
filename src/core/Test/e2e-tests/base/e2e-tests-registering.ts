@@ -6,6 +6,7 @@ import {
 } from '../immolation'
 import { activateAllLevels, activateFirstLevelOnly } from '../levels'
 import { spawn } from '../spawn'
+import { visibilityPartition } from '../visibilityPartition'
 import { e2e } from './e2e-tests-base'
 
 export const init_E2ETests = () => {
@@ -16,4 +17,5 @@ export const init_E2ETests = () => {
     e2e.registerTest(restoreImmolation)
     e2e.registerTest(contactCheckForEveryHero)
     e2e.registerTest(contactCheckForAsyncSlidesOnly)
+    e2e.registerTest(visibilityPartition)
 }

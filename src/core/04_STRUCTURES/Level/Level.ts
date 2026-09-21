@@ -26,10 +26,10 @@ import { CircleMobArray } from '../Monster_properties/CircleMobArray'
 import { ClearMobArray } from '../Monster_properties/ClearMobArray'
 import { PortalMobArray } from '../Monster_properties/PortalMobArray'
 import { RegionArray } from '../Region/RegionArray'
+import { VisibilityTileArray } from '../Visibility/VisibilityTileArray'
 import { End, Start, TpForEnd } from './StartAndEnd'
 import { StaticSlideArray } from './StaticSlideArray'
 import { TriggerArray } from './Triggers'
-import type { VisibilityModifier } from './VisibilityModifier'
 import { VisibilityModifierArray } from './VisibilityModifierArray'
 import { checkPointReviveHeroes } from './checkpointReviveHeroes_function'
 
@@ -66,7 +66,10 @@ export class Level {
      */
     static debugRegionsMode: 'on' | 'off' | 'on_monsters' = 'off'
 
+    /** The old, reveal-only rectangles. Read only now: loaded and saved as they are, but nothing creates any more */
     visibilities: VisibilityModifierArray
+    /** What this level says about the visibility of the terrain tiles, composed with the other levels' at runtime */
+    visibilityTiles: VisibilityTileArray
     private resetVisiblitiesAtStart: boolean // if true, all visibilities from previous levels are disabled at level start
     monsters: MonsterArray
     monsterSpawns: MonsterSpawnArray
@@ -84,6 +87,7 @@ export class Level {
 
     constructor() {
         this.visibilities = new VisibilityModifierArray(this)
+        this.visibilityTiles = new VisibilityTileArray()
         this.resetVisiblitiesAtStart = false
         this.triggers = new TriggerArray()
         this.monsters = new MonsterArray(this)
@@ -249,6 +253,7 @@ export class Level {
         this.start && this.start.destroy()
         this.end && this.end.destroy()
         this.visibilities.destroy()
+        this.visibilityTiles.destroy()
         this.triggers.destroy()
         this.monsters.destroy()
         this.monsterSpawns.destroy()
@@ -301,16 +306,15 @@ export class Level {
         return this.livesEarnedAtBeginning
     }
 
-    newVisibilityModifier(x1: number, y1: number, x2: number, y2: number) {
-        return this.visibilities.new(x1, y1, x2, y2)
-    }
-
-    newVisibilityModifierFromExisting(vm: VisibilityModifier) {
-        return this.visibilities.newFromExisting(vm)
-    }
+    /**
+     * A level holds either the old rectangles or the tiles, never both: the old ones cannot be created any more, and
+     * a level that still has some refuses to be painted until -convertVisibilities or -remv has emptied it.
+     */
+    isLegacyVisibility = () => this.visibilities.count() > 0
 
     removeVisibilities = () => {
         this.visibilities.removeAllVisibilityModifiers()
+        this.visibilityTiles.clear()
     }
 
     activateVisibilities(activate: boolean) {
@@ -582,6 +586,7 @@ export class Level {
 
         //visibilities
         json.visibilities = this.visibilities.toJson()
+        json.visibilityTiles = this.visibilityTiles.toJson()
         json.resetVisiblitiesAtStart = this.resetVisiblitiesAtStart
 
         //monsters
