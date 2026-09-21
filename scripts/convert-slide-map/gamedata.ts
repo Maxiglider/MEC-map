@@ -22,6 +22,7 @@ import { parseWts } from './mapFiles'
 import { readMecOneData } from './mecOneData'
 import { fixObjectDataWriter, isSkinField, variableTypeOf } from './objectData'
 import { addCustomTextTriggers, CustomTextTrigger, hasCategory } from './triggerFiles'
+import { visibilityTilesOfLevels } from './visibilityTiles'
 
 fixObjectDataWriter()
 
@@ -75,14 +76,6 @@ if (mecOne) {
         visibilities: l.visibilities,
         ...(l.nbLives !== undefined ? { nbLives: l.nbLives } : {}),
     }))
-
-    // visibility rectangles the old map's own triggers ran, which its MEC 1 data doesn't hold: the lights an old
-    // map flashes on a dark level, now MEC's own blinking visibilities (spec extraVisibilities)
-    for (const v of (spec.extraVisibilities ?? []) as Json[]) {
-        if (!spec.levels[v.level]) throw new Error(`extraVisibilities: no level ${v.level}`)
-        const { level: _level, ...visibility } = v
-        spec.levels[v.level].visibilities.push(visibility)
-    }
 }
 
 // monster types the old map's data doesn't hold: the projectiles a caster shoots, say (spec extraMonsterTypes),
@@ -277,20 +270,7 @@ function range(a: number, b: number) {
 
 const levels: Json[] = spec.levels
 
-/**
- * A level's visibility rectangles: a region name or a rect, or `{ rect, blinkVisibleTime, blinkHiddenTime }` for one
- * that shows and hides over and over, as an old map lights a dark maze now and then.
- */
-type VisibilityRef = RectRef | { rect: RectRef; blinkVisibleTime: number; blinkHiddenTime: number }
-const isBlinking = (v: VisibilityRef): v is { rect: RectRef; blinkVisibleTime: number; blinkHiddenTime: number } =>
-    typeof v === 'object' && 'rect' in v
-const levelVisibilities = levels.map(l =>
-    (l.visibilities as VisibilityRef[]).map(v =>
-        isBlinking(v)
-            ? { rect: resolveRect(v.rect), blinkVisibleTime: v.blinkVisibleTime, blinkHiddenTime: v.blinkHiddenTime }
-            : { rect: resolveRect(v) }
-    )
-)
+const levelVisibilities = levels.map(l => (l.visibilities as RectRef[]).map(resolveRect))
 // areas whose units and gates belong to a level whatever its visibility says (spec levels[].unitsIn): for a map whose
 // visibility doesn't split the levels (Sliding Bunnys shows the whole map from the start)
 const levelUnitAreas = levels.map(l => ((l.unitsIn ?? []) as RectRef[]).map(resolveRect))
@@ -299,7 +279,7 @@ const levelUnitAreas = levels.map(l => ((l.unitsIn ?? []) as RectRef[]).map(reso
 const levelOfPoint = (x: number, y: number) => {
     const inArea = levelUnitAreas.findIndex(rects => rects.some(r => inside(r, x, y)))
     if (inArea !== -1) return inArea
-    const found = levelVisibilities.findIndex(vms => vms.some(v => inside(v.rect, x, y)))
+    const found = levelVisibilities.findIndex(rects => rects.some(r => inside(r, x, y)))
     return found === -1 ? levels.length - 1 : found
 }
 
@@ -985,10 +965,46 @@ safeStarts.forEach((start, i) => {
     }
 })
 
+// ---------------------------------------------------------------------------------------------- visibility tiles
+
+/**
+ * An old map that lights part of its maze now and then needs a `periodic` visibility type, and a type lives on
+ * tiles: so every level of such a map goes to tiles, its reveal-only rectangles included, since a level holds
+ * either the rectangles or the tiles and a `masked` tile cannot hide what a legacy level reveals
+ * (docs/VISIBILITY.md). A map whose levels only ever reveal keeps its rectangles, which move no border.
+ */
+const visibilityTypes: Json[] = (spec.visibilityTypes ?? []).map((vt: Json) => ({
+    label: vt.label,
+    alias: vt.alias ?? null,
+    kind: 'periodic',
+    startState: vt.startState ?? 'masked',
+    visibleTime: vt.visibleTime,
+    maskedTime: vt.maskedTime,
+}))
+const visibilityTypeLabels = new Set(visibilityTypes.map(vt => vt.label))
+
+const periodicVisibilities: { level: number; type: string; rect: Rect }[] = (spec.periodicVisibilities ?? []).map(
+    (pv: Json) => {
+        if (!visibilityTypeLabels.has(pv.type)) throw new Error(`periodicVisibilities: unknown type ${pv.type}`)
+        if (!levels[pv.level]) throw new Error(`periodicVisibilities: no level ${pv.level}`)
+        return { level: pv.level, type: pv.type, rect: resolveRect(pv.rect) }
+    }
+)
+
+const visibilityTiles = periodicVisibilities.length
+    ? visibilityTilesOfLevels(
+          levels.map((_level, i) => ({
+              visible: levelVisibilities[i],
+              periodic: periodicVisibilities.filter(pv => pv.level === i).map(pv => ({ type: pv.type, rect: pv.rect })),
+          }))
+      )
+    : undefined
+
 const gameData = {
     terrainTypesMec,
     monsterTypes,
     casterTypes,
+    ...(visibilityTypes.length ? { visibilityTypes } : {}),
     levels: levels.map((level, i) => ({
         id: i,
         start: rounded(safeStarts[i]),
@@ -1002,15 +1018,17 @@ const gameData = {
                   ),
               }
             : {}),
-        visibilities: levelVisibilities[i].map(v => ({
-            x1: Math.round(v.rect.minX),
-            y1: Math.round(v.rect.minY),
-            x2: Math.round(v.rect.maxX),
-            y2: Math.round(v.rect.maxY),
-            ...(v.blinkVisibleTime && v.blinkHiddenTime
-                ? { blinkVisibleTime: v.blinkVisibleTime, blinkHiddenTime: v.blinkHiddenTime }
-                : {}),
-        })),
+        // the old reveal-only rectangles, or the tiles they became when the map needs more than revealing
+        ...(visibilityTiles
+            ? { visibilities: [], visibilityTiles: visibilityTiles[i] }
+            : {
+                  visibilities: levelVisibilities[i].map(r => ({
+                      x1: Math.round(r.minX),
+                      y1: Math.round(r.minY),
+                      x2: Math.round(r.maxX),
+                      y2: Math.round(r.maxY),
+                  })),
+              }),
         resetVisiblitiesAtStart: level.resetVisiblitiesAtStart ?? false,
         ...(level.nbLives !== undefined ? { nbLives: level.nbLives } : {}),
         ...(level.startMessage ? { startMessage: level.startMessage } : {}),
