@@ -35,7 +35,7 @@ class Compositor {
     /** The level stack resolved into one layer, reused between recompositions rather than reallocated */
     private composed = new VisibilityTileArray()
     private zones = new VisibilityZoneArray()
-    private phases: { [typeId: number]: Phase } = {}
+    private phases: { [typeId: number]: Phase | undefined } = {}
 
     private debugEnabled = false
     /**
@@ -153,7 +153,7 @@ class Compositor {
         for (let id = 0; id < visibilityTypes.getIdLimit(); id++) {
             const phase = this.phases[id]
 
-            if (phase) {
+            if (phase !== undefined) {
                 DestroyTimer(phase.timer)
                 delete this.phases[id]
             }
@@ -176,20 +176,20 @@ class Compositor {
             const phase = this.phases[id]
 
             if (!visibilityType || !hasZones || !visibilityType.isPeriodic()) {
-                if (phase) {
+                if (phase !== undefined) {
                     DestroyTimer(phase.timer)
                     delete this.phases[id]
                 }
 
                 // A plain visible type has nothing to drive: its zones are simply on
-                if (visibilityType && hasZones) {
+                if (visibilityType !== null && hasZones) {
                     this.applyPhase(visibilityType, true)
                 }
 
                 continue
             }
 
-            if (phase) {
+            if (phase !== undefined) {
                 this.applyPhase(visibilityType, phase.visible)
                 continue
             }

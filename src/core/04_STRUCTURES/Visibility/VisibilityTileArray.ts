@@ -34,7 +34,7 @@ type TileBox = {
  * compositor wants rectangles anyway.
  */
 export class VisibilityTileArray {
-    private types: { [index: number]: VisibilityType } = {}
+    private types: { [index: number]: VisibilityType | undefined } = {}
     private nbTiles = 0
 
     private box: TileBox = { minTx: 0, minTy: 0, maxTx: -1, maxTy: -1 }
@@ -45,7 +45,7 @@ export class VisibilityTileArray {
 
     count = () => this.nbTiles
 
-    get = (tx: number, ty: number): VisibilityType | null => this.types[indexOf(tx, ty)] || null
+    get = (tx: number, ty: number): VisibilityType | null => this.types[indexOf(tx, ty)] ?? null
 
     /**
      * Paints one tile and gives back what was there before, which is what the make actions need to undo a stroke.
@@ -53,10 +53,10 @@ export class VisibilityTileArray {
      */
     set = (tx: number, ty: number, visibilityType: VisibilityType): VisibilityType | null => {
         const index = indexOf(tx, ty)
-        const previous = this.types[index] || null
+        const previous = this.types[index] ?? null
 
         if (visibilityType.isUntouched()) {
-            if (previous) {
+            if (previous !== null) {
                 delete this.types[index]
                 this.nbTiles--
                 this.boxDirty = true
@@ -65,7 +65,7 @@ export class VisibilityTileArray {
             return previous
         }
 
-        if (!previous) {
+        if (previous === null) {
             this.nbTiles++
             this.growBox(tx, ty)
         }
@@ -82,7 +82,7 @@ export class VisibilityTileArray {
     setIfAbsent = (tx: number, ty: number, visibilityType: VisibilityType) => {
         const index = indexOf(tx, ty)
 
-        if (this.types[index] || visibilityType.isUntouched()) {
+        if (this.types[index] !== undefined || visibilityType.isUntouched()) {
             return
         }
 

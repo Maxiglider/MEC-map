@@ -105,7 +105,7 @@ export const initExecuteCommandMake_visibility = () => {
             const visibleTime = parsePositiveTime(param3)
             const maskedTime = parsePositiveTime(param4)
 
-            if (!visibleTime || !maskedTime) {
+            if (visibleTime === null || maskedTime === null) {
                 Text.erP(p, 'both times must be numbers of seconds greater than zero')
                 return true
             }
@@ -238,7 +238,7 @@ export const initExecuteCommandMake_visibility = () => {
             const visibleTime = parsePositiveTime(param2)
             const maskedTime = parsePositiveTime(param3)
 
-            if (!visibleTime || !maskedTime) {
+            if (visibleTime === null || maskedTime === null) {
                 Text.erP(p, 'both times must be numbers of seconds greater than zero')
                 return true
             }

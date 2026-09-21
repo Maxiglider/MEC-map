@@ -66,8 +66,8 @@ export const partitionTiles = (mask: TileMask): TileRect[] => {
         return out
     }
 
-    // Sparse, only the filled tiles ever get an entry. 0/undefined means "not visited yet".
-    const componentOf: { [index: number]: number } = {}
+    // Sparse, only the filled tiles ever get an entry. undefined means "not visited yet".
+    const componentOf: { [index: number]: number | undefined } = {}
     const indexOf = (tx: number, ty: number) => (ty - mask.minTy) * width + (tx - mask.minTx)
 
     let componentCount = 0
@@ -75,7 +75,7 @@ export const partitionTiles = (mask: TileMask): TileRect[] => {
     // Row major, so the components come out in a fixed order whatever the shape
     for (let ty = mask.minTy; ty <= mask.maxTy; ty++) {
         for (let tx = mask.minTx; tx <= mask.maxTx; tx++) {
-            if (!mask.has(tx, ty) || componentOf[indexOf(tx, ty)]) {
+            if (!mask.has(tx, ty) || componentOf[indexOf(tx, ty)] !== undefined) {
                 continue
             }
 
@@ -93,7 +93,7 @@ export const partitionTiles = (mask: TileMask): TileRect[] => {
  */
 const partitionComponent = (
     mask: TileMask,
-    componentOf: { [index: number]: number },
+    componentOf: { [index: number]: number | undefined },
     indexOf: (tx: number, ty: number) => number,
     componentId: number,
     startTx: number,
@@ -136,7 +136,7 @@ const partitionComponent = (
                 continue
             }
 
-            if (!mask.has(nx, ny) || componentOf[indexOf(nx, ny)]) {
+            if (!mask.has(nx, ny) || componentOf[indexOf(nx, ny)] !== undefined) {
                 continue
             }
 
@@ -154,7 +154,7 @@ const partitionComponent = (
     //     not being 4-adjacent.
     const reflex: Reflex[] = []
     // Grid point (px, py) -> its 1 based rank in `reflex`. Sparse, membership only, never iterated.
-    const reflexAt: { [key: number]: number } = {}
+    const reflexAt: { [key: number]: number | undefined } = {}
     const pointStride = bx2 - bx1 + 3
     const pointKey = (px: number, py: number) => (py - by1 + 1) * pointStride + (px - bx1 + 1)
 
@@ -219,7 +219,7 @@ const partitionComponent = (
         for (let py = by1; py <= by2 + 1; py++) {
             const rank = reflexAt[pointKey(px, py)]
 
-            if (!rank) {
+            if (rank === undefined) {
                 continue
             }
 
@@ -415,12 +415,12 @@ const emit = (
     const isCutBelow = (x: number, y: number) => (cutBelow ? cutBelow[pointKey(x, y)] === true : false)
     const isCutLeft = (x: number, y: number) => (cutLeft ? cutLeft[pointKey(x, y)] === true : false)
 
-    const pieceOf: { [key: number]: number } = {}
+    const pieceOf: { [key: number]: number | undefined } = {}
     let pieceCount = 0
 
     // The cells are visited in the order the component's flood fill found them, which is itself fixed
     for (let c = 0; c < cellsX.length; c++) {
-        if (pieceOf[pointKey(cellsX[c], cellsY[c])]) {
+        if (pieceOf[pointKey(cellsX[c], cellsY[c])] !== undefined) {
             continue
         }
 
@@ -462,7 +462,7 @@ const emit = (
                 const nx = neighboursX[n]
                 const ny = neighboursY[n]
 
-                if (!inComponent(nx, ny) || pieceOf[pointKey(nx, ny)]) {
+                if (!inComponent(nx, ny) || pieceOf[pointKey(nx, ny)] !== undefined) {
                     continue
                 }
 

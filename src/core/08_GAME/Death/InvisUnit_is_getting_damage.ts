@@ -58,10 +58,8 @@ const InitTrig_InvisUnit_is_getting_damage = () => {
                         'saves'
                     )
 
-                    if (hooks.hooks_onCoopHeroRevive) {
-                        for (const hook of hooks.hooks_onCoopHeroRevive.getHooks()) {
-                            hook.execute2(escaper, targetEscaper)
-                        }
+                    for (const hook of hooks.hooks_onCoopHeroRevive.getHooks()) {
+                        hook.execute2(escaper, targetEscaper)
                     }
                 }
 
