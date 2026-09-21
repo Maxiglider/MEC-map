@@ -344,27 +344,35 @@ for (const [placeholder, value] of [
     }
 }
 
-// MEC's own quest says the map was converted to MEC with help of AI (user's rule); its other lines (and links) stay
+// MEC's own quest says the map was converted to MEC with help of AI (user's rule); its other lines (and links) stay.
+// A MEC 1 map is left out of it: it was already made with MEC, in the World Editor, by its author's own hand - what
+// happens here is its engine going from MEC 1 to MEC 2, not a conversion to MEC - so it keeps the base map's "made
+// with" wording, which is simply true of it.
 const MADE_WITH_MEC = 'This map was made with Max Escape Creation 2.'
 const CONVERTED_TO_MEC = 'This map was converted to Max Escape Creation 2 with help of AI.'
-const madeWithCount = wts.split(MADE_WITH_MEC).length - 1
-wts = wts.split(MADE_WITH_MEC).join(CONVERTED_TO_MEC)
-log.push(
-    madeWithCount
-        ? `- \`war3map.wts\`: "${MADE_WITH_MEC}" → "${CONVERTED_TO_MEC}" (${madeWithCount}×, MEC's quest)`
-        : `- \`war3map.wts\`: **"${MADE_WITH_MEC}" not found** in the base map's strings: MEC's quest not changed, check it`
-)
-// and that quest's title, a whole string of its own
+// that quest's title, a whole string of its own
 const MEC_QUEST_TITLE = 'MapDescription'
 const CONVERSION_QUEST_TITLE = 'To MEC conversion'
-const questTitle = new RegExp(`(STRING \\d+\\r?\\n(?://[^\\n]*\\n)?\\{\\r?\\n)${MEC_QUEST_TITLE}(\\r?\\n\\})`, 'g')
-const questTitleCount = (wts.match(questTitle) ?? []).length
-wts = wts.replace(questTitle, `$1${CONVERSION_QUEST_TITLE}$2`)
-log.push(
-    questTitleCount
-        ? `- \`war3map.wts\`: MEC's quest title "${MEC_QUEST_TITLE}" → "${CONVERSION_QUEST_TITLE}" (${questTitleCount}×)`
-        : `- \`war3map.wts\`: **MEC's quest title "${MEC_QUEST_TITLE}" not found**: not changed, check it`
-)
+
+if (spec.mecOne) {
+    log.push(`- \`war3map.wts\`: MEC's own quest left as it is (MEC 1 map: it was already made with MEC)`)
+} else {
+    const madeWithCount = wts.split(MADE_WITH_MEC).length - 1
+    wts = wts.split(MADE_WITH_MEC).join(CONVERTED_TO_MEC)
+    log.push(
+        madeWithCount
+            ? `- \`war3map.wts\`: "${MADE_WITH_MEC}" → "${CONVERTED_TO_MEC}" (${madeWithCount}×, MEC's quest)`
+            : `- \`war3map.wts\`: **"${MADE_WITH_MEC}" not found** in the base map's strings: MEC's quest not changed, check it`
+    )
+    const questTitle = new RegExp(`(STRING \\d+\\r?\\n(?://[^\\n]*\\n)?\\{\\r?\\n)${MEC_QUEST_TITLE}(\\r?\\n\\})`, 'g')
+    const questTitleCount = (wts.match(questTitle) ?? []).length
+    wts = wts.replace(questTitle, `$1${CONVERSION_QUEST_TITLE}$2`)
+    log.push(
+        questTitleCount
+            ? `- \`war3map.wts\`: MEC's quest title "${MEC_QUEST_TITLE}" → "${CONVERSION_QUEST_TITLE}" (${questTitleCount}×)`
+            : `- \`war3map.wts\`: **MEC's quest title "${MEC_QUEST_TITLE}" not found**: not changed, check it`
+    )
+}
 
 set('war3map.wts', wts, 'the strings above')
 
