@@ -451,9 +451,28 @@ set(
 const CORE_START = '-- Max Escape Creation'
 const CORE_END = 'onGlobalInit(initMEC_core)'
 const corePath = path.join(__dirname, '..', '..', 'bin', 'MEC_core.lua')
-const newCore = args.includes('--keep-base-core') ? undefined : fs.readFileSync(corePath, 'utf8')
+let newCore = args.includes('--keep-base-core') ? undefined : fs.readFileSync(corePath, 'utf8')
 if (newCore && (!newCore.startsWith(CORE_START) || !newCore.trimEnd().endsWith(CORE_END))) {
     throw new Error(`${corePath} does not run from "${CORE_START}" to "${CORE_END}": run yarn release`)
+}
+
+// the conversion noted in MEC's own version quest (user's rule), as a second paragraph under the core's own lines:
+// that quest is the one a player opens to know what the map runs, so the note stands where it is looked for, and
+// the old map's own quests are left as their author wrote them. A MEC 1 map says what really happened to it - its
+// engine went from MEC 1 to MEC 2 - rather than claiming a conversion to MEC it never needed.
+const today = new Date()
+const buildDate = [today.getFullYear(), today.getMonth() + 1, today.getDate()]
+    .map(n => String(n).padStart(2, '0'))
+    .join('-')
+const conversionNote = spec.mecOne
+    ? `${buildDate} Map brought from MEC 1 to MEC 2 by Maximaxou with help of AI`
+    : `${buildDate} Map converted to MEC by Maximaxou with help of AI`
+if (newCore) {
+    const description = /(QuestSetDescription\(q, ")([^"]*)(")/
+    if (!description.test(newCore)) throw new Error(`No MEC version quest to note the conversion in: ${corePath}`)
+    // two \n in the Lua string the core hands the quest, which makes one blank line between the paragraphs
+    newCore = newCore.replace(description, `$1$2\\n\\n${conversionNote}$3`)
+    log.push(`- MEC's version quest: "${conversionNote}" added under its description`)
 }
 const spliceCore = (text: string, where: string) => {
     const start = text.indexOf(CORE_START)

@@ -1173,25 +1173,6 @@ const legacyQuests = spec.legacyQuests
           .map(q => ({ ...q, text: spec.legacyQuests.replaceText?.[q.title!] ?? q.text }))
     : []
 
-// the conversion noted in the quests of every converted map (user's rule): in the old map's version log if it has
-// one, else in a quest of its own
-const today = new Date()
-const buildDate = [today.getFullYear(), today.getMonth() + 1, today.getDate()]
-    .map(n => String(n).padStart(2, '0'))
-    .join('-')
-const conversionNote = `${buildDate} Map converted to MEC by Maximaxou with help of AI`
-const versionLog = legacyQuests.find(q => /version|change\s*log|history|updates?\b|patch notes/i.test(q.title ?? ''))
-if (versionLog) {
-    versionLog.text = (versionLog.text ?? '') + '\n\n|cffffd700' + conversionNote
-} else {
-    legacyQuests.push({
-        type: '2',
-        title: 'Conversion to MEC',
-        text: '|cffffd700' + conversionNote,
-        icon: 'ReplaceableTextures\\CommandButtons\\BTNTomeBrown.blp',
-    })
-}
-
 const questsCode = legacyQuests.length
     ? `-- the old map's quests, created before MEC's own; the obsolete ones (commands MEC doesn't have) left out
 onGlobalInit(function()
@@ -1382,7 +1363,7 @@ fs.writeFileSync(
         '',
         `Custom triggers (category "${CUSTOM_CATEGORY}" in the editor): ${customTriggers.map(t => t.name).join(', ') || 'none'}.`,
         '',
-        `Legacy quests: ${legacyQuests.map(q => q.title).join(', ') || 'none'}. Conversion note (${versionLog ? `in "${versionLog.title}"` : 'in its own quest'}): ${conversionNote}.`,
+        `Legacy quests: ${legacyQuests.map(q => q.title).join(', ') || 'none'} (the conversion note goes to MEC's own version quest: see rebase.md).`,
         '',
         `Decor: ${count(decor, d => d.typeId) || 'none'}${spec.decor ? ' (created by the generated decor trigger)' : ' (not created: no decor entry in the spec)'}.`,
         '',
