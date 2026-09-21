@@ -75,7 +75,7 @@ export const initExecuteCommandMake_visibility = () => {
         return visibilityType
     }
 
-    //-newVisibilityType(newvt) <label> <visible|masked> <visibleTime> <maskedTime>   --> add a new periodic visibility type
+    //-newVisibilityType(newvt) <label> visible|v|masked|m <visibleTime> <maskedTime>   --> add a new periodic visibility type
     registerCommand({
         name: 'newVisibilityType',
         alias: ['newvt'],
@@ -182,7 +182,7 @@ export const initExecuteCommandMake_visibility = () => {
         },
     })
 
-    //-setVisibilityTypeStart(setvts) <label> <visible|masked>
+    //-setVisibilityTypeStart(setvts) <label> visible|v|masked|m
     registerCommand({
         name: 'setVisibilityTypeStart',
         alias: ['setvts'],

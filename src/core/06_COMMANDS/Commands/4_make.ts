@@ -545,7 +545,7 @@ export const initExecuteCommandMake = () => {
         },
     })
 
-    //-setLevelResetVisibilities(setlrv) <boolean> [<levelId>]   --> set whether visibilities are reset when re-entering the level
+    //-setLevelResetVisibilities(setlrv) <boolean> [<levelId>]   --> set whether the levels below stop contributing to the visibility when this one starts
     registerCommand({
         name: 'setLevelResetVisibilities',
         alias: ['setlrv'],
