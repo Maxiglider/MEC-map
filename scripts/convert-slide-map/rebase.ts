@@ -745,7 +745,7 @@ if (imports.length) {
 
     if (rescued.wanted.length > 0 && !process.env.WAR3_LEGACY_MPQS_LOCATION)
         log.push(
-            `- **the models draw with art Reforged no longer ships, and WAR3_LEGACY_MPQS_LOCATION is not set**, so they will show nothing but their shadow: ${rescued.wanted.join(', ')}`
+            `- **the imported models draw with ${rescued.wanted.length} texture(s) of the game, and WAR3_LEGACY_MPQS_LOCATION is not set**: a model whose texture the current game dropped will show nothing but its shadow`
         )
     else if (rescued.missing.length > 0)
         log.push(`- **art the models draw with and the legacy game has not either**: ${rescued.missing.join(', ')}`)
@@ -761,7 +761,9 @@ if (imports.length) {
         throw new Error(
             `the base map holds ${base.countUnresolved()} file(s) whose name is unknown, so its hashtable cannot be grown`
         )
-    if (!base.resizeHashtable(base.getFileNames().length + imports.length + rescued.taken.size))
+    // twice what will be in it: an MPQ looks a name up by probing from its hash, so a table filled to the brim
+    // has no empty slot to end a failed search on, and every lookup that should miss goes wrong instead
+    if (!base.resizeHashtable((base.getFileNames().length + imports.length + rescued.taken.size) * 2))
         throw new Error('the base map’s hashtable could not be grown to hold the old map’s imports')
 
     for (const name of imports) {
@@ -781,7 +783,7 @@ if (imports.length) {
     }
     if (rescued.taken.size > 0)
         log.push(
-            `- art taken from the legacy game for the models that draw with it, which Reforged no longer ships: ${[...rescued.taken.keys()].join(', ')}`
+            `- ${rescued.taken.size} texture(s) the imported models draw with, taken from the legacy game so they render whatever the current one still ships: ${[...rescued.taken.keys()].join(', ')}`
         )
 
     const imp = Buffer.concat([

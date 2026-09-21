@@ -90,7 +90,8 @@ export const saveArchiveWhole = (archive: MpqArchive): Uint8Array => {
     }
 
     const whole = new MpqArchive()
-    whole.resizeHashtable(files.size)
+    // twice the files: a table filled to the brim leaves no empty slot to end a failed lookup on
+    whole.resizeHashtable(files.size * 2)
 
     for (const [name, bytes] of files) {
         if (!whole.set(name, bytes)) throw new Error(`${name} could not be written to the archive`)

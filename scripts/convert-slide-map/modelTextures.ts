@@ -7,9 +7,13 @@
  * footman (`Frost_Fury_v1.1.mdx`, on `UI\Glues\SinglePlayer\HumanCampaign3D\HumanCampaignFootman.blp`) and its
  * crow (`Raven.mdx`) are in that case: they worked for years, then stopped, without the map changing.
  *
- * What the game dropped cannot be known from here, so the rule is on where the art comes from: `UI\` is the glue
- * and campaign art, the part Reforged rebuilt. Those textures are taken from a Warcraft III Legacy install and
- * imported into the converted map at their own paths, where the model looks for them.
+ * What the game still ships cannot be known from here - its files are in CASC, not in an MPQ we can read - and
+ * guessing at which folders Reforged rebuilt only fixed some of them: the footman also draws with
+ * `Textures\Ice3b.blp`, at the root of the old generic art, and stayed invisible. So every texture a model draws
+ * with and the map does not hold is taken from a Warcraft III Legacy install and imported at its own path.
+ *
+ * It costs about 2 MB on Slide Is Magic, and it pins those textures to their classic version. For a map converted
+ * as SD only, which is what a map made before Reforged gets, that is what it would be served anyway.
  */
 import * as fs from 'fs'
 import MpqArchive from 'mdx-m3-viewer-th/dist/cjs/parsers/mpq/archive'
@@ -19,12 +23,6 @@ const MdlxModel = require('mdx-m3-viewer-th/dist/cjs/parsers/mdlx/model').defaul
 
 /** The archives of Warcraft III The Frozen Throne (Legacy), in the order the game reads them */
 const MPQS = ['War3.mpq', 'War3x.mpq', 'War3Local.mpq', 'War3xLocal.mpq', 'Deprecated.mpq']
-
-/**
- * Where Reforged rebuilt the art, and so where a texture a model borrowed may be gone. Everything else the game
- * ships is left where it is: carrying it would only make the map heavier.
- */
-const AT_RISK = /^UI\\/i
 
 /** The textures a model really draws with: the ones its materials name, not the ones merely listed in the file */
 export const texturesDrawnBy = (modelBytes: Uint8Array): string[] => {
@@ -74,7 +72,7 @@ export const rescueModelTextures = (
         }
 
         for (const texture of drawn) {
-            if (AT_RISK.test(texture) && !mapHas(texture)) wanted.add(texture)
+            if (!mapHas(texture)) wanted.add(texture)
         }
     }
 
