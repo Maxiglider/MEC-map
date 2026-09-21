@@ -44,6 +44,7 @@ import {
     parseW3iHead,
     parseWts,
     readArchive,
+    saveArchiveWhole,
     withoutProtectedMarks,
 } from './mapFiles'
 import { fixObjectDataWriter, isSkinField, variableTypeOf } from './objectData'
@@ -726,12 +727,27 @@ if (imports.length) {
         entries.some(e => (e.flag === 13 ? e.path : 'war3mapImported\\' + e.path).toLowerCase() === p.toLowerCase())
     const added: string[] = []
     const kept: string[] = []
+
+    // An MPQ's hash table has a fixed number of slots, and the base map's is full at 64. Every set() past that
+    // silently answers false, which is how the first builds lost most of the old map's imports. Room is made
+    // first, for everything already there plus everything about to come.
+    //
+    // Growing it needs every name in the archive to be known, and the base map's `(attributes)` is in no listfile:
+    // asking for it by name is what resolves it.
+    base.get('(attributes)')
+    if (base.countUnresolved() > 0)
+        throw new Error(
+            `the base map holds ${base.countUnresolved()} file(s) whose name is unknown, so its hashtable cannot be grown`
+        )
+    if (!base.resizeHashtable(base.getFileNames().length + imports.length))
+        throw new Error('the base map’s hashtable could not be grown to hold the old map’s imports')
+
     for (const name of imports) {
         if (base.get(name) || listed(name)) {
             kept.push(name)
             continue
         }
-        base.set(name, old.get(name)!)
+        if (!base.set(name, old.get(name)!)) throw new Error(`${name} could not be added to the converted map`)
         entries.push({ flag: 13, path: name })
         added.push(name)
     }
@@ -758,8 +774,7 @@ if (imports.length) {
 // the 512-byte HM3W header before the archive, when the base map has one (maps saved by the current editor
 // have none). War3Map.save would read the map info again, which its parser cannot for the base map's format,
 // so it is written here from the base map's own header.
-const archiveBytes = base.save()
-if (!archiveBytes) throw new Error('The map could not be saved')
+const archiveBytes = saveArchiveWhole(base)
 const baseHasHeader = fs.readFileSync(baseMapPath).toString('latin1', 0, 4) === 'HM3W'
 const header = Buffer.alloc(baseHasHeader ? 512 : 0)
 if (baseHasHeader) {

@@ -67,6 +67,46 @@ export const KNOWN_MAP_FILES = [
     '(attributes)',
 ]
 
+/**
+ * Saves an archive, and makes sure nothing was lost on the way.
+ *
+ * `mdx-m3-viewer`'s own save drops a file on the first save that follows an addition, and does it silently: the
+ * conversion shipped maps missing a texture with nothing saying so. Rather than fight it, everything is read out
+ * and written into a fresh archive, which has no block left over from a deleted file and no `(attributes)` for the
+ * save to remove. The result is read back and checked, so a loss can never pass unnoticed again.
+ */
+export const saveArchiveWhole = (archive: MpqArchive): Uint8Array => {
+    const files = new Map<string, Uint8Array>()
+
+    for (const name of archive.getFileNames()) {
+        // an archive's own bookkeeping is rebuilt by the save, and a name that did not resolve is a file we cannot
+        // read anyway - neither belongs in the copy
+        if (name.startsWith('(') || /^File[0-9A-F]{8}$/.test(name)) continue
+
+        const file = archive.get(name)
+        const bytes = file?.bytes()
+        if (!bytes) throw new Error(`${name} could not be read from the archive`)
+        files.set(name, bytes)
+    }
+
+    const whole = new MpqArchive()
+    whole.resizeHashtable(files.size)
+
+    for (const [name, bytes] of files) {
+        if (!whole.set(name, bytes)) throw new Error(`${name} could not be written to the archive`)
+    }
+
+    const saved = whole.save()
+    if (!saved) throw new Error('the archive could not be saved')
+
+    const check = new MpqArchive()
+    check.load(saved, true)
+    const missing = [...files.keys()].filter(name => !check.get(name))
+    if (missing.length > 0) throw new Error(`the saved archive is missing ${missing.join(', ')}`)
+
+    return saved
+}
+
 export const readArchive = (buffer: Buffer) => {
     const archive = new MpqArchive()
     archive.load(new Uint8Array(buffer), true)

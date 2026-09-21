@@ -18,7 +18,7 @@ import Modification from 'mdx-m3-viewer-th/dist/cjs/parsers/w3x/w3u/modification
 import ModifiedObject from 'mdx-m3-viewer-th/dist/cjs/parsers/w3x/w3u/modifiedobject'
 import * as path from 'path'
 import { callArgs } from './jass'
-import { parseWts } from './mapFiles'
+import { parseWts, saveArchiveWhole } from './mapFiles'
 import { readMecOneData } from './mecOneData'
 import { fixObjectDataWriter, isSkinField, variableTypeOf } from './objectData'
 import { addCustomTextTriggers, CustomTextTrigger, hasCategory } from './triggerFiles'
@@ -1354,8 +1354,7 @@ if ((spec.unitTypes ?? []).length > 0) {
     archive.set('war3mapSkin.w3u', skin.save())
 }
 
-const saved = archive.save()
-if (!saved) throw new Error('The map could not be saved')
+const saved = saveArchiveWhole(archive)
 fs.writeFileSync(outputMap, saved)
 
 // ---------------------------------------------------------------------------------------------- summary
