@@ -23,6 +23,7 @@
         "prettier-staged-files": "ts-node --transpile-only scripts/prettier-staged-files.ts",
         "prepare": "yarn build-tsconfig && husky",
         "convert-slide-map:extract": "ts-node --transpile-only scripts/convert-slide-map/extract.ts",
+        "convert-slide-map:war3-paths": "ts-node --transpile-only scripts/convert-slide-map/generateWar3FilePaths.ts",
         "convert-slide-map:rebase": "ts-node --transpile-only scripts/convert-slide-map/rebase.ts",
         "convert-slide-map:gamedata": "ts-node --transpile-only scripts/convert-slide-map/gamedata.ts",
         "convert-slide-map:build": "ts-node --transpile-only scripts/convert-slide-map/build.ts"

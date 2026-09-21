@@ -1,5 +1,18 @@
+import * as fs from 'fs'
 import MpqArchive from 'mdx-m3-viewer-th/dist/cjs/parsers/mpq/archive'
-import { TERRAIN_TEXTURE_PATHS } from './terrainTextures'
+import * as path from 'path'
+
+/**
+ * Every file path Warcraft III ships with, from the `(listfile)` of its own MPQs
+ * (`yarn convert-slide-map:war3-paths`). A map replaces a game asset by importing a file at the game's path for
+ * it, and nothing in the map points at that import: the game goes by the path alone. Trying them all is what finds
+ * those imports on a protected map, and a hit is proof, an MPQ being keyed by the hash of the path.
+ */
+const war3FilePaths = (): string[] =>
+    fs
+        .readFileSync(path.join(__dirname, 'war3FilePaths.txt'), 'latin1')
+        .split('\n')
+        .filter(line => line !== '')
 
 /** The files a map may hold, for protected maps whose (listfile) is emptied */
 export const KNOWN_MAP_FILES = [
@@ -52,11 +65,9 @@ export const readArchive = (buffer: Buffer) => {
 
     const names = new Set<string>(KNOWN_MAP_FILES)
 
-    // A map re-skins a terrain tile by importing a file over the path the game loads that tile's texture from.
-    // Nothing in the map points at it - the game goes from the tile id alone - so it is invisible to the walk
-    // below, which only follows paths the map writes down. Every one of them is tried instead: an MPQ is keyed by
-    // the hash of the path, so a hit is proof the file is there, and a miss costs nothing.
-    Object.values(TERRAIN_TEXTURE_PATHS).forEach(path => names.add(path))
+    // the game's own paths, which the walk below cannot reach: what the map replaces of the game is found by
+    // trying them, not by following anything the map writes down
+    war3FilePaths().forEach(p => names.add(p))
     const listfile = archive.get('(listfile)')?.text()
     listfile?.split(/\r?\n/).forEach(n => n.trim() !== '' && names.add(n.trim()))
 
