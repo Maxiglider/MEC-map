@@ -386,6 +386,17 @@ export abstract class Monster {
         return this.circleMobParent ? 'circleMob' : 'monster'
     }
 
+    /** Takes in the new immolation radius of the monster type without rebuilding the unit. */
+    refreshImmolation = (previousSkill: number | null) => {
+        if (this.u && isImmolationSystemEnabled() && !this.isDisabledB) {
+            previousSkill && UnitRemoveAbility(this.u, previousSkill)
+            const skill = this.mt?.getImmolationSkill() || 0
+            skill > 0 && UnitAddAbility(this.u, skill)
+        }
+
+        this.refreshCollisionLandmark()
+    }
+
     refreshCollisionLandmark = () => {
         const localEscaper = getUdgEscapers().get(GetPlayerId(Natives.UGetLocalPlayer()))
         const displayCollisionLandmark = localEscaper?.getDisplayCollisionLandmarks() ?? false

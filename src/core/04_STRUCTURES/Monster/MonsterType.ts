@@ -189,9 +189,13 @@ export class MonsterType {
         if (immolationRadius !== 0 && !IMMOLATION_SKILLS[immolationRadius]) {
             return false
         }
+
+        const previousSkill = this.immolationSkill
         this.immolationRadius = immolationRadius
         this.immolationSkill = IMMOLATION_SKILLS[immolationRadius]
-        this.refresh()
+
+        // the units are not rebuilt for this: see Monster.refreshImmolation
+        this.forEachLiveLevel(level => level.refreshImmolationOfMonsterType(this, previousSkill))
         requestContactChunksRebuild()
         return true
     }

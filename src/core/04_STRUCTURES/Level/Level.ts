@@ -266,6 +266,10 @@ export class Level {
         this.monsters.recreateMonstersUnitsOfType(mt)
     }
 
+    refreshImmolationOfMonsterType(mt: MonsterType, previousSkill: number | null) {
+        this.monsters.refreshImmolationOfType(mt, previousSkill)
+    }
+
     playIdleOfMonsterType(mt: MonsterType) {
         this.monsters.playIdleOfMonsterType(mt)
     }

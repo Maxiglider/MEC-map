@@ -158,6 +158,15 @@ export class MonsterArray extends BaseArray<Monster> {
         }
     }
 
+    /** The new immolation radius of a type taken in by its monsters, without rebuilding any of them */
+    refreshImmolationOfType = (mt: MonsterType, previousSkill: number | null) => {
+        for (const [_, monster] of pairs(this.data)) {
+            if (monster.getMonsterType() === mt) {
+                monster.refreshImmolation(previousSkill)
+            }
+        }
+    }
+
     //Destroy one monster
     clearMonster = (monsterId: number) => {
         if (this.data[monsterId]) {
