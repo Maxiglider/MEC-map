@@ -672,9 +672,30 @@ const remappedTextures = new Set(
         .map(id => TERRAIN_TEXTURE_PATHS[id]?.toLowerCase())
         .filter(Boolean)
 )
-const imports = [...old.keys()].filter(
-    n => !KNOWN_MAP_FILES.some(k => k.toLowerCase() === n.toLowerCase()) && !remappedTextures.has(n.toLowerCase())
+
+/**
+ * What a MEC 1 map carries of the game that MEC 2 has no use for (user's rule, 2026-09-21). The World Editor of the
+ * day put a copy of the ability table in the map; it is one of an old patch - a quarter the size of the game's
+ * today - and importing it would put that old table back over the current one, MEC's own immolation abilities
+ * (`ANpi`) included.
+ */
+const MEC_ONE_LEGACY_IMPORTS = ['Units\\AbilityData.slk']
+
+const excludedImports = new Set(
+    [...(spec.mecOne ? MEC_ONE_LEGACY_IMPORTS : []), ...((spec.excludeImports ?? []) as string[])].map(p =>
+        p.toLowerCase()
+    )
 )
+
+const imports = [...old.keys()].filter(
+    n =>
+        !KNOWN_MAP_FILES.some(k => k.toLowerCase() === n.toLowerCase()) &&
+        !remappedTextures.has(n.toLowerCase()) &&
+        !excludedImports.has(n.toLowerCase())
+)
+
+const dropped = [...old.keys()].filter(n => excludedImports.has(n.toLowerCase()))
+if (dropped.length > 0) log.push(`- imports left out, of the game and out of date: ${dropped.join(', ')}`)
 if (remappedTextures.size > 0)
     log.push(
         `- the terrain textures of the renamed tiles are not imported, their new ids carry the look: ${[...remappedTextures].join(', ')}`
