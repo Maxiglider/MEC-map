@@ -217,6 +217,47 @@ const remapW3eTilesets = (bytes: Buffer) => {
     return bytes
 }
 
+/**
+ * The terrain in the format of the current game: version 12, which the World Editor writes and which MEC's own tools
+ * read - `mec-smic-loader` stopped on Slide Is Magic's, a version 11 kept as the old map had it ("Unable to read
+ * beyond the end of the stream"), reading 8 bytes a corner where there were 7.
+ *
+ * Version 11 packs a corner's ground texture and flags in one byte, the texture in the low 4 bits and the flags
+ * above it (ramp 0x10, blight 0x20, water 0x40, map edge 0x80); version 12 gives them 16 bits, the texture in the
+ * low 6 and the flags from 0x40 on (ramp 0x40, blight 0x80, water 0x100, map edge 0x200). Nothing else moves.
+ */
+const upgradeW3eToV12 = (bytes: Buffer): Buffer => {
+    const version = bytes.readUInt32LE(4)
+    if (version >= 12) return bytes
+    if (version !== 11) throw new Error(`war3map.w3e: version ${version}, neither 11 nor 12`)
+
+    let at = 4 + 4 + 1 + 4
+    at += 4 + bytes.readUInt32LE(at) * 4 // ground tilesets
+    at += 4 + bytes.readUInt32LE(at) * 4 // cliff tilesets
+    const width = bytes.readUInt32LE(at)
+    const height = bytes.readUInt32LE(at + 4)
+    at += 16 // width, height, centre offset
+    const corners = width * height
+    if (bytes.length !== at + corners * 7)
+        throw new Error(`war3map.w3e: ${bytes.length} bytes, not the ${at + corners * 7} of ${width}x${height} corners`)
+
+    const upgraded = Buffer.alloc(at + corners * 8)
+    bytes.copy(upgraded, 0, 0, at)
+    upgraded.writeUInt32LE(12, 4)
+
+    for (let i = 0; i < corners; i++) {
+        const from = at + i * 7
+        const to = at + i * 8
+        bytes.copy(upgraded, to, from, from + 4) // ground height, water level and map edge
+        const textureAndFlags = bytes[from + 4]
+        upgraded.writeUInt16LE((textureAndFlags & 0x0f) | ((textureAndFlags & 0xf0) << 2), to + 4)
+        bytes.copy(upgraded, to + 6, from + 5, from + 7) // variation, cliff texture and layer
+    }
+
+    log.push(`- \`war3map.w3e\`: version 11 upgraded to 12, the current game's (${width}x${height} corners)`)
+    return upgraded
+}
+
 for (const name of [
     'war3map.w3e',
     'war3map.wpm',
@@ -227,7 +268,11 @@ for (const name of [
 ]) {
     const bytes = old.get(name)
     if (bytes) {
-        set(name, name === 'war3map.w3e' ? remapW3eTilesets(Buffer.from(bytes)) : bytes, 'the old map’s')
+        set(
+            name,
+            name === 'war3map.w3e' ? upgradeW3eToV12(remapW3eTilesets(Buffer.from(bytes))) : bytes,
+            'the old map’s'
+        )
     } else if (base.has(name) && ['war3mapMap.blp', 'war3mapPreview.tga', 'war3map.mmp'].includes(name)) {
         base.delete(name)
         log.push(`- \`${name}\`: removed, the old map has none and the base map’s shows its own terrain`)

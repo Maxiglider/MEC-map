@@ -184,6 +184,8 @@ Write them in `conversion-work/<map>/custom-triggers.lua` (or several files) and
   - Count the old waits exactly, including the ones hidden in Blizzard functions: a transmission called with its wait flag (`TransmissionFromUnitTypeWithNameBJ(…, true)`) holds the old trigger for the line's whole duration (`bj_TIMETYPE_ADD`: the given time, plus the sound's length if any). Leaving those out made Polar Escape 3's ending 7 s too short.
   - Give each step its own timer at its absolute time from the start, rather than chaining them, so a step that goes wrong doesn't hold up the next ones and the end of the game.
 
+- **Terrain format**: the rebase writes `war3map.w3e` in version 12, the current game's, whatever the old map's (`upgradeW3eToV12`). Old maps have version 11, 7 bytes a corner; `mec-smic-loader` reads 8 and stopped on a converted map ("Unable to read beyond the end of the stream", Slide Is Magic, 2026-09-21). Checked corner by corner against the old terrain on Slide Is Magic and Polar Escape 3 (ramps, water and map edges included): nothing else moves.
+
 ## MEC 1 maps
 
 A MEC 1 map was made with the vJass MEC of this repo's `v1-jass` tag, from the World Editor, its script compiled to JASS. Its structures keep their names there (`s__Escaper_`, `s__Level_`, `s__TerrainTypeArray_`…), which is what `detectMapKind` looks for (`mecOne.ts`). Such a map splits in three, and `summary.md`'s "MEC 1" section gives each:
