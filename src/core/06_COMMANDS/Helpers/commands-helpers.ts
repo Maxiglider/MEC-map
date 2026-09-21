@@ -97,16 +97,35 @@ export const snapPointToSlide = (
     return createPoint(newX, newY)
 }
 
-// For command -patchImmo
+/**
+ * For command -patchImmo: every radius moved by what the hero's collision gained or lost, so the distance a monster
+ * kills at does not change (ContactCheck reaches at the radius plus the hero's own collision).
+ *
+ * A radius the hero's new collision swallows whole - the hero being alone wider than everything the monster used to
+ * reach - cannot be written: 5 is the smallest MEC has, and keeping it there would make the monster deadlier than it
+ * ever was, by the whole of the new collision. Such a type loses its immolation instead and kills nobody, which is
+ * the near side of an approximation that has no exact answer (user's decision, 2026-09-21, on Slide Is Magic, whose
+ * 19 types at MEC 1's minimum of 5 could not kill anyone: 295 of their 296 monsters stand on ground that kills on
+ * its own). The count is given back so the command can say how many went.
+ */
 export const adaptMonstersImmolation = (delta: number) => {
+    let nbLost = 0
+
     getUdgMonsterTypes().forAll(monsterType => {
         const previousImmolationRadius = monsterType.getImmolationRadius()
         if (previousImmolationRadius > 0) {
             // if immolation is null, we keep it null
-            const newImmolationRadius = Math.max(5, Math.min(400, monsterType.getImmolationRadius() + delta))
-            monsterType.setImmolation(newImmolationRadius)
+            const newImmolationRadius = Math.min(400, previousImmolationRadius + delta)
+
+            if (newImmolationRadius <= 0) {
+                nbLost++
+            }
+
+            monsterType.setImmolation(newImmolationRadius <= 0 ? 0 : newImmolationRadius)
         }
     })
+
+    return nbLost
 }
 
 export const cameraFieldMap: { [x: string]: camerafield } = {
