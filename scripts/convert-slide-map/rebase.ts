@@ -47,6 +47,7 @@ import {
     saveArchiveWhole,
     withoutProtectedMarks,
 } from './mapFiles'
+import { rescueModelTextures } from './modelTextures'
 import { fixObjectDataWriter, isSkinField, variableTypeOf } from './objectData'
 import { TERRAIN_TEXTURE_PATHS } from './terrainTextures'
 
@@ -737,6 +738,18 @@ if (imports.length) {
     const added: string[] = []
     const kept: string[] = []
 
+    // art the old map's models borrowed from the game and that Reforged dropped: without it a model shows nothing
+    // at all, only the shadow, and the map looks broken through no fault of its own
+    const models = new Map(imports.filter(n => /\.mdx$/i.test(n)).map(n => [n, old.get(n)!]))
+    const rescued = rescueModelTextures(models, p => old.has(p), process.env.WAR3_LEGACY_MPQS_LOCATION)
+
+    if (rescued.wanted.length > 0 && !process.env.WAR3_LEGACY_MPQS_LOCATION)
+        log.push(
+            `- **the models draw with art Reforged no longer ships, and WAR3_LEGACY_MPQS_LOCATION is not set**, so they will show nothing but their shadow: ${rescued.wanted.join(', ')}`
+        )
+    else if (rescued.missing.length > 0)
+        log.push(`- **art the models draw with and the legacy game has not either**: ${rescued.missing.join(', ')}`)
+
     // An MPQ's hash table has a fixed number of slots, and the base map's is full at 64. Every set() past that
     // silently answers false, which is how the first builds lost most of the old map's imports. Room is made
     // first, for everything already there plus everything about to come.
@@ -748,7 +761,7 @@ if (imports.length) {
         throw new Error(
             `the base map holds ${base.countUnresolved()} file(s) whose name is unknown, so its hashtable cannot be grown`
         )
-    if (!base.resizeHashtable(base.getFileNames().length + imports.length))
+    if (!base.resizeHashtable(base.getFileNames().length + imports.length + rescued.taken.size))
         throw new Error('the base map’s hashtable could not be grown to hold the old map’s imports')
 
     for (const name of imports) {
@@ -760,6 +773,17 @@ if (imports.length) {
         entries.push({ flag: 13, path: name })
         added.push(name)
     }
+    for (const [texture, bytes] of rescued.taken) {
+        if (base.get(texture) || listed(texture)) continue
+        if (!base.set(texture, bytes)) throw new Error(`${texture} could not be added to the converted map`)
+        entries.push({ flag: 13, path: texture })
+        added.push(texture)
+    }
+    if (rescued.taken.size > 0)
+        log.push(
+            `- art taken from the legacy game for the models that draw with it, which Reforged no longer ships: ${[...rescued.taken.keys()].join(', ')}`
+        )
+
     const imp = Buffer.concat([
         Buffer.from(Int32Array.of(1, entries.length).buffer),
         ...entries.map(e => Buffer.concat([Buffer.from([e.flag]), Buffer.from(e.path, 'utf8'), Buffer.from([0])])),
