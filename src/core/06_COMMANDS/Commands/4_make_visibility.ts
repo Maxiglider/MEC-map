@@ -1,6 +1,6 @@
 import { getUdgLevels, getUdgVisibilityTypes } from '../../../../globals'
 import { ServiceManager } from '../../../Services'
-import { arrayPush } from '../../01_libraries/Basic_functions'
+import { IsBoolString, S2B, arrayPush } from '../../01_libraries/Basic_functions'
 import { Constants } from '../../01_libraries/Constants'
 import { IsPositiveInteger } from '../../01_libraries/Functions_on_numbers'
 import { Text } from '../../01_libraries/Text'
@@ -404,24 +404,25 @@ export const initExecuteCommandMake_visibility = () => {
         },
     })
 
-    //-debugVisibilityZones(dvz) <on|off>   --> outline the fog modifiers the compositor builds
+    //-debugVisibilityZones(dvz) <boolean>   --> outline the fog modifiers the compositor builds
     registerCommand({
         name: 'debugVisibilityZones',
         alias: ['dvz'],
         group,
-        argDescription: 'on|off',
+        argDescription: '<boolean>',
         description:
             'Outline the zones the visibility compositor turns the painted tiles into, and show how many of them there are and how long the partition took',
         cb: ({ nbParam, param1 }, escaper) => {
-            if (nbParam !== 1 || (param1 !== 'on' && param1 !== 'off')) {
+            if (nbParam !== 1 || !IsBoolString(param1)) {
                 return USAGE
             }
 
             const p = escaper.getPlayer()
+            const enabled = S2B(param1)
 
-            VisibilityCompositor.setDebugEnabled(param1 === 'on')
+            VisibilityCompositor.setDebugEnabled(enabled)
 
-            if (param1 === 'off') {
+            if (!enabled) {
                 Text.mkP(p, 'visibility zones debug off')
                 return true
             }

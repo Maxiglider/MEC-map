@@ -104,7 +104,7 @@ Note for the Lua side: `typescript-to-lua` only shifts an index to Lua's 1 based
 | `-setVisibilityTypeTimes <label> <visibleTime> <maskedTime>` | `setvtt` | Both durations |
 | `-deleteVisibilityType <label> [--force]` | `delvt` | `--force` also removes the type's tiles from every level. Not undoable, which is why it is spelled out |
 | `-displayVisibilityTypes [<label>] [page]` | `dvt` | Lists the types |
-| `-debugVisibilityZones on\|off` | `dvz` | Outlines the zones, and reports their count per type and the partition's duration |
+| `-debugVisibilityZones <boolean>` | `dvz` | Outlines the zones, and reports their count per type and the partition's duration |
 | `-setLevelResetVisibilities <boolean> [<levelId>]` | `setlrv` | Still truncates the composition stack. Largely superseded by painting `m` |
 | `-viewAll` / `-hideAll` | `va` / `ha` | Untouched: a cheat-tier override sitting above all of this |
 

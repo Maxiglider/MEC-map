@@ -174,7 +174,7 @@ Not undoable: `MakeAction` is bound to one escaper and one level, and a delete t
 | Command | Alias | Args |
 | --- | --- | --- |
 | `-convertVisibilities` | `convv` | `[<levelId>]` — opt-in conversion of a legacy level's rectangles into `visible` tiles, warning about the ≤ 64 unit border snap |
-| `-debugVisibilityZones` | `dvz` | `on\|off` — draws the computed zones and prints **the rectangle count per type and the partition time** |
+| `-debugVisibilityZones` | `dvz` | `<boolean>` — draws the computed zones and prints **the rectangle count per type and the partition time** |
 
 ## Reworked
 
