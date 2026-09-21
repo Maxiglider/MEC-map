@@ -80,7 +80,7 @@ export const initExecuteCommandMake_visibility = () => {
         name: 'newVisibilityType',
         alias: ['newvt'],
         group,
-        argDescription: '<label> <visible|masked> <visibleTime> <maskedTime>',
+        argDescription: '<label> visible|v|masked|m <visibleTime> <maskedTime>',
         description:
             'Add a new visibility type, switching between visible and masked. The two times are in seconds and must be greater than zero',
         cb: ({ nbParam, param1, param2, param3, param4 }, escaper) => {
@@ -187,7 +187,7 @@ export const initExecuteCommandMake_visibility = () => {
         name: 'setVisibilityTypeStart',
         alias: ['setvts'],
         group,
-        argDescription: '<label> <visible|masked>',
+        argDescription: '<label> visible|v|masked|m',
         description: 'Set the state a visibility type starts its cycle on',
         cb: ({ nbParam, param1, param2 }, escaper) => {
             if (nbParam !== 2) {
@@ -409,7 +409,7 @@ export const initExecuteCommandMake_visibility = () => {
         name: 'debugVisibilityZones',
         alias: ['dvz'],
         group,
-        argDescription: '<on|off>',
+        argDescription: 'on|off',
         description:
             'Outline the zones the visibility compositor turns the painted tiles into, and show how many of them there are and how long the partition took',
         cb: ({ nbParam, param1 }, escaper) => {

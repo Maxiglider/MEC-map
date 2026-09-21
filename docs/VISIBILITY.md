@@ -98,13 +98,13 @@ Note for the Lua side: `typescript-to-lua` only shifts an index to Lua's 1 based
 | `-createVisibility <typeLabel> [<brushSize> [<shape>]]` | `crv` | Paints tiles of the making level, two clicks or brush. `-crv u` erases. Without a parameter it explains what the old form became |
 | `-removeVisibilities [<levelId>]` | `remv` | Empties a level, tiles and old rectangles alike |
 | `-convertVisibilities [<levelId>]` | `convv` | Turns a legacy level's rectangles into `visible` tiles. Cannot be undone |
-| `-newVisibilityType <label> <visible\|masked> <visibleTime> <maskedTime>` | `newvt` | A new periodic type |
+| `-newVisibilityType <label> visible\|v\|masked\|m <visibleTime> <maskedTime>` | `newvt` | A new periodic type |
 | `-setVisibilityTypeLabel` / `-setVisibilityTypeAlias` | `setvtl` / `setvta` | Rename, alias |
-| `-setVisibilityTypeStart <label> <visible\|masked>` | `setvts` | Which state the cycle starts on |
+| `-setVisibilityTypeStart <label> visible\|v\|masked\|m` | `setvts` | Which state the cycle starts on |
 | `-setVisibilityTypeTimes <label> <visibleTime> <maskedTime>` | `setvtt` | Both durations |
 | `-deleteVisibilityType <label> [--force]` | `delvt` | `--force` also removes the type's tiles from every level. Not undoable, which is why it is spelled out |
 | `-displayVisibilityTypes [<label>] [page]` | `dvt` | Lists the types |
-| `-debugVisibilityZones <on\|off>` | `dvz` | Outlines the zones, and reports their count per type and the partition's duration |
+| `-debugVisibilityZones on\|off` | `dvz` | Outlines the zones, and reports their count per type and the partition's duration |
 | `-setLevelResetVisibilities <boolean> [<levelId>]` | `setlrv` | Still truncates the composition stack. Largely superseded by painting `m` |
 | `-viewAll` / `-hideAll` | `va` / `ha` | Untouched: a cheat-tier override sitting above all of this |
 
