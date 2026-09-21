@@ -683,12 +683,21 @@ const remappedTextures = new Set(
 )
 
 /**
- * What a MEC 1 map carries of the game that MEC 2 has no use for (user's rule, 2026-09-21). The World Editor of the
- * day put a copy of the ability table in the map; it is one of an old patch - a quarter the size of the game's
- * today - and importing it would put that old table back over the current one, MEC's own immolation abilities
- * (`ANpi`) included.
+ * What a MEC 1 map carries that MEC 2 has no use for (user's rule, 2026-09-21).
+ *
+ * The three tables are the game's own, put in the map by the World Editor of the day. They are of an old patch -
+ * the ability one is a quarter the size of the game's today - and importing one puts that old version back over
+ * the current one, MEC's own immolation abilities (`ANpi`) included.
+ *
+ * `triple_kill.wav` is MEC 1's own: its `gg_snd_multisquish`, which MEC 2 no longer plays. Its `Noob.wav` is still
+ * used and the base map ships it, so that one is not listed here.
  */
-const MEC_ONE_LEGACY_IMPORTS = ['Units\\AbilityData.slk', 'Units\\CommandStrings.txt', 'Units\\CommandFunc.txt']
+const MEC_ONE_LEGACY_IMPORTS = [
+    'Units\\AbilityData.slk',
+    'Units\\CommandStrings.txt',
+    'Units\\CommandFunc.txt',
+    'war3mapImported\\triple_kill.wav',
+]
 
 const excludedImports = new Set(
     [...(spec.mecOne ? MEC_ONE_LEGACY_IMPORTS : []), ...((spec.excludeImports ?? []) as string[])].map(p =>
@@ -704,7 +713,7 @@ const imports = [...old.keys()].filter(
 )
 
 const dropped = [...old.keys()].filter(n => excludedImports.has(n.toLowerCase()))
-if (dropped.length > 0) log.push(`- imports left out, of the game and out of date: ${dropped.join(', ')}`)
+if (dropped.length > 0) log.push(`- imports left out, of no use to MEC 2: ${dropped.join(', ')}`)
 
 if (remappedTextures.size > 0)
     log.push(
