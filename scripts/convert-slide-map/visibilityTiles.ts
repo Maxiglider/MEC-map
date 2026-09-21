@@ -28,33 +28,10 @@ const keyTy = (key: number) => (key % KEY_STRIDE) - KEY_OFFSET
 
 export type TileSet = Set<number>
 
-/** Every tile a world rectangle touches, a tile it only clips counted in: the rounding goes outwards */
+/** Every tile a world rectangle covers, its borders snapping to the nearest tile centre */
 export const tilesOfRect = (r: Rect, into: TileSet = new Set()): TileSet => {
     for (let tx = worldToTile(r.minX); tx <= worldToTile(r.maxX); tx++) {
         for (let ty = worldToTile(r.minY); ty <= worldToTile(r.maxY); ty++) {
-            into.add(tileKey(tx, ty))
-        }
-    }
-    return into
-}
-
-/**
- * The tiles a world rectangle covers whole, the ones it only clips left out: the rounding goes inwards.
- *
- * This is what a reveal owns for certain. A tile it merely clips is left to whatever else wants it - a light or a
- * mask - because a half-lit tile that ends up lit is ground the old map kept dark.
- */
-export const tilesInsideRect = (r: Rect, into: TileSet = new Set()): TileSet => {
-    for (
-        let tx = Math.ceil((r.minX + HALF_TILE) / TILE_WIDTH);
-        tx <= Math.floor((r.maxX - HALF_TILE) / TILE_WIDTH);
-        tx++
-    ) {
-        for (
-            let ty = Math.ceil((r.minY + HALF_TILE) / TILE_WIDTH);
-            ty <= Math.floor((r.maxY - HALF_TILE) / TILE_WIDTH);
-            ty++
-        ) {
             into.add(tileKey(tx, ty))
         }
     }
@@ -114,20 +91,12 @@ export const tileGroup = (type: string, tiles: TileSet): VisibilityTileGroup | u
  * - `periodic` is painted only where no level up to this one reveals;
  * - `masked` carries what the old map did by switching a level's lights off when the next one began - the lights of
  *   the levels before, again minus what is revealed by then.
- *
- * The borders do not fall on the tile grid, and the two sides do not round the same way: darkness rounds outwards
- * and light inwards. A reveal keeps only the tiles it covers whole, so a tile it merely clips is free for a light
- * or a mask that touches it, which rounds outwards and takes it. The other way round, the tile grid would eat up to
- * one tile off every border of a dark area, and the black masks would hide less than the old map's did - which is
- * what one sees in game, an area being far easier to read as too small than as too large. A reveal alone on a tile
- * still keeps it: only a light or a mask reaching for it can take one away, never the grid on its own.
  */
 export const visibilityTilesOfLevels = (
     levels: { visible: Rect[]; periodic: { type: string; rect: Rect }[] }[]
 ): VisibilityTileGroup[][] => {
     const revealed: TileSet[] = []
-    /** What each reveal owns whole, which is all that may hold a light or a mask back */
-    const solidSoFar: TileSet[] = []
+    const revealedSoFar: TileSet[] = []
     const accumulated: TileSet = new Set()
 
     for (const level of levels) {
@@ -135,8 +104,8 @@ export const visibilityTilesOfLevels = (
         for (const rect of level.visible) tilesOfRect(rect, tiles)
         revealed.push(tiles)
 
-        for (const rect of level.visible) tilesInsideRect(rect, accumulated)
-        solidSoFar.push(new Set(accumulated))
+        for (const key of tiles) accumulated.add(key)
+        revealedSoFar.push(new Set(accumulated))
     }
 
     // the periodic tiles of each level, by type, and the running union of every level's, for the masking below
@@ -149,7 +118,7 @@ export const visibilityTilesOfLevels = (
 
         const byType: { [type: string]: TileSet } = {}
         for (const { type, rect } of level.periodic) {
-            const tiles = withoutTiles(tilesOfRect(rect), solidSoFar[levelIndex])
+            const tiles = withoutTiles(tilesOfRect(rect), revealedSoFar[levelIndex])
             byType[type] = unionTiles(byType[type] ?? new Set(), tiles)
         }
 
@@ -159,21 +128,16 @@ export const visibilityTilesOfLevels = (
 
     return levels.map((_level, levelIndex) => {
         const groups: VisibilityTileGroup[] = []
-        const byType = periodicByLevel[levelIndex]
 
-        const periodicHere = unionTiles(...Object.keys(byType).map(type => byType[type]))
-        const maskedHere = withoutTiles(withoutTiles(litBefore[levelIndex], solidSoFar[levelIndex]), periodicHere)
-
-        // one tile, one type: what a light or a mask took is no longer part of what the level reveals
-        const visible = tileGroup('visible', withoutTiles(withoutTiles(revealed[levelIndex], periodicHere), maskedHere))
+        const visible = tileGroup('visible', revealed[levelIndex])
         visible && groups.push(visible)
 
-        for (const type of Object.keys(byType).sort()) {
-            const group = tileGroup(type, byType[type])
+        for (const type of Object.keys(periodicByLevel[levelIndex]).sort()) {
+            const group = tileGroup(type, periodicByLevel[levelIndex][type])
             group && groups.push(group)
         }
 
-        const masked = tileGroup('masked', maskedHere)
+        const masked = tileGroup('masked', withoutTiles(litBefore[levelIndex], revealedSoFar[levelIndex]))
         masked && groups.push(masked)
 
         return groups
