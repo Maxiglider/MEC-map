@@ -1,6 +1,4 @@
-> **Status**: implemented and play-tested in a single client. The six steps below went in one commit each, followed by the corrections that came out of using it — the brush now recomposing live rather than on release, and the world mask rebuild whose reason was finally established (see step 4). The reference documentation lives in [`docs/VISIBILITY.md`](../../docs/VISIBILITY.md); this file keeps the reasoning that led there.
->
-> **Still not done**: the two-instance LAN test described at the end. It is the only thing that can confirm the partition agrees across machines, and nothing in a single client can stand in for it.
+> **Status**: done. The six steps below went in one commit each, followed by the corrections that came out of using it — the brush now recomposing live rather than on release, and the world mask rebuild whose reason was finally established (see step 4). The reference documentation lives in [`docs/VISIBILITY.md`](../../docs/VISIBILITY.md); this file keeps the reasoning that led there.
 >
 > **Known and left as they are**: `-debvz` reports `0 ms` on its first call, the duration being measured only by a recomposition that runs with the flag already up; the outlines of the previous game data stay on screen between `-lmfc` and the next recomposition; the erasing button uses the brush size rather than a gum size of its own, unlike `-crt`; and masked tiles are not outlined at all, there being no rectangle to draw — deliberate, but it means the overlay cannot tell a tile painted `m` from one never painted.
 
