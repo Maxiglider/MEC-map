@@ -560,10 +560,33 @@ if (oldW3uBytes) {
     )
     const merged: string[] = []
     const skipped: string[] = []
+    const modelsRepointed = new Set<string>()
+
+    /**
+     * The object data of a map made in the World Editor names a model `.mdl` while the file imported beside it is
+     * `.mdx`, and the game is expected to swap the extension. It does - unless the name holds a dot of its own,
+     * `Frost_Fury_v1.1.mdl`, where the swap has nothing sound to cut on. So the name of the file that is really
+     * there is written instead, which is what it meant all along.
+     */
+    const pointAtTheFileThatExists = (source: ModifiedObject) => {
+        for (const modification of source.modifications) {
+            const value = modification.value
+            if (typeof value !== 'string' || !/\.mdl$/i.test(value)) continue
+            if (old.has(value)) continue
+
+            const mdx = value.replace(/\.mdl$/i, '.mdx')
+            if (!old.has(mdx)) continue
+
+            modification.value = mdx
+            modelsRepointed.add(`${value} → ${mdx}`)
+        }
+    }
 
     const add = (table: 'originalTable' | 'customTable', source: ModifiedObject) => {
         const id = table === 'customTable' ? source.newId : source.oldId
         const baseId = source.oldId
+
+        pointAtTheFileThatExists(source)
 
         if (!standardUnits.has(baseId)) {
             skipped.push(`${id} (not a unit: an item or else)`)
@@ -597,6 +620,9 @@ if (oldW3uBytes) {
 
     oldW3u.originalTable.objects.forEach(o => add('originalTable', o))
     oldW3u.customTable.objects.forEach(o => add('customTable', o))
+
+    if (modelsRepointed.size > 0)
+        log.push(`- models named after a file that is not there, repointed: ${[...modelsRepointed].join(', ')}`)
 
     // the old hero's looks on MEC's heroes: its skin fields, over theirs
     const facts = JSON.parse(fs.readFileSync(path.join(workDir, 'facts.json'), 'utf8'))
