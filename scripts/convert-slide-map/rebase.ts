@@ -47,7 +47,7 @@ import {
     saveArchiveWhole,
     withoutProtectedMarks,
 } from './mapFiles'
-import { rescueModelTextures, sortModelTracks } from './modelTextures'
+import { repairModel, rescueModelTextures } from './modelTextures'
 import { fixObjectDataWriter, isSkinField, variableTypeOf } from './objectData'
 import { TERRAIN_TEXTURE_PATHS } from './terrainTextures'
 
@@ -876,9 +876,9 @@ if (imports.length) {
             kept.push(name)
             continue
         }
-        // a model whose tracks list their keys out of order is put back in order: the game reads such a track wrong
-        const repaired = /\.mdx$/i.test(name) ? sortModelTracks(old.get(name)!) : undefined
-        if (repaired) repairedModels.push(`${name} (${repaired.sorted} tracks)`)
+        // a model with what the current game reads wrong is repaired of it (repairModel)
+        const repaired = /\.mdx$/i.test(name) ? repairModel(old.get(name)!) : undefined
+        if (repaired) repairedModels.push(`${name} (${repaired.repairs.join(', ')})`)
         if (!base.set(name, repaired?.bytes ?? old.get(name)!))
             throw new Error(`${name} could not be added to the converted map`)
         entries.push({ flag: 13, path: name })
@@ -891,9 +891,7 @@ if (imports.length) {
         added.push(texture)
     }
     if (repairedModels.length > 0)
-        log.push(
-            `- models whose tracks listed their keys out of order, put back in order: ${repairedModels.join(', ')}`
-        )
+        log.push(`- imported models repaired of what the current game reads wrong: ${repairedModels.join('; ')}`)
     if (rescued.taken.size > 0)
         log.push(
             `- ${rescued.taken.size} texture(s) the imported models draw with, taken from the legacy game so they render whatever the current one still ships: ${[...rescued.taken.keys()].join(', ')}`

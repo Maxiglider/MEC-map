@@ -102,23 +102,27 @@ export const rescueModelTextures = (
     return { taken, wanted: [...wanted], missing: [...wanted].filter(w => !taken.has(w)) }
 }
 
-/**
- * A model whose animation tracks list their keys out of order, put back in order.
- *
- * Old editors wrote a track's keys in the order they were made, not by frame, and the old engine read them anyway.
- * Slide Is Magic's footman (`Frost_Fury_v1.1.mdx`) has 27 tracks of 94 so, among them the visibility of every one
- * of its 15 geosets - `1000, 2500, 5800, 7650, 8000, 0, 8251…` - and it shows nothing in game but its shadow,
- * with every texture it draws present and opaque. A key lookup that searches the frames as sorted, which is what
- * a current engine can be expected to do, reads such a track wrong.
- *
- * Sorting changes nothing to what a well-made track says, keys at the same frame keep their order, and a model
- * with no such track is given back as undefined so that its file stays byte for byte the same. Parsing then saving
- * drops nothing but empty chunks (checked on that footman: identical once its empty `PREM` is left out).
- */
-export const sortModelTracks = (modelBytes: Uint8Array): { bytes: Uint8Array; sorted: number } | undefined => {
-    const model = new MdlxModel()
-    model.load(modelBytes)
+/** The nodes of a model, every list whose members carry an objectId, a parentId and a pivot of that index */
+const NODE_LISTS = [
+    'bones',
+    'lights',
+    'helpers',
+    'attachments',
+    'particleEmitters',
+    'particleEmitters2',
+    'ribbonEmitters',
+    'eventObjects',
+    'collisionShapes',
+    'cameras',
+    'faceEffects',
+] as const
 
+/**
+ * Puts a model's animation tracks back in key order: old editors wrote a track's keys in the order they were made,
+ * not by frame, and the old engine read them anyway. Slide Is Magic's footman has 27 of its 94 so. Keys at the same
+ * frame keep their order, so a well-made track says the same.
+ */
+const sortTracks = (model: any) => {
     let sorted = 0
     const seen = new Set<object>()
 
@@ -144,6 +148,73 @@ export const sortModelTracks = (modelBytes: Uint8Array): { bytes: Uint8Array; so
     }
 
     walk(model)
+    return sorted
+}
 
-    return sorted > 0 ? { bytes: model.saveMdx(), sorted } : undefined
+/**
+ * Takes out the lights that cannot light anything: no intensity and no track to give them one, or an attenuation
+ * that ends where it starts.
+ *
+ * Slide Is Magic's footman (`Frost_Fury_v1.1.mdx`) carries one such light - omni, attenuation 0 to 0, intensity 0 -
+ * and shows nothing in game but its shadow, every texture it draws present and opaque, every track sorted. It is the
+ * only one of the map's 23 imported models with a light, and the only one that is invisible. An attenuation of 0 to
+ * 0 divides by zero in a lighting shader, which the old fixed pipeline never ran. What such a light gave the old
+ * game is nothing, so nothing is lost.
+ *
+ * A node's id is its index among all the model's nodes, and it names its pivot, its children's parent and the bones
+ * a geoset is skinned to: every one of those is moved down past each node taken out.
+ */
+const removeDeadLights = (model: any) => {
+    const dead = (model.lights as any[]).filter(light => {
+        const animated = (light.animations as any[]).some(t => ['KLAI', 'KLBI', 'KLAE', 'KLAS'].includes(t.name))
+        if (animated) return false
+        const [start, end] = Array.from(light.attenuation as ArrayLike<number>)
+        return (light.intensity <= 0 && light.ambientIntensity <= 0) || end <= start
+    })
+    if (dead.length === 0) return 0
+
+    const removed = dead.map(light => light.objectId as number).sort((a, b) => a - b)
+    if (removed.some(id => id < 0)) throw new Error('a light without an object id')
+    const shift = (id: number) => (id < 0 ? id : id - removed.filter(r => r < id).length)
+
+    for (const id of removed) {
+        for (const list of NODE_LISTS) {
+            for (const node of model[list] ?? []) if (node.parentId === id) throw new Error(`light ${id} has children`)
+        }
+    }
+
+    model.lights = (model.lights as any[]).filter(light => !dead.includes(light))
+    model.pivotPoints = (model.pivotPoints as any[]).filter((_, i) => !removed.includes(i))
+
+    for (const list of NODE_LISTS) {
+        for (const node of model[list] ?? []) {
+            node.objectId = shift(node.objectId)
+            node.parentId = shift(node.parentId)
+        }
+    }
+    for (const geoset of model.geosets) {
+        const indices = Array.from(geoset.matrixIndices as ArrayLike<number>)
+        if (indices.some(id => removed.includes(id))) throw new Error('a geoset skinned to a light')
+        geoset.matrixIndices = new Uint32Array(indices.map(shift))
+    }
+
+    return dead.length
+}
+
+/**
+ * An imported model repaired of what the current game reads wrong (`sortTracks`, `removeDeadLights`), or undefined
+ * when it has none of it, so that its file stays byte for byte the same. Parsing then saving drops nothing but empty
+ * chunks (checked on Slide Is Magic's footman: identical once its empty `PREM` is left out).
+ */
+export const repairModel = (modelBytes: Uint8Array): { bytes: Uint8Array; repairs: string[] } | undefined => {
+    const model = new MdlxModel()
+    model.load(modelBytes)
+
+    const repairs: string[] = []
+    const sorted = sortTracks(model)
+    if (sorted > 0) repairs.push(`${sorted} tracks put back in key order`)
+    const lights = removeDeadLights(model)
+    if (lights > 0) repairs.push(`${lights} light(s) that light nothing taken out`)
+
+    return repairs.length > 0 ? { bytes: model.saveMdx(), repairs } : undefined
 }
