@@ -88,6 +88,16 @@ for (const [label, fields] of Object.entries((spec.monsterTypeOverrides ?? {}) a
     Object.assign(type, fields)
 }
 
+// monster types the old map defines and nothing uses (spec dropMonsterTypes): MEC 1's template ones, a family its
+// author gave up on. Dropped only when named, and checked again once the game data is built, so a type still used
+// stops the build rather than leaving monsters without their type
+const droppedMonsterTypes = new Set<string>((spec.dropMonsterTypes ?? []).filter((l: string) => !l.startsWith('$')))
+for (const label of droppedMonsterTypes) {
+    if (!(spec.monsterTypes as Json[]).some(t => t.label === label))
+        throw new Error(`dropMonsterTypes: unknown monster type ${label}`)
+}
+spec.monsterTypes = (spec.monsterTypes as Json[]).filter(t => !droppedMonsterTypes.has(t.label))
+
 // ---------------------------------------------------------------------------------------------- geometry
 
 const rectOf = (name: string): Rect => {
@@ -1069,6 +1079,16 @@ const gameData = {
 }
 
 const gameDataString = JSON.stringify(gameData)
+
+// a dropped monster type still named by the game data or a custom trigger stops the build
+const customTriggersText = ((spec.customTriggers ?? []) as string[])
+    .map(file => fs.readFileSync(path.join(workDir, file), 'utf8'))
+    .join('\n')
+for (const label of droppedMonsterTypes) {
+    const quoted = JSON.stringify(label)
+    if (gameDataString.includes(`:${quoted}`) || customTriggersText.includes(quoted))
+        throw new Error(`dropMonsterTypes: ${label} is still used`)
+}
 fs.writeFileSync(path.join(workDir, 'gamedata.json'), JSON.stringify(gameData, null, 2))
 
 // ---------------------------------------------------------------------------------------------- bake
