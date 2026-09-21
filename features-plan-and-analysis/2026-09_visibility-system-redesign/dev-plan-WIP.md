@@ -124,7 +124,7 @@ No automatic conversion on load: the requirement is that existing maps behave id
 `MakeHoldClick` has `MIN_TIME_BETWEEN_ACTIONS = null`, so `doMouseMoveActions` runs on every `EVENT_PLAYER_MOUSE_MOVE`. Recomposing on each of those would stall.
 
 - Real-time feedback while painting comes from `DrawLine` overlays (the mechanism `-debugRegions` already uses in `Level.ts`), one colour per visibility type. A maker almost always has `-va` on anyway, so real fog feedback would show them nothing.
-- The fog recomposition follows the brush at a bounded rate — at most every 0.1 s, and only when new tiles were actually painted — plus once more in `doUnpressActions`. It diffs the zone list so only changed modifiers are destroyed/created, with a single `RefreshHideAllVM()` at the end. (First written as "once per stroke, on release": that stopped one step short. The reason not to recompose on every mouse event is the missing throttle, and the answer to a missing throttle is a bounded rate, not a debounce to the end. The elapsed time has to come from a Warcraft III timer, `os.clock()` being local.)
+- The fog recomposition follows the brush at a bounded rate — at most every 0.1 s, and only when new tiles were actually painted — plus once more in `doUnpressActions`. It diffs the zone list so only changed modifiers are destroyed/created. (First written as "once per stroke, on release": that stopped one step short. The reason not to recompose on every mouse event is the missing throttle, and the answer to a missing throttle is a bounded rate, not a debounce to the end. The elapsed time has to come from a Warcraft III timer, `os.clock()` being local.)
 
 An incremental recomposition (re-partitioning only the affected types inside a dilated bounding box) is deliberately deferred: it reintroduces merges across the box border for little gain over the debounce.
 
@@ -300,7 +300,7 @@ src/core/04_STRUCTURES/Visibility/VisibilityCompositor.ts
 1. Walk the active level stack highest-first, resolving each tile (`untouched` transparent, `resetVisiblitiesAtStart` truncates). Legacy modifiers are not part of this walk — they keep being driven by `level.activateVisibilities()`.
 2. Drop the `untouched` and `masked` tiles.
 3. Partition each remaining type's mask.
-4. Diff against the current zones; destroy and create only what changed; one `RefreshHideAllVM()` at the end.
+4. Diff against the current zones; destroy and create only what changed. No `RefreshHideAllVM()`: the legacy `VisibilityModifier` rebuilds the world mask on every rectangle it creates, but that is a 2019 JASS workaround with no recorded reason, and it cannot be about priority since it runs after the visible modifier it would otherwise hide. Harmless once per authored rectangle, not harmless on every recomposition. To be confirmed in game — it is the first thing to put back if a painted area fails to light up.
 5. One timer per periodic type, started when the type gains its first zone, stopped when it loses its last.
 
 `LevelArray.refreshVisibilities()` (`:253`) delegates to the compositor. Its five callers stay untouched: `LevelArray.ts:155`, `LevelArray.ts:197`, `Level.ts:553`, `EscaperMake.ts:130`, `start_first_level.ts:8`.

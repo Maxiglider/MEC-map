@@ -52,7 +52,9 @@ Then, and this is the part that keeps the fog modifier count down: **only what e
 
 A fog modifier per tile would be unusable, so each type's composed tiles are partitioned into the **minimum** number of rectangles by `VisibilityPartition.ts` (Lipski/Ohtsuki — concave vertices, chords between consecutive ones, maximum independent set through a bipartite matching and König, then the cuts). One `VisibilityZone` per rectangle, one fog modifier per zone.
 
-`VisibilityZoneArray.applyRequests()` diffs rather than rebuilds: a recomposition usually leaves most rectangles where they were.
+`VisibilityZoneArray.applyRequests()` diffs rather than rebuilds: a recomposition usually leaves most rectangles where they were. It is worth knowing that the partition is deterministic but not *stable*: painting one tile can change the chords the matching picks and reshuffle a whole connected component, so a small edit can still move many rectangles. What bounds it is that components are partitioned independently, so an edit never disturbs a disjoint area.
+
+The compositor does **not** call `RefreshHideAllVM()`, unlike the legacy `VisibilityModifier`, which rebuilds the world bounds black mask every time it creates a rectangle. That call comes from the 2019 JASS version with no explanation, and it cannot have been about priority — it runs *after* creating a visible modifier and the rectangle still shows, so `VISIBLE` beats `MASKED` whatever the creation order. It reads as a "make the fog redraw" workaround of the 1.26 era. Harmless once per authored rectangle, not harmless on every recomposition. If a freshly painted area ever fails to light up, or an erased one to go black, until something else touches the fog, that call is the first thing to put back.
 
 All the zones of a periodic type share **one** timer, so they blink in step, and a zone born of a later recomposition joins the cycle where the others already are. Two zones in opposite phase are two types with opposite `startState`, not a per-zone setting.
 
