@@ -354,8 +354,30 @@ const CONVERTED_TO_MEC = 'This map was converted to Max Escape Creation 2 with h
 const MEC_QUEST_TITLE = 'MapDescription'
 const CONVERSION_QUEST_TITLE = 'To MEC conversion'
 
+// A MEC 1 map drops that quest altogether (user's rule): its own quests already say it was made with MEC, and the
+// version quest carries the conversion note and MEC's link - a third quest would only say it all again. It is created
+// by an action of the base map's F9 trigger, so that action is disabled in war3map.wtg, where the World Editor keeps
+// it greyed out, and its line removed from war3map.lua, which the editor would write without it.
+const mecQuestTitleRef = /STRING (\d+)\r?\n(?:\/\/[^\n]*\n)?\{\r?\nMapDescription\r?\n\}/.exec(wts)?.[1]
+const droppedQuestRef = spec.mecOne && mecQuestTitleRef ? `TRIGSTR_${mecQuestTitleRef.padStart(3, '0')}` : undefined
+if (spec.mecOne && !droppedQuestRef) {
+    log.push(`- **MEC's own quest title "${MEC_QUEST_TITLE}" not found**: the quest is not removed, check it`)
+}
+if (droppedQuestRef) {
+    const wtg = baseBytes('war3map.wtg')
+    const at = wtg.indexOf(Buffer.from(droppedQuestRef + '\0', 'latin1'))
+    const name = Buffer.from('CreateQuestBJ\0', 'latin1')
+    const action = at === -1 ? -1 : wtg.lastIndexOf(name, at)
+    // an action is its type, its name, then whether it is enabled: the flag sits right after the name
+    if (action === -1 || wtg.readUInt32LE(action + name.length) !== 1) {
+        throw new Error(`No enabled CreateQuestBJ of ${droppedQuestRef} in the base map's war3map.wtg`)
+    }
+    wtg.writeUInt32LE(0, action + name.length)
+    set('war3map.wtg', wtg, `MEC's own quest (${droppedQuestRef}) disabled in the F9 trigger (MEC 1 map)`)
+}
+
 if (spec.mecOne) {
-    log.push(`- \`war3map.wts\`: MEC's own quest left as it is (MEC 1 map: it was already made with MEC)`)
+    log.push(`- \`war3map.wts\`: MEC's own quest left out (MEC 1 map: its own quests already say it was made with MEC)`)
 } else {
     const madeWithCount = wts.split(MADE_WITH_MEC).length - 1
     wts = wts.split(MADE_WITH_MEC).join(CONVERTED_TO_MEC)
@@ -456,7 +478,7 @@ if (newCore && (!newCore.startsWith(CORE_START) || !newCore.trimEnd().endsWith(C
     throw new Error(`${corePath} does not run from "${CORE_START}" to "${CORE_END}": run yarn release`)
 }
 
-// the conversion noted in MEC's own version quest (user's rule), as a second paragraph under the core's own lines:
+// the conversion noted in MEC's own version quest (user's rule), as its first paragraph, above the core's own lines:
 // that quest is the one a player opens to know what the map runs, so the note stands where it is looked for, and
 // the old map's own quests are left as their author wrote them. A MEC 1 map says what really happened to it - its
 // engine went from MEC 1 to MEC 2 - rather than claiming a conversion to MEC it never needed.
@@ -471,8 +493,8 @@ if (newCore) {
     const description = /(QuestSetDescription\(q, ")([^"]*)(")/
     if (!description.test(newCore)) throw new Error(`No MEC version quest to note the conversion in: ${corePath}`)
     // two \n in the Lua string the core hands the quest, which makes one blank line between the paragraphs
-    newCore = newCore.replace(description, `$1$2\\n\\n${conversionNote}$3`)
-    log.push(`- MEC's version quest: "${conversionNote}" added under its description`)
+    newCore = newCore.replace(description, `$1${conversionNote}\\n\\n$2$3`)
+    log.push(`- MEC's version quest: "${conversionNote}" added above its description`)
 }
 const spliceCore = (text: string, where: string) => {
     const start = text.indexOf(CORE_START)
@@ -491,6 +513,11 @@ const oldLine = (native: string) => {
 
 let lua = baseBytes('war3map.lua').toString('utf8')
 if (newCore) lua = spliceCore(lua, 'war3map.lua')
+if (droppedQuestRef) {
+    const line = new RegExp(`\\n\\s*CreateQuestBJ\\([^\\n]*"${droppedQuestRef}"[^\\n]*`)
+    if (!line.test(lua)) throw new Error(`No CreateQuestBJ of ${droppedQuestRef} in the base map's war3map.lua`)
+    lua = lua.replace(line, '')
+}
 const mainStart = lua.indexOf('\nfunction main()')
 const mainEnd = lua.indexOf('\nend', mainStart)
 let main = lua.substring(mainStart, mainEnd)
