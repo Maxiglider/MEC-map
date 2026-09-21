@@ -499,12 +499,12 @@ export const initExecuteCommandMake_visibility = () => {
         },
     })
 
-    //-convertVisibilities(convv) [<levelId>]   --> turn a level's old visibility rectangles into painted tiles
+    //-convertVisibilities(convv) [<levelId>|current|c]   --> turn a level's old visibility rectangles into painted tiles
     registerCommand({
         name: 'convertVisibilities',
         alias: ['convv'],
         group,
-        argDescription: '[<levelId>]',
+        argDescription: '[<levelId>|current|c]',
         description:
             "Turn a level's old visibility rectangles into visible tiles, so it can be painted. Their borders snap to the terrain grid, by up to half a tile",
         cb: ({ noParam, nbParam, param1 }, escaper) => {
@@ -515,9 +515,11 @@ export const initExecuteCommandMake_visibility = () => {
             const p = escaper.getPlayer()
             let level = escaper.getMakingLevel()
 
-            if (nbParam === 1) {
+            // "current"/"c" names the making level explicitly, as the terrain save commands use it - the same level
+            // the command takes with no parameter at all
+            if (nbParam === 1 && param1 !== 'current' && param1 !== 'c') {
                 if (!IsPositiveInteger(param1)) {
-                    Text.erP(p, 'the level number must be a positive integer')
+                    Text.erP(p, 'the level number must be a positive integer, or "current" ("c")')
                     return true
                 }
 
