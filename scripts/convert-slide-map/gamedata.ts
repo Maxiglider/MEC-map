@@ -98,6 +98,22 @@ for (const label of droppedMonsterTypes) {
 }
 spec.monsterTypes = (spec.monsterTypes as Json[]).filter(t => !droppedMonsterTypes.has(t.label))
 
+// what MEC's -patchImmo does in game, done here instead (spec patchImmo: the new hero base collision size): every
+// immolation radius moves by what the hero's collision gains, so each monster kills at the distance it did, and a
+// radius the new collision swallows whole is removed rather than pinned at 5 (adaptMonstersImmolation, core)
+const patchImmoTo: number | undefined = spec.patchImmo
+if (patchImmoTo !== undefined) {
+    if (patchImmoTo < 0 || patchImmoTo > 200 || patchImmoTo % 5 !== 0)
+        throw new Error(`patchImmo: between 0 and 200 by steps of 5, not ${patchImmoTo}`)
+    const from = Number(spec.gameData?.heroBaseCollisionSize ?? 0)
+    const delta = from - patchImmoTo
+    for (const type of spec.monsterTypes as Json[]) {
+        const radius = Number(type.immolationRadius ?? 0)
+        if (radius > 0) type.immolationRadius = radius + delta <= 0 ? 0 : Math.min(400, radius + delta)
+    }
+    spec.gameData = { ...(spec.gameData ?? {}), heroBaseCollisionSize: patchImmoTo }
+}
+
 // ---------------------------------------------------------------------------------------------- geometry
 
 const rectOf = (name: string): Rect => {
