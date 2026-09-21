@@ -47,7 +47,7 @@ import {
     saveArchiveWhole,
     withoutProtectedMarks,
 } from './mapFiles'
-import { repairModel, rescueModelTextures } from './modelTextures'
+import { rescueModelTextures } from './modelTextures'
 import { fixObjectDataWriter, isSkinField, variableTypeOf } from './objectData'
 import { TERRAIN_TEXTURE_PATHS } from './terrainTextures'
 
@@ -841,7 +841,6 @@ if (imports.length) {
         entries.some(e => (e.flag === 13 ? e.path : 'war3mapImported\\' + e.path).toLowerCase() === p.toLowerCase())
     const added: string[] = []
     const kept: string[] = []
-    const repairedModels: string[] = []
 
     // art the old map's models borrowed from the game and that Reforged dropped: without it a model shows nothing
     // at all, only the shadow, and the map looks broken through no fault of its own
@@ -876,11 +875,7 @@ if (imports.length) {
             kept.push(name)
             continue
         }
-        // a model with what the current game reads wrong is repaired of it (repairModel)
-        const repaired = /\.mdx$/i.test(name) ? repairModel(old.get(name)!) : undefined
-        if (repaired) repairedModels.push(`${name} (${repaired.repairs.join(', ')})`)
-        if (!base.set(name, repaired?.bytes ?? old.get(name)!))
-            throw new Error(`${name} could not be added to the converted map`)
+        if (!base.set(name, old.get(name)!)) throw new Error(`${name} could not be added to the converted map`)
         entries.push({ flag: 13, path: name })
         added.push(name)
     }
@@ -890,8 +885,6 @@ if (imports.length) {
         entries.push({ flag: 13, path: texture })
         added.push(texture)
     }
-    if (repairedModels.length > 0)
-        log.push(`- imported models repaired of what the current game reads wrong: ${repairedModels.join('; ')}`)
     if (rescued.taken.size > 0)
         log.push(
             `- ${rescued.taken.size} texture(s) the imported models draw with, taken from the legacy game so they render whatever the current one still ships: ${[...rescued.taken.keys()].join(', ')}`
