@@ -4,9 +4,11 @@ import { IsBoolString, S2B, arrayPush } from '../../01_libraries/Basic_functions
 import { Constants } from '../../01_libraries/Constants'
 import { IsPositiveInteger } from '../../01_libraries/Functions_on_numbers'
 import { Text } from '../../01_libraries/Text'
+import { Level } from '../../04_STRUCTURES/Level/Level'
 import { worldToTile } from '../../04_STRUCTURES/Visibility/TileCoordinates'
 import { VisibilityCompositor } from '../../04_STRUCTURES/Visibility/VisibilityCompositor'
 import { VisibilityState, VisibilityType } from '../../04_STRUCTURES/Visibility/VisibilityType'
+import { BrushShape } from '../../05_MAKE_STRUCTURES/Make/BrushShape'
 import { USAGE } from '../Helpers/Command_functions'
 
 /** Accepts the full words and the built-ins' own aliases, so "-newvt blink v 2 1" reads naturally */
@@ -74,6 +76,8 @@ export const initExecuteCommandMake_visibility = () => {
 
         return visibilityType
     }
+
+    // --- The visibility types, which belong to the whole game ---
 
     //-newVisibilityType(newvt) <label> <visibilityTypeStart> <visibleTime> <maskedTime>   --> add a new periodic visibility type
     registerCommand({
@@ -335,6 +339,166 @@ export const initExecuteCommandMake_visibility = () => {
         },
     })
 
+    //-displayVisibilityTypes(dvt) [<label>] [page]
+    registerCommand({
+        name: 'displayVisibilityTypes',
+        alias: ['dvt'],
+        group,
+        argDescription: '[<label>] [page]',
+        description: 'Displays the visibility types of the game',
+        cb: ({ cmd }, escaper) => {
+            getUdgVisibilityTypes().displayPaginatedForPlayer(escaper.getPlayer(), cmd)
+            return true
+        },
+    })
+
+    // --- What a level says about its terrain tiles ---
+
+    //-createVisibility(crv) <visibilityTypeLabel> [<brushSize> [<shape>]]   --> paint visibility on the terrain tiles
+    registerCommand({
+        name: 'createVisibility',
+        alias: ['crv'],
+        group,
+        argDescription: '<visibilityTypeLabel> [<brushSize> [<shape>]]',
+        description:
+            'Paint a visibility type on the terrain tiles of the current level, by clicking two corners or with a brush. Paint "u" (untouched) to erase',
+        cb: ({ noParam, nbParam, param1, param2, param3 }, escaper) => {
+            const p = escaper.getPlayer()
+
+            // Not a USAGE: the parameterless form used to be the whole command, so it has to say what became of it
+            if (noParam) {
+                Text.erP(p, '-crv no longer creates a visibility rectangle on its own')
+                Text.mkP(
+                    p,
+                    'visibility is now painted per terrain tile, with a visibility type that can mask an area again, not only reveal it'
+                )
+                Text.mkP(p, 'use "-crv <visibilityTypeLabel>" - built in types: u (untouched), v (visible), m (masked)')
+                Text.mkP(p, 'type "-dvt" to list every visibility type, "-newvt" to create one')
+                return true
+            }
+
+            if (nbParam > 3) {
+                return USAGE
+            }
+
+            const visibilityType = getUdgVisibilityTypes().getByLabel(param1)
+
+            if (!visibilityType) {
+                Text.erP(p, 'visibility type "' + param1 + '" doesn\'t exist')
+                return true
+            }
+
+            const level = escaper.getMakingLevel()
+
+            // A level holds either the old rectangles or the tiles, never both: they do not compose together
+            if (level.isLegacyVisibility()) {
+                Text.erP(
+                    p,
+                    'level ' +
+                        I2S(level.getId()) +
+                        ' still uses the old visibility rectangles - run -convertVisibilities first, or -remv to clear them'
+                )
+                return true
+            }
+
+            if (nbParam === 1) {
+                escaper.makeCreateVisibility(visibilityType)
+                Text.mkP(p, 'visibility painting on, click two corners')
+                return true
+            }
+
+            const brushSize = S2I(param2)
+
+            if (brushSize < 1 || brushSize > 8) {
+                Text.erP(p, 'brush size has to be between 1 and 8')
+                return true
+            }
+
+            const shape: BrushShape = param3 == 'circle' || param3 == 'c' ? 'circle' : 'square'
+
+            escaper.makeCreateVisibility(visibilityType, brushSize, shape)
+            Text.mkP(p, 'visibility painting on, hold the right button to paint and the left one to erase')
+
+            return true
+        },
+    })
+
+    //-setLevelResetVisibilities(setlrv) <boolean> [<levelId>]   --> set whether the levels below stop contributing to the visibility when this one starts
+    registerCommand({
+        name: 'setLevelResetVisibilities',
+        alias: ['setlrv'],
+        group,
+        argDescription: '<boolean> [<levelId>]',
+        description:
+            'Set whether the levels below stop contributing to the visibility when this one starts (applies a total black mask on the map when true). Painting "m" tiles with -crv says the same thing per tile, and more precisely',
+        cb: ({ nbParam, param1, param2 }, escaper) => {
+            if (nbParam > 2 || !IsBoolString(param1)) {
+                return USAGE
+            }
+
+            const levelNum = nbParam == 2 ? S2I(param2) : escaper.getMakingLevel().getId()
+            const level = getUdgLevels().get(levelNum)
+            if (!level) {
+                Text.erP(escaper.getPlayer(), `Level number ${param2} doesn't exist`)
+                return true
+            }
+
+            const doReset = S2B(param1)
+
+            if (level.getResetVisiblitiesAtStart() === doReset) {
+                Text.erP(
+                    escaper.getPlayer(),
+                    `Level ${levelNum} already has reset visibilities at start set to ${param1}`
+                )
+                return true
+            }
+
+            level.setResetVisiblitiesAtStart(doReset)
+            Text.mkP(
+                escaper.getPlayer(),
+                `Level ${levelNum} will ${doReset ? '' : 'no longer '}reset visibilities at start`
+            )
+
+            return true
+        },
+    })
+
+    //-removeVisibilities(remv) [<levelId>]   --> remove everything the level says about visibility
+    registerCommand({
+        name: 'removeVisibilities',
+        alias: ['remv'],
+        group,
+        argDescription: '[<levelId>]',
+        description:
+            'Remove everything the current level says about visibility: its painted tiles, and the old visibility rectangles if it still has any',
+        cb: ({ noParam, nbParam, param1 }, escaper) => {
+            if (!(noParam || nbParam === 1)) {
+                return true
+            }
+
+            let level: Level | null = null
+
+            //check param1
+            if (nbParam === 1) {
+                if (!IsPositiveInteger(param1)) {
+                    Text.erP(escaper.getPlayer(), 'the level number must be a positive integer')
+                    return true
+                }
+                // was reading param2, which is empty here: every "-remv <levelId>" emptied level 0 instead
+                level = getUdgLevels().get(S2I(param1))
+                if (!level) {
+                    Text.erP(escaper.getPlayer(), 'level number ' + param1 + " doesn't exist")
+                    return true
+                }
+            } else {
+                level = escaper.getMakingLevel()
+            }
+            level.removeVisibilities()
+            Text.mkP(escaper.getPlayer(), 'visibilities removed for level ' + I2S(level.getId()))
+            return true
+        },
+    })
+
     //-convertVisibilities(convv) [<levelId>]   --> turn a level's old visibility rectangles into painted tiles
     registerCommand({
         name: 'convertVisibilities',
@@ -405,6 +569,8 @@ export const initExecuteCommandMake_visibility = () => {
         },
     })
 
+    // --- Debug ---
+
     //-debugVisibilityZones(dvz) <boolean>   --> outline the fog modifiers the compositor builds
     registerCommand({
         name: 'debugVisibilityZones',
@@ -450,19 +616,6 @@ export const initExecuteCommandMake_visibility = () => {
             // to nobody else, so a local value never becomes something the game depends on
             Text.mkP(p, 'last partition took ' + R2S(VisibilityCompositor.getLastDurationMs()) + ' ms on your machine')
 
-            return true
-        },
-    })
-
-    //-displayVisibilityTypes(dvt) [<label>] [page]
-    registerCommand({
-        name: 'displayVisibilityTypes',
-        alias: ['dvt'],
-        group,
-        argDescription: '[<label>] [page]',
-        description: 'Displays the visibility types of the game',
-        cb: ({ cmd }, escaper) => {
-            getUdgVisibilityTypes().displayPaginatedForPlayer(escaper.getPlayer(), cmd)
             return true
         },
     })
