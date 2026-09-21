@@ -148,10 +148,10 @@ All aliases below were checked against the 376 aliases registered in `src/core/0
 
 | Command | Alias | Args |
 | --- | --- | --- |
-| `-newVisibilityType` | `newvt` | `<label> visible\|v\|masked\|m <visibleTime> <maskedTime>` — creates a periodic type, both times > 0 |
+| `-newVisibilityType` | `newvt` | `<label> <visibilityTypeStart> <visibleTime> <maskedTime>` — creates a periodic type, `visibilityTypeStart` being `visible\|v\|masked\|m` and both times > 0 |
 | `-setVisibilityTypeLabel` | `setvtl` | `<label> <newLabel>` |
 | `-setVisibilityTypeAlias` | `setvta` | `<label> <alias>` |
-| `-setVisibilityTypeStart` | `setvts` | `<label> visible\|v\|masked\|m` |
+| `-setVisibilityTypeStart` | `setvts` | `<label> <visibilityTypeStart>` |
 | `-setVisibilityTypeTimes` | `setvtt` | `<label> <visibleTime> <maskedTime>` |
 | `-deleteVisibilityType` | `delvt` | `<label> [--force]` |
 | `-displayVisibilityTypes` | `dvt` | `[<search>] [<page>]` — paginated, like `-dt` |

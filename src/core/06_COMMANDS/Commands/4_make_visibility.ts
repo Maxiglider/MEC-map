@@ -75,14 +75,14 @@ export const initExecuteCommandMake_visibility = () => {
         return visibilityType
     }
 
-    //-newVisibilityType(newvt) <label> visible|v|masked|m <visibleTime> <maskedTime>   --> add a new periodic visibility type
+    //-newVisibilityType(newvt) <label> <visibilityTypeStart> <visibleTime> <maskedTime>   --> add a new periodic visibility type
     registerCommand({
         name: 'newVisibilityType',
         alias: ['newvt'],
         group,
-        argDescription: '<label> visible|v|masked|m <visibleTime> <maskedTime>',
+        argDescription: '<label> <visibilityTypeStart> <visibleTime> <maskedTime>',
         description:
-            'Add a new visibility type, switching between visible and masked. The two times are in seconds and must be greater than zero',
+            'Add a new visibility type, switching between visible and masked. visibilityTypeStart can be visible|v|masked|m. The two times are in seconds and must be greater than zero',
         cb: ({ nbParam, param1, param2, param3, param4 }, escaper) => {
             if (nbParam !== 4) {
                 return USAGE
@@ -182,13 +182,14 @@ export const initExecuteCommandMake_visibility = () => {
         },
     })
 
-    //-setVisibilityTypeStart(setvts) <label> visible|v|masked|m
+    //-setVisibilityTypeStart(setvts) <label> <visibilityTypeStart>
     registerCommand({
         name: 'setVisibilityTypeStart',
         alias: ['setvts'],
         group,
-        argDescription: '<label> visible|v|masked|m',
-        description: 'Set the state a visibility type starts its cycle on',
+        argDescription: '<label> <visibilityTypeStart>',
+        description:
+            'Set the state a visibility type starts its cycle on. visibilityTypeStart can be visible|v|masked|m',
         cb: ({ nbParam, param1, param2 }, escaper) => {
             if (nbParam !== 2) {
                 return USAGE
