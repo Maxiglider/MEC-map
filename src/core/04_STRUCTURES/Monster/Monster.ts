@@ -426,7 +426,21 @@ export abstract class Monster {
         }
     }
 
+    /** Whether the landmark was last built for a hidden unit, so the change is noticed without rebuilding it */
+    private landmarkWasHidden = false
+
     moveCollisionLandmark = () => {
+        // A map's own trigger may hide a monster and show it again - Slide Is Magic swaps a mage for the animal it
+        // turns into - and the contact check skips a hidden unit, so its landmark has no business standing there.
+        // Nothing tells us when that happens, so the change is noticed here, where every monster is walked anyway.
+        if (this.u) {
+            const hidden = IsUnitHidden(this.u)
+            if (hidden !== this.landmarkWasHidden) {
+                this.landmarkWasHidden = hidden
+                this.refreshCollisionLandmark()
+            }
+        }
+
         if (this.collisionLandmarkEffect && this.u) {
             const z =
                 GetUnitZEx(this.u) -
