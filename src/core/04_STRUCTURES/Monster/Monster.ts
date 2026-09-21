@@ -271,9 +271,12 @@ export abstract class Monster {
             this.setMonsterSkin(this.monsterSkin)
         }
 
-        // the colour of the monster type, which the monster's own colour below overrides when it has one
-        if (this.u && this.baseColorId === -1 && this.mt) {
-            const typeColorId = this.mt.getBaseColorId()
+        // The colour of the monster type, which the monster's own colour below overrides when it has one.
+        // getMonsterType(), not this.mt: a caster has no monster type of its own and answers with the one its
+        // caster type shoots from, which is what its unit is built from.
+        const colorMonsterType = this.getMonsterType()
+        if (this.u && this.baseColorId === -1 && colorMonsterType) {
+            const typeColorId = colorMonsterType.getBaseColorId()
             if (typeColorId === 0) {
                 SetUnitColor(this.u, PLAYER_COLOR_RED)
             } else if (typeColorId > 0) {
