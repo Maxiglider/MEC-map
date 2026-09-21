@@ -417,7 +417,9 @@ export abstract class Monster {
                 throw new Error("Couldn't create collision landmark effect")
             }
             // const scale = 1024 / Constants.COLLISION_LANDMARK_MODEL_BASE_RADIUS
-            const scale = (this.mt?.getImmolationRadius() ?? 0) / Constants.COLLISION_LANDMARK_MODEL_BASE_RADIUS
+            // getMonsterType(), not this.mt: a caster has none of its own and answers with the one it shoots from
+            const scale =
+                (this.getMonsterType()?.getImmolationRadius() ?? 0) / Constants.COLLISION_LANDMARK_MODEL_BASE_RADIUS
             BlzSetSpecialEffectScale(this.collisionLandmarkEffect, scale)
 
             if (!displayCollisionLandmark) {
@@ -444,7 +446,7 @@ export abstract class Monster {
         if (this.collisionLandmarkEffect && this.u) {
             const z =
                 GetUnitZEx(this.u) -
-                (Constants.COLLISION_LANDMARK_MODEL_BASE_HEIGHT * (this.mt?.getImmolationRadius() ?? 0)) /
+                (Constants.COLLISION_LANDMARK_MODEL_BASE_HEIGHT * (this.getMonsterType()?.getImmolationRadius() ?? 0)) /
                     Constants.COLLISION_LANDMARK_MODEL_BASE_RADIUS
             BlzSetSpecialEffectPosition(this.collisionLandmarkEffect, GetUnitX(this.u), GetUnitY(this.u), z)
         }
