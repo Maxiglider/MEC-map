@@ -47,7 +47,7 @@ import {
     saveArchiveWhole,
     withoutProtectedMarks,
 } from './mapFiles'
-import { rescueModelTextures } from './modelTextures'
+import { rescueModelTextures, sortModelTracks } from './modelTextures'
 import { fixObjectDataWriter, isSkinField, variableTypeOf } from './objectData'
 import { TERRAIN_TEXTURE_PATHS } from './terrainTextures'
 
@@ -841,6 +841,7 @@ if (imports.length) {
         entries.some(e => (e.flag === 13 ? e.path : 'war3mapImported\\' + e.path).toLowerCase() === p.toLowerCase())
     const added: string[] = []
     const kept: string[] = []
+    const repairedModels: string[] = []
 
     // art the old map's models borrowed from the game and that Reforged dropped: without it a model shows nothing
     // at all, only the shadow, and the map looks broken through no fault of its own
@@ -875,7 +876,11 @@ if (imports.length) {
             kept.push(name)
             continue
         }
-        if (!base.set(name, old.get(name)!)) throw new Error(`${name} could not be added to the converted map`)
+        // a model whose tracks list their keys out of order is put back in order: the game reads such a track wrong
+        const repaired = /\.mdx$/i.test(name) ? sortModelTracks(old.get(name)!) : undefined
+        if (repaired) repairedModels.push(`${name} (${repaired.sorted} tracks)`)
+        if (!base.set(name, repaired?.bytes ?? old.get(name)!))
+            throw new Error(`${name} could not be added to the converted map`)
         entries.push({ flag: 13, path: name })
         added.push(name)
     }
@@ -885,6 +890,10 @@ if (imports.length) {
         entries.push({ flag: 13, path: texture })
         added.push(texture)
     }
+    if (repairedModels.length > 0)
+        log.push(
+            `- models whose tracks listed their keys out of order, put back in order: ${repairedModels.join(', ')}`
+        )
     if (rescued.taken.size > 0)
         log.push(
             `- ${rescued.taken.size} texture(s) the imported models draw with, taken from the legacy game so they render whatever the current one still ships: ${[...rescued.taken.keys()].join(', ')}`

@@ -101,3 +101,49 @@ export const rescueModelTextures = (
 
     return { taken, wanted: [...wanted], missing: [...wanted].filter(w => !taken.has(w)) }
 }
+
+/**
+ * A model whose animation tracks list their keys out of order, put back in order.
+ *
+ * Old editors wrote a track's keys in the order they were made, not by frame, and the old engine read them anyway.
+ * Slide Is Magic's footman (`Frost_Fury_v1.1.mdx`) has 27 tracks of 94 so, among them the visibility of every one
+ * of its 15 geosets - `1000, 2500, 5800, 7650, 8000, 0, 8251…` - and it shows nothing in game but its shadow,
+ * with every texture it draws present and opaque. A key lookup that searches the frames as sorted, which is what
+ * a current engine can be expected to do, reads such a track wrong.
+ *
+ * Sorting changes nothing to what a well-made track says, keys at the same frame keep their order, and a model
+ * with no such track is given back as undefined so that its file stays byte for byte the same. Parsing then saving
+ * drops nothing but empty chunks (checked on that footman: identical once its empty `PREM` is left out).
+ */
+export const sortModelTracks = (modelBytes: Uint8Array): { bytes: Uint8Array; sorted: number } | undefined => {
+    const model = new MdlxModel()
+    model.load(modelBytes)
+
+    let sorted = 0
+    const seen = new Set<object>()
+
+    const walk = (node: any) => {
+        if (!node || typeof node !== 'object' || seen.has(node)) return
+        seen.add(node)
+
+        // a track: its keys' frames, their values, and the tangents of a curved one
+        if (node.frames && node.values && typeof node.name === 'string') {
+            const frames: number[] = Array.from(node.frames as ArrayLike<number>)
+            if (frames.every((frame, i) => i === 0 || frame >= frames[i - 1])) return
+
+            const order = frames.map((_, i) => i).sort((a, b) => frames[a] - frames[b] || a - b)
+            node.frames = new Uint32Array(order.map(i => frames[i]))
+            node.values = order.map(i => node.values[i])
+            if (node.inTans?.length) node.inTans = order.map(i => node.inTans[i])
+            if (node.outTans?.length) node.outTans = order.map(i => node.outTans[i])
+            sorted++
+            return
+        }
+
+        for (const key of Object.keys(node)) walk(node[key])
+    }
+
+    walk(model)
+
+    return sorted > 0 ? { bytes: model.saveMdx(), sorted } : undefined
+}

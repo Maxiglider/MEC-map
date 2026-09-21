@@ -182,6 +182,8 @@ Write them in `conversion-work/<map>/custom-triggers.lua` (or several files) and
   - Count the old waits exactly, including the ones hidden in Blizzard functions: a transmission called with its wait flag (`TransmissionFromUnitTypeWithNameBJ(…, true)`) holds the old trigger for the line's whole duration (`bj_TIMETYPE_ADD`: the given time, plus the sound's length if any). Leaving those out made Polar Escape 3's ending 7 s too short.
   - Give each step its own timer at its absolute time from the start, rather than chaining them, so a step that goes wrong doesn't hold up the next ones and the end of the game.
 
+- **Imported models with keys out of order**: old editors wrote an animation track's keys in the order they were made, not by frame. The rebase sorts them (`sortModelTracks`, `modelTextures.ts`) and `rebase.md` names the models it touched; a model without that fault is copied byte for byte. Slide Is Magic's footman (`Frost_Fury_v1.1.mdx`, 27 tracks out of 94, the visibility of all 15 geosets among them) was the only one, and the only model that showed nothing but its shadow, every texture it draws being present and opaque.
+
 ## MEC 1 maps
 
 A MEC 1 map was made with the vJass MEC of this repo's `v1-jass` tag, from the World Editor, its script compiled to JASS. Its structures keep their names there (`s__Escaper_`, `s__Level_`, `s__TerrainTypeArray_`…), which is what `detectMapKind` looks for (`mecOne.ts`). Such a map splits in three, and `summary.md`'s "MEC 1" section gives each:
