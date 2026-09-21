@@ -818,9 +818,15 @@ for (const [label, fields] of Object.entries((spec.terrainTypeOverrides ?? {}) a
     Object.assign(terrainType, fields)
 }
 
+// the tiles the old map renamed by re-skinning them (spec terrainTypeIdRemap), so MEC reads the ground by the id
+// the rebase wrote into the w3e's tileset list
+const terrainTypeIdRemap: { [oldId: string]: string } = Object.fromEntries(
+    Object.entries((spec.terrainTypeIdRemap ?? {}) as { [k: string]: string }).filter(([from]) => !from.startsWith('$'))
+)
+
 const terrainTypesMec = (spec.terrainTypes as Json[]).map((t, orderId) => {
     const common = {
-        terrainTypeId: t.tile,
+        terrainTypeId: terrainTypeIdRemap[t.tile] ?? t.tile,
         label: t.label,
         alias: t.alias,
         kind: t.kind,

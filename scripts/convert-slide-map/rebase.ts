@@ -39,6 +39,7 @@ import * as path from 'path'
 import { normalizeScript } from './jass'
 import { KNOWN_MAP_FILES, mecMapName, parseW3iHead, parseWts, readArchive, withoutProtectedMarks } from './mapFiles'
 import { fixObjectDataWriter, isSkinField, variableTypeOf } from './objectData'
+import { TERRAIN_TEXTURE_PATHS } from './terrainTextures'
 
 /** A standard unit's default values in the World Editor (war3-objectdata-th), by the names of its fields */
 const unitDefaults = (id: string): { [field: string]: string | number } | undefined =>
@@ -170,6 +171,42 @@ if (oldDoo) {
     )
 }
 
+/**
+ * The tiles an old map renamed, by re-skinning them (spec terrainTypeIdRemap: old id -> the id whose texture it
+ * imported). Writing the real id instead carries the look without carrying the file: a corner of the terrain holds
+ * an index into the w3e's own tileset list, so rewriting that list moves every corner at once. It is a permutation
+ * - Slide Is Magic's `Ndrt` becomes `Nice` while its `Nice` becomes `Isnw` - so it is applied in one pass.
+ */
+const terrainTypeIdRemap: { [oldId: string]: string } = Object.fromEntries(
+    Object.entries((spec.terrainTypeIdRemap ?? {}) as { [k: string]: string }).filter(([from]) => !from.startsWith('$'))
+)
+
+const remapW3eTilesets = (bytes: Buffer) => {
+    const entries = Object.entries(terrainTypeIdRemap)
+    if (entries.length === 0) return bytes
+
+    // W3E!, version, tileset char, custom tilesets flag, then the ground tileset ids
+    const nbGround = bytes.readUInt32LE(13)
+    const done: string[] = []
+
+    for (let i = 0; i < nbGround; i++) {
+        const at = 17 + i * 4
+        const id = bytes.toString('latin1', at, at + 4)
+        const to = terrainTypeIdRemap[id]
+        if (to) {
+            bytes.write(to, at, 'latin1')
+            done.push(`${id} → ${to}`)
+        }
+    }
+
+    const missed = entries.filter(([from]) => !done.some(d => d.startsWith(from + ' ')))
+    if (missed.length > 0)
+        throw new Error(`terrainTypeIdRemap: ${missed.map(([f]) => f).join(', ')} is not a tile of the old terrain`)
+
+    log.push(`- \`war3map.w3e\`: tiles renamed to the ones whose texture the old map imported: ${done.join(', ')}`)
+    return bytes
+}
+
 for (const name of [
     'war3map.w3e',
     'war3map.wpm',
@@ -180,7 +217,7 @@ for (const name of [
 ]) {
     const bytes = old.get(name)
     if (bytes) {
-        set(name, bytes, 'the old map’s')
+        set(name, name === 'war3map.w3e' ? remapW3eTilesets(Buffer.from(bytes)) : bytes, 'the old map’s')
     } else if (base.has(name) && ['war3mapMap.blp', 'war3mapPreview.tga', 'war3map.mmp'].includes(name)) {
         base.delete(name)
         log.push(`- \`${name}\`: removed, the old map has none and the base map’s shows its own terrain`)
@@ -629,7 +666,19 @@ for (const name of ['war3map.w3t', 'war3map.w3a', 'war3map.w3b', 'war3map.w3d', 
 // 7b. the old map's imported files (user's rule: its custom things are kept, a loading screen say), at their paths,
 // listed in war3map.imp so that the World Editor keeps them (13: a path of its own). A file the base map already
 // has at that path stays the base map's.
-const imports = [...old.keys()].filter(n => !KNOWN_MAP_FILES.some(k => k.toLowerCase() === n.toLowerCase()))
+// a re-skinned tile that was renamed carries its look through its new id: its texture file is not imported
+const remappedTextures = new Set(
+    Object.keys(terrainTypeIdRemap)
+        .map(id => TERRAIN_TEXTURE_PATHS[id]?.toLowerCase())
+        .filter(Boolean)
+)
+const imports = [...old.keys()].filter(
+    n => !KNOWN_MAP_FILES.some(k => k.toLowerCase() === n.toLowerCase()) && !remappedTextures.has(n.toLowerCase())
+)
+if (remappedTextures.size > 0)
+    log.push(
+        `- the terrain textures of the renamed tiles are not imported, their new ids carry the look: ${[...remappedTextures].join(', ')}`
+    )
 if (imports.length) {
     const baseImp = base.get('war3map.imp')?.bytes()
     const entries: { flag: number; path: string }[] = []
