@@ -11,7 +11,7 @@ import { ChangingVisibilityTile, MakeVisibilityTileAction } from '../MakeLastAct
 import { paintVisibilityTile } from './paintVisibilityTiles'
 
 /** How often the fog is allowed to follow the brush, in seconds */
-const REFRESH_PERIOD = 0.1
+const REFRESH_PERIOD = 0.3
 
 /** Long enough that no stroke outlives it, the timer only being read for its elapsed time */
 const STROKE_TIMER_DURATION = 3600
