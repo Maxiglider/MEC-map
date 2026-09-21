@@ -88,7 +88,7 @@ The partition result must be **byte-identical on every machine**. A different bu
 ### Scale adaptations (the POC runs on 32×32 = 1024 cells; a real map is ~256×256 = 65536)
 
 - `emit()` and the reflex scan re-sweep the whole grid **per component**. Add a per-component bounding box and iterate only inside it.
-- `new Uint8Array(N*N)` per component becomes a 65k-entry Lua table per component per recomposition. Replaced by sparse integer-keyed tables holding only the filled tiles, plus a component-number stamp instead of a cleared array — no dense allocation at all, so `MemoryHandler` pooling (`docs/MEMORY_HANDLER.md`) is not needed here. The partition runs on level transitions and on mouse-up, not per frame; if `-dvz` ever shows allocation pressure, pooling is the measured follow-up.
+- `new Uint8Array(N*N)` per component becomes a 65k-entry Lua table per component per recomposition. Replaced by sparse integer-keyed tables holding only the filled tiles, plus a component-number stamp instead of a cleared array — no dense allocation at all, so `MemoryHandler` pooling (`docs/MEMORY_HANDLER.md`) is not needed here. The partition runs on level transitions and on mouse-up, not per frame; if `-debvz` ever shows allocation pressure, pooling is the measured follow-up.
 - Kuhn is O(V·E) with E up to |H|·|V|. Keep Hopcroft–Karp (O(E·√V)) in reserve if measurements demand it.
 - The non-rectangular safety net in `emit()` should never fire with a correct construction. Keep it, but route it through the `Log` module so a real occurrence surfaces instead of silently producing extra modifiers.
 
@@ -174,7 +174,7 @@ Not undoable: `MakeAction` is bound to one escaper and one level, and a delete t
 | Command | Alias | Args |
 | --- | --- | --- |
 | `-convertVisibilities` | `convv` | `[<levelId>]` — opt-in conversion of a legacy level's rectangles into `visible` tiles, warning about the ≤ 64 unit border snap |
-| `-debugVisibilityZones` | `dvz` | `<boolean>` — draws the computed zones and prints **the rectangle count per type and the partition time** |
+| `-debugVisibilityZones` | `debvz` | `<boolean>` — draws the computed zones and prints **the rectangle count per type and the partition time** |
 
 ## Reworked
 

@@ -571,10 +571,10 @@ export const initExecuteCommandMake_visibility = () => {
 
     // --- Debug ---
 
-    //-debugVisibilityZones(dvz) <boolean>   --> outline the fog modifiers the compositor builds
+    //-debugVisibilityZones(debvz) <boolean>   --> outline the fog modifiers the compositor builds
     registerCommand({
         name: 'debugVisibilityZones',
-        alias: ['dvz'],
+        alias: ['debvz'],
         group,
         argDescription: '<boolean>',
         description:

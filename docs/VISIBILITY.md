@@ -70,7 +70,7 @@ So `VisibilityPartition.ts` breaks every tie by an explicit index order and neve
 
 `pairs` is used in `VisibilityTileArray`, and only for walks whose answer cannot depend on the order: a count, a min/max, a set of deletions, and the composition's "paint if absent" (a tile index appears once and only once there).
 
-The partition's duration, measured with `os.clock()` for `-dvz`, is a local value: it is shown to the player who asked and to nobody else, and nothing in the game reads it.
+The partition's duration, measured with `os.clock()` for `-debvz`, is a local value: it is shown to the player who asked and to nobody else, and nothing in the game reads it.
 
 ## Persistence
 
@@ -104,11 +104,11 @@ Note for the Lua side: `typescript-to-lua` only shifts an index to Lua's 1 based
 | `-setVisibilityTypeTimes <label> <visibleTime> <maskedTime>` | `setvtt` | Both durations |
 | `-deleteVisibilityType <label> [--force]` | `delvt` | `--force` also removes the type's tiles from every level. Not undoable, which is why it is spelled out |
 | `-displayVisibilityTypes [<label>] [page]` | `dvt` | Lists the types |
-| `-debugVisibilityZones <boolean>` | `dvz` | Outlines the zones, and reports their count per type and the partition's duration |
+| `-debugVisibilityZones <boolean>` | `debvz` | Outlines the zones, and reports their count per type and the partition's duration |
 | `-setLevelResetVisibilities <boolean> [<levelId>]` | `setlrv` | Still truncates the composition stack. Largely superseded by painting `m` |
 | `-viewAll` / `-hideAll` | `va` / `ha` | Untouched: a cheat-tier override sitting above all of this |
 
-`-dvz` is also the visual feedback while painting: it redraws at each recomposition, which is once per stroke. The fog itself is recomposed then too — never on a mouse move, `EVENT_PLAYER_MOUSE_MOVE` firing with no throttle at all.
+`-debvz` is also the visual feedback while painting: it redraws at each recomposition, which is once per stroke. The fog itself is recomposed then too — never on a mouse move, `EVENT_PLAYER_MOUSE_MOVE` firing with no throttle at all.
 
 ## Testing
 
