@@ -98,21 +98,46 @@ for (const label of droppedMonsterTypes) {
 }
 spec.monsterTypes = (spec.monsterTypes as Json[]).filter(t => !droppedMonsterTypes.has(t.label))
 
-// what MEC's -patchImmo does in game, done here instead (spec patchImmo: the new hero base collision size): every
-// immolation radius moves by what the hero's collision gains, so each monster kills at the distance it did, and a
-// radius the new collision swallows whole stays at 5, MEC's smallest (adaptMonstersImmolation, core): better a monster
-// that kills from a little further than one that kills no more (user's rule)
-const patchImmoTo: number | undefined = spec.patchImmo
-if (patchImmoTo !== undefined) {
-    if (patchImmoTo < 0 || patchImmoTo > 200 || patchImmoTo % 5 !== 0)
-        throw new Error(`patchImmo: between 0 and 200 by steps of 5, not ${patchImmoTo}`)
-    const from = Number(spec.gameData?.heroBaseCollisionSize ?? 0)
-    const delta = from - patchImmoTo
-    for (const type of spec.monsterTypes as Json[]) {
-        const radius = Number(type.immolationRadius ?? 0)
-        if (radius > 0) type.immolationRadius = Math.max(5, Math.min(400, radius + delta))
+// the hero's base collision is MEC's 25 on every converted map, whatever the old map was (user's rule)
+const MEC_HERO_COLLISION = 25
+if (spec.patchImmo !== undefined)
+    throw new Error('patchImmo: no longer a spec field, a MEC 1 map is always patched to 25')
+if (
+    spec.gameData?.heroBaseCollisionSize !== undefined &&
+    Number(spec.gameData.heroBaseCollisionSize) !== MEC_HERO_COLLISION
+)
+    throw new Error(
+        `gameData.heroBaseCollisionSize: every converted map has MEC's ${MEC_HERO_COLLISION}, not ${spec.gameData.heroBaseCollisionSize}`
+    )
+spec.gameData = { ...(spec.gameData ?? {}), heroBaseCollisionSize: MEC_HERO_COLLISION }
+
+// A MEC 1 map's radii are in its own frame: it killed at the radius plus the old hero's collision. So what MEC's
+// -patchImmo does in game is done here (user's rule): every radius moves by what the hero's collision gains, and each
+// monster kills at the distance it did. A radius the gain swallows would have to stay at 5 and kill from further than
+// before, and one the gain does not move by a whole step of 5 is rounded down: the first case is the user's to decide,
+// so the build stops and names those types - an immolationRadius in monsterTypeOverrides, in the old map's frame,
+// settles each of them. Overrides are applied before, which is why they are written in the old frame.
+if (spec.mecOne) {
+    if (spec.hero?.collision === undefined)
+        throw new Error("hero.collision: the old hero's collision is needed to move a MEC 1 map to MEC's own")
+    const delta = Number(spec.hero.collision) - MEC_HERO_COLLISION
+    const shifted = (spec.monsterTypes as Json[])
+        .filter(type => Number(type.immolationRadius ?? 0) > 0)
+        .map(type => ({
+            type,
+            radius: Number(type.immolationRadius),
+            to: Math.floor((Number(type.immolationRadius) + delta) / 5) * 5,
+        }))
+    const growing = shifted.filter(({ to }) => to < 5)
+    if (growing.length > 0) {
+        throw new Error(
+            `patchImmo not applied: these monster types would kill from further than in the old map (radius + old hero collision ${spec.hero.collision} = ` +
+                `${growing.map(({ type, radius }) => `${type.label} ${radius + Number(spec.hero.collision)}`).join(', ')}; MEC's smallest is 5 + ${MEC_HERO_COLLISION}). ` +
+                'Ask the user how to handle them, then set their immolationRadius in monsterTypeOverrides'
+        )
     }
-    spec.gameData = { ...(spec.gameData ?? {}), heroBaseCollisionSize: patchImmoTo }
+    for (const { type, to } of shifted) type.immolationRadius = Math.min(400, to)
+    if (delta % 5 !== 0) warn(`patchImmo: the shift of ${delta} is not a whole step of 5, every radius rounded down`)
 }
 
 // ---------------------------------------------------------------------------------------------- geometry
