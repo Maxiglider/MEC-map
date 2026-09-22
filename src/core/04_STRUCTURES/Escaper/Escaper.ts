@@ -2562,11 +2562,19 @@ export class Escaper extends EscaperMake {
         const viewer = getUdgEscapers().get(GetPlayerId(GetLocalPlayer()))
 
         const isUnderEffect = this.isHeroEffectActive
+        const x = isUnderEffect ? this.heroPos.x : GetUnitX(this.hero)
+        const y = isUnderEffect ? this.heroPos.y : GetUnitY(this.hero)
+
         const isShown =
             (isUnderEffect || this.isUnitShadowRemovedHere) &&
             viewer?.shadowState[this.escaperId] !== false &&
             !!this.isAlive() &&
-            !IsUnitHidden(this.hero)
+            !IsUnitHidden(this.hero) &&
+            // an image is drawn through the fog and through the black mask, which a unit and an effect are
+            // not: without this, a hero crossing a masked area showed its shadow alone, gliding over the
+            // dark (user's report on the converted Slide Is Magic, 2026-09-23). Asked of the position the
+            // shadow is drawn at, so it comes and goes exactly where the hero itself does.
+            IsVisibleToPlayer(x, y, GetLocalPlayer())
 
         if (isShown !== fakeShadow.isShown) {
             ShowImage(fakeShadow.image, isShown)
@@ -2576,9 +2584,6 @@ export class Escaper extends EscaperMake {
         if (!isShown) {
             return
         }
-
-        const x = isUnderEffect ? this.heroPos.x : GetUnitX(this.hero)
-        const y = isUnderEffect ? this.heroPos.y : GetUnitY(this.hero)
 
         SetImagePosition(fakeShadow.image, x - fakeShadow.centerX, y - fakeShadow.centerY, 0)
     }
