@@ -75,6 +75,7 @@ if (mecOne) {
               : {}),
         visibilities: l.visibilities,
         ...(l.nbLives !== undefined ? { nbLives: l.nbLives } : {}),
+        ...(l.startMessage ? { startMessage: l.startMessage } : {}),
     }))
 }
 

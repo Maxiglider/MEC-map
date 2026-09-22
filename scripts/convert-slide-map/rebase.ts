@@ -30,7 +30,6 @@
  */
 import 'dotenv/config'
 import * as fs from 'fs'
-import War3MapDoo from 'mdx-m3-viewer-th/dist/cjs/parsers/w3x/doo/file'
 import War3Map from 'mdx-m3-viewer-th/dist/cjs/parsers/w3x/map'
 import War3MapW3u from 'mdx-m3-viewer-th/dist/cjs/parsers/w3x/w3u/file'
 import Modification from 'mdx-m3-viewer-th/dist/cjs/parsers/w3x/w3u/modification'
@@ -40,6 +39,7 @@ import { normalizeScript } from './jass'
 import {
     isWar3FilePath,
     KNOWN_MAP_FILES,
+    loadDoo,
     mecMapName,
     parseW3iHead,
     parseWts,
@@ -114,9 +114,7 @@ const set = (name: string, bytes: Uint8Array | string, why: string) => {
 // 1. the world, unchanged but for the doodads MEC recreates
 const oldDoo = old.get('war3map.doo')
 if (oldDoo) {
-    const doo = new War3MapDoo()
-    // format 7 and 8 doodads before 1.32 have no skin: read as such
-    doo.load(oldDoo, 1)
+    const doo = loadDoo(oldDoo)
     const before = doo.doodads.length
     const removed: { [type: string]: number } = {}
     doo.doodads = doo.doodads.filter(d => {
@@ -162,7 +160,8 @@ if (oldDoo) {
     doo.version = 8
     doo.u1 = new Uint8Array([11, 0, 0, 0])
     for (const doodad of doo.doodads) {
-        doodad.skin = doodad.id
+        // a map saved since 1.32 has skins of its own: kept
+        if (doodad.skin === '\0\0\0\0') doodad.skin = doodad.id
         if (oldFormat.startsWith('7.')) {
             doodad.itemTable = -1
             doodad.itemSets = []

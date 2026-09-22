@@ -12,7 +12,6 @@
  */
 import 'dotenv/config'
 import * as fs from 'fs'
-import War3MapDoo from 'mdx-m3-viewer-th/dist/cjs/parsers/w3x/doo/file'
 import War3MapW3d from 'mdx-m3-viewer-th/dist/cjs/parsers/w3x/w3d/file'
 import War3MapW3e from 'mdx-m3-viewer-th/dist/cjs/parsers/w3x/w3e/file'
 import War3MapW3u from 'mdx-m3-viewer-th/dist/cjs/parsers/w3x/w3u/file'
@@ -30,7 +29,7 @@ import {
     parseTriggers,
     parseVisibility,
 } from './jass'
-import { KNOWN_MAP_FILES, parseW3iHead, parseWts, readArchive } from './mapFiles'
+import { KNOWN_MAP_FILES, loadDoo, parseW3iHead, parseWts, readArchive } from './mapFiles'
 import { detectMapKind, mecOneInventory } from './mecOne'
 
 const outputRoot = process.env.MAPS_OUTPUT_DIR_FOR_AI_CONVERSION_TO_MEC
@@ -187,8 +186,7 @@ for (const fn of functions.values()) {
 const dooBytes = file('war3map.doo')
 const doodads: any[] = []
 if (dooBytes) {
-    const doo = new War3MapDoo()
-    doo.load(dooBytes, 1)
+    const doo = loadDoo(dooBytes)
     for (const d of doo.doodads) {
         const scriptName = `gg_dest_${d.id}_${String(d.editorId).padStart(4, '0')}`
         doodads.push({

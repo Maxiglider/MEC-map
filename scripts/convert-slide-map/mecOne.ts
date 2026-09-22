@@ -106,11 +106,13 @@ export const mecOneInventory = (script: string) => {
         // the same calls elsewhere are MEC 1 running
         if (!trigger || !/^init_/i.test(trigger)) continue
 
-        for (const m of line.matchAll(/s__([A-Za-z]+)_([A-Za-z][A-Za-z0-9]*)\s*\(([^)]*)\)/g)) {
+        // the arguments are only looked ahead at, so that a call nested in another one (MEC 1's
+        // `s__Monster_setId(s__MonsterNoMoveArray_new(...), 12)`) is found too
+        for (const m of line.matchAll(/s__([A-Za-z]+)_([A-Za-z][A-Za-z0-9]*)\s*\((?=([^)]*))/g)) {
             const call = { fn: `${m[1]}.${m[2]}`, args: m[3].trim(), line: line.trim() }
             // what makes a map: its types, levels, monsters and their places, not MEC 1 running
             if (
-                /^(TerrainTypeArray|MonsterTypeArray|CasterTypeArray|MonsterType|CasterType|Level|LevelArray|MonsterSimplePatrolArray|MonsterNoMoveArray|MonsterMultiplePatrolsArray|MonsterMultiplePatrols|MonsterSpawnArray|MeteorArray|VisibilityModifierArray)\.(new|create|set|store|newSlide|newWalk|newDeath)/.test(
+                /^(TerrainTypeArray|MonsterTypeArray|CasterTypeArray|MonsterType|CasterType|Level|LevelArray|MonsterSimplePatrolArray|MonsterNoMoveArray|MonsterMultiplePatrolsArray|MonsterMultiplePatrols|MonsterTeleportArray|MonsterTeleport|MonsterSpawnArray|MeteorArray|VisibilityModifierArray)\.(new|create|set|store|newSlide|newWalk|newDeath)/.test(
                     call.fn
                 ) ||
                 /^(Level)\.(monsters|visibilities|meteors|monsterSpawns|newStart|newEnd|setNbLivesEarned)/.test(call.fn)

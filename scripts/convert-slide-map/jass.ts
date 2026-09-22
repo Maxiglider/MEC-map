@@ -35,7 +35,64 @@ export type ScriptUnit = {
 
 export type ScriptItem = { variable?: string; typeId: string; x: number; y: number; createdIn: string }
 
-export const normalizeScript = (raw: string) => raw.replace(/^﻿/, '').replace(/\r\n?/g, '\n')
+/** The characters JASS needs no space around: an operator, a bracket or a comma */
+const JASS_PUNCTUATION = new Set('()[],+-*/=<>!'.split(''))
+
+/**
+ * A script as the protected maps write it, with no space around operators, brackets and commas: `SetCameraBounds(-7680.0+
+ * GetCameraMargin(...)` rather than `SetCameraBounds(- 7680.0 + GetCameraMargin(...)`. The first three old maps came
+ * compact out of an optimizer, and every pattern here was written against that; Aerial Slide v1.2c, saved by the
+ * World Editor through JassHelper, spaces everything out, down to its negative numbers. Strings and comments are kept
+ * as they are, and a space between two minus signs stays, so that no `--` appears in a line copied into Lua.
+ */
+const compactJass = (script: string) => {
+    let out = ''
+    // a string literal may run over several lines (Slide Is Magic's quest texts): the script is read as one text
+    let inString: string | null = null
+    let inComment = false
+    for (let i = 0; i < script.length; i++) {
+        const c = script[i]
+        if (inComment) {
+            out += c
+            if (c === '\n') inComment = false
+            continue
+        }
+        if (inString) {
+            out += c
+            if (c === '\\') out += script[++i] ?? ''
+            else if (c === inString) inString = null
+            continue
+        }
+        if (c === '/' && script[i + 1] === '/') {
+            inComment = true
+            out += c
+            continue
+        }
+        if (c === '"' || c === "'") {
+            inString = c
+            out += c
+            continue
+        }
+        if (c === ' ' || c === '\t') {
+            let j = i
+            while (script[j] === ' ' || script[j] === '\t') j++
+            const before = out[out.length - 1]
+            const after = script[j]
+            const leading = before === undefined || before === '\n'
+            if (!leading && (JASS_PUNCTUATION.has(before) || JASS_PUNCTUATION.has(after))) {
+                if (before === '-' && after === '-') out += ' '
+            } else {
+                out += script.substring(i, j)
+            }
+            i = j - 1
+            continue
+        }
+        out += c
+    }
+    return out
+}
+
+export const normalizeScript = (raw: string) => compactJass(raw.replace(/^﻿/, '').replace(/\r\n?/g, '\n'))
 
 /** Splits the arguments of a call, keeping nested calls and strings whole */
 export const splitArgs = (inner: string): string[] => {

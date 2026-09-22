@@ -1,5 +1,6 @@
 import * as fs from 'fs'
 import MpqArchive from 'mdx-m3-viewer-th/dist/cjs/parsers/mpq/archive'
+import War3MapDoo from 'mdx-m3-viewer-th/dist/cjs/parsers/w3x/doo/file'
 import * as path from 'path'
 
 /**
@@ -20,6 +21,25 @@ let war3FilePathSet: Set<string> | undefined
 export const isWar3FilePath = (name: string) => {
     war3FilePathSet ??= new Set(war3FilePaths().map(p => p.toLowerCase()))
     return war3FilePathSet.has(name.toLowerCase())
+}
+
+/**
+ * Reads a war3map.doo, with or without doodad skins. The header doesn't tell: a map saved before 1.32 and one saved
+ * after both write format 8, subversion 11, and only the second gives each doodad a skin id. So the file is read
+ * without skins first, which is what old maps are, and with them when that doesn't end exactly on the file's last
+ * byte (Aerial Slide v1.2c, saved by a 1.32 editor).
+ */
+export const loadDoo = (bytes: Uint8Array): War3MapDoo => {
+    for (const buildVersion of [1, 132]) {
+        const doo = new War3MapDoo()
+        try {
+            doo.load(bytes, buildVersion)
+        } catch {
+            continue
+        }
+        if (doo.getByteLength(buildVersion) === bytes.length) return doo
+    }
+    throw new Error('war3map.doo: read neither with nor without doodad skins')
 }
 
 /** The files a map may hold, for protected maps whose (listfile) is emptied */

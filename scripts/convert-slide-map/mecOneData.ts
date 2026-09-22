@@ -17,6 +17,7 @@ type Rect = { minX: number; minY: number; maxX: number; maxY: number }
 
 export type MecOneLevel = {
     nbLives?: number
+    startMessage?: string
     /** the region the start is taken from, when MEC 1 wrote `GetRectMinX(gg_rct_...)` rather than numbers */
     startRegion?: string
     start: Rect
@@ -47,13 +48,22 @@ const rect = (x1: number, y1: number, x2: number, y2: number): Rect => ({
     maxY: Math.round(Math.max(y1, y2)),
 })
 
-/** The arguments of a call, as written, split on the commas that are not inside a nested call */
+/** The arguments of a call, as written, split on the commas that are not inside a nested call or a string */
 const splitArgs = (args: string): string[] => {
     const out: string[] = []
     let depth = 0
     let current = ''
+    let inString = false
 
-    for (const c of args) {
+    for (let i = 0; i < args.length; i++) {
+        const c = args[i]
+        if (inString) {
+            current += c
+            if (c === '\\') current += args[++i] ?? ''
+            else if (c === '"') inString = false
+            continue
+        }
+        if (c === '"') inString = true
         if (c === '(') depth++
         if (c === ')') depth--
         if (c === ',' && depth === 0) {
@@ -68,15 +78,23 @@ const splitArgs = (args: string): string[] => {
     return out
 }
 
-/** The arguments of the first `fn(...)` of the line, or undefined */
+/** The arguments of the first `fn(...)` of the line, or undefined; a bracket inside a string (a `:)` in a start message) counts for nothing */
 const callOf = (line: string, fn: string): string[] | undefined => {
     const start = line.indexOf(`${fn}(`)
     if (start === -1) return undefined
 
     let depth = 0
+    let inString = false
     for (let i = start + fn.length; i < line.length; i++) {
-        if (line[i] === '(') depth++
-        if (line[i] === ')') {
+        const c = line[i]
+        if (inString) {
+            if (c === '\\') i++
+            else if (c === '"') inString = false
+            continue
+        }
+        if (c === '"') inString = true
+        if (c === '(') depth++
+        if (c === ')') {
             depth--
             if (depth === 0) return splitArgs(line.substring(start + fn.length + 1, i))
         }
@@ -84,7 +102,8 @@ const callOf = (line: string, fn: string): string[] | undefined => {
     return undefined
 }
 
-const num = (arg: string) => Number(arg.replace(/[()]/g, '').replace(/\*1\.0$/, ''))
+/** A number as JASS writes it: `((- 1219 )*1.0)`, the minus sign apart from its digits */
+const num = (arg: string) => Number(arg.replace(/[()\s]/g, '').replace(/\*1\.0$/, ''))
 
 /** A string as JASS writes it, with its escapes undone: `"Abilities\\\\Spells\\\\..."` is one backslash each */
 const jassString = (arg: string) => /"(.*)"/.exec(arg)?.[1].replace(/\\(.)/g, '$1')
@@ -95,14 +114,16 @@ const monsterTypeArg = (arg: string) => /"([^"]+)"/.exec(arg)?.[1]
 const KNOWN_TERRAIN_KINDS = { newSlide: 'slide', newWalk: 'walk', newDeath: 'death' } as const
 
 /**
- * The one field whose meaning changed between the two MECs.
+ * The one field whose meaning changed between versions of MEC 1.
  *
- * MEC 1 creates a monster with `if (scale != 1) SetUnitScale(...)`, so 1 is its "leave the unit's own scale alone";
- * MEC 2 writes that as -1 and takes 1 for a real scale of 1. Copied over as written, every type of a MEC 1 map -
- * they all declare 1 - would be forced to 1 and lose its unit's `usca`: Slide Is Magic's eight "Giant" mages, made
- * at `usca` 2, showed at half their size (user's report, 2026-09-21).
+ * Early MEC 1 creates a monster with `if (scale != 1) SetUnitScale(...)`, so 1 is its "leave the unit's own scale
+ * alone"; MEC 2 writes that as -1 and takes 1 for a real scale of 1. Copied over as written, every type of such a
+ * map - they all declare 1 - would be forced to 1 and lose its unit's `usca`: Slide Is Magic's eight "Giant" mages,
+ * made at `usca` 2, showed at half their size (user's report, 2026-09-21).
+ * Later MEC 1 already tests `scale != -1`, as MEC 2 does (Aerial Slide v1.2c): its scales go over as they are. So the
+ * map's own `NewImmobileMonsterForPlayer` says which one it is.
  */
-const mecTwoScale = (mecOneScale: number) => (mecOneScale === 1 ? -1 : mecOneScale)
+const scaleOneIsOwnScale = (script: string) => /if\s*\(?\s*scale\s*!=\s*1\s*\)?\s*then/.test(script)
 
 export const readMecOneData = (script: string): MecOneData => {
     const terrainTypes: Json[] = []
@@ -120,8 +141,12 @@ export const readMecOneData = (script: string): MecOneData => {
     let currentLevel: number | undefined
     // the points a multiple-patrol monster walks through, stored one by one before the monster that uses them
     let storedLocs: { x: number; y: number }[] = []
+    let storedTeleportLocs: { x: number; y: number }[] = []
     let nextMonsterId = 0
     let nbSpawns = 0
+    const mecTwoScale = scaleOneIsOwnScale(script)
+        ? (mecOneScale: number) => (mecOneScale === 1 ? -1 : mecOneScale)
+        : (mecOneScale: number) => mecOneScale
 
     for (const rawLine of script.split('\n')) {
         const line = rawLine.trim()
@@ -189,6 +214,14 @@ export const readMecOneData = (script: string): MecOneData => {
             type && (type.killingEffect = jassString(killEffect[1]))
         }
 
+        // the height a flying monster is shown at, from later MEC 1 on
+        const height = callOf(line, 's__MonsterType_setHeight')
+        if (height) {
+            const target = monsterTypeArg(height[0]) ?? monsterTypes[monsterTypes.length - 1]?.label
+            const type = monsterTypes.find(t => t.label === target) ?? monsterTypes[monsterTypes.length - 1]
+            type && (type.height = num(height[1]))
+        }
+
         const meteorsToKill = callOf(line, 's__MonsterType_setNbMeteorsToKill')
         if (meteorsToKill) {
             const target = monsterTypeArg(meteorsToKill[0]) ?? monsterTypes[monsterTypes.length - 1]?.label
@@ -200,6 +233,9 @@ export const readMecOneData = (script: string): MecOneData => {
         const lvl = level(currentLevel)
 
         // ------------------------------------------------------------------------------- the level itself
+        const startMessage = callOf(line, 's__Level_setStartMessage')
+        if (startMessage) lvl.startMessage = jassString(startMessage[1])
+
         const lives = callOf(line, 's__Level_setNbLivesEarned')
         if (lives) lvl.nbLives = num(lives[1])
 
@@ -266,6 +302,32 @@ export const readMecOneData = (script: string): MecOneData => {
                 yArr: storedLocs.map(p => p.y),
             })
             storedLocs = []
+        }
+
+        // a monster jumping from spot to spot on a timer, from later MEC 1 on: its spots stored one by one before it,
+        // like a multiple patrol's
+        const storeTeleportLoc = callOf(line, 's__MonsterTeleport_storeNewLoc')
+        if (storeTeleportLoc && storeTeleportLoc.length === 2) {
+            storedTeleportLocs.push({
+                x: Math.round(num(storeTeleportLoc[0])),
+                y: Math.round(num(storeTeleportLoc[1])),
+            })
+        }
+
+        const teleport = callOf(line, 's__MonsterTeleportArray_new')
+        if (teleport && teleport.length === 6) {
+            lvl.monsters.push({
+                id: nextMonsterId++,
+                monsterClassName: 'MonsterTeleport',
+                monsterTypeLabel: monsterTypeArg(teleport[1]),
+                period: num(teleport[2]),
+                // passed to CreateUnit as it is, in MEC 1 as in MEC 2: -1 is a random facing
+                angle: num(teleport[3]),
+                mode: /"([^"]*)"/.exec(teleport[4])?.[1] ?? 'normal',
+                xArr: storedTeleportLocs.map(p => p.x),
+                yArr: storedTeleportLocs.map(p => p.y),
+            })
+            storedTeleportLocs = []
         }
 
         // ------------------------------------------------------------------------------- spawns and meteors
