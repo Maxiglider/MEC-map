@@ -328,8 +328,6 @@ export class Escaper extends EscaperMake {
     public panCameraOnPortal = true
 
     private tempSlideSpeedPerPeriod: number | null = null
-    private tempSlideSpeedTimer: Timer | null = null
-    private tempSlideSpeedEffect: effect | null = null
 
     private displayName: string
 
@@ -1379,11 +1377,6 @@ export class Escaper extends EscaperMake {
                 .staticSlides.get(movement.staticSlideId)
                 ?.carryDeadHero(this, movement.staticSlidePreviousSpeed)
         }
-
-        // Every machine runs this on the same turn, so dropping the temporary speed here is
-        // symmetric. Its timer could not be transmitted anyway, and the hero is dead: the speed
-        // only has to carry the body until it lands.
-        this.disableSlideSpeedTemporarily()
     }
 
     /** Kills the hero for real, wherever its unit stands */
@@ -1397,8 +1390,6 @@ export class Escaper extends EscaperMake {
                 for (const hook of hooks.hooks_onEscaperDeath.getHooks()) {
                     hook.execute(this)
                 }
-
-                this.disableSlideSpeedTemporarily()
             }
             return true
         }
@@ -1671,29 +1662,6 @@ export class Escaper extends EscaperMake {
     setSlideSpeed(ss: number) {
         this.slideSpeed = ss
         this.slideMovePerPeriod = ss * Constants.SLIDE_PERIOD
-    }
-
-    disableSlideSpeedTemporarily() {
-        if (this.tempSlideSpeedTimer) {
-            this.tempSlideSpeedEffect && DestroyEffect(this.tempSlideSpeedEffect)
-            this.tempSlideSpeedEffect = null
-            this.tempSlideSpeedTimer?.destroy()
-            this.tempSlideSpeedTimer = null
-            this.tempSlideSpeedPerPeriod = null
-        }
-    }
-
-    setSlideSpeedTemporarily(ss: number, duration: number, effect?: string) {
-        this.disableSlideSpeedTemporarily()
-        this.tempSlideSpeedPerPeriod = (this.getSlideMirror() ? -1 : 1) * ss * Constants.SLIDE_PERIOD
-
-        if (this.hero && effect) {
-            this.tempSlideSpeedEffect = Natives.UAddSpecialEffectTargetUnitBJ('origin', this.hero, effect)
-        }
-
-        this.tempSlideSpeedTimer = createTimer(duration, false, () => {
-            this.disableSlideSpeedTemporarily()
-        })
     }
 
     //speed methods
