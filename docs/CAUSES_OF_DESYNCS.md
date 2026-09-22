@@ -63,6 +63,7 @@ Since patch 1.32, `collectgarbage` cannot be called, and the Lua garbage collect
 - Never send a handle id in a sync packet.
 - Never let a handle id decide an order: a table keyed by handle id walked with `pairs`, or sorted by id.
 - Fixed in commit `ed85ea5`: spawned monsters get a registration number used for contacts and chunks (`globals.ts`, `ContactChunks.ts`), the unit recycler uses a plain queue, MEC regions and long-distance move orders are walked in creation order. The LAN repro on big spawns desynced before and no longer does.
+- Never let a handle id decide whether an agent is made or destroyed. `-debugCollisions` (`SpawnedCollisionLandmarks.ts`) kept the landmark effects of spawned units and caster shots keyed by handle id: a shot removed and a new one fired in the same tick could take the old one's id on one machine only, which kept the old effect while the others destroyed it and made another. Slide Is Magic desynced twice a few seconds after `-debc 1` (only the engine's agent checksum differed, units matched). The landmarks are now keyed by the registration number.
 
 ### 5. Iteration order of `pairs`
 

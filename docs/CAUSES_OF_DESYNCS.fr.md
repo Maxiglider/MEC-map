@@ -63,6 +63,7 @@ Depuis le patch 1.32, `collectgarbage` ne peut plus être appelé, et le ramasse
 - Ne jamais envoyer d'identifiant de handle dans un paquet de synchronisation.
 - Ne jamais laisser un identifiant de handle décider d'un ordre : table indexée par identifiant parcourue avec `pairs`, ou triée par identifiant.
 - Corrigé dans le commit `ed85ea5` : les monstres spawnés reçoivent un numéro d'enregistrement utilisé pour les contacts et les chunks (`globals.ts`, `ContactChunks.ts`), le recycleur d'unités utilise une simple file, les régions MEC et les ordres de déplacement longue distance sont parcourus dans l'ordre de création. Le scénario reproduit en LAN sur de gros spawns désynchronisait avant, et plus après.
+- Ne jamais laisser un handle id décider si un agent est créé ou détruit. `-debugCollisions` (`SpawnedCollisionLandmarks.ts`) rangeait les effets de repère des unités spawnées et des tirs de casters par handle id : un tir supprimé et un nouveau tiré dans le même tick pouvaient reprendre l'id de l'ancien sur une seule machine, qui gardait l'ancien effet quand les autres le détruisaient et en créaient un autre. Slide Is Magic a désynchronisé deux fois quelques secondes après `-debc 1` (seul le checksum des agents du moteur différait, les unités étaient identiques). Les repères sont maintenant rangés par numéro d'enregistrement.
 
 ### 5. L'ordre de parcours de `pairs`
 
