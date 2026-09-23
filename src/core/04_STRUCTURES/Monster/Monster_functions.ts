@@ -92,7 +92,12 @@ export const NewImmobileMonsterForPlayer = (
 
     SetUnitUseFood(monster, false)
 
-    BlzSetUnitRealField(monster, UNIT_RF_SIGHT_RADIUS, -999999999999999) // with a negative sight the sight is reduced faster to null
+    // The sight of a monster: none at all by default, so that it lights nothing of the level it stands in - a negative
+    // value, which the sight falls to faster than to null. A type asked for a sight of its own (a lamp of a dark level,
+    // `-setMonsterSight`) gets it here, as the unit is made: this is when the engine works a unit's vision out, and
+    // setting the field later on one that never moves changes nothing.
+    const sightRadius = mt.getSightRadius()
+    BlzSetUnitRealField(monster, UNIT_RF_SIGHT_RADIUS, sightRadius > 0 ? sightRadius : -999999999999999)
 
     if (mt.isClickable()) {
         SetUnitMaxLife(monster, mt.getMaxLife())

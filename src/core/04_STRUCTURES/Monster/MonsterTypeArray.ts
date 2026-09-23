@@ -62,6 +62,9 @@ export class MonsterTypeArray extends BaseArray<MonsterType> {
             if (mt.color) {
                 monsterType.setBaseColor(mt.color)
             }
+            if (mt.sightRadius) {
+                monsterType.setSightRadius(mt.sightRadius)
+            }
             if (mt.idlePeriod) {
                 monsterType.setIdle(mt.idlePeriod, mt.idleAnimation, mt.idleEffect)
             }

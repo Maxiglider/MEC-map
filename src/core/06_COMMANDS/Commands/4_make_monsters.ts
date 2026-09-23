@@ -16,7 +16,7 @@ import {
 } from '../../04_STRUCTURES/Caster/CasterType'
 import { IMMOLATION_SKILLS } from '../../04_STRUCTURES/Monster/Immolation_skills'
 import { MONSTER_TELEPORT_PERIOD_MAX, MONSTER_TELEPORT_PERIOD_MIN } from '../../04_STRUCTURES/Monster/MonsterTeleport'
-import { MAX_IDLE_PERIOD, MIN_IDLE_PERIOD } from '../../04_STRUCTURES/Monster/MonsterType'
+import { MAX_IDLE_PERIOD, MAX_MONSTER_SIGHT, MIN_IDLE_PERIOD } from '../../04_STRUCTURES/Monster/MonsterType'
 import { CLEAR_MOB_MAX_DURATION, FRONT_MONTANT_DURATION } from '../../04_STRUCTURES/Monster_properties/ClearMob'
 import { MakeMonsterSimplePatrol } from '../../05_MAKE_STRUCTURES/Make_create_monsters/MakeMonsterSimplePatrol'
 import { CmdParam, USAGE } from '../Helpers/Command_functions'
@@ -481,6 +481,38 @@ export const initExecuteCommandMake_monsters = () => {
                 return true
             }
             Text.mkP(escaper.getPlayer(), 'idle animation changed for this monster type')
+            return true
+        },
+    })
+
+    //-setMonsterSight(setmros) <monsterLabel> <sight>
+    registerCommand({
+        name: 'setMonsterRadiusOfSight',
+        alias: ['setmros'],
+        group,
+        argDescription: '<monsterLabel> <sight>',
+        description:
+            'Sets how far every unit of this monster type sees, sharing it with everyone (a lamp of a dark level); 0 gives it no sight at all, as MEC does',
+        cb: ({ nbParam, param1, param2 }, escaper) => {
+            if (!(nbParam === 2)) {
+                return USAGE
+            }
+            //checkParam1
+            const monsterType = getUdgMonsterTypes().getByLabel(param1)
+            if (!monsterType) {
+                Text.erP(escaper.getPlayer(), 'unknown monster type')
+                return true
+            }
+            //checkParam2
+            const sight = S2I(param2)
+            if (!monsterType.setSightRadius(sight)) {
+                Text.erP(escaper.getPlayer(), `the sight must be between 0 and ${I2S(MAX_MONSTER_SIGHT)}`)
+                return true
+            }
+            Text.mkP(
+                escaper.getPlayer(),
+                sight > 0 ? 'sight changed for this monster type' : 'sight removed for this monster type'
+            )
             return true
         },
     })

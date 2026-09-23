@@ -15,6 +15,9 @@ import { IMMOLATION_SKILLS } from './Immolation_skills'
 export const MIN_IDLE_PERIOD = 0.5
 export const MAX_IDLE_PERIOD = 600
 
+/** As far as a monster may be asked to see: a little over the widest sight the game gives a unit of its own */
+export const MAX_MONSTER_SIGHT = 2000
+
 export class MonsterType {
     label: string
     theAlias?: string
@@ -30,6 +33,13 @@ export class MonsterType {
     private height: number
     private createTerrainLabel?: string
     private killRectDimensions?: { width: number; height: number }
+
+    /**
+     * How far every unit of this type sees, sharing what it sees with everyone (the players are allied with shared
+     * vision). 0 is MEC's own: a monster is given no sight at all, so that it lights nothing of a level it stands in.
+     * A lamp of a dark level is what this is for.
+     */
+    private sightRadius = 0
 
     private lifeBonusEnabled = false
     private lifeBonusNbLivesEarned = 0
@@ -275,6 +285,25 @@ export class MonsterType {
         return true
     }
 
+    getSightRadius = (): number => {
+        return this.sightRadius
+    }
+
+    /**
+     * Gives every unit of this type a sight of its own, 0 taking it away again (MEC's own way).
+     *
+     * The units are made again: the engine works a unit's vision out when it is created, and setting the field on one
+     * already standing - a lamp that never moves - changes nothing.
+     */
+    setSightRadius = (sightRadius: number): boolean => {
+        if (sightRadius < 0 || sightRadius > MAX_MONSTER_SIGHT) {
+            return false
+        }
+        this.sightRadius = sightRadius
+        this.refresh()
+        return true
+    }
+
     getImmolationRadiusStr = (): string => {
         if (!this.immolationSkill) {
             return '0'
@@ -501,6 +530,10 @@ export class MonsterType {
         output['height'] = R2I(this.height)
         output['createTerrainLabel'] = this.createTerrainLabel
         output['color'] = this.baseColorStr
+
+        if (this.sightRadius > 0) {
+            output['sightRadius'] = this.sightRadius
+        }
 
         if (this.idlePeriod > 0) {
             output['idlePeriod'] = this.idlePeriod
