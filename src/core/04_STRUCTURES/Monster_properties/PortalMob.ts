@@ -1,4 +1,5 @@
 import { animUtils } from 'Utils/AnimUtils'
+import { GetLocZ } from 'Utils/LocationUtils'
 import { MemoryHandler } from 'Utils/MemoryHandler'
 import { createTimer } from 'Utils/mapUtils'
 import { StopUnit } from 'core/01_libraries/Basic_functions'
@@ -133,9 +134,14 @@ export class PortalMob {
         StopUnit(hero)
         escaper.moveHero(GetUnitX(targetMob.u), GetUnitY(targetMob.u))
 
-        SetUnitFlyHeight(hero, GetUnitFlyHeight(targetMob.u), 0)
+        // The hero arrives at the height of the mob he comes out of, and falls from there like anyone else. It goes
+        // through the escaper rather than the unit: a hero sliding as an effect has a height of its own, which
+        // SetUnitFlyHeight leaves alone, and a map whose heroes leave the ground (a ramp, a jump pad) then saw them
+        // keep the height they went in with and fall through the arrival (user's report, Aerial Slide, 2026-09-23).
+        escaper.setHeroFlyHeight(GetUnitFlyHeight(targetMob.u), 0)
 
-        escaper.setLastZ(BlzGetUnitZ(hero))
+        // the ground of the arrival, not of where he came from, so that the next slide step measures no fall
+        escaper.setLastZ(GetLocZ(GetUnitX(targetMob.u), GetUnitY(targetMob.u)))
         escaper.setOldDiffZ(0)
         escaper.setSpeedZ(0)
 
