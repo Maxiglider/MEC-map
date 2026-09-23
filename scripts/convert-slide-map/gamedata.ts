@@ -792,6 +792,28 @@ if (mecOne) {
     })
 }
 
+// ------------------------------------------------- monsters the spec adds
+
+// extraMonsters: monsters no old unit and no MEC 1 call describes - a book of life where the old map hid a secret,
+// say. `{ level, monsterType, x, y, angle? }`, or `x1/y1/x2/y2` for a patrol.
+for (const m of (spec.extraMonsters ?? []) as Json[]) {
+    if (m.$comment !== undefined && m.level === undefined) continue
+    if (typeof m.level !== 'number' || m.level < 0 || m.level >= levels.length)
+        throw new Error(`extraMonsters: level ${m.level} is not a level of the map`)
+
+    addMonster(m.level, {
+        monsterClassName: m.x1 !== undefined ? 'MonsterSimplePatrol' : 'MonsterNoMove',
+        monsterTypeLabel: requireMonsterType(m.monsterType),
+        ...(m.x1 !== undefined
+            ? { x1: Math.round(m.x1), y1: Math.round(m.y1), x2: Math.round(m.x2), y2: Math.round(m.y2) }
+            : {
+                  x: Math.round(m.x),
+                  y: Math.round(m.y),
+                  ...(m.angle !== undefined ? { angle: angleOf(m.angle) } : {}),
+              }),
+    })
+}
+
 // ------------------------------------------------- portals, clear mobs and circles of a MEC 1 map
 
 // A MEC 1 map has no unit placed in the editor: its teleporters, its levers and its rotating circles are monsters
