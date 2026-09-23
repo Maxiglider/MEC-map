@@ -34,9 +34,16 @@ export type MecOneData = {
     levels: MecOneLevel[]
 }
 
-/** MEC reads an angle of 0 as "no angle", so a monster facing east is written 360; -1 means "no angle" in MEC 1 */
+/**
+ * MEC reads an angle of 0 as "no angle", so a monster facing east is written 360.
+ *
+ * MEC 1's own -1 is kept as it is: both MECs read it as "no angle of its own" and give the unit a random facing
+ * (`GetRandomDirectionDeg` in `NewImmobileMonsterForPlayer`). Dropping it made every such monster face east, all the
+ * same way, where the old map scattered them - which shows on anything with a front, like Aerial Slide's levers
+ * (user's report, 2026-09-23).
+ */
 const angleOf = (degrees: number) => {
-    if (degrees < 0) return undefined
+    if (degrees < 0) return -1
     const a = Math.round(((degrees % 360) + 360) % 360)
     return a === 0 ? 360 : a
 }
