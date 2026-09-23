@@ -12,6 +12,8 @@
  * setting `heroBaseCollisionSize` to the old hero's collision (see the skill's report).
  */
 
+import { jassUnescape } from './jass'
+
 type Json = { [key: string]: any }
 type Rect = { minX: number; minY: number; maxX: number; maxY: number }
 
@@ -113,7 +115,10 @@ const callOf = (line: string, fn: string): string[] | undefined => {
 const num = (arg: string) => Number(arg.replace(/[()\s]/g, '').replace(/\*1\.0$/, ''))
 
 /** A string as JASS writes it, with its escapes undone: `"Abilities\\\\Spells\\\\..."` is one backslash each */
-const jassString = (arg: string) => /"(.*)"/.exec(arg)?.[1].replace(/\\(.)/g, '$1')
+const jassString = (arg: string) => {
+    const literal = /"(.*)"/.exec(arg)?.[1]
+    return literal === undefined ? undefined : jassUnescape(literal)
+}
 
 /** The label of the monster type a call takes, from its `MonsterTypeArray_get(udg_monsterTypes,"label")` argument */
 const monsterTypeArg = (arg: string) => /"([^"]+)"/.exec(arg)?.[1]

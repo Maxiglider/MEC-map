@@ -92,6 +92,14 @@ const compactJass = (script: string) => {
     return out
 }
 
+/**
+ * A JASS string literal's escapes undone: `\n` is a line break, not the letter n (the Contact quest of Aerial Slide
+ * read "on battle.netnHow to contact..." until this; user's report, 2026-09-24), `\\` one backslash, and anything
+ * else the character itself.
+ */
+export const jassUnescape = (literal: string) =>
+    literal.replace(/\\(.)/g, (_, c: string) => (c === 'n' ? '\n' : c === 'r' ? '\r' : c === 't' ? '\t' : c))
+
 export const normalizeScript = (raw: string) => compactJass(raw.replace(/^﻿/, '').replace(/\r\n?/g, '\n'))
 
 /** Splits the arguments of a call, keeping nested calls and strings whole */

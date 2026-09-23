@@ -17,7 +17,7 @@ import War3MapW3u from 'mdx-m3-viewer-th/dist/cjs/parsers/w3x/w3u/file'
 import Modification from 'mdx-m3-viewer-th/dist/cjs/parsers/w3x/w3u/modification'
 import ModifiedObject from 'mdx-m3-viewer-th/dist/cjs/parsers/w3x/w3u/modifiedobject'
 import * as path from 'path'
-import { callArgs } from './jass'
+import { callArgs, jassUnescape } from './jass'
 import { parseWts, saveArchiveWhole } from './mapFiles'
 import { readMecOneData } from './mecOneData'
 import { fixObjectDataWriter, isSkinField, variableTypeOf } from './objectData'
@@ -1435,7 +1435,7 @@ const jassText = (arg: string): string | undefined => {
 
     const literal = /^"(.*)"$/s.exec(written)?.[1]
     if (literal === undefined) return undefined
-    const raw = literal.replace(/\\(.)/g, '$1')
+    const raw = jassUnescape(literal)
     return raw.replace(/^TRIGSTR_\d+$/, key => oldWts[key] ?? key)
 }
 const legacyQuests = spec.legacyQuests
