@@ -22,7 +22,7 @@ import { parseWts, saveArchiveWhole } from './mapFiles'
 import { readMecOneData } from './mecOneData'
 import { fixObjectDataWriter, isSkinField, variableTypeOf } from './objectData'
 import { addCustomTextTriggers, CustomTextTrigger, hasCategory } from './triggerFiles'
-import { visibilityTilesOfLevels } from './visibilityTiles'
+import { VisibilityTileGroup, visibilityTilesOfLevels } from './visibilityTiles'
 
 fixObjectDataWriter()
 
@@ -1234,7 +1234,20 @@ safeStarts.forEach((start, i) => {
  * either the rectangles or the tiles and a `masked` tile cannot hide what a legacy level reveals
  * (docs/VISIBILITY.md). A map whose levels only ever reveal keeps its rectangles, which move no border.
  */
-const visibilityTypes: Json[] = (spec.visibilityTypes ?? []).map((vt: Json) => ({
+/**
+ * The visibility a maker set in game and saved with `-smic`, taken as it is (spec visibilityFrom: a file of the work
+ * folder holding `visibilityTypes` and, per level, its `visibilityTiles`).
+ *
+ * What this step works out from the old map's rectangles is a first draft: the two systems do not resolve a tile the
+ * same way, and a border moves by up to a tile. Once the maker has gone over it in game, their own is the truth, and
+ * a build that computed it again would undo their work - so the file wins, whole, and the spec's own
+ * `periodicVisibilities` are left in it only to say where the draft came from.
+ */
+const visibilityFromFile: { visibilityTypes?: Json[]; levels?: Json[] } | undefined = spec.visibilityFrom
+    ? JSON.parse(fs.readFileSync(path.join(workDir, spec.visibilityFrom), 'utf8'))
+    : undefined
+
+const visibilityTypes: Json[] = (visibilityFromFile?.visibilityTypes ?? spec.visibilityTypes ?? []).map((vt: Json) => ({
     label: vt.label,
     alias: vt.alias ?? null,
     kind: 'periodic',
@@ -1252,13 +1265,26 @@ const periodicVisibilities: { level: number; type: string; rect: Rect }[] = (spe
     }
 )
 
-const visibilityTiles = periodicVisibilities.length
+const generatedVisibilityTiles = periodicVisibilities.length
     ? visibilityTilesOfLevels(
           levels.map((_level, i) => ({
               visible: levelVisibilities[i],
               periodic: periodicVisibilities.filter(pv => pv.level === i).map(pv => ({ type: pv.type, rect: pv.rect })),
           }))
       )
+    : undefined
+
+const visibilityTiles = visibilityFromFile
+    ? levels.map((_level, i) => {
+          const level = (visibilityFromFile.levels ?? []).find((l: Json) => l.id === i)
+          if (!level) throw new Error(`${spec.visibilityFrom}: nothing for level ${i}`)
+          return level.visibilityTiles as VisibilityTileGroup[]
+      })
+    : generatedVisibilityTiles
+
+const visibilityNote = visibilityFromFile
+    ? `Visibility: taken from \`${spec.visibilityFrom}\` as it is, not worked out again - ` +
+      `${visibilityTiles!.reduce((n, groups) => n + groups.reduce((m, g) => m + g.rects.length, 0), 0)} rectangles.`
     : undefined
 
 const gameData = {
@@ -1618,6 +1644,7 @@ fs.writeFileSync(
         '',
         `Custom triggers (category "${CUSTOM_CATEGORY}" in the editor): ${customTriggers.map(t => t.name).join(', ') || 'none'}.`,
         '',
+        ...(visibilityNote ? [visibilityNote, ''] : []),
         `Legacy quests: ${legacyQuests.map(q => q.title).join(', ') || 'none'} (the conversion note goes to MEC's own version quest: see rebase.md).`,
         '',
         `Decor: ${count(decor, d => d.typeId) || 'none'}${spec.decor ? ' (created by the generated decor trigger)' : ' (not created: no decor entry in the spec)'}.`,
