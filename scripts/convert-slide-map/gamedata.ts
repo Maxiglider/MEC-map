@@ -792,6 +792,169 @@ if (mecOne) {
     })
 }
 
+// ------------------------------------------------- portals, clear mobs and circles of a MEC 1 map
+
+// A MEC 1 map has no unit placed in the editor: its teleporters, its levers and its rotating circles are monsters
+// of its own data, paired by triggers of its own. So these three blocks work from the monsters rather than from
+// the old map's units, which is what `portals`, `clearMobs` and the rest above do for a hand-made map.
+
+const levelCircleMobs: Json[][] = levels.map(() => [])
+
+/** The immobile monsters of a level of one type, in the order the level holds them */
+const immobileMonstersOfType = (levelIndex: number, label: string) =>
+    levelMonsters[levelIndex].filter(m => m.monsterClassName === 'MonsterNoMove' && m.monsterTypeLabel === label)
+
+const distanceBetween = (a: Json, b: Json) => Math.hypot(a.x - b.x, a.y - b.y)
+
+// portalsFromMonsterTypes: { "<entry type>": "<exit type>" | { to, effect, effectDuration, freezeDuration, oneWay } }
+// Every monster of the entry type becomes a portal to the nearest monster of the exit type in its level, which is
+// what an old map's teleporter trigger looks for ("the nearest TP_Target of the map", and only the current level's
+// monsters exist while it is played).
+for (const [entryLabel, rawOptions] of Object.entries((spec.portalsFromMonsterTypes ?? {}) as Json)) {
+    if (entryLabel.startsWith('$')) continue
+    const options: Json = typeof rawOptions === 'string' ? { to: rawOptions } : rawOptions
+    requireMonsterType(entryLabel)
+    requireMonsterType(options.to)
+
+    let nbPortals = 0
+    levels.forEach((_level, i) => {
+        const exits = immobileMonstersOfType(i, options.to)
+        for (const entry of immobileMonstersOfType(i, entryLabel)) {
+            const exit = exits
+                .filter(e => e.id !== entry.id)
+                .sort((a, b) => distanceBetween(entry, a) - distanceBetween(entry, b))[0]
+            if (!exit) {
+                warn(
+                    `portalsFromMonsterTypes: the ${entryLabel} at ${entry.x},${entry.y} (level ${i + 1}) has no ${options.to} in its level: no portal`
+                )
+                continue
+            }
+            nbPortals++
+            levelPortals[i].push({
+                triggerMobId: entry.id,
+                targetMobId: exit.id,
+                freezeDuration: options.freezeDuration ?? 0,
+                portalEffect: options.effect ?? null,
+                portalEffectDuration: options.effectDuration ?? 0,
+                oneWay: options.oneWay !== false,
+            })
+        }
+    })
+    if (nbPortals === 0) warn(`portalsFromMonsterTypes: no monster of type ${entryLabel} to turn into a portal`)
+}
+
+// clearMobsFromMonsterTypes: { "<trigger type>": "<blocked type>" | { clears, disableDuration } }
+// Each monster of the trigger type clears the nearest monster of the blocked type in its level, each block mob
+// taken once: the old trigger removes the nearest one still standing, so the closest pairs go first.
+for (const [triggerLabel, rawOptions] of Object.entries((spec.clearMobsFromMonsterTypes ?? {}) as Json)) {
+    if (triggerLabel.startsWith('$')) continue
+    const options: Json = typeof rawOptions === 'string' ? { clears: rawOptions } : rawOptions
+    requireMonsterType(triggerLabel)
+    requireMonsterType(options.clears)
+
+    let nbClearMobs = 0
+    levels.forEach((_level, i) => {
+        const triggers = immobileMonstersOfType(i, triggerLabel)
+        const blocked = immobileMonstersOfType(i, options.clears)
+        const pairs = triggers
+            .flatMap(trigger => blocked.map(block => ({ trigger, block, distance: distanceBetween(trigger, block) })))
+            // the ids break a tie, so that the same pairs come out on every run
+            .sort((a, b) => a.distance - b.distance || a.trigger.id - b.trigger.id || a.block.id - b.block.id)
+
+        const takenTriggers = new Set<number>()
+        const takenBlocks = new Set<number>()
+        for (const { trigger, block } of pairs) {
+            if (takenTriggers.has(trigger.id) || takenBlocks.has(block.id)) continue
+            takenTriggers.add(trigger.id)
+            takenBlocks.add(block.id)
+            nbClearMobs++
+            levelClearMobs[i].push({
+                triggerMobId: trigger.id,
+                blockMobsIds: [block.id],
+                disableDuration: options.disableDuration ?? 0,
+            })
+        }
+        for (const trigger of triggers) {
+            if (!takenTriggers.has(trigger.id))
+                warn(
+                    `clearMobsFromMonsterTypes: the ${triggerLabel} at ${trigger.x},${trigger.y} (level ${i + 1}) clears nothing: no ${options.clears} left in its level`
+                )
+        }
+    })
+    if (nbClearMobs === 0)
+        warn(`clearMobsFromMonsterTypes: no monster of type ${triggerLabel} to turn into a clear mob`)
+}
+
+// circleMobs: the rings and arcs of monsters an old map turns around a hidden centre, from its own triggers.
+//   { level, centre: { x, y }, patrolTo?, centreMonsterType, monsterType, radius, rotationSpeed, direction,
+//     facing?, angles: [...] }
+// MEC's circle spreads its mobs evenly (360/n apart) from its initial angle, which is a ring. An arc - the mobs
+// bunched on one side, the gap being the way through - is written as one circle per mob instead, each with its own
+// hidden centre at the same place and its own angle: the same motion, with nothing else to move it.
+const EVEN_SPACING_TOLERANCE = 0.01
+for (const circle of (spec.circleMobs ?? []) as Json[]) {
+    if (circle.$comment !== undefined && circle.level === undefined) continue
+    const levelIndex = circle.level
+    if (typeof levelIndex !== 'number' || levelIndex < 0 || levelIndex >= levels.length)
+        throw new Error(`circleMobs: level ${circle.level} is not a level of the map`)
+    requireMonsterType(circle.monsterType)
+    requireMonsterType(circle.centreMonsterType)
+
+    const angles: number[] = circle.angles
+    if (!Array.isArray(angles) || angles.length === 0)
+        throw new Error(`circleMobs: the circle of level ${levelIndex + 1} has no angles`)
+
+    const spacing = 360 / angles.length
+    const evenlySpaced = angles.every((angle, n) => {
+        const off = (((angle - angles[0] - n * spacing) % 360) + 360) % 360
+        return off < EVEN_SPACING_TOLERANCE || off > 360 - EVEN_SPACING_TOLERANCE
+    })
+
+    const newCentre = () =>
+        addMonster(levelIndex, {
+            monsterClassName: circle.patrolTo ? 'MonsterSimplePatrol' : 'MonsterNoMove',
+            monsterTypeLabel: circle.centreMonsterType,
+            ...(circle.patrolTo
+                ? {
+                      x1: Math.round(circle.centre.x),
+                      y1: Math.round(circle.centre.y),
+                      x2: Math.round(circle.patrolTo.x),
+                      y2: Math.round(circle.patrolTo.y),
+                  }
+                : { x: Math.round(circle.centre.x), y: Math.round(circle.centre.y) }),
+        })
+
+    const newMob = (angle: number) =>
+        addMonster(levelIndex, {
+            monsterClassName: 'MonsterNoMove',
+            monsterTypeLabel: circle.monsterType,
+            x: Math.round(circle.centre.x + circle.radius * Math.cos((angle * Math.PI) / 180)),
+            y: Math.round(circle.centre.y + circle.radius * Math.sin((angle * Math.PI) / 180)),
+        })
+
+    const newCircle = (centreId: number, mobIds: number[], initialAngle: number) =>
+        levelCircleMobs[levelIndex].push({
+            mainMobId: centreId,
+            blockMobsIds: mobIds,
+            rotationSpeed: circle.rotationSpeed,
+            direction: circle.direction ?? 'ccw',
+            facing: circle.facing ?? 'ccw',
+            shape: circle.shape ?? 'circle',
+            radius: circle.radius,
+            initialAngle: ((initialAngle % 360) + 360) % 360,
+        })
+
+    if (evenlySpaced) {
+        newCircle(
+            newCentre().id,
+            angles.map(angle => newMob(angle).id),
+            angles[0]
+        )
+    } else {
+        for (const angle of angles) newCircle(newCentre().id, [newMob(angle).id], angle)
+    }
+}
+
 // ---------------------------------------------------------------------------------------------- casters
 
 // A caster type shoots a projectile monster type from a caster monster type. `castersFromMonsterTypes` then turns
@@ -859,7 +1022,6 @@ const baseModel =
           )[heroBaseType]?.modelFile
         : undefined
 const heroModelPath = heroModelMod ?? spec.hero?.model ?? baseModel
-const heroModel = heroModelPath ? { heroModelPath } : {}
 
 // what the old map's own data says about a terrain type, corrected (spec terrainTypeOverrides: label -> fields).
 // The tile is the one MEC reads the ground with, so changing it moves which ground is walk, slide or death - it
@@ -897,6 +1059,14 @@ const map = new War3Map()
 map.load(new Uint8Array(fs.readFileSync(outputMap)), false)
 const archive = map.archive
 const fileText = (name: string) => Buffer.from(archive.get(name)!.bytes()!).toString('utf8')
+
+// The effect a hero slides as in async mode is named after the file that is really there: an old map's object data
+// says `.mdl` where the file imported beside it is `.mdx`, and the rebase repoints the unit types the same way.
+const heroModelInMap =
+    heroModelPath && !archive.get(heroModelPath) && archive.get(heroModelPath.replace(/\.mdl$/i, '.mdx'))
+        ? heroModelPath.replace(/\.mdl$/i, '.mdx')
+        : heroModelPath
+const heroModel = heroModelInMap ? { heroModelPath: heroModelInMap } : {}
 
 let lua = fileText('war3map.lua')
 const blockStart = lua.indexOf('function setGameData()')
@@ -1107,7 +1277,7 @@ const gameData = {
         clearMobs: levelClearMobs[i],
         portalMobs: levelPortals[i],
         keyAndDoors: levelKeyAndDoors[i],
-        circleMobs: [],
+        circleMobs: levelCircleMobs[i],
         staticSlides: [],
         regions: [],
     })),
@@ -1117,7 +1287,7 @@ const gameData = {
         ...baseGameData,
         ...heroModel,
         ...(mortarAreaShift !== 0 ? { mortarAreaShift } : {}),
-        ...(spec.gameData ?? {}),
+        ...Object.fromEntries(Object.entries((spec.gameData ?? {}) as Json).filter(([key]) => !key.startsWith('$'))),
     },
 }
 
@@ -1415,11 +1585,11 @@ fs.writeFileSync(
         '',
         `Baked into \`${outputMap}\`; the JSON is in \`gamedata.json\` (${Math.round(gameDataString.length / 1024)} KB).`,
         '',
-        '| Level | Monsters | Spawns | Meteors | Keys and doors | Clear mobs | Portals |',
-        '| --- | --- | --- | --- | --- | --- | --- |',
+        '| Level | Monsters | Spawns | Meteors | Keys and doors | Clear mobs | Portals | Circles |',
+        '| --- | --- | --- | --- | --- | --- | --- | --- |',
         ...gameData.levels.map(
             (l, i) =>
-                `| ${i + 1} | ${count(l.monsters, m => `${monsterTypeLabelOf(m)} ${m.monsterClassName.replace('Monster', '')}`) || '—'} | ${l.monsterSpawns.length} | ${l.meteors.length} | ${l.keyAndDoors.length} | ${l.clearMobs.length} | ${l.portalMobs.length} |`
+                `| ${i + 1} | ${count(l.monsters, m => `${monsterTypeLabelOf(m)} ${m.monsterClassName.replace('Monster', '')}`) || '—'} | ${l.monsterSpawns.length} | ${l.meteors.length} | ${l.keyAndDoors.length} | ${l.clearMobs.length} | ${l.portalMobs.length} | ${l.circleMobs.length} |`
         ),
         '',
         `Monster types: ${monsterTypes.map(mt => mt.label + (mt.killRectDimensions ? ` (kill rect ${mt.killRectDimensions.width}×${mt.killRectDimensions.height})` : '')).join(', ')}.`,
