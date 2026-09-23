@@ -107,6 +107,9 @@ function GetInvisUnitTypeFromCollisionSize(collisionSize: number): number {
 /** Where the hero effect waits while the hero is a unit: far under the map, out of sight */
 const PARKED_HERO_EFFECT_Z = -1000
 
+/** The 0-100 percentages the colour commands speak in, as the 0-255 bytes the effect natives take */
+const percentageToByte = (percentage: number) => math.floor(math.max(0, math.min(100, percentage)) * 2.55 + 0.5)
+
 /** How often the drawn shadow of a hero follows it when nothing else moves it: as often as its name does */
 const FAKE_SHADOW_PERIOD = 0.01
 
@@ -1925,6 +1928,9 @@ export class Escaper extends EscaperMake {
                 SetUnitColor(this.hero, Natives.UConvertPlayerColor(baseColorId))
                 SetUnitColor(this.powerCircle, Natives.UConvertPlayerColor(baseColorId))
             }
+
+            // the effect wears the colour too while it stands in for the unit, the disco included
+            this.updateHeroEffectVertexColor()
         }
 
         if (!this.isEscaperSecondary()) {
@@ -2442,7 +2448,7 @@ export class Escaper extends EscaperMake {
             return
         }
 
-        BlzSetSpecialEffectColorByPlayer(this.heroEffect, Natives.UPlayer(this.baseColorId))
+        this.updateHeroEffectVertexColor()
         this.refreshHeroEffectScale()
         this.parkHeroEffect()
     }
@@ -2995,11 +3001,24 @@ export class Escaper extends EscaperMake {
         SetCameraPosition(this.heroPos.x, this.heroPos.y)
     }
 
+    /**
+     * How transparent this machine draws that hero: what its own player asked for with
+     * -vertexColorTransparency, unless the player watching asked for something else of the other
+     * heroes with -othersTransparency.
+     *
+     * Read from the local player: only what is seen, so it may differ from one machine to another.
+     */
+    private getSeenTransparency = () => {
+        const otherTransparency =
+            getUdgEscapers().get(GetPlayerId(GetLocalPlayer()))?.othersTransparencyState[this.escaperId] || null
+
+        return GetLocalPlayer() === this.getPlayer() || otherTransparency === null || this.isEscaperSecondary()
+            ? this.vcTransparency
+            : otherTransparency
+    }
+
     updateUnitVertexColor = () => {
         if (this.hero) {
-            const otherTransparency =
-                getUdgEscapers().get(GetPlayerId(GetLocalPlayer()))?.othersTransparencyState[this.escaperId] || null
-
             const viewer = getUdgEscapers().get(GetPlayerId(GetLocalPlayer()))
             const shadow = viewer?.shadowState[this.escaperId]
 
@@ -3019,20 +3038,13 @@ export class Escaper extends EscaperMake {
                     ? viewer === this
                         ? (this.getLuckyLukeTransparency() ?? 100)
                         : 100
-                    : GetLocalPlayer() === this.getPlayer() || otherTransparency === null || this.isEscaperSecondary()
-                      ? this.vcTransparency
-                      : otherTransparency
+                    : this.getSeenTransparency()
             )
 
-            SetUnitVertexColorBJ(
-                this.powerCircle,
-                this.vcRed,
-                this.vcGreen,
-                this.vcBlue,
-                GetLocalPlayer() === this.getPlayer() || otherTransparency === null || this.isEscaperSecondary()
-                    ? this.vcTransparency
-                    : otherTransparency
-            )
+            SetUnitVertexColorBJ(this.powerCircle, this.vcRed, this.vcGreen, this.vcBlue, this.getSeenTransparency())
+
+            // the effect is what the colour commands have to reach while it stands in for the unit
+            this.updateHeroEffectVertexColor()
 
             // Changing base color with -red will break the teamglow. Thats why we need to reapply it
             BlzShowUnitTeamGlow(this.hero, true)
@@ -3040,6 +3052,31 @@ export class Escaper extends EscaperMake {
             BlzShowUnitTeamGlow(this.powerCircle, true)
             BlzShowUnitTeamGlow(this.powerCircle, this.glow)
         }
+    }
+
+    /**
+     * The look of the effect standing in for the hero in async slide mode: the unit under it is kept
+     * unseen, so the base colour, the vertex colour and the transparency have to be drawn on the
+     * effect, or those commands would do nothing at all while the hero slides.
+     *
+     * Only what is seen, and read from the local player as the unit is: it may differ from one
+     * machine to another, and it creates no handle, so the local calls are safe.
+     */
+    private updateHeroEffectVertexColor = () => {
+        if (!this.heroEffect) {
+            return
+        }
+
+        BlzSetSpecialEffectColorByPlayer(this.heroEffect, Natives.UPlayer(this.baseColorId))
+
+        BlzSetSpecialEffectColor(
+            this.heroEffect,
+            percentageToByte(this.vcRed),
+            percentageToByte(this.vcGreen),
+            percentageToByte(this.vcBlue)
+        )
+
+        BlzSetSpecialEffectAlpha(this.heroEffect, percentageToByte(100 - this.getSeenTransparency()))
     }
 
     enableClickWhereYouAre = (b: boolean) => {
