@@ -56,6 +56,7 @@ export const MEC_core_API = {
     getEscapers: getUdgEscapers,
     getTerrainTypes: getUdgTerrainTypes,
     getLevels: getUdgLevels,
+    getLives: () => ServiceManager.getService('Lives'),
     getMonsterTypes: getUdgMonsterTypes,
     getMonstersAll: () => {
         return udg_monsters
