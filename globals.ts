@@ -28,6 +28,11 @@ export const globals: {
      * for heroes of another collision than MEC's, its shells reach them as far as they used to
      */
     mortarAreaShift: number
+    /**
+     * How long the message "<player> has earned n lives for the team!" of a monster giving lives stays, in seconds
+     * (-setLifeBonusMessageDuration, saved by -smic)
+     */
+    lifeBonusMessageDuration: number
     autoreviveDelay?: number
     logStrings: string[]
 
@@ -70,6 +75,7 @@ export const globals: {
     coopModeActive: true,
     coopModeChoice: true,
     mortarAreaShift: 0,
+    lifeBonusMessageDuration: 3,
     CAN_TURN_IN_AIR: false,
     USE_VTOTO_SLIDE_LOGIC: false,
     coopCircles: true,

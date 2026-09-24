@@ -1,4 +1,4 @@
-import { getUdgCasterTypes, getUdgMonsterTypes, getUdgTerrainTypes } from '../../../../globals'
+import { getUdgCasterTypes, getUdgMonsterTypes, getUdgTerrainTypes, globals } from '../../../../globals'
 import { ServiceManager } from '../../../Services'
 import { String2Ascii } from '../../01_libraries/Ascii'
 import { convertTextToAngle, IsBoolString, S2B } from '../../01_libraries/Basic_functions'
@@ -664,6 +664,31 @@ export const initExecuteCommandMake_monsters = () => {
             //apply the command
             mt.setLifeBonus(enabling, nbLivesEarned, minimumSurviveTime)
             Text.mkP(escaper.getPlayer(), 'life bonus characteristic updated for this monster type')
+
+            return true
+        },
+    })
+
+    //-setLifeBonusMessageDuration(setlbmd) <duration>
+    registerCommand({
+        name: 'setLifeBonusMessageDuration',
+        alias: ['setlbmd'],
+        group,
+        argDescription: '<duration>',
+        description:
+            'Sets how many seconds the message "<player> has earned n lives for the team!" stays when a hero earns lives from a monster with a life bonus (3 by default)',
+        cb: ({ nbParam, param1 }, escaper) => {
+            if (nbParam !== 1) {
+                return USAGE
+            }
+
+            const duration = S2R(param1)
+            if (duration <= 0) {
+                return USAGE
+            }
+
+            globals.lifeBonusMessageDuration = duration
+            Text.mkP(escaper.getPlayer(), 'life bonus message duration changed')
 
             return true
         },

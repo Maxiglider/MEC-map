@@ -74,6 +74,10 @@ export class LoadMapFromCache {
                         globals.mortarAreaShift = gameData.gameData.mortarAreaShift
                     }
 
+                    if (gameData.gameData.lifeBonusMessageDuration !== undefined) {
+                        globals.lifeBonusMessageDuration = gameData.gameData.lifeBonusMessageDuration
+                    }
+
                     if (gameData.gameData.coopModeChoice !== undefined) {
                         globals.coopModeChoice = gameData.gameData.coopModeChoice
                     }

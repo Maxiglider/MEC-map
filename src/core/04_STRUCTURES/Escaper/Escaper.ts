@@ -3180,7 +3180,7 @@ export class Escaper extends EscaperMake {
         ServiceManager.getService('Lives').add(numLives)
 
         Text.ForAll_timed_withColorCode(
-            3,
+            globals.lifeBonusMessageDuration,
             SUCCESS_TEXT_COLORCODE,
             `${GetPlayerName(this.getPlayer())} has earned ${numLives} ${numLives > 1 ? 'lives' : 'life'} for the team!`
         )
