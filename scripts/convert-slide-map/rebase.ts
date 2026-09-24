@@ -684,6 +684,24 @@ if (oldW3uBytes) {
     const skipped: string[] = []
     const modelsRepointed = new Set<string>()
 
+    // The old map's own strings, written in: a unit's name, a hero's random names, a tooltip - the old object data
+    // names them by a TRIGSTR_ reference into the old map's `war3map.wts`, and the converted map carries MEC's own,
+    // where that number is something else or nothing at all. So the hero came in with no random names (user's report,
+    // 2026-09-24). Inlined here, before anything is merged, which is also what the World Editor does on the way back:
+    // it makes its own reference again when the map is saved.
+    const stringsInlined = new Set<string>()
+    for (const object of [...oldW3u.originalTable.objects, ...oldW3u.customTable.objects]) {
+        for (const modification of object.modifications) {
+            if (typeof modification.value !== 'string' || !modification.value.includes('TRIGSTR_')) continue
+            const resolved = resolveOld(modification.value)
+            if (resolved === modification.value) continue
+            modification.value = resolved
+            stringsInlined.add(`${object.newId || object.oldId}.${modification.id}`)
+        }
+    }
+    if (stringsInlined.size > 0)
+        log.push(`- the old map's strings written into its object data: ${[...stringsInlined].sort().join(', ')}`)
+
     /**
      * The object data of a map made in the World Editor names a model `.mdl` while the file imported beside it is
      * `.mdx`, and the game is expected to swap the extension. It does - unless the name holds a dot of its own,
