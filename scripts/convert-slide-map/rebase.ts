@@ -696,7 +696,8 @@ if (oldW3uBytes) {
             const resolved = resolveOld(modification.value)
             if (resolved === modification.value) continue
             modification.value = resolved
-            stringsInlined.add(`${object.newId || object.oldId}.${modification.id}`)
+            // a standard unit the map changes has no id of its own: four null characters, not an empty string
+            stringsInlined.add(`${object.newId.replace(/\0/g, '') || object.oldId}.${modification.id}`)
         }
     }
     if (stringsInlined.size > 0)
