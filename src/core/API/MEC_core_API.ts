@@ -215,6 +215,11 @@ export const MEC_core_API = {
         AfkMode.timeMinAfk = time
     },
 
+    // while paused, nobody becomes AFK nor is killed for it (a cinematic taking the players' hands, say); resuming
+    // gives every hero alive its whole AFK time again
+    setAfkPaused: (b: boolean) => AfkMode.setPaused(b),
+    isAfkPaused: () => AfkMode.isPaused(),
+
     NewImmobileMonsterUnit: NewImmobileMonster,
     NewPatrolMonsterUnit: NewPatrolMonster,
 

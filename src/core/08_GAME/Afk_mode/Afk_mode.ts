@@ -16,6 +16,7 @@ const initAfkMode = () => {
     const afkModeTextTags: texttag[] = []
     const afkModeCbs: (() => void)[] = []
     const killAllAfkTimer = CreateTimer()
+    let paused = false
 
     const AreAllAliveHeroesAfk = (): boolean => {
         let someoneAlive = false
@@ -97,6 +98,10 @@ const initAfkMode = () => {
     }
 
     const GetAfkModeTimeExpiresCodeFromId = (id: number) => {
+        if (paused) {
+            return
+        }
+
         SetAfkMode(id)
 
         if (AfkMode.AreAllAliveHeroesAfk()) {
@@ -118,6 +123,36 @@ const initAfkMode = () => {
         TimerStart(AfkMode.afkModeTimers[playerId], AfkMode.timeMinAfk, false, AfkMode.afkModeCbs[playerId])
     }
 
+    /**
+     * While paused, nobody becomes AFK and nobody is killed for it: for a while a map takes the players' hands
+     * itself, a cinematic say, where a player who cannot move would otherwise be marked AFK and killed with the
+     * others. Pausing lets go of the AFK marks already shown; resuming gives every hero alive its whole AFK time
+     * again, counted from then.
+     */
+    const setPaused = (b: boolean) => {
+        if (b === paused) {
+            return
+        }
+
+        paused = b
+
+        if (paused) {
+            PauseTimer(killAllAfkTimer)
+            forRange(Constants.NB_ESCAPERS, i => AfkMode.StopAfk(i))
+            return
+        }
+
+        forRange(Constants.NB_PLAYERS_MAX, i => {
+            const hero = getUdgEscapers().get(i)?.getHero()
+
+            if (hero && IsUnitAliveBJ(hero)) {
+                resetAfk(i)
+            }
+        })
+    }
+
+    const isPaused = () => paused
+
     return {
         timeMinAfk,
         isAfk,
@@ -131,6 +166,8 @@ const initAfkMode = () => {
         StopAfk,
         GetAfkModeTimeExpiresCodeFromId,
         resetAfk,
+        setPaused,
+        isPaused,
     }
 }
 
