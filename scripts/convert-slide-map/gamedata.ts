@@ -79,6 +79,26 @@ if (mecOne) {
     }))
 }
 
+// terrain types the old map's data doesn't hold (spec extraTerrainTypes): a tile its own triggers lay at runtime and
+// no terrain type of it names - Denmark Slide's Fgrd, which its prophecy path is laid with
+spec.terrainTypes = [
+    ...(spec.terrainTypes ?? []),
+    ...((spec.extraTerrainTypes ?? []) as Json[]).filter(t => !t.$comment || t.label),
+]
+
+// fields to change on some levels, over what the old map gives them (spec levelOverrides: level index -> fields,
+// a null removing the field): the end of a MEC 1 map's last level, which did nothing there and wins the game in MEC
+for (const [index, fields] of Object.entries((spec.levelOverrides ?? {}) as Json)) {
+    if (index.startsWith('$')) continue
+    const level = (spec.levels as Json[] | undefined)?.[Number(index)]
+    if (!level) throw new Error(`levelOverrides: no level ${index}`)
+    for (const [key, value] of Object.entries(fields as Json)) {
+        if (key.startsWith('$')) continue
+        if (value === null) delete level[key]
+        else level[key] = value
+    }
+}
+
 // monster types the old map's data doesn't hold: the projectiles a caster shoots, say (spec extraMonsterTypes),
 // and the fields to add to the ones it does hold, without writing them all out again (spec monsterTypeOverrides)
 spec.monsterTypes = [...(spec.monsterTypes ?? []), ...(spec.extraMonsterTypes ?? [])]
@@ -603,11 +623,13 @@ const speedOf = (variable?: string) => {
     return m ? String(Number(m[1])) : undefined
 }
 const ignored = new Set<string>(spec.ignoredUnitTypes ?? [])
+// units a custom trigger makes itself (the actors of a cinematic), neither decor nor monsters (spec leftOutUnitTypes)
+const leftOut = new Set<string>(spec.leftOutUnitTypes ?? [])
 const decor: Json[] = []
 
 facts.units.forEach((u: Json, index: number) => {
     const key = unitKey(u, index)
-    if (consumed.has(key)) return
+    if (consumed.has(key) || leftOut.has(u.typeId)) return
     if (ignored.has(u.typeId)) {
         // the players' unit (a hero type, or the spec's hero.unitType) isn't decor: MEC has its own heroes
         u.typeId !== (spec.hero?.unitType ?? spec.heroUnitType) &&
@@ -616,7 +638,7 @@ facts.units.forEach((u: Json, index: number) => {
         return
     }
 
-    const baseLabel = spec.unitMonsterTypes[u.typeId]
+    const baseLabel = spec.unitMonsterTypes?.[u.typeId]
     if (!baseLabel) {
         warn(`unit ${key} of type ${u.typeId} at ${u.x}, ${u.y}: no monster type for it, left out`)
         return
@@ -812,6 +834,230 @@ for (const m of (spec.extraMonsters ?? []) as Json[]) {
                   ...(m.angle !== undefined ? { angle: angleOf(m.angle) } : {}),
               }),
     })
+}
+
+// the tiles the old map renamed by re-skinning them (spec terrainTypeIdRemap), so MEC reads the ground by the id
+// the rebase wrote into the w3e's tileset list
+const terrainTypeIdRemap: { [oldId: string]: string } = Object.fromEntries(
+    Object.entries((spec.terrainTypeIdRemap ?? {}) as { [k: string]: string }).filter(([from]) => !from.startsWith('$'))
+)
+
+// ------------------------------------------------- static slides
+
+/**
+ * staticSlides: `{ speed, lanes: [{ level, entry, exit, angle }] }` (a level, or `"all"`), MEC's static slides where an old map carried a
+ * hero at a fixed angle and speed over any ground, from an entry area to an exit area (Denmark Slide's SlideTPs
+ * libraries). A MEC static slide ignores the terrain while it carries a hero, as those did. Its areas are rects when
+ * its angle is straight; at any other angle MEC makes each of them a line of 32 x 32 squares from its first point to
+ * its second, so an old rect becomes the line of squares along its diagonal, from its low corner up to 32 short of
+ * its high one.
+ */
+const levelStaticSlides: Json[][] = levels.map(() => [])
+{
+    const options = (spec.staticSlides ?? {}) as Json
+    for (const lane of (options.lanes ?? []) as Json[]) {
+        if (lane.level === undefined && lane.$comment !== undefined) continue
+        const laneLevels: number[] = lane.level === 'all' ? levels.map((_, i) => i) : [lane.level]
+        if (laneLevels.some(l => typeof l !== 'number' || !levelStaticSlides[l]))
+            throw new Error(`staticSlides: level ${lane.level} is not a level of the map`)
+        const speed = lane.speed ?? options.speed
+        if (!speed) throw new Error(`staticSlides: no speed for the lane from ${lane.entry}`)
+        const isDiagonal = lane.angle % 90 !== 0
+        const area = (ref: RectRef) => {
+            const r = rounded(resolveRect(ref))
+            if (!isDiagonal) return [r.minX, r.minY, r.maxX, r.maxY]
+            const end = [Math.max(r.minX, r.maxX - 32), Math.max(r.minY, r.maxY - 32)]
+            if (Math.hypot(end[0] - r.minX, end[1] - r.minY) < 32)
+                warn(
+                    `staticSlides: the ${typeof ref === 'string' ? ref : 'area'} of a diagonal lane is under 32 long: MEC makes no square of it`
+                )
+            return [r.minX, r.minY, end[0], end[1]]
+        }
+        const [x1, y1, x2, y2] = area(lane.entry)
+        const [x3, y3, x4, y4] = area(lane.exit)
+        for (const l of laneLevels)
+            levelStaticSlides[l].push({ x1, y1, x2, y2, x3, y3, x4, y4, angle: lane.angle, speed })
+    }
+}
+
+// ------------------------------------------------- terrain saves
+
+/**
+ * terrainSaves: MEC terrain saves where an old map changed tiles from a trigger of its own, once - a circle of power
+ * opening a path, a secret laying a shortcut. User's pattern (Denmark Slide, 2026-09-24): a save of the changed
+ * tiles, applied when a hero touches the switch (or when its monster dies), unapplied when its level ends - so the
+ * switch works again when the level or the game starts again.
+ *
+ * `{ label, levels, tiles: [[region, tile]…], touch?: [{ region, monsterType, spacing? }], death?: [{ x, y,
+ * monsterType }], atLevelStart?: { level, delay? } }`
+ * - `tiles`: the tile each old `SetTerrainTypeBJ(GetRectCenter(region), tile, -1, 1, 1)` set, the one under the
+ *   region's centre. A save rewrites every tile of its rect, so the tiles are grouped by neighbours, one save per
+ *   group, and the others of a group's rect keep the old map's own tile;
+ * - `levels`: the levels the switch is in (`"all"`): a save and its monsters per level, since the old switch was
+ *   there whatever the level;
+ * - `touch`: monsters touched to apply it, one at the centre of the region, or a row along a long thin region every
+ *   `spacing` (96) px; `death`: monsters whose death applies it (a meteor killing them);
+ * - `atLevelStart`: a save of no level, applied when a level starts (after `delay` s) and never unapplied: terrain
+ *   an old cinematic lays at the start of the game, once for good.
+ */
+const terrainSavesJson: Json[] = []
+{
+    const TILE = 128
+    const terrainTypeTiles = new Set((spec.terrainTypes as Json[]).map(t => terrainTypeIdRemap[t.tile] ?? t.tile))
+    const tileIndex = (v: number, offset: number) => Math.round((v - offset) / TILE)
+    const touchedBy: Map<string, string> = new Map()
+    for (const save of (spec.terrainSaves ?? []) as Json[]) {
+        if (save.label === undefined && save.$comment !== undefined) continue
+        const saveLevels: (number | null)[] = save.atLevelStart
+            ? [null]
+            : save.levels === 'all'
+              ? levels.map((_, i) => i)
+              : (save.levels as number[])
+        if (!saveLevels?.length) throw new Error(`terrainSaves ${save.label}: no levels`)
+
+        // the tiles, by corner index, the last value written winning as in the old sequence
+        const set = new Map<string, { i: number; j: number; tile: string }>()
+        for (const [region, tile] of save.tiles as [string, string][]) {
+            const c = center(rectOf(region))
+            const i = tileIndex(c.x, offsetX)
+            const j = tileIndex(c.y, offsetY)
+            set.set(`${i},${j}`, { i, j, tile })
+        }
+        // groups of neighbouring tiles
+        const groups: { i: number; j: number; tile: string }[][] = []
+        const seen = new Set<string>()
+        for (const [key, first] of set) {
+            if (seen.has(key)) continue
+            const group = [first]
+            seen.add(key)
+            for (let k = 0; k < group.length; k++) {
+                for (let di = -1; di <= 1; di++)
+                    for (let dj = -1; dj <= 1; dj++) {
+                        const nk = `${group[k].i + di},${group[k].j + dj}`
+                        const n = set.get(nk)
+                        if (n && !seen.has(nk)) {
+                            seen.add(nk)
+                            group.push(n)
+                        }
+                    }
+            }
+            // a group whose rect holds a tile no terrain type names (decor ground between the changed tiles) can't
+            // be saved whole: a save holds terrain types only, so each of its tiles gets a save of its own
+            const iMin = Math.min(...group.map(t => t.i))
+            const iMax = Math.max(...group.map(t => t.i))
+            const jMin = Math.min(...group.map(t => t.j))
+            const jMax = Math.max(...group.map(t => t.j))
+            let whole = true
+            for (let j = jMin; j <= jMax && whole; j++)
+                for (let i = iMin; i <= iMax && whole; i++) {
+                    const tile = tileAt(offsetX + i * TILE, offsetY + j * TILE)!
+                    if (!set.has(`${i},${j}`) && !terrainTypeTiles.has(terrainTypeIdRemap[tile] ?? tile)) whole = false
+                }
+            if (whole) groups.push(group)
+            else for (const t of group) groups.push([t])
+        }
+
+        const groupSaves = groups.map((group, g) => {
+            const iMin = Math.min(...group.map(t => t.i))
+            const iMax = Math.max(...group.map(t => t.i))
+            const jMin = Math.min(...group.map(t => t.j))
+            const jMax = Math.max(...group.map(t => t.j))
+            const capturedTerrain: string[] = []
+            for (let j = jMin; j <= jMax; j++) {
+                for (let i = iMin; i <= iMax; i++) {
+                    const key = `${i},${j}`
+                    const own = set.get(key)?.tile
+                    const x = offsetX + i * TILE
+                    const y = offsetY + j * TILE
+                    const tile = own ?? tileAt(x, y)!
+                    if (!own) {
+                        const other = touchedBy.get(key)
+                        if (other && other !== save.label)
+                            warn(
+                                `terrainSaves ${save.label}: its rect holds ${x}, ${y}, which ${other} changes: applying it puts the old tile back there`
+                            )
+                    }
+                    const mecTile = terrainTypeIdRemap[tile] ?? tile
+                    if (!terrainTypeTiles.has(mecTile))
+                        throw new Error(
+                            `terrainSaves ${save.label}: the tile ${tile} at ${x}, ${y} is no terrain type of the map (extraTerrainTypes)`
+                        )
+                    capturedTerrain.push(mecTile)
+                }
+            }
+            for (const t of group) touchedBy.set(`${t.i},${t.j}`, save.label)
+            const x = offsetX + iMin * TILE
+            const y = offsetY + jMin * TILE
+            return {
+                label: groups.length > 1 ? `${save.label}-${g + 1}` : save.label,
+                zone: {
+                    type: 'HorizontalRectangleRegion',
+                    x1: x - TILE / 2,
+                    y1: y - TILE / 2,
+                    x2: offsetX + iMax * TILE + TILE / 2,
+                    y2: offsetY + jMax * TILE + TILE / 2,
+                },
+                originX: x,
+                originY: y,
+                width: iMax - iMin + 1,
+                height: jMax - jMin + 1,
+                capturedTerrain,
+            }
+        })
+
+        for (const level of saveLevels) {
+            const events: Json[] = []
+            if (save.atLevelStart) {
+                events.push({
+                    condition: { kind: 'levelStart', levelNum: save.atLevelStart.level },
+                    action: 'apply',
+                    ...(save.atLevelStart.delay ? { delay: save.atLevelStart.delay } : {}),
+                })
+            } else {
+                const event = (kind: string, monster: Json) => ({
+                    condition: { kind, monsterId: monster.id },
+                    action: 'apply',
+                    onLvlEnd: 'unapply',
+                })
+                for (const touch of (save.touch ?? []) as Json[]) {
+                    const r = rectOf(touch.region)
+                    const type = requireMonsterType(touch.monsterType)
+                    const spacing = touch.spacing ?? 96
+                    const width = r.maxX - r.minX
+                    const height = r.maxY - r.minY
+                    const along = Math.max(width, height)
+                    const n = along > 2 * spacing ? Math.ceil(along / spacing) : 1
+                    for (let k = 0; k < n; k++) {
+                        const t = n === 1 ? 0.5 : (k + 0.5) / n
+                        const x = Math.round(width >= height ? r.minX + t * width : (r.minX + r.maxX) / 2)
+                        const y = Math.round(width >= height ? (r.minY + r.maxY) / 2 : r.minY + t * height)
+                        const monster = addMonster(level!, {
+                            monsterClassName: 'MonsterNoMove',
+                            monsterTypeLabel: type,
+                            x,
+                            y,
+                        })
+                        events.push(event('monsterTouch', monster))
+                    }
+                }
+                for (const death of (save.death ?? []) as Json[]) {
+                    const monster = addMonster(level!, {
+                        monsterClassName: 'MonsterNoMove',
+                        monsterTypeLabel: requireMonsterType(death.monsterType),
+                        x: Math.round(death.x),
+                        y: Math.round(death.y),
+                        ...(death.angle !== undefined ? { angle: angleOf(death.angle) } : {}),
+                    })
+                    events.push(event('monsterDeath', monster))
+                }
+                if (events.length === 0)
+                    throw new Error(`terrainSaves ${save.label}: nothing applies it (touch, death)`)
+            }
+            for (const groupSave of groupSaves) {
+                terrainSavesJson.push({ ...groupSave, level, events })
+            }
+        }
+    }
 }
 
 // ------------------------------------------------- portals, clear mobs and circles of a MEC 1 map
@@ -1149,12 +1395,6 @@ for (const [label, fields] of Object.entries((spec.terrainTypeOverrides ?? {}) a
     Object.assign(terrainType, fields)
 }
 
-// the tiles the old map renamed by re-skinning them (spec terrainTypeIdRemap), so MEC reads the ground by the id
-// the rebase wrote into the w3e's tileset list
-const terrainTypeIdRemap: { [oldId: string]: string } = Object.fromEntries(
-    Object.entries((spec.terrainTypeIdRemap ?? {}) as { [k: string]: string }).filter(([from]) => !from.startsWith('$'))
-)
-
 const terrainTypesMec = (spec.terrainTypes as Json[]).map((t, orderId) => {
     const common = {
         terrainTypeId: terrainTypeIdRemap[t.tile] ?? t.tile,
@@ -1420,11 +1660,12 @@ const gameData = {
         portalMobs: levelPortals[i],
         keyAndDoors: levelKeyAndDoors[i],
         circleMobs: levelCircleMobs[i],
-        staticSlides: [],
+        staticSlides: levelStaticSlides[i],
         regions: [],
     })),
     doorTypes,
     keyForDoorTypes,
+    ...(terrainSavesJson.length ? { terrainSaves: terrainSavesJson } : {}),
     gameData: {
         ...baseGameData,
         ...heroModel,
@@ -1499,10 +1740,11 @@ const recreatedTypes = new Set<string>([
 const destructablesByScript = (spec.scriptDestructables ?? 'script') === 'script'
 const scriptDestructables = [...oldScript.matchAll(/(gg_dest_\w+\s*=\s*)?CreateDestructable(Z?)\('(\w{4})',([^)]*)\)/g)]
     .filter(m => (destructablesByScript || !m[1]) && !recreatedTypes.has(m[3]))
-    .map(m => [m[0], m[2], m[3], m[4]] as RegExpMatchArray)
+    .map(m => [m[0], m[2], m[3], m[4], m[1]] as RegExpMatchArray)
     .map(
         m =>
-            `    CreateDestructable${m[1]}(FourCC("${m[2]}"), ${m[3]
+            // a named one keeps its gg_dest_ global, for a custom trigger that plays with it (a cinematic)
+            `    ${m[4] ? m[4].replace(/\s*=\s*$/, ' = ') : ''}CreateDestructable${m[1]}(FourCC("${m[2]}"), ${m[3]
                 .split(',')
                 .map(a => (/^-?\.\d/.test(a) ? a.replace('.', '0.') : a))
                 .join(', ')})`
