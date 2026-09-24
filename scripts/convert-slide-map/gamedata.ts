@@ -828,29 +828,88 @@ const immobileMonstersOfType = (levelIndex: number, label: string) =>
 
 const distanceBetween = (a: Json, b: Json) => Math.hypot(a.x - b.x, a.y - b.y)
 
-// portalsFromMonsterTypes: { "<entry type>": "<exit type>" | { to, effect, effectDuration, freezeDuration, oneWay } }
-// Every monster of the entry type becomes a portal to the nearest monster of the exit type in its level, which is
+/** The monsters of a level of some types, whatever they do, in the order the level holds them */
+const monstersOfTypes = (levelIndex: number, labels: string[]) =>
+    levelMonsters[levelIndex].filter(m => labels.includes(m.monsterTypeLabel))
+
+/** Where a monster can be found: its spot, or points along the path it walks */
+const PATH_SAMPLES_PER_LEG = 20
+const pathOf = (m: Json): { x: number; y: number }[] => {
+    const corners: { x: number; y: number }[] =
+        m.x !== undefined
+            ? [{ x: m.x, y: m.y }]
+            : m.x1 !== undefined
+              ? [
+                    { x: m.x1, y: m.y1 },
+                    { x: m.x2, y: m.y2 },
+                ]
+              : (m.xArr as number[]).map((x, n) => ({ x, y: m.yArr[n] }))
+    if (corners.length === 1 || m.monsterClassName === 'MonsterTeleport') return corners
+    const points: { x: number; y: number }[] = []
+    for (let c = 0; c < corners.length - 1; c++)
+        for (let s = 0; s < PATH_SAMPLES_PER_LEG; s++) {
+            const f = s / PATH_SAMPLES_PER_LEG
+            points.push({
+                x: corners[c].x + (corners[c + 1].x - corners[c].x) * f,
+                y: corners[c].y + (corners[c + 1].y - corners[c].y) * f,
+            })
+        }
+    points.push(corners[corners.length - 1])
+    return points
+}
+
+/**
+ * The monster of `candidates` nearest to `from`, as an old trigger looking for "the nearest one" finds it. Monsters
+ * that move make the answer depend on the moment: `ambiguous` says so, when another candidate could be the nearest
+ * from some point of `from`'s path, while the chosen one is the nearest from where both start.
+ */
+const nearestMonster = (from: Json, candidates: Json[]) => {
+    const start = (m: Json) => pathOf(m)[0]
+    const sorted = candidates
+        .filter(c => c.id !== from.id)
+        .sort((a, b) => distanceBetween(start(from), start(a)) - distanceBetween(start(from), start(b)))
+    const nearest = sorted[0]
+    if (!nearest) return { nearest, ambiguous: false }
+
+    const paths = sorted.map(c => pathOf(c))
+    const ambiguous = pathOf(from).some(p => {
+        const distances = paths.map(path => path.map(q => distanceBetween(p, q)))
+        const closestFurthest = Math.min(...distances.map(d => Math.max(...d)))
+        return distances.filter(d => Math.min(...d) <= closestFurthest).length > 1
+    })
+    return { nearest, ambiguous }
+}
+
+// portalsFromMonsterTypes: { "<entry type>": "<exit type>" | ["<exit type>", …] | { to, effect, effectDuration,
+// freezeDuration, oneWay } }
+// Every monster of the entry type becomes a portal to the nearest monster of the exit types in its level, which is
 // what an old map's teleporter trigger looks for ("the nearest TP_Target of the map", and only the current level's
-// monsters exist while it is played).
+// monsters exist while it is played). Entries and exits may move (Alpha Slide's snowmen, moving teleport targets): a
+// MEC portal sends the hero where its exit stands at that moment, but its pair is set once, where the old trigger
+// looked for the nearest exit each time - a warning says when that could have given another exit.
 for (const [entryLabel, rawOptions] of Object.entries((spec.portalsFromMonsterTypes ?? {}) as Json)) {
     if (entryLabel.startsWith('$')) continue
-    const options: Json = typeof rawOptions === 'string' ? { to: rawOptions } : rawOptions
+    const options: Json = typeof rawOptions === 'string' || Array.isArray(rawOptions) ? { to: rawOptions } : rawOptions
+    const exitLabels: string[] = Array.isArray(options.to) ? options.to : [options.to]
     requireMonsterType(entryLabel)
-    requireMonsterType(options.to)
+    exitLabels.forEach(requireMonsterType)
 
     let nbPortals = 0
     levels.forEach((_level, i) => {
-        const exits = immobileMonstersOfType(i, options.to)
-        for (const entry of immobileMonstersOfType(i, entryLabel)) {
-            const exit = exits
-                .filter(e => e.id !== entry.id)
-                .sort((a, b) => distanceBetween(entry, a) - distanceBetween(entry, b))[0]
+        const exits = monstersOfTypes(i, exitLabels)
+        for (const entry of monstersOfTypes(i, [entryLabel])) {
+            const { nearest: exit, ambiguous } = nearestMonster(entry, exits)
+            const where = `${pathOf(entry)[0].x},${pathOf(entry)[0].y} (level ${i + 1})`
             if (!exit) {
                 warn(
-                    `portalsFromMonsterTypes: the ${entryLabel} at ${entry.x},${entry.y} (level ${i + 1}) has no ${options.to} in its level: no portal`
+                    `portalsFromMonsterTypes: the ${entryLabel} at ${where} has no ${exitLabels.join(' or ')} in its level: no portal`
                 )
                 continue
             }
+            if (ambiguous)
+                warn(
+                    `portalsFromMonsterTypes: the ${entryLabel} at ${where} goes to the ${exit.monsterTypeLabel} starting at ${pathOf(exit)[0].x},${pathOf(exit)[0].y}, but a moving monster could have made another exit the nearest in the old map`
+                )
             nbPortals++
             levelPortals[i].push({
                 triggerMobId: entry.id,
@@ -975,6 +1034,41 @@ for (const circle of (spec.circleMobs ?? []) as Json[]) {
     } else {
         for (const angle of angles) newCircle(newCentre().id, [newMob(angle).id], angle)
     }
+}
+
+// ---------------------------------------------------------------------------------------------- mortars
+
+// mortarsFromMonsterTypes: { "<mortar type>": "<target type>" | { target, delay } }
+// Every immobile monster of the mortar type attacks the ground at the nearest monster of the target type in its
+// level - an old map's "attackground the nearest mortar target" trigger, run as the level's monsters appear - and
+// `delay` seconds after its unit is made, which is how an old map puts groups of mortars out of phase (Alpha Slide's
+// second mortars 1.5 s after the first, its "snakes" 0.2 s after one another). The target stays a monster of its own:
+// in the old map it is a unit without a model.
+for (const [mortarLabel, rawOptions] of Object.entries((spec.mortarsFromMonsterTypes ?? {}) as Json)) {
+    if (mortarLabel.startsWith('$')) continue
+    const options: Json = typeof rawOptions === 'string' ? { target: rawOptions } : rawOptions
+    requireMonsterType(mortarLabel)
+    requireMonsterType(options.target)
+
+    let nbMortars = 0
+    levels.forEach((_level, i) => {
+        const targets = immobileMonstersOfType(i, options.target)
+        for (const mortar of immobileMonstersOfType(i, mortarLabel)) {
+            const target = targets.sort((a, b) => distanceBetween(mortar, a) - distanceBetween(mortar, b))[0]
+            if (!target) {
+                warn(
+                    `mortarsFromMonsterTypes: the ${mortarLabel} at ${mortar.x},${mortar.y} (level ${i + 1}) has no ${options.target} in its level: it fires at nothing`
+                )
+                continue
+            }
+            nbMortars++
+            mortar.attackGroundX = target.x
+            mortar.attackGroundY = target.y
+            mortar.attackGroundDelay = options.delay ?? 0
+        }
+    })
+    if (nbMortars === 0)
+        warn(`mortarsFromMonsterTypes: no immobile monster of type ${mortarLabel} to turn into a mortar`)
 }
 
 // ---------------------------------------------------------------------------------------------- casters
