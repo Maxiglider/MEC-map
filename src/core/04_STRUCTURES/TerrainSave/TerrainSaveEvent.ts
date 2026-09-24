@@ -13,7 +13,7 @@ const RUNNING_MONSTER_TRANSPARENCY = 60
 
 export type TerrainSaveEventCondition =
     | { kind: 'levelStart' | 'levelEnd'; levelNum: number }
-    | { kind: 'monsterTouch'; monsterId: number }
+    | { kind: 'monsterTouch' | 'monsterDeath'; monsterId: number }
 
 export type TerrainSaveEventAction = 'apply' | 'unapply'
 
@@ -119,8 +119,9 @@ export class TerrainSaveEvent {
         }
     }
 
-    // Level conditions hook directly into Level.hooks_onStart/onEnd. monsterTouch needs no registration here -
-    // it's detected by a dedicated branch in onEscaperTouchingMonster instead (see step 5). Independently of the
+    // Level conditions hook directly into Level.hooks_onStart/onEnd. monsterTouch and monsterDeath need no
+    // registration here - they're detected by a dedicated branch in onEscaperTouchingMonster, and by the trigger
+    // of Terrain_save_monster_death. Independently of the
     // condition, onLvlEnd (if set) hooks into whichever level getOnLvlEndLevel() resolves to.
     register = (): void => {
         if (this.condition.kind === 'levelStart' || this.condition.kind === 'levelEnd') {

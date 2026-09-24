@@ -84,8 +84,9 @@ export const formatTerrainSaveEventConditionText = (condition: TerrainSaveEventC
         case 'levelStart':
         case 'levelEnd':
             return `${condition.kind} (level ${condition.levelNum})`
-        case 'monsterTouch': {
-            let text = 'monsterTouch'
+        case 'monsterTouch':
+        case 'monsterDeath': {
+            let text: string = condition.kind
             const monster = udg_monsters[condition.monsterId]
             if (monster?.getMonsterType()) {
                 text += ` (${monster.getMonsterType()?.getLabel()})`
@@ -185,7 +186,7 @@ export const displayTerrainSaveEventDetail = (event: TerrainSaveEvent, p: player
 
     Text.P_timed(p, Constants.TERRAIN_DATA_DISPLAY_TIME, text)
 
-    if (event.condition.kind === 'monsterTouch') {
+    if (event.condition.kind === 'monsterTouch' || event.condition.kind === 'monsterDeath') {
         const monster = udg_monsters[event.condition.monsterId]
         if (monster?.u) {
             SetCameraPositionForPlayer(p, GetUnitX(monster.u), GetUnitY(monster.u))

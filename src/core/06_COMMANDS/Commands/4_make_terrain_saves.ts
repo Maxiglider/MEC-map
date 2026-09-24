@@ -392,15 +392,15 @@ export const initExecuteCommandMake_terrain_saves = () => {
         },
     })
 
-    //-createTerrainSaveEvent(crtse) <terrainSaveLabel> apply|a|unapply|u lvlStart|lvlEnd|mob [delay=<seconds>] [period=<seconds>|<time1>-<time2>] [duration=<seconds>] [onLvlEnd=apply|unapply|stop]
+    //-createTerrainSaveEvent(crtse) <terrainSaveLabel> apply|a|unapply|u lvlStart|lvlEnd|mobTouch|mobDeath [delay=<seconds>] [period=<seconds>|<time1>-<time2>] [duration=<seconds>] [onLvlEnd=apply|unapply|stop]
     registerCommand({
         name: 'createTerrainSaveEvent',
         alias: ['crtse'],
         group,
         argDescription:
-            '<terrainSaveLabel> apply|a|unapply|u lvlStart|lvlEnd|mob [delay=<seconds>] [period=<seconds>|<time1>-<time2>] [duration=<seconds>] [onLvlEnd=apply|unapply|stop]',
+            '<terrainSaveLabel> apply|a|unapply|u lvlStart|lvlEnd|mobTouch|mobDeath [delay=<seconds>] [period=<seconds>|<time1>-<time2>] [duration=<seconds>] [onLvlEnd=apply|unapply|stop]',
         description:
-            'Creates an event that automatically applies/unapplies a terrain save. For lvlStart/lvlEnd, the level used is the terrain save\'s own level if it has one, or your current level. For "mob", click on a monster to target it. Period toggles apply/unapply repeatedly: <time1>-<time2> toggles asymmetrically (period=N means "N/2-N/2"). Duration auto-reverts the action that many seconds after it fires. onLvlEnd runs when the level ends: "apply/unapply" forces that action, "stop" just cancels the event leaving the terrain as is.',
+            'Creates an event that automatically applies/unapplies a terrain save. For lvlStart/lvlEnd, the level used is the terrain save\'s own level if it has one, or your current level. For "mobTouch" (a hero touching it) and "mobDeath" (its unit dying, whatever kills it), click on a monster to target it. Period toggles apply/unapply repeatedly: <time1>-<time2> toggles asymmetrically (period=N means "N/2-N/2"). Duration auto-reverts the action that many seconds after it fires. onLvlEnd runs when the level ends: "apply/unapply" forces that action, "stop" just cancels the event leaving the terrain as is.',
         cb: ({ nbParam, param1, param2, param3, param4, param5, param6, param7 }, escaper) => {
             if (nbParam < 3 || nbParam > 7) {
                 return USAGE
@@ -421,13 +421,15 @@ export const initExecuteCommandMake_terrain_saves = () => {
                 return USAGE
             }
 
-            let kind: 'levelStart' | 'levelEnd' | 'monsterTouch'
+            let kind: 'levelStart' | 'levelEnd' | 'monsterTouch' | 'monsterDeath'
             if (param3.toLowerCase() === 'lvlstart') {
                 kind = 'levelStart'
             } else if (param3.toLowerCase() === 'lvlend') {
                 kind = 'levelEnd'
-            } else if (param3.toLowerCase() === 'mob') {
+            } else if (param3.toLowerCase() === 'mobtouch') {
                 kind = 'monsterTouch'
+            } else if (param3.toLowerCase() === 'mobdeath') {
+                kind = 'monsterDeath'
             } else {
                 return USAGE
             }
@@ -485,7 +487,7 @@ export const initExecuteCommandMake_terrain_saves = () => {
                 }
             }
 
-            if (kind === 'monsterTouch') {
+            if (kind === 'monsterTouch' || kind === 'monsterDeath') {
                 const make = escaper.makeSelectMonsterForEvent(monsterId => {
                     const condition: TerrainSaveEventCondition = { kind, monsterId }
                     const event = terrainSave.addEvent(condition, action, delay, periodic, duration, onLvlEnd)
@@ -577,7 +579,7 @@ export const initExecuteCommandMake_terrain_saves = () => {
         group,
         argDescription: '<eventId> action|delay|period|duration|onLvlEnd|lvl|mob|enable|disable [<value>]',
         description:
-            'Edits a terrain save event. action: apply|a|unapply|u. delay/duration: <seconds>|none. period: <seconds>|<time1>-<time2>|none (see createTerrainSaveEvent for the asymmetric <time1>-<time2> semantics). onLvlEnd: apply|unapply|stop|none (requires the terrain save to be level-scoped or the event to trigger on some level start or end; stop just cancels any running delay/period timer). lvl (levelStart/levelEnd events only): <levelNum>|current|c. mob (monsterTouch events only): click on a hand-placed monster to retarget, no value typed. enable/disable: no value typed - disable freezes the event (cancels any running delay/period/duration timer without applying/unapplying), enable just resumes listening for the next trigger',
+            'Edits a terrain save event. action: apply|a|unapply|u. delay/duration: <seconds>|none. period: <seconds>|<time1>-<time2>|none (see createTerrainSaveEvent for the asymmetric <time1>-<time2> semantics). onLvlEnd: apply|unapply|stop|none (requires the terrain save to be level-scoped or the event to trigger on some level start or end; stop just cancels any running delay/period timer). lvl (levelStart/levelEnd events only): <levelNum>|current|c. mob (monsterTouch and monsterDeath events only): click on a hand-placed monster to retarget, no value typed. enable/disable: no value typed - disable freezes the event (cancels any running delay/period/duration timer without applying/unapplying), enable just resumes listening for the next trigger',
         cb: ({ nbParam, param1, param2, param3 }, escaper) => {
             if (nbParam < 2 || nbParam > 3 || !IsPositiveInteger(param1)) {
                 return USAGE
@@ -604,13 +606,17 @@ export const initExecuteCommandMake_terrain_saves = () => {
             }
 
             if (field === 'mob') {
-                if (event.condition.kind !== 'monsterTouch') {
-                    Text.erP(escaper.getPlayer(), 'the "target" field only applies to monsterTouch events')
+                const condition = event.condition
+                if (condition.kind !== 'monsterTouch' && condition.kind !== 'monsterDeath') {
+                    Text.erP(
+                        escaper.getPlayer(),
+                        'the "mob" field only applies to monsterTouch and monsterDeath events'
+                    )
                     return true
                 }
 
                 const make = escaper.makeSelectMonsterForEvent(monsterId => {
-                    event.condition = { kind: 'monsterTouch', monsterId }
+                    event.condition = { kind: condition.kind, monsterId }
                     Text.mkP(escaper.getPlayer(), `terrain save event #${event.getId()} retargeted`)
                 })
 

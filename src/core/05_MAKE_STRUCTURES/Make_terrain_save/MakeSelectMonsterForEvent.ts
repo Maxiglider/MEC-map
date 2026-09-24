@@ -5,7 +5,7 @@ import { Make } from '../Make/Make'
 // Single-click flow resolving a click to a hand-placed Monster's id, mirroring MakeGetMonsterInfo's proximity
 // resolution (level.monsters.getMonsterNear only ever contains hand-placed monsters, never MonsterSpawn-
 // generated ones - see onEscaperTouchingMonster). Used by createTerrainSaveEvent/editTerrainSaveEvent's
-// monsterTouch target selection - the id is never typed by the player, only ever resolved by clicking.
+// monsterTouch/monsterDeath target selection - the id is never typed by the player, only ever resolved by clicking.
 export class MakeSelectMonsterForEvent extends Make {
     private onSelected: (this: void, monsterId: number) => void
 
