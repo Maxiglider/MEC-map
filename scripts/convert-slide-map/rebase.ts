@@ -1049,6 +1049,15 @@ const output = path.join(outputDir, `${cleanName}--mec${coreMatch[1]}_${coreMatc
 if (path.resolve(output) === path.resolve(baseMapPath))
     throw new Error('The converted map cannot be the base map: the base map is only read')
 fs.writeFileSync(output, Buffer.concat([header, Buffer.from(archiveBytes)]))
+
+// The name carries the core's version and the day it was built, so a conversion that runs over midnight, or onto a
+// newer core, leaves an older copy of the same map beside the new one - and that is the one that gets play-tested
+// (user's rule, 2026-09-24). The map being converted has one copy here, the one just written.
+const superseded = fs
+    .readdirSync(outputDir)
+    .filter(name => name.startsWith(`${cleanName}--mec`) && path.join(outputDir, name) !== output)
+for (const name of superseded) fs.unlinkSync(path.join(outputDir, name))
+if (superseded.length > 0) log.push(`- older builds of this map removed: ${superseded.join(', ')}`)
 fs.writeFileSync(
     path.join(workDir, 'rebase.json'),
     JSON.stringify({ output, core: coreHeader.replace(CORE_START, '').trim() }, null, 2)

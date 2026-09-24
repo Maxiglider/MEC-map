@@ -55,6 +55,8 @@ The converted map is named after the old one without any "protected" mark ("-Pro
 
 The MEC base map is only read: the scripts refuse to write over it.
 
+A converted map's name carries the core's version and the day it was built, so a conversion that runs over midnight, or onto a newer core, would leave an older copy beside the new one - and that is the one that gets play-tested. The rebase removes the older builds of the map it is converting (user's rule, 2026-09-24), and says so in `rebase.md`; the other maps of the folder are left alone.
+
 ## The spec (`conversion.json`)
 
 Region names are the old ones without `gg_rct_`. Model a new spec on Polar Escape 3's.
