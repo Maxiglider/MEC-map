@@ -178,6 +178,17 @@ export class MonsterArray extends BaseArray<Monster> {
         }
     }
 
+    /** How many monsters clearMonstersOfType would destroy, for -removeMonster to say what is at stake */
+    countMonstersOfType = (mt: MonsterType) => {
+        let n = 0
+        for (const [_, monster] of pairs(this.data)) {
+            if (monster.getMonsterType() === mt) {
+                n++
+            }
+        }
+        return n
+    }
+
     //Destroy monsters of one type
     clearMonstersOfType = (mt: MonsterType) => {
         for (const [_, monster] of pairs(this.data)) {
@@ -193,6 +204,16 @@ export class MonsterArray extends BaseArray<Monster> {
         for (const [_, monster] of pairs(this.data)) {
             monster instanceof Caster && monster.getCasterType() === ct && monster.refresh()
         }
+    }
+
+    countCastersOfType(ct: CasterType) {
+        let n = 0
+        for (const [_, monster] of pairs(this.data)) {
+            if (monster instanceof Caster && monster.getCasterType() === ct) {
+                n++
+            }
+        }
+        return n
     }
 
     removeCastersOfType(ct: CasterType) {

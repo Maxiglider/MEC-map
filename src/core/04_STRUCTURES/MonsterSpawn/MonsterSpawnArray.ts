@@ -8,6 +8,7 @@ import { createPoint } from '../../../Utils/Point'
 import { handlePaginationArgs, handlePaginationObj } from '../../06_COMMANDS/Helpers/Pagination'
 import { BaseArray } from '../BaseArray'
 import type { Level } from '../Level/Level'
+import type { MonsterType } from '../Monster/MonsterType'
 import { CircleRegion } from '../Region/CircleRegion'
 import { HorizontalRegionDirection } from '../Region/HorizontalRectangleRegion'
 import { LineRegion } from '../Region/LineRegion'
@@ -279,6 +280,38 @@ export class MonsterSpawnArray extends BaseArray<MonsterSpawn> {
             return true
         } else {
             return false
+        }
+    }
+
+    /** How many spawns clearOfMonsterType would destroy, for -removeMonster to say what is at stake */
+    countOfMonsterType = (mt: MonsterType) => {
+        let n = 0
+        for (const [_, ms] of pairs(this.data)) {
+            if (ms.getMonsterType() === mt) {
+                n++
+            }
+        }
+        return n
+    }
+
+    /** Destroys the spawns of a monster type being removed, so none goes on making units of a type that is gone */
+    clearOfMonsterType = (mt: MonsterType) => {
+        // gathered first: destroying a spawn takes it out of this.data
+        const toDestroy: MonsterSpawn[] = []
+        for (const [_, ms] of pairs(this.data)) {
+            if (ms.getMonsterType() === mt) {
+                toDestroy.push(ms)
+            }
+        }
+
+        for (const ms of toDestroy) {
+            // a carried-over spawn would otherwise be deactivated again, once destroyed, when the next level ends
+            for (let i = carriedOver.length - 1; i >= 0; i--) {
+                if (carriedOver[i].spawn === ms) {
+                    carriedOver.splice(i, 1)
+                }
+            }
+            ms.destroy()
         }
     }
 

@@ -40,7 +40,7 @@ import { flushLogs } from '../../Log/log'
 import { startTurnMeasure } from '../../Log/TurnMeasure'
 import { e2e } from '../../Test/e2e-tests/base/e2e-tests-base'
 import { Natives } from '../../wc3_natives_unsecured/Natives'
-import { isPlayerId, resolvePlayerId, USAGE } from '../Helpers/Command_functions'
+import { countInLevels, FORCE_FLAG, isPlayerId, resolvePlayerId, USAGE } from '../Helpers/Command_functions'
 import { ActivateTeleport, DisableTeleport } from '../Helpers/Teleport'
 
 export const initExecuteCommandMax = () => {
@@ -663,22 +663,52 @@ export const initExecuteCommandMax = () => {
         },
     })
 
-    //-removeMonster(remm) <monsterLabel>
+    //-removeMonster(remm) <monsterLabel> [--force]
     registerCommand({
         name: 'removeMonster',
         alias: ['remm'],
         group,
-        argDescription: '<monsterLabel>',
-        description: 'Removes a monster from the map',
-        cb: ({ nbParam, param1 }, escaper) => {
-            if (!(nbParam === 1)) {
+        argDescription: '<monsterLabel> [--force]',
+        description:
+            'Removes a monster type from the map. --force also removes every monster and monster spawn of that type, in every level',
+        cb: ({ nbParam, param1, param2 }, escaper) => {
+            if (nbParam < 1 || nbParam > 2 || (nbParam === 2 && param2 !== FORCE_FLAG)) {
+                return USAGE
+            }
+            const monsterType = getUdgMonsterTypes().getByLabel(param1)
+            if (!monsterType) {
+                Text.erP(escaper.getPlayer(), 'unknown monster type')
                 return true
             }
-            if (getUdgMonsterTypes().remove(param1)) {
-                Text.mkP(escaper.getPlayer(), 'monster type removed')
-            } else {
-                Text.erP(escaper.getPlayer(), 'unknown monster type')
+
+            // getMonsterType() is what the removal goes by, so casters shooting from this type count too
+            const monsters = countInLevels(level => level.monsters.countMonstersOfType(monsterType))
+            const spawns = countInLevels(level => level.monsterSpawns.countOfMonsterType(monsterType))
+            const usage = countInLevels(
+                level =>
+                    level.monsters.countMonstersOfType(monsterType) +
+                    level.monsterSpawns.countOfMonsterType(monsterType)
+            )
+            const removed = I2S(monsters.count) + ' monsters and ' + I2S(spawns.count) + ' monster spawns'
+
+            if (usage.count > 0 && nbParam !== 2) {
+                Text.erP(
+                    escaper.getPlayer(),
+                    'monster type "' +
+                        param1 +
+                        '" is used by ' +
+                        removed +
+                        ' in ' +
+                        usage.levels +
+                        ' - add ' +
+                        FORCE_FLAG +
+                        ' to remove it and them'
+                )
+                return true
             }
+
+            getUdgMonsterTypes().remove(param1)
+            Text.mkP(escaper.getPlayer(), 'monster type removed, with ' + removed)
             return true
         },
     })
@@ -705,25 +735,45 @@ export const initExecuteCommandMax = () => {
         },
     })
 
-    //-removeCaster(remc) <casterLabel>
+    //-removeCaster(remc) <casterLabel> [--force]
     registerCommand({
         name: 'removeCaster',
         alias: ['remc'],
         group,
-        argDescription: '<casterLabel>',
-        description: 'Removes a caster from the map',
-        cb: ({ nbParam, param1 }, escaper) => {
-            if (nbParam !== 1) {
-                return true
+        argDescription: '<casterLabel> [--force]',
+        description:
+            'Removes a caster type from the map. --force also removes every caster of that type, in every level',
+        cb: ({ nbParam, param1, param2 }, escaper) => {
+            if (nbParam < 1 || nbParam > 2 || (nbParam === 2 && param2 !== FORCE_FLAG)) {
+                return USAGE
             }
             //checkParam 1
-            if (!getUdgCasterTypes().isLabelAlreadyUsed(param1)) {
+            const casterType = getUdgCasterTypes().getByLabel(param1)
+            if (!casterType) {
                 Text.erP(escaper.getPlayer(), 'unknown caster type "' + param1 + '"')
                 return true
             }
+
+            const usage = countInLevels(level => level.monsters.countCastersOfType(casterType))
+            if (usage.count > 0 && nbParam !== 2) {
+                Text.erP(
+                    escaper.getPlayer(),
+                    'caster type "' +
+                        param1 +
+                        '" is used by ' +
+                        I2S(usage.count) +
+                        ' casters in ' +
+                        usage.levels +
+                        ' - add ' +
+                        FORCE_FLAG +
+                        ' to remove it and those casters'
+                )
+                return true
+            }
+
             //apply command
             getUdgCasterTypes().remove(param1)
-            Text.mkP(escaper.getPlayer(), 'caster type removed')
+            Text.mkP(escaper.getPlayer(), 'caster type removed, with ' + I2S(usage.count) + ' casters')
             return true
         },
     })

@@ -5,6 +5,7 @@ import { arrayPush, IsBoolString, S2B, stringReplaceAll } from '../../01_librari
 import { Constants } from '../../01_libraries/Constants'
 import { ColorString2Id } from '../../01_libraries/Init_colorCodes'
 import { Escaper } from '../../04_STRUCTURES/Escaper/Escaper'
+import type { Level } from '../../04_STRUCTURES/Level/Level'
 import { TerrainTypeWalk } from '../../04_STRUCTURES/TerrainType/TerrainTypeWalk'
 import { HERO_START_ANGLE } from '../../08_GAME/Init_game/Heroes'
 import { DeplacementHeroHorsDeathPath } from '../../08_GAME/Mode_coop/deplacement_heros_hors_death_path'
@@ -17,6 +18,30 @@ import { Natives } from '../../wc3_natives_unsecured/Natives'
 // Deliberately defined here, not in Command_execution.ts: that file imports every Commands/*.ts module, so a
 // command file importing USAGE back from it would be a circular require - this file has no such back-edge.
 export const USAGE = 'USAGE' as const
+
+// The last parameter a removing command asks for when what it removes is still used in some level, since there is
+// no undoing it afterwards (-delvt, -removeDoor, -removeKeyForDoor, -removeCaster, -removeMonster).
+export const FORCE_FLAG = '--force'
+
+/** How many things countIn finds across every level, and which levels they are in, for a refusal to say what is at stake */
+export const countInLevels = (countIn: (level: Level) => number) => {
+    let count = 0
+    const levelIds: string[] = []
+
+    getUdgLevels().forAll((level, levelId) => {
+        const n = countIn(level)
+
+        if (n > 0) {
+            count += n
+            arrayPush(levelIds, I2S(levelId))
+        }
+    })
+
+    return {
+        count,
+        levels: levelIds.length === 1 ? 'level ' + levelIds[0] : 'levels ' + levelIds.join(', '),
+    }
+}
 
 export const rawPlayerNames: string[] = []
 

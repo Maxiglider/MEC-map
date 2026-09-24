@@ -67,6 +67,10 @@ export class KeyAndDoorArray {
         }
     }
 
+    countAllOfDoorType = (doorType: DoorType) => this.getAll().filter(kad => kad.doorType === doorType).length
+
+    countAllOfKeyType = (keyType: KeyForDoorType) => this.getAll().filter(kad => kad.keyType === keyType).length
+
     removeAllOfDoorType = (doorType: DoorType) => {
         let n = 0
         for (const kad of this.getAll()) {

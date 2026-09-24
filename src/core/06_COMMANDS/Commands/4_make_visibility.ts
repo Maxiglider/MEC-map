@@ -1,6 +1,6 @@
 import { getUdgLevels, getUdgVisibilityTypes } from '../../../../globals'
 import { ServiceManager } from '../../../Services'
-import { IsBoolString, S2B, arrayPush } from '../../01_libraries/Basic_functions'
+import { arrayPush, IsBoolString, S2B } from '../../01_libraries/Basic_functions'
 import { Constants } from '../../01_libraries/Constants'
 import { IsPositiveInteger } from '../../01_libraries/Functions_on_numbers'
 import { Text } from '../../01_libraries/Text'
@@ -9,7 +9,7 @@ import { worldToTile } from '../../04_STRUCTURES/Visibility/TileCoordinates'
 import { VisibilityCompositor } from '../../04_STRUCTURES/Visibility/VisibilityCompositor'
 import { VisibilityState, VisibilityType } from '../../04_STRUCTURES/Visibility/VisibilityType'
 import { BrushShape } from '../../05_MAKE_STRUCTURES/Make/BrushShape'
-import { USAGE } from '../Helpers/Command_functions'
+import { countInLevels, FORCE_FLAG, USAGE } from '../Helpers/Command_functions'
 
 /** Accepts the full words and the built-ins' own aliases, so "-newvt blink v 2 1" reads naturally */
 const parseVisibilityState = (str: string): VisibilityState | null => {
@@ -29,28 +29,6 @@ const parsePositiveTime = (str: string): number | null => {
     const time = S2R(str)
 
     return time > 0 ? time : null
-}
-
-const FORCE_FLAG = '--force'
-
-/** How many tiles a visibility type holds, and which levels they are in, for -delvt to say what is at stake */
-const countUsage = (visibilityType: VisibilityType) => {
-    let tiles = 0
-    const levelIds: string[] = []
-
-    getUdgLevels().forAll((level, levelId) => {
-        const n = level.visibilityTiles.countByType(visibilityType)
-
-        if (n > 0) {
-            tiles += n
-            arrayPush(levelIds, I2S(levelId))
-        }
-    })
-
-    return {
-        tiles,
-        levels: levelIds.length === 1 ? 'level ' + levelIds[0] : 'levels ' + levelIds.join(', '),
-    }
 }
 
 export const initExecuteCommandMake_visibility = () => {
@@ -295,17 +273,17 @@ export const initExecuteCommandMake_visibility = () => {
             }
 
             const label = visibilityType.label
-            const usage = countUsage(visibilityType)
+            const usage = countInLevels(level => level.visibilityTiles.countByType(visibilityType))
 
             // Deleting a type used somewhere takes those tiles away from levels the maker may not even be on, so it
             // asks to be spelled out - and the refusal gives the count first, since there is no undoing it afterwards.
-            if (usage.tiles > 0 && nbParam !== 2) {
+            if (usage.count > 0 && nbParam !== 2) {
                 Text.erP(
                     p,
                     'visibility type "' +
                         label +
                         '" is used by ' +
-                        I2S(usage.tiles) +
+                        I2S(usage.count) +
                         ' tiles in ' +
                         usage.levels +
                         ' - add ' +
@@ -315,19 +293,19 @@ export const initExecuteCommandMake_visibility = () => {
                 return true
             }
 
-            if (usage.tiles > 0) {
+            if (usage.count > 0) {
                 getUdgLevels().forAll(level => level.visibilityTiles.removeAllOfType(visibilityType))
             }
 
             getUdgVisibilityTypes().remove(visibilityType)
 
-            if (usage.tiles > 0) {
+            if (usage.count > 0) {
                 Text.mkP(
                     p,
                     'visibility type "' +
                         label +
                         '" deleted, along with ' +
-                        I2S(usage.tiles) +
+                        I2S(usage.count) +
                         ' tiles in ' +
                         usage.levels
                 )

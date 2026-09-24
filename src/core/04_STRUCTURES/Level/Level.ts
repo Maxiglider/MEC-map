@@ -276,6 +276,7 @@ export class Level {
 
     clearMonstersOfType(mt: MonsterType) {
         this.monsters.clearMonstersOfType(mt)
+        this.monsterSpawns.clearOfMonsterType(mt)
     }
 
     refreshCastersOfType(ct: CasterType) {

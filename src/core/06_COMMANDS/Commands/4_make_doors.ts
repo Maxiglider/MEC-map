@@ -3,7 +3,7 @@ import { ServiceManager } from '../../../Services'
 import { Text } from '../../01_libraries/Text'
 import { DoorType, doorTypes, KeyForDoorType, keyForDoorTypes } from '../../04_STRUCTURES/KeyAndDoor/KeyAndDoorTypes'
 import type { Level } from '../../04_STRUCTURES/Level/Level'
-import { USAGE } from '../Helpers/Command_functions'
+import { countInLevels, FORCE_FLAG, USAGE } from '../Helpers/Command_functions'
 
 /** Whether a destructable type exists: made and removed at once */
 const isDestructableType = (id: string) => {
@@ -295,15 +295,15 @@ export const initExecuteCommandMake_doors = () => {
         },
     })
 
-    //-removeKeyForDoor(remkfd) <keyForDoorLabel>
+    //-removeKeyForDoor(remkfd) <keyForDoorLabel> [--force]
     registerCommand({
         name: 'removeKeyForDoor',
         alias: ['remkfd'],
         group,
-        argDescription: '<keyForDoorLabel>',
-        description: 'Remove a kind of key, and every door and key made with it in every level',
-        cb: ({ nbParam, param1 }, escaper) => {
-            if (nbParam !== 1) {
+        argDescription: '<keyForDoorLabel> [--force]',
+        description: 'Removes a kind of key. --force also removes every door and key made with it, in every level',
+        cb: ({ nbParam, param1, param2 }, escaper) => {
+            if (nbParam < 1 || nbParam > 2 || (nbParam === 2 && param2 !== FORCE_FLAG)) {
                 return USAGE
             }
             const keyType = keyForDoorTypes.getByLabel(param1)
@@ -312,23 +312,31 @@ export const initExecuteCommandMake_doors = () => {
                 return true
             }
 
-            let n = 0
-            forAllLevels(level => (n += level.keyAndDoors.removeAllOfKeyType(keyType)))
+            const usage = countInLevels(level => level.keyAndDoors.countAllOfKeyType(keyType))
+            if (usage.count > 0 && nbParam !== 2) {
+                Text.erP(
+                    escaper.getPlayer(),
+                    `key "${param1}" is used by ${usage.count} key(s) and door(s) in ${usage.levels} - add ${FORCE_FLAG} to remove it and them`
+                )
+                return true
+            }
+
+            forAllLevels(level => level.keyAndDoors.removeAllOfKeyType(keyType))
             keyForDoorTypes.remove(keyType)
-            Text.mkP(escaper.getPlayer(), `key "${param1}" removed, with ${n} key(s) and door(s)`)
+            Text.mkP(escaper.getPlayer(), `key "${param1}" removed, with ${usage.count} key(s) and door(s)`)
             return true
         },
     })
 
-    //-removeDoor(remd) <doorLabel>
+    //-removeDoor(remd) <doorLabel> [--force]
     registerCommand({
         name: 'removeDoor',
         alias: ['remd'],
         group,
-        argDescription: '<doorLabel>',
-        description: 'Remove a kind of door, and every door and key made with it in every level',
-        cb: ({ nbParam, param1 }, escaper) => {
-            if (nbParam !== 1) {
+        argDescription: '<doorLabel> [--force]',
+        description: 'Remove a kind of door. --force also removes every door and key made with it, in every level',
+        cb: ({ nbParam, param1, param2 }, escaper) => {
+            if (nbParam < 1 || nbParam > 2 || (nbParam === 2 && param2 !== FORCE_FLAG)) {
                 return USAGE
             }
             const doorType = doorTypes.getByLabel(param1)
@@ -337,10 +345,18 @@ export const initExecuteCommandMake_doors = () => {
                 return true
             }
 
-            let n = 0
-            forAllLevels(level => (n += level.keyAndDoors.removeAllOfDoorType(doorType)))
+            const usage = countInLevels(level => level.keyAndDoors.countAllOfDoorType(doorType))
+            if (usage.count > 0 && nbParam !== 2) {
+                Text.erP(
+                    escaper.getPlayer(),
+                    `door "${param1}" is used by ${usage.count} key(s) and door(s) in ${usage.levels} - add ${FORCE_FLAG} to remove it and them`
+                )
+                return true
+            }
+
+            forAllLevels(level => level.keyAndDoors.removeAllOfDoorType(doorType))
             doorTypes.remove(doorType)
-            Text.mkP(escaper.getPlayer(), `door "${param1}" removed, with ${n} key(s) and door(s)`)
+            Text.mkP(escaper.getPlayer(), `door "${param1}" removed, with ${usage.count} key(s) and door(s)`)
             return true
         },
     })
