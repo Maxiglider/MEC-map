@@ -111,7 +111,11 @@ export class TerrainSaveEvent {
 
         if (this.condition.kind === 'monsterTouch') {
             const monster = udg_monsters[this.condition.monsterId]
-            monster?.setUnitTransparency(running ? globals.terrainSaveMobTransparency : 0)
+            // fully transparent is hidden: a unit's vertex alpha doesn't reach every material of every model - the
+            // circle of power stayed whole under a transparency of 100 (Denmark Slide, user's report, 2026-09-25)
+            const hidden = running && globals.terrainSaveMobTransparency >= 100
+            monster?.u && ShowUnit(monster.u, !hidden)
+            monster?.setUnitTransparency(running && !hidden ? globals.terrainSaveMobTransparency : 0)
         }
     }
 
