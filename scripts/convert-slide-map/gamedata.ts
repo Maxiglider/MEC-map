@@ -61,7 +61,53 @@ const warn = (message: string) => warnings.push(message)
  * MEC 2 game data takes over one for one. The spec says `"mecOne": true` and only has to add what the calls don't
  * hold (the hero, the game data, the quests, the custom triggers), or to override what they do.
  */
-const mecOne = spec.mecOne ? readMecOneData(oldScript) : undefined
+/**
+ * The game data of an MEC 2 version of the map, taken as it is (spec gameDataFrom: a file of the work folder holding
+ * what `MEC_core.setGameData` takes). For a map already converted to MEC 2 and played since, which a conversion
+ * reworks to restore what it lost of the old one: its gameplay is the truth, and working it out again from the old
+ * map could only undo it - Murloc Slide 2, whose MEC 1 map is protected, so that none of its calls can be read
+ * (2026-09-25). Its terrain types, monster types, caster types and levels are taken whole, in MEC's own frame (no
+ * immolation shift, starts kept as they are); the spec still adds its overrides, custom triggers, quests and decor.
+ */
+const gameDataFromFile: Json | undefined = spec.gameDataFrom
+    ? JSON.parse(fs.readFileSync(path.join(workDir, spec.gameDataFrom), 'utf8'))
+    : undefined
+if (gameDataFromFile) {
+    if (spec.levels || spec.monsterTypes || spec.terrainTypes)
+        throw new Error('gameDataFrom: the levels, monster types and terrain types come from the file, not the spec')
+    spec.terrainTypes = (gameDataFromFile.terrainTypesMec as Json[]).map(t => ({
+        label: t.label,
+        alias: t.alias,
+        tile: t.terrainTypeId,
+        kind: t.kind,
+        cliffClassId: t.cliffClassId,
+        walkSpeed: t.walkSpeed,
+        slideSpeed: t.slideSpeed,
+        canTurn: t.canTurn,
+        rotationSpeed: t.rotationSpeed,
+        killingEffect: t.killingEffet,
+        timeToKill: t.timeToKill,
+        toleranceDist: t.toleranceDist,
+    }))
+    spec.monsterTypes = gameDataFromFile.monsterTypes
+    spec.casterTypes ??= gameDataFromFile.casterTypes
+    const rectOfCorners = (r: Json) =>
+        r.minX !== undefined
+            ? r
+            : {
+                  minX: Math.min(r.x1, r.x2),
+                  minY: Math.min(r.y1, r.y2),
+                  maxX: Math.max(r.x1, r.x2),
+                  maxY: Math.max(r.y1, r.y2),
+              }
+    spec.levels = (gameDataFromFile.levels as Json[]).map(l => ({
+        start: l.start,
+        ...(l.end ? { end: l.end } : {}),
+        visibilities: ((l.visibilities ?? []) as Json[]).map(rectOfCorners),
+    }))
+}
+
+const mecOne = spec.mecOne && !gameDataFromFile ? readMecOneData(oldScript) : undefined
 if (mecOne) {
     spec.terrainTypes ??= mecOne.terrainTypes
     spec.monsterTypes ??= mecOne.monsterTypes
@@ -138,7 +184,7 @@ spec.gameData = { ...(spec.gameData ?? {}), heroBaseCollisionSize: MEC_HERO_COLL
 // before, and one the gain does not move by a whole step of 5 is rounded down: the first case is the user's to decide,
 // so the build stops and names those types - an immolationRadius in monsterTypeOverrides, in the old map's frame,
 // settles each of them. Overrides are applied before, which is why they are written in the old frame.
-if (spec.mecOne) {
+if (spec.mecOne && !gameDataFromFile) {
     if (spec.hero?.collision === undefined)
         throw new Error("hero.collision: the old hero's collision is needed to move a MEC 1 map to MEC's own")
     const delta = Number(spec.hero.collision) - MEC_HERO_COLLISION
@@ -1472,7 +1518,7 @@ const isSafeArea = (minX: number, minY: number, maxX: number, maxY: number) => {
  * heroes, so they can reach onto the terrain around; a MEC 1 map's starts are the ones its author made in game and
  * played on, and they stand on the slide terrain on purpose. Those are kept, and only checked for death tiles.
  */
-const shrinkStarts: boolean = spec.safeStarts?.shrink ?? !spec.mecOne
+const shrinkStarts: boolean = spec.safeStarts?.shrink ?? !(spec.mecOne || gameDataFromFile)
 
 const safeStart = (r: Rect, levelNumber: number): Rect => {
     if (!shrinkStarts) {
@@ -1629,8 +1675,18 @@ const visibilityNote = visibilityFromFile
       `${visibilityTiles!.reduce((n, groups) => n + groups.reduce((m, g) => m + g.rects.length, 0), 0)} rectangles.`
     : undefined
 
+// a level of the file (spec gameDataFrom) is taken whole, over what this step works out for it: only what the file
+// doesn't say (MEC fields newer than it) keeps the computed value
+const levelFromFile = (i: number): Json => {
+    if (!gameDataFromFile) return {}
+    if (levelMonsters[i].length > 0)
+        throw new Error(`gameDataFrom: level ${i + 1} has monsters of the spec too, which the file's would replace`)
+    const { id: _id, ...level } = (gameDataFromFile.levels as Json[])[i]
+    return level
+}
+
 const gameData = {
-    terrainTypesMec,
+    terrainTypesMec: gameDataFromFile ? gameDataFromFile.terrainTypesMec : terrainTypesMec,
     monsterTypes,
     casterTypes,
     ...(visibilityTypes.length ? { visibilityTypes } : {}),
@@ -1670,12 +1726,14 @@ const gameData = {
         circleMobs: levelCircleMobs[i],
         staticSlides: levelStaticSlides[i],
         regions: [],
+        ...levelFromFile(i),
     })),
     doorTypes,
     keyForDoorTypes,
     ...(terrainSavesJson.length ? { terrainSaves: terrainSavesJson } : {}),
     gameData: {
         ...baseGameData,
+        ...(gameDataFromFile?.gameData ?? {}),
         ...heroModel,
         ...(mortarAreaShift !== 0 ? { mortarAreaShift } : {}),
         ...Object.fromEntries(Object.entries((spec.gameData ?? {}) as Json).filter(([key]) => !key.startsWith('$'))),
