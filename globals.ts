@@ -33,6 +33,11 @@ export const globals: {
      * (-setLifeBonusMessageDuration, saved by -smic)
      */
     lifeBonusMessageDuration: number
+    /**
+     * How transparent (0 opaque - 100 invisible) the monster of a mobTouch terrain save event becomes while its event
+     * is triggered, the cue that touching it again does nothing (-setTerrainSaveMobTransparency, saved by -smic)
+     */
+    terrainSaveMobTransparency: number
     autoreviveDelay?: number
     logStrings: string[]
 
@@ -76,6 +81,7 @@ export const globals: {
     coopModeChoice: true,
     mortarAreaShift: 0,
     lifeBonusMessageDuration: 3,
+    terrainSaveMobTransparency: 60,
     CAN_TURN_IN_AIR: false,
     USE_VTOTO_SLIDE_LOGIC: false,
     coopCircles: true,

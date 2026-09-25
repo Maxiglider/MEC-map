@@ -1,15 +1,10 @@
 import { MemoryHandler } from 'Utils/MemoryHandler'
 import { Timer } from 'w3ts'
-import { getUdgLevels, udg_monsters } from '../../../../globals'
+import { getUdgLevels, globals, udg_monsters } from '../../../../globals'
 import { createTimer } from '../../../Utils/mapUtils'
 import { MecHook } from '../../API/MecHook'
 import type { Level } from '../Level/Level'
 import type { TerrainSave } from './TerrainSave'
-
-// How transparent (0 opaque - 100 fully invisible) a monsterTouch event's target monster becomes while its
-// event is considered triggered (see TerrainSaveEvent.running) - a visual cue that touching it again won't do
-// anything right now.
-const RUNNING_MONSTER_TRANSPARENCY = 60
 
 export type TerrainSaveEventCondition =
     | { kind: 'levelStart' | 'levelEnd'; levelNum: number }
@@ -109,13 +104,14 @@ export class TerrainSaveEvent {
     }
 
     // Also toggles the target monster's transparency for a monsterTouch event, as a visual cue that it's
-    // currently triggered and won't react to another touch.
+    // currently triggered and won't react to another touch: globals.terrainSaveMobTransparency (60 by default, 100
+    // for a switch that disappears once used, as an old map's circle of power did).
     private setRunning = (running: boolean): void => {
         this.running = running
 
         if (this.condition.kind === 'monsterTouch') {
             const monster = udg_monsters[this.condition.monsterId]
-            monster?.setUnitTransparency(running ? RUNNING_MONSTER_TRANSPARENCY : 0)
+            monster?.setUnitTransparency(running ? globals.terrainSaveMobTransparency : 0)
         }
     }
 

@@ -74,6 +74,10 @@ export class LoadMapFromCache {
                         globals.mortarAreaShift = gameData.gameData.mortarAreaShift
                     }
 
+                    if (gameData.gameData.terrainSaveMobTransparency !== undefined) {
+                        globals.terrainSaveMobTransparency = gameData.gameData.terrainSaveMobTransparency
+                    }
+
                     if (gameData.gameData.lifeBonusMessageDuration !== undefined) {
                         globals.lifeBonusMessageDuration = gameData.gameData.lifeBonusMessageDuration
                     }

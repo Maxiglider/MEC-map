@@ -1,8 +1,8 @@
-import { getUdgLevels, getUdgTerrainSaves } from '../../../../globals'
+import { getUdgLevels, getUdgTerrainSaves, globals } from '../../../../globals'
 import { ServiceManager } from '../../../Services'
 import { errorHandler } from '../../../Utils/mapUtils'
 import { Constants } from '../../01_libraries/Constants'
-import { IsPositiveInteger } from '../../01_libraries/Functions_on_numbers'
+import { IsPercentage, IsPositiveInteger } from '../../01_libraries/Functions_on_numbers'
 import { Text } from '../../01_libraries/Text'
 import type { Level } from '../../04_STRUCTURES/Level/Level'
 import type { TerrainSave } from '../../04_STRUCTURES/TerrainSave/TerrainSave'
@@ -29,6 +29,26 @@ import { handlePagination } from '../Helpers/Pagination'
 export const initExecuteCommandMake_terrain_saves = () => {
     const { registerCommand } = ServiceManager.getService('Cmd')
     const group = 'make'
+
+    //-setTerrainSaveMobTransparency(settsmt) <transparency>
+    registerCommand({
+        name: 'setTerrainSaveMobTransparency',
+        alias: ['settsmt'],
+        group,
+        argDescription: '<transparency>',
+        description:
+            'Sets how transparent (0 opaque, 100 invisible) the monster of a mobTouch terrain save event becomes once touched, until its event can fire again (60 by default). 100 makes a switch disappear once used',
+        cb: ({ nbParam, param1 }, escaper) => {
+            if (nbParam !== 1 || !IsPercentage(param1)) {
+                return USAGE
+            }
+
+            globals.terrainSaveMobTransparency = S2I(param1)
+            Text.mkP(escaper.getPlayer(), 'terrain save mob transparency changed')
+
+            return true
+        },
+    })
 
     //-saveTerrain(st) <label> [all|rect] [global|g]
     registerCommand({

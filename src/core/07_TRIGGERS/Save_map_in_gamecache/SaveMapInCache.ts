@@ -38,6 +38,7 @@ export class SaveMapInCache {
         jsonGameData.gameData.coopModeChoice = globals.coopModeChoice
         jsonGameData.gameData.mortarAreaShift = globals.mortarAreaShift
         jsonGameData.gameData.lifeBonusMessageDuration = globals.lifeBonusMessageDuration
+        jsonGameData.gameData.terrainSaveMobTransparency = globals.terrainSaveMobTransparency
         jsonGameData.gameData.CAN_TURN_IN_AIR = globals.CAN_TURN_IN_AIR
         jsonGameData.gameData.canSlideOverPathingBlockers = globals.canSlideOverPathingBlockers
         jsonGameData.gameData.animOnRevive = globals.animOnRevive
