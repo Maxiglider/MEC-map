@@ -11,6 +11,7 @@ import { TerrainTypeWalk } from 'core/04_STRUCTURES/TerrainType/TerrainTypeWalk'
 import { ASYNC_HERO_EVENT } from 'core/08_GAME/Contact/AsyncHeroSync'
 import { hooks } from 'core/API/GeneralHooks'
 import { getUdgEscapers, getUdgTerrainTypes } from '../../../../globals'
+import { getAutoTurnMode } from '../../Async_slide/AutoTurn'
 import { AutoContinueAfterSliding } from './Auto_continue_after_sliding'
 import { TurnOnSlide } from './To_turn_on_slide'
 
@@ -27,6 +28,9 @@ const initCheckTerrainTrigger = () => {
         wasSliding: boolean,
         wasReversed: boolean
     ) => {
+        // asked before the slide stops the unit, which drops the order it was walking to
+        const walkOrderAngle = wasSliding ? undefined : TurnOnSlide.getWalkOrderAngle(escaper)
+
         escaper.enableSlide(true)
 
         if (!wasSliding) {
@@ -80,6 +84,19 @@ const initCheckTerrainTrigger = () => {
         // after the half turn: the orders right behind it must not undo it
         if (hasTurnedHeroHalfATurn) {
             TurnOnSlide.markSlideDirectionSwitch(escaper)
+        }
+
+        // In "-autoTurn asyncClicks", a hero walking onto a slide becomes an effect, and the click it was walking to
+        // was lost with the order: it slid on as its unit happened to face. It turns towards that click now, aimed as
+        // its player aimed it, as a click made on the slide would turn it: by the machine moving the effect, which
+        // tells the others. A reverse slide turns the hero half a turn instead, and is left to it.
+        if (
+            walkOrderAngle !== undefined &&
+            escaper.getSlideSpeed() > 0 &&
+            getAutoTurnMode(escaper.getId()) === 'asyncClicks' &&
+            escaper.isAsyncControlledHere()
+        ) {
+            TurnOnSlide.turnSliderToDirection(escaper, walkOrderAngle, null, true)
         }
     }
 

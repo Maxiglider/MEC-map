@@ -85,6 +85,46 @@ const initTurnOnSlide = () => {
         )
     }
 
+    /**
+     * The last order a hero was given while walking, by escaper id: which order, and the angle towards its target
+     * from where the hero stood when its player clicked. A hero walking onto a slide is stopped there (see
+     * Escaper.enableSlide), which drops that order and the turn it was making towards it: see
+     * getWalkOrderAngle. Kept on every machine alike, from the order events every machine hears.
+     */
+    const walkOrderIds: number[] = []
+    const walkOrderAngles: number[] = []
+
+    const rememberWalkOrder = (triggerIsToLocation: boolean) => {
+        const hero = Natives.UGetTriggerUnit()
+        const escaper = Hero2Escaper(hero)
+
+        if (!escaper) {
+            return
+        }
+
+        const targetX = triggerIsToLocation ? GetOrderPointX() : GetWidgetX(Natives.UGetOrderTarget())
+        const targetY = triggerIsToLocation ? GetOrderPointY() : GetWidgetY(Natives.UGetOrderTarget())
+
+        walkOrderIds[escaper.getId()] = GetIssuedOrderId()
+        walkOrderAngles[escaper.getId()] =
+            Atan2(targetY - escaper.getHeroY(), targetX - escaper.getHeroX()) * bj_RADTODEG
+    }
+
+    /**
+     * The angle of the order this hero is still walking to, as its player aimed it when clicking, or undefined
+     * once it stopped or took another order. To be asked before the slide stops the unit.
+     */
+    const getWalkOrderAngle = (escaper: Escaper) => {
+        const hero = escaper.getHero()
+        const orderId = walkOrderIds[escaper.getId()]
+
+        if (!hero || orderId === undefined || GetUnitCurrentOrder(hero) !== orderId) {
+            return undefined
+        }
+
+        return walkOrderAngles[escaper.getId()]
+    }
+
     /** The way each drunk hero swayed last, for the turns only its own machine asks for */
     const drunkLocalSways: boolean[] = []
 
@@ -322,6 +362,23 @@ const initTurnOnSlide = () => {
             actions: [() => HandleTurn(false)],
         })
 
+        // the orders of a walking hero, for when it steps onto a slide (see getWalkOrderAngle)
+        createEvent({
+            events: [t => TriggerRegisterAnyUnitEventBJ(t, EVENT_PLAYER_UNIT_ISSUED_POINT_ORDER)],
+            conditions: [
+                () => IsHero(Natives.UGetTriggerUnit()) && !Hero2Escaper(Natives.UGetTriggerUnit())?.isSliding(),
+            ],
+            actions: [() => rememberWalkOrder(true)],
+        })
+
+        createEvent({
+            events: [t => TriggerRegisterAnyUnitEventBJ(t, EVENT_PLAYER_UNIT_ISSUED_TARGET_ORDER)],
+            conditions: [
+                () => IsHero(Natives.UGetTriggerUnit()) && !Hero2Escaper(Natives.UGetTriggerUnit())?.isSliding(),
+            ],
+            actions: [() => rememberWalkOrder(false)],
+        })
+
         //drunk mode
         forRange(Constants.NB_ESCAPERS, i => (udg_drunk[i] = INITIAL_DRUNK))
 
@@ -339,6 +396,7 @@ const initTurnOnSlide = () => {
         init_ToTurnOnSlide,
         turnSliderToDirection,
         markSlideDirectionSwitch,
+        getWalkOrderAngle,
     }
 }
 
