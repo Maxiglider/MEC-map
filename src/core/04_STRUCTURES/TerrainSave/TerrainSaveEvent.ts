@@ -216,11 +216,9 @@ export class TerrainSaveEvent {
             // - action === 'apply' with no such mechanism left would apply and never get unapplied again -
             //   stays locked forever instead, so a repeat touch can't just keep re-applying it for nothing.
             if (this.periodicInterval === undefined && this.duration === undefined) {
-                if (
-                    this.condition.kind !== 'monsterTouch' ||
-                    this.action === 'unapply' ||
-                    this.onLvlEnd === 'unapply'
-                ) {
+                // (onLvlEnd === 'unapply' used to be released here too, against the comment above: the touched mob
+                // was hidden and shown again at once - Denmark Slide's circles of power, user's report, 2026-09-25)
+                if (this.condition.kind !== 'monsterTouch' || this.action === 'unapply') {
                     this.setRunning(false)
                 }
             }
