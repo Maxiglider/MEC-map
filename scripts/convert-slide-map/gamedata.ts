@@ -1127,7 +1127,8 @@ const nearestMonster = (from: Json, candidates: Json[]) => {
 }
 
 // portalsFromMonsterTypes: { "<entry type>": "<exit type>" | ["<exit type>", …] | { to, effect, effectDuration,
-// freezeDuration, oneWay } }
+// freezeDuration, freezeDurationByLevel, oneWay } } - freezeDurationByLevel: { "<level index>": seconds }, the hold on
+// arrival of some levels over freezeDuration's (Denmark Slide's first level holds nobody)
 // Every monster of the entry type becomes a portal to the nearest monster of the exit types in its level, which is
 // what an old map's teleporter trigger looks for ("the nearest TP_Target of the map", and only the current level's
 // monsters exist while it is played). Entries and exits may move (Alpha Slide's snowmen, moving teleport targets): a
@@ -1160,7 +1161,7 @@ for (const [entryLabel, rawOptions] of Object.entries((spec.portalsFromMonsterTy
             levelPortals[i].push({
                 triggerMobId: entry.id,
                 targetMobId: exit.id,
-                freezeDuration: options.freezeDuration ?? 0,
+                freezeDuration: options.freezeDurationByLevel?.[i] ?? options.freezeDuration ?? 0,
                 portalEffect: options.effect ?? null,
                 portalEffectDuration: options.effectDuration ?? 0,
                 oneWay: options.oneWay !== false,
