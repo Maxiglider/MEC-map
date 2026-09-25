@@ -23,6 +23,7 @@ import { initAsyncHeroSync } from '../08_GAME/Contact/AsyncHeroSync'
 import { initContactCheck } from '../08_GAME/Contact/ContactCheck'
 import { initMortarSplash } from '../08_GAME/Death/MortarSplash'
 import { init_Trig_Allways_day } from '../08_GAME/Init_game/Allways_day'
+import { initAsyncSlideQuest } from '../08_GAME/Init_game/Async_slide_quest'
 import { init_Heroes } from '../08_GAME/Init_game/Heroes'
 import { initNoSelectionCircle } from '../08_GAME/Init_game/No_selection_circle'
 import { initSelectUnit } from '../08_GAME/select_unit'
@@ -37,6 +38,7 @@ import { init_dataFromWorleditor } from './init_dataFromWorleditor'
 import { initOldTriggers } from './init_old_triggers'
 
 export const initializers = () => {
+    initAsyncSlideQuest() // first of all, so that it comes before every other quest of the map
     init_globals()
     // startDesyncProbeAtGameStart() // first: a desync at the start of a game comes before any command
     init_dataFromWorleditor()
