@@ -7,7 +7,7 @@ const Y = '|cffffcc00'
 const R = '|r'
 
 const DESCRIPTION = [
-    `Your hero can now slide in ${Y}async${R} mode: your own machine moves it, without waiting for the network.`,
+    `Your hero can now slide in ${Y}async${R} mode: your own machine moves it, without waiting for the network. Feature brought by MEC core v2.3.`,
     '',
     '|cff00ff00Advantages|r',
     '- No delay: your hero turns the very moment you ask it to.',
