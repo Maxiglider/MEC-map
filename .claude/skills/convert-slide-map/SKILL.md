@@ -110,6 +110,7 @@ Region names are the old ones without `gg_rct_`. Model a new spec on Polar Escap
 - `safeStarts.shrink`: `false` keeps the level starts as they are (the default for a MEC 1 map), checking only that none holds a death tile.
 - `customTriggers`: the Lua files to bake.
 - `legacyQuests`: `{ "drop": [titles] }`: the old map's quests (its `CreateQuestBJ` calls, texts resolved), in the trigger "Original map legacy quests", created before MEC's own (in `onGlobalInit`, which runs before MEC's map initialization triggers). Drop what is obsolete in MEC, such as quests listing the old map's commands. `replaceText`: `{ title: new text }`, for a quest whose text holds personal data the user chose to take out (see step 3).
+- `baseQuestTexts`: `{ "<title of a base map quest>": { "prepend": "<line>" } }`, a line put first in the description of one of the MEC base map's own quests (Alpha Slide: `Type "Sliding ftw!" for a surprise!` at the top of "Some QoL Commands", announcing its secret phrase). The quest is found by its title, its description by the `CreateQuestBJ` of the base map's `war3map.lua`.
 - `gameData`: overrides of the base map's game data settings. `coopModeChoice: false` (core `8da3d1f4`): no coop or solo popup at the start, the game is solo (Polar Escape 3 requires solo).
 - `graphicsModes`: `"SD"`, `"HD"` or `"both"`, the graphics the map supports. By default a map made before Reforged (map info format below 31) is set to SD only, as it was made for: its models may play differently in HD (Polar Escape 3's bridges toggle in HD).
 

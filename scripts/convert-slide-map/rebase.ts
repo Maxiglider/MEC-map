@@ -464,6 +464,32 @@ if (spec.mecOne) {
     )
 }
 
+// baseQuestTexts: { "<title of a base map quest>": { "prepend": "<line>" } }, a line of the converted map's own put
+// first in one of the base map's quests (Alpha Slide's secret phrase, announced in "Some QoL Commands"). The quest is
+// found by its title's string, and its description is the string its CreateQuestBJ gives after that title.
+{
+    const baseLua = baseBytes('war3map.lua').toString('utf8')
+    for (const [title, change] of Object.entries((spec.baseQuestTexts ?? {}) as { [title: string]: any })) {
+        if (title.startsWith('$')) continue
+        const escapedTitle = title.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+        const titleId = new RegExp(`STRING (\\d+)\\r?\\n(?://[^\\n]*\\n)?\\{\\r?\\n${escapedTitle}\\r?\\n\\}`).exec(
+            wts
+        )?.[1]
+        const titleRef = titleId && `TRIGSTR_${titleId.padStart(3, '0')}`
+        const descriptionId =
+            titleRef && new RegExp(`CreateQuestBJ\\([^,]+,\\s*"${titleRef}",\\s*"TRIGSTR_0*(\\d+)"`).exec(baseLua)?.[1]
+        if (!descriptionId) throw new Error(`baseQuestTexts: no quest "${title}" in the base map`)
+
+        const description = new RegExp(`(STRING ${descriptionId}\\r?\\n(?://[^\\n]*\\n)?\\{\\r?\\n)`)
+        if (!description.test(wts))
+            throw new Error(`baseQuestTexts: the description of "${title}" is not in war3map.wts`)
+        if (typeof change.prepend === 'string') {
+            wts = wts.replace(description, (_all, head) => `${head}${change.prepend}\r\n`)
+            log.push(`- \`war3map.wts\`: the base map's quest "${title}" starts with "${change.prepend}"`)
+        }
+    }
+}
+
 set('war3map.wts', wts, 'the strings above')
 
 // 3. the map info: fixed-size fields patched in place, the rest of the base map's own format kept
