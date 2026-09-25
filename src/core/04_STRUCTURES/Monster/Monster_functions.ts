@@ -152,7 +152,9 @@ export const NewImmobileMonster = (
     disableAttack = true
 ): unit => {
     let p: player
-    if (mt.isClickable()) {
+    // A hero unit never goes to a player of the rotation, which takes in the real ones: the player it fell on got its
+    // hero icon, from the level starting to its end (Denmark Slide's Illidan of level 2, user's report, 2026-09-25)
+    if (mt.isClickable() || IsHeroUnitId(mt.getUnitTypeId())) {
         p = Constants.ENNEMY_PLAYER
     } else {
         p = GetCurrentMonsterPlayer()
