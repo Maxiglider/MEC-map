@@ -10,6 +10,22 @@ let dialBoutonAppuye: boolean
 const DIAL_TIME_TO_ANSWER = 10
 let dialTimerTempLimite: timer
 
+/**
+ * A dialog closing gives the player their hands back, the camera's arrow keys included, even during a cinematic: the
+ * first player could move the camera through a map's intro once they had chosen coop or solo (Murloc Slide 2, user's
+ * report, 2026-09-25). So once the dialog is gone, a cinematic playing gets its locked control back, at once and on
+ * the next frame, when the engine's own hand back comes. Local state only, the same on every machine: no desync.
+ */
+const keepCinematicControl = () => {
+    const lock = () => {
+        if (bj_cineModeAlreadyIn) {
+            EnableUserControl(false)
+        }
+    }
+    lock()
+    createTimer(0, false, lock)
+}
+
 /** The mode chosen for everybody, told to the hooks */
 const runModeSelectionHooks = () => {
     if (!!hooks.hooks_onModeSelection) {
@@ -40,6 +56,7 @@ export const InitTrig_creation_dialogue = () => {
                 () => {
                     globals.coopModeActive = GetClickedButton() === btnChoixCoop
                     dialBoutonAppuye = true
+                    keepCinematicControl()
                     if (globals.coopModeActive) {
                         DisplayTextToForce(Natives.UGetPlayersAll(), 'Coop mode chosen by first player')
                     } else {
@@ -93,6 +110,7 @@ export const gg_trg_apparition_dialogue_et_fermeture_automatique = createEvent({
             TimerStart(dialTimerTempLimite, DIAL_TIME_TO_ANSWER, false, () => {
                 if (!dialBoutonAppuye) {
                     DialogDisplay(udg_joueurDialogue, dialChoixModeCoop, false)
+                    keepCinematicControl()
                     if (globals.coopModeActive) {
                         DisplayTextToForce(Natives.UGetPlayersAll(), 'Coop mode automatically chosen')
                     } else {
