@@ -1869,6 +1869,11 @@ const legacyQuests = spec.legacyQuests
           .filter(q => q.title !== undefined && !(spec.legacyQuests.drop ?? []).includes(q.title))
           // personal data the user chose to take out (legacyQuests.replaceText: title → new text)
           .map(q => ({ ...q, text: spec.legacyQuests.replaceText?.[q.title!] ?? q.text }))
+          // requirements to change (legacyQuests.replaceItems: title → { old requirement: new one }): a dead link
+          .map(q => ({
+              ...q,
+              items: q.items.map(item => spec.legacyQuests.replaceItems?.[q.title!]?.[item] ?? item),
+          }))
     : []
 
 const questsCode = legacyQuests.length
