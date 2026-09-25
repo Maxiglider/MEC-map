@@ -123,7 +123,7 @@ export const cameraFieldMap: { [x: string]: camerafield } = {
     LOCAL_ROLL: CAMERA_FIELD_LOCAL_ROLL,
 }
 
-// For -autoTurn and -testAsyncClicks commands
+// For -slideMode and -testAsyncClicks commands
 
 /**
  * What the asynchronous slide costs, switched on and off with the modes that ask for it.
@@ -146,7 +146,7 @@ export const updateAsyncNeeds = (escaper: Escaper) => {
 }
 
 /**
- * Gives every player the default auto turn mode (see DEFAULT_AUTO_TURN_MODE), exactly as "-autoTurn"
+ * Gives every player the default auto turn mode (see DEFAULT_AUTO_TURN_MODE), exactly as "-slideMode"
  * would: called at the start of the game, on every machine at once. A player can still change it,
  * by hand or with their start commands.
  */

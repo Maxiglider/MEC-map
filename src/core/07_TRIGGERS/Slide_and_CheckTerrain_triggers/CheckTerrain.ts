@@ -86,7 +86,7 @@ const initCheckTerrainTrigger = () => {
             TurnOnSlide.markSlideDirectionSwitch(escaper)
         }
 
-        // In "-autoTurn asyncClicks", a hero walking onto a slide becomes an effect, and the click it was walking to
+        // In "-slideMode asyncClicks", a hero walking onto a slide becomes an effect, and the click it was walking to
         // was lost with the order: it slid on as its unit happened to face. It turns towards that click now, aimed as
         // its player aimed it, as a click made on the slide would turn it: by the machine moving the effect, which
         // tells the others. A reverse slide turns the hero half a turn instead, and is left to it.

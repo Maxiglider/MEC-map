@@ -203,7 +203,7 @@ export class Escaper extends EscaperMake {
     private contactStopTime: number | undefined = undefined
     /** Sequence of the last packet applied, so that a late one cannot undo a newer one */
     private lastAsyncSequence = 0
-    /** Set by the "-autoTurn async" mode: this hero slides as an effect */
+    /** Set by the "-slideMode async" mode: this hero slides as an effect */
     private isAsyncSlideEnabled = false
     /** os.clock() of the last packet received about this hero, to notice its owner going quiet */
     private lastAsyncPacketTime = 0
@@ -2612,7 +2612,7 @@ export class Escaper extends EscaperMake {
     isHeroAsEffect = () => this.isHeroEffectActive
 
     /**
-     * Whether this hero is meant to slide as an effect, which the "-autoTurn async" mode decides.
+     * Whether this hero is meant to slide as an effect, which the "-slideMode async" mode decides.
      * Kept here rather than read from that mode, so that the hand over belongs to the sliding
      * state itself and happens wherever that state changes.
      */
@@ -2894,7 +2894,7 @@ export class Escaper extends EscaperMake {
 
         // The unit takes back the place every machine agrees the effect had led it to. The packet that
         // ends a slide sets that place on all of them; a hand back no packet brings - a change of
-        // -autoTurn mode, a level restart - leaves the unit where the packets had carried it. Never
+        // -slideMode mode, a level restart - leaves the unit where the packets had carried it. Never
         // heroPos: that is where this machine sees the effect, turned by a cursor its owner alone
         // knows, and a unit given its facing or its place from it stands differently on each machine.
         SetUnitX(this.hero, this.syncedHeroPos.x)

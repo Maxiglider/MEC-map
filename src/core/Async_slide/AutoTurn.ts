@@ -50,7 +50,7 @@ export const isAsyncAutoTurnMode = (mode: AutoTurnMode) => mode === 'async' || m
 /** The modes where the hero keeps following the cursor while steering, handed over and taken back by the clicks */
 export const isCursorFollowingAutoTurnMode = (mode: AutoTurnMode) => mode === 'sync' || mode === 'async'
 
-/** The mode every player starts the game with, as if each had typed "-autoTurn" with it (see applyDefaultAutoTurnMode) */
+/** The mode every player starts the game with, as if each had typed "-slideMode" with it (see applyDefaultAutoTurnMode) */
 export const DEFAULT_AUTO_TURN_MODE: AutoTurnMode = 'asyncClicks'
 
 const modes: { [escaperId: number]: AutoTurnMode } = {}

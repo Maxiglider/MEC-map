@@ -314,7 +314,7 @@ const initTurnOnSlide = () => {
             return
         }
 
-        // A hero sliding as an effect ("-autoTurn async" or "asyncClicks") is turned by the machine of its
+        // A hero sliding as an effect ("-slideMode async" or "asyncClicks") is turned by the machine of its
         // player alone, from the cursor or at the press of the click, a latency before this order reaches
         // every machine: turning it again from here would aim it from where it is by then. Whether the hero
         // slides as an effect is known alike on every machine, so all of them leave it alone; the click is

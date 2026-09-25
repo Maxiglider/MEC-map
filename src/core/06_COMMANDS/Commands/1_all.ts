@@ -28,7 +28,7 @@ import { TurnOnSlide } from '../../07_TRIGGERS/Slide_and_CheckTerrain_triggers/T
 import { Apm } from '../../08_GAME/Apm_clics_par_minute/Apm'
 import { Cpm } from '../../08_GAME/Apm_clics_par_minute/Cpm'
 import { Globals } from '../../09_From_old_Worldedit_triggers/globals_variables_and_triggers'
-import { AUTO_TURN_MODES, AutoTurnMode, getAutoTurnMode, setAutoTurnMode } from '../../Async_slide/AutoTurn'
+import { AutoTurnMode, getAutoTurnMode, setAutoTurnMode } from '../../Async_slide/AutoTurn'
 import { isTestingAsyncClicks, setTestAsyncClicks } from '../../Async_slide/HeroEffect'
 import { setSlideTurnDebugEnabled } from '../../Async_slide/SlideTurnDebug'
 import { PRESS_TIME_TO_ENABLE_FOLLOW_MOUSE } from '../../Follow_mouse/Follow_mouse'
@@ -36,6 +36,22 @@ import { GetStringAssignedFromCommand, KeyboardShortcut } from '../../Keyboard_s
 import { Natives } from '../../wc3_natives_unsecured/Natives'
 import { glowCb, isPlayerId, resolvePlayerId, resolvePlayerIds, USAGE } from '../Helpers/Command_functions'
 import { cameraFieldMap, updateAsyncNeeds } from '../Helpers/commands-helpers'
+
+/**
+ * The choices of -slideMode, aliases included. The sync mode (the cursor read through the network) is no longer one
+ * of them, and the mode "off" is offered as "legacy": the slide as it always was.
+ */
+const SLIDE_MODE_OPTIONS: { [option: string]: AutoTurnMode } = {
+    async: 'async',
+    a: 'async',
+    asyncclicks: 'asyncClicks',
+    ac: 'asyncClicks',
+    legacy: 'off',
+    l: 'off',
+}
+
+/** A mode as -slideMode names it */
+const slideModeName = (mode: AutoTurnMode) => (mode === 'off' ? 'legacy' : mode)
 
 /** -toggle: the boolean each escaper's commands get next, by command (true the first time) */
 const toggleStates: { [escaperId: number]: { [command: string]: boolean } } = {}
@@ -1977,28 +1993,29 @@ export const initCommandAll = () => {
         },
     })
 
-    //-autoTurn(at) async|asyncClicks|sync|off   --> steers the hero towards the mouse while sliding
+    //-slideMode(sm) [async|a|asyncClicks|ac|legacy|l]   --> how the hero is steered while sliding
     registerCommand({
-        name: 'autoTurn',
-        alias: ['at'],
+        name: 'slideMode',
+        alias: ['sm'],
         group,
-        argDescription: 'async | asyncClicks | sync | off',
+        argDescription: '[async|a|asyncClicks|ac|legacy|l]',
         description:
-            'Turns the hero towards the mouse while sliding: async is instant, sync goes through the network. asyncClicks does not follow the mouse: the hero turns towards your right clicks, at once',
+            'How your hero is steered while sliding. async: your own machine moves it, and it follows your mouse in real time (right click to start steering, left click to stop). asyncClicks (the default): your own machine moves it, and it turns towards your right clicks at once. legacy: the slide as it always was, through the network. Without a value, tells the current mode',
         cb: ({ param1 }, escaper) => {
             if (param1.length === 0) {
-                Text.mkP(escaper.getPlayer(), `Auto turn is ${getAutoTurnMode(escaper.getId())}`)
+                Text.mkP(escaper.getPlayer(), `Slide mode: ${slideModeName(getAutoTurnMode(escaper.getId()))}`)
                 return true
             }
 
-            if (AUTO_TURN_MODES.indexOf(param1 as AutoTurnMode) < 0) {
-                Text.erP(escaper.getPlayer(), USAGE + '-autoTurn async|asyncClicks|sync|off')
+            const mode = SLIDE_MODE_OPTIONS[param1.toLowerCase()]
+            if (!mode) {
+                Text.erP(escaper.getPlayer(), USAGE + '-slideMode async|a|asyncClicks|ac|legacy|l')
                 return true
             }
 
-            setAutoTurnMode(escaper.getId(), param1 as AutoTurnMode)
+            setAutoTurnMode(escaper.getId(), mode)
             updateAsyncNeeds(escaper)
-            Text.mkP(escaper.getPlayer(), `Auto turn ${param1}`)
+            Text.mkP(escaper.getPlayer(), `Slide mode: ${slideModeName(mode)}`)
 
             return true
         },
