@@ -1,12 +1,17 @@
 import { Constants } from 'core/01_libraries/Constants'
 import { MemoryHandler } from 'Utils/MemoryHandler'
 import { Timer } from 'w3ts'
-import { getUdgEscapers, udg_monsters } from '../../../../globals'
+import { udg_monsters } from '../../../../globals'
 import { ServiceManager } from '../../../Services'
-import { GetUnitZEx } from '../../../Utils/LocationUtils'
+import { GetLocZ } from '../../../Utils/LocationUtils'
 import { createTimer } from '../../../Utils/mapUtils'
 import { ColorString2Id } from '../../01_libraries/Init_colorCodes'
 import { IsColorString } from '../../06_COMMANDS/Helpers/Command_functions'
+import {
+    collisionLandmarkZOffset,
+    createCollisionLandmark,
+    destroyCollisionLandmark,
+} from '../../07_TRIGGERS/CollisionLandmarks/CollisionLandmarkEffect'
 import { refreshMortarSensor, removeMortarSensor } from '../../08_GAME/Death/MortarSplash'
 import { hooks } from '../../API/GeneralHooks'
 import { CombineHooks } from '../../API/MecHookArray'
@@ -398,43 +403,36 @@ export abstract class Monster {
     }
 
     refreshCollisionLandmark = () => {
-        const localEscaper = getUdgEscapers().get(GetPlayerId(Natives.UGetLocalPlayer()))
-        const displayCollisionLandmark = localEscaper?.getDisplayCollisionLandmarks() ?? false
-
         if (this.collisionLandmarkEffect) {
-            BlzSetSpecialEffectScale(this.collisionLandmarkEffect, 0) // hide it because an effect doesn't visually instanstly disappear on destroy
-            DestroyEffect(this.collisionLandmarkEffect)
+            destroyCollisionLandmark(this.collisionLandmarkEffect)
             delete this.collisionLandmarkEffect
         }
 
         if (this.u && IsUnitAliveBJ(this.u) && !this.isDisabledB && !this.isDeleted() && !IsUnitHidden(this.u)) {
-            this.collisionLandmarkEffect = AddSpecialEffect(
-                Constants.COLLISION_LANDMARK_MODEL,
-                GetUnitX(this.u),
-                GetUnitY(this.u)
-            )
-            if (!this.collisionLandmarkEffect) {
-                throw new Error("Couldn't create collision landmark effect")
-            }
-            // const scale = 1024 / Constants.COLLISION_LANDMARK_MODEL_BASE_RADIUS
             // getMonsterType(), not this.mt: a caster has none of its own and answers with the one it shoots from
-            const scale =
-                (this.getMonsterType()?.getImmolationRadius() ?? 0) / Constants.COLLISION_LANDMARK_MODEL_BASE_RADIUS
-            BlzSetSpecialEffectScale(this.collisionLandmarkEffect, scale)
-
-            if (!displayCollisionLandmark) {
-                BlzSetSpecialEffectAlpha(this.collisionLandmarkEffect, 0)
-            }
+            const radius = this.getMonsterType()?.getImmolationRadius() ?? 0
+            this.collisionLandmarkEffect = createCollisionLandmark(GetUnitX(this.u), GetUnitY(this.u), radius)
+            this.landmarkZOffset = collisionLandmarkZOffset(radius)
+            // not placed yet: the next move places it whatever these are
+            this.landmarkX = NaN
         }
     }
+
+    /** How far below its unit the landmark stands, so that its circle lies at the unit's feet */
+    private landmarkZOffset = 0
+    /** Where the landmark was last placed: most monsters do not move, and theirs need not be placed again */
+    private landmarkX = NaN
+    private landmarkY = NaN
+    private landmarkFlyHeight = NaN
 
     /** Whether the landmark was last built for a hidden unit, so the change is noticed without rebuilding it */
     private landmarkWasHidden = false
 
-    moveCollisionLandmark = () => {
+    refreshCollisionLandmarkIfHiddenChanged = () => {
         // A map's own trigger may hide a monster and show it again - Slide Is Magic swaps a mage for the animal it
         // turns into - and the contact check skips a hidden unit, so its landmark has no business standing there.
-        // Nothing tells us when that happens, so the change is noticed here, where every monster is walked anyway.
+        // Nothing tells us when that happens, so the change is noticed by a walk of every monster, on every machine
+        // alike since it makes and drops landmarks.
         if (this.u) {
             const hidden = IsUnitHidden(this.u)
             if (hidden !== this.landmarkWasHidden) {
@@ -442,14 +440,30 @@ export abstract class Monster {
                 this.refreshCollisionLandmark()
             }
         }
+    }
 
-        if (this.collisionLandmarkEffect && this.u) {
-            const z =
-                GetUnitZEx(this.u) -
-                (Constants.COLLISION_LANDMARK_MODEL_BASE_HEIGHT * (this.getMonsterType()?.getImmolationRadius() ?? 0)) /
-                    Constants.COLLISION_LANDMARK_MODEL_BASE_RADIUS
-            BlzSetSpecialEffectPosition(this.collisionLandmarkEffect, GetUnitX(this.u), GetUnitY(this.u), z)
+    /** Local: run only where the landmarks are shown */
+    moveCollisionLandmark = () => {
+        if (!this.collisionLandmarkEffect || !this.u) {
+            return
         }
+
+        const x = GetUnitX(this.u)
+        const y = GetUnitY(this.u)
+        const flyHeight = GetUnitFlyHeight(this.u)
+        if (x === this.landmarkX && y === this.landmarkY && flyHeight === this.landmarkFlyHeight) {
+            return
+        }
+        this.landmarkX = x
+        this.landmarkY = y
+        this.landmarkFlyHeight = flyHeight
+
+        BlzSetSpecialEffectPosition(
+            this.collisionLandmarkEffect,
+            x,
+            y,
+            GetLocZ(x, y) + flyHeight - this.landmarkZOffset
+        )
     }
 
     delete = () => {

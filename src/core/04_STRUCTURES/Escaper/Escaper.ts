@@ -15,6 +15,10 @@ import { EncodingBase64 } from '../../../Utils/SaveLoad/TreeLib/EncodingBase64'
 import { createEvent, createTimer, errorHandler, runInTrigger } from '../../../Utils/mapUtils'
 import { RunSoundAtPoint, RunSoundOnUnit } from '../../02_bibliotheques_externes/SoundUtils'
 import { BlzColor2Id, removeHash } from '../../06_COMMANDS/Helpers/Command_functions'
+import {
+    createCollisionLandmark,
+    destroyCollisionLandmark,
+} from '../../07_TRIGGERS/CollisionLandmarks/CollisionLandmarkEffect'
 import { refreshTrigMoveCollisionLandmarks } from '../../07_TRIGGERS/CollisionLandmarks/MoveCollisionLandmarks'
 import { CheckTerrainTrigger } from '../../07_TRIGGERS/Slide_and_CheckTerrain_triggers/CheckTerrain'
 import { SlideTrigger } from '../../07_TRIGGERS/Slide_and_CheckTerrain_triggers/Slide'
@@ -3259,30 +3263,13 @@ export class Escaper extends EscaperMake {
      * Display or not collision landmark for all players according to their choice, and resize it according to collision size
      */
     refreshCollisionLandmark = () => {
-        const localEscaper = getUdgEscapers().get(GetPlayerId(Natives.UGetLocalPlayer()))
-        const displayCollisionLandmark = localEscaper?.displayCollisionLandmarks ?? false
-
         if (this.collisionLandmarkEffect) {
-            BlzSetSpecialEffectScale(this.collisionLandmarkEffect, 0) // hide it because an effect doesn't visually instanstly disappear on destroy
-            DestroyEffect(this.collisionLandmarkEffect)
+            destroyCollisionLandmark(this.collisionLandmarkEffect)
             delete this.collisionLandmarkEffect
         }
 
         if (this.hero) {
-            this.collisionLandmarkEffect = AddSpecialEffect(
-                Constants.COLLISION_LANDMARK_MODEL,
-                this.getHeroX(),
-                this.getHeroY()
-            )
-            if (!this.collisionLandmarkEffect) {
-                throw new Error("Couldn't create collision landmark effect")
-            }
-            const scale = this.collisionSize / Constants.COLLISION_LANDMARK_MODEL_BASE_RADIUS
-            BlzSetSpecialEffectScale(this.collisionLandmarkEffect, scale)
-
-            if (!displayCollisionLandmark) {
-                BlzSetSpecialEffectAlpha(this.collisionLandmarkEffect, 0)
-            }
+            this.collisionLandmarkEffect = createCollisionLandmark(this.getHeroX(), this.getHeroY(), this.collisionSize)
         }
     }
 

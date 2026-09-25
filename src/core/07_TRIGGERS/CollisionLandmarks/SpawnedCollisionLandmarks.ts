@@ -1,7 +1,6 @@
-import { getUdgEscapers, udg_spawned_monster_units, udg_spawned_monsters } from '../../../../globals'
-import { GetUnitZEx } from '../../../Utils/LocationUtils'
-import { Constants } from '../../01_libraries/Constants'
-import { Natives } from '../../wc3_natives_unsecured/Natives'
+import { udg_spawned_monster_units, udg_spawned_monsters } from '../../../../globals'
+import { GetLocZ } from '../../../Utils/LocationUtils'
+import { collisionLandmarkZOffset, createCollisionLandmark, destroyCollisionLandmark } from './CollisionLandmarkEffect'
 
 /**
  * The collision landmarks of the units that have no Monster of their own: what a monster spawn puts on the map and
@@ -13,7 +12,7 @@ import { Natives } from '../../wc3_natives_unsecured/Natives'
  * reach is hardest to judge by eye.
  *
  * They are built and dropped here, from the same walk that moves the others, since a spawned unit appears and goes
- * without telling anyone. As for a monster, the effect is created on every machine and only its alpha is local:
+ * without telling anyone. As for a monster, the effect is created on every machine and only its model is local:
  * a handle made on one machine and not on another is what desyncs a game.
  *
  * Keyed by the registration number of the unit (udg_spawned_monster_units), never by its handle id. Lua recycles
@@ -25,17 +24,17 @@ import { Natives } from '../../wc3_natives_unsecured/Natives'
  */
 const landmarks: { [spawnedMonsterId: number]: effect } = {}
 
-const scaleOf = (radius: number) => radius / Constants.COLLISION_LANDMARK_MODEL_BASE_RADIUS
+/** How far below its unit each landmark stands, so that its circle lies at the unit's feet */
+const zOffsets: { [spawnedMonsterId: number]: number } = {}
 
 const drop = (spawnedMonsterId: number) => {
     const landmark = landmarks[spawnedMonsterId]
     if (!landmark) {
         return
     }
-    // hidden first: an effect does not visually disappear the instant it is destroyed
-    BlzSetSpecialEffectScale(landmark, 0)
-    DestroyEffect(landmark)
+    destroyCollisionLandmark(landmark)
     delete landmarks[spawnedMonsterId]
+    delete zOffsets[spawnedMonsterId]
 }
 
 export const destroySpawnedCollisionLandmarks = () => {
@@ -44,10 +43,8 @@ export const destroySpawnedCollisionLandmarks = () => {
     }
 }
 
-export const moveSpawnedCollisionLandmarks = () => {
-    const localEscaper = getUdgEscapers().get(GetPlayerId(Natives.UGetLocalPlayer()))
-    const displayed = localEscaper?.getDisplayCollisionLandmarks() ?? false
-
+/** Makes and drops the landmarks as their units come and go: run on every machine alike */
+export const refreshSpawnedCollisionLandmarks = () => {
     // the ones whose unit is gone: its number is cleared the moment it is unregistered or recycled
     for (const [spawnedMonsterId, _] of pairs(landmarks)) {
         if (!udg_spawned_monster_units[spawnedMonsterId]) {
@@ -69,28 +66,34 @@ export const moveSpawnedCollisionLandmarks = () => {
             continue
         }
 
-        let landmark = landmarks[spawnedMonsterId]
-
-        if (!landmark) {
-            const created = AddSpecialEffect(
-                Constants.COLLISION_LANDMARK_MODEL,
-                GetUnitX(spawnedUnit),
-                GetUnitY(spawnedUnit)
-            )
+        if (!landmarks[spawnedMonsterId]) {
+            const created = createCollisionLandmark(GetUnitX(spawnedUnit), GetUnitY(spawnedUnit), radius)
             if (!created) {
                 continue
             }
-            landmark = created
-            BlzSetSpecialEffectScale(landmark, scaleOf(radius))
-            landmarks[spawnedMonsterId] = landmark
+            landmarks[spawnedMonsterId] = created
+            zOffsets[spawnedMonsterId] = collisionLandmarkZOffset(radius)
+        }
+    }
+}
+
+/** Moves the landmarks onto their units: a local matter, run only where they are shown */
+export const moveSpawnedCollisionLandmarks = () => {
+    for (const [spawnedMonsterId, landmark] of pairs(landmarks)) {
+        const spawnedUnit = udg_spawned_monster_units[spawnedMonsterId]
+
+        // removed since the last refresh, which drops its landmark soon: it stays where it is until then
+        if (!spawnedUnit || GetUnitTypeId(spawnedUnit) === 0) {
+            continue
         }
 
-        BlzSetSpecialEffectAlpha(landmark, displayed ? 255 : 0)
+        const x = GetUnitX(spawnedUnit)
+        const y = GetUnitY(spawnedUnit)
         BlzSetSpecialEffectPosition(
             landmark,
-            GetUnitX(spawnedUnit),
-            GetUnitY(spawnedUnit),
-            GetUnitZEx(spawnedUnit) - Constants.COLLISION_LANDMARK_MODEL_BASE_HEIGHT * scaleOf(radius)
+            x,
+            y,
+            GetLocZ(x, y) + GetUnitFlyHeight(spawnedUnit) - zOffsets[spawnedMonsterId]
         )
     }
 }
