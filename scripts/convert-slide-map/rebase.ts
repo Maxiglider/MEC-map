@@ -583,7 +583,11 @@ const buildDate = [today.getFullYear(), today.getMonth() + 1, today.getDate()]
 const conversionNote = spec.mecOne
     ? `${buildDate} Map brought from MEC 1 to MEC 2 by Maximaxou with help of AI`
     : `${buildDate} Map converted to MEC by Maximaxou with help of AI`
-if (newCore) {
+// spec conversionNote: false leaves it out, for a map the note would misdescribe: Murloc Slide 2 was brought to
+// MEC 2 years before, by hand, and this conversion only restores what it lost (user's request, 2026-09-26)
+if (spec.conversionNote === false) {
+    log.push("- MEC's version quest: no conversion note (spec conversionNote: false)")
+} else if (newCore) {
     const description = /(QuestSetDescription\(q, ")([^"]*)(")/
     if (!description.test(newCore)) throw new Error(`No MEC version quest to note the conversion in: ${corePath}`)
     // two \n in the Lua string the core hands the quest, which makes one blank line between the paragraphs
