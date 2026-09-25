@@ -99,7 +99,13 @@ export class StaticSlide {
                 escaper.setLastTerrainType(undefined)
                 this.slidingPlayers.splice(itemIndex, 1)
 
-                escaper.setSlideSpeed(this.slidingPlayerPrevSpeed[escaper.getEscaperId()])
+                // the speed it was carried at, forward along the lane, not the one it had before: the terrain it is
+                // let go on then decides as it would for a hero arriving there, and a reverse slide turns it half a
+                // turn so that it goes on its way. With the speed of before, a hero that came in on a reverse slide
+                // and was let go on another one went back where it came from - into the entry of the lane the other
+                // way, and so on for ever (Denmark Slide's level 2, user's report, 2026-09-25). MEC 1's own lanes
+                // did as this does: they stopped the slide of the hero they carried.
+                escaper.setSlideSpeed(this.speed)
 
                 if (!escaper.isAlive()) {
                     escaper.enableSlide(false)
@@ -242,6 +248,12 @@ export class StaticSlide {
 
         arrayPush(this.slidingPlayers, escaper.getEscaperId())
         escaper.setStaticSliding(this)
+
+        // The lane decides where the hero goes: the turn order it was following before is forgotten. Kept, a
+        // reverse slide at the exit turned the unit of a hero back towards that order, half a turn added
+        // (Escaper.reverse), and one that came in backwards on a reverse slide went back into the lane the other
+        // way (Denmark Slide's level 2, legacy slide, user's report, 2026-09-25)
+        escaper.setSlideLastAngleOrder(-1)
 
         if (this.canTurnAngle) {
             const currentAngle = escaper.getHeroFacing()
