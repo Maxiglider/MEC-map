@@ -1127,8 +1127,9 @@ const nearestMonster = (from: Json, candidates: Json[]) => {
 }
 
 // portalsFromMonsterTypes: { "<entry type>": "<exit type>" | ["<exit type>", …] | { to, effect, effectDuration,
-// freezeDuration, freezeDurationByLevel, oneWay } } - freezeDurationByLevel: { "<level index>": seconds }, the hold on
-// arrival of some levels over freezeDuration's (Denmark Slide's first level holds nobody)
+// freezeDuration, freezeDurationByLevel, freezeDurationAt, oneWay } } - freezeDurationByLevel: { "<level index>": seconds },
+// the hold on arrival of some levels over freezeDuration's (Denmark Slide's first level holds nobody); freezeDurationAt:
+// [{ level, x, y, freezeDuration }], the hold of one portal, whose entry starts within 64 of x, y, over both
 // Every monster of the entry type becomes a portal to the nearest monster of the exit types in its level, which is
 // what an old map's teleporter trigger looks for ("the nearest TP_Target of the map", and only the current level's
 // monsters exist while it is played). Entries and exits may move (Alpha Slide's snowmen, moving teleport targets): a
@@ -1161,7 +1162,13 @@ for (const [entryLabel, rawOptions] of Object.entries((spec.portalsFromMonsterTy
             levelPortals[i].push({
                 triggerMobId: entry.id,
                 targetMobId: exit.id,
-                freezeDuration: options.freezeDurationByLevel?.[i] ?? options.freezeDuration ?? 0,
+                freezeDuration:
+                    ((options.freezeDurationAt ?? []) as Json[]).find(
+                        at => at.level === i && Math.hypot(pathOf(entry)[0].x - at.x, pathOf(entry)[0].y - at.y) <= 64
+                    )?.freezeDuration ??
+                    options.freezeDurationByLevel?.[i] ??
+                    options.freezeDuration ??
+                    0,
                 portalEffect: options.effect ?? null,
                 portalEffectDuration: options.effectDuration ?? 0,
                 oneWay: options.oneWay !== false,
