@@ -51,7 +51,7 @@ export const isAsyncAutoTurnMode = (mode: AutoTurnMode) => mode === 'async' || m
 export const isCursorFollowingAutoTurnMode = (mode: AutoTurnMode) => mode === 'sync' || mode === 'async'
 
 /** The mode every player starts the game with, as if each had typed "-autoTurn" with it (see applyDefaultAutoTurnMode) */
-export const DEFAULT_AUTO_TURN_MODE: AutoTurnMode = 'async'
+export const DEFAULT_AUTO_TURN_MODE: AutoTurnMode = 'asyncClicks'
 
 const modes: { [escaperId: number]: AutoTurnMode } = {}
 /** The mode says where the cursor is read, this says whether the hero is being steered right now */
