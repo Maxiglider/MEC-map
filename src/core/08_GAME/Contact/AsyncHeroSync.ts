@@ -287,12 +287,12 @@ export const initAsyncHeroSync = () => {
  * The contacts the machine of an async hero stopped its effect for, sure that they kill it: by escaper
  * id, then by contact. This machine only. Each one is let go when it comes back from the network, and
  * the effect moves on again once none is left and none of them killed it (see
- * Escaper.stopHeroEffectForContact). Plain tables made once per hero, never from the shared pool.
+ * Escaper.stopHeroEffectForContact). Plain tables made once per hero and kind, never from the shared pool.
+ *
+ * By kind, then by id: never one number made of both, which Warcraft III's Lua cannot hold exactly (see the
+ * contacts of ContactCheck).
  */
-const awaitedKillingContacts: { [escaperId: number]: { [contactKey: number]: boolean } } = {}
-
-/** Names one contact with a single number, as the contact check does. No id ever comes close to it. */
-const AWAITED_CONTACT_KIND_FACTOR = 0x100000000
+const awaitedKillingContacts: { [escaperId: number]: { [kind: number]: { [id: number]: boolean } } } = {}
 
 /** Stops the effect of that hero until this contact, which its machine is sure kills it, comes back */
 export const awaitKillingContact = (escaperId: number, kind: number, id: number) => {
@@ -303,7 +303,14 @@ export const awaitKillingContact = (escaperId: number, kind: number, id: number)
         awaitedKillingContacts[escaperId] = awaited
     }
 
-    awaited[kind * AWAITED_CONTACT_KIND_FACTOR + id] = true
+    let awaitedOfKind = awaited[kind]
+
+    if (awaitedOfKind === undefined) {
+        awaitedOfKind = {}
+        awaited[kind] = awaitedOfKind
+    }
+
+    awaitedOfKind[id] = true
 
     getUdgEscapers().get(escaperId)?.stopHeroEffectForContact()
 }
@@ -316,10 +323,16 @@ const settleAwaitedContact = (escaperId: number, kind: number, id: number) => {
         return
     }
 
-    delete awaited[kind * AWAITED_CONTACT_KIND_FACTOR + id]
+    const awaitedOfKind = awaited[kind]
 
-    for (const [_] of pairs(awaited)) {
-        return
+    if (awaitedOfKind !== undefined) {
+        delete awaitedOfKind[id]
+    }
+
+    for (const [_, awaitedOfAnyKind] of pairs(awaited)) {
+        for (const [__] of pairs(awaitedOfAnyKind)) {
+            return
+        }
     }
 
     getUdgEscapers().get(escaperId)?.releaseHeroEffectContactStop()
@@ -333,8 +346,10 @@ export const forgetAwaitedKillingContacts = (escaperId: number) => {
         return
     }
 
-    for (const [contactKey] of pairs(awaited)) {
-        delete awaited[contactKey]
+    for (const [_, awaitedOfKind] of pairs(awaited)) {
+        for (const [id] of pairs(awaitedOfKind)) {
+            delete awaitedOfKind[id]
+        }
     }
 }
 

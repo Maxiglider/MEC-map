@@ -42,9 +42,6 @@ const CONTACT_CHECK_PERIOD = 0.02
  */
 const CONTACT_REPEAT_CHECKS = Math.floor(1 / CONTACT_CHECK_PERIOD)
 
-/** Names one thing touched with a single number. No handle id ever comes close to it. */
-const CONTACT_KEY_KIND_FACTOR = 0x100000000
-
 const state = { isInitialized: false, isEnabledForEveryHero: true, checkCount: 0 }
 
 /**
@@ -103,8 +100,13 @@ type ContactContext = {
     touchedKinds: number[]
     touchedIds: number[]
     touchedCount: number
-    /** At which check each thing touched last counted, so a lasting contact counts at its own pace */
-    lastContactChecks: { [contactKey: number]: number }
+    /**
+     * At which check each thing touched last counted, so a lasting contact counts at its own pace: by kind, then by
+     * id. Never one number made of both: kind * 2^32 + id is past what the numbers of Warcraft III's Lua hold
+     * exactly, and every circle of power got the same one - a rescuer touching a second circle within a second of
+     * the first was told it was the same contact, and that ally never got up (user's report, 2026-09-25).
+     */
+    lastContactChecks: { [kind: number]: { [id: number]: number } }
     /** Which check looked at this hero last, and whether it was the machine of an effect telling */
     lastCheck: number
     wasTold: boolean
@@ -118,10 +120,12 @@ const contexts: { [escaperId: number]: ContactContext } = {}
 
 /**
  * Where a contact found here is handled from: a thread a trigger starts, rather than the timer of the
- * check. What follows a contact may wait - a coop revive does, before giving its hero back its speed
- * and then its mortality - and a wait ends a timer thread on the spot, which left the revived hero
- * frozen and immortal. The immolation handed its contacts over through a damage trigger, and the
- * packet of an async hero comes through a sync one: both threads that may wait.
+ * check. A wait ends a timer thread on the spot: the coop revive used to wait before giving its hero
+ * back its speed and then its mortality, and was left there, its hero frozen and immortal. It runs on
+ * timers now (see Escaper.coopReviveHero) and nothing a contact leads to waits any more; the thread
+ * stays, so that one that waits again cannot break the check. The immolation handed its contacts over
+ * through a damage trigger, and the packet of an async hero comes through a sync one: both threads
+ * that may wait.
  *
  * One trigger for them all: each execution runs in a thread of its own, and reads what to handle
  * before anything in it can wait.
@@ -343,15 +347,21 @@ const checkEscaperContacts = (escaper: Escaper) => {
     for (let i = 0; i < context.touchedCount; i++) {
         const kind = context.touchedKinds[i]
         const id = context.touchedIds[i]
-        const contactKey = kind * CONTACT_KEY_KIND_FACTOR + id
-        const lastContactCheck = context.lastContactChecks[contactKey]
+        let checksOfKind = context.lastContactChecks[kind]
+
+        if (checksOfKind === undefined) {
+            checksOfKind = {}
+            context.lastContactChecks[kind] = checksOfKind
+        }
+
+        const lastContactCheck = checksOfKind[id]
 
         // the same thing again, so soon: the hero has not left it yet, nothing new happened
         if (lastContactCheck !== undefined && state.checkCount - lastContactCheck < CONTACT_REPEAT_CHECKS) {
             continue
         }
 
-        context.lastContactChecks[contactKey] = state.checkCount
+        checksOfKind[id] = state.checkCount
 
         if (isTold) {
             const heroZ = escaper.getHeroZ()

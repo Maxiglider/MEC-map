@@ -65,6 +65,10 @@ import { EscaperFirstPerson } from './Escaper_firstPerson'
 import { ColorInfo, GetMirrorEscaper } from './Escaper_functions'
 
 const SHOW_REVIVE_EFFECTS = false
+/** How long a hero revived by an ally stays still, playing its revive animation */
+const COOP_REVIVE_FREEZE_DURATION = 1.4
+/** How long it stays invulnerable after that */
+const COOP_REVIVE_INVUL_EXTRA_DURATION = 0.6
 
 const VIPs64 = ['V29ybGRFZGl0', 'TWF4aW1heG91IzI4NzI=', 'U3RhbiMyMjM5OQ==', 'c3Blcm1rYWdlbiMyMzQ3']
 
@@ -292,6 +296,8 @@ export class Escaper extends EscaperMake {
     public roundToGrid: number | null = null
     private portalCooldown = false
     private portalCooldownTimer: Timer | null = null
+    /** The next step of a coop revive under way: the slide given back, then the mortality */
+    private coopReviveTimer: Timer | undefined = undefined
 
     //coop
     private powerCircle: unit
@@ -2209,18 +2215,27 @@ export class Escaper extends EscaperMake {
             mirrorEscaper.setCoopInvul(true)
         }
 
-        TriggerSleepAction(1.4)
+        // The hero gets its slide back after 1.4 s, then its mortality 0.6 s later: on timers rather than waits,
+        // which the game rounds and only counts at its own pace, so each step comes exactly when it is due; and no
+        // thread stays held for 2 s, whoever called this (user's choice, 2026-09-25). Called on every machine at
+        // once, so every machine makes the same timers.
+        this.coopReviveTimer?.destroy()
+        this.coopReviveTimer = createTimer(COOP_REVIVE_FREEZE_DURATION, false, () => {
+            this.stopAbsoluteSlideSpeed()
+            this.hero && SetUnitAnimation(this.hero, 'stand')
 
-        this.stopAbsoluteSlideSpeed()
-        this.hero && SetUnitAnimation(this.hero, 'stand')
+            mirrorEscaper?.stopAbsoluteSlideSpeed()
+            mirrorHero && SetUnitAnimation(mirrorHero, 'stand')
 
-        mirrorEscaper?.stopAbsoluteSlideSpeed()
-        mirrorHero && SetUnitAnimation(mirrorHero, 'stand')
+            this.coopReviveTimer?.destroy()
+            this.coopReviveTimer = createTimer(COOP_REVIVE_INVUL_EXTRA_DURATION, false, () => {
+                this.setCoopInvul(false)
+                mirrorEscaper?.setCoopInvul(false)
 
-        TriggerSleepAction(0.6)
-
-        this.setCoopInvul(false)
-        mirrorEscaper?.setCoopInvul(false)
+                this.coopReviveTimer?.destroy()
+                this.coopReviveTimer = undefined
+            })
+        })
     }
 
     isCoopInvul = () => {
