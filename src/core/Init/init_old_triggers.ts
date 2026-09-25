@@ -8,7 +8,6 @@ import { InitTrig_A_hero_dies_check_if_all_dead_and_sounds } from 'core/08_GAME/
 import { InitTrig_Sound_monster_dies } from 'core/08_GAME/Death/Sound_monster_dies'
 import { InitTrig_Terrain_save_monster_death } from 'core/08_GAME/Death/Terrain_save_monster_death'
 import { InitTrig_Forces_ally } from 'core/08_GAME/Init_game/Forces_ally'
-import { InitTrig_Start_sound } from 'core/08_GAME/Init_game/Start_sound'
 import { InitTrig_A_player_leaves } from 'core/08_GAME/Leavers/A_player_leaves'
 import { InitTrig_creation_dialogue } from 'core/08_GAME/Mode_coop/creation_dialogue'
 import { InitTrig_Select_hero } from 'core/08_GAME/Select_and_unselect_heroes/Select_hero'
@@ -22,7 +21,6 @@ export const initOldTriggers = () => {
     InitTrig_Effect_meteor_on_pick_up()
     InitTrig_Effect_meteor_on_pick_down()
     InitTrig_Forces_ally()
-    InitTrig_Start_sound()
     InitTrig_creation_dialogue()
     InitTrig_Camera_reset()
     InitTrig_Afk_mode_ordre_recu()

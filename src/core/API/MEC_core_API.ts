@@ -28,7 +28,7 @@ import { LoadMapFromCache } from '../07_TRIGGERS/Load_map_from_gamecache/LoadMap
 import { Gravity } from '../07_TRIGGERS/Slide_and_CheckTerrain_triggers/Gravity'
 import { ReinitTerrains } from '../07_TRIGGERS/Triggers_to_modify_terrains/Reinit_terrains'
 import { ReinitTerrainsPositions } from '../07_TRIGGERS/Triggers_to_modify_terrains/Reinit_terrains_position_Change_variations_and_ut_at_beginning'
-import { heroes } from '../08_GAME/Init_game/Heroes'
+import { heroes, spawnHeroes } from '../08_GAME/Init_game/Heroes'
 import { e2e } from '../Test/e2e-tests/base/e2e-tests-base'
 import { hooks } from './GeneralHooks'
 import { MecHook } from './MecHook'
@@ -186,6 +186,9 @@ export const MEC_core_API = {
     setWanderMinTime: (time: number) => (globals.wanderMinTime = time),
     setWanderExtraTime: (time: number) => (globals.wanderExtraTime = time),
     setForceReviveAtStart: (b: boolean) => (globals.forceReviveAtStart = b),
+    // the start sound, then the heroes appearing at level 0's start 1 s later, when -autoSpawnHeroes is off (a map's
+    // own intro calls it as it ends); once per game, doing nothing if they already did
+    spawnHeroes,
     setKillAfkHeroes: (b: boolean) => (globals.killAfkHeroes = b),
     setWanderEffect: (effect: string) => (globals.wanderEffectStr = ReplaceBackslahsesInLinks(effect)),
     setWanderEffectFacing: (b: boolean) => (globals.wanderEffectFacing = b),

@@ -36,6 +36,7 @@ export class SaveMapInCache {
         jsonGameData.gameData.USE_VTOTO_SLIDE_LOGIC = globals.USE_VTOTO_SLIDE_LOGIC
         jsonGameData.gameData.coopCircles = globals.coopCircles
         jsonGameData.gameData.coopModeChoice = globals.coopModeChoice
+        jsonGameData.gameData.autoSpawnHeroes = globals.autoSpawnHeroes
         jsonGameData.gameData.mortarAreaShift = globals.mortarAreaShift
         jsonGameData.gameData.lifeBonusMessageDuration = globals.lifeBonusMessageDuration
         jsonGameData.gameData.terrainSaveMobTransparency = globals.terrainSaveMobTransparency

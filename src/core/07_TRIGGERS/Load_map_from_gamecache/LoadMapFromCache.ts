@@ -86,6 +86,10 @@ export class LoadMapFromCache {
                         globals.coopModeChoice = gameData.gameData.coopModeChoice
                     }
 
+                    if (gameData.gameData.autoSpawnHeroes !== undefined) {
+                        globals.autoSpawnHeroes = gameData.gameData.autoSpawnHeroes
+                    }
+
                     if (gameData.gameData.CAN_TURN_IN_AIR !== undefined) {
                         globals.CAN_TURN_IN_AIR = gameData.gameData.CAN_TURN_IN_AIR
                     }

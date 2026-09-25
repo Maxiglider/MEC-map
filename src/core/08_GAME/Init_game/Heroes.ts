@@ -1,9 +1,9 @@
 import { EffectUtils } from 'Utils/EffectUtils'
 import { IPoint, createPoint } from 'Utils/Point'
-import { createEvent } from 'Utils/mapUtils'
+import { createEvent, createTimer, runInTrigger } from 'Utils/mapUtils'
 import { Constants } from 'core/01_libraries/Constants'
 import { udg_doubleHeroesEnabled } from 'core/Double_heroes/double_heroes_config'
-import { getUdgEscapers } from '../../../../globals'
+import { getUdgEscapers, globals } from '../../../../globals'
 
 const startPositions: location[] = []
 const startPositionsRandomized: location[] = []
@@ -12,6 +12,10 @@ const playerIdsRandomized: number[] = []
 export const HERO_START_ANGLE = 90
 
 const TIME_BEFORE_HERO_SPAWN = 3
+/** When the start sound plays by itself, before the heroes appear (it had a trigger of its own, Start_sound) */
+const TIME_BEFORE_START_SOUND = 2
+/** From the start sound to the first hero, when MEC_core.spawnHeroes() starts them */
+const TIME_FROM_START_SOUND_TO_SPAWN = 1
 const TIME_BETWEEN_EACH_HERO_SPAWN = 0.1
 let EFFECT_FOR_MISSING_HEROES = 'Abilities\\Spells\\Undead\\DeathPact\\DeathPactTarget.mdl'
 
@@ -142,44 +146,86 @@ export const init_Heroes = () => {
         }
     }
 
+    // by themselves (-autoSpawnHeroes on, the default): the start sound at 2 s, the heroes at 3 s
+    createEvent({
+        events: [t => TriggerRegisterTimerEvent(t, TIME_BEFORE_START_SOUND, false)],
+        actions: [
+            () => {
+                if (globals.autoSpawnHeroes) {
+                    PlaySoundBJ(gg_snd_start)
+                }
+            },
+        ],
+    })
+
     createEvent({
         events: [t => TriggerRegisterTimerEvent(t, spawnPeriod, false)],
         actions: [
             () => {
-                //randomize start positions
-                RandomizeStartPositionsAndHeroSpawnOrder()
-
-                //create heroes
-                for (let i = 0; i < Constants.NB_ESCAPERS; i++) {
-                    if (!getUdgEscapers().get(i)?.getHero()) {
-                        if (GetPlayerId(GetLocalPlayer()) === i) {
-                            ClearSelection()
-                        }
-                    }
+                if (globals.autoSpawnHeroes) {
+                    spawnRequested = true
+                    spawnHeroesNow()
                 }
-
-                for (let i = 0; i < Constants.NB_ESCAPERS; i++) {
-                    const n = playerIdsRandomized[i]
-                    if (getUdgEscapers().get(n)) {
-                        getUdgEscapers()
-                            .get(n)
-                            ?.createHero(
-                                GetLocationX(startPositionsRandomized[n]),
-                                GetLocationY(startPositionsRandomized[n]),
-                                HERO_START_ANGLE
-                            )
-                    } else {
-                        EffectUtils.destroyEffect(
-                            EffectUtils.addSpecialEffectLoc(EFFECT_FOR_MISSING_HEROES, startPositionsRandomized[n])
-                        )
-                    }
-                    ;(startPositionsRandomized[n] as any) = null
-                    TriggerSleepAction(TIME_BETWEEN_EACH_HERO_SPAWN)
-                }
-
-                //call EnableTrigger(gg_trg_anticheat_teleport_and_revive)
-                //AnticheatTeleport_justRevived = true
             },
         ],
     })
+}
+
+let spawnRequested = false
+let heroesSpawned = false
+
+/**
+ * The start sound, then the heroes appearing at level 0's start 1 s later, one after the other: what the game does by
+ * itself at 2 s and 3 s, called by a map when -autoSpawnHeroes is off (its own intro, at its end). Once per game,
+ * doing nothing if they already did.
+ */
+export const spawnHeroes = () => {
+    if (spawnRequested) {
+        return
+    }
+    spawnRequested = true
+    PlaySoundBJ(gg_snd_start)
+    // in a trigger of its own, since it waits between two heroes
+    createTimer(TIME_FROM_START_SOUND_TO_SPAWN, false, () => runInTrigger(spawnHeroesNow))
+}
+
+const spawnHeroesNow = () => {
+    if (heroesSpawned) {
+        return
+    }
+    heroesSpawned = true
+
+    //randomize start positions
+    RandomizeStartPositionsAndHeroSpawnOrder()
+
+    //create heroes
+    for (let i = 0; i < Constants.NB_ESCAPERS; i++) {
+        if (!getUdgEscapers().get(i)?.getHero()) {
+            if (GetPlayerId(GetLocalPlayer()) === i) {
+                ClearSelection()
+            }
+        }
+    }
+
+    for (let i = 0; i < Constants.NB_ESCAPERS; i++) {
+        const n = playerIdsRandomized[i]
+        if (getUdgEscapers().get(n)) {
+            getUdgEscapers()
+                .get(n)
+                ?.createHero(
+                    GetLocationX(startPositionsRandomized[n]),
+                    GetLocationY(startPositionsRandomized[n]),
+                    HERO_START_ANGLE
+                )
+        } else {
+            EffectUtils.destroyEffect(
+                EffectUtils.addSpecialEffectLoc(EFFECT_FOR_MISSING_HEROES, startPositionsRandomized[n])
+            )
+        }
+        ;(startPositionsRandomized[n] as any) = null
+        TriggerSleepAction(TIME_BETWEEN_EACH_HERO_SPAWN)
+    }
+
+    //call EnableTrigger(gg_trg_anticheat_teleport_and_revive)
+    //AnticheatTeleport_justRevived = true
 }

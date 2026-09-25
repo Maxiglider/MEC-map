@@ -24,6 +24,11 @@ export const globals: {
     /** Whether the first player chooses coop or solo at the start (-coopModeChoice, saved by -smic); else solo */
     coopModeChoice: boolean
     /**
+     * Whether the heroes appear by themselves at the start of the game (-autoSpawnHeroes, saved by -smic); else they
+     * wait for MEC_core.spawnHeroes(), which a map's own intro calls when it ends
+     */
+    autoSpawnHeroes: boolean
+    /**
      * Added to every mortar area as MEC judges the heroes (gameData.mortarAreaShift, saved by -smic): for a map made
      * for heroes of another collision than MEC's, its shells reach them as far as they used to
      */
@@ -79,6 +84,7 @@ export const globals: {
 
     coopModeActive: true,
     coopModeChoice: true,
+    autoSpawnHeroes: true,
     mortarAreaShift: 0,
     lifeBonusMessageDuration: 3,
     terrainSaveMobTransparency: 60,

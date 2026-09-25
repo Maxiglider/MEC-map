@@ -75,6 +75,33 @@ export const initExecuteCommandMax = () => {
         },
     })
 
+    //-autoSpawnHeroes [<boolean>]   --> whether the heroes appear by themselves at the start (saved by -smic)
+    registerCommand({
+        name: 'autoSpawnHeroes',
+        alias: [],
+        group,
+        argDescription: '[<boolean>]',
+        description:
+            "Whether the heroes appear by themselves at level 0's start when the game starts, after the start sound (on by default: the sound at 2 s, the heroes at 3 s). Off, both wait for MEC_core.spawnHeroes(), which a map's own intro calls when it ends: the sound, then the heroes 1 s later. Without a param, tells the current setting. Saved by -smic, and taken into account from the next game",
+        cb: ({ nbParam, param1 }, escaper) => {
+            if (nbParam === 0) {
+                Text.P(escaper.getPlayer(), 'Auto spawn of the heroes is ' + (globals.autoSpawnHeroes ? 'on' : 'off'))
+                return true
+            }
+            if (nbParam !== 1 || !IsBoolString(param1)) {
+                return USAGE
+            }
+            globals.autoSpawnHeroes = S2B(param1)
+            Text.mkP(
+                escaper.getPlayer(),
+                globals.autoSpawnHeroes
+                    ? 'auto spawn of the heroes on: they appear by themselves at the start of the game'
+                    : 'auto spawn of the heroes off: they wait for MEC_core.spawnHeroes()'
+            )
+            return true
+        },
+    })
+
     //-enableCoop <boolean>   --> coop or solo from now on, for this game only (not saved by -smic)
     registerCommand({
         name: 'enableCoop',
