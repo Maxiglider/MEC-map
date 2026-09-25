@@ -1840,16 +1840,31 @@ const jassText = (arg: string): string | undefined => {
     const raw = jassUnescape(literal)
     return raw.replace(/^TRIGSTR_\d+$/, key => oldWts[key] ?? key)
 }
+// each call read from where it starts, not line by line: a quest text written inline runs over several lines
+// (Murloc Slide 2, protected, whose quests are no constants)
+const questItemsAfter = (at: number): string[] => {
+    const rest = oldScript.substring(at + 1)
+    const end = Math.min(
+        ...[rest.search(/\bCreateQuestBJ\(/), rest.search(/^endfunction/m)].filter(i => i !== -1),
+        rest.length
+    )
+    return [...rest.substring(0, end).matchAll(/\bCreateQuestItemBJ\(/g)]
+        .map(m => callArgs(rest.substring(m.index!), 'CreateQuestItemBJ'))
+        .filter((args): args is string[] => !!args && args.length === 2 && args[0].trim() === 'bj_lastCreatedQuest')
+        .map(args => jassText(args[1]))
+        .filter((text): text is string => text !== undefined)
+}
 const legacyQuests = spec.legacyQuests
-    ? oldScript
-          .split('\n')
-          .map(line => callArgs(line, 'CreateQuestBJ'))
-          .filter((args): args is string[] => !!args && args.length === 4)
-          .map(([type, title, text, icon]) => ({
+    ? [...oldScript.matchAll(/\bCreateQuestBJ\(/g)]
+          .map(m => ({ at: m.index!, args: callArgs(oldScript.substring(m.index!), 'CreateQuestBJ') }))
+          .filter((call): call is { at: number; args: string[] } => !!call.args && call.args.length === 4)
+          .map(({ at, args: [type, title, text, icon] }) => ({
               type,
               title: jassText(title),
               text: jassText(text),
               icon: jassText(icon),
+              // its requirements, the CreateQuestItemBJ(bj_lastCreatedQuest, …) calls that follow it in its function
+              items: questItemsAfter(at),
           }))
           .filter(q => q.title !== undefined && !(spec.legacyQuests.drop ?? []).includes(q.title))
           // personal data the user chose to take out (legacyQuests.replaceText: title → new text)
@@ -1859,7 +1874,14 @@ const legacyQuests = spec.legacyQuests
 const questsCode = legacyQuests.length
     ? `-- the old map's quests, created before MEC's own; the obsolete ones (commands MEC doesn't have) left out
 onGlobalInit(function()
-${legacyQuests.map(q => `    CreateQuestBJ(${q.type}, ${JSON.stringify(q.title)}, ${JSON.stringify(q.text ?? '')}, ${JSON.stringify(q.icon ?? '')})`).join('\n')}
+${legacyQuests
+    .map(q =>
+        [
+            `    CreateQuestBJ(${q.type}, ${JSON.stringify(q.title)}, ${JSON.stringify(q.text ?? '')}, ${JSON.stringify(q.icon ?? '')})`,
+            ...q.items.map(item => `    CreateQuestItemBJ(bj_lastCreatedQuest, ${JSON.stringify(item)})`),
+        ].join('\n')
+    )
+    .join('\n')}
 end)
 `
     : ''
