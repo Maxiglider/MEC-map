@@ -46,50 +46,59 @@ const JASS_PUNCTUATION = new Set('()[],+-*/=<>!'.split(''))
  * as they are, and a space between two minus signs stays, so that no `--` appears in a line copied into Lua.
  */
 const compactJass = (script: string) => {
-    let out = ''
+    // The pieces are gathered and joined once, and the last character written is kept aside: read back from a
+    // string built with +=, it flattened the whole string again at every run of spaces, and Alpha Slide's 4.4 MB
+    // script took 400 s to compact (2026-09-25).
+    const out: string[] = []
+    let last: string | undefined = undefined
+    const write = (piece: string) => {
+        if (piece === '') return
+        out.push(piece)
+        last = piece[piece.length - 1]
+    }
     // a string literal may run over several lines (Slide Is Magic's quest texts): the script is read as one text
     let inString: string | null = null
     let inComment = false
     for (let i = 0; i < script.length; i++) {
         const c = script[i]
         if (inComment) {
-            out += c
+            write(c)
             if (c === '\n') inComment = false
             continue
         }
         if (inString) {
-            out += c
-            if (c === '\\') out += script[++i] ?? ''
+            write(c)
+            if (c === '\\') write(script[++i] ?? '')
             else if (c === inString) inString = null
             continue
         }
         if (c === '/' && script[i + 1] === '/') {
             inComment = true
-            out += c
+            write(c)
             continue
         }
         if (c === '"' || c === "'") {
             inString = c
-            out += c
+            write(c)
             continue
         }
         if (c === ' ' || c === '\t') {
             let j = i
             while (script[j] === ' ' || script[j] === '\t') j++
-            const before = out[out.length - 1]
+            const before: string | undefined = last
             const after = script[j]
             const leading = before === undefined || before === '\n'
             if (!leading && (JASS_PUNCTUATION.has(before) || JASS_PUNCTUATION.has(after))) {
-                if (before === '-' && after === '-') out += ' '
+                if (before === '-' && after === '-') write(' ')
             } else {
-                out += script.substring(i, j)
+                write(script.substring(i, j))
             }
             i = j - 1
             continue
         }
-        out += c
+        write(c)
     }
-    return out
+    return out.join('')
 }
 
 /**
