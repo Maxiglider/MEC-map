@@ -35,10 +35,15 @@ export const initExecuteCommandMake_terrain_saves = () => {
         name: 'setTerrainSaveMobTransparency',
         alias: ['settsmt'],
         group,
-        argDescription: '<transparency>',
+        argDescription: '[<transparency>]',
         description:
-            'Sets how transparent (0 opaque, 100 invisible) the monster of a mobTouch terrain save event becomes once touched, until its event can fire again (60 by default). 100 makes a switch disappear once used',
+            'Sets how transparent (0 opaque, 100 invisible) the monster of a mobTouch terrain save event becomes once touched, until its event can fire again (60 by default). 100 makes a switch disappear once used. Without a value, tells the current one',
         cb: ({ nbParam, param1 }, escaper) => {
+            if (nbParam === 0) {
+                Text.mkP(escaper.getPlayer(), `terrain save mob transparency: ${globals.terrainSaveMobTransparency}`)
+                return true
+            }
+
             if (nbParam !== 1 || !IsPercentage(param1)) {
                 return USAGE
             }
