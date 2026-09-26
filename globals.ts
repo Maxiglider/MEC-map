@@ -55,6 +55,16 @@ export const globals: {
     WORLD_BOUNDS_RECT?: rect
 
     CAN_TURN_IN_AIR: boolean
+    /** Whether a hero sliding async speeds up by holding the right click and slows down holding the left one */
+    slideSpeedControl: boolean
+    /** The fastest a controlled slide goes, as a ratio of the base slide speed. At least 1 */
+    slideSpeedControlMax: number
+    /** The slowest a controlled slide goes, as a ratio of the base slide speed. Between 0 and 1 */
+    slideSpeedControlMin: number
+    /** How much a held right click adds to the slide speed each second, as a ratio of the base slide speed */
+    slideSpeedControlAcceleration: number
+    /** How much a held left click takes off the slide speed each second, as a ratio of the base slide speed */
+    slideSpeedControlBraking: number
     USE_VTOTO_SLIDE_LOGIC: boolean
     coopCircles: boolean
     heroToEscaperHandles: { [heroId: number]: number }
@@ -89,6 +99,11 @@ export const globals: {
     lifeBonusMessageDuration: 3,
     terrainSaveMobTransparency: 60,
     CAN_TURN_IN_AIR: false,
+    slideSpeedControl: false,
+    slideSpeedControlMax: 1.5,
+    slideSpeedControlMin: 0.5,
+    slideSpeedControlAcceleration: 0.2,
+    slideSpeedControlBraking: 0.4,
     USE_VTOTO_SLIDE_LOGIC: true,
     coopCircles: true,
     heroToEscaperHandles: {},

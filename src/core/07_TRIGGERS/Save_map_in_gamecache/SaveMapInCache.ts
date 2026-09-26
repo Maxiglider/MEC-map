@@ -41,6 +41,11 @@ export class SaveMapInCache {
         jsonGameData.gameData.lifeBonusMessageDuration = globals.lifeBonusMessageDuration
         jsonGameData.gameData.terrainSaveMobTransparency = globals.terrainSaveMobTransparency
         jsonGameData.gameData.CAN_TURN_IN_AIR = globals.CAN_TURN_IN_AIR
+        jsonGameData.gameData.slideSpeedControl = globals.slideSpeedControl
+        jsonGameData.gameData.slideSpeedControlMax = globals.slideSpeedControlMax
+        jsonGameData.gameData.slideSpeedControlMin = globals.slideSpeedControlMin
+        jsonGameData.gameData.slideSpeedControlAcceleration = globals.slideSpeedControlAcceleration
+        jsonGameData.gameData.slideSpeedControlBraking = globals.slideSpeedControlBraking
         jsonGameData.gameData.canSlideOverPathingBlockers = globals.canSlideOverPathingBlockers
         jsonGameData.gameData.animOnRevive = globals.animOnRevive
         jsonGameData.gameData.wanderMinTime = globals.wanderMinTime

@@ -158,6 +158,13 @@ export const MEC_core_API = {
         globals.CAN_TURN_IN_AIR = b
     },
     setStaticSpawnPositions: heroes.setStaticSpawnPositions,
+    // the slide speed control, see -slideSpeedControl: the bounds are ratios of the base slide speed, the
+    // acceleration and the braking ratios of it per second
+    setSlideSpeedControl: (b: boolean) => (globals.slideSpeedControl = b),
+    setSlideSpeedControlMax: (ratio: number) => (globals.slideSpeedControlMax = Math.max(1, ratio)),
+    setSlideSpeedControlMin: (ratio: number) => (globals.slideSpeedControlMin = Math.min(1, Math.max(0, ratio))),
+    setSlideSpeedControlAcceleration: (ratio: number) => (globals.slideSpeedControlAcceleration = Math.max(0, ratio)),
+    setSlideSpeedControlBraking: (ratio: number) => (globals.slideSpeedControlBraking = Math.max(0, ratio)),
 
     //helpers
     isHero: IsHero,

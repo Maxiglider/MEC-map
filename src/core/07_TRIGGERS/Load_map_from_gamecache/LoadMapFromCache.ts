@@ -94,6 +94,26 @@ export class LoadMapFromCache {
                         globals.CAN_TURN_IN_AIR = gameData.gameData.CAN_TURN_IN_AIR
                     }
 
+                    if (gameData.gameData.slideSpeedControl !== undefined) {
+                        globals.slideSpeedControl = gameData.gameData.slideSpeedControl
+                    }
+
+                    if (gameData.gameData.slideSpeedControlMax !== undefined) {
+                        globals.slideSpeedControlMax = gameData.gameData.slideSpeedControlMax
+                    }
+
+                    if (gameData.gameData.slideSpeedControlMin !== undefined) {
+                        globals.slideSpeedControlMin = gameData.gameData.slideSpeedControlMin
+                    }
+
+                    if (gameData.gameData.slideSpeedControlAcceleration !== undefined) {
+                        globals.slideSpeedControlAcceleration = gameData.gameData.slideSpeedControlAcceleration
+                    }
+
+                    if (gameData.gameData.slideSpeedControlBraking !== undefined) {
+                        globals.slideSpeedControlBraking = gameData.gameData.slideSpeedControlBraking
+                    }
+
                     if (gameData.gameData.canSlideOverPathingBlockers !== undefined) {
                         globals.canSlideOverPathingBlockers = gameData.gameData.canSlideOverPathingBlockers
                     }
