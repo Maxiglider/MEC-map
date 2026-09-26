@@ -1,6 +1,7 @@
 import { Constants } from 'core/01_libraries/Constants'
 import type { Escaper } from 'core/04_STRUCTURES/Escaper/Escaper'
 import { globals } from '../../../../globals'
+import { setLocalDragSelectEnabled } from '../../08_GAME/Init_game/Drag_select'
 
 /**
  * The slide speed control: a hero sliding async speeds up while its player holds the right click, and slows down
@@ -55,9 +56,13 @@ export const updateLocalSlideSpeedControl = (escaper: Escaper) => {
         held.right = 0
         held.left = 0
         escaper.setSlideSpeedControlState(SLIDE_SPEED_CONTROL.none, 1)
+        setLocalDragSelectEnabled(true)
 
         return
     }
+
+    // the left click held brakes: it must not draw the selection box too
+    setLocalDragSelectEnabled(false)
 
     held.right = BlzIsMouseButtonPressed(MOUSE_BUTTON_TYPE_RIGHT) ? held.right + Constants.SLIDE_PERIOD : 0
     held.left = BlzIsMouseButtonPressed(MOUSE_BUTTON_TYPE_LEFT) ? held.left + Constants.SLIDE_PERIOD : 0

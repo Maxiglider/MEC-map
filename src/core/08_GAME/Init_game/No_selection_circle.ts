@@ -1,9 +1,12 @@
+import { isLocalDragSelectEnabled } from './Drag_select'
+
 /**
  * MEC hides the heroes' selection circle for the whole game. Giving the players their hands back puts it back: the
  * end of a cinematic (CinematicModeBJ(false) calls EnableUserControl(true)) and the end of a fade (FinishCinematicFadeBJ
  * calls EnableUserUI(true)). So those natives are wrapped, and hide it again each time they give the hands back,
  * whoever calls them: the functions of blizzard.lua look the natives up by their global name at each call, and a map's
- * own triggers do the same. A call taking the hands away is left as it is.
+ * own triggers do the same. A call taking the hands away is left as it is. The selection box taken away while the
+ * slide speed control brakes (see Drag_select) is taken away again the same way.
  */
 export const initNoSelectionCircle = () => {
     EnableSelect(true, false)
@@ -15,6 +18,10 @@ export const initNoSelectionCircle = () => {
             native(b)
             if (b) {
                 EnableSelect(true, false)
+
+                if (!isLocalDragSelectEnabled()) {
+                    EnableDragSelect(false, false)
+                }
             }
         }
     }

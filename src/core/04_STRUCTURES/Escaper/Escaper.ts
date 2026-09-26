@@ -45,6 +45,7 @@ import {
     takeKillingEffectModelOfDeath,
     takeKillingEffectOfDeath,
 } from '../../08_GAME/Death/AsyncKillingEffects'
+import { setLocalDragSelectEnabled } from '../../08_GAME/Init_game/Drag_select'
 import { HERO_START_ANGLE } from '../../08_GAME/Init_game/Heroes'
 import { MessageHeroDies } from '../../08_GAME/Init_game/Message_heroDies'
 import { RunCoopSoundOnHero } from '../../08_GAME/Mode_coop/coop_init_sounds'
@@ -3088,6 +3089,11 @@ export class Escaper extends EscaperMake {
 
         // back to stand for the next slide, which starts at the base speed
         this.setSlideSpeedControlState(SLIDE_SPEED_CONTROL.none, 1)
+
+        // the left click selects again on walkable ground: for its own player only, what they alone see
+        if (GetLocalPlayer() === this.p) {
+            setLocalDragSelectEnabled(true)
+        }
 
         this.parkHeroEffect()
 
