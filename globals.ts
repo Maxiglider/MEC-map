@@ -89,7 +89,7 @@ export const globals: {
     lifeBonusMessageDuration: 3,
     terrainSaveMobTransparency: 60,
     CAN_TURN_IN_AIR: false,
-    USE_VTOTO_SLIDE_LOGIC: false,
+    USE_VTOTO_SLIDE_LOGIC: true,
     coopCircles: true,
     heroToEscaperHandles: {},
     canSlideOverPathingBlockers: true,
