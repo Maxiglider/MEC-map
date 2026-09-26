@@ -1581,6 +1581,26 @@ export const initCommandAll = () => {
         },
     })
 
+    //-showSlideSpeed(sss) <boolean>
+    registerCommand({
+        name: 'showSlideSpeed',
+        alias: ['sss'],
+        group,
+        argDescription: '<boolean>',
+        description:
+            'Shows the slide speed of every hero sliding, yours included, as a percentage of its base speed: the one of its slide terrain, or of -setSlideSpeed. With -showNames too, other heroes show "Name (120%)"',
+        cb: ({ nbParam, param1 }, escaper) => {
+            if (nbParam !== 1 || !IsBoolString(param1)) {
+                return true
+            }
+
+            Text.mkP(escaper.getPlayer(), S2B(param1) ? 'Showing slide speeds' : 'Hiding slide speeds')
+            escaper.setShowSlideSpeed(S2B(param1))
+
+            return true
+        },
+    })
+
     //-othersTransparency <number | off | reset> [all | unallied | allied | player]
     registerCommand({
         name: 'othersTransparency',

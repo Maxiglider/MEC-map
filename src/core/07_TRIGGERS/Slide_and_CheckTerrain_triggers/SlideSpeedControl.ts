@@ -86,5 +86,5 @@ export const updateLocalSlideSpeedControl = (escaper: Escaper) => {
         escaper.setSlideSpeed(clampSlideSpeedToControlBounds(baseSpeed < 0 ? -value : value, baseSpeed))
     }
 
-    escaper.setSlideSpeedControlState(state, baseValue > 0 ? RAbsBJ(escaper.getSlideSpeed()) / baseValue : 1)
+    escaper.setSlideSpeedControlState(state, escaper.getSlideSpeedRatio())
 }

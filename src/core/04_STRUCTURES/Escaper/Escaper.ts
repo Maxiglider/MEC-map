@@ -158,6 +158,8 @@ export const LUCKY_LUKE_DEFAULT_TRANSPARENCY = 70
 
 /** The god mode effects of an async hero are told at most this often: the check seeing them runs fifty times a second */
 const ASYNC_HERO_EVENT_MIN_INTERVAL = 0.1
+/** The text tag moves every 0.01 s, and its text is built again every tenth of those */
+const TEXT_TAG_REFRESH_TICKS = 10
 
 export function IsHeroCollisionSizeValid(collisionSize: number): boolean {
     return collisionSize >= 0 && collisionSize <= 200 && collisionSize % 5 === 0
@@ -357,6 +359,12 @@ export class Escaper extends EscaperMake {
     private displayName: string
 
     private showNames = false
+    /** Whether this player sees the slide speed of the heroes sliding, as a ratio of their base speed */
+    private showSlideSpeed = false
+    /** What the text tag of this hero says on this machine: it depends on what the player watching chose */
+    private textTagShownText: string | undefined
+    /** Counts the text tag moves, which are too frequent to build its text at each */
+    private textTagRefreshTicks = 0
     private staticSliding: StaticSlide | undefined
 
     public isNoobedit = false
@@ -738,9 +746,10 @@ export class Escaper extends EscaperMake {
         SetTextTagTextBJ(this.textTag, udg_colorCode[this.getColorId()] + this.getDisplayName(), 10)
         SetTextTagPermanent(this.textTag, true)
         SetTextTagVisibility(this.textTag, false)
+        this.textTagShownText = undefined
         this.textTagTimer = createTimer(0.01, true, this.updateTextTagPos)
 
-        this.updateShowNames(false)
+        this.refreshTextTag()
         this.updateUnitVertexColor()
 
         this.startCommandsHandle.loadStartCommands()
@@ -1175,7 +1184,7 @@ export class Escaper extends EscaperMake {
         rotationSpeed: this.rotationSpeed,
         slideInertia: this.slideInertia,
         speedControlState: this.slideSpeedControlState,
-        speedControlRatio: this.slideSpeedControlRatio,
+        speedControlRatio: this.getSlideSpeedRatio(),
         turnPerPeriod: this.getSlideCurrentTurnPerPeriod(),
         terrainTypeId: this.lastTerrainType?.getTerrainTypeId() ?? 0,
         staticSlideId: this.staticSliding?.id ?? -1,
@@ -2489,6 +2498,70 @@ export class Escaper extends EscaperMake {
         }
 
         SetTextTagPos(this.textTag, this.getHeroX() - 64, this.getHeroY() + 192, 0)
+
+        // the speed it may show changes all the time, but a tenth of a second is plenty to read it
+        this.textTagRefreshTicks++
+
+        if (this.textTagRefreshTicks >= TEXT_TAG_REFRESH_TICKS) {
+            this.textTagRefreshTicks = 0
+            this.refreshTextTag()
+        }
+    }
+
+    /**
+     * What the text tag of this hero says, for the player watching on this machine: the name of another hero with
+     * -showNames, and the slide speed of any hero sliding, their own included, with -showSlideSpeed - "Name (120%)"
+     * with both. Hidden when it has nothing to say.
+     *
+     * Local: each player chose what they see, so the text and its visibility differ from one machine to another.
+     * No handle is made, and the text is only set when it changes.
+     */
+    refreshTextTag = () => {
+        if (!this.textTag) {
+            return
+        }
+
+        const viewer = getUdgEscapers().get(GetPlayerId(GetLocalPlayer()))
+        const isShowingName = !!viewer?.showNames && GetLocalPlayer() !== this.p
+        const isShowingSpeed = !!viewer?.showSlideSpeed && !!this.hero && this.isAlive() && this.isSliding()
+
+        const color = udg_colorCode[this.getColorId()]
+        const speed = isShowingSpeed ? I2S(R2I(this.getSlideSpeedRatio() * 100 + 0.5)) + '%' : ''
+        const text =
+            isShowingName && isShowingSpeed
+                ? color + this.getDisplayName() + '|r (' + speed + ')'
+                : isShowingName
+                  ? color + this.getDisplayName()
+                  : isShowingSpeed
+                    ? color + speed
+                    : ''
+
+        if (text === this.textTagShownText) {
+            return
+        }
+
+        this.textTagShownText = text
+
+        if (text !== '') {
+            SetTextTagTextBJ(this.textTag, text, 10)
+        }
+
+        SetTextTagVisibility(this.textTag, text !== '')
+    }
+
+    /**
+     * The slide speed as a ratio of its base, 1 being the speed of the slide terrain or of -setSlideSpeed. For a
+     * hero sliding async on another machine, as the last packet of its own machine said: only that one knows its
+     * base. Read to be shown only, so it may differ from one machine to another.
+     */
+    getSlideSpeedRatio = () => {
+        if (this.isHeroEffectActive && GetLocalPlayer() !== this.p) {
+            return this.slideSpeedControlRatio
+        }
+
+        const baseValue = RAbsBJ(this.slideSpeedBase)
+
+        return baseValue > 0 ? RAbsBJ(this.slideSpeed) / baseValue : 1
     }
 
     getTextTag = () => this.textTag
@@ -2497,7 +2570,12 @@ export class Escaper extends EscaperMake {
 
     setShowNames = (showNames: boolean) => {
         this.showNames = showNames
-        this.updateShowNames(true)
+        this.refreshAllTextTags()
+    }
+
+    setShowSlideSpeed = (showSlideSpeed: boolean) => {
+        this.showSlideSpeed = showSlideSpeed
+        this.refreshAllTextTags()
     }
 
     isStaticSliding = () => !!this.staticSliding
@@ -2508,18 +2586,9 @@ export class Escaper extends EscaperMake {
         this.staticSliding = staticSliding
     }
 
-    updateShowNames = (localOnly: boolean) => {
-        for (const [_, player] of pairs(getUdgEscapers().getAll())) {
-            if (!localOnly || player.getPlayer() === GetLocalPlayer()) {
-                for (const [_, escaper] of pairs(getUdgEscapers().getAll())) {
-                    const textTag = escaper.getTextTag()
-
-                    if (textTag && GetLocalPlayer() !== escaper.getPlayer()) {
-                        SetTextTagVisibility(textTag, player.showNames)
-                    }
-                }
-            }
-        }
+    /** Only the player of this machine sees the change, so only what this machine shows is refreshed */
+    private refreshAllTextTags = () => {
+        getUdgEscapers().forAll(escaper => escaper.refreshTextTag())
     }
 
     /**
