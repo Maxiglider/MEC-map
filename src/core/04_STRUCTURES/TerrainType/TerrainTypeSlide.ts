@@ -10,6 +10,8 @@ export class TerrainTypeSlide extends TerrainType {
     /** How much inertia a hero turns with on this terrain, as a factor of the normal one (see SLIDE_INERTIA_FACTOR) */
     private slideInertia: number
     private canTurn: boolean
+    /** Whether the fire of a burn terrain can reach a tile of this terrain */
+    private canBurn = true
 
     constructor(
         label: string,
@@ -63,6 +65,18 @@ export class TerrainTypeSlide extends TerrainType {
         return true
     }
 
+    getCanBurn = (): boolean => {
+        return this.canBurn
+    }
+
+    setCanBurn = (canBurn: boolean): boolean => {
+        if (canBurn === this.canBurn) {
+            return false
+        }
+        this.canBurn = canBurn
+        return true
+    }
+
     getColor = () => {
         return COLOR_TERRAIN_SLIDE
     }
@@ -84,6 +98,10 @@ export class TerrainTypeSlide extends TerrainType {
             displayCanTurn +
             (this.getCanTurn() ? ':' + this.rotationSpeed + DISPLAY_SPACE + 'inertia:' + this.slideInertia : '')
 
+        if (!this.canBurn) {
+            display += DISPLAY_SPACE + "can't burn"
+        }
+
         //display cliff class
         display += DISPLAY_SPACE + 'cliff' + I2S(this.cliffClassId)
         return display
@@ -100,6 +118,7 @@ export class TerrainTypeSlide extends TerrainType {
         output['canTurn'] = this.getCanTurn()
         output['rotationSpeed'] = this.rotationSpeed
         output['slideInertia'] = this.slideInertia
+        output['canBurn'] = this.canBurn
 
         return output
     }

@@ -20,9 +20,10 @@ export class TerrainTypeDeath extends TerrainType {
         terrainTypeId: number,
         killingEffectStr: string,
         timeToKill: number,
-        toleranceDist: number
+        toleranceDist: number,
+        kind: 'death' | 'burn' = 'death'
     ) {
-        super(label, terrainTypeId, null, 'death', 0, 1)
+        super(label, terrainTypeId, null, kind, 0, 1)
 
         this.setKillingEffectStr(killingEffectStr)
         this.timeToKill = timeToKill
@@ -89,6 +90,11 @@ export class TerrainTypeDeath extends TerrainType {
     }
 
     toText = (): string => {
+        return this.deathTextForDisplay()
+    }
+
+    /** Apart from toText, which the burn terrain redefines while still starting with this */
+    protected deathTextForDisplay = (): string => {
         let display = this.baseTextForDisplay()
 
         display +=

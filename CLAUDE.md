@@ -53,6 +53,7 @@ See [ARCHITECTURE.md](./ARCHITECTURE.md) for the full directory tour and runtime
 - [docs/COMMANDS_SYSTEM.md](./docs/COMMANDS_SYSTEM.md) — the chat-command parser and the tiered access-control system.
 - [docs/MONSTER_SPAWNS.md](./docs/MONSTER_SPAWNS.md) — zone-based recurring monster generators: positioning math, long-distance movement, unit recycling, dead zones.
 - [docs/TERRAIN.md](./docs/TERRAIN.md) — how terrain is read/mutated at runtime, and the gap between the primitive session-only `-saveTerrain`/`-loadTerrain` commands and the richer, one-directional `-smic` terrain export.
+- [docs/TERRAIN_BURN.md](./docs/TERRAIN_BURN.md) — the burn terrain type (`-newBurn`): a death terrain spreading over the slide tiles of the level it touches, how a level's tiles are found from its start, and why the fire ticks on one timer.
 - [docs/SMIC_PIPELINE.md](./docs/SMIC_PIPELINE.md) — the `-smic` (Save Map In Cache) level-export pipeline, why it's desync-sensitive, and the full round trip through the separate `mec-smic-loader` tool.
 - [docs/MEMORY_HANDLER.md](./docs/MEMORY_HANDLER.md) — the object-pooling allocator used in hot paths to avoid Lua GC pressure.
 - [docs/MEC_CONTACT_CHECK_TO_REPLACE_IMMOLATION.md](./docs/MEC_CONTACT_CHECK_TO_REPLACE_IMMOLATION.md) — why and how MEC's own hero/monster contact check is meant to replace the Warcraft III immolation: measured costs, the chunk indexing decided for it, and the rejected alternatives.

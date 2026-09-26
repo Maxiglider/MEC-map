@@ -14,3 +14,17 @@ export const tileToWorldCenter = (tile: number) => tile * Constants.LARGEUR_CASE
 export const tileToWorldMin = (tile: number) => tile * Constants.LARGEUR_CASE - HALF_TILE
 
 export const tileToWorldMax = (tile: number) => tile * Constants.LARGEUR_CASE + HALF_TILE
+
+/**
+ * A tile index has to stay a plain positive integer while tile coordinates can be negative, the grid being anchored
+ * on the world origin. 4096 tiles either way is far beyond any Warcraft III map.
+ */
+const TILE_INDEX_OFFSET = 4096
+const TILE_INDEX_STRIDE = 8192
+
+export const tileIndexOf = (tx: number, ty: number) =>
+    (ty + TILE_INDEX_OFFSET) * TILE_INDEX_STRIDE + (tx + TILE_INDEX_OFFSET)
+
+export const tileIndexTx = (index: number) => (index % TILE_INDEX_STRIDE) - TILE_INDEX_OFFSET
+
+export const tileIndexTy = (index: number) => Math.floor(index / TILE_INDEX_STRIDE) - TILE_INDEX_OFFSET

@@ -3,6 +3,7 @@ import { getUdgEscapers, getUdgMonsterTypes, getUdgTerrainTypes } from '../../..
 import { createPoint } from '../../../Utils/Point'
 import { Escaper } from '../../04_STRUCTURES/Escaper/Escaper'
 import { MonsterType } from '../../04_STRUCTURES/Monster/MonsterType'
+import { isDeathTerrain } from '../../04_STRUCTURES/TerrainType/TerrainType'
 import {
     DEFAULT_AUTO_TURN_MODE,
     getAutoTurnMode,
@@ -36,7 +37,7 @@ export const snapPointToSlide = (
     let newX = x1
     let newY = y1
 
-    if (currentTerrain?.kind === 'death') {
+    if (currentTerrain && isDeathTerrain(currentTerrain)) {
         const angle = Atan2(y2 - y1, x2 - x1)
         let currentX: number | undefined = undefined
         let currentY: number | undefined = undefined
@@ -72,7 +73,7 @@ export const snapPointToSlide = (
             const testY = y1 + Math.sin(angle) * i
             const tt = getUdgTerrainTypes().getTerrainType(testX, testY)
 
-            if (tt?.kind === 'death') {
+            if (tt && isDeathTerrain(tt)) {
                 currentX = testX
                 currentY = testY
                 break

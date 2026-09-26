@@ -2,19 +2,9 @@ import { MemoryHandler } from 'Utils/MemoryHandler'
 import { getUdgVisibilityTypes } from '../../../../globals'
 import { arrayPush } from '../../01_libraries/Basic_functions'
 import { log } from '../../Log/log'
+import { tileIndexOf as indexOf, tileIndexTx as txOf, tileIndexTy as tyOf } from './TileCoordinates'
 import { TileMask, partitionTiles } from './VisibilityPartition'
 import { VisibilityType } from './VisibilityType'
-
-/**
- * A tile index has to stay a plain positive integer while tile coordinates can be negative, the grid being anchored
- * on the world origin. 4096 tiles either way is far beyond any Warcraft III map.
- */
-const TILE_INDEX_OFFSET = 4096
-const TILE_INDEX_STRIDE = 8192
-
-const indexOf = (tx: number, ty: number) => (ty + TILE_INDEX_OFFSET) * TILE_INDEX_STRIDE + (tx + TILE_INDEX_OFFSET)
-const txOf = (index: number) => (index % TILE_INDEX_STRIDE) - TILE_INDEX_OFFSET
-const tyOf = (index: number) => Math.floor(index / TILE_INDEX_STRIDE) - TILE_INDEX_OFFSET
 
 type TileBox = {
     minTx: number

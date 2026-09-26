@@ -4,7 +4,7 @@ import { Constants } from 'core/01_libraries/Constants'
 import { Escaper } from 'core/04_STRUCTURES/Escaper/Escaper'
 import { GetMirrorEscaper } from 'core/04_STRUCTURES/Escaper/Escaper_functions'
 import { MeteorFunctions } from 'core/04_STRUCTURES/Meteor/Meteor_functions'
-import { TerrainType } from 'core/04_STRUCTURES/TerrainType/TerrainType'
+import { TerrainType, isDeathTerrain } from 'core/04_STRUCTURES/TerrainType/TerrainType'
 import { TerrainTypeDeath } from 'core/04_STRUCTURES/TerrainType/TerrainTypeDeath'
 import { TerrainTypeSlide } from 'core/04_STRUCTURES/TerrainType/TerrainTypeSlide'
 import { TerrainTypeWalk } from 'core/04_STRUCTURES/TerrainType/TerrainTypeWalk'
@@ -159,7 +159,7 @@ const initCheckTerrainTrigger = () => {
 
                 deathTouch.toleranceTerrainType = terrainTypeTolerance
 
-                if (terrainTypeTolerance?.getKind() !== 'death') {
+                if (!terrainTypeTolerance || !isDeathTerrain(terrainTypeTolerance)) {
                     deathTouch.isTouched = false
                 }
 
@@ -197,10 +197,7 @@ const initCheckTerrainTrigger = () => {
         const lastTerrainType = escaper.getLastTerrainType()
         const currentTerrainType = getUdgTerrainTypes().getTerrainType(x, y)
 
-        if (
-            !currentTerrainType ||
-            (lastTerrainType === currentTerrainType && currentTerrainType.getKind() !== 'death')
-        ) {
+        if (!currentTerrainType || (lastTerrainType === currentTerrainType && !isDeathTerrain(currentTerrainType))) {
             return
         }
 
@@ -289,7 +286,7 @@ const initCheckTerrainTrigger = () => {
         if (escaper.isHeroOnGround()) {
             if (
                 !currentTerrainType ||
-                (lastTerrainType === currentTerrainType && currentTerrainType.getKind() !== 'death')
+                (lastTerrainType === currentTerrainType && !isDeathTerrain(currentTerrainType))
             ) {
                 return
             }

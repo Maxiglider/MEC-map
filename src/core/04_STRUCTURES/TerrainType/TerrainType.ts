@@ -1,20 +1,25 @@
 import { MemoryHandler } from 'Utils/MemoryHandler'
 import { CanUseTerrain } from 'core/07_TRIGGERS/Modify_terrain_Functions/Terrain_functions'
 import { Ascii2String } from '../../01_libraries/Ascii'
-import { TerrainTypeDeath } from './TerrainTypeDeath'
-import { TerrainTypeSlide } from './TerrainTypeSlide'
-import { TerrainTypeWalk } from './TerrainTypeWalk'
+import type { TerrainTypeBurn } from './TerrainTypeBurn'
+import type { TerrainTypeDeath } from './TerrainTypeDeath'
+import type { TerrainTypeSlide } from './TerrainTypeSlide'
+import type { TerrainTypeWalk } from './TerrainTypeWalk'
 
 export const DISPLAY_SPACE = '   '
 
 export const isWalkTerrain = (tt: TerrainType): tt is TerrainTypeWalk => tt.kind === 'walk'
 export const isSlideTerrain = (tt: TerrainType): tt is TerrainTypeSlide => tt.kind === 'slide'
-export const isDeathTerrain = (tt: TerrainType): tt is TerrainTypeDeath => tt.kind === 'death'
+/** A burn terrain is a death terrain too: it kills the same way, so this is true for both */
+export const isDeathTerrain = (tt: TerrainType): tt is TerrainTypeDeath => tt.kind === 'death' || tt.kind === 'burn'
+export const isBurnTerrain = (tt: TerrainType): tt is TerrainTypeBurn => tt.kind === 'burn'
+
+export type TerrainTypeKind = 'walk' | 'slide' | 'death' | 'burn'
 
 export abstract class TerrainType {
     label: string
     theAlias: string | null
-    kind: 'walk' | 'slide' | 'death'
+    kind: TerrainTypeKind
     terrainTypeId: number
     orderId: number //numéro du terrain (ordre des tilesets), de 1 à 16
     cliffClassId: number //cliff class 1 or 2, depending of the main tileset
@@ -24,7 +29,7 @@ export abstract class TerrainType {
         label: string,
         terrainTypeId: number,
         theAlias: string | null,
-        kind: 'walk' | 'slide' | 'death',
+        kind: TerrainTypeKind,
         orderId: number,
         cliffClassId: number
     ) {

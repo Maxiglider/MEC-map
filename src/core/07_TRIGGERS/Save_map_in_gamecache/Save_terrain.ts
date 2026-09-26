@@ -2,13 +2,12 @@ import { MemoryHandler } from 'Utils/MemoryHandler'
 import { Ascii2String } from 'core/01_libraries/Ascii'
 import { Constants } from 'core/01_libraries/Constants'
 import { Text } from 'core/01_libraries/Text'
-import { TerrainType } from 'core/04_STRUCTURES/TerrainType/TerrainType'
+import { getRealTerrainTypeId } from 'core/04_STRUCTURES/TerrainType/TerrainBurn/BurningTiles'
 import { getUdgTerrainTypes, globals } from '../../../../globals'
 import { arrayPush, ShowAllDestructables } from '../../01_libraries/Basic_functions'
 import { I2CustomBase64String } from '../../01_libraries/Functions_on_numbers'
 import { SaveTerrainHeights } from './Save_terrain_heights_and_cliffs'
 import { SaveTerrainRamps } from './Save_terrain_ramps'
-import { Natives } from '../../wc3_natives_unsecured/Natives'
 
 let terrainTypeIds: number[] = []
 let nbTerrainTypesUsed: number
@@ -40,7 +39,8 @@ const SaveMapDimensionsAndCenterOffset = (json: { [x: string]: any }) => {
 
 //crée si besoin une nouvelle instance dans le tableau et retourne l'id de cet élément de tableau
 const GetTerrainId = (x: number, y: number): string => {
-    let terrainTypeId = GetTerrainType(x, y)
+    // a burning tile is saved as the slide it really is: the fire is not part of the map
+    let terrainTypeId = getRealTerrainTypeId(x, y)
 
     for (let i = 0; i < nbTerrainTypesUsed; i++) {
         if (terrainTypeId === terrainTypeIds[i]) {

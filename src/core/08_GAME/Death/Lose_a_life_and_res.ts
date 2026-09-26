@@ -38,6 +38,19 @@ export const loseALifeAndRes = (escaperIds: number[]) => {
             arrayPush(clonedEscaperIds, i)
         }
 
+        // the checkpoint gives the level back as it started: the fires too, once per level, in the escapers' order
+        const levelIdsReset: { [levelId: number]: boolean | undefined } = {}
+
+        for (const i of clonedEscaperIds) {
+            const escaper = getUdgEscapers().get(i)
+            const level = escaper && getUdgLevels().getCurrentLevel(escaper)
+
+            if (level && !levelIdsReset[level.getId()]) {
+                levelIdsReset[level.getId()] = true
+                level.terrainBurns.reset()
+            }
+        }
+
         for (const i of clonedEscaperIds) {
             getUdgEscapers().get(i)?.reviveAtStart()
         }

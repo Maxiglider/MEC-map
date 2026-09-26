@@ -10,7 +10,8 @@ import { CmdParam, NbParam } from '../../06_COMMANDS/Helpers/Command_functions'
 import { handlePaginationArgs, handlePaginationObj } from '../../06_COMMANDS/Helpers/Pagination'
 import { TerrainTypeMax } from '../../07_TRIGGERS/Modify_terrain_Functions/Terrain_type_max'
 import { BaseArray } from '../BaseArray'
-import { TerrainType, isDeathTerrain } from './TerrainType'
+import { TerrainType, isBurnTerrain, isDeathTerrain } from './TerrainType'
+import { TerrainTypeBurn } from './TerrainTypeBurn'
 import { TerrainTypeDeath } from './TerrainTypeDeath'
 import { TerrainTypeSlide } from './TerrainTypeSlide'
 import { TerrainTypeWalk } from './TerrainTypeWalk'
@@ -149,6 +150,57 @@ export class TerrainTypeArray extends BaseArray<TerrainType> {
         return tt
     }
 
+    newBurn = (
+        label: string,
+        terrainTypeId: number,
+        propagationTime: number,
+        burningTime: number,
+        burningEffectStr: string,
+        burningEffectTime: number,
+        timeToBurnAgain: number,
+        killingEffectStr: string,
+        timeToKill: number,
+        toleranceDist: number
+    ) => {
+        if (this.isLabelAlreadyUsed(label)) throw `TerrainType label already used: "${label}"`
+        if (this.isTerrainTypeIdAlreadyUsed(terrainTypeId)) throw 'Terrain type already used'
+        if (terrainTypeId === 0) throw 'Wrong terrain type'
+
+        const tt = new TerrainTypeBurn(
+            label,
+            terrainTypeId,
+            propagationTime,
+            burningTime,
+            burningEffectStr,
+            burningEffectTime,
+            timeToBurnAgain,
+            killingEffectStr,
+            timeToKill,
+            toleranceDist
+        )
+        this._new(tt)
+        ServiceManager.getService('React').forceUpdate()
+        return tt
+    }
+
+    /**
+     * The burn terrain types, sorted by label: the fire of each is started in this order, and that order decides
+     * which one takes a slide tile two of them reach at once - so it must not be the order pairs walks them in.
+     */
+    getBurnTypes = (): TerrainTypeBurn[] => {
+        const burnTypes: TerrainTypeBurn[] = []
+
+        for (const [_, terrainType] of pairs(this.data)) {
+            if (isBurnTerrain(terrainType)) {
+                burnTypes.push(terrainType)
+            }
+        }
+
+        burnTypes.sort((a, b) => (a.label < b.label ? -1 : a.label > b.label ? 1 : 0))
+
+        return burnTypes
+    }
+
     remove = (label: string): boolean => {
         for (const [terrainTypeId, terrainType] of pairs(this.data)) {
             if (terrainType.label === label || terrainType.theAlias === label) {
@@ -264,8 +316,8 @@ export class TerrainTypeArray extends BaseArray<TerrainType> {
 
                     break
 
-                case 'slide':
-                    tt = this.newSlide(
+                case 'slide': {
+                    const slide = this.newSlide(
                         terrainTypeJson.label,
                         terrainTypeId,
                         terrainTypeJson.slideSpeed,
@@ -275,12 +327,36 @@ export class TerrainTypeArray extends BaseArray<TerrainType> {
                         terrainTypeJson.slideInertia ?? null
                     )
 
+                    // absent from the data saved before it existed: it can burn then
+                    if (terrainTypeJson.canBurn === false) {
+                        slide.setCanBurn(false)
+                    }
+
+                    tt = slide
+
                     break
+                }
 
                 case 'death':
                     tt = this.newDeath(
                         terrainTypeJson.label,
                         terrainTypeId,
+                        terrainTypeJson.killingEffet,
+                        terrainTypeJson.timeToKill,
+                        terrainTypeJson.toleranceDist
+                    )
+
+                    break
+
+                case 'burn':
+                    tt = this.newBurn(
+                        terrainTypeJson.label,
+                        terrainTypeId,
+                        terrainTypeJson.propagationTime,
+                        terrainTypeJson.burningTime,
+                        terrainTypeJson.burningEffect,
+                        terrainTypeJson.burningEffectTime,
+                        terrainTypeJson.timeToBurnAgain,
                         terrainTypeJson.killingEffet,
                         terrainTypeJson.timeToKill,
                         terrainTypeJson.toleranceDist

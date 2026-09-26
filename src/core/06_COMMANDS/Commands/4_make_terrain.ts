@@ -1,10 +1,23 @@
-import { getUdgTerrainTypes } from '../../../../globals'
+import { getUdgLevels, getUdgTerrainTypes } from '../../../../globals'
 import { ServiceManager } from '../../../Services'
 import { IsBoolString, S2B } from '../../01_libraries/Basic_functions'
 import { Constants } from '../../01_libraries/Constants'
 import { IsInteger, IsPositiveInteger } from '../../01_libraries/Functions_on_numbers'
 import { udg_colorCode } from '../../01_libraries/Init_colorCodes'
 import { Text } from '../../01_libraries/Text'
+import type { Escaper } from '../../04_STRUCTURES/Escaper/Escaper'
+import {
+    isTerrainBurnEnabled,
+    setTerrainBurnEnabled,
+} from '../../04_STRUCTURES/TerrainType/TerrainBurn/LevelTerrainBurns'
+import {
+    BURN_DEFAULT_BURNING_EFFECT_TIME,
+    BURN_DEFAULT_BURNING_TIME,
+    BURN_DEFAULT_PROPAGATION_TIME,
+    BURN_DEFAULT_TIME_TO_BURN_AGAIN,
+    BURN_MIN_PROPAGATION_TIME,
+    TerrainTypeBurn,
+} from '../../04_STRUCTURES/TerrainType/TerrainTypeBurn'
 import { DEATH_TERRAIN_MAX_TOLERANCE, TerrainTypeDeath } from '../../04_STRUCTURES/TerrainType/TerrainTypeDeath'
 import { TerrainTypeSlide } from '../../04_STRUCTURES/TerrainType/TerrainTypeSlide'
 import { TerrainTypeWalk } from '../../04_STRUCTURES/TerrainType/TerrainTypeWalk'
@@ -137,6 +150,257 @@ export const initExecuteCommandMake_terrain = () => {
 
             Text.mkP(escaper.getPlayer(), 'New terrain type "' + param1 + '" added')
 
+            return true
+        },
+    })
+
+    const burnEffectFromParam = (param: string) => (param === 'none' ? '' : param)
+
+    const isPropagationTime = (param: string) => S2R(param) >= BURN_MIN_PROPAGATION_TIME
+
+    const getBurnTerrainType = (label: string, escaper: Escaper): TerrainTypeBurn | null => {
+        const terrainType = getUdgTerrainTypes().getByLabel(label)
+
+        if (!terrainType) {
+            Text.erP(escaper.getPlayer(), 'unknown terrain')
+            return null
+        }
+
+        if (!(terrainType instanceof TerrainTypeBurn)) {
+            Text.erP(escaper.getPlayer(), 'the terrain must be of burn type')
+            return null
+        }
+
+        return terrainType
+    }
+
+    //-newBurn(newb) <label> <terrainType> [<propagationTime> [<burningTime> [<burningEffect> [<burningEffectTime> [<timeToBurnAgain>]]]]]   --> add a new kind of burn terrain
+    registerCommand({
+        name: 'newBurn',
+        alias: ['newb'],
+        group,
+        argDescription:
+            '<label> <terrainType> [<propagationTime> [<burningTime> [<burningEffect> [<burningEffectTime> [<timeToBurnAgain>]]]]]',
+        description:
+            'Add a new kind of burn terrain: a death terrain spreading to the slide tiles next to it, in the level it touches. propagationTime is in seconds (default 1), the other durations in propagation times. burningTime: how long a reached tile burns before becoming slide again, 0 for good (default 3). burningEffect: shown on the reached tiles, none by default. burningEffectTime: how long that effect lasts, 0 for as long as the tile burns (default 0). timeToBurnAgain: how long a tile back to slide cannot burn again (default 3). Killing effect, delay and tolerance are set as for a death terrain',
+        cb: ({ nbParam, param1, param2, param3, param4, param5, param6, param7 }, escaper) => {
+            if (nbParam < 2 || nbParam > 7) {
+                return true
+            }
+
+            let propagationTime = BURN_DEFAULT_PROPAGATION_TIME
+            let burningTime = BURN_DEFAULT_BURNING_TIME
+            let burningEffect = ''
+            let burningEffectTime = BURN_DEFAULT_BURNING_EFFECT_TIME
+            let timeToBurnAgain = BURN_DEFAULT_TIME_TO_BURN_AGAIN
+
+            if (nbParam >= 3) {
+                if (!isPropagationTime(param3)) {
+                    Text.erP(
+                        escaper.getPlayer(),
+                        'the propagation time must be a real of at least ' + R2S(BURN_MIN_PROPAGATION_TIME)
+                    )
+                    return true
+                }
+                propagationTime = S2R(param3)
+            }
+
+            if (nbParam >= 4) {
+                if (!IsPositiveInteger(param4)) {
+                    Text.erP(escaper.getPlayer(), 'the burning time must be a positive integer')
+                    return true
+                }
+                burningTime = S2I(param4)
+            }
+
+            if (nbParam >= 5) {
+                burningEffect = burnEffectFromParam(param5)
+            }
+
+            if (nbParam >= 6) {
+                if (!IsPositiveInteger(param6)) {
+                    Text.erP(escaper.getPlayer(), 'the burning effect time must be a positive integer')
+                    return true
+                }
+                burningEffectTime = S2I(param6)
+            }
+
+            if (nbParam === 7) {
+                if (!IsPositiveInteger(param7)) {
+                    Text.erP(escaper.getPlayer(), 'the time to burn again must be a positive integer')
+                    return true
+                }
+                timeToBurnAgain = S2I(param7)
+            }
+
+            getUdgTerrainTypes().newBurn(
+                param1,
+                TerrainTypeFromString.TerrainTypeString2TerrainTypeId(param2),
+                propagationTime,
+                burningTime,
+                burningEffect,
+                burningEffectTime,
+                timeToBurnAgain,
+                '',
+                Constants.TERRAIN_DEATH_TIME_TO_KILL,
+                0
+            )
+
+            Text.mkP(escaper.getPlayer(), 'New terrain type "' + param1 + '" added')
+
+            return true
+        },
+    })
+
+    //-terrainBurn(terb) <boolean>   --> light or put out the fires of the burn terrains, for this game only
+    registerCommand({
+        name: 'terrainBurn',
+        alias: ['terb'],
+        group,
+        argDescription: '<boolean>',
+        description:
+            'Light or put out the fires of the burn terrains in the levels being played. Put out, every tile they reached becomes slide again. For this game only: not saved by -smic',
+        cb: ({ nbParam, param1 }, escaper) => {
+            if (nbParam !== 1 || !IsBoolString(param1)) {
+                return true
+            }
+            const enabled = S2B(param1)
+            if (enabled === isTerrainBurnEnabled()) {
+                Text.erP(escaper.getPlayer(), 'terrain burn already ' + (enabled ? 'on' : 'off'))
+                return true
+            }
+            setTerrainBurnEnabled(enabled)
+            // by level id, the same order on every machine
+            for (let levelId = 0; levelId <= getUdgLevels().getLastLevelId(); levelId++) {
+                getUdgLevels().get(levelId)?.terrainBurns.reset()
+            }
+            Text.mkP(escaper.getPlayer(), 'terrain burn ' + (enabled ? 'on' : 'off'))
+            return true
+        },
+    })
+
+    //-setTerrainBurnPropagationTime(settbpt) <burnTerrainLabel> <propagationTime>
+    registerCommand({
+        name: 'setTerrainBurnPropagationTime',
+        alias: ['settbpt'],
+        group,
+        argDescription: '<burnTerrainLabel> <propagationTime>',
+        description:
+            'Seconds the fire of a burn terrain takes to reach the next tile. Applies from the next level start',
+        cb: ({ nbParam, param1, param2 }, escaper) => {
+            if (nbParam !== 2) {
+                return true
+            }
+            const terrainType = getBurnTerrainType(param1, escaper)
+            if (!terrainType) {
+                return true
+            }
+            if (!isPropagationTime(param2)) {
+                Text.erP(
+                    escaper.getPlayer(),
+                    'the propagation time must be a real of at least ' + R2S(BURN_MIN_PROPAGATION_TIME)
+                )
+                return true
+            }
+            terrainType.setPropagationTime(S2R(param2))
+            Text.mkP(escaper.getPlayer(), 'propagation time changed, from the next level start')
+            return true
+        },
+    })
+
+    //-setTerrainBurningTime(settbt) <burnTerrainLabel> <burningTime>
+    registerCommand({
+        name: 'setTerrainBurningTime',
+        alias: ['settbt'],
+        group,
+        argDescription: '<burnTerrainLabel> <burningTime>',
+        description:
+            'Number of propagation times a tile reached by the fire burns before becoming slide again, 0 for good',
+        cb: ({ nbParam, param1, param2 }, escaper) => {
+            if (nbParam !== 2) {
+                return true
+            }
+            const terrainType = getBurnTerrainType(param1, escaper)
+            if (!terrainType) {
+                return true
+            }
+            if (!IsPositiveInteger(param2)) {
+                Text.erP(escaper.getPlayer(), 'the burning time must be a positive integer')
+                return true
+            }
+            terrainType.setBurningTime(S2I(param2))
+            Text.mkP(escaper.getPlayer(), 'burning time changed')
+            return true
+        },
+    })
+
+    //-setTerrainBurningEffect(settbe) <burnTerrainLabel> <burningEffect>
+    registerCommand({
+        name: 'setTerrainBurningEffect',
+        alias: ['settbe'],
+        group,
+        argDescription: '<burnTerrainLabel> <burningEffect>',
+        description: 'Special effect shown on the tiles the fire reaches, none for no effect',
+        cb: ({ nbParam, param1, param2 }, escaper) => {
+            if (nbParam !== 2) {
+                return true
+            }
+            const terrainType = getBurnTerrainType(param1, escaper)
+            if (!terrainType) {
+                return true
+            }
+            terrainType.setBurningEffectStr(burnEffectFromParam(param2))
+            Text.mkP(escaper.getPlayer(), 'burning effect changed')
+            return true
+        },
+    })
+
+    //-setTerrainBurningEffectTime(settbet) <burnTerrainLabel> <burningEffectTime>
+    registerCommand({
+        name: 'setTerrainBurningEffectTime',
+        alias: ['settbet'],
+        group,
+        argDescription: '<burnTerrainLabel> <burningEffectTime>',
+        description: 'Number of propagation times the burning effect of a tile lasts, 0 for as long as the tile burns',
+        cb: ({ nbParam, param1, param2 }, escaper) => {
+            if (nbParam !== 2) {
+                return true
+            }
+            const terrainType = getBurnTerrainType(param1, escaper)
+            if (!terrainType) {
+                return true
+            }
+            if (!IsPositiveInteger(param2)) {
+                Text.erP(escaper.getPlayer(), 'the burning effect time must be a positive integer')
+                return true
+            }
+            terrainType.setBurningEffectTime(S2I(param2))
+            Text.mkP(escaper.getPlayer(), 'burning effect time changed')
+            return true
+        },
+    })
+
+    //-setTerrainTimeToBurnAgain(setttba) <burnTerrainLabel> <timeToBurnAgain>
+    registerCommand({
+        name: 'setTerrainTimeToBurnAgain',
+        alias: ['setttba'],
+        group,
+        argDescription: '<burnTerrainLabel> <timeToBurnAgain>',
+        description: 'Number of propagation times a tile back to slide cannot burn again',
+        cb: ({ nbParam, param1, param2 }, escaper) => {
+            if (nbParam !== 2) {
+                return true
+            }
+            const terrainType = getBurnTerrainType(param1, escaper)
+            if (!terrainType) {
+                return true
+            }
+            if (!IsPositiveInteger(param2)) {
+                Text.erP(escaper.getPlayer(), 'the time to burn again must be a positive integer')
+                return true
+            }
+            terrainType.setTimeToBurnAgain(S2I(param2))
+            Text.mkP(escaper.getPlayer(), 'time to burn again changed')
             return true
         },
     })
@@ -437,6 +701,46 @@ export const initExecuteCommandMake_terrain = () => {
 
             terrainType.setGravity(S2R(param2))
             Text.mkP(escaper.getPlayer(), 'terrain gravity changed')
+            return true
+        },
+    })
+
+    //-setTerrainCanBurn(settcb) <slideTerrainLabel> <canBurn>
+    registerCommand({
+        name: 'setTerrainCanBurn',
+        alias: ['settcb'],
+        group,
+        argDescription: '<slideTerrainLabel> <canBurn>',
+        description: 'Can the fire of a burn terrain reach this slide terrain. canBurn is a boolean, true by default',
+        cb: ({ nbParam, param1, param2 }, escaper) => {
+            if (nbParam !== 2) {
+                return true
+            }
+            const terrainType = getUdgTerrainTypes().getByLabel(param1)
+            if (!terrainType) {
+                Text.erP(escaper.getPlayer(), 'unknown terrain')
+                return true
+            }
+            if (!(terrainType instanceof TerrainTypeSlide)) {
+                Text.erP(escaper.getPlayer(), 'the terrain must be of slide type')
+                return true
+            }
+            if (!IsBoolString(param2)) {
+                Text.erP(escaper.getPlayer(), 'the property "canBurn" must be a boolean (true or false)')
+                return true
+            }
+            const canBurn = S2B(param2)
+            if (terrainType.setCanBurn(canBurn)) {
+                Text.mkP(
+                    escaper.getPlayer(),
+                    canBurn ? 'this slide terrain can now burn' : "this slide terrain can't burn anymore"
+                )
+            } else {
+                Text.erP(
+                    escaper.getPlayer(),
+                    canBurn ? 'this slide terrain can already burn' : "this slide terrain already can't burn"
+                )
+            }
             return true
         },
     })

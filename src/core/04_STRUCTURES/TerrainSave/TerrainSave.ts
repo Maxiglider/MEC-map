@@ -6,6 +6,7 @@ import { ChangeTerrainType } from '../../07_TRIGGERS/Modify_terrain_Functions/Mo
 import { TerrainTypeMax } from '../../07_TRIGGERS/Modify_terrain_Functions/Terrain_type_max'
 import type { Level } from '../Level/Level'
 import { HorizontalRectangleRegion } from '../Region/HorizontalRectangleRegion'
+import { getBurningTileOriginal } from '../TerrainType/TerrainBurn/BurningTiles'
 import type { TerrainType } from '../TerrainType/TerrainType'
 import type {
     TerrainSaveEvent,
@@ -140,7 +141,12 @@ export class TerrainSave {
             for (let col = 0; col < newWidth; col++) {
                 const x = newOriginX + col * Constants.LARGEUR_CASE
 
-                const terrainType = getUdgTerrainTypes().getTerrainType(x, y)
+                // a burning tile is captured as the slide it really is: the fire is not part of the map
+                const burningTileOriginal = getBurningTileOriginal(x, y)
+                const terrainType =
+                    burningTileOriginal !== undefined
+                        ? getUdgTerrainTypes().getByTerrainTypeId(burningTileOriginal)
+                        : getUdgTerrainTypes().getTerrainType(x, y)
                 if (terrainType === null) {
                     throw `TerrainSave: captureTerrain: no TerrainType found at (${x}, ${y})`
                 }

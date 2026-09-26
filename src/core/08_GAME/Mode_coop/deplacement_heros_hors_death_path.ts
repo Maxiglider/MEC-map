@@ -1,5 +1,6 @@
 import { getUdgTerrainTypes } from '../../../../globals'
 import { Hero2Escaper } from '../../04_STRUCTURES/Escaper/Escaper_functions'
+import { isDeathTerrain } from '../../04_STRUCTURES/TerrainType/TerrainType'
 
 const initDeplacementHeroHorsDeathPath = () => {
     const GRADUATION_ANGLE = 5
@@ -24,7 +25,9 @@ const initDeplacementHeroHorsDeathPath = () => {
         let angleNonDeathTrouveALInstant = false
 
         //vérification que le héros est sur le terrain qui tue
-        if (getUdgTerrainTypes().getTerrainType(xHero, yHero)?.getKind() !== 'death') {
+        const terrainTypeUnderHero = getUdgTerrainTypes().getTerrainType(xHero, yHero)
+
+        if (!terrainTypeUnderHero || !isDeathTerrain(terrainTypeUnderHero)) {
             return
         }
 
@@ -34,7 +37,9 @@ const initDeplacementHeroHorsDeathPath = () => {
             if (angle >= 360) break
             x = xHero + VALEUR_DECALAGE * CosBJ(angle)
             y = yHero + VALEUR_DECALAGE * SinBJ(angle)
-            if (getUdgTerrainTypes().getTerrainType(x, y)?.getKind() !== 'death') {
+            const terrainTypeAtAngle = getUdgTerrainTypes().getTerrainType(x, y)
+
+            if (!terrainTypeAtAngle || !isDeathTerrain(terrainTypeAtAngle)) {
                 if (!angleNonDeathTrouveALInstant) {
                     if (dernierAngleNonDeath === 0) {
                         premierAngleNonDeath = angle

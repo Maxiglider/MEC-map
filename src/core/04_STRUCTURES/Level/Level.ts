@@ -26,6 +26,7 @@ import { CircleMobArray } from '../Monster_properties/CircleMobArray'
 import { ClearMobArray } from '../Monster_properties/ClearMobArray'
 import { PortalMobArray } from '../Monster_properties/PortalMobArray'
 import { RegionArray } from '../Region/RegionArray'
+import { LevelTerrainBurns } from '../TerrainType/TerrainBurn/LevelTerrainBurns'
 import { VisibilityTileArray } from '../Visibility/VisibilityTileArray'
 import { End, Start, TpForEnd } from './StartAndEnd'
 import { StaticSlideArray } from './StaticSlideArray'
@@ -80,6 +81,7 @@ export class Level {
     staticSlides: StaticSlideArray
     regions: RegionArray
     keyAndDoors: KeyAndDoorArray
+    terrainBurns: LevelTerrainBurns
 
     //hooks
     public hooks_onStart = new MecHookArray<(level: Level) => void>()
@@ -99,6 +101,7 @@ export class Level {
         this.staticSlides = new StaticSlideArray(this)
         this.regions = new RegionArray(this)
         this.keyAndDoors = new KeyAndDoorArray(this)
+        this.terrainBurns = new LevelTerrainBurns(this)
         this.livesEarnedAtBeginning = 1
         this.isActivatedB = false
         this.startMessage = ''
@@ -127,6 +130,7 @@ export class Level {
             this.regions.activate(true)
             this.keyAndDoors.activate(true)
             this.removeTempTerrainTypes()
+            this.terrainBurns.activate(true)
 
             if (getUdgLevels().getLevelProgression() === 'all') {
                 if (Level.earningLivesActivated && this.getId() > 0) {
@@ -154,6 +158,7 @@ export class Level {
             this.regions.activate(false)
             this.keyAndDoors.activate(false)
             this.removeTempTerrainTypes()
+            this.terrainBurns.activate(false)
             getUdgEscapers().deleteSpecificActionsForLevel(this)
             this.setDebugRegionsVisible('off')
 
@@ -260,6 +265,7 @@ export class Level {
         this.keyAndDoors.destroy()
         this.destroyDebugRegions()
         this.removeTempTerrainTypes()
+        this.terrainBurns.stop()
     }
 
     recreateMonstersUnitsOfType(mt: MonsterType) {

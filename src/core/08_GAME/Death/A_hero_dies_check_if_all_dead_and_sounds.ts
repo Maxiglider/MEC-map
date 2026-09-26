@@ -4,6 +4,7 @@ import { arrayPush } from 'core/01_libraries/Basic_functions'
 import { Constants } from 'core/01_libraries/Constants'
 import { IsHero } from 'core/04_STRUCTURES/Escaper/Escaper_functions'
 import { sameLevelProgression } from 'core/04_STRUCTURES/Level/LevelProgression'
+import { isDeathTerrain } from 'core/04_STRUCTURES/TerrainType/TerrainType'
 import { getUdgEscapers, getUdgTerrainTypes, globals } from '../../../../globals'
 import { Natives } from '../../wc3_natives_unsecured/Natives'
 import { AfkMode } from '../Afk_mode/Afk_mode'
@@ -136,14 +137,12 @@ export const InitTrig_A_hero_dies_check_if_all_dead_and_sounds = () => {
                         }
 
                         //déplacement du héros si mort sur le death path
-                        if (
-                            getUdgTerrainTypes()
-                                .getTerrainType(
-                                    getUdgEscapers().get(n)?.getHeroX() ?? 0,
-                                    getUdgEscapers().get(n)?.getHeroY() ?? 0
-                                )
-                                ?.getKind() === 'death'
-                        ) {
+                        const terrainTypeUnderHero = getUdgTerrainTypes().getTerrainType(
+                            getUdgEscapers().get(n)?.getHeroX() ?? 0,
+                            getUdgEscapers().get(n)?.getHeroY() ?? 0
+                        )
+
+                        if (terrainTypeUnderHero && isDeathTerrain(terrainTypeUnderHero)) {
                             DeplacementHeroHorsDeathPath.DeplacementHeroHorsDeathPath(hero2)
                         }
 
