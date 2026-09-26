@@ -14,6 +14,7 @@ import { initExecuteCommandMake } from '../Commands/4_make'
 import { initExecuteCommandMake_doors } from '../Commands/4_make_doors'
 import { initExecuteCommandMake_monsters } from '../Commands/4_make_monsters'
 import { initExecuteCommandMake_spawns } from '../Commands/4_make_spawns'
+import { initExecuteCommandMake_speed_control } from '../Commands/4_make_speed_control'
 import { initExecuteCommandMake_terrain } from '../Commands/4_make_terrain'
 import { initExecuteCommandMake_terrain_saves } from '../Commands/4_make_terrain_saves'
 import { initExecuteCommandMake_visibility } from '../Commands/4_make_visibility'
@@ -350,6 +351,7 @@ export const initCommandExecution = () => {
         initExecuteCommandMake_terrain()
         initExecuteCommandMake_terrain_saves()
         initExecuteCommandMake_visibility()
+        initExecuteCommandMake_speed_control()
 
         // Commands Admin
         initExecuteCommandMax()
