@@ -54,6 +54,7 @@ import { MakeTpForEnd } from '../../05_MAKE_STRUCTURES/Make_start_end_visibility
 import { MakeTerrainCopyPaste } from '../../05_MAKE_STRUCTURES/Make_terrain/MakeTerrainCopyPaste'
 import { MakeTerrainCreate } from '../../05_MAKE_STRUCTURES/Make_terrain/MakeTerrainCreate'
 import { MakeTerrainCreateBrush } from '../../05_MAKE_STRUCTURES/Make_terrain/MakeTerrainCreateBrush'
+import { MakeTerrainFill } from '../../05_MAKE_STRUCTURES/Make_terrain/MakeTerrainFill'
 import { MakeTerrainHorizontalSymmetry } from '../../05_MAKE_STRUCTURES/Make_terrain/MakeTerrainHorizontalSymmetry'
 import { MakeTerrainVerticalSymmetry } from '../../05_MAKE_STRUCTURES/Make_terrain/MakeTerrainVerticalSymmetry'
 import { MakeTerrainHeight } from '../../05_MAKE_STRUCTURES/Make_terrain_height/MakeTerrainHeight'
@@ -752,6 +753,11 @@ export abstract class EscaperMake {
     makeCreateTerrainBrush(terrainType: TerrainType, brushSize: number, shape: 'square' | 'circle' = 'square') {
         this.destroyMake()
         this.make = new MakeTerrainCreateBrush(this as unknown as Escaper, terrainType, brushSize, shape)
+    }
+
+    makeCreateTerrainFill(terrainType: TerrainType) {
+        this.destroyMake()
+        if (this.hero) this.make = new MakeTerrainFill(this.hero, terrainType)
     }
 
     makeTerrainCopyPaste = () => {

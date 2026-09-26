@@ -900,13 +900,14 @@ export const initExecuteCommandMake_terrain = () => {
         },
     })
 
-    //-createTerrain(crt) <terrainLabel> [<brushSize> [<shape>]]  --> create the terrain on the map, by clicking
+    //-createTerrain(crt) <terrainLabel> [<brushSize>|fill [<shape>]]  --> create the terrain on the map, by clicking
     registerCommand({
         name: 'createTerrain',
         alias: ['crt'],
         group,
-        argDescription: '<terrainLabel> [<brushSize> [<shape>]',
-        description: 'Create the terrain on the map, by clicking',
+        argDescription: '<terrainLabel> [<brushSize>|fill [<shape>]]',
+        description:
+            'Create the terrain on the map, by clicking: two clicks for a rectangle, or holding a click with a brush size. With fill, a right click fills the clicked tile and every tile of the same terrain linked to it',
         cb: ({ nbParam, param1, param2, param3 }, escaper) => {
             if (nbParam < 1 || nbParam > 3) {
                 return true
@@ -916,7 +917,10 @@ export const initExecuteCommandMake_terrain = () => {
             if (!terrainType) {
                 Text.erP(escaper.getPlayer(), 'terrain "' + param1 + '" doesn\'t exist')
             } else {
-                if (nbParam > 1) {
+                if (param2 === 'fill') {
+                    //paint bucket mode
+                    escaper.makeCreateTerrainFill(terrainType)
+                } else if (nbParam > 1) {
                     //brush mode
                     //param2 : brush size
                     const brushSize = S2I(param2)
