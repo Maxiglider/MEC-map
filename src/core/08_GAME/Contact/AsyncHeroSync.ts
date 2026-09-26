@@ -52,6 +52,8 @@ const POSITION_PERIOD = 0.1
  *  - turnPerPeriod, the current angular speed. The slide accelerates its turns, so without it a
  *    receiver would restart that acceleration from its own value and draw another curve,
  *  - the vertical state, as for a death,
+ *  - speedControlState and speedControlRatio, what its player does with the slide speed control and the
+ *    speed as a ratio of its base: only the animation of the effect shows them, the speed being above,
  *  - slideSpeed, rotationSpeed and slideInertia, which the terrain and the static slides under the
  *    hero change on its own machine only,
  *  - terrainTypeId, the terrain the hero was last seen on (0 for none): its gravity and whether it
@@ -72,6 +74,8 @@ export type HeroMovementState = {
     slideSpeed: number
     rotationSpeed: number
     slideInertia: number
+    speedControlState: number
+    speedControlRatio: number
     turnPerPeriod: number
     terrainTypeId: number
     staticSlideId: number
@@ -86,7 +90,8 @@ const encode = (escaperId: number, sequence: number, movement: HeroMovementState
         `%d${FIELD_SEPARATOR}%d${FIELD_SEPARATOR}%.2f${FIELD_SEPARATOR}%.2f${FIELD_SEPARATOR}%.2f` +
             `${FIELD_SEPARATOR}%.2f${FIELD_SEPARATOR}%.2f${FIELD_SEPARATOR}%.4f${FIELD_SEPARATOR}%.2f` +
             `${FIELD_SEPARATOR}%.4f${FIELD_SEPARATOR}%.2f${FIELD_SEPARATOR}%.4f${FIELD_SEPARATOR}%.4f` +
-            `${FIELD_SEPARATOR}%d${FIELD_SEPARATOR}%d${FIELD_SEPARATOR}%.2f${FIELD_SEPARATOR}%.4f`,
+            `${FIELD_SEPARATOR}%d${FIELD_SEPARATOR}%d${FIELD_SEPARATOR}%.2f${FIELD_SEPARATOR}%.4f` +
+            `${FIELD_SEPARATOR}%d${FIELD_SEPARATOR}%.3f`,
         escaperId,
         sequence,
         movement.x,
@@ -103,7 +108,9 @@ const encode = (escaperId: number, sequence: number, movement: HeroMovementState
         movement.terrainTypeId,
         movement.staticSlideId,
         movement.staticSlidePreviousSpeed,
-        movement.slideInertia
+        movement.slideInertia,
+        movement.speedControlState,
+        movement.speedControlRatio
     )
 
 const decodeNumbers = (data: string) => {
@@ -120,7 +127,7 @@ const decodeNumbers = (data: string) => {
 const decode = (data: string) => {
     const fields = decodeNumbers(data)
 
-    if (fields.length < 17) {
+    if (fields.length < 19) {
         return undefined
     }
 
@@ -143,6 +150,8 @@ const decode = (data: string) => {
             staticSlideId: fields[14],
             staticSlidePreviousSpeed: fields[15],
             slideInertia: fields[16],
+            speedControlState: fields[17],
+            speedControlRatio: fields[18],
         },
     }
 }

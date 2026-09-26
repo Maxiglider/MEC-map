@@ -13,6 +13,7 @@ import { hooks } from 'core/API/GeneralHooks'
 import { getUdgEscapers, getUdgTerrainTypes } from '../../../../globals'
 import { getAutoTurnMode } from '../../Async_slide/AutoTurn'
 import { AutoContinueAfterSliding } from './Auto_continue_after_sliding'
+import { clampSlideSpeedToControlBounds, isSlideSpeedControlled } from './SlideSpeedControl'
 import { TurnOnSlide } from './To_turn_on_slide'
 
 const TOLERANCE_ANGLE_DIFF = 5
@@ -38,8 +39,21 @@ const initCheckTerrainTrigger = () => {
             AutoContinueAfterSliding.ClearLastClickSave(playerId)
         }
 
+        // The base speed is the one of this terrain, or the one -setSlideSpeed gave. From walkable ground the slide
+        // starts at it; from another slide, a hero whose speed is controlled keeps the speed it had, within the
+        // bounds of this base.
         if (!escaper.isAbsoluteSlideSpeed()) {
-            escaper.setSlideSpeed((escaper.getSlideMirror() ? -1 : 1) * terrainType.getSlideSpeed())
+            escaper.setSlideSpeedBase((escaper.getSlideMirror() ? -1 : 1) * terrainType.getSlideSpeed())
+        }
+
+        if (!escaper.isAbsoluteSlideSpeed() || escaper.isSlideSpeedModulable()) {
+            const baseSpeed = escaper.getSlideSpeedBase()
+
+            if (wasSliding && isSlideSpeedControlled(escaper)) {
+                escaper.setSlideSpeed(clampSlideSpeedToControlBounds(escaper.getSlideSpeed(), baseSpeed))
+            } else if (!escaper.isAbsoluteSlideSpeed() || !wasSliding) {
+                escaper.setSlideSpeed(baseSpeed)
+            }
         }
 
         if (!escaper.isAbsoluteRotationSpeed()) {

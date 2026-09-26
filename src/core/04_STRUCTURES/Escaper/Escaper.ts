@@ -22,6 +22,7 @@ import {
 import { refreshTrigMoveCollisionLandmarks } from '../../07_TRIGGERS/CollisionLandmarks/MoveCollisionLandmarks'
 import { CheckTerrainTrigger } from '../../07_TRIGGERS/Slide_and_CheckTerrain_triggers/CheckTerrain'
 import { SlideTrigger } from '../../07_TRIGGERS/Slide_and_CheckTerrain_triggers/Slide'
+import { SLIDE_SPEED_CONTROL } from '../../07_TRIGGERS/Slide_and_CheckTerrain_triggers/SlideSpeedControl'
 import {
     HERO_ROTATION_SPEED,
     HERO_ROTATION_TIME_FOR_MAXIMUM_SPEED,
@@ -225,6 +226,17 @@ export class Escaper extends EscaperMake {
     private walkSpeed: number
     private slideSpeed: number
     private slideSpeedCmd: number | undefined
+    /**
+     * What the slide speed control starts from and is bounded by: the speed of the slide terrain under the hero,
+     * signed as the slide goes, or the one -setSlideSpeed gave it (see SlideSpeedControl)
+     */
+    private slideSpeedBase: number = Constants.HERO_SLIDE_SPEED
+    /** False while a speed is forced on the hero, -setSlideSpeed aside: nothing may change it then */
+    private slideSpeedModulable = true
+    /** What the player is doing with the slide speed control (SLIDE_SPEED_CONTROL), shown by the effect */
+    private slideSpeedControlState = SLIDE_SPEED_CONTROL.none
+    /** The slide speed as a ratio of its base, the pace of the walk animation while speeding up */
+    private slideSpeedControlRatio = 1
     private rotationSpeed: number
     /** How much inertia the hero turns with while sliding, as a factor of the normal one (see SLIDE_INERTIA_FACTOR) */
     private slideInertia: number
@@ -1162,6 +1174,8 @@ export class Escaper extends EscaperMake {
         slideSpeed: this.slideSpeed,
         rotationSpeed: this.rotationSpeed,
         slideInertia: this.slideInertia,
+        speedControlState: this.slideSpeedControlState,
+        speedControlRatio: this.slideSpeedControlRatio,
         turnPerPeriod: this.getSlideCurrentTurnPerPeriod(),
         terrainTypeId: this.lastTerrainType?.getTerrainTypeId() ?? 0,
         staticSlideId: this.staticSliding?.id ?? -1,
@@ -1305,6 +1319,8 @@ export class Escaper extends EscaperMake {
         this.setSlideSpeed(movement.slideSpeed)
         this.setRotationSpeed(movement.rotationSpeed)
         this.setSlideInertia(movement.slideInertia)
+        // only what the effect shows: the speed itself came above
+        this.setSlideSpeedControlState(movement.speedControlState, movement.speedControlRatio)
         this.lastTerrainType = getUdgTerrainTypes().getByTerrainTypeId(movement.terrainTypeId) ?? undefined
 
         // last, once all of it is set: moving the unit may fire the triggers of a map
@@ -1737,10 +1753,61 @@ export class Escaper extends EscaperMake {
         return this.slideSpeedAbsolute
     }
 
+    getSlideSpeedBase = () => this.slideSpeedBase
+
+    setSlideSpeedBase = (slideSpeedBase: number) => {
+        this.slideSpeedBase = slideSpeedBase
+    }
+
+    isSlideSpeedModulable = () => this.slideSpeedModulable
+
+    /**
+     * What the player does with the slide speed control, and the animation the effect of the hero shows for it:
+     * walk while speeding up, at the pace of the speed, channel while slowing down, stand otherwise. Played again
+     * only when it changes, which would restart it otherwise. The effect only: the unit is unseen while it stands
+     * in, and this runs on one machine alone for its own hero.
+     */
+    setSlideSpeedControlState = (state: number, ratio: number) => {
+        const hasChanged = state !== this.slideSpeedControlState
+
+        this.slideSpeedControlState = state
+        this.slideSpeedControlRatio = ratio
+
+        const heroEffect = this.heroEffect
+
+        if (!heroEffect) {
+            return
+        }
+
+        if (hasChanged) {
+            BlzSpecialEffectClearSubAnimations(heroEffect)
+
+            if (state === SLIDE_SPEED_CONTROL.accelerating) {
+                BlzPlaySpecialEffect(heroEffect, ANIM_TYPE_WALK)
+            } else if (state === SLIDE_SPEED_CONTROL.braking) {
+                BlzSpecialEffectAddSubAnimation(heroEffect, SUBANIM_TYPE_CHANNEL)
+                BlzPlaySpecialEffect(heroEffect, ANIM_TYPE_SPELL)
+            } else {
+                BlzPlaySpecialEffect(heroEffect, ANIM_TYPE_STAND)
+            }
+        }
+
+        if (hasChanged || state === SLIDE_SPEED_CONTROL.accelerating) {
+            BlzSetSpecialEffectTimeScale(heroEffect, state === SLIDE_SPEED_CONTROL.accelerating ? ratio : 1)
+        }
+    }
+
     absoluteSlideSpeed(slideSpeed: number, isCommand = false) {
         this.slideSpeedAbsolute = true
         this.setSlideSpeed((this.getSlideMirror() ? -1 : 1) * slideSpeed)
         isCommand && (this.slideSpeedCmd = slideSpeed)
+
+        // -setSlideSpeed gives a base speed the slide speed control works from, as a terrain does; any other
+        // forced speed, a portal stopping the hero for instance, is left as it is
+        this.slideSpeedModulable = isCommand
+        if (isCommand) {
+            this.slideSpeedBase = (this.getSlideMirror() ? -1 : 1) * slideSpeed
+        }
 
         if (!this.isEscaperSecondary()) {
             GetMirrorEscaper(this)?.absoluteSlideSpeed(slideSpeed, isCommand)
@@ -1755,15 +1822,19 @@ export class Escaper extends EscaperMake {
                 const currentTerrainType = getUdgTerrainTypes().getTerrainType(this.getHeroX(), this.getHeroY())
 
                 if (currentTerrainType instanceof TerrainTypeSlide) {
-                    this.setSlideSpeed((this.getSlideMirror() ? -1 : 1) * currentTerrainType.getSlideSpeed())
+                    this.slideSpeedBase = (this.getSlideMirror() ? -1 : 1) * currentTerrainType.getSlideSpeed()
+                    this.setSlideSpeed(this.slideSpeedBase)
                 }
             }
+
+            this.slideSpeedModulable = true
 
             if (isCommand) {
                 this.slideSpeedCmd = undefined
             } else {
                 if (this.slideSpeedCmd !== undefined) {
                     this.slideSpeedAbsolute = true
+                    this.slideSpeedBase = this.slideSpeedCmd
                     this.setSlideSpeed(this.slideSpeedCmd)
                 }
             }
@@ -2945,6 +3016,9 @@ export class Escaper extends EscaperMake {
         // taken along by a static slide of this machine alone, if this one owns the hero: the
         // others never heard of that ride
         this.staticSliding?.forgetHero(this)
+
+        // back to stand for the next slide, which starts at the base speed
+        this.setSlideSpeedControlState(SLIDE_SPEED_CONTROL.none, 1)
 
         this.parkHeroEffect()
 

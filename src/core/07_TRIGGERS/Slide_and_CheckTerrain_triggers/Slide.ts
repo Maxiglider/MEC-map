@@ -10,6 +10,7 @@ import { Escaper } from '../../04_STRUCTURES/Escaper/Escaper'
 import { GetMirrorEscaper } from '../../04_STRUCTURES/Escaper/Escaper_functions'
 import { ASYNC_HERO_EVENT } from '../../08_GAME/Contact/AsyncHeroSync'
 import { GRAVITY_EVERY_N_PERIOD, Gravity } from './Gravity'
+import { updateLocalSlideSpeedControl } from './SlideSpeedControl'
 import { computeSlideTurnForOnePeriod, slideTurn } from './SlidingMax'
 
 const tmpLoc = Location(0, 0)
@@ -59,6 +60,11 @@ const initSlideTrigger = () => {
         const hero = escaper.getHero()
 
         if (!hero) return
+
+        // the machine of its player alone, before the move: the speed it gives is carried to the others by the packets
+        if (escaper.isAsyncControlledHere()) {
+            updateLocalSlideSpeedControl(escaper)
+        }
 
         //offset of the hero position
         const oldX = escaper.getHeroX()
