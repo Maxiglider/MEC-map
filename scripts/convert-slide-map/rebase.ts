@@ -444,6 +444,32 @@ if (droppedQuestRef) {
     )
 }
 
+// Custom text triggers of the base map to disable (spec disabledBaseTriggers, by name): the base map's "Admin for
+// all" gives every player the making rights, which a finished map should not (user's request, Murloc Slide 2,
+// 2026-09-26). Disabled as the World Editor does it: its flag in war3map.wtg, its text kept in war3map.wct, and its
+// code left out of war3map.lua, where the editor writes enabled triggers only.
+const disabledBaseTriggerTexts = ((spec.disabledBaseTriggers ?? []) as string[]).map(triggerName => {
+    const wtg = baseBytes('war3map.wtg')
+    const nameAt = wtg.indexOf(Buffer.from(triggerName + '\0', 'utf8'))
+    // a custom text trigger: its kind (32), name, description, isComment, id, isEnabled…
+    if (nameAt === -1 || wtg.readUInt32LE(nameAt - 4) !== 32) {
+        throw new Error(`spec.disabledBaseTriggers: no custom text trigger "${triggerName}" in the base map`)
+    }
+    const descriptionEnd = wtg.indexOf(0, nameAt + Buffer.byteLength(triggerName, 'utf8') + 1)
+    const idAt = descriptionEnd + 1 + 4
+    const enabledAt = idAt + 4
+    wtg.writeUInt32LE(0, enabledAt)
+    set('war3map.wtg', wtg, `base map trigger "${triggerName}" disabled (spec disabledBaseTriggers)`)
+
+    // its text in war3map.wct: after the header, the comment and the map's own script, one text per custom text
+    // trigger, numbered as their ids (checked against war3map.lua below, where it must be found as it is)
+    const wct = baseBytes('war3map.wct')
+    let at = wct.indexOf(0, 8) + 1
+    at += 4 + wct.readUInt32LE(at)
+    for (let n = 0; n < wtg.readUInt32LE(idAt) - 0x05000000; n++) at += 4 + wct.readUInt32LE(at)
+    return { triggerName, text: wct.toString('utf8', at + 4, at + 4 + wct.readUInt32LE(at) - 1) }
+})
+
 if (spec.mecOne) {
     log.push(`- \`war3map.wts\`: MEC's own quest left out (MEC 1 map: its own quests already say it was made with MEC)`)
 } else {
@@ -615,6 +641,11 @@ if (droppedQuestRef) {
     const line = new RegExp(`\\n\\s*CreateQuestBJ\\([^\\n]*"${droppedQuestRef}"[^\\n]*`)
     if (!line.test(lua)) throw new Error(`No CreateQuestBJ of ${droppedQuestRef} in the base map's war3map.lua`)
     lua = lua.replace(line, '')
+}
+for (const { triggerName, text } of disabledBaseTriggerTexts) {
+    const at = text === '' ? -1 : lua.indexOf(text)
+    if (at === -1) throw new Error(`The code of base map trigger "${triggerName}" is not in its war3map.lua`)
+    lua = lua.substring(0, at) + lua.substring(at + text.length)
 }
 const mainStart = lua.indexOf('\nfunction main()')
 const mainEnd = lua.indexOf('\nend', mainStart)
