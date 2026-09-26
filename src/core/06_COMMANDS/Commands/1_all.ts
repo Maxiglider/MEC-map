@@ -2000,7 +2000,7 @@ export const initCommandAll = () => {
         group,
         argDescription: '[async|a|asyncClicks|ac|legacy|l]',
         description:
-            'How your hero is steered while sliding. async: your own machine moves it, and it follows your mouse in real time (right click to start steering, left click to stop). asyncClicks (the default): your own machine moves it, and it turns towards your right clicks at once. legacy: the slide as it always was, through the network. Without a value, tells the current mode',
+            'How your hero is steered while sliding. async: your own machine moves it, and it follows your mouse in real time (right click to start steering). asyncClicks (the default): your own machine moves it, and it turns towards your right clicks at once. legacy: the slide as it always was, through the network. Without a value, tells the current mode',
         cb: ({ param1 }, escaper) => {
             if (param1.length === 0) {
                 Text.mkP(escaper.getPlayer(), `Slide mode: ${slideModeName(getAutoTurnMode(escaper.getId()))}`)

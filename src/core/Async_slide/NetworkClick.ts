@@ -91,9 +91,12 @@ export const setNetworkClickListeningEnabled = (escaperId: number, isEnabled: bo
                     // only, which is why it is solo only.
                     const escaperId = GetPlayerId(Natives.UGetTriggerPlayer())
 
-                    // while a steering mode is chosen, the buttons hand the hero over to the mouse
-                    // and take it back, rather than each click being an order of its own
-                    if (isCursorFollowingAutoTurnMode(getAutoTurnMode(escaperId))) {
+                    // while a steering mode is chosen, the right click hands the hero over to the
+                    // mouse rather than being an order of its own. The left click takes it back in
+                    // sync mode only: in async mode that went unused in practice
+                    const autoTurnMode = getAutoTurnMode(escaperId)
+
+                    if (isCursorFollowingAutoTurnMode(autoTurnMode) && (isRightClick || autoTurnMode === 'sync')) {
                         setAutoTurnSteering(escaperId, isRightClick)
                     }
 

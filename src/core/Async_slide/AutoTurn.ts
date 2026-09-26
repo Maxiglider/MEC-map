@@ -15,7 +15,8 @@ import { screen2World } from './Screen2World'
  * towards the cursor, over and over, while the right click still gives its instant smart order
  * for the parts of the map where one walks.
  *
- * Right click turns it on, left click turns it off.
+ * Right click turns it on. In sync mode, left click turns it off; in async mode it stays on, the left
+ * click being unused in practice there.
  *
  * The clicks are read from the synchronized mouse event. The cursor, on the other hand, comes from
  * AsyncMouse in async mode, read on this machine at once, so the hero faces where the cursor is now
@@ -94,7 +95,7 @@ export const getAutoTurnMode = (escaperId: number) => modes[escaperId] ?? 'off'
 export const isSteering = (escaperId: number) =>
     isCursorFollowingAutoTurnMode(getAutoTurnMode(escaperId)) && steering[escaperId] === true
 
-/** The right click hands the steering to the mouse, the left click gives it back */
+/** The right click hands the steering to the mouse, the left click gives it back in sync mode only */
 export const setAutoTurnSteering = (escaperId: number, isOn: boolean) => {
     steering[escaperId] = isOn
 }
