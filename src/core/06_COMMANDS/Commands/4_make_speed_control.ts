@@ -3,6 +3,7 @@ import { ServiceManager } from '../../../Services'
 import { IsBoolString, S2B } from '../../01_libraries/Basic_functions'
 import { Text } from '../../01_libraries/Text'
 import type { Escaper } from '../../04_STRUCTURES/Escaper/Escaper'
+import { refreshStartZoneHints } from '../../08_GAME/Init_game/Start_zone_hints'
 
 /**
  * The commands setting the slide speed control, the game constants a hero sliding async speeds up and slows down
@@ -78,6 +79,8 @@ export const initExecuteCommandMake_speed_control = () => {
             }
 
             globals.slideSpeedControl = S2B(param1)
+            // the line under the start zone telling how to use it comes and goes with it
+            refreshStartZoneHints()
             Text.A('slide speed control ' + (globals.slideSpeedControl ? 'on' : 'off'))
             return true
         },

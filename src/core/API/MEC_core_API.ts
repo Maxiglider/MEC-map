@@ -29,6 +29,7 @@ import { Gravity } from '../07_TRIGGERS/Slide_and_CheckTerrain_triggers/Gravity'
 import { ReinitTerrains } from '../07_TRIGGERS/Triggers_to_modify_terrains/Reinit_terrains'
 import { ReinitTerrainsPositions } from '../07_TRIGGERS/Triggers_to_modify_terrains/Reinit_terrains_position_Change_variations_and_ut_at_beginning'
 import { heroes, spawnHeroes } from '../08_GAME/Init_game/Heroes'
+import { refreshStartZoneHints } from '../08_GAME/Init_game/Start_zone_hints'
 import { e2e } from '../Test/e2e-tests/base/e2e-tests-base'
 import { hooks } from './GeneralHooks'
 import { MecHook } from './MecHook'
@@ -160,7 +161,10 @@ export const MEC_core_API = {
     setStaticSpawnPositions: heroes.setStaticSpawnPositions,
     // the slide speed control, see -slideSpeedControl: the bounds are ratios of the base slide speed, the
     // acceleration and the braking ratios of it per second
-    setSlideSpeedControl: (b: boolean) => (globals.slideSpeedControl = b),
+    setSlideSpeedControl: (b: boolean) => {
+        globals.slideSpeedControl = b
+        refreshStartZoneHints()
+    },
     setSlideSpeedControlMax: (ratio: number) => (globals.slideSpeedControlMax = Math.max(1, ratio)),
     setSlideSpeedControlMin: (ratio: number) => (globals.slideSpeedControlMin = Math.min(1, Math.max(0, ratio))),
     setSlideSpeedControlAcceleration: (ratio: number) => (globals.slideSpeedControlAcceleration = Math.max(0, ratio)),

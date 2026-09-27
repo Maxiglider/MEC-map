@@ -11,6 +11,7 @@ import { getUdgEscapers, getUdgLevels, getUdgTerrainTypes } from '../../../../gl
 import { DefineDrawLineType, DrawLine } from '../../01_libraries/Draw_lines'
 import { createDiagonalRegions } from '../../01_libraries/Regions_functions'
 import { ChangeTerrainType } from '../../07_TRIGGERS/Modify_terrain_Functions/Modify_terrain_functions'
+import { refreshStartZoneHints } from '../../08_GAME/Init_game/Start_zone_hints'
 import { MecHookArray } from '../../API/MecHookArray'
 import type { CasterType } from '../Caster/CasterType'
 import type { Escaper } from '../Escaper/Escaper'
@@ -207,6 +208,11 @@ export class Level {
         this.start = new Start(x1, y1, x2, y2, facing)
 
         this.updateDebugRegions()
+
+        // the hints written under the start zone of the first level follow it
+        if (this.id === 0) {
+            refreshStartZoneHints()
+        }
     }
 
     newStartFromJson(data: { [x: string]: number }) {
