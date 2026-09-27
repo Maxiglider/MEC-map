@@ -15,8 +15,8 @@ export const HERO_ROTATION_TIME_FOR_MAXIMUM_SPEED = 0.11
  * speeds up), then tried in the game with -physicalTurn: 25 and 80 degrees are near 0.15 and 0.47 seconds at
  * the default rotation speed.
  */
-export const PHYSICAL_ACCELERATION_DEGREES = 25
-export const PHYSICAL_BRAKING_DEGREES = 80
+export const PHYSICAL_ACCELERATION_DEGREES = 15
+export const PHYSICAL_BRAKING_DEGREES = 50
 
 /**
  * The degrees the physical turn uses, PHYSICAL_ACCELERATION_DEGREES and PHYSICAL_BRAKING_DEGREES by default.
