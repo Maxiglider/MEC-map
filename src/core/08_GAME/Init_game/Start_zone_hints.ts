@@ -17,12 +17,13 @@ const CHAR_WIDTH = 11
 /** How far under the start zone the first line stands, and the second under the first */
 const MARGIN_UNDER_ZONE = 32
 const LINE_HEIGHT = 48
+const SPACE_BETWEEN_TAGS = 16
 
 const lines: { followMouse?: texttag; slideSpeedControl?: texttag } = {}
 
-const placeLine = (textTag: texttag, text: string, centerX: number, y: number) => {
+const placeLine = (textTag: texttag, text: string, x: number, y: number) => {
     SetTextTagTextBJ(textTag, text, FONT_SIZE)
-    SetTextTagPos(textTag, centerX - (text.length * CHAR_WIDTH) / 2, y, 0)
+    SetTextTagPos(textTag, x, y, 0)
 }
 
 const makeLine = () => {
@@ -44,14 +45,13 @@ export const refreshStartZoneHints = () => {
         return
     }
 
-    const centerX = (start.minX + start.maxX) / 2
     const y = start.minY - MARGIN_UNDER_ZONE
 
     lines.followMouse = lines.followMouse ?? makeLine()
-    placeLine(lines.followMouse, FOLLOW_MOUSE_LINE, centerX, y)
+    placeLine(lines.followMouse, FOLLOW_MOUSE_LINE, start.minX, y)
     SetTextTagVisibility(lines.followMouse, true)
 
     lines.slideSpeedControl = lines.slideSpeedControl ?? makeLine()
-    placeLine(lines.slideSpeedControl, SLIDE_SPEED_CONTROL_LINE, centerX, y - LINE_HEIGHT)
+    placeLine(lines.slideSpeedControl, SLIDE_SPEED_CONTROL_LINE, start.minX, y - LINE_HEIGHT * 2 - SPACE_BETWEEN_TAGS)
     SetTextTagVisibility(lines.slideSpeedControl, globals.slideSpeedControl)
 }
