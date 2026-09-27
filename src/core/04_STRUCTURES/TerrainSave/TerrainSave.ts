@@ -7,6 +7,7 @@ import { TerrainTypeMax } from '../../07_TRIGGERS/Modify_terrain_Functions/Terra
 import type { Level } from '../Level/Level'
 import { HorizontalRectangleRegion } from '../Region/HorizontalRectangleRegion'
 import { getBurningTileOriginal } from '../TerrainType/TerrainBurn/BurningTiles'
+import { refreshTerrainBurnsOfActiveLevels } from '../TerrainType/TerrainBurn/LevelTerrainBurns'
 import type { TerrainType } from '../TerrainType/TerrainType'
 import type {
     TerrainSaveEvent,
@@ -167,7 +168,12 @@ export class TerrainSave {
         if (!this.applied) {
             const newPreviousTerrain: TerrainType[] = []
             this.forEachTile((x, y, index) => {
-                const terrainType = getUdgTerrainTypes().getTerrainType(x, y)
+                // a burning tile is kept as the slide it really is, or unloading would paint the fire for good
+                const burningTileOriginal = getBurningTileOriginal(x, y)
+                const terrainType =
+                    burningTileOriginal !== undefined
+                        ? getUdgTerrainTypes().getByTerrainTypeId(burningTileOriginal)
+                        : getUdgTerrainTypes().getTerrainType(x, y)
                 if (terrainType !== null) {
                     newPreviousTerrain[index] = terrainType
                 }
@@ -183,6 +189,7 @@ export class TerrainSave {
         })
 
         this.applied = true
+        refreshTerrainBurnsOfActiveLevels()
         return true
     }
 
@@ -201,6 +208,7 @@ export class TerrainSave {
 
         this.applied = false
         this.previousTerrain = null
+        refreshTerrainBurnsOfActiveLevels()
         return true
     }
 

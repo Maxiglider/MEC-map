@@ -265,7 +265,7 @@ export class Level {
         this.keyAndDoors.destroy()
         this.destroyDebugRegions()
         this.removeTempTerrainTypes()
-        this.terrainBurns.stop()
+        this.terrainBurns.activate(false)
     }
 
     recreateMonstersUnitsOfType(mt: MonsterType) {

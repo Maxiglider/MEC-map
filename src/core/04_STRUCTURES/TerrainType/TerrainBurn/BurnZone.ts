@@ -4,11 +4,11 @@ import type { Level } from '../../Level/Level'
 import type { Start } from '../../Level/StartAndEnd'
 import { tileIndexOf, tileIndexTx, tileIndexTy, tileToWorldCenter } from '../../Visibility/TileCoordinates'
 import type { TerrainTypeKind } from '../TerrainType'
-import { burningTileOriginals } from './BurningTiles'
+import { getBurningTileOriginalAt } from './BurningTiles'
 
 /** The terrain type id a tile really has: the one under the fire when it burns */
 export const getTileTerrainTypeId = (tileIndex: number) =>
-    burningTileOriginals[tileIndex] ??
+    getBurningTileOriginalAt(tileIndex) ??
     GetTerrainType(tileToWorldCenter(tileIndexTx(tileIndex)), tileToWorldCenter(tileIndexTy(tileIndex)))
 
 export type BurnZone = {

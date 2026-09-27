@@ -41,6 +41,8 @@ A source belongs to the level when it touches one of these tiles. The zone decid
 
 The checkpoint revival — every hero dead, a life lost, the heroes back at the start (`loseALifeAndRes`) — resets the fires of the levels of the revived heroes: the reached tiles become slide again, the cooldowns are forgotten and the fires are lit anew from their sources, the zone being computed again. A single hero's revival (`-revive`, autorevive) leaves them as they are.
 
+A terrain save loaded or unloaded (`TerrainSave.apply` / `unapply`, by an event, `-loadTerrain` or `-unloadTerrain`) makes every level being played find its tiles and its sources again (`refreshTerrainBurnsOfActiveLevels`). The fires go on rather than start over — a terrain save loaded periodically would otherwise cut them short at every load: a runner takes its new sources, and a burn type that got some is lit. A burning tile the load painted over is no longer burning: its fire drops it at its next tick, without giving it its slide back, and until then `BurningTiles` already reads the terrain it shows. The terrain a load keeps for its unload reads a burning tile as its slide, or unloading would paint the fire for good.
+
 A property change applies at once, except the propagation time, which is the period of the runner's timer: that one applies from the next level start.
 
 ## Desyncs

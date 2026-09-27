@@ -5,7 +5,7 @@ import { ChangeTerrainType } from '../../../07_TRIGGERS/Modify_terrain_Functions
 import { tileIndexTx, tileIndexTy, tileToWorldCenter } from '../../Visibility/TileCoordinates'
 import { isSlideTerrain } from '../TerrainType'
 import type { TerrainTypeBurn } from '../TerrainTypeBurn'
-import { burningTileOriginals } from './BurningTiles'
+import { burningTileOriginals, clearBurningTile, setBurningTile } from './BurningTiles'
 import { forEachNeighbour } from './BurnZone'
 
 /**
@@ -37,8 +37,18 @@ export class TerrainBurnRunner {
          * The tiles painted with the burn terrain type, touching the level: they burn for good. The level only
          * decides which tiles are sources - the fire they start reaches any slide tile, the level's or not.
          */
-        private readonly sources: number[]
+        private sources: number[]
     ) {}
+
+    getBurnType = () => this.burnType
+
+    /**
+     * The sources found again after the terrain changed under the level (a terrain save loaded): the fire goes on
+     * from them, the tiles already burning keeping their own course. None left, and it only burns out.
+     */
+    setSources = (sources: number[]) => {
+        this.sources = sources
+    }
 
     start = () => {
         this.timer = createTimer(this.burnType.getPropagationTime(), true, () => this.onTick())
@@ -65,10 +75,18 @@ export class TerrainBurnRunner {
 
         for (const tileIndex of this.burning) {
             const burnEnd = this.burnEnd[tileIndex] ?? 0
+            // painted over since it caught fire, by a terrain save loaded or a maker: not burning any more, and the
+            // terrain it got stays
+            const isPaintedOver =
+                GetTerrainType(tileToWorldCenter(tileIndexTx(tileIndex)), tileToWorldCenter(tileIndexTy(tileIndex))) !==
+                this.burnType.getTerrainTypeId()
 
-            if (burnEnd !== 0 && burnEnd <= tick) {
+            if (isPaintedOver || (burnEnd !== 0 && burnEnd <= tick)) {
                 this.extinguish(tileIndex)
-                this.cooldownEnd[tileIndex] = tick + this.burnType.getTimeToBurnAgain()
+
+                if (!isPaintedOver) {
+                    this.cooldownEnd[tileIndex] = tick + this.burnType.getTimeToBurnAgain()
+                }
             } else {
                 const effectEnd = this.effectEnd[tileIndex] ?? 0
 
@@ -112,7 +130,7 @@ export class TerrainBurnRunner {
             return
         }
 
-        burningTileOriginals[tileIndex] = terrainTypeId
+        setBurningTile(tileIndex, terrainTypeId, this.burnType.getTerrainTypeId())
         ChangeTerrainType(x, y, this.burnType.getTerrainTypeId())
 
         this.isBurning[tileIndex] = true
@@ -144,7 +162,7 @@ export class TerrainBurnRunner {
             }
         }
 
-        burningTileOriginals[tileIndex] = undefined
+        clearBurningTile(tileIndex)
         this.isBurning[tileIndex] = undefined
         this.burnEnd[tileIndex] = undefined
         this.destroyEffect(tileIndex)
