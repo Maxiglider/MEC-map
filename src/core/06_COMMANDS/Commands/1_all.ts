@@ -1181,7 +1181,7 @@ export const initCommandAll = () => {
             const value = states[target] ?? true
             states[target] = !value
 
-            const bool = value ? '1' : '0'
+            const bool = value ? 'on' : 'off'
             execute(
                 escaper,
                 target.indexOf(TOGGLE_PLACEHOLDER) !== -1
