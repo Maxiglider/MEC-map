@@ -1,4 +1,4 @@
-import { forRange } from 'Utils/mapUtils'
+import { createEvent, createTimer, forRange } from 'Utils/mapUtils'
 import { Constants } from 'core/01_libraries/Constants'
 import { udg_colorCode } from 'core/01_libraries/Init_colorCodes'
 import { escaperId2playerId } from 'core/04_STRUCTURES/Escaper/Escaper_functions'
@@ -152,6 +152,68 @@ const initAfkMode = () => {
     }
 
     const isPaused = () => paused
+
+    /** Activity counts for a hero alive only: the timer of a dead one is paused, and would start again */
+    const resetAfkIfAlive = (playerId: number) => {
+        const hero = getUdgEscapers()?.get(playerId)?.getHero()
+
+        if (hero && IsUnitAliveBJ(hero)) {
+            resetAfk(playerId)
+        }
+    }
+
+    // Any chat message, commands included, shows the player is there. The chat event is synchronized already,
+    // so listening to every message costs nothing more on the network.
+    createEvent({
+        events: [
+            t =>
+                forRange(Constants.NB_PLAYERS_MAX, i =>
+                    TriggerRegisterPlayerChatEvent(t, Natives.UPlayer(i), '', false)
+                ),
+        ],
+        actions: [() => resetAfkIfAlive(GetPlayerId(Natives.UGetTriggerPlayer()))],
+    })
+
+    /**
+     * Moving the camera shows the player is there too, but only their own machine knows where it looks. So once a
+     * second, that machine tells every machine when the camera moved since, as AutoTurn does with the cursor of a
+     * hero sliding async. A camera locked on a hero is left out: it moves with that hero, nobody touching it. Only
+     * where it looks counts, not its rotation, which the spin camera of the slide turns by itself.
+     */
+    const CAMERA_ACTIVITY_PREFIX = 'MEC_AFC'
+    const CAMERA_ACTIVITY_PERIOD = 1
+    /** Below this, a move is taken for the rounding of the camera position rather than for the player */
+    const CAMERA_ACTIVITY_MIN_MOVE = 1
+    const camera = { x: 0, y: 0, isKnown: false }
+
+    createEvent({
+        events: [
+            t =>
+                forRange(Constants.NB_PLAYERS_MAX, i =>
+                    BlzTriggerRegisterPlayerSyncEvent(t, Natives.UPlayer(i), CAMERA_ACTIVITY_PREFIX, false)
+                ),
+        ],
+        actions: [() => resetAfkIfAlive(GetPlayerId(Natives.UGetTriggerPlayer()))],
+    })
+
+    // made on every machine alike: only what it reads, the camera of this machine, differs from one to another
+    createTimer(CAMERA_ACTIVITY_PERIOD, true, () => {
+        const x = GetCameraTargetPositionX()
+        const y = GetCameraTargetPositionY()
+        const hasMoved =
+            camera.isKnown &&
+            (RAbsBJ(x - camera.x) >= CAMERA_ACTIVITY_MIN_MOVE || RAbsBJ(y - camera.y) >= CAMERA_ACTIVITY_MIN_MOVE)
+
+        camera.x = x
+        camera.y = y
+        camera.isKnown = true
+
+        const localEscaper = getUdgEscapers()?.get(GetPlayerId(GetLocalPlayer()))
+
+        if (hasMoved && localEscaper && !localEscaper.getLockCamTarget()) {
+            BlzSendSyncData(CAMERA_ACTIVITY_PREFIX, '1')
+        }
+    })
 
     return {
         timeMinAfk,
