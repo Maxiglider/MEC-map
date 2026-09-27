@@ -3,6 +3,7 @@ import { Ascii2String } from 'core/01_libraries/Ascii'
 import { Constants } from 'core/01_libraries/Constants'
 import { Text } from 'core/01_libraries/Text'
 import { getRealTerrainTypeId } from 'core/04_STRUCTURES/TerrainType/TerrainBurn/BurningTiles'
+import type { TerrainType } from 'core/04_STRUCTURES/TerrainType/TerrainType'
 import { getUdgTerrainTypes, globals } from '../../../../globals'
 import { arrayPush, ShowAllDestructables } from '../../01_libraries/Basic_functions'
 import { I2CustomBase64String } from '../../01_libraries/Functions_on_numbers'
@@ -55,47 +56,36 @@ const GetTerrainId = (x: number, y: number): string => {
     return I2CustomBase64String(nbTerrainTypesUsed - 1)
 }
 
+/**
+ * The terrain types given an order (-setTerrainsOrder), sorted by it: the order the exported terrain lists its tiles in.
+ *
+ * Gathered into an array of its own: the terrain types array is keyed by creation, with a hole wherever one was
+ * removed, and holds the unordered ones too, so it can be neither walked by index nor sorted in place. Ties are broken
+ * by label, so that the result does not depend on the order pairs walks that array in.
+ */
 const GererOrdreTerrains = () => {
-    let nbOrderedTerrains = 0
-    let ordreMinTerrainId: number = -1
-    let ordreMin: number
+    const orderedTerrainTypes: TerrainType[] = []
 
-    //récupération de tous les terrains
-    const terrainTypes = getUdgTerrainTypes().getAll()
-    // const terrainTypesWithOrder: TerrainType[] = [] //todomax is this variable terrainTypesWithOrder really useless ?
-
-    //suppression des terrains non ordonnés du tableau
-    for (const [i] of pairs(terrainTypes)) {
-        if (terrainTypes[i].getOrderId() != 0) {
-            // arrayPush(terrainTypesWithOrder, terrainTypes[i])
-            nbOrderedTerrains = nbOrderedTerrains + 1
+    for (const [_, terrainType] of pairs(getUdgTerrainTypes().getAll())) {
+        if (terrainType.getOrderId() !== 0) {
+            orderedTerrainTypes.push(terrainType)
         }
     }
 
-    //tri du tableau
-    for (let numTerrain = 0; numTerrain < nbOrderedTerrains - 1; numTerrain++) {
-        //on trouve l'emplacement du terrain avec l'ordre le plus petit
-        ordreMin = 100
-
-        for (let i = numTerrain; i < nbOrderedTerrains; i++) {
-            if (terrainTypes[i].getOrderId() < ordreMin) {
-                ordreMinTerrainId = i
-                ordreMin = terrainTypes[i].getOrderId()
-            }
-        }
-
-        //on inverse l'emplacement du terrain trouvé avec celui du premier terrain non trié
-        if (ordreMinTerrainId !== numTerrain) {
-            const terrainType = terrainTypes[numTerrain]
-            terrainTypes[numTerrain] = terrainTypes[ordreMinTerrainId]
-            terrainTypes[ordreMinTerrainId] = terrainType
-        }
-    }
+    orderedTerrainTypes.sort((a, b) =>
+        a.getOrderId() !== b.getOrderId()
+            ? a.getOrderId() - b.getOrderId()
+            : a.label < b.label
+              ? -1
+              : a.label > b.label
+                ? 1
+                : 0
+    )
 
     //sauvegarde des terrains dans les variables finales
-    nbTerrainTypesUsed = nbOrderedTerrains
-    for (let i = 0; i < nbOrderedTerrains; i++) {
-        terrainTypeIds[i] = terrainTypes[i].getTerrainTypeId()
+    nbTerrainTypesUsed = orderedTerrainTypes.length
+    for (let i = 0; i < nbTerrainTypesUsed; i++) {
+        terrainTypeIds[i] = orderedTerrainTypes[i].getTerrainTypeId()
     }
 }
 
