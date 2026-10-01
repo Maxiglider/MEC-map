@@ -40,10 +40,40 @@ const initMemoryHandler = () => {
         }
     }
 
+    /**
+     * How deep we are inside code that only one machine runs (see withLocalTables). While it is above zero, the
+     * tables handed out come from outside the pool and are counted nowhere: a machine taking or giving back a table
+     * the others do not would make every machine hand out different tables from then on, and a table reused with
+     * another history is walked by `pairs` in another order (docs/CAUSES_OF_DESYNCS.md, causes 5 and 6).
+     */
+    let localDepth = 0
+
+    /** A table made outside the pool goes nowhere when destroyed: only its contents are let go */
+    const destroyLocalObject = (self: any, recursive = false) => {
+        purgeObject(self, recursive)
+    }
+
+    /** The metatable of the tables made outside the pool, which is also how they are recognized */
+    const localObjectMeta: any = {
+        __index: (_self: any, key: string) => {
+            if (key === '__destroy') {
+                return destroyLocalObject
+            }
+        },
+    }
+
     const destroyObject = (self: any, recursive = false) => {
         if (!self.__destroy) {
             print(info().GetStackTrace())
             throw 'Object is not memory handled'
+        }
+
+        // Made outside the pool, whether or not we are still inside the local code that asked for it: it was never
+        // counted, so giving it back would add a table on this machine alone.
+        if (getmetatable(self) === localObjectMeta) {
+            purgeObject(self, recursive)
+
+            return
         }
 
         purgeObject(self, recursive)
@@ -183,6 +213,16 @@ const initMemoryHandler = () => {
     }
 
     const getEmptyObject = <T>(debugName?: string, objectClass?: any) => {
+        // Inside code only one machine runs: a plain table, taken from nowhere and counted nowhere. Class objects are
+        // left out on purpose - local code has no business making one, and their prototype carries the pool's destroy.
+        if (localDepth > 0 && !objectClass) {
+            const localObj = {} as T & IDestroyable
+
+            setmetatable(localObj, localObjectMeta)
+
+            return localObj
+        }
+
         numHandedOutObjects++
 
         let cachedObjectsToUse: any[] | undefined = cachedObjects
@@ -239,6 +279,30 @@ const initMemoryHandler = () => {
         destroyObject,
         destroyClassObject,
         destroyArray: destroyObject,
+        /**
+         * Runs code that only one machine runs, with its tables taken from outside the pool.
+         *
+         * The rule it enforces: local code must never take from the pool nor give back to it, or the next table every
+         * other machine hands out differs from then on, and the game desyncs a while later, far from the cause. The
+         * `-smic` export is the case it was written for: it walks the whole game to build its JSON, out of dozens of
+         * tables, on the machine of the player who asked and on no other.
+         *
+         * Anything the code inside hands out is a plain table; destroying one lets its contents go and nothing else.
+         * Nested calls are counted, so an inner one cannot put the pool back in use too early.
+         */
+        withLocalTables: <T>(fn: () => T): T => {
+            localDepth++
+
+            const [ok, result] = pcall(fn)
+
+            localDepth--
+
+            if (!ok) {
+                throw result
+            }
+
+            return result as T
+        },
         cloneArray: <T>(arr: T[]) => {
             const newArray = MemoryHandler.getEmptyArray<T>()
 

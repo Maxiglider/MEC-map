@@ -75,7 +75,9 @@ Since patch 1.32, `collectgarbage` cannot be called, and the Lua garbage collect
 `MemoryHandler` hands out recycled tables. A reused table keeps the internal layout of its previous life, so `pairs` over it depends on history. If one machine takes or returns a table the others don't, every machine hands out different tables from then on.
 
 - **Static slide areas** used to be built on demand by the machine of an async hero (`createDiagonalRegions` takes pool tables); they are now built when the level is activated, on every machine (`StaticSlide.activate`).
-- Rule: code running on one machine only uses plain `{}` / `[]`, never `MemoryHandler`.
+- **The `-smic` export** (`SaveMapInCache.gameAsJsonString`, the terrain savers, every `toJson` they reach) builds its JSON out of dozens of pool tables, on the machine of the player who asked and on no other. Caught by `-desyncProbe` on 2026-10-01: `mh` was the first field to part, 58 tables handed out on that machine alone against 3 on the other, and the game split 0.2 s later - with `rng`, the monsters, the heroes and every agent counter still equal. The export now runs inside `MemoryHandler.withLocalTables`, which hands out plain tables and gives none back, so the whole chain is covered without touching a single `toJson`.
+- Rule: code running on one machine only uses plain `{}` / `[]`, never `MemoryHandler` - or runs inside `MemoryHandler.withLocalTables`, which enforces it for everything it calls.
+- **Latent**: the make mode draws its landmark lightnings on the maker's machine alone and keeps them in a pool array (`MakeBySeveralClicks.landmarkLines`), which breaks both halves of the rule. Seen in the same games as a `li` counter differing by thousands between the two machines.
 - **Latent**: a static slide added while its level is active, other than through make mode, would still have its areas built on demand.
 
 ### 7. Shared Lua state written by local code, read by synced code

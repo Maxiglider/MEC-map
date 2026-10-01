@@ -94,11 +94,21 @@ export class SaveMapInCache {
 
     private static smicStringObj = { str: '' }
 
+    /**
+     * Writes the whole game as JSON, on the machine of that player alone (null for every machine).
+     *
+     * That machine walks everything and builds its JSON out of dozens of tables, which is why the export runs with
+     * tables taken from outside the MemoryHandler pool: taken from the pool, on one machine only, they would offset
+     * every machine's pool and desync the game a moment later. Measured with -desyncProbe on 2026-10-01: 58 tables
+     * handed out on the exporting machine alone, and the game split 0.2 s later (docs/CAUSES_OF_DESYNCS.md, cause 6).
+     */
     public static smic = (p: player | null = null, withTerrain = true, fileName?: string) => {
         if (p === null || GetLocalPlayer() == p) {
             const startTime = os.clock()
 
-            SaveMapInCache.smicStringObj.str = SaveMapInCache.gameAsJsonString(withTerrain)
+            SaveMapInCache.smicStringObj.str = MemoryHandler.withLocalTables(() =>
+                SaveMapInCache.gameAsJsonString(withTerrain)
+            )
             fileName = fileName || Constants.MEC_SMIC_DATA_FILE_DATE_TPL.replace('[date]', os.date('%Y-%m-%d_%H-%M-%S'))
 
             SaveLoad.saveFile(fileName, p, SaveMapInCache.smicStringObj.str, false)
