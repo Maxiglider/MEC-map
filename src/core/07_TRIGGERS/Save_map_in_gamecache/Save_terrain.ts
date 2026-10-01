@@ -5,7 +5,7 @@ import { Text } from 'core/01_libraries/Text'
 import { getRealTerrainTypeId } from 'core/04_STRUCTURES/TerrainType/TerrainBurn/BurningTiles'
 import type { TerrainType } from 'core/04_STRUCTURES/TerrainType/TerrainType'
 import { getUdgTerrainTypes, globals } from '../../../../globals'
-import { arrayPush, ShowAllDestructables } from '../../01_libraries/Basic_functions'
+import { arrayPush } from '../../01_libraries/Basic_functions'
 import { I2CustomBase64String } from '../../01_libraries/Functions_on_numbers'
 import { SaveTerrainHeights } from './Save_terrain_heights_and_cliffs'
 import { SaveTerrainRamps } from './Save_terrain_ramps'
@@ -129,16 +129,18 @@ const SaveBoundsInfo = (json: { [x: string]: any }) => {
     }
 }
 
+/**
+ * The terrain of the map into that JSON. Expects the destructables to be hidden by its caller, on every machine: the
+ * heights are read with GetLocationZ, which a bridge or any walkable destructable raises - see SaveMapInCache.smic.
+ */
 export const PushTerrainDataIntoJson = (json: { [x: string]: any }) => {
     json.mainTileset = getUdgTerrainTypes().getMainTileset()
     GererOrdreTerrains()
     SaveTerrain(json) //2 MB leak
     SaveTerrainsUsed(json)
     SaveMapDimensionsAndCenterOffset(json)
-    ShowAllDestructables(false)
     SaveTerrainHeights.SaveTerrainHeights(json)
     SaveTerrainHeights.SaveTerrainCliffs(json)
     SaveTerrainRamps.SaveTerrainRamps(json)
-    ShowAllDestructables(true)
     SaveBoundsInfo(json)
 }
