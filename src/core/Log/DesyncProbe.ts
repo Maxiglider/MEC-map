@@ -59,16 +59,21 @@ const PROBE_PERIOD = 0.2
 /** The last minute: a desync is noticed a few seconds after what caused it */
 const PROBE_FILE_LINES = 300
 
-/** The file is written once a second rather than at every probe: writing it is the costly part */
-const PROBES_PER_WRITE = 5
+/**
+ * The whole file is written every four seconds rather than at every probe: writing it is by far the costly part of
+ * the probe (one Preload call per line, then the disk), and at 300 lines it dwarfs everything else. Nothing is lost
+ * by writing it rarely, because the `_last` file below covers more than the gap between two writes.
+ */
+const PROBES_PER_WRITE = 20
 
 /**
- * The last five seconds, written again at every probe to a file of their own. The machine a desync
+ * The last six seconds, written again at every probe to a file of their own. The machine a desync
  * drops hears of no player leaving: its game just ends, and what it probed since its last write of
- * the whole file is lost - up to a second, the one before its drop, which only that machine can show.
- * The machines still in the game notice the drop seconds later, which is why they need the whole file.
+ * the whole file is lost - up to four seconds, the ones before its drop, which only that machine can
+ * show. This file holds more than that gap, so nothing is ever missing; the machines still in the game
+ * notice the drop seconds later, which is why they need the whole file.
  */
-const LAST_PROBES_LINES = 25
+const LAST_PROBES_LINES = 30
 
 /** How long the probe runs by itself at the start of every game, unless it is turned on by hand meanwhile */
 const GAME_START_PROBE_DURATION = 120
@@ -82,6 +87,50 @@ const state = {
     leaveTrigger: undefined as trigger | undefined,
     /** Running by itself at the start of the game, to stop once GAME_START_PROBE_DURATION is over */
     isTimeLimited: false,
+    /** `-desyncProbe on --verbose`: every agent made is also written down with where it was made from */
+    isVerbose: false,
+}
+
+/**
+ * The lines kept, which is more than the probes while something else writes lines of its own: a death writes one,
+ * and `--verbose` writes one per probe that made an agent. Counting those in would cut the file down to half a
+ * minute just when it is read the most, so the room is given rather than taken.
+ */
+const maxKeptLines = () => (state.isVerbose ? PROBE_FILE_LINES * 2 + 20 : PROBE_FILE_LINES + 20)
+
+/** Drops the oldest lines once the file holds more than it keeps */
+const trimLines = () => {
+    while (state.lines.length > maxKeptLines()) {
+        state.lines.shift()
+    }
+}
+
+/**
+ * Where the agents made since the last probe were made from, by call site and kind, only while the probe runs
+ * verbose. This is what tells a lot of 27 effects apart from the twenty-odd agents a turn makes anyway: the counters
+ * say how many, this says who.
+ *
+ * Reading the call site costs an `xpcall` per agent made, which is why it waits for `--verbose`: MEC makes tens of
+ * agents per turn, and a multiplayer game does not need that weight. Purely local, as a log: it reads the stack of
+ * this machine and changes nothing.
+ */
+const siteCounts: { [siteAndKind: string]: number } = {}
+const hasSiteCounts = { any: false }
+
+/** The line the current native was called from, as "war3map.lua:1234" - empty when the stack cannot be read */
+const callSite = (): string => {
+    let message = ''
+    const store = (msg: unknown) => {
+        message = typeof msg === 'string' ? msg : ''
+    }
+
+    // the level that lands on the caller of the wrapped native, as info().GetStackTrace does for a death
+    xpcall(error, store, '', 4)
+
+    // destructured, or the two values string.find gives back would land in a table rather than a number
+    const [cut] = string.find(message, ': ', 1, true)
+
+    return cut === undefined ? message : string.sub(message, 1, cut - 1)
 }
 
 const writeProbeFile = () => {
@@ -131,7 +180,7 @@ const flag = (value: boolean | unit | undefined) => (value ? '1' : '0')
 type NativeFunction = (this: void, ...args: any[]) => any
 
 /** The kinds of agent counted, in the order they are written */
-const AGENT_KINDS = ['e', 't', 'u', 'tr', 'g', 'l', 'r', 'rg', 'i', 'li', 'f', 'd', 's', 'fr']
+const AGENT_KINDS = ['e', 't', 'u', 'tr', 'g', 'l', 'r', 'rg', 'i', 'li', 'f', 'd', 's', 'fr', 'fm']
 
 /** The natives making or unmaking an agent, by kind. One missing from this version of the game is skipped */
 const AGENT_NATIVES: { name: string; kind: string; isMade: boolean }[] = [
@@ -183,6 +232,14 @@ const AGENT_NATIVES: { name: string; kind: string; isMade: boolean }[] = [
     { name: 'CreateSound', kind: 's', isMade: true },
     { name: 'CreateSoundFromLabel', kind: 's', isMade: true },
     { name: 'CreateMIDISound', kind: 's', isMade: true },
+    // the game has no DestroySound: a sound goes when it has played, which this asks for (SoundUtils).
+    // Counted where it is asked rather than where it happens, so both machines count it on the same turn.
+    { name: 'KillSoundWhenDone', kind: 's', isMade: false },
+    // a fog modifier is an agent too, and the visibility makes them by the lot (VisibilityZone)
+    { name: 'CreateFogModifierRect', kind: 'fm', isMade: true },
+    { name: 'CreateFogModifierRadius', kind: 'fm', isMade: true },
+    { name: 'CreateFogModifierRadiusLoc', kind: 'fm', isMade: true },
+    { name: 'DestroyFogModifier', kind: 'fm', isMade: false },
     // frames only became agents with Warcraft III 3.0
     { name: 'BlzCreateFrame', kind: 'fr', isMade: true },
     { name: 'BlzCreateSimpleFrame', kind: 'fr', isMade: true },
@@ -192,6 +249,19 @@ const AGENT_NATIVES: { name: string; kind: string; isMade: boolean }[] = [
 
 const madeAgents: { [kind: string]: number } = {}
 const unmadeAgents: { [kind: string]: number } = {}
+
+/**
+ * How many times Lua's own random generator was drawn from, which the engine knows nothing about.
+ *
+ * `math.random` is not `GetRandomInt`: the engine's `rand` checksum and the probe's `rng` field only ever see the
+ * game's generator. Lua's one runs from its own seed, identical on every machine only as long as every machine
+ * draws from it exactly as often - one draw made on one machine alone, and every draw after it differs there for
+ * the rest of the game, silently. MEC draws from it in code that changes the game (wander timers, random points
+ * of a region, a facing), so this counter is what tells the two apart when a probe shows agents differing with
+ * `rng` equal.
+ */
+const luaRandomDraws = { count: 0 }
+const originalLuaRandom = { fn: undefined as NativeFunction | undefined }
 
 /** The natives as they were before the probe wrapped them, by name, to give them back */
 const originalNatives: { [name: string]: NativeFunction | undefined } = {}
@@ -219,17 +289,59 @@ const wrapAgentNatives = () => {
         const counts = native.isMade ? madeAgents : unmadeAgents
         const kind = native.kind
 
+        const isMade = native.isMade
+
         const counted: NativeFunction = (...args: any[]) => {
             counts[kind] = counts[kind] + 1
+
+            if (state.isVerbose && isMade) {
+                const key = callSite() + ' ' + kind
+                siteCounts[key] = (siteCounts[key] ?? 0) + 1
+                hasSiteCounts.any = true
+            }
 
             return original(...args)
         }
 
         ;(_G as any)[native.name] = counted
     }
+
+    wrapLuaRandom()
+}
+
+/** Counts the draws from Lua's generator, without touching what it gives back: the same numbers, in the same order */
+const wrapLuaRandom = () => {
+    luaRandomDraws.count = 0
+
+    const mathTable = (_G as any).math
+
+    if (!mathTable || typeof mathTable.random !== 'function' || originalLuaRandom.fn !== undefined) {
+        return
+    }
+
+    const original = mathTable.random as NativeFunction
+
+    originalLuaRandom.fn = original
+
+    mathTable.random = (...args: any[]) => {
+        luaRandomDraws.count = luaRandomDraws.count + 1
+
+        return original(...args)
+    }
+}
+
+const unwrapLuaRandom = () => {
+    const mathTable = (_G as any).math
+
+    if (originalLuaRandom.fn !== undefined && mathTable) {
+        mathTable.random = originalLuaRandom.fn
+        originalLuaRandom.fn = undefined
+    }
 }
 
 const unwrapAgentNatives = () => {
+    unwrapLuaRandom()
+
     for (const native of AGENT_NATIVES) {
         const original = originalNatives[native.name]
 
@@ -249,7 +361,44 @@ const describeAgents = () => {
 
     const pool = MemoryHandler.getPoolStats()
 
-    return line + string.format(' mh %d/%d/%d', pool.handedOut, pool.returned, pool.cached)
+    return (
+        line +
+        string.format(' mh %d/%d/%d', pool.handedOut, pool.returned, pool.cached) +
+        string.format(' lr %d', luaRandomDraws.count)
+    )
+}
+
+/**
+ * A line of its own for the agents made since the last probe, by where they were made from, biggest lot first:
+ * `[probe 42 sites] war3map.lua:8831 e 27 | war3map.lua:5120 t 2`. Only while the probe runs verbose, and only when
+ * something was made, so a quiet probe writes nothing more than before.
+ */
+const writeSiteCountsLine = () => {
+    if (!state.isVerbose || !hasSiteCounts.any) {
+        return
+    }
+
+    const sites: { key: string; count: number }[] = []
+
+    for (const [key, count] of pairs(siteCounts)) {
+        sites[sites.length] = { key: tostring(key), count }
+        delete siteCounts[key]
+    }
+
+    hasSiteCounts.any = false
+
+    // biggest lot first, then by site, so that the line reads the same way whatever the walk gave
+    table.sort(sites, (a, b) => (a.count === b.count ? a.key < b.key : a.count > b.count))
+
+    const parts: string[] = []
+
+    for (const site of sites) {
+        parts[parts.length] = string.format('%s %d', site.key, site.count)
+    }
+
+    state.lines.push(string.format('[probe %d sites] %s', state.tick, table.concat(parts, ' | ')))
+
+    trimLines()
 }
 
 /** A line of its own for each death, written at once: a death is what a probe is most often read for */
@@ -269,9 +418,7 @@ const writeHeroDeath = (escaperId: number, x: number, y: number, cause: string) 
         )
     )
 
-    if (state.lines.length > PROBE_FILE_LINES) {
-        state.lines.shift()
-    }
+    trimLines()
 
     writeProbeFile()
 }
@@ -372,12 +519,12 @@ const probe = () => {
         )
     )
 
-    if (state.lines.length > PROBE_FILE_LINES) {
-        state.lines.shift()
-    }
+    trimLines()
+
+    writeSiteCountsLine()
 
     // The last seconds at every probe, so that a machine dropped by a desync keeps the probes that led
-    // to its drop; the whole file once a second. Writing a file only concerns this machine, and makes
+    // to its drop; the whole file every few seconds. Writing a file only concerns this machine, and makes
     // no handle, and every machine writes at the same probes.
     writeLastProbesFile()
 
@@ -386,11 +533,13 @@ const probe = () => {
     }
 }
 
-export const setDesyncProbeEnabled = (isEnabled: boolean) => {
+export const setDesyncProbeEnabled = (isEnabled: boolean, isVerbose = false) => {
     if (isEnabled === (state.timer !== undefined)) {
-        // turned on by hand while it runs for the start of the game: it goes on with no limit
+        // turned on by hand while it runs for the start of the game: it goes on with no limit, and takes
+        // the verbose mode it is asked for now
         if (isEnabled) {
             state.isTimeLimited = false
+            state.isVerbose = isVerbose
         }
 
         return
@@ -400,11 +549,14 @@ export const setDesyncProbeEnabled = (isEnabled: boolean) => {
         state.timer?.destroy()
         state.timer = undefined
         state.isTimeLimited = false
+        state.isVerbose = false
         setHeroDeathListener(undefined)
         unwrapAgentNatives()
 
         return
     }
+
+    state.isVerbose = isVerbose
 
     // made once, the first time, and kept: it only acts while the probe runs
     if (!state.leaveTrigger) {

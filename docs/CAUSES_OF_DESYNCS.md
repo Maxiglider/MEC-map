@@ -43,6 +43,7 @@ The most common one. The machine has an object the others don't, handle ids shif
 The random generator is shared: one extra draw on one machine changes every draw after it.
 
 - **Drunk mode in the async auto turn** (`To_turn_on_slide.ts`, `isDrunkSwayPositive`): the auto turn runs on the player's machine only, so it alternates the sway instead of drawing.
+- **Lua's own generator is a second one, and nothing watches it.** `math.random` is not `GetRandomInt`: the engine's `rand` checksum and the probe's `rng` field only ever see the game's generator. Lua's runs from its own seed, the same on every machine only as long as every machine draws from it exactly as often - one draw on one machine alone, and every draw after it differs there, for the rest of the game, with nothing to show for it. MEC draws from it in code that changes the game: the wander timers of `MonsterNoMove`, `Region.getRandomPoint` (which also makes a location per draw), `GetRandomAngle`, the hero columns of `init_Heroes`. Prefer `GetRandomReal`/`GetRandomInt` wherever the draw reaches the game, and read the probe's `lr` counter when agents differ while `rng` does not.
 
 ### 3. The game changed from a value only one machine knows
 
@@ -101,8 +102,10 @@ The probe runs by itself for the first 2 minutes of every game, started from the
 
 `-desyncProbe true` (admin command, heard by every machine) makes each machine write, five times a second, values that must be identical everywhere, to two files in `Documents/Warcraft III/CustomMapData/MEC/` (N = player number on that machine):
 
-- `desync_probe_p<N>.txt`: the last minute, written once a second. The probe stops by itself when a player leaves, so the machines still in the game end this file with the drop. They notice it seconds after it happens, which is why they need the whole minute.
-- `desync_probe_p<N>_last.txt`: the last 5 seconds, written at every probe. The machine a desync drops hears of no player leaving: its game just ends, and it loses up to the last second of the first file, the second before its drop, which only it can show.
+- `desync_probe_p<N>.txt`: the last minute, written every 4 seconds (writing it is what the probe costs, so it is written rarely; the file below covers the gap). The probe stops by itself when a player leaves, so the machines still in the game end this file with the drop. They notice it seconds after it happens, which is why they need the whole minute.
+- `desync_probe_p<N>_last.txt`: the last 6 seconds, written at every probe. The machine a desync drops hears of no player leaving: its game just ends, and it loses up to the last 4 seconds of the first file, the second before its drop, which only it can show.
+
+`-desyncProbe on --verbose` adds, at every probe that made any, a line naming **where** this machine made its agents from: `[probe 42 sites] war3map.lua:8831 e 27 | war3map.lua:5120 t 2`. That is what tells a lot of agents made by one piece of code apart from the twenty-odd a turn makes anyway - the `ag` counters say how many, this says who. It reads the stack at every agent made, so it is for a test game, not for a real one, and it is never on unless asked for.
 
 After a desync, collect **both** files of **every** player (dead players included) and compare the lines with the same probe number, reading the `_last` file of the dropped machine for its final probes. The first field that differs is where to look.
 
@@ -111,6 +114,7 @@ After a desync, collect **both** files of **every** player (dead players include
 - `mobs … face … ord`: sums of monster positions, facings and orders.
 - `ag e…/… t…/… u…/…`: agents made/unmade by kind since the probe started, counted by wrapping every native that makes or unmakes one, whoever calls it (cause 1). `fr` counts the frames.
 - `mh <handed out>/<returned>/<cached>`: `MemoryHandler` pool counters (cause 6).
+- `lr <draws>`: how many times Lua's own `math.random` was drawn from since the probe started (cause 2). `rng` equal and `lr` differing means the two generators parted ways, which no engine checksum shows.
 - Per hero: unit position, facing, fly height, life, alive, sliding as an effect (`e`), sliding, static slide, terrain, speed, coop invulnerability, afk, camera target, invisible unit, power circle. For a hero sliding as an effect, `ss`, `tt` and `sp` read `*` and `fx*` is where that machine sees the effect: those differ **by design**.
 - `[probe N death]` lines give where a hero died and its cause as written where the death was decided (contact, death terrain, static slide left sideways, or a stack trace). For an async hero only its own machine knows the cause. Not compared.
 

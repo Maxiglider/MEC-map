@@ -43,6 +43,7 @@ La plus fréquente. La machine a un objet que les autres n'ont pas, les identifi
 Le générateur aléatoire est partagé : un tirage de plus sur une machine change tous les tirages suivants.
 
 - **Mode ivre dans le tournage automatique async** (`To_turn_on_slide.ts`, `isDrunkSwayPositive`) : le tournage automatique ne tourne que sur la machine du joueur, il alterne donc le balancement au lieu de tirer au sort.
+- **Le générateur de Lua en est un second, que rien ne surveille.** `math.random` n'est pas `GetRandomInt` : le checksum `rand` du moteur et le champ `rng` de la sonde ne voient que le générateur du jeu. Celui de Lua part de sa propre graine, identique sur chaque machine tant que chacune y puise exactement aussi souvent - un tirage fait sur une seule machine, et tous les tirages suivants y diffèrent, jusqu'à la fin de la partie, sans que rien ne le montre. MEC y puise dans du code qui change le jeu : les timers de vagabondage de `MonsterNoMove`, `Region.getRandomPoint` (qui crée en plus une location par tirage), `GetRandomAngle`, les colonnes de héros d'`init_Heroes`. Préférer `GetRandomReal`/`GetRandomInt` partout où le tirage atteint le jeu, et lire le compteur `lr` de la sonde quand les agents diffèrent alors que `rng` est identique.
 
 ### 3. La partie modifiée à partir d'une valeur que seule une machine connaît
 
@@ -101,8 +102,10 @@ La probe tourne d'elle-même pendant les 2 premières minutes de chaque partie, 
 
 `-desyncProbe true` (commande admin, reçue par toutes les machines) fait écrire à chaque machine, cinq fois par seconde, des valeurs qui doivent être identiques partout, dans deux fichiers de `Documents/Warcraft III/CustomMapData/MEC/` (N = numéro du joueur sur cette machine) :
 
-- `desync_probe_p<N>.txt` : la dernière minute, écrite une fois par seconde. La probe s'arrête d'elle-même quand un joueur part, pour que les machines restées dans la partie terminent ce fichier sur la coupure. Elles ne la remarquent que quelques secondes après, d'où la minute entière.
-- `desync_probe_p<N>_last.txt` : les 5 dernières secondes, écrites à chaque probe. La machine qu'une désynchronisation éjecte n'est prévenue d'aucun départ : sa partie s'arrête, et elle perd jusqu'à la dernière seconde du premier fichier, celle d'avant sa coupure, qu'elle seule peut montrer.
+- `desync_probe_p<N>.txt` : la dernière minute, écrite toutes les 4 secondes (l'écrire est ce que coûte la sonde, elle l'est donc rarement ; le fichier ci-dessous couvre l'intervalle). La probe s'arrête d'elle-même quand un joueur part, pour que les machines restées dans la partie terminent ce fichier sur la coupure. Elles ne la remarquent que quelques secondes après, d'où la minute entière.
+- `desync_probe_p<N>_last.txt` : les 6 dernières secondes, écrites à chaque probe. La machine qu'une désynchronisation éjecte n'est prévenue d'aucun départ : sa partie s'arrête, et elle perd jusqu'aux 4 dernières secondes du premier fichier, celles d'avant sa coupure, qu'elle seule peut montrer.
+
+`-desyncProbe on --verbose` ajoute, à chaque sonde qui en a fait, une ligne nommant **d'où** cette machine a créé ses agents : `[probe 42 sites] war3map.lua:8831 e 27 | war3map.lua:5120 t 2`. C'est ce qui distingue un lot d'agents créés par un même bout de code de la vingtaine qu'un tour crée de toute façon - les compteurs `ag` disent combien, ceci dit qui. La pile est lue à chaque agent créé : c'est pour une partie de test, pas pour une vraie, et ce n'est jamais actif sans l'avoir demandé.
 
 Après une désynchronisation, récupérer **les deux** fichiers de **chaque** joueur (y compris les joueurs morts) et comparer les lignes de même numéro de probe, en lisant le fichier `_last` de la machine éjectée pour ses dernières probes. Le premier champ qui diffère indique où chercher.
 
@@ -111,6 +114,7 @@ Après une désynchronisation, récupérer **les deux** fichiers de **chaque** j
 - `mobs … face … ord` : sommes des positions, orientations et ordres des monstres.
 - `ag e…/… t…/… u…/…` : agents créés/détruits par type depuis le démarrage de la probe, comptés en enveloppant chaque native qui en crée ou en détruit, quel que soit l'appelant (cause 1). `fr` compte les frames.
 - `mh <distribuées>/<rendues>/<en réserve>` : compteurs de la réserve de `MemoryHandler` (cause 6).
+- `lr <tirages>` : combien de fois `math.random`, le générateur propre à Lua, a été tiré depuis le démarrage de la sonde (cause 2). `rng` identique et `lr` différent signifie que les deux générateurs ont divergé, ce qu'aucun checksum du moteur ne montre.
 - Par héros : position de l'unité, orientation, hauteur de vol, vie, vivant, slide en tant qu'effet (`e`), slide, static slide, terrain, vitesse, invulnérabilité coop, afk, cible de caméra, unité invisible, cercle de résurrection. Pour un héros en slide async, `ss`, `tt` et `sp` valent `*` et `fx*` est l'endroit où cette machine voit l'effet : ces valeurs diffèrent **par conception**.
 - Les lignes `[probe N death]` donnent où un héros est mort et sa cause, notée là où la mort a été décidée (contact, terrain mortel, sortie latérale d'un static slide, ou une pile d'appels). Pour un héros async, seule sa propre machine connaît la cause. Non comparées.
 

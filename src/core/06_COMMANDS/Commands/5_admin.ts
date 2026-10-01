@@ -1118,23 +1118,36 @@ export const initExecuteCommandMax = () => {
         name: 'desyncProbe',
         alias: [],
         group,
-        argDescription: '<boolean>',
+        argDescription: '<boolean> [--verbose]',
         description:
             'Writes, five times a second and on every machine, values that must be the same on all of them, to ' +
-            'CustomMapData/MEC/desync_probe_p<player number>.txt (the last minute, written once a second) and ' +
-            'desync_probe_p<player number>_last.txt (the last 5 seconds, written at every probe, which the machine ' +
+            'CustomMapData/MEC/desync_probe_p<player number>.txt (the last minute, written every 4 seconds) and ' +
+            'desync_probe_p<player number>_last.txt (the last 6 seconds, written at every probe, which the machine ' +
             'a desync drops still has). After a desync, every player sends both files: the first value that ' +
-            'differs at the same probe tick shows what diverged.',
-        cb: ({ nbParam, param1 }, escaper) => {
-            if (nbParam !== 1 || !IsBoolString(param1)) {
+            'differs at the same probe tick shows what diverged. ' +
+            '--verbose adds a line naming where each agent was made from, which finds the code behind a lot of ' +
+            'agents made on one machine only - it reads the stack at every agent made, so it is meant for a test ' +
+            'game, not for a real one.',
+        cb: ({ nbParam, param1, param2 }, escaper) => {
+            if (nbParam < 1 || nbParam > 2 || !IsBoolString(param1)) {
                 return USAGE
             }
 
-            setDesyncProbeEnabled(S2B(param1))
+            const isVerbose = nbParam === 2
+
+            if (isVerbose && param2 !== '--verbose') {
+                return USAGE
+            }
+
+            const isEnabled = S2B(param1)
+
+            setDesyncProbeEnabled(isEnabled, isVerbose)
             Text.mkP(
                 escaper.getPlayer(),
-                S2B(param1)
-                    ? 'Desync probe on: every machine writes its last minute to CustomMapData/MEC/desync_probe_p<player number>.txt and its last 5 seconds to desync_probe_p<player number>_last.txt'
+                isEnabled
+                    ? 'Desync probe on' +
+                          (isVerbose ? ' (verbose: where every agent is made from, heavy)' : '') +
+                          ': every machine writes its last minute to CustomMapData/MEC/desync_probe_p<player number>.txt and its last 6 seconds to desync_probe_p<player number>_last.txt'
                     : 'Desync probe off'
             )
 
