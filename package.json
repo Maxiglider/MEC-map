@@ -20,6 +20,7 @@
         "dev": "npm-watch",
         "build:defs": "ts-node scripts/dev",
         "build-tsconfig": "ts-node --transpile-only scripts/build-tsconfig.ts",
+        "compare-desync-probes": "ts-node --transpile-only scripts/compareDesyncProbes.ts",
         "prettier-staged-files": "ts-node --transpile-only scripts/prettier-staged-files.ts",
         "prepare": "yarn build-tsconfig && husky",
         "convert-slide-map:extract": "ts-node --transpile-only scripts/convert-slide-map/extract.ts",
