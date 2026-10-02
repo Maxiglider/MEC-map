@@ -1,4 +1,5 @@
 import { Text } from '../../01_libraries/Text'
+import { terrainHeightModifications } from '../../04_STRUCTURES/TerrainHeight/TerrainHeightModifications'
 import { MakeAction } from './MakeAction'
 
 export class MakeTerrainHeightAction extends MakeAction {
@@ -21,6 +22,7 @@ export class MakeTerrainHeightAction extends MakeAction {
 
     apply = () => {
         this.terrainDeform = TerrainDeformCrater(this.x, this.y, this.radius, -this.height, 0, true)
+        terrainHeightModifications.addCrater(this.x, this.y, this.radius, this.height, 1)
     }
 
     cancel = (): boolean => {
@@ -29,6 +31,7 @@ export class MakeTerrainHeightAction extends MakeAction {
         }
 
         this.terrainDeform && TerrainDeformStop(this.terrainDeform, 0)
+        terrainHeightModifications.addCrater(this.x, this.y, this.radius, this.height, -1)
         this.isActionMadeB = false
         this.owner && Text.mkP(this.owner.getPlayer(), 'terrain height cancelled')
 

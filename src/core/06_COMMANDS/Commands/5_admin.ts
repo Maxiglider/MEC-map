@@ -612,7 +612,7 @@ export const initExecuteCommandMax = () => {
         group,
         argDescription: '[<outputFilename> [withoutTerrain|wt]]',
         description:
-            'Saves the map in cache for usage with mec-smic-loader. If you specify "withoutTerrain" as second parameter, the data will be lighter but not usable with smic-loader, only with -lmfc command.',
+            'Saves the map in cache for usage with mec-smic-loader. If you specify "withoutTerrain" as second parameter, the data will be lighter but the terrain changes made in the game (terrain types, terrain heights) are not saved: mec-smic-loader keeps the terrain of the map as it is.',
         cb: ({ noParam, param1, param2, nbParam }, escaper) => {
             if (nbParam > 2) {
                 return USAGE

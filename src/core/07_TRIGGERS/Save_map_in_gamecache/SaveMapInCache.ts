@@ -10,7 +10,7 @@ import {
     getUdgVisibilityTypes,
     globals,
 } from '../../../../globals'
-import { jsonEncode, ShowAllDestructables } from '../../01_libraries/Basic_functions'
+import { jsonEncode } from '../../01_libraries/Basic_functions'
 import { Text } from '../../01_libraries/Text'
 import { doorTypes, keyForDoorTypes } from '../../04_STRUCTURES/KeyAndDoor/KeyAndDoorTypes'
 import { Gravity } from '../Slide_and_CheckTerrain_triggers/Gravity'
@@ -98,26 +98,15 @@ export class SaveMapInCache {
      * Writes the whole game as JSON, on the machine of that player alone (null for every machine). Called from a
      * command, so every machine goes through here on the same turn.
      *
-     * The terrain heights are read with GetLocationZ, which a bridge or any walkable destructable raises, so every
-     * destructable is hidden while they are read. Hiding one changes the game - its pathing, its collision - so it
-     * happens on every machine, around the export only one of them runs: hidden on that machine alone, it desynced
-     * every multiplayer game a -smic was typed in (2026-10-01: -msc, which writes a file by the same path, and
-     * -smic withoutTerrain, which skips this, never did). Shown again whatever the export does, an error included.
+     * Nothing of the game is changed for it: the terrain heights are no longer read with GetLocationZ, which a
+     * bridge raised, so the destructables no longer have to be hidden - which, on the exporting machine alone,
+     * desynced every multiplayer game a -smic was typed in (docs/CAUSES_OF_DESYNCS.md).
      *
      * The export also builds its JSON out of dozens of tables, taken from outside the MemoryHandler pool: taken from
      * the pool, on one machine only, they would offset every machine's pool (docs/CAUSES_OF_DESYNCS.md, cause 6).
      */
     public static smic = (p: player | null = null, withTerrain = true, fileName?: string) => {
-        withTerrain && ShowAllDestructables(false)
-
-        // pcall rather than try/finally, which tstl compiles into a pcall that swallows the error
-        const [ok, error] = pcall(() => SaveMapInCache.exportOnItsMachine(p, withTerrain, fileName))
-
-        withTerrain && ShowAllDestructables(true)
-
-        if (!ok) {
-            throw error
-        }
+        SaveMapInCache.exportOnItsMachine(p, withTerrain, fileName)
     }
 
     private static exportOnItsMachine = (p: player | null, withTerrain: boolean, fileName?: string) => {

@@ -393,15 +393,6 @@ export function GetRandomAngle() {
     return Math.floor(Math.random() * 360)
 }
 
-export function ShowAllDestructables(flag: boolean) {
-    if (!globals.ENTIRE_MAP_RECT) {
-        return
-    }
-    EnumDestructablesInRect(globals.ENTIRE_MAP_RECT, undefined, () => {
-        ShowDestructable(Natives.UGetEnumDestructable(), flag)
-    })
-}
-
 // For WC3 Rects
 export function Round32(num: number): number {
     return Math.round(num / 32) * 32

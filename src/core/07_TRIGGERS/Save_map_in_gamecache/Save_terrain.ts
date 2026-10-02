@@ -7,8 +7,7 @@ import type { TerrainType } from 'core/04_STRUCTURES/TerrainType/TerrainType'
 import { getUdgTerrainTypes, globals } from '../../../../globals'
 import { arrayPush } from '../../01_libraries/Basic_functions'
 import { I2CustomBase64String } from '../../01_libraries/Functions_on_numbers'
-import { SaveTerrainHeights } from './Save_terrain_heights_and_cliffs'
-import { SaveTerrainRamps } from './Save_terrain_ramps'
+import { terrainHeightModifications } from '../../04_STRUCTURES/TerrainHeight/TerrainHeightModifications'
 
 let terrainTypeIds: number[] = []
 let nbTerrainTypesUsed: number
@@ -130,17 +129,22 @@ const SaveBoundsInfo = (json: { [x: string]: any }) => {
 }
 
 /**
- * The terrain of the map into that JSON. Expects the destructables to be hidden by its caller, on every machine: the
- * heights are read with GetLocationZ, which a bridge or any walkable destructable raises - see SaveMapInCache.smic.
+ * The version of the terrain the loader is given, which it refuses if it does not know it. 2: no more heights,
+ * cliffs nor ramps, which the loader keeps from the base map, but the height modifications made in the game.
+ */
+const TERRAIN_FORMAT_VERSION = 2
+
+/**
+ * The terrain of the map into that JSON: what the game can change of it, the loader keeping the rest from the
+ * base map.
  */
 export const PushTerrainDataIntoJson = (json: { [x: string]: any }) => {
+    json.formatVersion = TERRAIN_FORMAT_VERSION
     json.mainTileset = getUdgTerrainTypes().getMainTileset()
     GererOrdreTerrains()
     SaveTerrain(json) //2 MB leak
     SaveTerrainsUsed(json)
     SaveMapDimensionsAndCenterOffset(json)
-    SaveTerrainHeights.SaveTerrainHeights(json)
-    SaveTerrainHeights.SaveTerrainCliffs(json)
-    SaveTerrainRamps.SaveTerrainRamps(json)
+    json.terrainHeightModifications = terrainHeightModifications.toJson()
     SaveBoundsInfo(json)
 }
