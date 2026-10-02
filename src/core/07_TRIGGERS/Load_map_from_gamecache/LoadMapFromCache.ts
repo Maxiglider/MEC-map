@@ -142,6 +142,11 @@ export class LoadMapFromCache {
                     if (gameData.gameData.heroModelPath) {
                         setHeroModelPath(gameData.gameData.heroModelPath)
                     }
+
+                    // a map saved before this was saved stays on auto
+                    if (gameData.gameData.mainTileset !== undefined) {
+                        getUdgTerrainTypes().setMainTileset(gameData.gameData.mainTileset)
+                    }
                 }
 
                 //terrain types MEC

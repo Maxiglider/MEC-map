@@ -858,7 +858,8 @@ export const initExecuteCommandMax = () => {
         alias: [],
         group,
         argDescription: '<tileset>',
-        description: 'Sets the main tileset',
+        description:
+            'Sets the main tileset mec-smic-loader writes in the map, which decides its lighting; auto: the one of the MEC base map (Ashenvale). Persistent between "smiced" games.',
         cb: ({ nbParam, param1 }, escaper) => {
             if (nbParam > 1) {
                 return true

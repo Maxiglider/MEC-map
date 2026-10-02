@@ -53,6 +53,7 @@ export class SaveMapInCache {
         jsonGameData.gameData.gravity = Gravity.GetRealGravity()
         jsonGameData.gameData.heroBaseCollisionSize = globals.heroBaseCollisionSize
         jsonGameData.gameData.heroModelPath = globals.heroModelPath
+        jsonGameData.gameData.mainTileset = getUdgTerrainTypes().getMainTileset()
 
         //terrain config
         jsonGameData.terrainTypesMec = getUdgTerrainTypes().toJson()
