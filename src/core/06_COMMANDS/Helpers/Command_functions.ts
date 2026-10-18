@@ -351,10 +351,15 @@ export const abilityCb = (escaper: Escaper, abilityId: string) => {
         return
     }
 
-    if (GetUnitAbilityLevel(hero, FourCC(abilityId)) > 0) {
-        UnitRemoveAbility(hero, FourCC(abilityId))
+    const abilityCode = FourCC(abilityId)
+
+    if (GetUnitAbilityLevel(hero, abilityCode) > 0) {
+        UnitRemoveAbility(hero, abilityCode)
+        escaper.removeAbilityEffects(abilityCode)
     } else {
-        UnitAddAbility(hero, FourCC(abilityId))
+        UnitAddAbility(hero, abilityCode)
+        // the unit is unseen while the hero slides async: its effect shows the ability instead
+        escaper.addAbilityEffects(abilityCode)
     }
 }
 

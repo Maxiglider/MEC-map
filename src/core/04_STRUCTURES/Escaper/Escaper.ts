@@ -278,6 +278,8 @@ export class Escaper extends EscaperMake {
      * at the right hand of the effect instead - where each machine sees that effect.
      */
     private meteorHandEffect?: effect
+    /** The models of the abilities given with -ability, held on the hero effect while it stands in for the unit */
+    private abilityEffects = new Map<number, effect[]>()
 
     private godMode: boolean
     private godModeKills: boolean
@@ -639,6 +641,77 @@ export class Escaper extends EscaperMake {
         }
     }
 
+    /**
+     * Gives the hero effect the visuals of an ability the unit was just given. The unit is unseen while
+     * the effect stands in, so the models the ability would show on it are drawn on the effect instead:
+     * the ones its object data names, read the same on every machine. Only what is seen - the ability
+     * itself still works on the unit. Called from a command, heard by every machine on the same turn,
+     * since it makes handles.
+     */
+    addAbilityEffects = (abilityId: number) => {
+        if (!this.hero || this.abilityEffects.has(abilityId)) {
+            return
+        }
+
+        const ability = BlzGetUnitAbility(this.hero, abilityId)
+
+        if (!ability) {
+            return
+        }
+
+        const effects: effect[] = []
+        const fields = [ABILITY_SLF_TARGET, ABILITY_SLF_SPECIAL, ABILITY_SLF_EFFECT, ABILITY_SLF_AREA_EFFECT]
+        const models = new Set<string>()
+
+        for (const field of fields) {
+            const value = BlzGetAbilityStringLevelField(ability, field, 0)
+
+            // several models may be listed in one field, separated by commas
+            for (const model of (value ?? '').split(',')) {
+                const trimmed = model.trim()
+                trimmed !== '' && models.add(trimmed)
+            }
+        }
+
+        models.forEach(model => {
+            const abilityEffect = EffectUtils.addSpecialEffect(model, 0, 0)
+
+            if (abilityEffect) {
+                effects.push(abilityEffect)
+                BlzSetSpecialEffectZ(abilityEffect, PARKED_HERO_EFFECT_Z)
+            }
+        })
+
+        this.abilityEffects.set(abilityId, effects)
+        this.updateAbilityEffects()
+    }
+
+    removeAbilityEffects = (abilityId: number) => {
+        this.abilityEffects.get(abilityId)?.forEach(abilityEffect => EffectUtils.destroyEffect(abilityEffect))
+        this.abilityEffects.delete(abilityId)
+    }
+
+    private removeAllAbilityEffects = () => {
+        this.abilityEffects.forEach((_, abilityId) => this.removeAbilityEffects(abilityId))
+    }
+
+    /** Holds the ability models on the hero effect, or under the map while the unit is what is seen */
+    private updateAbilityEffects = () => {
+        const scale = this.scale ?? globals.heroBaseScale ?? 1
+
+        this.abilityEffects.forEach(effects => {
+            for (const abilityEffect of effects) {
+                if (this.isHeroEffectActive) {
+                    BlzSetSpecialEffectScale(abilityEffect, scale)
+                    BlzSetSpecialEffectPosition(abilityEffect, this.heroPos.x, this.heroPos.y, this.getHeroZ())
+                    BlzSetSpecialEffectYaw(abilityEffect, Deg2Rad(this.heroPos.facing))
+                } else {
+                    BlzSetSpecialEffectPosition(abilityEffect, 0, 0, PARKED_HERO_EFFECT_Z)
+                }
+            }
+        })
+    }
+
     /** Holds the carried meteor at the right hand of the hero effect, where this machine sees that effect */
     private updateMeteorHandEffect = () => {
         if (!this.meteorHandEffect || !this.isHeroEffectActive) {
@@ -801,6 +874,9 @@ export class Escaper extends EscaperMake {
         this.leaveHeroEffectMode()
 
         this.resetItem()
+
+        // the unit takes its abilities with it
+        this.removeAllAbilityEffects()
 
         this.kill()
 
@@ -3096,6 +3172,7 @@ export class Escaper extends EscaperMake {
         }
 
         this.parkHeroEffect()
+        this.updateAbilityEffects()
 
         // seen again
         this.updateUnitVertexColor()
@@ -3151,6 +3228,7 @@ export class Escaper extends EscaperMake {
         // at the very moment the effect moves, or they would trail behind it
         this.updateFakeShadow()
         this.updateMeteorHandEffect()
+        this.updateAbilityEffects()
         this.updateLockedCamera()
     }
 
