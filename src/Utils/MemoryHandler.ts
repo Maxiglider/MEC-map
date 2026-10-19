@@ -6,7 +6,7 @@ export type IDestroyable = { __destroy: (recursive?: boolean) => void }
  * False turns the pool off altogether: every table handed out is a new one, and one given back is left to the garbage
  * collector as it is - what the game does without MemoryHandler, to compare (-simulateLuaLeaks).
  */
-const MEMORY_HANDLER_ENABLED: boolean = true
+const MEMORY_HANDLER_ENABLED: boolean = false
 
 const initMemoryHandler = () => {
     let numCreatedObjects = 0
