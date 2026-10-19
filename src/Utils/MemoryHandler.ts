@@ -2,6 +2,12 @@ import { arrayPush } from 'core/01_libraries/Basic_functions'
 
 export type IDestroyable = { __destroy: (recursive?: boolean) => void }
 
+/**
+ * False turns the pool off altogether: every table handed out is a new one, and one given back is left to the garbage
+ * collector as it is - what the game does without MemoryHandler, to compare (-simulateLuaLeaks).
+ */
+const MEMORY_HANDLER_ENABLED: boolean = true
+
 const initMemoryHandler = () => {
     let numCreatedObjects = 0
 
@@ -68,6 +74,11 @@ const initMemoryHandler = () => {
             throw 'Object is not memory handled'
         }
 
+        if (!MEMORY_HANDLER_ENABLED) {
+            numReturnedObjects++
+            return
+        }
+
         // Made outside the pool, whether or not we are still inside the local code that asked for it: it was never
         // counted, so giving it back would add a table on this machine alone.
         if (getmetatable(self) === localObjectMeta) {
@@ -81,11 +92,25 @@ const initMemoryHandler = () => {
         numReturnedObjects++
     }
 
+    /** The tables made while the pool is off: destroying one does nothing, the garbage collector taking it */
+    const unpooledObjectMeta: any = {
+        __index: (_self: any, key: string) => {
+            if (key === '__destroy') {
+                return destroyObject
+            }
+        },
+    }
+
     const destroyClassObject = (self: any, className: string, recursive = false) => {
         if (!self.__destroy) {
             print(info().GetStackTrace())
 
             throw 'Object is not memory handled'
+        }
+
+        if (!MEMORY_HANDLER_ENABLED) {
+            numReturnedObjects++
+            return
         }
 
         purgeObject(self, recursive)
@@ -224,6 +249,19 @@ const initMemoryHandler = () => {
         }
 
         numHandedOutObjects++
+
+        if (!MEMORY_HANDLER_ENABLED) {
+            const newObj = {} as T & IDestroyable
+
+            if (objectClass) {
+                setmetatable(newObj, objectClass.prototype)
+                objectClass.prototype.__destroy = destroyObject
+            } else {
+                setmetatable(newObj, unpooledObjectMeta)
+            }
+
+            return newObj
+        }
 
         let cachedObjectsToUse: any[] | undefined = cachedObjects
         if (objectClass) {
